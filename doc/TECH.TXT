@@ -1,0 +1,960 @@
+                 SYSTEM 3.5 Technical documentation
+
+目次
+
+  0. はじめに
+  1. SYSTEM 3.5 前史
+  2. SYSTEM 3.5 のデータファイル
+  3. データファイル (.ald) のフォーマット
+  4. CG のフォーマット
+   4.1 VSP フォーマット
+   4.2 PMS フォーマット
+   4.3 QNT フォーマット
+  5. シナリオデータのフォーマット
+   5.1 計算式について
+   5.2 for 文のエンコード
+   5.3 while 文のエンコード
+   5.4 ラベルコールと返り値( ~label と ~0, cali: と ~~cali:)
+   5.5 G コマンドのエンコード
+   5.6 代入演算子
+   5.7 0x2f コマンド拡張
+     5.7.1 Txx コマンド
+     5.7.2 inc/dec
+     5.7.3 小文字コマンドとその他 2F command
+   5.8 未解説コマンド
+  6. SYSTEM 3.6 extension
+  7. SYSTEM 3.8 extension
+  8. SYSTEM 3.9 extension
+   8.1 System39.ain フォーマット
+   8.2 ゲームメッセージの System39.ain への格納
+
+
+0. はじめに
+
+   このドキュメントは、SYSTEM 3.* 開発キットでは詳しく説明されていない情報
+ について、分かる範囲で書いたものです。
+
+
+1. SYSTEM 3.5 前史
+   
+   SYSTEM 1 〜 SYSTEM 3 の時代。ゲームとしてはランス１から学園KINGまでです。
+ どのゲームがどのシステムを使っていたかは何処かの HDD*.DOC に入っていたと
+ 思うのでそちらをごらんください。
+
+
+2. SYSTEM 3.5 のデータファイル
+
+ SYSTTEM 3.5 のデータファイルは以下のように大別できます。
+
+ a) シナリオファイル
+ b) CG ファイル
+ c) WAV ファイル
+ d) MIDI ファイル
+ e) データファイル
+ f) リソースファイル
+ g) セーブデータファイル
+ h) その他
+
+ a) シナリオファイルはゲームのシナリオデータが入っており、文章、ゲームの流れ
+ の制御などを行うスクリプトがエンコードされて入っています。ゲームはシナリオ
+ データの１番目から開始します。シナリオファイルはゲーム実行には必須ですが、
+ 他の CG ファイルや WAV ファイルなどのデータは無くても動作可能です。
+ 
+ b) CG ファイルはグラフィクスデータが入っています。SYSTEM 3.5 で使用可能な
+ フォーマットは VSP/PMS8/PMS16/BMP8/BMP24/JPEG です。BMP8/24 と JPEGデータ
+ は SYSTEM 3.5 開発キットを外部に公開したときに追加されたものです。また VSP
+ は１６色時代のゲームに使われていたもので、闘神都市IIなどの旧いゲームを移植
+ する際に使用されます。よって SYSTEM 3.5 で通常使われる CG フォーマットは
+ PMS8/16 と言うことになります。PMS8 はパレットを使う２５６色用のフォーマット
+ で、PMS16 はデータがピクセル値を示すダイレクトカラーのフォーマットで、１
+ ピクセルで 16 bit のデータを持っています。また PMS16 はαチャンネル(透過度)
+ も扱う事ができます。SYSTEM 3.9 から 24bitカラーを扱える QNT フォーマットが
+ 追加されました。詳しくは 4.3 項を参照してください。
+
+ c) WAV データは WAV 形式のファイルで効果音やセリフなどに使われています。
+
+ d) MIDI ファイルは standard midi file データで、ゲーム中の音楽演奏に使われ
+ ます。多くのゲームでは音楽は CD-DA のみを使っていますが、MIDI のみ、あるいは
+ MIDI と CD-DA の両対応それぞれのゲームがあります。
+   SYSTEM 3.5 (Windows版)が扱うことの出来る MIDI ファイルは format 0 のみなので
+ 注意が必要です。ただ、exclusive message は透過的に扱うらしいので、それ経由で
+ GS-resetを送ってGSのデータを鳴らす事は出来るようです。
+
+ e) データファイルは、数値変数や文字列変数をファイルに書き出したものです。
+ 必要に応じてシナリオ内の変数に読み込みます。
+
+ f) リソースファイルは、マウスカーソルの形状とアニメーションマウスカーソルの
+ データを格納しています。これまで DARCROW でのみ使用されました。
+
+ g) セーブデータは、システム管理情報と数値変数、文字列変数のすべてを含んだ
+ 全セーブデータ(*.asd)と数値変数・文字列変数の一部を保存したデータの２種類が
+ あります。一部保存の場合は、任意のファイル名を付ける事ができるので、h) の
+ その他のデータファイルと区別を付けることができません。
+
+ h) その他のデータの範疇に入るものとしては外字ファイルとデータファイルがあり
+ ます。
+    外字ファイルは、PC9801の外字領域に16x16ドットのビットマップデータを並べた
+ もので、オリジナルの外字を表示させるのに加えて、９８機種依存文字の吸収も目指
+ していたのですが、結局外字ファイルは「いけないかつみ先生」で使われたのみで、
+ SYSTEM35.EXE Version 2.x 以降ではサポートすらされなくなりました。また、機種
+ 依存文字(まる文字やギリシャ数字など)はそれ以降のゲームでも機種存のコードで
+ 継続して使われています。SYSTEM 3.9 では再び外字のサポートが復活するようです。
+
+   データファイルは、基本的には、シナリオ変数を外部に保存したものと考える事
+ ができます。マップデータのようにあらかじめゲームに附属しているものもあれば、
+ ゲームの途中経過を記録するために、ファイルに書き出す事もあります。
+ かえるにょぱにょーんのマップデータ等のように e)のデータファイルで代用できる
+ ものもあります。
+
+3. データファイル (.ald) のフォーマット
+
+  SYSTEM 3.5 のデータは ald という拡張子のついたアーカイブファイルにデータ
+ の種類毎にまとめられています。１つの ald アーカイブは最大で65535個のデータを
+ 持つ事が出来ますが、それ以上のデータを扱いたい場合や、HDD と CD-ROM で別々に
+ データを置いて HDD の占有量を減らしたい場合に複数のアーカイブを持つ事が出来
+ ます。その場合、hoge_sa.ald, hoge_sb.aldのようにファイル名をつけます。
+ sa,sb,sc...の用に必ずしも連続にする必要はありません。Windows ではレジストリ
+ に実際のファイル名が書かれます。
+
+   ald のアーカイブ形式は大きく分けて、３つの構造からなっています。
+
+ +---------+
+ | header1 |
+ +---------+
+ | header2 |
+ +---------+
+ |  data   |
+ |         |
+ +---------+
+ 
+   header1 はアーカイブ中にある各データの位置を示しています。単位は256bytesで、
+ ３バイトで表されます。最初の３バイトは header2 へのポインタで、次の３バイトは
+ data の最初のデータへのポインタです。それ以降は data の２番目のデータ、３番目
+ のデータ....となっています。header1/header2/data 内の個々のデータは 256bytes
+ で丸められているので、header1 が 256bytes 単位になっているのです。
+
+   header2 はシナリオデータから指示されるデータがどのファイルの何番目にあるか
+ を示しています。シナリオやCG等のデータは通し番号が振られていて、シナリオから
+ はその番号を指定してデータを読み込みます。その通し番号に対応するファイルと
+ その位置が header2 に書かれています。header2 は ３バイトで１つの番号に対応
+ しており、最初の１バイトで、何番目のアーカイブか(1〜)を示し、次の２バイトで、
+ アーカイブの中の何番目のファイルかを示します。
+
+   data そのものについても、ヘッダと実データに分ける事が出来ます。ヘッダは
+ 32バイト以上の長さで次のようになっています。
+
+	int32 prt;
+	int32 size;
+	int32 time_l;
+	int32 time_h;
+	char  name[?];
+
+   ptr は実際のデータへのヘッダからの相対アドレスです。size はデータの大きさを
+ 表します。 time_l と time_h は Windows 特有(?)の値で、データの作成時間をユリ
+ ウス歴の最初の日付からの経過時間をナノ秒で表したものです。name はアーカイブ
+ する前のデータのファイル名で、16バイト以上の長さがあります。16バイト未満の時
+ は０でパディングされます。またヘッダとデータを併せて 256バイト単位になるよう
+ にデータの後ろは０でパディングされます。
+
+
+4. CG のフォーマット
+
+   現在の SYSTEM 3.5 で使用されている CG フォーマットは VSP/PMS8/PMS16 
+ の３種類です。過去には GL2 や GL3 などのフォーマットもありましたが、すでに
+ 使われていません。
+
+   VSP フォーマットは１６色専用のフォーマットで、SYSTEM 3.5 においては、闘神
+ 都市２やランス４など、過去にPC98用に出たゲームの移植に際して使われています。
+
+   PMS8フォーマットは 256色専用のフォーマットで、SYSTEM 3 の256色対応ゲーム
+ から使われています。ヘッダ情報が SYSTEM 3 と SYSTEM 3.5 とでは一部異なって
+ います。
+
+   PMS16フォーマットは６万色専用のフォーマットです。符号化の方法は PMS8＋α
+ といったところで、PMS8 と多くの共通部分を持っています。また PMS16 は
+ αチャンネルを扱う事ができます。αチャンネルは 8bitの情報量を持ち、PMS8 の
+ 符号化方法を使います。
+
+ それでは個々のフォーマットについて詳しくみて行きます。
+
+ 4.1 VSP フォーマット
+
+   VSP はもともと、PC98x1用のフォーマットとして登場したため、４プレーン１６色
+ のハードウェアと密接に関係しています。PC98x1 の１６色モードは 赤(R)・青(B)・
+ 緑(G)・輝度(I)の４つのプレーンの重ね合わせと４０９６色中１６色のパレットに
+ よって実現されていました。パレットを使うので、実際には赤・青等のプレーンの
+ 呼び方はあまり意味が無いかも知れません。
+   例を示すと、ある座標(x,y)のピクセルが、４つのプレーンで R=1,B=1,G=1,I=1
+ のように立っていると、このピクセルは15番(00001111b)のパレットを参照して色を
+ 出します。パレットは RGB 各 4bit の情報を持ち、最大で 4096色を表現できます。
+   VSPフォーマットはプレーンごとに圧縮されます。しかし SYSTEM 3.5 が動作する
+ のは 256色以上の環境なので、256色の場合はプレーン型のデータからパックド
+ ピクセル方式に変換する必要があります。また、プレーン型のデータを 1byte読み
+ 込むと、１プレーンの 8ピクセル分に相当しますので注意が必要です。
+
+   VSP ヘッダ
+   VSP のヘッダは次の 58バイトから構成されます。
+
+	int16 x0;
+	int16 y0;
+	int16 width;
+	int16 height;
+	int8  rsv;
+	int8  pallet_bank;
+	int8  pal[3*16];
+
+ (x0,y0) は、CGを表示する位置を表します。シナリオから表示位置の指定のない場合
+ この値を使います。x0 は 8で割った大きさになっていいますので、x0=10 とあった
+ 場合は実際には (80,y0) の位置に表示します。
+
+ (width, height) は CG の大きさを表します。widthは実際には８で割った大きさに
+ なっています。これは、プレーン型のデータが元になっているためです。プレーン型
+ のデータの場合、１バイトで表されるのは８ピクセル分だったため、width にいれる
+ 値は占めるバイト数を格納した方が有利だったんめと考えられます。よってCGの横の
+ サイズは常に８の倍数になります。８の倍数以外にしたい場合は、余る部分を透過
+ パレット(スプライト)とする事で実現出来ます。
+
+ rsv は現在のところ、使われていません。
+
+ pallet_bank は、SYSTEM 3 の時代に 256色対応ゲームで、VSPファイルを読み込ませ
+ るために、256個のパレットのどの場所に 16色分のパレットを置くかを決めます。
+ bank=0 で 0-15, bank=1 で 16-31 となります。実装方法としては、plane->packed
+ の変換の際に上位4bitにpalletを置いた場所の bitを立てます。bank=1 なら '| 0x10'
+ という具合です。シナリオ側からパレットバンクを指定することもできます。しかし、
+ シナリオ側から１度もパレットバンクの指定が無い場合はこのヘッダ内の情報が使用
+ されます。(これは実装依存かもしれません)
+
+   パレット
+   パレットは 3バイト*16 個のデータで、B,R,G の順に１６個格納されています。
+ 下位4bitのみが使用されます。
+
+
+   VSP 圧縮コード
+   VSP の圧縮コードは次のようになっています。圧縮方向は左から右へ、上から下へ
+ です。
+
+ 00, len;
+ 一つ上のプレーンと(len+1)の長さだけ同じ
+
+ 01, len, pic;
+ １バイト(pic)の繰り返し。長さは(len+1)
+
+ 02, len, pic1, pic2;
+ ２バイト(pic1, pic2)の繰り返し、長さは (2*(len+1))
+
+ 03, len;
+ 青のプレーンと(len+1)の長さだけ同じ。
+
+ 04, len;
+ 赤のプレーンと(len+1)の長さだけ同じ。
+
+ 05, len;
+ 緑のプレーンと(len+1)の長さだけ同じ。
+
+ 06;
+ 上の 03, 04, 05 のパターンについて、この後に続く 03,04,05 のパターンは
+ 反転したものと同じとする。
+
+ 07, pic
+ picそのもの。コードと重なるデータ (00-07) に対して適用。
+
+ 08-255
+ そのデータそのもの。
+
+
+ 4.2 PMS フォーマット
+
+   PMS は最初 256色データを扱うために登場しましたが、後に 64k色も扱えるように
+ SYSTEM 3.5 に移行した際に拡張されました。256色の場合はパックドピクセル型の
+ データを扱い、64k色の場合はダイレクトカラー型のデータを扱います。
+
+   PMS ヘッダ
+   PMS のヘッダは次のようになっています。
+
+	char  sig[2]; 'PM'
+	int16 ver
+	int16 hdr_size;
+	int8  bpp;
+	int8  bppS;
+	int8  trans_pal;
+	int16 palett_bank;
+	int32 rsv;
+	int32 x0;
+	int32 y0;
+	int32 width;
+	int32 height;
+	int32 data_ptr;
+	int32 pallet_ptr;
+	int32 comment_ptr;
+
+ sig はデータのマジックナンバーで 'PM' というデータが入っています。
+
+ ver はデータのバージョンで、現在は 1 が入っています。
+
+ bpp はデータの bit per pixel で 8または16です。256色データの場合は 8、64k色
+ の場合は 16です。
+
+ bppsはαチャンネルの bit per pixel で通常は8です。
+
+ trans_pal は透過するパレットの番号です。通常はシナリオから指定が来るので
+ 使用しません。
+
+ pallet_bank は データの中のパレットのどの部分をシステムに転送するかを
+ 表します。通常は 256個全部転送するのですが、CGデータがそれ以下しか色を使って
+ ない場合には、一部のみ転送することができます。pallet_bank は 16bit の情報を
+ 持ち 256個を 16個づつに分割してどの部分を転送するかを指定します。bit-on で
+ 転送です。LSB が0-15, MSB が 240-255 です。
+
+ (x0, y0) は CG の表示位置です。VSP と違って８で割った大きさではなく実際の
+ 大きさが入ります。表示位置はシナリオ側からも変更可能です。
+
+ (width, height) は CG の大きさです。こちらも実際の大きさが入っています。
+
+ data_ptr はデータ先頭からピクセルデータへの相対アドレスが入ります。
+
+ pallet_ptr は bppが８の場合にはパレットへの相対アドレスが入りますが、
+ １６の場合にはαチャンネルデータへの相対アドレスが入ります。
+
+ comment_prt はデータにコメントをつける事ができて、そのデータへの相対アドレス
+ を指定します。
+
+   パレット
+   パレットは RGB 各 8bit で RGB の順に 256 個入ります。
+
+   PMS 圧縮コード
+   PMS の圧縮コードは次のようになっています。圧縮方向は左から右へ、上から下へ
+ です。
+
+ 0xff, len;
+ １つ上のラインと同じ。長さは (len+3:8bit, len+2:16bit)
+ 16bitの場合は、長さはピクセル単位(2byte)で、以下同様です。
+
+ 0xfe, len;
+ ２つ上のラインと同じ。長さは (len+3:8bit, len+2:16bit)
+
+ 0xfd, len, pic,
+ 1byte の picデータの連続。長さは (len+4:8bit, len+3:16bit)
+
+ 0xfc, len, pic1, pic2
+ 2byte (pic1, pic2) データの連続。長さは ((len+3)*2:8bit, ((len+2)*2):16bit))
+
+ 0xfb
+ 左上のデータと同じ。(PMS16専用)
+
+ 0xfa
+ 右上のデータと同じ。(PMS16専用)
+
+ 0xf9, len, pic_h, pic_l1, pic_l2, .... (PMS16専用)
+ ピクセル間の色の差が小さいものの連続。長さは(len+1)
+ 各ピクセルのうち、R の上位 3bit, G の 2bit, B の 2bit が同じで、R の下位 
+ 2bit, G の 4bit, B の 2bit が異なるとき、下位の異なる部分のみを pic_l2, 
+ pic_l3... で表す。( RGB は 5bit, 6bit, 5bit で表される)
+ pic_h, pic_l1 で最初のピクセルを構成し、ここから、RGB の上位が同じで、下位の
+ 異なる部分を pic_l2, pic_l3... で構成する
+ 
+ 0xf8, pic
+ picそのもの。コードと同じピクセル用。8bit では pic は 1byte, 16bit では 2byte.
+
+ 0xf7-0x00
+ データそのもの 8bitでは 1byte, 16bit では 00-f7 の次のコードはすべて(00-ff)
+ 使用してピクセルを構成。
+
+
+ 4.3 QNT フォーマット
+
+   QNT は Only You 〜リ・クルス〜 から導入されたCGフォーマットです。24bit
+ カラーを扱うことができます。LZ77 圧縮 + ピクセルの並び変え・差分 という
+ 形をしています。LZ77 圧縮(Zlib)については RFC1950,1951 で定義されています
+ ので、ここでは説明しません。
+
+ QNT ヘッダ
+
+ 現在のところ、リクルスで使われた Version 0、大悪司の Version 1 があります。
+
+ QNT ヘッダ Version 0
+
+     char   sig[4]; 'QNT\0'
+     int32  0;
+     int32  x0;
+     int32  y0;
+     int32  width;
+     int32  height;
+     int32  bpp;
+     int32  rsv(?)
+     int32  pixel_size;
+     int32  alpha_size;
+
+ QNT ヘッダ Version 1
+
+     char   sig[4]; 'QNT\0'
+     int32  1;
+     int32  header_size;
+     int32  x0;
+     int32  y0;
+     int32  width;
+     int32  height;
+     int32  bpp;
+     int32  rsv; (?)
+     int32  pixel_size;
+     int32  alpha_size;
+
+ QNT ヘッダ Version 2
+
+     char   sig[4]; 'QNT\0'
+     int32  2;
+     int32  header_size;
+     int32  x0;
+     int32  y0;
+     int32  width;
+     int32  height;
+     int32  bpp;
+     int32  rsv; (?)
+     int32  pixel_size;
+     int32  alpha_size;
+     FILETIME lastmake; ?
+     FILETIME lastchange; ?
+     FILETIME lastaccess; ?
+
+  sig はデータのマジックナンバーで 'QNT\0' が入っています。(\0 はヌル文字)
+
+  header_size はヘッダの大きさをバイト数で表しています。Version 0 では 48
+  バイト固定です。
+
+  (x0, y0) は CG の表示位置の指定です
+
+  (width, height) は CG の大きさの指定です。
+
+  bpp はデータの色の大きさで通常 24(bpp) です。
+
+  rsv は不明で現在は 1 です。
+
+  pixel_size は LZ77 圧縮後のピクセルデータサイズです。
+
+  alpha_size は LZ77 圧縮後のアルファピクセルデータサイズです。
+
+    pixel_size と alpha_size は 0 の場合はそのデータは存在しません。
+
+
+  pixel データの圧縮
+
+    pixel データはピクセルの並べ換えを行った後、LZ77 圧縮で圧縮されています。
+  まず zlib の uncompress 等で展開します。展開したデータは次のようにピクセル
+  が並んでいますので並び換えます。
+  B(x,y), B(x,y+1), B(x+1,y), B(x+1,y+1), G(x,y), G(x,y+1), G(x+1,y),
+  G(x+1,y+1), R(x,y), R(x,y+1), R(x+1,y), R(x+1,y+1)
+
+  次に、左(x-1,y)と上(x,y-1)の平均から 現在のピクセル(x,y)を引いたものが正しい
+  ピクセルデータになります。
+  
+  PIC(x,y) = (PIC(x-1,y) + PIC(x,y-1)) / 2 - pic(x,y)
+
+  alpha データの圧縮
+
+    alpha データも並び換えと LZ77 圧縮です。uncompress で展開したあと、次の
+  ように並び換えます。
+
+  ALPHA(x,y) = (ALPHA(x-1,y) + ALPHA(x,y-1)) / 2 - alpha(x,y)
+
+
+5. シナリオデータのフォーマット
+
+  以下にシナリオデータのヘッダ情報を示します。
+
+	char   sig[4];
+	int32  data_ptr;
+	int32  size;
+	int32  no;
+	int16  fn_len;
+
+	char   fn[?];
+
+ sig はシナリオデータのバージョンで、SYSTEM 3.5 初期の鬼畜王ランスで'S350'、
+ 最新のものでは 'S380' となっています。途中混乱した時期があってこれと異なる
+ 場合もあります。
+
+ dat_prt は実際のシナリオデータの先頭への相対アドレスです。また、シナリオ中の
+ ジャンプ命令のアドレスは、上のヘッダの最初からの相対アドレスを使用します。
+
+ size はヘッダを含めたデータのサイズを示しています。
+
+ no はこのデータの番号で、０番が最初のデータです。
+
+ fn[] はこのシナリオデータのコンパイル前のファイル名で、その長さは fn_len に
+ 格納されます。コンパイル前のシナリオデータでのページジャンプは &#TEST.ADV 
+ のように書きます。このファイル名が fn に格納され、no に番号付けされます。
+
+ シナリオデータで扱われるデータは次のようなものです。
+ * コマンド (1-3byte)
+ * １バイトデータ。コマンド引数の１つ。getc。
+ * ２バイトデータ。データテーブル内数値データ。WORD。getw。
+ * ４バイトデータ。ジャンプ等のアドレス。DWORD。getdw。
+ * 計算式(0x7fで終了)。コマンド引数。cali。
+ * 文字列(':'で終了)。コマンド引数。
+ * 文字列(0x00で終了) テーブルデータ内文字列データ。コマンド引数。
+
+
+ 5.1 計算式について
+   計算式はコマンドに与える数値や変数などの引数を作成するのに使われます。
+ 数値や変数の値に加減乗除などの演算を加えることもできます。
+
+ 1byteめ 2byteめ
+    00h       [２バイトコード]
+         00h  予約
+         01h〜33h  (3.51)拡張コード
+         34h〜FFh  word定数(0034h〜00FFh)
+    01h〜3Fh  [２バイトコード]
+         00h〜FFh  word定数(0100h〜3FFFh)
+    40h〜73h  byte定数(00h〜33h)
+    74h〜7Eh  基本演算子(&|^*/+-=<>\)
+              7Eh : 等しくない(!=)
+              7Dh : より大きい(>)
+              7Ch : より小さい(<)
+              7Bh : 等しい(==)
+              7Ah : 減算(-)
+              79h : 加算(+)
+              78h : 除算(/)
+              77h : 乗算(*)
+              76h : 排他論理和(XOR)
+              75h : 論理和(OR, |)
+              74h : 論理積(AND, &)
+    7Fh       終了コード
+    80h〜BFh  byte変数番号(00h〜3Fh)
+    C0h       [２バイトコード]
+         00h       予約
+         01h〜3Fh  (3.51)拡張コード
+         40h〜FFh  word変数番号(0040h〜00FFh)
+    C1h〜FFh  [２バイトコード]
+         00h〜FFh  word変数番号(0100h〜3FFFh)
+
+    (3.51)拡張コード
+    C0h
+        01h wordベース変数番号 + caliインデックス
+	02h 演算子(% 剰余)
+	03h 演算子(<= 以下)
+	04h 演算子(>= 以上)
+
+   数値は0から65535までの正の整数を扱えます。しかし、計算式上では word 定数は
+ 3FFFh しかあつかえませんので、それ以上の値を扱う場合は演算子を使います。
+ 65536 以上の数値を扱ったり、浮動小数を扱う場合は、64ビット変数を使用します。
+
+ 配列を除く変数の最大は論理的には、16384 個ですが、実際には 2000 以下に実装上
+ の限界があります。1000 以上になる場合は、配列変数を有効に使うと良いでしょう。
+ (xsystem35 の場合は 1024, 1.5.1pre1から 8192)
+
+ 変数には、数値変数と配列変数があります。配列変数は、index 変数を用いた
+ アクセス方法と、var[]のようなアクセス方法があります。var[]では上の 3.51拡張
+ コードを使用して C0, 01, base_h, base_l, cali: というコーディングがなされま
+ す。配列のベースとなる変数が (base_h << 8) + base_l で表され、インデックスは
+ cali で指定されます。インデックスは配列変数も使用可能です。ex. var10[var20[5]]
+
+ 計算式は逆ポーランド記述で格納されますので、基本的な処理はスタックから２つの
+ 数値または変数と１つの演算子を取り出して演算し、結果をスタックに戻します。
+ この操作を 0x7f が出現するまで繰り返します。0x7f が来たら、スタックに残って
+ いる数値を取り出します。コマンドの引数として変数を要求している場合の計算式
+ は、変数へのポインタを返します。
+
+ 比較演算子は結果が真であれば 1 を、偽であれば、0 を返します。また演算の結果
+ オーバーフロー・アンダーフローした場合は次のような値が返ります。
+ * 加算・乗算で63355を越えた時 → 65535
+ * 減算でマイナスになった時。  → 0
+ * ０で除算したとき、          → 0
+
+
+ 5.2 for 文のエンコード
+
+  for文はつぎのようにエンコードされます。
+
+  !var:?!,3c,00,3c,01,end address(DWORD),var(cali),last(cali),direction(cali),
+  step(cali), (operation)... ,3e,loop address(DWORD)
+
+  !var:?! : 使用する変数を初期化します
+  3c,00   : 繰り返しのマークです。
+  3c,01   : 繰り返しのマークです。loop address(DWORD)はこのアドレスをさします。
+  end address : 繰り返しブロックをぬけた後のアドレスです。 
+                loop address(DOWRD)の次のアドレスをさします。
+  var     : このループで使用するカウンタ変数です。
+  last    : カウンタ変数の値がこの値になるまで繰り返します。
+  direction : カウンタ変数の増加方向(0:-, 1:+)
+  step    : カウンタ変数の１回の増減分
+  ここから 3e までのブロックを繰り返します。
+  loop address : 繰り返しをするときの戻りアドレスです。
+
+
+ 5.3 while 文のエンコード
+
+ while 文はコンパイルされると、条件分岐とループとジャンプの組合せと同等に
+ なります。
+
+ コンパイル前
+   <@ cali: operation>
+ コンパイル後      
+   {cali:
+	  operation:
+	  @loop:
+   }
+ 
+
+ 5.4 ラベルコールと返り値( ~label と ~0, cali: と ~~cali:)
+
+  ~label で任意のシナリオファイルの指定のラベルに far call します。そのために
+ label はシナリオ中で一意である必要があります。
+
+ ~0, cali: で、far call から戻る際に値 (cali) を１つ返す事ができます。その値を
+ ~~cali: で変数 (cali) に受け取る事ができます。これらのコードは次のようになって
+ います。
+
+ ~label  : ~, page(int16), address(int32) 
+ ~0, cali: ~, 0, 0, cali
+ ~~cali  : ~, 0xff, 0xff, cali
+
+
+ 5.5 G コマンドのエンコード
+
+   G コマンドはシナリオ上では CGロードが G cali: スプライトロードが
+ G cali, cali: になっています。これらは次のようにエンコードされます。
+ 
+ G cali:       G, 0, cali
+ G cali, cali: G, 1, cali, cali
+
+
+ 5.6 代入演算子
+
+   !var+:10! などです。 !var:var+10! よりも短いコードを生成します。
+
+  !var+=cali! : 0x10, var, cali
+  !var-=cali! : 0x11, var, cali
+  !var*=cali! : 0x12, var, cali
+  !var/=cali! : 0x13, var, cali
+  !var%=cali! : 0x14, var, cali
+  !var&=cali! : 0x15, var, cali
+  !var|=cali! : 0x16, var, cali
+  !var^=cali! : 0x17, var, cali
+
+
+ 5.7 0x2f コマンド拡張
+
+   エンコードした結果、0x2f で始まるコマンドです。system 3.6 以降のコマンド
+ 拡張はこの方法を主に使用しています。
+ 
+ 5.7.1 Txx コマンド
+
+   TAA cali: 0x2f, 0x08, cali:
+   TAB var:  0x2f, 0x09, cali:
+   TOC:      0x2f, 0x00:
+   TOP:      0x2f, 0x04:
+   TOS:      0x2f, 0x01:
+   TPC cali: 0x2f, 0x02, cali:
+   TPP:      0x2f, 0x05:
+   TPS cali: 0x2f, 0x03, cali:
+
+
+ 5.7.2 inc/dec
+
+    inc var: 0x2f,0x06,cali
+    dec var: 0x2f,0x07,cali
+
+ 5.7.3 小文字コマンドとその他 2F command
+
+    wav** など小文字系のコマンドはすべて 0x2f, 0x??, にエンコードされます。
+ また引数として文字列を含むもの(ファイル名など)は、従来は ':' で終っていました
+ が、system 3.8 以降では '\0' で終わるようになり、これらコマンドは新規に 0x2f
+ コマンドとして新規に割り当てられました。
+
+  0x2f, 0x0a, cali *2: [wavLoad]
+  0x2f, 0x0b, cali *2: [wavPlay]
+  0x2f, 0x0c, cali:    [wavStop]
+  0x2f, 0x0d, cali:    [wavUnload]
+  0x2f, 0x0e, cali *2: [wavIsPlay]
+  0x2f, 0x0f, cali *4: [wavFade]
+  0x2f, 0x10, cali *2: [wavIsFade]
+  0x2f, 0x11, cali:    [wavStopFade]
+  0x2f, 0x12, str(\0): [trace]
+  0x2f, 0x13, cali *4: [wav3DSetPos]
+  0x2f, 0x14:          [wav3DCommit]
+  0x2f, 0x15, cali *4: [wav3DGetPos]
+  0x2f, 0x16, cali *3: [wav3DSetPosL]
+  0x2f, 0x17, cali *3: [wav3DGetPosL]
+  0x2f, 0x18, cali *5: [wav3DFadePos]
+  0x2f, 0x19, cali *2: [wav3DIsFadePos]
+  0x2f, 0x1a, cali:    [wav3DStopFadePos]
+  0x2f, 0x1b, cali *4: [wav3DFadePosL]
+  0x2f, 0x1c, cali:    [wav3DIsFadePosL]
+  0x2f, 0x1d:          [wav3DStopFadePosL]
+  0x2f, 0x1e, cali *2: [sndPlay]
+  0x2f, 0x1f:          [sndStop]
+  0x2f, 0x20, cali:    [sndIsPlay]
+  0x2f, 0x21, str(\0): [半角OKの文字列表示 'TEST', msg 'hoge':]
+  0x2f, 0x22, getc, cali: [HH]
+  0x2f, 0x23, cali, cali, str(\0): [new LC]
+  0x2f, 0x24, getc, str(\0), cali, cali: [new LE]
+  0x2f, 0x25, cali, str(\0), str(\0): [LXG]
+  0x2f, 0x26, cali, cali, str(\0): [new MI]
+  0x2f, 0x27, cali, str(\0): [new MS]
+  0x2f, 0x28, str(\0): [new MT]
+  0x2f, 0x29, str(\0): [new NT]
+  0x2f, 0x2a, getc, str(\0), cali, cali: [new QE]
+  0x2f, 0x2b, getc, str(\0), str(\0): [new UP]
+  0x2f, 0x2c, getc, cali, cali: [new F1-F11]
+  0x2f, 0x2d, cali *2: [wavWaitTime]
+  0x2f, 0x2e, cali *2: [wavGetPlayPos]
+  0x2f, 0x2f, cali:    [wavWaitEnd]
+  0x2f, 0x30, cali *2: [wavGetWavTime]
+  0x2f, 0x31, page, offset: [menuSetCbkSelect]
+  0x2f, 0x32, page, offset: [menuSetCbkCancel]
+  0x2f, 0x33:          [menuClearCbkSelect]
+  0x2f, 0x34:          [menuClearCbkCancel]
+  0x2f, 0x35, cali *2: [wav3DSetMode]
+  0x2f, 0x36, cali *9: [grCopyStretch]
+  0x2f, 0x37, cali *5: [grFilterRect]
+  0x2f, 0x38:          [iptClearWheelCount]
+  0x2f, 0x39, cali *2: [iptGetWheelCount]
+  0x2f, 0x3a, cali:    [menuGetFontSize]
+  0x2f, 0x3b, cali:    [msgGetFontSize]
+  0x2f, 0x3c, cali *3: [strGetCharType]
+  0x2f, 0x3d, cali *2: [strGetLengthASCII]
+  0x2f, 0x3e:          [sysWinMsgLock]
+  0x2f, 0x3f:          [sysWinMsgUnlock]
+  0x2f, 0x40, cali *4: [aryCmpCount] 
+  0x2f, 0x41, cali *6: [aryCmpTrans]
+  0x2f, 0x42, cali *9: [grBlendColorRect]
+  0x2f, 0x43, cali *4: [grDrawFillCircle]
+  0x2f, 0x44, cali *3: [MHH]
+  0x2f, 0x45, page, offset: [menuSetCbkInit]
+  0x2f, 0x46:          [menuClearCbkInit]
+  0x2f, 0x47, getc:    [new ']'] (**1)
+  0x2f, 0x48, str(\0): [sysOpenShell]
+  0x2f, 0x49, str(\0), str(\0): [sysAddWebMenu]
+  0x2f, 0x4a, cali:    [iptSetMoveCursorTime]
+  0x2f, 0x4b, cali:    [iptGetMoveCursorTime]
+  0x2f, 0x4c, cali *6: [grBlt]
+  0x2f, 0x4d, cali, str(\0): [LXWT]
+  0x2f, 0x4e, cali *2: [LXWS]
+  0x2f, 0x4f, cali *2: [LXWE]
+  0x2f, 0x50, cali, getc, cali: [LXWH]
+  0x2f, 0x51, cali, getc, cali: [LXWHH]
+  0x2f, 0x52, cali:    [sysGetOSName]
+  0x2f, 0x53, cali:    [patchEC]
+  0x2f, 0x54, cali *4: [mathSetClipWindow]
+  0x2f, 0x55, cali *6: [mathClip]
+  0x2f, 0x56, cali, str(\0), str(\0): [LXF]
+  0x2f, 0x57, str(\0), cali *3: [strInputDlg]
+  0x2f, 0x58, cali *2: [strCheckASCII]
+  0x2f, 0x59, cali *2: [strCheckSJIS]  
+  0x2f, 0x5a, str(\0): [strMessageBox]
+  0x2f, 0x5b, cali:    [strMessageBoxStr]
+  0x2f, 0x5c, cali *7: [grCopyUseAMapUseA]
+  0x2f, 0x5d, cali *2: [grSetCEParam]
+  0x2f, 0x5e, cali *4: [grEffectMoveView]
+  0x2f, 0x5f, cali:    [cgSetCacheSize]
+  0x2f, 0x60, cali, cali, (任意): [DLL call] (**2)
+  0x2f, 0x61, cali *2: [gaijiSet]
+  0x2f, 0x62:          [gaijiClearAll]
+  0x2f, 0x63, cali:    [menuGetLatestSelect]
+  0x2f, 0x64, cali *3: [lnkIsLink]
+  0x2f, 0x65, cali *3: [lnkIsData]
+  0x2f, 0x66, cali *2: [fncSetTable]
+  0x2f, 0x67, cali *3: [fncSetTableFromStr]
+  0x2f, 0x68, cali:    [fncClearTable]
+  0x2f, 0x69, cali:    [fncCall]
+  0x2f, 0x6a, cali:    [fncSetReturnCode]
+  0x2f, 0x6b, cali:    [fncGetReturnCode]
+  0x2f, 0x6c, cali:    [msgSetOutputFlag]
+  0x2f, 0x6d, cali *2: [saveDeleteFile]
+  0x2f, 0x6e, cali:    [wav3DSetUseFlag]
+  0x2f, 0x6f, cali *4: [wavFadeVolume]
+  0x2f, 0x70, cali:    [patchEMEN]
+  0x2f, 0x71, cali:    [wmenuEnableMsgSkip]
+  0x2f, 0x72, cali:    [winGetFlipFlag]
+  0x2f, 0x73, cali:    [cdGetMaxTrack]
+  0x2f, 0x74, str(\0), cali: [dlgErrorOkCancel]
+  0x2f, 0x75, cali:    [menuReduce]
+  0x2f, 0x76, cali:    [menuGetNumof]
+  0x2f, 0x77, cali *2: [menuGetText]
+  0x2f, 0x78, cali *2: [menuGoto]
+  0x2f, 0x79, cali *2: [menuReturn]
+  0x2f, 0x7a:          [menuFreeShelterDIB]
+  0x2f, 0x7b:          [msgFreeShelterDIB]
+  0x2f, 0x7c, dword:
+  0x2f, 0x7d, getdw, getc, cali:
+  0x2f, 0x7e, getdw, getc, cali:
+  0x2f, 0x7f, getdw, cali:
+  0x2f, 0x80, getw, getdw: [dataSetPointer]
+  0x2f, 0x81, cali *2: [dataGetWORD]
+  0x2f, 0x82, cali *2: [dataGetString]
+  0x2f, 0x83, cali:    [dataSkipWORD]
+  0x2f, 0x84, cali:    [dataSkipString]
+  0x2f, 0x85, cali:    [varGetNumof]
+  0x2f, 0x86, cali:    [patchG0]
+  0x2f, 0x87, cali *4  [regReadString]
+  0x2f, 0x88, cali *2: [fileCheckExist]
+  0x2f, 0x89, cali *5: [timeCheckCurData]
+  0x2f, 0x8a, const*2: [dlgManualProtect]
+  0x2f, 0x8b, const, cali, cali, const, cali: [fileCheckDVD]
+  0x2f, 0x8c:          [sysReset]
+
+
+  (**1) System 3.8 では以降では選択肢ウィンドを開く場合は 0x2f, 0x47, 0x5d
+  となりました。これは menuSetCbkInit等の menu* 系コマンドを使うに当たって
+  変更されたものと思われます。
+
+  (**2) SYSTEM 3.9 の拡張で DLL 呼び出しが可能になりました。そのインター
+  フェイスが 0x2f, 0x60 です。最初の cali で DLL の種類、次の cali で DLL
+  内の関数の番号を指定します。それ以降は DLL によって引数の数が異なります。
+
+
+ 5.8 未解説コマンド
+
+  ここでは、コマンド表に載っていないけど、ゲームに出て来るものを紹介します。
+
+  5.8.1 VA 
+    * 機能: ユニットアニメーション (かえるにょ・ぱにょん初出)
+    * フォーマット: VA getd, cali, cali, cali:
+
+    * VA0 : 制御用コマンド
+
+      VA0, no, 0, 0:
+         no番のアニメーション停止。停止後ユニットを消す。
+
+      VA0, no, 0, 1:
+         no番のアニメーション停止。停止後ユニットを描画。
+
+      VA0, no, 1, num: 
+         no番のアニメーション開始。すぐに制御を戻す。
+         numはコマ数, 0の場合と開始位置と終了位置が同じな時はアニメーションは
+         動かずにコマ数だけが無限にされるカウント。
+
+      VA0, no, 2, num:
+	no番のアニメーション開始。終るまで制御を戻さない。
+	numはコマ数で、0は指定できない。またキーが押されても制御を戻さない。
+
+      VA0, no, 3, num:
+        no番のアニメーション開始。終るまで制御を戻さない。
+	numはコマ数で、0は指定できない。またキーが押されたら制御を戻す。
+	押されたキーをRNDに返す。
+
+    * VA1, no, x0, y0:
+        no番のアニメーションの表示座標(x0,y0)の指定。
+
+    * VA2, no, x0, y0:
+        no番のアニメーションの移動先(最終座標(x,y0))の指定。この位置まで来たら
+        自動的にアニメーション停止。
+
+    * VA3, no, width, height:
+	no番にアニメーションユニットの大きさ(width,height)の指定。
+
+    * VA4, no, num, interval:
+	no番アニメーションのパターン数(num)、描画間隔(interval, 1/100sec)の指定
+
+    * VA5, no, x0, y0:
+        no番のアニメーションのユニットの初期取得座標(x0,y0)の指定
+
+    * VA6, no, x0, y0:
+        no番のアニメーションの背景退避座標(x0,y0)の指定
+
+    * VA7, no, type, col:
+        no番のアニメーションのスプライト方法、色等の指定。
+	type = 0: 通常コピー
+	       1: 色指定(col)スプライト
+	       2: 影データスプライト(?)
+
+    * VA10, no, var1, var2:
+ 	no番のアニメーションの状態取得。停止中ならva1=0、動作中ならva1=1。
+	var2に経過したカット数を保存。
+
+    * VA11, no, varX, varY:
+	no番アニメーションの現在位置を(varX,varY)に取得。
+ 
+  5.8.2 ZK
+    * 機能: CD-ROMの入れ換えを促すメッセージ (戦巫女専用？)
+    * フォーマット: ZK, p1, p2, str:
+
+      メッセージ(str)を表示してCD-ROMの入れ換えを待つ。
+
+
+6. SYSTEM 3.6 extension
+
+   SYSTEM 3.6 での主な拡張はコマンドの追加です。また、DARCROWS から 0x2f
+ コマンド (TAA など) の導入が始まりました。MIDIスクリプトの導入もこのへん
+ からです。
+
+
+7. SYSTEM 3.8 extension
+
+   SYSTEM 3.8 では小文字コマンド、すなわち 0x2f コマンドが大量に追加されま
+ した。また、計算式にも新しい演算子が追加されました。
+
+
+8. SYSTEM 3.9 extension
+
+   SYSTEM 3.9 ではコマンドの拡張を DLL という形で行うようになりました。
+ ドキュメントも少ないのでまだ全貌は明らかではありませんが、すこしずつ情報を追加
+ していきます。
+
+ 8.1 System39.ain フォーマット
+
+   System 3.9 で使用される DLL の関数名や、fncXXXX コマンドで使用されるラベルを
+ 保存しているファイルです。最初の 4バイト以外は上位 2bit と下位 6bit の入れ換え
+ を行っています。
+
+  char  ID[4];    /* AINI */
+  int32 IDlen;    /* 4    */
+  char  IDdll[4]; /* HEL0 */
+  int32 rsv1;     /* 0    */
+  int32 DLLnum;   /* DLL の数 */
+      char *DLLname;     /* DLLファイル名, \0 で終る文字列 */
+      int32 funcnum;     /* DLL内の関数の数 */
+         char *funcname; /* 関数名, \0 で終る文字列 */
+         int32 argc;     /* 引数の数 */
+           int32 *argv;  /* 引数の種類 0: 変数   (cali value) 
+                                       1: 計算式 (cali variable) pword
+                                       2: ISurface
+                                       3: 文字列 (文字列番号) IString
+                                       4: IWinMsg
+                                       5: ITimer
+                                       6: IUI
+                                       7: ISys3xDIB
+                                       9: ISys3xCG
+                                       10: ISys3xStringTable
+                                       13: ISys3xSystem
+                                       14: ISys3xMusic
+                                       15: ISys3xMsgString
+                                       16: ISys3xInputDevice
+                                       17: ISys3x
+                         */
+
+  char  IDfunc[4];   /* FUNC, シナリオ上のジャンプラベル  */
+  int32 rsv2;        /* 0         */
+  int32 FUNCnum;     /* FUNC の数 */
+     char *FUNCname; /* FUNC名, \0 で終る文字列 */
+     int16 fncPage;  /* 関数のシナリオ上の位置 (1~) */
+     int32 fncIndex;
+
+  char  IDvari[4];   /* VARI, シナリオ上の変数名 */
+  int32 rsv3;        /* 0    */
+  int32 VARInum;     /* 変数名の数 */
+     char *VARIname; /* 変数名, \0 で終る文字列 */
+
+  char  IDmsgi[4];   /* MSGI, シナリオメッセージ(2f7c〜2f7fコマンドで使用) */
+  int32 rsv4;        /* 0 */
+  int32 MSGInum;     /* メッセージの数 */
+     char *MSGIname; /* メッセージ, \0 で終る文字列 */
+  
+
+ 8.2 ゲームメッセージの System39.ain への格納
+
+   ゲーム中のメッセージの一部が番号づけされて System39.ain に格納され、シナリオ
+ 上では番号で管理されるようになりました。基本的にシナリオテキストデータ１行に
+ １つのインデックスが割り当てられます。シナリオデータでは 0x2f,0x7c,getdw で
+ エンコードされ getdw がインデックス番号となります。また、H,HH,Xコマンド + 
+ メッセージも同様にエンコードされます。
+
+  'てすとてすと'      -> 0x2f, 0x7c, gwtdw:
+  H?, cali: 'てすと'  -> 0x2f, 0x7d, getdw, getc, cali:
+  HH?, cali: 'てすと' -> 0x2f, 0x7e, getdw, getc, cali:
+  X?: 'てすと'        -> 0x2f, 0x7f, getdw, cali:
+
+
+ 8.3 汎用 DLL と専用 DLL
+
+
+[EOF]

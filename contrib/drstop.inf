@@ -1,0 +1,10 @@
+# DrStop! Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	drstop\!/ds_sa.ald,	ds_sa.ald
+GraphicsA,	drstop\!/ds_ga.ald,	ds_ga.ald
+MidiA,		drstop\!/ds_ma.ald,	ds_ma.ald
+SaveA,				,	ds_sa.asd
+SaveB,				,	ds_sb.asd
+SaveC,				,	ds_sc.asd
+SaveD,				,	ds_sd.asd
+SaveE,				,	ds_se.asd

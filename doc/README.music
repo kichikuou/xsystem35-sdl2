@@ -1,0 +1,307 @@
+
+                    xsystem35 における音楽環境について
+
+
+0. もくじ
+  1. MIDIについて
+     a) 外部プレーヤーを使う方法
+       1) xsystem35 側の準備
+       2) プレイヤーの準備
+       3) xsystem35へのリダイレクト
+       4) 制限事項
+     b) 外部 MIDI 音源を /dev/midi 経由で制御する方法
+       1) xsystem35 側の準備
+       2) 外部 MIDI 音源の準備
+     c) Synthesizer 音源を /dev/sequencer 経由で制御する方法
+       1) xsystem35 側の準備
+       2) Synthesizer 音源の準備
+     d) オプション一覧
+  2. 効果音(WAV)について
+     a) OSS 出力
+     b) ALSA 出力
+     c) ESD 出力
+  3. CDオーディオについて
+     a) CD-ROM コントロールによる演奏
+     b) 外部プレイヤ(mp3など)による演奏
+  4. PCM & MIDI(timidity) & CD-ROM(MP3) を１枚のサウンドカードで同時に使う方法
+
+ 
+1. MIDIについて
+   
+   xsystem35 では MIDI の演奏に外部プレーヤーを使う方法と、サウンドカードの
+ MIDI port を介して接続した外部 MIDI 機器を /dev/midi 経由で制御する方法、
+ さらに、synthesizer device を OSS sequencer (/dev/sequencer) 経由で制御する
+ 方法の３種類が選択できます。
+
+ a) 外部プレーヤーを使う方法
+
+   1) xsystem35 側の準備
+        xsystem35 の configure 実行時に --enable-midi=extp を付けてコンパイル
+      しておきます。
+
+   2) プレイヤーの準備
+        TiMidity や playmidi など、お好みのプレーヤーをお使いください。
+      プレイヤーへはあらかじめパスを通しておき、~/.xsys35rc にプレイヤーと
+      プレイヤーへの引数を記述します。
+  
+       (例) TiMidity を esd 経由で出力する場合
+       midi_player: timidity -A 100 -s 44100 -Oe
+
+   2a) xsystem35へのリダイレクト (オプション)
+        TiMidity を使っている場合、TiMidity の PCM 出力を xsystem35 へとリダ
+      イレクトして xsystem35 側で管理しているPCM デバイスに流す事が出来ます。
+      ~/.xsys35rc の MIDI プレーヤーの設定の際に先頭に '-' をつけて下さい。
+
+      (例)
+       midi_player: -timidity -A 100 -s 44100 -Or -o-
+
+       この場合 timidity の出力は 44.1kHz, Stereo, 16bit 固定です。
+
+   3) 制限事項
+        外部プレイヤーを 使用する場合、MIDIファイルに埋め込まれた system35 用の
+      制御コマンドを実行することができず、リピート再生、ジャンプ再生などが出来
+      ません。このため、ゲームの進行に支障が出ることがあります。
+
+
+ b) 外部 MIDI 音源を /dev/midi 経由で制御する方法
+
+   1) xsystem35 側の準備
+        xsystem35 の configure 実行時に --enable-midi=raw を付けてコンパイル
+      しておきます。
+
+   2) 外部 MIDI 音源の準備
+        外部 MIDI 音源(SC-88など)をサウンドカード の MIDI port を介して接続
+      します。このポートは /dev/midi デバイスを介して制御できる必要があります。
+      ALSA OSS Emulation 上で SB-Live の MIDI 端子に接続した SC-88 での動作を
+      確認しています。
+
+ c) Synthesizer 音源を /dev/sequencer 経由で制御する方法
+
+   1) xsystem35 側の準備
+        xsystem35 の configure 実行時に --enable-midi=seq を付けてコンパイル
+      しておきます。
+   
+   2) Synthesizer 音源の準備
+        外部 MIDI 機器を接続するか、サウンドカード上に soundfont を load するか
+      TiMidity を ALSA sequencer server として常駐させておいてください。
+ 
+      TiMidity を ALSA sequencer server にするには、コンパイル時にその機能を
+      有効にしておき、timidity -iA で常駐させます。
+
+ d) オプション一覧
+
+      MIDI 出力に関する、 .xsys35rc の設定項目(A)とコマンドラインオプション(B)
+   をまとめます。
+
+   1) MIDI プレイヤーの設定
+        (A) ----> midi_player:
+        (B) ----> -midiplayer
+
+   2) MIDI デバイスファイルの設定 (default: /dev/midi or /dev/sequencer)
+        (A) ----> midi_device:
+        (B) ----> -devmidi
+ 
+   3) MIDI 出力方法の選択 (default: e)
+        (A) ----> midi_output_device: ?
+        (B) ----> -M?
+
+         ? .... e : 外部プレーヤ
+                r : midi device 経由
+                sX: sequencer device 経由 (X番目のポート)
+                0 : (ゼロ) 無効化
+
+      コンパイル時に --enable-midi=extp,raw,seq とすることで、複数の方式を有効
+      にし、実行時にいずれかを選択できます。その他のコンパイルオプションは 
+      INSTALL ドキュメントを御覧ください。
+
+      sequencer device の X 番目のポートは通常、0 ですが、複数のポートがある
+      場合はそのポート番号を指定してください。ALSA の OSS emu では、
+        $ cat /proc/asound/seq/oss 
+      と実行して出て来る
+        midi ?: [xxxx] ALSA port aa:bb
+      の ? の番号を指定します。
+
+      コマンドラインから外部MIDIプレイヤーを指定する場合は
+      -midiplayer "timidity -A 100 -s 44100 -Oe" のようにします。
+
+
+2. 効果音(WAV)について
+
+   xsystem35ではオーディオインターフェイスとして、Linux/*BSD などで良く使われて
+ いる OSS およびその互換インターフェイスに加えて、ALSA(Advanced Linux Sound 
+ Architecture) と ESD(Enligtened Sound Daemon)に対応しています。
+
+ a) OSS 出力
+
+   1) コンパイル
+        configure 時に --enable-audio=oss オプションを付けてコンパイルします。
+
+   2) 実行時オプション
+        コマンドライン: -Oo
+        .xsys35rc     : audio_output_device: o    
+
+   3) dsp デバイス (default: /dev/dsp)
+        コマンドライン: -devdsp
+        .xsys35rc     : dsp_device:
+
+   4) mixer デバイス (default: /dev/mixer)
+        コマンドライン: -devmix 
+        .xsys35rc     : mixer_device:
+
+
+ b) ALSA 出力
+
+   1) コンパイル
+        configure 時に --enable-audio=alsa オプションを付けてコンパイルします。
+
+   2) 実行時オプション
+        コマンドライン: -Os
+        .xsys35rc     : audio_output_device: s    
+
+   3) dsp デバイス (default: 0:0)
+        コマンドライン: -devdsp
+        .xsys35rc     : dsp_device:
+
+
+ c) ESD 出力
+
+   1) コンパイル
+        configure 時に --enable-audio=esd オプションを付けてコンパイルします。
+
+   2) 実行時オプション
+        コマンドライン: -Oe
+        .xsys35rc     : audio_output_device: e
+
+ OSS/ALSA/ESD をすべて有効にしてコンパイルし、実行時にどの出力を使用するか
+ 選択できます。configure 時に --enable-audio=oss,alsa,esd としてコンパイル
+ してください。
+
+
+3. CDオーディオについて
+
+   CD-ROM の制御には Linux/FreeBSD/Irix のインターフェイスに対応しています。
+ また、CD-ROM デバイスを直接制御する他に、外部プレイヤを使って mp3 file など
+ を鳴らすことも出来ます。
+
+ a) CD-ROM コントロールによる演奏
+      環境によって自動的に適切なドライブが選択されコンパイルされます。
+
+ b) 外部プレイヤ(mp3など)による演奏
+      あらかじめ CD を MP3/WAV 化して起きます。また mpg123 などのプレイヤ
+    を用意し、パスを通しておきます。
+
+    1) コンパイル
+      configure 時に --enable-cdrom=mp3 オプションを追加します。CD-ROM 
+    コントロールを実行時に使い分けたい時は --enable-cdrom=linux,mp3 などと
+    します。
+
+    3) プレイヤー名とファイルリストを書いた次のようなファイルを用意します。
+
+      % cat /game/kichiku.playlist
+      mpg123-esd -quite
+      /game/kichiku/mp3/trk02.mp3
+      /game/kichiku/mp3/trk03.mp3
+      /game/kichiku/mp3/trk04.mp3
+      /game/kichiku/mp3/trk05.mp3
+      /game/kichiku/mp3/trk06.mp3
+
+    というようなファイルを用意します。
+    １行目はプレーヤーとそのオプション
+    ２行目以降はトラック２から順にファイルをならべます。(フルパスで指定します)
+
+    *) 適切に外部プレイヤーと演奏ファイルを用意すれば、データ形式は問いません。
+
+    3a)  xsystem35 へのリダイレクト(オプション)
+
+       mpg123 などのプレイヤーのPCM 出力を xsystem35 へとリダイレクトして
+       xsystem35 側で管理しているPCM デバイスに流す事が出来ます。
+       上の kichiku.playlist ファイルのプレイヤの設定で先頭に '-' をつけて
+       ください。
+
+      (例)
+      -mpg123 -q -s
+
+       この場合 mpg123 の出力は 44.1kHz, Stereo, 16bit 固定です。
+
+    4) 実行時オプションに -devcd /game/kichiku.playlist と上で作成したファイル
+     を指定します。
+
+
+
+  CD-ROM に関する .xsys35rc の設定項目(A) と コマンドラインオプション(B) を
+  まとめます。
+
+  1) CD 出力方法の選択
+       (A) ----> cdrom_device: ???
+       (B) ----> -devcd ????
+
+        MP3 出力  => ???? にプレイリストを指定
+        CD-ROM    => ???? にデバイスファイルを指定
+
+  2) CD-ROM デバイスファイルの設定 (defult /dev/cdrom)
+       (A) ----> cdrom_device: ???
+       (B) ----> -devcd: ????
+
+
+4. PCM & MIDI(timidity) & CD-ROM(MP3) を１枚のサウンドカードで同時に使う方法
+   (special thanks to Fumihiko Murata)
+
+   サウンドカードを選ばない方法としては esd を使うことです。esd は対応した複数
+ のプログラムの音の出力を合成してサウンドカードに出力するプログラムです。
+ xsystem35/timidity/mp3 player を esd 対応にコンパイルすることで合成が可能
+ です。
+
+   また、Trident 4DWave DX/NX、SoundBlaster Live/ YAMAHA YMF724以降 などのサウ
+ ンドカードは PCM チャンネルを複数持っていて、対応のサウンドドライバーがあれば
+ PCMとMIDI(SoftwareMIDI)とMP3 を同時に鳴らすことが出来ます。たとえば 
+ SoundBlaster Live + ALSA では
+
+ $ cat /proc/asound/pcm 
+ 00-00: emu10k1 : EMU10K1 : playback 32 : capture 1
+ 00-01: emu10k1 mic : EMU10K1 MIC : capture 1
+ 00-02: emu10k1 efx : EMU10K1 EFX : capture 1
+
+ のように PCM を 32 チャンネル持っていることが分かります。これは OSS でいうと
+ ころの /dev/dspN に最大 32 の PCM がぶら下がっているように見え、同時に 32 回
+ /dev/dspN を開くことが出来ます。
+
+ また Trident 4DWave DX/NX + ALSA では全部で64chあり、最大で32chを PCM playback
+ に割り当てる事ができます。最大チャンネルはモジュールロード時に 設定され、設定
+ 数を使いきるまで同時に /dev/dspN を開く事ができます。
+
+ 残りの 32ch は MIDI 用に設けられていて、PCM と MIDI の２つのバンクに分ける事
+ ができます。個々のチャンネルには PCM front volume がありますが、２つのバンク
+ をそれぞれ統括する Wave/Music Volume があり さらにそれらを合わせる PCM volume
+ があります。(最後に Master Volume)
+
+  図にすると次のようになります。
+
+  PCM Volume + - Wave Volume  + - front volume- PCM Playback 0
+             |                + -  ..         - PCM Playback 1
+             |                :
+             |                + -  ..         - PCM Playback 31
+             |
+             + - Music Volume + -  ..         - PCM Playback 32
+                              :
+                              + -  ..         - PCM Playback 63
+
+
+   ES1370/1371 でも PCM 用 と MIDI 用に 2 チャンネルの PCM 出力があります。
+ ALSA では 
+ 
+ $ cat /proc/asound/pcm 
+ 00-00: ES1371/1 : ES1371 DAC2/ADC : playback 1 : capture 1
+ 00-01: ES1371/2 : ES1371 DAC1 : playback 1
+ 
+ のように 0:0 と 0:1 のデバイスが再生用として使う事が出来ます。timidity 用に
+ 0:1 のデバイスを使うと良いでしょう。OSS では /dev/dsp0 と /dev/dsp1 に割り当
+ てられ、 /dev/dsp1 を timidity で使います。
+
+ またその他のカードでも多チャンネル出力を持っているものもありますので、
+ ドライバーのドキュメントを御覧下さい。
+
+
+(2003.1.23 追記)
+  追記を書いている時点で手に入りやすい多チャンネルPCM出力をもつ音源カード
+  としては SoundBlaster Live と YMF7xx くらいでしょうか。
+

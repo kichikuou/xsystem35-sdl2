@@ -1,0 +1,34 @@
+# MAMATOTO Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	GAMEDATA/*SA.ALD,	mamatoto_sa.ald
+GraphicsA,	GAMEDATA/*GA.ALD,	mamatoto_ga.ald
+GraphicsB,	GAMEDATA/*GB.ALD,	mamatoto_gb.ald
+WaveA,		GAMEDATA/*WA.ALD,	mamatoto_wa.ald
+MidiA,		GAMEDATA/*MA.ALD,	mamatoto_ma.ald
+DataA,		GAMEDATA/*DA.ALD,	mamatoto_da.ald
+SaveA,				,	mamatoto_sa.asd
+SaveB,				,	mamatoto_sb.asd
+SaveC,				,	mamatoto_sc.asd
+SaveD,				,	mamatoto_sd.asd
+SaveE,				,	mamatoto_se.asd
+SaveF,				,	mamatoto_sf.asd
+SaveG,				,	mamatoto_sg.asd
+SaveH,				,	mamatoto_sh.asd
+SaveI,				,	mamatoto_si.asd
+SaveJ,				,	mamatoto_sj.asd
+SaveK,				,	mamatoto_sk.asd
+SaveL,				,	mamatoto_sl.asd
+SaveM,				,	mamatoto_sm.asd
+SaveN,				,	mamatoto_sn.asd
+SaveO,				,	mamatoto_so.asd
+SaveP,				,	mamatoto_sp.asd
+SaveQ,				,	mamatoto_sq.asd
+SaveR,				,	mamatoto_sr.asd
+SaveS,				,	mamatoto_ss.asd
+SaveT,				,	mamatoto_st.asd
+SaveU,				,	mamatoto_su.asd
+SaveV,				,	mamatoto_sv.asd
+SaveW,				,	mamatoto_sw.asd
+SaveX,				,	mamatoto_sx.asd
+SaveY,				,	mamatoto_sy.asd
+SaveZ,				,	mamatoto_sz.asd

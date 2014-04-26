@@ -1,0 +1,15 @@
+# Rance 3 Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,      rance3/rance3sa.ald,    rance3sa.ald
+GraphicsA,      rance3/rance3ga.ald,    rance3ga.ald
+WaveA,          rance3/rance3wa.ald,    rance3wa.ald
+MidiA,          rance3/rance3ma.ald,    rance3ma.ald
+DataA,          rance3/rance3da.ald,    rance3da.ald
+SaveA,                             ,    rance3sa.asd
+SaveB,                             ,    rance3sb.asd
+SaveC,                             ,    rance3sc.asd
+SaveD,                             ,    rance3sd.asd
+SaveE,                             ,    rance3se.asd
+SaveF,                             ,    rance3sf.asd
+SaveG,                             ,    rance3sg.asd
+SaveH,                             ,    rance3sh.asd

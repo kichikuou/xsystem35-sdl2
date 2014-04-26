@@ -1,0 +1,17 @@
+# MamoriGami Sama Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	GAMEDATA/*SA.ALD,	mamori_sa.ald
+GraphicsA,	GAMEDATA/*GA.ALD,	mamori_ga.ald
+GraphicsB,	GAMEDATA/*GB.ALD,	mamori_gb.ald
+WaveA,		GAMEDATA/*WA.ALD,	mamori_wa.ald
+MidiA,		GAMEDATA/*MA.ALD,	mamori_ma.ald
+SaveA,				,	mamori_sa.asd
+SaveB,				,	mamori_sb.asd
+SaveC,				,	mamori_sc.asd
+SaveD,				,	mamori_sd.asd
+SaveE,				,	mamori_se.asd
+SaveF,				,	mamori_sf.asd
+SaveG,				,	mamori_sg.asd
+SaveH,				,	mamori_sh.asd
+SaveI,				,	mamori_si.asd
+SaveJ,				,	mamori_sj.asd

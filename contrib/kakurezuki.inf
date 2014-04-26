@@ -1,0 +1,16 @@
+# kakurezuki Install infomation
+# Tag,          #origin,                #destination
+ScenarioA,      GAMEDATA/*SA.ALD,       tsuki_sa.ald
+GraphicsA,      GAMEDATA/*GA.ALD,       tsuki_ga.ald
+WaveA,          GAMEDATA/*WA.ALD,       tsuki_wa.ald
+SaveA,                          ,       tsuki_sa.asd
+SaveB,                          ,       tsuki_sb.asd
+SaveC,                          ,       tsuki_sc.asd
+SaveD,                          ,       tsuki_sd.asd
+SaveE,                          ,       tsuki_se.asd
+SaveF,                          ,       tsuki_sf.asd
+SaveG,                          ,       tsuki_sg.asd
+SaveH,                          ,       tsuki_sh.asd
+SaveI,                          ,       tsuki_si.asd
+SaveJ,                          ,       tsuki_sj.asd
+SaveK,                          ,       tsuki_sk.asd

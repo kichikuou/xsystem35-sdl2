@@ -1,0 +1,32 @@
+# ºÊ¤ß¤°¤¤ Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ald,	tsuma_sa.ald
+GraphicsA,	gamedata/*GA.ald,	tsuma_ga.ald
+WaveA,		gamedata/*WA.ald,	tsuma_wa.ald
+Ain,		gamedata/*.ain,		system39.ain
+SaveA,				,	tsuma_sa.asd
+SaveB,				,	tsuma_sb.asd
+SaveC,				,	tsuma_sc.asd
+SaveD,				,	tsuma_sd.asd
+SaveE,				,	tsuma_se.asd
+SaveF,				,	tsuma_sf.asd
+SaveG,				,	tsuma_sg.asd
+SaveH,				,	tsuma_sh.asd
+SaveI,				,	tsuma_si.asd
+SaveJ,				,	tsuma_sj.asd
+SaveK,				,	tsuma_sk.asd
+SaveL,				,	tsuma_sl.asd
+SaveM,				,	tsuma_sm.asd
+SaveN,				,	tsuma_sn.asd
+SaveO,				,	tsuma_so.asd
+SaveP,				,	tsuma_sp.asd
+SaveQ,				,	tsuma_sq.asd
+SaveR,				,	tsuma_sr.asd
+SaveS,				,	tsuma_ss.asd
+SaveT,				,	tsuma_st.asd
+SaveU,				,	tsuma_su.asd
+SaveV,				,	tsuma_sv.asd
+SaveW,				,	tsuma_sw.asd
+SaveX,				,	tsuma_sx.asd
+SaveY,				,	tsuma_sy.asd
+SaveZ,				,	tsuma_sz.asd

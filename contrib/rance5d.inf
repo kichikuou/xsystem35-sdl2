@@ -1,0 +1,36 @@
+# Rance5D Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	GAMEDATA/*SA.ALD,	r5d_sa.ald
+GraphicsA,	GAMEDATA/*GA.ALD,	r5d_ga.ald
+WaveA,		GAMEDATA/*WA.ALD,	r5d_wa.ald
+BGMA,		GAMEDATA/*BA.ALD,	r5d_ba.ald
+BGIA,		GAMEDATA/*BA.BGI,	r5d_ba.bgi
+Ain,		GAMEDATA/*.ain,		system39.ain
+Init,		GAMEDATA/*.ini,		system39.ini
+SACT01,		GAMEDATA/SACTEFAM.KLD,	SACTEFAM.KLD
+SaveA,				,	r5d_sa.asd
+SaveB,				,	r5d_sb.asd
+SaveC,				,	r5d_sc.asd
+SaveD,				,	r5d_sd.asd
+SaveE,				,	r5d_se.asd
+SaveF,				,	r5d_sf.asd
+SaveG,				,	r5d_sg.asd
+SaveH,				,	r5d_sh.asd
+SaveI,				,	r5d_si.asd
+SaveJ,				,	r5d_sj.asd
+SaveK,				,	r5d_sk.asd
+SaveL,				,	r5d_sl.asd
+SaveM,				,	r5d_sm.asd
+SaveN,				,	r5d_sn.asd
+SaveO,				,	r5d_so.asd
+SaveP,				,	r5d_sp.asd
+SaveQ,				,	r5d_sq.asd
+SaveR,				,	r5d_sr.asd
+SaveS,				,	r5d_ss.asd
+SaveT,				,	r5d_st.asd
+SaveU,				,	r5d_su.asd
+SaveV,				,	r5d_sv.asd
+SaveW,				,	r5d_sw.asd
+SaveX,				,	r5d_sx.asd
+SaveY,				,	r5d_sy.asd
+SaveZ,				,	r5d_sz.asd

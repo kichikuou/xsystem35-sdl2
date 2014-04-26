@@ -1,0 +1,14 @@
+# ATLACH-NACHA Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	atlach_sa.ald
+GraphicsA,	gamedata/*ga.ald,	atlach_ga.ald
+GraphicsB,	gamedata/*gb.ald,	atlach_gb.ald
+WaveA,		gamedata/*wa.ald,	atlach_wa.ald
+SaveA,				,	atlach_sa.asd
+SaveB,				,	atlach_sb.asd
+SaveC,				,	atlach_sc.asd
+SaveD,				,	atlach_sd.asd
+SaveE,				,	atlach_se.asd
+SaveF,				,	atlach_sf.asd
+SaveG,				,	atlach_sg.asd
+SaveH,				,	atlach_sh.asd

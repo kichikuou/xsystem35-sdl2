@@ -1,0 +1,30 @@
+# DiaboLiQue (low price version) Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	diabo_sa.ald
+GraphicsA,	gamedata/*ga.ald,	diabo_ga.ald
+WaveA,		gamedata/*wa.ald,	diabo_wa.ald
+SaveA,				,	diabo_sa.asd
+SaveB,				,	diabo_sb.asd
+SaveC,				,	diabo_sc.asd
+SaveD,				,	diabo_sd.asd
+SaveE,				,	diabo_se.asd
+SaveF,				,	diabo_sf.asd
+SaveG,				,	diabo_sg.asd
+SaveH,				,	diabo_sh.asd
+SaveI,				,	diabo_si.asd
+SaveJ,				,	diabo_sj.asd
+SaveK,				,	diabo_sk.asd
+SaveL,				,	diabo_sl.asd
+SaveM,				,	diabo_sm.asd
+SaveN,				,	diabo_sn.asd
+SaveO,				,	diabo_so.asd
+SaveP,				,	diabo_sp.asd
+SaveQ,				,	diabo_sq.asd
+SaveR,				,	diabo_sr.asd
+SaveS,				,	diabo_ss.asd
+SaveT,				,	diabo_st.asd
+SaveU,				,	diabo_su.asd
+SaveV,				,	diabo_sv.asd
+SaveW,				,	diabo_sw.asd
+SaveX,				,	diabo_sx.asd
+SaveY,				,	diabo_sy.asd

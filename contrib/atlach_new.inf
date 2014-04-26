@@ -1,0 +1,30 @@
+# ATLACH-NACHA (low price version) Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	atlach_sa.ald
+GraphicsA,	gamedata/*ga.ald,	atlach_ga.ald
+WaveA,		gamedata/*wa.ald,	atlach_wa.ald
+SaveA,				,	atlach_sa.asd
+SaveB,				,	atlach_sb.asd
+SaveC,				,	atlach_sc.asd
+SaveD,				,	atlach_sd.asd
+SaveE,				,	atlach_se.asd
+SaveF,				,	atlach_sf.asd
+SaveG,				,	atlach_sg.asd
+SaveH,				,	atlach_sh.asd
+SaveI,				,	atlach_si.asd
+SaveJ,				,	atlach_sj.asd
+SaveK,				,	atlach_sk.asd
+SaveL,				,	atlach_sl.asd
+SaveM,				,	atlach_sm.asd
+SaveN,				,	atlach_sn.asd
+SaveO,				,	atlach_so.asd
+SaveP,				,	atlach_sp.asd
+SaveQ,				,	atlach_sq.asd
+SaveR,				,	atlach_sr.asd
+SaveS,				,	atlach_ss.asd
+SaveT,				,	atlach_st.asd
+SaveU,				,	atlach_su.asd
+SaveV,				,	atlach_sv.asd
+SaveW,				,	atlach_sw.asd
+SaveX,				,	atlach_sx.asd
+SaveY,				,	atlach_sy.asd

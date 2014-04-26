@@ -1,0 +1,10 @@
+# 20世紀アリス かえるにょ国にょアリス Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ald,	20cKaeru_sa.ald
+GraphicsA,	gamedata/*GA.ald,	20cKaeru_ga.ald
+WaveA,		gamedata/*WA.ald,	20cKaeru_wa.ald
+MidiA,		gamedata/*MA.ald,	20cKaeru_ma.ald
+DataA,		gamedata/*DA.ald,	20cKaeru_da.ald
+Ain,		gamedata/*.ain,		system39.ain
+SaveA,				,	20cKaeru_sa.asd
+SaveZ,				,	20cKaeru_sz.asd

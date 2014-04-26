@@ -1,0 +1,20 @@
+# Persiom Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	GAMEDATA/*SA.ALD,	persiom_sa.ald
+GraphicsA,	GAMEDATA/*GA.ALD,	persiom_ga.ald
+GraphicsB,	GAMEDATA/*GB.ALD,	persiom_gb.ald
+WaveA,		GAMEDATA/*WA.ALD,	persiom_wa.ald
+MidiA,		GAMEDATA/*MA.ALD,	persiom_ma.ald
+DataA,		GAMEDATA/*DA.ALD,	persiom_da.ald
+SaveA,				,	persiom_sa.asd
+SaveB,				,	persiom_sb.asd
+SaveC,				,	persiom_sc.asd
+SaveD,				,	persiom_sd.asd
+SaveE,				,	persiom_se.asd
+SaveF,				,	persiom_sf.asd
+SaveG,				,	persiom_sg.asd
+SaveH,				,	persiom_sh.asd
+SaveI,				,	persiom_si.asd
+SaveJ,				,	persiom_sj.asd
+SaveK,				,	persiom_sk.asd
+SaveL,				,	persiom_sl.asd

@@ -1,0 +1,58 @@
+
+                   その他の SYSTEM 3.5 のゲームについて
+
+   README にある動作確認ゲーム以外にも、ネット上で公開されているSYSTEM3.5対応
+ のゲームのうち幾つかは動く事が確認されています。ここでは 1.4.0 preX での動作
+ 状況です。1.4.0 公開時点で手に入るゲームを順次追加していっています。
+ また、XXXが動かないんだけど調べてください、XXXはちゃんと動きました、といった
+ 情報もおよせください。
+
+   OKは問題なく動く。GOODが多少の問題あるもののゲームをやるぶんで気にはなるけど
+ 耐えられる範囲のもの。BADは動かないものです。
+ 
+
+(作者の敬称略)
+【  ソフト名  】  【 ファイル名 】【   作者名   】【 動作  】
+国立ファーブル図
+書館司書〜
+ブックルちゃん〜   SSYO_100.LZH    大塚ヒロ          OK
+バルーンぽっぷ     BPOP_093.LZH    大塚ヒロ          OK 
+
+Self               self.lzh        よこやまなおき    OK
+おせろっと         othellotto.exe  よこやまなおき    OK
+キャロル           carol.lzh       よこやまなおき    GOOD(1)
+
+積層四目並べ       Te1.lzh         深叢　忍          OK
+16Piece Puzzle     16p1.lzh        深叢　忍          OK
+The Line           Line0.lzh       深叢　忍          OK
+
+Black Jack         bj120.lzh       かずき            OK
+
+マスカレイド       (in AliceCD202) ちあぼう          OK
+戦娘ver2.12        ikusa212.lzh    ちあぼう          OK
+
+できるかなー！     (in AliceCD202) KIMM SOFT         OK(2)
+
+恋は計算どおり♪   koi.lzh         SS                OK
+
+動体視力を鍛えるにょ game_191.lzh  LazyRichField    BAD(3)
+集中力を鍛えるにょ game_22.lh      LazyRichField    GOOD(4)
+
+
+1) 雪が降らない (grDrawFillCircle が未実装)
+   通信対戦が出来ない
+2) メッセージサイズ300ドットの表示は 100 ドットに制限しています
+3) DS 数字 となっている
+4) 色がおかしい
+
+最後にこれらのデータを公開している作者の方々のURLです。
+
+大塚ヒロさん       http://www.studioHIRO.com/
+よこやまなおきさん http://www3.justnet.ne.jp/~naoki-yokoyama/
+深叢 忍さん        http://www2s.biglobe.ne.jp/~nin/
+かずきさん         http://www.din.or.jp/~kazuki/
+桐ヶ屋 inc.（ちあぼう）さん   http://www.eucaly.net/~kiri
+KIMM SOFT／ネリワサヴィちーむ heavyd@syd.odn.ne.jp
+SSさん             http://www.sspzgr.net/
+LazyRichFieldさん  http://www2j.biglobe.ne.jp/~Lazy/staff/alice.htm
+

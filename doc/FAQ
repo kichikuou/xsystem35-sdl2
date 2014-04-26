@@ -1,0 +1,13 @@
+
+Q. FreeBSD でコンパイルできない。make とするとエラーが出る。
+A. gmake (GNU make) を使ってください。
+
+
+Q. cant load font JISX0201.1976-0 と出て終了してしまう。
+A. ~/.xsys35rc に自分のシステムにインストールされているフォントを指定して
+   いますか？
+
+  % xlsfonts | grep 0-0-0-0 | grep jisx0201.1976
+
+ とやって表示されるフォント名を ~/.xsys35rc の font_gothic と font_mincho
+ に書きます。今の所この２つしか使用していません。

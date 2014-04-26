@@ -1,0 +1,196 @@
+
+        System 3.5 for X Window System     Version 1.7 (開発版)
+
+                   インストールドキュメント
+
+
+0. 目次
+
+  1. 必要環境と対応機能
+  2. コンパイルとインストール
+  3. コンパイル時のオプション
+  4. サポート
+
+
+1. 必要環境と対応機能
+
+ 1.1 必要環境
+   * X11R6
+   * gtk+ 1.0.6 以上
+   * SYSV IPC in kernel
+   * zlib
+   * Ogg Vorbis library (libvorbis)
+
+ 1.2 推奨環境
+   * スケーラブルフォント(例えば X-TT など)
+     (http://X-TT.dsl.gr.jp/index-ja.html)
+   * MIT-SHM extension をサポートした X Server。次のようにチェックします。
+     $ xdpyinfo | grep MIT-SHM
+   * MMX Pentinum 以降 (for IA32 platform)
+
+ 1.3 対応機能
+   * ALSA (for Linux) 0.5.x 以上
+     (http://www.alsa-project.org/)
+   * ESD (Esound) 0.2.8 以上
+     (http://www.tux.org/~ricdude/EsounD.html)
+     (ftp://ftp.gnome.org/pub/GNOME/stable/sources/esound/ or mirrors)
+   * Joystick (for Linux kernel 2.2.x)
+   * SDL(Simple DirectMedia Layer) 1.0.x 以上
+     (http://www.devolution.com/~slouken/SDL)
+   * FreeType Library  1.1 以上
+     (http://www.freetype.org/)
+     (http://freetype.sourceforge.net/index.html)
+   * midi デバイス(OSS /dev/midi, /dev/sequencer)を介した外部/仮想MIDI音源
+
+ 1.4 注意点
+   * コンパイルには GNU Make (gmake) と gtk-config と nasm (assembler)
+   が必要です。(nasm は IA-32 platform のみ)
+   * また gcc 以外でのコンパイルは多分出来ないと思います。標準 cc でコンパイル
+   を通すためのパッチは大歓迎です。
+
+
+2. コンパイルとインストール
+
+ 2.1 プログラムのコンパイルとインストール
+
+ $ tar xvfz xsystem35-(version).tar.gz  # ソースコードの展開
+ $ cd xsystem35-(version)               # xsystem35 のトップディレクトリに移動
+ $ cp src/xsys35rc.sample ~/.xsys35rc   # 設定ファイルのコピー
+ $ ./configure                          # `configure' スクリプトの実行 
+ $ make                                 # xsystem35 のコンパイル
+ [必要なら root になる]
+ # make install                         # xsystem35 のインストール
+
+ default では make install で /usr/local/bin にインストールされます。
+
+ 2.2 ゲームデータのインストール
+
+ contrib ディレクトリにゲームデータをインストールするプログラムが入っています。
+ /cdromにCD-ROMをマウントした後、
+
+ $ cd ./contrib
+ $ ./instgame kichiku.inf
+
+ のようにしてインストールします。 詳しくは contrib/README.TXTを御覧下さい。
+
+
+3. コンパイル時のオプション
+
+ $ ./configure --help
+ で使用可能なオプションの一覧がでます。
+
+ * audio 関連
+
+  --enable-audio=xxx
+     オーディオデバイスのうち xxx を有効にしてコンパイルします。xxx には今の所
+     oss, alsa, esd が使えます。カンマで区切って並べて指定する事で複数のデバイ
+     スをゲーム起動時に選択できます。(ex. --enable-audio=oss,alsa,esd)
+     このオプションを指定しない時は OS ごとに適切なデバイスが組み込まれます。
+
+  --with-default-output=xxx
+     --enable-audioで複数のデバイスを選択した時、デフォルトのデバイスをこの
+    オプションで指定できます。指定しない場合は使用可能なデバイスのうち任意の
+    デバイスを使用します。
+
+  --with-oss-audiodev=xxx
+     OSS での DSP デバイスのデバイスファイルを xxx で指定します。デフォルトは
+     /dev/dsp です。(*1)
+
+  --with-oss-mixerdev=xxx
+     OSS での MIXER デバイスのデバイスファイルを xxx で指定します。デフォルトは
+     /dev/mixer です。(*1)
+  
+  --enable-cdrom=xxx
+     CD-ROM デバイスのうち xxx を有効にしてコンパイルします。CD-DA の代わりに
+     MP3などを外部プレイヤを使って演奏することも出来ます。xxx には linux,bsd,
+     irix,mp3 が使えます。
+     カンマで区切って並べて指定することで複数のデバイスをゲーム起動時に選択
+     できます。(ex. --enable-cdrom=linux,mp3)
+     CD-DA を使うか MP3 を使うかの指定については README.music を御覧下さい。
+     このオプションを指定しない時は OS ごとに適切なデバイスが組み込まれます。
+
+  --with-cdromdev=xxx
+     CD-ROM デバイスのデバイスファイルを xxx で指定します。デフォルトは
+     /dev/cdrom です。(*1)
+
+  --enable-midi=xxx
+     MIDI デバイスのうち xxx を有効にしてコンパイルします。xxx にはいまのところ
+     extp,raw,seq が使えます。extp は外部プレイヤを使って MIDI を演奏します。
+     raw は Raw midi デバイス (/dev/midiなど)を通して外部MIDI機器を接続している
+     場合に使います。seq は OSS sequencer device (/dev/sequencer) を通して MIDI
+     機器を接続している場合に使います。カンマで区切って並べて指定することで複数
+     のデバイスをゲーム起動時に選択できます。(ex. --enable-midi=extp,raw,seq)
+
+  --with-mididev=xxx
+     Raw MIDI デバイスのデバイスファイルを xxx で指定します。デフォルトは
+     /dev/midi です。(*1)
+
+  --with-seqdev=xxx
+     Sequencer MIDI デバイスのデバイスファイルを xxx で指定します。デフォルトは
+     /dev/sequencer です。(*1)
+
+  --with-midiplayer=xxx
+     外部 MIDI プレイヤを指定します。デフォルトは midiplay -4 です。(*1)
+
+  --enable-qmidi
+     外部 MIDI プレイヤを実行する際に、プレイヤーの実行時メッセージを抑止
+     します。
+
+
+ * graphics 関連
+ 
+  --enable-sdl
+     SDL を有効にしてコンパイルします。
+
+  --enable-bgr
+     X server の color order が BGR の時指定します。SunとSGIのプラットフォーム
+     ではデフォルトでこの指定が有効になっています。それ以外のプラットフォーム
+     では不要です。ただし、sgi O2 および、Sun sparc のマシンの中には RGB の
+     並びのものもあるので、その場合は --enable-bgr=no あるいは --disable-bgr 
+     としてください。詳しくは doc/README.color を御覧下さい。
+
+
+ * その他
+
+  --enable-joy
+     Joystic support を有効にしてコンパイルします。Linux kernel 2.2 以降に
+     対応しています。
+
+  --with-joydev=xxx
+     Joystick デバイスのデバイスファイルを xxx で指定します。デフォルトは
+     /dev/js0 です。(*1)
+
+  --with-locale=xxxx
+     X の locale 機構を使う場合に指定します。Linux libc5 System 等では通常
+     使用している locale を指定して下さい。(ex. --with-locale=ja_JP.ujis)
+     それ以外では必要無いと思います。
+
+  --with-cachesize=xxxx
+     データキャッシュの大きさを指定します。単位は MB で、デフォルトは 20MB
+     です。データのほとんどは展開済み CG のキャッシュに使われます。シナリオ
+     などのデータは mmap を使っていますので、キャッシングは xsystem35 の管理
+     外です。
+
+  --enable-mmx
+     IA32 プラットフォームで MMX を使うようにします。nasm というアセンブラが
+     必要になります。IA32 ではデフォルトで有効にします。無効にする場合は =no
+     を指定して下さい。実行時に MMX 命令が使用可能かどうかチェックしますので、
+     MMX 命令を持たないCPUでも有効のままでかまいません。
+
+  --enable-debug
+     debuging を有効にします。
+     有効にしてコンパイルすると -debuglv # オプションが使えるようになります。
+     debug level に関しては src/xsystem35.h を参照して下さい。
+
+## (*1) 実行時に読み込む設定ファイル ~/.xsys35rc でも指定できます。
+
+
+  参考: 私の開発時の configure オプション(実際には１行です)
+
+        ./configure --enable-midi=extp,raw,seq --enable-audio=oss,alsa,esd 
+        --enable-cdrom=linux,mp3 --enable-debug
+
+4. サポート
+ 
+  http://www.aist-nara.ac.jp/~masaki-c/private/unitbase/xsys35/index.html
+  または READMEの 8. サポートの項を御覧下さい。

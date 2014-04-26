@@ -1,0 +1,43 @@
+/* XPM */
+static const char *cursor_cross[] = {
+	/* width height num_colors chars_per_pixel */
+	"    32    32        3            1",
+	/* colors */
+	"X c #000000",
+	". c #ffffff",
+	"  c None",
+	/* pixels */
+	"                                ",
+	"                                ",
+	"                                ",
+	"                                ",
+	"                                ",
+	"             XXXX               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"     XXXXXXXXX..XXXXXXXXX       ",
+	"     X..................X       ",
+	"     X..................X       ",
+	"     XXXXXXXXX..XXXXXXXXX       ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             X..X               ",
+	"             XXXX               ",
+	"                                ",
+	"                                ",
+	"                                ",
+	"                                ",
+	"                                ",
+	"                                ",
+	"                                ",
+	"15,15"
+};

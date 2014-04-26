@@ -1,0 +1,7 @@
+# mugen hoyo Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ald,	mugen_sa.ald
+GraphicsA,	gamedata/*GA.ald,	mugen_ga.ald
+SaveA,				,	mugen_sa.asd
+SaveB,				,	mugen_sb.asd
+SaveC,				,	mugen_sc.asd

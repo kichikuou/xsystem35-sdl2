@@ -1,0 +1,16 @@
+# Oudou Yusha Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	oudou_sa.ald
+GraphicsA,	gamedata/*ga.ald,	oudou_ga.ald
+GraphicsB,	gamedata/*gb.ald,	oudou_gb.ald
+WaveA,		gamedata/*wa.ald,	oudou_wa.ald
+SaveA,				,	oudou_sa.asd
+SaveB,				,	oudou_sb.asd
+SaveC,				,	oudou_sc.asd
+SaveD,				,	oudou_sd.asd
+SaveE,				,	oudou_se.asd
+SaveF,				,	oudou_sf.asd
+SaveG,				,	oudou_sg.asd
+SaveH,				,	oudou_sh.asd
+SaveI,				,	oudou_si.asd
+SaveJ,				,	oudou_sj.asd

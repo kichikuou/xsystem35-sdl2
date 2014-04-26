@@ -1,0 +1,15 @@
+# Rance 4 Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	rance4_sa.ald
+GraphicsA,	gamedata/*ga.ald,	rance4_ga.ald
+WaveA,		gamedata/*wa.ald,	rance4_wa.ald
+SaveA,				,	rance4_sa.asd
+SaveB,				,	rance4_sb.asd
+SaveC,				,	rance4_sc.asd
+SaveD,				,	rance4_sd.asd
+SaveE,				,	rance4_se.asd
+SaveF,				,	rance4_sf.asd
+SaveG,				,	rance4_sg.asd
+SaveH,				,	rance4_sh.asd
+SaveI,				,	rance4_si.asd
+SaveJ,				,	rance4_sj.asd

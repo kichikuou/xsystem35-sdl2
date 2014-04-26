@@ -1,0 +1,505 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: src/menu_gui.c:207
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-08-24 23:32+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/menu.c:89
+#, c-format
+msgid "MAX %d charater"
+msgstr ""
+
+#: src/menu.c:143 src/menu.c:145 src/menu.c:147
+#, c-format
+msgid "%d "
+msgstr ""
+
+#: src/menu_gui.c:80 src/menu_gui_volval.c:39 src/menu_gui_volval.c:41
+msgid "window1"
+msgstr ""
+
+#: src/menu_gui.c:81
+msgid "InputNumber"
+msgstr ""
+
+#: src/menu_gui.c:87 src/menu_gui_volval.c:107
+msgid "hbox1"
+msgstr ""
+
+#: src/menu_gui.c:94
+msgid "vbox1"
+msgstr ""
+
+#: src/menu_gui.c:108
+msgid "spinbutton1"
+msgstr ""
+
+#: src/menu_gui.c:115
+msgid "table1"
+msgstr ""
+
+#: src/menu_gui.c:122 src/menu_gui.c:830
+msgid "default"
+msgstr ""
+
+#: src/menu_gui.c:124
+msgid "label3"
+msgstr ""
+
+#: src/menu_gui.c:132
+msgid "min"
+msgstr ""
+
+#: src/menu_gui.c:134
+msgid "label9"
+msgstr ""
+
+#: src/menu_gui.c:142
+msgid "max"
+msgstr ""
+
+#: src/menu_gui.c:144
+msgid "label10"
+msgstr ""
+
+#: src/menu_gui.c:152 src/menu_gui.c:162 src/menu_gui.c:172
+msgid "0"
+msgstr ""
+
+#: src/menu_gui.c:154
+msgid "label11"
+msgstr ""
+
+#: src/menu_gui.c:164
+msgid "label12"
+msgstr ""
+
+#: src/menu_gui.c:174
+msgid "label13"
+msgstr ""
+
+#: src/menu_gui.c:184
+msgid "vbox2"
+msgstr ""
+
+#: src/menu_gui.c:193 src/menu_gui.c:306 src/menu_gui.c:473 src/menu_gui.c:866
+msgid "OK"
+msgstr ""
+
+#: src/menu_gui.c:195
+msgid "button1"
+msgstr ""
+
+#: src/menu_gui.c:200 src/menu_gui.c:299
+msgid "Cancel"
+msgstr ""
+
+#: src/menu_gui.c:202
+msgid "button2"
+msgstr ""
+
+#: src/menu_gui.c:209
+msgid "label4"
+msgstr ""
+
+#: src/menu_gui.c:214 src/menu_gui.c:319 src/menu_gui.c:774 src/menu_gui.c:777
+#: src/menu_gui.c:780 src/menu_gui.c:784 src/menu_gui.c:787 src/menu_gui.c:790
+#: src/menu_gui.c:793 src/menu_gui.c:796 src/menu_gui.c:799 src/menu_gui.c:803
+#: src/menu_gui.c:806 src/menu_gui.c:832
+msgid "activate"
+msgstr ""
+
+#: src/menu_gui.c:217 src/menu_gui.c:220 src/menu_gui.c:313 src/menu_gui.c:316
+#: src/menu_gui.c:389 src/menu_gui.c:392 src/menu_gui.c:482 src/menu_gui.c:873
+msgid "clicked"
+msgstr ""
+
+#: src/menu_gui.c:241
+msgid "window2"
+msgstr ""
+
+#: src/menu_gui.c:247
+msgid "InputString"
+msgstr ""
+
+#: src/menu_gui.c:253
+msgid "vbox3"
+msgstr ""
+
+#: src/menu_gui.c:258
+msgid "title"
+msgstr ""
+
+#: src/menu_gui.c:260
+msgid "label5"
+msgstr ""
+
+#: src/menu_gui.c:269
+msgid "entry1"
+msgstr ""
+
+#: src/menu_gui.c:274
+msgid "MAX charater"
+msgstr ""
+
+#: src/menu_gui.c:276 src/menu_gui_volval.c:116
+msgid "label6"
+msgstr ""
+
+#: src/menu_gui.c:283
+msgid "Notice) HANKAKU is not available"
+msgstr ""
+
+#: src/menu_gui.c:285 src/menu_gui_volval.c:124
+msgid "label7"
+msgstr ""
+
+#: src/menu_gui.c:294
+msgid "hbox2"
+msgstr ""
+
+#: src/menu_gui.c:301
+msgid "button4"
+msgstr ""
+
+#: src/menu_gui.c:308
+msgid "button3"
+msgstr ""
+
+#: src/menu_gui.c:337
+msgid "window3"
+msgstr ""
+
+#: src/menu_gui.c:343 src/menu_gui.c:758
+msgid "Exit"
+msgstr ""
+
+#: src/menu_gui.c:349
+msgid "vbox4"
+msgstr ""
+
+#: src/menu_gui.c:358
+msgid "Exit System35 ?"
+msgstr ""
+
+#: src/menu_gui.c:360
+msgid "label8"
+msgstr ""
+
+#: src/menu_gui.c:367
+msgid "hbox3"
+msgstr ""
+
+#: src/menu_gui.c:372
+msgid "Yes"
+msgstr ""
+
+#: src/menu_gui.c:374
+msgid "button5"
+msgstr ""
+
+#: src/menu_gui.c:379
+msgid "No"
+msgstr ""
+
+#: src/menu_gui.c:381
+msgid "button6"
+msgstr ""
+
+#: src/menu_gui.c:386
+msgid "destroy"
+msgstr ""
+
+#: src/menu_gui.c:414
+msgid "window4"
+msgstr ""
+
+#: src/menu_gui.c:415 src/menu_gui.c:743
+msgid "About"
+msgstr ""
+
+#: src/menu_gui.c:420
+msgid "fixed1"
+msgstr ""
+
+#: src/menu_gui.c:427
+msgid "notebook1"
+msgstr ""
+
+#: src/menu_gui.c:434
+msgid ""
+"System 3.5 scenario decoder\n"
+"for X\n"
+"Version "
+msgstr ""
+
+#: src/menu_gui.c:434
+msgid " [proj. RainyMoon]"
+msgstr ""
+
+#: src/menu_gui.c:436
+msgid "label26"
+msgstr ""
+
+#: src/menu_gui.c:441
+msgid "Information1"
+msgstr ""
+
+#: src/menu_gui.c:443
+msgid "label23"
+msgstr ""
+
+#: src/menu_gui.c:453
+msgid "Information2"
+msgstr ""
+
+#: src/menu_gui.c:455
+msgid "label24"
+msgstr ""
+
+#: src/menu_gui.c:465
+msgid "Information3"
+msgstr ""
+
+#: src/menu_gui.c:467
+msgid "label25"
+msgstr ""
+
+#: src/menu_gui.c:475
+msgid "button11"
+msgstr ""
+
+#: src/menu_gui.c:533
+msgid "menu1"
+msgstr ""
+
+#: src/menu_gui.c:540
+msgid "MessageSkip"
+msgstr ""
+
+#: src/menu_gui.c:542
+msgid "item1"
+msgstr ""
+
+#: src/menu_gui.c:549
+msgid "item1_menu"
+msgstr ""
+
+#: src/menu_gui.c:558 src/menu_gui.c:600 src/menu_gui.c:650 src/menu_gui.c:684
+#: src/menu_gui.c:718
+msgid "ON"
+msgstr ""
+
+#: src/menu_gui.c:561
+msgid "item2"
+msgstr ""
+
+#: src/menu_gui.c:566 src/menu_gui.c:608 src/menu_gui.c:658 src/menu_gui.c:692
+#: src/menu_gui.c:726
+msgid "OFF"
+msgstr ""
+
+#: src/menu_gui.c:569
+msgid "item3"
+msgstr ""
+
+#: src/menu_gui.c:576
+msgid "__________1"
+msgstr ""
+
+#: src/menu_gui.c:582
+msgid "MouseAutoMove"
+msgstr ""
+
+#: src/menu_gui.c:584
+msgid "item4"
+msgstr ""
+
+#: src/menu_gui.c:591
+msgid "item4_menu"
+msgstr ""
+
+#: src/menu_gui.c:603
+msgid "item5"
+msgstr ""
+
+#: src/menu_gui.c:611
+msgid "item6"
+msgstr ""
+
+#: src/menu_gui.c:618
+msgid "__________2"
+msgstr ""
+
+#: src/menu_gui.c:624 src/menu_gui_volval.c:43
+msgid "VolumeValance"
+msgstr ""
+
+#: src/menu_gui.c:626 src/menu_gui.c:634
+msgid "item7"
+msgstr ""
+
+#: src/menu_gui.c:632
+msgid "PCM-audio"
+msgstr ""
+
+#: src/menu_gui.c:641
+msgid "item7_menu"
+msgstr ""
+
+#: src/menu_gui.c:653
+msgid "item8"
+msgstr ""
+
+#: src/menu_gui.c:661
+msgid "item9"
+msgstr ""
+
+#: src/menu_gui.c:666
+msgid "CDROM-audio"
+msgstr ""
+
+#: src/menu_gui.c:668
+msgid "item10"
+msgstr ""
+
+#: src/menu_gui.c:675
+msgid "item10_menu"
+msgstr ""
+
+#: src/menu_gui.c:687
+msgid "item11"
+msgstr ""
+
+#: src/menu_gui.c:695
+msgid "item12"
+msgstr ""
+
+#: src/menu_gui.c:700
+msgid "MIDI-audio"
+msgstr ""
+
+#: src/menu_gui.c:702
+msgid "item13"
+msgstr ""
+
+#: src/menu_gui.c:709
+msgid "item13_menu"
+msgstr ""
+
+#: src/menu_gui.c:721
+msgid "item14"
+msgstr ""
+
+#: src/menu_gui.c:729
+msgid "item15"
+msgstr ""
+
+#: src/menu_gui.c:736
+msgid "__________3"
+msgstr ""
+
+#: src/menu_gui.c:745
+msgid "item16"
+msgstr ""
+
+#: src/menu_gui.c:752
+msgid "__________4"
+msgstr ""
+
+#: src/menu_gui.c:760
+msgid "item17"
+msgstr ""
+
+#: src/menu_gui.c:765
+msgid "deactivate"
+msgstr ""
+
+#: src/menu_gui.c:768 src/menu_gui.c:771 src/menu_gui_volval.c:97
+msgid "toggled"
+msgstr ""
+
+#: src/menu_gui.c:820
+msgid "window5"
+msgstr ""
+
+#: src/menu_gui.c:825
+msgid "entry2"
+msgstr ""
+
+#: src/menu_gui.c:848
+msgid "window6"
+msgstr ""
+
+#: src/menu_gui.c:849
+msgid "MessageBox"
+msgstr ""
+
+#: src/menu_gui.c:854
+msgid "vbox5"
+msgstr ""
+
+#: src/menu_gui.c:859
+msgid "Messge"
+msgstr ""
+
+#: src/menu_gui.c:861
+msgid "label51"
+msgstr ""
+
+#: src/menu_gui.c:868
+msgid "button16"
+msgstr ""
+
+#: src/menu_gui_volval.c:45
+msgid "frame1"
+msgstr ""
+
+#: src/menu_gui_volval.c:53
+msgid "table2"
+msgstr ""
+
+#: src/menu_gui_volval.c:65
+msgid "label1"
+msgstr ""
+
+#: src/menu_gui_volval.c:74
+msgid "value-changed"
+msgstr ""
+
+#: src/menu_gui_volval.c:80
+msgid "hscale1"
+msgstr ""
+
+#: src/menu_gui_volval.c:89
+msgid "mute"
+msgstr ""
+
+#: src/menu_gui_volval.c:91
+msgid "checkbutton1"
+msgstr ""
+
+#: src/menu_gui_volval.c:114
+msgid "small"
+msgstr ""
+
+#: src/menu_gui_volval.c:122
+msgid "large"
+msgstr ""
+
+#: src/menu_gui_volval.c:130
+msgid "delete_event"
+msgstr ""

@@ -1,0 +1,80 @@
+                  ゲームリソースファイル(*.gr)の書き方
+
+
+   xsystem35ではゲームデータの置き場所をテキストファイルに保存しておき、
+ それをxsystem35に指定してやる事でデータの置き場所を知らせます。
+
+# このファイルのファイル名はxsystem35を起動する時に指定できますので、hoge.gr
+# である必要は無く、自由につける事が出来ます。
+
+ ここでは、このテキストファイル(ゲームリソースファイル)の書式を説明します。
+
+
+  １つのデータにつき１行で記述します。例を見て下さい。
+
+  ScenarioA /home/chikama/game/rance4/rance4_sa.ald
+
+    キーワード データのフルパス
+
+ の順に書きます。キーワードは行の先頭から書き、データのフルパスとの間は半角
+ スペースです。(セーブデータのみ、ホームディレクトリを表す ~ を評価します。)
+ 
+ キーワードには次の７つがあります。
+
+    Scenario : シナリオ
+    Graphics : グラフィック
+    Wave     : PCMデータ
+    Midi     : MIDIデータ
+    Data     : その他データ
+    Save     : セーブデータ
+    Resouce  : リソースファイル(マウスカーソル形状)
+    Ain      : DLL とその関数の情報のかかれた System39.ain
+    BGM      : BGMデータ(エスカレイヤー以降のBGMデータファイル)
+    WAI      : PCMデータの追加情報 (mixer channel 情報等)
+    BGI      : BGMデータの追加情報 (ループ位置等)
+    SACT01   : SACT.DLL用データ (SACTEFAM.KLD)
+    ALK      : デモ用アーカイブファイル
+    Init     : System39.ini
+   
+ 同じ種類のデータが複数ある場合はキーワードの次にA,B,C...をつけます。
+ (Ain を除く)
+
+   CD-ROM上のどれがどの種類のファイルかは、ファイル名で判別します。
+ *SA.ALD ならシナリオの１番目、*GA.ALDはグラフィック、*WA.ALDはPCM、
+ *MA.ALD はMIDI、*DA.ALDはその他データです。
+
+   Ain は System39.ain へのパスを書きます。例えば
+ Ain /home/chikama/game/20cKaeru/System39.ain
+ のように書きます。
+
+   Init は System39.ini へのパスを書きます。例えば
+ Init /home/chikama/game/esuka/System39.ini
+ のように書きます。
+
+   WAI/BGI は通常１ファイルだけですので
+ WAIA /home/chikama/game/esuka/DOKI_WA.WAI
+ BGIA /home/chikama/game/esuka/DOKI_BA.BGI
+ のように書きます。
+  
+   SACT01 は SACTシステム固有のデータファイル(SACTEFAM.KLD)へのパスを
+ 指定します。
+ SACT01 /home/chikama/game/rance5d/SACTEFAM.KLD
+
+   ALK はデモ用のデータが入ったアーカイブファイルです。
+ ALK01 /home/chikama/game/nd/NightDemonDemo1.alk
+ ALK02 /home/chikama/game/nd/NightDemonDemo2.alk
+ ALK03 /home/chikama/game/nd/NightDemonDemo3.alk
+ のように書きます。
+
+
+  また、これらの範疇にはいらないデータ、たとえば、かえるにょぱにょんの
+ floor_1.mapなどはリソースファイルを介しませんので、ゲームリソース
+ ファイルには書かず、「セーブデータを置いたディレクトリと同じ場所」に
+ コピーして下さい。
+
+   また、Save? のみ、'~' (ホームディレクトリ)を評価しますので、
+ SaveA ~/savedata/kichiku/kichiku_sa.ald
+ のように書く事が出来ます。
+
+ コメントを書く場合は行頭に # をつけます。また空白行は無視されます。
+

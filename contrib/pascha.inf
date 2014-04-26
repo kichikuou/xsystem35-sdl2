@@ -1,0 +1,33 @@
+# PastelChime Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ALD,	pascha_sa.ald
+GraphicsA,	gamedata/*GA.ALD,	pascha_ga.ald
+WaveA,		gamedata/*WA.ALD,	pascha_wa.ald
+MidiA,		gamedata/*MA.ALD,	pascha_ma.ald
+DataA,		gamedata/*DA.ALD,	pascha_da.ald
+SaveA,				,	pascha_sa.asd
+SaveB,				,	pascha_sb.asd
+SaveC,				,	pascha_sc.asd
+SaveD,				,	pascha_sd.asd
+SaveE,				,	pascha_se.asd
+SaveF,				,	pascha_sf.asd
+SaveG,				,	pascha_sg.asd
+SaveH,				,	pascha_sh.asd
+SaveI,				,	pascha_si.asd
+SaveJ,				,	pascha_sj.asd
+SaveK,				,	pascha_sk.asd
+SaveL,				,	pascha_sl.asd
+SaveM,				,	pascha_sm.asd
+SaveN,				,	pascha_sn.asd
+SaveO,				,	pascha_so.asd
+SaveP,				,	pascha_sp.asd
+SaveQ,				,	pascha_sq.asd
+SaveR,				,	pascha_sr.asd
+SaveS,				,	pascha_ss.asd
+SaveT,				,	pascha_st.asd
+SaveU,				,	pascha_su.asd
+SaveV,				,	pascha_sv.asd
+SaveW,				,	pascha_sw.asd
+SaveX,				,	pascha_sx.asd
+SaveY,				,	pascha_sy.asd
+SaveZ,				,	pascha_sz.asd

@@ -1,0 +1,32 @@
+# Only You リクルス Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ald,	onlyyou_r_sa.ald
+GraphicsA,	gamedata/*GA.ald,	onlyyou_r_ga.ald
+WaveA,		gamedata/*WA.ald,	onlyyou_r_wa.ald
+Ain,		gamedata/*.ain,		System39.ain
+SaveA,				,	onlyyou_r_sa.asd
+SaveB,				,	onlyyou_r_sb.asd
+SaveC,				,	onlyyou_r_sc.asd
+SaveD,				,	onlyyou_r_sd.asd
+SaveE,				,	onlyyou_r_se.asd
+SaveF,				,	onlyyou_r_sf.asd
+SaveG,				,	onlyyou_r_sg.asd
+SaveH,				,	onlyyou_r_sh.asd
+SaveI,				,	onlyyou_r_si.asd
+SaveJ,				,	onlyyou_r_sj.asd
+SaveK,				,	onlyyou_r_sk.asd
+SaveL,				,	onlyyou_r_sl.asd
+SaveM,				,	onlyyou_r_sm.asd
+SaveN,				,	onlyyou_r_sn.asd
+SaveO,				,	onlyyou_r_so.asd
+SaveP,				,	onlyyou_r_sp.asd
+SaveQ,				,	onlyyou_r_sq.asd
+SaveR,				,	onlyyou_r_sr.asd
+SaveS,				,	onlyyou_r_ss.asd
+SaveT,				,	onlyyou_r_st.asd
+SaveU,				,	onlyyou_r_su.asd
+SaveV,				,	onlyyou_r_sv.asd
+SaveW,				,	onlyyou_r_sw.asd
+SaveX,				,	onlyyou_r_sx.asd
+SaveY,				,	onlyyou_r_sy.asd
+SaveZ,				,	onlyyou_r_sz.asd

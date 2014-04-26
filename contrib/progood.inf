@@ -1,0 +1,17 @@
+# prostudent good Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	GAMEDATA/*SA.ALD,	progood_sa.ald
+GraphicsA,	GAMEDATA/*GA.ALD,	progood_ga.ald
+WaveA,		GAMEDATA/*WA.ALD,	progood_wa.ald
+DataA,		GAMEDATA/*DA.ALD,	progood_da.ald
+SaveA,				,	progood_sa.asd
+SaveB,				,	progood_sb.asd
+SaveC,				,	progood_sc.asd
+SaveD,				,	progood_sd.asd
+SaveE,				,	progood_se.asd
+SaveF,				,	progood_sf.asd
+SaveG,				,	progood_sg.asd
+SaveH,				,	progood_sh.asd
+SaveI,				,	progood_si.asd
+SaveJ,				,	progood_sj.asd
+SaveK,				,	progood_sk.asd

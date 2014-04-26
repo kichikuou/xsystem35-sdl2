@@ -1,0 +1,328 @@
+
+        System 3.5 for X Window System     Version 1.7 (開発版)
+
+0. 目次
+
+   1. はじめに
+   2. 開発環境と動作確認環境
+    2.a. 開発環境
+    2.b. 動作確認環境
+    2.c. 多分動くと思われる環境
+   3. xystem35の設定ファイル
+   4. ゲームの実行と終了
+    4.a. ゲームの実行
+    4.b. ゲームの終了
+    4.c. xsystem35メニュー
+    4.d. キーボード操作
+   5. コマンドラインオプション
+   6. その他情報
+    6.a. SYSV IPC
+    6.b. SharedMemoryの大きさについて
+    6.c. locale と X
+   7. 著作権とライセンス
+   8. サポート
+
+
+1. はじめに
+
+   このソフトは AliceSoft の Syetem3.5/3.6/3.8/3.9 上で動くゲームを
+ X Window System 上で動かすためのプログラムです。
+
+ * 動作確認ゲーム
+
+     鬼畜王ランス
+     ランス４ (for Win95)
+     闘神都市II (for Win95)
+     夢幻泡影 (for Win95)
+     かえるにょぱにょ〜ん (初版、廉価版)
+     いけないかつみ先生
+     戦巫女 (初版、廉価版)
+     零式 (館４５６版、廉価版)
+     ATLACH=NACHA (館４５６版、廉価版)
+     人間狩り
+     王道勇者
+     ディアボリカ (初版、廉価版)
+     AmbivalenZ(for Win95)
+     ぱすてるチャイム
+     ぷろすちゅーでんとGood
+     守り神様
+     ママトト
+
+     アリスの館４５６
+        DALK
+        闘神都市
+        DrStop!
+        ランス１
+        ランス２
+        ランス３
+
+     アリスＣＤ Ver 1.02
+        メイドのすすめ
+        ぶろぶろ
+        学園漂流戦記
+
+     Hushaby Baby
+     Darcrows
+     PERSIOM
+     隠れ月
+     SeeIn青
+
+     20世紀アリス
+        これDPS？
+        かえるにょ国にょアリス
+
+     アリスＣＤ Ver 2.02
+        扉
+        妖精
+
+     OnlyYou リ・クルス
+     王子さま Lv1.5
+
+ * 動かないゲーム
+
+     夜が来る！
+     王子さま Lv1
+     DALK外伝 (System4)
+     ままにょにょ (System4)
+
+ * 一部動作可能
+
+     大悪司 (オープニング不可)
+     妻みぐい (オープニング不可)
+     エスカレイヤー (オープニング不可)
+     Rance5D
+     妻みぐい２ (オープニング不可)
+     シェル・クレイル
+     NightDemon (オープニング不可)
+     
+
+   各ゲームについての補足事項は doc/GAMES.TXT を御覧ください。
+     
+   また、ネット上で公開されているSYSTEM3.5用のゲームのうち、いくつかは
+  動作が確認されています。くわしくは MISCGAME.TXT を御覧下さい。
+
+
+2. 開発環境と動作確認環境
+
+ 2.a. 開発環境
+
+   Kondara-1.2 (Linux/i386)
+
+ 2.b. 動作確認環境
+
+   DigitalUnix 4.0F (alpha)
+   SunOS 5.8 (sparc)
+
+ 2.c. 多分動くと思われる環境
+
+   Linux(!i386)
+   FreeBSD/NetBSD/OpenBSD (i386 etc)
+   Irix 6.X
+   Solaris 2.X 以降 (sparc/i386)
+
+
+3. xystem35の設定ファイル
+
+   xsystem35ではフォントの設定などを .xsys35rcというファイルから読み込みます。
+ デフォルトでは、ホームディレクトリをまず探し、次にカレントディレクトリを探し
+ ます。サンプルとなるファイルを xsys35rc.sample として用意しました。
+
+   また、gtk widgetのリソースは ~/.gtk/gtkrc または ~/.gtkrc から読み込みます。
+ 読み込み先は .xsys35rc で指定できます。
+
+   ゲームで使用するフォントは X のフォントの仕組を使う方法と、TrueTypeFontを
+ 外部ライブラリを使って直接表示する方法の２種類が選べます。
+ 
+ ~/.xsys35rc の ttfont_mincho: と ttfont_gothic: の場所にフォントファイルを
+ 指定し、font_device: ttf と指定してください。詳しくはサンプルファイル
+ (xsys35rc.sample)を見て下さい。
+
+
+4. ゲームの実行と終了
+
+ 4.a. ゲームの実行
+
+    instgameを使ってゲームデータをインストールすると、インストールした
+  ディレクトリにの一つ上に ???????.gr というファイル(ゲームリソースファイル)
+  が自動的に作成されますので
+
+  % xsystem35 -gamefile ~/game/???????.gr
+
+  のように実行します。-gamefile オプションをつけない場合は、カレントディレク
+  トリの xsystem35.gr を参照します。
+
+    またいずれも見つからない場合は、カレントディレクトリにあるファイルをゲーム
+  データとして設定します。例えば testSA.ALD というファイルがカレントディレク
+  トリにあると、それをシナリオデータとして使います。またセーブデータは適当な
+  名前で 10個確保されます。
+
+  ゲームリソースファイルの書き方については、doc/GRFMT.TXT を御覧下さい。
+
+ 4.b. ゲームの終了
+
+   * 起動した端末で Ctrl+C を押すと、すぐに終了します。
+
+   * ゲーム中にマウスの真中のボタンを押すと、メニューが出て来ますので、
+   そこから 'Exit' を選んで終了させて下さい。Window Manager のCloseボタンでも
+   同じように動作します。
+
+   * ESC + SPACE + RET キーを同時に押すと、すぐに終了します。
+
+ 4.c. xsystem35メニュー
+
+   ゲーム中にマウスの真中ボタンを押すとメニューが出て来ます。
+
+  メッセージスキップ(MessageSkip):
+        次の選択肢までメッセージを飛ばします。マウスの右クリックで
+        止まります。シナリオによっては停止しない場合もあります。
+  
+  マウスカーソル移動(MouseAutoMove):
+        選択ウィンドなどでマウスが自動的に移動するのを制御します。
+
+  ボリュームバランス(VolumeValance):
+        SACTシステムで音声の人物毎に音量を変えることができます。
+        (ゲームがそう出来るように対応している場合のみ)
+
+  情報(About):
+        このゲームについて。
+
+  終了(Exit):
+        ゲームを終了します。
+
+ 4.d. キーボード操作
+
+    アリスソフトのゲームは有史来、基本的に上下左右キーに SPACE, RET, ESC, TAB
+  キーしか使いません(一部のゲームはそれ以外のキーを使うこともあります)。
+  XSystem35 では次のキー割当を特別に使っています。
+
+    F1: メッセージスキップ
+    F4: フルスクリーン <-> Window表示の切替え
+
+  また、旧き良き時代の DOS への復帰キー (ESC + SPACE + RET) でゲームを確認なし
+  で終了出来ます。  
+
+
+5. コマンドラインオプション
+
+  -h             : ヘルプを表示します。
+
+  -gamefile file : ゲームリソースファイルを file から読み込みます。
+
+  -no-shm        : ネットワーク越しに起動する場合に指定します。
+
+  -devcd name    : CD-ROM device名を name にします。
+  -devmidi name  : MIDI device名を name にします。
+  -devdsp name   : DSP device名を name にします。
+
+  -O?            : PCM の出力の種類を選択します。
+  -Oo            : OSS mode
+  -Os            : ALSA mode
+  -Oe            : Enlightened Sound Daemon mode
+  -O0            : disable audio
+
+  -M?            : MIDI の出力の種類を選択します。
+  -Me            : External midi player (default)
+  -Mr            : Raw Midi device
+  -Ms?           : Sequencer device (?:device number)
+  -M0            : disable midi
+
+  -midiplayer cmd: 外部MIDIプレイヤーとして cmd を使います。
+                   -midiplayer "timidity -A 100 -s 44100 -Oe" のように指定
+                   します。
+
+  -devmix name   : OSS の mixer device の device 名をname にします。
+
+  -devjoy name   : joystick のデバイス名を name にします
+
+  -savekanji #   : ゲーム内でファイル名を指定してセーブデータを記録するとき、
+                   日本語のファイル名を EUC と SJIS のどちらで保存するかを
+                   指定します。(# は 0 または 1 ... 0:euc, 1:sjis)
+
+  -version       : バージョン情報を表示します。
+
+  -fullscreen    : フルスクリーンでゲームを実行します。
+                   SDL 有効時には Widget にフォーカスが当たらないため Popup
+                   menu 等が使用できません。
+
+  -antialias     : 常に文字にアンチエリアスをかけます。Hushaby Baby よりも前の
+                   ゲームのうち 256色でないものに対して有効です。
+
+  -noantialias   : 常に文字にアンチエリアスをかけません。シナリオ上でアンチ
+                   エリアスの指定があっても無視します。
+
+  -devfont       : フォントデバイスを指定します。x11/gtk/ttf のいずれかが
+                   使えます。
+
+  -noimagecursor : リソースファイルによるカーソル形状の変更(Darcrows等)を無効
+                   にしたい場合に指定します。
+
+
+6. その他情報
+
+ 6.a. SYSV IPC
+
+    カーネルに SYSV IPC (SharedMemory/MessageQueue/Semaphore)の機能が
+  組み込まれている必要があります。
+
+ 6.b. SharedMemoryの大きさについて
+
+   カーネルのSharedMemoryの大きさが十分大きい場合、MIT-SHMを利用して画面を
+ 高速に描画する事が出来ます。起動時にエラーが出る場合、カーネルパラメータを
+ 変更してみて下さい。(BSD 系はデフォルトの SharedMemory の大きさが小さい
+ ようです)
+
+ 6.b.1. FreeBSDの場合 /usr/src/sys/i386/conf/LINT 中の
+
+   options         SHMALL=1025
+   options         "SHMMAX=(SHMMAXPGS*PAGE_SIZE+1)"
+   options         SHMMAXPGS=1025
+   options         SHMMIN=2
+   options         SHMMNI=33
+   options         SHMSEG=9
+  「SHMMAXPGS」が関連項目です。
+
+   24bppで起動する場合は SHMMAXPGS=4096 くらいにするとよいようです。
+ もちろん設定後はカーネルの再構築が必要です。
+
+ 6.c. locale と X
+
+  libc に locale 機構が組み込まれていない環境の場合、libxpg4 などの
+  ライブラリ(FreeBSD) や X の locale を使うことになります。
+
+  linux の libc5 な環境では configure 時に --with-locale=ja_JP.ujis として
+  コンパイルしてください。
+
+  それ以外のほとんどの環境では考慮する必要はないでしょう。
+
+
+7. 著作権とライセンス
+
+   プログラムの著作権は作者(chikama)に属しますが、ソースコードはGPLに基づいて
+ 再配付できます。
+ (一部のソースコードは私以外に著作権があります。詳しくは、ソースコードを御覧
+  下さい)
+
+   ゲーム内で使われてるカーソルフォントの一部をqvwm(Windows95そっくりのWindow
+ Manager)からいただきました。
+
+
+8. サポート
+
+   動作報告・バグ報告などは以下のメールアドレスまでお願いします。
+
+   E-Mail: chikama@nabal.aist-nara.ac.jp     (private)
+           masaki-c@is.aist-nara.ac.jp       (official)
+
+   また最新版は以下のURLからダウンロードできます。
+
+   http://www.aist-nara.ac.jp/~masaki-c/private/unitbase/xsys35/index.html
+
+   バグレポートの際は、お使いの環境を出来るだけくわしく書いて下さい。
+ また特定のゲームで動かない場合は、出来るだけセーブデータも添付して下さい。
+
+   プログラムやシナリオデータのバグで 'sigsegv caught @xxx,xxxxx' といって
+ 終了する場合は、そのメッセージの部分(xxx,xxxx)も送って下さい。
+
+   可能ならば、./configure で --enable-debug を付けてコンパイルしておき、
+ デバッガ上で実行して segmentation fault で止まった時に、bt と打って出てくる
+ メッセージを添付していただけるととても助かります。

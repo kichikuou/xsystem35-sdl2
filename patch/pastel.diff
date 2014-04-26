@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ "$1" = "" ]; then 
+	echo "pascha.diff targetfile"
+	exit 1
+fi
+
+if [ ! -f "$1" ]; then
+	echo "$1 not found"
+	exit 1
+fi
+cp $1 $1.org
+chmod u+w $1
+echo 'G' | dd of=$1 ibs=1 obs=1 count=1 seek=7272 conv=notrunc
+chmod u-w $1
+echo "done!"
+exit 0

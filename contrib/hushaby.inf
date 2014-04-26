@@ -1,0 +1,8 @@
+# Hushaby Baby Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ALD,	hushaby_sa.ald
+GraphicsA,	gamedata/*GA.ALD,	hushaby_ga.ald
+WaveA,		gamedata/*WA.ALD,	hushaby_wa.ald
+MidiA,		gamedata/*MA.ALD,	hushaby_ma.ald
+SaveA,				,	hushaby_sa.asd
+

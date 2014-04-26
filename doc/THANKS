@@ -1,0 +1,44 @@
+
+Special Thanks To ...
+
+
+
+奈良木さんにはゲームのインストール用のスクリプトを作成して頂きました。
+また、Debianのパッケージ化をしていただきました。
+<naraki@debian.or.jp>
+
+鍋谷さんにはFreeBSDへのポーティングについて情報やテストをして頂きました。
+<nabe@ksj.mcu.or.jp>
+
+ごうさんにはプログラムの事やOpenBSDについていろいろとアドバイスを頂きました。
+<go@cclub.cc.tut.ac.jp>
+
+後藤さんにはLinuxPPC/MkLinuxに関する情報をいただきました。
+<karg@can.bekkoame.ne.jp>
+
+田尻さんにはペイントルーチンを実装して頂きました。また、アリスの館４５６
+に収録されているゲームへの対応など、各種パッチをいただきました。
+また、ネット上のSYSTEM3.5対応ゲームの動作状況をまとめていただきました。
+マウスカーソル形状変更に対応して頂きました。
+<tajiri@wizard.elec.waseda.ac.jp>
+
+村田さんには より汎用的な midi.c を頂きました。
+また、ALSAのMixerまわりの改良をしていただきました。
+linuxのjoystickへの対応をしていただきました。
+SDL に対応していただきました。
+TrueType Font に対応していただきました。
+<fmurata@p1.tcnet.ne.jp>
+
+平岡さんにはFreeBSDのportを作成して頂きました。
+<flathill@flathill.gr.jp>
+現在のportsの管理は藤島さんが行なっています。
+<k5@respo.or.jp>
+
+高木さんにはrpmのパッケージ化をして頂きました。
+<jwtoshi@mars.dti.ne.jp>
+
+
+その他、テストプレイをして頂いた皆さんに感謝します。
+
+
+by Masaki Chikama(Wren) <masaki-c@is.aist-nara.ac.jp>

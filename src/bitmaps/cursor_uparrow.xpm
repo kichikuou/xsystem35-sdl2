@@ -1,0 +1,43 @@
+/* XPM */
+static const char *cursor_uparrow[] = {
+	/* width height num_colors chars_per_pixel */
+	"    32    32        3            1",
+	/* colors */
+	". c #000000",
+	"X c #ffffff",
+	"  c None",
+	/* pixels */
+	"              X                 ",
+	"             XXX                ",
+	"            X...X               ",
+	"           X.....X              ",
+	"          X.......X             ",
+	"         X.........X            ",
+	"        X...........X           ",
+	"       X... .........X          ",
+	"      XXXXXXXX.XXXXXXXX         ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             X.X                ",
+	"             XXX                ",
+	"                                ",
+	"                                ",
+	"15,0"
+};

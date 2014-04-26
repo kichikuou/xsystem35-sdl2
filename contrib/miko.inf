@@ -1,0 +1,9 @@
+# Ikusa Miko Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	miko_sa.ald
+GraphicsA,	gamedata/*ga.ald,	miko_ga.ald
+WaveA,		gamedata/*wa.ald,	miko_wa.ald
+SaveA,				,	miko_sa.asd
+SaveB,				,	miko_sb.asd
+SaveC,				,	miko_sc.asd
+SaveJ,				,	miko_sj.asd

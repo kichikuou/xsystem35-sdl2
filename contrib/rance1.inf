@@ -1,0 +1,20 @@
+# Rance 1 Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	rance1/rancesa.ald,	rance1_sa.ald
+GraphicsA,	rance1/rancega.ald,	rance1_ga.ald
+MidiA,		rance1/rancema.ald,	rance1_ma.ald
+WaveA,		rance1/rancewa.ald,	rance1_wa.ald
+SaveA,				,	rance1_sa.asd
+SaveB,				,	rance1_sb.asd
+SaveC,				,	rance1_sc.asd
+SaveD,				,	rance1_sd.asd
+SaveE,				,	rance1_se.asd
+SaveF,				,	rance1_sf.asd
+SaveG,				,	rance1_sg.asd
+SaveH,				,	rance1_sh.asd
+SaveI,				,	rance1_si.asd
+SaveJ,				,	rance1_sj.asd
+SaveK,				,	rance1_sk.asd
+SaveL,				,	rance1_sl.asd
+SaveM,				,	rance1_sm.asd
+SaveN,				,	rance1_sn.asd

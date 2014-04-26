@@ -1,0 +1,191 @@
+                それぞれのゲームに付いての注意書き
+
+ [鬼畜王ランス]
+
+ [ランス４(for Win95)]
+   = マウスのクリック反応が悪い (fixed ?)
+
+ [闘神都市２(for Win95)]
+
+ [いけないかつみ先生]
+   = 外字データには対応していません
+
+ [かえるにょぱにょ〜ん]
+   = フロアデータ(floor_1.map 〜 floor_16.map) はセーブデータと同じディレク
+     トリに置いてください。
+   = 一部のキャラの絵と説明が違う(金魚と????)
+
+ [戦巫女]
+   = 戦巫女は２枚組のCDで、Windows版では一部のデータをCD-ROMに置いたままゲーム
+     することになっていますが、xsystem35 では CD-Audio と CD-ROM上のデータを
+     同時に使用することは出来ません。ハードディスク等に全てのデータをインス
+     トールするか、あるいは CD-Audio 以外の演奏方法(MP3等)を使用してください。
+     CD-Audio を使う場合は２枚目の CD に音楽データが入っています。
+
+ [零式(アリスの館４５６版)]
+   = マップデータ(MAP_DATA.DAT, UR_DATA.DATA)はセーブデータと同じディレクトリに
+     置いてください。
+
+ [ATLACH=NACHA(アリスの館４５６版)]
+
+ [人間狩り(アリスの館４５６版)]
+
+ [アリスの館４５６]
+   - DALK
+
+   - 闘神都市
+
+   - DrStop!
+
+   - ランス１
+
+   - ランス２
+
+   - ランス３
+
+ [王道勇者]
+
+ [ディアボリカ]
+
+ [AmbivalenZ(for Win95)]
+
+ [夢幻泡影 (for Win95)]
+
+ [ぱすてるチャイム]
+   = ぱすてるチャイムでは明らかにシナリオにおかしいところがあります。
+     そこで、これに対するパッチを作成しました。
+
+     patch というディレクトリの下に pastel.diff というパッチ当てのスクリプト
+     がありますので、ゲームのシナリオデータのあるディレクトリにコピーして
+     そのディレクトリに移動した後、 ./pastel.diff (シナリオファイル名) と
+     実行してください。
+     (例)
+      > ./pastel.diff pastel_sa.ald
+
+     古いデータは pastel_sa.ald.org として保存されます。
+     シナリオデータは Ver 1.00 と Ver 1.01 に適用できます。
+
+     (廉価版では直っている？)
+
+ [ぷろすちゅーでんとGood]
+
+ [守り神様]
+
+ [ママトト]
+
+ [HushByBaby]
+
+ [Darcrows]
+
+ [PERSIOM]
+   = DirectSound(3D Sound) には対応していません。
+
+ [隠れ月]
+
+ [SeeIn青]
+
+ [廉価版・デアボリカ]
+
+ [廉価版・アトラクナクア]
+
+ [廉価版・かえるにょ・ぱにょん]
+
+ [廉価版・零式]
+
+ [かえるにょ国にょありす(２０世紀アリス)]
+   = 外部MIDIプレイヤーモードでは音楽がリピートされません。
+
+ [これＤＰＳ？(２０世紀アリス)]
+
+ [夜が来る！]
+   = 動きません
+
+ [王子さま Lv1]
+   = 動きません
+
+ [Only You 〜リ・クルス〜]
+
+ [大悪司]
+   = オープニングが動かない
+
+ [王子さま Lv1.5]
+
+ [妻みぐい]
+   = オープニングが動かない
+
+ [エスカレイヤー]
+   = オープニングが動かない
+
+ [Rance5D]
+
+ [妻みぐい２]
+   = オープニングが動かない
+
+ [DALK外伝]
+ [ままにょにょ]
+   = System4につき動きません
+
+
+/*
+ * その他
+ */
+
+ * センチメンタルシーズン (Aliceの館 CDをベースに UNITBASE が移植したもの)
+   = http://www4.big.or.jp/~unitbase/sys35sdk/games.html
+   
+ * Intruder (Aliceの館 CDをベースに UNITBASE が移植したもの)
+   = まだ完了していません
+
+ * Crecent Moon がぁる (Aliceの館 CDをベースに UNITBASE が移植したもの)
+   = http://www4.big.or.jp/~unitbase/sys35sdk/games.html
+
+ * あぶない天狗伝説 (Aliceの館 CD2をベースに UNITBASE が移植したもの)
+   = 掲載許可が下りません
+
+ * OnlyYou (system3版をベースに TOTOさんが移植したもの)
+   = http://www1.interq.or.jp/t-takeda/index.html
+
+ * ランス4.1 (system3版をベースに TOTOさんが移植したもの)
+   = http://www1.interq.or.jp/t-takeda/index.html
+   = スプライトの色がおかしい   
+
+ * ランス4.2 (system3版をベースに TOTOさんが移植したもの
+   = http://www1.interq.or.jp/t-takeda/index.html
+   = スプライトの色がおかしい   
+
+ * アリスの館３ (system3版をベースに TOTOさんが移植したもの)
+   = http://www1.interq.or.jp/t-takeda/index.html
+
+ * 乙女戦記 (system3版をベースに TOTOさんが移植したもの)
+   = http://www1.interq.or.jp/t-takeda/index.html
+
+ * 闘神都市２外伝 (system3版をベースに TOTOさんが移植したもの)
+   = http://www1.interq.or.jp/t-takeda/index.html
+
+ * DPS全部 (system3版をベースに TOTOさんが移植したもの)
+   = http://www1.interq.or.jp/t-takeda/index.html
+
+ * ProStudentG (system3版をベースに TOTOさんが移植したもの)
+   = http://www1.interq.or.jp/t-takeda/index.html
+
+ * 学園ＫＩＮＧ (AliceCD Ver 1.??)
+   = CDが鳴らない
+     -> TOTOさんが、CD-DAに対応するためのシナリオパッチをつくっています。
+        http://www1.interq.or.jp/t-takeda/midi.html
+
+
+ * メイドのススメ (AliceCD Ver 1.02)
+
+ * ぶろぶろ (AliceCD Ver 1.02)
+
+ * 学園漂流戦記 (AliceCD Ver 1.02)
+
+ * 扉 (AliceCD Ver 2.02)
+
+ * 妖精 (AliceCD Ver 2.02)
+
+/* 
+ * 3rd party 製作 ゲーム
+*/
+
+#include "MISCGAME.TXT"

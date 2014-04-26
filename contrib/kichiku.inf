@@ -1,0 +1,16 @@
+# Kichikuoh Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	kichiku_sa.ald
+GraphicsA,	gamedata/*ga.ald,	kichiku_ga.ald
+GraphicsB,	gamedata/*gb.ald,	kichiku_gb.ald
+WaveA,		gamedata/*wa.ald,	kichiku_wa.ald
+SaveA,				,	kichiku_sa.asd
+SaveB,				,	kichiku_sb.asd
+SaveC,				,	kichiku_sc.asd
+SaveD,				,	kichiku_sd.asd
+SaveE,				,	kichiku_se.asd
+SaveF,				,	kichiku_sf.asd
+SaveG,				,	kichiku_sg.asd
+SaveH,				,	kichiku_sh.asd
+SaveI,				,	kichiku_si.asd
+SaveJ,				,	kichiku_sj.asd

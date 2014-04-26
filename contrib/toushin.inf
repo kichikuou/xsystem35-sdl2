@@ -1,0 +1,16 @@
+# Toushin Toshi Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	???_?s?s/*_sa.ald,	toushin_sa.ald
+GraphicsA,	???_?s?s/*_ga.ald,	toushin_ga.ald
+MidiA,		???_?s?s/*_ma.ald,	toushin_ma.ald
+WaveA,		???_?s?s/*_wa.ald,	toushin_wa.ald
+DataA,		???_?s?s/*_da.ald,	toushin_da.ald
+SaveA,				,	toushin_sa.asd
+SaveB,				,	toushin_sb.asd
+SaveC,				,	toushin_sc.asd
+SaveD,				,	toushin_sd.asd
+SaveE,				,	toushin_se.asd
+SaveF,				,	toushin_sf.asd
+SaveG,				,	toushin_sg.asd
+SaveH,				,	toushin_sh.asd
+

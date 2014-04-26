@@ -1,0 +1,16 @@
+# Toushintoshi2 Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	toushin2_sa.ald
+GraphicsA,	gamedata/*ga.ald,	toushin2_ga.ald
+WaveA,		gamedata/*wa.ald,	toushin2_wa.ald
+DataA,		gamedata/*da.ald,	toushin2_da.ald
+SaveA,				,	toushin2_sa.asd
+SaveB,				,	toushin2_sb.asd
+SaveC,				,	toushin2_sc.asd
+SaveD,				,	toushin2_sd.asd
+SaveE,				,	toushin2_se.asd
+SaveF,				,	toushin2_sf.asd
+SaveG,				,	toushin2_sg.asd
+SaveH,				,	toushin2_sh.asd
+SaveI,				,	toushin2_si.asd
+SaveJ,				,	toushin2_sj.asd

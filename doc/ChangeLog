@@ -1,0 +1,785 @@
+Version 1.7.2 -> Version 1.7.3 (200?.**.**)
+
+pre5
+ * FedoraCore5 でコンパイルできるようにした。
+
+pre4
+ * config.sub, config.guess update
+
+pre3
+ * freetype compile errror fix
+ * Dr.Stopが動作が動作しなかったのをfix (Thanx by Onodera Hirotaka)
+ * Gtk2.0のチェックを入れた
+
+pre2
+ * configure時のlibjpegのチェックに失敗していたのをfix
+   (Thanx by Tamura Toshimichi)
+
+pre1
+ * configure時に libjpegの場所を指定できるようにした。 --with-libjpeg-prefix
+ * src/tempname.c がコンパイル出来ない場合があったのをfix
+   (Thanx by Tamura Toshimichi)
+
+Version 1.7.1 -> Version 1.7.2 (2003.12.21)
+
+final
+ * no change from pre3
+
+pre3
+ * sys_resetコマンドがよばれたときに、テンポラリディレクトリを消していなかった
+   のをfix (Thanx by OKUMURA N. Shin-ya)
+ * musicサブシステムの初期化をmusic server プロセスで行うようにした。
+   (sys_resetでデバイスを掴んだままになり音楽がならなくなっていた)
+   (Thanx by OKUMURA N. Shin-ya)
+ * SACT/sactcg.c: fix compile problem (by OKUMURA N. Shin-ya)
+ * SACT/sactcg.c: 引数が合っていないのをfix (by OKUMURA N. Shin-ya)
+ * SACT/sactcg.c: sg_loadcg_no() が NULLを返す場合の処理を追加 
+   (Thanx by OKUMURA N. Shin-ya)
+ * SACT/sactcg.c: cgオブジェクトの回収方法の再変更
+   (エスカのロード時等で落ちていたのをfix)
+
+pre2
+ * NightDemonDemo: デモをスキップできるようにした
+ * IMA ADPCM 形式の .WAV ファイルを再生できるようにした
+ * gcc-3.3.2+glibc-2.3.2の環境で alk.h でエラーがでていたのをfix
+   (by OKUMURA N. Shin-ya)
+ * テンポラリディレクトリを mkdtemp で作成するようにして、マルチユーザ環境での
+   いくつかの問題を解消した(Thanx by OKUMURA N. Shin-ya)
+
+pre1
+ * add NightDemonDemo.Init, NightDemonDemo.Run
+
+Version 1.7.0 -> Version 1.7.1 (2003.08.31)
+
+final
+ * SACT.MusicCheck で曲が存在しない場合、落ちていたのをfix
+ * アセンブラ(nasm)の存在チェックを入れた
+ * portab.h から abs を削除 (thanx by OKUMURA N. Shin-ya)
+
+pre4
+ * add dummy AliceDemo.dll NightDemonDemo.dll
+ * add SACT.MusicCheck command
+ * SACT.MusicXXX でファイル番号に0が指定されたときに対応
+ * SACT: 使用中のcgオブジェクトを開放していた場合があったのをfix
+
+pre3
+ * pcmobjのロード等のcleanup
+ * libtoolがインストールされていないとき、modules/lib がコンパイルでき
+   なかったのをfix (thanx by FUJITA)
+ * 8bitPCMの変換が正しくなかったのをfix
+   (鬼畜王などで効果音の終了時にノイズがのっていた)
+
+pre2
+ * modules/libs/graph_rect.c に 8/24bitのコードを追加
+ * sys_exitが正しく終了コードを返していなかったのをfix
+   (thanx by OKUMURA N. Shin-ya)
+ * ShSoundでメモリ上で左右のチャンネルの入れ換えが出来なくなっていたのをfix
+   (thanx by OKUMURA N. Shin-ya)
+ * SACT.SoundXXXX で配列外のメモリを破壊していたのをfix
+ * バックログ閲覧中のホイールの操作を逆にした
+
+pre1
+ * 効果音が消えずに残ることがあったのをfix
+ * MMXルーチンの関連で、surfaceを横１ライン分だけ余分に確保するようにした
+ * SACT: cgオブジェクトの回収方法のcleanup
+ * SACT: メッセージスプライトの範囲を越えて文字を描画する場合があったのをfix
+
+
+Version 1.6.0 -> Version 1.7.0 (2003.07.21)
+
+final
+ * BAファイルの演奏用スロットの決定方法の変更
+ * シェルクレイルの*BA.BGIファイルが正しくよみこめてなかったのをfix
+   (オープニングの曲の終りがおかしかった)
+ * シェルクレイルでZキーでメッセージ欄が消えなかったのをfix
+ * image拡大縮小ルーチンでバッファオーバーランする場合があったのをfix(again)
+ * SACT.DrawEffectの10番の効果が正しく動いていなかったのをfix	
+ * SACT.DrawEffectの19番の効果を追加
+ * SACT.RegistReplaceStringでsrcとdstが同じ文字列番号の時は無視するようにした
+ * バックログ閲覧中にCtrlを押すとへんになっていたのをfix
+ * バックログのページUP/DNを1行すくなくした
+ * ルビつき文字のときのセンタリングの位置がおかしかったのをfix
+
+pre6
+ * --enable-pkg-config で glib が見付けられなかったのを fix
+ * MMX alpha blend(ablend16_ppp.s)で blend率が0の時に落ちていたのをfix
+   (妻みぐい２のクイックロード等)
+ * SACT.MessageOutput(Ex)の実装を共通化
+ * SACT.MusicXXのフェード時間が短すぎたのをfix
+ * SACT.MusicXXで曲が終了しないのをfix
+ * make install で modules/libs/ 以下のものをインストールしないようにした
+ * add sysReset command
+
+pre5
+ * add fncSetTableFromStr command
+ * メッセージ文字のセンタリングが正しくなかったのをfix
+ * SACT.MessageOutputExの引数の数が間違っていたのをfix
+ * SACT: ルビつき文字を表示できるようにした
+ * SACT.XMenu???? に対応
+ * SACT.WaitKeySimple が呼ばれたときは全画面更新を行うようにした
+
+pre4
+ * SACT.WaitKeySpriteTimeOut で Timeout 時間が短すぎたのをfix
+ * BigEndianマシンで音楽・効果音が正しく演奏できなかったのをfix
+ * 画面サイズが小さくなったとき(640x480→640x400等)にエラーで落ちていたのをfix
+
+pre3
+ * add SACT.MusicGetLength command
+ * SACT.MusicGetPos が正しい値をかえしていなかったのをfix
+ * くり返し数が１の音楽を再生できなかったのをfix
+   (エスカレイヤーのエンディング等)
+
+pre2
+ * SACT.EffectDrawの10番の効果を追加
+ * 16bit alpha blend まわりのみなおし
+ * Gpx.CopyEffect(2,4) で参照サーフェイスが間違っていたのをfix
+ * eeDemo.Run に引数がたりなかったのを fix
+
+pre1
+ * 奇数x奇数サイズのqntファイルの展開がおかしかったのをfix
+ * Gpx.c から cg -> surface 変換部を切り出して libgraph へ統合
+ * DLL 用にメッセージ文字列出力、キーとマウスイベントの callback を設定できる
+   ようにした。
+ * menuReturnGoto で farcall からのreturnができなかったのをfix
+ * ablend16.s: rate設定ありの場合におかしいときがあったのをfix
+ * PCMデータの左右チャンネル反転や16bitWAVファイルのEndian変換などを
+   再生時にリアルタイムで行うよう変更
+ * 効果音データとしてOGGファイルを再生できるようにした
+ * BGMデータ(*BA.ALD)を扱えるようにした。
+ * 起動時の画面の大きさを 640x480 にした。
+ * SACT.DLL を一部実装
+ * image拡大縮小ルーチンでバッファオーバーランする場合があったのをfix
+
+
+Version 1.5.4 -> Version 1.6.0 (2003.02.01)
+
+final
+ * gtk-1.0時にGLIB_{CFLAGS|LIBS}が設定されていなかったのをfix
+ * libgen.h の存在チェックと無い環境での対策をいれた
+ * FreeBSD+OSSでSNDCTL_DSP_GETBLKSIZEで得たサイズより小さい長さをwriteする
+   と以後deviceがreadyにならずpollで待てなくなるのを fix (thanx by kurokawa)
+ * font_x11.c でメモリーリークがおきていたのを fix (thanx by kurokawa)
+ * modules以下でいくつか Makefile.amの@GLIB_LIBS@がおかしくなっていたのをfix
+ * x11でフルスクリーンにできなくなっていたのを fix (thanx by matuyama_takaaki)
+ * TPC|TPS|TPPコマンドでスタックにつんだデータが関数からのリターンの際の全POP
+   の際に正しく値を戻していなかったのをfix (リクルスのおまけモードで選択中の
+   メッセージの表示が一部おかしくなっていた) (thanx by matuyama_takaaki)
+ * moduleの検索パスが重複して登録されていたのをfix
+ * pcmlib_load() でメモリーリークしていたのをfix
+ * リソースファイルによるカーソル形状の変更を無効にするオプションを追加
+   (-noimagecursor)
+
+pre4
+ * font_gtk.c で存在しないフォントファイルを指定すると異常終了していたのをfix
+ * SDL/24bppでスプライトの色抜けができないことがあったのを fix (大悪司の
+   アニメーション等) (thanx by matuyama_takaaki)
+ * --disable-debug をデフォルトへ
+ * --disable-gtk の復活と関連する configure.ac 等の cleanup
+ * モジュールを最初にカレントディレクトリの下から検索するようにした。
+ * add msgSetOutputFlag command
+ * デフォルトのaudiodeviceの設定が効いていなかったのを fix
+ * セーブが失敗した場合、必ずコンソールにエラーメッセージを出すようにした。
+   (セーブが失敗してもシナリオ側で無視する場合があるので) (thanx by kurokawa)
+ * メッセージ領域の退避・回復に一部失敗していたのを fix (ぱすちゃで画面更新
+   が一部正しくなかった) (thanx by kurokawa)
+
+pre3
+ * Ctrl+C で正しく終了できなかったのを fix
+ * -midiplayer コマンドラインオプションをつけた
+ * ENコマンドでどの領域にも含まれていないときの返り値が正しくなかったのをfix
+   (王子様Lv1.5でスケジュールの選択が決定できなかった)
+ * music_fade.c: pcmobjがNULLの時にfadeが始まると落ちていたのを fix
+ * add wavFadeVolue command
+ * endian の判定を portab.h から configure.ac に (AC_C_BIGENDIAN)
+ * remove acconfig.h
+ * configure.ac から --disable-gtk をなくした
+ * PPC+OSSで一部音が正常にならなかったのを fix (Thanx by Onodera Hirotaka)
+
+pre2
+ * fix some compile warning
+ * Ain ファイルが指定されていないときに 2F60 command が呼ばれると異常終了
+   していたのを fix
+ * contrib/*.inf に幾つかの定義ファイルを追加
+ * -O0 時にfade 状態が正しくとれていなかったのを fix (-O0時に妻みぐいが動かな
+   かった) (Thanx by Onodera Hirotaka)
+ * {OSS|ALSA}でPCMのフォーマットを LE -> NE へ
+ * 音楽フェード用カウンタが正しく初期化されていなかったのを fix
+ * ワーク内の初期ボリュームが正しく初期化されていなかったのを fix
+ * フェード開始時のボリュームが正しく設定されていなかったのを fix
+
+pre1
+ * --enable-sdl時のコンパイルfix
+ * SDLで alpha <-> DIB 間のコピー(Copy_{from|to}_alpha)が正しく動いていなかった
+ * SDL_*.cとimage*.cとのdepthが一致していなかったのをfix (大悪司で戦略マップが
+   正しく表示できなかった)
+ * configure.ac の cleanup (freetypeを自動検出に)
+ * -M0/-O0 (使用不可にする)オプションの追加
+ * audio_oss.cのsoundcard.hのパスの変更
+ * .wavデータの読み込みの src/pcmlib.c への一元化
+ * BIGENDIANマシンでの16BitPCMデータは読み込み時に変換するようにした
+ * ShSound/pcmlib.[ch]の ShSound/shpcmlib.c のファイル名変更
+
+
+Version 1.5.3 -> Version 1.5.4 (2002.12.31)
+
+final
+ * esdのボリューム設定で、MASTERとPCM以外は無視するようにした
+ * gcc3対策で __func__をラップして sys_error -> SYSERROR に変更
+   (thanx by OKUMURA N. Shin-ya)
+ * PCM合成でmono->stereoの変換が一部おかしかったのをfix(かえるにょ国のアリス
+   で効果音がおかしかった)
+ * cdrom.mp3|midi.extplayのpipeモードでstopが機能していなかったのをfix
+ * midi.extplayのpipeモードで演奏状態が正しくとれていなかったのをfix
+ * musstremのpipe open時は実際にpopenせずにその直後のseekでopenさせるようにした
+ * midi.rawmidi.cのmidiスクリプト処理の微修正
+ * midi.rawmidi.cでmidiスクリプト処理で、jump時はALL ch NOTE off をいれるよう
+   にした。(ループの時などに音が残らなくなった)
+
+pre3
+ * System_tmpDir 等のグローバル変数の削除
+ * -devfont のデバイス名で TrueTypeFont は ttf に統一(ft2もまだ使えます)
+ * alk.[ch] を modules/dDemo から modules/lib へ移動
+ * 残っていた __FUNCTION__ を __func__ に置き換え
+ * music_client.c: mus_pcm_stop()で socket の閉じ忘れでがあったのをfix
+   (by OKUMURA N. Shin-ya)
+ * xcore_input.c: KeyPress|Releaseの時のButtonMask処理をはずし、かわりに
+   ButtonPress|Release時のRawKeyInfoへ正しく反映させるようにした
+ * ShPort.{Set|Get}KeyStatus によるキーマップ切り替えに対応 (大悪司で右ボタン
+   を押すとメッセージスキップ状態になっていた) (thanx by matuyama_takaaki)
+ * PCM合成で周波数変換がなくVol|bit|ch変更がある場合の処理が間違っていたのをfix
+   (大悪司でパイプによるMP3再生でノイズになっていた)(thanx by matuyama_takaaki)
+ * doc/TECH.TXT に VA/ZK コマンドの記述を追加。
+
+pre2
+ * audio device file のデフォルトの設定を変更
+ * audio 関係の popup メニューを削除
+ * シナリオの busy loop を避けるため main loop に usleep を入れてみる
+ * __func__ まわりの変更 (thanx by OKUMURA N. Shin-ya)
+ * いくつかの WARNING メッセージの変更
+ * DC コマンドの配列変数の確保方法の変更。(ランス４で異常な挙動がみられた)
+   (thanx by OKUMURA N. Shin-ya)
+ * マウスカーソルの移動速度のデフォルトを変更 (100msec -> 50msec)
+ * 実行時にフォントデバイスを選択できるようにした。(X11とFreeTypeの切替え等)
+ * コマンドラインからフォントファイルを指定できるようにした。
+ * DC コマンドの配列変数確保で、領域を拡張したときに、拡張した領域も 0 で
+   初期化するようにした。
+
+pre1
+ * music sever のイベント待ちを select から poll に変更
+ * mixer_esd で level が正しく設定されていなかったのを fix
+ * audio.c で条件コンパイルで ALSA が全くコンパイルされていなかったのを fix
+ * alsa の fragment size の変更 (8192->1536)
+ * audio device をゲーム中は常に open にしておくようにした
+ * auido の rate 変換でバッファ溢れが起きていたのを fix
+
+
+Version 1.5.2 -> Version 1.5.3 (2002.09.01)
+
+final
+ * fix some compile warning
+ * Gpx.EffectCopy の 11番の効果を変更
+ * cdrom.mp3 で引数の分解を basename と strtok_r でおこなうようにした。
+   (by Tomoaki Mega)
+ * fix ALSA09 'COMPILE'
+
+pre7
+ * ShSound: wav*Memory で load 後はすぐにdridataを解放
+ * music_pcm|midi で dridata の解放方法が古い方法だったのを fix
+ * PCMの演奏長さを取得する部分で桁溢れが起きていたのを fix
+   (pipe play が曲の最後まで演奏されていなかった)
+ * pipe play で曲の終了状態が正しく取れていなかったのを fix 
+ * midi演奏でstopが２度続くと落ちていたのを fix
+ * cdrom.mp3 で演奏時間の計算が間違っていたのを fix
+ * music server <-> client 間のパケットストーム回避のために usleep をいれた
+ * スペースを含むファイル名をcdrom.mp3のpipeモードで渡したときに動かなかった
+   のを fix
+	
+pre6
+ * mus_wav_* で ch の範囲チェックをいれた
+ * volume の設定で起動時のlevelを100%とするようにした
+ * pcmlib を xsystem35 コア使用部と ShSound 使用部に分離した
+ * ShSound: wav*Memory のデータの扱い方を変更した
+ * ShSound: add wavFadeVolume command
+ * mus_wav_unload と mus_wav_stop で ch情報が正しく送れていなかったのを fix
+   (リクルス等で効果音がなりっぱなしになっていた)
+ * audio_write で 0バイトの write は無視するようにした。
+
+pre5
+ * リクルスで、ジョーに最終奥義を伝授される時の効果で落ちるのを fix
+   (by matuyama_takaaki)
+ * ShCalc: BitToNumが正しく動いていなかったのを fix
+   大悪司でキャラの属性のマークが出ていなかった。(thanx by matuyama_takaaki)
+ * mixer_oss.c: levelの最大値の clipping の間違いを fix
+ * 異常終了時に残った sockt file を削除するようにした
+ * add alsa for new music subsystem
+ * update macro/alsa.m4
+ * mus_wav_waitend で再生していないときはすぐにackを返すようにした。
+
+pre4
+ * dri.c: ファイル数の見積もりバグで領域外のメモリを参照していたのを fix
+ * version 1.5 系用に xsystem35.spec.in を修正
+ * gcc 以外のコンパイラ対策 (-Wall, __FUNCTION__)
+ * linux における endian 決定の方法の変更
+ * ShString: 文字列の置換で複数の文字列を正しく置き換えられていなかったのをfix
+   大悪司でおかしな名前のキャラが出現する。(by matuyama_takaaki)
+ * ShArray: typo fix
+ * ShArray: GrepHighOrderArray で最小値の扱いが間違っていたのを fix
+   大悪司で体力順に並べるとキャラが消えた。(thanx by matuyama_takaaki)
+ * rewrite music subsystem 
+
+pre3
+ * .xsys35rc の設定でTrueTypeFontの face を選択できるようにした。
+ * MMX alphablend で一部おかしかったのを fix (SeeIn青のオープニング)
+ * 24ビットカラーでいくつかおかしいところがあったのを fix
+   (リクルスで戦闘シーンで攻撃が当たった時の効果で一瞬色が乱れる)
+   (大悪司の戦闘シーンアニメーションで色が抜けない)
+ * Gpx.BrightDestOnly+MMXで明るさ指定がおかしかったのを fix
+   (リクルスのCGモードで非選択CGが暗くならない)
+ * dataGetWORD が BigEndian マシンで正しくなかったのを fix
+ * add cdGetMaxTrack command (大悪司のシナリオバージョン 1.05 で問題がでていた)
+ * F コマンドを data* コマンド系に合わせて書き直した
+
+pre2
+ * image.c: image_putRegion に範囲チェックをいれた
+ * message.c: 現在使用中のメッセージWindow情報に関して退避情報が正しく反映
+   されていなかったのを fix (ディアボリカでsegvっていた)
+ * sel/msg: ウィンド情報に関する取扱方法を変更
+ * cmd2F.c: add data* command 
+ * cmd2F.c: add fnc{Set,Get}ReturnCode command と関数返り値の扱い方の変更
+ * cmd2F.c: add varGetNumof command
+
+pre1
+ * midi.extplay で SIGSTP で止まっているときにmidi_stopが呼ばれた時の処理を
+   変更。(by OKUMURA N. Shin-ya)
+ * macro/pkg.m4 が入っていなかったのを fix
+ * newer missing
+ * configure.ac: default audio mode のエラーを fix
+ * font_freetype2.c でフォント毎にエンコードが違う場合におかしかったのを fix
+ * font_freetype2.c でフォントのエンコード方式を取得する方法を変更
+ * font_freetype2.c で作業領域への描画範囲のチェックをいれた
+ * xcore_maskupdate.c で五芒星,六芒星は２回転ではなく、半回転にした
+	
+
+Version 1.5.1 -> Version 1.5.2 (2002.04.30)
+
+final
+ * automake 関連の cleanup
+ * CDROM_LINUX 等を ENABLE_CDROM_LINUX へ変更
+ * struct _message が定義ずみの環境があったので __message に変更
+
+pre5
+ * oDEMO ディレクトリを commit し忘れた
+
+pre4
+ * font_freetype2.c でアンチエリアスOFF時や小さいフォントサイズで埋め込みビット
+   マップフォントがある場合はそちらを使うようにした。(by TAJIRI Yasuhiro)
+ * gtk-1.3系への対応(by Fumihiko Murata)
+ * セーブファイルのバックアップを作成するときに、バックアップ元が空の場合に
+   おかしかったのを fix (by Fumihiko Murata)
+ * SDL HAVE_SDLRALPHA 関係 clean up (by Fumihiko Murata)
+ * リクルスのプロローグで流豪鉄に勝つとゲームが落るのを fix
+   (by matuyama_takaaki)
+ * JIS0213 エンコード方式の TrueType Font に対応。(by TAJIRI Yasuhiro)
+ * TrueType Font のエンコード方式毎の切替え方式を変更
+ * add empty oDEMO.dll
+ * Gpx.dll: surface を一度も作らないうちに find_null_surface を呼ぶと予約して
+   あった surface0 を返してしまっていたのを fix
+ * 闘神都市２で CD-DA の曲が切り替わらないのを fix (by OKUMURA N. Shin-ya)
+ * OSS でサウンドが固まるのを fix (by OKUMURA N. Shin-ya)
+ * ShSound.dll: 一部の関数を追加
+ * Gpx.dll: misc clean
+
+pre3
+ * add ShArray.ChangeEquArray command
+ * Gpx.LoadCGで PMS8 を読み込んだ時はα領域に展開するようにした
+ * xcore_setForeground でパレット番号が変化せず、パレットの中身が変化したときに
+   古い色で塗られていたのを fix
+ * ShGraph.dll: パラメータの解釈がいくつか違っていたのを fix
+ * msg_init() が呼ばれていなかったため、各種初期設定がされていなかったのを fix
+
+pre2
+ * ComImage -> agsurface_t に名前と一部メンバを変更
+ * pre1 での alpha plane の変更に SDL が一部追従できていなかったのを fix
+ * -noantialias オプションをつけた。
+ * ags.c: region check で width,height が 0 以下になったときの処理を追加
+ * alpha blend の MMX 対応がちゃんと動いていなかったのを fix
+ * ShGraph.dll: アニメーション関連の関数追加
+ * menuReduce で指定された数よりも実際に登録されている選択肢が少ない場合に
+   おかしかったのを fix
+
+pre1
+ * SJIS->UNICODE変換テーブルにIBM拡張漢字の項が無かったため、unicode マップの
+   TrueType font でIBM拡張漢字が表示できなかったのを fix (by TAJIRI Yasuhiro)
+ * MZ0 コマンドで文字列長さが 0 (∞？)の場合に対応
+ * ShCalc.dll, ShArray.dll, ShString.dll, Gpx.dll の関数のうち、大悪司で
+   使われているものの追加。
+ * font_freetype2.c のフォントのベースラインをそろえるようにした。
+ * メイン仮想画面(GetDIB()でとれるもの)の alplha plane を統合して仮想画面の
+   配下にした。
+ * Gpx.dll: 読み込んだ CG に alpha 情報が無い場合は、0 クリアされた alpha plane
+   を返すようにした。
+ * add menuReduce, menuGetNumof, menuGetText, menuGoto, menuReturnGoto command
+ * selection.c, message.c のグローバル変数を nact 構造体の下へ
+
+
+Version 1.5.0 -> Version 1.5.1 (2001.11.30)
+
+final
+ * RandMT.dll(王子さまlv1)に対応
+ * .grファイルが無い場合に *RA.ALD も探すようにした。
+ * libtoolの関連でmoduleがコンパイルできないのを fix
+ * qnt.c で展開バッファ不足のため zlib の展開に失敗していたのを fix
+ * 大悪司の DLL のエントリを追加
+ * QNT format version 1 に対応
+ * update doc/TECH.TXT
+ * update doc/README.music
+	
+pre4
+ * pre2でいれた sysVar の最大値の変更でこれまでのセーブデータが読めなく
+   なっていたのを fix
+ * Gコマンドでファイルが存在しない場合、Jコマンドの設定を更新していなかった
+   のをfix(鬼畜王の迷宮探検で敵のCGの部分がおかしかった)
+ * SDL フルスクリーン時に画像の表示領域がかわるとおかしかったのをfix
+   (ディアボリカのBAD-ENDで再現)
+ * update doc/TECH.TXT
+ * system39.ain へのメッセージ埋め込みへの対応
+ * add patchEC, patchENEM command
+ * かえるにょ国にょアリスで選択ウィンドの選択肢が見えにくいのを改善
+ * add Gpx.EffectCopy{7,11,12,13} command
+ * add WZ 1,e command
+
+pre3
+ * libtool-1.4 以外がインストールされていないとコンパイルできなかったのを fix
+ * newer config.sub/guess
+ * gexttext(0.10.39) automake(1.4p5), autoconf(2.52) にそれぞれ up
+ * .gr ファイルがない場合に自動的に生成するセーブファイルを 26 個に
+ * 「Only You リクルス」 Math.dll に対応
+ * 「Only You リクルス」 Gpx.dll の関数を追加実装
+
+pre2
+ * ProStudent-Good のオープニングで一瞬色がおかしくなるのを fix (xcore)
+ * ProStudent-Good のオープニングで色がおかしくなるのを fix (sdl)
+ * セーブデータを保存するとき、バックアップファイルをつくるようにした。
+ * LL command でデータの読み込みに失敗すると異常終了していたのを fix
+ * add PT2 command
+ * add FAQ about gmake
+ * 夢幻泡影で最初に落ちるのを fix (QD 0: というコマンドがあった)
+ * Q/L command で 存在しないファイルのチェック行うようにした。
+ * ぱすてるチャイム、シナリオパッチのドキュメントの修正と追加。
+ * gettext がインストールされていなくても build できるようにした。
+ * QNT cg format に対応
+ * 「Only You リクルス」のDLLに一部対応
+
+pre1
+ * system39.ain をカレントディレクトリからも探すようにした
+ * 夜のDLLのエントリーだけ追加
+ * Darcrows 等でメッセージの改行が一部おかしかったのを fix
+ * FreeBSD 等で libintl.h が適切に include できていなかったのを fix
+   (by Tamura Toshimichi)
+ * WVコマンドで x/y のみが変化した時異常動作していたのを fix
+   (かえるにょぱにょん etc)
+ * CE コマンドで描画先が view area の外の場合に異常動作していたのを fix
+   (かえるにょぱにょん/ProStudent-Good etc)
+ * 廉価版かえるにょぱにょんで、PCM演奏がloopしてしまうのを fix
+   (by TAJIRI Yasuhiro)
+ * DLL の読み込みパス候補をいくつか追加
+
+
+Version 1.4.0 -> Version 1.5.0 (2001.05.09)
+
+ * シーン青の音楽鑑賞などで画面更新が一部おかしかったのを fix (xcore/sdl)
+ * ランス４で、一部のCGの色がおかしくなるのを fix (By matuyama_takaaki)
+ * 「かえるにょ国にょアリス」の DLL に対応
+
+
+Version 1.3.4 -> Version 1.4.0 (2001.05.01)
+
+final
+ * --disable-debug の時意図通り動いていなかったのを fix
+ * cdrom.Linux.c の LinuxPPC workaround がおかしいかったのを fix
+ * -antialias オプションをつけた
+ * Rance4 のキーウエイト調整
+	
+pre5
+ * command2F60 関係を remove
+ * 「妖精(AliceCD 2.02)」で右クリックメニューを閉じたあと異常終了していた
+   のを fix
+ * メッセージの文字の大きさを最大100ドットに制限。
+ * add grBlt command
+
+pre4
+ * SDL + joystick の時コンパイルできなかったのを fix (By matuyama_takaaki)
+ * 文字列入力 Window 等の表示時の動作改善
+ * F1キー でメッセージスキップ、F4キーで Fullscreen <-> Window 表示の行き来
+   を出来るようにした。
+
+pre3
+ * .gr ファイルに空白行を含んでも強制終了しないようにした。
+ * メニューから cd/midi/pcm を無効化したとき、鳴っていれば止めるようにした。
+ * CE36-38 command で画面更新が一部おかしかったのを fix
+ * CD44-47,50-52 command で画面更新が一部おかしかったのを fix
+ * PMS8 ではパレットの 250-255 を転送しないようにした。
+ * savedata の格納 path が不正な時に異常終了するのを fix
+ * 変数への代入で NULL (範囲外) の場合、代入しないようにした。
+ * 大きいサイズ(96)のフォントを読み込む時にバッファ溢れを起こしていたのを fix
+ * 特に大きさサイズのフォントで文字の下が切れてしまっていたのを fix 
+   (font_freetype2.c)
+
+pre2
+ * configure が {freetype-prefix}/freetype.h を発見出来なかったのを fix
+ * Txx コマンドでスタックに積むサイズがおかしかったのを fix
+ * Txx コマンドで選択肢ウィンドの色とサイズを保存していなかったのを fix
+ * add strMessageBox command
+ * モノクロカーソル以外は読み込まないようにした。
+
+pre1
+ * テンポラリディレクトリに関する Warning を削除
+ * gettext 化 (メニューのみ)
+ * spec ファイルの cleanup
+ * AFMT_S16_NE が定義されていない場合コンパイル出来なかったのを fix
+ * .xsys35rc でフォント名が設定されていない場合、segv. っていたのを fix
+ * SQ コマンドで 16bit の wav が mix できていなかったのを fix
+ * 王道勇者でオープニングが乱れるを fix
+ * ald_getdata でメモリリークしていたのを fix
+ * 存在しないファイルを読み込もうとして落ちていたのを fix
+ * system35 のスタックから通常変数を POP するとき、不正なアドレスを参照
+   していたのを fix
+
+
+Version 1.3.3 -> Version 1.3.4 (2001.04.01)
+
+final
+ * メッセージの最後が `\0` で終っていると落ちていたのを fix
+ * snprintf を g_snprintf へ
+ * DigitalUNIX/Irix等 で色がおかしかったのを fix
+ * cdrom.Irix.c がコンパイル出来なかったのを fix
+ * freetype library がインストールされている場所を configure  
+    --with-freetpe-prefix=PFX で指定できるようにした。
+ * --disable-bgr が機能していなかったのを fix
+ * シナリオファイルが見つからないと segv. ってたのを fix
+	
+pre5
+ * ResourceFile(ICON file) をちゃんと動くようにした。(xcore.c)
+ * ViewArea が移動したときのマウスの位置取得が一部おかしかったのを fix
+ * configure で --enable-midi を指定しなかった時、ゴミが出るのを fix
+ * SDL の一部のバージョンで画面が出なかったのを(多分) fix
+ * SDL でカーソル形状の変更をちゃんと動くようにした。
+ * SDL で右ボタンを押すと異常終了することがあったのを fix
+ * SDL + freetype で文字がちゃんと出ないのを fix
+ * cdrom/midi が無効の場合、終了時に落ちるのを fix
+ * midi 埋め込みフラグを正しく処理していなかったのを fix
+
+pre4
+ * midi.raw.c/midifile.h: compile fix for FreeBSD
+ * audio_oss で channel の設定がおかしかったのを fix
+ * fix more compile warning
+ * audio_oss で fragment size の調整
+ * MUS_PCM_STOP では flush せずに stop コマンドを発行することにした
+ * OSS sequencer device に対応
+ * Mixer の volume が 0 の時にフェードさせると落ちていたのを fix
+ * midi/mp3 のプロセスが残ったまままなのを fix
+ * ALSA small cleanup
+
+pre3
+ * add xsystem35.spec.in (from JRPM by Toshiya Takagi)
+ * フェード状態の取得で処理が止まってしまっていたのをfix
+ * Ctrl-C キーで終了したとき音楽が終了しないのを fix (again)
+ * add CE44,45,46,47,50,51,52 command for xcore
+ * music.c add more comment
+ * 夢幻泡影で色がおかしかったのを fix 
+  (!8bppでVSPをloadしたときおかしかった)
+ * 夢幻泡影でタイトルの出現がおかしかったのを fix (CD5 command)
+ * 256色モード(ゲーム)時に色がおかしかったのを fix
+ * たまに音楽が終了しないことがあったのを fix
+ * oss の midi mixer 接続を line-out へ
+ * セーブディレクトリが存在しないときに異常動作していたのを fix
+ * raw midi mode で pause/unpause がおかしかったのを fix
+ * MJ コマンドの入力 Window の幅が短かったのを fix
+
+pre2
+ * 数値入力ウィンドでキャンセルを押したときの動作のfix
+ * raw midi インターフェイスを介した midi file の演奏に対応
+ * freetype version 2 に対応
+ * cdrom.mp3/midi.* の共有メモリ部を music の共有メモリ部へ
+ * play_pipe.c の write bytes 数をメッセージ受渡しから共有メモリへ
+ * rewrite music.c
+
+pre1
+ * SDL/xcore: 機能ごとに source code の分割
+ * fontdevice の分離
+ * SDL: offscree を display と同じ depth に
+ * SDL/xcore: fullscreen 仮対応 (-fullscreen option)
+ * add ZW command.
+
+
+Version 1.3.2 -> Version 1.3.3 (2000.11.26)
+
+final
+ * fix message typo in audio_oss.c (by NABETANI Masaki)
+ * enable audio framgemt in audio_oss.c
+ * cleanup key release wait
+ * popup menu の処理の仕方の変更
+ * fix some include file dependency
+ * fix double link -lxpg4 for FreeBSD (by NABETANI Masaki)
+ * SDL + ttf 時の文字のfore/backgroundの反転の fix (by Fumihiko Murata)
+ 
+pre5
+ * Ctrl-C キーで終了したとき音楽が終了しないのを fix
+ * music fadeout で 時間が 0 の時 fade が終ったのを検知できないのを fix
+ * optimaize wait for fade in / out and CE command.
+ * fix CE32 command.
+ * add CD5 command.
+ * 最初の midi start が始まらないことがあるのを fix
+ * まれに music_server/wav_server のプロセスが残る事があるのを fix
+ * fix scaled copyarea in SDL
+ * add CE43 command for SDL
+ * disable SDL_RLEACCEL
+ * cleanup sdl related include file
+ * 廉価版ゲームの install用 .inf ファイルの追加 (by hachkun-lucifer2 and 
+  TAJIRI Yasuhiro)
+
+pre4
+ * フェードアウトで曲を止めた場合、同じ曲が演奏できないのを修正
+ * some cleanup music server.
+ * fix CE43 command.
+ * some error message cleanup
+ * SDL cleanup (by Fumihiko Murata)
+ * xcore.c remove unused code
+
+pre3
+ * add x86 cpu capability checker from GOGO-no-coda
+ * fix segv. in sys_getMouseInfo() (by TAJIRI Yasuhiro)
+ * scaled copy area 1/2 を１つに (xcore)
+ * fix eCopyUpdateArea()
+ * more mmx-ize in alpha blend
+ * fix segv. in mmx-ed alpha blend
+ * 選択肢 Window の枠の横幅を決める時の演算子の優先順位の間違いの fix
+  (by TAJIRI Yasuhiro)
+ * check cdrom device is block or character device.
+ * fix ZZ13 (missed fontsize and fonttype)
+ * fix 数値入力ウィンド
+ * modify ecopy skip_mask (by Fumihiko Murata)
+ * SDL 1.1.5 の RLE accel に対応 (by Fumihiko Murata)
+ * revive [ESC + SPC + RET] to exit game
+ * fix compile problem for non-x86
+ * CG のロードに失敗した時、CG の種類を参照しようとして落ちていたのを fix
+  (by TAJIRI Yasuhiro)
+ * fix segv. when display 16bit-cg with alpha level
+ * modify so that ZI command affects IK0/1 command (by Fumihiko Murata)
+
+pre2
+ * mv flood from sdl/xcore.c to ags.c
+ * change save/put/copy region not to use Xlib (xcore)
+ * small change interface between ags and graphicsdevice
+ * use mmx for alpha blend (nasm is required)
+
+pre1
+ * rewrite dri.c to use mmap, and related modification
+ * keep extracted cg in memory using cache.c
+ * change interface to cg related above (rewrite vsp/pms/bmp)
+ * add CE24/32 command(xcore)
+ * add CE43(xcore/sdl)
+ * separate alpha plane operation
+
+
+Version 1.3.1 -> Version 1.3.2 (2000.9.13)
+
+final
+ * fix segv. when --enable-ttf (by TAJIRI Yasuhiro)
+ * more debug message cleanup
+ * View 領域が変わった時のマウス自動移動の位置の修正
+
+pre5
+ * fix wavXXX command 
+ * fix white fader and sdl more (by Fumihiko Murata and me)
+ * fix antialias sting in 15/16 bpp screen
+ * modify MIDI play no check (by Fumihiko Murata)
+ * add MHH command (by Fumihiko Murata)
+ * add wave server for wavXXXX command (by Fumihiko Murata)
+ * modify ML command
+ * kconv.c -> eucsjis.c と 関連関数をまとめ & 関連修正
+ * debugging 回りの clean up (in progress)
+ * 15/16bpp で antialiase文字がおかしかったのを修正(xcore)
+ * LE/QE filename サーチの変更
+
+pre4
+ * pcm device が無い時の mixer read で異常終了するのを修正
+ * white fader の修正 (xcore)
+ * View領域が変わった時の mouse の位置の報告の修正
+ * fix ZR command
+ * fix CE 27-30/16 command (by Fumihiko Murata and me)
+ * 選択 Window で選択肢の位置にマウスを持って来た時に、囲みが横方向へ
+   伸びてしまう事の修正。
+ * add some 2Fxx commands more. (by Fumihiko Murata and me)
+ * dri.c で登録していないデータファイルにアクセスすると落ちるのを修正
+ * add ZC 15 command
+ * fix ZT10 command when base == 0 (by TAJIRI Yasuhiro and Fumihiko Murata)
+ * add copyarea with white level (sdl) (by Fumihiko Murata)
+ * 選択 Window で選択肢の囲みの位置のずれを修正
+ * fix LL command when data is shortage.
+
+pre3
+ * fix alsa compile failfure (by TAJIRI Yasuhiro)
+ * check NULL in NB command (by TAJIRI Yasuhiro and me)
+ * シーン青の音楽鑑賞で MIDI が鳴らないことがあるのを修正 (by Fumihiko Murata)
+ * ttf のアンチエリアシング用のパレット値の再修正 (by Fumihiko Murata)
+ * 選択 Window にまつわる callback コマンド対応
+ * add B12-14 command, fix B21-B24 command.
+ * LE/QE/new-LE,QE command fix (by Fumihiko Murata and me)
+ * add some 2Fxx commands. (by Fumihiko Murata,TAJIRI Yasuhiro and me)
+ * 影(alpha)つき copy に 影の割合をかける引数の追加とそれに伴う変更
+   (by Fumihiko Murata and me)
+
+pre2
+ * copyRegion (xcore) の修正
+ * 半角->全角変換で ASCII 文字は変換の対象外へ
+ * new QE/LE/MT/MS/F comannd の対応  (by Fumihiko Murata and me)
+ * antialiase 文字(TAA/TABコマンド) 対応 (sdl) (by Fumihiko Murata)
+ * window title をつけると落ちるバグの修正
+ * TOx/TPx コマンド対応(多分)
+ * ttf.c 半角かな対応 (by TAJIRI Yasuhiro)
+ * かえるにょぱにょんで、味方ユニットを2回クリックした時の戦闘で
+   アニメが正しくないことの修正 (by Tamura Toshimichi)
+ * packed 24bpp の修正
+ * ALSA の反応向上(鳴り始めを早くした) (by Fumihiko Murata)
+ * ALSA で fragmentsize が境界をまたぐ恐れがあったのを修正 (by Fumihiko Murata)
+ * mp3 でプレイヤーの指定でファイルを書く場所に %s を指定できるようにした
+   (by Fumihiko Murata)
+ * sysGetOsName,HH,ZZ14 コマンド対応 (by Fumihiko Murata)
+ * ttf のアンチエリアシング用のパレット値の修正 (by Fumihiko Murata)
+ 
+pre1
+ * packed 24bpp (3bytes/pixel) Xserver 対応
+ * ttf on 時に 256 ゲームで色が化けることの修正
+ * 全角・半角表示 (ZH) の挙動がおかしいことの修正
+ * midi/mp3 piped play の修正 (by Fumihiko Murata)
+ * CEコマンドの追加と修正 (add dunction 33-42,48,49. modify 32)
+   (by Fumihiko Murata)
+ * 高精度カウンタの初期値を 1 に (by Fumihiko Murata)
+ * -devcd オプションで存在しない(オープンできない)ファイルを指定した場合でも
+   CD が enable になるのを修正 (by Fumihiko Murata)
+ * midi/mp3 piped play の修正 その２ (by Fumihiko Murata)
+ * pipe_play でオーディオバッファの位置を検出するのは ALSA のみ,他はカウンター
+   で計測 (by Fumihiko Murata)
+ * LE コマンドで文字列を読み込む位置がずれていたことの修正
+   (by Fumihiko Murata)
+ * 同じ音量で音楽のフェードを行なうと0除算でおちることの修正
+   (by Fumihiko Murata)
+ * antialiase 文字(TAA/TABコマンド) 対応 (xcore)
+
+
+Version 1.3.0 -> Version 1.3.1 (2000.8.12)
+
+ * configure 化しました。
+ * SDL に対応しました。
+ * 終了確認 Window などの popup menu を全面的に書換えました。
+ * OSS/ALSA/ESD を起動時に選択して使えるようになりました。
+ * FreeType library を使って TrueType font を直接あつかえるようにしました。
+ * その他、細かい fix と新たなバグの埋め込み。
+
+
+Version 1.2.5 -> Version 1.3.0 (2000.3.06)
+
+ * 開発ブランチ 1.3.x を開始しました。
+ * 描画関数を graigics.c から ags.c へ。関数名の変更(ags_XXX)
+ * Eventdrivenにしました。

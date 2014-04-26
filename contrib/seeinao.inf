@@ -1,0 +1,31 @@
+# SeeInAO Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ald,	seeinao_sa.ald
+GraphicsA,	gamedata/*GA.ald,	seeinao_ga.ald
+WaveA,		gamedata/*WA.ald,	seeinao_wa.ald
+MidiA,		gamedata/*MA.ald,	seeinao_ma.ald
+SaveA,				,	seeinao_sa.asd
+SaveB,				,	seeinao_sb.asd
+SaveC,				,	seeinao_sc.asd
+SaveD,				,	seeinao_sd.asd
+SaveE,				,	seeinao_se.asd
+SaveF,				,	seeinao_sf.asd
+SaveG,				,	seeinao_sg.asd
+SaveH,				,	seeinao_sh.asd
+SaveI,				,	seeinao_si.asd
+SaveJ,				,	seeinao_sj.asd
+SaveK,				,	seeinao_sk.asd
+SaveL,				,	seeinao_sl.asd
+SaveM,				,	seeinao_sm.asd
+SaveN,				,	seeinao_sn.asd
+SaveO,				,	seeinao_so.asd
+SaveP,				,	seeinao_sp.asd
+SaveQ,				,	seeinao_sq.asd
+SaveR,				,	seeinao_sr.asd
+SaveS,				,	seeinao_ss.asd
+SaveT,				,	seeinao_st.asd
+SaveU,				,	seeinao_su.asd
+SaveV,				,	seeinao_sv.asd
+SaveW,				,	seeinao_sw.asd
+SaveX,				,	seeinao_sx.asd
+SaveY,				,	seeinao_sy.asd

@@ -1,0 +1,7 @@
+# 20世紀アリス これDPS? Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ald,	20cDPS_sa.ald
+GraphicsA,	gamedata/*GA.ald,	20cDPS_ga.ald
+MidiA,		gamedata/*MA.ald,	20cDPS_ma.ald
+SaveA,				,	20cDPS_sa.asd
+Ain,		gamedata/*.ain,		system39.ain

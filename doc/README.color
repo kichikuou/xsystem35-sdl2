@@ -1,0 +1,56 @@
+
+                      色がおかしいぞ？？？ 
+
+
+ 起動してみて色がおかしいと思った方はこのドキュメントを読み進めて下さい。
+
+
+1. i386系
+
+   色がおかしいと言うことはまず無いと思いますが、ビデオカードの中には packed24
+ と呼ばれる 1pixel につき 3byte を使って 1600万色モードを実現しているものが
+ あります。例えば Matrox Mystique などがあります(通常は 1pixel につき 4byte
+ を使って 1600万色モードを実現しています)。
+ 
+   xdpyinfo とやって supported pixmap formats のリストに
+    depth 24, bits_per_pixel 24, scanline_pad 32
+ とあれば packed24 です。
+
+ この packed24 にも対応していますが、速度の面から 16bpp または32bpp で X server
+ を起動することを推奨します。
+
+
+2. PPC系
+
+   linuxPPCでは X server として Xpmac と XF68_FBDev のどちらかが使われて
+ います。LinuxPPC R4 あたりの X Server では次のような不具合があるそうなの
+ でうまく回避して下さい。
+
+ * Xpmac でアクセラレーションを有効にしたものを使うとXが固まるので、
+   xsystem35 を -no-shm オプション付で実行して下さい。設定ファイル(.xsys35rc)
+   に -no-shmに関する設定を書いておくこともできます。
+
+
+3. SGI系, Sparc系
+
+   これらの X Server は ピクセルのRGBのならびがi386系などとは逆になっています。
+ 行儀の良いアプリケーションは X Server から情報を取り出して適切に処理する事で
+ どのようなRGBの並びにも対応できるはずなのですが、xsystem35は手抜きをしていて
+ ハードコーディングしています。これは速度(？)と利用数の問題と言う事で.. (^^;;;
+
+ xdpyinfo として Visual のところで
+
+   class:    TrueColor
+   depth:    24 planes
+   red, green, blue masks:    0xff, 0xff00, 0xff0000
+
+ のようになっていたら、BGR の並びと言うことになります。SGI 系と Sparc 系では
+ これがデフォルトの動作ですが、sgi O2 や sparc の一部の機種では
+
+   class:    TrueColor
+   depth:    24 planes
+   red, green, blue masks:    0xff0000, 0xff00, 0xff
+
+ となっている場合があります。この場合、configure に --disable-bgr をつけて
+ コンパイルしてください。
+

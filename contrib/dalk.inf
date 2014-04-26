@@ -1,0 +1,17 @@
+# dalk Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	dalk/dalk_sa.ald,	dalk_sa.ald
+GraphicsA,	dalk/dalk_ga.ald,	dalk_ga.ald
+MidiA,		dalk/dalk_ma.ald,	dalk_ma.ald
+WaveA,		dalk/dalk_wa.ald,	dalk_wa.ald
+DataA,		dalk/dalk_da.ald,	dalk_da.ald
+SaveA,				,	dalk_sa.asd
+SaveB,				,	dalk_sb.asd
+SaveC,				,	dalk_sc.asd
+SaveD,				,	dalk_sd.asd
+SaveE,				,	dalk_se.asd
+SaveF,				,	dalk_sf.asd
+SaveG,				,	dalk_sg.asd
+SaveH,				,	dalk_sh.asd
+SaveI,				,	dalk_si.asd
+SaveJ,				,	dalk_sj.asd

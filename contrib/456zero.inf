@@ -1,0 +1,12 @@
+# Zero-shiki Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	zero_sa.ald
+GraphicsA,	gamedata/*ga.ald,	zero_ga.ald
+WaveA,		gamedata/*wa.ald,	zero_wa.ald
+SaveA,				,	zero_sa.asd
+SaveB,				,	zero_sb.asd
+SaveC,				,	zero_sc.asd
+SaveD,				,	zero_sd.asd
+SaveE,				,	zero_se.asd
+,          gamedata/map_data.dat,      MAP_DATA.DAT
+,           gamedata/ur_data.dat,       UR_DATA.DAT

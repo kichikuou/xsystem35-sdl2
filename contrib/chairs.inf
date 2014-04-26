@@ -1,0 +1,37 @@
+# シェル・クレイル Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	GAMEDATA/*SA.ALD,	chairs_sa.ald
+GraphicsA,	GAMEDATA/*GA.ald,	chairs_ga.ald
+WaveA,		GAMEDATA/*WA.ald,	chairs_wa.ald
+BGMA,		GAMEDATA/*BA.ald,	chairs_ba.ald
+WAIA,		GAMEDATA/*WA.wai,	chairs_wa.wai
+BGIA,		GAMEDATA/*BA.bgi,	chairs_ba.bgi
+Ain,		GAMEDATA/*.ain,		system39.ain
+Init,		GAMEDATA/*.ini,		system39.ini
+SACT01,         GAMEDATA/SACTEFAM.KLD,  SACTEFAM.KLD
+SaveA,				,	chairs_sa.asd
+SaveB,				,	chairs_sb.asd
+SaveC,				,	chairs_sc.asd
+SaveD,				,	chairs_sd.asd
+SaveE,				,	chairs_se.asd
+SaveF,				,	chairs_sf.asd
+SaveG,				,	chairs_sg.asd
+SaveH,				,	chairs_sh.asd
+SaveI,				,	chairs_si.asd
+SaveJ,				,	chairs_sj.asd
+SaveK,				,	chairs_sk.asd
+SaveL,				,	chairs_sl.asd
+SaveM,				,	chairs_sm.asd
+SaveN,				,	chairs_sn.asd
+SaveO,				,	chairs_so.asd
+SaveP,				,	chairs_sp.asd
+SaveQ,				,	chairs_sq.asd
+SaveR,				,	chairs_sr.asd
+SaveS,				,	chairs_ss.asd
+SaveT,				,	chairs_st.asd
+SaveU,				,	chairs_su.asd
+SaveV,				,	chairs_sv.asd
+SaveW,				,	chairs_sw.asd
+SaveX,				,	chairs_sx.asd
+SaveY,				,	chairs_sy.asd
+SaveZ,				,	chairs_sz.asd

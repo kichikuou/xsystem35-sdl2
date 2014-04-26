@@ -1,0 +1,35 @@
+# DARCROWS Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*SA.ALD,	hime_sa.ald
+GraphicsA,	gamedata/*GA.ALD,	hime_ga.ald
+GraphicsB,	gamedata/*GB.ALD,	hime_gb.ald
+WaveA,		gamedata/*WA.ALD,	hime_wa.ald
+WaveB,		gamedata/*WB.ALD,	hime_wb.ald
+MidiA,		gamedata/*MA.ALD,	hime_ma.ald
+ResourceA,	gamedata/*RA.ALD,	hime_ra.ald
+SaveA,				,	hime_sa.asd
+SaveB,				,	hime_sb.asd
+SaveC,				,	hime_sc.asd
+SaveD,				,	hime_sd.asd
+SaveE,				,	hime_se.asd
+SaveF,				,	hime_sf.asd
+SaveG,				,	hime_sg.asd
+SaveH,				,	hime_sh.asd
+SaveI,				,	hime_si.asd
+SaveJ,				,	hime_sj.asd
+SaveK,				,	hime_sk.asd
+SaveL,				,	hime_sl.asd
+SaveM,				,	hime_sm.asd
+SaveN,				,	hime_sn.asd
+SaveO,				,	hime_so.asd
+SaveP,				,	hime_sp.asd
+SaveQ,				,	hime_sq.asd
+SaveR,				,	hime_sr.asd
+SaveS,				,	hime_ss.asd
+SaveT,				,	hime_st.asd
+SaveU,				,	hime_su.asd
+SaveV,				,	hime_sv.asd
+SaveW,				,	hime_sw.asd
+SaveX,				,	hime_sx.asd
+SaveY,				,	hime_sy.asd
+SaveZ,				,	hime_sz.asd

@@ -1,0 +1,18 @@
+# AmbivalenZ Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	ambi_sa.ald
+GraphicsA,	gamedata/*ga.ald,	ambi_ga.ald
+SaveA,				,	ambi_sa.asd
+SaveB,				,	ambi_sb.asd
+SaveC,				,	ambi_sc.asd
+SaveD,				,	ambi_sd.asd
+SaveE,				,	ambi_se.asd
+SaveF,				,	ambi_sf.asd
+SaveG,				,	ambi_sg.asd
+SaveH,				,	ambi_sh.asd
+SaveI,				,	ambi_si.asd
+SaveJ,				,	ambi_sj.asd
+SaveK,				,	ambi_sk.asd
+SaveL,				,	ambi_sl.asd
+SaveM,				,	ambi_sm.asd
+SaveN,				,	ambi_sn.asd

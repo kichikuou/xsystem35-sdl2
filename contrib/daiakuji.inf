@@ -1,0 +1,19 @@
+# Âç°­»Ê Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	GAMEDATA/*SA.ALD,	daiakuji_sa.ald
+GraphicsA,	GAMEDATA/*GA.ALD,	daiakuji_ga.ald
+WaveA,		GAMEDATA/*WA.ALD,	daiakuji_wa.ald
+DataA,		GAMEDATA/*DA.ALD,	daiakuji_da.ald
+Ain,		GAMEDATA/*.ain,		system39.ain
+SaveA,				,	daiakuji_sa.asd
+SaveB,				,	daiakuji_sb.asd
+SaveC,				,	daiakuji_sc.asd
+SaveD,				,	daiakuji_sd.asd
+SaveE,				,	daiakuji_se.asd
+SaveF,				,	daiakuji_sf.asd
+SaveG,				,	daiakuji_sg.asd
+SaveH,				,	daiakuji_sh.asd
+SaveI,				,	daiakuji_si.asd
+SaveJ,				,	daiakuji_sj.asd
+SaveK,				,	daiakuji_sk.asd
+SaveL,				,	daiakuji_sl.asd

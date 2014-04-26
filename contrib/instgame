@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+#
+# instgame: xsystem3.5 data install script
+#
+# Author: Hiroshi Naraki<naraki@debian.or.jp>
+#
+# $Id: instgame,v 1.5 1999/05/18 21:52:02 chikama Exp $
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+# default value
+$cdrom_dir = "/cdrom";
+$dest_base_dir = "~/game";
+
+# get program name
+($program) = ($0 =~ m%([^/]+)$%);
+
+# get home directory
+$home = $ENV{'HOME'};
+
+# show usage and exit
+sub usage {
+    print "Usage: $program [options] <target>.inf \n";
+    print "  -c directory    cdrom directory.(default: /cdrom) \n"; 
+    print "  -d directory    destination game directory.(default: ~/game/<target>)\n"; 
+    print "  -g file         game resource file name.(default: ~/game/<target>.gr)\n"; 
+    print "  -k tag          keep the tagged file from copying.\n"; 
+}
+
+;# parsing options
+while (@ARGV) {
+    $_ = shift;
+    s/^-// || do { $target = $_; last };
+    $_ eq 'c' && @ARGV && do { $cdrom_dir = shift; next }; # install from
+    $_ eq 'd' && @ARGV && do { $dest_base_dir = shift; next }; # install to
+    $_ eq 'g' && @ARGV && do { $grfile = shift; next }; # gr-file to
+    $_ eq 'k' && @ARGV && do { @keep_list = (@keep_list, shift); next }; # keep tag
+    $_ eq 'v' && @ARGV && do { $debug = 1; next }; # debug
+    &usage;
+    exit;
+}
+
+# nothing target
+if (! -f $target ) { 
+	&usage;
+	exit;
+}
+# decide game resource file name 
+$base = $target; 
+$base =~ s%.*/%%;
+$base =~ s/\.inf//;
+$dest_dir = $dest_base_dir."/".$base;
+$grfile = $dest_base_dir."/".$base.".gr";
+
+# expand directory name
+$dest_dir =~ s/~/$home/;
+$grfile   =~ s/~/$home/;
+
+# print variables if debug
+if ($debug) {
+	print "cdrom_dir:$cdrom_dir\n";
+	print "dest_dir:$dest_dir\n";
+	print "grfile  :$grfile\n";
+}
+
+-d $cdrom_dir || die "$!:$cdrom_dir\n";
+
+&make_dir($dest_dir);
+
+open( DAT, $target) || die "Can't open $target:$!\n";
+
+open( FILE, "> $grfile" )     || die "Can't create file $grfile:$!\n";
+print FILE "# System 3.5 GameResource File: [$target]\n";
+
+while( $line = <DAT>) {
+	$line =~ s/\#.*|\s//g; 
+	$line eq /^$/ && do { next };
+	@data = split(/,/,$line);
+	$tag  = $data[0];
+	$from = $data[1];
+	$to   = $data[2];
+
+	if( $to eq '' ) {
+		&view_action("Ignore ", $tag, $from, $to);
+		next;
+	}
+	$to = $dest_dir."/".$to;
+	if( $tag eq '' ) {
+		$keep = 0;
+	} else {
+		$keep = grep(/$tag*/, @keep_list );
+	}
+	if( $keep ) {
+		$from = $cdrom_dir."/".$from ;
+		&view_action("Linking", $tag, $from, $to);
+#		symlink($from, $to) if !$debug;
+		system("ln -s $from $to") if !$debug;
+	} elsif( $from eq '' ) { 
+#		&view_action("Create ", $tag, $from, $to);
+#		system("touch $to") if !$debug;
+		&view_action("Skip   ", $tag, $from, $to);
+	} else {
+		$from = $cdrom_dir."/".$from ;
+		foreach ( <${from}>) {
+			&view_action("Copying", $tag, $from, $to);
+			system("cp $from $to") if !$debug;
+		}
+	}
+
+	# Create game resource file
+	if( $tag ne '' ) { 
+		print "writing: $tag $to\n" if $debug;
+		print FILE "$tag $to\n";
+	}
+}
+close(FILE);
+close(DAT);
+exit;
+
+sub view_action {
+	local($action, $tag, $from, $to ) = @_;
+
+	print "$action $tag: $from -> $to\n";
+}
+
+# mkdir destination directories.
+sub make_dir {
+	local($target ) = @_;
+
+	@dest = split(/\//,$target);
+	foreach $dir ( @dest ) {
+        	$work .= $dir.'/';
+        	print "checking $work\n" if $debug;
+        	if( !-d $work ) {
+        		print "mkdir $work\n" if $debug;
+			mkdir( $work,0777) || die "Can't mkdir $work:$!\n";
+		}
+	}
+}

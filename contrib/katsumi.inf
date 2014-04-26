@@ -1,0 +1,17 @@
+# Ikenai Katsumisensei Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	katsumi_sa.ald
+GraphicsA,	gamedata/*ga.ald,	katsumi_ga.ald
+GraphicsB,	gamedata/*gb.ald,	katsumi_gb.ald
+WaveA,		gamedata/*wa.ald,	katsumi_wa.ald
+SaveA,				,	katsumi_sa.asd
+SaveB,				,	katsumi_sb.asd
+SaveC,				,	katsumi_sc.asd
+SaveD,				,	katsumi_sd.asd
+SaveE,				,	katsumi_se.asd
+SaveF,				,	katsumi_sf.asd
+SaveG,				,	katsumi_sg.asd
+SaveH,				,	katsumi_sh.asd
+SaveI,				,	katsumi_si.asd
+SaveJ,				,	katsumi_sj.asd
+              gamedata/gaiji.dat,       gaiji.dat

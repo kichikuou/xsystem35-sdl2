@@ -1,0 +1,6 @@
+# Ningen Kari Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	ningen_sa.ald
+GraphicsA,	gamedata/*ga.ald,	ningen_ga.ald
+WaveA,		gamedata/*wa.ald,	ningen_wa.ald
+SaveA,				,	ningen_sa.asd

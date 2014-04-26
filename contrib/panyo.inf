@@ -1,0 +1,36 @@
+# Kaerunyo Panyon Install infomation
+# Tag,		#origin,		#destination
+ScenarioA,	gamedata/*sa.ald,	panyo_sa.ald
+GraphicsA,	gamedata/*ga.ald,	panyo_ga.ald
+WaveA,		gamedata/*wa.ald,	panyo_wa.ald
+SaveA,				,	panyo_sa.asd
+SaveB,				,	panyo_sb.asd
+SaveC,				,	panyo_sc.asd
+SaveD,				,	panyo_sd.asd
+SaveE,				,	panyo_se.asd
+SaveF,				,	panyo_sf.asd
+SaveG,				,	panyo_sg.asd
+SaveH,				,	panyo_sh.asd
+SaveI,				,	panyo_si.asd
+SaveJ,				,	panyo_sj.asd
+SaveK,				,	panyo_sk.asd
+SaveL,				,	panyo_sl.asd
+SaveM,				,	panyo_sm.asd
+SaveN,				,	panyo_sn.asd
+SaveO,				,	panyo_so.asd
+,           gamedata/floor_1.map,       floor_1.map
+,           gamedata/floor_2.map,       floor_2.map
+,           gamedata/floor_3.map,       floor_3.map
+,           gamedata/floor_4.map,       floor_4.map
+,           gamedata/floor_5.map,       floor_5.map
+,           gamedata/floor_6.map,       floor_6.map
+,           gamedata/floor_7.map,       floor_7.map
+,           gamedata/floor_8.map,       floor_8.map
+,           gamedata/floor_9.map,       floor_9.map
+,           gamedata/floor_10.map,      floor_10.map
+,           gamedata/floor_11.map,      floor_11.map
+,           gamedata/floor_12.map,      floor_12.map
+,           gamedata/floor_13.map,      floor_13.map
+,           gamedata/floor_14.map,      floor_14.map
+,           gamedata/floor_15.map,      floor_15.map
+,           gamedata/floor_16.map,      floor_16.map

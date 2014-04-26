@@ -1,0 +1,17 @@
+
+  Joystick の使い方について
+
+  現在 linux の kernel 2.2.x 以降の Joystick インターフェイスに対応して
+います。対応環境をおもちの方は configure --enable-joy としてコンパイル
+コンパイルして下さい。
+
+  Joystick のデバイス名はデフォルトでは /dev/js0 で、実行時に -devjoy 
+オプションで指定するか、.xsys35rc ファイルで joy_device のエントリー
+に加えて下さい。
+
+  他環境での動作報告、パッチなどお待ちしています。宛先は以下の両方に
+お願いします。
+
+  chikama (masaki-c@is.aist-nara.ac.jp)
+  linux 版の作者の村田さん(fmurata@p1.tcnet.ne.jp)
+
