@@ -30,7 +30,7 @@ libdrawtext_la_LIBADD = @GLIB_LIBS@
 
 AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
 
-INCLUDES = -I$(top_builddir) -I$(top_srcdir) \
+AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \
 	$(LTDLINCL) \
 	-I$(top_builddir)/modules/lib -I$(top_srcdir)/modules/lib

@@ -11927,6 +11927,8 @@ CC="$lt_save_CC"
 
 
 
+
+
 case $enable_ltdl_convenience in
   no) as_fn_error $? "this package needs a convenience libltdl" "$LINENO" 5 ;;
   "") enable_ltdl_convenience=yes
@@ -12812,9 +12814,6 @@ fi
 
 
 fi
-
-
-
 
 
 

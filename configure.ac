@@ -69,7 +69,7 @@ dnl Check for libltdl
 dnl 
 dnl AC_CONFIG_SUBDIRS(libltdl)
 LT_INIT([dlopen])
-_LT_CONFIG_LTDL_DIR([m4_default([libltdl], [libltdl])])
+LT_CONFIG_LTDL_DIR([libltdl])
 _LTDL_CONVENIENCE
 LTDL_INIT([])
 AC_SUBST([LTDLINCL])
