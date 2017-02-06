@@ -846,11 +846,11 @@ AC_SUBST(SRC_ABLEND)
 dnl
 dnl Vorbis input
 dnl
-AM_PATH_OGG(
-           [ AM_PATH_VORBIS([], 
-                            AC_MSG_ERROR([OGG/VORBIS needed])) 
-           ], 
-           AC_MSG_ERROR([OGG/VORBIS needed]))
+XIPH_PATH_OGG(
+             [ XIPH_PATH_VORBIS([],
+                                AC_MSG_ERROR([OGG/VORBIS needed]))
+             ],
+             AC_MSG_ERROR([OGG/VORBIS needed]))
 AM_CONDITIONAL(HAVE_VORBIS, [test "x$no_ogg" != xyes -a "x$no_vorbis" != xyes])
 
 dnl

@@ -685,9 +685,12 @@ HAVE_GTK_TRUE
 GTK_LIBS
 GTK_CFLAGS
 GTK_CONFIG
+GLIB_COMPILE_RESOURCES
 GLIB_MKENUMS
 GOBJECT_QUERY
 GLIB_GENMARSHAL
+PKG_CONFIG_LIBDIR
+PKG_CONFIG_PATH
 PKG_CONFIG
 GLIB_LIBS
 GLIB_CFLAGS
@@ -916,9 +919,13 @@ enable_freetypetest
 with_freetype_prefix
 enable_xrender
 enable_mmx
-with_ogg_prefix
+with_ogg
+with_ogg_libraries
+with_ogg_includes
 enable_oggtest
-with_vorbis_prefix
+with_vorbis
+with_vorbis_libraries
+with_vorbis_includes
 enable_vorbistest
 with_libjpeg_prefix
 enable_debug
@@ -932,7 +939,10 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP
-XMKMF'
+XMKMF
+PKG_CONFIG
+PKG_CONFIG_PATH
+PKG_CONFIG_LIBDIR'
 ac_subdirs_all='libltdl'
 
 # Initialize some variables set by options.
@@ -1606,7 +1616,7 @@ Optional Features:
   --enable-xrender        Use XRender extension (future work) default=disable
   --enable-mmx            MMX support default=yes
   --disable-oggtest       Do not try to compile and run a test Ogg program
-  --disable-vorbistest       Do not try to compile and run a test Vorbis program
+  --disable-vorbistest    Do not try to compile and run a test Vorbis program
   --enable-debug          Turn on debugging default=no
 
 Optional Packages:
@@ -1654,8 +1664,19 @@ Optional Packages:
        --with-ft-exec-prefix=PREFIX
                           Exec prefix where FreeType is installed (optional)
   --with-freetype-prefix=PFX  Prefix for Freetype (optional)
-  --with-ogg-prefix=PFX   Prefix where libogg is installed (optional)
-  --with-vorbis-prefix=PFX   Prefix where libvorbis is installed (optional)
+  --with-ogg=PFX          Prefix where libogg is installed (optional)
+  --with-ogg-libraries=DIR
+                          Directory where libogg library is installed
+                          (optional)
+  --with-ogg-includes=DIR Directory where libogg header files are installed
+                          (optional)
+  --with-vorbis=PFX       Prefix where libvorbis is installed (optional)
+  --with-vorbis-libraries=DIR
+                          Directory where libvorbis library is installed
+                          (optional)
+  --with-vorbis-includes=DIR
+                          Directory where libvorbis header files are installed
+                          (optional)
   --with-libjpeg-prefix=PFX Prefix where libjpeg is install(optional)
 
 Some influential environment variables:
@@ -1668,6 +1689,11 @@ Some influential environment variables:
               you have headers in a nonstandard directory <include dir>
   CPP         C preprocessor
   XMKMF       Path to xmkmf, Makefile generator for X Window System
+  PKG_CONFIG  path to pkg-config utility
+  PKG_CONFIG_PATH
+              directories to add to pkg-config's search path
+  PKG_CONFIG_LIBDIR
+              path overriding pkg-config's built-in search path
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -15804,11 +15830,23 @@ fi
          gthread)
              pkg_config_args="$pkg_config_args gthread-2.0"
          ;;
+         gio*)
+             pkg_config_args="$pkg_config_args $module-2.0"
+         ;;
       esac
   done
 
-  # Extract the first word of "pkg-config", so it can be a program name with args.
-set dummy pkg-config; ac_word=$2
+
+
+
+
+
+
+
+if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
+	if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_PKG_CONFIG+:} false; then :
@@ -15834,7 +15872,6 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
   ;;
 esac
 fi
@@ -15848,19 +15885,83 @@ $as_echo "no" >&6; }
 fi
 
 
+fi
+if test -z "$ac_cv_path_PKG_CONFIG"; then
+  ac_pt_PKG_CONFIG=$PKG_CONFIG
+  # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_PKG_CONFIG="$ac_pt_PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_ac_pt_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_PKG_CONFIG=$ac_cv_path_ac_pt_PKG_CONFIG
+if test -n "$ac_pt_PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_PKG_CONFIG" >&5
+$as_echo "$ac_pt_PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_pt_PKG_CONFIG
+  fi
+else
+  PKG_CONFIG="$ac_cv_path_PKG_CONFIG"
+fi
+
+fi
+if test -n "$PKG_CONFIG"; then
+	_pkg_min_version=0.16
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking pkg-config is at least version $_pkg_min_version" >&5
+$as_echo_n "checking pkg-config is at least version $_pkg_min_version... " >&6; }
+	if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		PKG_CONFIG=""
+	fi
+fi
 
   no_glib=""
 
-  if test x$PKG_CONFIG != xno ; then
-    if $PKG_CONFIG --atleast-pkgconfig-version 0.7 ; then
-      :
-    else
-      echo *** pkg-config too old; version 0.7 or better required.
-      no_glib=yes
-      PKG_CONFIG=no
-    fi
-  else
+  if test "x$PKG_CONFIG" = x ; then
     no_glib=yes
+    PKG_CONFIG=no
   fi
 
   min_glib_version=2.0.0
@@ -15885,6 +15986,7 @@ $as_echo_n "checking for GLIB - version >= $min_glib_version... " >&6; }
     GLIB_GENMARSHAL=`$PKG_CONFIG --variable=glib_genmarshal glib-2.0`
     GOBJECT_QUERY=`$PKG_CONFIG --variable=gobject_query glib-2.0`
     GLIB_MKENUMS=`$PKG_CONFIG --variable=glib_mkenums glib-2.0`
+    GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable=glib_compile_resources gio-2.0`
 
     GLIB_CFLAGS=`$PKG_CONFIG --cflags $pkg_config_args`
     GLIB_LIBS=`$PKG_CONFIG --libs $pkg_config_args`
@@ -15913,14 +16015,11 @@ else
 int
 main ()
 {
-  int major, minor, micro;
-  char *tmp_version;
+  unsigned int major, minor, micro;
 
-  system ("touch conf.glibtest");
+  fclose (fopen ("conf.glibtest", "w"));
 
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
-  tmp_version = g_strdup("$min_glib_version");
-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
+  if (sscanf("$min_glib_version", "%u.%u.%u", &major, &minor, &micro) != 3) {
      printf("%s, bad version string\n", "$min_glib_version");
      exit(1);
    }
@@ -15959,9 +16058,9 @@ main ()
        }
      else
       {
-        printf("\n*** An old version of GLIB (%d.%d.%d) was found.\n",
+        printf("\n*** An old version of GLIB (%u.%u.%u) was found.\n",
                glib_major_version, glib_minor_version, glib_micro_version);
-        printf("*** You need a version of GLIB newer than %d.%d.%d. The latest version of\n",
+        printf("*** You need a version of GLIB newer than %u.%u.%u. The latest version of\n",
 	       major, minor, micro);
         printf("*** GLIB is always available from ftp://ftp.gtk.org.\n");
         printf("***\n");
@@ -16051,12 +16150,14 @@ rm -f core conftest.err conftest.$ac_objext \
      GLIB_GENMARSHAL=""
      GOBJECT_QUERY=""
      GLIB_MKENUMS=""
+     GLIB_COMPILE_RESOURCES=""
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: No glib-2.x found. Next check glib-1.0 in gtk" >&5
 $as_echo "No glib-2.x found. Next check glib-1.0 in gtk" >&6; }
      must_gtk=yes
 
 
   fi
+
 
 
 
@@ -16483,7 +16584,7 @@ main ()
   int major, minor, micro;
   char *tmp_version;
 
-  system ("touch conf.gtktest");
+  fclose (fopen ("conf.gtktest", "w"));
 
   /* HP/UX 9 (%@#!) writes to sscanf strings */
   tmp_version = g_strdup("$min_gtk_version");
@@ -16802,14 +16903,11 @@ if test "$alsa_prefix" != "" ; then
 fi
 
 ALSA_LIBS="$ALSA_LIBS -lasound -lm -ldl -lpthread"
-LIBS=`echo $LIBS | sed 's/-lm//'`
-LIBS=`echo $LIBS | sed 's/-ldl//'`
-LIBS=`echo $LIBS | sed 's/-lpthread//'`
-LIBS=`echo $LIBS | sed 's/  //'`
 LIBS="$ALSA_LIBS $LIBS"
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ALSA_LIBS" >&5
 $as_echo "$ALSA_LIBS" >&6; }
 
+if test "x$enable_alsatest" = "xyes"; then
 min_alsa_version=0.9.0
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libasound headers version >= $min_alsa_version" >&5
 $as_echo_n "checking for libasound headers version >= $min_alsa_version... " >&6; }
@@ -16890,6 +16988,7 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+fi
 
 if test "x$enable_alsatest" = "xyes"; then
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for snd_ctl_open in -lasound" >&5
@@ -17014,14 +17113,11 @@ if test "$alsa_prefix" != "" ; then
 fi
 
 ALSA_LIBS="$ALSA_LIBS -lasound -lm -ldl -lpthread"
-LIBS=`echo $LIBS | sed 's/-lm//'`
-LIBS=`echo $LIBS | sed 's/-ldl//'`
-LIBS=`echo $LIBS | sed 's/-lpthread//'`
-LIBS=`echo $LIBS | sed 's/  //'`
 LIBS="$ALSA_LIBS $LIBS"
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ALSA_LIBS" >&5
 $as_echo "$ALSA_LIBS" >&6; }
 
+if test "x$enable_alsatest" = "xyes"; then
 min_alsa_version=0.5.0
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libasound headers version >= $min_alsa_version" >&5
 $as_echo_n "checking for libasound headers version >= $min_alsa_version... " >&6; }
@@ -17102,6 +17198,7 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+fi
 
 if test "x$enable_alsatest" = "xyes"; then
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for snd_ctl_open in -lasound" >&5
@@ -17943,20 +18040,22 @@ fi
 
 
   if test x$sdl_exec_prefix != x ; then
-     sdl_args="$sdl_args --exec-prefix=$sdl_exec_prefix"
-     if test x${SDL_CONFIG+set} != xset ; then
-        SDL_CONFIG=$sdl_exec_prefix/bin/sdl-config
-     fi
+    sdl_config_args="$sdl_config_args --exec-prefix=$sdl_exec_prefix"
+    if test x${SDL_CONFIG+set} != xset ; then
+      SDL_CONFIG=$sdl_exec_prefix/bin/sdl-config
+    fi
   fi
   if test x$sdl_prefix != x ; then
-     sdl_args="$sdl_args --prefix=$sdl_prefix"
-     if test x${SDL_CONFIG+set} != xset ; then
-        SDL_CONFIG=$sdl_prefix/bin/sdl-config
-     fi
+    sdl_config_args="$sdl_config_args --prefix=$sdl_prefix"
+    if test x${SDL_CONFIG+set} != xset ; then
+      SDL_CONFIG=$sdl_prefix/bin/sdl-config
+    fi
   fi
 
-
-  PATH="$prefix/bin:$prefix/usr/bin:$PATH"
+  as_save_PATH="$PATH"
+  if test "x$prefix" != xNONE; then
+    PATH="$prefix/bin:$prefix/usr/bin:$PATH"
+  fi
   # Extract the first word of "sdl-config", so it can be a program name with args.
 set dummy sdl-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -17998,6 +18097,7 @@ $as_echo "no" >&6; }
 fi
 
 
+  PATH="$as_save_PATH"
   min_sdl_version=1.0.0
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SDL - version >= $min_sdl_version" >&5
 $as_echo_n "checking for SDL - version >= $min_sdl_version... " >&6; }
@@ -18005,12 +18105,12 @@ $as_echo_n "checking for SDL - version >= $min_sdl_version... " >&6; }
   if test "$SDL_CONFIG" = "no" ; then
     no_sdl=yes
   else
-    SDL_CFLAGS=`$SDL_CONFIG $sdlconf_args --cflags`
-    SDL_LIBS=`$SDL_CONFIG $sdlconf_args --libs`
+    SDL_CFLAGS=`$SDL_CONFIG $sdl_config_args --cflags`
+    SDL_LIBS=`$SDL_CONFIG $sdl_config_args --libs`
 
-    sdl_major_version=`$SDL_CONFIG $sdl_args --version | \
+    sdl_major_version=`$SDL_CONFIG $sdl_config_args --version | \
            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-    sdl_minor_version=`$SDL_CONFIG $sdl_args --version | \
+    sdl_minor_version=`$SDL_CONFIG $sdl_config_args --version | \
            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
     sdl_micro_version=`$SDL_CONFIG $sdl_config_args --version | \
            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
@@ -18096,6 +18196,7 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
 fi
 
        CFLAGS="$ac_save_CFLAGS"
+       CXXFLAGS="$ac_save_CXXFLAGS"
        LIBS="$ac_save_LIBS"
      fi
   fi
@@ -18162,7 +18263,6 @@ rm -f core conftest.err conftest.$ac_objext \
        fi
      fi
      SDL_CFLAGS=""
-     SDL_CXXFLAGS=""
      SDL_LIBS=""
      have_sdl=no
   fi
@@ -18415,8 +18515,10 @@ fi
      fi
    fi
 
-   # Extract the first word of "freetype-config", so it can be a program name with args.
-set dummy freetype-config; ac_word=$2
+   if test "x$FT2_CONFIG" = x ; then
+     if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}freetype-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}freetype-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_FT2_CONFIG+:} false; then :
@@ -18442,7 +18544,6 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_path_FT2_CONFIG" && ac_cv_path_FT2_CONFIG="no"
   ;;
 esac
 fi
@@ -18456,6 +18557,64 @@ $as_echo "no" >&6; }
 fi
 
 
+fi
+if test -z "$ac_cv_path_FT2_CONFIG"; then
+  ac_pt_FT2_CONFIG=$FT2_CONFIG
+  # Extract the first word of "freetype-config", so it can be a program name with args.
+set dummy freetype-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_FT2_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_FT2_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_FT2_CONFIG="$ac_pt_FT2_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_ac_pt_FT2_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_FT2_CONFIG=$ac_cv_path_ac_pt_FT2_CONFIG
+if test -n "$ac_pt_FT2_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_FT2_CONFIG" >&5
+$as_echo "$ac_pt_FT2_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_FT2_CONFIG" = x; then
+    FT2_CONFIG="no"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    FT2_CONFIG=$ac_pt_FT2_CONFIG
+  fi
+else
+  FT2_CONFIG="$ac_cv_path_FT2_CONFIG"
+fi
+
+   fi
 
    min_ft_version=2.0.0
    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for FreeType -- version >= $min_ft_version" >&5
@@ -18603,14 +18762,14 @@ $as_echo "$as_me: WARNING:
   The FreeType test program failed to run.  If your system uses
   shared libraries and they are installed outside the normal
   system library path, make sure the variable LD_LIBRARY_PATH
-  (or whatever is appropiate for your system) is correctly set.
+  (or whatever is appropriate for your system) is correctly set.
          " >&5
 $as_echo "$as_me: WARNING:
 
   The FreeType test program failed to run.  If your system uses
   shared libraries and they are installed outside the normal
   system library path, make sure the variable LD_LIBRARY_PATH
-  (or whatever is appropiate for your system) is correctly set.
+  (or whatever is appropriate for your system) is correctly set.
          " >&2;}
        fi
      fi
@@ -18878,11 +19037,27 @@ fi
 
 
 
-# Check whether --with-ogg-prefix was given.
-if test "${with_ogg_prefix+set}" = set; then :
-  withval=$with_ogg_prefix; ogg_prefix="$withval"
+# Check whether --with-ogg was given.
+if test "${with_ogg+set}" = set; then :
+  withval=$with_ogg; ogg_prefix="$withval"
 else
   ogg_prefix=""
+fi
+
+
+# Check whether --with-ogg-libraries was given.
+if test "${with_ogg_libraries+set}" = set; then :
+  withval=$with_ogg_libraries; ogg_libraries="$withval"
+else
+  ogg_libraries=""
+fi
+
+
+# Check whether --with-ogg-includes was given.
+if test "${with_ogg_includes+set}" = set; then :
+  withval=$with_ogg_includes; ogg_includes="$withval"
+else
+  ogg_includes=""
 fi
 
 # Check whether --enable-oggtest was given.
@@ -18893,17 +19068,38 @@ else
 fi
 
 
-  if test x$ogg_prefix != x ; then
-    ogg_args="$ogg_args --prefix=$ogg_prefix"
-    OGG_CFLAGS="-I$ogg_prefix/include"
+  if test "x$ogg_libraries" != "x" ; then
+    OGG_LIBS="-L$ogg_libraries"
+  elif test "x$ogg_prefix" = "xno" || test "x$ogg_prefix" = "xyes" ; then
+    OGG_LIBS=""
+  elif test "x$ogg_prefix" != "x" ; then
     OGG_LIBS="-L$ogg_prefix/lib"
+  elif test "x$prefix" != "xNONE" ; then
+    OGG_LIBS="-L$prefix/lib"
   fi
 
-  OGG_LIBS="$OGG_LIBS -logg"
+  if test "x$ogg_prefix" != "xno" ; then
+    OGG_LIBS="$OGG_LIBS -logg"
+  fi
+
+  if test "x$ogg_includes" != "x" ; then
+    OGG_CFLAGS="-I$ogg_includes"
+  elif test "x$ogg_prefix" = "xno" || test "x$ogg_prefix" = "xyes" ; then
+    OGG_CFLAGS=""
+  elif test "x$ogg_prefix" != "x" ; then
+    OGG_CFLAGS="-I$ogg_prefix/include"
+  elif test "x$prefix" != "xNONE"; then
+    OGG_CFLAGS="-I$prefix/include"
+  fi
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Ogg" >&5
 $as_echo_n "checking for Ogg... " >&6; }
-  no_ogg=""
+  if test "x$ogg_prefix" = "xno" ; then
+    no_ogg="disabled"
+    enable_oggtest="no"
+  else
+    no_ogg=""
+  fi
 
 
   if test "x$enable_oggtest" = "xyes" ; then
@@ -18944,15 +19140,35 @@ fi
        LIBS="$ac_save_LIBS"
   fi
 
-  if test "x$no_ogg" = x ; then
+  if test "x$no_ogg" = "xdisabled" ; then
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+     as_fn_error $? "OGG/VORBIS needed" "$LINENO" 5
+  elif test "x$no_ogg" = "x" ; then
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-# Check whether --with-vorbis-prefix was given.
-if test "${with_vorbis_prefix+set}" = set; then :
-  withval=$with_vorbis_prefix; vorbis_prefix="$withval"
+# Check whether --with-vorbis was given.
+if test "${with_vorbis+set}" = set; then :
+  withval=$with_vorbis; vorbis_prefix="$withval"
 else
   vorbis_prefix=""
+fi
+
+
+# Check whether --with-vorbis-libraries was given.
+if test "${with_vorbis_libraries+set}" = set; then :
+  withval=$with_vorbis_libraries; vorbis_libraries="$withval"
+else
+  vorbis_libraries=""
+fi
+
+
+# Check whether --with-vorbis-includes was given.
+if test "${with_vorbis_includes+set}" = set; then :
+  withval=$with_vorbis_includes; vorbis_includes="$withval"
+else
+  vorbis_includes=""
 fi
 
 # Check whether --enable-vorbistest was given.
@@ -18963,26 +19179,48 @@ else
 fi
 
 
-  if test x$vorbis_prefix != x ; then
-    vorbis_args="$vorbis_args --prefix=$vorbis_prefix"
-    VORBIS_CFLAGS="-I$vorbis_prefix/include"
-    VORBIS_LIBDIR="-L$vorbis_prefix/lib"
+  if test "x$vorbis_libraries" != "x" ; then
+    VORBIS_LIBS="-L$vorbis_libraries"
+  elif test "x$vorbis_prefix" = "xno" || test "x$vorbis_prefix" = "xyes" ; then
+    VORBIS_LIBS=""
+  elif test "x$vorbis_prefix" != "x" ; then
+    VORBIS_LIBS="-L$vorbis_prefix/lib"
+  elif test "x$prefix" != "xNONE"; then
+    VORBIS_LIBS="-L$prefix/lib"
   fi
 
-  VORBIS_LIBS="$VORBIS_LIBDIR -lvorbis -lm"
+  if test "x$vorbis_prefix" != "xno" ; then
+    VORBIS_LIBS="$VORBIS_LIBS -lvorbis -lm"
+  fi
   VORBISFILE_LIBS="-lvorbisfile"
   VORBISENC_LIBS="-lvorbisenc"
 
+  if test "x$vorbis_includes" != "x" ; then
+    VORBIS_CFLAGS="-I$vorbis_includes"
+  elif test "x$vorbis_prefix" = "xno" || test "x$vorbis_prefix" = "xyes" ; then
+    VORBIS_CFLAGS=""
+  elif test "x$vorbis_prefix" != "x" ; then
+    VORBIS_CFLAGS="-I$vorbis_prefix/include"
+  elif test "x$prefix" != "xNONE"; then
+    VORBIS_CFLAGS="-I$prefix/include"
+  fi
+
+
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Vorbis" >&5
 $as_echo_n "checking for Vorbis... " >&6; }
-  no_vorbis=""
+  if test "x$vorbis_prefix" = "xno" ; then
+    no_vorbis="disabled"
+    enable_vorbistest="no"
+  else
+    no_vorbis=""
+  fi
 
 
   if test "x$enable_vorbistest" = "xyes" ; then
     ac_save_CFLAGS="$CFLAGS"
     ac_save_LIBS="$LIBS"
-    CFLAGS="$CFLAGS $VORBIS_CFLAGS"
-    LIBS="$LIBS $VORBIS_LIBS $OGG_LIBS"
+    CFLAGS="$CFLAGS $VORBIS_CFLAGS $OGG_CFLAGS"
+    LIBS="$LIBS $VORBIS_LIBS $VORBISENC_LIBS $OGG_LIBS"
       rm -f conf.vorbistest
       if test "$cross_compiling" = yes; then :
   echo $ac_n "cross compiling; assumed OK... $ac_c"
@@ -18994,11 +19232,23 @@ else
 #include <stdlib.h>
 #include <string.h>
 #include <vorbis/codec.h>
+#include <vorbis/vorbisenc.h>
 
 int main ()
 {
-  system("touch conf.vorbistest");
-  return 0;
+    vorbis_block 	vb;
+    vorbis_dsp_state	vd;
+    vorbis_info		vi;
+
+    vorbis_info_init (&vi);
+    vorbis_encode_init (&vi, 2, 44100, -1, 128000, -1);
+    vorbis_analysis_init (&vd, &vi);
+    vorbis_block_init (&vd, &vb);
+    /* this function was added in 1.0rc3, so this is what we're testing for */
+    vorbis_bitrate_addblock (&vb);
+
+    system("touch conf.vorbistest");
+    return 0;
 }
 
 
@@ -19016,7 +19266,11 @@ fi
        LIBS="$ac_save_LIBS"
   fi
 
-  if test "x$no_vorbis" = x ; then
+  if test "x$no_vorbis" = "xdisabled" ; then
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+     as_fn_error $? "OGG/VORBIS needed" "$LINENO" 5
+  elif test "x$no_vorbis" = "x" ; then
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
      :
@@ -19112,8 +19366,7 @@ if ac_fn_c_try_link "$LINENO"; then :
 else
    echo "*** The test program failed to compile or link. See the file config.log for the"
        echo "*** exact error that occured. This usually means Ogg was incorrectly installed"
-       echo "*** or that you have moved Ogg since it was installed. In the latter case, you"
-       echo "*** may want to edit the ogg-config script: $OGG_CONFIG"
+       echo "*** or that you have moved Ogg since it was installed."
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
