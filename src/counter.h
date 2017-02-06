@@ -21,8 +21,8 @@
 */
 /* $Id: counter.h,v 1.7 2000/11/25 13:09:03 chikama Exp $ */
 
-#ifndef __COUNTER__
-#define __COUNTER__
+#ifndef __XSYSTEM35_COUNTER__
+#define __XSYSTEM35_COUNTER__
 
 #define EXTER_HIGHTCOUNTER_NUM 5
 #define SYSTEMCOUNTER_MP3      (256 + 1)
@@ -36,4 +36,4 @@ extern void reset_counter(int val);
 extern int  get_high_counter(int num);
 extern void reset_counter_high(int num, int division, int val);
 
-#endif /* !__COUNTER__ */
+#endif /* !__XSYSTEM35_COUNTER__ */

@@ -24,7 +24,7 @@
 /* $Id: LittleEndian.h,v 1.6 2000/11/25 13:08:56 chikama Exp $ */
 
 #ifndef __LITTLEENDIAN__
-#define __LITTIEENDIAN__
+#define __LITTLEENDIAN__
 
 #include "portab.h"
 
