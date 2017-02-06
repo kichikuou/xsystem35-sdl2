@@ -1,13 +1,14 @@
 dnl
 dnl configure.ac for xsystem35
 dnl -----
-AC_INIT(configure.ac)
+AC_INIT
+AC_CONFIG_SRCDIR([configure.ac])
 AC_CANONICAL_TARGET
 
 dnl
 dnl Require autoconf version 2.59
 dnl
-AC_PREREQ(2.59)
+AC_PREREQ([2.69])
 
 dnl
 dnl EXTRAxxx is for misc CFLAGS and LIBS
@@ -60,26 +61,27 @@ dnl
 AC_PROG_CC
 dnl AC_PROG_INSTALL
 dnl AC_PROG_MAKE_SET
-dnl AC_ISC_POSIX
+dnl AC_SEARCH_LIBS([strerror],[cposix])
 dnl AC_C_VAR_FUNC 
 
 dnl
 dnl Check for libltdl
 dnl 
-AC_CONFIG_SUBDIRS(libltdl)
-AC_LIBTOOL_DLOPEN
-AC_LIBLTDL_CONVENIENCE([libltdl])
-AC_LIB_LTDL
-AC_PROG_LIBTOOL
+dnl AC_CONFIG_SUBDIRS(libltdl)
+LT_INIT([dlopen])
+_LT_CONFIG_LTDL_DIR([m4_default([libltdl], [libltdl])])
+_LTDL_CONVENIENCE
+LTDL_INIT([])
 AC_SUBST([LTDLINCL])
 AC_SUBST([LIBLTDL])
 
-dnl AM_PROG_LIBTOOL
+dnl LT_INIT
 dnl AC_SUBST(INCLTDL)
 dnl AC_SUBST(LIBLTDL)
 dnl AC_SUBST(LIBADD_DL)
-dnl AC_LIBLTDL_INSTALLABLE
-dnl AC_WITH_LTDL
+dnl _LT_CONFIG_LTDL_DIR([m4_default([], [libltdl])])
+_LTDL_INSTALLABLE
+dnl LTDL_INIT([])
 
 dnl
 dnl Check for gettext
@@ -286,15 +288,15 @@ dnl
 have_sunaudio=no
 if test "x$enable_sun" = xyes; then
   AC_MSG_CHECKING(for Sun audio support)
-  AC_TRY_COMPILE([
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
             #include <sys/types.h>
             #include <sys/audioio.h>
-        ],[
+        ]], [[
             audio_info_t audio_info;
             AUDIO_INITINFO(&audio_info);
-        ],[
+        ]])],[
             have_sunaudio=yes
-        ])
+        ],[])
   AC_MSG_RESULT($have_sunaudio)
   if test "x$have_sunaudio" = xyes; then
     AC_DEFINE(ENABLE_SUNAUDIO,1,[define this if you use sun stlye audio interface])
@@ -512,7 +514,7 @@ dnl
 AC_ARG_WITH(locale, [  --with-locale=LOCALE    locale name you want to use(ex. ja_JP.ujis) ])
 AC_MSG_CHECKING(need -DX_LOCALE)
 
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <stdio.h>
 #include <locale.h>
 
@@ -520,10 +522,7 @@ int
 main ()
 {
   return setlocale (LC_ALL, "${with_locale}") == NULL;
-}],
-need_x_locale=no,
-need_x_locale=yes,
-need_x_locale=no)
+}]])],[need_x_locale=no],[need_x_locale=yes],[need_x_locale=no])
 AC_MSG_RESULT($need_x_locale)
 
 if test "x$need_x_locale" = xyes; then
@@ -696,7 +695,7 @@ if test "x$enable_sdl" = xyes ; then
   AC_MSG_CHECKING(for SDL RLE accell)
   sdlrle=no
   sdlralpha=no
-  AC_TRY_RUN([
+  AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <SDL.h>
 int main( int argc,char **argv) {
 #ifndef SDL_RLEACCEL
@@ -705,14 +704,11 @@ int main( int argc,char **argv) {
   exit(0);
 #endif
 }
-  ],
-    AC_MSG_RESULT("yes");sdlrle=yes,
-    AC_MSG_RESULT("no"),
-    AC_MSG_RESULT("unknown")
-  )
+  ]])],[AC_MSG_RESULT("yes");sdlrle=yes],[AC_MSG_RESULT("no")],[AC_MSG_RESULT("unknown")
+  ])
   if test "x$sdlrle" = xyes ; then
     AC_MSG_CHECKING(for SDL alpha value)
-    AC_TRY_RUN([
+    AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <SDL.h>
 int main( int argc,char **argv) {
 	SDL_Surface *s1,*s2;
@@ -728,11 +724,8 @@ int main( int argc,char **argv) {
 		exit(1);
 	exit(0);
 }
-      ],    
-      AC_MSG_RESULT("normal"),
-      AC_MSG_RESULT("revese");sdlralpha=yes,
-      AC_MSG_RESULT("unknown")
-    )
+      ]])],[AC_MSG_RESULT("normal")],[AC_MSG_RESULT("revese");sdlralpha=yes],[AC_MSG_RESULT("unknown")
+    ])
   fi
   LIBS=$KEEPLIBS
   CFLAGS=$KEEPCFLAGS
@@ -885,14 +878,11 @@ AC_CHECK_LIB(jpeg, jpeg_destroy_decompress,
 
 if test "x$available_jpeg" = xyes; then
    AC_MSG_CHECKING([for jpeglib.h])
-   AC_TRY_CPP(
-[#include <stdio.h>
+   AC_PREPROC_IFELSE([AC_LANG_SOURCE([[#include <stdio.h>
 #undef PACKAGE
 #undef VERSION
 #undef HAVE_STDLIB_H
-#include <jpeglib.h>],
-      available_jpeg=yes,
-      available_jpeg=no)
+#include <jpeglib.h>]])],[available_jpeg=yes],[available_jpeg=no])
    AC_MSG_RESULT($available_jpeg)
    if test "x$available_jpeg" = xyes; then
      JPEG_LIBS="$JPEG_LIBS -ljpeg"
