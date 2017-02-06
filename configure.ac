@@ -781,6 +781,7 @@ if test "x$have_sdl" = xyes; then
   fi
 else
   SRC_FONT="font_x11.c"
+  AC_CHECK_LIB(X11, XmbTextEscapement, X_LIBS="$X_LIBS -lX11", AC_MSG_ERROR(libX11 needed))
   AC_DEFINE(ENABLE_X11FONT,1,[define this if you use X11 font interface])
 fi
 AC_CHECK_FT2(2.0.0,
