@@ -85,8 +85,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
 	$(top_srcdir)/macros/alsa.m4 $(top_srcdir)/macros/argz.m4 \
-	$(top_srcdir)/macros/esd.m4 $(top_srcdir)/macros/freetype.m4 \
-	$(top_srcdir)/macros/freetype2.m4 \
+	$(top_srcdir)/macros/esd.m4 $(top_srcdir)/macros/freetype2.m4 \
 	$(top_srcdir)/macros/gettext.m4 \
 	$(top_srcdir)/macros/glib-2.0.m4 $(top_srcdir)/macros/glib.m4 \
 	$(top_srcdir)/macros/gtk-2.0.m4 $(top_srcdir)/macros/gtk.m4 \
@@ -249,8 +248,6 @@ EXTRACFLAGS = @EXTRACFLAGS@
 EXTRALDFLAGS = @EXTRALDFLAGS@
 EXTRALIBS = @EXTRALIBS@
 FGREP = @FGREP@
-FREETYPE_INCLUDES = @FREETYPE_INCLUDES@
-FREETYPE_LIBS = @FREETYPE_LIBS@
 FT2_CFLAGS = @FT2_CFLAGS@
 FT2_CONFIG = @FT2_CONFIG@
 FT2_LIBS = @FT2_LIBS@

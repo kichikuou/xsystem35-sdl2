@@ -57,10 +57,6 @@ typedef struct _FONT FONT;
 
 extern void font_init(int dev);
 
-#ifdef ENABLE_TTF
-extern FONT *font_ttf_new();
-#endif
-
 #ifdef ENABLE_FT2
 extern FONT *font_ft2_new();
 #endif

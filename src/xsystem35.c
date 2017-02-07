@@ -170,7 +170,7 @@ static void sys35_usage(boolean verbose) {
 #ifdef DEBUG
 
 	puts(" -devfont device: select font device");
-#if defined(ENABLE_TTF) || defined(ENABLE_FT2)
+#ifdef ENABLE_FT2
 	puts(" -devfont ttf   : FreerType (True Type Font)");
 #endif
 #ifdef ENABLE_X11FONT
@@ -190,7 +190,7 @@ static void sys35_usage(boolean verbose) {
 	puts("                : default is x11");
 #endif
 
-#if defined(ENABLE_TTF) || defined(ENABLE_SDLTTF) || defined(ENABLE_FT2)
+#if defined(ENABLE_SDLTTF) || defined(ENABLE_FT2)
 	puts(" -ttfont_mincho: set TrueType font for mincho");
 	puts(" -ttfont_gothic: set TrueType font for mincho");
 #endif
@@ -252,12 +252,6 @@ void sys_exit(int code) {
 }
 
 static int check_fontdev(char *devname) {
-#ifdef ENABLE_TTF
-	if (0 == strcmp(devname, "ttf")) {
-		return FONT_TTF;
-	}
-#endif
-
 #ifdef ENABLE_FT2
 	if (0 == strcmp(devname, "ft2")) {
 		return FONT_FT2;

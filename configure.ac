@@ -772,7 +772,6 @@ AC_DEFINE_UNQUOTED(JOY_DEVICE,"$joydev",[joystick device])
 dnl
 dnl FreeType (Font)
 dnl
-have_ttf=no
 SRC_FONT=
 if test "x$have_sdl" = xyes; then
   if test "x$enable_gtk" = xyes; then
@@ -786,18 +785,10 @@ else
 fi
 AC_CHECK_FT2(2.0.0,
 	     AC_DEFINE(ENABLE_FT2,1,[Define this if you have freetype2 installed]))
-if test "x$no_ft" = xyes; then
-  AM_PATH_FREETYPE(1.0.0,
-	AC_DEFINE(ENABLE_TTF,1,[Define this if you have old(1.x) freetype installed]) have_ttf=yes,have_ttf=no)
-fi
 if test "x$no_ft" != xyes; then
    SRC_FONT="$SRC_FONT font_freetype2.c cp932tojis0213.c"
    EXTRALIBS="$EXTRALIBS $FT2_LIBS"
    EXTRACFLAGS="$EXTRACFLAGS $FT2_CFLAGS"
-elif test "x$have_ttf" = xyes; then
-   SRC_FONT="$SRC_FONT font_ttf.c"
-   EXTRALIBS="$EXTRALIBS $FREETYPE_LIBS"
-   EXTRACFLAGS="$EXTRACFLAGS $FREETYPE_INCLUDES"
 fi
 dnl
 dnl check null
@@ -985,9 +976,6 @@ if test "x$have_sdl" = xyes; then
   fi
 else
   echo "    - x11 font"
-fi
-if test "x$have_ttf" = xyes; then
-  echo "    - old truetype font library"
 fi
 if test "x$no_ft" != xyes; then
   echo "    - freetype2 library"

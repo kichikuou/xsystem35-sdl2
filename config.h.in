@@ -88,17 +88,11 @@
 /* define this if you use sun stlye audio interface */
 #undef ENABLE_SUNAUDIO
 
-/* Define this if you have old(1.x) freetype installed */
-#undef ENABLE_TTF
-
 /* define this if you use X11 font interface */
 #undef ENABLE_X11FONT
 
 /* define this if you use X11 render etension */
 #undef ENABLE_XRENDER
-
-/* define this if you have freetype/freetype.h */
-#undef FREETYPE_HAVE_DIR
 
 /* Define to 1 if you have the `argz_add' function. */
 #undef HAVE_ARGZ_ADD

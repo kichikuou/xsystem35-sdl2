@@ -40,11 +40,6 @@ void font_init(int dev) {
 		nact->ags.font = font_gtk_new();
 		break;
 #endif
-#ifdef ENABLE_TTF
-	case FONT_TTF:
-		nact->ags.font = font_ttf_new();
-		break;
-#endif
 #ifdef ENABLE_FT2
 	case FONT_FT2:
 		nact->ags.font = font_ft2_new();

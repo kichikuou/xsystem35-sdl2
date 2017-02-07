@@ -7,7 +7,6 @@ MACROS= \
   codeset.m4 \
   esd.m4 \
   freetype2.m4 \
-  freetype.m4 \
   gettext.m4 \
   glib-2.0.m4 \
   glibc21.m4 \

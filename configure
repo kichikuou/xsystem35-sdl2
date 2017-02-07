@@ -659,8 +659,6 @@ VORBIS_CFLAGS
 SRC_ABLEND
 HAVE_NASM
 SRC_FONT
-FREETYPE_INCLUDES
-FREETYPE_LIBS
 FT2_LIBS
 FT2_CFLAGS
 FT2_CONFIG
@@ -916,7 +914,6 @@ with_joydev
 with_ft_prefix
 with_ft_exec_prefix
 enable_freetypetest
-with_freetype_prefix
 enable_xrender
 enable_mmx
 with_ogg
@@ -1663,7 +1660,6 @@ Optional Packages:
        --with-ft-prefix=PREFIX Prefix where FreeType is installed (optional)
        --with-ft-exec-prefix=PREFIX
                           Exec prefix where FreeType is installed (optional)
-  --with-freetype-prefix=PFX  Prefix for Freetype (optional)
   --with-ogg=PFX          Prefix where libogg is installed (optional)
   --with-ogg-libraries=DIR
                           Directory where libogg library is installed
@@ -18457,7 +18453,6 @@ _ACEOF
 
 
 
-have_ttf=no
 SRC_FONT=
 if test "x$have_sdl" = xyes; then
   if test "x$enable_gtk" = xyes; then
@@ -18822,132 +18817,10 @@ $as_echo "$as_me: WARNING:
 
 
 
-if test "x$no_ft" = xyes; then
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-# Check whether --with-freetype-prefix was given.
-if test "${with_freetype_prefix+set}" = set; then :
-  withval=$with_freetype_prefix; freetype_prefix="$withval"
-else
-  freetype_prefix=""
-fi
-
-
-  if test ".$freetype_prefix" != . ; then
-    FREETYPE_INCLUDES=-I$freetype_prefix/include
-  fi
-  save_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$FREETYPE_INCLUDES $CPPFLAGS"
-  ac_fn_c_check_header_mongrel "$LINENO" "freetype/freetype.h" "ac_cv_header_freetype_freetype_h" "$ac_includes_default"
-if test "x$ac_cv_header_freetype_freetype_h" = xyes; then :
-
-$as_echo "#define FREETYPE_HAVE_DIR 1" >>confdefs.h
-
-fi
-
-
-  CPPFLAGS="$save_CPPFLAGS"
-
-  if test x$no_freetype = x ; then
-    if test x$freetype_prefix != x ; then
-      freetype_libs=-L$freetype_prefix/lib
-    fi
-    freetype_libs="$freetype_libs -lttf"
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for working Freetype environment" >&5
-$as_echo_n "checking for working Freetype environment... " >&6; }
-if ${ac_cv_lib_freetype+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-		save_LDFLAGS="$LDFLAGS"
-		save_CPPFLAGS="$CPPFLAGS"
-		save_LIBS="$LIBS"
-		LIBS="$LIBS $freetype_libs"
-		LDFLAGS="$LDFLAGS"
-		CPPFLAGS="$CPPFLAGS $FREETYPE_INCLUDES"
-
-				if test "$cross_compiling" = yes; then :
-  ac_cv_lib_freetype=yes
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#ifdef FREETYPE_HAVE_DIR
-#include <freetype/freetype.h>
-#else
-#include <freetype.h>
-#endif
-#include <stdio.h>
-int main (int argc, char* argv[])
-{
-  TT_Engine library;
-  if(TT_Init_FreeType(&library) != 0)
-    {
-     printf("Error: Could not initialize FreeType engine!\n");
-      return 1;
-    }
-  return 0;
-}
-
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  ac_cv_lib_freetype=yes
-else
-  ac_cv_lib_freetype=no
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-
-	CPPFLAGS="$save_CPPFLAGS"
-	LDFLAGS="$save_LDFLAGS"
- 	LIBS="$save_LIBS"
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_freetype" >&5
-$as_echo "$ac_cv_lib_freetype" >&6; }
-  fi
-
-  if test x$ac_cv_lib_freetype = xyes ; then
-    FREETYPE_LIBS=$freetype_libs
-
-$as_echo "#define ENABLE_TTF 1" >>confdefs.h
- have_ttf=yes
-  else
-
-  if test ".1.0.0" = .mandatory ; then
-    as_fn_error $? "Could not find freetype library!" "$LINENO" 5
-  fi
-  have_ttf=no
-  fi
-
-
-
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-fi
 if test "x$no_ft" != xyes; then
    SRC_FONT="$SRC_FONT font_freetype2.c cp932tojis0213.c"
    EXTRALIBS="$EXTRALIBS $FT2_LIBS"
    EXTRACFLAGS="$EXTRACFLAGS $FT2_CFLAGS"
-elif test "x$have_ttf" = xyes; then
-   SRC_FONT="$SRC_FONT font_ttf.c"
-   EXTRALIBS="$EXTRALIBS $FREETYPE_LIBS"
-   EXTRACFLAGS="$EXTRACFLAGS $FREETYPE_INCLUDES"
 fi
 if test x"SRC_FONT" = "x"; then
   as_fn_error $? "\"*** No font device available ***\"" "$LINENO" 5;
@@ -19620,9 +19493,6 @@ if test "x$have_sdl" = xyes; then
   fi
 else
   echo "    - x11 font"
-fi
-if test "x$have_ttf" = xyes; then
-  echo "    - old truetype font library"
 fi
 if test "x$no_ft" != xyes; then
   echo "    - freetype2 library"
