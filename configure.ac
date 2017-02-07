@@ -144,23 +144,11 @@ dnl fi
 dnl
 dnl check glib
 dnl
-no_glib12=no
-must_gtk=no
-AM_PATH_GLIB(1.2.0,
-  AC_DEFINE(ENABLE_GLIB,1,[Define this if you have glib >= 1.2.0]),
-    [AC_MSG_RESULT(No glib-1.2 found. Next check glib-2.0)
-     no_glib12=yes
-    ]
-  )
+AM_PATH_GLIB_2_0(2.0.0,
+  AC_DEFINE(ENABLE_GLIB,1,[Define this if you have glib >= 2.0.0]),
+  AC_MSG_ERROR(*** check for glib-2.x failed ***)
+)
 
-if test "x$no_glib12" = xyes; then
-  AM_PATH_GLIB_2_0(2.0.0,
-    AC_DEFINE(ENABLE_GLIB,1,[Define this if you have glib >= 1.2.0]),
-    [AC_MSG_RESULT(No glib-2.x found. Next check glib-1.0 in gtk)
-     must_gtk=yes
-    ]
-  )
-fi
 
 dnl if test x"$enable_pkgc" = "xno"; then
 dnl  AM_PATH_GLIB(1.2.0,
@@ -184,11 +172,6 @@ dnl
 AC_ARG_ENABLE(gtk,
   [  --enable-gtk            Enable gtk-based widget [default=yes]],,
   [enable_gtk=yes])
-if test "x$must_gtk" = xyes; then
-  if test "x$enable_gtk" != xyes; then
-    enable_gtk=yes
-  fi
-fi
 
 no_gtk1x=no
 have_gtk=no
@@ -234,12 +217,6 @@ else
   SRC_MENU="menu_null.c"
 fi
 AC_SUBST(SRC_MENU)
-
-dnl for gtk-1.0
-if test "x$must_gtk" = xyes; then
-  GLIB_CFLAGS="$GTK_CFLAGS"
-  GLIB_LIBS="$GTK_LIBS"
-fi
 
 
 dnl

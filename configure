@@ -687,12 +687,11 @@ GLIB_COMPILE_RESOURCES
 GLIB_MKENUMS
 GOBJECT_QUERY
 GLIB_GENMARSHAL
+GLIB_LIBS
+GLIB_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
-GLIB_LIBS
-GLIB_CFLAGS
-GLIB_CONFIG
 ZLIB_LIBS
 X_EXTRA_LIBS
 X_LIBS
@@ -875,8 +874,6 @@ with_libiconv_prefix
 enable_nls
 with_libintl_prefix
 with_x
-with_glib_prefix
-with_glib_exec_prefix
 enable_glibtest
 enable_gtk
 with_gtk_prefix
@@ -1578,7 +1575,6 @@ Optional Features:
   --enable-ltdl-install   install libltdl
   --disable-rpath         do not hardcode runtime library paths
   --disable-nls           do not use Native Language Support
-  --disable-glibtest       Do not try to compile and run a test GLIB program
   --disable-glibtest      do not try to compile and run a test GLIB program
   --enable-gtk            Enable gtk-based widget default=yes
   --disable-gtktest       Do not try to compile and run a test GTK program
@@ -1633,8 +1629,6 @@ Optional Packages:
   --with-libintl-prefix=DIR  search for libintl in DIR/include and DIR/lib
   --without-libintl-prefix     don't search for libintl in includedir and libdir
   --with-x                use the X Window System
-  --with-glib-prefix=PFX   Prefix where GLIB is installed (optional)
-  --with-glib-exec-prefix=PFX Exec prefix where GLIB is installed (optional)
   --with-gtk-prefix=PFX   Prefix where GTK is installed (optional)
   --with-gtk-exec-prefix=PFX Exec prefix where GTK is installed (optional)
   --with-alsa-prefix=PFX  Prefix where Alsa library is installed(optional)
@@ -15520,288 +15514,7 @@ fi
 
 
 
-no_glib12=no
-must_gtk=no
-
-# Check whether --with-glib-prefix was given.
-if test "${with_glib_prefix+set}" = set; then :
-  withval=$with_glib_prefix; glib_config_prefix="$withval"
-else
-  glib_config_prefix=""
-fi
-
-
-# Check whether --with-glib-exec-prefix was given.
-if test "${with_glib_exec_prefix+set}" = set; then :
-  withval=$with_glib_exec_prefix; glib_config_exec_prefix="$withval"
-else
-  glib_config_exec_prefix=""
-fi
-
 # Check whether --enable-glibtest was given.
-if test "${enable_glibtest+set}" = set; then :
-  enableval=$enable_glibtest;
-else
-  enable_glibtest=yes
-fi
-
-
-  if test x$glib_config_exec_prefix != x ; then
-     glib_config_args="$glib_config_args --exec-prefix=$glib_config_exec_prefix"
-     if test x${GLIB_CONFIG+set} != xset ; then
-        GLIB_CONFIG=$glib_config_exec_prefix/bin/glib-config
-     fi
-  fi
-  if test x$glib_config_prefix != x ; then
-     glib_config_args="$glib_config_args --prefix=$glib_config_prefix"
-     if test x${GLIB_CONFIG+set} != xset ; then
-        GLIB_CONFIG=$glib_config_prefix/bin/glib-config
-     fi
-  fi
-
-  for module in .
-  do
-      case "$module" in
-         gmodule)
-             glib_config_args="$glib_config_args gmodule"
-         ;;
-         gthread)
-             glib_config_args="$glib_config_args gthread"
-         ;;
-      esac
-  done
-
-  # Extract the first word of "glib-config", so it can be a program name with args.
-set dummy glib-config; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_GLIB_CONFIG+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $GLIB_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_GLIB_CONFIG="$GLIB_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_GLIB_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_GLIB_CONFIG" && ac_cv_path_GLIB_CONFIG="no"
-  ;;
-esac
-fi
-GLIB_CONFIG=$ac_cv_path_GLIB_CONFIG
-if test -n "$GLIB_CONFIG"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $GLIB_CONFIG" >&5
-$as_echo "$GLIB_CONFIG" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-  min_glib_version=1.2.0
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GLIB - version >= $min_glib_version" >&5
-$as_echo_n "checking for GLIB - version >= $min_glib_version... " >&6; }
-  no_glib=""
-  if test "$GLIB_CONFIG" = "no" ; then
-    no_glib=yes
-  else
-    GLIB_CFLAGS=`$GLIB_CONFIG $glib_config_args --cflags`
-    GLIB_LIBS=`$GLIB_CONFIG $glib_config_args --libs`
-    glib_config_major_version=`$GLIB_CONFIG $glib_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-    glib_config_minor_version=`$GLIB_CONFIG $glib_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-    glib_config_micro_version=`$GLIB_CONFIG $glib_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-    if test "x$enable_glibtest" = "xyes" ; then
-      ac_save_CFLAGS="$CFLAGS"
-      ac_save_LIBS="$LIBS"
-      CFLAGS="$CFLAGS $GLIB_CFLAGS"
-      LIBS="$GLIB_LIBS $LIBS"
-      rm -f conf.glibtest
-      if test "$cross_compiling" = yes; then :
-  echo $ac_n "cross compiling; assumed OK... $ac_c"
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <glib.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-int
-main ()
-{
-  int major, minor, micro;
-  char *tmp_version;
-
-  system ("touch conf.glibtest");
-
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
-  tmp_version = g_strdup("$min_glib_version");
-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
-     printf("%s, bad version string\n", "$min_glib_version");
-     exit(1);
-   }
-
-  if ((glib_major_version != $glib_config_major_version) ||
-      (glib_minor_version != $glib_config_minor_version) ||
-      (glib_micro_version != $glib_config_micro_version))
-    {
-      printf("\n*** 'glib-config --version' returned %d.%d.%d, but GLIB (%d.%d.%d)\n",
-             $glib_config_major_version, $glib_config_minor_version, $glib_config_micro_version,
-             glib_major_version, glib_minor_version, glib_micro_version);
-      printf ("*** was found! If glib-config was correct, then it is best\n");
-      printf ("*** to remove the old version of GLIB. You may also be able to fix the error\n");
-      printf("*** by modifying your LD_LIBRARY_PATH enviroment variable, or by editing\n");
-      printf("*** /etc/ld.so.conf. Make sure you have run ldconfig if that is\n");
-      printf("*** required on your system.\n");
-      printf("*** If glib-config was wrong, set the environment variable GLIB_CONFIG\n");
-      printf("*** to point to the correct copy of glib-config, and remove the file config.cache\n");
-      printf("*** before re-running configure\n");
-    }
-  else if ((glib_major_version != GLIB_MAJOR_VERSION) ||
-	   (glib_minor_version != GLIB_MINOR_VERSION) ||
-           (glib_micro_version != GLIB_MICRO_VERSION))
-    {
-      printf("*** GLIB header files (version %d.%d.%d) do not match\n",
-	     GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
-      printf("*** library (version %d.%d.%d)\n",
-	     glib_major_version, glib_minor_version, glib_micro_version);
-    }
-  else
-    {
-      if ((glib_major_version > major) ||
-        ((glib_major_version == major) && (glib_minor_version > minor)) ||
-        ((glib_major_version == major) && (glib_minor_version == minor) && (glib_micro_version >= micro)))
-      {
-        return 0;
-       }
-     else
-      {
-        printf("\n*** An old version of GLIB (%d.%d.%d) was found.\n",
-               glib_major_version, glib_minor_version, glib_micro_version);
-        printf("*** You need a version of GLIB newer than %d.%d.%d. The latest version of\n",
-	       major, minor, micro);
-        printf("*** GLIB is always available from ftp://ftp.gtk.org.\n");
-        printf("***\n");
-        printf("*** If you have already installed a sufficiently new version, this error\n");
-        printf("*** probably means that the wrong copy of the glib-config shell script is\n");
-        printf("*** being found. The easiest way to fix this is to remove the old version\n");
-        printf("*** of GLIB, but you can also set the GLIB_CONFIG environment to point to the\n");
-        printf("*** correct copy of glib-config. (In this case, you will have to\n");
-        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
-        printf("*** so that the correct libraries are found at run-time))\n");
-      }
-    }
-  return 1;
-}
-
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-
-else
-  no_glib=yes
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-       CFLAGS="$ac_save_CFLAGS"
-       LIBS="$ac_save_LIBS"
-     fi
-  fi
-  if test "x$no_glib" = x ; then
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define ENABLE_GLIB 1" >>confdefs.h
-
-  else
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-     if test "$GLIB_CONFIG" = "no" ; then
-       echo "*** The glib-config script installed by GLIB could not be found"
-       echo "*** If GLIB was installed in PREFIX, make sure PREFIX/bin is in"
-       echo "*** your path, or set the GLIB_CONFIG environment variable to the"
-       echo "*** full path to glib-config."
-     else
-       if test -f conf.glibtest ; then
-        :
-       else
-          echo "*** Could not run GLIB test program, checking why..."
-          CFLAGS="$CFLAGS $GLIB_CFLAGS"
-          LIBS="$LIBS $GLIB_LIBS"
-          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <glib.h>
-#include <stdio.h>
-
-int
-main ()
-{
- return ((glib_major_version) || (glib_minor_version) || (glib_micro_version));
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-   echo "*** The test program compiled, but did not run. This usually means"
-          echo "*** that the run-time linker is not finding GLIB or finding the wrong"
-          echo "*** version of GLIB. If it is not finding GLIB, you'll need to set your"
-          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-          echo "*** is required on your system"
-	  echo "***"
-          echo "*** If you have an old version installed, it is best to remove it, although"
-          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
-          echo "***"
-          echo "*** If you have a RedHat 5.0 system, you should remove the GTK package that"
-          echo "*** came with the system with the command"
-          echo "***"
-          echo "***    rpm --erase --nodeps gtk gtk-devel"
-else
-   echo "*** The test program failed to compile or link. See the file config.log for the"
-          echo "*** exact error that occured. This usually means GLIB was incorrectly installed"
-          echo "*** or that you have moved GLIB since it was installed. In the latter case, you"
-          echo "*** may want to edit the glib-config script: $GLIB_CONFIG"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-          CFLAGS="$ac_save_CFLAGS"
-          LIBS="$ac_save_LIBS"
-       fi
-     fi
-     GLIB_CFLAGS=""
-     GLIB_LIBS=""
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: No glib-1.2 found. Next check glib-2.0" >&5
-$as_echo "No glib-1.2 found. Next check glib-2.0" >&6; }
-     no_glib12=yes
-
-
-  fi
-
-
-  rm -f conf.glibtest
-
-
-if test "x$no_glib12" = xyes; then
-  # Check whether --enable-glibtest was given.
 if test "${enable_glibtest+set}" = set; then :
   enableval=$enable_glibtest;
 else
@@ -16146,10 +15859,7 @@ rm -f core conftest.err conftest.$ac_objext \
      GOBJECT_QUERY=""
      GLIB_MKENUMS=""
      GLIB_COMPILE_RESOURCES=""
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: No glib-2.x found. Next check glib-1.0 in gtk" >&5
-$as_echo "No glib-2.x found. Next check glib-1.0 in gtk" >&6; }
-     must_gtk=yes
-
+     as_fn_error $? "*** check for glib-2.x failed ***" "$LINENO" 5
 
   fi
 
@@ -16160,7 +15870,7 @@ $as_echo "No glib-2.x found. Next check glib-1.0 in gtk" >&6; }
 
   rm -f conf.glibtest
 
-fi
+
 
 
 # Check whether --enable-gtk was given.
@@ -16170,11 +15880,6 @@ else
   enable_gtk=yes
 fi
 
-if test "x$must_gtk" = xyes; then
-  if test "x$enable_gtk" != xyes; then
-    enable_gtk=yes
-  fi
-fi
 
 no_gtk1x=no
 have_gtk=no
@@ -16739,11 +16444,6 @@ else
   SRC_MENU="menu_null.c"
 fi
 
-
-if test "x$must_gtk" = xyes; then
-  GLIB_CFLAGS="$GTK_CFLAGS"
-  GLIB_LIBS="$GTK_LIBS"
-fi
 
 
 # Check whether --enable-audio was given.
