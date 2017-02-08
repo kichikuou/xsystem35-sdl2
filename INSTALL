@@ -16,7 +16,7 @@
 
  1.1 必要環境
    * X11R6
-   * gtk+ 1.0.6 以上
+   * gtk+ 2.0.0 以上
    * SYSV IPC in kernel
    * zlib
    * Ogg Vorbis library (libvorbis)
@@ -37,9 +37,8 @@
    * Joystick (for Linux kernel 2.2.x)
    * SDL(Simple DirectMedia Layer) 1.0.x 以上
      (http://www.devolution.com/~slouken/SDL)
-   * FreeType Library  1.1 以上
+   * FreeType Library  2.0 以上
      (http://www.freetype.org/)
-     (http://freetype.sourceforge.net/index.html)
    * midi デバイス(OSS /dev/midi, /dev/sequencer)を介した外部/仮想MIDI音源
 
  1.4 注意点
@@ -103,7 +102,7 @@
   --enable-cdrom=xxx
      CD-ROM デバイスのうち xxx を有効にしてコンパイルします。CD-DA の代わりに
      MP3などを外部プレイヤを使って演奏することも出来ます。xxx には linux,bsd,
-     irix,mp3 が使えます。
+     mp3 が使えます。
      カンマで区切って並べて指定することで複数のデバイスをゲーム起動時に選択
      できます。(ex. --enable-cdrom=linux,mp3)
      CD-DA を使うか MP3 を使うかの指定については README.music を御覧下さい。
