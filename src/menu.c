@@ -33,20 +33,6 @@
 #include "music.h"
 
 
-#ifndef GTK_CHECK_VERSION
-#define GTK_CHECK_VERSION(major,minor,micro)    \
-(GTK_MAJOR_VERSION > (major) || \
- (GTK_MAJOR_VERSION == (major) && GTK_MINOR_VERSION > (minor)) || \
- (GTK_MAJOR_VERSION == (major) && GTK_MINOR_VERSION == (minor) && \
-  GTK_MICRO_VERSION >= (micro)))
-#endif /* !GTK_CHECK_VERSION */
-
-#if defined (GTK_CHECK_VERSION) && GTK_CHECK_VERSION (1,2,0)
-#define GTKV12 
-#else
-#define GTKV10
-#endif
-
 static boolean menu_initilized = FALSE;
 
 static int menu_callback() {
@@ -58,13 +44,8 @@ static int menu_callback() {
 void menu_open(void) {
 	if (!menu_initilized) return;
 	
-#ifdef GTKV12
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_on), get_skipMode());
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_off), !get_skipMode());
-#else
-	gtk_check_menu_item_set_state (GTK_CHECK_MENU_ITEM(menu_item_msgskip_on), get_skipMode());
-	gtk_check_menu_item_set_state (GTK_CHECK_MENU_ITEM(menu_item_msgskip_off), !get_skipMode());
-#endif
 	gtk_menu_popup(GTK_MENU(menu_window_popup), NULL, NULL, NULL, NULL, 0, 100);
 	gtk_widget_show(menu_window_popup);
 	nact->popupmenu_opened = TRUE;

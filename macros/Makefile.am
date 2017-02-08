@@ -11,7 +11,6 @@ MACROS= \
   glib-2.0.m4 \
   glibc21.m4 \
   gtk-2.0.m4 \
-  gtk.m4 \
   iconv.m4 \
   intdiv0.m4 \
   inttypes_h.m4 \

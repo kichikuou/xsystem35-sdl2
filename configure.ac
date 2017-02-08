@@ -173,21 +173,12 @@ AC_ARG_ENABLE(gtk,
   [  --enable-gtk            Enable gtk-based widget [default=yes]],,
   [enable_gtk=yes])
 
-no_gtk1x=no
 have_gtk=no
 if test "x$enable_gtk" = xyes; then
-  AM_PATH_GTK(1.0.0,
-    AC_DEFINE(ENABLE_GTK,1,[Define this if you have gtk+ >= 1.0.0]),
-    [AC_MSG_RESULT(No gtk-1.x found. Next check gtk-2.x)
-     no_gtk1x=yes
-    ]
+  AM_PATH_GTK_2_0(2.0.0,
+    AC_DEFINE(ENABLE_GTK,1,[Define this if you have gtk+ >= 2.0.0]),
+    AC_MSG_ERROR(*** check for GTK failed ***)
   )
-  if test "x$no_gtk1x" = xyes; then
-    AM_PATH_GTK_2_0(2.0.0,
-      AC_DEFINE(ENABLE_GTK,1,[Define this if you have gtk+ >= 1.0.0]),
-      AC_MSG_ERROR(*** check for GTK failed ***)
-    )
-  fi
   have_gtk=yes
 fi
 

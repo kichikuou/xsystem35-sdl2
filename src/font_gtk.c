@@ -41,20 +41,6 @@
 #include "antialiase.h"
 #include "image.h"
 
-#ifndef GTK_CHECK_VERSION
-#define GTK_CHECK_VERSION(major,minor,micro)    \
-(GTK_MAJOR_VERSION > (major) || \
- (GTK_MAJOR_VERSION == (major) && GTK_MINOR_VERSION > (minor)) || \
- (GTK_MAJOR_VERSION == (major) && GTK_MINOR_VERSION == (minor) && \
-  GTK_MICRO_VERSION >= (micro)))
-#endif /* !GTK_CHECK_VERSION */
-
-#if defined (GTK_CHECK_VERSION) && GTK_CHECK_VERSION (1,2,0)
-#define GTKV12 
-#else
-#define GTKV10
-#endif
-
 /* fontset の為の情報 */
 typedef struct {
 	int      size;
@@ -145,11 +131,7 @@ static void *font_gtk_get_glyph(unsigned char *str) {
 		return NULL;
 	}
 	
-#ifdef GTKV12
 	h = gdk_text_height(fontset, conv, l);
-#else
-	h = font_ascent + fontset->ascent;
-#endif
 	
 	if (w > GLYPH_PIXMAP_WIDTH)  w = GLYPH_PIXMAP_WIDTH;
 	if (h > GLYPH_PIXMAP_HEIGHT) h = GLYPH_PIXMAP_HEIGHT;

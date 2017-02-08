@@ -32,27 +32,6 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#ifndef GTK_CHECK_VERSION
-#define GTK_CHECK_VERSION(major,minor,micro)    \
-(GTK_MAJOR_VERSION > (major) || \
- (GTK_MAJOR_VERSION == (major) && GTK_MINOR_VERSION > (minor)) || \
- (GTK_MAJOR_VERSION == (major) && GTK_MINOR_VERSION == (minor) && \
-  GTK_MICRO_VERSION >= (micro)))
-#endif /* !GTK_CHECK_VERSION */
-
-#if GTK_CHECK_VERSION (1,2,0)
-#define GTKV12 
-#if GTK_CHECK_VERSION(1,3,0)
-#define GTKV13
-#endif
-#else
-#define GTKV10
-#endif
-
-#ifdef GTKV13
-#define GTK_WINDOW_DIALOG GTK_WINDOW_TOPLEVEL
-#endif
-
 #include "menu_callback.h"
 #include "menu_gui.h"
 
@@ -76,7 +55,7 @@ create_window1 (void)
   GtkWidget *button2;
   GtkWidget *label4;
 
-  window1 = gtk_window_new (GTK_WINDOW_DIALOG);
+  window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (window1), "window1", window1);
   gtk_window_set_title (GTK_WINDOW (window1), _("InputNumber"));
   gtk_window_set_policy (GTK_WINDOW (window1), FALSE, FALSE, FALSE);
@@ -96,11 +75,7 @@ create_window1 (void)
   gtk_widget_show (vbox1);
   gtk_box_pack_start (GTK_BOX (hbox1), vbox1, TRUE, TRUE, 0);
   gtk_widget_set_usize (vbox1, 128, -2);
-#ifdef GTKV12
   gtk_container_set_border_width (GTK_CONTAINER (vbox1), 10);
-#else
-  gtk_container_border_width (GTK_CONTAINER (vbox1), 10);
-#endif
 
   spinbutton1_adj = gtk_adjustment_new (100, 0, 100, 1, 1, 100);
   menu_spinbutton = spinbutton1 = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton1_adj), 1, 0);
@@ -185,11 +160,7 @@ create_window1 (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (vbox2);
   gtk_box_pack_start (GTK_BOX (hbox1), vbox2, FALSE, TRUE, 0);
-#ifdef GTKV12
   gtk_container_set_border_width (GTK_CONTAINER (vbox2), 10);
-#else
-  gtk_container_border_width (GTK_CONTAINER (vbox2), 10);
-#endif
   button1 = gtk_button_new_with_label (_("OK"));
   gtk_widget_ref (button1);
   gtk_object_set_data_full (GTK_OBJECT (window1), "button1", button1,
@@ -237,13 +208,9 @@ create_window2 (void)
   GtkWidget *button4;
   GtkWidget *button3;
 
-  window2 = gtk_window_new (GTK_WINDOW_DIALOG);
+  window2 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (window2), "window2", window2);
-#ifdef GTKV12
   gtk_container_set_border_width (GTK_CONTAINER (window2), 10);
-#else
-  gtk_container_border_width (GTK_CONTAINER (window2), 10);
-#endif
   gtk_window_set_title (GTK_WINDOW (window2), _("InputString"));
   gtk_window_set_policy (GTK_WINDOW (window2), FALSE, FALSE, FALSE);
   gtk_window_position (GTK_WINDOW (window2), GTK_WIN_POS_MOUSE);
@@ -333,13 +300,9 @@ create_window3 (void)
   GtkWidget *button5;
   GtkWidget *button6;
 
-  window3 = gtk_window_new (GTK_WINDOW_DIALOG);
+  window3 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (window3), "window3", window3);
-#ifdef GTKV12
   gtk_container_set_border_width (GTK_CONTAINER (window3), 10);
-#else
-  gtk_container_border_width (GTK_CONTAINER (window3), 10);
-#endif
   gtk_window_set_title (GTK_WINDOW (window3), _("Exit"));
   gtk_window_set_policy (GTK_WINDOW (window3), FALSE, FALSE, FALSE);
   gtk_window_position (GTK_WINDOW (window3), GTK_WIN_POS_MOUSE);
@@ -350,11 +313,7 @@ create_window3 (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (vbox4);
   gtk_container_add (GTK_CONTAINER (window3), vbox4);
-#ifdef GTKV12
   gtk_container_set_border_width (GTK_CONTAINER (vbox4), 5);
-#else
-  gtk_container_border_width (GTK_CONTAINER (vbox4), 5);
-#endif
   label8 = gtk_label_new (_("Exit System35 ?"));
   gtk_widget_ref (label8);
   gtk_object_set_data_full (GTK_OBJECT (window3), "label8", label8,
@@ -410,7 +369,7 @@ create_window4 (void)
   GtkWidget *label25;
   GtkWidget *button11;
 
-  window4 = gtk_window_new (GTK_WINDOW_DIALOG);
+  window4 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (window4), "window4", window4);
   gtk_window_set_title (GTK_WINDOW (window4), _("About"));
   gtk_window_position (GTK_WINDOW (window4), GTK_WIN_POS_MOUSE);
@@ -443,9 +402,7 @@ create_window4 (void)
   gtk_object_set_data_full (GTK_OBJECT (window4), "label23", label23,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label23);
-#ifdef GTKV12
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label23);
-#endif
   empty_notebook_page = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (empty_notebook_page);
   gtk_container_add (GTK_CONTAINER (notebook1), empty_notebook_page);
@@ -455,9 +412,7 @@ create_window4 (void)
   gtk_object_set_data_full (GTK_OBJECT (window4), "label24", label24,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label24);
-#ifdef GTKV12
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label24);
-#endif
   empty_notebook_page = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (empty_notebook_page);
   gtk_container_add (GTK_CONTAINER (notebook1), empty_notebook_page);
@@ -467,9 +422,7 @@ create_window4 (void)
   gtk_object_set_data_full (GTK_OBJECT (window4), "label25", label25,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label25);
-#ifdef GTKV12
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label25);
-#endif
   button11 = gtk_button_new_with_label (_("OK"));
   gtk_widget_ref (button11);
   gtk_object_set_data_full (GTK_OBJECT (window4), "button11", button11,
@@ -489,14 +442,12 @@ GtkWidget*
 create_menu1 (void)
 {
   GtkWidget *menu1;
-#ifdef GTKV12
   GtkAccelGroup *menu1_accels;
   GtkAccelGroup *item1_menu_accels;
   GtkAccelGroup *item4_menu_accels;
   GtkAccelGroup *item7_menu_accels;
   GtkAccelGroup *item10_menu_accels;
   GtkAccelGroup *item13_menu_accels;
-#endif
   GtkWidget *item1;
   GtkWidget *item1_menu;
   GSList *msg_group = NULL;
@@ -531,12 +482,6 @@ create_menu1 (void)
 
   menu1 = gtk_menu_new ();
   gtk_object_set_data (GTK_OBJECT (menu1), "menu1", menu1);
-#ifdef GTKV12
-#ifdef GTKV13
-#else
-  menu1_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (menu1));
-#endif
-#endif
   item1 = gtk_menu_item_new_with_label (_("MessageSkip"));
   gtk_widget_ref (item1);
   gtk_object_set_data_full (GTK_OBJECT (menu1), "item1", item1,
@@ -549,12 +494,6 @@ create_menu1 (void)
   gtk_object_set_data_full (GTK_OBJECT (menu1), "item1_menu", item1_menu,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item1), item1_menu);
-#ifdef GTKV12
-#ifdef GTKV13
-#else
-  item1_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (item1_menu));
-#endif
-#endif
   menu_item_msgskip_on = item2 = gtk_radio_menu_item_new_with_label (msg_group, _("ON"));
   msg_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item2));
   gtk_widget_ref (item2);
@@ -591,12 +530,6 @@ create_menu1 (void)
   gtk_object_set_data_full (GTK_OBJECT (menu1), "item4_menu", item4_menu,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item4), item4_menu);
-#ifdef GTKV12
-#ifdef GTKV13
-#else
-  item4_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (item4_menu));
-#endif
-#endif
   item5 = gtk_radio_menu_item_new_with_label (mouse_group, _("ON"));
   mouse_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item5));
   gtk_widget_ref (item5);
@@ -641,12 +574,6 @@ create_menu1 (void)
   gtk_object_set_data_full (GTK_OBJECT (menu1), "item7_menu", item7_menu,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item7), item7_menu);
-#ifdef GTKV12
-#ifdef GTKV13
-#else
-  item7_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (item7_menu));
-#endif
-#endif
   item8 = gtk_radio_menu_item_new_with_label (pcm_group, _("ON"));
   pcm_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item8));
   gtk_widget_ref (item8);
@@ -675,12 +602,6 @@ create_menu1 (void)
   gtk_object_set_data_full (GTK_OBJECT (menu1), "item10_menu", item10_menu,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item10), item10_menu);
-#ifdef GTKV12
-#ifdef GTKV13
-#else
-  item10_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (item10_menu));
-#endif
-#endif
   item11 = gtk_radio_menu_item_new_with_label (cdrom_group, _("ON"));
   cdrom_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item11));
   gtk_widget_ref (item11);
@@ -709,12 +630,6 @@ create_menu1 (void)
   gtk_object_set_data_full (GTK_OBJECT (menu1), "item13_menu", item13_menu,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (item13), item13_menu);
-#ifdef GTKV12
-#ifdef GTKV13
-#else
-  item13_menu_accels = gtk_menu_ensure_uline_accel_group (GTK_MENU (item13_menu));
-#endif
-#endif
   item14 = gtk_radio_menu_item_new_with_label (midi_group, _("ON"));
   midi_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item14));
   gtk_widget_ref (item14);
@@ -816,7 +731,7 @@ create_window5 (void)
   GtkWidget *window5;
   GtkWidget *entry2;
 
-  window5 = gtk_window_new (GTK_WINDOW_DIALOG);
+  window5 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (window5), "window5", window5);
   gtk_window_position (GTK_WINDOW (window5), GTK_WIN_POS_MOUSE);
   
@@ -844,7 +759,7 @@ create_window6 (void)
   GtkWidget *label51;
   GtkWidget *button16;
 
-  window6 = menu_window_msgbox = gtk_window_new (GTK_WINDOW_DIALOG);
+  window6 = menu_window_msgbox = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (window6), "window6", window6);
   gtk_window_set_title (GTK_WINDOW (window6), _("MessageBox"));
   gtk_window_position (GTK_WINDOW (window6), GTK_WIN_POS_MOUSE);

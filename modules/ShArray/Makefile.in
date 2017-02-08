@@ -88,8 +88,8 @@ am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
 	$(top_srcdir)/macros/esd.m4 $(top_srcdir)/macros/freetype2.m4 \
 	$(top_srcdir)/macros/gettext.m4 \
 	$(top_srcdir)/macros/glib-2.0.m4 \
-	$(top_srcdir)/macros/gtk-2.0.m4 $(top_srcdir)/macros/gtk.m4 \
-	$(top_srcdir)/macros/iconv.m4 $(top_srcdir)/macros/lib-ld.m4 \
+	$(top_srcdir)/macros/gtk-2.0.m4 $(top_srcdir)/macros/iconv.m4 \
+	$(top_srcdir)/macros/lib-ld.m4 \
 	$(top_srcdir)/macros/lib-link.m4 \
 	$(top_srcdir)/macros/lib-prefix.m4 \
 	$(top_srcdir)/macros/libtool.m4 $(top_srcdir)/macros/ltdl.m4 \
@@ -254,7 +254,6 @@ GMSGFMT = @GMSGFMT@
 GOBJECT_QUERY = @GOBJECT_QUERY@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
-GTK_CONFIG = @GTK_CONFIG@
 GTK_LIBS = @GTK_LIBS@
 HAVE_NASM = @HAVE_NASM@
 INCLTDL = @INCLTDL@

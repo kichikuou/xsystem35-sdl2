@@ -57,7 +57,7 @@
 /* Define this if you have glib >= 2.0.0 */
 #undef ENABLE_GLIB
 
-/* Define this if you have gtk+ >= 1.0.0 */
+/* Define this if you have gtk+ >= 2.0.0 */
 #undef ENABLE_GTK
 
 /* define this if you use gtk(gdk) font interface */
