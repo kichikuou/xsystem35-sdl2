@@ -417,7 +417,6 @@ AC_ARG_ENABLE(cdrom,
                               (default:  Automatically select cdrom device)
                               linux:    linux API (Linux/Solaris)
                               bsd:      BSD API (FreeBSD/NetBSD/OpenBSD)
-                              irix:     IRIX API
                               mp3:      play mp3 file using external/piped player],
   [ enable_cdrom=$enableval],
   [ enable_cdrom=yes])
@@ -442,9 +441,6 @@ if test "x$enable_cdrom" = xdefault; then
     *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
       enable_cd_bsd=yes
       ;;
-    *-irix*)
-      enable_cd_irix=yes
-      ;;
     *-dec-*)
       enable_cd_mp3=yes
       ;;
@@ -461,9 +457,6 @@ if test "x$enable_cd_linux" = xyes; then
 elif test "x$enable_cd_bsd" = xyes; then
   SRC_CDROM="$SRC_CROM cdrom.FreeBSD.c"
   AC_DEFINE(ENABLE_CDROM_BSD,1,[Define this if you use cdrom iotctl in *BSD])
-elif test "x$enable_cd_irix" = xyes; then
-  SRC_CDROM="$SRC_CDROM cdrom.Irix.c"
-  AC_DEFINE(ENABLE_CDROM_IRIX,1,[Define this if you use cdrom ctrl library in IRX])
 else
   SRC_CDROM="$SRC_CDROM cdrom.empty.c"
 fi
@@ -507,10 +500,6 @@ case "$target" in
     EXTRALIBS="$EXTRALIBS -lxpg4"
     EXTRACFLAGS="$EXTRACFLAGS -I/usr/local/include"
     EXTRALDFLAGS="$EXTRALDFLAGS -L/usr/local/lib"
-    ;;
-  *-irix*)
-    chk_rgb=yes
-    EXTRALIBS="$EXTRALIBS -lcdaudio -lds -lmediad"
     ;;
   sparc-*)
     chk_rgb=yes
@@ -914,9 +903,6 @@ if test "x$enable_cd_linux" = xyes; then
 fi
 if test "x$enable_cd_bsd" = xyes; then
   echo "    - *BSD ioctl"
-fi
-if test "x$enable_cd_irix" = xyes; then
-  echo "    - Irix cdrom library"
 fi
 if test "x$enable_cd_mp3" = xyes; then
   echo "    - External player (wav|mp3|ogg...)"

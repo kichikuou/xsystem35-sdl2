@@ -39,9 +39,6 @@
 /* Define this if you use cdrom iotctl in *BSD */
 #undef ENABLE_CDROM_BSD
 
-/* Define this if you use cdrom ctrl library in IRX */
-#undef ENABLE_CDROM_IRIX
-
 /* Define this if your use cdrom ioctl in linux or Solaris */
 #undef ENABLE_CDROM_LINUX
 

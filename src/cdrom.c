@@ -40,10 +40,6 @@ extern cdromdevice_t cdrom_linux;
 extern cdromdevice_t cdrom_bsd;
 #define DEV_PLAY_MODE &cdrom_bsd
 
-#elif defined(ENALE_CDROM_IRIX)
-extern cdromdevice_t cdrom_irix;
-#define DEV_PLAY_MODE &cdrom_irix
-
 #else
 
 extern cdromdevice_t cdrom_empty;
@@ -60,7 +56,6 @@ extern cdromdevice_t cdrom_mp3;
    
   default ... /dev/cdrom
   
-  Irix(O2) ... /dev/scsi/sc1d4l0 
   FreeBSD  ... /dev/acd0a
    etc...
 */
