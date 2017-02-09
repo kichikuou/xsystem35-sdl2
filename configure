@@ -16174,7 +16174,10 @@ fi
 
 if test "x$enable_audio" = xdefault; then
   case "$target" in
-    *-*-linux*|*-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
+    *-*-linux*)
+      enable_alsa=yes
+      ;;
+    *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
       enable_oss=yes
       ;;
     *-*-solaris*)
