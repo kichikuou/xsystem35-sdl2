@@ -59,9 +59,7 @@ extern int oss_init(audiodevice_t *dev, char *devdsp, char *devmix);
 #endif /* ENABLE_OSS */
 
 #ifdef ENABLE_ALSA
-#ifdef ENABLE_ALSA09
 extern int alsa_init(audiodevice_t *dev, char *hw, boolean automix);
-#endif /* ENABLE_ALSA09 */
 #endif
 	
 #ifdef ENABLE_ESD
@@ -92,14 +90,12 @@ int audio_init(audiodevice_t *a) {
 		if (mode_onlyone) break;
 #endif
 #ifdef ENABLE_ALSA
-#ifdef ENABLE_ALSA09
 	case AUDIO_PCM_ALSA:
 		if (audio_dev_dsp == NULL) {
 			audio_dev_dsp = "hw:0";
 		}
 		if (alsa_init(a, audio_dev_dsp, FALSE) == 0) break;
 		if (mode_onlyone) break;
-#endif
 #endif
 #ifdef ENABLE_ESD
 	case AUDIO_PCM_ESD:

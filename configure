@@ -887,9 +887,6 @@ enable_cdrom
 with_cdromdev
 with_locale
 enable_bgr
-with_alsa_card
-with_alsa_pcmdev
-with_alsa_mixerdev
 with_audiodev
 with_mixerdev
 enable_midi
@@ -1631,9 +1628,6 @@ Optional Packages:
                                    default|oss|alsa|esd|sun
   --with-cdromdev=#       CDROM Device Name. [default=/dev/cdrom]
   --with-locale=LOCALE    locale name you want to use(ex. ja_JP.ujis)
-  --with-alsa-card=#      ALSA Card No.
-  --with-alsa-pcmdev=#    ALSA PCM device No.
-  --with-alsa-mixerdev=#  ALSA Mixer device No.
   --with-oss-audiodev=DEVFILE DSP DEVICE
   --with-oss-mixerdev=DEVFILE MIXER DEVICE
   --with-midi-player=xxx  External Midi Player default=playmidi -4
@@ -16261,7 +16255,7 @@ $as_echo "#define ENABLE_OSS 1" >>confdefs.h
 fi
 
 
-
+have_alsa=no
 if test "x$enable_alsa" = xyes; then
   alsa_save_CFLAGS="$CFLAGS"
 alsa_save_LDFLAGS="$LDFLAGS"
@@ -16452,16 +16446,17 @@ fi
 
 if test "x$alsa_found" = "xyes" ; then
 
-$as_echo "#define ENABLE_ALSA09 1" >>confdefs.h
+$as_echo "#define ENABLE_ALSA 1" >>confdefs.h
 
-                 have_alsa09=yes
+	         have_alsa=yes
 
    LIBS=`echo $LIBS | sed 's/-lasound//g'`
    LIBS=`echo $LIBS | sed 's/  //'`
    LIBS="-lasound $LIBS"
 fi
 if test "x$alsa_found" = "xno" ; then
-   have_alsa09=no
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: *** All of ALSA dependent parts will be disabled ***" >&5
+$as_echo "*** All of ALSA dependent parts will be disabled ***" >&6; }
    CFLAGS="$alsa_save_CFLAGS"
    LDFLAGS="$alsa_save_LDFLAGS"
    LIBS="$alsa_save_LIBS"
@@ -16472,14 +16467,6 @@ fi
 
 
 
-  if test "x$have_alsa09" = xno; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: *** All of ALSA dependent parts will be disabled ***" >&5
-$as_echo "*** All of ALSA dependent parts will be disabled ***" >&6; }
-  else
-
-$as_echo "#define ENABLE_ALSA 1" >>confdefs.h
-
-  fi
 fi
 
 
@@ -16781,11 +16768,6 @@ case ".$DEFAULT_PLAYMODE" in
   .sun)      def_am=AUDIO_PCM_SUN ;;
   *)         def_am= ;;
 esac
-if test "x$have_alsa09" = xyes; then
-  if test "x$def_am" != x; then
-    def_am="$def_am09"
-  fi
-fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $def_am" >&5
 $as_echo "$def_am" >&6; }
 if test "x$def_am" != x; then
@@ -16805,8 +16787,8 @@ fi
 if test "x$have_sunaudio" = xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_sun.c"
 fi
-if test "x$have_alsa09" = xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_alsa09.c"
+if test "x$have_alsa" = xyes; then
+  SRC_AUDIO="$SRC_AUDIO audio_alsa.c"
 fi
 if test "x$no_esd" != xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_esd.c"
@@ -16955,51 +16937,6 @@ $as_echo "#define BGR_ORDER 1" >>confdefs.h
 else
 
 $as_echo "#define RGB_ORDER 1" >>confdefs.h
-
-fi
-
-if test "x$have_alsa" = xyes ; then
-
-# Check whether --with-alsa-card was given.
-if test "${with_alsa_card+set}" = set; then :
-  withval=$with_alsa_card; alsacard="$withval"
-else
-  alsacard="0"
-fi
-
-
-# Check whether --with-alsa-pcmdev was given.
-if test "${with_alsa_pcmdev+set}" = set; then :
-  withval=$with_alsa_pcmdev; alsapcmdev="$withval"
-else
-  alsapcmdev="0"
-fi
-
-
-# Check whether --with-alsa-mixerdev was given.
-if test "${with_alsa_mixerdev+set}" = set; then :
-  withval=$with_alsa_mixerdev; alsamixerdev="$withval"
-else
-  alsamixerdev="0"
-fi
-
-    ALSACARD=$alsacard
-
-cat >>confdefs.h <<_ACEOF
-#define ALSACARD "$alsacard"
-_ACEOF
-
-    MIXERDEV_ALSA=$alsamixerdev
-    AUDIODEV_ALSA=$alsapcmdev
-
-cat >>confdefs.h <<_ACEOF
-#define AUDIODEV_ALSA "$AUDIODEV_ALSA"
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
-#define MIXERDEV_ALSA "$MIXERDEV_ALSA"
-_ACEOF
 
 fi
 
@@ -18592,10 +18529,8 @@ fi
 if test "x$have_sunaudio" = xyes; then
     echo "    - sun ()"
 fi
-if test "x$no_alsa" != xyes; then
-  if test "x$have_alsa09" = xyes; then
-    echo "    - alsa09 (Alsa 0.9.x)"
-  fi
+if test "x$have_alsa" = xyes; then
+  echo "    - alsa"
 fi
 if test "x$no_esd" != xyes; then
   echo "    - esd (Enlightened Sound Daemon)"

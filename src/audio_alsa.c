@@ -1,5 +1,5 @@
 /*
- * audio_alsa09.c  alsa lowlevel acess (for 0.9.x)
+ * audio_alsa.c  alsa lowlevel acess (for 0.9.x)
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -32,8 +32,8 @@
 
 #include "system.h"
 #include "audio.h"
-#include "audio_alsa09.h"
-#include "mixer_alsa09.c"
+#include "audio_alsa.h"
+#include "mixer_alsa.c"
 #include "music_pcm.h"
 
 #ifndef SND_PROTOCOL_VERSION
@@ -47,7 +47,7 @@ static int audio_close(audiodevice_t *audio);
 static int audio_write(audiodevice_t *audio, unsigned char *buf,int cnt);
 
 static int audio_open(audiodevice_t *dev, chanfmt_t fmt) {
-	audio_alsa09_t *alsa = (audio_alsa09_t *)dev->data_pcm;
+	audio_alsa_t *alsa = (audio_alsa_t *)dev->data_pcm;
 	struct pollfd pfds;
 	snd_pcm_hw_params_t *hwparams;
 #if SND_LIB_VERSION >= SND_PROTOCOL_VERSION(1,0,0)
@@ -139,7 +139,7 @@ static int audio_open(audiodevice_t *dev, chanfmt_t fmt) {
 }
 
 static int audio_close(audiodevice_t *dev) {
-	audio_alsa09_t *alsa = (audio_alsa09_t *)dev->data_pcm;
+	audio_alsa_t *alsa = (audio_alsa_t *)dev->data_pcm;
 	
 	dev->fd = -1;
 	if (alsa->handle) {
@@ -149,7 +149,7 @@ static int audio_close(audiodevice_t *dev) {
 }
 
 static int audio_write(audiodevice_t *dev, unsigned char *buf, int cnt) {
-	audio_alsa09_t *alsa = (audio_alsa09_t *)dev->data_pcm;
+	audio_alsa_t *alsa = (audio_alsa_t *)dev->data_pcm;
 	int len, err;
 	
 	if (NULL == alsa->handle) return NG;
@@ -193,15 +193,15 @@ static int alsa_exit(audiodevice_t *dev) {
 }
 
 int alsa_init(audiodevice_t *dev, char *devname, boolean automix) {
-	audio_alsa09_t *alsa;
+	audio_alsa_t *alsa;
 	
-	alsa = g_new0(audio_alsa09_t, 1);
+	alsa = g_new0(audio_alsa_t, 1);
 	alsa->dev = devname;
 	dev->data_pcm = alsa;
 	
 	mixer_init(dev);
 	
-	dev->id      = AUDIO_PCM_ALSA09;
+	dev->id      = AUDIO_PCM_ALSA;
 	dev->fd      = -1;
 	dev->open    = audio_open;
 	dev->close   = audio_close;

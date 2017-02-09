@@ -3,12 +3,6 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
-/* alsa card no */
-#undef ALSACARD
-
-/* aduio device */
-#undef AUDIODEV_ALSA
-
 /* aduio device */
 #undef AUDIODEV_OSS
 
@@ -29,9 +23,6 @@
 
 /* Define this if you have Alsa (libasound) installed */
 #undef ENABLE_ALSA
-
-/* Define this if you have alsa 0.9.x and more installed */
-#undef ENABLE_ALSA09
 
 /* Define this if you use cdrom iotctl in *BSD */
 #undef ENABLE_CDROM_BSD
@@ -277,9 +268,6 @@
 
 /* midi player */
 #undef MIDI_PLAYER
-
-/* mixer device */
-#undef MIXERDEV_ALSA
 
 /* mixer device */
 #undef MIXERDEV_OSS

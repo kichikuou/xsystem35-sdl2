@@ -81,7 +81,6 @@ typedef struct _audiodevice audiodevice_t;
 enum {
 	AUDIO_PCM_OSS,
 	AUDIO_PCM_ALSA,
-	AUDIO_PCM_ALSA09,
 	AUDIO_PCM_ESD,
 	AUDIO_PCM_SDL,
 	AUDIO_PCM_ARTS,

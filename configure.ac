@@ -317,18 +317,13 @@ dnl           fi
 dnl         ],
 dnl   AC_MSG_RESULT(*** All of ALSA dependent parts will be disabled ***))
 dnl fi
-
+have_alsa=no
 if test "x$enable_alsa" = xyes; then
   AM_PATH_ALSA(0.9.0,
-               [ AC_DEFINE(ENABLE_ALSA09,1,[Define this if you have alsa 0.9.x and more installed])
-                 have_alsa09=yes
+               [ AC_DEFINE(ENABLE_ALSA,1,[Define this if you have Alsa (libasound) installed])
+	         have_alsa=yes
                ],
-               have_alsa09=no)
-  if test "x$have_alsa09" = xno; then
-    AC_MSG_RESULT(*** All of ALSA dependent parts will be disabled ***)
-  else
-    AC_DEFINE(ENABLE_ALSA,1,[Define this if you have Alsa (libasound) installed])
-  fi 
+               AC_MSG_RESULT(*** All of ALSA dependent parts will be disabled ***))
 fi
 
 
@@ -369,11 +364,6 @@ case ".$DEFAULT_PLAYMODE" in
   .sun)      def_am=AUDIO_PCM_SUN ;;
   *)         def_am= ;;
 esac
-if test "x$have_alsa09" = xyes; then
-  if test "x$def_am" != x; then
-    def_am="$def_am09"
-  fi
-fi
 AC_MSG_RESULT($def_am)
 if test "x$def_am" != x; then
   AC_DEFINE_UNQUOTED(DEFAULT_AUDIO_MODE, $def_am, [default audio mode])
@@ -391,8 +381,8 @@ fi
 if test "x$have_sunaudio" = xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_sun.c"
 fi
-if test "x$have_alsa09" = xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_alsa09.c"
+if test "x$have_alsa" = xyes; then
+  SRC_AUDIO="$SRC_AUDIO audio_alsa.c"
 fi
 if test "x$no_esd" != xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_esd.c"
@@ -510,24 +500,6 @@ if test "x$enable_bgr" = xyes; then
   AC_DEFINE(BGR_ORDER,1,[Define this if X11 Pixmap color order is BGR])
 else
   AC_DEFINE(RGB_ORDER,1,[Define this if X11 Pixmap color order is RGB])
-fi
-
-dnl
-dnl set ALSA param
-dnl
-if test "x$have_alsa" = xyes ; then
-    AC_ARG_WITH(alsa-card,    [  --with-alsa-card=#      ALSA Card No.],
-	alsacard="$withval",alsacard="0")
-    AC_ARG_WITH(alsa-pcmdev,  [  --with-alsa-pcmdev=#    ALSA PCM device No.],
-	alsapcmdev="$withval",alsapcmdev="0")
-    AC_ARG_WITH(alsa-mixerdev,[  --with-alsa-mixerdev=#  ALSA Mixer device No.],
-	alsamixerdev="$withval",alsamixerdev="0")
-    ALSACARD=$alsacard
-    AC_DEFINE_UNQUOTED(ALSACARD,"$alsacard",[alsa card no])
-    MIXERDEV_ALSA=$alsamixerdev
-    AUDIODEV_ALSA=$alsapcmdev
-    AC_DEFINE_UNQUOTED(AUDIODEV_ALSA,"$AUDIODEV_ALSA",[aduio device])
-    AC_DEFINE_UNQUOTED(MIXERDEV_ALSA,"$MIXERDEV_ALSA",[mixer device])
 fi
 
 dnl
@@ -871,10 +843,8 @@ fi
 if test "x$have_sunaudio" = xyes; then
     echo "    - sun ()"
 fi
-if test "x$no_alsa" != xyes; then
-  if test "x$have_alsa09" = xyes; then
-    echo "    - alsa09 (Alsa 0.9.x)"
-  fi
+if test "x$have_alsa" = xyes; then
+  echo "    - alsa"
 fi
 if test "x$no_esd" != xyes; then
   echo "    - esd (Enlightened Sound Daemon)"

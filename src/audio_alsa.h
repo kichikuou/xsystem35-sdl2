@@ -1,9 +1,9 @@
 /*
- * mixer_alsa09.c  ALSA mixer lowlevel access (for 0.9.x)
+ * audio_alsa.h  alsa lowlevel acess
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
- * rewrited      2000-     Fumihiko Murata <fmurata@p1.tcnet.ne.jp>
+ * rewrited      1999- Fumihiko Murata <fmurata@p1.tcnet.ne.jp>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,42 +20,35 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: mixer_alsa09.c,v 1.3 2002/09/01 11:54:51 chikama Exp $ */
+/* $Id: audio_alsa09.h,v 1.4 2002/09/04 13:20:13 chikama Exp $ */
 
-#include "config.h"
-#include "audio.h"
+#ifndef __AUDIO_ALSA__
+#define __AUDIO_ALSA__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <alsa/asoundlib.h>
 
-#include "audio_alsa09.h"
+typedef struct {
+	snd_pcm_t *handle;
+	snd_async_handler_t *async_handler;
+	char *dev;
+  
+	boolean automixer;  // 自動的に pcmdevice に接続されている mixer を探すか？ 
+	
+	int silence;
 
-#define MIXER_ELEMENT_MAX 100
+	int frag,frags;
+	struct {
+		int mix_dev;
+	} mixer;
 
-/*
-  level: 0-100
-*/
-static void mixer_set_level(audiodevice_t *dev, int ch, int level) {
-	mixer_alsa09_t *amix = (mixer_alsa09_t *)dev->data_mix;
-}
+	int mm_flag;
+	char *mm_data;
+} audio_alsa_t;
 
-static int mixer_get_level(audiodevice_t *dev, int ch) {
-	mixer_alsa09_t *amix = (mixer_alsa09_t *)dev->data_mix;
+typedef struct {
+	int card;
+	int mix_dev;
+	int connect[MIX_NRDEVICES];
+} mixer_alsa_t;
 
-	return 0;
-}
-
-void mixer_exit(audiodevice_t *dev) {
-	g_free(dev->data_mix);
-}
-
-int mixer_init(audiodevice_t *dev) {
-        mixer_alsa09_t *mix = g_new0(mixer_alsa09_t, 1);
-	mix->card = 0;
-	mix->mix_dev = 0;
-	dev->data_mix = mix;
-	return 0;
-}
-
+#endif /* __AUDIO_ALSA__ */
