@@ -30,9 +30,6 @@
 /* Define this if you have Alsa (libasound) installed */
 #undef ENABLE_ALSA
 
-/* Define this if you have 0.5.x <= alsa < 0.9.0 installed */
-#undef ENABLE_ALSA05
-
 /* Define this if you have alsa 0.9.x and more installed */
 #undef ENABLE_ALSA09
 

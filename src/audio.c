@@ -59,10 +59,6 @@ extern int oss_init(audiodevice_t *dev, char *devdsp, char *devmix);
 #endif /* ENABLE_OSS */
 
 #ifdef ENABLE_ALSA
-#ifdef ENABLE_ALSA05
-extern int alsa_init(audiodevice_t *dev, int cardno, int pcmdev, int mixdev, boolean automix);
-#endif /* ENABLE_ALSA05 */
-
 #ifdef ENABLE_ALSA09
 extern int alsa_init(audiodevice_t *dev, char *hw, boolean automix);
 #endif /* ENABLE_ALSA09 */
@@ -96,17 +92,6 @@ int audio_init(audiodevice_t *a) {
 		if (mode_onlyone) break;
 #endif
 #ifdef ENABLE_ALSA
-#ifdef ENABLE_ALSA05
-	case AUDIO_PCM_ALSA:
-	{
-		int card = -1, pcm = -1;
-		if (audio_dev_dsp) {
-			sscanf(audio_dev_dsp, "%d:%d\n", &card, &pcm);
-		}
-		if (alsa_init(a, card, pcm, -1, FALSE) == 0) break;
-		if (mode_onlyone) break;
-	}
-#endif
 #ifdef ENABLE_ALSA09
 	case AUDIO_PCM_ALSA:
 		if (audio_dev_dsp == NULL) {

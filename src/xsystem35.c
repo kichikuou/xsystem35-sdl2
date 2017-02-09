@@ -130,9 +130,6 @@ static void sys35_usage(boolean verbose) {
 	puts("                :  /dev/dsp : oss type (device name)");
 #endif
 #ifdef ENABLE_ALSA
-#ifdef ENABLE_ALSA05
-	puts("                :  0:0      : alsa type (card and device)");
-#endif
 #ifdef ENABLE_ALSA09
 	puts("                :  hw:0,0   : alsa hardware");
 #endif

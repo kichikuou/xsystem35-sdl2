@@ -325,13 +325,6 @@ if test "x$enable_alsa" = xyes; then
                ],
                have_alsa09=no)
   if test "x$have_alsa09" = xno; then
-    AM_PATH_ALSA(0.5.0,
-                 [ AC_DEFINE(ENABLE_ALSA05,1,[Define this if you have 0.5.x <= alsa < 0.9.0 installed])
-                   have_alsa05=yes
-                 ],
-                 have_alsa05=no)
-  fi
-  if test "x$have_alsa09" = xno -a "x$have_alsa05" = xno; then
     AC_MSG_RESULT(*** All of ALSA dependent parts will be disabled ***)
   else
     AC_DEFINE(ENABLE_ALSA,1,[Define this if you have Alsa (libasound) installed])
@@ -397,9 +390,6 @@ if test "x$have_ossaudio" = xyes; then
 fi
 if test "x$have_sunaudio" = xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_sun.c"
-fi
-if test "x$have_alsa05" = xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_alsa.c"
 fi
 if test "x$have_alsa09" = xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_alsa09.c"
@@ -538,8 +528,6 @@ if test "x$have_alsa" = xyes ; then
     AUDIODEV_ALSA=$alsapcmdev
     AC_DEFINE_UNQUOTED(AUDIODEV_ALSA,"$AUDIODEV_ALSA",[aduio device])
     AC_DEFINE_UNQUOTED(MIXERDEV_ALSA,"$MIXERDEV_ALSA",[mixer device])
-    AC_CHECK_LIB(asound,snd_mixer_element_read,ALSAMIX_H=mixer_alsa.h)
-    AC_SUBST(ALSAMIX_H)
 fi
 
 dnl
@@ -884,9 +872,6 @@ if test "x$have_sunaudio" = xyes; then
     echo "    - sun ()"
 fi
 if test "x$no_alsa" != xyes; then
-  if test "x$have_alsa05" = xyes; then
-    echo "    - alsa05 (Alsa 0.5.x)"
-  fi
   if test "x$have_alsa09" = xyes; then
     echo "    - alsa09 (Alsa 0.9.x)"
   fi
