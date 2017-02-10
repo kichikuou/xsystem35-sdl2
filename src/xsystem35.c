@@ -96,7 +96,7 @@ static boolean isjix0213_tt[FONTTYPEMAX];
 static char fontface[FONTTYPEMAX];
 
 #ifdef ENABLE_EDL
-static fontdev_t fontdev = FONT_GTK;
+static fontdev_t fontdev = FONT_FT2;
 #else
 static fontdev_t fontdev = FONT_X11;
 #endif
@@ -170,9 +170,6 @@ static void sys35_usage(boolean verbose) {
 #endif
 #ifdef ENABLE_X11FONT
 	puts(" -devfont x11   : x11");
-#endif
-#ifdef ENABLE_GTKFONT
-	puts(" -devfont gtk   : gtk");
 #endif
 
 #ifdef ENABLE_EDL
@@ -262,18 +259,8 @@ static int check_fontdev(char *devname) {
 	}
 #endif
 
-#ifdef ENABLE_GTKFONT
-	if (0 == strcmp(devname, "gtk")) {
-		return FONT_GTK;
-	}
-#endif
-	
 #ifdef ENABLE_SDL
-#ifdef ENABLE_GTK
-	return FONT_GTK;
-#else
-	return FONT_TTF;
-#endif
+	return FONT_FT2;
 #else
 	return FONT_X11;
 #endif
@@ -504,7 +491,6 @@ static void sys35_init() {
 
 	for (i = 0; i < FONTTYPEMAX; i++) {
 		switch(fontdev) {
-		case FONT_TTF:
 		case FONT_FT2:
 		case FONT_SDLTTF:
 			if (fontname_tt[i] == NULL) {
@@ -517,7 +503,6 @@ static void sys35_init() {
 			break;
 			
 		case FONT_X11:
-		case FONT_GTK:
 			if (fontname[i] == NULL) {
 				nact->ags.font->name[i] = strdup(FONT_DEFAULTNAME_X);
 			} else {

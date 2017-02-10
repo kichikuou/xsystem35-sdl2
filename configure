@@ -17540,14 +17540,7 @@ _ACEOF
 
 
 SRC_FONT=
-if test "x$have_sdl" = xyes; then
-  if test "x$enable_gtk" = xyes; then
-    SRC_FONT="font_gtk.c"
-
-$as_echo "#define ENABLE_GTKFONT 1" >>confdefs.h
-
-  fi
-else
+if test "x$have_sdl" != xyes; then
   SRC_FONT="font_x11.c"
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XmbTextEscapement in -lX11" >&5
 $as_echo_n "checking for XmbTextEscapement in -lX11... " >&6; }
@@ -18565,11 +18558,7 @@ fi
 echo ""
 
 echo " * font device:"
-if test "x$have_sdl" = xyes; then
-  if test "x$enable_gtk" = xyes; then
-    echo "    - gtk(gdk) font"
-  fi
-else
+if test "x$have_sdl" != xyes; then
   echo "    - x11 font"
 fi
 if test "x$no_ft" != xyes; then

@@ -69,10 +69,6 @@ extern FONT *font_sdlttf_new();
 extern FONT *font_x11_new();
 #endif
 
-#ifdef ENABLE_GTKFONT
-extern FONT *font_gtk_new();
-#endif
-
 /* デフォルトのフォント名 */
 #define FONT_DEFAULTNAME_X "-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0201.1976-0,*"
 
@@ -81,8 +77,6 @@ extern FONT *font_gtk_new();
 //
 typedef enum {
 	FONT_X11,
-	FONT_GTK,
-	FONT_TTF,
 	FONT_FT2,
 	FONT_SDLTTF
 } fontdev_t;

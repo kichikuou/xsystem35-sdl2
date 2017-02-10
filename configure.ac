@@ -693,12 +693,7 @@ dnl
 dnl FreeType (Font)
 dnl
 SRC_FONT=
-if test "x$have_sdl" = xyes; then
-  if test "x$enable_gtk" = xyes; then
-    SRC_FONT="font_gtk.c"
-    AC_DEFINE(ENABLE_GTKFONT,1,[define this if you use gtk(gdk) font interface])
-  fi
-else
+if test "x$have_sdl" != xyes; then
   SRC_FONT="font_x11.c"
   AC_CHECK_LIB(X11, XmbTextEscapement, X_LIBS="$X_LIBS -lX11", AC_MSG_ERROR(libX11 needed))
   AC_DEFINE(ENABLE_X11FONT,1,[define this if you use X11 font interface])
@@ -882,11 +877,7 @@ echo ""
 
 dnl font
 echo " * font device:"
-if test "x$have_sdl" = xyes; then
-  if test "x$enable_gtk" = xyes; then
-    echo "    - gtk(gdk) font"
-  fi
-else
+if test "x$have_sdl" != xyes; then
   echo "    - x11 font"
 fi
 if test "x$no_ft" != xyes; then

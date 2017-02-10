@@ -45,9 +45,6 @@
 /* Define this if you have gtk+ >= 2.0.0 */
 #undef ENABLE_GTK
 
-/* define this if you use gtk(gdk) font interface */
-#undef ENABLE_GTKFONT
-
 /* define this if you use external midi player */
 #undef ENABLE_MIDI_EXTPLAYER
 
