@@ -212,3 +212,11 @@ agsurface_t *sdl_getDIB(void) {
 	return sdl_dibinfo;
 }
 
+/* AutoRepeat ¤ÎÀßÄê */
+void sdl_setAutoRepeat(boolean bool) {
+	if (bool) {
+		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	} else {
+		SDL_EnableKeyRepeat(0, 0);
+	}
+}

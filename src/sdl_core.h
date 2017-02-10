@@ -94,6 +94,7 @@ extern boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCur
 extern int  sdl_getKeyInfo();
 extern int  sdl_getMouseInfo(MyPoint *p);
 extern int  sdl_getjoyinfo(void);
+extern void sdl_setAutoRepeat(boolean bool);
 
 /* misc */
 extern void sdl_mainIteration();
@@ -162,6 +163,7 @@ extern boolean RawKeyInfo[];
 #define Keywait(r,flg) sdl_keywait(r,flg)
 #define SetCursorLocation(x,y) sdl_setCursorLocation((x),(y))
 #define CursorNew(d,no,i,dir) sdl_cursorNew((d),(no),(i),(dir))
+#define SetAutoRepeat(b) sdl_setAutoRepeat(b)
 
 /* misc */
 #define ResourceInit(c,v) sdl_ResourceInit((c),(v))
