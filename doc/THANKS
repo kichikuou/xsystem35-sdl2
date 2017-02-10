@@ -3,42 +3,42 @@ Special Thanks To ...
 
 
 
-$BF`NILZ$5$s$K$O%2!<%`$N%$%s%9%H!<%kMQ$N%9%/%j%W%H$r:n@.$7$FD:$-$^$7$?!#(B
-$B$^$?!"(BDebian$B$N%Q%C%1!<%82=$r$7$F$$$?$@$-$^$7$?!#(B
+奈良木さんにはゲームのインストール用のスクリプトを作成して頂きました。
+また、Debianのパッケージ化をしていただきました。
 <naraki@debian.or.jp>
 
-$BFiC+$5$s$K$O(BFreeBSD$B$X$N%]!<%F%#%s%0$K$D$$$F>pJs$d%F%9%H$r$7$FD:$-$^$7$?!#(B
+鍋谷さんにはFreeBSDへのポーティングについて情報やテストをして頂きました。
 <nabe@ksj.mcu.or.jp>
 
-$B$4$&$5$s$K$O%W%m%0%i%`$N;v$d(BOpenBSD$B$K$D$$$F$$$m$$$m$H%"%I%P%$%9$rD:$-$^$7$?!#(B
+ごうさんにはプログラムの事やOpenBSDについていろいろとアドバイスを頂きました。
 <go@cclub.cc.tut.ac.jp>
 
-$B8eF#$5$s$K$O(BLinuxPPC/MkLinux$B$K4X$9$k>pJs$r$$$?$@$-$^$7$?!#(B
+後藤さんにはLinuxPPC/MkLinuxに関する情報をいただきました。
 <karg@can.bekkoame.ne.jp>
 
-$BED?,$5$s$K$O%Z%$%s%H%k!<%A%s$r<BAu$7$FD:$-$^$7$?!#$^$?!"%"%j%9$N4[#4#5#6(B
-$B$K<}O?$5$l$F$$$k%2!<%`$X$NBP1~$J$I!"3F<o%Q%C%A$r$$$?$@$-$^$7$?!#(B
-$B$^$?!"%M%C%H>e$N(BSYSTEM3.5$BBP1~%2!<%`$NF0:n>u67$r$^$H$a$F$$$?$@$-$^$7$?!#(B
-$B%^%&%9%+!<%=%k7A>uJQ99$KBP1~$7$FD:$-$^$7$?!#(B
+田尻さんにはペイントルーチンを実装して頂きました。また、アリスの館４５６
+に収録されているゲームへの対応など、各種パッチをいただきました。
+また、ネット上のSYSTEM3.5対応ゲームの動作状況をまとめていただきました。
+マウスカーソル形状変更に対応して頂きました。
 <tajiri@wizard.elec.waseda.ac.jp>
 
-$BB<ED$5$s$K$O(B $B$h$jHFMQE*$J(B midi.c $B$rD:$-$^$7$?!#(B
-$B$^$?!"(BALSA$B$N(BMixer$B$^$o$j$N2~NI$r$7$F$$$?$@$-$^$7$?!#(B
-linux$B$N(Bjoystick$B$X$NBP1~$r$7$F$$$?$@$-$^$7$?!#(B
-SDL $B$KBP1~$7$F$$$?$@$-$^$7$?!#(B
-TrueType Font $B$KBP1~$7$F$$$?$@$-$^$7$?!#(B
+村田さんには より汎用的な midi.c を頂きました。
+また、ALSAのMixerまわりの改良をしていただきました。
+linuxのjoystickへの対応をしていただきました。
+SDL に対応していただきました。
+TrueType Font に対応していただきました。
 <fmurata@p1.tcnet.ne.jp>
 
-$BJ?2,$5$s$K$O(BFreeBSD$B$N(Bport$B$r:n@.$7$FD:$-$^$7$?!#(B
+平岡さんにはFreeBSDのportを作成して頂きました。
 <flathill@flathill.gr.jp>
-$B8=:_$N(Bports$B$N4IM}$OF#Eg$5$s$,9T$J$C$F$$$^$9!#(B
+現在のportsの管理は藤島さんが行なっています。
 <k5@respo.or.jp>
 
-$B9bLZ$5$s$K$O(Brpm$B$N%Q%C%1!<%82=$r$7$FD:$-$^$7$?!#(B
+高木さんにはrpmのパッケージ化をして頂きました。
 <jwtoshi@mars.dti.ne.jp>
 
 
-$B$=$NB>!"%F%9%H%W%l%$$r$7$FD:$$$?3'$5$s$K46<U$7$^$9!#(B
+その他、テストプレイをして頂いた皆さんに感謝します。
 
 
 by Masaki Chikama(Wren) <masaki-c@is.aist-nara.ac.jp>

@@ -1,201 +1,201 @@
 
-                    xsystem35 $B$K$*$1$k2;3Z4D6-$K$D$$$F(B
+                    xsystem35 における音楽環境について
 
 
-0. $B$b$/$8(B
-  1. MIDI$B$K$D$$$F(B
-     a) $B30It%W%l!<%d!<$r;H$&J}K!(B
-       1) xsystem35 $BB&$N=`Hw(B
-       2) $B%W%l%$%d!<$N=`Hw(B
-       3) xsystem35$B$X$N%j%@%$%l%/%H(B
-       4) $B@)8B;v9`(B
-     b) $B30It(B MIDI $B2;8;$r(B /dev/midi $B7PM3$G@)8f$9$kJ}K!(B
-       1) xsystem35 $BB&$N=`Hw(B
-       2) $B30It(B MIDI $B2;8;$N=`Hw(B
-     c) Synthesizer $B2;8;$r(B /dev/sequencer $B7PM3$G@)8f$9$kJ}K!(B
-       1) xsystem35 $BB&$N=`Hw(B
-       2) Synthesizer $B2;8;$N=`Hw(B
-     d) $B%*%W%7%g%s0lMw(B
-  2. $B8z2L2;(B(WAV)$B$K$D$$$F(B
-     a) OSS $B=PNO(B
-     b) ALSA $B=PNO(B
-     c) ESD $B=PNO(B
-  3. CD$B%*!<%G%#%*$K$D$$$F(B
-     a) CD-ROM $B%3%s%H%m!<%k$K$h$k1iAU(B
-     b) $B30It%W%l%$%d(B(mp3$B$J$I(B)$B$K$h$k1iAU(B
-  4. PCM & MIDI(timidity) & CD-ROM(MP3) $B$r#1Kg$N%5%&%s%I%+!<%I$GF1;~$K;H$&J}K!(B
+0. もくじ
+  1. MIDIについて
+     a) 外部プレーヤーを使う方法
+       1) xsystem35 側の準備
+       2) プレイヤーの準備
+       3) xsystem35へのリダイレクト
+       4) 制限事項
+     b) 外部 MIDI 音源を /dev/midi 経由で制御する方法
+       1) xsystem35 側の準備
+       2) 外部 MIDI 音源の準備
+     c) Synthesizer 音源を /dev/sequencer 経由で制御する方法
+       1) xsystem35 側の準備
+       2) Synthesizer 音源の準備
+     d) オプション一覧
+  2. 効果音(WAV)について
+     a) OSS 出力
+     b) ALSA 出力
+     c) ESD 出力
+  3. CDオーディオについて
+     a) CD-ROM コントロールによる演奏
+     b) 外部プレイヤ(mp3など)による演奏
+  4. PCM & MIDI(timidity) & CD-ROM(MP3) を１枚のサウンドカードで同時に使う方法
 
  
-1. MIDI$B$K$D$$$F(B
+1. MIDIについて
    
-   xsystem35 $B$G$O(B MIDI $B$N1iAU$K30It%W%l!<%d!<$r;H$&J}K!$H!"%5%&%s%I%+!<%I$N(B
- MIDI port $B$r2p$7$F@\B3$7$?30It(B MIDI $B5!4o$r(B /dev/midi $B7PM3$G@)8f$9$kJ}K!!"(B
- $B$5$i$K!"(Bsynthesizer device $B$r(B OSS sequencer (/dev/sequencer) $B7PM3$G@)8f$9$k(B
- $BJ}K!$N#3<oN`$,A*Br$G$-$^$9!#(B
+   xsystem35 では MIDI の演奏に外部プレーヤーを使う方法と、サウンドカードの
+ MIDI port を介して接続した外部 MIDI 機器を /dev/midi 経由で制御する方法、
+ さらに、synthesizer device を OSS sequencer (/dev/sequencer) 経由で制御する
+ 方法の３種類が選択できます。
 
- a) $B30It%W%l!<%d!<$r;H$&J}K!(B
+ a) 外部プレーヤーを使う方法
 
-   1) xsystem35 $BB&$N=`Hw(B
-        xsystem35 $B$N(B configure $B<B9T;~$K(B --enable-midi=extp $B$rIU$1$F%3%s%Q%$%k(B
-      $B$7$F$*$-$^$9!#(B
+   1) xsystem35 側の準備
+        xsystem35 の configure 実行時に --enable-midi=extp を付けてコンパイル
+      しておきます。
 
-   2) $B%W%l%$%d!<$N=`Hw(B
-        TiMidity $B$d(B playmidi $B$J$I!"$*9%$_$N%W%l!<%d!<$r$*;H$$$/$@$5$$!#(B
-      $B%W%l%$%d!<$X$O$"$i$+$8$a%Q%9$rDL$7$F$*$-!"(B~/.xsys35rc $B$K%W%l%$%d!<$H(B
-      $B%W%l%$%d!<$X$N0z?t$r5-=R$7$^$9!#(B
+   2) プレイヤーの準備
+        TiMidity や playmidi など、お好みのプレーヤーをお使いください。
+      プレイヤーへはあらかじめパスを通しておき、~/.xsys35rc にプレイヤーと
+      プレイヤーへの引数を記述します。
   
-       ($BNc(B) TiMidity $B$r(B esd $B7PM3$G=PNO$9$k>l9g(B
+       (例) TiMidity を esd 経由で出力する場合
        midi_player: timidity -A 100 -s 44100 -Oe
 
-   2a) xsystem35$B$X$N%j%@%$%l%/%H(B ($B%*%W%7%g%s(B)
-        TiMidity $B$r;H$C$F$$$k>l9g!"(BTiMidity $B$N(B PCM $B=PNO$r(B xsystem35 $B$X$H%j%@(B
-      $B%$%l%/%H$7$F(B xsystem35 $BB&$G4IM}$7$F$$$k(BPCM $B%G%P%$%9$KN.$9;v$,=PMh$^$9!#(B
-      ~/.xsys35rc $B$N(B MIDI $B%W%l!<%d!<$N@_Dj$N:]$K@hF,$K(B '-' $B$r$D$1$F2<$5$$!#(B
+   2a) xsystem35へのリダイレクト (オプション)
+        TiMidity を使っている場合、TiMidity の PCM 出力を xsystem35 へとリダ
+      イレクトして xsystem35 側で管理しているPCM デバイスに流す事が出来ます。
+      ~/.xsys35rc の MIDI プレーヤーの設定の際に先頭に '-' をつけて下さい。
 
-      ($BNc(B)
+      (例)
        midi_player: -timidity -A 100 -s 44100 -Or -o-
 
-       $B$3$N>l9g(B timidity $B$N=PNO$O(B 44.1kHz, Stereo, 16bit $B8GDj$G$9!#(B
+       この場合 timidity の出力は 44.1kHz, Stereo, 16bit 固定です。
 
-   3) $B@)8B;v9`(B
-        $B30It%W%l%$%d!<$r(B $B;HMQ$9$k>l9g!"(BMIDI$B%U%!%$%k$KKd$a9~$^$l$?(B system35 $BMQ$N(B
-      $B@)8f%3%^%s%I$r<B9T$9$k$3$H$,$G$-$:!"%j%T!<%H:F@8!"%8%c%s%W:F@8$J$I$,=PMh(B
-      $B$^$;$s!#$3$N$?$a!"%2!<%`$N?J9T$K;Y>c$,=P$k$3$H$,$"$j$^$9!#(B
+   3) 制限事項
+        外部プレイヤーを 使用する場合、MIDIファイルに埋め込まれた system35 用の
+      制御コマンドを実行することができず、リピート再生、ジャンプ再生などが出来
+      ません。このため、ゲームの進行に支障が出ることがあります。
 
 
- b) $B30It(B MIDI $B2;8;$r(B /dev/midi $B7PM3$G@)8f$9$kJ}K!(B
+ b) 外部 MIDI 音源を /dev/midi 経由で制御する方法
 
-   1) xsystem35 $BB&$N=`Hw(B
-        xsystem35 $B$N(B configure $B<B9T;~$K(B --enable-midi=raw $B$rIU$1$F%3%s%Q%$%k(B
-      $B$7$F$*$-$^$9!#(B
+   1) xsystem35 側の準備
+        xsystem35 の configure 実行時に --enable-midi=raw を付けてコンパイル
+      しておきます。
 
-   2) $B30It(B MIDI $B2;8;$N=`Hw(B
-        $B30It(B MIDI $B2;8;(B(SC-88$B$J$I(B)$B$r%5%&%s%I%+!<%I(B $B$N(B MIDI port $B$r2p$7$F@\B3(B
-      $B$7$^$9!#$3$N%]!<%H$O(B /dev/midi $B%G%P%$%9$r2p$7$F@)8f$G$-$kI,MW$,$"$j$^$9!#(B
-      ALSA OSS Emulation $B>e$G(B SB-Live $B$N(B MIDI $BC<;R$K@\B3$7$?(B SC-88 $B$G$NF0:n$r(B
-      $B3NG'$7$F$$$^$9!#(B
+   2) 外部 MIDI 音源の準備
+        外部 MIDI 音源(SC-88など)をサウンドカード の MIDI port を介して接続
+      します。このポートは /dev/midi デバイスを介して制御できる必要があります。
+      ALSA OSS Emulation 上で SB-Live の MIDI 端子に接続した SC-88 での動作を
+      確認しています。
 
- c) Synthesizer $B2;8;$r(B /dev/sequencer $B7PM3$G@)8f$9$kJ}K!(B
+ c) Synthesizer 音源を /dev/sequencer 経由で制御する方法
 
-   1) xsystem35 $BB&$N=`Hw(B
-        xsystem35 $B$N(B configure $B<B9T;~$K(B --enable-midi=seq $B$rIU$1$F%3%s%Q%$%k(B
-      $B$7$F$*$-$^$9!#(B
+   1) xsystem35 側の準備
+        xsystem35 の configure 実行時に --enable-midi=seq を付けてコンパイル
+      しておきます。
    
-   2) Synthesizer $B2;8;$N=`Hw(B
-        $B30It(B MIDI $B5!4o$r@\B3$9$k$+!"%5%&%s%I%+!<%I>e$K(B soundfont $B$r(B load $B$9$k$+(B
-      TiMidity $B$r(B ALSA sequencer server $B$H$7$F>oCs$5$;$F$*$$$F$/$@$5$$!#(B
+   2) Synthesizer 音源の準備
+        外部 MIDI 機器を接続するか、サウンドカード上に soundfont を load するか
+      TiMidity を ALSA sequencer server として常駐させておいてください。
  
-      TiMidity $B$r(B ALSA sequencer server $B$K$9$k$K$O!"%3%s%Q%$%k;~$K$=$N5!G=$r(B
-      $BM-8z$K$7$F$*$-!"(Btimidity -iA $B$G>oCs$5$;$^$9!#(B
+      TiMidity を ALSA sequencer server にするには、コンパイル時にその機能を
+      有効にしておき、timidity -iA で常駐させます。
 
- d) $B%*%W%7%g%s0lMw(B
+ d) オプション一覧
 
-      MIDI $B=PNO$K4X$9$k!"(B .xsys35rc $B$N@_Dj9`L\(B(A)$B$H%3%^%s%I%i%$%s%*%W%7%g%s(B(B)
-   $B$r$^$H$a$^$9!#(B
+      MIDI 出力に関する、 .xsys35rc の設定項目(A)とコマンドラインオプション(B)
+   をまとめます。
 
-   1) MIDI $B%W%l%$%d!<$N@_Dj(B
+   1) MIDI プレイヤーの設定
         (A) ----> midi_player:
         (B) ----> -midiplayer
 
-   2) MIDI $B%G%P%$%9%U%!%$%k$N@_Dj(B (default: /dev/midi or /dev/sequencer)
+   2) MIDI デバイスファイルの設定 (default: /dev/midi or /dev/sequencer)
         (A) ----> midi_device:
         (B) ----> -devmidi
  
-   3) MIDI $B=PNOJ}K!$NA*Br(B (default: e)
+   3) MIDI 出力方法の選択 (default: e)
         (A) ----> midi_output_device: ?
         (B) ----> -M?
 
-         ? .... e : $B30It%W%l!<%d(B
-                r : midi device $B7PM3(B
-                sX: sequencer device $B7PM3(B (X$BHVL\$N%]!<%H(B)
-                0 : ($B%<%m(B) $BL58z2=(B
+         ? .... e : 外部プレーヤ
+                r : midi device 経由
+                sX: sequencer device 経由 (X番目のポート)
+                0 : (ゼロ) 無効化
 
-      $B%3%s%Q%$%k;~$K(B --enable-midi=extp,raw,seq $B$H$9$k$3$H$G!"J#?t$NJ}<0$rM-8z(B
-      $B$K$7!"<B9T;~$K$$$:$l$+$rA*Br$G$-$^$9!#$=$NB>$N%3%s%Q%$%k%*%W%7%g%s$O(B 
-      INSTALL $B%I%-%e%a%s%H$r8fMw$/$@$5$$!#(B
+      コンパイル時に --enable-midi=extp,raw,seq とすることで、複数の方式を有効
+      にし、実行時にいずれかを選択できます。その他のコンパイルオプションは 
+      INSTALL ドキュメントを御覧ください。
 
-      sequencer device $B$N(B X $BHVL\$N%]!<%H$ODL>o!"(B0 $B$G$9$,!"J#?t$N%]!<%H$,$"$k(B
-      $B>l9g$O$=$N%]!<%HHV9f$r;XDj$7$F$/$@$5$$!#(BALSA $B$N(B OSS emu $B$G$O!"(B
+      sequencer device の X 番目のポートは通常、0 ですが、複数のポートがある
+      場合はそのポート番号を指定してください。ALSA の OSS emu では、
         $ cat /proc/asound/seq/oss 
-      $B$H<B9T$7$F=P$FMh$k(B
+      と実行して出て来る
         midi ?: [xxxx] ALSA port aa:bb
-      $B$N(B ? $B$NHV9f$r;XDj$7$^$9!#(B
+      の ? の番号を指定します。
 
-      $B%3%^%s%I%i%$%s$+$i30It(BMIDI$B%W%l%$%d!<$r;XDj$9$k>l9g$O(B
-      -midiplayer "timidity -A 100 -s 44100 -Oe" $B$N$h$&$K$7$^$9!#(B
+      コマンドラインから外部MIDIプレイヤーを指定する場合は
+      -midiplayer "timidity -A 100 -s 44100 -Oe" のようにします。
 
 
-2. $B8z2L2;(B(WAV)$B$K$D$$$F(B
+2. 効果音(WAV)について
 
-   xsystem35$B$G$O%*!<%G%#%*%$%s%?!<%U%'%$%9$H$7$F!"(BLinux/*BSD $B$J$I$GNI$/;H$o$l$F(B
- $B$$$k(B OSS $B$*$h$S$=$N8_49%$%s%?!<%U%'%$%9$K2C$($F!"(BALSA(Advanced Linux Sound 
- Architecture) $B$H(B ESD(Enligtened Sound Daemon)$B$KBP1~$7$F$$$^$9!#(B
+   xsystem35ではオーディオインターフェイスとして、Linux/*BSD などで良く使われて
+ いる OSS およびその互換インターフェイスに加えて、ALSA(Advanced Linux Sound 
+ Architecture) と ESD(Enligtened Sound Daemon)に対応しています。
 
- a) OSS $B=PNO(B
+ a) OSS 出力
 
-   1) $B%3%s%Q%$%k(B
-        configure $B;~$K(B --enable-audio=oss $B%*%W%7%g%s$rIU$1$F%3%s%Q%$%k$7$^$9!#(B
+   1) コンパイル
+        configure 時に --enable-audio=oss オプションを付けてコンパイルします。
 
-   2) $B<B9T;~%*%W%7%g%s(B
-        $B%3%^%s%I%i%$%s(B: -Oo
+   2) 実行時オプション
+        コマンドライン: -Oo
         .xsys35rc     : audio_output_device: o    
 
-   3) dsp $B%G%P%$%9(B (default: /dev/dsp)
-        $B%3%^%s%I%i%$%s(B: -devdsp
+   3) dsp デバイス (default: /dev/dsp)
+        コマンドライン: -devdsp
         .xsys35rc     : dsp_device:
 
-   4) mixer $B%G%P%$%9(B (default: /dev/mixer)
-        $B%3%^%s%I%i%$%s(B: -devmix 
+   4) mixer デバイス (default: /dev/mixer)
+        コマンドライン: -devmix 
         .xsys35rc     : mixer_device:
 
 
- b) ALSA $B=PNO(B
+ b) ALSA 出力
 
-   1) $B%3%s%Q%$%k(B
-        configure $B;~$K(B --enable-audio=alsa $B%*%W%7%g%s$rIU$1$F%3%s%Q%$%k$7$^$9!#(B
+   1) コンパイル
+        configure 時に --enable-audio=alsa オプションを付けてコンパイルします。
 
-   2) $B<B9T;~%*%W%7%g%s(B
-        $B%3%^%s%I%i%$%s(B: -Os
+   2) 実行時オプション
+        コマンドライン: -Os
         .xsys35rc     : audio_output_device: s    
 
-   3) dsp $B%G%P%$%9(B (default: 0:0)
-        $B%3%^%s%I%i%$%s(B: -devdsp
+   3) dsp デバイス (default: 0:0)
+        コマンドライン: -devdsp
         .xsys35rc     : dsp_device:
 
 
- c) ESD $B=PNO(B
+ c) ESD 出力
 
-   1) $B%3%s%Q%$%k(B
-        configure $B;~$K(B --enable-audio=esd $B%*%W%7%g%s$rIU$1$F%3%s%Q%$%k$7$^$9!#(B
+   1) コンパイル
+        configure 時に --enable-audio=esd オプションを付けてコンパイルします。
 
-   2) $B<B9T;~%*%W%7%g%s(B
-        $B%3%^%s%I%i%$%s(B: -Oe
+   2) 実行時オプション
+        コマンドライン: -Oe
         .xsys35rc     : audio_output_device: e
 
- OSS/ALSA/ESD $B$r$9$Y$FM-8z$K$7$F%3%s%Q%$%k$7!"<B9T;~$K$I$N=PNO$r;HMQ$9$k$+(B
- $BA*Br$G$-$^$9!#(Bconfigure $B;~$K(B --enable-audio=oss,alsa,esd $B$H$7$F%3%s%Q%$%k(B
- $B$7$F$/$@$5$$!#(B
+ OSS/ALSA/ESD をすべて有効にしてコンパイルし、実行時にどの出力を使用するか
+ 選択できます。configure 時に --enable-audio=oss,alsa,esd としてコンパイル
+ してください。
 
 
-3. CD$B%*!<%G%#%*$K$D$$$F(B
+3. CDオーディオについて
 
-   CD-ROM $B$N@)8f$K$O(B Linux/FreeBSD/Irix $B$N%$%s%?!<%U%'%$%9$KBP1~$7$F$$$^$9!#(B
- $B$^$?!"(BCD-ROM $B%G%P%$%9$rD>@\@)8f$9$kB>$K!"30It%W%l%$%d$r;H$C$F(B mp3 file $B$J$I(B
- $B$rLD$i$9$3$H$b=PMh$^$9!#(B
+   CD-ROM の制御には Linux/FreeBSD/Irix のインターフェイスに対応しています。
+ また、CD-ROM デバイスを直接制御する他に、外部プレイヤを使って mp3 file など
+ を鳴らすことも出来ます。
 
- a) CD-ROM $B%3%s%H%m!<%k$K$h$k1iAU(B
-      $B4D6-$K$h$C$F<+F0E*$KE,@Z$J%I%i%$%V$,A*Br$5$l%3%s%Q%$%k$5$l$^$9!#(B
+ a) CD-ROM コントロールによる演奏
+      環境によって自動的に適切なドライブが選択されコンパイルされます。
 
- b) $B30It%W%l%$%d(B(mp3$B$J$I(B)$B$K$h$k1iAU(B
-      $B$"$i$+$8$a(B CD $B$r(B MP3/WAV $B2=$7$F5/$-$^$9!#$^$?(B mpg123 $B$J$I$N%W%l%$%d(B
-    $B$rMQ0U$7!"%Q%9$rDL$7$F$*$-$^$9!#(B
+ b) 外部プレイヤ(mp3など)による演奏
+      あらかじめ CD を MP3/WAV 化して起きます。また mpg123 などのプレイヤ
+    を用意し、パスを通しておきます。
 
-    1) $B%3%s%Q%$%k(B
-      configure $B;~$K(B --enable-cdrom=mp3 $B%*%W%7%g%s$rDI2C$7$^$9!#(BCD-ROM 
-    $B%3%s%H%m!<%k$r<B9T;~$K;H$$J,$1$?$$;~$O(B --enable-cdrom=linux,mp3 $B$J$I$H(B
-    $B$7$^$9!#(B
+    1) コンパイル
+      configure 時に --enable-cdrom=mp3 オプションを追加します。CD-ROM 
+    コントロールを実行時に使い分けたい時は --enable-cdrom=linux,mp3 などと
+    します。
 
-    3) $B%W%l%$%d!<L>$H%U%!%$%k%j%9%H$r=q$$$?<!$N$h$&$J%U%!%$%k$rMQ0U$7$^$9!#(B
+    3) プレイヤー名とファイルリストを書いた次のようなファイルを用意します。
 
       % cat /game/kichiku.playlist
       mpg123-esd -quite
@@ -205,76 +205,76 @@
       /game/kichiku/mp3/trk05.mp3
       /game/kichiku/mp3/trk06.mp3
 
-    $B$H$$$&$h$&$J%U%!%$%k$rMQ0U$7$^$9!#(B
-    $B#19TL\$O%W%l!<%d!<$H$=$N%*%W%7%g%s(B
-    $B#29TL\0J9_$O%H%i%C%/#2$+$i=g$K%U%!%$%k$r$J$i$Y$^$9!#(B($B%U%k%Q%9$G;XDj$7$^$9(B)
+    というようなファイルを用意します。
+    １行目はプレーヤーとそのオプション
+    ２行目以降はトラック２から順にファイルをならべます。(フルパスで指定します)
 
-    *) $BE,@Z$K30It%W%l%$%d!<$H1iAU%U%!%$%k$rMQ0U$9$l$P!"%G!<%?7A<0$OLd$$$^$;$s!#(B
+    *) 適切に外部プレイヤーと演奏ファイルを用意すれば、データ形式は問いません。
 
-    3a)  xsystem35 $B$X$N%j%@%$%l%/%H(B($B%*%W%7%g%s(B)
+    3a)  xsystem35 へのリダイレクト(オプション)
 
-       mpg123 $B$J$I$N%W%l%$%d!<$N(BPCM $B=PNO$r(B xsystem35 $B$X$H%j%@%$%l%/%H$7$F(B
-       xsystem35 $BB&$G4IM}$7$F$$$k(BPCM $B%G%P%$%9$KN.$9;v$,=PMh$^$9!#(B
-       $B>e$N(B kichiku.playlist $B%U%!%$%k$N%W%l%$%d$N@_Dj$G@hF,$K(B '-' $B$r$D$1$F(B
-       $B$/$@$5$$!#(B
+       mpg123 などのプレイヤーのPCM 出力を xsystem35 へとリダイレクトして
+       xsystem35 側で管理しているPCM デバイスに流す事が出来ます。
+       上の kichiku.playlist ファイルのプレイヤの設定で先頭に '-' をつけて
+       ください。
 
-      ($BNc(B)
+      (例)
       -mpg123 -q -s
 
-       $B$3$N>l9g(B mpg123 $B$N=PNO$O(B 44.1kHz, Stereo, 16bit $B8GDj$G$9!#(B
+       この場合 mpg123 の出力は 44.1kHz, Stereo, 16bit 固定です。
 
-    4) $B<B9T;~%*%W%7%g%s$K(B -devcd /game/kichiku.playlist $B$H>e$G:n@.$7$?%U%!%$%k(B
-     $B$r;XDj$7$^$9!#(B
+    4) 実行時オプションに -devcd /game/kichiku.playlist と上で作成したファイル
+     を指定します。
 
 
 
-  CD-ROM $B$K4X$9$k(B .xsys35rc $B$N@_Dj9`L\(B(A) $B$H(B $B%3%^%s%I%i%$%s%*%W%7%g%s(B(B) $B$r(B
-  $B$^$H$a$^$9!#(B
+  CD-ROM に関する .xsys35rc の設定項目(A) と コマンドラインオプション(B) を
+  まとめます。
 
-  1) CD $B=PNOJ}K!$NA*Br(B
+  1) CD 出力方法の選択
        (A) ----> cdrom_device: ???
        (B) ----> -devcd ????
 
-        MP3 $B=PNO(B  => ???? $B$K%W%l%$%j%9%H$r;XDj(B
-        CD-ROM    => ???? $B$K%G%P%$%9%U%!%$%k$r;XDj(B
+        MP3 出力  => ???? にプレイリストを指定
+        CD-ROM    => ???? にデバイスファイルを指定
 
-  2) CD-ROM $B%G%P%$%9%U%!%$%k$N@_Dj(B (defult /dev/cdrom)
+  2) CD-ROM デバイスファイルの設定 (defult /dev/cdrom)
        (A) ----> cdrom_device: ???
        (B) ----> -devcd: ????
 
 
-4. PCM & MIDI(timidity) & CD-ROM(MP3) $B$r#1Kg$N%5%&%s%I%+!<%I$GF1;~$K;H$&J}K!(B
+4. PCM & MIDI(timidity) & CD-ROM(MP3) を１枚のサウンドカードで同時に使う方法
    (special thanks to Fumihiko Murata)
 
-   $B%5%&%s%I%+!<%I$rA*$P$J$$J}K!$H$7$F$O(B esd $B$r;H$&$3$H$G$9!#(Besd $B$OBP1~$7$?J#?t(B
- $B$N%W%m%0%i%`$N2;$N=PNO$r9g@.$7$F%5%&%s%I%+!<%I$K=PNO$9$k%W%m%0%i%`$G$9!#(B
- xsystem35/timidity/mp3 player $B$r(B esd $BBP1~$K%3%s%Q%$%k$9$k$3$H$G9g@.$,2DG=(B
- $B$G$9!#(B
+   サウンドカードを選ばない方法としては esd を使うことです。esd は対応した複数
+ のプログラムの音の出力を合成してサウンドカードに出力するプログラムです。
+ xsystem35/timidity/mp3 player を esd 対応にコンパイルすることで合成が可能
+ です。
 
-   $B$^$?!"(BTrident 4DWave DX/NX$B!"(BSoundBlaster Live/ YAMAHA YMF724$B0J9_(B $B$J$I$N%5%&(B
- $B%s%I%+!<%I$O(B PCM $B%A%c%s%M%k$rJ#?t;}$C$F$$$F!"BP1~$N%5%&%s%I%I%i%$%P!<$,$"$l$P(B
- PCM$B$H(BMIDI(SoftwareMIDI)$B$H(BMP3 $B$rF1;~$KLD$i$9$3$H$,=PMh$^$9!#$?$H$($P(B 
- SoundBlaster Live + ALSA $B$G$O(B
+   また、Trident 4DWave DX/NX、SoundBlaster Live/ YAMAHA YMF724以降 などのサウ
+ ンドカードは PCM チャンネルを複数持っていて、対応のサウンドドライバーがあれば
+ PCMとMIDI(SoftwareMIDI)とMP3 を同時に鳴らすことが出来ます。たとえば 
+ SoundBlaster Live + ALSA では
 
  $ cat /proc/asound/pcm 
  00-00: emu10k1 : EMU10K1 : playback 32 : capture 1
  00-01: emu10k1 mic : EMU10K1 MIC : capture 1
  00-02: emu10k1 efx : EMU10K1 EFX : capture 1
 
- $B$N$h$&$K(B PCM $B$r(B 32 $B%A%c%s%M%k;}$C$F$$$k$3$H$,J,$+$j$^$9!#$3$l$O(B OSS $B$G$$$&$H(B
- $B$3$m$N(B /dev/dspN $B$K:GBg(B 32 $B$N(B PCM $B$,$V$i2<$,$C$F$$$k$h$&$K8+$(!"F1;~$K(B 32 $B2s(B
- /dev/dspN $B$r3+$/$3$H$,=PMh$^$9!#(B
+ のように PCM を 32 チャンネル持っていることが分かります。これは OSS でいうと
+ ころの /dev/dspN に最大 32 の PCM がぶら下がっているように見え、同時に 32 回
+ /dev/dspN を開くことが出来ます。
 
- $B$^$?(B Trident 4DWave DX/NX + ALSA $B$G$OA4It$G(B64ch$B$"$j!":GBg$G(B32ch$B$r(B PCM playback
- $B$K3d$jEv$F$k;v$,$G$-$^$9!#:GBg%A%c%s%M%k$O%b%8%e!<%k%m!<%I;~$K(B $B@_Dj$5$l!"@_Dj(B
- $B?t$r;H$$$-$k$^$GF1;~$K(B /dev/dspN $B$r3+$/;v$,$G$-$^$9!#(B
+ また Trident 4DWave DX/NX + ALSA では全部で64chあり、最大で32chを PCM playback
+ に割り当てる事ができます。最大チャンネルはモジュールロード時に 設定され、設定
+ 数を使いきるまで同時に /dev/dspN を開く事ができます。
 
- $B;D$j$N(B 32ch $B$O(B MIDI $BMQ$K@_$1$i$l$F$$$F!"(BPCM $B$H(B MIDI $B$N#2$D$N%P%s%/$KJ,$1$k;v(B
- $B$,$G$-$^$9!#8D!9$N%A%c%s%M%k$K$O(B PCM front volume $B$,$"$j$^$9$,!"#2$D$N%P%s%/(B
- $B$r$=$l$>$lE}3g$9$k(B Wave/Music Volume $B$,$"$j(B $B$5$i$K$=$l$i$r9g$o$;$k(B PCM volume
- $B$,$"$j$^$9!#(B($B:G8e$K(B Master Volume)
+ 残りの 32ch は MIDI 用に設けられていて、PCM と MIDI の２つのバンクに分ける事
+ ができます。個々のチャンネルには PCM front volume がありますが、２つのバンク
+ をそれぞれ統括する Wave/Music Volume があり さらにそれらを合わせる PCM volume
+ があります。(最後に Master Volume)
 
-  $B?^$K$9$k$H<!$N$h$&$K$J$j$^$9!#(B
+  図にすると次のようになります。
 
   PCM Volume + - Wave Volume  + - front volume- PCM Playback 0
              |                + -  ..         - PCM Playback 1
@@ -286,22 +286,22 @@
                               + -  ..         - PCM Playback 63
 
 
-   ES1370/1371 $B$G$b(B PCM $BMQ(B $B$H(B MIDI $BMQ$K(B 2 $B%A%c%s%M%k$N(B PCM $B=PNO$,$"$j$^$9!#(B
- ALSA $B$G$O(B 
+   ES1370/1371 でも PCM 用 と MIDI 用に 2 チャンネルの PCM 出力があります。
+ ALSA では 
  
  $ cat /proc/asound/pcm 
  00-00: ES1371/1 : ES1371 DAC2/ADC : playback 1 : capture 1
  00-01: ES1371/2 : ES1371 DAC1 : playback 1
  
- $B$N$h$&$K(B 0:0 $B$H(B 0:1 $B$N%G%P%$%9$,:F@8MQ$H$7$F;H$&;v$,=PMh$^$9!#(Btimidity $BMQ$K(B
- 0:1 $B$N%G%P%$%9$r;H$&$HNI$$$G$7$g$&!#(BOSS $B$G$O(B /dev/dsp0 $B$H(B /dev/dsp1 $B$K3d$jEv(B
- $B$F$i$l!"(B /dev/dsp1 $B$r(B timidity $B$G;H$$$^$9!#(B
+ のように 0:0 と 0:1 のデバイスが再生用として使う事が出来ます。timidity 用に
+ 0:1 のデバイスを使うと良いでしょう。OSS では /dev/dsp0 と /dev/dsp1 に割り当
+ てられ、 /dev/dsp1 を timidity で使います。
 
- $B$^$?$=$NB>$N%+!<%I$G$bB?%A%c%s%M%k=PNO$r;}$C$F$$$k$b$N$b$"$j$^$9$N$G!"(B
- $B%I%i%$%P!<$N%I%-%e%a%s%H$r8fMw2<$5$$!#(B
+ またその他のカードでも多チャンネル出力を持っているものもありますので、
+ ドライバーのドキュメントを御覧下さい。
 
 
-(2003.1.23 $BDI5-(B)
-  $BDI5-$r=q$$$F$$$k;~E@$G<j$KF~$j$d$9$$B?%A%c%s%M%k(BPCM$B=PNO$r$b$D2;8;%+!<%I(B
-  $B$H$7$F$O(B SoundBlaster Live $B$H(B YMF7xx $B$/$i$$$G$7$g$&$+!#(B
+(2003.1.23 追記)
+  追記を書いている時点で手に入りやすい多チャンネルPCM出力をもつ音源カード
+  としては SoundBlaster Live と YMF7xx くらいでしょうか。
 

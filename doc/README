@@ -1,277 +1,277 @@
 
-        System 3.5 for X Window System     Version 1.7 ($B3+H/HG(B)
+        System 3.5 for X Window System     Version 1.7 (開発版)
 
-0. $BL\<!(B
+0. 目次
 
-   1. $B$O$8$a$K(B
-   2. $B3+H/4D6-$HF0:n3NG'4D6-(B
-    2.a. $B3+H/4D6-(B
-    2.b. $BF0:n3NG'4D6-(B
-    2.c. $BB?J,F0$/$H;W$o$l$k4D6-(B
-   3. xystem35$B$N@_Dj%U%!%$%k(B
-   4. $B%2!<%`$N<B9T$H=*N;(B
-    4.a. $B%2!<%`$N<B9T(B
-    4.b. $B%2!<%`$N=*N;(B
-    4.c. xsystem35$B%a%K%e!<(B
-    4.d. $B%-!<%\!<%IA`:n(B
-   5. $B%3%^%s%I%i%$%s%*%W%7%g%s(B
-   6. $B$=$NB>>pJs(B
+   1. はじめに
+   2. 開発環境と動作確認環境
+    2.a. 開発環境
+    2.b. 動作確認環境
+    2.c. 多分動くと思われる環境
+   3. xystem35の設定ファイル
+   4. ゲームの実行と終了
+    4.a. ゲームの実行
+    4.b. ゲームの終了
+    4.c. xsystem35メニュー
+    4.d. キーボード操作
+   5. コマンドラインオプション
+   6. その他情報
     6.a. SYSV IPC
-    6.b. SharedMemory$B$NBg$-$5$K$D$$$F(B
-    6.c. locale $B$H(B X
-   7. $BCx:n8"$H%i%$%;%s%9(B
-   8. $B%5%]!<%H(B
+    6.b. SharedMemoryの大きさについて
+    6.c. locale と X
+   7. 著作権とライセンス
+   8. サポート
 
 
-1. $B$O$8$a$K(B
+1. はじめに
 
-   $B$3$N%=%U%H$O(B AliceSoft $B$N(B Syetem3.5/3.6/3.8/3.9 $B>e$GF0$/%2!<%`$r(B
- X Window System $B>e$GF0$+$9$?$a$N%W%m%0%i%`$G$9!#(B
+   このソフトは AliceSoft の Syetem3.5/3.6/3.8/3.9 上で動くゲームを
+ X Window System 上で動かすためのプログラムです。
 
- * $BF0:n3NG'%2!<%`(B
+ * 動作確認ゲーム
 
-     $B54C\2&%i%s%9(B
-     $B%i%s%9#4(B (for Win95)
-     $BF.?@ET;T(BII (for Win95)
-     $BL488K"1F(B (for Win95)
-     $B$+$($k$K$g$Q$K$g!A$s(B ($B=iHG!"Nw2AHG(B)
-     $B$$$1$J$$$+$D$_@h@8(B
-     $B@oV`=w(B ($B=iHG!"Nw2AHG(B)
-     $BNm<0(B ($B4[#4#5#6HG!"Nw2AHG(B)
-     ATLACH=NACHA ($B4[#4#5#6HG!"Nw2AHG(B)
-     $B?M4V<m$j(B
-     $B2&F;M&<T(B
-     $B%G%#%"%\%j%+(B ($B=iHG!"Nw2AHG(B)
+     鬼畜王ランス
+     ランス４ (for Win95)
+     闘神都市II (for Win95)
+     夢幻泡影 (for Win95)
+     かえるにょぱにょ〜ん (初版、廉価版)
+     いけないかつみ先生
+     戦巫女 (初版、廉価版)
+     零式 (館４５６版、廉価版)
+     ATLACH=NACHA (館４５６版、廉価版)
+     人間狩り
+     王道勇者
+     ディアボリカ (初版、廉価版)
      AmbivalenZ(for Win95)
-     $B$Q$9$F$k%A%c%$%`(B
-     $B$W$m$9$A$e!<$G$s$H(BGood
-     $B<i$j?@MM(B
-     $B%^%^%H%H(B
+     ぱすてるチャイム
+     ぷろすちゅーでんとGood
+     守り神様
+     ママトト
 
-     $B%"%j%9$N4[#4#5#6(B
+     アリスの館４５６
         DALK
-        $BF.?@ET;T(B
+        闘神都市
         DrStop!
-        $B%i%s%9#1(B
-        $B%i%s%9#2(B
-        $B%i%s%9#3(B
+        ランス１
+        ランス２
+        ランス３
 
-     $B%"%j%9#C#D(B Ver 1.02
-        $B%a%$%I$N$9$9$a(B
-        $B$V$m$V$m(B
-        $B3X1`I:N.@o5-(B
+     アリスＣＤ Ver 1.02
+        メイドのすすめ
+        ぶろぶろ
+        学園漂流戦記
 
      Hushaby Baby
      Darcrows
      PERSIOM
-     $B1#$l7n(B
-     SeeIn$B@D(B
+     隠れ月
+     SeeIn青
 
-     20$B@$5*%"%j%9(B
-        $B$3$l(BDPS$B!)(B
-        $B$+$($k$K$g9q$K$g%"%j%9(B
+     20世紀アリス
+        これDPS？
+        かえるにょ国にょアリス
 
-     $B%"%j%9#C#D(B Ver 2.02
-        $BHb(B
-        $BME@:(B
+     アリスＣＤ Ver 2.02
+        扉
+        妖精
 
-     OnlyYou $B%j!&%/%k%9(B
-     $B2&;R$5$^(B Lv1.5
+     OnlyYou リ・クルス
+     王子さま Lv1.5
 
- * $BF0$+$J$$%2!<%`(B
+ * 動かないゲーム
 
-     $BLk$,Mh$k!*(B
-     $B2&;R$5$^(B Lv1
-     DALK$B30EA(B (System4)
-     $B$^$^$K$g$K$g(B (System4)
+     夜が来る！
+     王子さま Lv1
+     DALK外伝 (System4)
+     ままにょにょ (System4)
 
- * $B0lItF0:n2DG=(B
+ * 一部動作可能
 
-     $BBg0-;J(B ($B%*!<%W%K%s%0IT2D(B)
-     $B:J$_$0$$(B ($B%*!<%W%K%s%0IT2D(B)
-     $B%(%9%+%l%$%d!<(B ($B%*!<%W%K%s%0IT2D(B)
+     大悪司 (オープニング不可)
+     妻みぐい (オープニング不可)
+     エスカレイヤー (オープニング不可)
      Rance5D
-     $B:J$_$0$$#2(B ($B%*!<%W%K%s%0IT2D(B)
-     $B%7%'%k!&%/%l%$%k(B
-     NightDemon ($B%*!<%W%K%s%0IT2D(B)
+     妻みぐい２ (オープニング不可)
+     シェル・クレイル
+     NightDemon (オープニング不可)
      
 
-   $B3F%2!<%`$K$D$$$F$NJdB-;v9`$O(B doc/GAMES.TXT $B$r8fMw$/$@$5$$!#(B
+   各ゲームについての補足事項は doc/GAMES.TXT を御覧ください。
      
-   $B$^$?!"%M%C%H>e$G8x3+$5$l$F$$$k(BSYSTEM3.5$BMQ$N%2!<%`$N$&$A!"$$$/$D$+$O(B
-  $BF0:n$,3NG'$5$l$F$$$^$9!#$/$o$7$/$O(B MISCGAME.TXT $B$r8fMw2<$5$$!#(B
+   また、ネット上で公開されているSYSTEM3.5用のゲームのうち、いくつかは
+  動作が確認されています。くわしくは MISCGAME.TXT を御覧下さい。
 
 
-2. $B3+H/4D6-$HF0:n3NG'4D6-(B
+2. 開発環境と動作確認環境
 
- 2.a. $B3+H/4D6-(B
+ 2.a. 開発環境
 
    Kondara-1.2 (Linux/i386)
 
- 2.b. $BF0:n3NG'4D6-(B
+ 2.b. 動作確認環境
 
    DigitalUnix 4.0F (alpha)
    SunOS 5.8 (sparc)
 
- 2.c. $BB?J,F0$/$H;W$o$l$k4D6-(B
+ 2.c. 多分動くと思われる環境
 
    Linux(!i386)
    FreeBSD/NetBSD/OpenBSD (i386 etc)
    Irix 6.X
-   Solaris 2.X $B0J9_(B (sparc/i386)
+   Solaris 2.X 以降 (sparc/i386)
 
 
-3. xystem35$B$N@_Dj%U%!%$%k(B
+3. xystem35の設定ファイル
 
-   xsystem35$B$G$O%U%)%s%H$N@_Dj$J$I$r(B .xsys35rc$B$H$$$&%U%!%$%k$+$iFI$_9~$_$^$9!#(B
- $B%G%U%)%k%H$G$O!"%[!<%`%G%#%l%/%H%j$r$^$:C5$7!"<!$K%+%l%s%H%G%#%l%/%H%j$rC5$7(B
- $B$^$9!#%5%s%W%k$H$J$k%U%!%$%k$r(B xsys35rc.sample $B$H$7$FMQ0U$7$^$7$?!#(B
+   xsystem35ではフォントの設定などを .xsys35rcというファイルから読み込みます。
+ デフォルトでは、ホームディレクトリをまず探し、次にカレントディレクトリを探し
+ ます。サンプルとなるファイルを xsys35rc.sample として用意しました。
 
-   $B$^$?!"(Bgtk widget$B$N%j%=!<%9$O(B ~/.gtk/gtkrc $B$^$?$O(B ~/.gtkrc $B$+$iFI$_9~$_$^$9!#(B
- $BFI$_9~$_@h$O(B .xsys35rc $B$G;XDj$G$-$^$9!#(B
+   また、gtk widgetのリソースは ~/.gtk/gtkrc または ~/.gtkrc から読み込みます。
+ 読み込み先は .xsys35rc で指定できます。
 
-   $B%2!<%`$G;HMQ$9$k%U%)%s%H$O(B X $B$N%U%)%s%H$N;EAH$r;H$&J}K!$H!"(BTrueTypeFont$B$r(B
- $B30It%i%$%V%i%j$r;H$C$FD>@\I=<($9$kJ}K!$N#2<oN`$,A*$Y$^$9!#(B
+   ゲームで使用するフォントは X のフォントの仕組を使う方法と、TrueTypeFontを
+ 外部ライブラリを使って直接表示する方法の２種類が選べます。
  
- ~/.xsys35rc $B$N(B ttfont_mincho: $B$H(B ttfont_gothic: $B$N>l=j$K%U%)%s%H%U%!%$%k$r(B
- $B;XDj$7!"(Bfont_device: ttf $B$H;XDj$7$F$/$@$5$$!#>\$7$/$O%5%s%W%k%U%!%$%k(B
- (xsys35rc.sample)$B$r8+$F2<$5$$!#(B
+ ~/.xsys35rc の ttfont_mincho: と ttfont_gothic: の場所にフォントファイルを
+ 指定し、font_device: ttf と指定してください。詳しくはサンプルファイル
+ (xsys35rc.sample)を見て下さい。
 
 
-4. $B%2!<%`$N<B9T$H=*N;(B
+4. ゲームの実行と終了
 
- 4.a. $B%2!<%`$N<B9T(B
+ 4.a. ゲームの実行
 
-    instgame$B$r;H$C$F%2!<%`%G!<%?$r%$%s%9%H!<%k$9$k$H!"%$%s%9%H!<%k$7$?(B
-  $B%G%#%l%/%H%j$K$N0l$D>e$K(B ???????.gr $B$H$$$&%U%!%$%k(B($B%2!<%`%j%=!<%9%U%!%$%k(B)
-  $B$,<+F0E*$K:n@.$5$l$^$9$N$G(B
+    instgameを使ってゲームデータをインストールすると、インストールした
+  ディレクトリにの一つ上に ???????.gr というファイル(ゲームリソースファイル)
+  が自動的に作成されますので
 
   % xsystem35 -gamefile ~/game/???????.gr
 
-  $B$N$h$&$K<B9T$7$^$9!#(B-gamefile $B%*%W%7%g%s$r$D$1$J$$>l9g$O!"%+%l%s%H%G%#%l%/(B
-  $B%H%j$N(B xsystem35.gr $B$r;2>H$7$^$9!#(B
+  のように実行します。-gamefile オプションをつけない場合は、カレントディレク
+  トリの xsystem35.gr を参照します。
 
-    $B$^$?$$$:$l$b8+$D$+$i$J$$>l9g$O!"%+%l%s%H%G%#%l%/%H%j$K$"$k%U%!%$%k$r%2!<%`(B
-  $B%G!<%?$H$7$F@_Dj$7$^$9!#Nc$($P(B testSA.ALD $B$H$$$&%U%!%$%k$,%+%l%s%H%G%#%l%/(B
-  $B%H%j$K$"$k$H!"$=$l$r%7%J%j%*%G!<%?$H$7$F;H$$$^$9!#$^$?%;!<%V%G!<%?$OE,Ev$J(B
-  $BL>A0$G(B 10$B8D3NJ]$5$l$^$9!#(B
+    またいずれも見つからない場合は、カレントディレクトリにあるファイルをゲーム
+  データとして設定します。例えば testSA.ALD というファイルがカレントディレク
+  トリにあると、それをシナリオデータとして使います。またセーブデータは適当な
+  名前で 10個確保されます。
 
-  $B%2!<%`%j%=!<%9%U%!%$%k$N=q$-J}$K$D$$$F$O!"(Bdoc/GRFMT.TXT $B$r8fMw2<$5$$!#(B
+  ゲームリソースファイルの書き方については、doc/GRFMT.TXT を御覧下さい。
 
- 4.b. $B%2!<%`$N=*N;(B
+ 4.b. ゲームの終了
 
-   * $B5/F0$7$?C<Kv$G(B Ctrl+C $B$r2!$9$H!"$9$0$K=*N;$7$^$9!#(B
+   * 起動した端末で Ctrl+C を押すと、すぐに終了します。
 
-   * $B%2!<%`Cf$K%^%&%9$N??Cf$N%\%?%s$r2!$9$H!"%a%K%e!<$,=P$FMh$^$9$N$G!"(B
-   $B$=$3$+$i(B 'Exit' $B$rA*$s$G=*N;$5$;$F2<$5$$!#(BWindow Manager $B$N(BClose$B%\%?%s$G$b(B
-   $BF1$8$h$&$KF0:n$7$^$9!#(B
+   * ゲーム中にマウスの真中のボタンを押すと、メニューが出て来ますので、
+   そこから 'Exit' を選んで終了させて下さい。Window Manager のCloseボタンでも
+   同じように動作します。
 
-   * ESC + SPACE + RET $B%-!<$rF1;~$K2!$9$H!"$9$0$K=*N;$7$^$9!#(B
+   * ESC + SPACE + RET キーを同時に押すと、すぐに終了します。
 
- 4.c. xsystem35$B%a%K%e!<(B
+ 4.c. xsystem35メニュー
 
-   $B%2!<%`Cf$K%^%&%9$N??Cf%\%?%s$r2!$9$H%a%K%e!<$,=P$FMh$^$9!#(B
+   ゲーム中にマウスの真中ボタンを押すとメニューが出て来ます。
 
-  $B%a%C%;!<%8%9%-%C%W(B(MessageSkip):
-        $B<!$NA*Br;h$^$G%a%C%;!<%8$rHt$P$7$^$9!#%^%&%9$N1&%/%j%C%/$G(B
-        $B;_$^$j$^$9!#%7%J%j%*$K$h$C$F$ODd;_$7$J$$>l9g$b$"$j$^$9!#(B
+  メッセージスキップ(MessageSkip):
+        次の選択肢までメッセージを飛ばします。マウスの右クリックで
+        止まります。シナリオによっては停止しない場合もあります。
   
-  $B%^%&%9%+!<%=%k0\F0(B(MouseAutoMove):
-        $BA*Br%&%#%s%I$J$I$G%^%&%9$,<+F0E*$K0\F0$9$k$N$r@)8f$7$^$9!#(B
+  マウスカーソル移動(MouseAutoMove):
+        選択ウィンドなどでマウスが自動的に移動するのを制御します。
 
-  $B%\%j%e!<%`%P%i%s%9(B(VolumeValance):
-        SACT$B%7%9%F%`$G2;@<$N?MJ*Kh$K2;NL$rJQ$($k$3$H$,$G$-$^$9!#(B
-        ($B%2!<%`$,$=$&=PMh$k$h$&$KBP1~$7$F$$$k>l9g$N$_(B)
+  ボリュームバランス(VolumeValance):
+        SACTシステムで音声の人物毎に音量を変えることができます。
+        (ゲームがそう出来るように対応している場合のみ)
 
-  $B>pJs(B(About):
-        $B$3$N%2!<%`$K$D$$$F!#(B
+  情報(About):
+        このゲームについて。
 
-  $B=*N;(B(Exit):
-        $B%2!<%`$r=*N;$7$^$9!#(B
+  終了(Exit):
+        ゲームを終了します。
 
- 4.d. $B%-!<%\!<%IA`:n(B
+ 4.d. キーボード操作
 
-    $B%"%j%9%=%U%H$N%2!<%`$OM-;KMh!"4pK\E*$K>e2<:81&%-!<$K(B SPACE, RET, ESC, TAB
-  $B%-!<$7$+;H$$$^$;$s(B($B0lIt$N%2!<%`$O$=$l0J30$N%-!<$r;H$&$3$H$b$"$j$^$9(B)$B!#(B
-  XSystem35 $B$G$O<!$N%-!<3dEv$rFCJL$K;H$C$F$$$^$9!#(B
+    アリスソフトのゲームは有史来、基本的に上下左右キーに SPACE, RET, ESC, TAB
+  キーしか使いません(一部のゲームはそれ以外のキーを使うこともあります)。
+  XSystem35 では次のキー割当を特別に使っています。
 
-    F1: $B%a%C%;!<%8%9%-%C%W(B
-    F4: $B%U%k%9%/%j!<%s(B <-> Window$BI=<($N@ZBX$((B
+    F1: メッセージスキップ
+    F4: フルスクリーン <-> Window表示の切替え
 
-  $B$^$?!"5l$-NI$-;~Be$N(B DOS $B$X$NI|5"%-!<(B (ESC + SPACE + RET) $B$G%2!<%`$r3NG'$J$7(B
-  $B$G=*N;=PMh$^$9!#(B  
+  また、旧き良き時代の DOS への復帰キー (ESC + SPACE + RET) でゲームを確認なし
+  で終了出来ます。  
 
 
-5. $B%3%^%s%I%i%$%s%*%W%7%g%s(B
+5. コマンドラインオプション
 
-  -h             : $B%X%k%W$rI=<($7$^$9!#(B
+  -h             : ヘルプを表示します。
 
-  -gamefile file : $B%2!<%`%j%=!<%9%U%!%$%k$r(B file $B$+$iFI$_9~$_$^$9!#(B
+  -gamefile file : ゲームリソースファイルを file から読み込みます。
 
-  -no-shm        : $B%M%C%H%o!<%/1[$7$K5/F0$9$k>l9g$K;XDj$7$^$9!#(B
+  -no-shm        : ネットワーク越しに起動する場合に指定します。
 
-  -devcd name    : CD-ROM device$BL>$r(B name $B$K$7$^$9!#(B
-  -devmidi name  : MIDI device$BL>$r(B name $B$K$7$^$9!#(B
-  -devdsp name   : DSP device$BL>$r(B name $B$K$7$^$9!#(B
+  -devcd name    : CD-ROM device名を name にします。
+  -devmidi name  : MIDI device名を name にします。
+  -devdsp name   : DSP device名を name にします。
 
-  -O?            : PCM $B$N=PNO$N<oN`$rA*Br$7$^$9!#(B
+  -O?            : PCM の出力の種類を選択します。
   -Oo            : OSS mode
   -Os            : ALSA mode
   -Oe            : Enlightened Sound Daemon mode
   -O0            : disable audio
 
-  -M?            : MIDI $B$N=PNO$N<oN`$rA*Br$7$^$9!#(B
+  -M?            : MIDI の出力の種類を選択します。
   -Me            : External midi player (default)
   -Mr            : Raw Midi device
   -Ms?           : Sequencer device (?:device number)
   -M0            : disable midi
 
-  -midiplayer cmd: $B30It(BMIDI$B%W%l%$%d!<$H$7$F(B cmd $B$r;H$$$^$9!#(B
-                   -midiplayer "timidity -A 100 -s 44100 -Oe" $B$N$h$&$K;XDj(B
-                   $B$7$^$9!#(B
+  -midiplayer cmd: 外部MIDIプレイヤーとして cmd を使います。
+                   -midiplayer "timidity -A 100 -s 44100 -Oe" のように指定
+                   します。
 
-  -devmix name   : OSS $B$N(B mixer device $B$N(B device $BL>$r(Bname $B$K$7$^$9!#(B
+  -devmix name   : OSS の mixer device の device 名をname にします。
 
-  -devjoy name   : joystick $B$N%G%P%$%9L>$r(B name $B$K$7$^$9(B
+  -devjoy name   : joystick のデバイス名を name にします
 
-  -savekanji #   : $B%2!<%`Fb$G%U%!%$%kL>$r;XDj$7$F%;!<%V%G!<%?$r5-O?$9$k$H$-!"(B
-                   $BF|K\8l$N%U%!%$%kL>$r(B EUC $B$H(B SJIS $B$N$I$A$i$GJ]B8$9$k$+$r(B
-                   $B;XDj$7$^$9!#(B(# $B$O(B 0 $B$^$?$O(B 1 ... 0:euc, 1:sjis)
+  -savekanji #   : ゲーム内でファイル名を指定してセーブデータを記録するとき、
+                   日本語のファイル名を EUC と SJIS のどちらで保存するかを
+                   指定します。(# は 0 または 1 ... 0:euc, 1:sjis)
 
-  -version       : $B%P!<%8%g%s>pJs$rI=<($7$^$9!#(B
+  -version       : バージョン情報を表示します。
 
-  -fullscreen    : $B%U%k%9%/%j!<%s$G%2!<%`$r<B9T$7$^$9!#(B
-                   SDL $BM-8z;~$K$O(B Widget $B$K%U%)!<%+%9$,Ev$?$i$J$$$?$a(B Popup
-                   menu $BEy$,;HMQ$G$-$^$;$s!#(B
+  -fullscreen    : フルスクリーンでゲームを実行します。
+                   SDL 有効時には Widget にフォーカスが当たらないため Popup
+                   menu 等が使用できません。
 
-  -antialias     : $B>o$KJ8;z$K%"%s%A%(%j%"%9$r$+$1$^$9!#(BHushaby Baby $B$h$j$bA0$N(B
-                   $B%2!<%`$N$&$A(B 256$B?'$G$J$$$b$N$KBP$7$FM-8z$G$9!#(B
+  -antialias     : 常に文字にアンチエリアスをかけます。Hushaby Baby よりも前の
+                   ゲームのうち 256色でないものに対して有効です。
 
-  -noantialias   : $B>o$KJ8;z$K%"%s%A%(%j%"%9$r$+$1$^$;$s!#%7%J%j%*>e$G%"%s%A(B
-                   $B%(%j%"%9$N;XDj$,$"$C$F$bL5;k$7$^$9!#(B
+  -noantialias   : 常に文字にアンチエリアスをかけません。シナリオ上でアンチ
+                   エリアスの指定があっても無視します。
 
-  -devfont       : $B%U%)%s%H%G%P%$%9$r;XDj$7$^$9!#(Bx11/gtk/ttf $B$N$$$:$l$+$,(B
-                   $B;H$($^$9!#(B
+  -devfont       : フォントデバイスを指定します。x11/gtk/ttf のいずれかが
+                   使えます。
 
-  -noimagecursor : $B%j%=!<%9%U%!%$%k$K$h$k%+!<%=%k7A>u$NJQ99(B(Darcrows$BEy(B)$B$rL58z(B
-                   $B$K$7$?$$>l9g$K;XDj$7$^$9!#(B
+  -noimagecursor : リソースファイルによるカーソル形状の変更(Darcrows等)を無効
+                   にしたい場合に指定します。
 
 
-6. $B$=$NB>>pJs(B
+6. その他情報
 
  6.a. SYSV IPC
 
-    $B%+!<%M%k$K(B SYSV IPC (SharedMemory/MessageQueue/Semaphore)$B$N5!G=$,(B
-  $BAH$_9~$^$l$F$$$kI,MW$,$"$j$^$9!#(B
+    カーネルに SYSV IPC (SharedMemory/MessageQueue/Semaphore)の機能が
+  組み込まれている必要があります。
 
- 6.b. SharedMemory$B$NBg$-$5$K$D$$$F(B
+ 6.b. SharedMemoryの大きさについて
 
-   $B%+!<%M%k$N(BSharedMemory$B$NBg$-$5$,==J,Bg$-$$>l9g!"(BMIT-SHM$B$rMxMQ$7$F2hLL$r(B
- $B9bB.$KIA2h$9$k;v$,=PMh$^$9!#5/F0;~$K%(%i!<$,=P$k>l9g!"%+!<%M%k%Q%i%a!<%?$r(B
- $BJQ99$7$F$_$F2<$5$$!#(B(BSD $B7O$O%G%U%)%k%H$N(B SharedMemory $B$NBg$-$5$,>.$5$$(B
- $B$h$&$G$9(B)
+   カーネルのSharedMemoryの大きさが十分大きい場合、MIT-SHMを利用して画面を
+ 高速に描画する事が出来ます。起動時にエラーが出る場合、カーネルパラメータを
+ 変更してみて下さい。(BSD 系はデフォルトの SharedMemory の大きさが小さい
+ ようです)
 
- 6.b.1. FreeBSD$B$N>l9g(B /usr/src/sys/i386/conf/LINT $BCf$N(B
+ 6.b.1. FreeBSDの場合 /usr/src/sys/i386/conf/LINT 中の
 
    options         SHMALL=1025
    options         "SHMMAX=(SHMMAXPGS*PAGE_SIZE+1)"
@@ -279,50 +279,50 @@
    options         SHMMIN=2
    options         SHMMNI=33
    options         SHMSEG=9
-  $B!V(BSHMMAXPGS$B!W$,4XO"9`L\$G$9!#(B
+  「SHMMAXPGS」が関連項目です。
 
-   24bpp$B$G5/F0$9$k>l9g$O(B SHMMAXPGS=4096 $B$/$i$$$K$9$k$H$h$$$h$&$G$9!#(B
- $B$b$A$m$s@_Dj8e$O%+!<%M%k$N:F9=C[$,I,MW$G$9!#(B
+   24bppで起動する場合は SHMMAXPGS=4096 くらいにするとよいようです。
+ もちろん設定後はカーネルの再構築が必要です。
 
- 6.c. locale $B$H(B X
+ 6.c. locale と X
 
-  libc $B$K(B locale $B5!9=$,AH$_9~$^$l$F$$$J$$4D6-$N>l9g!"(Blibxpg4 $B$J$I$N(B
-  $B%i%$%V%i%j(B(FreeBSD) $B$d(B X $B$N(B locale $B$r;H$&$3$H$K$J$j$^$9!#(B
+  libc に locale 機構が組み込まれていない環境の場合、libxpg4 などの
+  ライブラリ(FreeBSD) や X の locale を使うことになります。
 
-  linux $B$N(B libc5 $B$J4D6-$G$O(B configure $B;~$K(B --with-locale=ja_JP.ujis $B$H$7$F(B
-  $B%3%s%Q%$%k$7$F$/$@$5$$!#(B
+  linux の libc5 な環境では configure 時に --with-locale=ja_JP.ujis として
+  コンパイルしてください。
 
-  $B$=$l0J30$N$[$H$s$I$N4D6-$G$O9MN8$9$kI,MW$O$J$$$G$7$g$&!#(B
-
-
-7. $BCx:n8"$H%i%$%;%s%9(B
-
-   $B%W%m%0%i%`$NCx:n8"$O:n<T(B(chikama)$B$KB0$7$^$9$,!"%=!<%9%3!<%I$O(BGPL$B$K4p$E$$$F(B
- $B:FG[IU$G$-$^$9!#(B
- ($B0lIt$N%=!<%9%3!<%I$O;d0J30$KCx:n8"$,$"$j$^$9!#>\$7$/$O!"%=!<%9%3!<%I$r8fMw(B
-  $B2<$5$$(B)
-
-   $B%2!<%`Fb$G;H$o$l$F$k%+!<%=%k%U%)%s%H$N0lIt$r(Bqvwm(Windows95$B$=$C$/$j$N(BWindow
- Manager)$B$+$i$$$?$@$-$^$7$?!#(B
+  それ以外のほとんどの環境では考慮する必要はないでしょう。
 
 
-8. $B%5%]!<%H(B
+7. 著作権とライセンス
 
-   $BF0:nJs9p!&%P%0Js9p$J$I$O0J2<$N%a!<%k%"%I%l%9$^$G$*4j$$$7$^$9!#(B
+   プログラムの著作権は作者(chikama)に属しますが、ソースコードはGPLに基づいて
+ 再配付できます。
+ (一部のソースコードは私以外に著作権があります。詳しくは、ソースコードを御覧
+  下さい)
+
+   ゲーム内で使われてるカーソルフォントの一部をqvwm(Windows95そっくりのWindow
+ Manager)からいただきました。
+
+
+8. サポート
+
+   動作報告・バグ報告などは以下のメールアドレスまでお願いします。
 
    E-Mail: chikama@nabal.aist-nara.ac.jp     (private)
            masaki-c@is.aist-nara.ac.jp       (official)
 
-   $B$^$?:G?7HG$O0J2<$N(BURL$B$+$i%@%&%s%m!<%I$G$-$^$9!#(B
+   また最新版は以下のURLからダウンロードできます。
 
    http://www.aist-nara.ac.jp/~masaki-c/private/unitbase/xsys35/index.html
 
-   $B%P%0%l%]!<%H$N:]$O!"$*;H$$$N4D6-$r=PMh$k$@$1$/$o$7$/=q$$$F2<$5$$!#(B
- $B$^$?FCDj$N%2!<%`$GF0$+$J$$>l9g$O!"=PMh$k$@$1%;!<%V%G!<%?$bE:IU$7$F2<$5$$!#(B
+   バグレポートの際は、お使いの環境を出来るだけくわしく書いて下さい。
+ また特定のゲームで動かない場合は、出来るだけセーブデータも添付して下さい。
 
-   $B%W%m%0%i%`$d%7%J%j%*%G!<%?$N%P%0$G(B 'sigsegv caught @xxx,xxxxx' $B$H$$$C$F(B
- $B=*N;$9$k>l9g$O!"$=$N%a%C%;!<%8$NItJ,(B(xxx,xxxx)$B$bAw$C$F2<$5$$!#(B
+   プログラムやシナリオデータのバグで 'sigsegv caught @xxx,xxxxx' といって
+ 終了する場合は、そのメッセージの部分(xxx,xxxx)も送って下さい。
 
-   $B2DG=$J$i$P!"(B./configure $B$G(B --enable-debug $B$rIU$1$F%3%s%Q%$%k$7$F$*$-!"(B
- $B%G%P%C%,>e$G<B9T$7$F(B segmentation fault $B$G;_$^$C$?;~$K!"(Bbt $B$HBG$C$F=P$F$/$k(B
- $B%a%C%;!<%8$rE:IU$7$F$$$?$@$1$k$H$H$F$b=u$+$j$^$9!#(B
+   可能ならば、./configure で --enable-debug を付けてコンパイルしておき、
+ デバッガ上で実行して segmentation fault で止まった時に、bt と打って出てくる
+ メッセージを添付していただけるととても助かります。

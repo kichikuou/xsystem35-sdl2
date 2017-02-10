@@ -1,17 +1,17 @@
 
-  Joystick $B$N;H$$J}$K$D$$$F(B
+  Joystick の使い方について
 
-  $B8=:_(B linux $B$N(B kernel 2.2.x $B0J9_$N(B Joystick $B%$%s%?!<%U%'%$%9$KBP1~$7$F(B
-$B$$$^$9!#BP1~4D6-$r$*$b$A$NJ}$O(B configure --enable-joy $B$H$7$F%3%s%Q%$%k(B
-$B%3%s%Q%$%k$7$F2<$5$$!#(B
+  現在 linux の kernel 2.2.x 以降の Joystick インターフェイスに対応して
+います。対応環境をおもちの方は configure --enable-joy としてコンパイル
+コンパイルして下さい。
 
-  Joystick $B$N%G%P%$%9L>$O%G%U%)%k%H$G$O(B /dev/js0 $B$G!"<B9T;~$K(B -devjoy 
-$B%*%W%7%g%s$G;XDj$9$k$+!"(B.xsys35rc $B%U%!%$%k$G(B joy_device $B$N%(%s%H%j!<(B
-$B$K2C$($F2<$5$$!#(B
+  Joystick のデバイス名はデフォルトでは /dev/js0 で、実行時に -devjoy 
+オプションで指定するか、.xsys35rc ファイルで joy_device のエントリー
+に加えて下さい。
 
-  $BB>4D6-$G$NF0:nJs9p!"%Q%C%A$J$I$*BT$A$7$F$$$^$9!#08@h$O0J2<$NN>J}$K(B
-$B$*4j$$$7$^$9!#(B
+  他環境での動作報告、パッチなどお待ちしています。宛先は以下の両方に
+お願いします。
 
   chikama (masaki-c@is.aist-nara.ac.jp)
-  linux $BHG$N:n<T$NB<ED$5$s(B(fmurata@p1.tcnet.ne.jp)
+  linux 版の作者の村田さん(fmurata@p1.tcnet.ne.jp)
 

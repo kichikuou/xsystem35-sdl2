@@ -1,56 +1,56 @@
 
-                      $B?'$,$*$+$7$$$>!)!)!)(B 
+                      色がおかしいぞ？？？ 
 
 
- $B5/F0$7$F$_$F?'$,$*$+$7$$$H;W$C$?J}$O$3$N%I%-%e%a%s%H$rFI$_?J$a$F2<$5$$!#(B
+ 起動してみて色がおかしいと思った方はこのドキュメントを読み進めて下さい。
 
 
-1. i386$B7O(B
+1. i386系
 
-   $B?'$,$*$+$7$$$H8@$&$3$H$O$^$:L5$$$H;W$$$^$9$,!"%S%G%*%+!<%I$NCf$K$O(B packed24
- $B$H8F$P$l$k(B 1pixel $B$K$D$-(B 3byte $B$r;H$C$F(B 1600$BK|?'%b!<%I$r<B8=$7$F$$$k$b$N$,(B
- $B$"$j$^$9!#Nc$($P(B Matrox Mystique $B$J$I$,$"$j$^$9(B($BDL>o$O(B 1pixel $B$K$D$-(B 4byte
- $B$r;H$C$F(B 1600$BK|?'%b!<%I$r<B8=$7$F$$$^$9(B)$B!#(B
+   色がおかしいと言うことはまず無いと思いますが、ビデオカードの中には packed24
+ と呼ばれる 1pixel につき 3byte を使って 1600万色モードを実現しているものが
+ あります。例えば Matrox Mystique などがあります(通常は 1pixel につき 4byte
+ を使って 1600万色モードを実現しています)。
  
-   xdpyinfo $B$H$d$C$F(B supported pixmap formats $B$N%j%9%H$K(B
+   xdpyinfo とやって supported pixmap formats のリストに
     depth 24, bits_per_pixel 24, scanline_pad 32
- $B$H$"$l$P(B packed24 $B$G$9!#(B
+ とあれば packed24 です。
 
- $B$3$N(B packed24 $B$K$bBP1~$7$F$$$^$9$,!"B.EY$NLL$+$i(B 16bpp $B$^$?$O(B32bpp $B$G(B X server
- $B$r5/F0$9$k$3$H$r?d>)$7$^$9!#(B
-
-
-2. PPC$B7O(B
-
-   linuxPPC$B$G$O(B X server $B$H$7$F(B Xpmac $B$H(B XF68_FBDev $B$N$I$A$i$+$,;H$o$l$F(B
- $B$$$^$9!#(BLinuxPPC R4 $B$"$?$j$N(B X Server $B$G$O<!$N$h$&$JIT6q9g$,$"$k$=$&$J$N(B
- $B$G$&$^$/2sHr$7$F2<$5$$!#(B
-
- * Xpmac $B$G%"%/%;%i%l!<%7%g%s$rM-8z$K$7$?$b$N$r;H$&$H(BX$B$,8G$^$k$N$G!"(B
-   xsystem35 $B$r(B -no-shm $B%*%W%7%g%sIU$G<B9T$7$F2<$5$$!#@_Dj%U%!%$%k(B(.xsys35rc)
-   $B$K(B -no-shm$B$K4X$9$k@_Dj$r=q$$$F$*$/$3$H$b$G$-$^$9!#(B
+ この packed24 にも対応していますが、速度の面から 16bpp または32bpp で X server
+ を起動することを推奨します。
 
 
-3. SGI$B7O(B, Sparc$B7O(B
+2. PPC系
 
-   $B$3$l$i$N(B X Server $B$O(B $B%T%/%;%k$N(BRGB$B$N$J$i$S$,(Bi386$B7O$J$I$H$O5U$K$J$C$F$$$^$9!#(B
- $B9T57$NNI$$%"%W%j%1!<%7%g%s$O(B X Server $B$+$i>pJs$r<h$j=P$7$FE,@Z$K=hM}$9$k;v$G(B
- $B$I$N$h$&$J(BRGB$B$NJB$S$K$bBP1~$G$-$k$O$:$J$N$G$9$,!"(Bxsystem35$B$O<jH4$-$r$7$F$$$F(B
- $B%O!<%I%3!<%G%#%s%0$7$F$$$^$9!#$3$l$OB.EY(B($B!)(B)$B$HMxMQ?t$NLdBj$H8@$&;v$G(B.. (^^;;;
+   linuxPPCでは X server として Xpmac と XF68_FBDev のどちらかが使われて
+ います。LinuxPPC R4 あたりの X Server では次のような不具合があるそうなの
+ でうまく回避して下さい。
 
- xdpyinfo $B$H$7$F(B Visual $B$N$H$3$m$G(B
+ * Xpmac でアクセラレーションを有効にしたものを使うとXが固まるので、
+   xsystem35 を -no-shm オプション付で実行して下さい。設定ファイル(.xsys35rc)
+   に -no-shmに関する設定を書いておくこともできます。
+
+
+3. SGI系, Sparc系
+
+   これらの X Server は ピクセルのRGBのならびがi386系などとは逆になっています。
+ 行儀の良いアプリケーションは X Server から情報を取り出して適切に処理する事で
+ どのようなRGBの並びにも対応できるはずなのですが、xsystem35は手抜きをしていて
+ ハードコーディングしています。これは速度(？)と利用数の問題と言う事で.. (^^;;;
+
+ xdpyinfo として Visual のところで
 
    class:    TrueColor
    depth:    24 planes
    red, green, blue masks:    0xff, 0xff00, 0xff0000
 
- $B$N$h$&$K$J$C$F$$$?$i!"(BBGR $B$NJB$S$H8@$&$3$H$K$J$j$^$9!#(BSGI $B7O$H(B Sparc $B7O$G$O(B
- $B$3$l$,%G%U%)%k%H$NF0:n$G$9$,!"(Bsgi O2 $B$d(B sparc $B$N0lIt$N5!<o$G$O(B
+ のようになっていたら、BGR の並びと言うことになります。SGI 系と Sparc 系では
+ これがデフォルトの動作ですが、sgi O2 や sparc の一部の機種では
 
    class:    TrueColor
    depth:    24 planes
    red, green, blue masks:    0xff0000, 0xff00, 0xff
 
- $B$H$J$C$F$$$k>l9g$,$"$j$^$9!#$3$N>l9g!"(Bconfigure $B$K(B --disable-bgr $B$r$D$1$F(B
- $B%3%s%Q%$%k$7$F$/$@$5$$!#(B
+ となっている場合があります。この場合、configure に --disable-bgr をつけて
+ コンパイルしてください。
 

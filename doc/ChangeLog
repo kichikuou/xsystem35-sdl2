@@ -1,23 +1,23 @@
 Version 1.7.2 -> Version 1.7.3 (200?.**.**)
 
 pre5
- * FedoraCore5 $B$G%3%s%Q%$%k$G$-$k$h$&$K$7$?!#(B
+ * FedoraCore5 でコンパイルできるようにした。
 
 pre4
  * config.sub, config.guess update
 
 pre3
  * freetype compile errror fix
- * Dr.Stop$B$,F0:n$,F0:n$7$J$+$C$?$N$r(Bfix (Thanx by Onodera Hirotaka)
- * Gtk2.0$B$N%A%'%C%/$rF~$l$?(B
+ * Dr.Stopが動作が動作しなかったのをfix (Thanx by Onodera Hirotaka)
+ * Gtk2.0のチェックを入れた
 
 pre2
- * configure$B;~$N(Blibjpeg$B$N%A%'%C%/$K<:GT$7$F$$$?$N$r(Bfix
+ * configure時のlibjpegのチェックに失敗していたのをfix
    (Thanx by Tamura Toshimichi)
 
 pre1
- * configure$B;~$K(B libjpeg$B$N>l=j$r;XDj$G$-$k$h$&$K$7$?!#(B --with-libjpeg-prefix
- * src/tempname.c $B$,%3%s%Q%$%k=PMh$J$$>l9g$,$"$C$?$N$r(Bfix
+ * configure時に libjpegの場所を指定できるようにした。 --with-libjpeg-prefix
+ * src/tempname.c がコンパイル出来ない場合があったのをfix
    (Thanx by Tamura Toshimichi)
 
 Version 1.7.1 -> Version 1.7.2 (2003.12.21)
@@ -26,25 +26,25 @@ final
  * no change from pre3
 
 pre3
- * sys_reset$B%3%^%s%I$,$h$P$l$?$H$-$K!"%F%s%]%i%j%G%#%l%/%H%j$r>C$7$F$$$J$+$C$?(B
-   $B$N$r(Bfix (Thanx by OKUMURA N. Shin-ya)
- * music$B%5%V%7%9%F%`$N=i4|2=$r(Bmusic server $B%W%m%;%9$G9T$&$h$&$K$7$?!#(B
-   (sys_reset$B$G%G%P%$%9$rDO$s$@$^$^$K$J$j2;3Z$,$J$i$J$/$J$C$F$$$?(B)
+ * sys_resetコマンドがよばれたときに、テンポラリディレクトリを消していなかった
+   のをfix (Thanx by OKUMURA N. Shin-ya)
+ * musicサブシステムの初期化をmusic server プロセスで行うようにした。
+   (sys_resetでデバイスを掴んだままになり音楽がならなくなっていた)
    (Thanx by OKUMURA N. Shin-ya)
  * SACT/sactcg.c: fix compile problem (by OKUMURA N. Shin-ya)
- * SACT/sactcg.c: $B0z?t$,9g$C$F$$$J$$$N$r(Bfix (by OKUMURA N. Shin-ya)
- * SACT/sactcg.c: sg_loadcg_no() $B$,(B NULL$B$rJV$9>l9g$N=hM}$rDI2C(B 
+ * SACT/sactcg.c: 引数が合っていないのをfix (by OKUMURA N. Shin-ya)
+ * SACT/sactcg.c: sg_loadcg_no() が NULLを返す場合の処理を追加 
    (Thanx by OKUMURA N. Shin-ya)
- * SACT/sactcg.c: cg$B%*%V%8%'%/%H$N2s<}J}K!$N:FJQ99(B
-   ($B%(%9%+$N%m!<%I;~Ey$GMn$A$F$$$?$N$r(Bfix)
+ * SACT/sactcg.c: cgオブジェクトの回収方法の再変更
+   (エスカのロード時等で落ちていたのをfix)
 
 pre2
- * NightDemonDemo: $B%G%b$r%9%-%C%W$G$-$k$h$&$K$7$?(B
- * IMA ADPCM $B7A<0$N(B .WAV $B%U%!%$%k$r:F@8$G$-$k$h$&$K$7$?(B
- * gcc-3.3.2+glibc-2.3.2$B$N4D6-$G(B alk.h $B$G%(%i!<$,$G$F$$$?$N$r(Bfix
+ * NightDemonDemo: デモをスキップできるようにした
+ * IMA ADPCM 形式の .WAV ファイルを再生できるようにした
+ * gcc-3.3.2+glibc-2.3.2の環境で alk.h でエラーがでていたのをfix
    (by OKUMURA N. Shin-ya)
- * $B%F%s%]%i%j%G%#%l%/%H%j$r(B mkdtemp $B$G:n@.$9$k$h$&$K$7$F!"%^%k%A%f!<%64D6-$G$N(B
-   $B$$$/$D$+$NLdBj$r2r>C$7$?(B(Thanx by OKUMURA N. Shin-ya)
+ * テンポラリディレクトリを mkdtemp で作成するようにして、マルチユーザ環境での
+   いくつかの問題を解消した(Thanx by OKUMURA N. Shin-ya)
 
 pre1
  * add NightDemonDemo.Init, NightDemonDemo.Run
@@ -52,563 +52,563 @@ pre1
 Version 1.7.0 -> Version 1.7.1 (2003.08.31)
 
 final
- * SACT.MusicCheck $B$G6J$,B8:_$7$J$$>l9g!"Mn$A$F$$$?$N$r(Bfix
- * $B%"%;%s%V%i(B(nasm)$B$NB8:_%A%'%C%/$rF~$l$?(B
- * portab.h $B$+$i(B abs $B$r:o=|(B (thanx by OKUMURA N. Shin-ya)
+ * SACT.MusicCheck で曲が存在しない場合、落ちていたのをfix
+ * アセンブラ(nasm)の存在チェックを入れた
+ * portab.h から abs を削除 (thanx by OKUMURA N. Shin-ya)
 
 pre4
  * add dummy AliceDemo.dll NightDemonDemo.dll
  * add SACT.MusicCheck command
- * SACT.MusicXXX $B$G%U%!%$%kHV9f$K(B0$B$,;XDj$5$l$?$H$-$KBP1~(B
- * SACT: $B;HMQCf$N(Bcg$B%*%V%8%'%/%H$r3+J|$7$F$$$?>l9g$,$"$C$?$N$r(Bfix
+ * SACT.MusicXXX でファイル番号に0が指定されたときに対応
+ * SACT: 使用中のcgオブジェクトを開放していた場合があったのをfix
 
 pre3
- * pcmobj$B$N%m!<%IEy$N(Bcleanup
- * libtool$B$,%$%s%9%H!<%k$5$l$F$$$J$$$H$-!"(Bmodules/lib $B$,%3%s%Q%$%k$G$-(B
-   $B$J$+$C$?$N$r(Bfix (thanx by FUJITA)
- * 8bitPCM$B$NJQ49$,@5$7$/$J$+$C$?$N$r(Bfix
-   ($B54C\2&$J$I$G8z2L2;$N=*N;;~$K%N%$%:$,$N$C$F$$$?(B)
+ * pcmobjのロード等のcleanup
+ * libtoolがインストールされていないとき、modules/lib がコンパイルでき
+   なかったのをfix (thanx by FUJITA)
+ * 8bitPCMの変換が正しくなかったのをfix
+   (鬼畜王などで効果音の終了時にノイズがのっていた)
 
 pre2
- * modules/libs/graph_rect.c $B$K(B 8/24bit$B$N%3!<%I$rDI2C(B
- * sys_exit$B$,@5$7$/=*N;%3!<%I$rJV$7$F$$$J$+$C$?$N$r(Bfix
+ * modules/libs/graph_rect.c に 8/24bitのコードを追加
+ * sys_exitが正しく終了コードを返していなかったのをfix
    (thanx by OKUMURA N. Shin-ya)
- * ShSound$B$G%a%b%j>e$G:81&$N%A%c%s%M%k$NF~$l49$($,=PMh$J$/$J$C$F$$$?$N$r(Bfix
+ * ShSoundでメモリ上で左右のチャンネルの入れ換えが出来なくなっていたのをfix
    (thanx by OKUMURA N. Shin-ya)
- * SACT.SoundXXXX $B$GG[Ns30$N%a%b%j$rGK2u$7$F$$$?$N$r(Bfix
- * $B%P%C%/%m%01\MwCf$N%[%$!<%k$NA`:n$r5U$K$7$?(B
+ * SACT.SoundXXXX で配列外のメモリを破壊していたのをfix
+ * バックログ閲覧中のホイールの操作を逆にした
 
 pre1
- * $B8z2L2;$,>C$($:$K;D$k$3$H$,$"$C$?$N$r(Bfix
- * MMX$B%k!<%A%s$N4XO"$G!"(Bsurface$B$r2##1%i%$%sJ,$@$1M>J,$K3NJ]$9$k$h$&$K$7$?(B
- * SACT: cg$B%*%V%8%'%/%H$N2s<}J}K!$N(Bcleanup
- * SACT: $B%a%C%;!<%8%9%W%i%$%H$NHO0O$r1[$($FJ8;z$rIA2h$9$k>l9g$,$"$C$?$N$r(Bfix
+ * 効果音が消えずに残ることがあったのをfix
+ * MMXルーチンの関連で、surfaceを横１ライン分だけ余分に確保するようにした
+ * SACT: cgオブジェクトの回収方法のcleanup
+ * SACT: メッセージスプライトの範囲を越えて文字を描画する場合があったのをfix
 
 
 Version 1.6.0 -> Version 1.7.0 (2003.07.21)
 
 final
- * BA$B%U%!%$%k$N1iAUMQ%9%m%C%H$N7hDjJ}K!$NJQ99(B
- * $B%7%'%k%/%l%$%k$N(B*BA.BGI$B%U%!%$%k$,@5$7$/$h$_$3$a$F$J$+$C$?$N$r(Bfix
-   ($B%*!<%W%K%s%0$N6J$N=*$j$,$*$+$7$+$C$?(B)
- * $B%7%'%k%/%l%$%k$G(BZ$B%-!<$G%a%C%;!<%8Ms$,>C$($J$+$C$?$N$r(Bfix
- * image$B3HBg=L>.%k!<%A%s$G%P%C%U%!%*!<%P!<%i%s$9$k>l9g$,$"$C$?$N$r(Bfix(again)
- * SACT.DrawEffect$B$N(B10$BHV$N8z2L$,@5$7$/F0$$$F$$$J$+$C$?$N$r(Bfix	
- * SACT.DrawEffect$B$N(B19$BHV$N8z2L$rDI2C(B
- * SACT.RegistReplaceString$B$G(Bsrc$B$H(Bdst$B$,F1$8J8;zNsHV9f$N;~$OL5;k$9$k$h$&$K$7$?(B
- * $B%P%C%/%m%01\MwCf$K(BCtrl$B$r2!$9$H$X$s$K$J$C$F$$$?$N$r(Bfix
- * $B%P%C%/%m%0$N%Z!<%8(BUP/DN$B$r(B1$B9T$9$/$J$/$7$?(B
- * $B%k%S$D$-J8;z$N$H$-$N%;%s%?%j%s%0$N0LCV$,$*$+$7$+$C$?$N$r(Bfix
+ * BAファイルの演奏用スロットの決定方法の変更
+ * シェルクレイルの*BA.BGIファイルが正しくよみこめてなかったのをfix
+   (オープニングの曲の終りがおかしかった)
+ * シェルクレイルでZキーでメッセージ欄が消えなかったのをfix
+ * image拡大縮小ルーチンでバッファオーバーランする場合があったのをfix(again)
+ * SACT.DrawEffectの10番の効果が正しく動いていなかったのをfix	
+ * SACT.DrawEffectの19番の効果を追加
+ * SACT.RegistReplaceStringでsrcとdstが同じ文字列番号の時は無視するようにした
+ * バックログ閲覧中にCtrlを押すとへんになっていたのをfix
+ * バックログのページUP/DNを1行すくなくした
+ * ルビつき文字のときのセンタリングの位置がおかしかったのをfix
 
 pre6
- * --enable-pkg-config $B$G(B glib $B$,8+IU$1$i$l$J$+$C$?$N$r(B fix
- * MMX alpha blend(ablend16_ppp.s)$B$G(B blend$BN($,(B0$B$N;~$KMn$A$F$$$?$N$r(Bfix
-   ($B:J$_$0$$#2$N%/%$%C%/%m!<%IEy(B)
- * SACT.MessageOutput(Ex)$B$N<BAu$r6&DL2=(B
- * SACT.MusicXX$B$N%U%'!<%I;~4V$,C;$9$.$?$N$r(Bfix
- * SACT.MusicXX$B$G6J$,=*N;$7$J$$$N$r(Bfix
- * make install $B$G(B modules/libs/ $B0J2<$N$b$N$r%$%s%9%H!<%k$7$J$$$h$&$K$7$?(B
+ * --enable-pkg-config で glib が見付けられなかったのを fix
+ * MMX alpha blend(ablend16_ppp.s)で blend率が0の時に落ちていたのをfix
+   (妻みぐい２のクイックロード等)
+ * SACT.MessageOutput(Ex)の実装を共通化
+ * SACT.MusicXXのフェード時間が短すぎたのをfix
+ * SACT.MusicXXで曲が終了しないのをfix
+ * make install で modules/libs/ 以下のものをインストールしないようにした
  * add sysReset command
 
 pre5
  * add fncSetTableFromStr command
- * $B%a%C%;!<%8J8;z$N%;%s%?%j%s%0$,@5$7$/$J$+$C$?$N$r(Bfix
- * SACT.MessageOutputEx$B$N0z?t$N?t$,4V0c$C$F$$$?$N$r(Bfix
- * SACT: $B%k%S$D$-J8;z$rI=<($G$-$k$h$&$K$7$?(B
- * SACT.XMenu???? $B$KBP1~(B
- * SACT.WaitKeySimple $B$,8F$P$l$?$H$-$OA42hLL99?7$r9T$&$h$&$K$7$?(B
+ * メッセージ文字のセンタリングが正しくなかったのをfix
+ * SACT.MessageOutputExの引数の数が間違っていたのをfix
+ * SACT: ルビつき文字を表示できるようにした
+ * SACT.XMenu???? に対応
+ * SACT.WaitKeySimple が呼ばれたときは全画面更新を行うようにした
 
 pre4
- * SACT.WaitKeySpriteTimeOut $B$G(B Timeout $B;~4V$,C;$9$.$?$N$r(Bfix
- * BigEndian$B%^%7%s$G2;3Z!&8z2L2;$,@5$7$/1iAU$G$-$J$+$C$?$N$r(Bfix
- * $B2hLL%5%$%:$,>.$5$/$J$C$?$H$-(B(640x480$B"*(B640x400$BEy(B)$B$K%(%i!<$GMn$A$F$$$?$N$r(Bfix
+ * SACT.WaitKeySpriteTimeOut で Timeout 時間が短すぎたのをfix
+ * BigEndianマシンで音楽・効果音が正しく演奏できなかったのをfix
+ * 画面サイズが小さくなったとき(640x480→640x400等)にエラーで落ちていたのをfix
 
 pre3
  * add SACT.MusicGetLength command
- * SACT.MusicGetPos $B$,@5$7$$CM$r$+$($7$F$$$J$+$C$?$N$r(Bfix
- * $B$/$jJV$7?t$,#1$N2;3Z$r:F@8$G$-$J$+$C$?$N$r(Bfix
-   ($B%(%9%+%l%$%d!<$N%(%s%G%#%s%0Ey(B)
+ * SACT.MusicGetPos が正しい値をかえしていなかったのをfix
+ * くり返し数が１の音楽を再生できなかったのをfix
+   (エスカレイヤーのエンディング等)
 
 pre2
- * SACT.EffectDraw$B$N(B10$BHV$N8z2L$rDI2C(B
- * 16bit alpha blend $B$^$o$j$N$_$J$*$7(B
- * Gpx.CopyEffect(2,4) $B$G;2>H%5!<%U%'%$%9$,4V0c$C$F$$$?$N$r(Bfix
- * eeDemo.Run $B$K0z?t$,$?$j$J$+$C$?$N$r(B fix
+ * SACT.EffectDrawの10番の効果を追加
+ * 16bit alpha blend まわりのみなおし
+ * Gpx.CopyEffect(2,4) で参照サーフェイスが間違っていたのをfix
+ * eeDemo.Run に引数がたりなかったのを fix
 
 pre1
- * $B4q?t(Bx$B4q?t%5%$%:$N(Bqnt$B%U%!%$%k$NE83+$,$*$+$7$+$C$?$N$r(Bfix
- * Gpx.c $B$+$i(B cg -> surface $BJQ49It$r@Z$j=P$7$F(B libgraph $B$XE}9g(B
- * DLL $BMQ$K%a%C%;!<%8J8;zNs=PNO!"%-!<$H%^%&%9%$%Y%s%H$N(B callback $B$r@_Dj$G$-$k(B
-   $B$h$&$K$7$?!#(B
- * menuReturnGoto $B$G(B farcall $B$+$i$N(Breturn$B$,$G$-$J$+$C$?$N$r(Bfix
- * ablend16.s: rate$B@_Dj$"$j$N>l9g$K$*$+$7$$$H$-$,$"$C$?$N$r(Bfix
- * PCM$B%G!<%?$N:81&%A%c%s%M%kH?E>$d(B16bitWAV$B%U%!%$%k$N(BEndian$BJQ49$J$I$r(B
-   $B:F@8;~$K%j%"%k%?%$%`$G9T$&$h$&JQ99(B
- * $B8z2L2;%G!<%?$H$7$F(BOGG$B%U%!%$%k$r:F@8$G$-$k$h$&$K$7$?(B
- * BGM$B%G!<%?(B(*BA.ALD)$B$r07$($k$h$&$K$7$?!#(B
- * $B5/F0;~$N2hLL$NBg$-$5$r(B 640x480 $B$K$7$?!#(B
- * SACT.DLL $B$r0lIt<BAu(B
- * image$B3HBg=L>.%k!<%A%s$G%P%C%U%!%*!<%P!<%i%s$9$k>l9g$,$"$C$?$N$r(Bfix
+ * 奇数x奇数サイズのqntファイルの展開がおかしかったのをfix
+ * Gpx.c から cg -> surface 変換部を切り出して libgraph へ統合
+ * DLL 用にメッセージ文字列出力、キーとマウスイベントの callback を設定できる
+   ようにした。
+ * menuReturnGoto で farcall からのreturnができなかったのをfix
+ * ablend16.s: rate設定ありの場合におかしいときがあったのをfix
+ * PCMデータの左右チャンネル反転や16bitWAVファイルのEndian変換などを
+   再生時にリアルタイムで行うよう変更
+ * 効果音データとしてOGGファイルを再生できるようにした
+ * BGMデータ(*BA.ALD)を扱えるようにした。
+ * 起動時の画面の大きさを 640x480 にした。
+ * SACT.DLL を一部実装
+ * image拡大縮小ルーチンでバッファオーバーランする場合があったのをfix
 
 
 Version 1.5.4 -> Version 1.6.0 (2003.02.01)
 
 final
- * gtk-1.0$B;~$K(BGLIB_{CFLAGS|LIBS}$B$,@_Dj$5$l$F$$$J$+$C$?$N$r(Bfix
- * libgen.h $B$NB8:_%A%'%C%/$HL5$$4D6-$G$NBP:v$r$$$l$?(B
- * FreeBSD+OSS$B$G(BSNDCTL_DSP_GETBLKSIZE$B$GF@$?%5%$%:$h$j>.$5$$D9$5$r(Bwrite$B$9$k(B
-   $B$H0J8e(Bdevice$B$,(Bready$B$K$J$i$:(Bpoll$B$GBT$F$J$/$J$k$N$r(B fix (thanx by kurokawa)
- * font_x11.c $B$G%a%b%j!<%j!<%/$,$*$-$F$$$?$N$r(B fix (thanx by kurokawa)
- * modules$B0J2<$G$$$/$D$+(B Makefile.am$B$N(B@GLIB_LIBS@$B$,$*$+$7$/$J$C$F$$$?$N$r(Bfix
- * x11$B$G%U%k%9%/%j!<%s$K$G$-$J$/$J$C$F$$$?$N$r(B fix (thanx by matuyama_takaaki)
- * TPC|TPS|TPP$B%3%^%s%I$G%9%?%C%/$K$D$s$@%G!<%?$,4X?t$+$i$N%j%?!<%s$N:]$NA4(BPOP
-   $B$N:]$K@5$7$/CM$rLa$7$F$$$J$+$C$?$N$r(Bfix ($B%j%/%k%9$N$*$^$1%b!<%I$GA*BrCf$N(B
-   $B%a%C%;!<%8$NI=<($,0lIt$*$+$7$/$J$C$F$$$?(B) (thanx by matuyama_takaaki)
- * module$B$N8!:w%Q%9$,=EJ#$7$FEPO?$5$l$F$$$?$N$r(Bfix
- * pcmlib_load() $B$G%a%b%j!<%j!<%/$7$F$$$?$N$r(Bfix
- * $B%j%=!<%9%U%!%$%k$K$h$k%+!<%=%k7A>u$NJQ99$rL58z$K$9$k%*%W%7%g%s$rDI2C(B
+ * gtk-1.0時にGLIB_{CFLAGS|LIBS}が設定されていなかったのをfix
+ * libgen.h の存在チェックと無い環境での対策をいれた
+ * FreeBSD+OSSでSNDCTL_DSP_GETBLKSIZEで得たサイズより小さい長さをwriteする
+   と以後deviceがreadyにならずpollで待てなくなるのを fix (thanx by kurokawa)
+ * font_x11.c でメモリーリークがおきていたのを fix (thanx by kurokawa)
+ * modules以下でいくつか Makefile.amの@GLIB_LIBS@がおかしくなっていたのをfix
+ * x11でフルスクリーンにできなくなっていたのを fix (thanx by matuyama_takaaki)
+ * TPC|TPS|TPPコマンドでスタックにつんだデータが関数からのリターンの際の全POP
+   の際に正しく値を戻していなかったのをfix (リクルスのおまけモードで選択中の
+   メッセージの表示が一部おかしくなっていた) (thanx by matuyama_takaaki)
+ * moduleの検索パスが重複して登録されていたのをfix
+ * pcmlib_load() でメモリーリークしていたのをfix
+ * リソースファイルによるカーソル形状の変更を無効にするオプションを追加
    (-noimagecursor)
 
 pre4
- * font_gtk.c $B$GB8:_$7$J$$%U%)%s%H%U%!%$%k$r;XDj$9$k$H0[>o=*N;$7$F$$$?$N$r(Bfix
- * SDL/24bpp$B$G%9%W%i%$%H$N?'H4$1$,$G$-$J$$$3$H$,$"$C$?$N$r(B fix ($BBg0-;J$N(B
-   $B%"%K%a!<%7%g%sEy(B) (thanx by matuyama_takaaki)
- * --disable-debug $B$r%G%U%)%k%H$X(B
- * --disable-gtk $B$NI|3h$H4XO"$9$k(B configure.ac $BEy$N(B cleanup
- * $B%b%8%e!<%k$r:G=i$K%+%l%s%H%G%#%l%/%H%j$N2<$+$i8!:w$9$k$h$&$K$7$?!#(B
+ * font_gtk.c で存在しないフォントファイルを指定すると異常終了していたのをfix
+ * SDL/24bppでスプライトの色抜けができないことがあったのを fix (大悪司の
+   アニメーション等) (thanx by matuyama_takaaki)
+ * --disable-debug をデフォルトへ
+ * --disable-gtk の復活と関連する configure.ac 等の cleanup
+ * モジュールを最初にカレントディレクトリの下から検索するようにした。
  * add msgSetOutputFlag command
- * $B%G%U%)%k%H$N(Baudiodevice$B$N@_Dj$,8z$$$F$$$J$+$C$?$N$r(B fix
- * $B%;!<%V$,<:GT$7$?>l9g!"I,$:%3%s%=!<%k$K%(%i!<%a%C%;!<%8$r=P$9$h$&$K$7$?!#(B
-   ($B%;!<%V$,<:GT$7$F$b%7%J%j%*B&$GL5;k$9$k>l9g$,$"$k$N$G(B) (thanx by kurokawa)
- * $B%a%C%;!<%8NN0h$NB`Hr!&2sI|$K0lIt<:GT$7$F$$$?$N$r(B fix ($B$Q$9$A$c$G2hLL99?7(B
-   $B$,0lIt@5$7$/$J$+$C$?(B) (thanx by kurokawa)
+ * デフォルトのaudiodeviceの設定が効いていなかったのを fix
+ * セーブが失敗した場合、必ずコンソールにエラーメッセージを出すようにした。
+   (セーブが失敗してもシナリオ側で無視する場合があるので) (thanx by kurokawa)
+ * メッセージ領域の退避・回復に一部失敗していたのを fix (ぱすちゃで画面更新
+   が一部正しくなかった) (thanx by kurokawa)
 
 pre3
- * Ctrl+C $B$G@5$7$/=*N;$G$-$J$+$C$?$N$r(B fix
- * -midiplayer $B%3%^%s%I%i%$%s%*%W%7%g%s$r$D$1$?(B
- * EN$B%3%^%s%I$G$I$NNN0h$K$b4^$^$l$F$$$J$$$H$-$NJV$jCM$,@5$7$/$J$+$C$?$N$r(Bfix
-   ($B2&;RMM(BLv1.5$B$G%9%1%8%e!<%k$NA*Br$,7hDj$G$-$J$+$C$?(B)
- * music_fade.c: pcmobj$B$,(BNULL$B$N;~$K(Bfade$B$,;O$^$k$HMn$A$F$$$?$N$r(B fix
+ * Ctrl+C で正しく終了できなかったのを fix
+ * -midiplayer コマンドラインオプションをつけた
+ * ENコマンドでどの領域にも含まれていないときの返り値が正しくなかったのをfix
+   (王子様Lv1.5でスケジュールの選択が決定できなかった)
+ * music_fade.c: pcmobjがNULLの時にfadeが始まると落ちていたのを fix
  * add wavFadeVolue command
- * endian $B$NH=Dj$r(B portab.h $B$+$i(B configure.ac $B$K(B (AC_C_BIGENDIAN)
+ * endian の判定を portab.h から configure.ac に (AC_C_BIGENDIAN)
  * remove acconfig.h
- * configure.ac $B$+$i(B --disable-gtk $B$r$J$/$7$?(B
- * PPC+OSS$B$G0lIt2;$,@5>o$K$J$i$J$+$C$?$N$r(B fix (Thanx by Onodera Hirotaka)
+ * configure.ac から --disable-gtk をなくした
+ * PPC+OSSで一部音が正常にならなかったのを fix (Thanx by Onodera Hirotaka)
 
 pre2
  * fix some compile warning
- * Ain $B%U%!%$%k$,;XDj$5$l$F$$$J$$$H$-$K(B 2F60 command $B$,8F$P$l$k$H0[>o=*N;(B
-   $B$7$F$$$?$N$r(B fix
- * contrib/*.inf $B$K4v$D$+$NDj5A%U%!%$%k$rDI2C(B
- * -O0 $B;~$K(Bfade $B>uBV$,@5$7$/$H$l$F$$$J$+$C$?$N$r(B fix (-O0$B;~$K:J$_$0$$$,F0$+$J(B
-   $B$+$C$?(B) (Thanx by Onodera Hirotaka)
- * {OSS|ALSA}$B$G(BPCM$B$N%U%)!<%^%C%H$r(B LE -> NE $B$X(B
- * $B2;3Z%U%'!<%IMQ%+%&%s%?$,@5$7$/=i4|2=$5$l$F$$$J$+$C$?$N$r(B fix
- * $B%o!<%/Fb$N=i4|%\%j%e!<%`$,@5$7$/=i4|2=$5$l$F$$$J$+$C$?$N$r(B fix
- * $B%U%'!<%I3+;O;~$N%\%j%e!<%`$,@5$7$/@_Dj$5$l$F$$$J$+$C$?$N$r(B fix
+ * Ain ファイルが指定されていないときに 2F60 command が呼ばれると異常終了
+   していたのを fix
+ * contrib/*.inf に幾つかの定義ファイルを追加
+ * -O0 時にfade 状態が正しくとれていなかったのを fix (-O0時に妻みぐいが動かな
+   かった) (Thanx by Onodera Hirotaka)
+ * {OSS|ALSA}でPCMのフォーマットを LE -> NE へ
+ * 音楽フェード用カウンタが正しく初期化されていなかったのを fix
+ * ワーク内の初期ボリュームが正しく初期化されていなかったのを fix
+ * フェード開始時のボリュームが正しく設定されていなかったのを fix
 
 pre1
- * --enable-sdl$B;~$N%3%s%Q%$%k(Bfix
- * SDL$B$G(B alpha <-> DIB $B4V$N%3%T!<(B(Copy_{from|to}_alpha)$B$,@5$7$/F0$$$F$$$J$+$C$?(B
- * SDL_*.c$B$H(Bimage*.c$B$H$N(Bdepth$B$,0lCW$7$F$$$J$+$C$?$N$r(Bfix ($BBg0-;J$G@oN,%^%C%W$,(B
-   $B@5$7$/I=<($G$-$J$+$C$?(B)
- * configure.ac $B$N(B cleanup (freetype$B$r<+F08!=P$K(B)
- * -M0/-O0 ($B;HMQIT2D$K$9$k(B)$B%*%W%7%g%s$NDI2C(B
- * audio_oss.c$B$N(Bsoundcard.h$B$N%Q%9$NJQ99(B
- * .wav$B%G!<%?$NFI$_9~$_$N(B src/pcmlib.c $B$X$N0l852=(B
- * BIGENDIAN$B%^%7%s$G$N(B16BitPCM$B%G!<%?$OFI$_9~$_;~$KJQ49$9$k$h$&$K$7$?(B
- * ShSound/pcmlib.[ch]$B$N(B ShSound/shpcmlib.c $B$N%U%!%$%kL>JQ99(B
+ * --enable-sdl時のコンパイルfix
+ * SDLで alpha <-> DIB 間のコピー(Copy_{from|to}_alpha)が正しく動いていなかった
+ * SDL_*.cとimage*.cとのdepthが一致していなかったのをfix (大悪司で戦略マップが
+   正しく表示できなかった)
+ * configure.ac の cleanup (freetypeを自動検出に)
+ * -M0/-O0 (使用不可にする)オプションの追加
+ * audio_oss.cのsoundcard.hのパスの変更
+ * .wavデータの読み込みの src/pcmlib.c への一元化
+ * BIGENDIANマシンでの16BitPCMデータは読み込み時に変換するようにした
+ * ShSound/pcmlib.[ch]の ShSound/shpcmlib.c のファイル名変更
 
 
 Version 1.5.3 -> Version 1.5.4 (2002.12.31)
 
 final
- * esd$B$N%\%j%e!<%`@_Dj$G!"(BMASTER$B$H(BPCM$B0J30$OL5;k$9$k$h$&$K$7$?(B
- * gcc3$BBP:v$G(B __func__$B$r%i%C%W$7$F(B sys_error -> SYSERROR $B$KJQ99(B
+ * esdのボリューム設定で、MASTERとPCM以外は無視するようにした
+ * gcc3対策で __func__をラップして sys_error -> SYSERROR に変更
    (thanx by OKUMURA N. Shin-ya)
- * PCM$B9g@.$G(Bmono->stereo$B$NJQ49$,0lIt$*$+$7$+$C$?$N$r(Bfix($B$+$($k$K$g9q$N%"%j%9(B
-   $B$G8z2L2;$,$*$+$7$+$C$?(B)
- * cdrom.mp3|midi.extplay$B$N(Bpipe$B%b!<%I$G(Bstop$B$,5!G=$7$F$$$J$+$C$?$N$r(Bfix
- * midi.extplay$B$N(Bpipe$B%b!<%I$G1iAU>uBV$,@5$7$/$H$l$F$$$J$+$C$?$N$r(Bfix
- * musstrem$B$N(Bpipe open$B;~$O<B:]$K(Bpopen$B$;$:$K$=$ND>8e$N(Bseek$B$G(Bopen$B$5$;$k$h$&$K$7$?(B
- * midi.rawmidi.c$B$N(Bmidi$B%9%/%j%W%H=hM}$NHy=$@5(B
- * midi.rawmidi.c$B$G(Bmidi$B%9%/%j%W%H=hM}$G!"(Bjump$B;~$O(BALL ch NOTE off $B$r$$$l$k$h$&(B
-   $B$K$7$?!#(B($B%k!<%W$N;~$J$I$K2;$,;D$i$J$/$J$C$?(B)
+ * PCM合成でmono->stereoの変換が一部おかしかったのをfix(かえるにょ国のアリス
+   で効果音がおかしかった)
+ * cdrom.mp3|midi.extplayのpipeモードでstopが機能していなかったのをfix
+ * midi.extplayのpipeモードで演奏状態が正しくとれていなかったのをfix
+ * musstremのpipe open時は実際にpopenせずにその直後のseekでopenさせるようにした
+ * midi.rawmidi.cのmidiスクリプト処理の微修正
+ * midi.rawmidi.cでmidiスクリプト処理で、jump時はALL ch NOTE off をいれるよう
+   にした。(ループの時などに音が残らなくなった)
 
 pre3
- * System_tmpDir $BEy$N%0%m!<%P%kJQ?t$N:o=|(B
- * -devfont $B$N%G%P%$%9L>$G(B TrueTypeFont $B$O(B ttf $B$KE}0l(B(ft2$B$b$^$@;H$($^$9(B)
- * alk.[ch] $B$r(B modules/dDemo $B$+$i(B modules/lib $B$X0\F0(B
- * $B;D$C$F$$$?(B __FUNCTION__ $B$r(B __func__ $B$KCV$-49$((B
- * music_client.c: mus_pcm_stop()$B$G(B socket $B$NJD$8K:$l$G$,$"$C$?$N$r(Bfix
+ * System_tmpDir 等のグローバル変数の削除
+ * -devfont のデバイス名で TrueTypeFont は ttf に統一(ft2もまだ使えます)
+ * alk.[ch] を modules/dDemo から modules/lib へ移動
+ * 残っていた __FUNCTION__ を __func__ に置き換え
+ * music_client.c: mus_pcm_stop()で socket の閉じ忘れでがあったのをfix
    (by OKUMURA N. Shin-ya)
- * xcore_input.c: KeyPress|Release$B$N;~$N(BButtonMask$B=hM}$r$O$:$7!"$+$o$j$K(B
-   ButtonPress|Release$B;~$N(BRawKeyInfo$B$X@5$7$/H?1G$5$;$k$h$&$K$7$?(B
- * ShPort.{Set|Get}KeyStatus $B$K$h$k%-!<%^%C%W@Z$jBX$($KBP1~(B ($BBg0-;J$G1&%\%?%s(B
-   $B$r2!$9$H%a%C%;!<%8%9%-%C%W>uBV$K$J$C$F$$$?(B) (thanx by matuyama_takaaki)
- * PCM$B9g@.$G<~GH?tJQ49$,$J$/(BVol|bit|ch$BJQ99$,$"$k>l9g$N=hM}$,4V0c$C$F$$$?$N$r(Bfix
-   ($BBg0-;J$G%Q%$%W$K$h$k(BMP3$B:F@8$G%N%$%:$K$J$C$F$$$?(B)(thanx by matuyama_takaaki)
- * doc/TECH.TXT $B$K(B VA/ZK $B%3%^%s%I$N5-=R$rDI2C!#(B
+ * xcore_input.c: KeyPress|Releaseの時のButtonMask処理をはずし、かわりに
+   ButtonPress|Release時のRawKeyInfoへ正しく反映させるようにした
+ * ShPort.{Set|Get}KeyStatus によるキーマップ切り替えに対応 (大悪司で右ボタン
+   を押すとメッセージスキップ状態になっていた) (thanx by matuyama_takaaki)
+ * PCM合成で周波数変換がなくVol|bit|ch変更がある場合の処理が間違っていたのをfix
+   (大悪司でパイプによるMP3再生でノイズになっていた)(thanx by matuyama_takaaki)
+ * doc/TECH.TXT に VA/ZK コマンドの記述を追加。
 
 pre2
- * audio device file $B$N%G%U%)%k%H$N@_Dj$rJQ99(B
- * audio $B4X78$N(B popup $B%a%K%e!<$r:o=|(B
- * $B%7%J%j%*$N(B busy loop $B$rHr$1$k$?$a(B main loop $B$K(B usleep $B$rF~$l$F$_$k(B
- * __func__ $B$^$o$j$NJQ99(B (thanx by OKUMURA N. Shin-ya)
- * $B$$$/$D$+$N(B WARNING $B%a%C%;!<%8$NJQ99(B
- * DC $B%3%^%s%I$NG[NsJQ?t$N3NJ]J}K!$NJQ99!#(B($B%i%s%9#4$G0[>o$J5sF0$,$_$i$l$?(B)
+ * audio device file のデフォルトの設定を変更
+ * audio 関係の popup メニューを削除
+ * シナリオの busy loop を避けるため main loop に usleep を入れてみる
+ * __func__ まわりの変更 (thanx by OKUMURA N. Shin-ya)
+ * いくつかの WARNING メッセージの変更
+ * DC コマンドの配列変数の確保方法の変更。(ランス４で異常な挙動がみられた)
    (thanx by OKUMURA N. Shin-ya)
- * $B%^%&%9%+!<%=%k$N0\F0B.EY$N%G%U%)%k%H$rJQ99(B (100msec -> 50msec)
- * $B<B9T;~$K%U%)%s%H%G%P%$%9$rA*Br$G$-$k$h$&$K$7$?!#(B(X11$B$H(BFreeType$B$N@ZBX$(Ey(B)
- * $B%3%^%s%I%i%$%s$+$i%U%)%s%H%U%!%$%k$r;XDj$G$-$k$h$&$K$7$?!#(B
- * DC $B%3%^%s%I$NG[NsJQ?t3NJ]$G!"NN0h$r3HD%$7$?$H$-$K!"3HD%$7$?NN0h$b(B 0 $B$G(B
-   $B=i4|2=$9$k$h$&$K$7$?!#(B
+ * マウスカーソルの移動速度のデフォルトを変更 (100msec -> 50msec)
+ * 実行時にフォントデバイスを選択できるようにした。(X11とFreeTypeの切替え等)
+ * コマンドラインからフォントファイルを指定できるようにした。
+ * DC コマンドの配列変数確保で、領域を拡張したときに、拡張した領域も 0 で
+   初期化するようにした。
 
 pre1
- * music sever $B$N%$%Y%s%HBT$A$r(B select $B$+$i(B poll $B$KJQ99(B
- * mixer_esd $B$G(B level $B$,@5$7$/@_Dj$5$l$F$$$J$+$C$?$N$r(B fix
- * audio.c $B$G>r7o%3%s%Q%$%k$G(B ALSA $B$,A4$/%3%s%Q%$%k$5$l$F$$$J$+$C$?$N$r(B fix
- * alsa $B$N(B fragment size $B$NJQ99(B (8192->1536)
- * audio device $B$r%2!<%`Cf$O>o$K(B open $B$K$7$F$*$/$h$&$K$7$?(B
- * auido $B$N(B rate $BJQ49$G%P%C%U%!0n$l$,5/$-$F$$$?$N$r(B fix
+ * music sever のイベント待ちを select から poll に変更
+ * mixer_esd で level が正しく設定されていなかったのを fix
+ * audio.c で条件コンパイルで ALSA が全くコンパイルされていなかったのを fix
+ * alsa の fragment size の変更 (8192->1536)
+ * audio device をゲーム中は常に open にしておくようにした
+ * auido の rate 変換でバッファ溢れが起きていたのを fix
 
 
 Version 1.5.2 -> Version 1.5.3 (2002.09.01)
 
 final
  * fix some compile warning
- * Gpx.EffectCopy $B$N(B 11$BHV$N8z2L$rJQ99(B
- * cdrom.mp3 $B$G0z?t$NJ,2r$r(B basename $B$H(B strtok_r $B$G$*$3$J$&$h$&$K$7$?!#(B
+ * Gpx.EffectCopy の 11番の効果を変更
+ * cdrom.mp3 で引数の分解を basename と strtok_r でおこなうようにした。
    (by Tomoaki Mega)
  * fix ALSA09 'COMPILE'
 
 pre7
- * ShSound: wav*Memory $B$G(B load $B8e$O$9$0$K(Bdridata$B$r2rJ|(B
- * music_pcm|midi $B$G(B dridata $B$N2rJ|J}K!$,8E$$J}K!$@$C$?$N$r(B fix
- * PCM$B$N1iAUD9$5$r<hF@$9$kItJ,$G7e0n$l$,5/$-$F$$$?$N$r(B fix
-   (pipe play $B$,6J$N:G8e$^$G1iAU$5$l$F$$$J$+$C$?(B)
- * pipe play $B$G6J$N=*N;>uBV$,@5$7$/<h$l$F$$$J$+$C$?$N$r(B fix 
- * midi$B1iAU$G(Bstop$B$,#2EYB3$/$HMn$A$F$$$?$N$r(B fix
- * cdrom.mp3 $B$G1iAU;~4V$N7W;;$,4V0c$C$F$$$?$N$r(B fix
- * music server <-> client $B4V$N%Q%1%C%H%9%H!<%`2sHr$N$?$a$K(B usleep $B$r$$$l$?(B
- * $B%9%Z!<%9$r4^$`%U%!%$%kL>$r(Bcdrom.mp3$B$N(Bpipe$B%b!<%I$GEO$7$?$H$-$KF0$+$J$+$C$?(B
-   $B$N$r(B fix
+ * ShSound: wav*Memory で load 後はすぐにdridataを解放
+ * music_pcm|midi で dridata の解放方法が古い方法だったのを fix
+ * PCMの演奏長さを取得する部分で桁溢れが起きていたのを fix
+   (pipe play が曲の最後まで演奏されていなかった)
+ * pipe play で曲の終了状態が正しく取れていなかったのを fix 
+ * midi演奏でstopが２度続くと落ちていたのを fix
+ * cdrom.mp3 で演奏時間の計算が間違っていたのを fix
+ * music server <-> client 間のパケットストーム回避のために usleep をいれた
+ * スペースを含むファイル名をcdrom.mp3のpipeモードで渡したときに動かなかった
+   のを fix
 	
 pre6
- * mus_wav_* $B$G(B ch $B$NHO0O%A%'%C%/$r$$$l$?(B
- * volume $B$N@_Dj$G5/F0;~$N(Blevel$B$r(B100%$B$H$9$k$h$&$K$7$?(B
- * pcmlib $B$r(B xsystem35 $B%3%";HMQIt$H(B ShSound $B;HMQIt$KJ,N%$7$?(B
- * ShSound: wav*Memory $B$N%G!<%?$N07$$J}$rJQ99$7$?(B
+ * mus_wav_* で ch の範囲チェックをいれた
+ * volume の設定で起動時のlevelを100%とするようにした
+ * pcmlib を xsystem35 コア使用部と ShSound 使用部に分離した
+ * ShSound: wav*Memory のデータの扱い方を変更した
  * ShSound: add wavFadeVolume command
- * mus_wav_unload $B$H(B mus_wav_stop $B$G(B ch$B>pJs$,@5$7$/Aw$l$F$$$J$+$C$?$N$r(B fix
-   ($B%j%/%k%9Ey$G8z2L2;$,$J$j$C$Q$J$7$K$J$C$F$$$?(B)
- * audio_write $B$G(B 0$B%P%$%H$N(B write $B$OL5;k$9$k$h$&$K$7$?!#(B
+ * mus_wav_unload と mus_wav_stop で ch情報が正しく送れていなかったのを fix
+   (リクルス等で効果音がなりっぱなしになっていた)
+ * audio_write で 0バイトの write は無視するようにした。
 
 pre5
- * $B%j%/%k%9$G!"%8%g!<$K:G=*1|5A$rEA<x$5$l$k;~$N8z2L$GMn$A$k$N$r(B fix
+ * リクルスで、ジョーに最終奥義を伝授される時の効果で落ちるのを fix
    (by matuyama_takaaki)
- * ShCalc: BitToNum$B$,@5$7$/F0$$$F$$$J$+$C$?$N$r(B fix
-   $BBg0-;J$G%-%c%i$NB0@-$N%^!<%/$,=P$F$$$J$+$C$?!#(B(thanx by matuyama_takaaki)
- * mixer_oss.c: level$B$N:GBgCM$N(B clipping $B$N4V0c$$$r(B fix
- * $B0[>o=*N;;~$K;D$C$?(B sockt file $B$r:o=|$9$k$h$&$K$7$?(B
+ * ShCalc: BitToNumが正しく動いていなかったのを fix
+   大悪司でキャラの属性のマークが出ていなかった。(thanx by matuyama_takaaki)
+ * mixer_oss.c: levelの最大値の clipping の間違いを fix
+ * 異常終了時に残った sockt file を削除するようにした
  * add alsa for new music subsystem
  * update macro/alsa.m4
- * mus_wav_waitend $B$G:F@8$7$F$$$J$$$H$-$O$9$0$K(Back$B$rJV$9$h$&$K$7$?!#(B
+ * mus_wav_waitend で再生していないときはすぐにackを返すようにした。
 
 pre4
- * dri.c: $B%U%!%$%k?t$N8+@Q$b$j%P%0$GNN0h30$N%a%b%j$r;2>H$7$F$$$?$N$r(B fix
- * version 1.5 $B7OMQ$K(B xsystem35.spec.in $B$r=$@5(B
- * gcc $B0J30$N%3%s%Q%$%iBP:v(B (-Wall, __FUNCTION__)
- * linux $B$K$*$1$k(B endian $B7hDj$NJ}K!$NJQ99(B
- * ShString: $BJ8;zNs$NCV49$GJ#?t$NJ8;zNs$r@5$7$/CV$-49$($i$l$F$$$J$+$C$?$N$r(Bfix
-   $BBg0-;J$G$*$+$7$JL>A0$N%-%c%i$,=P8=$9$k!#(B(by matuyama_takaaki)
+ * dri.c: ファイル数の見積もりバグで領域外のメモリを参照していたのを fix
+ * version 1.5 系用に xsystem35.spec.in を修正
+ * gcc 以外のコンパイラ対策 (-Wall, __FUNCTION__)
+ * linux における endian 決定の方法の変更
+ * ShString: 文字列の置換で複数の文字列を正しく置き換えられていなかったのをfix
+   大悪司でおかしな名前のキャラが出現する。(by matuyama_takaaki)
  * ShArray: typo fix
- * ShArray: GrepHighOrderArray $B$G:G>.CM$N07$$$,4V0c$C$F$$$?$N$r(B fix
-   $BBg0-;J$GBNNO=g$KJB$Y$k$H%-%c%i$,>C$($?!#(B(thanx by matuyama_takaaki)
+ * ShArray: GrepHighOrderArray で最小値の扱いが間違っていたのを fix
+   大悪司で体力順に並べるとキャラが消えた。(thanx by matuyama_takaaki)
  * rewrite music subsystem 
 
 pre3
- * .xsys35rc $B$N@_Dj$G(BTrueTypeFont$B$N(B face $B$rA*Br$G$-$k$h$&$K$7$?!#(B
- * MMX alphablend $B$G0lIt$*$+$7$+$C$?$N$r(B fix (SeeIn$B@D$N%*!<%W%K%s%0(B)
- * 24$B%S%C%H%+%i!<$G$$$/$D$+$*$+$7$$$H$3$m$,$"$C$?$N$r(B fix
-   ($B%j%/%k%9$G@oF.%7!<%s$G967b$,Ev$?$C$?;~$N8z2L$G0l=V?'$,Mp$l$k(B)
-   ($BBg0-;J$N@oF.%7!<%s%"%K%a!<%7%g%s$G?'$,H4$1$J$$(B)
- * Gpx.BrightDestOnly+MMX$B$GL@$k$5;XDj$,$*$+$7$+$C$?$N$r(B fix
-   ($B%j%/%k%9$N(BCG$B%b!<%I$GHsA*Br(BCG$B$,0E$/$J$i$J$$(B)
- * dataGetWORD $B$,(B BigEndian $B%^%7%s$G@5$7$/$J$+$C$?$N$r(B fix
- * add cdGetMaxTrack command ($BBg0-;J$N%7%J%j%*%P!<%8%g%s(B 1.05 $B$GLdBj$,$G$F$$$?(B)
- * F $B%3%^%s%I$r(B data* $B%3%^%s%I7O$K9g$o$;$F=q$-D>$7$?(B
+ * .xsys35rc の設定でTrueTypeFontの face を選択できるようにした。
+ * MMX alphablend で一部おかしかったのを fix (SeeIn青のオープニング)
+ * 24ビットカラーでいくつかおかしいところがあったのを fix
+   (リクルスで戦闘シーンで攻撃が当たった時の効果で一瞬色が乱れる)
+   (大悪司の戦闘シーンアニメーションで色が抜けない)
+ * Gpx.BrightDestOnly+MMXで明るさ指定がおかしかったのを fix
+   (リクルスのCGモードで非選択CGが暗くならない)
+ * dataGetWORD が BigEndian マシンで正しくなかったのを fix
+ * add cdGetMaxTrack command (大悪司のシナリオバージョン 1.05 で問題がでていた)
+ * F コマンドを data* コマンド系に合わせて書き直した
 
 pre2
- * image.c: image_putRegion $B$KHO0O%A%'%C%/$r$$$l$?(B
- * message.c: $B8=:_;HMQCf$N%a%C%;!<%8(BWindow$B>pJs$K4X$7$FB`Hr>pJs$,@5$7$/H?1G(B
-   $B$5$l$F$$$J$+$C$?$N$r(B fix ($B%G%#%"%\%j%+$G(Bsegv$B$C$F$$$?(B)
- * sel/msg: $B%&%#%s%I>pJs$K4X$9$k<h07J}K!$rJQ99(B
+ * image.c: image_putRegion に範囲チェックをいれた
+ * message.c: 現在使用中のメッセージWindow情報に関して退避情報が正しく反映
+   されていなかったのを fix (ディアボリカでsegvっていた)
+ * sel/msg: ウィンド情報に関する取扱方法を変更
  * cmd2F.c: add data* command 
- * cmd2F.c: add fnc{Set,Get}ReturnCode command $B$H4X?tJV$jCM$N07$$J}$NJQ99(B
+ * cmd2F.c: add fnc{Set,Get}ReturnCode command と関数返り値の扱い方の変更
  * cmd2F.c: add varGetNumof command
 
 pre1
- * midi.extplay $B$G(B SIGSTP $B$G;_$^$C$F$$$k$H$-$K(Bmidi_stop$B$,8F$P$l$?;~$N=hM}$r(B
-   $BJQ99!#(B(by OKUMURA N. Shin-ya)
- * macro/pkg.m4 $B$,F~$C$F$$$J$+$C$?$N$r(B fix
+ * midi.extplay で SIGSTP で止まっているときにmidi_stopが呼ばれた時の処理を
+   変更。(by OKUMURA N. Shin-ya)
+ * macro/pkg.m4 が入っていなかったのを fix
  * newer missing
- * configure.ac: default audio mode $B$N%(%i!<$r(B fix
- * font_freetype2.c $B$G%U%)%s%HKh$K%(%s%3!<%I$,0c$&>l9g$K$*$+$7$+$C$?$N$r(B fix
- * font_freetype2.c $B$G%U%)%s%H$N%(%s%3!<%IJ}<0$r<hF@$9$kJ}K!$rJQ99(B
- * font_freetype2.c $B$G:n6HNN0h$X$NIA2hHO0O$N%A%'%C%/$r$$$l$?(B
- * xcore_maskupdate.c $B$G8^gj@1(B,$BO;gj@1$O#22sE>$G$O$J$/!"H>2sE>$K$7$?(B
+ * configure.ac: default audio mode のエラーを fix
+ * font_freetype2.c でフォント毎にエンコードが違う場合におかしかったのを fix
+ * font_freetype2.c でフォントのエンコード方式を取得する方法を変更
+ * font_freetype2.c で作業領域への描画範囲のチェックをいれた
+ * xcore_maskupdate.c で五芒星,六芒星は２回転ではなく、半回転にした
 	
 
 Version 1.5.1 -> Version 1.5.2 (2002.04.30)
 
 final
- * automake $B4XO"$N(B cleanup
- * CDROM_LINUX $BEy$r(B ENABLE_CDROM_LINUX $B$XJQ99(B
- * struct _message $B$,Dj5A$:$_$N4D6-$,$"$C$?$N$G(B __message $B$KJQ99(B
+ * automake 関連の cleanup
+ * CDROM_LINUX 等を ENABLE_CDROM_LINUX へ変更
+ * struct _message が定義ずみの環境があったので __message に変更
 
 pre5
- * oDEMO $B%G%#%l%/%H%j$r(B commit $B$7K:$l$?(B
+ * oDEMO ディレクトリを commit し忘れた
 
 pre4
- * font_freetype2.c $B$G%"%s%A%(%j%"%9(BOFF$B;~$d>.$5$$%U%)%s%H%5%$%:$GKd$a9~$_%S%C%H(B
-   $B%^%C%W%U%)%s%H$,$"$k>l9g$O$=$A$i$r;H$&$h$&$K$7$?!#(B(by TAJIRI Yasuhiro)
- * gtk-1.3$B7O$X$NBP1~(B(by Fumihiko Murata)
- * $B%;!<%V%U%!%$%k$N%P%C%/%"%C%W$r:n@.$9$k$H$-$K!"%P%C%/%"%C%W85$,6u$N>l9g$K(B
-   $B$*$+$7$+$C$?$N$r(B fix (by Fumihiko Murata)
- * SDL HAVE_SDLRALPHA $B4X78(B clean up (by Fumihiko Murata)
- * $B%j%/%k%9$N%W%m%m!<%0$GN.9kE4$K>!$D$H%2!<%`$,Mn$k$N$r(B fix
+ * font_freetype2.c でアンチエリアスOFF時や小さいフォントサイズで埋め込みビット
+   マップフォントがある場合はそちらを使うようにした。(by TAJIRI Yasuhiro)
+ * gtk-1.3系への対応(by Fumihiko Murata)
+ * セーブファイルのバックアップを作成するときに、バックアップ元が空の場合に
+   おかしかったのを fix (by Fumihiko Murata)
+ * SDL HAVE_SDLRALPHA 関係 clean up (by Fumihiko Murata)
+ * リクルスのプロローグで流豪鉄に勝つとゲームが落るのを fix
    (by matuyama_takaaki)
- * JIS0213 $B%(%s%3!<%IJ}<0$N(B TrueType Font $B$KBP1~!#(B(by TAJIRI Yasuhiro)
- * TrueType Font $B$N%(%s%3!<%IJ}<0Kh$N@ZBX$(J}<0$rJQ99(B
+ * JIS0213 エンコード方式の TrueType Font に対応。(by TAJIRI Yasuhiro)
+ * TrueType Font のエンコード方式毎の切替え方式を変更
  * add empty oDEMO.dll
- * Gpx.dll: surface $B$r0lEY$b:n$i$J$$$&$A$K(B find_null_surface $B$r8F$V$HM=Ls$7$F(B
-   $B$"$C$?(B surface0 $B$rJV$7$F$7$^$C$F$$$?$N$r(B fix
- * $BF.?@ET;T#2$G(B CD-DA $B$N6J$,@Z$jBX$o$i$J$$$N$r(B fix (by OKUMURA N. Shin-ya)
- * OSS $B$G%5%&%s%I$,8G$^$k$N$r(B fix (by OKUMURA N. Shin-ya)
- * ShSound.dll: $B0lIt$N4X?t$rDI2C(B
+ * Gpx.dll: surface を一度も作らないうちに find_null_surface を呼ぶと予約して
+   あった surface0 を返してしまっていたのを fix
+ * 闘神都市２で CD-DA の曲が切り替わらないのを fix (by OKUMURA N. Shin-ya)
+ * OSS でサウンドが固まるのを fix (by OKUMURA N. Shin-ya)
+ * ShSound.dll: 一部の関数を追加
  * Gpx.dll: misc clean
 
 pre3
  * add ShArray.ChangeEquArray command
- * Gpx.LoadCG$B$G(B PMS8 $B$rFI$_9~$s$@;~$O&ANN0h$KE83+$9$k$h$&$K$7$?(B
- * xcore_setForeground $B$G%Q%l%C%HHV9f$,JQ2=$;$:!"%Q%l%C%H$NCf?H$,JQ2=$7$?$H$-$K(B
-   $B8E$$?'$GEI$i$l$F$$$?$N$r(B fix
- * ShGraph.dll: $B%Q%i%a!<%?$N2r<a$,$$$/$D$+0c$C$F$$$?$N$r(B fix
- * msg_init() $B$,8F$P$l$F$$$J$+$C$?$?$a!"3F<o=i4|@_Dj$,$5$l$F$$$J$+$C$?$N$r(B fix
+ * Gpx.LoadCGで PMS8 を読み込んだ時はα領域に展開するようにした
+ * xcore_setForeground でパレット番号が変化せず、パレットの中身が変化したときに
+   古い色で塗られていたのを fix
+ * ShGraph.dll: パラメータの解釈がいくつか違っていたのを fix
+ * msg_init() が呼ばれていなかったため、各種初期設定がされていなかったのを fix
 
 pre2
- * ComImage -> agsurface_t $B$KL>A0$H0lIt%a%s%P$rJQ99(B
- * pre1 $B$G$N(B alpha plane $B$NJQ99$K(B SDL $B$,0lItDI=>$G$-$F$$$J$+$C$?$N$r(B fix
- * -noantialias $B%*%W%7%g%s$r$D$1$?!#(B
- * ags.c: region check $B$G(B width,height $B$,(B 0 $B0J2<$K$J$C$?$H$-$N=hM}$rDI2C(B
- * alpha blend $B$N(B MMX $BBP1~$,$A$c$s$HF0$$$F$$$J$+$C$?$N$r(B fix
- * ShGraph.dll: $B%"%K%a!<%7%g%s4XO"$N4X?tDI2C(B
- * menuReduce $B$G;XDj$5$l$??t$h$j$b<B:]$KEPO?$5$l$F$$$kA*Br;h$,>/$J$$>l9g$K(B
-   $B$*$+$7$+$C$?$N$r(B fix
+ * ComImage -> agsurface_t に名前と一部メンバを変更
+ * pre1 での alpha plane の変更に SDL が一部追従できていなかったのを fix
+ * -noantialias オプションをつけた。
+ * ags.c: region check で width,height が 0 以下になったときの処理を追加
+ * alpha blend の MMX 対応がちゃんと動いていなかったのを fix
+ * ShGraph.dll: アニメーション関連の関数追加
+ * menuReduce で指定された数よりも実際に登録されている選択肢が少ない場合に
+   おかしかったのを fix
 
 pre1
- * SJIS->UNICODE$BJQ49%F!<%V%k$K(BIBM$B3HD%4A;z$N9`$,L5$+$C$?$?$a!"(Bunicode $B%^%C%W$N(B
-   TrueType font $B$G(BIBM$B3HD%4A;z$,I=<($G$-$J$+$C$?$N$r(B fix (by TAJIRI Yasuhiro)
- * MZ0 $B%3%^%s%I$GJ8;zNsD9$5$,(B 0 ($B!g!)(B)$B$N>l9g$KBP1~(B
- * ShCalc.dll, ShArray.dll, ShString.dll, Gpx.dll $B$N4X?t$N$&$A!"Bg0-;J$G(B
-   $B;H$o$l$F$$$k$b$N$NDI2C!#(B
- * font_freetype2.c $B$N%U%)%s%H$N%Y!<%9%i%$%s$r$=$m$($k$h$&$K$7$?!#(B
- * $B%a%$%s2>A[2hLL(B(GetDIB()$B$G$H$l$k$b$N(B)$B$N(B alplha plane $B$rE}9g$7$F2>A[2hLL$N(B
-   $BG[2<$K$7$?!#(B
- * Gpx.dll: $BFI$_9~$s$@(B CG $B$K(B alpha $B>pJs$,L5$$>l9g$O!"(B0 $B%/%j%"$5$l$?(B alpha plane
-   $B$rJV$9$h$&$K$7$?!#(B
+ * SJIS->UNICODE変換テーブルにIBM拡張漢字の項が無かったため、unicode マップの
+   TrueType font でIBM拡張漢字が表示できなかったのを fix (by TAJIRI Yasuhiro)
+ * MZ0 コマンドで文字列長さが 0 (∞？)の場合に対応
+ * ShCalc.dll, ShArray.dll, ShString.dll, Gpx.dll の関数のうち、大悪司で
+   使われているものの追加。
+ * font_freetype2.c のフォントのベースラインをそろえるようにした。
+ * メイン仮想画面(GetDIB()でとれるもの)の alplha plane を統合して仮想画面の
+   配下にした。
+ * Gpx.dll: 読み込んだ CG に alpha 情報が無い場合は、0 クリアされた alpha plane
+   を返すようにした。
  * add menuReduce, menuGetNumof, menuGetText, menuGoto, menuReturnGoto command
- * selection.c, message.c $B$N%0%m!<%P%kJQ?t$r(B nact $B9=B$BN$N2<$X(B
+ * selection.c, message.c のグローバル変数を nact 構造体の下へ
 
 
 Version 1.5.0 -> Version 1.5.1 (2001.11.30)
 
 final
- * RandMT.dll($B2&;R$5$^(Blv1)$B$KBP1~(B
- * .gr$B%U%!%$%k$,L5$$>l9g$K(B *RA.ALD $B$bC5$9$h$&$K$7$?!#(B
- * libtool$B$N4XO"$G(Bmodule$B$,%3%s%Q%$%k$G$-$J$$$N$r(B fix
- * qnt.c $B$GE83+%P%C%U%!ITB-$N$?$a(B zlib $B$NE83+$K<:GT$7$F$$$?$N$r(B fix
- * $BBg0-;J$N(B DLL $B$N%(%s%H%j$rDI2C(B
- * QNT format version 1 $B$KBP1~(B
+ * RandMT.dll(王子さまlv1)に対応
+ * .grファイルが無い場合に *RA.ALD も探すようにした。
+ * libtoolの関連でmoduleがコンパイルできないのを fix
+ * qnt.c で展開バッファ不足のため zlib の展開に失敗していたのを fix
+ * 大悪司の DLL のエントリを追加
+ * QNT format version 1 に対応
  * update doc/TECH.TXT
  * update doc/README.music
 	
 pre4
- * pre2$B$G$$$l$?(B sysVar $B$N:GBgCM$NJQ99$G$3$l$^$G$N%;!<%V%G!<%?$,FI$a$J$/(B
-   $B$J$C$F$$$?$N$r(B fix
- * G$B%3%^%s%I$G%U%!%$%k$,B8:_$7$J$$>l9g!"(BJ$B%3%^%s%I$N@_Dj$r99?7$7$F$$$J$+$C$?(B
-   $B$N$r(Bfix($B54C\2&$NLB5\C58!$GE($N(BCG$B$NItJ,$,$*$+$7$+$C$?(B)
- * SDL $B%U%k%9%/%j!<%s;~$K2hA|$NI=<(NN0h$,$+$o$k$H$*$+$7$+$C$?$N$r(Bfix
-   ($B%G%#%"%\%j%+$N(BBAD-END$B$G:F8=(B)
+ * pre2でいれた sysVar の最大値の変更でこれまでのセーブデータが読めなく
+   なっていたのを fix
+ * Gコマンドでファイルが存在しない場合、Jコマンドの設定を更新していなかった
+   のをfix(鬼畜王の迷宮探検で敵のCGの部分がおかしかった)
+ * SDL フルスクリーン時に画像の表示領域がかわるとおかしかったのをfix
+   (ディアボリカのBAD-ENDで再現)
  * update doc/TECH.TXT
- * system39.ain $B$X$N%a%C%;!<%8Kd$a9~$_$X$NBP1~(B
+ * system39.ain へのメッセージ埋め込みへの対応
  * add patchEC, patchENEM command
- * $B$+$($k$K$g9q$K$g%"%j%9$GA*Br%&%#%s%I$NA*Br;h$,8+$($K$/$$$N$r2~A1(B
+ * かえるにょ国にょアリスで選択ウィンドの選択肢が見えにくいのを改善
  * add Gpx.EffectCopy{7,11,12,13} command
  * add WZ 1,e command
 
 pre3
- * libtool-1.4 $B0J30$,%$%s%9%H!<%k$5$l$F$$$J$$$H%3%s%Q%$%k$G$-$J$+$C$?$N$r(B fix
+ * libtool-1.4 以外がインストールされていないとコンパイルできなかったのを fix
  * newer config.sub/guess
- * gexttext(0.10.39) automake(1.4p5), autoconf(2.52) $B$K$=$l$>$l(B up
- * .gr $B%U%!%$%k$,$J$$>l9g$K<+F0E*$K@8@.$9$k%;!<%V%U%!%$%k$r(B 26 $B8D$K(B
- * $B!V(BOnly You $B%j%/%k%9!W(B Math.dll $B$KBP1~(B
- * $B!V(BOnly You $B%j%/%k%9!W(B Gpx.dll $B$N4X?t$rDI2C<BAu(B
+ * gexttext(0.10.39) automake(1.4p5), autoconf(2.52) にそれぞれ up
+ * .gr ファイルがない場合に自動的に生成するセーブファイルを 26 個に
+ * 「Only You リクルス」 Math.dll に対応
+ * 「Only You リクルス」 Gpx.dll の関数を追加実装
 
 pre2
- * ProStudent-Good $B$N%*!<%W%K%s%0$G0l=V?'$,$*$+$7$/$J$k$N$r(B fix (xcore)
- * ProStudent-Good $B$N%*!<%W%K%s%0$G?'$,$*$+$7$/$J$k$N$r(B fix (sdl)
- * $B%;!<%V%G!<%?$rJ]B8$9$k$H$-!"%P%C%/%"%C%W%U%!%$%k$r$D$/$k$h$&$K$7$?!#(B
- * LL command $B$G%G!<%?$NFI$_9~$_$K<:GT$9$k$H0[>o=*N;$7$F$$$?$N$r(B fix
+ * ProStudent-Good のオープニングで一瞬色がおかしくなるのを fix (xcore)
+ * ProStudent-Good のオープニングで色がおかしくなるのを fix (sdl)
+ * セーブデータを保存するとき、バックアップファイルをつくるようにした。
+ * LL command でデータの読み込みに失敗すると異常終了していたのを fix
  * add PT2 command
  * add FAQ about gmake
- * $BL488K"1F$G:G=i$KMn$A$k$N$r(B fix (QD 0: $B$H$$$&%3%^%s%I$,$"$C$?(B)
- * Q/L command $B$G(B $BB8:_$7$J$$%U%!%$%k$N%A%'%C%/9T$&$h$&$K$7$?!#(B
- * $B$Q$9$F$k%A%c%$%`!"%7%J%j%*%Q%C%A$N%I%-%e%a%s%H$N=$@5$HDI2C!#(B
- * gettext $B$,%$%s%9%H!<%k$5$l$F$$$J$/$F$b(B build $B$G$-$k$h$&$K$7$?!#(B
- * QNT cg format $B$KBP1~(B
- * $B!V(BOnly You $B%j%/%k%9!W$N(BDLL$B$K0lItBP1~(B
+ * 夢幻泡影で最初に落ちるのを fix (QD 0: というコマンドがあった)
+ * Q/L command で 存在しないファイルのチェック行うようにした。
+ * ぱすてるチャイム、シナリオパッチのドキュメントの修正と追加。
+ * gettext がインストールされていなくても build できるようにした。
+ * QNT cg format に対応
+ * 「Only You リクルス」のDLLに一部対応
 
 pre1
- * system39.ain $B$r%+%l%s%H%G%#%l%/%H%j$+$i$bC5$9$h$&$K$7$?(B
- * $BLk$N(BDLL$B$N%(%s%H%j!<$@$1DI2C(B
- * Darcrows $BEy$G%a%C%;!<%8$N2~9T$,0lIt$*$+$7$+$C$?$N$r(B fix
- * FreeBSD $BEy$G(B libintl.h $B$,E,@Z$K(B include $B$G$-$F$$$J$+$C$?$N$r(B fix
+ * system39.ain をカレントディレクトリからも探すようにした
+ * 夜のDLLのエントリーだけ追加
+ * Darcrows 等でメッセージの改行が一部おかしかったのを fix
+ * FreeBSD 等で libintl.h が適切に include できていなかったのを fix
    (by Tamura Toshimichi)
- * WV$B%3%^%s%I$G(B x/y $B$N$_$,JQ2=$7$?;~0[>oF0:n$7$F$$$?$N$r(B fix
-   ($B$+$($k$K$g$Q$K$g$s(B etc)
- * CE $B%3%^%s%I$GIA2h@h$,(B view area $B$N30$N>l9g$K0[>oF0:n$7$F$$$?$N$r(B fix
-   ($B$+$($k$K$g$Q$K$g$s(B/ProStudent-Good etc)
- * $BNw2AHG$+$($k$K$g$Q$K$g$s$G!"(BPCM$B1iAU$,(Bloop$B$7$F$7$^$&$N$r(B fix
+ * WVコマンドで x/y のみが変化した時異常動作していたのを fix
+   (かえるにょぱにょん etc)
+ * CE コマンドで描画先が view area の外の場合に異常動作していたのを fix
+   (かえるにょぱにょん/ProStudent-Good etc)
+ * 廉価版かえるにょぱにょんで、PCM演奏がloopしてしまうのを fix
    (by TAJIRI Yasuhiro)
- * DLL $B$NFI$_9~$_%Q%98uJd$r$$$/$D$+DI2C(B
+ * DLL の読み込みパス候補をいくつか追加
 
 
 Version 1.4.0 -> Version 1.5.0 (2001.05.09)
 
- * $B%7!<%s@D$N2;3Z4U>^$J$I$G2hLL99?7$,0lIt$*$+$7$+$C$?$N$r(B fix (xcore/sdl)
- * $B%i%s%9#4$G!"0lIt$N(BCG$B$N?'$,$*$+$7$/$J$k$N$r(B fix (By matuyama_takaaki)
- * $B!V$+$($k$K$g9q$K$g%"%j%9!W$N(B DLL $B$KBP1~(B
+ * シーン青の音楽鑑賞などで画面更新が一部おかしかったのを fix (xcore/sdl)
+ * ランス４で、一部のCGの色がおかしくなるのを fix (By matuyama_takaaki)
+ * 「かえるにょ国にょアリス」の DLL に対応
 
 
 Version 1.3.4 -> Version 1.4.0 (2001.05.01)
 
 final
- * --disable-debug $B$N;~0U?^DL$jF0$$$F$$$J$+$C$?$N$r(B fix
- * cdrom.Linux.c $B$N(B LinuxPPC workaround $B$,$*$+$7$$$+$C$?$N$r(B fix
- * -antialias $B%*%W%7%g%s$r$D$1$?(B
- * Rance4 $B$N%-!<%&%(%$%HD4@0(B
+ * --disable-debug の時意図通り動いていなかったのを fix
+ * cdrom.Linux.c の LinuxPPC workaround がおかしいかったのを fix
+ * -antialias オプションをつけた
+ * Rance4 のキーウエイト調整
 	
 pre5
- * command2F60 $B4X78$r(B remove
- * $B!VME@:(B(AliceCD 2.02)$B!W$G1&%/%j%C%/%a%K%e!<$rJD$8$?$"$H0[>o=*N;$7$F$$$?(B
-   $B$N$r(B fix
- * $B%a%C%;!<%8$NJ8;z$NBg$-$5$r:GBg(B100$B%I%C%H$K@)8B!#(B
+ * command2F60 関係を remove
+ * 「妖精(AliceCD 2.02)」で右クリックメニューを閉じたあと異常終了していた
+   のを fix
+ * メッセージの文字の大きさを最大100ドットに制限。
  * add grBlt command
 
 pre4
- * SDL + joystick $B$N;~%3%s%Q%$%k$G$-$J$+$C$?$N$r(B fix (By matuyama_takaaki)
- * $BJ8;zNsF~NO(B Window $BEy$NI=<(;~$NF0:n2~A1(B
- * F1$B%-!<(B $B$G%a%C%;!<%8%9%-%C%W!"(BF4$B%-!<$G(B Fullscreen <-> Window $BI=<($N9T$-Mh(B
-   $B$r=PMh$k$h$&$K$7$?!#(B
+ * SDL + joystick の時コンパイルできなかったのを fix (By matuyama_takaaki)
+ * 文字列入力 Window 等の表示時の動作改善
+ * F1キー でメッセージスキップ、F4キーで Fullscreen <-> Window 表示の行き来
+   を出来るようにした。
 
 pre3
- * .gr $B%U%!%$%k$K6uGr9T$r4^$s$G$b6/@)=*N;$7$J$$$h$&$K$7$?!#(B
- * $B%a%K%e!<$+$i(B cd/midi/pcm $B$rL58z2=$7$?$H$-!"LD$C$F$$$l$P;_$a$k$h$&$K$7$?!#(B
- * CE36-38 command $B$G2hLL99?7$,0lIt$*$+$7$+$C$?$N$r(B fix
- * CD44-47,50-52 command $B$G2hLL99?7$,0lIt$*$+$7$+$C$?$N$r(B fix
- * PMS8 $B$G$O%Q%l%C%H$N(B 250-255 $B$rE>Aw$7$J$$$h$&$K$7$?!#(B
- * savedata $B$N3JG<(B path $B$,IT@5$J;~$K0[>o=*N;$9$k$N$r(B fix
- * $BJQ?t$X$NBeF~$G(B NULL ($BHO0O30(B) $B$N>l9g!"BeF~$7$J$$$h$&$K$7$?!#(B
- * $BBg$-$$%5%$%:(B(96)$B$N%U%)%s%H$rFI$_9~$`;~$K%P%C%U%!0n$l$r5/$3$7$F$$$?$N$r(B fix
- * $BFC$KBg$-$5%5%$%:$N%U%)%s%H$GJ8;z$N2<$,@Z$l$F$7$^$C$F$$$?$N$r(B fix 
+ * .gr ファイルに空白行を含んでも強制終了しないようにした。
+ * メニューから cd/midi/pcm を無効化したとき、鳴っていれば止めるようにした。
+ * CE36-38 command で画面更新が一部おかしかったのを fix
+ * CD44-47,50-52 command で画面更新が一部おかしかったのを fix
+ * PMS8 ではパレットの 250-255 を転送しないようにした。
+ * savedata の格納 path が不正な時に異常終了するのを fix
+ * 変数への代入で NULL (範囲外) の場合、代入しないようにした。
+ * 大きいサイズ(96)のフォントを読み込む時にバッファ溢れを起こしていたのを fix
+ * 特に大きさサイズのフォントで文字の下が切れてしまっていたのを fix 
    (font_freetype2.c)
 
 pre2
- * configure $B$,(B {freetype-prefix}/freetype.h $B$rH/8+=PMh$J$+$C$?$N$r(B fix
- * Txx $B%3%^%s%I$G%9%?%C%/$K@Q$`%5%$%:$,$*$+$7$+$C$?$N$r(B fix
- * Txx $B%3%^%s%I$GA*Br;h%&%#%s%I$N?'$H%5%$%:$rJ]B8$7$F$$$J$+$C$?$N$r(B fix
+ * configure が {freetype-prefix}/freetype.h を発見出来なかったのを fix
+ * Txx コマンドでスタックに積むサイズがおかしかったのを fix
+ * Txx コマンドで選択肢ウィンドの色とサイズを保存していなかったのを fix
  * add strMessageBox command
- * $B%b%N%/%m%+!<%=%k0J30$OFI$_9~$^$J$$$h$&$K$7$?!#(B
+ * モノクロカーソル以外は読み込まないようにした。
 
 pre1
- * $B%F%s%]%i%j%G%#%l%/%H%j$K4X$9$k(B Warning $B$r:o=|(B
- * gettext $B2=(B ($B%a%K%e!<$N$_(B)
- * spec $B%U%!%$%k$N(B cleanup
- * AFMT_S16_NE $B$,Dj5A$5$l$F$$$J$$>l9g%3%s%Q%$%k=PMh$J$+$C$?$N$r(B fix
- * .xsys35rc $B$G%U%)%s%HL>$,@_Dj$5$l$F$$$J$$>l9g!"(Bsegv. $B$C$F$$$?$N$r(B fix
- * SQ $B%3%^%s%I$G(B 16bit $B$N(B wav $B$,(B mix $B$G$-$F$$$J$+$C$?$N$r(B fix
- * $B2&F;M&<T$G%*!<%W%K%s%0$,Mp$l$k$r(B fix
- * ald_getdata $B$G%a%b%j%j!<%/$7$F$$$?$N$r(B fix
- * $BB8:_$7$J$$%U%!%$%k$rFI$_9~$b$&$H$7$FMn$A$F$$$?$N$r(B fix
- * system35 $B$N%9%?%C%/$+$iDL>oJQ?t$r(B POP $B$9$k$H$-!"IT@5$J%"%I%l%9$r;2>H(B
-   $B$7$F$$$?$N$r(B fix
+ * テンポラリディレクトリに関する Warning を削除
+ * gettext 化 (メニューのみ)
+ * spec ファイルの cleanup
+ * AFMT_S16_NE が定義されていない場合コンパイル出来なかったのを fix
+ * .xsys35rc でフォント名が設定されていない場合、segv. っていたのを fix
+ * SQ コマンドで 16bit の wav が mix できていなかったのを fix
+ * 王道勇者でオープニングが乱れるを fix
+ * ald_getdata でメモリリークしていたのを fix
+ * 存在しないファイルを読み込もうとして落ちていたのを fix
+ * system35 のスタックから通常変数を POP するとき、不正なアドレスを参照
+   していたのを fix
 
 
 Version 1.3.3 -> Version 1.3.4 (2001.04.01)
 
 final
- * $B%a%C%;!<%8$N:G8e$,(B `\0` $B$G=*$C$F$$$k$HMn$A$F$$$?$N$r(B fix
- * snprintf $B$r(B g_snprintf $B$X(B
- * DigitalUNIX/Irix$BEy(B $B$G?'$,$*$+$7$+$C$?$N$r(B fix
- * cdrom.Irix.c $B$,%3%s%Q%$%k=PMh$J$+$C$?$N$r(B fix
- * freetype library $B$,%$%s%9%H!<%k$5$l$F$$$k>l=j$r(B configure  
-    --with-freetpe-prefix=PFX $B$G;XDj$G$-$k$h$&$K$7$?!#(B
- * --disable-bgr $B$,5!G=$7$F$$$J$+$C$?$N$r(B fix
- * $B%7%J%j%*%U%!%$%k$,8+$D$+$i$J$$$H(B segv. $B$C$F$?$N$r(B fix
+ * メッセージの最後が `\0` で終っていると落ちていたのを fix
+ * snprintf を g_snprintf へ
+ * DigitalUNIX/Irix等 で色がおかしかったのを fix
+ * cdrom.Irix.c がコンパイル出来なかったのを fix
+ * freetype library がインストールされている場所を configure  
+    --with-freetpe-prefix=PFX で指定できるようにした。
+ * --disable-bgr が機能していなかったのを fix
+ * シナリオファイルが見つからないと segv. ってたのを fix
 	
 pre5
- * ResourceFile(ICON file) $B$r$A$c$s$HF0$/$h$&$K$7$?!#(B(xcore.c)
- * ViewArea $B$,0\F0$7$?$H$-$N%^%&%9$N0LCV<hF@$,0lIt$*$+$7$+$C$?$N$r(B fix
- * configure $B$G(B --enable-midi $B$r;XDj$7$J$+$C$?;~!"%4%_$,=P$k$N$r(B fix
- * SDL $B$N0lIt$N%P!<%8%g%s$G2hLL$,=P$J$+$C$?$N$r(B($BB?J,(B) fix
- * SDL $B$G%+!<%=%k7A>u$NJQ99$r$A$c$s$HF0$/$h$&$K$7$?!#(B
- * SDL $B$G1&%\%?%s$r2!$9$H0[>o=*N;$9$k$3$H$,$"$C$?$N$r(B fix
- * SDL + freetype $B$GJ8;z$,$A$c$s$H=P$J$$$N$r(B fix
- * cdrom/midi $B$,L58z$N>l9g!"=*N;;~$KMn$A$k$N$r(B fix
- * midi $BKd$a9~$_%U%i%0$r@5$7$/=hM}$7$F$$$J$+$C$?$N$r(B fix
+ * ResourceFile(ICON file) をちゃんと動くようにした。(xcore.c)
+ * ViewArea が移動したときのマウスの位置取得が一部おかしかったのを fix
+ * configure で --enable-midi を指定しなかった時、ゴミが出るのを fix
+ * SDL の一部のバージョンで画面が出なかったのを(多分) fix
+ * SDL でカーソル形状の変更をちゃんと動くようにした。
+ * SDL で右ボタンを押すと異常終了することがあったのを fix
+ * SDL + freetype で文字がちゃんと出ないのを fix
+ * cdrom/midi が無効の場合、終了時に落ちるのを fix
+ * midi 埋め込みフラグを正しく処理していなかったのを fix
 
 pre4
  * midi.raw.c/midifile.h: compile fix for FreeBSD
- * audio_oss $B$G(B channel $B$N@_Dj$,$*$+$7$+$C$?$N$r(B fix
+ * audio_oss で channel の設定がおかしかったのを fix
  * fix more compile warning
- * audio_oss $B$G(B fragment size $B$ND4@0(B
- * MUS_PCM_STOP $B$G$O(B flush $B$;$:$K(B stop $B%3%^%s%I$rH/9T$9$k$3$H$K$7$?(B
- * OSS sequencer device $B$KBP1~(B
- * Mixer $B$N(B volume $B$,(B 0 $B$N;~$K%U%'!<%I$5$;$k$HMn$A$F$$$?$N$r(B fix
- * midi/mp3 $B$N%W%m%;%9$,;D$C$?$^$^$^$J$N$r(B fix
+ * audio_oss で fragment size の調整
+ * MUS_PCM_STOP では flush せずに stop コマンドを発行することにした
+ * OSS sequencer device に対応
+ * Mixer の volume が 0 の時にフェードさせると落ちていたのを fix
+ * midi/mp3 のプロセスが残ったまままなのを fix
  * ALSA small cleanup
 
 pre3
  * add xsystem35.spec.in (from JRPM by Toshiya Takagi)
- * $B%U%'!<%I>uBV$N<hF@$G=hM}$,;_$^$C$F$7$^$C$F$$$?$N$r(Bfix
- * Ctrl-C $B%-!<$G=*N;$7$?$H$-2;3Z$,=*N;$7$J$$$N$r(B fix (again)
+ * フェード状態の取得で処理が止まってしまっていたのをfix
+ * Ctrl-C キーで終了したとき音楽が終了しないのを fix (again)
  * add CE44,45,46,47,50,51,52 command for xcore
  * music.c add more comment
- * $BL488K"1F$G?'$,$*$+$7$+$C$?$N$r(B fix 
-  (!8bpp$B$G(BVSP$B$r(Bload$B$7$?$H$-$*$+$7$+$C$?(B)
- * $BL488K"1F$G%?%$%H%k$N=P8=$,$*$+$7$+$C$?$N$r(B fix (CD5 command)
- * 256$B?'%b!<%I(B($B%2!<%`(B)$B;~$K?'$,$*$+$7$+$C$?$N$r(B fix
- * $B$?$^$K2;3Z$,=*N;$7$J$$$3$H$,$"$C$?$N$r(B fix
- * oss $B$N(B midi mixer $B@\B3$r(B line-out $B$X(B
- * $B%;!<%V%G%#%l%/%H%j$,B8:_$7$J$$$H$-$K0[>oF0:n$7$F$$$?$N$r(B fix
- * raw midi mode $B$G(B pause/unpause $B$,$*$+$7$+$C$?$N$r(B fix
- * MJ $B%3%^%s%I$NF~NO(B Window $B$NI}$,C;$+$C$?$N$r(B fix
+ * 夢幻泡影で色がおかしかったのを fix 
+  (!8bppでVSPをloadしたときおかしかった)
+ * 夢幻泡影でタイトルの出現がおかしかったのを fix (CD5 command)
+ * 256色モード(ゲーム)時に色がおかしかったのを fix
+ * たまに音楽が終了しないことがあったのを fix
+ * oss の midi mixer 接続を line-out へ
+ * セーブディレクトリが存在しないときに異常動作していたのを fix
+ * raw midi mode で pause/unpause がおかしかったのを fix
+ * MJ コマンドの入力 Window の幅が短かったのを fix
 
 pre2
- * $B?tCMF~NO%&%#%s%I$G%-%c%s%;%k$r2!$7$?$H$-$NF0:n$N(Bfix
- * raw midi $B%$%s%?!<%U%'%$%9$r2p$7$?(B midi file $B$N1iAU$KBP1~(B
- * freetype version 2 $B$KBP1~(B
- * cdrom.mp3/midi.* $B$N6&M-%a%b%jIt$r(B music $B$N6&M-%a%b%jIt$X(B
- * play_pipe.c $B$N(B write bytes $B?t$r%a%C%;!<%8<uEO$7$+$i6&M-%a%b%j$X(B
+ * 数値入力ウィンドでキャンセルを押したときの動作のfix
+ * raw midi インターフェイスを介した midi file の演奏に対応
+ * freetype version 2 に対応
+ * cdrom.mp3/midi.* の共有メモリ部を music の共有メモリ部へ
+ * play_pipe.c の write bytes 数をメッセージ受渡しから共有メモリへ
  * rewrite music.c
 
 pre1
- * SDL/xcore: $B5!G=$4$H$K(B source code $B$NJ,3d(B
- * fontdevice $B$NJ,N%(B
- * SDL: offscree $B$r(B display $B$HF1$8(B depth $B$K(B
- * SDL/xcore: fullscreen $B2>BP1~(B (-fullscreen option)
+ * SDL/xcore: 機能ごとに source code の分割
+ * fontdevice の分離
+ * SDL: offscree を display と同じ depth に
+ * SDL/xcore: fullscreen 仮対応 (-fullscreen option)
  * add ZW command.
 
 
@@ -618,28 +618,28 @@ final
  * fix message typo in audio_oss.c (by NABETANI Masaki)
  * enable audio framgemt in audio_oss.c
  * cleanup key release wait
- * popup menu $B$N=hM}$N;EJ}$NJQ99(B
+ * popup menu の処理の仕方の変更
  * fix some include file dependency
  * fix double link -lxpg4 for FreeBSD (by NABETANI Masaki)
- * SDL + ttf $B;~$NJ8;z$N(Bfore/background$B$NH?E>$N(B fix (by Fumihiko Murata)
+ * SDL + ttf 時の文字のfore/backgroundの反転の fix (by Fumihiko Murata)
  
 pre5
- * Ctrl-C $B%-!<$G=*N;$7$?$H$-2;3Z$,=*N;$7$J$$$N$r(B fix
- * music fadeout $B$G(B $B;~4V$,(B 0 $B$N;~(B fade $B$,=*$C$?$N$r8!CN$G$-$J$$$N$r(B fix
+ * Ctrl-C キーで終了したとき音楽が終了しないのを fix
+ * music fadeout で 時間が 0 の時 fade が終ったのを検知できないのを fix
  * optimaize wait for fade in / out and CE command.
  * fix CE32 command.
  * add CD5 command.
- * $B:G=i$N(B midi start $B$,;O$^$i$J$$$3$H$,$"$k$N$r(B fix
- * $B$^$l$K(B music_server/wav_server $B$N%W%m%;%9$,;D$k;v$,$"$k$N$r(B fix
+ * 最初の midi start が始まらないことがあるのを fix
+ * まれに music_server/wav_server のプロセスが残る事があるのを fix
  * fix scaled copyarea in SDL
  * add CE43 command for SDL
  * disable SDL_RLEACCEL
  * cleanup sdl related include file
- * $BNw2AHG%2!<%`$N(B install$BMQ(B .inf $B%U%!%$%k$NDI2C(B (by hachkun-lucifer2 and 
+ * 廉価版ゲームの install用 .inf ファイルの追加 (by hachkun-lucifer2 and 
   TAJIRI Yasuhiro)
 
 pre4
- * $B%U%'!<%I%"%&%H$G6J$r;_$a$?>l9g!"F1$86J$,1iAU$G$-$J$$$N$r=$@5(B
+ * フェードアウトで曲を止めた場合、同じ曲が演奏できないのを修正
  * some cleanup music server.
  * fix CE43 command.
  * some error message cleanup
@@ -649,20 +649,20 @@ pre4
 pre3
  * add x86 cpu capability checker from GOGO-no-coda
  * fix segv. in sys_getMouseInfo() (by TAJIRI Yasuhiro)
- * scaled copy area 1/2 $B$r#1$D$K(B (xcore)
+ * scaled copy area 1/2 を１つに (xcore)
  * fix eCopyUpdateArea()
  * more mmx-ize in alpha blend
  * fix segv. in mmx-ed alpha blend
- * $BA*Br;h(B Window $B$NOH$N2#I}$r7h$a$k;~$N1i;;;R$NM%@h=g0L$N4V0c$$$N(B fix
+ * 選択肢 Window の枠の横幅を決める時の演算子の優先順位の間違いの fix
   (by TAJIRI Yasuhiro)
  * check cdrom device is block or character device.
  * fix ZZ13 (missed fontsize and fonttype)
- * fix $B?tCMF~NO%&%#%s%I(B
+ * fix 数値入力ウィンド
  * modify ecopy skip_mask (by Fumihiko Murata)
- * SDL 1.1.5 $B$N(B RLE accel $B$KBP1~(B (by Fumihiko Murata)
+ * SDL 1.1.5 の RLE accel に対応 (by Fumihiko Murata)
  * revive [ESC + SPC + RET] to exit game
  * fix compile problem for non-x86
- * CG $B$N%m!<%I$K<:GT$7$?;~!"(BCG $B$N<oN`$r;2>H$7$h$&$H$7$FMn$A$F$$$?$N$r(B fix
+ * CG のロードに失敗した時、CG の種類を参照しようとして落ちていたのを fix
   (by TAJIRI Yasuhiro)
  * fix segv. when display 16bit-cg with alpha level
  * modify so that ZI command affects IK0/1 command (by Fumihiko Murata)
@@ -687,7 +687,7 @@ Version 1.3.1 -> Version 1.3.2 (2000.9.13)
 final
  * fix segv. when --enable-ttf (by TAJIRI Yasuhiro)
  * more debug message cleanup
- * View $BNN0h$,JQ$o$C$?;~$N%^%&%9<+F00\F0$N0LCV$N=$@5(B
+ * View 領域が変わった時のマウス自動移動の位置の修正
 
 pre5
  * fix wavXXX command 
@@ -697,89 +697,89 @@ pre5
  * add MHH command (by Fumihiko Murata)
  * add wave server for wavXXXX command (by Fumihiko Murata)
  * modify ML command
- * kconv.c -> eucsjis.c $B$H(B $B4XO"4X?t$r$^$H$a(B & $B4XO"=$@5(B
- * debugging $B2s$j$N(B clean up (in progress)
- * 15/16bpp $B$G(B antialiase$BJ8;z$,$*$+$7$+$C$?$N$r=$@5(B(xcore)
- * LE/QE filename $B%5!<%A$NJQ99(B
+ * kconv.c -> eucsjis.c と 関連関数をまとめ & 関連修正
+ * debugging 回りの clean up (in progress)
+ * 15/16bpp で antialiase文字がおかしかったのを修正(xcore)
+ * LE/QE filename サーチの変更
 
 pre4
- * pcm device $B$,L5$$;~$N(B mixer read $B$G0[>o=*N;$9$k$N$r=$@5(B
- * white fader $B$N=$@5(B (xcore)
- * View$BNN0h$,JQ$o$C$?;~$N(B mouse $B$N0LCV$NJs9p$N=$@5(B
+ * pcm device が無い時の mixer read で異常終了するのを修正
+ * white fader の修正 (xcore)
+ * View領域が変わった時の mouse の位置の報告の修正
  * fix ZR command
  * fix CE 27-30/16 command (by Fumihiko Murata and me)
- * $BA*Br(B Window $B$GA*Br;h$N0LCV$K%^%&%9$r;}$C$FMh$?;~$K!"0O$_$,2#J}8~$X(B
-   $B?-$S$F$7$^$&;v$N=$@5!#(B
+ * 選択 Window で選択肢の位置にマウスを持って来た時に、囲みが横方向へ
+   伸びてしまう事の修正。
  * add some 2Fxx commands more. (by Fumihiko Murata and me)
- * dri.c $B$GEPO?$7$F$$$J$$%G!<%?%U%!%$%k$K%"%/%;%9$9$k$HMn$A$k$N$r=$@5(B
+ * dri.c で登録していないデータファイルにアクセスすると落ちるのを修正
  * add ZC 15 command
  * fix ZT10 command when base == 0 (by TAJIRI Yasuhiro and Fumihiko Murata)
  * add copyarea with white level (sdl) (by Fumihiko Murata)
- * $BA*Br(B Window $B$GA*Br;h$N0O$_$N0LCV$N$:$l$r=$@5(B
+ * 選択 Window で選択肢の囲みの位置のずれを修正
  * fix LL command when data is shortage.
 
 pre3
  * fix alsa compile failfure (by TAJIRI Yasuhiro)
  * check NULL in NB command (by TAJIRI Yasuhiro and me)
- * $B%7!<%s@D$N2;3Z4U>^$G(B MIDI $B$,LD$i$J$$$3$H$,$"$k$N$r=$@5(B (by Fumihiko Murata)
- * ttf $B$N%"%s%A%(%j%"%7%s%0MQ$N%Q%l%C%HCM$N:F=$@5(B (by Fumihiko Murata)
- * $BA*Br(B Window $B$K$^$D$o$k(B callback $B%3%^%s%IBP1~(B
+ * シーン青の音楽鑑賞で MIDI が鳴らないことがあるのを修正 (by Fumihiko Murata)
+ * ttf のアンチエリアシング用のパレット値の再修正 (by Fumihiko Murata)
+ * 選択 Window にまつわる callback コマンド対応
  * add B12-14 command, fix B21-B24 command.
  * LE/QE/new-LE,QE command fix (by Fumihiko Murata and me)
  * add some 2Fxx commands. (by Fumihiko Murata,TAJIRI Yasuhiro and me)
- * $B1F(B(alpha)$B$D$-(B copy $B$K(B $B1F$N3d9g$r$+$1$k0z?t$NDI2C$H$=$l$KH<$&JQ99(B
+ * 影(alpha)つき copy に 影の割合をかける引数の追加とそれに伴う変更
    (by Fumihiko Murata and me)
 
 pre2
- * copyRegion (xcore) $B$N=$@5(B
- * $BH>3Q(B->$BA43QJQ49$G(B ASCII $BJ8;z$OJQ49$NBP>]30$X(B
- * new QE/LE/MT/MS/F comannd $B$NBP1~(B  (by Fumihiko Murata and me)
- * antialiase $BJ8;z(B(TAA/TAB$B%3%^%s%I(B) $BBP1~(B (sdl) (by Fumihiko Murata)
- * window title $B$r$D$1$k$HMn$A$k%P%0$N=$@5(B
- * TOx/TPx $B%3%^%s%IBP1~(B($BB?J,(B)
- * ttf.c $BH>3Q$+$JBP1~(B (by TAJIRI Yasuhiro)
- * $B$+$($k$K$g$Q$K$g$s$G!"L#J}%f%K%C%H$r(B2$B2s%/%j%C%/$7$?;~$N@oF.$G(B
-   $B%"%K%a$,@5$7$/$J$$$3$H$N=$@5(B (by Tamura Toshimichi)
- * packed 24bpp $B$N=$@5(B
- * ALSA $B$NH?1~8~>e(B($BLD$j;O$a$rAa$/$7$?(B) (by Fumihiko Murata)
- * ALSA $B$G(B fragmentsize $B$,6-3&$r$^$?$062$l$,$"$C$?$N$r=$@5(B (by Fumihiko Murata)
- * mp3 $B$G%W%l%$%d!<$N;XDj$G%U%!%$%k$r=q$/>l=j$K(B %s $B$r;XDj$G$-$k$h$&$K$7$?(B
+ * copyRegion (xcore) の修正
+ * 半角->全角変換で ASCII 文字は変換の対象外へ
+ * new QE/LE/MT/MS/F comannd の対応  (by Fumihiko Murata and me)
+ * antialiase 文字(TAA/TABコマンド) 対応 (sdl) (by Fumihiko Murata)
+ * window title をつけると落ちるバグの修正
+ * TOx/TPx コマンド対応(多分)
+ * ttf.c 半角かな対応 (by TAJIRI Yasuhiro)
+ * かえるにょぱにょんで、味方ユニットを2回クリックした時の戦闘で
+   アニメが正しくないことの修正 (by Tamura Toshimichi)
+ * packed 24bpp の修正
+ * ALSA の反応向上(鳴り始めを早くした) (by Fumihiko Murata)
+ * ALSA で fragmentsize が境界をまたぐ恐れがあったのを修正 (by Fumihiko Murata)
+ * mp3 でプレイヤーの指定でファイルを書く場所に %s を指定できるようにした
    (by Fumihiko Murata)
- * sysGetOsName,HH,ZZ14 $B%3%^%s%IBP1~(B (by Fumihiko Murata)
- * ttf $B$N%"%s%A%(%j%"%7%s%0MQ$N%Q%l%C%HCM$N=$@5(B (by Fumihiko Murata)
+ * sysGetOsName,HH,ZZ14 コマンド対応 (by Fumihiko Murata)
+ * ttf のアンチエリアシング用のパレット値の修正 (by Fumihiko Murata)
  
 pre1
- * packed 24bpp (3bytes/pixel) Xserver $BBP1~(B
- * ttf on $B;~$K(B 256 $B%2!<%`$G?'$,2=$1$k$3$H$N=$@5(B
- * $BA43Q!&H>3QI=<((B (ZH) $B$N5sF0$,$*$+$7$$$3$H$N=$@5(B
- * midi/mp3 piped play $B$N=$@5(B (by Fumihiko Murata)
- * CE$B%3%^%s%I$NDI2C$H=$@5(B (add dunction 33-42,48,49. modify 32)
+ * packed 24bpp (3bytes/pixel) Xserver 対応
+ * ttf on 時に 256 ゲームで色が化けることの修正
+ * 全角・半角表示 (ZH) の挙動がおかしいことの修正
+ * midi/mp3 piped play の修正 (by Fumihiko Murata)
+ * CEコマンドの追加と修正 (add dunction 33-42,48,49. modify 32)
    (by Fumihiko Murata)
- * $B9b@:EY%+%&%s%?$N=i4|CM$r(B 1 $B$K(B (by Fumihiko Murata)
- * -devcd $B%*%W%7%g%s$GB8:_$7$J$$(B($B%*!<%W%s$G$-$J$$(B)$B%U%!%$%k$r;XDj$7$?>l9g$G$b(B
-   CD $B$,(B enable $B$K$J$k$N$r=$@5(B (by Fumihiko Murata)
- * midi/mp3 piped play $B$N=$@5(B $B$=$N#2(B (by Fumihiko Murata)
- * pipe_play $B$G%*!<%G%#%*%P%C%U%!$N0LCV$r8!=P$9$k$N$O(B ALSA $B$N$_(B,$BB>$O%+%&%s%?!<(B
-   $B$G7WB,(B (by Fumihiko Murata)
- * LE $B%3%^%s%I$GJ8;zNs$rFI$_9~$`0LCV$,$:$l$F$$$?$3$H$N=$@5(B
+ * 高精度カウンタの初期値を 1 に (by Fumihiko Murata)
+ * -devcd オプションで存在しない(オープンできない)ファイルを指定した場合でも
+   CD が enable になるのを修正 (by Fumihiko Murata)
+ * midi/mp3 piped play の修正 その２ (by Fumihiko Murata)
+ * pipe_play でオーディオバッファの位置を検出するのは ALSA のみ,他はカウンター
+   で計測 (by Fumihiko Murata)
+ * LE コマンドで文字列を読み込む位置がずれていたことの修正
    (by Fumihiko Murata)
- * $BF1$82;NL$G2;3Z$N%U%'!<%I$r9T$J$&$H(B0$B=|;;$G$*$A$k$3$H$N=$@5(B
+ * 同じ音量で音楽のフェードを行なうと0除算でおちることの修正
    (by Fumihiko Murata)
- * antialiase $BJ8;z(B(TAA/TAB$B%3%^%s%I(B) $BBP1~(B (xcore)
+ * antialiase 文字(TAA/TABコマンド) 対応 (xcore)
 
 
 Version 1.3.0 -> Version 1.3.1 (2000.8.12)
 
- * configure $B2=$7$^$7$?!#(B
- * SDL $B$KBP1~$7$^$7$?!#(B
- * $B=*N;3NG'(B Window $B$J$I$N(B popup menu $B$rA4LLE*$K=q49$($^$7$?!#(B
- * OSS/ALSA/ESD $B$r5/F0;~$KA*Br$7$F;H$($k$h$&$K$J$j$^$7$?!#(B
- * FreeType library $B$r;H$C$F(B TrueType font $B$rD>@\$"$D$+$($k$h$&$K$7$^$7$?!#(B
- * $B$=$NB>!":Y$+$$(B fix $B$H?7$?$J%P%0$NKd$a9~$_!#(B
+ * configure 化しました。
+ * SDL に対応しました。
+ * 終了確認 Window などの popup menu を全面的に書換えました。
+ * OSS/ALSA/ESD を起動時に選択して使えるようになりました。
+ * FreeType library を使って TrueType font を直接あつかえるようにしました。
+ * その他、細かい fix と新たなバグの埋め込み。
 
 
 Version 1.2.5 -> Version 1.3.0 (2000.3.06)
 
- * $B3+H/%V%i%s%A(B 1.3.x $B$r3+;O$7$^$7$?!#(B
- * $BIA2h4X?t$r(B graigics.c $B$+$i(B ags.c $B$X!#4X?tL>$NJQ99(B(ags_XXX)
- * Eventdriven$B$K$7$^$7$?!#(B
+ * 開発ブランチ 1.3.x を開始しました。
+ * 描画関数を graigics.c から ags.c へ。関数名の変更(ags_XXX)
+ * Eventdrivenにしました。

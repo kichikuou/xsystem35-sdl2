@@ -1,80 +1,80 @@
-                  $B%2!<%`%j%=!<%9%U%!%$%k(B(*.gr)$B$N=q$-J}(B
+                  ゲームリソースファイル(*.gr)の書き方
 
 
-   xsystem35$B$G$O%2!<%`%G!<%?$NCV$->l=j$r%F%-%9%H%U%!%$%k$KJ]B8$7$F$*$-!"(B
- $B$=$l$r(Bxsystem35$B$K;XDj$7$F$d$k;v$G%G!<%?$NCV$->l=j$rCN$i$;$^$9!#(B
+   xsystem35ではゲームデータの置き場所をテキストファイルに保存しておき、
+ それをxsystem35に指定してやる事でデータの置き場所を知らせます。
 
-# $B$3$N%U%!%$%k$N%U%!%$%kL>$O(Bxsystem35$B$r5/F0$9$k;~$K;XDj$G$-$^$9$N$G!"(Bhoge.gr
-# $B$G$"$kI,MW$OL5$/!"<+M3$K$D$1$k;v$,=PMh$^$9!#(B
+# このファイルのファイル名はxsystem35を起動する時に指定できますので、hoge.gr
+# である必要は無く、自由につける事が出来ます。
 
- $B$3$3$G$O!"$3$N%F%-%9%H%U%!%$%k(B($B%2!<%`%j%=!<%9%U%!%$%k(B)$B$N=q<0$r@bL@$7$^$9!#(B
+ ここでは、このテキストファイル(ゲームリソースファイル)の書式を説明します。
 
 
-  $B#1$D$N%G!<%?$K$D$-#19T$G5-=R$7$^$9!#Nc$r8+$F2<$5$$!#(B
+  １つのデータにつき１行で記述します。例を見て下さい。
 
   ScenarioA /home/chikama/game/rance4/rance4_sa.ald
 
-    $B%-!<%o!<%I(B $B%G!<%?$N%U%k%Q%9(B
+    キーワード データのフルパス
 
- $B$N=g$K=q$-$^$9!#%-!<%o!<%I$O9T$N@hF,$+$i=q$-!"%G!<%?$N%U%k%Q%9$H$N4V$OH>3Q(B
- $B%9%Z!<%9$G$9!#(B($B%;!<%V%G!<%?$N$_!"%[!<%`%G%#%l%/%H%j$rI=$9(B ~ $B$rI>2A$7$^$9!#(B)
+ の順に書きます。キーワードは行の先頭から書き、データのフルパスとの間は半角
+ スペースです。(セーブデータのみ、ホームディレクトリを表す ~ を評価します。)
  
- $B%-!<%o!<%I$K$O<!$N#7$D$,$"$j$^$9!#(B
+ キーワードには次の７つがあります。
 
-    Scenario : $B%7%J%j%*(B
-    Graphics : $B%0%i%U%#%C%/(B
-    Wave     : PCM$B%G!<%?(B
-    Midi     : MIDI$B%G!<%?(B
-    Data     : $B$=$NB>%G!<%?(B
-    Save     : $B%;!<%V%G!<%?(B
-    Resouce  : $B%j%=!<%9%U%!%$%k(B($B%^%&%9%+!<%=%k7A>u(B)
-    Ain      : DLL $B$H$=$N4X?t$N>pJs$N$+$+$l$?(B System39.ain
-    BGM      : BGM$B%G!<%?(B($B%(%9%+%l%$%d!<0J9_$N(BBGM$B%G!<%?%U%!%$%k(B)
-    WAI      : PCM$B%G!<%?$NDI2C>pJs(B (mixer channel $B>pJsEy(B)
-    BGI      : BGM$B%G!<%?$NDI2C>pJs(B ($B%k!<%W0LCVEy(B)
-    SACT01   : SACT.DLL$BMQ%G!<%?(B (SACTEFAM.KLD)
-    ALK      : $B%G%bMQ%"!<%+%$%V%U%!%$%k(B
+    Scenario : シナリオ
+    Graphics : グラフィック
+    Wave     : PCMデータ
+    Midi     : MIDIデータ
+    Data     : その他データ
+    Save     : セーブデータ
+    Resouce  : リソースファイル(マウスカーソル形状)
+    Ain      : DLL とその関数の情報のかかれた System39.ain
+    BGM      : BGMデータ(エスカレイヤー以降のBGMデータファイル)
+    WAI      : PCMデータの追加情報 (mixer channel 情報等)
+    BGI      : BGMデータの追加情報 (ループ位置等)
+    SACT01   : SACT.DLL用データ (SACTEFAM.KLD)
+    ALK      : デモ用アーカイブファイル
     Init     : System39.ini
    
- $BF1$8<oN`$N%G!<%?$,J#?t$"$k>l9g$O%-!<%o!<%I$N<!$K(BA,B,C...$B$r$D$1$^$9!#(B
- (Ain $B$r=|$/(B)
+ 同じ種類のデータが複数ある場合はキーワードの次にA,B,C...をつけます。
+ (Ain を除く)
 
-   CD-ROM$B>e$N$I$l$,$I$N<oN`$N%U%!%$%k$+$O!"%U%!%$%kL>$GH=JL$7$^$9!#(B
- *SA.ALD $B$J$i%7%J%j%*$N#1HVL\!"(B*GA.ALD$B$O%0%i%U%#%C%/!"(B*WA.ALD$B$O(BPCM$B!"(B
- *MA.ALD $B$O(BMIDI$B!"(B*DA.ALD$B$O$=$NB>%G!<%?$G$9!#(B
+   CD-ROM上のどれがどの種類のファイルかは、ファイル名で判別します。
+ *SA.ALD ならシナリオの１番目、*GA.ALDはグラフィック、*WA.ALDはPCM、
+ *MA.ALD はMIDI、*DA.ALDはその他データです。
 
-   Ain $B$O(B System39.ain $B$X$N%Q%9$r=q$-$^$9!#Nc$($P(B
+   Ain は System39.ain へのパスを書きます。例えば
  Ain /home/chikama/game/20cKaeru/System39.ain
- $B$N$h$&$K=q$-$^$9!#(B
+ のように書きます。
 
-   Init $B$O(B System39.ini $B$X$N%Q%9$r=q$-$^$9!#Nc$($P(B
+   Init は System39.ini へのパスを書きます。例えば
  Init /home/chikama/game/esuka/System39.ini
- $B$N$h$&$K=q$-$^$9!#(B
+ のように書きます。
 
-   WAI/BGI $B$ODL>o#1%U%!%$%k$@$1$G$9$N$G(B
+   WAI/BGI は通常１ファイルだけですので
  WAIA /home/chikama/game/esuka/DOKI_WA.WAI
  BGIA /home/chikama/game/esuka/DOKI_BA.BGI
- $B$N$h$&$K=q$-$^$9!#(B
+ のように書きます。
   
-   SACT01 $B$O(B SACT$B%7%9%F%`8GM-$N%G!<%?%U%!%$%k(B(SACTEFAM.KLD)$B$X$N%Q%9$r(B
- $B;XDj$7$^$9!#(B
+   SACT01 は SACTシステム固有のデータファイル(SACTEFAM.KLD)へのパスを
+ 指定します。
  SACT01 /home/chikama/game/rance5d/SACTEFAM.KLD
 
-   ALK $B$O%G%bMQ$N%G!<%?$,F~$C$?%"!<%+%$%V%U%!%$%k$G$9!#(B
+   ALK はデモ用のデータが入ったアーカイブファイルです。
  ALK01 /home/chikama/game/nd/NightDemonDemo1.alk
  ALK02 /home/chikama/game/nd/NightDemonDemo2.alk
  ALK03 /home/chikama/game/nd/NightDemonDemo3.alk
- $B$N$h$&$K=q$-$^$9!#(B
+ のように書きます。
 
 
-  $B$^$?!"$3$l$i$NHOaF$K$O$$$i$J$$%G!<%?!"$?$H$($P!"$+$($k$K$g$Q$K$g$s$N(B
- floor_1.map$B$J$I$O%j%=!<%9%U%!%$%k$r2p$7$^$;$s$N$G!"%2!<%`%j%=!<%9(B
- $B%U%!%$%k$K$O=q$+$:!"!V%;!<%V%G!<%?$rCV$$$?%G%#%l%/%H%j$HF1$8>l=j!W$K(B
- $B%3%T!<$7$F2<$5$$!#(B
+  また、これらの範疇にはいらないデータ、たとえば、かえるにょぱにょんの
+ floor_1.mapなどはリソースファイルを介しませんので、ゲームリソース
+ ファイルには書かず、「セーブデータを置いたディレクトリと同じ場所」に
+ コピーして下さい。
 
-   $B$^$?!"(BSave? $B$N$_!"(B'~' ($B%[!<%`%G%#%l%/%H%j(B)$B$rI>2A$7$^$9$N$G!"(B
+   また、Save? のみ、'~' (ホームディレクトリ)を評価しますので、
  SaveA ~/savedata/kichiku/kichiku_sa.ald
- $B$N$h$&$K=q$/;v$,=PMh$^$9!#(B
+ のように書く事が出来ます。
 
- $B%3%a%s%H$r=q$/>l9g$O9TF,$K(B # $B$r$D$1$^$9!#$^$?6uGr9T$OL5;k$5$l$^$9!#(B
+ コメントを書く場合は行頭に # をつけます。また空白行は無視されます。
 

@@ -1,58 +1,58 @@
 
-                   $B$=$NB>$N(B SYSTEM 3.5 $B$N%2!<%`$K$D$$$F(B
+                   その他の SYSTEM 3.5 のゲームについて
 
-   README $B$K$"$kF0:n3NG'%2!<%`0J30$K$b!"%M%C%H>e$G8x3+$5$l$F$$$k(BSYSTEM3.5$BBP1~(B
- $B$N%2!<%`$N$&$A4v$D$+$OF0$/;v$,3NG'$5$l$F$$$^$9!#$3$3$G$O(B 1.4.0 preX $B$G$NF0:n(B
- $B>u67$G$9!#(B1.4.0 $B8x3+;~E@$G<j$KF~$k%2!<%`$r=g<!DI2C$7$F$$$C$F$$$^$9!#(B
- $B$^$?!"(BXXX$B$,F0$+$J$$$s$@$1$ID4$Y$F$/$@$5$$!"(BXXX$B$O$A$c$s$HF0$-$^$7$?!"$H$$$C$?(B
- $B>pJs$b$*$h$;$/$@$5$$!#(B
+   README にある動作確認ゲーム以外にも、ネット上で公開されているSYSTEM3.5対応
+ のゲームのうち幾つかは動く事が確認されています。ここでは 1.4.0 preX での動作
+ 状況です。1.4.0 公開時点で手に入るゲームを順次追加していっています。
+ また、XXXが動かないんだけど調べてください、XXXはちゃんと動きました、といった
+ 情報もおよせください。
 
-   OK$B$OLdBj$J$/F0$/!#(BGOOD$B$,B?>/$NLdBj$"$k$b$N$N%2!<%`$r$d$k$V$s$G5$$K$O$J$k$1$I(B
- $BBQ$($i$l$kHO0O$N$b$N!#(BBAD$B$OF0$+$J$$$b$N$G$9!#(B
+   OKは問題なく動く。GOODが多少の問題あるもののゲームをやるぶんで気にはなるけど
+ 耐えられる範囲のもの。BADは動かないものです。
  
 
-($B:n<T$N7I>NN,(B)
-$B!Z(B  $B%=%U%HL>(B  $B![(B  $B!Z(B $B%U%!%$%kL>(B $B![!Z(B   $B:n<TL>(B   $B![!Z(B $BF0:n(B  $B![(B
-$B9qN)%U%!!<%V%k?^(B
-$B=q4[;J=q!A(B
-$B%V%C%/%k$A$c$s!A(B   SSYO_100.LZH    $BBgDM%R%m(B          OK
-$B%P%k!<%s$]$C$W(B     BPOP_093.LZH    $BBgDM%R%m(B          OK 
+(作者の敬称略)
+【  ソフト名  】  【 ファイル名 】【   作者名   】【 動作  】
+国立ファーブル図
+書館司書〜
+ブックルちゃん〜   SSYO_100.LZH    大塚ヒロ          OK
+バルーンぽっぷ     BPOP_093.LZH    大塚ヒロ          OK 
 
-Self               self.lzh        $B$h$3$d$^$J$*$-(B    OK
-$B$*$;$m$C$H(B         othellotto.exe  $B$h$3$d$^$J$*$-(B    OK
-$B%-%c%m%k(B           carol.lzh       $B$h$3$d$^$J$*$-(B    GOOD(1)
+Self               self.lzh        よこやまなおき    OK
+おせろっと         othellotto.exe  よこやまなおき    OK
+キャロル           carol.lzh       よこやまなおき    GOOD(1)
 
-$B@QAX;ML\JB$Y(B       Te1.lzh         $B?<AQ!!G&(B          OK
-16Piece Puzzle     16p1.lzh        $B?<AQ!!G&(B          OK
-The Line           Line0.lzh       $B?<AQ!!G&(B          OK
+積層四目並べ       Te1.lzh         深叢　忍          OK
+16Piece Puzzle     16p1.lzh        深叢　忍          OK
+The Line           Line0.lzh       深叢　忍          OK
 
-Black Jack         bj120.lzh       $B$+$:$-(B            OK
+Black Jack         bj120.lzh       かずき            OK
 
-$B%^%9%+%l%$%I(B       (in AliceCD202) $B$A$"$\$&(B          OK
-$B@oL<(Bver2.12        ikusa212.lzh    $B$A$"$\$&(B          OK
+マスカレイド       (in AliceCD202) ちあぼう          OK
+戦娘ver2.12        ikusa212.lzh    ちあぼう          OK
 
-$B$G$-$k$+$J!<!*(B     (in AliceCD202) KIMM SOFT         OK(2)
+できるかなー！     (in AliceCD202) KIMM SOFT         OK(2)
 
-$BNx$O7W;;$I$*$j"v(B   koi.lzh         SS                OK
+恋は計算どおり♪   koi.lzh         SS                OK
 
-$BF0BN;kNO$rCC$($k$K$g(B game_191.lzh  LazyRichField    BAD(3)
-$B=8CfNO$rCC$($k$K$g(B game_22.lh      LazyRichField    GOOD(4)
+動体視力を鍛えるにょ game_191.lzh  LazyRichField    BAD(3)
+集中力を鍛えるにょ game_22.lh      LazyRichField    GOOD(4)
 
 
-1) $B@c$,9_$i$J$$(B (grDrawFillCircle $B$,L$<BAu(B)
-   $BDL?.BP@o$,=PMh$J$$(B
-2) $B%a%C%;!<%8%5%$%:(B300$B%I%C%H$NI=<($O(B 100 $B%I%C%H$K@)8B$7$F$$$^$9(B
-3) DS $B?t;z(B $B$H$J$C$F$$$k(B
-4) $B?'$,$*$+$7$$(B
+1) 雪が降らない (grDrawFillCircle が未実装)
+   通信対戦が出来ない
+2) メッセージサイズ300ドットの表示は 100 ドットに制限しています
+3) DS 数字 となっている
+4) 色がおかしい
 
-$B:G8e$K$3$l$i$N%G!<%?$r8x3+$7$F$$$k:n<T$NJ}!9$N(BURL$B$G$9!#(B
+最後にこれらのデータを公開している作者の方々のURLです。
 
-$BBgDM%R%m$5$s(B       http://www.studioHIRO.com/
-$B$h$3$d$^$J$*$-$5$s(B http://www3.justnet.ne.jp/~naoki-yokoyama/
-$B?<AQ(B $BG&$5$s(B        http://www2s.biglobe.ne.jp/~nin/
-$B$+$:$-$5$s(B         http://www.din.or.jp/~kazuki/
-$B6M%v20(B inc.$B!J$A$"$\$&!K$5$s(B   http://www.eucaly.net/~kiri
-KIMM SOFT$B!?%M%j%o%5%t%#$A!<$`(B heavyd@syd.odn.ne.jp
-SS$B$5$s(B             http://www.sspzgr.net/
-LazyRichField$B$5$s(B  http://www2j.biglobe.ne.jp/~Lazy/staff/alice.htm
+大塚ヒロさん       http://www.studioHIRO.com/
+よこやまなおきさん http://www3.justnet.ne.jp/~naoki-yokoyama/
+深叢 忍さん        http://www2s.biglobe.ne.jp/~nin/
+かずきさん         http://www.din.or.jp/~kazuki/
+桐ヶ屋 inc.（ちあぼう）さん   http://www.eucaly.net/~kiri
+KIMM SOFT／ネリワサヴィちーむ heavyd@syd.odn.ne.jp
+SSさん             http://www.sspzgr.net/
+LazyRichFieldさん  http://www2j.biglobe.ne.jp/~Lazy/staff/alice.htm
 

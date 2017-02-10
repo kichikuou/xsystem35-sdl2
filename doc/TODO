@@ -1,57 +1,57 @@
-TODO (���֤��ä�̵��)
+TODO (順番は特に無し)
 
- * ���ƥʥ�
+ * メンテナンス
 
 -- obsolete
 
- * TODO�����䤵�ʤ�
- * SYSTEM3��3.5�ؤΰܿ���Τ䡢�ͥåȾ�ˤ���SYSTEM3.5�Υǡ����ؤ��б�
- * system 3.9�ؤ��б�
- * X�Υ��٥�ȥϥ�ɥ�󥰤β���
- * oringinal �� savedata(v1/v2/v3?) �� convert ���� tool
- * savedata �� lt/bg �Ǥɤä��Ǥ��ɤ��褦�ˤ���
- * XIM �б���
- * �ؿ�/�ѿ�̾������
- * ���Ѿ���Υɥ�����Ȳ�
- * GUI�� installer (�äƤ�������CD-ROM����� setup.inf��ľ�ܻȤ�)
- * �۾ｪλ���˽��������ץ��������Ĥ�ʤ��褦�ˤ���
- * global�ѿ��򸺤餹
- * �տ�Ū�ʰ۾亮�ʥꥪ�ǡ����Ǥ�segv.��ʤ��褦���Ϥ���
- * Tab/Space�κ��ߤʤɥ������θ�ľ��(���)
- * CE�λĤ�Υ��ޥ�ɤ򤵤ä��ȼ�������
- * SDL �����򤷤� cleanup
- * �������Ϥޤ��� cleanup
- * UNIX+X �ʳ��δĶ��ذܿ����䤹������
+ * TODOを増やさない
+ * SYSTEM3の3.5への移植ものや、ネット上にあるSYSTEM3.5のデータへの対応
+ * system 3.9への対応
+ * Xのイベントハンドリングの改良
+ * oringinal の savedata(v1/v2/v3?) を convert する tool
+ * savedata を lt/bg でどっちでも読めるようにする
+ * XIM 対応？
+ * 関数/変数名の統一
+ * 技術情報のドキュメント化
+ * GUI付 installer (っていうか、CD-ROMの中の setup.infを直接使う)
+ * 異常終了時に出来るだけプロセスが残らないようにする
+ * global変数を減らす
+ * 意図的な異常シナリオデータでもsegv.らないよう努力する
+ * Tab/Spaceの混在などソースの見直し(随時)
+ * CEの残りのコマンドをさっさと実装する
+ * SDL を理解して cleanup
+ * キー入力まわりの cleanup
+ * UNIX+X 以外の環境へ移植しやすくする
 
 
- * ������1/16 
-    + �������塼����Ȥ���ˡ֤�ɤ�ס֥��ꥢ�ס֣ϣˡ��פ����򤬤��ޤ���
-      ���ʤ���
- * ��󥹣�
-    + �ץ��ϥˡ��������˴������ޤ��ȡ������ξ�ˡ��ɡץޡ������Ĥ��ä�
-      �ʤ��ˤʤ롣
-    + ��Ʈ������Ǥ��ޤ˺���˥�󥹥����Τ����餬ɽ������뤳�Ȥ����롣
+ * 王子様1/16 
+    + スケジュールを組む時に「もどる」「クリア」「ＯＫ！」の選択がうまくで
+      きない。
+ * ランス４
+    + プチハニーの爆風に巻き込まれると、キャラの上に「防」マークがつきっぱ
+      なしになる。
+    + 戦闘シーンでたまに左上にモンスターのかけらが表示されることがある。
 
 
 DONE
 
- * configure ��
+ * configure 化
  * gtk_setup.c rewrite
- * keyboard����б�
- * cd/mp3�����ؤ��򥪥ץ��������ؤ�����褦�ˤ���
- * packed 24bpp�б� (rewrite xcore.c)
+ * keyboard操作対応
+ * cd/mp3の切替えをオプションで切替えられるようにする
+ * packed 24bpp対応 (rewrite xcore.c)
  * music server cleanup
- * dri mmap��
- * ���� data cache �������롣TTF �ե���Ȥ�Ÿ���Ѥ� CG �ǻȤ�������
- * alphabelnd asm��
- * imgae.c ��⤦����äȤ��ä���ȡ�(depth�Ǵؿ��Υơ��֥벽
- * ecopy �Υ����ߥ󥰤κ�Ŭ�� 
- * wav ���Ĥ�ʤ��������Ф��Ф���(open err)�Τ�Ĵ��������
- * *.h �ΰ�¸�ط� cleanup, �ä� xsystem35.h 
- * xcore/image�������cleanup
- * MIDI�μ����Υϥ�ɥ��(/dev/sequener ?)
- * FullScreen�б�(with DGA)
- * �Ť��ɥ�����Ȥ�ʤ�Ȥ����롣(FAQ/BUGS etc)
- * �簭��
-    + SDL�λ���MAP���������ư���ʤ���
+ * dri mmap化
+ * 汎用 data cache 処理を作る。TTF フォントと展開済み CG で使おうか。
+ * alphabelnd asm化
+ * imgae.c をもうちょっとすっきりと。(depthで関数のテーブル化
+ * ecopy のタイミングの最適化 
+ * wav が鳴らない事がしばしばある(open err)のを調査＆修正
+ * *.h の依存関係 cleanup, 特に xsystem35.h 
+ * xcore/imageの統合とcleanup
+ * MIDIの自前のハンドリング(/dev/sequener ?)
+ * FullScreen対応(with DGA)
+ * 古いドキュメントをなんとかする。(FAQ/BUGS etc)
+ * 大悪司
+    + SDLの時、MAP選択が正常に動かない。
 
