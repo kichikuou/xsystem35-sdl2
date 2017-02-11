@@ -25,7 +25,7 @@
 #define __CDROM_H__
 
 /*
- * CD-ROM �ؤΥ����������԰���ʾ��ϼ�����������䤷�ƤߤƲ�����
+ * CD-ROM へのアクセスが不安定な場合は次の定数を増やしてみて下さい
  */
 /* ioctrole retry times */
 #define CDROM_IOCTL_RETRY_TIME 3

@@ -1,5 +1,5 @@
 /*
- * sprite_eupdate.c: ¸ú²Ì¤Ä¤­¹¹¿·
+ * sprite_eupdate.c: åŠ¹æœã¤ãæ›´æ–°
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -76,10 +76,10 @@ typedef void entrypoint (surface_t *, surface_t *);
 
 static entrypoint *cb[39] = {
 	ec1_cb,
-	ec_dummy_cb, // ·çÈÖ
-	ec_dummy_cb, // ·çÈÖ
-	ec_dummy_cb, // ·çÈÖ
-	ec_dummy_cb, // ·çÈÖ
+	ec_dummy_cb, // æ¬ ç•ª
+	ec_dummy_cb, // æ¬ ç•ª
+	ec_dummy_cb, // æ¬ ç•ª
+	ec_dummy_cb, // æ¬ ç•ª
 	ec6_cb,
 	ec7_cb,
 	ec8_cb,
@@ -92,7 +92,7 @@ static entrypoint *cb[39] = {
 	ec15_cb,
 	ec16_cb,
 	ec17_cb,
-	ec_dummy_cb,  // ·çÈÖ
+	ec_dummy_cb,  // æ¬ ç•ª
 	ec19_cb,
 	ec20_cb,
 	ec21_cb,
@@ -120,7 +120,7 @@ static void ec_dummy_cb(surface_t *sfsrc, surface_t *sfdst) {
 	WARNING("NOT IMPLEMENTED\n");
 }
 
-// ¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec1_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep;
 	
@@ -137,7 +137,7 @@ static void ec1_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// ¤¹¤À¤ìÍî¤Á
+// ã™ã ã‚Œè½ã¡
 static void ec7_cb(surface_t *sfsrc, surface_t *sfdst) {
 #define EC7DELTA 16
 	int curstep, maxstep = sfsrc->height / EC7DELTA + EC7DELTA;
@@ -165,7 +165,7 @@ static void ec7_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ags_updateFull();
 }
 
-// ¤¹¤À¤ìº¸->±¦
+// ã™ã ã‚Œå·¦->å³
 static void ec8_cb(surface_t *sfsrc, surface_t *sfdst) {
 #define EC8DELTA 16
 	int curstep, maxstep = sfsrc->width / EC8DELTA + EC8DELTA;
@@ -193,7 +193,7 @@ static void ec8_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ags_updateFull();
 }
 
-// ¤¹¤À¤ìÍî¤Á¡õº¸->±¦
+// ã™ã ã‚Œè½ã¡ï¼†å·¦->å³
 static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
 #define EC9DELTA 16
 	int curstep, maxstep; 
@@ -230,7 +230,7 @@ static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ags_updateFull();
 }
 
-// ¾å->²¼¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ä¸Š->ä¸‹ã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec12_cb(surface_t *src, surface_t *dst) {
 #define EC12DELTA 256
 	int curstep, maxstep = src->height + EC12DELTA;
@@ -258,7 +258,7 @@ static void ec12_cb(surface_t *src, surface_t *dst) {
 	ecp.oldstep = st_i;
 }
 
-// ²¼->¾å¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ä¸‹->ä¸Šã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec13_cb(surface_t *src, surface_t *dst) {
 #define EC13DELTA 256
 	int curstep, maxstep = src->height + EC12DELTA;
@@ -289,7 +289,7 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 	ecp.oldstep = st_i;
 }
 
-// ¸ŞçêÀ± (Æâ->³°)
+// äº”èŠ’æ˜Ÿ (å†…->å¤–)
 static void ec14_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -302,7 +302,7 @@ static void ec14_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// ¸ŞçêÀ± (³°->Æâ)
+// äº”èŠ’æ˜Ÿ (å¤–->å†…)
 static void ec15_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -315,7 +315,7 @@ static void ec15_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// Ï»çêÀ± (Æâ->³°)
+// å…­èŠ’æ˜Ÿ (å†…->å¤–)
 static void ec16_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -328,7 +328,7 @@ static void ec16_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// Ï»çêÀ± (³°->Æâ)
+// å…­èŠ’æ˜Ÿ (å¤–->å†…)
 static void ec17_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -343,56 +343,56 @@ static void ec17_cb(surface_t *sfsrc, surface_t *sfdst) {
 
 
 
-//¥Ö¥í¥Ã¥¯¥Ç¥£¥¾¥ë¥Ö
+//ãƒ–ãƒ­ãƒƒã‚¯ãƒ‡ã‚£ã‚¾ãƒ«ãƒ–
 static void ec24_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ¿¶Æ°
+// æŒ¯å‹•
 static void ec27_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ²óÅ¾¥º¡¼¥à¥Ö¥ì¥ó¥É¥Ö¥é¡¼(SRC¤Î¤ß»²¾È
+// å›è»¢ã‚ºãƒ¼ãƒ ãƒ–ãƒ¬ãƒ³ãƒ‰ãƒ–ãƒ©ãƒ¼(SRCã®ã¿å‚ç…§
 static void ec30_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// £Ô£Ö¥¹¥¤¥Ã¥Á¥ª¥Õ(Dest¤Î¤ß»²¾È)
+// ï¼´ï¼¶ã‚¹ã‚¤ãƒƒãƒã‚ªãƒ•(Destã®ã¿å‚ç…§)
 static void ec32_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// £Ô£Ö¥¹¥¤¥Ã¥Á¥ª¥ó(Src¤Î¤ß»²¾È)
+// ï¼´ï¼¶ã‚¹ã‚¤ãƒƒãƒã‚ªãƒ³(Srcã®ã¿å‚ç…§)
 static void ec33_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ¥İ¥ê¥´¥óÇúÈ¯
+// ãƒãƒªã‚´ãƒ³çˆ†ç™º
 static void ec34_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ¥Î¥¤¥º¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ãƒã‚¤ã‚ºã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec35_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ¥Ú¡¼¥¸¤á¤¯¤ê
+// ãƒšãƒ¼ã‚¸ã‚ãã‚Š
 static void ec36_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ¥»¥Ô¥¢¥Î¥¤¥º¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ã‚»ãƒ”ã‚¢ãƒã‚¤ã‚ºã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec37_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ¤°¤·¤ã¤°¤·¤ã»æ±¦²¼¤Ò¤Ã¤Ñ¤ê
+// ãã—ã‚ƒãã—ã‚ƒç´™å³ä¸‹ã²ã£ã±ã‚Š
 static void ec38_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-// ²£¤¦¤Í¤¦¤Í
+// æ¨ªã†ã­ã†ã­
 static void ec39_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
 
 /*
-  ¸ú²Ì¤Ä¤­²èÌÌ¹¹¿·
-  @param type: ¸ú²Ì¤Î¼ïÎà
-  @param time: ¼Â¹Ô»ş´Ö
-  @param cancel: ¥­¡¼È´¤±(0:¤Ê¤·, 1:¤¢¤ê)
+  åŠ¹æœã¤ãç”»é¢æ›´æ–°
+  @param type: åŠ¹æœã®ç¨®é¡
+  @param time: å®Ÿè¡Œæ™‚é–“
+  @param cancel: ã‚­ãƒ¼æŠœã‘(0:ãªã—, 1:ã‚ã‚Š)
 */
 int sp_eupdate(int type, int time, int cancel) {
 	surface_t *sfsrc, *sfdst;
@@ -403,15 +403,15 @@ int sp_eupdate(int type, int time, int cancel) {
 		return OK;
 	}
 	
-	// ¸½ºß¤Î sf0 ¤ò¥»¡¼¥Ö
+	// ç¾åœ¨ã® sf0 ã‚’ã‚»ãƒ¼ãƒ–
 	sfsrc = sf_dup(sf0);
 	
 	sp_update_all(FALSE);
 	
 	sfdst = sf_dup(sf0);
 	
-	sf_copyall(sf0, sfsrc); // Á´Éô¤Î¸ú²Ì¥¿¥¤¥×¤Ë¤³¤Î½èÍı¤ÏÍ×¤é¤Ê¤¤¤ó¤À¤±¤É
-	// 5¤Ä¤ò±Û¤¨¤¿¤éÊÌ¤ÎÊıË¡¤ò¹Í¤¨¤è¤¦
+	sf_copyall(sf0, sfsrc); // å…¨éƒ¨ã®åŠ¹æœã‚¿ã‚¤ãƒ—ã«ã“ã®å‡¦ç†ã¯è¦ã‚‰ãªã„ã‚“ã ã‘ã©
+	// 5ã¤ã‚’è¶ŠãˆãŸã‚‰åˆ¥ã®æ–¹æ³•ã‚’è€ƒãˆã‚ˆã†
 	if (type == 10) {
 		ec10_prepare(sfsrc, sfdst);
 	}

@@ -1,7 +1,7 @@
 /*
- * flood.h  ÅÉ¤ê¤Ä¤Ö¤·Áàºî 
+ * flood.h  å¡—ã‚Šã¤ã¶ã—æ“ä½œ 
  *
- * Copyright (C) 1998- ÅÄ¿¬¤µ¤ó <tajiri@wizard.elec.waseda.ac.jp>
+ * Copyright (C) 1998- ç”°å°»ã•ã‚“ <tajiri@wizard.elec.waseda.ac.jp>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

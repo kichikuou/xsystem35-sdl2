@@ -40,7 +40,7 @@ static int wav_read(musstream_t *this, void *ptr, int size, int nmemb) {
 	if (len <= 0) return 0;
 	
 #ifdef WORDS_BIGENDIAN
-	if (this->byteswap) { //  16bit¤Î¤È¤­¤Î¤ßÎ©¤Æ¤ë
+	if (this->byteswap) { //  16bitã®ã¨ãã®ã¿ç«‹ã¦ã‚‹
 		WORD *src = (WORD *)this->hidden.mem.cur;
 		WORD *dst = (WORD *)ptr;
 		int sample = len /2;
@@ -113,7 +113,7 @@ static int wav_seek2(struct _musstream *this, int offset, int where) {
 	
 	switch(where) {
 	case SEEK_SET:
-		newpos = this->hidden.mem.lpp + offset;  // ¤¦¤Ò¤Ò
+		newpos = this->hidden.mem.lpp + offset;  // ã†ã²ã²
 		break;
 	case SEEK_CUR:
 		newpos = this->hidden.mem.cur + offset;

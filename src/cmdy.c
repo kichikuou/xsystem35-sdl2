@@ -39,33 +39,33 @@ void commandY() {
 	
 	if (p1 == 1) {
 		if (p2 == 0) {
-			/* ��å������ΰ�ν�����ȡ�ʸ����ɽ�����֤򺸾�ü�˥��åȤ��� */
+			/* メッセージ領域の初期化と、文字の表示位置を左上端にセットする */
 			msg_nextPage(TRUE);
 		} else if (p2 == 1) {
-			/* ��å������ΰ��ʸ����ɽ�����֤򺸾�ü�˥��åȤ��� */
+			/* メッセージ領域の文字の表示位置を左上端にセットする */
 			msg_nextPage(FALSE);
 		}
 	} else if (p1 == 2) {
-		/*�����ƥ��ѿ� D01��D20 �ޤǤ��������� */ 
+		/*システム変数 D01〜D20 までを初期化する */ 
 		for (i = 0; i < 20; i++) {
 			sysVar[i + 1] = 0;
 		}
 	} else if (p1 == 3) {
 		if (p2 == 10000) {
-			/* �ʹߤΥ������ȤǤϥ������Ϥ�����Ĥ��ʤ��ʤ� */
+			/* 以降のウェイトではキー入力を受けつけなくなる */
 			Y3waitCancel = FALSE;
 		} else if (p2 == 10001) {
-			/* �ʹߤΥ������ȤǤϥ������Ϥ�����Ĥ���ʽ�������*/
+			/* 以降のウェイトではキー入力を受けつける（初期設定）*/
 			Y3waitCancel = TRUE;
 		} else if (p2 == 0) {
-			sysVar[0] = sys_getInputInfo(); /* thanx TOTO���� */
+			sysVar[0] = sys_getInputInfo(); /* thanx TOTOさん */
 		} else {
-			/* �ף��ɣ� (1/60��) �� n �����������Ȥ򤫤��롣*/
+			/* ＷＡＩＴ (1/60秒) × n だけウェイトをかける。*/
 			if (get_skipMode()) return;
 			sysVar[0] = sys_keywait(16 * p2, Y3waitCancel);
 		}
 	} else if (p1 == 4) {
-		/* 1 �� n �ޤǤ������ RND ���֤���*/
+		/* 1 〜 n までの乱数を RND に返す。*/
 		if (p2 == 0 || p2 == 1) {
 			sysVar[0] = p2;
 		} else {

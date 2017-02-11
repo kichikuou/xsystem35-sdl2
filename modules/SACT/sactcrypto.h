@@ -1,5 +1,5 @@
 /*
- * sactcrypt.h: SACT�ΰŹ沽��Ϣ
+ * sactcrypt.h: SACTの暗号化関連
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

@@ -1,5 +1,5 @@
 /*
- * scenario.h  ¥·¥Ê¥ê¥ª´ÉÍı¼Â¹Ô
+ * scenario.h  ã‚·ãƒŠãƒªã‚ªç®¡ç†å®Ÿè¡Œ
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

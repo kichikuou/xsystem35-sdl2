@@ -1,5 +1,5 @@
 /*
- * sprite_draw.c: ¥¹¥×¥é¥¤¥ÈºÆÉÁ²è³Æ¼ï
+ * sprite_draw.c: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†æç”»å„ç¨®
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -41,7 +41,7 @@ static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w
 
 
 
-// ¶ë·Á¤Î depthmap ¤òÉÁ²è
+// çŸ©å½¢ã® depthmap ã‚’æç”»
 static void fill_dmap(int dx ,int dy, int w, int h, WORD val) {
 	BYTE *dp, *dp_;
 	int x, y;
@@ -59,7 +59,7 @@ static void fill_dmap(int dx ,int dy, int w, int h, WORD val) {
 	}
 }
 
-// alphamap¤Ë¤·¤¿¤¬¤Ã¤Æ¡¢alphaÃÍ¤¬0¤è¤êÂç¤­¤¤¤È¤³¤í¤ò»ØÄê¤Îdepth¤È¤¹¤ë
+// alphamapã«ã—ãŸãŒã£ã¦ã€alphaå€¤ãŒ0ã‚ˆã‚Šå¤§ãã„ã¨ã“ã‚ã‚’æŒ‡å®šã®depthã¨ã™ã‚‹
 static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w, int h, WORD val) {
 	BYTE *sp, *dp;
 	int x, y;
@@ -78,8 +78,8 @@ static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w
 }
 
 /*
- »ØÄê¤Î sprite (¤Î¸½ºß¤ÎCG)¤ò surface0 ¤Ë½ñ¤¯
- @param sp: ÉÁ²è¤¹¤ë¥¹¥×¥é¥¤¥È
+ æŒ‡å®šã® sprite (ã®ç¾åœ¨ã®CG)ã‚’ surface0 ã«æ›¸ã
+ @param sp: æç”»ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 int sp_draw(sprite_t *sp) {
 	if (sp == NULL) return NG;
@@ -88,11 +88,11 @@ int sp_draw(sprite_t *sp) {
 }
 
 /*
-  »ØÄê¤Î sprite¤Î»ØÄê¤ÎCG¤ò surface0 ¤Ë½ñ¤¯
-  (¤³¤Î¥¤¥ó¥¿¡¼¥Õ¥§¥¤¥¹¤Ï¤â¤¦ÉÔÍ×?)
+  æŒ‡å®šã® spriteã®æŒ‡å®šã®CGã‚’ surface0 ã«æ›¸ã
+  (ã“ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¯ã‚‚ã†ä¸è¦?)
 
-  @param sp: ÉÁ²è¤¹¤ë¥¹¥×¥é¥¤¥È
-  @param cg: ÉÁ²è¤¹¤ëCG
+  @param sp: æç”»ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+  @param cg: æç”»ã™ã‚‹CG
 */
 int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	surface_t update;
@@ -101,7 +101,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	if (cg == NULL) return NG;
 	if (cg->sf == NULL) return NG;
 
-	// ¹¹¿·ÎÎ°è¤Î³ÎÄê
+	// æ›´æ–°é ˜åŸŸã®ç¢ºå®š
 	update.width  = sact.updaterect.width;
 	update.height = sact.updaterect.height;
 	sx = 0;
@@ -119,7 +119,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	dy += sact.updaterect.y;
 	
 	if (cg->sf->has_alpha) {
-		// alpha map ¤¬¤¢¤ë¾ì¹ç
+		// alpha map ãŒã‚ã‚‹å ´åˆ
 		gre_BlendUseAMap(sf0, dx, dy,
 				 sf0, dx, dy,
 				 cg->sf, sx, sy, w, h,
@@ -127,10 +127,10 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 				 sp->blendrate);
 	} else {
 		if (sp->blendrate == 255) {
-			// alphaÃÍ»ØÄê¤¬Ìµ¤¤¾ì¹ç
+			// alphaå€¤æŒ‡å®šãŒç„¡ã„å ´åˆ
 			gr_copy(sf0, dx, dy, cg->sf, sx, sy, w, h);
 		} else if (sp->blendrate > 0) {
-			// alphaÃÍ»ØÄê¤¬¤¢¤ë¾ì¹ç
+			// alphaå€¤æŒ‡å®šãŒã‚ã‚‹å ´åˆ
 			gre_Blend(sf0, dx, dy,
 				  sf0, dx, dy,
 				  cg->sf, sx, sy, w, h,
@@ -144,7 +144,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 }
 
 /*
-  ¥¹¥×¥é¥¤¥È¥­¡¼ÂÔ¤ÁÍÑ¤Îdepthmap ¤ò¹¹¿·
+  ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚­ãƒ¼å¾…ã¡ç”¨ã®depthmap ã‚’æ›´æ–°
 */
 void sp_draw_dmap(gpointer data, gpointer userdata) {
 	sprite_t *sp = (sprite_t *)data;
@@ -152,17 +152,17 @@ void sp_draw_dmap(gpointer data, gpointer userdata) {
 	surface_t update;
 	int sx, sy, w, h, dx, dy;
 	
-	// ÈóÉ½¼¨¾õÂÖ¤Î»ş¤ÏÌµ»ë
+	// éè¡¨ç¤ºçŠ¶æ…‹ã®æ™‚ã¯ç„¡è¦–
 	if (!sp->show) return;
 	
-	// ¥É¥é¥Ã¥°Ãæ¤Î¥¹¥×¥é¥¤¥È¤ÏÌµ»ë
+	// ãƒ‰ãƒ©ãƒƒã‚°ä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯ç„¡è¦–
 	if (sp == sact.draggedsp) return;
 	
 	cg = sp->curcg;
 	if (cg == NULL) return;
 	if (cg->sf == NULL) return;
 	
-	// depth map ¤ò½ñ¤¯ÎÎ°è¤ò³ÎÄê
+	// depth map ã‚’æ›¸ãé ˜åŸŸã‚’ç¢ºå®š
 	update.width  = sf0->width;
 	update.height = sf0->height;
 	sx = 0;

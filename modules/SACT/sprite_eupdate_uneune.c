@@ -42,7 +42,7 @@ static void uneune(surface_t *in, surface_t *out, int st) {
 
 
 
-// §¶§Õ§¶§Õ•Ø•Ì•π•’•ß°º•…
+// „ÅÜ„Å≠„ÅÜ„Å≠„ÇØ„É≠„Çπ„Éï„Çß„Éº„Éâ
 static void ec31_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	surface_t *st, *dt;

@@ -42,7 +42,7 @@ static void commandF9();
 static void commandF10();
 static void commandF11();
 
-/* F6/7 ÍÑÊÑ¿ô */
+/* F6/7 ç”¨å¤‰æ•° */
 static int *F6Index[256];
 
 void commandF() {

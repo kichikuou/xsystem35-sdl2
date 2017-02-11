@@ -1,5 +1,5 @@
 /*
- * savedate.c  ¥»¡¼¥Ö¥Ç¡¼¥¿¤Î´ÉÍı
+ * savedate.c  ã‚»ãƒ¼ãƒ–ãƒ‡ãƒ¼ã‚¿ã®ç®¡ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -39,7 +39,7 @@
 #include "selection.h"
 #include "message.h"
 
-/* ¥»¡¼¥Ö¥Ç¡¼¥¿ */
+/* ã‚»ãƒ¼ãƒ–ãƒ‡ãƒ¼ã‚¿ */
 static char *saveDataFile[SAVE_MAXNUMBER];
 static char *saveDataPath;
 static int savefile_sysvar_cnt = SYSVAR_MAX;
@@ -55,31 +55,31 @@ static int   saveGameData(int no, char *buf, int size);
 
 
 
-/* savefile ¤¬¤¢¤ë directory ¤òÅĞÏ¿ */
+/* savefile ãŒã‚ã‚‹ directory ã‚’ç™»éŒ² */
 void save_set_path(char *path) {
 	nact->files.savedir = strdup(path);
 	saveDataPath = strdup(path);
 	fc_init(path);
 }
 
-/* savefile ¤òÅĞÏ¿ */
+/* savefile ã‚’ç™»éŒ² */
 void save_register_file(char *name, int index) {
 	saveDataFile[index] = strdup(name);
 }
 
-/* savefile ¤ò»²¾È */
+/* savefile ã‚’å‚ç…§ */
 char *save_get_file(int index) {
 	return saveDataFile[index];
 }
 
-/* savefile ¤òºï½ü */
+/* savefile ã‚’å‰Šé™¤ */
 int save_delete_file(int index) {
 	int ret = unlink(saveDataFile[index]);
 	
 	if (ret == 0) {
 		return 1;
 	}
-	return 1; /* ¤È¤ê¤¢¤¨¤º */
+	return 1; /* ã¨ã‚Šã‚ãˆãš */
 }
 
 static char *get_fullpath(char *filename) {
@@ -127,7 +127,7 @@ static FILE *fileopen(char *filename, char type) {
 	return fp;
 }
 
-/* »ØÄê¥Õ¥¡¥¤¥ë¤Ø¤ÎÊÑ¿ô¤Î½ñ¤­¹ş¤ß */
+/* æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®å¤‰æ•°ã®æ›¸ãè¾¼ã¿ */
 int save_save_var_with_file(char *filename, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
@@ -167,7 +167,7 @@ int save_save_var_with_file(char *filename, int *start, int cnt) {
 	return status;
 }
 
-/* »ØÄê¥Õ¥¡¥¤¥ë¤«¤é¤ÎÊÑ¿ô¤ÎÆÉ¤ß¹ş¤ß */
+/* æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã®å¤‰æ•°ã®èª­ã¿è¾¼ã¿ */
 int save_load_var_with_file(char *filename, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
@@ -207,7 +207,7 @@ int save_load_var_with_file(char *filename, int *start, int cnt) {
 }
 
 
-/* »ØÄê¥Õ¥¡¥¤¥ë¤Ø¤ÎÊ¸»úÎó¤Î½ñ¤­¹ş¤ß, start = 1~ */
+/* æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®æ–‡å­—åˆ—ã®æ›¸ãè¾¼ã¿, start = 1~ */
 int save_save_str_with_file(char *filename, int start, int cnt) {
 	int status = 0, size, _size,i;
 	FILE *fp;
@@ -245,7 +245,7 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 	return status;
 }
 
-/* »ØÄê¥Õ¥¡¥¤¥ë¤«¤é¤ÎÊ¸»úÎó¤ÎÆÉ¤ß¹ş¤ß */
+/* æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã®æ–‡å­—åˆ—ã®èª­ã¿è¾¼ã¿ */
 int save_load_str_with_file(char *filename, int start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
@@ -286,7 +286,7 @@ int save_load_str_with_file(char *filename, int start, int cnt) {
 	return status;
 }
 
-/* ¥»¡¼¥Ö¥Õ¥¡¥¤¥ë¤Î¥³¥Ô¡¼ */
+/* ã‚»ãƒ¼ãƒ–ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚³ãƒ”ãƒ¼ */
 int save_copyAll(int dstno, int srcno) {
 	char *saveTop;
 	int status, filesize;
@@ -310,7 +310,7 @@ int save_copyAll(int dstno, int srcno) {
 	return status;
 }
 
-/* ¥Ç¡¼¥¿¤Î°ìÉô¥í¡¼¥É */
+/* ãƒ‡ãƒ¼ã‚¿ã®ä¸€éƒ¨ãƒ­ãƒ¼ãƒ‰ */
 int save_loadPartial(int no, int page, int offset, int cnt) {
 	Ald_baseHdr *save_base;
 	char *vtop;
@@ -366,7 +366,7 @@ int save_loadPartial(int no, int page, int offset, int cnt) {
 	return SAVE_LOADERR;
 }
 
-/* ¥Ç¡¼¥¿¤Î°ìÉô¥»¡¼¥Ö */
+/* ãƒ‡ãƒ¼ã‚¿ã®ä¸€éƒ¨ã‚»ãƒ¼ãƒ– */
 int save_savePartial(int no, int page, int offset, int cnt) {
 	Ald_baseHdr *save_base;
 	WORD *tmp;
@@ -416,7 +416,7 @@ int save_savePartial(int no, int page, int offset, int cnt) {
 }
 
 
-/* ¥Ç¡¼¥¿¤Î¥í¡¼¥É */
+/* ãƒ‡ãƒ¼ã‚¿ã®ãƒ­ãƒ¼ãƒ‰ */
 int save_loadAll(int no) {
 	Ald_baseHdr *save_base;
 	char *saveTop = NULL;
@@ -430,7 +430,7 @@ int save_loadAll(int no) {
 		return status;
 	if (filesize <= sizeof(Ald_baseHdr))
 		goto errexit;
-	/* ³Æ¼ï¥Ç¡¼¥¿¤ÎÈ¿±Ç */
+	/* å„ç¨®ãƒ‡ãƒ¼ã‚¿ã®åæ˜  */
 	save_base = (Ald_baseHdr *)saveTop;
 	if (save_base->version != SAVE_DATAVERSION) {
 		fprintf(stderr, "save_loadAll(): endian mismatch\n");
@@ -463,11 +463,11 @@ int save_loadAll(int no) {
 		// msgWinInfo[i].savedImage = NULL;
 		// msgWinInfo[i].save   = FALSE;
 	}
-	/* ¥¹¥¿¥Ã¥¯¤Î¥í¡¼¥É */
+	/* ã‚¹ã‚¿ãƒƒã‚¯ã®ãƒ­ãƒ¼ãƒ‰ */
 	loadStackInfo(saveTop + save_base->stackinfo);
-	/* Ê¸»úÎóÊÑ¿ô¤Î¥í¡¼¥É */
+	/* æ–‡å­—åˆ—å¤‰æ•°ã®ãƒ­ãƒ¼ãƒ‰ */
 	loadStrVar(saveTop + save_base->varStr);
-	/* ¿ôÃÍ¡¦ÇÛÎóÊÑ¿ô¤Î¥í¡¼¥É */
+	/* æ•°å€¤ãƒ»é…åˆ—å¤‰æ•°ã®ãƒ­ãƒ¼ãƒ‰ */
 	for (i = 0; i < 256; i++) {
 		if (save_base->varSys[i] != 0) {
 			if (SAVE_LOADOK != loadSysVar(saveTop + save_base->varSys[i]))
@@ -482,7 +482,7 @@ int save_loadAll(int no) {
 	return SAVE_LOADERR;
 }
 
-/* ¥Ç¡¼¥¿¤Î¥»¡¼¥Ö */
+/* ãƒ‡ãƒ¼ã‚¿ã®ã‚»ãƒ¼ãƒ– */
 int save_saveAll(int no) {
 	Ald_baseHdr   *save_base = calloc(1, sizeof(Ald_baseHdr));
 	Ald_strVarHdr save_strHdr;
@@ -510,7 +510,7 @@ int save_saveAll(int no) {
 	memset(&save_strHdr, 0, sizeof(Ald_strVarHdr));
 	memset(&save_sysHdr, 0, sizeof(Ald_sysVarHdr));
 	
-	/* ³Æ¼ï¥Ç¡¼¥¿¤Î¥»¡¼¥Ö */
+	/* å„ç¨®ãƒ‡ãƒ¼ã‚¿ã®ã‚»ãƒ¼ãƒ– */
 	strncpy(save_base->ID, SAVE_DATAID, 32);
 	save_base->version       = SAVE_DATAVERSION;
 	save_base->selMsgSize    = (BYTE)nact->sel.MsgFontSize;
@@ -540,7 +540,7 @@ int save_saveAll(int no) {
 
 	fseek(fp, sizeof(Ald_baseHdr), SEEK_SET);
 	
-	/* ¥¹¥¿¥Ã¥¯¾ğÊó */
+	/* ã‚¹ã‚¿ãƒƒã‚¯æƒ…å ± */
 	if (NULL == (sd_stack = saveStackInfo(&save_stackHdr)))
 		goto errexit;
 
@@ -553,7 +553,7 @@ int save_saveAll(int no) {
 	save_base->stackinfo  = totalsize;
 	totalsize            += save_stackHdr.size + sizeof(Ald_stackHdr);
 	
-	/* Ê¸»úÎóÊÑ¿ô */
+	/* æ–‡å­—åˆ—å¤‰æ•° */
 	if (NULL == (sd_varStr = saveStrVar(&save_strHdr)))
 		goto errexit;
 	
@@ -567,7 +567,7 @@ int save_saveAll(int no) {
 	totalsize         += save_strHdr.size + sizeof(Ald_strVarHdr);
 	free(sd_varStr);
 	
-	/* ¿ôÃÍÊÑ¿ô¡¦ÇÛÎóÊÑ¿ô */
+	/* æ•°å€¤å¤‰æ•°ãƒ»é…åˆ—å¤‰æ•° */
 	for (i = 0; i < 256; i++) {
 		sd_varSys = saveSysVar(&save_sysHdr, i);
 		if (sd_varSys == NULL) {
@@ -606,7 +606,7 @@ int save_saveAll(int no) {
 	return SAVE_SAVEERR;
 }
 
-/* ¥¹¥¿¥Ã¥¯¾ğÊó¤Î¥»¡¼¥Ö */
+/* ã‚¹ã‚¿ãƒƒã‚¯æƒ…å ±ã®ã‚»ãƒ¼ãƒ– */
 static void *saveStackInfo(Ald_stackHdr *head) {
 	int count;
 	int *info = sl_getStackInfo(&count);
@@ -615,14 +615,14 @@ static void *saveStackInfo(Ald_stackHdr *head) {
 	return (void *)info;
 }
 
-/* ¥¹¥¿¥Ã¥¯¾ğÊó¤Î¥í¡¼¥É */
+/* ã‚¹ã‚¿ãƒƒã‚¯æƒ…å ±ã®ãƒ­ãƒ¼ãƒ‰ */
 static void loadStackInfo(char *buf) {
 	Ald_stackHdr *head = (Ald_stackHdr *)buf;
 	char         *data = buf + sizeof(Ald_stackHdr);
 	sl_putStackInfo((int *)data, head->size / sizeof(int));
 }
 
-/* Ê¸»úÎóÊÑ¿ô¤Î¥»¡¼¥Ö */
+/* æ–‡å­—åˆ—å¤‰æ•°ã®ã‚»ãƒ¼ãƒ– */
 static void *saveStrVar(Ald_strVarHdr *head) {
 	int i;
 	char *tmp, *_tmp;
@@ -642,7 +642,7 @@ static void *saveStrVar(Ald_strVarHdr *head) {
 	return _tmp;
 }
 
-/* Ê¸»úÎóÊÑ¿ô¤Î¥í¡¼¥É */
+/* æ–‡å­—åˆ—å¤‰æ•°ã®ãƒ­ãƒ¼ãƒ‰ */
 static void loadStrVar(char *buf) {
 	Ald_strVarHdr *head = (Ald_strVarHdr *)buf;
 	int cnt, max, i;
@@ -658,7 +658,7 @@ static void loadStrVar(char *buf) {
 	}
 }
 
-/* ¿ôÃÍ¡¦ÇÛÎóÊÑ¿ô¤Î¥»¡¼¥Ö */
+/* æ•°å€¤ãƒ»é…åˆ—å¤‰æ•°ã®ã‚»ãƒ¼ãƒ– */
 static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	int *var;
 	int cnt, i;
@@ -687,7 +687,7 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	return _tmp;
 }
 
-/* ¿ôÃÍ¡¦ÇÛÎóÊÑ¿ô¤Î¥í¡¼¥É */
+/* æ•°å€¤ãƒ»é…åˆ—å¤‰æ•°ã®ãƒ­ãƒ¼ãƒ‰ */
 static int loadSysVar(char *buf) {
 	int i, cnt;
 	int  *var;
@@ -732,13 +732,13 @@ static int loadSysVar(char *buf) {
 }
 
 
-/* ¥²¡¼¥à¥Ç¡¼¥¿¤Î¥í¡¼¥É
+/* ã‚²ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿ã®ãƒ­ãƒ¼ãƒ‰
 
- no:    ¥»¡¼¥Ö¥Õ¥¡¥¤¥ëÈÖ¹æ 0~ 
- *status:  ¥¹¥Æ¡¼¥¿¥¹
- *size: ¥Ç¡¼¥¿¤ÎÂç¤­¤µ¤òÊÖ¤¹¥İ¥¤¥ó¥¿
+ no:    ã‚»ãƒ¼ãƒ–ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå· 0~ 
+ *status:  ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹
+ *size: ãƒ‡ãƒ¼ã‚¿ã®å¤§ãã•ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿
 
-¤¢¤È¤Ç free(*buf)¤¹¤ë¤Î¤òËº¤ì¤Ê¤¤¤è¤¦¤Ë
+ã‚ã¨ã§ free(*buf)ã™ã‚‹ã®ã‚’å¿˜ã‚Œãªã„ã‚ˆã†ã«
 */
 static void* loadGameData(int no, int *status, int *size) {
 	FILE *fp;
@@ -788,7 +788,7 @@ static int saveGameData(int no, char *buf, int size) {
         return status;
 }
 
-/* »ØÄê¥Õ¥¡¥¤¥ë¤«¤é¤Î²èÁü¤ÎÆÉ¤ß¹ş¤ß thanx tajiru@wizard */
+/* æŒ‡å®šãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã®ç”»åƒã®èª­ã¿è¾¼ã¿ thanx tajiru@wizard */
 BYTE* load_cg_with_file(char *filename, int *status){
 	int size;
 	FILE *fp;

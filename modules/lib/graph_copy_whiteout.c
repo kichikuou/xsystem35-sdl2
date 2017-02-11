@@ -1,4 +1,4 @@
-// �����surface�ΰ��lv=255�򿿤��� lv=0���̾�Ȥ��ƥ��ԡ�
+// 指定のsurface領域をlv=255を真っ白 lv=0を通常としてコピー
 
 #include <string.h>
 

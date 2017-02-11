@@ -1,5 +1,5 @@
 /*
- * selection.c  ÁªÂò
+ * selection.c  é¸æŠ
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -34,44 +34,44 @@
 #include "message.h"
 #include "selection.h"
 
-/* ¥·¥ç¡¼¥È¥«¥Ã¥È */
+/* ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆ */
 #define sel nact->sel
 
-/* ÁªÂò¥¦¥£¥ó¥É¤¬³«¤¤¤¿»ş¤Î¥Ş¥¦¥¹¤Î½é´ü°ÌÃÖ(ºÇ½é¤ÎÁªÂò»è¤Î°Ï¤ßÆâ) */
+/* é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ãŒé–‹ã„ãŸæ™‚ã®ãƒã‚¦ã‚¹ã®åˆæœŸä½ç½®(æœ€åˆã®é¸æŠè‚¢ã®å›²ã¿å†…) */
 #define MOUSE_INIT_X_RATIO 5  /* from 0 to 100 */
 #define MOUSE_INIT_Y_RATIO 30 /* from 0 to 100 */
 
-/* ÁªÂò»è¤ÎºÇÂç¿ô */
+/* é¸æŠè‚¢ã®æœ€å¤§æ•° */
 #define ELEMENT_MAX 20
-/* ÁªÂò»è¤Î£±¤Ä¤ÎºÇÂçÄ¹¤µ */
+/* é¸æŠè‚¢ã®ï¼‘ã¤ã®æœ€å¤§é•·ã• */
 #define ELEMENT_LENGTH 101
 
 /**************** Private Variables **********************/
-/* ÁªÂò»è¤ÎÍ×ÁÇ */
+/* é¸æŠè‚¢ã®è¦ç´  */
 static char elm[ELEMENT_MAX][ELEMENT_LENGTH];
-/* ÁªÂò¤·¤¿¤È¤­¤ËÊÖ¤¹ÃÍ */
+/* é¸æŠã—ãŸã¨ãã«è¿”ã™å€¤ */
 static int elmv[ELEMENT_MAX];
-/* ¸½ºßÅĞÏ¿Ãæ¤ÎÁªÂò»è¤ÎÈÖ¹æ */
+/* ç¾åœ¨ç™»éŒ²ä¸­ã®é¸æŠè‚¢ã®ç•ªå· */
 static int regnum = 0;
-/* ÁªÂò»è¤ÎÍ×ÁÇ¤ÎºÇÂçÄ¹¤µ */
+/* é¸æŠè‚¢ã®è¦ç´ ã®æœ€å¤§é•·ã• */
 static int maxElementLength = 0;
-/* ÁªÂò»è¥¦¥£¥ó¥ÉÂàÈò */
+/* é¸æŠè‚¢ã‚¦ã‚£ãƒ³ãƒ‰é€€é¿ */
 static MyRectangle saveArea;
-/* ÁªÂò¥¦¥£¥ó¥É¤ÎÂàÈòÍÑ */
+/* é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ã®é€€é¿ç”¨ */
 static void *saveimg;
 static void *saveimg2;
-/* ÁªÂò»ş¤Î¥ï¡¼¥¯ */
+/* é¸æŠæ™‚ã®ãƒ¯ãƒ¼ã‚¯ */
 static MyRectangle *workR;
-/* callback functions ½é´ü²½/ÁªÂò/¥­¥ã¥ó¥»¥ë»ş¤Ë¸Æ¤Ğ¤ì¤ë¥·¥Ê¥ê¥ªÆâ´Ø¿ô*/
+/* callback functions åˆæœŸåŒ–/é¸æŠ/ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ™‚ã«å‘¼ã°ã‚Œã‚‹ã‚·ãƒŠãƒªã‚ªå†…é–¢æ•°*/
 static int cb_select_page;
 static int cb_select_address;
 static int cb_cancel_page;
 static int cb_cancel_address;
-/* ÁªÂò»è window ¤ò³«¤¤¤¿»ş¤Î¥Ş¥¦¥¹¥«¡¼¥½¥ë¤ÎÆ°ºî */
+/* é¸æŠè‚¢ window ã‚’é–‹ã„ãŸæ™‚ã®ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®å‹•ä½œ */
 static int default_element = 1;
-/* ºÇ¸å¤ËÁª¤ó¤ÀÁªÂò»è¤ÎÍ×ÁÇÈÖ¹æ */
+/* æœ€å¾Œã«é¸ã‚“ã é¸æŠè‚¢ã®è¦ç´ ç•ªå· */
 static int last_selected_element;
-/* ¥­¡¼¥Ü¡¼¥É¤Ë¤è¤ëÁªÂòÁàºîÍÑ */
+/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã«ã‚ˆã‚‹é¸æŠæ“ä½œç”¨ */
 static int keymode = 0;
 
 
@@ -80,20 +80,20 @@ static void drawLineFrame(int x, int y, int width, int height);
 static int  whereElement(void);
 
 /*
-  ³Æ¸ø³«ÊÑ¿ô½é´ü²½
+  å„å…¬é–‹å¤‰æ•°åˆæœŸåŒ–
 */
 void sel_init() {
-	/* WindowÏÈ¤Î¼ïÎà */
+	/* Windowæ ã®ç¨®é¡ */
 	sel.WindowFrameType = 0;
 	sel.FrameCgNoTop = 0;
 	sel.FrameCgNoMid = 0;
 	sel.FrameCgNoBot = 0;
 	sel.Framedot = 0;
 	
-	/* ¥á¥Ã¥»¡¼¥¸¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ */
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã• */
 	sel.MsgFontSize = 16;
 	
-	/* ³Æ¼ï¿§ */
+	/* å„ç¨®è‰² */
 	sel.MsgFontColor             = 255;
 	sel.WinFrameColor            = 255;
 	sel.WinBackgroundColor       = 0;
@@ -102,10 +102,10 @@ void sel_init() {
 	sel.WinBackgroundTransparent = 255;
 	sel.EncloseType              = 0;
 	
-	/* ÁªÂò¤·¤¿¤¢¤È¥á¥Ã¥»¡¼¥¸ÎÎ°è¤ò½é´ü²½¤¹¤ë¤« */
+	/* é¸æŠã—ãŸã‚ã¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é ˜åŸŸã‚’åˆæœŸåŒ–ã™ã‚‹ã‹ */
 	sel.ClearMsgWindow  = TRUE;
 	
-	/* ÁªÂòWindow¤ÎÂç¤­¤µ¤ÎÊÑ¹¹ */
+	/* é¸æŠWindowã®å¤§ãã•ã®å¤‰æ›´ */
 	sel.WinResizeWidth  = FALSE;
 	sel.WinResizeHeight = TRUE;
 
@@ -118,28 +118,28 @@ void sel_init() {
 	sel.savedImage = NULL;
 #endif
 	
-	/* ÁªÂò»è¤òÅĞÏ¿Ãæ */
+	/* é¸æŠè‚¢ã‚’ç™»éŒ²ä¸­ */
 	sel.in_setting = FALSE;
 }
 
-/* ÅĞÏ¿¤µ¤ì¤¿ÁªÂò»è¤Î¸Ä¿ô¤òºï¸º¤¹¤ë */
+/* ç™»éŒ²ã•ã‚ŒãŸé¸æŠè‚¢ã®å€‹æ•°ã‚’å‰Šæ¸›ã™ã‚‹ */
 void sel_reduce(int no) {
 	if (regnum > no) {
 		regnum = no;
 	}
 }
 
-/* ÅĞÏ¿¤µ¤ì¤¿ÁªÂò»è¤Î¸Ä¿ô¤ò¼èÆÀ¤¹¤ë */
+/* ç™»éŒ²ã•ã‚ŒãŸé¸æŠè‚¢ã®å€‹æ•°ã‚’å–å¾—ã™ã‚‹ */
 int sel_getnumberof() {
 	return regnum;
 }
 
-/* ÅĞÏ¿¤µ¤ì¤¿ÁªÂò»èÊ¸»úÎó¤ò¼èÆÀ¤¹¤ë */
+/* ç™»éŒ²ã•ã‚ŒãŸé¸æŠè‚¢æ–‡å­—åˆ—ã‚’å–å¾—ã™ã‚‹ */
 char *sel_gettext(int no) {
 	return elm[no -1];
 }
 
-/* ÅĞÏ¿¤µ¤ì¤¿ÁªÂò»è¥¢¥É¥ì¥¹¤Ë¥¸¥ã¥ó¥×¤¹¤ë */
+/* ç™»éŒ²ã•ã‚ŒãŸé¸æŠè‚¢ã‚¢ãƒ‰ãƒ¬ã‚¹ã«ã‚¸ãƒ£ãƒ³ãƒ—ã™ã‚‹ */
 void sel_goto(int no, int flag) {
 	sl_jmpNear(elmv[no -1]);
 	
@@ -150,9 +150,9 @@ void sel_goto(int no, int flag) {
 	}
 }
 
-/* ÅĞÏ¿¤µ¤ì¤¿ÁªÂò»è¥¢¥É¥ì¥¹¤Ë¡¢´Ø¿ô¥ê¥¿¡¼¥ó¸å¥¸¥ã¥ó¥×¤¹¤ë */
+/* ç™»éŒ²ã•ã‚ŒãŸé¸æŠè‚¢ã‚¢ãƒ‰ãƒ¬ã‚¹ã«ã€é–¢æ•°ãƒªã‚¿ãƒ¼ãƒ³å¾Œã‚¸ãƒ£ãƒ³ãƒ—ã™ã‚‹ */
 void sel_returengoto(int no, int flag) {
-	// ÀÑ¤ó¤Ç¤¢¤ë¤Î¤¬ far call ¤Î»ş¤Ï¡¢sl_retFar¤Ç¤â¤É¤ê¡¢farJump¤¹¤ë
+	// ç©ã‚“ã§ã‚ã‚‹ã®ãŒ far call ã®æ™‚ã¯ã€sl_retFarã§ã‚‚ã©ã‚Šã€farJumpã™ã‚‹
 	// sl_retNear();
 	// sl_jmpNear(elmv[no -1]);
 	sl_returnGoto(elmv[no -1]);
@@ -164,12 +164,12 @@ void sel_returengoto(int no, int flag) {
 	}
 }
 
-/* ÁªÂò»è¥Ç¥Õ¥©¥ë¥ÈÈÖ¹æ»ØÄê */
+/* é¸æŠè‚¢ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆç•ªå·æŒ‡å®š */
 void sel_setDefaultElement(int type) {
 	default_element = type;
 }
 
-/* ÁªÂò»ş¥³¡¼¥ë¥Ğ¥Ã¥¯»ØÄê */
+/* é¸æŠæ™‚ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯æŒ‡å®š */
 void sel_setCallback(int type, int page, int adr) {
 	switch(type) {
 	case 1:
@@ -183,22 +183,22 @@ void sel_setCallback(int type, int page, int adr) {
 	}
 }
 
-/* ºÇ¸å¤ËÁªÂò¤µ¤ì¤¿ÁªÂòÈÖ¹æ¤ò¼èÆÀ */
+/* æœ€å¾Œã«é¸æŠã•ã‚ŒãŸé¸æŠç•ªå·ã‚’å–å¾— */
 int sel_getLastElement() {
 	return last_selected_element;
 }
 
-/* ÁªÂòÍ×ÁÇ¿ô¤òÊÖ¤¹ */
+/* é¸æŠè¦ç´ æ•°ã‚’è¿”ã™ */
 int sel_getRegistoredElementNumber() {
 	return regnum;
 }
 
-/* ÁªÂò»èºÇÂçÊ¸»úÉı¼èÆÀ */
+/* é¸æŠè‚¢æœ€å¤§æ–‡å­—å¹…å–å¾— */
 int sel_getRegistoredElementWidth() {
 	return maxElementLength;
 }
 
-/* ÁªÂò»èºÇÂçÊ¸»úÉı¼èÆÀ(ASCII) */
+/* é¸æŠè‚¢æœ€å¤§æ–‡å­—å¹…å–å¾—(ASCII) */
 int sel_getRegistoredElement_strlen() {
 	int i, _max = 0;
 	
@@ -208,12 +208,12 @@ int sel_getRegistoredElement_strlen() {
 	return _max;
 }
 
-/* ¥Õ¥©¥ó¥È¤ÎÀßÄê */
+/* ãƒ•ã‚©ãƒ³ãƒˆã®è¨­å®š */
 void sel_setFontSize(int size) {
 	sel.MsgFontSize = size;
 }
 
-/* ÁªÂò»è¤ÎÅĞÏ¿ */
+/* é¸æŠè‚¢ã®ç™»éŒ² */
 void sel_addElement(const char *str) {
 	int catlen;
 	
@@ -221,19 +221,19 @@ void sel_addElement(const char *str) {
 	strncat(elm[regnum], str, catlen);
 }
 
-/* ÁªÂò¤·¤¿¤È¤­¤ÎÊÖ¤êÃÍ¤òÅĞÏ¿ */
+/* é¸æŠã—ãŸã¨ãã®è¿”ã‚Šå€¤ã‚’ç™»éŒ² */
 void sel_addRetValue(int val) {
 	elm[regnum][0] = 0;
 	elmv[regnum] = val;
 }
 
-/* £±Í×ÁÇ¤ÎÅĞÏ¿¤Î½ªÎ» */
+/* ï¼‘è¦ç´ ã®ç™»éŒ²ã®çµ‚äº† */
 void sel_fixElement() {
 	maxElementLength = max(maxElementLength, strlen(elm[regnum]) /2);
 	regnum++;
 }
 
-/* ÁªÂò»è¥¦¥£¥ó¥É¤ò³«¤¯°Ù¤Î½àÈ÷ */
+/* é¸æŠè‚¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚’é–‹ãç‚ºã®æº–å‚™ */
 static void init_selwindow() {
 	int i;
 	MyRectangle r;
@@ -279,7 +279,7 @@ static void init_selwindow() {
 	}
 	ags_updateArea(saveArea.x, saveArea.y, saveArea.width, saveArea.height);
 	
-	/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤Î¼«Æ°°ÜÆ° */
+	/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®è‡ªå‹•ç§»å‹• */
 	if (default_element == 0) {
 		MyPoint p;
 		sys_getMouseInfo(&p, TRUE);
@@ -399,7 +399,7 @@ static void drawLineFrame(int x, int y, int width, int height) {
 	ags_drawRectangle(x - 1, y - 1, width +  2, height +  2, sel.WinBackgroundColor);
 }
 
-/* ¼Âºİ¤ËÁªÂò */
+/* å®Ÿéš›ã«é¸æŠ */
 void sel_select() {
 	int curElement = -1;
 	int preElement = -1;
@@ -408,10 +408,10 @@ void sel_select() {
 	saveimg2 = NULL;
 	keymode = 0;
 	
-	/* ÁªÂò»è¥¦¥£¥ó¥É¤Î½é´ü²½ */
+	/* é¸æŠè‚¢ã‚¦ã‚£ãƒ³ãƒ‰ã®åˆæœŸåŒ– */
 	init_selwindow();
 
-	/* ¥Ş¥¦¥¹ÎÎ°è¤Î½é´ü²½ */
+	/* ãƒã‚¦ã‚¹é ˜åŸŸã®åˆæœŸåŒ– */
 	if (NULL == (workR = malloc(sizeof(MyRectangle) * regnum))) {
 		NOMEMERR();
 	}
@@ -476,7 +476,7 @@ void sel_select() {
 	
 	free(workR);
 	
-	/* sysVar[0] = key; ¼Âºİ¤Ë¤ÏÆş¤é¤Ê¤¤¡£thanx ÅÄ¿¬¤µ¤ó */
+	/* sysVar[0] = key; å®Ÿéš›ã«ã¯å…¥ã‚‰ãªã„ã€‚thanx ç”°å°»ã•ã‚“ */
 	
 	regnum = 0;
 	maxElementLength = 0;

@@ -30,11 +30,11 @@
 #include "ags.h"
 #include "cursor.h"
 
-/* ½é´ü²½´Ø·¸ */
+/* åˆæœŸåŒ–é–¢ä¿‚ */
 extern int  sdl_Initilize(void);
 extern void sdl_Remove(void);
 
-/* ¥¦¥£¥ó¥É´Ø·¸ */
+/* ã‚¦ã‚£ãƒ³ãƒ‰é–¢ä¿‚ */
 extern void sdl_setWorldSize(int width, int height, int depth);
 extern void sdl_setWindowSize(int x, int y, int w, int h);
 extern void sdl_setWindowTitle(char *name);
@@ -42,14 +42,14 @@ extern void sdl_getWindowInfo(DispInfo *info);
 extern void sdl_FullScreen(boolean on);
 extern agsurface_t *sdl_getDIB(void);
 
-/* ²èÌÌ¹¹¿· */
+/* ç”»é¢æ›´æ–° */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);
 extern void sdl_fullScreen(boolean on);
 
-/* ¥Ñ¥ì¥Ã¥È´Ø·¸ */
+/* ãƒ‘ãƒ¬ãƒƒãƒˆé–¢ä¿‚ */
 extern void sdl_setPallet(Pallet256 *pal, int src, int cnt);
 
-/* ÉÁ²è´Ø·¸ */
+/* æç”»é–¢ä¿‚ */
 extern void sdl_drawRectangle(int x, int y, int w, int h, int cl);
 extern void sdl_fillRectangle(int x, int y, int w, int h, u_long c);
 extern void sdl_drawLine(int x1, int y1, int x2, int y2, u_long col);
@@ -76,7 +76,7 @@ extern void sdl_restoreRegion(SDL_Surface *src, int x, int y);
 extern SDL_Surface* sdl_saveRegion(int x, int y, int w, int h);
 extern void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step);
 
-/* ¥Õ¥©¥ó¥È´ØÏ¢ */
+/* ãƒ•ã‚©ãƒ³ãƒˆé–¢é€£ */
 extern void sdl_setFontDevice(FONT *f);
 
 /* fader */
@@ -85,7 +85,7 @@ extern void sdl_fadeOut(int step);
 extern void sdl_whiteIn(int step);
 extern void sdl_whiteOut(int step);
 
-/* key/pointer ´Ø·¸ */
+/* key/pointer é–¢ä¿‚ */
 extern int  sdl_keywait(int msec, boolean cancel);
 extern void sdl_keywait_post(void);
 extern void sdl_setCursorLocation(int x, int y);
@@ -100,26 +100,26 @@ extern void sdl_setAutoRepeat(boolean bool);
 extern void sdl_mainIteration();
 extern boolean RawKeyInfo[];
 
-/* ½é´ü²½´Ø·¸ */
+/* åˆæœŸåŒ–é–¢ä¿‚ */
 #define GraphicsInitilize() sdl_Initilize()
 #define GraphicsRemove() sdl_Remove()
 
-/* ¥¦¥£¥ó¥É´Ø·¸ */
+/* ã‚¦ã‚£ãƒ³ãƒ‰é–¢ä¿‚ */
 #define GetWindowInfo(info) sdl_getWindowInfo(info)
 #define SetWindowSize(x,y,w,h) sdl_setWindowSize((x),(y),(w),(h))
 #define SetWindowTitle(size) sdl_setWindowTitle((size))
 #define SetWorldSize(w,h,d) sdl_setWorldSize((w),(h),(d))
 #define GetDIB() sdl_getDIB()
 
-/* ²èÌÌ¹¹¿· */
+/* ç”»é¢æ›´æ–° */
 #define DspDeviceSync() sdl_sync()
 #define UpdateArea(src,dst) sdl_updateArea((src),(dst))
 #define FullScreen(on) sdl_FullScreen(on)
 
-/* ¥Ñ¥ì¥Ã¥È´Ø·¸ */
+/* ãƒ‘ãƒ¬ãƒƒãƒˆé–¢ä¿‚ */
 #define SetPallet(pal,src,cnt) sdl_setPallet((pal),(src),(cnt))
 
-/* ÉÁ²è´Ø·¸ */
+/* æç”»é–¢ä¿‚ */
 #define DrawString(x,y,str,col) sdl_drawString((x),(y),(str),(col))
 #define FillRectangle(x,y,w,h,col) sdl_fillRectangle((x),(y),(w),(h),(col))
 #define CopyArea(sx,sy,w,h,dx,dy) sdl_copyArea((sx),(sy),(w),(h),(dx),(dy))
@@ -147,16 +147,16 @@ extern boolean RawKeyInfo[];
 #define CopyRegion(i,sx,sy,w,h,dx,dy) sdl_CopyRegion(i,sx,sy,w,h,dx,dy)
 #define Maskupdate(sx,sy,w,h,dx,dy,f,st) sdl_maskupdate(sx,sy,w,h,dx,dy,f,st)
 
-/* ¥Õ¥©¥ó¥È´ØÏ¢ */
+/* ãƒ•ã‚©ãƒ³ãƒˆé–¢é€£ */
 #define SetFontDevice(f) sdl_setFontDevice(f)
 
-/* fader ´ØÏ¢ */
+/* fader é–¢é€£ */
 #define FadeOut sdl_fadeOut
 #define FadeIn sdl_fadeIn
 #define WhiteIn sdl_whiteIn
 #define WhiteOut sdl_whiteOut
 
-/* key/pointer ´Ø·¸ */
+/* key/pointer é–¢ä¿‚ */
 #define GetKeyInfo() sdl_getKeyInfo()
 #define SetCursorType(t) sdl_setCursorType((t))
 #define GetMouseInfo(info) sdl_getMouseInfo(info)

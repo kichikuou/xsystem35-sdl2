@@ -54,41 +54,41 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 }
 
 /**
- * surface¤ÎÀ¸À® (pixel + alpha)
- * @param width:  surface¤ÎÉı
- * @param height: surface¤Î¹â¤µ
- * @param depth:  surface¤Îpixel¤ÎBPP (8|15|16|24|32), alpha¤Ï8¸ÇÄê
- * @return À¸À®¤·¤¿ surface ¥ª¥Ö¥¸¥§¥¯¥È
+ * surfaceã®ç”Ÿæˆ (pixel + alpha)
+ * @param width:  surfaceã®å¹…
+ * @param height: surfaceã®é«˜ã•
+ * @param depth:  surfaceã®pixelã®BPP (8|15|16|24|32), alphaã¯8å›ºå®š
+ * @return ç”Ÿæˆã—ãŸ surface ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
  */
 surface_t *sf_create_surface(int width, int height, int depth) {
 	return create(width, height, depth, TRUE, TRUE);
 }
 
 /**
- * surface¤ÎÀ¸À® (alpha¤Î¤ß)
- * @param width:  surface¤ÎÉı
- * @param height: surface¤Î¹â¤µ
- * @return À¸À®¤·¤¿ surface ¥ª¥Ö¥¸¥§¥¯¥È
+ * surfaceã®ç”Ÿæˆ (alphaã®ã¿)
+ * @param width:  surfaceã®å¹…
+ * @param height: surfaceã®é«˜ã•
+ * @return ç”Ÿæˆã—ãŸ surface ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
  */
 surface_t *sf_create_alpha(int width, int height) {
 	return create(width, height, 8, FALSE, TRUE);
 }
 
 /**
- * surface¤ÎÀ¸À® (pixel¤Î¤ß)
- * @param width:  surface¤ÎÉı
- * @param height: surface¤Î¹â¤µ
- * @param depth:  surface¤ÎBPP(8|15|16|24|32)
- * @return À¸À®¤·¤¿ surface ¥ª¥Ö¥¸¥§¥¯¥È
+ * surfaceã®ç”Ÿæˆ (pixelã®ã¿)
+ * @param width:  surfaceã®å¹…
+ * @param height: surfaceã®é«˜ã•
+ * @param depth:  surfaceã®BPP(8|15|16|24|32)
+ * @return ç”Ÿæˆã—ãŸ surface ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
  */
 surface_t *sf_create_pixel(int width, int height, int depth) {
 	return create(width, height, depth, TRUE, FALSE);
 }
 
 /**
- * surface¥ª¥Ö¥¸¥§¥¯¥È¤Î³«Êü
- * @param s: ³«Êü¤¹¤ë¥ª¥Ö¥¸¥§¥¯¥È
- * @return:  ¤Ê¤·
+ * surfaceã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é–‹æ”¾
+ * @param s: é–‹æ”¾ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+ * @return:  ãªã—
  */
 void sf_free(surface_t *s) {
 	if (s == NULL) return;
@@ -98,9 +98,9 @@ void sf_free(surface_t *s) {
 }
 
 /**
- * surface ¤ÎÊ£À½¤òºîÀ®(dupulicate)
- * @param in: Ê£À½¤â¤È
- * @return  : Ê£À½¤·¤¿surface
+ * surface ã®è¤‡è£½ã‚’ä½œæˆ(dupulicate)
+ * @param in: è¤‡è£½ã‚‚ã¨
+ * @return  : è¤‡è£½ã—ãŸsurface
  */
 surface_t *sf_dup(surface_t *in) {
 	surface_t *sf;
@@ -127,10 +127,10 @@ surface_t *sf_dup(surface_t *in) {
 }
 
 /**
- * surfaceÁ´ÂÎ¤Î¥³¥Ô¡¼
- * @param dst: ¥³¥Ô¡¼Àè surface
- * @param src: ¥³¥Ô¡¼¸µ surface
- * @return ¤Ê¤·
+ * surfaceå…¨ä½“ã®ã‚³ãƒ”ãƒ¼
+ * @param dst: ã‚³ãƒ”ãƒ¼å…ˆ surface
+ * @param src: ã‚³ãƒ”ãƒ¼å…ƒ surface
+ * @return ãªã—
  */
 void sf_copyall(surface_t *dst, surface_t *src) {
 	int len;
@@ -155,11 +155,11 @@ void sf_copyall(surface_t *dst, surface_t *src) {
 }
 
 /**
- * surface ¤ÎÊ£À½
- * @param in: Ê£À½¤â¤È
- * @param copypixel: pixel¤ò¥³¥Ô¡¼¤¹¤ë¤«
- * @param copyalpha: alpha pixel ¤ò¥³¥Ô¡¼¤¹¤ë¤«
- * @return: Ê£À½¤·¤¿ surface
+ * surface ã®è¤‡è£½
+ * @param in: è¤‡è£½ã‚‚ã¨
+ * @param copypixel: pixelã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ã‹
+ * @param copyalpha: alpha pixel ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ã‹
+ * @return: è¤‡è£½ã—ãŸ surface
  */
 surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 	surface_t *sf;

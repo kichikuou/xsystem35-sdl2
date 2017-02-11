@@ -30,7 +30,7 @@
 #include "cursor.h"
 #include "sdl_private.h"
 
-/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸*/
+/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸*/
 #include "bitmaps/cursor_arrow.xpm"
 #include "bitmaps/cursor_busy.xpm"
 #include "bitmaps/cursor_no.xpm"
@@ -81,7 +81,7 @@ static SDL_Cursor *init_system_cursor(const char *image[]) {
 	return SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
 }
 
-/* mouse cursur ¤Î½é´ü²½ */
+/* mouse cursur ã®åˆæœŸåŒ– */
 void sdl_cursor_init(void) {
 	cursor[IDC_ARROW] = init_system_cursor(cursor_arrow);
 	cursor[IDC_CROSS] = init_system_cursor(cursor_cross);
@@ -147,12 +147,12 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	return TRUE;
 }
 
-/* ¥Ş¥¦¥¹¤Î°ÌÃÖ¤Î°ÜÆ° */
+/* ãƒã‚¦ã‚¹ã®ä½ç½®ã®ç§»å‹• */
 void sdl_setCursorLocation(int x, int y) {
 	if (ms_active) SDL_WarpMouse(x, y);
 }
 
-/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤Î·Á¾õ¤ÎÀßÄê */
+/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®å½¢çŠ¶ã®è¨­å®š */
 void sdl_setCursorType(int type) {
 	if (cursor[type] != NULL) {
 		SDL_SetCursor(cursor[type]);

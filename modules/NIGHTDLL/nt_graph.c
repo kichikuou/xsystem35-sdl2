@@ -11,22 +11,22 @@
 #include "nt_scenario.h"
 #include "sactcg.h"
 
-// ÊÉ»æ¥¹¥×¥é¥¤¥ÈÉ½¼¨°ÌÃÖ
+// å£ç´™ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¡¨ç¤ºä½ç½®
 #define WALL_LOC_X 0
 #define WALL_LOC_Y 0
-// É÷·Ê¥¹¥×¥é¥¤¥ÈÉ½¼¨°ÌÃÖ
+// é¢¨æ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¡¨ç¤ºä½ç½®
 #define SCENERY_LOC_X 0
 #define SCENERY_LOC_Y 64
-// ´é¥¹¥×¥é¥¤¥ÈÉ½¼¨°ÌÃÖ
+// é¡”ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¡¨ç¤ºä½ç½®
 #define FACE_LOC_X 6
 #define FACE_LOC_Y 272
-// Î©¤Á³¨º¸¥¹¥×¥é¥¤¥ÈÉ½¼¨°ÌÃÖ
+// ç«‹ã¡çµµå·¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¡¨ç¤ºä½ç½®
 #define TACHI_L_LOC_X 0
 #define TACHI_L_LOC_Y 0
-// Î©¤Á³¨Ãæ±û¥¹¥×¥é¥¤¥È°ÌÃÖ
+// ç«‹ã¡çµµä¸­å¤®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½ç½®
 #define TACHI_M_LOC_X 160
 #define TACHI_M_LOC_Y 0
-// Î©¤Á³¨±¦¥¹¥×¥é¥¤¥È°ÌÃÖ
+// ç«‹ã¡çµµå³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½ç½®
 #define TACHI_R_LOC_X 360
 #define TACHI_R_LOC_Y 0
 
@@ -175,7 +175,7 @@ void nt_gr_set_drawtime(int msec) {
 void nt_gr_draw(int effectno) {
 	switch(effectno) {
 	case 0:
-		// Á´¾Ã¤·
+		// å…¨æ¶ˆã—
 		break;
 	case 1:
 		sp_update_all(TRUE);

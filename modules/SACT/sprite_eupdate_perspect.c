@@ -1,33 +1,33 @@
-// Æ©»ëÅê±ÆÊÑ´¹¤Î¤¦¤Á¡¢X¼´¤ÈY¼´¼ş¤ê¤Î²óÅ¾¤Î¤ß¤ò¹ÍÎ¸
+// é€è¦–æŠ•å½±å¤‰æ›ã®ã†ã¡ã€Xè»¸ã¨Yè»¸å‘¨ã‚Šã®å›è»¢ã®ã¿ã‚’è€ƒæ…®
 /*
-  X¼´²óÅ¾¹ÔÎó  1    0   0  0 
+  Xè»¸å›è»¢è¡Œåˆ—  1    0   0  0 
                0  cos sin  0
                0 -sin cos  0
 	       0    0   0  1
 
-  Y¼´²óÅ¾¹ÔÎó   cos 0 sin 0
+  Yè»¸å›è»¢è¡Œåˆ—   cos 0 sin 0
                   0 1   0 0
 	       -sin 0 cos 0
 	          0 0   0 1
 
-  »ëÅÀºÂÉ¸ÊÑ´¹¹ÔÎó (G)
+  è¦–ç‚¹åº§æ¨™å¤‰æ›è¡Œåˆ— (G)
                1 0  0 0
 	       0 1  0 0
                0 0 -1 0
 	       0 0  t 1   , t = 1
  
-  Æ©»ëÊÑ´¹¹ÔÎó (H)
+  é€è¦–å¤‰æ›è¡Œåˆ— (H)
               1 0   0   0 
 	      0 1   0   0 
 	      0 0 1/s 1/s
 	      0 0  -1   0 , s = 1
 
- X¼´²óÅ¾ (ys = height/2)
+ Xè»¸å›è»¢ (ys = height/2)
 	k[1] = -sin(rx* M_PI / 180) / (float)ys;
 	k[2] = cos(rx* M_PI / 180);
 	k[3] = cos(rx* M_PI / 180);
 	k[7] = 1;
- Y¼´²óÅ¾ (xs = width/2)
+ Yè»¸å›è»¢ (xs = width/2)
 	k[0] = sin(ry * M_PI / 180) / (float)xs;
 	k[2] = cos(ry * M_PI / 180);
 	k[3] = 1;
@@ -124,7 +124,7 @@ static void perspect_rotatey(surface_t *in, surface_t *out, double ry) {
 	do_per(in, out, k);
 }
 
-// ¥İ¥ê¥´¥ó²óÅ¾(Y¼´¡¦È¾·×²ó¤ê)
+// ãƒãƒªã‚´ãƒ³å›è»¢(Yè»¸ãƒ»åŠè¨ˆå›ã‚Š)
 static void ec25_cb(surface_t *src, surface_t *dst) {
 	int curstep, maxstep;
 	maxstep = 180;
@@ -137,7 +137,7 @@ static void ec25_cb(surface_t *src, surface_t *dst) {
 	ags_updateFull();
 }
 
-// ¥İ¥ê¥´¥ó²óÅ¾(Y¼´¡¦·×²ó¤ê)
+// ãƒãƒªã‚´ãƒ³å›è»¢(Yè»¸ãƒ»è¨ˆå›ã‚Š)
 static void ec26_cb(surface_t *src, surface_t *dst) {
 	int curstep, maxstep;
 	maxstep = 180;
@@ -150,7 +150,7 @@ static void ec26_cb(surface_t *src, surface_t *dst) {
 	ags_updateFull();
 }
 
-// ¥İ¥ê¥´¥ó²óÅ¾(X¼´¡¦»ş·×²ó¤ê)
+// ãƒãƒªã‚´ãƒ³å›è»¢(Xè»¸ãƒ»æ™‚è¨ˆå›ã‚Š)
 static void ec28_cb(surface_t *src, surface_t *dst) {
 	int curstep, maxstep;
 	maxstep = 180;
@@ -163,7 +163,7 @@ static void ec28_cb(surface_t *src, surface_t *dst) {
 	ags_updateFull();
 }
 
-// ¥İ¥ê¥´¥ó²óÅ¾(X¼´)
+// ãƒãƒªã‚´ãƒ³å›è»¢(Xè»¸)
 static void ec29_cb(surface_t *src, surface_t *dst) {
 	int curstep, maxstep;
 	maxstep = 180;

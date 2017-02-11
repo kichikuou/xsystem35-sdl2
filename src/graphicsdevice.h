@@ -1,5 +1,5 @@
 /*
- * graphicdevice.h  ¼Âºİ¤Î graphic¥Ç¥Ğ¥¤¥¹¤Îinclude
+ * graphicdevice.h  å®Ÿéš›ã® graphicãƒ‡ãƒã‚¤ã‚¹ã®include
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

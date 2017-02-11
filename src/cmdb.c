@@ -29,17 +29,17 @@
 #include "message.h"
 #include "selection.h"
 
-/* ÁªÂò»èWindow¾ğÊó */
+/* é¸æŠè‚¢Windowæƒ…å ± */
 Bcom_WindowInfo selWinInfo[SELWINMAX] = {{ 464, 80, 160, 160, TRUE}, 0};
-/* ¸½ºß¤ÎÁªÂò»èWindowÈÖ¹æ */
+/* ç¾åœ¨ã®é¸æŠè‚¢Windowç•ªå· */
 static int selWinNo;
-/* MessageWindow¾ğÊó */
+/* MessageWindowæƒ…å ± */
 Bcom_WindowInfo msgWinInfo[MSGWINMAX] = {{ 8, 311, 616, 80, TRUE}, 0};
-/* ¸½ºß¤ÎMessageWindowÈÖ¹æ */
+/* ç¾åœ¨ã®MessageWindowç•ªå· */
 static int msgWinNo;
 
 void commandB0() {
-	/* ¥á¥Ã¥»¡¼¥¸¥¦¥£¥ó¥É¥¦¤ò¥¯¥ê¥¢¤¹¤ë¡£*/
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ã€‚*/
 	int num = getCaliValue();
 	
 	switch(num) {
@@ -228,7 +228,7 @@ void commandB24() {
 }
 
 void commandB31() {
-	/* ÀßÄê¤µ¤ì¤Æ¤¢¤ëÁªÂò»è¥¦¥£¥ó¥É¥¦¤Îº¸¾åºÂÉ¸¤ò¼èÆÀ¤¹¤ë */
+	/* è¨­å®šã•ã‚Œã¦ã‚ã‚‹é¸æŠè‚¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å·¦ä¸Šåº§æ¨™ã‚’å–å¾—ã™ã‚‹ */
 	int no = getCaliValue();
 	int *x_var = getCaliVariable();
 	int *y_var = getCaliVariable();

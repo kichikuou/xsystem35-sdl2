@@ -1,5 +1,5 @@
 /*
- * sprite_event.c: SACTÆâ¤Î mouse/key ¥¤¥Ù¥ó¥È¤Î¥Ï¥ó¥É¥é
+ * sprite_event.c: SACTå†…ã® mouse/key ã‚¤ãƒ™ãƒ³ãƒˆã®ãƒãƒ³ãƒ‰ãƒ©
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -39,40 +39,40 @@
 #include "sactlog.h"
 
 /*
-  SACTÆâ¤ÎSpriteKeyÂÔ¤Á¤ä¥á¥Ã¥»¡¼¥¸KeyÂÔ¤Á¤Ê¤É¤ò¼Â¸½¤¹¤ë¤¿¤á¡¢X|SDL ¤«¤é
-  Key/Mouse ¥¤¥Ù¥ó¥È¤¬¤¢¤Ã¤¿¤È¤­¤Ë¡¢nact->ags.eventcb()¤Ë¤è¤Ã¤ÆÂ¾¤Î¥â¥¸¥å¡¼¥ë
-  ¤Ë¥¤¥Ù¥ó¥È¤òÁ÷½Ğ¤Ç¤­¤ë¤è¤¦¤Ë¤·¤¿¡£
+  SACTå†…ã®SpriteKeyå¾…ã¡ã‚„ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸Keyå¾…ã¡ãªã©ã‚’å®Ÿç¾ã™ã‚‹ãŸã‚ã€X|SDL ã‹ã‚‰
+  Key/Mouse ã‚¤ãƒ™ãƒ³ãƒˆãŒã‚ã£ãŸã¨ãã«ã€nact->ags.eventcb()ã«ã‚ˆã£ã¦ä»–ã®ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«
+  ã«ã‚¤ãƒ™ãƒ³ãƒˆã‚’é€å‡ºã§ãã‚‹ã‚ˆã†ã«ã—ãŸã€‚
 
-  SACT¤Ç¤ÏºÇ½é¤Ë spev_callback ¤Ç¥¤¥Ù¥ó¥È¤ò¼õ¤±¼è¤ë¤è¤¦¤Ë¤·¡¢¸½ºß¤Î¥­¡¼ÂÔ¤Á¤Î
-  ¾õÂÖ(sact.waittype)¤Ë¤è¤Ã¤Æ¤½¤ì¤¾¤ì¤Î¥¤¥Ù¥ó¥È¥Ï¥ó¥É¥é¤ò¸Æ¤Ó½Ğ¤·¤Æ¤¤¤ë¡£
+  SACTã§ã¯æœ€åˆã« spev_callback ã§ã‚¤ãƒ™ãƒ³ãƒˆã‚’å—ã‘å–ã‚‹ã‚ˆã†ã«ã—ã€ç¾åœ¨ã®ã‚­ãƒ¼å¾…ã¡ã®
+  çŠ¶æ…‹(sact.waittype)ã«ã‚ˆã£ã¦ãã‚Œãã‚Œã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ã‚’å‘¼ã³å‡ºã—ã¦ã„ã‚‹ã€‚
   
-  ¸½ºß¤Î¤È¤³¤í¡¢1) ¥á¥Ã¥»¡¼¥¸¥­¡¼ÂÔ¤Á¡¢2) Ã±½ã¥­¡¼ÂÔ¤Á¡¢3) ¥á¥Ë¥å¡¼¥­¡¼ÂÔ¤Á¡¢
-  4) ¥¹¥×¥é¥¤¥È¥­¡¼ 5) ¥Ğ¥Ã¥¯¥í¥°¥­¡¼ÂÔ¤Á¤Î£µ¤Ä¤¬¤¢¤ë¡£
+  ç¾åœ¨ã®ã¨ã“ã‚ã€1) ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚­ãƒ¼å¾…ã¡ã€2) å˜ç´”ã‚­ãƒ¼å¾…ã¡ã€3) ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚­ãƒ¼å¾…ã¡ã€
+  4) ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚­ãƒ¼ 5) ãƒãƒƒã‚¯ãƒ­ã‚°ã‚­ãƒ¼å¾…ã¡ã®ï¼•ã¤ãŒã‚ã‚‹ã€‚
 
-  1)¥á¥Ã¥»¡¼¥¸¥­¡¼ÂÔ¤Á
-    ²¿¤«¥­¡¼¤¬²¡¤µ¤ì¤ë¤Ş¤ÇÂÔ¤Ä¡£Z¥­¡¼¥¹¥×¥é¥¤¥È¤Î¾Ãµî¤¬¤Ç¤­¤ë¡£
+  1)ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚­ãƒ¼å¾…ã¡
+    ä½•ã‹ã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã‚‹ã¾ã§å¾…ã¤ã€‚Zã‚­ãƒ¼ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æ¶ˆå»ãŒã§ãã‚‹ã€‚
 
-  2)Ã±½ã¥­¡¼ÂÔ¤Á
-    1)¤ÈÆ±¤¸
+  2)å˜ç´”ã‚­ãƒ¼å¾…ã¡
+    1)ã¨åŒã˜
 
-  3)¥á¥Ë¥å¡¼¥­¡¼ÂÔ¤Á
-    ¥á¥Ë¥å¡¼¥ª¡¼¥×¥ó»ş¤Î½èÍı¡£¥Ş¥¦¥¹¤¬Æ°¤¤¤¿»ş¤È¡¢¥­¡¼(or¥Ü¥¿¥ó)¤¬Î¥¤ì¤¿¤È¤­¤Ë
-    ¤¤¤¯¤Ä¤«¤Î½èÍı¤ò¹Ô¤¦¡£
+  3)ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚­ãƒ¼å¾…ã¡
+    ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‚ªãƒ¼ãƒ—ãƒ³æ™‚ã®å‡¦ç†ã€‚ãƒã‚¦ã‚¹ãŒå‹•ã„ãŸæ™‚ã¨ã€ã‚­ãƒ¼(orãƒœã‚¿ãƒ³)ãŒé›¢ã‚ŒãŸã¨ãã«
+    ã„ãã¤ã‹ã®å‡¦ç†ã‚’è¡Œã†ã€‚
 
-  4)¥¹¥×¥é¥¤¥ÈÂÔ¤Á
-    SW/GETA/GETB/PUT/SWPUT¥¹¥×¥é¥¤¥È¤Î³Æ½èÍı¤ò¹Ô¤¦¡£
-    ¥¹¥×¥é¥¤¥È¤ÏÈÖ¹æ¤Î¾®¤µ¤¤¤â¤Î¤«¤é½ç¤Ë¾å¤Ë½Å¤Í¤ÆÉ½¼¨¤·¡¢²¼¤Ë¤Ê¤Ã¤Æ¤¤¤ë
-    ¥¹¥×¥é¥¤¥È¤Ë¥¤¥Ù¥ó¥È¤¬ÅÁ¤ï¤é¤Ê¤¤¤è¤¦¤Ë¤¹¤ë
-    -> SpriteKeyÂÔ¤Á¤ÎÄ¾Á°¤Ë¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ¤Ë¤è¤ë depth map ¤òºîÀ®¤·¡¢
-       ¥Ş¥¦¥¹¤Î°ÌÃÖ¤Ë¤¢¤ë¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ¤ò¤Ç¼è¤ê½Ğ¤¹¡£
-       Alpha¥Ş¥¹¥¯¤Ä¤­¤ÎSprite¤Î¾ì¹ç¡¢¤½¤ì¤òÈ¿±Ç¤·¡¢É½¼¨¤·¤Æ¤¤¤ë¾ì½ê¤Î¤ß¤Ë
-       depthmap¤òÈ¿±Ç¡£
+  4)ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå¾…ã¡
+    SW/GETA/GETB/PUT/SWPUTã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å„å‡¦ç†ã‚’è¡Œã†ã€‚
+    ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯ç•ªå·ã®å°ã•ã„ã‚‚ã®ã‹ã‚‰é †ã«ä¸Šã«é‡ã­ã¦è¡¨ç¤ºã—ã€ä¸‹ã«ãªã£ã¦ã„ã‚‹
+    ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«ã‚¤ãƒ™ãƒ³ãƒˆãŒä¼ã‚ã‚‰ãªã„ã‚ˆã†ã«ã™ã‚‹
+    -> SpriteKeyå¾…ã¡ã®ç›´å‰ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·ã«ã‚ˆã‚‹ depth map ã‚’ä½œæˆã—ã€
+       ãƒã‚¦ã‚¹ã®ä½ç½®ã«ã‚ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·ã‚’ã§å–ã‚Šå‡ºã™ã€‚
+       Alphaãƒã‚¹ã‚¯ã¤ãã®Spriteã®å ´åˆã€ãã‚Œã‚’åæ˜ ã—ã€è¡¨ç¤ºã—ã¦ã„ã‚‹å ´æ‰€ã®ã¿ã«
+       depthmapã‚’åæ˜ ã€‚
 
-      dragÃæ¤Î¥¹¥×¥é¥¤¥È¤Ï¾ï¤ËºÇ¾å°Ì¤Ë¤¯¤ë¤è¤¦¤ËÉ½¼¨¤·¡¢¥Ş¥¦¥¹°ÜÆ°Åù¤Î¥¤¥Ù¥ó¥È
-      ¤ÏºÇ½é¤Ë½èÍı¤¹¤ë¡£
+      dragä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯å¸¸ã«æœ€ä¸Šä½ã«ãã‚‹ã‚ˆã†ã«è¡¨ç¤ºã—ã€ãƒã‚¦ã‚¹ç§»å‹•ç­‰ã®ã‚¤ãƒ™ãƒ³ãƒˆ
+      ã¯æœ€åˆã«å‡¦ç†ã™ã‚‹ã€‚
 
-  5)¥Ğ¥Ã¥¯¥í¥°É½¼¨Ãæ¤Î¥­¡¼ÂÔ¤Á
-    ¥ª¥ê¥¸¥Ê¥ë¤ÈÆ±¤¸¥­¡¼Áàºî¤Î¤Ï¤º
+  5)ãƒãƒƒã‚¯ãƒ­ã‚°è¡¨ç¤ºä¸­ã®ã‚­ãƒ¼å¾…ã¡
+    ã‚ªãƒªã‚¸ãƒŠãƒ«ã¨åŒã˜ã‚­ãƒ¼æ“ä½œã®ã¯ãš
 */
 
 
@@ -85,8 +85,8 @@ static void cb_waitkey_sprite(agsevent_t *e);
 static void cb_waitkey_selection(agsevent_t *e);
 
 /*
- ¥Õ¥©¡¼¥«¥¹¤òÆÀ¤¿¥¹¥×¥é¥¤¥È¤ËÀâÌÀ¥¹¥×¥é¥¤¥È¤¬ÅĞÏ¿¤µ¤ì¤Æ¤¤¤¿¾ì¹ç¤Î
- ÀâÌÀ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨ON
+ ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å¾—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒç™»éŒ²ã•ã‚Œã¦ã„ãŸå ´åˆã®
+ èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºON
 */
 static void cb_focused_swsp(gpointer s, gpointer data) {
 	sprite_t *sp = (sprite_t *)s;
@@ -103,8 +103,8 @@ static void cb_focused_swsp(gpointer s, gpointer data) {
 }
 
 /*
- ¥Õ¥©¡¼¥«¥¹¤òÆÀ¤¿¥¹¥×¥é¥¤¥È¤ËÀâÌÀ¥¹¥×¥é¥¤¥È¤¬ÅĞÏ¿¤µ¤ì¤Æ¤¤¤¿¾ì¹ç¤Î
- ÀâÌÀ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨OFF
+ ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å¾—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒç™»éŒ²ã•ã‚Œã¦ã„ãŸå ´åˆã®
+ èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºOFF
 */
 static void cb_defocused_swsp(gpointer s, gpointer data) {
 	sprite_t *sp = (sprite_t *)s;
@@ -148,13 +148,13 @@ static void cb_defocused_zkey(gpointer s, gpointer data) {
 }
 
 /*
-  ¥Õ¥©¡¼¥«¥¹¤òÆÀ¤¿¥¹¥×¥é¥¤¥È¤Î½èÍı
-    cg2¤¬¤¢¤ì¤Ğcurcg¤òcg2¤ËÀßÄê
+  ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å¾—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‡¦ç†
+    cg2ãŒã‚ã‚Œã°curcgã‚’cg2ã«è¨­å®š
 
-    dragÃæ¤Î¥¹¥×¥é¥¤¥È¤¬¤¢¤ë¾ì¹ç
-      -> PUT/SWPUT¥¹¥×¥é¥¤¥È¤Î¤ßÈ¿±ş
-    dragÃæ¤Î¥¹¥×¥é¥¤¥È¤¬¤Ê¤¤¾ì¹ç
-      -> GETA/GETB/SWPUT¥¹¥×¥é¥¤¥È¤Î¤ßÈ¿±ş
+    dragä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒã‚ã‚‹å ´åˆ
+      -> PUT/SWPUTã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã¿åå¿œ
+    dragä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒãªã„å ´åˆ
+      -> GETA/GETB/SWPUTã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã¿åå¿œ
 */
 static int cb_focused(sprite_t *sp) {
 	int update = 0;
@@ -185,8 +185,8 @@ static int cb_focused(sprite_t *sp) {
 }
 
 /*
-  ¥Õ¥©¡¼¥«¥¹¤ò¼º¤Ã¤¿¥¹¥×¥é¥¤¥È¤Î½èÍı
-    curcg ¤ò cg1 ¤Ë¥»¥Ã¥È
+  ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å¤±ã£ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‡¦ç†
+    curcg ã‚’ cg1 ã«ã‚»ãƒƒãƒˆ
 */
 static int cb_defocused(sprite_t *sp) {
 	int update = 0;
@@ -205,7 +205,7 @@ static int cb_defocused(sprite_t *sp) {
 }
 
 /*
-  WaitKeySimple¤Îcallback
+  WaitKeySimpleã®callback
 */
 static void cb_waitkey_simple(agsevent_t *e) {
 	int cur, update = 0;
@@ -226,10 +226,10 @@ static void cb_waitkey_simple(agsevent_t *e) {
 		break;
 		
 	case AGSEVENT_BUTTON_RELEASE:
-		// back log view mode ¤Ë°Ü¹Ô
+		// back log view mode ã«ç§»è¡Œ
 		if (e->d3 == AGSEVENT_WHEEL_UP ||
 		    e->d3 == AGSEVENT_WHEEL_DN) {
-			// MessageKey ÂÔ¤Á¤Î¤È¤­¤Î¤ß
+			// MessageKey å¾…ã¡ã®ã¨ãã®ã¿
 			if (sact.waittype != KEYWAIT_MESSAGE) break;
 			sblog_start();
 			sact.waittype = KEYWAIT_BACKLOG;
@@ -252,7 +252,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 			break;
 		case KEY_PAGEUP:
 		case KEY_PAGEDOWN:
-			// MessageKey ÂÔ¤Á¤Î¤È¤­¤Î¤ß
+			// MessageKey å¾…ã¡ã®ã¨ãã®ã¿
 			if (sact.waittype != KEYWAIT_MESSAGE) break;
 			sblog_start();
 			sact.waittype = KEYWAIT_BACKLOG;
@@ -269,15 +269,15 @@ static void cb_waitkey_simple(agsevent_t *e) {
 }
 
 /*
-  WaitKeySprite¤Îcallback
+  WaitKeySpriteã®callback
 */
 static void cb_waitkey_sprite(agsevent_t *e) {
 	GSList *node;
-	sprite_t *focused_sp = NULL;   // focus ¤òÆÀ¤Æ¤¤¤ë sprite
-	sprite_t *defocused_sp = NULL; // focus ¤ò¼º¤Ã¤¿ sprite
+	sprite_t *focused_sp = NULL;   // focus ã‚’å¾—ã¦ã„ã‚‹ sprite
+	sprite_t *defocused_sp = NULL; // focus ã‚’å¤±ã£ãŸ sprite
 	int update = 0;
 	
-	// ¥­¡¼¥¤¥Ù¥ó¥È¤ÏÌµ»ë
+	// ã‚­ãƒ¼ã‚¤ãƒ™ãƒ³ãƒˆã¯ç„¡è¦–
 	switch(e->type) {
 	case AGSEVENT_KEY_RELEASE:
 	case AGSEVENT_KEY_PRESS:
@@ -285,11 +285,11 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 	}
 	
 	if (sact.draggedsp) {
-		// Àè¤Ë dragÃæ¤Îsprite¤Ë¥¤¥Ù¥ó¥È¤òÁ÷¤ë
+		// å…ˆã« dragä¸­ã®spriteã«ã‚¤ãƒ™ãƒ³ãƒˆã‚’é€ã‚‹
 		update = sact.draggedsp->eventcb(sact.draggedsp, e);
 	} else {
-		// ±¦¥¯¥ê¥Ã¥¯¥­¥ã¥ó¥»¥ë
-		// dragÃæ¤Ç¤Ê¤¤»ş¤Î¤ß¡¢¥­¥ã¥ó¥»¥ë¤ò¼õ¤±ÉÕ¤±¤ë
+		// å³ã‚¯ãƒªãƒƒã‚¯ã‚­ãƒ£ãƒ³ã‚»ãƒ«
+		// dragä¸­ã§ãªã„æ™‚ã®ã¿ã€ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã‚’å—ã‘ä»˜ã‘ã‚‹
 		if (e->type == AGSEVENT_BUTTON_RELEASE &&
 		    e->d3   == AGSEVENT_BUTTON_RIGHT) {
 			sact.waitkey = 0;
@@ -297,31 +297,31 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		}
 	}
 	
-	// forcus¤òÆÀ¤Æ¤¤¤ë sprite ¤È focus¤ò¼º¤Ã¤¿ sprite ¤òÃµ¤¹
+	// forcusã‚’å¾—ã¦ã„ã‚‹ sprite ã¨ focusã‚’å¤±ã£ãŸ sprite ã‚’æ¢ã™
 	for (node = sact.eventlisteners; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;
 		
 		if (sp == NULL) continue;
 		if (!sp->show) continue;
 		
-		// freeze¾õÂÖ¤Ç¤ÏCG¤ÏÊÑ²½¤·¤Ê¤¤
+		// freezeçŠ¶æ…‹ã§ã¯CGã¯å¤‰åŒ–ã—ãªã„
 		if (sp->freezed_state != 0) continue;
 		
-		// draggÃæ¤Î sprite ¤ÏÌµ»ë¤¹¤ë
+		// draggä¸­ã® sprite ã¯ç„¡è¦–ã™ã‚‹
 		if (sp == sact.draggedsp) continue;
 		
 		if (focused_sp == NULL && sp_is_insprite(sp, e->d1, e->d2)) {
 			/*
-			  focus¤òÆÀ¤Æ¤¤¤ë sprite
+			  focusã‚’å¾—ã¦ã„ã‚‹ sprite
 			*/
 			update += cb_focused(sp);
 			focused_sp = sp;
 		} else {
 			/* 
-			   ¸½ºß¤Î¥«¡¼¥½¥ë°ÌÃÖ¤Ë¤Ï¤¤¤Ş½èÍı¤·¤Æ¤¤¤ëÈÖ¹æ¤Îsprite
-			   ¤ÏÂ¸ºß¤·¤Ê¤¤¤Î¤Ç¡¢defocus ¤Î½èÍı¤ò¹Ô¤¦¡£
-			   º£²ó¤Î¥Ş¥¦¥¹°ÜÆ°¥¤¥Ù¥ó¥È¤Ë¤è¤êfocus¤ò¼º¤Ã¤¿¤Î¤Ç
-			   ¤¢¤ì¤Ğ¡¢cb_decocused(sp)¤Ï 1 ¤òÊÖ¤¹
+			   ç¾åœ¨ã®ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã«ã¯ã„ã¾å‡¦ç†ã—ã¦ã„ã‚‹ç•ªå·ã®sprite
+			   ã¯å­˜åœ¨ã—ãªã„ã®ã§ã€defocus ã®å‡¦ç†ã‚’è¡Œã†ã€‚
+			   ä»Šå›ã®ãƒã‚¦ã‚¹ç§»å‹•ã‚¤ãƒ™ãƒ³ãƒˆã«ã‚ˆã‚Šfocusã‚’å¤±ã£ãŸã®ã§
+			   ã‚ã‚Œã°ã€cb_decocused(sp)ã¯ 1 ã‚’è¿”ã™
 			*/ 
 			int ret = cb_defocused(sp);
 			if (ret > 0) defocused_sp = sp;
@@ -329,21 +329,21 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		}
 	}
 	
-	// focus¤òÆÀ¤¿ sprite ¤Ë BUTTON¥¤¥Ù¥ó¥È¤Î¤ß¤òÁ÷¤ë
+	// focusã‚’å¾—ãŸ sprite ã« BUTTONã‚¤ãƒ™ãƒ³ãƒˆã®ã¿ã‚’é€ã‚‹
 	if (focused_sp && e->type != AGSEVENT_MOUSE_MOTION) {
 		update += focused_sp->eventcb(focused_sp, e);
 	}
 	
-	// ÈÏ°Ï³°(focus¤òÆÀ¤Æ¤¤¤ësprite¤¬¤Ê¤¤¾ì¹ç)¤ò¥¯¥ê¥Ã¥¯¤·¤¿¤È¤­¤Î²»
+	// ç¯„å›²å¤–(focusã‚’å¾—ã¦ã„ã‚‹spriteãŒãªã„å ´åˆ)ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã®éŸ³
 	if (!focused_sp &&
 	    e->type != AGSEVENT_MOUSE_MOTION &&
 	    sact.numsoundob) {
 		ssnd_play(sact.numsoundob);
 	}
 	
-	// dragÃæ¤Ç¤Ê¤¤¾ì¹ç¤Ï¡¢ÀâÌÀ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨¡¢¾Ãµî¤ò¹Ô¤¦
+	// dragä¸­ã§ãªã„å ´åˆã¯ã€èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºã€æ¶ˆå»ã‚’è¡Œã†
 	if (sact.draggedsp == NULL && e->type == AGSEVENT_MOUSE_MOTION) {
-		// focus ¤ò¼º¤Ã¤¿ sprite ¤Î ÀâÌÀ sprite ¤Î¾Ãµî
+		// focus ã‚’å¤±ã£ãŸ sprite ã® èª¬æ˜ sprite ã®æ¶ˆå»
 		if (defocused_sp) {
 			sprite_t *sp = defocused_sp;
 			if (sp->expsp) {
@@ -351,7 +351,7 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 			}
 		}
 		
-		// focus ¤òÆÀ¤¿ sprite ¤Î ÀâÌÀ sprite ¤ÎÉ½¼¨
+		// focus ã‚’å¾—ãŸ sprite ã® èª¬æ˜ sprite ã®è¡¨ç¤º
 		if (focused_sp) {
 			sprite_t *sp = focused_sp;
 			if (sp->expsp) {
@@ -360,14 +360,14 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		}
 	}
 	
-	// É½¼¨¾õÂÖ¤ËÊÑ¹¹¤¬¤¢¤ì¤Ğ¤½¤ÎÎÎ°è¤ò¹¹¿·
+	// è¡¨ç¤ºçŠ¶æ…‹ã«å¤‰æ›´ãŒã‚ã‚Œã°ãã®é ˜åŸŸã‚’æ›´æ–°
 	if (update) {
 		sp_update_clipped();
 	}
 }
 
 /*
-  ÁªÂò»è Window Open »ş¤Î callback
+  é¸æŠè‚¢ Window Open æ™‚ã® callback
 */
 static void cb_waitkey_selection(agsevent_t *e) {
 	switch (e->type) {
@@ -382,7 +382,7 @@ static void cb_waitkey_selection(agsevent_t *e) {
 }
 
 /*
-  ¥Ğ¥Ã¥¯¥í¥°»²¾È»ş
+  ãƒãƒƒã‚¯ãƒ­ã‚°å‚ç…§æ™‚
 */
 static void cb_waitkey_backlog(agsevent_t *e) {
 	switch (e->type) {
@@ -425,10 +425,10 @@ static void cb_waitkey_backlog(agsevent_t *e) {
 }
 
 /*
-  X|SDL ¤Î¥¤¥Ù¥ó¥È¥Ç¥£¥¹¥Ñ¥Ã¥Á¥ã¤«¤é¤¯¤ëºÇ½é¤Î¾ì½ê
+  X|SDL ã®ã‚¤ãƒ™ãƒ³ãƒˆãƒ‡ã‚£ã‚¹ãƒ‘ãƒƒãƒãƒ£ã‹ã‚‰ãã‚‹æœ€åˆã®å ´æ‰€
 */
 void spev_callback(agsevent_t *e) {
-	// menu openÃæ¤ÏÌµ»ë
+	// menu openä¸­ã¯ç„¡è¦–
 	if (nact->popupmenu_opened) {
 		return;
 	}
@@ -471,7 +471,7 @@ void spev_callback(agsevent_t *e) {
 }
 
 /*
-  ³Æ¥¹¥×¥é¥¤¥ÈËè¤Î¥¤¥Ù¥ó¥È callback ¤ÎÅĞÏ¿
+  å„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ¯ã®ã‚¤ãƒ™ãƒ³ãƒˆ callback ã®ç™»éŒ²
 */
 void spev_add_eventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) {
 	sp->eventcb = cb;
@@ -479,7 +479,7 @@ void spev_add_eventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) {
 }
 
 /*
-  ¾å¤ÇÅĞÏ¿¤·¤¿ callback ¤Îºï½ü
+  ä¸Šã§ç™»éŒ²ã—ãŸ callback ã®å‰Šé™¤
 */
 void spev_remove_eventlistener(sprite_t *sp) {
 	sact.eventlisteners = g_slist_remove(sact.eventlisteners, sp);

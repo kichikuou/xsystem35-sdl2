@@ -1,5 +1,5 @@
 /*
- * sactsound.h: SACT¤Î¸ú²Ì²»´ØÏ¢
+ * sactsound.h: SACTã®åŠ¹æœéŸ³é–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

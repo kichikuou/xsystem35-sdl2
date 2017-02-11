@@ -11,7 +11,7 @@
 
 
 
-// ¥­¡¼¥¦¥§¥¤¥È¤Î¼ïÎà
+// ã‚­ãƒ¼ã‚¦ã‚§ã‚¤ãƒˆã®ç¨®é¡
 #define KEYWAIT_NONE    0
 #define KEYWAIT_SIMPLE  1
 #define KEYWAIT_SPRITE  2
@@ -22,10 +22,10 @@
 #define MSGBUFMAX 512
 
 #if 0
-// Ê¸»úÎóÃÖ´¹ÍÑ
+// æ–‡å­—åˆ—ç½®æ›ç”¨
 typedef struct {
-	char *src; // ÃÖ¤­´¹¤¨¸µÊ¸»úÎó
-	char *dst; // ÃÖ¤­´¹¤¨Ê¸»úÎó
+	char *src; // ç½®ãæ›ãˆå…ƒæ–‡å­—åˆ—
+	char *dst; // ç½®ãæ›ãˆæ–‡å­—åˆ—
 } strexchange_t;
 #endif
 

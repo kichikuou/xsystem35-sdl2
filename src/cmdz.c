@@ -37,7 +37,7 @@
 #include "nact.h"
 
 void commandZC() {
-	/* ¥·¥¹¥Æ¥à¤Î»ÈÍÑ´Ä¶­¤òÊÑ¹¹¤¹¤ë */
+	/* ã‚·ã‚¹ãƒ†ãƒ ã®ä½¿ç”¨ç’°å¢ƒã‚’å¤‰æ›´ã™ã‚‹ */
 	int m = getCaliValue();
 	int n = getCaliValue();
 	
@@ -63,7 +63,7 @@ void commandZC() {
 }
 
 void commandZM() {
-	/* ¥·¥Ê¥ê¥ª¥á¥Ã¥»¡¼¥¸¤Î¥Õ¥©¥ó¥È¥µ¥¤¥º¤ò»ØÄê¤¹¤ë¡£*/
+	/* ã‚·ãƒŠãƒªã‚ªãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’æŒ‡å®šã™ã‚‹ã€‚*/
 	int size = getCaliValue();
 
 	if (size > 100) {
@@ -77,7 +77,7 @@ void commandZM() {
 }
 
 void commandZS() {
-	/* ÁªÂò»è¤Î¥Õ¥©¥ó¥È¥µ¥¤¥º¤ò»ØÄê¤¹¤ë */
+	/* é¸æŠè‚¢ã®ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’æŒ‡å®šã™ã‚‹ */
 	int size = getCaliValue();
 	
 	nact->sel.MsgFontSize = size;
@@ -86,7 +86,7 @@ void commandZS() {
 }
 
 void commandZB() {
-	/* ¥á¥Ã¥»¡¼¥¸Ê¸»ú¤òÂÀ¤µ¤òÀßÄê */
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ–‡å­—ã‚’å¤ªã•ã‚’è¨­å®š */
 	int size = getCaliValue();
 	
 	nact->msg.MsgFontBoldSize = size;
@@ -95,7 +95,7 @@ void commandZB() {
 }
 
 void commandZH() {
-	/* Á´³ÑÈ¾³ÑÀÚÂØ¤¨ */
+	/* å…¨è§’åŠè§’åˆ‡æ›¿ãˆ */
 	int sw = getCaliValue();
 	
 	sys_setHankakuMode(sw);
@@ -104,7 +104,7 @@ void commandZH() {
 }
 
 void commandZW() {
-	/* CAPS ¾õÂÖ¤ÎÆâÉôÅªÀ©¸æ¤òÊÑ¹¹¤¹¤ë¡£ */
+	/* CAPS çŠ¶æ…‹ã®å†…éƒ¨çš„åˆ¶å¾¡ã‚’å¤‰æ›´ã™ã‚‹ã€‚ */
 	int sw = getCaliValue();
 	
 	if (sw < 256) {
@@ -119,7 +119,7 @@ void commandZW() {
 }
 
 void commandZL() {
-	/* ¥á¥Ã¥»¡¼¥¸ÎÎ°è¤ÎÊ¸»ú¤Î½ÄÊı¸ş¹Ô´Ö¥É¥Ã¥È¿ô¤ò»ØÄê¤¹¤ë¡£*/
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é ˜åŸŸã®æ–‡å­—ã®ç¸¦æ–¹å‘è¡Œé–“ãƒ‰ãƒƒãƒˆæ•°ã‚’æŒ‡å®šã™ã‚‹ã€‚*/
 	int line = getCaliValue();
 	
 	nact->msg.LineIncrement = line;
@@ -128,7 +128,7 @@ void commandZL() {
 }
 
 void commandZE() {
-	/* ÁªÂò»è¤òÁª¤ó¤À¤é¥á¥Ã¥»¡¼¥¸ÎÎ°è¤ò½é´ü²½¤¹¤ë¤«¤É¤¦¤«¤ò»ØÄê¤¹¤ë */
+	/* é¸æŠè‚¢ã‚’é¸ã‚“ã ã‚‰ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é ˜åŸŸã‚’åˆæœŸåŒ–ã™ã‚‹ã‹ã©ã†ã‹ã‚’æŒ‡å®šã™ã‚‹ */
 	int sw = getCaliValue();
 	
 	nact->sel.ClearMsgWindow = sw == 0 ? FALSE : TRUE;
@@ -137,7 +137,7 @@ void commandZE() {
 }
 
 void commandZF() {
-	/* ÁªÂò»èÏÈ¥µ¥¤¥º¤ò²ÄÊÑ¤Ë¤¹¤ë¤«¸ÇÄê¤Ë¤¹¤ë¤«¤ò»ØÄê */
+	/* é¸æŠè‚¢æ ã‚µã‚¤ã‚ºã‚’å¯å¤‰ã«ã™ã‚‹ã‹å›ºå®šã«ã™ã‚‹ã‹ã‚’æŒ‡å®š */
 	int sw = getCaliValue();
 	
 	switch(sw) {
@@ -155,7 +155,7 @@ void commandZF() {
 }
 
 void commandZD() {
-	/* ¥Ç¥Ğ¥Ã¥°¥â¡¼¥É»ş¤Î¥Ç¥Ğ¥Ã¥°¥á¥Ã¥»¡¼¥¸¤Î½ĞÎÏ ON/OFF/PAUSE */
+	/* ãƒ‡ãƒãƒƒã‚°ãƒ¢ãƒ¼ãƒ‰æ™‚ã®ãƒ‡ãƒãƒƒã‚°ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡ºåŠ› ON/OFF/PAUSE */
 	int c0 = sys_getc();
 	int sw = 0, *var;
 	
@@ -178,14 +178,14 @@ void commandZD() {
 }
 
 void commandZT0() {
-	/* ¸½ºß¤ÎÆü»ş¤ò var0¡Ávar6 ¤ÎÊÑ¿ôÎó¤ËÊÖ¤¹¡£*/
+	/* ç¾åœ¨ã®æ—¥æ™‚ã‚’ var0ã€œvar6 ã®å¤‰æ•°åˆ—ã«è¿”ã™ã€‚*/
 	time_t    time_now = time(NULL);
 	struct tm *lc;
 	int       sv = sl_getIndex();
 	int       c1, c2;
 	int       *var;
 
-	/* ZT 0,1ÂĞºö for DALK */
+	/* ZT 0,1å¯¾ç­– for DALK */
 	c1 = sl_getc();
 	c2 = sl_getc();
 	if (c1 == 0x41 && c2 == 0x7f) {
@@ -209,7 +209,7 @@ void commandZT0() {
 }
 
 void commandZT1() {
-	/* ¥¿¥¤¥Ş¡¼¤ò n ¤Î¿ôÃÍ¤Ç¥¯¥ê¥¢¤¹¤ë */
+	/* ã‚¿ã‚¤ãƒãƒ¼ã‚’ n ã®æ•°å€¤ã§ã‚¯ãƒªã‚¢ã™ã‚‹ */
 	int n = getCaliValue();
 	
 	reset_counter(n);
@@ -218,7 +218,7 @@ void commandZT1() {
 }
 
 void commandZT2() {
-	/* ¥¿¥¤¥Ş¡¼¤ò var ¤Ë¼èÆÀ¤¹¤ë 1/10 sec */
+	/* ã‚¿ã‚¤ãƒãƒ¼ã‚’ var ã«å–å¾—ã™ã‚‹ 1/10 sec */
 	int *var = getCaliVariable();
 	int val = get_counter(100);
 	
@@ -229,7 +229,7 @@ void commandZT2() {
 }
 
 void commandZT3() {
-	/* ¥¿¥¤¥Ş¡¼¤ò var ¤Ë¼èÆÀ¤¹¤ë 1/30 sec */
+	/* ã‚¿ã‚¤ãƒãƒ¼ã‚’ var ã«å–å¾—ã™ã‚‹ 1/30 sec */
 	int *var = getCaliVariable();
 	int val = get_counter(33);
 	
@@ -240,7 +240,7 @@ void commandZT3() {
 }
 
 void commandZT4() {
-	/* ¥¿¥¤¥Ş¡¼¤ò var ¤Ë¼èÆÀ¤¹¤ë 1/60 sec */
+	/* ã‚¿ã‚¤ãƒãƒ¼ã‚’ var ã«å–å¾—ã™ã‚‹ 1/60 sec */
 	int *var = getCaliVariable();
 	int val = get_counter(17);
 	
@@ -251,7 +251,7 @@ void commandZT4() {
 }
 
 void commandZT5() {
-	/* ¥¿¥¤¥Ş¡¼¤ò var ¤Ë¼èÆÀ¤¹¤ë */
+	/* ã‚¿ã‚¤ãƒãƒ¼ã‚’ var ã«å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 	int val = get_counter(10);
 	
@@ -262,7 +262,7 @@ void commandZT5() {
 }
 
 void commandZT10() {
-	/* ¹âÀºÅÙ¥¿¥¤¥Ş¡¼ ÀßÄê */
+	/* é«˜ç²¾åº¦ã‚¿ã‚¤ãƒãƒ¼ è¨­å®š */
 	int num   = getCaliValue();
 	int base  = getCaliValue();
 	int count = getCaliValue();
@@ -273,7 +273,7 @@ void commandZT10() {
 }
 
 void commandZT11() {
-	/* ¹âÀºÅÙ¥¿¥¤¥Ş¡¼¼èÆÀ */
+	/* é«˜ç²¾åº¦ã‚¿ã‚¤ãƒãƒ¼å–å¾— */
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 	int val  = get_high_counter(num);
@@ -301,7 +301,7 @@ void commandZT21() {
 }
 
 void commandZZ0() {
-	/* £Ó£Ù£Ó£Ô£Å£Í£³¡¥£µ¤ò½ªÎ»¤¹¤ë */
+	/* ï¼³ï¼¹ï¼³ï¼´ï¼¥ï¼­ï¼“ï¼ï¼•ã‚’çµ‚äº†ã™ã‚‹ */
 	int sw = getCaliValue();
 	
 	DEBUG_COMMAND("ZZ0 %d:\n",sw);
@@ -317,7 +317,7 @@ void commandZZ0() {
 }
 
 void commandZZ1() {
-	/* ¸½ºß¤ÎÆ°ºîµ¡¼ï¥³¡¼¥É¤ò var ¤ËÊÖ¤¹ */
+	/* ç¾åœ¨ã®å‹•ä½œæ©Ÿç¨®ã‚³ãƒ¼ãƒ‰ã‚’ var ã«è¿”ã™ */
 	int *var = getCaliVariable();
 #if 1
 	*var = 1;
@@ -332,7 +332,7 @@ void commandZZ1() {
 }
 
 void commandZZ2() {
-	/* µ¡¼ïÊ¸»úÎó¤òÊ¸»úÎóÎÎ°è num ¤ËÊÖ¤¹¡Ê£Í£Á£Ø£±£²Ê¸»ú¡Ë*/
+	/* æ©Ÿç¨®æ–‡å­—åˆ—ã‚’æ–‡å­—åˆ—é ˜åŸŸ num ã«è¿”ã™ï¼ˆï¼­ï¼¡ï¼¸ï¼‘ï¼’æ–‡å­—ï¼‰*/
 	int num = getCaliValue();
 #if defined(linux)
 	static BYTE str[] = {0x82, 0x6B, 0x82, 0x89, 0x82, 0x8E, 0x82, 0x95, 0x82, 0x98, 0};
@@ -357,7 +357,7 @@ void commandZZ2() {
 }
 
 void commandZZ3() {
-	/* WINDOWS¤ÎÁ´²èÌÌ¥µ¥¤¥º¤äÉ½¼¨¿§¿ô¤òÊÑ¿ôÎó¤ËÊÖ¤¹ */
+	/* WINDOWSã®å…¨ç”»é¢ã‚µã‚¤ã‚ºã‚„è¡¨ç¤ºè‰²æ•°ã‚’å¤‰æ•°åˆ—ã«è¿”ã™ */
 	int *var = getCaliVariable();
 	DispInfo info;
 	
@@ -370,7 +370,7 @@ void commandZZ3() {
 }
 
 void commandZZ4() {
-	/* £Ä£É£Â ¤ÎÁ´²èÌÌ ¥µ¥¤¥º¤ä¿§¿ô¤òÊÑ¿ôÎó¤ËÊÖ¤¹ */
+	/* ï¼¤ï¼©ï¼¢ ã®å…¨ç”»é¢ ã‚µã‚¤ã‚ºã‚„è‰²æ•°ã‚’å¤‰æ•°åˆ—ã«è¿”ã™ */
 	int *var = getCaliVariable();
 	DispInfo info;
 	
@@ -383,7 +383,7 @@ void commandZZ4() {
 }
 
 void commandZZ5() {
-	/* £Ó£Ù£Ó£Ô£Å£Í£³¡¥£µÍÑÉ½¼¨²èÌÌ ¤Î ¥µ¥¤¥º¤ä¿§¿ô¤òÊÑ¿ôÎó¤ËÊÖ¤¹ */
+	/* ï¼³ï¼¹ï¼³ï¼´ï¼¥ï¼­ï¼“ï¼ï¼•ç”¨è¡¨ç¤ºç”»é¢ ã® ã‚µã‚¤ã‚ºã‚„è‰²æ•°ã‚’å¤‰æ•°åˆ—ã«è¿”ã™ */
 	int *var = getCaliVariable();
 	DispInfo info;
 
@@ -396,7 +396,7 @@ void commandZZ5() {
 }
 
 void commandZZ7() {
-	// ¥»¡¼¥Ö¥É¥é¥¤¥Ö¤Î»Ä¤ê¥Ç¥£¥¹¥¯ÍÆÎÌ¤òÆÀ¤ë
+	// ã‚»ãƒ¼ãƒ–ãƒ‰ãƒ©ã‚¤ãƒ–ã®æ®‹ã‚Šãƒ‡ã‚£ã‚¹ã‚¯å®¹é‡ã‚’å¾—ã‚‹
 	int *var = getCaliVariable();
 	
 	*var = 65535;
@@ -405,14 +405,14 @@ void commandZZ7() {
 }
 
 void commandZZ8() {
-	// ¥á¥â¥ê¥ª¥ó¥Ğ¥Ã¥Õ¥¡¤Î»Ä¤êÍÆÎÌ¤òÆÀ¤ë
+	// ãƒ¡ãƒ¢ãƒªã‚ªãƒ³ãƒãƒƒãƒ•ã‚¡ã®æ®‹ã‚Šå®¹é‡ã‚’å¾—ã‚‹
 	int *var = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("ZZ8 %p:\n",var);
 }
 
 void commandZZ9() {
-	/* µ¯Æ°»ş¤Î¥¹¥¯¥ê¡¼¥ó¥µ¥¤¥º¤ò¼èÆÀ¤¹¤ë */
+	/* èµ·å‹•æ™‚ã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 	DispInfo info;
 	
@@ -425,7 +425,7 @@ void commandZZ9() {
 }
 
 void commandZZ10() {
-	/* ¥¹¥¯¥ê¡¼¥ó¥â¡¼¥É¤ò¼èÆÀ¤¹¤ë */
+	/* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 
 	*var = nact->sys_fullscreen_on ? 1 : 0;
@@ -434,7 +434,7 @@ void commandZZ10() {
 }
 
 void commandZZ13() {
-	/* É½¼¨¥Õ¥©¥ó¥È¤òÀßÄê¤¹¤ë */
+	/* è¡¨ç¤ºãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®šã™ã‚‹ */
 	int num = getCaliValue();
 	
 	nact->msg.MsgFont = num;
@@ -459,7 +459,7 @@ void commandZZ14() {
 }
 
 void commandZG() {
-	/* £Ã£Ç¤Î¥í¡¼¥É¤·¤¿²ó¿ô¤ò¥ê¥ó¥¯ÈÖ¹æËè¤ËÇÛÎó¤Ë½ñ¤­¹ş¤àÇÛÎó¤òÀßÄê */
+	/* ï¼£ï¼§ã®ãƒ­ãƒ¼ãƒ‰ã—ãŸå›æ•°ã‚’ãƒªãƒ³ã‚¯ç•ªå·æ¯ã«é…åˆ—ã«æ›¸ãè¾¼ã‚€é…åˆ—ã‚’è¨­å®š */
 	int *var = getCaliVariable();
 	
 	cg_loadCountVar = var;
@@ -468,7 +468,7 @@ void commandZG() {
 }
 
 void commandZI() { /* T2 */
-	/* £Á¥³¥Ş¥ó¥É¤Î¥­¡¼ÆşÎÏÂÔ¤Á»ş¤Î³Æ¥­¡¼¤ÎÆ°ºî¤Î»ØÄê */
+	/* ï¼¡ã‚³ãƒãƒ³ãƒ‰ã®ã‚­ãƒ¼å…¥åŠ›å¾…ã¡æ™‚ã®å„ã‚­ãƒ¼ã®å‹•ä½œã®æŒ‡å®š */
 	int key  = getCaliValue();
 	int mode = getCaliValue();
 	
@@ -478,7 +478,7 @@ void commandZI() { /* T2 */
 }
 
 void commandZA() { /* T2 */
-	/* Ê¸»ú¾ş¤ê¤Î¼ïÎà¤ò»ØÄê¤¹¤ë */
+	/* æ–‡å­—é£¾ã‚Šã®ç¨®é¡ã‚’æŒ‡å®šã™ã‚‹ */
 	int p1 = sys_getc();
 	int p2 = getCaliValue();
 	
@@ -498,7 +498,7 @@ void commandZA() { /* T2 */
 }
 
 void commandZK() {
-	// ¥Ç¥£¥¹¥¯¤ÎÆş¤ìÂØ¤¨¤òÂ¥¤¹
+	// ãƒ‡ã‚£ã‚¹ã‚¯ã®å…¥ã‚Œæ›¿ãˆã‚’ä¿ƒã™
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	char *str = sys_getString(':');
@@ -507,7 +507,7 @@ void commandZK() {
 }
 
 void commandZR() {
-	/* 1 ¡Á num ¤Ş¤Ç¤ÎÍğ¿ô¤òÈ¯À¸¤·¤ÆÊÑ¿ô¤ËÊÖ¤¹¡£ */
+	/* 1 ã€œ num ã¾ã§ã®ä¹±æ•°ã‚’ç™ºç”Ÿã—ã¦å¤‰æ•°ã«è¿”ã™ã€‚ */
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 	

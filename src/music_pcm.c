@@ -37,7 +37,7 @@
 #include "counter.h"
 #include "pcmlib.h"
 
-// £±²ó¤Î cb ¤Ç audio buffer ¤Î²¿Ê¬¤Î£±¤ò½èÍı¤¹¤ë¤«
+// ï¼‘å›ã® cb ã§ audio buffer ã®ä½•åˆ†ã®ï¼‘ã‚’å‡¦ç†ã™ã‚‹ã‹
 #define SLICE 4
 
 #define IS_LOADED(slot) (prv.pcm[(slot)])
@@ -72,7 +72,7 @@ int muspcm_init() {
 	}
 	
 	{
-		// device buffer ¤ÎÀßÄê
+		// device buffer ã®è¨­å®š
 		audiodevbuf_t *buf = &prv.audiodev.buf;
 		
 		buf->b[0] = g_malloc0(buf->len);
@@ -99,7 +99,7 @@ int muspcm_exit() {
 	return OK;
 }
 
-// ÈÖ¹æ»ØÄê¤ÎPCM¥Õ¥¡¥¤¥ëÆÉ¤ß¹ş¤ß
+// ç•ªå·æŒ‡å®šã®PCMãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
 int muspcm_load_no(int slot, int no) {
 	pcmobj_t *obj;
 	WAVFILE *wfile;
@@ -149,7 +149,7 @@ int muspcm_load_no(int slot, int no) {
 	return OK;
 }
 
-// ¥á¥â¥ê¾å¤ÎPCM¥Ç¡¼¥¿¤ÎÆÉ¤ß¹ş¤ß
+// ãƒ¡ãƒ¢ãƒªä¸Šã®PCMãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿
 int muspcm_load_mem(int slot, void *mem) {
 	pcmobj_t *obj;
 	WAVFILE *wfile;
@@ -179,7 +179,7 @@ int muspcm_load_mem(int slot, void *mem) {
 	return OK;
 }
 
-// ¥Ñ¥¤¥×¤«¤é¤ÎPCM¥Ç¡¼¥¿¤«¤é¤ÎÆÉ¤ß¹ş¤ß
+// ãƒ‘ã‚¤ãƒ—ã‹ã‚‰ã®PCMãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ã®èª­ã¿è¾¼ã¿
 int muspcm_load_pipe(int slot, char *cmd) {
 	pcmobj_t *obj;
 	
@@ -201,7 +201,7 @@ int muspcm_load_pipe(int slot, char *cmd) {
 	return OK;
 }
 
-// º¸±¦¤òÆş¤ì´¹¤¨¤¿¥Õ¥¡¥¤¥ë¤«¤é¤ÎPCM¤ÎºÆÀ¸¤Î¤¿¤á¤ÎÆÉ¤ß¹ş¤ß
+// å·¦å³ã‚’å…¥ã‚Œæ›ãˆãŸãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã®PCMã®å†ç”Ÿã®ãŸã‚ã®èª­ã¿è¾¼ã¿
 int muspcm_load_no_lrsw(int slot, int no) {
 	pcmobj_t *obj;
 	int ret = muspcm_load_no(slot, no);
@@ -217,7 +217,7 @@ int muspcm_load_no_lrsw(int slot, int no) {
 	return OK;
 }
 
-// PCM¥Ç¡¼¥¿¤òºÆÀ¸
+// PCMãƒ‡ãƒ¼ã‚¿ã‚’å†ç”Ÿ
 int muspcm_start(int slot, int loop) {
 	pcmobj_t *obj;
 	// printf("pcm start slot = %d, loop = %d\n", slot, loop);
@@ -239,7 +239,7 @@ int muspcm_start(int slot, int loop) {
 	return OK;
 }
 
-// PCM¥Ç¡¼¥¿¤ÎºÆÀ¸Ää»ß
+// PCMãƒ‡ãƒ¼ã‚¿ã®å†ç”Ÿåœæ­¢
 int muspcm_stop(int slot) {
 	pcmobj_t *obj;
 	
@@ -252,7 +252,7 @@ int muspcm_stop(int slot) {
 	return OK;
 }
 
-// PCM¥Ç¡¼¥¿¤Î¥á¥â¥ê¾å¤«¤é¤Î¥¢¥ó¥í¡¼¥É
+// PCMãƒ‡ãƒ¼ã‚¿ã®ãƒ¡ãƒ¢ãƒªä¸Šã‹ã‚‰ã®ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰
 int muspcm_unload(int slot) {
 	pcmobj_t *obj;
 	
@@ -278,7 +278,7 @@ int muspcm_unload(int slot) {
 	return OK;
 }
 
-// PCM¥Ç¡¼¥¿ºÆÀ¸°ì»şÄä»ß
+// PCMãƒ‡ãƒ¼ã‚¿å†ç”Ÿä¸€æ™‚åœæ­¢
 int muspcm_pause(int slot) {
 	if (prv.pcm[slot] != NULL) {
 		prv.pcm[slot]->paused = TRUE;
@@ -286,7 +286,7 @@ int muspcm_pause(int slot) {
 	return OK;
 }
 
-// PCM¥Ç¡¼¥¿ºÆÀ¸°ì»şÄä»ß²ò½ü
+// PCMãƒ‡ãƒ¼ã‚¿å†ç”Ÿä¸€æ™‚åœæ­¢è§£é™¤
 int muspcm_unpause(int slot) {
 	if (prv.pcm[slot] != NULL) {
 		prv.pcm[slot]->paused = FALSE;
@@ -322,7 +322,7 @@ static int pcmmix_mix(short *src, int len) {
 		src++; dst++;
 	}
 	
-	// ¼¡¤Î¥Ğ¥Ã¥Õ¥¡¤Ø
+	// æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ã¸
 	if (len2 != 0) {
 		dst = (short *)buf->b[!buf->sw];
 		for (i = 0; i < len2; i+=2) {
@@ -338,7 +338,7 @@ static int pcmmix_send2devbuf() {
 	int len2;
 	
 	if (buf->cur + buf->lenmax >= buf->end) {
-		// ¼¡¤Î¥Ğ¥Ã¥Õ¥¡¤ËÀÚÂØ¤¨
+		// æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ã«åˆ‡æ›¿ãˆ
 		len2 = buf->lenmax - (buf->end - buf->cur);
 		buf->ready[buf->sw] = TRUE;
 		buf->sw  = !(buf->sw);
@@ -353,7 +353,7 @@ static int pcmmix_send2devbuf() {
 	return OK;
 }
 
-// defice ¤Ë¥Ç¡¼¥¿¤¬Á÷¤é¤ì¤¿¤È¤­¤Ë cb ¤òÀßÄê¤·¤Æ¤¢¤ë¤È¤½¤ì¤ò¸Æ¤Ö
+// defice ã«ãƒ‡ãƒ¼ã‚¿ãŒé€ã‚‰ã‚ŒãŸã¨ãã« cb ã‚’è¨­å®šã—ã¦ã‚ã‚‹ã¨ãã‚Œã‚’å‘¼ã¶
 static GSList *cb_flush[2];
 static void cb_at_devflush4each(gpointer data, gpointer userdata) {
 	pcmobj_t *obj = (pcmobj_t *)data;
@@ -368,7 +368,7 @@ static void cb_at_devflush(int sw) {
 	}
 }
 
-// PCMºÆÀ¸¥ê¥¹¥ÈÃæ¤ÎPCM¥½¡¼¥¹¤«¤é¥Ç¡¼¥¿¤òÆÉ¤ß¹ş¤ó¤Ç¹çÀ®
+// PCMå†ç”Ÿãƒªã‚¹ãƒˆä¸­ã®PCMã‚½ãƒ¼ã‚¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚“ã§åˆæˆ
 int muspcm_cb() {
 	audiodevbuf_t *buf = &prv.audiodev.buf;
 	pcmobj_t *obj;
@@ -376,50 +376,50 @@ int muspcm_cb() {
 	GSList *removelist = NULL, *snode;
 	int len;
 	
-	// ºÆÀ¸¥ê¥¹¥È¤¬¶õ¤Î¾ì¹ç¤Ï¤Ê¤Ë¤â¤·¤Ê¤¤
+	// å†ç”Ÿãƒªã‚¹ãƒˆãŒç©ºã®å ´åˆã¯ãªã«ã‚‚ã—ãªã„
 	if (g_list_length(prv.pcmplist) == 0) {
 		return 0;
 	}
 	
-	// ¼¡¤Î¥Ğ¥Ã¥Õ¥¡¤¬¤¤¤Ã¤Ñ¤¤¤Î¤È¤­¤Ï¤Ê¤Ë¤â¤·¤Ê¤¤
+	// æ¬¡ã®ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã®ã¨ãã¯ãªã«ã‚‚ã—ãªã„
 	if (buf->ready[!buf->sw]) {
 		//printf("buffer is full\n");
 		return 0;
 	}
 	
-	// Á´¤Æ¤ÎºÆÀ¸¥ê¥¹¥ÈÃæ¤Î¥Á¥ã¥ó¥Í¥ë¤ò¹çÀ®
+	// å…¨ã¦ã®å†ç”Ÿãƒªã‚¹ãƒˆä¸­ã®ãƒãƒ£ãƒ³ãƒãƒ«ã‚’åˆæˆ
 	for (node = prv.pcmplist; node; node = g_list_next(node)) {
 		obj = (pcmobj_t *)node->data;
 		if (obj == NULL) continue;  // why ?
 		
-		// Ää»ßÃæ¤Î¾ì¹ç
+		// åœæ­¢ä¸­ã®å ´åˆ
 		if (obj->paused) continue;
 		
 		len = obj->conv.convert(obj, obj->vollv * prv.volval[prv.vol_pcm_sub[obj->slot]] / 100, prv.audiodev.buf.len/SLICE);
-		if (len <= 0) { // ¥¨¥é¡¼¤Ş¤¿¤Ï½ªÃ¼¤ËÅşÃ£¤·¤¿¾ì¹ç
+		if (len <= 0) { // ã‚¨ãƒ©ãƒ¼ã¾ãŸã¯çµ‚ç«¯ã«åˆ°é”ã—ãŸå ´åˆ
 			if (obj->cb_atend) {
-				// ±éÁÕ½ªÎ»¤òÃÎ¤é¤»¤ÆÍß¤·¤¤
-				// ¥Õ¥§¡¼¥É¤äpcm_stop¤Ç¤Î½ªÎ»¤Îºİ¤ÏÃÎ¤é¤»¤Ê¤¯¤Æ¤è¤¤¡©
+				// æ¼”å¥çµ‚äº†ã‚’çŸ¥ã‚‰ã›ã¦æ¬²ã—ã„
+				// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚„pcm_stopã§ã®çµ‚äº†ã®éš›ã¯çŸ¥ã‚‰ã›ãªãã¦ã‚ˆã„ï¼Ÿ
 				cb_flush[buf->sw] = g_slist_append(cb_flush[buf->sw], obj);
 			}
 			// loop check
-			if (obj->loop == 0) { // Ìµ¸Â¥ë¡¼¥×
+			if (obj->loop == 0) { // ç„¡é™ãƒ«ãƒ¼ãƒ—
 				obj->src->seek(obj->src, 0, SEEK_SET);
 				obj->written_len = 0;
 				continue;
 			}
-			if (--obj->loop == 0) { // ·«¤êÊÖ¤·½ªÎ»
+			if (--obj->loop == 0) { // ç¹°ã‚Šè¿”ã—çµ‚äº†
 				// remove
 				// muspcm_stop(obj->slot);
 				removelist = g_slist_append(removelist, obj);
 				continue;
-			} else { // ÀèÆ¬¤Ø
+			} else { // å…ˆé ­ã¸
 				obj->src->seek(obj->src, 0, SEEK_SET);
 				obj->written_len = 0;
 				continue;
 			}
 		}
-		// ¹çÀ®
+		// åˆæˆ
 		pcmmix_mix(obj->conv.buf, len);
 		obj->written_len += len;
 	}
@@ -427,37 +427,37 @@ int muspcm_cb() {
 	len = prv.audiodev.buf.lenmax;
 	if (len > 0) pcmmix_send2devbuf();
 	
-	// ºÇ¸å¤Ë pcm playlist ¤«¤é stop ¤·¤¿ pcmobj ¤òºï½ü
+	// æœ€å¾Œã« pcm playlist ã‹ã‚‰ stop ã—ãŸ pcmobj ã‚’å‰Šé™¤
 	for (snode = removelist; snode; snode = g_slist_next(snode)) {
 		obj = (pcmobj_t *)snode->data;
 		if (obj == NULL) continue;
 		muspcm_stop(obj->slot);
 	}
 	
-	return len; // ¼Âºİ¤Ë¹çÀ®¤·¤¿Ä¹¤µ
+	return len; // å®Ÿéš›ã«åˆæˆã—ãŸé•·ã•
 }
 
-// ¥Ğ¥Ã¥Õ¥¡Ãæ¤ÎPCM¥Ç¡¼¥¿¤ò¥Ç¥Ğ¥¤¥¹¤Ë½ĞÎÏ (pollout»ş¤Ë¸Æ¤Ğ¤ì¤ë)
+// ãƒãƒƒãƒ•ã‚¡ä¸­ã®PCMãƒ‡ãƒ¼ã‚¿ã‚’ãƒ‡ãƒã‚¤ã‚¹ã«å‡ºåŠ› (polloutæ™‚ã«å‘¼ã°ã‚Œã‚‹)
 int muspcm_write2dev(void) {
 	audiodevbuf_t *buf = &prv.audiodev.buf;
 	int sw;
 	
-	// ¥Ğ¥Ã¥Õ¥¡¤¬audiodevice¤Ë½ñ¤­¹ş¤ßOK¤ÎÊı¤òÁªÂò
+	// ãƒãƒƒãƒ•ã‚¡ãŒaudiodeviceã«æ›¸ãè¾¼ã¿OKã®æ–¹ã‚’é¸æŠ
 	sw = (buf->ready[0] ? 0 : buf->ready[1] ? 1 : -1);
 	while (sw < 0) {
 		int len = 0;
 		if (g_list_length(prv.pcmplist) != 0) {
-			// playlistÃæ¤ËPCM¥Ç¡¼¥¿¥½¡¼¥¹¤¬¤¢¤ë¾ì¹ç¤Ï
-			// ¥Ğ¥Ã¥Õ¥¡¤¬¤¤¤Ã¤Ñ¤¤¤Ë¤Ê¤ë¤Ş¤ÇÆÉ¤ß¹ş¤à
+			// playlistä¸­ã«PCMãƒ‡ãƒ¼ã‚¿ã‚½ãƒ¼ã‚¹ãŒã‚ã‚‹å ´åˆã¯
+			// ãƒãƒƒãƒ•ã‚¡ãŒã„ã£ã±ã„ã«ãªã‚‹ã¾ã§èª­ã¿è¾¼ã‚€
 			len = muspcm_cb();
 		}
 		if (len == 0) {
-			// ¼Âºİ¤ËÆÉ¤ß¹ş¤á¤¿¥Ç¡¼¥¿¤¬£°¤Î¾ì¹ç
+			// å®Ÿéš›ã«èª­ã¿è¾¼ã‚ãŸãƒ‡ãƒ¼ã‚¿ãŒï¼ã®å ´åˆ
 			sw = buf->sw;
 			if (buf->cur == buf->b[sw]) return OK;
-			// »Ä¤ê¤Î¥Ç¡¼¥¿¤ÎÅÇ¤­½Ğ¤·¤È¥Ğ¥Ã¥Õ¥¡¤Î¥¯¥ê¥¢
-			//   audiodevice¤Î¥Ğ¥Ã¥Õ¥¡¥µ¥¤¥ºÁ´ÂÎ¤òÁ÷½Ğ¤·¤Ê¤¤¤È
-			//   FreeBSD+OSS¤Ç¥Ç¥Ğ¥¤¥¹¤¬write ready¤Ë¤Ê¤é¤Ê¤¤¡£
+			// æ®‹ã‚Šã®ãƒ‡ãƒ¼ã‚¿ã®åãå‡ºã—ã¨ãƒãƒƒãƒ•ã‚¡ã®ã‚¯ãƒªã‚¢
+			//   audiodeviceã®ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºå…¨ä½“ã‚’é€å‡ºã—ãªã„ã¨
+			//   FreeBSD+OSSã§ãƒ‡ãƒã‚¤ã‚¹ãŒwrite readyã«ãªã‚‰ãªã„ã€‚
 			prv.audiodev.write(&prv.audiodev, buf->b[sw], buf->len);
 			memset(buf->b[sw], 0, buf->len);
 			buf->ready[sw] = FALSE;
@@ -470,17 +470,17 @@ int muspcm_write2dev(void) {
 		sw = (buf->ready[0] ? 0 : buf->ready[1] ? 1 : -1);
 	}
 	
-	// ½ñ¤­¹ş¤ß¤Î½àÈ÷¤¬¤Ç¤­¤Æ¤¤¤ëÊı¤ò¥Ç¥Ğ¥¤¥¹¤Ø
+	// æ›¸ãè¾¼ã¿ã®æº–å‚™ãŒã§ãã¦ã„ã‚‹æ–¹ã‚’ãƒ‡ãƒã‚¤ã‚¹ã¸
 	prv.audiodev.write(&prv.audiodev, buf->b[sw], buf->len);
 	memset(buf->b[sw], 0, buf->len);
 	buf->ready[sw] = FALSE;
 	
-	// ¥Ç¥Ğ¥¤¥¹¤Ë½ñ¤­¹ş¤àºİ¤Ë callback ¤¬¤¢¤ì¤Ğ¤½¤ì¤ò¸Æ¤Ó½Ğ¤¹
+	// ãƒ‡ãƒã‚¤ã‚¹ã«æ›¸ãè¾¼ã‚€éš›ã« callback ãŒã‚ã‚Œã°ãã‚Œã‚’å‘¼ã³å‡ºã™
 	cb_at_devflush(sw);
 	return OK;
 }
 
-// ¸½ºß¤ÎºÆÀ¸°ÌÃÖ¤òÊÖ¤¹
+// ç¾åœ¨ã®å†ç”Ÿä½ç½®ã‚’è¿”ã™
 int muspcm_getpos(int slot) {
 	pcmobj_t *obj;
 	guint64 len;
@@ -500,7 +500,7 @@ int muspcm_getpos(int slot) {
 	return (int)(((guint64)(len * 1000) / (obj->fmt.rate * (obj->fmt.bit/8) * obj->fmt.ch)));
 }
 
-// PCM¥ª¥Ö¥¸¥§¥¯¥È¤ËÂĞ¤·¤Æ¥Ü¥ê¥å¡¼¥à¤ò¥»¥Ã¥È
+// PCMã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«å¯¾ã—ã¦ãƒœãƒªãƒ¥ãƒ¼ãƒ ã‚’ã‚»ãƒƒãƒˆ
 int muspcm_setvol(int dev, int slot, int lv) {
 	pcmobj_t *obj;
 	
@@ -512,7 +512,7 @@ int muspcm_setvol(int dev, int slot, int lv) {
 	return OK;
 }
 
-// PCM¥Ç¡¼¥¿¤ÎÄ¹¤µ¤ò¼èÆÀ
+// PCMãƒ‡ãƒ¼ã‚¿ã®é•·ã•ã‚’å–å¾—
 int muspcm_getwavelen(int slot) {
 	pcmobj_t *obj;
 	
@@ -526,7 +526,7 @@ int muspcm_getwavelen(int slot) {
 	return obj->data_len;
 }
 
-// »ØÄê¤Î¥¹¥í¥Ã¥È¤¬¸½ºß±éÁÕÃæ¤«¤É¤¦¤«¤ò¼èÆÀ
+// æŒ‡å®šã®ã‚¹ãƒ­ãƒƒãƒˆãŒç¾åœ¨æ¼”å¥ä¸­ã‹ã©ã†ã‹ã‚’å–å¾—
 boolean muspcm_isplaying(int slot) {
 	pcmobj_t *obj;
 	

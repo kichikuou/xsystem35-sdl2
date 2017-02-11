@@ -1,7 +1,7 @@
 /*
- * ShGraph.c  ���˥᡼������Ϣ module
+ * ShGraph.c  アニメーション関連 module
  *
- *    �簭��
+ *    大悪司
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -41,10 +41,10 @@
 
 static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, int r, int g, int b);
 
-static MyRectangle maprect;  /* ���˥᡼�����ɽ���ΰ� */
-static MyRectangle mapback;  /* �طʥ������ΰ� */
-static int mapback_p5;       /* �ط�ž���� X */
-static int mapback_p6;       /* �ط�ž���� Y */
+static MyRectangle maprect;  /* アニメーション表示領域 */
+static MyRectangle mapback;  /* 背景セーブ領域 */
+static int mapback_p5;       /* 背景転送先 X */
+static int mapback_p6;       /* 背景転送先 Y */
 
 struct animsrc {
 	int x;
@@ -57,7 +57,7 @@ struct animsrc {
 	int g;
 	int b;
 };
-static struct animsrc src[SLOT];  /* ���˥᡼�����ƥ���ž���� */
+static struct animsrc src[SLOT];  /* アニメーション各コマ転送元 */
 	
 struct _s0 {
 	int *dst_p1;
@@ -85,12 +85,12 @@ struct _s2 {
 };
 static struct _s2 s2[SLOT];
 
-static int* add_p5[SLOT]; /* �ɤ��ޤǥ��˥᡼�����Υ��ޤ��ʤ���� */
+static int* add_p5[SLOT]; /* どこまでアニメーションのコマが進んだか */
 
 
 void Init() {
 	/*
-	  �⥸�塼������
+	  モジュール初期化
 	*/
 	int p1 = getCaliValue(); /* ISurface */
 	
@@ -117,14 +117,14 @@ void ChangeEquColor() {
 
 void ChangeNotColor() {
 	/*
-	  ������ΰ褬 src ���������ʤ���� dst ���ɤ�Ĥ֤�
+	  指定の領域が src と等しくなければ dst に塗りつぶす
 	  
 	  x0:     source x0
 	  y0:     source y0
 	  width:  source width
 	  height: source height
-	  *src:   �ɤ�Ĥ֤�����ο������äƤ����ѿ� src, src+1, src+2
-	  *dst:   �ɤ�Ĥ֤��ο������äƤ����ѿ� dst, dst+1, dst+2
+	  *src:   塗りつぶし候補の色が入っている変数 src, src+1, src+2
+	  *dst:   塗りつぶしの色が入っている変数 dst, dst+1, dst+2
 	*/
 	int x0 = getCaliValue();
 	int y0 = getCaliValue();
@@ -202,36 +202,36 @@ void ChangeNotColor() {
 }
 
 /*
-  ���˥᡼�������Ѽ��
-   1: �ޤ����ꥻ�å� (ResetAnimData 0:)
-   2: ���˥᡼������ɽ�������ΰ������ (SetAnimeRect x,y,w,h:)
-   3: ���˥᡼�������طʤ��񤫤�Ƥ����ΰ������ 
-      (SetAnimeBack sx,sy,w,h,dx,dy:) dx, dy ��ž����
-   4: �ƥ��˥᡼�����Υѥ�������ΰ������
+  アニメーション使用手順
+   1: まず、リセット (ResetAnimData 0:)
+   2: アニメーションを表示する領域の設定 (SetAnimeRect x,y,w,h:)
+   3: アニメーションの背景が書かれている領域の設定 
+      (SetAnimeBack sx,sy,w,h,dx,dy:) dx, dy は転送先
+   4: 各アニメーションのパターンの領域の設定
       (SetAnimeSrc slot,sx,sy,w,h,uw,uh,pal)
-   5: �ƥ��˥᡼������ɽ����ɸ������
+   5: 各アニメーションの表示座標の設定
       (SetAnimeDst slot,varx,vary,offx,offy,offw,offh:)
-   6: ���˥᡼�����ѥ����������
-      ���֤Υ����åȤ�ɤν��֤Ǻ������뤫�����
+   6: アニメーションパターンの設定
+      何番のスロットをどの順番で再生するかを指定
       (SetAnimeData pat,src,dst,num,varpat,waveno:)
-      ��
+      例
        ShGraph.AddAnimeData 1,11,11,5,var1,81:
        ShGraph.AddAnimeData 1,13,12,8,var2,84:
        ShGraph.AddAnimeData 1,14,12,2,var3,20736:
        
-         ���˥᤽�Σ��� �ѥ����� 11->13->14 �Υ����åȤ���������줾�졢5����,
-       8����,2���ޤŤĻ��Ѥ��롣ɽ�����֤� 11->12->12 �Υ����åȤ���ѡ�
+         アニメその１は パターン 11->13->14 のスロットを再生。それぞれ、5コマ,
+       8コマ,2コマづつ使用する。表示位置は 11->12->12 のスロットを使用。
        
-   7: �ºݤ˺������륢�˥����ꡣ(AddAnimeRemain slot:)
-   8: ���ꤹ�륹���åȤޤǥ��˥���� (PlayAnimeData lastslot,wait:)
-      lastslot�����ξ��� 7 �ǻ��ꤷ���Ȥ����ޤǡ�
+   7: 実際に再生するアニメを決定。(AddAnimeRemain slot:)
+   8: 指定するスロットまでアニメ再生 (PlayAnimeData lastslot,wait:)
+      lastslotが０の場合は 7 で指定したところまで。
 
 */
 void ResetAnimeData() {
 	/*
-	  ���˥᡼������ѤγƼ�ǡ����򥯥ꥢ
+	  アニメーション用の各種データをクリア
 	  
-	  no: ���ꥢ�оݥ����å�(0�ʤ��������åȥ��ꥢ)
+	  no: クリア対象スロット(0なら全スロットクリア)
 	*/
 	int no = getCaliValue();
 	
@@ -254,16 +254,16 @@ void ResetAnimeData() {
 
 void SetAnimeSrc() {
 	/*
-	  ���˥᡼�����γƥѥ�����Υ������ΰ������
+	  アニメーションの各パターンのソース領域の設定
 
-	  no: �����å��ֹ�
+	  no: スロット番号
 	  x0: src x0
 	  y0: src y0
 	  w : src width
 	  h : src height
-	  uw: �ѥ�����β����¤Ӥο�
-	  uh: �ѥ�����νĤ��¤Ӥο�
-	  *pal: ȴ�������Ǽ���Ƥ����ѿ�����Ƭ (pal, pal+1, pal+2)
+	  uw: パターンの横の並びの数
+	  uh: パターンの縦の並びの数
+	  *pal: 抜き色を格納してある変数の先頭 (pal, pal+1, pal+2)
 	*/
 	int no = getCaliValue();
 	int x0 = getCaliValue();
@@ -297,15 +297,15 @@ void SetAnimeSrc() {
 
 void SetAnimeDst() {
 	/*
-	  ���˥᡼����������������
+	  アニメーションの描画先設定
 	  
-	  no: �����å��ֹ�
-	  p1: ���ߤ�������(x)���Ǽ�����ѿ�
-	  p2: ���ߤ�������(y)���Ǽ�����ѿ�
-	  p3: �����襪�ե��å� (x) 10000�����(0)
-	  p4: �����襪�ե��å� (y) 10000�����
-	  p5: �����襪�ե��å��ɲ�ʬ (w) 10000�����
-	  p6: �����襪�ե��å��ɲ�ʬ (h) 10000�����
+	  no: スロット番号
+	  p1: 現在の描画先(x)を格納する変数
+	  p2: 現在の描画先(y)を格納する変数
+	  p3: 描画先オフセット (x) 10000が中央(0)
+	  p4: 描画先オフセット (y) 10000が中央
+	  p5: 描画先オフセット追加分 (w) 10000が中央
+	  p6: 描画先オフセット追加分 (h) 10000が中央
 	*/
 	int no = getCaliValue();
 	int *p1 = getCaliVariable();
@@ -332,14 +332,14 @@ void SetAnimeDst() {
 
 void AddAnimeData() {
 	/*
-	  ���˥᡼�����Ƽ�����
+	  アニメーション各種設定
 	  
-	  no: �����å��ֹ�
-	  p2: ���˥᡼�����ѥ������Ǽ��Ƭ�����å�
-	  p3: ���˥᡼�����ѥ�����ɽ����Ƭ�����å�
-	  p4: ���˥᡼�����ѥ�����Ŀ�
-	  p5: ���ߤɤβ����ܤΥѥ������񤤤Ƥ��뤫����¸���Ƥ����ѿ�
-	  p6: ���̲� WAV �ե������ֹ�
+	  no: スロット番号
+	  p2: アニメーションパターン格納先頭スロット
+	  p3: アニメーションパターン表示先頭スロット
+	  p4: アニメーションパターン個数
+	  p5: 現在どの何番目のパターンを書いているかを保存しておく変数
+	  p6: 効果音 WAV ファイル番号
 	*/
 	int no = getCaliValue();
 	int p2 = getCaliValue();
@@ -376,9 +376,9 @@ void AddAnimeData() {
 
 void AddAnimeRemain() {
 	/*
-	  ���˥᡼�����Ƽ�����
+	  アニメーション各種設定
 	  
-	  no: �����å��ֹ�
+	  no: スロット番号
 	*/
 	int no = getCaliValue();
 	int i, _max = 0;
@@ -402,7 +402,7 @@ void AddAnimeRemain() {
 
 void SetAnimeRect() {
 	/*
-	  ���˥᡼����������ΰ�����
+	  アニメーション描画領域設定
 
 	  x: region x
 	  y: region y
@@ -424,14 +424,14 @@ void SetAnimeRect() {
 
 void SetAnimeBack() {
 	/*
-	  ���˥᡼������ط��ΰ�����
+	  アニメーション背景領域設定
 	  
-	  sx: �ط��ΰ� x
-	  sy: �ط��ΰ� y
-	  w:  �ط��ΰ� width
-	  h:  �ط��ΰ� height
-	  p5: �ط��ΰ� ž���� x ���ե��å�
-	  p6: �ط��ΰ� ž���� y ���ե��å�
+	  sx: 背景領域 x
+	  sy: 背景領域 y
+	  w:  背景領域 width
+	  h:  背景領域 height
+	  p5: 背景領域 転送先 x オフセット
+	  p6: 背景領域 転送先 y オフセット
 	*/
 	int sx = getCaliValue();
 	int sy = getCaliValue();
@@ -452,10 +452,10 @@ void SetAnimeBack() {
 
 void PlayAnimeData() {
 	/*
-	  �ºݤ˥��˥᡼������¹�
+	  実際にアニメーションを実行
 	  
-	  p1: ������������å�(0�ξ�������)
-	  p2: ���˥᡼����󥤥󥿡��Х�(10msecñ��)
+	  p1: 最大再生スロット(0の場合は全部)
+	  p2: アニメーションインターバル(10msec単位)
 	*/
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();

@@ -14,7 +14,7 @@
 #include "sprite.h"
 
 /*
-  Message¥­¡¼ÆþÎÏÂÔ¤Á»þ¤Î
+  Messageã‚­ãƒ¼å…¥åŠ›å¾…ã¡æ™‚ã®
 */
 static void cb_waitkey_message(agsevent_t *e) {
 	switch (e->type) {
@@ -29,7 +29,7 @@ static void cb_waitkey_message(agsevent_t *e) {
 }
 
 /*
-  WaitKeySimple¤Îcallback
+  WaitKeySimpleã®callback
 */
 static void cb_waitkey_simple(agsevent_t *e) {
 	switch (e->type) {
@@ -41,7 +41,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 }
 
 /*
-  ÁªÂò»è Window Open »þ¤Î callback
+  é¸æŠžè‚¢ Window Open æ™‚ã® callback
 */
 static void cb_waitkey_selection(agsevent_t *e) {
 	switch (e->type) {
@@ -56,7 +56,7 @@ static void cb_waitkey_selection(agsevent_t *e) {
 }
 
 void ntev_callback(agsevent_t *e) {
-	// menu openÃæ¤ÏÌµ»ë
+	// menu openä¸­ã¯ç„¡è¦–
 	if (nact->popupmenu_opened) {
 		return;
 	}
@@ -97,10 +97,10 @@ void ntev_callback(agsevent_t *e) {
 }
 
 /*
-  system35¤Î¥á¥¤¥ó¥ë¡¼¥×¤«¤é¤Ç¸Æ¤Ð¤ì¤ë¥³¡¼¥ë¥Ð¥Ã¥¯
+  system35ã®ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ—ã‹ã‚‰ã§å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯
 */
 void ntev_main() {
-        // ¥Ç¥Õ¥©¥ë¥È¤Î¥³¡¼¥ë¥Ð¥Ã¥¯¤Î¤¦¤Á¡¢¤³¤³¤ÇÉ¬Í×¤Ê¤â¤Î¤À¤±½èÍý¡£
+        // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã®ã†ã¡ã€ã“ã“ã§å¿…è¦ãªã‚‚ã®ã ã‘å‡¦ç†ã€‚
         if (nact->popupmenu_opened) {
                 menu_gtkmainiteration();
                 if (nact->is_quit) sys_exit(0);

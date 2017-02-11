@@ -1,9 +1,9 @@
 /*
- * Gpx.c  Graphics ÈÆÍÑ´Ø¿ô
+ * Gpx.c  Graphics æ±ç”¨é–¢æ•°
  *
- *      OnlyYou -¥ê¡¦¥¯¥¹¥ë
- *      system3.9²½ µ´ÃÜ²¦¥é¥ó¥¹
- *      Âç°­»Ê
+ *      OnlyYou -ãƒªãƒ»ã‚¯ã‚¹ãƒ«
+ *      system3.9åŒ– é¬¼ç•œç‹ãƒ©ãƒ³ã‚¹
+ *      å¤§æ‚ªå¸
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -52,7 +52,7 @@
 
 
 
-static int pre_freesurfno; /* Ä¾Á°¤Ë³«Êü¤·¤¿ surface no */
+static int pre_freesurfno; /* ç›´å‰ã«é–‹æ”¾ã—ãŸ surface no */
 static surface_t *suf[MAX_SURFACE];
 
 static int find_null_surface() {
@@ -127,14 +127,14 @@ static int load_cg_main(int no) {
 
 void Init() {
 	/*
-	  Gpx.Init(): Gpx ¥â¥¸¥å¡¼¥ë¤Î½é´ü²½
+	  Gpx.Init(): Gpx ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®åˆæœŸåŒ–
 	*/
 	int p1 = getCaliValue(); /* ISys3x */
 	
 	suf[0] = NULL;
 	gr_init();
 	
-	// surface0 ¤ò pre_freesurfno ¤È¤·¤ÆÊÖ¤µ¤Ê¤¤¤è¤¦¤Ë¡£
+	// surface0 ã‚’ pre_freesurfno ã¨ã—ã¦è¿”ã•ãªã„ã‚ˆã†ã«ã€‚
 	pre_freesurfno = 1;
 	
 	DEBUG_COMMAND("Gpx.Init %d:\n", p1);
@@ -142,14 +142,14 @@ void Init() {
 
 void Create() {
 	/*
-	  Gpx.Create(): ¿·µ¬ surface ¤ÎºîÀ®(Pixel¤ÈAlpha¥Ş¥Ã¥×¤ÎÎ¾Êı)
+	  Gpx.Create(): æ–°è¦ surface ã®ä½œæˆ(Pixelã¨Alphaãƒãƒƒãƒ—ã®ä¸¡æ–¹)
 	  
-	   var   : ºîÀ®¤·¤¿ surface ¤ÎÈÖ¹æ¤òÊÖ¤¹ÊÑ¿ô
-	           ºîÀ®¤Ë¼ºÇÔ¤·¤¿¾ì¹ç¤Ï 0 ¤òÊÖ¤¹
-	   width : surface ¤ÎÉı
-	   height: surface ¤Î¹â¤µ
-	   bpp   : surface ¤Î¿¼¤µ(¥ª¥ê¥¸¥Ê¥ë¤Ç¤Ï24bpp¤Î¤ß¥µ¥İ¡¼¥È,
-	                          xsystem35 ¤Ç¤Ï display ¤Î depth ¤ÈÆ±¤¸)
+	   var   : ä½œæˆã—ãŸ surface ã®ç•ªå·ã‚’è¿”ã™å¤‰æ•°
+	           ä½œæˆã«å¤±æ•—ã—ãŸå ´åˆã¯ 0 ã‚’è¿”ã™
+	   width : surface ã®å¹…
+	   height: surface ã®é«˜ã•
+	   bpp   : surface ã®æ·±ã•(ã‚ªãƒªã‚¸ãƒŠãƒ«ã§ã¯24bppã®ã¿ã‚µãƒãƒ¼ãƒˆ,
+	                          xsystem35 ã§ã¯ display ã® depth ã¨åŒã˜)
 	*/
 	int *var   = getCaliVariable();
 	int width  = getCaliValue();
@@ -173,12 +173,12 @@ void Create() {
 
 void CreatePixelOnly() {
 	/*
-	  Gpx.CreatePixelOnly(): ¿·µ¬ surface ¤ÎºîÀ®(Pixel¤Î¤ß)
+	  Gpx.CreatePixelOnly(): æ–°è¦ surface ã®ä½œæˆ(Pixelã®ã¿)
 	  
-	   var   : ºîÀ®¤·¤¿ surface ¤ÎÈÖ¹æ¤òÊÖ¤¹ÊÑ¿ô
-	   width : surface ¤ÎÉı
-	   height: surface ¤Î¹â¤µ
-	   bpp   : surface ¤Î¿¼¤µ(24bpp only)
+	   var   : ä½œæˆã—ãŸ surface ã®ç•ªå·ã‚’è¿”ã™å¤‰æ•°
+	   width : surface ã®å¹…
+	   height: surface ã®é«˜ã•
+	   bpp   : surface ã®æ·±ã•(24bpp only)
 	*/
 	int *var   = getCaliVariable();
 	int width  = getCaliValue();
@@ -201,11 +201,11 @@ void CreatePixelOnly() {
 
 void CreateAMapOnly() {
 	/*
-	  Gpx.CreateAMapOnly(): ¿·µ¬ surface ¤ÎºîÀ®(AlphaMap¤Î¤ß)
+	  Gpx.CreateAMapOnly(): æ–°è¦ surface ã®ä½œæˆ(AlphaMapã®ã¿)
 	  
-	   var   : ºîÀ®¤·¤¿ surface ¤ÎÈÖ¹æ¤òÊÖ¤¹ÊÑ¿ô
-	   width : surface ¤ÎÉı
-	   height: surface ¤Î¹â¤µ
+	   var   : ä½œæˆã—ãŸ surface ã®ç•ªå·ã‚’è¿”ã™å¤‰æ•°
+	   width : surface ã®å¹…
+	   height: surface ã®é«˜ã•
 	*/
 	int *var   = getCaliVariable();
 	int width  = getCaliValue();
@@ -227,11 +227,11 @@ void CreateAMapOnly() {
 
 void IsSurface() {
 	/*
-	  Gpx.IsSurface(): »ØÄê¤ÎÈÖ¹æ¤Î surface ¤¬ surface ¤«¤É¤¦¤«
-	                   (pixel ¤È alpha ¤ÎÎ¾Êı¤Î¥Ç¡¼¥¿¤ò»ı¤Ä)¤òÄ´¤Ù¤ë
+	  Gpx.IsSurface(): æŒ‡å®šã®ç•ªå·ã® surface ãŒ surface ã‹ã©ã†ã‹
+	                   (pixel ã¨ alpha ã®ä¸¡æ–¹ã®ãƒ‡ãƒ¼ã‚¿ã‚’æŒã¤)ã‚’èª¿ã¹ã‚‹
 	  
-	   p1  : surface ÈÖ¹æ
-	   var : ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô¡£surface ¤Ê¤é¤Ğ 1, !surface ¤Ê¤é¤Ğ 0
+	   p1  : surface ç•ªå·
+	   var : çµæœã‚’è¿”ã™å¤‰æ•°ã€‚surface ãªã‚‰ã° 1, !surface ãªã‚‰ã° 0
 	*/
 	int p1   = getCaliValue();
 	int *var = getCaliVariable();
@@ -250,10 +250,10 @@ void IsSurface() {
 
 void IsPixel() {
 	/*
-	  Gpx.IsPixel(): »ØÄê¤ÎÈÖ¹æ¤Î surface ¤¬ pixel¥Ç¡¼¥¿¤«¤É¤¦¤«¤òÄ´¤Ù¤ë
+	  Gpx.IsPixel(): æŒ‡å®šã®ç•ªå·ã® surface ãŒ pixelãƒ‡ãƒ¼ã‚¿ã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹
 	  
-	   p1  : surface ÈÖ¹æ
-	   var : ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô¡£pixel ¤Ê¤é¤Ğ 1, !pixel ¤Ê¤é¤Ğ 0
+	   p1  : surface ç•ªå·
+	   var : çµæœã‚’è¿”ã™å¤‰æ•°ã€‚pixel ãªã‚‰ã° 1, !pixel ãªã‚‰ã° 0
 	*/
 	int p1   = getCaliValue();
 	int *var = getCaliVariable();
@@ -272,10 +272,10 @@ void IsPixel() {
 
 void IsAlpha() {
 	/*
-	  Gpx.IsAlpha(): »ØÄê¤ÎÈÖ¹æ¤Î surface ¤¬ alpha map¤«¤É¤¦¤«¤òÄ´¤Ù¤ë
+	  Gpx.IsAlpha(): æŒ‡å®šã®ç•ªå·ã® surface ãŒ alpha mapã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹
 	  
-	   p1  : surface ÈÖ¹æ
-	   var : ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô¡£alpha ¤Ê¤é¤Ğ 1, !alpha ¤Ê¤é¤Ğ 0
+	   p1  : surface ç•ªå·
+	   var : çµæœã‚’è¿”ã™å¤‰æ•°ã€‚alpha ãªã‚‰ã° 1, !alpha ãªã‚‰ã° 0
 	*/
 	int p1   = getCaliValue();
 	int *var = getCaliVariable();
@@ -294,10 +294,10 @@ void IsAlpha() {
 
 void GetWidth() {
 	/*
-	  Gpx.GetWidth(): »ØÄê¤ÎÈÖ¹æ¤Î surface ¤ÎÉı¤ò¼èÆÀ¤¹¤ë
+	  Gpx.GetWidth(): æŒ‡å®šã®ç•ªå·ã® surface ã®å¹…ã‚’å–å¾—ã™ã‚‹
 	  
-	   p1  : surface ÈÖ¹æ
-	   var : ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô¡£
+	   p1  : surface ç•ªå·
+	   var : çµæœã‚’è¿”ã™å¤‰æ•°ã€‚
 	*/
 	int p1   = getCaliValue();
 	int *var = getCaliVariable();
@@ -316,10 +316,10 @@ void GetWidth() {
 
 void GetHeight() {
 	/*
-	  Gpx.GetWidth(): »ØÄê¤ÎÈÖ¹æ¤Î surface ¤Î¹â¤µ¤ò¼èÆÀ¤¹¤ë
+	  Gpx.GetWidth(): æŒ‡å®šã®ç•ªå·ã® surface ã®é«˜ã•ã‚’å–å¾—ã™ã‚‹
 	  
-	   p1  : surface ÈÖ¹æ
-	   var : ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô¡£
+	   p1  : surface ç•ªå·
+	   var : çµæœã‚’è¿”ã™å¤‰æ•°ã€‚
 	*/
 	int p1   = getCaliValue();
 	int *var = getCaliVariable();
@@ -344,10 +344,10 @@ void GetCreatedSurface() { /* not used ? */
 
 void LoadCG() {
 	/*
-	  Gpx.LoadCG(): ¿·µ¬ surface ¤òºîÀ®¤·¤Æ¤½¤Î¾å¤Ë CG ¤ò load
+	  Gpx.LoadCG(): æ–°è¦ surface ã‚’ä½œæˆã—ã¦ãã®ä¸Šã« CG ã‚’ load
 	  
-	   var : ºîÀ®¤·¤¿ surface ¤ÎÈÖ¹æ¤òÊÖ¤¹ÊÑ¿ô
-	   p1  : ÆÉ¤ß¹ş¤à CG ¤ÎÈÖ¹æ
+	   var : ä½œæˆã—ãŸ surface ã®ç•ªå·ã‚’è¿”ã™å¤‰æ•°
+	   p1  : èª­ã¿è¾¼ã‚€ CG ã®ç•ªå·
 	*/
 	int *var = getCaliVariable();
 	int p1   = getCaliValue();
@@ -373,9 +373,9 @@ void GetCGPosY() { /* not useed ? */
 
 void Free() {
 	/*
-	  Gpx.Free(): »ØÄê¤Î surface ¤ò³«Êü¤¹¤ë
+	  Gpx.Free(): æŒ‡å®šã® surface ã‚’é–‹æ”¾ã™ã‚‹
 	  
-	   p1: ³«Êü¤¹¤ë surface ¤ÎÈÖ¹æ
+	   p1: é–‹æ”¾ã™ã‚‹ surface ã®ç•ªå·
 	*/
 	int p1 = getCaliValue();
 	
@@ -388,7 +388,7 @@ void Free() {
 
 void FreeAll() {
 	/*
-	  Gpx.FreeAll(): Á´¤Æ¤Î surface ¤ò³«Êü¤¹¤ë
+	  Gpx.FreeAll(): å…¨ã¦ã® surface ã‚’é–‹æ”¾ã™ã‚‹
 	*/
 	sf_free_all();
 	
@@ -397,16 +397,16 @@ void FreeAll() {
 
 void Copy() {
 	/*
-	  Gpx.Copy(): »ØÄê surface ÎÎ°è¤Î¥³¥Ô¡¼
+	  Gpx.Copy(): æŒ‡å®š surface é ˜åŸŸã®ã‚³ãƒ”ãƒ¼
 	  
-	   ds: Å¾Á÷Àè surface ÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   ss: Å¾Á÷¸µ surface ÈÖ¹æ
-	   sx: Å¾Á÷¸µ x ºÂÉ¸
-	   sy: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı
-	   sh: Å¾Á÷¸µ ¹â¤µ
+	   ds: è»¢é€å…ˆ surface ç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   ss: è»¢é€å…ƒ surface ç•ªå·
+	   sx: è»¢é€å…ƒ x åº§æ¨™
+	   sy: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹…
+	   sh: è»¢é€å…ƒ é«˜ã•
 	*/
 	int ds = getCaliValue();
 	int dx = getCaliValue();
@@ -442,16 +442,16 @@ void CopyBright() { /* not used ? */
 
 void CopyAMap() {
 	/*
-	  Gpx.CopyAMap(): »ØÄê surface ¤Î alpha map ÎÎ°è¤Î¥³¥Ô¡¼
+	  Gpx.CopyAMap(): æŒ‡å®š surface ã® alpha map é ˜åŸŸã®ã‚³ãƒ”ãƒ¼
 	  
-	   da: Å¾Á÷Àè surface(alpha map) ÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   sa: Å¾Á÷¸µ surface(alpha map) ÈÖ¹æ
-	   sx: Å¾Á÷¸µ x ºÂÉ¸
-	   sy: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı
-	   sh: Å¾Á÷¸µ ¹â¤µ
+	   da: è»¢é€å…ˆ surface(alpha map) ç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   sa: è»¢é€å…ƒ surface(alpha map) ç•ªå·
+	   sx: è»¢é€å…ƒ x åº§æ¨™
+	   sy: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹…
+	   sh: è»¢é€å…ƒ é«˜ã•
 	*/
 	int da = getCaliValue();
 	int dx = getCaliValue();
@@ -515,16 +515,16 @@ void BlendAddSatur() { /* not used ? */
 
 void BlendAMap() {
 	/*
-	  Gpx.BlendAMap(): Å¾Á÷¸µ¤Î alpha map ¤ò»²¾È¤·¤Æ »ØÄêÎÎ°è¤ò alpha blend
+	  Gpx.BlendAMap(): è»¢é€å…ƒã® alpha map ã‚’å‚ç…§ã—ã¦ æŒ‡å®šé ˜åŸŸã‚’ alpha blend
 	  
-	   ds: Å¾Á÷Àè surface ÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   ss: Å¾Á÷¸µ surface ÈÖ¹æ
-	   sx: Å¾Á÷¸µ x ºÂÉ¸
-	   sy: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı
-	   sh: Å¾Á÷¸µ ¹â¤µ
+	   ds: è»¢é€å…ˆ surface ç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   ss: è»¢é€å…ƒ surface ç•ªå·
+	   sx: è»¢é€å…ƒ x åº§æ¨™
+	   sy: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹…
+	   sh: è»¢é€å…ƒ é«˜ã•
 	*/
 	int ds = getCaliValue();
 	int dx = getCaliValue();
@@ -692,16 +692,16 @@ void BlendScreenAlpha() { /* not used ? */
 
 void Fill() {
 	/*
-	  Gpx.Fill(): »ØÄêÎÎ°è¤ÎÅÉ¤ê¤Ä¤Ö¤·
+	  Gpx.Fill(): æŒ‡å®šé ˜åŸŸã®å¡—ã‚Šã¤ã¶ã—
 	  
-	   ds: ÅÉ¤ê¤Ä¤Ö¤· surface ÈÖ¹æ
-	   dx: ÎÎ°è x ºÂÉ¸
-	   dy: ÎÎ°è y ºÂÉ¸
-	   dw: ÎÎ°è Éı
-	   dh: ÎÎ°è ¹â¤µ
-	   r : ÅÉ¤ê¤Ä¤Ö¤·¿§ ÀÖ
-	   g : ÅÉ¤ê¤Ä¤Ö¤·¿§ ÎĞ
-	   b : ÅÉ¤ê¤Ä¤Ö¤·¿§ ÀÄ
+	   ds: å¡—ã‚Šã¤ã¶ã— surface ç•ªå·
+	   dx: é ˜åŸŸ x åº§æ¨™
+	   dy: é ˜åŸŸ y åº§æ¨™
+	   dw: é ˜åŸŸ å¹…
+	   dh: é ˜åŸŸ é«˜ã•
+	   r : å¡—ã‚Šã¤ã¶ã—è‰² èµ¤
+	   g : å¡—ã‚Šã¤ã¶ã—è‰² ç·‘
+	   b : å¡—ã‚Šã¤ã¶ã—è‰² é’
 	*/
 	int ds = getCaliValue();
 	int dx = getCaliValue();
@@ -752,16 +752,16 @@ void FillAMap() { /* not used ? */
 
 void FillAMapOverBorder() {
 	/*
-	  Gpx.FillAMapOverBorder(): ¶ë·ÁÎÎ°èÃæ¤Î ïçÃÍ°Ê¾å¤Î alpha ÃÍ¤ò»ı¤Ä
-	                            ¤â¤Î¤ò»ØÄê¤Î alpha ÃÍ¤ËÃÖ¤­´¹¤¨¡£
+	  Gpx.FillAMapOverBorder(): çŸ©å½¢é ˜åŸŸä¸­ã® é–¾å€¤ä»¥ä¸Šã® alpha å€¤ã‚’æŒã¤
+	                            ã‚‚ã®ã‚’æŒ‡å®šã® alpha å€¤ã«ç½®ãæ›ãˆã€‚
 	  
-	   ds: ÅÉ¤ê¤Ä¤Ö¤· surface ÈÖ¹æ
-	   dx: ÎÎ°è x ºÂÉ¸
-	   dy: ÎÎ°è y ºÂÉ¸
-	   dw: ÎÎ°è Éı
-	   dh: ÎÎ°è ¹â¤µ
-	   s : ïçÃÍ
-	   d : ïçÃÍ¤òÄ¶¤¨¤¿¾ì¹ç¤ÎÀßÄêÃÍ
+	   ds: å¡—ã‚Šã¤ã¶ã— surface ç•ªå·
+	   dx: é ˜åŸŸ x åº§æ¨™
+	   dy: é ˜åŸŸ y åº§æ¨™
+	   dw: é ˜åŸŸ å¹…
+	   dh: é ˜åŸŸ é«˜ã•
+	   s : é–¾å€¤
+	   d : é–¾å€¤ã‚’è¶…ãˆãŸå ´åˆã®è¨­å®šå€¤
 	*/
 	int ds = getCaliValue();
 	int dx = getCaliValue();
@@ -831,17 +831,17 @@ void AddDA_DAxSA() { /* not used ? */
 
 void SpriteCopyAMap() {
 	/*
-	  Gpx.SpriteCopyAMap(): »ØÄê¤Î alpha ÃÍ°Ê³°¤ÎÎÎ°è¤Î alpha map ¥³¥Ô¡¼
+	  Gpx.SpriteCopyAMap(): æŒ‡å®šã® alpha å€¤ä»¥å¤–ã®é ˜åŸŸã® alpha map ã‚³ãƒ”ãƒ¼
 	  
-	   da: Å¾Á÷Àè surface(alpha map) ÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   ss: Å¾Á÷¸µ surface(alpha map) ÈÖ¹æ
-	   sx: Å¾Á÷¸µ x ºÂÉ¸
-	   sy: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı
-	   sh: Å¾Á÷¸µ ¹â¤µ
-	   cl: Å¾Á÷¤·¤Ê¤¤ alpha ÃÍ
+	   da: è»¢é€å…ˆ surface(alpha map) ç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   ss: è»¢é€å…ƒ surface(alpha map) ç•ªå·
+	   sx: è»¢é€å…ƒ x åº§æ¨™
+	   sy: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹…
+	   sh: è»¢é€å…ƒ é«˜ã•
+	   cl: è»¢é€ã—ãªã„ alpha å€¤
 	*/
 	int da = getCaliValue();
 	int dx = getCaliValue();
@@ -865,14 +865,14 @@ void SpriteCopyAMap() {
 
 void BrightDestOnly() {
 	/*
-	  Gpx.BrightDestOnly(): »ØÄêÎÎ°è¤ÎÌÀ¤ë¤µ¤òÀßÄê
+	  Gpx.BrightDestOnly(): æŒ‡å®šé ˜åŸŸã®æ˜ã‚‹ã•ã‚’è¨­å®š
 	  
-	   ds: ÌÀ¤ë¤µ¤òÀßÄê¤¹¤ë surface ÈÖ¹æ
-	   dx: ÎÎ°è x ºÂÉ¸
-	   dy: ÎÎ°è y ºÂÉ¸
-	   dw: ÎÎ°è Éı
-	   dh: ÎÎ°è ¹â¤µ
-	   r : »ØÄêÌÀ¤ë¤µ (255: ÌÀ¤ë¤µ 100%, pixelÃÍ¤½¤Î¤â¤Î)
+	   ds: æ˜ã‚‹ã•ã‚’è¨­å®šã™ã‚‹ surface ç•ªå·
+	   dx: é ˜åŸŸ x åº§æ¨™
+	   dy: é ˜åŸŸ y åº§æ¨™
+	   dw: é ˜åŸŸ å¹…
+	   dh: é ˜åŸŸ é«˜ã•
+	   r : æŒ‡å®šæ˜ã‚‹ã• (255: æ˜ã‚‹ã• 100%, pixelå€¤ãã®ã‚‚ã®)
 	*/
 	int ds = getCaliValue();
 	int dx = getCaliValue();
@@ -927,18 +927,18 @@ void CopyTextureWrapAlpha() { /* not used ? */
 
 void CopyStretch() {
 	/*
-	  Gpx.CopyStretch(): ³ÈÂç¡¦½Ì¾®
+	  Gpx.CopyStretch(): æ‹¡å¤§ãƒ»ç¸®å°
 	  
-	   ds: Å¾Á÷Àè surface ÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   dw: Å¾Á÷Àè Éı
-	   dh: Å¾Á÷Àè ¹â¤µ
-	   ss: Å¾Á÷¸µ surface ÈÖ¹æ
-	   sx: Å¾Á÷¸µ x ºÂÉ¸
-	   sy: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı
-	   sh: Å¾Á÷¸µ ¹â¤µ
+	   ds: è»¢é€å…ˆ surface ç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   dw: è»¢é€å…ˆ å¹…
+	   dh: è»¢é€å…ˆ é«˜ã•
+	   ss: è»¢é€å…ƒ surface ç•ªå·
+	   sx: è»¢é€å…ƒ x åº§æ¨™
+	   sy: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹…
+	   sh: è»¢é€å…ƒ é«˜ã•
 	*/
 	int ds = getCaliValue();
 	int dx = getCaliValue();
@@ -977,18 +977,18 @@ void CopyStretchBlend() { /* not used ? */
 
 void CopyStretchBlendAMap() {
 	/*
-	  Gpx.CopyStretchBlendAMap(): ³ÈÂç¡¦½Ì¾®¤·¤Ê¤¬¤é alpha blend
+	  Gpx.CopyStretchBlendAMap(): æ‹¡å¤§ãƒ»ç¸®å°ã—ãªãŒã‚‰ alpha blend
 	  
-	   ds: Å¾Á÷Àè surface ÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   dw: Å¾Á÷Àè Éı
-	   dh: Å¾Á÷Àè ¹â¤µ
-	   ss: Å¾Á÷¸µ surface ÈÖ¹æ
-	   sx: Å¾Á÷¸µ x ºÂÉ¸
-	   sy: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı
-	   sh: Å¾Á÷¸µ ¹â¤µ
+	   ds: è»¢é€å…ˆ surface ç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   dw: è»¢é€å…ˆ å¹…
+	   dh: è»¢é€å…ˆ é«˜ã•
+	   ss: è»¢é€å…ƒ surface ç•ªå·
+	   sx: è»¢é€å…ƒ x åº§æ¨™
+	   sy: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹…
+	   sh: è»¢é€å…ƒ é«˜ã•
 	*/
 	int ds = getCaliValue();
 	int dx = getCaliValue();
@@ -1026,20 +1026,20 @@ void StretchBlendScreen2x2() { /* not used ? */
 
 void StretchBlendScreen2x2WDS() {
 	/*
-	  Gpx.StretchBlenfScreen2x2WDS(): £²Ëç¤Î surface ¤ò½Ä²££²ÇÜ¤Ë³ÈÂç¤·¤Ä¤Ä
-                                         alpha blend (Ë°ÏÂ²Ã»»)¤¹¤ë
+	  Gpx.StretchBlenfScreen2x2WDS(): ï¼’æšã® surface ã‚’ç¸¦æ¨ªï¼’å€ã«æ‹¡å¤§ã—ã¤ã¤
+                                         alpha blend (é£½å’ŒåŠ ç®—)ã™ã‚‹
 	  
-	   ds: Å¾Á÷Àè surface ÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   ss1: Å¾Á÷¸µ surface ÈÖ¹æ (³ÈÂç¸µ surface) ss1¤ÎÊı¤¬¾®¤µ¤¤
-	   sx1: Å¾Á÷¸µ x ºÂÉ¸
-	   sy1: Å¾Á÷¸µ y ºÂÉ¸
-	   ss2: Å¾Á÷¸µ surface ÈÖ¹æ (½Å¤ÍÀè¤Î surface)
-	   sx2: Å¾Á÷¸µ x ºÂÉ¸
-	   sy2: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı (sw*2, sh*2)¤ÎÂç¤­¤µ¤Ë³ÈÂç
-	   sh: Å¾Á÷¸µ ¹â¤µ
+	   ds: è»¢é€å…ˆ surface ç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   ss1: è»¢é€å…ƒ surface ç•ªå· (æ‹¡å¤§å…ƒ surface) ss1ã®æ–¹ãŒå°ã•ã„
+	   sx1: è»¢é€å…ƒ x åº§æ¨™
+	   sy1: è»¢é€å…ƒ y åº§æ¨™
+	   ss2: è»¢é€å…ƒ surface ç•ªå· (é‡ã­å…ˆã® surface)
+	   sx2: è»¢é€å…ƒ x åº§æ¨™
+	   sy2: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹… (sw*2, sh*2)ã®å¤§ãã•ã«æ‹¡å¤§
+	   sh: è»¢é€å…ƒ é«˜ã•
 	*/
 	int ds  = getCaliValue();
 	int dx  = getCaliValue();
@@ -1065,19 +1065,19 @@ void StretchBlendScreen2x2WDS() {
 
 void BlendScreenWDS() {
 	/*
-	  Gpx.BlendScreenWDS(): Ë°ÏÂ²Ã»» alpha blend
+	  Gpx.BlendScreenWDS(): é£½å’ŒåŠ ç®— alpha blend
 	  
-	   ds : Å¾Á÷Àè surface ÈÖ¹æ
-	   dx : Å¾Á÷Àè x ºÂÉ¸
-	   dy : Å¾Á÷Àè y ºÂÉ¸
-	   ss1: Å¾Á÷¸µ surface ÈÖ¹æ (½Å¤Í¸µ¤Î surface)
-	   sx1: Å¾Á÷¸µ x ºÂÉ¸
-	   sy1: Å¾Á÷¸µ y ºÂÉ¸
-	   ss2: Å¾Á÷¸µ surface ÈÖ¹æ (½Å¤ÍÀè¤Î surface)
-	   sx2: Å¾Á÷¸µ x ºÂÉ¸
-	   sy2: Å¾Á÷¸µ y ºÂÉ¸
-	   sw : Å¾Á÷¸µ Éı
-	   sh : Å¾Á÷¸µ ¹â¤µ
+	   ds : è»¢é€å…ˆ surface ç•ªå·
+	   dx : è»¢é€å…ˆ x åº§æ¨™
+	   dy : è»¢é€å…ˆ y åº§æ¨™
+	   ss1: è»¢é€å…ƒ surface ç•ªå· (é‡ã­å…ƒã® surface)
+	   sx1: è»¢é€å…ƒ x åº§æ¨™
+	   sy1: è»¢é€å…ƒ y åº§æ¨™
+	   ss2: è»¢é€å…ƒ surface ç•ªå· (é‡ã­å…ˆã® surface)
+	   sx2: è»¢é€å…ƒ x åº§æ¨™
+	   sy2: è»¢é€å…ƒ y åº§æ¨™
+	   sw : è»¢é€å…ƒ å¹…
+	   sh : è»¢é€å…ƒ é«˜ã•
 	*/
 	int ds  = getCaliValue();
 	int dx  = getCaliValue();
@@ -1103,21 +1103,21 @@ void BlendScreenWDS() {
 
 void EffectCopy() {
 	/*
-	  Gpx.EffectCopy(): ¸ú²Ì¤Ä¤­ÎÎ°è¥³¥Ô¡¼
+	  Gpx.EffectCopy(): åŠ¹æœã¤ãé ˜åŸŸã‚³ãƒ”ãƒ¼
 	  
-	   no: ¸ú²ÌÈÖ¹æ
-	   dx: Å¾Á÷Àè x ºÂÉ¸
-	   dy: Å¾Á÷Àè y ºÂÉ¸
-	   ss1: Å¾Á÷¸µ surface ÈÖ¹æ (½Å¤Í¸µ¤Î surface)
-	   sx1: Å¾Á÷¸µ x ºÂÉ¸
-	   sy1: Å¾Á÷¸µ y ºÂÉ¸
-	   ss2: Å¾Á÷¸µ surface ÈÖ¹æ (½Å¤ÍÀè¤Î surface)
-	   sx2: Å¾Á÷¸µ x ºÂÉ¸
-	   sy2: Å¾Á÷¸µ y ºÂÉ¸
-	   sw: Å¾Á÷¸µ Éı
-	   sh: Å¾Á÷¸µ ¹â¤µ
-	   time: ¼Â¹Ô»ş´Ö(ms) (0¤Î¾ì¹ç¤Ï¤½¤ì¤¾¤Î¤ì¸ú²ÌËè¤Î¥Ç¥Õ¥©¥ë¥ÈÃÍ)
-	   var: ¥­¡¼ÆşÎÏ¤¬¤¢¤Ã¤¿¤«¤Ê¤¤¤«¡©(?????)
+	   no: åŠ¹æœç•ªå·
+	   dx: è»¢é€å…ˆ x åº§æ¨™
+	   dy: è»¢é€å…ˆ y åº§æ¨™
+	   ss1: è»¢é€å…ƒ surface ç•ªå· (é‡ã­å…ƒã® surface)
+	   sx1: è»¢é€å…ƒ x åº§æ¨™
+	   sy1: è»¢é€å…ƒ y åº§æ¨™
+	   ss2: è»¢é€å…ƒ surface ç•ªå· (é‡ã­å…ˆã® surface)
+	   sx2: è»¢é€å…ƒ x åº§æ¨™
+	   sy2: è»¢é€å…ƒ y åº§æ¨™
+	   sw: è»¢é€å…ƒ å¹…
+	   sh: è»¢é€å…ƒ é«˜ã•
+	   time: å®Ÿè¡Œæ™‚é–“(ms) (0ã®å ´åˆã¯ãã‚Œãã®ã‚ŒåŠ¹æœæ¯ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤)
+	   var: ã‚­ãƒ¼å…¥åŠ›ãŒã‚ã£ãŸã‹ãªã„ã‹ï¼Ÿ(?????)
 
 
 	  effect no:
@@ -1126,10 +1126,10 @@ void EffectCopy() {
 	    3: CE27 (fade in)
 	    4: CE30 (white out)
 	    5: CE28 (white in)
-	    7: CE11 (¤¹¤À¤ìÍî¤Á)
-	    11: CE53 (Àş·Á¤Ü¤«¤·)
-	    12: CE35 (¾å->²¼¥¯¥í¥¹¥Õ¥§¡¼¥É)
-	    13: CE36 (²¼->¾å¥¯¥í¥¹¥Õ¥§¡¼¥É)
+	    7: CE11 (ã™ã ã‚Œè½ã¡)
+	    11: CE53 (ç·šå½¢ã¼ã‹ã—)
+	    12: CE35 (ä¸Š->ä¸‹ã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰)
+	    13: CE36 (ä¸‹->ä¸Šã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰)
 	*/
 	int no   = getCaliValue();
 	int dx   = getCaliValue();

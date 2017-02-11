@@ -1,5 +1,5 @@
 /*
- * sndcnv.c  PCM ¥Õ¥©¡¼¥Ş¥Ã¥ÈÊÑ´¹
+ * sndcnv.c  PCM ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆå¤‰æ›
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -127,7 +127,7 @@ static int sndcnv_norateconvert(pcmobj_t *pcm, int lv, int outlen) {
 		}
 	}
 	
-	// stereo ²½
+	// stereo åŒ–
 	if (pcm->fmt.ch == 1) {
 		unsigned short *src, *dst;
 		src = pd; dst = pcm->conv.buf;
@@ -170,7 +170,7 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 	bufrw = g_malloc(outlen*2);
 	buflw = g_malloc(outlen*2);
 	
-	// 8|16 bit -> LONG ÊÑ´¹
+	// 8|16 bit -> LONG å¤‰æ›
 	switch(pcm->fmt.bit) {
 	case 8: // 8bit
 	{
@@ -213,7 +213,7 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 		}
 	}
 	
-	// stereo Ê¬²ò
+	// stereo åˆ†è§£
 	if (pcm->fmt.ch == 2) {
 		LONG *src = buf0, *dstl = bufl, *dstr = bufr;
 		isample /= 2;
@@ -228,14 +228,14 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 		pr = NULL;
 	}
 	
-	// rate ÊÑ´¹ left
+	// rate å¤‰æ› left
 	i = isample;
 	osamplel = outlen;
 	//printf("insample = %d, osample = %d\n", isample, osamplel);
 	st_rate_flow(&pcm->conv, pl, buflw, &isample, &osamplel);
 	//printf("insample = %d, osample = %d\n", isample, osamplel);
 
-	// rate ÊÑ´¹ right
+	// rate å¤‰æ› right
 	if (pcm->fmt.ch == 2) {
 		isample  = i;
 		osampler = outlen;
@@ -245,7 +245,7 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 	}
 	osample = MIN(osampler, osamplel);
 	
-	// LONG -> 16bit ÊÑ´¹
+	// LONG -> 16bit å¤‰æ›
 	if (pcm->fmt.ch == 2) {
 		LONG *srcl, *srcr;
 		unsigned short *dstl, *dstr;
@@ -266,7 +266,7 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 		}
 	}
 	
-	// stereo ²½
+	// stereo åŒ–
 	if (pcm->fmt.ch == 2) {
 		unsigned short *srcl, *srcr, *dst;
 		
@@ -294,7 +294,7 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 	g_free(ibuf);
 
 	//printf("outlen = %d\n", osample * 4);
-	return osample * 4;  // ÊÑ´¹¸å¤ÎÄ¹¤µ(byte¿ô)
+	return osample * 4;  // å¤‰æ›å¾Œã®é•·ã•(byteæ•°)
 }
 
 int sndcnv_drain(pcmobj_t *pcm) {

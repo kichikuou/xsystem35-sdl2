@@ -1,5 +1,5 @@
 /*
- * sprite_update.c: sprite¤ÎÄÌ¾ï¹¹¿·¤¤¤í¤¤¤í
+ * sprite_update.c: spriteã®é€šå¸¸æ›´æ–°ã„ã‚ã„ã‚
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -36,7 +36,7 @@
 #include "ngraph.h"
 #include "sprite.h"
 
-// ¥¹¥×¥é¥¤¥ÈºÆÉÁ²è´Ö¤Î´Ö¤ËÊÑ¹¹¤Î¤¢¤Ã¤¿¥¹¥×¥é¥¤¥È¤ÎÎÎ°è¤ÎÏÂ
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†æç”»é–“ã®é–“ã«å¤‰æ›´ã®ã‚ã£ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®é ˜åŸŸã®å’Œ
 static GSList *updatearea;
 
 static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst);
@@ -44,7 +44,7 @@ static void disjunction(gpointer region, gpointer data);
 static void get_updatearea();
 static void do_update_each(gpointer data, gpointer userdata);
 
-// ÎÎ°è£±¤ÈÎÎ°è£²¤ÎÀÑ¤ò·×»»
+// é ˜åŸŸï¼‘ã¨é ˜åŸŸï¼’ã®ç©ã‚’è¨ˆç®—
 static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst) {
         int x1 = max(r1->x, r2->x);
         int x2 = min(r1->x + r1->width, r2->x + r2->width);
@@ -57,7 +57,7 @@ static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst) {
 	rst->height = y2 - y1;
 }
 
-// ÎÎ°è£±¤ÈÎÎ°è£²¤ò¤¹¤Ù¤Æ´Ş¤à¶ë·ÁÎÎ°è¤ò·×»»
+// é ˜åŸŸï¼‘ã¨é ˜åŸŸï¼’ã‚’ã™ã¹ã¦å«ã‚€çŸ©å½¢é ˜åŸŸã‚’è¨ˆç®—
 static void disjunction(gpointer region, gpointer data) {
 	MyRectangle *r1 = (MyRectangle *)region;
 	MyRectangle *r2 = (MyRectangle *)data;
@@ -87,7 +87,7 @@ static void disjunction(gpointer region, gpointer data) {
 	//WARNING("res:r2x=%d,r2y=%d,r2w=%d,r2h=%d\n", r2->x, r2->y, r2->width, r2->height);
 }
 
-// ¹¹¿·¤ÎÉ¬Í×¤Ê¥¹¥×¥é¥¤¥È¤ÎÎÎ°è¤ÎÏÂ¤ò¤È¤Ã¤Æ¥¯¥ê¥Ã¥Ô¥ó¥°¤¹¤ë
+// æ›´æ–°ã®å¿…è¦ãªã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®é ˜åŸŸã®å’Œã‚’ã¨ã£ã¦ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã™ã‚‹
 static void get_updatearea() {
 	MyRectangle clip = {0, 0, 0, 0};
 	MyRectangle rsf0 = {0, 0, sf0->width, sf0->height};
@@ -97,7 +97,7 @@ static void get_updatearea() {
 	g_slist_free(updatearea);
 	updatearea = NULL;
 	
-	// surface0¤È¤ÎÎÎ°è¤ÎÀÑ¤ò¤È¤ë
+	// surface0ã¨ã®é ˜åŸŸã®ç©ã‚’ã¨ã‚‹
 	intersection(&rsf0, &clip, &sact.updaterect);
 	
 	WARNING("clipped area x=%d y=%d w=%d h=%d\n",
@@ -107,90 +107,90 @@ static void get_updatearea() {
 	return;
 }
 
-// updatelist ¤ËÅĞÏ¿¤·¤Æ¤¢¤ë¤¹¤Ù¤Æ¤Î¥¹¥×¥é¥¤¥È¤ò¹¹¿·
+// updatelist ã«ç™»éŒ²ã—ã¦ã‚ã‚‹ã™ã¹ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æ›´æ–°
 static void do_update_each(gpointer data, gpointer userdata) {
 	sprite_t *sp = (sprite_t *)data;
 	
-	// ÈóÉ½¼¨¤Î¾ì¹ç¤Ï¤Ê¤Ë¤â¤·¤Ê¤¤
+	// éè¡¨ç¤ºã®å ´åˆã¯ãªã«ã‚‚ã—ãªã„
 	if (!sp->show) return;
 	
-	if (sp == sact.draggedsp) return; // dragÃæ¤Î¥¹¥×¥é¥¤¥È¤ÏºÇ¸å¤ËÉ½¼¨
+	if (sp == sact.draggedsp) return; // dragä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯æœ€å¾Œã«è¡¨ç¤º
 		
-	// ¥¹¥×¥é¥¤¥ÈËè¤Îupdate¥ë¡¼¥Á¥ó¤Î¸Æ¤Ó½Ğ¤·
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ¯ã®updateãƒ«ãƒ¼ãƒãƒ³ã®å‘¼ã³å‡ºã—
 	if (sp->update) {
 		sp->update(sp);
 	}
 }
 
 /*
-  ²èÌÌÁ´ÂÎ¤Î¹¹¿·
-  @param syncscreen: surface0 ¤ËÉÁ²è¤·¤¿¤â¤Î¤ò Screen ¤ËÈ¿±Ç¤µ¤»¤ë¤«¤É¤¦¤«
+  ç”»é¢å…¨ä½“ã®æ›´æ–°
+  @param syncscreen: surface0 ã«æç”»ã—ãŸã‚‚ã®ã‚’ Screen ã«åæ˜ ã•ã›ã‚‹ã‹ã©ã†ã‹
  */
 int sp_update_all(boolean syncscreen) {
 
-	// ¥¹¥×¥é¥¤¥È°ÜÆ°¤¬¤¢¤ë¾ì¹ç¤Ï°ÜÆ°³«»Ï
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç§»å‹•ãŒã‚ã‚‹å ´åˆã¯ç§»å‹•é–‹å§‹
 	if (sact.movelist) {
-		// °ÜÆ°³«»Ï»ş´Ö¤ò¹ç¤ï¤»¤ë
+		// ç§»å‹•é–‹å§‹æ™‚é–“ã‚’åˆã‚ã›ã‚‹
 		sact.movestarttime = get_high_counter(SYSTEMCOUNTER_MSEC);
 		g_slist_foreach(sact.movelist, spev_move_setup, NULL);
 		g_slist_free(sact.movelist);
 		sact.movelist = NULL;
 	}
 
-	// ²èÌÌÁ´ÂÎ¤ò¹¹¿·ÎÎ°è¤Ë
+	// ç”»é¢å…¨ä½“ã‚’æ›´æ–°é ˜åŸŸã«
 	sact.updaterect.x = 0;
 	sact.updaterect.y = 0;
 	sact.updaterect.width  = sf0->width;
 	sact.updaterect.height = sf0->height;
 	
-	// updatelist¤ËÅĞÏ¿¤·¤Æ¤¢¤ë¥¹¥×¥é¥¤¥È¤òºÆÉÁ²è
-	// updatelist¤Ï¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ½ç¤ËÊÂ¤ó¤Ç¤¤¤ë
+	// updatelistã«ç™»éŒ²ã—ã¦ã‚ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’å†æç”»
+	// updatelistã¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·é †ã«ä¸¦ã‚“ã§ã„ã‚‹
 	g_slist_foreach(sact.updatelist, do_update_each, NULL);
 
-	// ¤³¤Î¥ë¡¼¥Á¥ó¤¬¸Æ¤Ğ¤ì¤ë¤È¤­¤Ï¥¹¥×¥é¥¤¥È¤Ï¥É¥é¥Ã¥°Ãæ¤Ç¤Ï¤Ê¤¤
+	// ã“ã®ãƒ«ãƒ¼ãƒãƒ³ãŒå‘¼ã°ã‚Œã‚‹ã¨ãã¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯ãƒ‰ãƒ©ãƒƒã‚°ä¸­ã§ã¯ãªã„
 	
-	// screen¤ÈÆ±´ü¤ÏÉ¬Í×¤Ê¤È¤­¤Ï²èÌÌÁ´ÂÎ¤òWindow¤ØÅ¾Á÷
+	// screenã¨åŒæœŸã¯å¿…è¦ãªã¨ãã¯ç”»é¢å…¨ä½“ã‚’Windowã¸è»¢é€
 	if (syncscreen) {
 		ags_updateFull();
 	}
 	
-	// °ÜÆ°Ãæ¤Î¤¹¤Ù¤Æ¤Î¥¹¥×¥é¥¤¥È¤¬°ÜÆ°½ªÎ»¤¹¤ë¤Ş¤ÇÂÔ¤Ä
-	// ¤³¤¦¤·¤Ê¤¤¤ÈÆ°¤­¤¬Æ±´ü¤·¤Ê¤¤ 
+	// ç§»å‹•ä¸­ã®ã™ã¹ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒç§»å‹•çµ‚äº†ã™ã‚‹ã¾ã§å¾…ã¤
+	// ã“ã†ã—ãªã„ã¨å‹•ããŒåŒæœŸã—ãªã„ 
 	spev_wait4moving_sp();
 	
 	return OK;
 }
 
 /*
-  ²èÌÌ¤Î°ìÉô¤ò¹¹¿·
-   updateme(_part)¤ÇÅĞÏ¿¤·¤¿¹¹¿·¤¬É¬Í×¤Êsprite¤ÎÏÂ¤ÎÎÎ°è¤òupdate
+  ç”»é¢ã®ä¸€éƒ¨ã‚’æ›´æ–°
+   updateme(_part)ã§ç™»éŒ²ã—ãŸæ›´æ–°ãŒå¿…è¦ãªspriteã®å’Œã®é ˜åŸŸã‚’update
 */
 int sp_update_clipped() {
-	// ¹¹¿·ÎÎ°è¤Î³ÎÄê
+	// æ›´æ–°é ˜åŸŸã®ç¢ºå®š
 	get_updatearea();
 	
-	// Éı¤Ş¤¿¤Ï¹â¤µ¤¬ 0 ¤Î»ş¤Ï¤Ê¤Ë¤â¤·¤Ê¤¤
+	// å¹…ã¾ãŸã¯é«˜ã•ãŒ 0 ã®æ™‚ã¯ãªã«ã‚‚ã—ãªã„
 	if (sact.updaterect.width == 0 || sact.updaterect.height == 0) {
 		return OK;
 	}
 
-	// ¹¹¿·ÎÎ°è¤ËÆş¤Ã¤Æ¤¤¤ë¥¹¥×¥é¥¤¥È¤ÎºÆÉÁ²è
+	// æ›´æ–°é ˜åŸŸã«å…¥ã£ã¦ã„ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å†æç”»
 	g_slist_foreach(sact.updatelist, do_update_each, NULL);
 	
-	// dragÃæ¤Î¥¹¥×¥é¥¤¥È¤òºÇ¸å¤ËÉÁ²è
+	// dragä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æœ€å¾Œã«æç”»
 	if (sact.draggedsp) {
 		sact.draggedsp->update(sact.draggedsp);
 	}
 	
-	// ¹¹¿·ÎÎ°è¤ò Window ¤ËÅ¾Á÷
+	// æ›´æ–°é ˜åŸŸã‚’ Window ã«è»¢é€
 	ags_updateArea(sact.updaterect.x, sact.updaterect.y, sact.updaterect.width, sact.updaterect.height);
 	
 	return OK;
 }
 
 /*
-  spriteÁ´ÂÎ¤Î¹¹¿·¤òÅĞÏ¿
-  @param sp: ¹¹¿·¤¹¤ë¥¹¥×¥é¥¤¥È
+  spriteå…¨ä½“ã®æ›´æ–°ã‚’ç™»éŒ²
+  @param sp: æ›´æ–°ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 int sp_updateme(sprite_t *sp) {
 	MyRectangle *r;
@@ -213,12 +213,12 @@ int sp_updateme(sprite_t *sp) {
 }
 
 /*
-  sprite¤Î°ìÉô¹¹¿·¤òÅĞÏ¿
-  @param sp: ¹¹¿·¤¹¤ë¥¹¥×¥é¥¤¥È
-  @param x: ¹¹¿·ÎÎ°è£ØºÂÉ¸
-  @param y: ¹¹¿·ÎÎ°è£ÙºÂÉ¸
-  @param w: ¹¹¿·ÎÎ°èÉı
-  @param h: ¹¹¿·ÎÎ°è¹â¤µ
+  spriteã®ä¸€éƒ¨æ›´æ–°ã‚’ç™»éŒ²
+  @param sp: æ›´æ–°ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+  @param x: æ›´æ–°é ˜åŸŸï¼¸åº§æ¨™
+  @param y: æ›´æ–°é ˜åŸŸï¼¹åº§æ¨™
+  @param w: æ›´æ–°é ˜åŸŸå¹…
+  @param h: æ›´æ–°é ˜åŸŸé«˜ã•
 */
 int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	MyRectangle *r;

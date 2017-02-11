@@ -14,129 +14,129 @@ msgstr ""
 "Last-Translator: CHIKAMA Masaki <chika@8ne.sakura.ne.jp>\n"
 "Language-Team: Japanese <chika@8ne.sakura.ne.jp>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=euc-jp\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/menu.c:89
 #, c-format
 msgid "MAX %d charater"
-msgstr "ºÇÂç %d Ê¸»ú"
+msgstr "æœ€å¤§ %d æ–‡å­—"
 
 #: src/menu_gui.c:81
 msgid "InputNumber"
-msgstr "¿ôÃÍÆşÎÏ"
+msgstr "æ•°å€¤å…¥åŠ›"
 
 #: src/menu_gui.c:122 src/menu_gui.c:830
 msgid "default"
-msgstr "´ûÄêÃÍ"
+msgstr "æ—¢å®šå€¤"
 
 #: src/menu_gui.c:132
 msgid "min"
-msgstr "ºÇ¾®ÃÍ"
+msgstr "æœ€å°å€¤"
 
 #: src/menu_gui.c:142
 msgid "max"
-msgstr "ºÇÂçÃÍ"
+msgstr "æœ€å¤§å€¤"
 
 #: src/menu_gui.c:193 src/menu_gui.c:306 src/menu_gui.c:473 src/menu_gui.c:866
 msgid "OK"
-msgstr "£Ï£Ë"
+msgstr "ï¼¯ï¼«"
 
 #: src/menu_gui.c:200 src/menu_gui.c:299
 msgid "Cancel"
-msgstr "¥­¥ã¥ó¥»¥ë"
+msgstr "ã‚­ãƒ£ãƒ³ã‚»ãƒ«"
 
 #: src/menu_gui.c:247
 msgid "InputString"
-msgstr "Ê¸»úÎóÆşÎÏ"
+msgstr "æ–‡å­—åˆ—å…¥åŠ›"
 
 #: src/menu_gui.c:258
 msgid "title"
-msgstr "¥¿¥¤¥È¥ë"
+msgstr "ã‚¿ã‚¤ãƒˆãƒ«"
 
 #: src/menu_gui.c:274
 msgid "MAX charater"
-msgstr "ºÇÂçÊ¸»ú¿ô"
+msgstr "æœ€å¤§æ–‡å­—æ•°"
 
 #: src/menu_gui.c:283
 msgid "Notice) HANKAKU is not available"
-msgstr "Ãğ¡ËÁ´³ÑÊ¸»ú¤Î¤ßÍ­¸ú"
+msgstr "è¨»ï¼‰å…¨è§’æ–‡å­—ã®ã¿æœ‰åŠ¹"
 
 #: src/menu_gui.c:343 src/menu_gui.c:758
 msgid "Exit"
-msgstr "½ªÎ»"
+msgstr "çµ‚äº†"
 
 #: src/menu_gui.c:358
 msgid "Exit System35 ?"
-msgstr "System35¤ò½ªÎ»¤·¤Ş¤¹¤«¡©"
+msgstr "System35ã‚’çµ‚äº†ã—ã¾ã™ã‹ï¼Ÿ"
 
 #: src/menu_gui.c:372
 msgid "Yes"
-msgstr "¤Ï¤¤"
+msgstr "ã¯ã„"
 
 #: src/menu_gui.c:379
 msgid "No"
-msgstr "¤¤¤¤¤¨"
+msgstr "ã„ã„ãˆ"
 
 #: src/menu_gui.c:415 src/menu_gui.c:743
 msgid "About"
-msgstr "¾ğÊó"
+msgstr "æƒ…å ±"
 
 #: src/menu_gui.c:441
 msgid "Information1"
-msgstr "¾ğÊó£±"
+msgstr "æƒ…å ±ï¼‘"
 
 #: src/menu_gui.c:453
 msgid "Information2"
-msgstr "¾ğÊó£²"
+msgstr "æƒ…å ±ï¼’"
 
 #: src/menu_gui.c:465
 msgid "Information3"
-msgstr "¾ğÊó£³"
+msgstr "æƒ…å ±ï¼“"
 
 #: src/menu_gui.c:540
 msgid "MessageSkip"
-msgstr "¥á¥Ã¥»¡¼¥¸¥¹¥­¥Ã¥×"
+msgstr "ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ã‚­ãƒƒãƒ—"
 
 #: src/menu_gui.c:558 src/menu_gui.c:600 src/menu_gui.c:650 src/menu_gui.c:684
 #: src/menu_gui.c:718
 msgid "ON"
-msgstr "Í­¸ú"
+msgstr "æœ‰åŠ¹"
 
 #: src/menu_gui.c:566 src/menu_gui.c:608 src/menu_gui.c:658 src/menu_gui.c:692
 #: src/menu_gui.c:726
 msgid "OFF"
-msgstr "Ìµ¸ú"
+msgstr "ç„¡åŠ¹"
 
 #: src/menu_gui.c:582
 msgid "MouseAutoMove"
-msgstr "¥Ş¥¦¥¹¥«¡¼¥½¥ë°ÜÆ°"
+msgstr "ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•"
 
 #: src/menu_gui.c:624 src/menu_gui_volval.c:43
 msgid "VolumeValance"
-msgstr "¥Ü¥ê¥å¡¼¥à¥Ğ¥é¥ó¥¹"
+msgstr "ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒãƒ©ãƒ³ã‚¹"
 
 #: src/menu_gui.c:632
 msgid "PCM-audio"
-msgstr "PCM¥ª¡¼¥Ç¥£¥ª"
+msgstr "PCMã‚ªãƒ¼ãƒ‡ã‚£ã‚ª"
 
 #: src/menu_gui.c:666
 msgid "CDROM-audio"
-msgstr "CDROM¥ª¡¼¥Ç¥£¥ª"
+msgstr "CDROMã‚ªãƒ¼ãƒ‡ã‚£ã‚ª"
 
 #: src/menu_gui.c:700
 msgid "MIDI-audio"
-msgstr "MIDI¥ª¡¼¥Ç¥£¥ª"
+msgstr "MIDIã‚ªãƒ¼ãƒ‡ã‚£ã‚ª"
 
 #: src/menu_gui_volval.c:89
 msgid "mute"
-msgstr "¥ß¥å¡¼¥È"
+msgstr "ãƒŸãƒ¥ãƒ¼ãƒˆ"
 
 #: src/menu_gui_volval.c:114
 msgid "small"
-msgstr "¾®"
+msgstr "å°"
 
 #: src/menu_gui_volval.c:122
 msgid "large"
-msgstr "Âç"
+msgstr "å¤§"
 

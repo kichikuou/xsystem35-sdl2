@@ -1,5 +1,5 @@
 /*
- * image24.c  imageÁàºî(24/32bpp)
+ * image24.c  imageæ“ä½œ(24/32bpp)
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

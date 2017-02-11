@@ -1,5 +1,5 @@
 /*
- * sactamask.c: SACTEFAM.KLD Å¸³«
+ * sactamask.c: SACTEFAM.KLD å±•é–‹
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -58,7 +58,7 @@ struct ecopyparam {
 typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
 
-// SACTEFAM.KLD ¤ÎÆÉ¤ß¹ş¤ß
+// SACTEFAM.KLD ã®èª­ã¿è¾¼ã¿
 int smask_init(char *path) {
 	struct stat sbuf;
 	int i, fd;
@@ -99,7 +99,7 @@ int smask_init(char *path) {
 	return OK;
 }
 
-// »ØÄêÈÖ¹æ¤Î alphamask ¥Õ¥¡¥¤¥ë¤ò¤è¤ß¤À¤¹
+// æŒ‡å®šç•ªå·ã® alphamask ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚ˆã¿ã ã™
 static surface_t *smask_get(int no) {
 	int i;
 	SACTEFAM_t *am = &sact.am;
@@ -113,7 +113,7 @@ static surface_t *smask_get(int no) {
 	return sf_getcg(am->mapadr + am->offset[i]);
 }
 
-// ¥Ù¡¼¥¹¤Ë¤Ê¤ë¥Ş¥¹¥¯¤Î alpha ÃÍ¤ò³ÈÂç¤·¤Æ¼è¤ê½Ğ¤¹
+// ãƒ™ãƒ¼ã‚¹ã«ãªã‚‹ãƒã‚¹ã‚¯ã® alpha å€¤ã‚’æ‹¡å¤§ã—ã¦å–ã‚Šå‡ºã™
 static surface_t *smask_mul(surface_t *sf, int val) {
 	surface_t *out = sf_create_alpha(sf->width, sf->height);
 	BYTE *src = sf->alpha;
@@ -122,9 +122,9 @@ static surface_t *smask_mul(surface_t *sf, int val) {
 
 	while(pix--) {
 		int i = (*src - val) * 16;
-		if (i < 0)        *dst = 255; // »ØÄêÃÍ¤è¤ê¤âÂç¤­¤¤¤Î¤Ï¥³¥Ô¡¼
-		else if (i > 255) *dst = 0;   // »ØÄêÃÍ¤è¤ê¤â¾®¤µ¤¤¤Î¤ÏÌµ»ë
-		else              *dst = 255-i; // ¤½¤ì°Ê³°¤ÏÃÍ¤ò16ÇÜ
+		if (i < 0)        *dst = 255; // æŒ‡å®šå€¤ã‚ˆã‚Šã‚‚å¤§ãã„ã®ã¯ã‚³ãƒ”ãƒ¼
+		else if (i > 255) *dst = 0;   // æŒ‡å®šå€¤ã‚ˆã‚Šã‚‚å°ã•ã„ã®ã¯ç„¡è¦–
+		else              *dst = 255-i; // ãã‚Œä»¥å¤–ã¯å€¤ã‚’16å€
 		src++; dst++;
 	}
 	
@@ -132,7 +132,7 @@ static surface_t *smask_mul(surface_t *sf, int val) {
 }
 
 /**
- * ¥Ş¥¹¥¯¤Ä¤­²èÌÌ¹¹¿·
+ * ãƒã‚¹ã‚¯ã¤ãç”»é¢æ›´æ–°
  */
 int sp_eupdate_amap(int index, int time, int cancel) {
 	surface_t *mask, *mask2;
@@ -145,7 +145,7 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 		return OK;
 	}
 	
-	// ¸½ºß¤Î sf0 ¤ò¥»¡¼¥Ö
+	// ç¾åœ¨ã® sf0 ã‚’ã‚»ãƒ¼ãƒ–
 	sfsrc = sf_dup(sf0);
 	sp_update_all(FALSE);
 	sfdst = sf_dup(sf0);
@@ -157,7 +157,7 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 	
 	while ((ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < ecp.edtime) {
 		int curstep = 255 * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-		// ¸µ¤Ë¤Ê¤ë¥Ş¥¹¥¯¤ÎalphaÃÍ¤ò16ÇÜ¤·¤ÆÍß¤·¤¤¤È¤³¤í¤À¤±¼è¤ê½Ğ¤¹
+		// å…ƒã«ãªã‚‹ãƒã‚¹ã‚¯ã®alphaå€¤ã‚’16å€ã—ã¦æ¬²ã—ã„ã¨ã“ã‚ã ã‘å–ã‚Šå‡ºã™
 		mask2 = smask_mul(mask, curstep);
 		
 		gre_BlendUseAMap(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, mask2, 0, 0, 255);
@@ -166,7 +166,7 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 		key = sys_keywait(10, cancel);
 		if (cancel && key) break;
 		
-		// °ì»ş¥Ş¥¹¥¯¤òºï½ü
+		// ä¸€æ™‚ãƒã‚¹ã‚¯ã‚’å‰Šé™¤
 		sf_free(mask2);
 	}
 	

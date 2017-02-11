@@ -1,5 +1,5 @@
 /*
- * sactamask.h: SACTEFAM.KLD Å¸³«
+ * sactamask.h: SACTEFAM.KLD å±•é–‹
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

@@ -1,5 +1,5 @@
 /*
- * pcmlib.c  PCM misc¥é¥¤¥Ö¥é¥ê
+ * pcmlib.c  PCM miscãƒ©ã‚¤ãƒ–ãƒ©ãƒª
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -36,11 +36,11 @@
 extern WAVFILE *ogg_getinfo(char *data, long size);
 
 /**
- * noL ¤È noR ¤Î .WAV ¤ò¥í¡¼¥É¤·¡¢º¸±¦¹çÀ®
+ * noL ã¨ noR ã® .WAV ã‚’ãƒ­ãƒ¼ãƒ‰ã—ã€å·¦å³åˆæˆ
  *
- * @param noL: º¸¤Î WAV ¥Õ¥¡¥¤¥ë¤ÎÈÖ¹æ
- * @param noR: ±¦¤Î WAV ¥Õ¥¡¥¤¥ë¤ÎÈÖ¹æ
- * @return   : ¹çÀ®¸å¤Î WAVFILE ¥Ç¡¼¥¿
+ * @param noL: å·¦ã® WAV ãƒ•ã‚¡ã‚¤ãƒ«ã®ç•ªå·
+ * @param noR: å³ã® WAV ãƒ•ã‚¡ã‚¤ãƒ«ã®ç•ªå·
+ * @return   : åˆæˆå¾Œã® WAVFILE ãƒ‡ãƒ¼ã‚¿
  */
 WAVFILE *pcmlib_mixlr(int noL, int noR) {
 	WAVFILE *wfileL, *wfileR, *wfile;
@@ -71,8 +71,8 @@ WAVFILE *pcmlib_mixlr(int noL, int noR) {
 }
 
 /**
- * »ØÄê¤ÎÈÖ¹æ¤Î .WAV|.OGG ¤ò¥í¡¼¥É¤¹¤ë¡£
- * @param no: DRI¥Õ¥¡¥¤¥ëÈÖ¹æ
+ * æŒ‡å®šã®ç•ªå·ã® .WAV|.OGG ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
+ * @param no: DRIãƒ•ã‚¡ã‚¤ãƒ«ç•ªå·
  * @return: WAVFILE object
  */
 WAVFILE *pcmlib_load(int no) {
@@ -101,9 +101,9 @@ WAVFILE *pcmlib_load(int no) {
 }
 
 /**
- * pcmlib_{load|mixlr}¤ÇÆÉ¤ß¹ş¤ó¤ÀWAVFILE¤Î²òÊü
- * @param wfile: ²òÊü¤¹¤ë¥Ç¡¼¥¿
- * @return ¤Ê¤·
+ * pcmlib_{load|mixlr}ã§èª­ã¿è¾¼ã‚“ã WAVFILEã®è§£æ”¾
+ * @param wfile: è§£æ”¾ã™ã‚‹ãƒ‡ãƒ¼ã‚¿
+ * @return ãªã—
  */
 void pcmlib_free(WAVFILE *wfile) {
 	if (wfile == NULL) return;

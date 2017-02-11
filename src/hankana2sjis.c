@@ -1,5 +1,5 @@
 /*
- * hankana2sjis.c  È¾³Ñ¥«¥¿¥«¥Ê -> Á´³ÑÊ¿²¾Ì¾ÊÑ´¹
+ * hankana2sjis.c  åŠè§’ã‚«ã‚¿ã‚«ãƒŠ -> å…¨è§’å¹³ä»®åå¤‰æ›
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

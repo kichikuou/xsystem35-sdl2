@@ -8,7 +8,7 @@
 
 #define sf0 nact->ags.dib
 
-// DLL ÍÑ graphic ´ØÏ¢´Ø¿ô 
+// DLL ç”¨ graphic é–¢é€£é–¢æ•° 
 
 /* in graph.c */
 extern boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy);
@@ -16,7 +16,7 @@ extern boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
 
 
 /* in graph_expandcolor_blend.c */
-// 8bpp¤Î¥â¥Î¥¯¥í¤òcol¤Ç¥Ö¥ì¥ó¥É
+// 8bppã®ãƒ¢ãƒã‚¯ãƒ­ã‚’colã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 extern int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int r, int g, int b);
 
 /* in graph_fillrect.c */
@@ -29,7 +29,7 @@ extern int gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int
 extern int gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv);
 
 /* in graph_rect.c */
-// ¶ë·ÁÏÈÉÁ²è
+// çŸ©å½¢æ æç”»
 extern int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b);
 
 /* in graph_copy.c */
@@ -45,7 +45,7 @@ extern int gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int
 extern int gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
 /* in graph_saturadd_amap.c */
-// alpha map ¤ÎË°ÏÂ²Ã»»
+// alpha map ã®é£½å’ŒåŠ ç®—
 extern int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
 /* in graph_draw_amap.c */

@@ -28,7 +28,7 @@
 
 /* absolete */
 void commandPN() {
-	/* num ÈÖ¤Î£Ã£Ç¤òÉ½¼¨¤¹¤ë»ş¡¢¥«¥é¡¼¥Ñ¥ì¥Ã¥È¤òÅ¸³«¤·¤Ê¤¤¤è¤¦¤Ë¤¹¤ë¡£*/
+	/* num ç•ªã®ï¼£ï¼§ã‚’è¡¨ç¤ºã™ã‚‹æ™‚ã€ã‚«ãƒ©ãƒ¼ãƒ‘ãƒ¬ãƒƒãƒˆã‚’å±•é–‹ã—ãªã„ã‚ˆã†ã«ã™ã‚‹ã€‚*/
 	int num = getCaliValue();
 	
 	DEBUG_COMMAND_YET("PN %d:\n",num);
@@ -46,13 +46,13 @@ void commandPF() {
 	}
 	switch(p1) {
 	case 0:
-		/* ¥°¥é¥Õ¥£¥Ã¥¯²èÌÌ¤ò¥Õ¥§¡¼¥É¥¤¥ó¤¹¤ë¡Ê¹õ²èÌÌ¢ªÄÌ¾ï²èÌÌ¡Ë*/
+		/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ç”»é¢ã‚’ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã™ã‚‹ï¼ˆé»’ç”»é¢â†’é€šå¸¸ç”»é¢ï¼‰*/
 		ags_fadeIn(num, cancel_enabled); break;
 	case 2:
 		ags_fadeIn(num, cancel_enabled);
 		sysVar[0] = nact->waitcancel_key; break;
 	case 1:
-		/* ¥°¥é¥Õ¥£¥Ã¥¯²èÌÌ¤ò¥Õ¥§¡¼¥É¥¢¥¦¥È¤¹¤ë¡ÊÄÌ¾ï²èÌÌ¢ª¹õ²èÌÌ¡Ë*/
+		/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ç”»é¢ã‚’ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã™ã‚‹ï¼ˆé€šå¸¸ç”»é¢â†’é»’ç”»é¢ï¼‰*/
 		ags_fadeOut(num, cancel_enabled); break;
 	case 3:
 		ags_fadeOut(num, cancel_enabled);
@@ -74,13 +74,13 @@ void commandPW() {
 	}
 	switch(p1) {
 	case 0:
-		/* ¥°¥é¥Õ¥£¥Ã¥¯²èÌÌ¤ò¥Û¥ï¥¤¥È¥Õ¥§¡¼¥É¥¤¥ó¤¹¤ë¡ÊÇò²èÌÌ¢ªÄÌ¾ï²èÌÌ¡Ë */
+		/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ç”»é¢ã‚’ãƒ›ãƒ¯ã‚¤ãƒˆãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ã™ã‚‹ï¼ˆç™½ç”»é¢â†’é€šå¸¸ç”»é¢ï¼‰ */
 		ags_whiteIn(num, cancel_enabled); break;
 	case 2:
 		ags_whiteIn(num, cancel_enabled);
 		sysVar[0] = nact->waitcancel_key; break;
 	case 1:
-		/* ¥°¥é¥Õ¥£¥Ã¥¯²èÌÌ¤ò¥Û¥ï¥¤¥È¥Õ¥§¡¼¥É¥¢¥¦¥È¤¹¤ë¡ÊÄÌ¾ï²èÌÌ¢ªÇò²èÌÌ¡Ë */
+		/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ç”»é¢ã‚’ãƒ›ãƒ¯ã‚¤ãƒˆãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã™ã‚‹ï¼ˆé€šå¸¸ç”»é¢â†’ç™½ç”»é¢ï¼‰ */
 		ags_whiteOut(num, cancel_enabled); break;
 	case 3:
 		ags_whiteOut(num, cancel_enabled);
@@ -91,7 +91,7 @@ void commandPW() {
 }
 
 void commandPS() {
-	/* ¥«¥é¡¼¥Ñ¥ì¥Ã¥È¤òÀßÄê¤¹¤ë¡£ */
+	/* ã‚«ãƒ©ãƒ¼ãƒ‘ãƒ¬ãƒƒãƒˆã‚’è¨­å®šã™ã‚‹ã€‚ */
 	int Plane, Red, Green, Blue;
 	Plane = getCaliValue();
 	Red   = getCaliValue();
@@ -104,7 +104,7 @@ void commandPS() {
 }
 
 void commandPG() { /* T2 */
-	/* ¥Ñ¥ì¥Ã¥È¥Ç¡¼¥¿¤òÊÑ¿ôÎó¤Ë¼èÆÀ¤¹¤ë */
+	/* ãƒ‘ãƒ¬ãƒƒãƒˆãƒ‡ãƒ¼ã‚¿ã‚’å¤‰æ•°åˆ—ã«å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
@@ -119,7 +119,7 @@ void commandPG() { /* T2 */
 }
 
 void commandPP() { /* T2 */
-	/* ¥Ñ¥ì¥Ã¥È¥Ç¡¼¥¿¤òÊÑ¿ôÎó¤«¤é½ñ¤­¹ş¤ß */
+	/* ãƒ‘ãƒ¬ãƒƒãƒˆãƒ‡ãƒ¼ã‚¿ã‚’å¤‰æ•°åˆ—ã‹ã‚‰æ›¸ãè¾¼ã¿ */
 	int *var = getCaliVariable();
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
@@ -133,7 +133,7 @@ void commandPP() { /* T2 */
 }
 
 void commandPC() {
-	/* £Ç¥³¥Ş¥ó¥É¤ÎÀ©¸æ¡Ê¥Ñ¥ì¥Ã¥È¼èÆÀ¡¢¥Ñ¥ì¥Ã¥ÈÅ¸³«¡¢£Ã£ÇÅ¸³«¡Ë¤òÊÑ¹¹¤¹¤ë¡£*/
+	/* ï¼§ã‚³ãƒãƒ³ãƒ‰ã®åˆ¶å¾¡ï¼ˆãƒ‘ãƒ¬ãƒƒãƒˆå–å¾—ã€ãƒ‘ãƒ¬ãƒƒãƒˆå±•é–‹ã€ï¼£ï¼§å±•é–‹ï¼‰ã‚’å¤‰æ›´ã™ã‚‹ã€‚*/
 	int num = getCaliValue();
 
 	cg_fflg = num;
@@ -142,7 +142,7 @@ void commandPC() {
 }
 
 void commandPD() {
-	/* £Ã£ÇÅ¸³«¤ÎÌÀÅÙ¤ò»ØÄê¤¹¤ë */
+	/* ï¼£ï¼§å±•é–‹ã®æ˜åº¦ã‚’æŒ‡å®šã™ã‚‹ */
 	int num = getCaliValue();
 	
 	cg_alphaLevel = num;
@@ -151,7 +151,7 @@ void commandPD() {
 }
 
 void commandPT0() {
-	/* »ØÄêºÂÉ¸¤ËÉÁ¤«¤ì¤Æ¤¤¤ë¥Ñ¥ì¥Ã¥ÈÈÖ¹æ¤ò¼èÆÀ¤¹¤ë */
+	/* æŒ‡å®šåº§æ¨™ã«æã‹ã‚Œã¦ã„ã‚‹ãƒ‘ãƒ¬ãƒƒãƒˆç•ªå·ã‚’å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
@@ -164,7 +164,7 @@ void commandPT0() {
 }
 
 void commandPT1() {
-	/* »ØÄêºÂÉ¸¤ËÉÁ¤«¤ì¤Æ¤¤¤ë¿§¤ò¼èÆÀ¤¹¤ë */
+	/* æŒ‡å®šåº§æ¨™ã«æã‹ã‚Œã¦ã„ã‚‹è‰²ã‚’å–å¾—ã™ã‚‹ */
 	int *r_var = getCaliVariable();
 	int *g_var = getCaliVariable();
 	int *b_var = getCaliVariable();
@@ -181,7 +181,7 @@ void commandPT1() {
 }
 
 void commandPT2() {
-	/* »ØÄêºÂÉ¸¤ËÉÁ¤«¤ì¤Æ¤¤¤ë¿§¤ò¼èÆÀ¤¹¤ë */
+	/* æŒ‡å®šåº§æ¨™ã«æã‹ã‚Œã¦ã„ã‚‹è‰²ã‚’å–å¾—ã™ã‚‹ */
 	int *hi_var  = getCaliVariable();
 	int *low_var = getCaliVariable();
 	int x = getCaliValue();

@@ -43,7 +43,7 @@ static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool);
 static int  check_button(void);
 
 
-/* pointer ¤Î¾õÂÖ */
+/* pointer ã®çŠ¶æ…‹ */
 static int mousex, mousey, mouseb;
 boolean RawKeyInfo[256];
 /* SDL Joystick */
@@ -61,7 +61,7 @@ static int mouse_to_rawkey(int button) {
 	return 0;
 }
 
-/* Event½èÍý */
+/* Eventå‡¦ç† */
 static void sdl_getEvent(void) {
 	SDL_Event e;
 	boolean m2b = FALSE, msg_skip = FALSE;
@@ -181,7 +181,7 @@ int sdl_keywait(int msec, boolean cancel) {
 	return key;
 }
 
-/* ¥­¡¼¾ðÊó¤Î¼èÆÀ */
+/* ã‚­ãƒ¼æƒ…å ±ã®å–å¾— */
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool) {
 	RawKeyInfo[sdl_keytable[e->keysym.sym]] = bool;
 }

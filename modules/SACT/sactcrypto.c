@@ -1,5 +1,5 @@
 /*
- * sactcrypt.c: SACT¤Î°Å¹æ²½´ØÏ¢
+ * sactcrypt.c: SACTã®æš—å·åŒ–é–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -28,8 +28,8 @@
 #include "variable.h"
 
 /*
-  Â¿Ê¬¡¢¥»¡¼¥Ö»ş¤Ë°Å¹æ²½¤·¤Æ¡¢¥í¡¼¥É»ş¤ËÉü¹æ²½¤¹¤ë¤Î¤Ç
-  Å¬Åö¤Ç¤¤¤¤¤È¤ª¤â¤¦
+  å¤šåˆ†ã€ã‚»ãƒ¼ãƒ–æ™‚ã«æš—å·åŒ–ã—ã¦ã€ãƒ­ãƒ¼ãƒ‰æ™‚ã«å¾©å·åŒ–ã™ã‚‹ã®ã§
+  é©å½“ã§ã„ã„ã¨ãŠã‚‚ã†
 */
 
 int scryp_encrypt_word(int *array, int num, int key) {

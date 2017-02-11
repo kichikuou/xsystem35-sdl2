@@ -1,5 +1,5 @@
 /*
- * xsystem35.c  SYSTEM35 ¥Ç¥³¡¼¥À
+ * xsystem35.c  SYSTEM35 ãƒ‡ã‚³ãƒ¼ãƒ€
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -297,7 +297,7 @@ static void storeSaveName(int no, char *src) {
 	if (path) free(path);
 }
 
-/* ¥²¡¼¥à¤Î¥Ç¡¼¥¿¥Õ¥¡¥¤¥ë¤Î¾ğÊó¤ò¥Ç¥£¥ì¥¯¥È¥ê¤«¤éºîÀ® thanx tajiri@wizard*/
+/* ã‚²ãƒ¼ãƒ ã®ãƒ‡ãƒ¼ã‚¿ãƒ•ã‚¡ã‚¤ãƒ«ã®æƒ…å ±ã‚’ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‹ã‚‰ä½œæˆ thanx tajiri@wizard*/
 static boolean sys35_initGameDataDir(int* cnt)
 {
     DIR* dir;
@@ -371,7 +371,7 @@ static boolean sys35_initGameDataDir(int* cnt)
 }
 
     
-/* ¥²¡¼¥à¤Î¥Ç¡¼¥¿¥Õ¥¡¥¤¥ë¤Î¾ğÊó¤òÆÉ¤ß¹ş¤à */
+/* ã‚²ãƒ¼ãƒ ã®ãƒ‡ãƒ¼ã‚¿ãƒ•ã‚¡ã‚¤ãƒ«ã®æƒ…å ±ã‚’èª­ã¿è¾¼ã‚€ */
 static boolean sys35_initGameDataResorce() {
 	int cnt[] = {0, 0, 0, 0, 0, 0, 0};
 	int linecnt = 0, dno;
@@ -676,87 +676,87 @@ static void sys35_ParseOption(int *argc, char **argv) {
 static void check_profile() {
 	char *param;
 	
-	/* ¥Õ¥©¥ó¥È¥Ç¥Ğ¥¤¥¹¤ÎÁªÂò */
+	/* ãƒ•ã‚©ãƒ³ãƒˆãƒ‡ãƒã‚¤ã‚¹ã®é¸æŠ */
 	param = get_profile("font_device");
 	if (param) {
 		fontdev = check_fontdev(param);
 	}
-	/* ¥´¥·¥Ã¥¯¥Õ¥©¥ó¥È¤ÎÀßÄê */
+	/* ã‚´ã‚·ãƒƒã‚¯ãƒ•ã‚©ãƒ³ãƒˆã®è¨­å®š */
 	param = get_profile("font_gothic");
 	if (param) {
 		fontname[FONT_GOTHIC] = param;
 	}
-	/* ÌÀÄ«¥Õ¥©¥ó¥È¤ÎÀßÄê */
+	/* æ˜æœãƒ•ã‚©ãƒ³ãƒˆã®è¨­å®š */
 	param = get_profile("font_mincho");
 	if (param) {
 		fontname[FONT_MINCHO] = param;
 	}
-	/* ¥´¥·¥Ã¥¯¥Õ¥©¥ó¥È(TT)¤ÎÀßÄê */
+	/* ã‚´ã‚·ãƒƒã‚¯ãƒ•ã‚©ãƒ³ãƒˆ(TT)ã®è¨­å®š */
 	param = get_profile("ttfont_gothic");
 	if (param) {
 		fontname_tt[FONT_GOTHIC] = param;
 	}
-	/* ÌÀÄ«¥Õ¥©¥ó¥È(TT)¤ÎÀßÄê */
+	/* æ˜æœãƒ•ã‚©ãƒ³ãƒˆ(TT)ã®è¨­å®š */
 	param = get_profile("ttfont_mincho");
 	if (param) {
 		fontname_tt[FONT_MINCHO] = param;
 	}
-	/* ¥´¥·¥Ã¥¯¥Õ¥©¥ó¥È(TT)¤Î¥³¡¼¥ÉÀßÄê */
+	/* ã‚´ã‚·ãƒƒã‚¯ãƒ•ã‚©ãƒ³ãƒˆ(TT)ã®ã‚³ãƒ¼ãƒ‰è¨­å®š */
 	param = get_profile("ttfont_gothic_code");
 	if (param) {
 		isjix0213_tt[FONT_GOTHIC] = (strcmp("jisx0213",param) == 0 ? TRUE : FALSE);
 	}
-	/* ÌÀÄ«¥Õ¥©¥ó¥È(TT)¤Î¥³¡¼¥ÉÀßÄê */
+	/* æ˜æœãƒ•ã‚©ãƒ³ãƒˆ(TT)ã®ã‚³ãƒ¼ãƒ‰è¨­å®š */
 	param = get_profile("ttfont_mincho_code");
 	if (param) {
 		isjix0213_tt[FONT_MINCHO] = (strcmp("jisx0213",param) == 0 ? TRUE : FALSE);
 	}
-	/* ¥´¥·¥Ã¥¯¥Õ¥©¥ó¥È(TT)¤Î¥Õ¥§¥¤¥¹»ØÄê */
+	/* ã‚´ã‚·ãƒƒã‚¯ãƒ•ã‚©ãƒ³ãƒˆ(TT)ã®ãƒ•ã‚§ã‚¤ã‚¹æŒ‡å®š */
 	param = get_profile("ttfont_gothic_face");
 	if (param) {
 		fontface[FONT_GOTHIC] = *param - '0';
 	}
-	/* ÌÀÄ«¥Õ¥©¥ó¥È(TT)¤Î¥Õ¥§¥¤¥¹»ØÄê */
+	/* æ˜æœãƒ•ã‚©ãƒ³ãƒˆ(TT)ã®ãƒ•ã‚§ã‚¤ã‚¹æŒ‡å®š */
 	param = get_profile("ttfont_mincho_face");
 	if (param) {
 		fontface[FONT_MINCHO] = *param - '0';
 	}
-	/* CD-ROM device name ¤ÎÀßÄê */
+	/* CD-ROM device name ã®è¨­å®š */
 	param = get_profile("cdrom_device");
 	if (param) {
 		cd_set_devicename(param);
 	}
-	/* DSP device name ¤ÎÀßÄê */
+	/* DSP device name ã®è¨­å®š */
 	param = get_profile("dsp_device");
 	if (param) {
 		audio_set_pcm_devicename(param);
 	}
-	/* mixer device name ¤ÎÀßÄê */
+	/* mixer device name ã®è¨­å®š */
 	param = get_profile("mixer_device");
 	if (param) {
 		audio_set_mixer_devicename(param);
 	}
-	/* audio output device ¤ÎÀßÄê */
+	/* audio output device ã®è¨­å®š */
 	param = get_profile("audio_output_device");
 	if (param) {
 		audio_set_output_device(*param);
 	}
-	/* joystick device name ¤ÎÀßÄê */
+	/* joystick device name ã®è¨­å®š */
 	param = get_profile("joy_device");
 	if (param) {
 		joy_set_devicename(param);
 	}
-	/* ³°ÉôMIDI¥×¥ì¡¼¥ä¡¼¤ÎÀßÄê */
+	/* å¤–éƒ¨MIDIãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ã®è¨­å®š */
 	param = get_profile("midi_player");
 	if (param) {
 		midi_set_playername(param);
 	}
-	/* Raw MIDI device name ¤ÎÀßÄê */
+	/* Raw MIDI device name ã®è¨­å®š */
 	param = get_profile("midi_device");
 	if (param) {
 		midi_set_devicename(param);
 	}
-	/* MIDI output device ¤ÎÀßÄê */
+	/* MIDI output device ã®è¨­å®š */
 	param = get_profile("midi_output_device");
 	if (param) {
 		int subdev = 0;

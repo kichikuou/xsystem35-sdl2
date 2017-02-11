@@ -1,5 +1,5 @@
 /*
- * variable.c  ÊÑ¿ô´ÉÍı
+ * variable.c  å¤‰æ•°ç®¡ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -28,22 +28,22 @@
 #include "variable.h"
 #include "xsystem35.h"
 
-/* ¥·¥¹¥Æ¥àÊÑ¿ô */
+/* ã‚·ã‚¹ãƒ†ãƒ å¤‰æ•° */
 int *sysVar;
-/* ÇÛÎóÊÑ¿ô¤Î¾ğÊó */
+/* é…åˆ—å¤‰æ•°ã®æƒ…å ± */
 arrayVarStruct *sysVarAttribute;
-/* ÇÛÎóËÜÂÎ */
+/* é…åˆ—æœ¬ä½“ */
 arrayVarBufferStruct *arrayVarBuffer;
-/* 64bitÊÑ¿ô */
+/* 64bitå¤‰æ•° */
 double longVar[SYSVARLONG_MAX];
-/* Ê¸»úÎóÊÑ¿ô */
+/* æ–‡å­—åˆ—å¤‰æ•° */
 static char *strVar;
-/* Ê¸»úÎóÊÑ¿ô¤ÎÂ°À­(ºÇÂç,1¤Ä¤¢¤¿¤ê¤ÎÂç¤­¤µ) */
+/* æ–‡å­—åˆ—å¤‰æ•°ã®å±æ€§(æœ€å¤§,1ã¤ã‚ãŸã‚Šã®å¤§ãã•) */
 int strvar_cnt = STRVAR_MAX;
 int strvar_len = STRVAR_LEN;
 
 
-/* ÇÛÎó¥Ğ¥Ã¥Õ¥¡¤Î³ÎÊİ DC ,page = 1~ */
+/* é…åˆ—ãƒãƒƒãƒ•ã‚¡ã®ç¢ºä¿ DC ,page = 1~ */
 extern boolean v_allocateArrayBuffer(int page, int size, boolean flg) {
 	void *buf;
 	
@@ -66,7 +66,7 @@ extern boolean v_allocateArrayBuffer(int page, int size, boolean flg) {
 	return true;
 }
 
-/*¡¡ÇÛÎóÊÑ¿ô¤Î³ä¤êÅö¤Æ DS */
+/*ã€€é…åˆ—å¤‰æ•°ã®å‰²ã‚Šå½“ã¦ DS */
 extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page) {
 	if (datavar < 0 || datavar > SYSVAR_MAX - 1)                   { return false; }
 	if (page    < 0 || page    > ARRAYVAR_PAGEMAX - 1)             { return false; }
@@ -78,23 +78,23 @@ extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page
 	return true;
 }
 
-/* ÇÛÎóÊÑ¿ô¤Î³ä¤êÅö¤Æ²ò½ü DR */
+/* é…åˆ—å¤‰æ•°ã®å‰²ã‚Šå½“ã¦è§£é™¤ DR */
 extern boolean v_releaseArrayVar(int datavar) {
 	sysVarAttribute[datavar].page = 0;
 	return true;
 }
 
-/* »ØÄê¥Ú¡¼¥¸¤ÎºÇÂçÊÑ¿ô¤Î¼èÆÀ page = 1~ */
+/* æŒ‡å®šãƒšãƒ¼ã‚¸ã®æœ€å¤§å¤‰æ•°ã®å–å¾— page = 1~ */
 extern int v_getArrayBufferCnt(int page) {
 	return arrayVarBuffer[page - 1].max;
 }
 
-/* »ØÄê¥Ú¡¼¥¸¤Ï»ÈÍÑÃæ page = 1~ */
+/* æŒ‡å®šãƒšãƒ¼ã‚¸ã¯ä½¿ç”¨ä¸­ page = 1~ */
 extern boolean v_getArrayBufferStatus(int page) {
 	return (arrayVarBuffer[page - 1].value != NULL) ? true : false;
 }
 
-/* Ê¸»úÎóÊÑ¿ô¤ÎºÆ½é´ü²½ */
+/* æ–‡å­—åˆ—å¤‰æ•°ã®å†åˆæœŸåŒ– */
 extern void v_initStringVars(int cnt,int len) {
 	strVar = realloc(strVar, cnt * len);
 	if (strVar == NULL) {
@@ -104,7 +104,7 @@ extern void v_initStringVars(int cnt,int len) {
 	strvar_len = len;
 }
 
-/* ÊÑ¿ô¤Î½é´ü²½ */
+/* å¤‰æ•°ã®åˆæœŸåŒ– */
 extern boolean v_initVars() {
 	sysVar          = calloc(SYSVAR_MAX, sizeof(int));
 	sysVarAttribute	= calloc(SYSVAR_MAX, sizeof(arrayVarStruct));
@@ -118,22 +118,22 @@ extern boolean v_initVars() {
 	return true;
 }
 
-/* Ê¸»úÊÑ¿ô¤Ø¤ÎÂåÆş */
+/* æ–‡å­—å¤‰æ•°ã¸ã®ä»£å…¥ */
 char *v_strcpy(int no, const char *str) {
 	return strncpy(strVar + no * strvar_len, str, strvar_len - 1);
 }
 
-/* Ê¸»úÊÑ¿ô¤Ø¤ÎÀÜÂ³ */
+/* æ–‡å­—å¤‰æ•°ã¸ã®æ¥ç¶š */
 char *v_strcat(int no, const char *str) {
 	return strncat(strVar + no * strvar_len, str, strvar_len - 1);
 }
 
-/* Ê¸»úÊÑ¿ô¤ÎÄ¹¤µ */
+/* æ–‡å­—å¤‰æ•°ã®é•·ã• */
 size_t v_strlen(int no) {
 	return strlen(strVar + no * strvar_len);
 }
 
-/* Ê¸»úÊÑ¿ô¤½¤Î¤â¤Î */
+/* æ–‡å­—å¤‰æ•°ãã®ã‚‚ã® */
 char *v_str(int no) {
 	return strVar + no * strvar_len;
 }

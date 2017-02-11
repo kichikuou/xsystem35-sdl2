@@ -1,7 +1,7 @@
 
 
 
-// ¥¯¥í¥¹¥Õ¥§¡¼¥É¥â¥¶¥¤¥¯
+// ã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰ãƒ¢ã‚¶ã‚¤ã‚¯
 static void ec6_cb(surface_t *src, surface_t *dst) {
 	int curstep, maxstep = 32;
 	surface_t *st, *dt;

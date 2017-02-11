@@ -37,20 +37,20 @@
 #include "savedata.h"
 #include "cache.h"
 
-/* VSP¤Î¥Ñ¥ì¥Ã¥ÈÅ¸³«¥Ğ¥ó¥¯ */
+/* VSPã®ãƒ‘ãƒ¬ãƒƒãƒˆå±•é–‹ãƒãƒ³ã‚¯ */
 int cg_vspPB = -1;
-/* cg,pallet Å¸³«¥Õ¥é¥° (funciotn flag) */
+/* cg,pallet å±•é–‹ãƒ•ãƒ©ã‚° (funciotn flag) */
 int cg_fflg = 7;
-/* CG¤ò¥í¡¼¥É¤·¤¿²ó¿ô¤ò½ñ¤­¹ş¤àÊÑ¿ô */
+/* CGã‚’ãƒ­ãƒ¼ãƒ‰ã—ãŸå›æ•°ã‚’æ›¸ãè¾¼ã‚€å¤‰æ•° */
 int *cg_loadCountVar = NULL;
-/* CG¤ÎÌÀÅÙ»ØÄê */
+/* CGã®æ˜åº¦æŒ‡å®š */
 int cg_alphaLevel = 255;
 
 #define GCMD_EXTRACTCG(c)    ((c) & 0x01)
 #define GCMD_SET_PALLET(c)  ((c) & 0x02)
 #define GCMD_LOAD_PALLET(c) ((c) & 0x04)
 
-/* CGÉ½¼¨°ÌÃÖ¤Ë´Ø¤¹¤ë¾ğÊó */
+/* CGè¡¨ç¤ºä½ç½®ã«é–¢ã™ã‚‹æƒ…å ± */
 static CG_WHERETODISP loc_policy = OFFSET_NOMOVE, loc_policy0;
 static MyPoint        loc_where, loc_where0;
 
@@ -253,7 +253,7 @@ static cgdata *loader(int no) {
 	
 	/* load pallet if not extracted */
 	if (GCMD_LOAD_PALLET(cg_fflg) && cg == NULL) {
-		/* XXXX ¤¦¤à¡¢¤³¤¤¤Ä¤é¤É¤³¤Ç²òÊü¤¹¤ë¤ó¤À */
+		/* XXXX ã†ã‚€ã€ã“ã„ã¤ã‚‰ã©ã“ã§è§£æ”¾ã™ã‚‹ã‚“ã  */
 		switch(type) {
 		case ALCG_VSP:
 			cg = vsp_getpal(dfile->data);

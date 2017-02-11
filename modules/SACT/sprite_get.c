@@ -1,5 +1,5 @@
 /*
- * sprite_get.c: ¥²¥Ã¥ÈA/B¥¹¥×¥é¥¤¥ÈÆÃÍ­¤Î½èÍı
+ * sprite_get.c: ã‚²ãƒƒãƒˆA/Bã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç‰¹æœ‰ã®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -37,8 +37,8 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e);
 static void cb_remove(sprite_t *sp);
 
 /*
-  ÀâÌÀ¥¹¥×¥é¥¤¥È¤Î¾Ãµî
-    drag¤¬»Ï¤Ş¤Ã¤¿¤éÀâÌÀ¥¹¥×¥é¥¤¥È¤Ï¾Ãµî¤¹¤ë
+  èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æ¶ˆå»
+    dragãŒå§‹ã¾ã£ãŸã‚‰èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯æ¶ˆå»ã™ã‚‹
 */
 static void cb_defocused_swsp(gpointer s, gpointer data) {
 	sprite_t *sp = (sprite_t *)s;
@@ -53,7 +53,7 @@ static void cb_defocused_swsp(gpointer s, gpointer data) {
 }
 
 
-//¥²¥Ã¥È¥¹¥×¥é¥¤¥È¤Î¥¤¥Ù¥ó¥È½èÍı
+//ã‚²ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†
 static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 	int update = 0;
 	
@@ -61,7 +61,7 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 	case AGSEVENT_BUTTON_PRESS:
 		if (e->d3 != AGSEVENT_BUTTON_LEFT) break;
 		
-		// drag³«»Ï»ş¤Î¥Ş¥¦¥¹¤Î°ÌÃÖµ­Ï¿
+		// dragé–‹å§‹æ™‚ã®ãƒã‚¦ã‚¹ã®ä½ç½®è¨˜éŒ²
 		sp->u.get.dragging = TRUE;
 		sp->u.get.dragstart.x = e->d1;
 		sp->u.get.dragstart.y = e->d2;
@@ -72,16 +72,16 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 			sp_updateme(sp);
 		}
 		
-		// ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨¤ò°ìÈÖÁ°¤Ë»ı¤Ã¤ÆÍè¤ë
+		// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºã‚’ä¸€ç•ªå‰ã«æŒã£ã¦æ¥ã‚‹
 		sact.draggedsp = sp;
 		sact.dropped = FALSE;
 		
-		// ÀâÌÀ¥¹¥×¥é¥¤¥È¤¬¤¢¤ë¾ì¹ç¤Ï¡¢¤½¤ì¤òÈóÉ½¼¨¤Ë¤¹¤ë
+		// èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒã‚ã‚‹å ´åˆã¯ã€ãã‚Œã‚’éè¡¨ç¤ºã«ã™ã‚‹
 		if (sp->expsp) {
 			g_slist_foreach(sp->expsp, cb_defocused_swsp, &update);
 		}
 		
-		// SpriteSound¤¬¤¢¤ì¤Ğ¡¢¤½¤ì¤òÌÄ¤é¤¹
+		// SpriteSoundãŒã‚ã‚Œã°ã€ãã‚Œã‚’é³´ã‚‰ã™
 		if (sp->numsound2) {
 			ssnd_play(sp->numsound2);
 		}
@@ -89,7 +89,7 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		break;
 		
 	case AGSEVENT_BUTTON_RELEASE:
-		// ¤É¤Î¥Ü¥¿¥ó¤Ç¤â¥É¥é¥Ã¥°Ãæ»ß|½ªÎ»
+		// ã©ã®ãƒœã‚¿ãƒ³ã§ã‚‚ãƒ‰ãƒ©ãƒƒã‚°ä¸­æ­¢|çµ‚äº†
 		
 		if (!sp->u.get.dragging) break;
 		
@@ -100,11 +100,11 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 	{
 		int newx, newy;
 		
-		// MOUSE MOTION ¤Ï draggÃæ¤Ë¤·¤«¸Æ¤Ğ¤ì¤Ê¤¤¤«¤é
-		// ¤³¤ì¤ÏÉÔÍ×
+		// MOUSE MOTION ã¯ draggä¸­ã«ã—ã‹å‘¼ã°ã‚Œãªã„ã‹ã‚‰
+		// ã“ã‚Œã¯ä¸è¦
 		// if (!sp->u.get.dragging) break;
 		
-		// ¥Ş¥¦¥¹¤Î¸½ºß°ÌÃÖ¤Ë¤è¤ê¿·¤·¤¤¾ì½ê¤ò·×»»
+		// ãƒã‚¦ã‚¹ã®ç¾åœ¨ä½ç½®ã«ã‚ˆã‚Šæ–°ã—ã„å ´æ‰€ã‚’è¨ˆç®—
 		newx = sp->loc.x + (e->d1 - sp->u.get.dragstart.x);
 		newy = sp->loc.y + (e->d2 - sp->u.get.dragstart.y);
 		if (newx != sp->cur.x || newy != sp->cur.y) {
@@ -120,14 +120,14 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 	return update;
 }
 
-// ¥¹¥×¥é¥¤¥Èºï½ü»ş¤Î½èÍı
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå‰Šé™¤æ™‚ã®å‡¦ç†
 static void cb_remove(sprite_t *sp) {
 	spev_remove_eventlistener(sp);
 }
 
 /*
-  sp_new ¤Î»ş¤Ë¥¹¥×¥é¥¤¥È¤Î¼ïÎàËè¤Î½é´ü²½
-  @param sp: ½é´ü²½¤¹¤ë¥¹¥×¥é¥¤¥È
+  sp_new ã®æ™‚ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç¨®é¡æ¯ã®åˆæœŸåŒ–
+  @param sp: åˆæœŸåŒ–ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 int sp_get_setup(sprite_t *sp) {
 	spev_add_eventlistener(sp, eventCB_GET);

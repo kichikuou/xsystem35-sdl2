@@ -43,7 +43,7 @@
 
 extern void sys_set_signalhandler(int SIG, void (*handler)(int));
 
-/* music server Æâ¶¦ÄÌÊÑ¿ô */
+/* music server å†…å…±é€šå¤‰æ•° */
 struct _musprvdat musprv;
 
 static pid_t sv_pid;

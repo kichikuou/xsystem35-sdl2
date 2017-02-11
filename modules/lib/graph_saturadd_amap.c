@@ -1,4 +1,4 @@
-// alpha map ��˰�²û�
+// alpha map の飽和加算
 
 #include <glib.h>
 #include "portab.h"

@@ -55,7 +55,7 @@ void commandG1() {
 }
 
 void commandGS() {
-        /* num ÈÖ¤Ë¥ê¥ó¥¯¤µ¤ì¤Æ¤¤¤ë£Ã£Ç¤ÎºÂÉ¸¤È¥µ¥¤¥º¤ò¼èÆÀ¤¹¤ë */
+        /* num ç•ªã«ãƒªãƒ³ã‚¯ã•ã‚Œã¦ã„ã‚‹ï¼£ï¼§ã®åº§æ¨™ã¨ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ */
 	MyRectangle r;
 	int num = getCaliValue();
 	int *var = getCaliVariable();

@@ -1,5 +1,5 @@
 /*
- * sactcg.c: CG∫Ó¿Æ
+ * sactcg.c: CG‰ΩúÊàê
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -51,15 +51,15 @@ static cginfo_t *cgs[CGMAX];
 
  
 /*
-  cg§Œ∆…§ﬂπ˛§ﬂ
+  cg„ÅÆË™≠„ÅøËæº„Åø
 
-    ªÿƒÍ§Œ»÷πÊ§ŒCG§Ú•Í•Û•Ø•’•°•§•Î§´§È∆…§ﬂπ˛§Û§¿§Í°¢
-    CG_xxx§«∫Ó¿Æ§∑§øCG§Úª≤æ»§π§Î
+    ÊåáÂÆö„ÅÆÁï™Âè∑„ÅÆCG„Çí„É™„É≥„ÇØ„Éï„Ç°„Ç§„É´„Åã„ÇâË™≠„ÅøËæº„Çì„Å†„Çä„ÄÅ
+    CG_xxx„Åß‰ΩúÊàê„Åó„ÅüCG„ÇíÂèÇÁÖß„Åô„Çã
     
-  @param no: ∆…§ﬂπ˛§‡CG»÷πÊ
-  @param refinc: ª≤æ»•´•¶•Û•ø§Ú¡˝§‰§π§´§…§¶§´°£
-                 sprite§´§Èª≤æ»§µ§Ï§Î§»§≠§œ¡˝§‰§∑°¢CG_xxx§Ú∫Ó§Îª˛§À
-                 ª≤æ»§µ§Ï§Î§»§≠§œ¡˝§‰§µ§ §§°£
+  @param no: Ë™≠„ÅøËæº„ÇÄCGÁï™Âè∑
+  @param refinc: ÂèÇÁÖß„Ç´„Ç¶„É≥„Çø„ÇíÂ¢ó„ÇÑ„Åô„Åã„Å©„ÅÜ„Åã„ÄÇ
+                 sprite„Åã„ÇâÂèÇÁÖß„Åï„Çå„Çã„Å®„Åç„ÅØÂ¢ó„ÇÑ„Åó„ÄÅCG_xxx„Çí‰Ωú„ÇãÊôÇ„Å´
+                 ÂèÇÁÖß„Åï„Çå„Çã„Å®„Åç„ÅØÂ¢ó„ÇÑ„Åï„Å™„ÅÑ„ÄÇ
 */
 cginfo_t *scg_loadcg_no(int no, boolean refinc) {
 	cginfo_t *i;
@@ -69,8 +69,8 @@ cginfo_t *scg_loadcg_no(int no, boolean refinc) {
 		return NULL;
 	}
 	
-	// §π§«§À •Ì°º•…§µ§Ï§∆§§§Î§´°¢CG_xxx §«∫Ó¿Æ§∫§ﬂ§ŒæÏπÁ§œ
-	// ª≤æ»•´•¶•Û•ø§Ú¡˝§‰§π
+	// „Åô„Åß„Å´ „É≠„Éº„Éâ„Åï„Çå„Å¶„ÅÑ„Çã„Åã„ÄÅCG_xxx „Åß‰ΩúÊàê„Åö„Åø„ÅÆÂ†¥Âêà„ÅØ
+	// ÂèÇÁÖß„Ç´„Ç¶„É≥„Çø„ÇíÂ¢ó„ÇÑ„Åô
 	if (cgs[no] != NULL) {
 		if (refinc) {
 			cgs[no]->refcnt++;
@@ -94,7 +94,7 @@ cginfo_t *scg_loadcg_no(int no, boolean refinc) {
 	return i;
 }
 
-//  ªÿƒÍ§Œ¬Á§≠§µ°¢øß§Œ∂Î∑¡§Œ CG §Ú∫Ó¿Æ
+//  ÊåáÂÆö„ÅÆÂ§ß„Åç„Åï„ÄÅËâ≤„ÅÆÁü©ÂΩ¢„ÅÆ CG „Çí‰ΩúÊàê
 int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
 	cginfo_t *i;
 	
@@ -108,7 +108,7 @@ int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int 
 	gr_fill(i->sf, 0, 0, wWidth, wHeight, wR, wG, wB);
 	gr_fill_alpha_map(i->sf, 0, 0, wWidth, wHeight, wBlendRate);
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
@@ -116,7 +116,7 @@ int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int 
 	return OK;
 }
 
-// ªÿƒÍ§ŒCG§Ú»ø≈æ§µ§ª§øCG§Ú∫Ó¿Æ
+// ÊåáÂÆö„ÅÆCG„ÇíÂèçËª¢„Åï„Åõ„ÅüCG„Çí‰ΩúÊàê
 int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) {
 	cginfo_t *i, *srccg;
 	surface_t *src;
@@ -124,7 +124,7 @@ int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) 
 	spcg_assert_no(wNumCG);
 	spcg_assert_no(wNumSrcCG);
 	
-	// ∏µ§À§π§ÎCG§Úª≤æ» (LINKCG§ §È∆…§ﬂπ˛§ﬂ)
+	// ÂÖÉ„Å´„Åô„ÇãCG„ÇíÂèÇÁÖß (LINKCG„Å™„ÇâË™≠„ÅøËæº„Åø)
 	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
@@ -136,7 +136,7 @@ int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) 
 	
 	src = srccg->sf;
 	i->sf = stretch(src, src->width, src->height, (wReverseX << 1) | wReverseY);
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
@@ -144,7 +144,7 @@ int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) 
 	return OK;
 }
 
-// ªÿƒÍ§ŒCG§Ú≥»¬Á/ΩÃæÆ§∑§øCG§Ú∫Ó¿Æ
+// ÊåáÂÆö„ÅÆCG„ÇíÊã°Â§ß/Á∏ÆÂ∞è„Åó„ÅüCG„Çí‰ΩúÊàê
 int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	cginfo_t *i, *srccg;
 	surface_t *src;
@@ -152,7 +152,7 @@ int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	spcg_assert_no(wNumCG);
 	spcg_assert_no(wNumSrcCG);
 
-	// ∏µ§À§π§ÎCG§Úª≤æ» (LINKCG§ §È∆…§ﬂπ˛§ﬂ)
+	// ÂÖÉ„Å´„Åô„ÇãCG„ÇíÂèÇÁÖß (LINKCG„Å™„ÇâË™≠„ÅøËæº„Åø)
 	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
@@ -165,7 +165,7 @@ int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	src = srccg->sf;
 	i->sf = stretch(src, wWidth, wHeight, 0);
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
@@ -173,7 +173,7 @@ int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	return OK;
 }
 
-// •Ÿ°º•πCG§ŒæÂ§À•÷•Ï•Û•…CG§ÚΩ≈§Õ§ø CG §Ú∫Ó¿Æ
+// „Éô„Éº„ÇπCG„ÅÆ‰∏ä„Å´„Éñ„É¨„É≥„ÉâCG„ÇíÈáç„Å≠„Åü CG „Çí‰ΩúÊàê
 int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode) {
 	cginfo_t *i, *basecg, *blendcg;
 	
@@ -181,7 +181,7 @@ int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlen
 	spcg_assert_no(wNumBaseCG);
 	spcg_assert_no(wNumBlendCG);
 	
-	// ∏µ§À§π§ÎCG§Úª≤æ» (LINKCG§ §È∆…§ﬂπ˛§ﬂ)
+	// ÂÖÉ„Å´„Åô„ÇãCG„ÇíÂèÇÁÖß (LINKCG„Å™„ÇâË™≠„ÅøËæº„Åø)
 	basecg  = scg_loadcg_no(wNumBaseCG, FALSE);
 	blendcg = scg_loadcg_no(wNumBlendCG, FALSE);
 	if (basecg == NULL || blendcg == NULL) return NG;
@@ -193,7 +193,7 @@ int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlen
 	
 	i->sf = blend(basecg->sf, wX , wY, blendcg->sf, wAlphaMapMode);
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
@@ -201,7 +201,7 @@ int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlen
 	return OK;
 }
 
-// ªÿƒÍ§Œ ∏ª˙ŒÛ§ŒCG§Ú∫Ó¿Æ
+// ÊåáÂÆö„ÅÆÊñáÂ≠óÂàó„ÅÆCG„Çí‰ΩúÊàê
 int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) {
 	cginfo_t *i;
 	agsurface_t *glyph;
@@ -215,7 +215,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) 
 	
 	spcg_assert_no(wNumCG);
 	
-	// æ°ºÍ§ÀΩ–§∆§§§§§Œ§´§ °©
+	// ÂãùÊâã„Å´Âá∫„Å¶„ÅÑ„ÅÑ„ÅÆ„Åã„Å™Ôºü
 	if (strlen(cText) == 0) return OK;
 	
 	font = nact->ags.font;
@@ -231,7 +231,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) 
 	gr_fill(i->sf, 0, 0, glyph->width, wSize, wR, wG, wB);
 	gr_draw_amap(i->sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
@@ -239,7 +239,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) 
 	return OK;
 }
 
-// øÙª˙ ∏ª˙ŒÛ§ŒCG§Ú∫Ó¿Æ
+// Êï∞Â≠óÊñáÂ≠óÂàó„ÅÆCG„Çí‰ΩúÊàê
 int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue) {
 	cginfo_t *i;
 	agsurface_t *glyph;
@@ -269,7 +269,7 @@ int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs,
 	gr_fill(i->sf, 0, 0, glyph->width, wSize, wR, wG, wB);
 	gr_draw_amap(i->sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
@@ -277,14 +277,14 @@ int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs,
 	return OK;
 }
 
-// CG§Ú £¿Ω
+// CG„ÇíË§áË£Ω
 int scg_copy(int wNumDstCG, int wNumSrcCG) {
 	cginfo_t *i, *srccg;
 	
 	spcg_assert_no(wNumDstCG);
 	spcg_assert_no(wNumSrcCG);
 	
-	// ∏µ§À§π§ÎCG§Úª≤æ» (LINKCG§ §È∆…§ﬂπ˛§ﬂ)
+	// ÂÖÉ„Å´„Åô„ÇãCG„ÇíÂèÇÁÖß (LINKCG„Å™„ÇâË™≠„ÅøËæº„Åø)
 	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
@@ -295,7 +295,7 @@ int scg_copy(int wNumDstCG, int wNumSrcCG) {
 	i->refcnt = 0;
 	i->sf = sf_dup(srccg->sf);
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
@@ -303,7 +303,7 @@ int scg_copy(int wNumDstCG, int wNumSrcCG) {
 	return OK;
 }
 
-// CG§Œ∞Ï…Ù§Ú¿⁄§Í§Ã§§§øCG§Ú∫Ó¿Æ
+// CG„ÅÆ‰∏ÄÈÉ®„ÇíÂàá„Çä„Å¨„ÅÑ„ÅüCG„Çí‰ΩúÊàê
 int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
 	cginfo_t *i, *srccg;
 	surface_t *dst, *src;
@@ -311,7 +311,7 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 	spcg_assert_no(wNumDstCG);
 	spcg_assert_no(wNumSrcCG);
 	
-	// ∏µ§À§π§ÎCG§Úª≤æ» (LINKCG§ §È∆…§ﬂπ˛§ﬂ)
+	// ÂÖÉ„Å´„Åô„ÇãCG„ÇíÂèÇÁÖß (LINKCG„Å™„ÇâË™≠„ÅøËæº„Åø)
 	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
@@ -336,7 +336,7 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 	
 	i->sf = dst;
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
@@ -344,7 +344,7 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 	return OK;
 }
 
-// ∏µ§ŒCG§Œ∞Ï…Ù§Ú¿⁄§Í§Ã§§§øCG§Ú∫Ó¿Æ
+// ÂÖÉ„ÅÆCG„ÅÆ‰∏ÄÈÉ®„ÇíÂàá„Çä„Å¨„ÅÑ„ÅüCG„Çí‰ΩúÊàê
 int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
 	cginfo_t *i, *srccg;
 	surface_t *dst, *src;
@@ -352,7 +352,7 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 	spcg_assert_no(wNumDstCG);
 	spcg_assert_no(wNumSrcCG);
 	
-	// ∏µ§À§π§ÎCG§Úª≤æ» (LINKCG§ §È∆…§ﬂπ˛§ﬂ)
+	// ÂÖÉ„Å´„Åô„ÇãCG„ÇíÂèÇÁÖß (LINKCG„Å™„ÇâË™≠„ÅøËæº„Åø)
 	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
@@ -379,7 +379,7 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 	
 	i->sf = dst;
 	
-	// §‚§∑¡∞§À∫Ó¿Æ§∑§ø§‚§Œ§¨§¢§Í°¢Ã§≥´ ¸§ŒæÏπÁ§œ≥´ ¸
+	// „ÇÇ„ÅóÂâç„Å´‰ΩúÊàê„Åó„Åü„ÇÇ„ÅÆ„Åå„ÅÇ„Çä„ÄÅÊú™ÈñãÊîæ„ÅÆÂ†¥Âêà„ÅØÈñãÊîæ
 	scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
@@ -387,7 +387,7 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 	return OK;
 }
 
-// ¡¥§∆§ŒCG§Œ≥´ ¸
+// ÂÖ®„Å¶„ÅÆCG„ÅÆÈñãÊîæ
 int scg_freeall() {
 	int i;
 	
@@ -398,8 +398,8 @@ int scg_freeall() {
 }
 
 /**
- * ªÿƒÍ§Œ»÷πÊ§Œ CG §Ú•™•÷•∏•ß•Ø•»•Í•π•»§´§Èæ√§∑°¢•™•÷•∏•ß•Ø•»§¨§…§≥§´§È§‚ª≤æ»
- * §µ§Ï§∆§§§ §§(ª≤æ»øÙ§¨0§Œ)æÏπÁ§Œ§ﬂ°¢•™•÷•∏•ß•Ø•»§Ú∫ÔΩ¸
+ * ÊåáÂÆö„ÅÆÁï™Âè∑„ÅÆ CG „Çí„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„É™„Çπ„Éà„Åã„ÇâÊ∂à„Åó„ÄÅ„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„Åå„Å©„Åì„Åã„Çâ„ÇÇÂèÇÁÖß
+ * „Åï„Çå„Å¶„ÅÑ„Å™„ÅÑ(ÂèÇÁÖßÊï∞„Åå0„ÅÆ)Â†¥Âêà„ÅÆ„Åø„ÄÅ„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„ÇíÂâäÈô§
  */
 int scg_free(int no) {
 	cginfo_t *cg;
@@ -408,36 +408,36 @@ int scg_free(int no) {
 	
 	if (NULL == (cg = cgs[no])) return NG;
 	
-	// ª≤æ»øÙ§¨0§Œª˛§Œ§ﬂ•™•÷•∏•ß•Ø•»§Ú≥´ ¸
+	// ÂèÇÁÖßÊï∞„Åå0„ÅÆÊôÇ„ÅÆ„Åø„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„ÇíÈñãÊîæ
 	if (cg->refcnt == 0) {
 		scg_free_cgobj(cg);
 	}
 	
-	// »÷πÊ§«æ√§∑§ø§»§≠§œ•™•÷•∏•ß•Ø•»§¨≥´ ¸§µ§Ï§ §Ø§∆§‚
-	// •™•÷•∏•ß•Ø•»•Í•π•»§´§È∫ÔΩ¸
+	// Áï™Âè∑„ÅßÊ∂à„Åó„Åü„Å®„Åç„ÅØ„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„ÅåÈñãÊîæ„Åï„Çå„Å™„Åè„Å¶„ÇÇ
+	// „Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„É™„Çπ„Éà„Åã„ÇâÂâäÈô§
 	cgs[no] = NULL;
 	
 	return OK;
 }
 
 /**
- * CG •™•÷•∏•ß•Ø•»§Œ≥´ ¸
+ * CG „Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„ÅÆÈñãÊîæ
  */
 int scg_free_cgobj(cginfo_t *cg) {
 	if (cg == NULL) return NG;
 	
 	(cg->refcnt)--;
-	// ¬æ§«§ﬁ§¿ª≤æ»§∑§∆§§§Ï§–≥´ ¸§∑§ §§
+	// ‰ªñ„Åß„Åæ„Å†ÂèÇÁÖß„Åó„Å¶„ÅÑ„Çå„Å∞ÈñãÊîæ„Åó„Å™„ÅÑ
 	if (cg->refcnt > 0) {
 		return NG;
 	}
 	
-	// CGÀ‹¬Œ§Œ≥´ ¸
+	// CGÊú¨‰Ωì„ÅÆÈñãÊîæ
 	if (cg->sf) {
 		sf_free(cg->sf);
 	}
 	
-	// ∫ÔΩ¸§π§Î•™•÷•∏•ß•Ø•»§Úª≤æ»§∑§∆§§§Î•™•÷•∏•ß•Ø•»•Í•π•»§‚∫ÔΩ¸
+	// ÂâäÈô§„Åô„Çã„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„ÇíÂèÇÁÖß„Åó„Å¶„ÅÑ„Çã„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„É™„Çπ„Éà„ÇÇÂâäÈô§
 	if (cg == cgs[cg->no]) {
 		cgs[cg->no] = NULL;
 	}
@@ -447,7 +447,7 @@ int scg_free_cgobj(cginfo_t *cg) {
 	return OK;
 }
 
-// CG§ŒºÔŒ‡§ÚºË∆¿
+// CG„ÅÆÁ®ÆÈ°û„ÇíÂèñÂæó
 int scg_querytype(int wNumCG, int *ret) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;
@@ -461,7 +461,7 @@ int scg_querytype(int wNumCG, int *ret) {
 	return NG;
 }
 
-// CG§Œ¬Á§≠§µ§ÚºË∆¿
+// CG„ÅÆÂ§ß„Åç„Åï„ÇíÂèñÂæó
 int scg_querysize(int wNumCG, int *w, int *h) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;
@@ -477,7 +477,7 @@ int scg_querysize(int wNumCG, int *w, int *h) {
 	return NG;
 }
 
-// CG§ŒBPP§ÚºË∆¿
+// CG„ÅÆBPP„ÇíÂèñÂæó
 int scg_querybpp(int wNumCG, int *ret) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;
@@ -492,7 +492,7 @@ int scg_querybpp(int wNumCG, int *ret) {
 	return NG;
 }
 
-// CG§Œ alphamap §¨¬∏∫ﬂ§π§Î§´§ÚºË∆¿
+// CG„ÅÆ alphamap „ÅåÂ≠òÂú®„Åô„Çã„Åã„ÇíÂèñÂæó
 int scg_existalphamap(int wNumCG, int *ret) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;

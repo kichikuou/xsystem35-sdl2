@@ -5,22 +5,22 @@ static surface_t *blend(surface_t *base, int x, int y, surface_t *blend, int mod
 	gr_copy(dst, 0, 0, base, 0, 0, base->width, base->height);
 	
 	if (base->has_alpha) {
-		// ¥Ù¡¼¥¹¤Ë alpha map ¤¬¤¢¤ë¾ì¹ç¤Ï¤½¤ì¤ò¥³¥Ô¡¼
+		// ãƒ™ãƒ¼ã‚¹ã« alpha map ãŒã‚ã‚‹å ´åˆã¯ãã‚Œã‚’ã‚³ãƒ”ãƒ¼
 		gr_copy_alpha_map(dst, 0, 0, base, 0, 0, base->width, base->height);
 	} else {
-		// Ìµ¤¤¾ì¹ç¤ÏÁ´¤Æ 255 ¤Î map ¤òºîÀ®
+		// ç„¡ã„å ´åˆã¯å…¨ã¦ 255 ã® map ã‚’ä½œæˆ
 		gr_fill_alpha_map(dst, 0, 0, base->width, base->height, 255);
 	}
 	
 	if (blend->has_alpha) {
-		// ½Å¤Í¹ç¤ï¤»Àè¤Î alpha map ¤¬¤¢¤ë¤È¤­¤Ï¤½¤ì¤ò»È¤¦
+		// é‡ã­åˆã‚ã›å…ˆã® alpha map ãŒã‚ã‚‹ã¨ãã¯ãã‚Œã‚’ä½¿ã†
 		gre_BlendUseAMap(dst, x, y, base, x, y, blend, 0, 0, blend->width, blend->height, blend, 0, 0, 255);
 	} else {
-		// Ìµ¤¤¤È¤­¤Ï dst ¤Î alpha map ¤ò»È¤¦
+		// ç„¡ã„ã¨ãã¯ dst ã® alpha map ã‚’ä½¿ã†
 		gre_BlendUseAMap(dst, x, y, base, x, y, blend, 0, 0, blend->width, blend->height, dst, x, y, 255);
 	}
 	
-	// alpha ºîÀ®¥â¡¼¥É¤¬ dst + blend ¤Î»þ¤ÏË°ÏÂ²Ã»»
+	// alpha ä½œæˆãƒ¢ãƒ¼ãƒ‰ãŒ dst + blend ã®æ™‚ã¯é£½å’ŒåŠ ç®—
 	if (mode == 1) {
 		gr_saturadd_alpha_map(dst, x, y, blend, 0, 0, blend->width, blend->height);
 	}

@@ -32,7 +32,7 @@ typedef struct {
 	snd_async_handler_t *async_handler;
 	char *dev;
   
-	boolean automixer;  // ¼«Æ°Åª¤Ë pcmdevice ¤ËÀÜÂ³¤µ¤ì¤Æ¤¤¤ë mixer ¤òÃµ¤¹¤«¡© 
+	boolean automixer;  // è‡ªå‹•çš„ã« pcmdevice ã«æ¥ç¶šã•ã‚Œã¦ã„ã‚‹ mixer ã‚’æ¢ã™ã‹ï¼Ÿ 
 	
 	int silence;
 

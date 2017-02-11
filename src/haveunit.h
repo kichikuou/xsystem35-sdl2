@@ -11,7 +11,7 @@
 #define t3DN	(1<<2)
 #define tSSE	(1<<3)
 #define tCMOV	(1<<4)
-#define tE3DN	(1<<5)	/* AthlonÍÑ(Externd 3D Now!) */
+#define tE3DN	(1<<5)	/* Athlonç”¨(Externd 3D Now!) */
 #define tEMMX   (1<<6)  /* EMMX=E3DNow!_INT=SSE_INT  */
 #define tINTEL	(1<<8)
 #define tAMD	(1<<9)
@@ -19,35 +19,35 @@
 #define tIDT	(1<<11)
 #define tMULTI	(1<<12)	/* for Multi-threaded encoder. */
 		/* Never set on UP or in the binary linked w/o multithread lib. */
-#define tUNKNOWN	(1<<15)	/* ¥Ù¥ó¥À¡¼ÉÔÌÀ */
-#define tSPC1 (1<<16)	/* ÆÃÊÌ¤Ê¥¹¥¤¥Ã¥Á */
-#define tSPC2 (1<<17)	/* ÍÑÅÓ¤Ï·è¤Þ¤Ã¤Æ¤Ê¤¤ */
+#define tUNKNOWN	(1<<15)	/* ãƒ™ãƒ³ãƒ€ãƒ¼ä¸æ˜Ž */
+#define tSPC1 (1<<16)	/* ç‰¹åˆ¥ãªã‚¹ã‚¤ãƒƒãƒ */
+#define tSPC2 (1<<17)	/* ç”¨é€”ã¯æ±ºã¾ã£ã¦ãªã„ */
 
-#define tFAMILY4	(1<<20)	/* 486 ¤³¤Î»þ¥Ù¥ó¥À¡¼È½Äê¤ÏÅö¤Æ¤Ë¤Ê¤é¤Ê¤¤ */
+#define tFAMILY4	(1<<20)	/* 486 ã“ã®æ™‚ãƒ™ãƒ³ãƒ€ãƒ¼åˆ¤å®šã¯å½“ã¦ã«ãªã‚‰ãªã„ */
 #define tFAMILY5	(1<<21)	/* 586 (P5, P5-MMX, K6, K6-2, K6-III) */
-#define tFAMILY6	(1<<22)	/* 686°Ê¹ß P-Pro, P-II, P-III, Athlon */
+#define tFAMILY6	(1<<22)	/* 686ä»¥é™ P-Pro, P-II, P-III, Athlon */
 
 /*
- *	ÅëºÜ¤·¤Æ¤¤¤ë¥æ¥Ë¥Ã¥È¤Ë½¾¤Ã¤Æ¾å¤ÎÃÍ¤ÎÏÀÍýÏÂ¤òÊÖ¤¹
- *	chkcpu.asm¤È¤ÎÀ°¹çÀ­Ãí°Õ
+ *	æ­è¼‰ã—ã¦ã„ã‚‹ãƒ¦ãƒ‹ãƒƒãƒˆã«å¾“ã£ã¦ä¸Šã®å€¤ã®è«–ç†å’Œã‚’è¿”ã™
+ *	chkcpu.asmã¨ã®æ•´åˆæ€§æ³¨æ„
  */
 
 int haveUNIT(void);
 
 /*
- *	useUNIT¤Ë½¾¤Ã¤Æ´Ø¿ô¤Î»ÈÍÑ¤òÊÑ¹¹¤¹¤ë
+ *	useUNITã«å¾“ã£ã¦é–¢æ•°ã®ä½¿ç”¨ã‚’å¤‰æ›´ã™ã‚‹
  */
 
 void setupUNIT(int useUNIT);
 
 /*
- *	SSE¤ò»Í¼Î¸ÞÆþ¥â¡¼¥É¤Ë¤¹¤ë
+ *	SSEã‚’å››æ¨äº”å…¥ãƒ¢ãƒ¼ãƒ‰ã«ã™ã‚‹
  */
 
 void setPIII_round(void);
 
  /*
- *	»ÈÍÑ´Ø¿ô¤ÎÉ½¼¨(¥Ç¥Ð¥Ã¥°ÍÑ)
+ *	ä½¿ç”¨é–¢æ•°ã®è¡¨ç¤º(ãƒ‡ãƒãƒƒã‚°ç”¨)
  */
 
 void SETUP_DSP(char *mes);

@@ -1,5 +1,5 @@
 /*
- * nact.c ¥·¥Ê¥ê¥ª¥Ç¡¼¥¿¤Î²òÀÏ
+ * nact.c ã‚·ãƒŠãƒªã‚ªãƒ‡ãƒ¼ã‚¿ã®è§£æ
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -39,13 +39,13 @@
 
 /*
 
-SCO¤Ç¤Î¥³¡¼¥É   ZH 0          ZH 1
-È¾³Ñ¥«¥Ê       Á´³ÑÊ¿²¾Ì¾   È¾³Ñ¥«¥Ê
-Á´³ÑÊ¿²¾Ì¾     Á´³ÑÊ¿²¾Ì¾   Á´³ÑÊ¿²¾Ì¾
-Á´³ÑÊÒ²¾Ì¾     Á´³ÑÊÒ²¾Ì¾   È¾³Ñ¥«¥Ê
+SCOã§ã®ã‚³ãƒ¼ãƒ‰   ZH 0          ZH 1
+åŠè§’ã‚«ãƒŠ       å…¨è§’å¹³ä»®å   åŠè§’ã‚«ãƒŠ
+å…¨è§’å¹³ä»®å     å…¨è§’å¹³ä»®å   å…¨è§’å¹³ä»®å
+å…¨è§’ç‰‡ä»®å     å…¨è§’ç‰‡ä»®å   åŠè§’ã‚«ãƒŠ
 
-MS ¥³¥Ş¥ó¥É: É½¼¨»ş¤Î ZH ¤Ë°ÍÂ¸, MS cali,str(:) ¤Îstr¤Ï¾ï¤ËÁ´³ÑÊ¸»ú¤¬³ÊÇ¼.
-MG ¥³¥Ş¥ó¥É: É½¼¨»ş¤Î ZH ¤Ë°ÍÂ¸
+MS ã‚³ãƒãƒ³ãƒ‰: è¡¨ç¤ºæ™‚ã® ZH ã«ä¾å­˜, MS cali,str(:) ã®strã¯å¸¸ã«å…¨è§’æ–‡å­—ãŒæ ¼ç´.
+MG ã‚³ãƒãƒ³ãƒ‰: è¡¨ç¤ºæ™‚ã® ZH ã«ä¾å­˜
 
 */
 
@@ -58,21 +58,21 @@ extern char *hankana2sjis(int index);
 extern void check_command(int c0);
 /* defined by cmdv.c */
 extern void va_animation();
-/* ¥³¥Ş¥ó¥É²òÀÏ»ş¤ÎÅ¸³«¥Ğ¥Ã¥Õ¥¡ */
+/* ã‚³ãƒãƒ³ãƒ‰è§£ææ™‚ã®å±•é–‹ãƒãƒƒãƒ•ã‚¡ */
 static char msgbuf[512];
-/* È¾³Ñ¥â¡¼¥É */
-static int msg_msgHankakuMode = 0; /* 0:Á´³Ñ 1:È¾³Ñ, 2: ÌµÊÑ´¹ */
+/* åŠè§’ãƒ¢ãƒ¼ãƒ‰ */
+static int msg_msgHankakuMode = 0; /* 0:å…¨è§’ 1:åŠè§’, 2: ç„¡å¤‰æ› */
 
-/* ¥²¡¼¥à¥·¥¹¥Æ¥à¾ğÊó */
+/* ã‚²ãƒ¼ãƒ ã‚·ã‚¹ãƒ†ãƒ æƒ…å ± */
 static NACTINFO nactprv;
 NACTINFO *nact = &nactprv;
 
-/* ¥á¥Ã¥»¡¼¥¸¤ÎÈ¾³Ñ²½ */
+/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®åŠè§’åŒ– */
 void sys_setHankakuMode(int mode) {
 	msg_msgHankakuMode = mode;
 }
 
-/* Ê¸»úÎó¤Î¼è¤ê½Ğ¤· */
+/* æ–‡å­—åˆ—ã®å–ã‚Šå‡ºã— */
 char *sys_getString(char term) {
 	int c0;
 	char *index = msgbuf;
@@ -84,7 +84,7 @@ char *sys_getString(char term) {
 	return msgbuf;
 }
 
-/* ÆÃ¼ì const string */
+/* ç‰¹æ®Š const string */
 char *sys_getConstString() {
 	int c0;
 	char *index = msgbuf;
@@ -99,7 +99,7 @@ char *sys_getConstString() {
 	return msgbuf;
 }
 
-/* ²Ã¹©ºÑ¤ß(È¾¥«¥Ê->Á´¥«¥Ê) Ê¸»úÎóÃê½Ğ */
+/* åŠ å·¥æ¸ˆã¿(åŠã‚«ãƒŠ->å…¨ã‚«ãƒŠ) æ–‡å­—åˆ—æŠ½å‡º */
 char* sys_getConvString(char term) {
 	int c0;
 	char *index = msgbuf;
@@ -121,7 +121,7 @@ char* sys_getConvString(char term) {
 	return msgbuf;
 }
 
-/* ÁªÂò»è¡¦ÄÌ¾ï¥á¥Ã¥»¡¼¥¸¿¶¤êÊ¬¤± */
+/* é¸æŠè‚¢ãƒ»é€šå¸¸ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æŒ¯ã‚Šåˆ†ã‘ */
 void sys_addMsg(char *str) {
 	char *msg = NULL;
 
@@ -137,10 +137,10 @@ void sys_addMsg(char *str) {
 	}
 	
 	if (nact->sel.in_setting) {
-		// ÁªÂò»è¤Î¥Ğ¥Ã¥Õ¥¡¤Ø
+		// é¸æŠè‚¢ã®ãƒãƒƒãƒ•ã‚¡ã¸
 		sel_addElement(msg);
 	} else {
-		// ÄÌ¾ï¤Î¥á¥Ã¥»¡¼¥¸
+		// é€šå¸¸ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 		DEBUG_MESSAGE("%s", msg);
 		if (nact->is_msg_out) {
 			msg_putMessage(msg);
@@ -155,7 +155,7 @@ void sys_addMsg(char *str) {
 	}
 }
 
-/* Ê¸»úÎóÃê½Ğ */
+/* æ–‡å­—åˆ—æŠ½å‡º */
 static int checkMessage() {
 	char *index = msgbuf;
 	int c0 = sl_getc();

@@ -1,5 +1,5 @@
 /*
- * ags.c  system35¤Î¥°¥é¥Õ¥£¥Ã¥¯¥Ö¥ê¥Ã¥¸
+ * ags.c  system35ã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒ–ãƒªãƒƒã‚¸
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -51,7 +51,7 @@ static boolean intersects(MyRectangle *r1, MyRectangle *r2);
 static Pallet256 pal_256;
 static boolean need_update = TRUE;
 static boolean fade_outed = FALSE;
-static int cursor_move_time = 50; /* ¥«¡¼¥½¥ë°ÜÆ°¤Ë¤«¤«¤ë»ş´Ö(ms) */
+static int cursor_move_time = 50; /* ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•ã«ã‹ã‹ã‚‹æ™‚é–“(ms) */
 
 static void initPal(Pallet256 *pal) {
 	int i;
@@ -127,7 +127,7 @@ boolean ags_check_param_xy(int *x, int *y) {
 }
 
 void ags_init() {
-	nact->sys_mouse_movesw = 2; /* 0:IZ¤òÌµ»ë, 1: Ä¾ÀÜ»ØÄê¾ì½ê¤Ø, 2: ¥¹¥à¡¼¥º¤Ë»ØÄê¾ì½ê¤Ë */
+	nact->sys_mouse_movesw = 2; /* 0:IZã‚’ç„¡è¦–, 1: ç›´æ¥æŒ‡å®šå ´æ‰€ã¸, 2: ã‚¹ãƒ ãƒ¼ã‚ºã«æŒ‡å®šå ´æ‰€ã« */
 	nact->sys_pal = &pal_256;
 	nact->sys_world_size.width  =  SYS35_DEFAULT_WIDTH;
 	nact->sys_world_size.height =  SYS35_DEFAULT_HEIGHT;
@@ -161,7 +161,7 @@ void ags_setWorldSize(int width, int height, int depth) {
 	nact->ags.dib->has_alpha = FALSE;
 	nact->ags.dib->has_pixel = TRUE;
 	
-	/* DIB¤¬8°Ê¾å¤Î¾ì¹ç¤Ï¡¢alpha plane ¤òÍÑ°Õ */
+	/* DIBãŒ8ä»¥ä¸Šã®å ´åˆã¯ã€alpha plane ã‚’ç”¨æ„ */
 	if (depth > 8) {
 		if (nact->ags.dib->alpha != NULL) {
 			g_free(nact->ags.dib->alpha);
@@ -303,7 +303,7 @@ void ags_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 	if (!check_param(&sx, &sy, &sw, &sh)) return;
 	if (!check_param(&dx, &dy, &dw, &dh)) return;
 	
-	DspDeviceSync(); /* Device°ÍÂ¸¤Î sync (ex. XSync()) */
+	DspDeviceSync(); /* Deviceä¾å­˜ã® sync (ex. XSync()) */
 	ScaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw);
 }
 
@@ -490,17 +490,17 @@ void ags_copyArea_whiteLevel(int sx, int sy, int w, int h, int dx, int dy, int l
 
 /*******************************************************
  *
- * special thanks to tajiri@wizard.elec.waseda.ac.jp¤µ¤ó
+ * special thanks to tajiri@wizard.elec.waseda.ac.jpã•ã‚“
  *
  *******************************************************/
-/* CP ¥³¥Ş¥ó¥É¤Î¼ÂÁõÍÑ. Æ±¤¸¿§¤Ç½ĞÍè¤¿ÎÎ°è¤ò»ØÄê¤µ¤ì¤¿
-   ¿§¤ÇÅÉ¤êÊÑ¤¨¤ë¡£
+/* CP ã‚³ãƒãƒ³ãƒ‰ã®å®Ÿè£…ç”¨. åŒã˜è‰²ã§å‡ºæ¥ãŸé ˜åŸŸã‚’æŒ‡å®šã•ã‚ŒãŸ
+   è‰²ã§å¡—ã‚Šå¤‰ãˆã‚‹ã€‚
 */
 static int floodColor;
 static int changeColor;
 static agsurface_t *__img;
-/*¤³¤ÎÁàºî¤Î¤¢¤È¤Ë¥¢¥Ã¥×¥Ç¡¼¥È¤¹¤ëÎÎ°è
-  (updatePointTop ¤È updatePointEnd¤Ç°Ï¤Ş¤ì¤¿Ä¹Êı·Á)
+/*ã“ã®æ“ä½œã®ã‚ã¨ã«ã‚¢ãƒƒãƒ—ãƒ‡ãƒ¼ãƒˆã™ã‚‹é ˜åŸŸ
+  (updatePointTop ã¨ updatePointEndã§å›²ã¾ã‚ŒãŸé•·æ–¹å½¢)
  */
 static MyPoint updatePointTop, updatePointEnd;
 
@@ -540,7 +540,7 @@ MyRectangle* ags_imageFlood(int x, int y, int c) {
 	updatePointTop.y = y;
 	updatePointEnd.x = x;
 	updatePointEnd.y = y;
-	/*Ä¾Àş¤Ï¤Ì¤ê¤Ê¤ª¤·¤¿¤ê¤·¤Ê¤¤¡ª¡ª*/
+	/*ç›´ç·šã¯ã¬ã‚ŠãªãŠã—ãŸã‚Šã—ãªã„ï¼ï¼*/
 	if ((x <= 0 || (*(dst - 1) != *(dst))) && ((x >= dib->width) || (*(dst + 1) != *dst)))
 		return NULL;
 	if ((y <= 0 || (*(dst - dib->bytes_per_line) != *(dst)))
@@ -637,7 +637,7 @@ void ags_alpha_setPixel(int x, int y, int w, int h, BYTE *b) {
 }
 
 /*
- * fade in/out ¤Î wait À©¸æ
+ * fade in/out ã® wait åˆ¶å¾¡
  */
 void ags_fader(ags_faderinfo_t *i) {
 	int cnt_st, step, key = 0, canceled_key = 0;
@@ -654,29 +654,29 @@ void ags_fader(ags_faderinfo_t *i) {
 		cnt1 = get_high_counter(SYSTEMCOUNTER_MSEC);
 		i->callback(step);
 		key = sys_getInputInfo();
-		/* ¼Âºİ¤Î fade ¤Ë¤«¤«¤Ã¤¿»ş´Ö */
+		/* å®Ÿéš›ã® fade ã«ã‹ã‹ã£ãŸæ™‚é–“ */
 		usleep(0); /* It's a magic !!! */
 		cnt2 = get_high_counter(SYSTEMCOUNTER_MSEC) - cnt1;
 		
-		lefttime = i->effect_time - (cnt1 + cnt2 - cnt_st); /* fade »Ä¤ê»ş´Ö */
-		leftstep = i->step_max - step;  /* fade »Ä¤ê¥¹¥Æ¥Ã¥×¿ô */
+		lefttime = i->effect_time - (cnt1 + cnt2 - cnt_st); /* fade æ®‹ã‚Šæ™‚é–“ */
+		leftstep = i->step_max - step;  /* fade æ®‹ã‚Šã‚¹ãƒ†ãƒƒãƒ—æ•° */
 		
-		if (lefttime <= 0) break;  /* »ş´ÖÀÚ¤ì */
+		if (lefttime <= 0) break;  /* æ™‚é–“åˆ‡ã‚Œ */
 		if (leftstep <= 0) break;
 		
-		mstime = lefttime / leftstep; /* 1step¤Ëµö¤µ¤ì¤ë»ş´Ö */
+		mstime = lefttime / leftstep; /* 1stepã«è¨±ã•ã‚Œã‚‹æ™‚é–“ */
 		if (mstime > cnt2) {
-			/* wait ¤ò¤¤¤ì¤ëÍ¾Íµ¤¬¤¢¤ë¾ì¹ç */
+			/* wait ã‚’ã„ã‚Œã‚‹ä½™è£•ãŒã‚ã‚‹å ´åˆ */
 			key = sys_keywait(mstime - cnt2, i->cancel);
 			step++;
 		} else if (mstime > 0) {
-			/* wait ¤ò¤¤¤ì¤ëÍ¾Íµ¤¬Ìµ¤¤¾ì¹ç */
+			/* wait ã‚’ã„ã‚Œã‚‹ä½™è£•ãŒç„¡ã„å ´åˆ */
 			step += ((cnt2+1) * leftstep / lefttime);
 			nact->callback();
 		} else {
 			break;
 		}
-		/* wait cancel ¤¬Í­¸ú¤Î¾ì¹ç */
+		/* wait cancel ãŒæœ‰åŠ¹ã®å ´åˆ */
 		if (i->cancel) {
 			if (key != 0) {
 				canceled_key = key;
@@ -783,7 +783,7 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 	MyPoint p;
 	if (!check_param_xy(&x, &y)) return;
 
-	/* DIB ºÂÉ½·Ï¤« Window ºÂÉ½·Ï¤« */
+	/* DIB åº§è¡¨ç³»ã‹ Window åº§è¡¨ç³»ã‹ */
 	if (is_dibgeo) {
 		x -= nact->sys_view_area.x;
 		y -= nact->sys_view_area.y;
@@ -851,7 +851,7 @@ int ags_getCursorMoveTime() {
 }
 
 /*
- * »ØÄê¤ÎÎÎ°è¤ËÁ´²èÌÌ¤òZoom
+ * æŒ‡å®šã®é ˜åŸŸã«å…¨ç”»é¢ã‚’Zoom
  * 
  */
 void ags_zoom(int x, int y, int w, int h) {

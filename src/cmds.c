@@ -26,15 +26,15 @@
 #include "xsystem35.h"
 #include "music_client.h"
 
-/* ¤Ñ¤Ë¤ç¡Á¤ó °Û¾ï¥·¥Ê¥ê¥ªÂĞºö */
+/* ã±ã«ã‚‡ã€œã‚“ ç•°å¸¸ã‚·ãƒŠãƒªã‚ªå¯¾ç­– */
 static boolean dummy_pcm_in_play = FALSE;
-/* Æ®¿ÀÅÔ»ÔII °Û¾ï¥·¥Ê¥ê¥ªÂĞºö */
+/* é—˜ç¥éƒ½å¸‚II ç•°å¸¸ã‚·ãƒŠãƒªã‚ªå¯¾ç­– */
 boolean dummy_pcm_su_flag = FALSE;
-/* ¼¡¤Î cdrom ¤Î loop ²ó¿ô */ 
+/* æ¬¡ã® cdrom ã® loop å›æ•° */ 
 static int next_cdrom_loopcnt = 0;
 
 void commandSS() {
-	/* ²»³Ú±éÁÕ¤ò³«»Ï¤¹¤ë¡Ê£Ã£Ä¤Î¤ß¡Ë*/
+	/* éŸ³æ¥½æ¼”å¥ã‚’é–‹å§‹ã™ã‚‹ï¼ˆï¼£ï¼¤ã®ã¿ï¼‰*/
 	int num = getCaliValue();
 	static int pre = 0;
 	
@@ -54,7 +54,7 @@ void commandSS() {
 }
 
 void commandSC() {
-	/* £Ã£Ä¤Î¥×¥ì¥¤Ãæ¤Î¥¿¥¤¥à¤ò¼èÆÀ¤¹¤ë */
+	/* ï¼£ï¼¤ã®ãƒ—ãƒ¬ã‚¤ä¸­ã®ã‚¿ã‚¤ãƒ ã‚’å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 	cd_time info;
 	
@@ -72,7 +72,7 @@ void commandSC() {
 }
 
 void commandSD() {
-	/* ²»³Ú±éÁÕ¤ò³«»Ï¤¹¤ë¡Ê¥Ç¥Õ¥©¥ë¥È¤Ï£Ã£Ä¡İ£Ä£Á¡Ë*/
+	/* éŸ³æ¥½æ¼”å¥ã‚’é–‹å§‹ã™ã‚‹ï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ï¼£ï¼¤âˆ’ï¼¤ï¼¡ï¼‰*/
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
@@ -80,14 +80,14 @@ void commandSD() {
 }
 
 void commandSR() {
-	/* ²»³Ú±éÁÕ¾ğÊó¤òÊÖ¤¹ (CD,MIDI)
-	   num   = ¥Ç¥Ğ¥¤¥¹¤Î»ØÄê (0=CD , 1=MIDI)
-	   var   = ±éÁÕ¶ÊÈÖ¹æ (0¤Î»ş¤Ï±éÁÕÄä»ßÃæ)
-	   var+1 = ¥ë¡¼¥×²ó¿ô
-	   var+2 = ±éÁÕ°ÌÃÖ
-	   var+3 = ¥Õ¥§¡¼¥É¥¤¥ó¡¿¥¢¥¦¥ÈÃæ
+	/* éŸ³æ¥½æ¼”å¥æƒ…å ±ã‚’è¿”ã™ (CD,MIDI)
+	   num   = ãƒ‡ãƒã‚¤ã‚¹ã®æŒ‡å®š (0=CD , 1=MIDI)
+	   var   = æ¼”å¥æ›²ç•ªå· (0ã®æ™‚ã¯æ¼”å¥åœæ­¢ä¸­)
+	   var+1 = ãƒ«ãƒ¼ãƒ—å›æ•°
+	   var+2 = æ¼”å¥ä½ç½®
+	   var+3 = ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ï¼ã‚¢ã‚¦ãƒˆä¸­
 	*/
-	/* Hushaby ¤«¤é SR,c,P:¤ËÊÑ¹¹¤«¡© */
+	/* Hushaby ã‹ã‚‰ SR,c,P:ã«å¤‰æ›´ã‹ï¼Ÿ */
 	int num, *var;
 	int c = sl_getcAt(sl_getIndex());
 	if (c < 0x40) {
@@ -115,7 +115,7 @@ void commandSR() {
 }
 
 void commandSL() {
-	/* ¼¡¤Î²»³Ú¤Î¥ë¡¼¥×²ó¿ô¤ò»ØÄê¤¹¤ë */
+	/* æ¬¡ã®éŸ³æ¥½ã®ãƒ«ãƒ¼ãƒ—å›æ•°ã‚’æŒ‡å®šã™ã‚‹ */
 	int num = getCaliValue();
 	
 	next_cdrom_loopcnt = num;
@@ -124,7 +124,7 @@ void commandSL() {
 }
 
 void commandSI() {
-	/* »ØÄê¤·¤¿²»¸»¤ÎÀÜÂ³¾õÂÖ¤ò var ¤Ë¼èÆÀ */
+	/* æŒ‡å®šã—ãŸéŸ³æºã®æ¥ç¶šçŠ¶æ…‹ã‚’ var ã«å–å¾— */
 	int type = sys_getc();
 	int *var = getCaliVariable();
 	
@@ -140,7 +140,7 @@ void commandSI() {
 }
 
 void commandSG() {
-	/* MIDI±éÁÕ */
+	/* MIDIæ¼”å¥ */
 	static int loopcnt = 0;
 	int sw  = sys_getc();
 	int num, fnum, *var;
@@ -148,13 +148,13 @@ void commandSG() {
 	
 	switch(sw) {
 	case 0:
-		/* ±éÁÕÃæ¤Î£Í£É£Ä£É¤òÄä»ß¤¹¤ë */
+		/* æ¼”å¥ä¸­ã®ï¼­ï¼©ï¼¤ï¼©ã‚’åœæ­¢ã™ã‚‹ */
 		num = getCaliValue();
 		mus_midi_stop();
 		DEBUG_COMMAND("SG0 %d:\n", num);
 		break;
 	case 1:
-		/* £Í£É£Ä£É¤ò±éÁÕ¤¹¤ë */
+		/* ï¼­ï¼©ï¼¤ï¼©ã‚’æ¼”å¥ã™ã‚‹ */
 		num = getCaliValue();
 		if (num == 0) {
 			mus_midi_stop();
@@ -165,7 +165,7 @@ void commandSG() {
 		DEBUG_COMMAND("SG1 %d:\n", num);
 		break;
 	case 2:
-		/* £Í£É£Ä£É±éÁÕ°ÌÃÖ¤ò1/100ÉÃÃ±°Ì¤Ç¼èÆÀ¤¹¤ë */
+		/* ï¼­ï¼©ï¼¤ï¼©æ¼”å¥ä½ç½®ã‚’1/100ç§’å˜ä½ã§å–å¾—ã™ã‚‹ */
 		var = getCaliVariable();
 		mus_midi_get_playposition(&st);
 		*var = st.loc_ms / 10;
@@ -174,17 +174,17 @@ void commandSG() {
 	case 3:
 		num = getCaliValue();
 		if (num == 0) {
-			/* ±éÁÕÃæ¤Î£Í£É£Ä£É¤ò°ì»şÄä»ß¤¹¤ë */
+			/* æ¼”å¥ä¸­ã®ï¼­ï¼©ï¼¤ï¼©ã‚’ä¸€æ™‚åœæ­¢ã™ã‚‹ */
 			mus_midi_pause();
 		} else {
-			/* °ì»şÄä»ßÃæ¤Î£Í£É£Ä£É¤Î°ì»şÄä»ß¤ò²ò½ü¤¹¤ë */
+			/* ä¸€æ™‚åœæ­¢ä¸­ã®ï¼­ï¼©ï¼¤ï¼©ã®ä¸€æ™‚åœæ­¢ã‚’è§£é™¤ã™ã‚‹ */
 			mus_midi_unpause();
 		}
 		DEBUG_COMMAND("SG3 %d:\n", num);
 		break;
 	case 4:
 		num = getCaliValue();
-		/* ¼¡¤ÎSG1¥³¥Ş¥ó¥É¤Ç¤ÎMIDI±éÁÕ¤Î·«¤êÊÖ¤·²ó¿ô»ØÄê */
+		/* æ¬¡ã®SG1ã‚³ãƒãƒ³ãƒ‰ã§ã®MIDIæ¼”å¥ã®ç¹°ã‚Šè¿”ã—å›æ•°æŒ‡å®š */
 		loopcnt = num;
 		DEBUG_COMMAND("SG4 %d:\n", num);
 		break;
@@ -223,7 +223,7 @@ void commandSG() {
 }
 
 void commandSP() {
-	/* £Ğ£Ã£Í¥Ç¡¼¥¿¤ò±éÁÕ¤¹¤ë */
+	/* ï¼°ï¼£ï¼­ãƒ‡ãƒ¼ã‚¿ã‚’æ¼”å¥ã™ã‚‹ */
 	int no = getCaliValue();
 	int loop = getCaliValue();
 
@@ -242,7 +242,7 @@ void commandSP() {
 }
 
 void commandST() {
-	/* £Ğ£Ã£Í¥Ç¡¼¥¿¤Î±éÁÕ¤òÄä»ß¤¹¤ë¡£ */
+	/* ï¼°ï¼£ï¼­ãƒ‡ãƒ¼ã‚¿ã®æ¼”å¥ã‚’åœæ­¢ã™ã‚‹ã€‚ */
 	int time = getCaliValue();
 	
 	DEBUG_COMMAND("ST %d:\n",time);
@@ -254,7 +254,7 @@ void commandST() {
 }
 
 void commandSU() {
-	/* £Ğ£Ã£Í¤Î±éÁÕ¾õÂÖ¤òÊÑ¿ô var1 , var2 ¤ËÊÖ¤¹ */
+	/* ï¼°ï¼£ï¼­ã®æ¼”å¥çŠ¶æ…‹ã‚’å¤‰æ•° var1 , var2 ã«è¿”ã™ */
 	int *var1 = getCaliVariable();
 	int *var2 = getCaliVariable();
 
@@ -278,7 +278,7 @@ void commandSU() {
 }
 
 void commandSQ() {
-	/* º¸±¦ÊÌ¡¹¤Î£Ğ£Ã£Í¥Ç¡¼¥¿¤ò¹çÀ®¤·¤Æ±éÁÕ¤¹¤ë */
+	/* å·¦å³åˆ¥ã€…ã®ï¼°ï¼£ï¼­ãƒ‡ãƒ¼ã‚¿ã‚’åˆæˆã—ã¦æ¼”å¥ã™ã‚‹ */
 	int noL  = getCaliValue();
 	int noR  = getCaliValue();
 	int loop = getCaliValue();
@@ -298,14 +298,14 @@ void commandSQ() {
 }
 
 void commandSO() {
-	// £Ğ£Ã£Í¥Ç¥Ğ¥¤¥¹¤Î¥µ¥İ¡¼¥È¾ğÊó¤ò¼èÆÀ
+	// ï¼°ï¼£ï¼­ãƒ‡ãƒã‚¤ã‚¹ã®ã‚µãƒãƒ¼ãƒˆæƒ…å ±ã‚’å–å¾—
 	int *var = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("SO %p:\n",var);
 }
 
 void commandSW() {
-	/* »ØÄê¥Ç¡¼¥¿·Á¼°¤¬±éÁÕ½ĞÍè¤ë¤«¥Á¥§¥Ã¥¯¤¹¤ë¡¥*/
+	/* æŒ‡å®šãƒ‡ãƒ¼ã‚¿å½¢å¼ãŒæ¼”å¥å‡ºæ¥ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹ï¼*/
 	int *var    = getCaliVariable();
 	int channel = getCaliValue();
 	int Srate   = getCaliValue();
@@ -330,7 +330,7 @@ void commandSW() {
 }
 
 void commandSM() {
-	/* £Ğ£Ã£Í¥Ç¡¼¥¿¤ò¥á¥â¥ê¾å¤Ë¾è¤»¤ë¡£*/
+	/* ï¼°ï¼£ï¼­ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ¡ãƒ¢ãƒªä¸Šã«ä¹—ã›ã‚‹ã€‚*/
 	int no = getCaliValue();
 	DEBUG_COMMAND("SM %d:\n",no);
 	
@@ -343,7 +343,7 @@ void commandSX() {
 
 	switch(sw) {
 	case 1: {
-		/* ¥Õ¥§¡¼¥É */
+		/* ãƒ•ã‚§ãƒ¼ãƒ‰ */
 		int time   = getCaliValue();
 		int volume = getCaliValue();
 		int stop   = getCaliValue();
@@ -352,7 +352,7 @@ void commandSX() {
 		break;
 	}
 	case 2: {
-		/* ¥Õ¥§¡¼¥É½ªÎ»³ÎÇ§ */
+		/* ãƒ•ã‚§ãƒ¼ãƒ‰çµ‚äº†ç¢ºèª */
 		int *var   = getCaliVariable();
 		boolean st;
 		st = mus_mixer_fadeout_get_state(device);
@@ -361,13 +361,13 @@ void commandSX() {
 		break;
 	}
 	case 3: {
-		/*  ¥Õ¥§¡¼¥É¶¯À©½ªÎ» */
+		/*  ãƒ•ã‚§ãƒ¼ãƒ‰å¼·åˆ¶çµ‚äº† */
 		mus_mixer_fadeout_stop(device);
 		DEBUG_COMMAND("SX %d,%d:\n", device, sw);
 		break;
 	}
 	case 4: {
-		/* ¥Ü¥ê¥å¡¼¥à¼èÆÀ */
+		/* ãƒœãƒªãƒ¥ãƒ¼ãƒ å–å¾— */
 		int *var   = getCaliVariable();
 		*var = mus_mixer_get_level(device);
 		DEBUG_COMMAND("SX %d,%d:\n", device, sw);

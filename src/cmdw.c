@@ -58,7 +58,7 @@ void commandWZ() {
 	case 0:
 		ags_setExposeSwitch(sw == 0 ? FALSE : TRUE);
 		if (sw == 1) {
-			/* ¤¦¡Á¤ó ¤³¤ó¤Ê½èÍý¤¤¤ì¤Ê¤¢¤«¤ó¤Î¤«¤¡¡Á (T_T) */
+			/* ã†ã€œã‚“ ã“ã‚“ãªå‡¦ç†ã„ã‚Œãªã‚ã‹ã‚“ã®ã‹ãã€œ (T_T) */
 			if (nact->sys_world_depth == 8) nact->sys_pal_changed = TRUE;
 			ags_updateFull();
 		}

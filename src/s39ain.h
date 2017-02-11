@@ -27,42 +27,42 @@
 #include <ltdl.h>
 #include "portab.h"
 
-/* DLL Æâ´Ø¿ô¾ğÊó */
+/* DLL å†…é–¢æ•°æƒ…å ± */
 typedef struct {
-	char *name; /* ´Ø¿ôÌ¾ */
-	int   argc; /* ´Ø¿ô¤Î°ú¿ô¤Î¿ô */
-	int  *argv; /* ´Ø¿ô¤Î°ú¿ô¤Î¤½¤ì¤¾¤ì¤Î¼ïÎà */
+	char *name; /* é–¢æ•°å */
+	int   argc; /* é–¢æ•°ã®å¼•æ•°ã®æ•° */
+	int  *argv; /* é–¢æ•°ã®å¼•æ•°ã®ãã‚Œãã‚Œã®ç¨®é¡ */
 } S39AIN_DLLFN;
 
-/* DLL ¾ğÊó */
+/* DLL æƒ…å ± */
 typedef struct {
 	lt_dlhandle *handle;       /* DLL handler */
-	char        *name;         /* DLL Ì¾      */
-	int          function_num; /* ´Ø¿ô¤Î¿ô    */
-	S39AIN_DLLFN       *function; /* ´Ø¿ôËÜÂÎ */
+	char        *name;         /* DLL å      */
+	int          function_num; /* é–¢æ•°ã®æ•°    */
+	S39AIN_DLLFN       *function; /* é–¢æ•°æœ¬ä½“ */
 } S39AIN_DLLINF;
 
-/* ¥·¥Ê¥ê¥ª´Ø¿ô¾ğÊó */
+/* ã‚·ãƒŠãƒªã‚ªé–¢æ•°æƒ…å ± */
 typedef struct {
-	char *name; /* ¥·¥Ê¥ê¥ª´Ø¿ôÌ¾ */
-	int page;   /* ¥·¥Ê¥ê¥ª¾å¤Î°ÌÃÖ (¥Ú¡¼¥¸ÈÖ¹æ) */
-	int index;  /* ¥·¥Ê¥ê¥ª¾å¤Î°ÌÃÖ (¥¢¥É¥ì¥¹)   */
+	char *name; /* ã‚·ãƒŠãƒªã‚ªé–¢æ•°å */
+	int page;   /* ã‚·ãƒŠãƒªã‚ªä¸Šã®ä½ç½® (ãƒšãƒ¼ã‚¸ç•ªå·) */
+	int index;  /* ã‚·ãƒŠãƒªã‚ªä¸Šã®ä½ç½® (ã‚¢ãƒ‰ãƒ¬ã‚¹)   */
 } S39AIN_FUNCNAME;
 
-/* System39.ain Á´ÂÎ¤Î¾ğÊó */
+/* System39.ain å…¨ä½“ã®æƒ…å ± */
 typedef struct {
-	char *path_to_ain; /* system39.ain ¤Ø¤Î¥Ñ¥¹  */
-	char *path_to_dll; /* DLL ¥â¥¸¥å¡¼¥ë¤Ø¤Î¥Ñ¥¹ */
+	char *path_to_ain; /* system39.ain ã¸ã®ãƒ‘ã‚¹  */
+	char *path_to_dll; /* DLL ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã¸ã®ãƒ‘ã‚¹ */
 	
-	int   dllnum; /* DLL  ¤Î¿ô */
-	int   fncnum; /* FUNC ¤Î¿ô */
-	int   varnum; /* VARI ¤Î¿ô */
-	int   msgnum; /* MSGI ¤Î¿ô */
+	int   dllnum; /* DLL  ã®æ•° */
+	int   fncnum; /* FUNC ã®æ•° */
+	int   varnum; /* VARI ã®æ•° */
+	int   msgnum; /* MSGI ã®æ•° */
 	
-	S39AIN_DLLINF   *dll; /* DLL  ¤Ë´Ø¿ô¤ë¾ğÊó */
-	S39AIN_FUNCNAME *fnc; /* FUNC ¤Ë´Ø¤¹¤ë¾ğÊó */
-	char **var;           /* VARI ¤Ë´Ø¤¹¤ë¾ğÊó */
-	char **msg;           /* MSGI ¤Ë´Ø¤¹¤ë¾ğÊó */
+	S39AIN_DLLINF   *dll; /* DLL  ã«é–¢æ•°ã‚‹æƒ…å ± */
+	S39AIN_FUNCNAME *fnc; /* FUNC ã«é–¢ã™ã‚‹æƒ…å ± */
+	char **var;           /* VARI ã«é–¢ã™ã‚‹æƒ…å ± */
+	char **msg;           /* MSGI ã«é–¢ã™ã‚‹æƒ…å ± */
 } S39AIN;
 
 extern int s39ain_init(void);

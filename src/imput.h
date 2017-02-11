@@ -1,5 +1,5 @@
 /*
- * imput.c ¥­¡¼¥Ü¡¼¥É¥Þ¥¦¥¹´ØÏ¢
+ * imput.c ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒžã‚¦ã‚¹é–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

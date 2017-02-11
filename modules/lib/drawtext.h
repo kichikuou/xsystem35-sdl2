@@ -1,5 +1,5 @@
 /*
- * drawtext.h  DLLÍÑ¤Ë surface ¾å¤ËÊ¸»ú¤òÉÁ¤¯
+ * drawtext.h  DLLç”¨ã« surface ä¸Šã«æ–‡å­—ã‚’æã
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

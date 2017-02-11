@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- * @version         0.00 97/11/06 ½éÈÇ
+ * @version         0.00 97/11/06 åˆç‰ˆ
 */
 /* $Id: LittleEndian.h,v 1.6 2000/11/25 13:08:56 chikama Exp $ */
 

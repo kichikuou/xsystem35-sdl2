@@ -29,12 +29,12 @@
 #include "xsystem35.h"
 #include "menu.h"
 
-/* NI/NT ÍÑ¥Ñ¥é¥á¡¼¥¿ */
+/* NI/NT ç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */
 INPUTNUM_PARAM ni_param;
 
 void commandNB() {
-	/* var1 ¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤Ø
-	   var2 ¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤ò¥³¥Ô¡¼¤¹¤ë */
+	/* var1 ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã¸
+	   var2 ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	int *var1 = getCaliVariable();
 	int *var2 = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -56,7 +56,7 @@ void commandNB() {
 }
 
 void commandNC() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤ò0¤Ç¥¯¥ê¥¢¤¹¤ë */
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã‚’0ã§ã‚¯ãƒªã‚¢ã™ã‚‹ */
 	int *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	
@@ -68,8 +68,8 @@ void commandNC() {
 }
 
 void commandNR() {
-	/* var1¤Ëvar2¤Î¥ë¡¼¥È¤òµá¤á¤ë (´Ö°ã¤¤)*/
-	/* NR 100,D01:         ; < D01¤Ë¥ë¡¼¥È100(10)¤¬ÊÖ¤ë */
+	/* var1ã«var2ã®ãƒ«ãƒ¼ãƒˆã‚’æ±‚ã‚ã‚‹ (é–“é•ã„)*/
+	/* NR 100,D01:         ; < D01ã«ãƒ«ãƒ¼ãƒˆ100(10)ãŒè¿”ã‚‹ */
 	int var1  = getCaliValue();
 	int *var2 = getCaliVariable();
 	
@@ -78,7 +78,7 @@ void commandNR() {
 }
 
 void commandN_ADD() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤Ënum¤òÂ­¤¹ */
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã«numã‚’è¶³ã™ */
 	int *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
@@ -91,7 +91,7 @@ void commandN_ADD() {
 }
 
 void commandN_SUB() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤«¤énum¤ò°ú¤¯ */
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã‹ã‚‰numã‚’å¼•ã */
 	int *var1 = getCaliVariable();
 	int num  = getCaliValue();
 	int cnt  = getCaliValue();
@@ -104,7 +104,7 @@ void commandN_SUB() {
 }
 
 void commandN_MUL() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤Ënum¤ò³İ¤±¤ë */
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã«numã‚’æ›ã‘ã‚‹ */
 	int *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
@@ -117,7 +117,7 @@ void commandN_MUL() {
 }
 
 void commandN_DIV() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤ònum¤Ç³ä¤ë */
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã‚’numã§å‰²ã‚‹ */
 	int *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
@@ -130,8 +130,8 @@ void commandN_DIV() {
 }
 
 void commandN_GT() {
-	/* var1 ¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤«¤énum¤è¤êÂç¤­¤¤¤±¤ì¤Ğ1¤ò¡¢°Ê²¼¤Ê¤é¤Ğ0¤ò
-	   var2¤«¤é»Ï¤Ş¤ëÊÑ¿ôÎó¤ËÊÖ¤¹
+	/* var1 ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã‹ã‚‰numã‚ˆã‚Šå¤§ãã„ã‘ã‚Œã°1ã‚’ã€ä»¥ä¸‹ãªã‚‰ã°0ã‚’
+	   var2ã‹ã‚‰å§‹ã¾ã‚‹å¤‰æ•°åˆ—ã«è¿”ã™
 	*/
 	int *var1 = getCaliVariable();
 	int num   = getCaliValue();
@@ -145,8 +145,8 @@ void commandN_GT() {
 }
 
 void commandN_LT() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤«¤énum¤è¤ê¾®¤µ¤±¤ì¤Ğ1¤ò¡¢°Ê¾å¤Ê¤é¤Ğ0¤ò
-	   var2¤«¤é»Ï¤Ş¤ëÊÑ¿ôÎó¤ËÊÖ¤¹
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã‹ã‚‰numã‚ˆã‚Šå°ã•ã‘ã‚Œã°1ã‚’ã€ä»¥ä¸Šãªã‚‰ã°0ã‚’
+	   var2ã‹ã‚‰å§‹ã¾ã‚‹å¤‰æ•°åˆ—ã«è¿”ã™
 	 */
 	int *var1 = getCaliVariable();
 	int num   = getCaliValue();
@@ -160,8 +160,8 @@ void commandN_LT() {
 }
 
 void commandN_EQ() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤«¤énum¤ËÅù¤·¤±¤ì¤Ğ1¤ò¡¢Åù¤·¤¯¤Ê¤±¤ì¤Ğ0¤ò
-	   var2¤«¤é»Ï¤Ş¤ëÊÑ¿ôÎó¤ËÊÖ¤¹
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã‹ã‚‰numã«ç­‰ã—ã‘ã‚Œã°1ã‚’ã€ç­‰ã—ããªã‘ã‚Œã°0ã‚’
+	   var2ã‹ã‚‰å§‹ã¾ã‚‹å¤‰æ•°åˆ—ã«è¿”ã™
 	 */
 	int *var1 = getCaliVariable();
 	int num   = getCaliValue();
@@ -175,7 +175,7 @@ void commandN_EQ() {
 }
 
 void commandN_NE() {
-	/* var1¤«¤é»Ï¤Ş¤ëcount¸Ä¤ÎÊÑ¿ô¤Î0,1¤òÈ¿Å¾¤¹¤ë */
+	/* var1ã‹ã‚‰å§‹ã¾ã‚‹countå€‹ã®å¤‰æ•°ã®0,1ã‚’åè»¢ã™ã‚‹ */
 	int *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	
@@ -186,7 +186,7 @@ void commandN_NE() {
 }
 
 void commandN_AND() {
-	/* var1,var2¤Îcount¸Ä¤ÎÊÑ¿ô¤ÎAND¤ò¤È¤ë */
+	/* var1,var2ã®countå€‹ã®å¤‰æ•°ã®ANDã‚’ã¨ã‚‹ */
 	int *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
@@ -198,7 +198,7 @@ void commandN_AND() {
 }
 
 void commandN_OR() {
-	/* var1,var2¤Îcount¸Ä¤ÎÊÑ¿ô¤ÎOR¤ò¤È¤ë */
+	/* var1,var2ã®countå€‹ã®å¤‰æ•°ã®ORã‚’ã¨ã‚‹ */
 	int *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
@@ -210,7 +210,7 @@ void commandN_OR() {
 }
 
 void commandN_XOR() {
-	/* var1,var2¤Îcount¸Ä¤ÎÊÑ¿ô¤ÎXOR¤ò¤È¤ë */
+	/* var1,var2ã®countå€‹ã®å¤‰æ•°ã®XORã‚’ã¨ã‚‹ */
 	int *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
@@ -222,7 +222,7 @@ void commandN_XOR() {
 }
 
 void commandN_NOT() {
-	/* ¥Ó¥Ã¥ÈÈ¿Å¾¤¹¤ë */
+	/* ãƒ“ãƒƒãƒˆåè»¢ã™ã‚‹ */
 	int *var = getCaliVariable();
 	int cnt  = getCaliValue();
 	
@@ -240,7 +240,7 @@ void commandNO() { /* T2 */
 	int i, tmp = 0;
 	
 	if (p1 == 0) {
-		/* ÊÑ¿ôÊÂ¤Ó¤ò¥Ó¥Ã¥ÈÎó¤Ë°µ½Ì¤¹¤ë¡£ */
+		/* å¤‰æ•°ä¸¦ã³ã‚’ãƒ“ãƒƒãƒˆåˆ—ã«åœ§ç¸®ã™ã‚‹ã€‚ */
 		for (i = 0; i < cnt; i++) {
 			tmp |= ((*src_var & 1) << (15 - (i%16))); src_var++;
 			if ((i%16) == 15 && i < (cnt-1)) {
@@ -249,7 +249,7 @@ void commandNO() { /* T2 */
 		}
 		*dst_var = tmp;
 	} else if (p1 == 1) {
-		/* ¥Ó¥Ã¥ÈÎó¤òÊÑ¿ôÊÂ¤Ó¤ËÅ¸³«¤¹¤ë¡£*/
+		/* ãƒ“ãƒƒãƒˆåˆ—ã‚’å¤‰æ•°ä¸¦ã³ã«å±•é–‹ã™ã‚‹ã€‚*/
 		for (i = 0; i < cnt; i++) {
 			if ((i%16) == 0) {
 				tmp = *src_var++;
@@ -264,7 +264,7 @@ void commandNO() { /* T2 */
 }
 
 void commandNDC() {
-	/* w64n¤Ënum¤ò¥³¥Ô¡¼¤¹¤ë */
+	/* w64nã«numã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	int w64n = getCaliValue();
 	int num  = getCaliValue();
 	longVar[w64n] = num;
@@ -273,7 +273,7 @@ void commandNDC() {
 }
 
 void commandNDD() {
-	/* var¤Ëw64n¤ò¥³¥Ô¡¼¤¹¤ë*/
+	/* varã«w64nã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹*/
 	int *var = getCaliVariable();
 	int w64n = getCaliValue();
 	*var = (int)longVar[w64n];
@@ -282,7 +282,7 @@ void commandNDD() {
 }
 
 void commandNDM() {
-	// ¿ôÃÍw64n¤òÊ¸»úÎóÎÎ°èstr¤ØÊ¸»úÎó¤È¤·¤ÆÈ¿±Ç
+	// æ•°å€¤w64nã‚’æ–‡å­—åˆ—é ˜åŸŸstrã¸æ–‡å­—åˆ—ã¨ã—ã¦åæ˜ 
 	int str  = getCaliValue();
 	int w64n = getCaliValue();
 	
@@ -290,7 +290,7 @@ void commandNDM() {
 }
 
 void commandNDA() { 
-	// Ê¸»úÎóÎÎ°èstr¤ò¿ôÃÍ¤È¤·¤Æw64n¤ØÈ¿±Ç
+	// æ–‡å­—åˆ—é ˜åŸŸstrã‚’æ•°å€¤ã¨ã—ã¦w64nã¸åæ˜ 
 	int str  = getCaliValue();
 	int w64n = getCaliValue();
 	
@@ -298,7 +298,7 @@ void commandNDA() {
 }
 
 void commandNDH() {
-	// ¿ôÃÍw64n¤ò²èÌÌ¤ËÉ½¼¨¡Ê¥Ñ¥é¥á¡¼¥¿¤Î°ÕÌ£¤Ï£È¥³¥Ş¥ó¥É¤Ë½àµò¡Ë
+	// æ•°å€¤w64nã‚’ç”»é¢ã«è¡¨ç¤ºï¼ˆãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®æ„å‘³ã¯ï¼¨ã‚³ãƒãƒ³ãƒ‰ã«æº–æ‹ ï¼‰
 	int str  = getCaliValue();
 	int w64n = getCaliValue();
 	
@@ -306,7 +306,7 @@ void commandNDH() {
 }
 
 void commandND_ADD() {
-	/* w64n2¤Èw64n3¤òÂ­¤·¤Æw64n1¤ËÂåÆş */
+	/* w64n2ã¨w64n3ã‚’è¶³ã—ã¦w64n1ã«ä»£å…¥ */
 	int w64n1 = getCaliValue();
 	int w64n2 = getCaliValue();
 	int w64n3 = getCaliValue();
@@ -317,7 +317,7 @@ void commandND_ADD() {
 }
 
 void commandND_SUB() {
-	/* w64n2¤«¤éw64n3¤ò°ú¤¤¤Æw64n1¤ËÂåÆş */
+	/* w64n2ã‹ã‚‰w64n3ã‚’å¼•ã„ã¦w64n1ã«ä»£å…¥ */
 	int w64n1 = getCaliValue();
 	int w64n2 = getCaliValue();
 	int w64n3 = getCaliValue();
@@ -328,7 +328,7 @@ void commandND_SUB() {
 }
 
 void commandND_MUL() {
-	/* w64n2¤Èw64n3¤ò³İ¤±¤Æw64n1¤ËÂåÆş */
+	/* w64n2ã¨w64n3ã‚’æ›ã‘ã¦w64n1ã«ä»£å…¥ */
 	int w64n1 = getCaliValue();
 	int w64n2 = getCaliValue();
 	int w64n3 = getCaliValue();
@@ -339,7 +339,7 @@ void commandND_MUL() {
 }
 
 void commandND_DIV() {
-	// w64n2¤òw64n3¤Ç³ä¤Ã¤Æw64n1¤ËÂåÆş
+	// w64n2ã‚’w64n3ã§å‰²ã£ã¦w64n1ã«ä»£å…¥
 	int w64n1 = getCaliValue();
 	int w64n2 = getCaliValue();
 	int w64n3 = getCaliValue();
@@ -350,7 +350,7 @@ void commandND_DIV() {
 }
 
 void commandNI() { /* From Panyo */
-	/* ¿ôÃÍÆşÎÏ */
+	/* æ•°å€¤å…¥åŠ› */
 	int *var  = getCaliVariable();
 	int def   = getCaliValue();
 	int _min  = getCaliValue();
@@ -373,7 +373,7 @@ void commandNI() { /* From Panyo */
 }
 
 void commandNT() { /* From Panyo */
-	/* NI¥³¥Ş¥ó¥É¤ÇÉ½¼¨¤¹¤ë¥¿¥¤¥È¥ë¤òÀßÄê¤¹¤ë¡£*/
+	/* NIã‚³ãƒãƒ³ãƒ‰ã§è¡¨ç¤ºã™ã‚‹ã‚¿ã‚¤ãƒˆãƒ«ã‚’è¨­å®šã™ã‚‹ã€‚*/
 	char *str = sys_getString(':');
 	char *t;
 
@@ -387,7 +387,7 @@ void commandNT() { /* From Panyo */
 }
 
 void commandNP() {
-	/* ÇÛÎóÈæ³Ó */
+	/* é…åˆ—æ¯”è¼ƒ */
 	int *var1   = getCaliVariable();
 	int *var2   = getCaliVariable();
 	int count   = getCaliValue();

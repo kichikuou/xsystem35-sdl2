@@ -47,62 +47,62 @@
 #include "sactamask.h"
 
 /*
-  MT¥³¥Ş¥ó¥É¤ÇÀßÄê¤µ¤ì¤¿Ê¸»úÎó¤Ë¤è¤Ã¤Æ¡¢¥Ğ¡¼¥¸¥ç¥ó´Ö¤Î°ã¤¤¤òµÛ¼ı
+  MTã‚³ãƒãƒ³ãƒ‰ã§è¨­å®šã•ã‚ŒãŸæ–‡å­—åˆ—ã«ã‚ˆã£ã¦ã€ãƒãƒ¼ã‚¸ãƒ§ãƒ³é–“ã®é•ã„ã‚’å¸å
 
-  Version 1.0 : ¥¨¥¹¥«¥ì¥¤¥ä¡¼
+  Version 1.0 : ã‚¨ã‚¹ã‚«ãƒ¬ã‚¤ãƒ¤ãƒ¼
           1.1 : Rance5D
-          1.2(Á°´ü): ºÊ¤ß¤°¤¤£²
-          1.2(¸å´ü): SACT³«È¯¥­¥Ã¥È, ¥·¥§¥ë¡¦¥¯¥ì¥¤¥ë, NightDemon
+          1.2(å‰æœŸ): å¦»ã¿ãã„ï¼’
+          1.2(å¾ŒæœŸ): SACTé–‹ç™ºã‚­ãƒƒãƒˆ, ã‚·ã‚§ãƒ«ãƒ»ã‚¯ãƒ¬ã‚¤ãƒ«, NightDemon
 */ 
 
 /*
-  ºÊ¤ß¤°¤¤£²¥­¡¼ÀâÌÀ
+  å¦»ã¿ãã„ï¼’ã‚­ãƒ¼èª¬æ˜
 
-  ¥á¥Ã¥»¡¼¥¸¥¹¥­¥Ã¥×(´ûÆÉ¡¢Ì¤ÆÉ´Ø·¸¤Ê¤¯¥¹¥­¥Ã¥×) -> Ctrl
-  ¼«Æ°¥á¥Ã¥»¡¼¥¸Á÷¤ê -> A¥­¡¼
-    A¥­¡¼¤ò²¡¤¹¤³¤È¤Ç¡¢¼«Æ°Åª¤Ë¥á¥Ã¥»¡¼¥¸¤¬¤¹¤¹¤ó¤Ç¹Ô¤­¤Ş¤¹¡£(¼«Æ°¥á¥Ã¥»¡¼¥¸
-    Á÷¤ê¤¬ON¤Ë¤Ê¤ë¤È¡¢¥á¥Ã¥»¡¼¥¸¥¦¥£¥ó¥É¤Î±¦²¼¤Ë¤¢¤ëÆşÎÏÂÔ¤Á¥«¡¼¥½¥ë(>>>>)¤¬
-    ¾Ã¤¨¤Ş¤¹¡£²ò½ü¤¹¤ë¾ì¹ç¤Ï¡¢¥»¥ê¥Õ¤â¤·¤¯¤Ï²»À¼½ªÎ»¤Ş¤Ç¡¢A¥­¡¼¤ò²¡¤·Â³¤±¤Æ
-    ¤¯¤À¤µ¤¤¡£A¥­¡¼¤òÎ¥¤·¤¿¤È¤­¤Ë¡¢ÆşÎÏÂÔ¤Á¥«¡¼¥½¥ë¤¬É½¼¨¤µ¤ì¤ì¤Ğ²ò½ü¤µ¤ì¤¿
-    ¤³¤È¤Ë¤Ê¤ê¤Ş¤¹¡£
-  ¥Ğ¥Ã¥¯¥í¥° -> ¥Û¥¤¡¼¥ë
+  ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ã‚­ãƒƒãƒ—(æ—¢èª­ã€æœªèª­é–¢ä¿‚ãªãã‚¹ã‚­ãƒƒãƒ—) -> Ctrl
+  è‡ªå‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é€ã‚Š -> Aã‚­ãƒ¼
+    Aã‚­ãƒ¼ã‚’æŠ¼ã™ã“ã¨ã§ã€è‡ªå‹•çš„ã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒã™ã™ã‚“ã§è¡Œãã¾ã™ã€‚(è‡ªå‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+    é€ã‚ŠãŒONã«ãªã‚‹ã¨ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¦ã‚£ãƒ³ãƒ‰ã®å³ä¸‹ã«ã‚ã‚‹å…¥åŠ›å¾…ã¡ã‚«ãƒ¼ã‚½ãƒ«(>>>>)ãŒ
+    æ¶ˆãˆã¾ã™ã€‚è§£é™¤ã™ã‚‹å ´åˆã¯ã€ã‚»ãƒªãƒ•ã‚‚ã—ãã¯éŸ³å£°çµ‚äº†ã¾ã§ã€Aã‚­ãƒ¼ã‚’æŠ¼ã—ç¶šã‘ã¦
+    ãã ã•ã„ã€‚Aã‚­ãƒ¼ã‚’é›¢ã—ãŸã¨ãã«ã€å…¥åŠ›å¾…ã¡ã‚«ãƒ¼ã‚½ãƒ«ãŒè¡¨ç¤ºã•ã‚Œã‚Œã°è§£é™¤ã•ã‚ŒãŸ
+    ã“ã¨ã«ãªã‚Šã¾ã™ã€‚
+  ãƒãƒƒã‚¯ãƒ­ã‚° -> ãƒ›ã‚¤ãƒ¼ãƒ«
 */
 
 
 /*
-   wNum ¤ÎÈÏ°Ï¤Ê¤É¡¢°ú¿ô¤Î¥Á¥§¥Ã¥¯¤Ï³Æ¥µ¥Ö¥·¥¹¥Æ¥à¾å¤Ç¤¹¤ë¡£
+   wNum ã®ç¯„å›²ãªã©ã€å¼•æ•°ã®ãƒã‚§ãƒƒã‚¯ã¯å„ã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ ä¸Šã§ã™ã‚‹ã€‚
 
 
-¼ÂÁõ³ÎÇ§»ö¹à
-  SACT.CreateSprite ¤Ï¤½¤Î¸Æ¤Ğ¤ì¤¿½Ö´Ö¤ÎCG¤¬»ÈÍÑ¤µ¤ì¤ë
-    ->SACT.Draw¤Ş¤Ç¤ËCG¤¬ÊÑ¹¹¤µ¤ì¤Æ¤â¡¢Create»ş¤ÎCG¤ò»ÈÍÑ
-  OutputMessage¤Ï¥á¥Ã¥»¡¼¥¸¤¬É½¼¨½ª¤ë¤Ş¤Ç¤â¤É¤Ã¤Æ¤³¤Ê¤¤¡£
-  QuakeScreen¤Ï½ªÎ»¤Ş¤Ç¤â¤É¤Ã¤Æ¤³¤Ê¤¤¡£(¥­¡¼È´¤±¤¢¤ê)
-  ¼«Æ°²ş¹Ô¤Ï¤·¤Ê¤¤
-  OutputMessage ¤¬¤­¤Æ»Ï¤á¤Æ£±Ê¸»ú¤Å¤ÄÉÁ²è¤ò¹Ô¤¦¡£NewLine¤Ç¤Ï½ñ¤«¤Ê¤¤¡£
-  ~KEY 2: ¤ÏÄ¾Á°¤ÎÁ´¤Æ¤ÎSP_MOVE¤¬½ªÎ»¤¹¤ë¤Ş¤Ç¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥ÈÅù¤ÏÈ¿±ş¤·¤Ê¤¤
-  dragÃæ¤Ë¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥È¤ÏÈ¿±ş¤·¤Ê¤¤
-  ¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È¤Ï¤Ä¤Í¤ËÆ°ºî
-  ¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥È¤Ï¡¢¥Ü¥¿¥ó¤¬²¡²¼¾õÂÖ¤Ç¥¹¥×¥é¥¤¥ÈÆâ¤ËÆş¤Ã¤ÆÍè¤¿¤È¤­¤â¡¢
-  cg3¤ËÊÑ²½¤¹¤ë¡£¤³¤Î¤È¤­¥Ü¥¿¥ó¤òÎ¥¤·¤Æ¤â SpriteKeyWait¤òÈ´¤±¤Ê¤¤¡£
-  ¤Ş¤¿¡¢¥Ü¥¿¥ó¤ò²¡¤·¤¿¤Ş¤Ş¥¹¥×¥é¥¤¥È³°¤Ë½Ğ¤Æ¤â¡¢½Ğ¤¿¸å¤Ïcg1¤ËÊÑ²½¤¹¤ë
-  GETA/B¤â¥Õ¥©¡¼¥«¥¹¥¤¥ó¤ÇCG2¤Ë¥Ü¥¿¥ó²¡²¼¤ÇCG3¤Ë
-  SWPUT¤Ï¥Ü¥¿¥ó²¡²¼¤ÇÈ´¤±¤ë
+å®Ÿè£…ç¢ºèªäº‹é …
+  SACT.CreateSprite ã¯ãã®å‘¼ã°ã‚ŒãŸç¬é–“ã®CGãŒä½¿ç”¨ã•ã‚Œã‚‹
+    ->SACT.Drawã¾ã§ã«CGãŒå¤‰æ›´ã•ã‚Œã¦ã‚‚ã€Createæ™‚ã®CGã‚’ä½¿ç”¨
+  OutputMessageã¯ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒè¡¨ç¤ºçµ‚ã‚‹ã¾ã§ã‚‚ã©ã£ã¦ã“ãªã„ã€‚
+  QuakeScreenã¯çµ‚äº†ã¾ã§ã‚‚ã©ã£ã¦ã“ãªã„ã€‚(ã‚­ãƒ¼æŠœã‘ã‚ã‚Š)
+  è‡ªå‹•æ”¹è¡Œã¯ã—ãªã„
+  OutputMessage ãŒãã¦å§‹ã‚ã¦ï¼‘æ–‡å­—ã¥ã¤æç”»ã‚’è¡Œã†ã€‚NewLineã§ã¯æ›¸ã‹ãªã„ã€‚
+  ~KEY 2: ã¯ç›´å‰ã®å…¨ã¦ã®SP_MOVEãŒçµ‚äº†ã™ã‚‹ã¾ã§ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç­‰ã¯åå¿œã—ãªã„
+  dragä¸­ã«ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯åå¿œã—ãªã„
+  ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯ã¤ã­ã«å‹•ä½œ
+  ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯ã€ãƒœã‚¿ãƒ³ãŒæŠ¼ä¸‹çŠ¶æ…‹ã§ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†…ã«å…¥ã£ã¦æ¥ãŸã¨ãã‚‚ã€
+  cg3ã«å¤‰åŒ–ã™ã‚‹ã€‚ã“ã®ã¨ããƒœã‚¿ãƒ³ã‚’é›¢ã—ã¦ã‚‚ SpriteKeyWaitã‚’æŠœã‘ãªã„ã€‚
+  ã¾ãŸã€ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸã¾ã¾ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå¤–ã«å‡ºã¦ã‚‚ã€å‡ºãŸå¾Œã¯cg1ã«å¤‰åŒ–ã™ã‚‹
+  GETA/Bã‚‚ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚¤ãƒ³ã§CG2ã«ãƒœã‚¿ãƒ³æŠ¼ä¸‹ã§CG3ã«
+  SWPUTã¯ãƒœã‚¿ãƒ³æŠ¼ä¸‹ã§æŠœã‘ã‚‹
 */
 
 
-// SACT ´ØÏ¢¤Î¾ğÊó
+// SACT é–¢é€£ã®æƒ…å ±
 sact_t sactprv;
 extern char *xsys35_sact01;
 
 /**
  * SACT.Init (1.0~)
- *   SACTÁ´ÂÎ¤Î½é´ü²½
+ *   SACTå…¨ä½“ã®åˆæœŸåŒ–
  */
 void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
 	
-	// ¥²¡¼¥à¥¿¥¤¥È¥ë¤Ë¤è¤ë¥Ğ¡¼¥¸¥ç¥óÀßÄê
+	// ã‚²ãƒ¼ãƒ ã‚¿ã‚¤ãƒˆãƒ«ã«ã‚ˆã‚‹ãƒãƒ¼ã‚¸ãƒ§ãƒ³è¨­å®š
 	if (0 == strcmp(nact->game_title_name, GT_ESUKA)) {
 		sact.version = 100;
 	} else if (0 == strcmp(nact->game_title_name, GT_RANCE5D)){
@@ -113,11 +113,11 @@ void Init() {
 	
 	NOTICE("SACT version = %d\n", sact.version);
 	
-	// ½é´üºÂÉ¸¸¶ÅÀ
+	// åˆæœŸåº§æ¨™åŸç‚¹
 	sact.origin.x = 0;
 	sact.origin.y = 0;
 	
-	// ³Æ¥µ¥Ö¥·¥¹¥Æ¥à½é´ü²½
+	// å„ã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ åˆæœŸåŒ–
 	sp_init();
 	sstr_init();
 	ssel_init();
@@ -131,9 +131,9 @@ void Init() {
 	// create depth map
 	sact.dmap = sf_create_pixel(sf0->width, sf0->height, 16);
 	
-	// ¤½¤ÎÂ¾ System35 ¤Î¥Ç¥Õ¥©¥ë¥ÈÆ°ºî¤ÎÊÑ¹¹
+	// ãã®ä»– System35 ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå‹•ä½œã®å¤‰æ›´
 	nact->ags.font->antialiase_on = TRUE;
-	sys_setHankakuMode(2); // Á´³ÑÈ¾³ÑÊÑ´¹Ìµ¤·
+	sys_setHankakuMode(2); // å…¨è§’åŠè§’å¤‰æ›ç„¡ã—
 	ags_autorepeat(FALSE); // key auto repeat off
 	
 	if (sact.version >= 120) {
@@ -147,12 +147,12 @@ void Init() {
 
 /**
  * SACT.CreateSprite (1.0~)
- *   ¥¹¥×¥é¥¤¥ÈºîÀ®
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wNumCG1: ÄÌ¾ïÉ½¼¨¤¹¤ë£Ã£ÇÈÖ¹æ
- *   @param wNumCG2: ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤ò½Å¤Í¤¿¤È¤­¤Î£Ã£ÇÈÖ¹æ
- *   @param wNumCG3: ¥¯¥ê¥Ã¥¯¤·¤¿¤È¤­¤Î£Ã£ÇÈÖ¹æ
- *   @param wType: ¥¹¥×¥é¥¤¥È¤Î¥¿¥¤¥×
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½œæˆ
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wNumCG1: é€šå¸¸è¡¨ç¤ºã™ã‚‹ï¼£ï¼§ç•ªå·
+ *   @param wNumCG2: ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã‚’é‡ã­ãŸã¨ãã®ï¼£ï¼§ç•ªå·
+ *   @param wNumCG3: ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã®ï¼£ï¼§ç•ªå·
+ *   @param wType: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¿ã‚¤ãƒ—
  */
 void CreateSprite() {
 	int wNum    = getCaliValue();
@@ -168,12 +168,12 @@ void CreateSprite() {
 
 /**
  * SACT.CreateTextSprite (1.0~)
- *   ¥á¥Ã¥»¡¼¥¸¤òÉ½¼¨¤¹¤ë¥¹¥×¥é¥¤¥È¤ÎºîÀ®
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wX: É½¼¨°ÌÃÖ¤Î£ØºÂÉ¸
- *   @param wY: É½¼¨°ÌÃÖ¤Î£ÙºÂÉ¸
- *   @param wWidth: ¥¹¥×¥é¥¤¥È¤ÎÉı
- *   @param wHeight: ¥¹¥×¥é¥¤¥È¤Î¹â¤µ
+ *   ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ä½œæˆ
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wX: è¡¨ç¤ºä½ç½®ã®ï¼¸åº§æ¨™
+ *   @param wY: è¡¨ç¤ºä½ç½®ã®ï¼¹åº§æ¨™
+ *   @param wWidth: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¹…
+ *   @param wHeight: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®é«˜ã•
  */
 void CreateTextSprite() {
 	int wNum = getCaliValue();
@@ -189,8 +189,8 @@ void CreateTextSprite() {
 
 /**
  * SACT.SetWallPaper (1.0~)
- *   ÊÉ»æ(²èÌÌÇØ·Ê)¤È¤·¤ÆÉ½¼¨¤¹¤ë£Ã£Ç¤ÎÀßÄê
- *   @param wNum: ÊÉ»æ(ÇØ·Ê)¤È¤·¤ÆÉ½¼¨¤¹¤ë£Ã£Ç¤ÎÈÖ¹æ
+ *   å£ç´™(ç”»é¢èƒŒæ™¯)ã¨ã—ã¦è¡¨ç¤ºã™ã‚‹ï¼£ï¼§ã®è¨­å®š
+ *   @param wNum: å£ç´™(èƒŒæ™¯)ã¨ã—ã¦è¡¨ç¤ºã™ã‚‹ï¼£ï¼§ã®ç•ªå·
  */
 void SetWallPaper() {
 	int wNum = getCaliValue();
@@ -202,7 +202,7 @@ void SetWallPaper() {
 
 /**
  * SACT.Clear (1.0~)
- *   Á´¥¹¥×¥é¥¤¥Èºï½ü(~SP_CLR)
+ *   å…¨ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå‰Šé™¤(~SP_CLR)
  */
 void Clear() {
 	sp_free_all();
@@ -212,8 +212,8 @@ void Clear() {
 
 /**
  * SACT.Delete (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤Îºï½ü
- *   @param wNum: ºï½ü¤¹¤ë¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‰Šé™¤
+ *   @param wNum: å‰Šé™¤ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  */
 void Delete() {
 	int wNum = getCaliValue();
@@ -225,9 +225,9 @@ void Delete() {
 
 /**
  * SACT.SpriteDeleteCount (1.0~)
- *   wNumÈÖ¤«¤éwCount¸Ä¤ÎÈÏ°Ï¤Î¥¹¥×¥é¥¤¥È¤Îºï½ü
- *   @param wNum: ÀèÆ¬¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wCount: ÈÏ°Ï
+ *   wNumç•ªã‹ã‚‰wCountå€‹ã®ç¯„å›²ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‰Šé™¤
+ *   @param wNum: å…ˆé ­ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wCount: ç¯„å›²
  */
 void SpriteDeleteCount() {
 	int wNum   = getCaliValue();
@@ -243,7 +243,7 @@ void SpriteDeleteCount() {
 
 /**
  * SACT.Draw (1.0~)
- *   ¸½ºßÀßÄê¤µ¤ì¤Æ¤¤¤ë¥¹¥×¥é¥¤¥È¾õÂÖ¤ò²èÌÌ¤ËÈ¿±Ç(~SP_UPDATE)
+ *   ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆçŠ¶æ…‹ã‚’ç”»é¢ã«åæ˜ (~SP_UPDATE)
  */
 void Draw() {
 	sp_update_all(TRUE);
@@ -253,10 +253,10 @@ void Draw() {
 
 /**
  * SCAT.DrawEffect (1.0~)
- *   ¸ú²Ì»ØÄêÉÕ¤­²èÌÌ¹¹¿·
- *   @param wType: ¥¨¥Õ¥§¥¯¥È¥¿¥¤¥×
- *   @param wEffectTime: ¥¨¥Õ¥§¥¯¥È¤Î»ş´Ö(1/100ÉÃÃ±°Ì)
- *   @param wEffectKey: ¥­¡¼È´¤±ÀßÄê (1.1~) (1¤ÇÍ­¸ú)
+ *   åŠ¹æœæŒ‡å®šä»˜ãç”»é¢æ›´æ–°
+ *   @param wType: ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚¿ã‚¤ãƒ—
+ *   @param wEffectTime: ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ™‚é–“(1/100ç§’å˜ä½)
+ *   @param wEffectKey: ã‚­ãƒ¼æŠœã‘è¨­å®š (1.1~) (1ã§æœ‰åŠ¹)
  */
 void DrawEffect() {
 	int wType       = getCaliValue();
@@ -274,10 +274,10 @@ void DrawEffect() {
 
 /**
  * SCAT.DrawEffectAlphaMap (1.1~)
- *   ¦Á¥Ş¥¹¥¯¤Ä¤­²èÌÌ¹¹¿·
- *   @param nIndexAlphaMap: ¥Ş¥¹¥¯¦ÁÈÖ¹æ
- *   @param wEffectTime: ¥¨¥Õ¥§¥¯¥È¤Î»ş´Ö(1/100ÉÃÃ±°Ì)
- *   @param wEffectKey: ¥­¡¼È´¤±ÀßÄê
+ *   Î±ãƒã‚¹ã‚¯ã¤ãç”»é¢æ›´æ–°
+ *   @param nIndexAlphaMap: ãƒã‚¹ã‚¯Î±ç•ªå·
+ *   @param wEffectTime: ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æ™‚é–“(1/100ç§’å˜ä½)
+ *   @param wEffectKey: ã‚­ãƒ¼æŠœã‘è¨­å®š
  */
 void DrawEffectAlphaMap() {
 	int nIndexAlphaMap = getCaliValue();
@@ -291,14 +291,14 @@ void DrawEffectAlphaMap() {
 
 /**
  * SCAT.QuakeScreen (1.0~)
- *   ²èÌÌÍÉ¤é¤·
- *   @param wType: 0=½Ä²£, 1:²óÅ¾
- *   @param wParam1: wType=0¤Î¤È¤­xÊı¸ş¤Î¿¶Éı
- *                   wType=1¤Î¤È¤­¿¶Éı
- *   @param wParam2: wType=0¤Î¤È¤­yÊı¸ş¤Î¿¶Éı
- *                   wType=1¤Î¤È¤­²óÅ¾¿ô
- *   @param wCount: »ş´Ö(1/100ÉÃ)
- *   @param nfKeyEnable: ¥­¡¼È´¤± (1¤ÇÍ­¸ú) (1.1~) 
+ *   ç”»é¢æºã‚‰ã—
+ *   @param wType: 0=ç¸¦æ¨ª, 1:å›è»¢
+ *   @param wParam1: wType=0ã®ã¨ãxæ–¹å‘ã®æŒ¯å¹…
+ *                   wType=1ã®ã¨ãæŒ¯å¹…
+ *   @param wParam2: wType=0ã®ã¨ãyæ–¹å‘ã®æŒ¯å¹…
+ *                   wType=1ã®ã¨ãå›è»¢æ•°
+ *   @param wCount: æ™‚é–“(1/100ç§’)
+ *   @param nfKeyEnable: ã‚­ãƒ¼æŠœã‘ (1ã§æœ‰åŠ¹) (1.1~) 
  */
 void QuakeScreen() {
 	int wType   = getCaliValue();
@@ -318,9 +318,9 @@ void QuakeScreen() {
 
 /**
  * SACT.SetOrigin (1.0~)
- *   ´ğ½àºÂÉ¸ÊÑ¹¹
- *   @param wX: ¸¶ÅÀ¤Ë¤¹¤ë£ØºÂÉ¸¤Î°ÌÃÖ
- *   @param wY: ¸¶ÅÀ¤Ë¤¹¤ë£ÙºÂÉ¸¤Î°ÌÃÖ
+ *   åŸºæº–åº§æ¨™å¤‰æ›´
+ *   @param wX: åŸç‚¹ã«ã™ã‚‹ï¼¸åº§æ¨™ã®ä½ç½®
+ *   @param wY: åŸç‚¹ã«ã™ã‚‹ï¼¹åº§æ¨™ã®ä½ç½®
  */
 void SetOrigin() {
 	int wX = getCaliValue();
@@ -334,10 +334,10 @@ void SetOrigin() {
 
 /**
  * SACT.SetShow (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨¾õÂÖ¤ÎÊÑ¹¹
- *   @param wNum: ÀèÆ¬¤Î¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wCount: É½¼¨¤¹¤ë¸Ä¿ô
- *   @param wShow: 0:ÈóÉ½¼¨, 1:É½¼¨
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºçŠ¶æ…‹ã®å¤‰æ›´
+ *   @param wNum: å…ˆé ­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wCount: è¡¨ç¤ºã™ã‚‹å€‹æ•°
+ *   @param wShow: 0:éè¡¨ç¤º, 1:è¡¨ç¤º
  */
 void SetShow() {
 	int wNum   = getCaliValue();
@@ -351,10 +351,10 @@ void SetShow() {
 
 /**
  * SACT.SetBlendRate (1.1~)
- *   ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨¾õÂÖ¤ÎÊÑ¹¹
- *   @param wNum: ÀèÆ¬¤Î¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wCount: É½¼¨¤¹¤ë¸Ä¿ô
- *   @param nBlendRate: ¥Ö¥ì¥ó¥ÉÎ¨
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºçŠ¶æ…‹ã®å¤‰æ›´
+ *   @param wNum: å…ˆé ­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wCount: è¡¨ç¤ºã™ã‚‹å€‹æ•°
+ *   @param nBlendRate: ãƒ–ãƒ¬ãƒ³ãƒ‰ç‡
  */
 void SetBlendRate() {
 	int wNum   = getCaliValue();
@@ -368,10 +368,10 @@ void SetBlendRate() {
 
 /**
  * SACT.SetPos (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨°ÌÃÖ¤òÀßÄê(ÊÑ¹¹)
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wX: É½¼¨£ØºÂÉ¸
- *   @param wY: É½¼¨£ÙºÂÉ¸
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºä½ç½®ã‚’è¨­å®š(å¤‰æ›´)
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wX: è¡¨ç¤ºï¼¸åº§æ¨™
+ *   @param wY: è¡¨ç¤ºï¼¹åº§æ¨™
  */
 void SetPos() {
 	int wNum = getCaliValue();
@@ -385,10 +385,10 @@ void SetPos() {
 
 /**
  * SACT.SetMove (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤Î°ÜÆ° (¤¹¤°¤Ë½èÍı¤òÌá¤¹)
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wX: É½¼¨£ØºÂÉ¸
- *   @param wY: É½¼¨£ÙºÂÉ¸
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹• (ã™ãã«å‡¦ç†ã‚’æˆ»ã™)
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wX: è¡¨ç¤ºï¼¸åº§æ¨™
+ *   @param wY: è¡¨ç¤ºï¼¹åº§æ¨™
  */
 void SetMove() {
 	int wNum = getCaliValue();
@@ -402,9 +402,9 @@ void SetMove() {
 
 /**
  * SACT.SetMoveTime (1.0~)
- *   SetMove¤Ë¤è¤ë¥¹¥×¥é¥¤¥È°ÜÆ°¤Î»ş´Ö¤ÎÀßÄê
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wTime: °ÜÆ°¤ò´°Î»¤¹¤ë¤Ş¤Ç¤Î»ş´Ö(1/100ÉÃÃ±°Ì)
+ *   SetMoveã«ã‚ˆã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç§»å‹•ã®æ™‚é–“ã®è¨­å®š
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wTime: ç§»å‹•ã‚’å®Œäº†ã™ã‚‹ã¾ã§ã®æ™‚é–“(1/100ç§’å˜ä½)
  */
 void SetMoveTime() {
 	int wNum  = getCaliValue();
@@ -417,9 +417,9 @@ void SetMoveTime() {
 
 /**
  * SACT.SetMoveSpeed (1.0~)
- *   SetMove¤Ë¤è¤ë¥¹¥×¥é¥¤¥È°ÜÆ°¤ÎÂ®ÅÙ¤òÀßÄê
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wSpeed: °ÜÆ°Â®ÅÙ(¥Ç¥Õ¥©¥ë¥È¤ò100%¤È¤·¤¿%»ØÄê)
+ *   SetMoveã«ã‚ˆã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç§»å‹•ã®é€Ÿåº¦ã‚’è¨­å®š
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wSpeed: ç§»å‹•é€Ÿåº¦(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚’100%ã¨ã—ãŸ%æŒ‡å®š)
  */
 void SetMoveSpeed() {
 	int wNum   = getCaliValue();
@@ -432,10 +432,10 @@ void SetMoveSpeed() {
 
 /**
  * SACT.SetMoveSpeedCount (1.0~)
- *   Ê£¿ô¤Î¥¹¥×¥é¥¤¥È¤ËÂĞ¤¹¤ë¥¹¥×¥é¥¤¥È°ÜÆ°¤ÎÂ®ÅÙ¤ÎÀßÄê
- *   @param wNum: ÀèÆ¬¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wCount: ÈÏ°Ï
- *   @param wSpeed: °ÜÆ°Â®ÅÙ(¥Ç¥Õ¥©¥ë¥È¤ò100%¤È¤·¤¿%»ØÄê)
+ *   è¤‡æ•°ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«å¯¾ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç§»å‹•ã®é€Ÿåº¦ã®è¨­å®š
+ *   @param wNum: å…ˆé ­ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wCount: ç¯„å›²
+ *   @param wSpeed: ç§»å‹•é€Ÿåº¦(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚’100%ã¨ã—ãŸ%æŒ‡å®š)
  */
 void SetMoveSpeedCount() {
 	int wNum   = getCaliValue();
@@ -452,10 +452,10 @@ void SetMoveSpeedCount() {
 
 /**
  * SACT.SetSpriteAnimeTimeInterval (1.1~)
- *   Ê£¿ô¤Î¥¹¥×¥é¥¤¥È¤ËÂĞ¤¹¤ë¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È¤Î´Ö³Ö
- *   @param wNum: ÀèÆ¬¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wCount: ÈÏ°Ï
- *   @param nTime: ´Ö³Ö 
+ *   è¤‡æ•°ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«å¯¾ã™ã‚‹ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®é–“éš”
+ *   @param wNum: å…ˆé ­ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wCount: ç¯„å›²
+ *   @param nTime: é–“éš” 
  */
 void SetSpriteAnimeTimeInterval() {
 	int wNum   = getCaliValue();
@@ -472,8 +472,8 @@ void SetSpriteAnimeTimeInterval() {
 
 /**
  * SACT.AddZKeyHideSprite (1.0~)
- *   ¥­¡¼ÆşÎÏÂÔ¤Á¤ÇZ¥­¡¼¤¬²¡¤µ¤ì¤¿¤È¤­¤ËÉ½¼¨OFF¤Ë¤Ê¤ë¥¹¥×¥é¥¤¥È¤ÎÅĞÏ¿
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   ã‚­ãƒ¼å…¥åŠ›å¾…ã¡ã§Zã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã¨ãã«è¡¨ç¤ºOFFã«ãªã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç™»éŒ²
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  */
 void AddZKeyHideSprite() {
 	int wNum = getCaliValue();
@@ -485,7 +485,7 @@ void AddZKeyHideSprite() {
 
 /**
  * SACT.ClearZKeyHideSprite (1.0~)
- *   AddZKeyHideSprite¤ÇÅĞÏ¿¤·¤¿¥¹¥×¥é¥¤¥ÈÈÖ¹æ¤òÁ´¤Æ¥¯¥ê¥¢
+ *   AddZKeyHideSpriteã§ç™»éŒ²ã—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·ã‚’å…¨ã¦ã‚¯ãƒªã‚¢
  */
 void ClearZKeyHideSprite() {
 	sp_clear_zkey_hidesprite_all();
@@ -495,10 +495,10 @@ void ClearZKeyHideSprite() {
 
 /**
  * SACT.SpriteFreeze (1.0~)
- *   ¥¹¥×¥é¥¤¥È¥¹¥¤¥Ã¥Á¤òwIndex¤Î¾õÂÖ¤Ç¸ÇÄê¤·¡¢~KEY 2:¤Ê¤É¤ÇÈ¿±ş¤·¤Ê¤¤
- *   ¤è¤¦¤Ë¤¹¤ë
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wIndex: ¸ÇÄê¤¹¤ë¾õÂÖÈÖ¹æ(1-3)
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚¹ã‚¤ãƒƒãƒã‚’wIndexã®çŠ¶æ…‹ã§å›ºå®šã—ã€~KEY 2:ãªã©ã§åå¿œã—ãªã„
+ *   ã‚ˆã†ã«ã™ã‚‹
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wIndex: å›ºå®šã™ã‚‹çŠ¶æ…‹ç•ªå·(1-3)
  */
 void SpriteFreeze() {
 	int wNum   = getCaliValue();
@@ -511,8 +511,8 @@ void SpriteFreeze() {
 
 /**
  * SACT.SpriteThaw (1.0~)
- *   Freeze¤·¤¿¥¹¥×¥é¥¤¥È¾õÂÖ¤ò²ò½ü
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   Freezeã—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆçŠ¶æ…‹ã‚’è§£é™¤
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  */
 void SpriteThaw() {
 	int wNum = getCaliValue();
@@ -524,10 +524,10 @@ void SpriteThaw() {
 
 /**
  * SACT.SpriteFreezeCount (1.0~)
- *   Ê£¿ô¤Î¥¹¥×¥é¥¤¥È¤òFreeze¤¹¤ë
- *   @param wNum: ÀèÆ¬¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wCount: ÈÏ°Ï
- *   @param wIndex: ¸ÇÄê¤¹¤ë¾õÂÖÈÖ¹æ
+ *   è¤‡æ•°ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’Freezeã™ã‚‹
+ *   @param wNum: å…ˆé ­ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wCount: ç¯„å›²
+ *   @param wIndex: å›ºå®šã™ã‚‹çŠ¶æ…‹ç•ªå·
  */
 void SpriteFreezeCount() {
 	int wNum   = getCaliValue();
@@ -544,9 +544,9 @@ void SpriteFreezeCount() {
 
 /**
  * SACT.SpriteThawCount (1.0~)
- *    Ê£¿ô¤ÎFreeze¥¹¥×¥é¥¤¥È¾õÂÖ¤Î²ò½ü
- *    @param wNum: ÀèÆ¬¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *    @param wCount: ÈÏ°Ï
+ *    è¤‡æ•°ã®Freezeã‚¹ãƒ—ãƒ©ã‚¤ãƒˆçŠ¶æ…‹ã®è§£é™¤
+ *    @param wNum: å…ˆé ­ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *    @param wCount: ç¯„å›²
  */
 void SpriteThawCount() {
 	int wNum   = getCaliValue();
@@ -562,8 +562,8 @@ void SpriteThawCount() {
 
 /**
  * SACT.QuakeSpriteAdd (1.0~)
- *   QuakeSprite¤ÇÍÉ¤é¤¹¥¹¥×¥é¥¤¥È¤òÄÉ²Ã
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   QuakeSpriteã§æºã‚‰ã™ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’è¿½åŠ 
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  */
 void QuakeSpriteAdd() {
 	int wNum = getCaliValue();
@@ -575,7 +575,7 @@ void QuakeSpriteAdd() {
 
 /**
  * SACT.QuakeSpriteReset (1.0~)
- *   QuakeSpriteAdd¤ÎÀßÄê¤òÁ´¤Æ²ò½ü
+ *   QuakeSpriteAddã®è¨­å®šã‚’å…¨ã¦è§£é™¤
  */
 void QuakeSpriteReset() {
 	sp_clear_quakesprite_all();
@@ -584,13 +584,13 @@ void QuakeSpriteReset() {
 
 /**
  * SACT.QuakeSprite (1.0~)
- *   QuakeSpriteAdd¤ÇÀßÄê¤·¤¿¥¹¥×¥é¥¤¥È¤òÍÉ¤é¤¹
- *   @param wType: 0:½Ä²£(Á´¤Æ¤Î¥¹¥×¥é¥¤¥È¤òÆ±¤¸¤è¤¦¤ËÍÉ¤é¤¹)
- *                 1:½Ä²£(Á´¤Æ¤Î¥¹¥×¥é¥¤¥È¤ò¥Ğ¥é¥Ğ¥é¤ËÍÉ¤é¤¹)
- *   @param wAmplitudeX: £ØÊı¸ş¤Î¿¶Éı
- *   @param wAmplitudeY: £ÙÊı¸ş¤Î¿¶Éı
- *   @param wCount: »ş´Ö(1/100ÉÃ)
- *   @param nfKeyEnable: (1.1~): ¥­¡¼¥­¥ã¥ó¥»¥ë¤¢¤ê(=1)
+ *   QuakeSpriteAddã§è¨­å®šã—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æºã‚‰ã™
+ *   @param wType: 0:ç¸¦æ¨ª(å…¨ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åŒã˜ã‚ˆã†ã«æºã‚‰ã™)
+ *                 1:ç¸¦æ¨ª(å…¨ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ãƒãƒ©ãƒãƒ©ã«æºã‚‰ã™)
+ *   @param wAmplitudeX: ï¼¸æ–¹å‘ã®æŒ¯å¹…
+ *   @param wAmplitudeY: ï¼¹æ–¹å‘ã®æŒ¯å¹…
+ *   @param wCount: æ™‚é–“(1/100ç§’)
+ *   @param nfKeyEnable: (1.1~): ã‚­ãƒ¼ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã‚ã‚Š(=1)
  */
 void QuakeSprite() {
 	int wType       = getCaliValue();
@@ -610,9 +610,9 @@ void QuakeSprite() {
 
 /**
  * SACT.QuerySpriteIsExist (1.0~)
- *  »ØÄê¤Î¥¹¥×¥é¥¤¥È¤¬ÅĞÏ¿¤µ¤ì¤Æ¤¤¤ë¤«¤É¤¦¤«¤ò¼èÆÀ
- *  @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *  @param var: ÅĞÏ¿¾õÂÖ¤òÊÖ¤¹ÊÑ¿ô 0: Ì¤ÅĞÏ¿, 1:´ûÅĞÏ¿
+ *  æŒ‡å®šã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ã‚’å–å¾—
+ *  @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *  @param var: ç™»éŒ²çŠ¶æ…‹ã‚’è¿”ã™å¤‰æ•° 0: æœªç™»éŒ², 1:æ—¢ç™»éŒ²
  */
 void QuerySpriteIsExist() {
 	int wNum = getCaliValue();
@@ -625,12 +625,12 @@ void QuerySpriteIsExist() {
 
 /**
  * SACT.QuerySpriteInfo (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤Î¾ğÊó¤ò¼èÆÀ
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param vType: ¥¹¥×¥é¥¤¥È¥¿¥¤¥×¡£¥Æ¥­¥¹¥È¥¹¥×¥é¥¤¥È¤Î¾ì¹ç¤Ï100
- *   @param vCG1: £Ã£Ç£±(¤Ê¤¤¾ì¹ç¤Ï£°)
- *   @param vCG2: £Ã£Ç£²(¤Ê¤¤¾ì¹ç¤Ï£°)
- *   @param vCG3: £Ã£Ç£³(¤Ê¤¤¾ì¹ç¤Ï£°)
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æƒ…å ±ã‚’å–å¾—
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param vType: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚¿ã‚¤ãƒ—ã€‚ãƒ†ã‚­ã‚¹ãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å ´åˆã¯100
+ *   @param vCG1: ï¼£ï¼§ï¼‘(ãªã„å ´åˆã¯ï¼)
+ *   @param vCG2: ï¼£ï¼§ï¼’(ãªã„å ´åˆã¯ï¼)
+ *   @param vCG3: ï¼£ï¼§ï¼“(ãªã„å ´åˆã¯ï¼)
  */
 void QuerySpriteInfo() {
 	int wNum   = getCaliValue();
@@ -646,9 +646,9 @@ void QuerySpriteInfo() {
 
 /**
  * SACT.QuerySpriteShow (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨¾õÂÖ(SP_SHOW¤ÎÃÍ)¤ò¼èÆÀ
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param vShow: 0:ÈóÉ½¼¨, 1:É½¼¨
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºçŠ¶æ…‹(SP_SHOWã®å€¤)ã‚’å–å¾—
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param vShow: 0:éè¡¨ç¤º, 1:è¡¨ç¤º
  */
 void QuerySpriteShow() {
 	int wNum = getCaliValue();
@@ -661,10 +661,10 @@ void QuerySpriteShow() {
 
 /**
  * SACT.QuerySpritePos (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨°ÌÃÖ¤Î¼èÆÀ
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param vX: £ØºÂÉ¸
- *   @param vY: £ÙºÂÉ¸
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºä½ç½®ã®å–å¾—
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param vX: ï¼¸åº§æ¨™
+ *   @param vY: ï¼¹åº§æ¨™
  */
 void QuerySpritePos() {
 	int wNum = getCaliValue();
@@ -678,10 +678,10 @@ void QuerySpritePos() {
 
 /**
  * SACT.QuerySpriteSize (1.0~)
- *   ¥¹¥×¥é¥¤¥È¤ÎÂç¤­¤µ¤Î¼èÆÀ
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param vWidth: ¥¹¥×¥é¥¤¥È¤ÎÉı
- *   @param vHeight: ¥¹¥×¥é¥¤¥È¤Î¹â¤µ
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¤§ãã•ã®å–å¾—
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param vWidth: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¹…
+ *   @param vHeight: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®é«˜ã•
  */
 void QuerySpriteSize() {
 	int wNum     = getCaliValue();
@@ -695,7 +695,7 @@ void QuerySpriteSize() {
 
 /**
  * SACT.QueryTextPos (1.2~)
- *   ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥È¤ÎÊ¸»ú°ÌÃÖ
+ *   ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æ–‡å­—ä½ç½®
  *   @param nMesSpID:
  *   @param pwX:
  *   @param pwY:
@@ -712,7 +712,7 @@ void QueryTextPos() {
 
 /**
  * SCAT.CG_Clear (1.0~)
- *   CG_Create¤ÇºîÀ®¤·¤¿CG¤òÁ´¤Æºï½ü
+ *   CG_Createã§ä½œæˆã—ãŸCGã‚’å…¨ã¦å‰Šé™¤
  */
 void CG_Clear() {
 	scg_freeall();
@@ -722,8 +722,8 @@ void CG_Clear() {
 
 /**
  * SACT.CG_Reset (1.0~)
- *   CG_Create¤ÇºîÀ®¤·¤¿CG¤òºï½ü
- *   @param wNumCG: ºï½ü¤¹¤ëCGÈÖ¹æ
+ *   CG_Createã§ä½œæˆã—ãŸCGã‚’å‰Šé™¤
+ *   @param wNumCG: å‰Šé™¤ã™ã‚‹CGç•ªå·
  */
 void CG_Reset() {
 	int wNumCG = getCaliValue();
@@ -735,10 +735,10 @@ void CG_Reset() {
 
 /**
  * SACT.CG_QueryType (1.0~)
- *   CG¤Î¾õÂÖ(CG¤Î¥¿¥¤¥×)¤ò¼èÆÀ
- *   @param wNumCG: CGÈÖ¹æ
- *   @param vType: CG¤Î¼ïÎà, 0: Ì¤»ÈÍÑ, 1:¥ê¥ó¥¯¤µ¤ì¤Æ¤¤¤ë, 2: CG_SET¤ÇºîÀ®
- *                 3: CG_REVERSE¤ÇºîÀ®, 4: CG_STRETCH¤ÇºîÀ®
+ *   CGã®çŠ¶æ…‹(CGã®ã‚¿ã‚¤ãƒ—)ã‚’å–å¾—
+ *   @param wNumCG: CGç•ªå·
+ *   @param vType: CGã®ç¨®é¡, 0: æœªä½¿ç”¨, 1:ãƒªãƒ³ã‚¯ã•ã‚Œã¦ã„ã‚‹, 2: CG_SETã§ä½œæˆ
+ *                 3: CG_REVERSEã§ä½œæˆ, 4: CG_STRETCHã§ä½œæˆ
  */
 void CG_QueryType() {
 	int wNumCG = getCaliValue();
@@ -751,10 +751,10 @@ void CG_QueryType() {
 
 /**
  * SACT.CG_QuerySize (1.0~)
- *   CG¤ÎÂç¤­¤µ¤ò¼èÆÀ
- *   @param wNumCG: CGÈÖ¹æ
- *   @param vWidth: Éı
- *   @param vHeight: ¹â¤µ
+ *   CGã®å¤§ãã•ã‚’å–å¾—
+ *   @param wNumCG: CGç•ªå·
+ *   @param vWidth: å¹…
+ *   @param vHeight: é«˜ã•
  */
 void CG_QuerySize() {
 	int wNumCG   = getCaliValue();
@@ -768,9 +768,9 @@ void CG_QuerySize() {
 
 /**
  * SACT.CG_QueryBpp (1.0~)
- *   CG¤Îbpp¤ò¼èÆÀ
- *   @param wNumCG: CGÈÖ¹æ
- *   @param vBpp: CG¤Îbpp
+ *   CGã®bppã‚’å–å¾—
+ *   @param wNumCG: CGç•ªå·
+ *   @param vBpp: CGã®bpp
  */
 void CG_QueryBpp() {
 	int wNumCG = getCaliValue();
@@ -783,8 +783,8 @@ void CG_QueryBpp() {
 
 /**
  * SACT.CG_ExistAlphaMap (1.0~)
- *   CG¤Î¦Á¥Ş¥Ã¥×(¥Ş¥¹¥¯)¤¬¤¢¤ì¤Ğ£±¡¢¤Ê¤±¤ì¤Ğ£°
- *   @param wNumCG: CGÈÖ¹æ
+ *   CGã®Î±ãƒãƒƒãƒ—(ãƒã‚¹ã‚¯)ãŒã‚ã‚Œã°ï¼‘ã€ãªã‘ã‚Œã°ï¼
+ *   @param wNumCG: CGç•ªå·
  *   @param vMask: 0/1
  */
 void CG_ExistAlphaMap() {
@@ -798,14 +798,14 @@ void CG_ExistAlphaMap() {
 
 /**
  * SACT.CG_Create (1.0~)
- *   »ØÄê¥µ¥¤¥º¡¢¿§¡¢¥Ö¥ì¥ó¥ÉÎ¨¤Î»Í³Ñ¤òÉ½¼¨¤¹¤ë
- *   @param wNumCG: CGÈÖ¹æ
- *   @param wWidth: Éı
- *   @param wHeight: ¹â¤µ
- *   @param wR: RGBÃÍ¤ÎÀÖ(0-255)
- *   @param wG: RGBÃÍ¤ÎÎĞ(0-255)
- *   @param wB: RGBÃÍ¤ÎÀÄ(0-255)
- *   @param wBlendRate: ¥Ö¥ì¥ó¥ÉÎ¨(0-255)
+ *   æŒ‡å®šã‚µã‚¤ã‚ºã€è‰²ã€ãƒ–ãƒ¬ãƒ³ãƒ‰ç‡ã®å››è§’ã‚’è¡¨ç¤ºã™ã‚‹
+ *   @param wNumCG: CGç•ªå·
+ *   @param wWidth: å¹…
+ *   @param wHeight: é«˜ã•
+ *   @param wR: RGBå€¤ã®èµ¤(0-255)
+ *   @param wG: RGBå€¤ã®ç·‘(0-255)
+ *   @param wB: RGBå€¤ã®é’(0-255)
+ *   @param wBlendRate: ãƒ–ãƒ¬ãƒ³ãƒ‰ç‡(0-255)
  */
 void CG_Create() {
 	int wNumCG     = getCaliValue();
@@ -823,11 +823,11 @@ void CG_Create() {
 
 /**
  * SACT,CG_CreateReverse (1.0~)
- *   ¸µ¤Ë¤Ê¤ëCG¤òÈ¿Å¾¤·¤¿CG¤òºîÀ®¤¹¤ë
- *   @param wNumCG: CGÈÖ¹æ
- *   @param wNumSrcCG: ¥³¥Ô¡¼¤Î¸µ¤Ë¤Ê¤ëCG¤ÎÈÖ¹æ
- *   @param wReverseX: XÊı¸ş¤ÎÈ¿Å¾¥¹¥¤¥Ã¥Á(0:È¿Å¾¤·¤Ê¤¤¡¢1:È¿Å¾¤¹¤ë)
- *   @param wReverseY: YÊı¸ş¤ÎÈ¿Å¾¥¹¥¤¥Ã¥Á(0:È¿Å¾¤·¤Ê¤¤¡¢1:È¿Å¾¤¹¤ë)
+ *   å…ƒã«ãªã‚‹CGã‚’åè»¢ã—ãŸCGã‚’ä½œæˆã™ã‚‹
+ *   @param wNumCG: CGç•ªå·
+ *   @param wNumSrcCG: ã‚³ãƒ”ãƒ¼ã®å…ƒã«ãªã‚‹CGã®ç•ªå·
+ *   @param wReverseX: Xæ–¹å‘ã®åè»¢ã‚¹ã‚¤ãƒƒãƒ(0:åè»¢ã—ãªã„ã€1:åè»¢ã™ã‚‹)
+ *   @param wReverseY: Yæ–¹å‘ã®åè»¢ã‚¹ã‚¤ãƒƒãƒ(0:åè»¢ã—ãªã„ã€1:åè»¢ã™ã‚‹)
  */
 void CG_CreateReverse() {
 	int wNumCG = getCaliValue();
@@ -842,11 +842,11 @@ void CG_CreateReverse() {
 
 /**
  * SACT.CG_CreateStretch (1.0~)
- *   ¸µ¤Ë¤Ê¤ëCG¤ò³ÈÂç¤â¤·¤¯¤Ï½Ì¾®¤·¤¿CG¤òºîÀ®¤¹¤ë
- *   @param wNumCG: CGÈÖ¹æ
- *   @param wWidth: ºîÀ®¤¹¤ëCG¤ÎÉı
- *   @param wHeight: ºîÀ®¤¹¤ëCG¤Î¹â¤µ
- *   @param wNumSrcCG: ¸µ¤Ë¤Ê¤ëCG¤ÎÈÖ¹æ
+ *   å…ƒã«ãªã‚‹CGã‚’æ‹¡å¤§ã‚‚ã—ãã¯ç¸®å°ã—ãŸCGã‚’ä½œæˆã™ã‚‹
+ *   @param wNumCG: CGç•ªå·
+ *   @param wWidth: ä½œæˆã™ã‚‹CGã®å¹…
+ *   @param wHeight: ä½œæˆã™ã‚‹CGã®é«˜ã•
+ *   @param wNumSrcCG: å…ƒã«ãªã‚‹CGã®ç•ªå·
  */
 void CG_CreateStretch() {
 	int wNumCG    = getCaliValue();
@@ -861,13 +861,13 @@ void CG_CreateStretch() {
 
 /**
  * SACT.CG_CreateBlend (1.0~)
- *   £²Ëç¤ÎCG¤ò¤«¤µ¤Í¤¢¤ï¤»¤¿CG¤òºîÀ®
- *   @param wNumDstCG: CGÈÖ¹æ(ºîÀ®Àè)
- *   @param wNumBaseCG: ½Å¤Í¹ç¤ï¤»¤Î¤â¤È¤È¤Ê¤ëCG
- *   @param wX: ½Å¤Í¹ç¤ï¤»¤ë°ÌÃÖ¤Î£ØºÂÉ¸
- *   @param wY: ½Å¤Í¹ç¤ï¤»¤ë°ÌÃÖ¤Î£ÙºÂÉ¸
- *   @param wNumBlendCG: ¾å¤Ë½Å¤Í¹ç¤ï¤»¤ëCG
- *   @param wAlphaMapMode: ¦Á¥Ş¥Ã¥×¤ÎºîÀ®¥â¡¼¥É
+ *   ï¼’æšã®CGã‚’ã‹ã•ã­ã‚ã‚ã›ãŸCGã‚’ä½œæˆ
+ *   @param wNumDstCG: CGç•ªå·(ä½œæˆå…ˆ)
+ *   @param wNumBaseCG: é‡ã­åˆã‚ã›ã®ã‚‚ã¨ã¨ãªã‚‹CG
+ *   @param wX: é‡ã­åˆã‚ã›ã‚‹ä½ç½®ã®ï¼¸åº§æ¨™
+ *   @param wY: é‡ã­åˆã‚ã›ã‚‹ä½ç½®ã®ï¼¹åº§æ¨™
+ *   @param wNumBlendCG: ä¸Šã«é‡ã­åˆã‚ã›ã‚‹CG
+ *   @param wAlphaMapMode: Î±ãƒãƒƒãƒ—ã®ä½œæˆãƒ¢ãƒ¼ãƒ‰
  */
 void CG_CreateBlend() {
 	int wNumDstCG  = getCaliValue();
@@ -884,13 +884,13 @@ void CG_CreateBlend() {
 
 /**
  * SACT.CG_CreateText (1.0~)
- *   Ê¸»úÎó¤«¤éCG¤òºîÀ®
- *   @param wNumCG: ºîÀ®¤¹¤ëCGÈÖ¹æ
- *   @param wSize: Ê¸»ú¤Î¹â¤µ(pixel)
- *   @param wR: Ê¸»ú¤ÎRÃÍ(0-255)
- *   @param wG: Ê¸»ú¤ÎGÃÍ(0-255)
- *   @param wB: Ê¸»ú¤ÎBÃÍ(0-255)
- *   @param wText: ÉÁ²è¤¹¤ëÊ¸»úÎóÊÑ¿ô¤ÎÈÖ¹æ
+ *   æ–‡å­—åˆ—ã‹ã‚‰CGã‚’ä½œæˆ
+ *   @param wNumCG: ä½œæˆã™ã‚‹CGç•ªå·
+ *   @param wSize: æ–‡å­—ã®é«˜ã•(pixel)
+ *   @param wR: æ–‡å­—ã®Rå€¤(0-255)
+ *   @param wG: æ–‡å­—ã®Gå€¤(0-255)
+ *   @param wB: æ–‡å­—ã®Bå€¤(0-255)
+ *   @param wText: æç”»ã™ã‚‹æ–‡å­—åˆ—å¤‰æ•°ã®ç•ªå·
  */
 void CG_CreateText() {
 	int wNumCG = getCaliValue();
@@ -907,16 +907,16 @@ void CG_CreateText() {
 
 /**
  * SACT.CG_CreateTextNum (1.0~)
- *   ¿ôÃÍ¤«¤é¥·¥¹¥Æ¥à¥Æ¥­¥¹¥È¤ÎCG¤òºîÀ®
- *   @param wNumCG: ºîÀ®¤¹¤ëCGÈÖ¹æ
- *   @param wSize: Ê¸»ú¤Î¹â¤µ(pixel)
- *   @param wR: Ê¸»ú¤ÎRÃÍ(0-255)
- *   @param wG: Ê¸»ú¤ÎGÃÍ(0-255)
- *   @param wB: Ê¸»ú¤ÎBÃÍ(0-255)
- *   @param wFigs: ·å¿ô
- *   @param wZeroPadding: ·å¿ô¤ËËş¤¿¤Ê¤¤ÉôÊ¬£°¤ÇËä¤á¤ë¤«¤É¤¦¤«¤Î¥Õ¥é¥°
- *                        0:¥¼¥íËä¤á¤·¤Ê¤¤ 1:¥¼¥íËä¤á¤¹¤ë
- *   @param wValue: ÉÁ²è¤¹¤ëÃÍ
+ *   æ•°å€¤ã‹ã‚‰ã‚·ã‚¹ãƒ†ãƒ ãƒ†ã‚­ã‚¹ãƒˆã®CGã‚’ä½œæˆ
+ *   @param wNumCG: ä½œæˆã™ã‚‹CGç•ªå·
+ *   @param wSize: æ–‡å­—ã®é«˜ã•(pixel)
+ *   @param wR: æ–‡å­—ã®Rå€¤(0-255)
+ *   @param wG: æ–‡å­—ã®Gå€¤(0-255)
+ *   @param wB: æ–‡å­—ã®Bå€¤(0-255)
+ *   @param wFigs: æ¡æ•°
+ *   @param wZeroPadding: æ¡æ•°ã«æº€ãŸãªã„éƒ¨åˆ†ï¼ã§åŸ‹ã‚ã‚‹ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+ *                        0:ã‚¼ãƒ­åŸ‹ã‚ã—ãªã„ 1:ã‚¼ãƒ­åŸ‹ã‚ã™ã‚‹
+ *   @param wValue: æç”»ã™ã‚‹å€¤
  */
 void CG_CreateTextNum() {
 	int wNumCG       = getCaliValue();
@@ -935,9 +935,9 @@ void CG_CreateTextNum() {
 
 /**
  * SACT.CG_Copy (1.0~)
- *   CG¤òÊ£À½
- *   @param wNumDst: Ê£¼ÌÀè¤ÎCGÈÖ¹æ
- *   @param wNumSrc: Ê£¼Ì¸µ¤ÎCGÈÖ¹æ
+ *   CGã‚’è¤‡è£½
+ *   @param wNumDst: è¤‡å†™å…ˆã®CGç•ªå·
+ *   @param wNumSrc: è¤‡å†™å…ƒã®CGç•ªå·
  */
 void CG_Copy() {
 	int wNumDst = getCaliValue();
@@ -950,13 +950,13 @@ void CG_Copy() {
 
 /**
  * SACT.CG_Cut (1.0~)
- *   ¸µ¤ÎCG¤Î°ìÉô¤òÀÚ¤ê¤Ì¤¤¤¿CG¤òºîÀ®
- *   @param wNumDstCG: CGÈÖ¹æ(ºîÀ®Àè)
- *   @param wNumSrcCG: CGÈÖ¹æ(¥«¥Ã¥È¸µ)
- *   @param wX: ¥«¥Ã¥È³«»Ï£ØºÂÉ¸
- *   @param wY: ¥«¥Ã¥È³«»Ï£ÙºÂÉ¸
- *   @param wWidth: ¥«¥Ã¥ÈÉı
- *   @param wHeight: ¥«¥Ã¥È¹â¤µ
+ *   å…ƒã®CGã®ä¸€éƒ¨ã‚’åˆ‡ã‚Šã¬ã„ãŸCGã‚’ä½œæˆ
+ *   @param wNumDstCG: CGç•ªå·(ä½œæˆå…ˆ)
+ *   @param wNumSrcCG: CGç•ªå·(ã‚«ãƒƒãƒˆå…ƒ)
+ *   @param wX: ã‚«ãƒƒãƒˆé–‹å§‹ï¼¸åº§æ¨™
+ *   @param wY: ã‚«ãƒƒãƒˆé–‹å§‹ï¼¹åº§æ¨™
+ *   @param wWidth: ã‚«ãƒƒãƒˆå¹…
+ *   @param wHeight: ã‚«ãƒƒãƒˆé«˜ã•
  */
 void CG_Cut() {
 	int wNumDstCG = getCaliValue();
@@ -973,14 +973,14 @@ void CG_Cut() {
 
 /**
  * SACT.CG_PartCopy (1.0~)
- *   ¸µ¤ÎCG¤Î°ìÉô¤òÀÚ¤ê¤Ì¤¤¤¿CG¤òºîÀ®¡¢CG¤Î¥µ¥¤¥º¼«ÂÎ¤Ï¤â¤È¤Î¤Ş¤Ş¤Ç¡¢
- *   ¥Ş¥¹¥¯¥Ç¡¼¥¿¤Î¤ß¤ò½èÍı¤·¤Æ¸«³İ¤±¾å¤Î¥µ¥¤¥º¤òÊÑ²½¤µ¤»¤ë
- *   @param wNumDstCG: CGÈÖ¹æ(ºîÀ®Àè)
- *   @param wNumSrcCG: CGÈÖ¹æ(¸µ)
- *   @param wX: ³«»Ï£ØºÂÉ¸
- *   @param wY: ³«»Ï£ÙºÂÉ¸
- *   @param wWidth: ¥«¥Ã¥ÈÉı
- *   @param wHeight: ¥«¥Ã¥È¹â¤µ
+ *   å…ƒã®CGã®ä¸€éƒ¨ã‚’åˆ‡ã‚Šã¬ã„ãŸCGã‚’ä½œæˆã€CGã®ã‚µã‚¤ã‚ºè‡ªä½“ã¯ã‚‚ã¨ã®ã¾ã¾ã§ã€
+ *   ãƒã‚¹ã‚¯ãƒ‡ãƒ¼ã‚¿ã®ã¿ã‚’å‡¦ç†ã—ã¦è¦‹æ›ã‘ä¸Šã®ã‚µã‚¤ã‚ºã‚’å¤‰åŒ–ã•ã›ã‚‹
+ *   @param wNumDstCG: CGç•ªå·(ä½œæˆå…ˆ)
+ *   @param wNumSrcCG: CGç•ªå·(å…ƒ)
+ *   @param wX: é–‹å§‹ï¼¸åº§æ¨™
+ *   @param wY: é–‹å§‹ï¼¹åº§æ¨™
+ *   @param wWidth: ã‚«ãƒƒãƒˆå¹…
+ *   @param wHeight: ã‚«ãƒƒãƒˆé«˜ã•
  */
 void CG_PartCopy() {
 	int wNumDstCG = getCaliValue();
@@ -997,15 +997,15 @@ void CG_PartCopy() {
 
 /**
  * SACT.WiatKeySimple (1.0~)
- *   ÄÌ¾ï¥­¡¼ÆşÎÏÂÔ¤Á
- *   @param vKey: ÆşÎÏ¤µ¤ì¤¿¥­¡¼
+ *   é€šå¸¸ã‚­ãƒ¼å…¥åŠ›å¾…ã¡
+ *   @param vKey: å…¥åŠ›ã•ã‚ŒãŸã‚­ãƒ¼
  */
 void WaitKeySimple() {
 	int *vKey = getCaliVariable();
 
 	DEBUG_COMMAND_YET("SACT.WaitKeySimple %d:\n", vKey);
 
-	// ¤È¤ê¤¢¤¨¤ºÁ´¹¹¿·
+	// ã¨ã‚Šã‚ãˆãšå…¨æ›´æ–°
 	sp_update_all(TRUE);
 	
 	sact.waittype = KEYWAIT_SIMPLE;
@@ -1023,9 +1023,9 @@ void WaitKeySimple() {
 
 /**
  * SACT.WaitKeyMessgae (1.0~)
- *   ¥á¥Ã¥»¡¼¥¸¥­¡¼ÆşÎÏÂÔ¤Á
- *   @param wMessageMark1: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ1(¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È)
- *   @param wMessageMark2: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ2(¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È)
+ *   ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚­ãƒ¼å…¥åŠ›å¾…ã¡
+ *   @param wMessageMark1: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·1(ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ)
+ *   @param wMessageMark2: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·2(ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ)
  *   @param wMessageLength: (1.2~)
  */
 void WaitKeyMessage() {
@@ -1044,11 +1044,11 @@ void WaitKeyMessage() {
 
 /**
  * SACT.WaitKeySprite (1.0~)
- *   ¥¹¥×¥é¥¤¥È½èÍıÂÔ¤Á
- *   @param vOK: 0¤Ê¤é¤Ğ±¦¥¯¥ê¥Ã¥¯ 
- *   @param vRND: ¥­¡¼ÆşÎÏ·ë²Ì
- *   @param vRsv1: Í½Ìó
- *   @param vRsv2: Í½Ìó
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå‡¦ç†å¾…ã¡
+ *   @param vOK: 0ãªã‚‰ã°å³ã‚¯ãƒªãƒƒã‚¯ 
+ *   @param vRND: ã‚­ãƒ¼å…¥åŠ›çµæœ
+ *   @param vRsv1: äºˆç´„
+ *   @param vRsv2: äºˆç´„
  */
 void WaitKeySprite() {
 	int *vOK = getCaliVariable();
@@ -1079,7 +1079,7 @@ void PeekKey() {
 
 /**
  * SACT.WaitKeySKipKeyUp (1.0~)
- *   Ê¸»úÁ÷¤ê¥­¡¼¤¬²¡¤µ¤ì¤Ã¤Ñ¤Ê¤·¤Î»ş¡¢Î¥¤µ¤ì¤ë¤Ş¤ÇÂÔ¤Ä
+ *   æ–‡å­—é€ã‚Šã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã£ã±ãªã—ã®æ™‚ã€é›¢ã•ã‚Œã‚‹ã¾ã§å¾…ã¤
  */
 void WaitMsgSkipKeyUp() {
 	WARNING("NOT IMPLEMENTED\n");
@@ -1088,10 +1088,10 @@ void WaitMsgSkipKeyUp() {
 
 /**
  * SACT.WaiKeySimpleTimeOut (1.0~)
- *   ¥¿¥¤¥à¥¢¥¦¥È¤Ä¤­¥­¡¼¥¦¥§¥¤¥È
- *   @param vRND: ÆşÎÏ¤µ¤ì¤¿¥­¡¼¥³¡¼¥É
- *   @param vD03: ¥¿¥¤¥à¥¢¥¦¥È¤·¤¿¾ì¹ç=1, ¤·¤Ê¤¤¾ì¹ç=0
- *   @param wTime: ¥¿¥¤¥à¥¢¥¦¥È»ş´Ö (1/100sec)
+ *   ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã¤ãã‚­ãƒ¼ã‚¦ã‚§ã‚¤ãƒˆ
+ *   @param vRND: å…¥åŠ›ã•ã‚ŒãŸã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰
+ *   @param vD03: ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã—ãŸå ´åˆ=1, ã—ãªã„å ´åˆ=0
+ *   @param wTime: ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆæ™‚é–“ (1/100sec)
  */
 void WaitKeySimpleTimeOut() {
 	int *vRND = getCaliVariable();
@@ -1117,13 +1117,13 @@ void WaitKeySimpleTimeOut() {
 
 /**
  * SACT.WaiKeySpriteTimeOut (1.0~)
- *   ¥¿¥¤¥à¥¢¥¦¥È¤Ä¤­¥¹¥×¥é¥¤¥È¥­¡¼¥¦¥§¥¤¥È 
- *   @param vOK: 0 ¤Î»ş±¦¥¯¥ê¥Ã¥¯
- *   @param vRND: ¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ
- *   @param vD01: ¥²¥Ã¥È¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ
- *   @param vD02: ¥×¥Ã¥È¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ
- *   @param vD03: ¥¿¥¤¥à¥¢¥¦¥È¤·¤¿¾ì¹ç=1, ¤·¤Ê¤¤¾ì¹ç=0
- *   @param wTime: ¥¿¥¤¥à¥¢¥¦¥È»ş´Ö (1/100sec)
+ *   ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã¤ãã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚­ãƒ¼ã‚¦ã‚§ã‚¤ãƒˆ 
+ *   @param vOK: 0 ã®æ™‚å³ã‚¯ãƒªãƒƒã‚¯
+ *   @param vRND: ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·
+ *   @param vD01: ã‚²ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·
+ *   @param vD02: ãƒ—ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·
+ *   @param vD03: ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã—ãŸå ´åˆ=1, ã—ãªã„å ´åˆ=0
+ *   @param wTime: ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆæ™‚é–“ (1/100sec)
  */
 void WaitKeySpriteTimeOut() {
 	int *vOK = getCaliVariable();
@@ -1153,9 +1153,9 @@ void QueryMessageSkip() {
 
 /**
  * SACT.RegistReplaceString (1.0~)
- *   ¥á¥Ã¥»¡¼¥¸Ãæ¤ÎÊ¸»úÎó¤ÎÃÖ¤­´¹¤¨
- *   @param sstr: ÊÑ´¹¸µÊ¸»úÎóÈÖ¹æ
- *   @param dstr: ÊÑ´¹ÀèÊ¸»úÎóÈÖ¹æ
+ *   ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ä¸­ã®æ–‡å­—åˆ—ã®ç½®ãæ›ãˆ
+ *   @param sstr: å¤‰æ›å…ƒæ–‡å­—åˆ—ç•ªå·
+ *   @param dstr: å¤‰æ›å…ˆæ–‡å­—åˆ—ç•ªå·
  */
 void RegistReplaceString() {
 	int sstr = getCaliValue();
@@ -1168,18 +1168,18 @@ void RegistReplaceString() {
 
 /**
  * SACT.MessageOutput (1.0~)
- *   @param wMessageSpriteNumber: ¥á¥Ã¥»¡¼¥¸¤òÉ½¼¨¤¹¤ë¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   @param wMessageSpriteNumber: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  *                                (~MES)
- *   @param wMessageSize: ¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ (~MES_SIZE|~MES_SET)
- *   @param wMessageColorR: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Red) (~MES_SET|~MES_COLOR)
- *   @param wMessageColorG: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Green) (~MES_SET|~MES_COLOR)
- *   @param wMessageColorB: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Blue) (~MES_SET|~MES_COLOR)
- *   @param wMessageFont: ¥á¥Ã¥»¡¼¥¸¤Î¥Õ¥©¥ó¥È(0:¥´¥·¥Ã¥¯, 1:ÌÀÄ«)
+ *   @param wMessageSize: ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã• (~MES_SIZE|~MES_SET)
+ *   @param wMessageColorR: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Red) (~MES_SET|~MES_COLOR)
+ *   @param wMessageColorG: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Green) (~MES_SET|~MES_COLOR)
+ *   @param wMessageColorB: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Blue) (~MES_SET|~MES_COLOR)
+ *   @param wMessageFont: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ãƒ•ã‚©ãƒ³ãƒˆ(0:ã‚´ã‚·ãƒƒã‚¯, 1:æ˜æœ)
  *                         (~MES_FONT)
- *   @param wMessageSpeed: ¥á¥Ã¥»¡¼¥¸¤ÎÉ½¼¨Â®ÅÙ(0:¥¦¥§¥¤¥ÈÌµ¤·, 1:Â®¤¤,
- *                          2:Ãæ¤¯¤é¤¤, 3: ÃÙ¤¤) (~MES_SPEED) (msec)
- *   @param wMessageLineSpace: ¹Ô´Ö¥¹¥Ú¡¼¥¹ (~MES_SPC_Y)
- *   @param wMessageAlign: ¹Ô¤½¤í¤¨ (1.1~)
+ *   @param wMessageSpeed: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è¡¨ç¤ºé€Ÿåº¦(0:ã‚¦ã‚§ã‚¤ãƒˆç„¡ã—, 1:é€Ÿã„,
+ *                          2:ä¸­ãã‚‰ã„, 3: é…ã„) (~MES_SPEED) (msec)
+ *   @param wMessageLineSpace: è¡Œé–“ã‚¹ãƒšãƒ¼ã‚¹ (~MES_SPC_Y)
+ *   @param wMessageAlign: è¡Œãã‚ãˆ (1.1~)
  *   @param vMessageLength: ???     (1.2~)
  */
 void MessageOutput() {
@@ -1208,22 +1208,22 @@ void MessageOutput() {
 
 /**
  * SACT.MessageOutputEx (1.1~)
- *   ¥ë¥Ó¤Ä¤­¥á¥Ã¥»¡¼¥¸½ĞÎÏ
- *   @param wMessageSpriteNumber: ¥á¥Ã¥»¡¼¥¸¤òÉ½¼¨¤¹¤ë¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   ãƒ«ãƒ“ã¤ããƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›
+ *   @param wMessageSpriteNumber: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  *                                (~MES)
- *   @param wMessageSize: ¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ (~MES_SIZE|~MES_SET)
- *   @param wMessageColorR: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Red) (~MES_SET|~MES_COLOR)
- *   @param wMessageColorG: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Green) (~MES_SET|~MES_COLOR)
- *   @param wMessageColorB: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Blue) (~MES_SET|~MES_COLOR)
- *   @param wMessageFont: ¥á¥Ã¥»¡¼¥¸¤Î¥Õ¥©¥ó¥È(0:¥´¥·¥Ã¥¯, 1:ÌÀÄ«)
+ *   @param wMessageSize: ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã• (~MES_SIZE|~MES_SET)
+ *   @param wMessageColorR: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Red) (~MES_SET|~MES_COLOR)
+ *   @param wMessageColorG: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Green) (~MES_SET|~MES_COLOR)
+ *   @param wMessageColorB: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Blue) (~MES_SET|~MES_COLOR)
+ *   @param wMessageFont: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ãƒ•ã‚©ãƒ³ãƒˆ(0:ã‚´ã‚·ãƒƒã‚¯, 1:æ˜æœ)
  *                         (~MES_FONT)
- *   @param wMessageSpeed: ¥á¥Ã¥»¡¼¥¸¤ÎÉ½¼¨Â®ÅÙ(0:¥¦¥§¥¤¥ÈÌµ¤·, 1:Â®¤¤,
- *                          2:Ãæ¤¯¤é¤¤, 3: ÃÙ¤¤) (~MES_SPEED)
- *   @param wMessageLineSpace: ¹Ô´Ö¥¹¥Ú¡¼¥¹ (~MES_SPC_Y)
- *   @param wMessageAlign: ¹Ô¤½¤í¤¨
- *   @param wRubySize:     ¥ë¥ÓÊ¸»ú¤ÎÂç¤­¤µ
- *   @param wRubyFont:     ¥ë¥ÓÊ¸»ú¤Î¥Õ¥©¥ó¥È¤Î¼ïÎà((0:¥´¥·¥Ã¥¯, 1:ÌÀÄ«)
- *   @param wRubyLineSpace: ¥ë¥ÓÊ¸»ú¤È¥á¥Ã¥»¡¼¥¸¤Î¹Ô´Ö¥¹¥Ú¡¼¥¹
+ *   @param wMessageSpeed: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è¡¨ç¤ºé€Ÿåº¦(0:ã‚¦ã‚§ã‚¤ãƒˆç„¡ã—, 1:é€Ÿã„,
+ *                          2:ä¸­ãã‚‰ã„, 3: é…ã„) (~MES_SPEED)
+ *   @param wMessageLineSpace: è¡Œé–“ã‚¹ãƒšãƒ¼ã‚¹ (~MES_SPC_Y)
+ *   @param wMessageAlign: è¡Œãã‚ãˆ
+ *   @param wRubySize:     ãƒ«ãƒ“æ–‡å­—ã®å¤§ãã•
+ *   @param wRubyFont:     ãƒ«ãƒ“æ–‡å­—ã®ãƒ•ã‚©ãƒ³ãƒˆã®ç¨®é¡((0:ã‚´ã‚·ãƒƒã‚¯, 1:æ˜æœ)
+ *   @param wRubyLineSpace: ãƒ«ãƒ“æ–‡å­—ã¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è¡Œé–“ã‚¹ãƒšãƒ¼ã‚¹
  *   @param vLength: ???    (1.2~)
  */
 void MessageOutputEx() {
@@ -1252,9 +1252,9 @@ void MessageOutputEx() {
 
 /**
  * SACT.MessageNewLine (1.0~)
- *   ²ş¹Ô(£Ò¥³¥Ş¥ó¥ÉÁêÅö) (~MES_NEW_LINE)
- *   @param wMessageSpriteNumber: ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param wMessageSize: ¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ (~MES_SIZE|~MES_SET)
+ *   æ”¹è¡Œ(ï¼²ã‚³ãƒãƒ³ãƒ‰ç›¸å½“) (~MES_NEW_LINE)
+ *   @param wMessageSpriteNumber: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param wMessageSize: ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã• (~MES_SIZE|~MES_SET)
  */
 void MessageNewLine() {
 	int wMessageSpriteNumber = getCaliValue();
@@ -1267,8 +1267,8 @@ void MessageNewLine() {
 
 /**
  * SACT.MessageClear (1.0~)
- *   ¥á¥Ã¥»¡¼¥¸ÎÎ°è¤Î¾Ãµî(A¥³¥Ş¥ó¥ÉÁêÅö)
- *   @param wMessageSpriteNumber: ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é ˜åŸŸã®æ¶ˆå»(Aã‚³ãƒãƒ³ãƒ‰ç›¸å½“)
+ *   @param wMessageSpriteNumber: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  */ 
 void MessageClear() {
 	int wMessageSpriteNumber = getCaliValue();
@@ -1280,8 +1280,8 @@ void MessageClear() {
 
 /**
  * SACT.MessageIsEmpty  (1.0~)
- *   ¥á¥Ã¥»¡¼¥¸¤¬»Ä¤Ã¤Æ¤¤¤ë¾ì¹ç wResult ¤Ë 0 ¤òÊÖ¤¹?
- *   @param wResult: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
+ *   ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒæ®‹ã£ã¦ã„ã‚‹å ´åˆ wResult ã« 0 ã‚’è¿”ã™?
+ *   @param wResult: çµæœã‚’è¿”ã™å¤‰æ•°
  */
 void MessageIsEmpty() {
 	int *wResult = getCaliVariable();
@@ -1292,10 +1292,10 @@ void MessageIsEmpty() {
 }
 
 /**
- * SACT.MessagePeek  (1.2+~) (ºÊ¤ß¤°¤¤£²¤Ë¤Ï¤Ê¤¤)
- *   ¥á¥Ã¥»¡¼¥¸¥Ğ¥Ã¥Õ¥¡¤ÎÆâÍÆ¤ò¼èÆÀ¤¹¤ë
- *   @param vCount: ¼èÆÀ¤·¤¿¹Ô¿ô
- *   @param nTopStringNum: ¥Ğ¥Ã¥Õ¥¡¤ò¼èÆÀ¤¹¤ëÊ¸»úÎóÊÑ¿ô¤ÎºÇ½é
+ * SACT.MessagePeek  (1.2+~) (å¦»ã¿ãã„ï¼’ã«ã¯ãªã„)
+ *   ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡ã®å†…å®¹ã‚’å–å¾—ã™ã‚‹
+ *   @param vCount: å–å¾—ã—ãŸè¡Œæ•°
+ *   @param nTopStringNum: ãƒãƒƒãƒ•ã‚¡ã‚’å–å¾—ã™ã‚‹æ–‡å­—åˆ—å¤‰æ•°ã®æœ€åˆ
  */
 void MessagePeek() {
 	int *vCount = getCaliVariable();
@@ -1308,7 +1308,7 @@ void MessagePeek() {
 
 /**
  * SACT.Log_Stop (1.2~)
- *   ¥í¥°ºÎ¼èÄä»ß
+ *   ãƒ­ã‚°æ¡å–åœæ­¢
  */
 void Log_Stop() {
 	sact.logging = FALSE;
@@ -1317,7 +1317,7 @@ void Log_Stop() {
 
 /**
  * SACT.Log_Start (1.2~)
- *   ¥í¥°ºÎ¼è³«»Ï
+ *   ãƒ­ã‚°æ¡å–é–‹å§‹
  */
 void Log_Start() {
 	sact.logging = TRUE;
@@ -1326,7 +1326,7 @@ void Log_Start() {
 
 /**
  * SACT.MenuClear (1.0~)
- *   SACTÆâÉô¤ÎÁªÂò»è¾ğÊó¤ò¥¯¥ê¥¢
+ *   SACTå†…éƒ¨ã®é¸æŠè‚¢æƒ…å ±ã‚’ã‚¯ãƒªã‚¢
  */
 void MenuClear() {
 	ssel_clear();
@@ -1336,9 +1336,9 @@ void MenuClear() {
 
 /**
  * SACT.MenuAdd (1.0~)
- *   ÅĞÏ¿Ê¸»úÎó¤òSACTÆâÉôÁªÂò»è¾ğÊó¤ËÄÉ²Ã
- *   @param nString: ÅĞÏ¿¤¹¤ëÊ¸»úÎóÊÑ¿ôÈÖ¹æ
- *   @param wI: ÅĞÏ¿¤¹¤ë°ÌÃÖ (1-)
+ *   ç™»éŒ²æ–‡å­—åˆ—ã‚’SACTå†…éƒ¨é¸æŠè‚¢æƒ…å ±ã«è¿½åŠ 
+ *   @param nString: ç™»éŒ²ã™ã‚‹æ–‡å­—åˆ—å¤‰æ•°ç•ªå·
+ *   @param wI: ç™»éŒ²ã™ã‚‹ä½ç½® (1-)
  */
 void MenuAdd() {
 	int nString = getCaliValue();
@@ -1351,14 +1351,14 @@ void MenuAdd() {
 
 /**
  * SACT.MenuOpen (1.0~)
- *   SACTÆâÉôÁªÂò¥ë¡¼¥×
- *   @param wMenuResult: ÁªÂò·ë²Ì(ÈÖ¹æ) ¥­¥ã¥ó¥»¥ë¤·¤¿¤é0
- *   @param wNum: ÏÈ,ÇØ·Ê¤È¤¹¤ë¥¹¥×¥é¥¤¥ÈÈÖ¹æ (~SP_SEL)
- *   @param wChoiceSize: ÁªÂò»èÊ¸»ú¥µ¥¤¥º (~SEL_SIZE)
- *   @param wMenuOutSpc: ÏÈ¥¹¥×¥é¥¤¥È¤Î³°Â¦¤«¤é¤Î¥Ô¥¯¥»¥ë¿ô(~SP_SETSELSPC)
- *   @param wChoiceLineSpace: ÁªÂò»è¤Î¹Ô´Ö(1¤Ë¸ÇÄê?)
- *   @param wChoiceAutoMoveCursor: ¥ª¡¼¥×¥ó»ş¤Ë¼«Æ°Åª¤Ë°ÜÆ°¤¹¤ëÁªÂò»è¤ÎÈÖ¹æ
- *   @param nAlign: ¹Ô¤½¤í¤¨ (0:º¸, 1:Ãæ±û, 2: ±¦) (1.1~)
+ *   SACTå†…éƒ¨é¸æŠãƒ«ãƒ¼ãƒ—
+ *   @param wMenuResult: é¸æŠçµæœ(ç•ªå·) ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ãŸã‚‰0
+ *   @param wNum: æ ,èƒŒæ™¯ã¨ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå· (~SP_SEL)
+ *   @param wChoiceSize: é¸æŠè‚¢æ–‡å­—ã‚µã‚¤ã‚º (~SEL_SIZE)
+ *   @param wMenuOutSpc: æ ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¤–å´ã‹ã‚‰ã®ãƒ”ã‚¯ã‚»ãƒ«æ•°(~SP_SETSELSPC)
+ *   @param wChoiceLineSpace: é¸æŠè‚¢ã®è¡Œé–“(1ã«å›ºå®š?)
+ *   @param wChoiceAutoMoveCursor: ã‚ªãƒ¼ãƒ—ãƒ³æ™‚ã«è‡ªå‹•çš„ã«ç§»å‹•ã™ã‚‹é¸æŠè‚¢ã®ç•ªå·
+ *   @param nAlign: è¡Œãã‚ãˆ (0:å·¦, 1:ä¸­å¤®, 2: å³) (1.1~)
  */
 void MenuOpen() {
 	int *wMenuResult = getCaliVariable();
@@ -1380,8 +1380,8 @@ void MenuOpen() {
 
 /**
  * SACT.PushString (1.0~)
- *   SACTÆâÉô¤ËÊ¸»úÎóÊÑ¿ô¤ò¥×¥Ã¥·¥å
- *   @param nString: Ê¸»úÎóÊÑ¿ôÈÖ¹æ
+ *   SACTå†…éƒ¨ã«æ–‡å­—åˆ—å¤‰æ•°ã‚’ãƒ—ãƒƒã‚·ãƒ¥
+ *   @param nString: æ–‡å­—åˆ—å¤‰æ•°ç•ªå·
  */
 void PushString() {
 	int nString = getCaliValue();
@@ -1393,8 +1393,8 @@ void PushString() {
 
 /**
  * SACT.PopString (1.0~)
- *   SACTÆâÉô¤Ë¥×¥Ã¥·¥å¤·¤¿Ê¸»úÎóÊÑ¿ô¤ò¥İ¥Ã¥×
- *   @param nString: Ê¸»úÎóÊÑ¿ôÈÖ¹æ
+ *   SACTå†…éƒ¨ã«ãƒ—ãƒƒã‚·ãƒ¥ã—ãŸæ–‡å­—åˆ—å¤‰æ•°ã‚’ãƒãƒƒãƒ—
+ *   @param nString: æ–‡å­—åˆ—å¤‰æ•°ç•ªå·
  */
 void PopString() {
 	int nString = getCaliValue();
@@ -1406,16 +1406,16 @@ void PopString() {
 
 /**
  * SACT.Numeral_XXXX
- *   ¥¹¥×¥é¥¤¥ÈËè¤Ë¡¢»ØÄê¤Î¿ô»ú(0¡Á9)¤ËÂĞ¤·¤ÆÂĞ±ş¤¹¤ëCGÈÖ¹æ¤ä
- *   É½¼¨°ÌÃÖ¡¢´Ö³Ö¤Ê¤É¤ò³ÊÇ¼¡¦¼è¤ê½Ğ¤·¤ò¹Ô¤¦
+ *   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ¯ã«ã€æŒ‡å®šã®æ•°å­—(0ã€œ9)ã«å¯¾ã—ã¦å¯¾å¿œã™ã‚‹CGç•ªå·ã‚„
+ *   è¡¨ç¤ºä½ç½®ã€é–“éš”ãªã©ã‚’æ ¼ç´ãƒ»å–ã‚Šå‡ºã—ã‚’è¡Œã†
  */
 
 /**
  * SACT.Numeral_SetCG (1.0~)
- *   »ØÄê¤Î¿ôÃÍ¤ËÂĞ¤¹¤ëCGÈÖ¹æ¤ÎÀßÄê
- *   @param nNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param nIndex: ¿ô»ú(0-9)
- *   @param nCG: ¿ô»ú¤ËÂĞ±ş¤¹¤ëCGÈÖ¹æ
+ *   æŒ‡å®šã®æ•°å€¤ã«å¯¾ã™ã‚‹CGç•ªå·ã®è¨­å®š
+ *   @param nNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param nIndex: æ•°å­—(0-9)
+ *   @param nCG: æ•°å­—ã«å¯¾å¿œã™ã‚‹CGç•ªå·
  */
 void Numeral_SetCG() {
 	int nNum = getCaliValue();
@@ -1429,10 +1429,10 @@ void Numeral_SetCG() {
 
 /**
  * SACT.Numeral_GetCG (1.0~)
- *   »ØÄê¤Î¿ôÃÍ¤ËÂĞ¤¹¤ëCGÈÖ¹æ¤ÎÀßÄê
- *   @param nNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param nIndex: ¿ô»ú(0-9)
- *   @param vCG: ÀßÄê¤µ¤ì¤Æ¤¤¤ëCGÈÖ¹æ¤òÊÖ¤¹ÊÑ¿ô
+ *   æŒ‡å®šã®æ•°å€¤ã«å¯¾ã™ã‚‹CGç•ªå·ã®è¨­å®š
+ *   @param nNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param nIndex: æ•°å­—(0-9)
+ *   @param vCG: è¨­å®šã•ã‚Œã¦ã„ã‚‹CGç•ªå·ã‚’è¿”ã™å¤‰æ•°
  */
 void Numeral_GetCG() {
 	int nNum = getCaliValue();
@@ -1446,10 +1446,10 @@ void Numeral_GetCG() {
 
 /**
  * SACT.Numeral_SetPos (1.0~)
- *   Numeral¤ÎÉ½¼¨°ÌÃÖ¤ÎÀßÄê
- *   @param nNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param nX: É½¼¨£ØºÂÉ¸
- *   @param ny: É½¼¨£ÙºÂÉ¸
+ *   Numeralã®è¡¨ç¤ºä½ç½®ã®è¨­å®š
+ *   @param nNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param nX: è¡¨ç¤ºï¼¸åº§æ¨™
+ *   @param ny: è¡¨ç¤ºï¼¹åº§æ¨™
  */
 void Numeral_SetPos() {
 	int nNum = getCaliValue();
@@ -1463,10 +1463,10 @@ void Numeral_SetPos() {
 
 /**
  * SACT.Numeral_GetPos (1.0~)
- *   Numeral_SetPos¤ÇÀßÄê¤·¤¿ºÂÉ¸¤Î¼è¤ê½Ğ¤·
- *   @param nNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param vX: £ØºÂÉ¸¤ò³ÊÇ¼¤¹¤ëÊÑ¿ô
- *   @param vY: £ÙºÂÉ¸¤ò³ÊÇ¼¤¹¤ëÊÑ¿ô
+ *   Numeral_SetPosã§è¨­å®šã—ãŸåº§æ¨™ã®å–ã‚Šå‡ºã—
+ *   @param nNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param vX: ï¼¸åº§æ¨™ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
+ *   @param vY: ï¼¹åº§æ¨™ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
  */
 void Numeral_GetPos() {
 	int nNum = getCaliValue();
@@ -1480,9 +1480,9 @@ void Numeral_GetPos() {
 
 /**
  * SACT.Numeral_SetSpan (1.0~)
- *   Numeral¤Î´Ö³Ö(Span)¤ÎÀßÄê
- *   @param nNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param nSpan: ´Ö³Ö
+ *   Numeralã®é–“éš”(Span)ã®è¨­å®š
+ *   @param nNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param nSpan: é–“éš”
  */
 void Numeral_SetSpan() {
 	int nNum = getCaliValue();
@@ -1495,9 +1495,9 @@ void Numeral_SetSpan() {
 
 /**
  * SACT.Numeral_GetSpan (1.0~)
- *   Numeral_SetSpan¤ÇÀßÄê¤·¤¿ÃÍ¤Î¼è¤ê½Ğ¤·
- *   @param nNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param vSpan: ÃÍ¤ò³ÊÇ¼¤¹¤ëÊÑ¿ô
+ *   Numeral_SetSpanã§è¨­å®šã—ãŸå€¤ã®å–ã‚Šå‡ºã—
+ *   @param nNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param vSpan: å€¤ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
  */
 void Numeral_GetSpan() {
 	int nNum = getCaliValue();
@@ -1510,7 +1510,7 @@ void Numeral_GetSpan() {
 
 /**
  * SACT.ExpSp_Clear (1.0~)
- *   ÀâÌÀ¥¹¥×¥é¥¤¥ÈÀßÄê¥¯¥ê¥¢
+ *   èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¨­å®šã‚¯ãƒªã‚¢
  */
 void ExpSp_Clear() {
 	DEBUG_COMMAND_YET("SACT.ExpSp_Clear:\n");
@@ -1520,9 +1520,9 @@ void ExpSp_Clear() {
 
 /**
  * SACT.ExpSp_Add (1.0~)
- *   ÀâÌÀ¥¹¥×¥é¥¤¥ÈÀßÄêÄÉ²Ã
- *   @param wNumSP1: ¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥È
- *   @param wNumSP2: ÀâÌÀ¥¹¥×¥é¥¤¥È
+ *   èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè¨­å®šè¿½åŠ 
+ *   @param wNumSP1: ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+ *   @param wNumSP2: èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
  */
 void ExpSp_Add() {
 	int wNumSP1 = getCaliValue();
@@ -1535,8 +1535,8 @@ void ExpSp_Add() {
 
 /**
  * SACT.ExpSp_Del (1.0~)
- *   ÀâÌÀ¥¹¥×¥é¥¤¥Èºï½ü
- *   @param wNum: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+ *   èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå‰Šé™¤
+ *   @param wNum: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  */
 void ExpSp_Del() {
 	int wNum = getCaliValue();
@@ -1548,9 +1548,9 @@ void ExpSp_Del() {
 
 /**
  * SACT.TimerSet (1.0~)
- *   »ØÄê¤ÎID¤Î¥¿¥¤¥Ş¡¼¤òwCountÃÍ¤Ç¥ê¥»¥Ã¥È
- *   @param wTimerID: ¥¿¥¤¥Ş¡¼ID
- *   @param wCount: ¥ê¥»¥Ã¥È¤¹¤ëÃÍ
+ *   æŒ‡å®šã®IDã®ã‚¿ã‚¤ãƒãƒ¼ã‚’wCountå€¤ã§ãƒªã‚»ãƒƒãƒˆ
+ *   @param wTimerID: ã‚¿ã‚¤ãƒãƒ¼ID
+ *   @param wCount: ãƒªã‚»ãƒƒãƒˆã™ã‚‹å€¤
  */
 void TimerSet() {
 	int wTimerID = getCaliValue();
@@ -1563,9 +1563,9 @@ void TimerSet() {
 
 /**
  * SACT.TimerGet (1.0~)
- *   »ØÄê¤ÎID¤Î¥¿¥¤¥Ş¡¼¤òRND¤Ë¼èÆÀ
- *   @param wTimerID: ¥¿¥¤¥Ş¡¼ID
- *   @param vRND: ¼èÆÀ¤¹¤ëÊÑ¿ô
+ *   æŒ‡å®šã®IDã®ã‚¿ã‚¤ãƒãƒ¼ã‚’RNDã«å–å¾—
+ *   @param wTimerID: ã‚¿ã‚¤ãƒãƒ¼ID
+ *   @param vRND: å–å¾—ã™ã‚‹å¤‰æ•°
  */
 void TimerGet() {
 	int wTimerID = getCaliValue();
@@ -1578,9 +1578,9 @@ void TimerGet() {
 
 /**
  * SACT.TimerWait (1.0~)
- *   »ØÄêID¤Î¥¿¥¤¥Ş¡¼¤¬»ØÄê¥«¥¦¥ó¥È¤Ë¤Ê¤ë¤Ş¤ÇÂÔ¤Ä
- *   @param wTimerID: ¥¿¥¤¥Ş¡¼ID
- *   @param wCount: »ØÄê¥«¥¦¥ó¥È
+ *   æŒ‡å®šIDã®ã‚¿ã‚¤ãƒãƒ¼ãŒæŒ‡å®šã‚«ã‚¦ãƒ³ãƒˆã«ãªã‚‹ã¾ã§å¾…ã¤
+ *   @param wTimerID: ã‚¿ã‚¤ãƒãƒ¼ID
+ *   @param wCount: æŒ‡å®šã‚«ã‚¦ãƒ³ãƒˆ
  */
 void TimerWait() {
 	int wTimerID = getCaliValue();
@@ -1595,8 +1595,8 @@ void TimerWait() {
 
 /**
  * SACT.Wait (1.1~)
- *   »ØÄê»ş´Ö¡¢¤¹¤Ù¤Æ¤ÎÆ°ºî¤òÄä»ß
- *   @param nCount: »ş´Ö(1/100ÉÃÃ±°Ì)
+ *   æŒ‡å®šæ™‚é–“ã€ã™ã¹ã¦ã®å‹•ä½œã‚’åœæ­¢
+ *   @param nCount: æ™‚é–“(1/100ç§’å˜ä½)
  */
 void Wait() {
 	int wCount = getCaliValue();
@@ -1608,8 +1608,8 @@ void Wait() {
 
 /**
  * SACT.SoundPlay (1.0~)
- *   ¥µ¥¦¥ó¥ÉÄ¾ÀÜºÆÀ¸  (~SOUND_PLAY)
- *   @param wNum: ºÆÀ¸¤¹¤ëÈÖ¹æ
+ *   ã‚µã‚¦ãƒ³ãƒ‰ç›´æ¥å†ç”Ÿ  (~SOUND_PLAY)
+ *   @param wNum: å†ç”Ÿã™ã‚‹ç•ªå·
  */
 void SoundPlay() {
 	int wNum = getCaliValue();
@@ -1621,9 +1621,9 @@ void SoundPlay() {
 
 /**
  * SACT.SoundStop (1.0~)
- *   ¥µ¥¦¥ó¥ÉºÆÀ¸Ää»ß (~SOUND_STOP)
- *   @param wNum: Ää»ß¤¹¤ëÈÖ¹æ
- *   @param wFadeTime: Ää»ß¤¹¤ë¤Ş¤Ç¤Î»ş´Ö (1/100sec)
+ *   ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿåœæ­¢ (~SOUND_STOP)
+ *   @param wNum: åœæ­¢ã™ã‚‹ç•ªå·
+ *   @param wFadeTime: åœæ­¢ã™ã‚‹ã¾ã§ã®æ™‚é–“ (1/100sec)
  */
 void SoundStop() {
 	int wNum = getCaliValue();
@@ -1636,9 +1636,9 @@ void SoundStop() {
 
 /**
  * SACT.SoundStopAll (1.1~)
- *   ¥µ¥¦¥ó¥ÉºÆÀ¸Ää»ß (~SOUND_STOP)
- *   @param wNum: Ää»ß¤¹¤ëÈÖ¹æ
- *   @param wFadeTime: Ää»ß¤¹¤ë¤Ş¤Ç¤Î»ş´Ö (1/100sec)
+ *   ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿåœæ­¢ (~SOUND_STOP)
+ *   @param wNum: åœæ­¢ã™ã‚‹ç•ªå·
+ *   @param wFadeTime: åœæ­¢ã™ã‚‹ã¾ã§ã®æ™‚é–“ (1/100sec)
  */
 void SoundStopAll() {
 	int wFadeTime = getCaliValue();
@@ -1650,8 +1650,8 @@ void SoundStopAll() {
 
 /**
  * SACT.SoundWait (1.0~)
- *   ¥Ø¥Ã¥À¤Ç»ØÄê¤µ¤ì¤¿»ş´ÖorºÆÀ¸½ªÎ»¤Ş¤ÇÂÔ¤Ä  (~SOUND_WAIT)
- *   @param wNum: »ØÄêÈÖ¹æ
+ *   ãƒ˜ãƒƒãƒ€ã§æŒ‡å®šã•ã‚ŒãŸæ™‚é–“orå†ç”Ÿçµ‚äº†ã¾ã§å¾…ã¤  (~SOUND_WAIT)
+ *   @param wNum: æŒ‡å®šç•ªå·
  */
 void SoundWait() {
 	int wNum = getCaliValue();
@@ -1663,9 +1663,9 @@ void SoundWait() {
 
 /**
  * SACT.SoundWaitKey (1.0~)
- *   »ØÄê¤µ¤ì¤¿¥µ¥¦¥ó¥É¤¬ºÆÀ¸½ªÎ»¤¹¤ë¤«¡¢¥­¡¼¤¬²¡¤µ¤ì¤ë¤Ş¤ÇÂÔ¤Ä
- *   @param wNum: »ØÄêÈÖ¹æ
- *   @param vKey: ¥­¥ã¥ó¥»¥ë¥­¡¼
+ *   æŒ‡å®šã•ã‚ŒãŸã‚µã‚¦ãƒ³ãƒ‰ãŒå†ç”Ÿçµ‚äº†ã™ã‚‹ã‹ã€ã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã‚‹ã¾ã§å¾…ã¤
+ *   @param wNum: æŒ‡å®šç•ªå·
+ *   @param vKey: ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã‚­ãƒ¼
  */
 void SoundWaitKey() {
 	int wNum = getCaliValue();
@@ -1678,8 +1678,8 @@ void SoundWaitKey() {
 
 /**
  * SACT.SoundPrepare (1.0~)
- *   ºÆÀ¸¤Î½àÈ÷¤ò¤¹¤ë(~SOUND_PREPARE)
- *   @param wNum: ºÆÀ¸¤¹¤ëÈÖ¹æ
+ *   å†ç”Ÿã®æº–å‚™ã‚’ã™ã‚‹(~SOUND_PREPARE)
+ *   @param wNum: å†ç”Ÿã™ã‚‹ç•ªå·
  */
 void SoundPrepare() {
 	int wNum = getCaliValue();
@@ -1691,8 +1691,8 @@ void SoundPrepare() {
 
 /**
  * SACT.SoundPrepareLR (1.0~)
- *   ºÆÀ¸¤Î½àÈ÷¤ò¤¹¤ë(º¸±¦È¿Å¾) (~SOUND_PREPARE_LR)
- *   @param wNum: ºÆÀ¸¤¹¤ëÈÖ¹æ
+ *   å†ç”Ÿã®æº–å‚™ã‚’ã™ã‚‹(å·¦å³åè»¢) (~SOUND_PREPARE_LR)
+ *   @param wNum: å†ç”Ÿã™ã‚‹ç•ªå·
  */
 void SoundPrepareLR() {
 	int wNum = getCaliValue();
@@ -1704,8 +1704,8 @@ void SoundPrepareLR() {
 
 /**
  * SACT.SoundPlayLR (1.0~)
- *   º¸±¦È¿Å¾¤·¤ÆºÆÀ¸ (~SOUND_PLAY_LR)
- *   @param wNum: ºÆÀ¸¤¹¤ëÈÖ¹æ
+ *   å·¦å³åè»¢ã—ã¦å†ç”Ÿ (~SOUND_PLAY_LR)
+ *   @param wNum: å†ç”Ÿã™ã‚‹ç•ªå·
  */
 void SoundPlayLR() {
 	int wNum = getCaliValue();
@@ -1717,9 +1717,9 @@ void SoundPlayLR() {
 
 /**
  * SACT.SpriteSound (1.0~)
- * ¥µ¥¦¥ó¥É(¥¹¥×¥é¥¤¥È»ØÄê) (~SP_SOUND)
- *   @param wNumSP: ÀßÄê¤¹¤ë¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- *   @param nCount: ÀßÄê¤¹¤ë¸Ä¿ô
+ * ã‚µã‚¦ãƒ³ãƒ‰(ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæŒ‡å®š) (~SP_SOUND)
+ *   @param wNumSP: è¨­å®šã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ *   @param nCount: è¨­å®šã™ã‚‹å€‹æ•°
  *   @param wNumWave1: Sound1
  *   @param wNumWave2: Sound2
  *   @param wNumWave3: Sound3
@@ -1741,7 +1741,7 @@ void SpriteSound() {
 
 /**
  * SACT.SpriteSoundWait (1.0~)
- *   SpriteSound¤ÇÀßÄê¤·¤¿¤¹¤Ù¤Æ¤Î²»¤ÎºÆÀ¸½ªÎ»¤Ş¤ÇÂÔ¤Ä (~SP_SOUND_WAIT)
+ *   SpriteSoundã§è¨­å®šã—ãŸã™ã¹ã¦ã®éŸ³ã®å†ç”Ÿçµ‚äº†ã¾ã§å¾…ã¤ (~SP_SOUND_WAIT)
  */
 void SpriteSoundWait() {
 	DEBUG_COMMAND_YET("SACT.SpriteSoundWait:\n");
@@ -1751,8 +1751,8 @@ void SpriteSoundWait() {
 
 /**
  * SACT.SpriteSoundOB (1.0~)
- *   ÈÏ°Ï³°¤ò¥¯¥ê¥Ã¥¯¤·¤¿¤È¤­¤Î²»  (~SPRITE_SOUND_OB)
- *   @param wNumWave: ºÆÀ¸¤¹¤ëÈÖ¹æ¡¢£°¤Ç¥¯¥ê¥¢
+ *   ç¯„å›²å¤–ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã®éŸ³  (~SPRITE_SOUND_OB)
+ *   @param wNumWave: å†ç”Ÿã™ã‚‹ç•ªå·ã€ï¼ã§ã‚¯ãƒªã‚¢
  */
 void SpriteSoundOB() {
 	int wNumWave = getCaliValue();
@@ -1764,9 +1764,9 @@ void SpriteSoundOB() {
 
 /**
  * SACT.MusicCheck (1.0~)
- *   ²»³Ú¥Ç¡¼¥¿¤¬¤¢¤ë¤«¤É¤¦¤« (~MUSIC_CHECK)
- *   @param wNum: ÈÖ¹æ
- *   @param vRND: 0:¤Ê¤¤¡¢1:¤¢¤ë
+ *   éŸ³æ¥½ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚‹ã‹ã©ã†ã‹ (~MUSIC_CHECK)
+ *   @param wNum: ç•ªå·
+ *   @param vRND: 0:ãªã„ã€1:ã‚ã‚‹
  */
 void MusicCheck() {
 	int wNum = getCaliValue();
@@ -1779,9 +1779,9 @@ void MusicCheck() {
 
 /**
  * SACT.MusicGetLength (1.0~)
- *   ²»³Ú¥Ç¡¼¥¿¤ÎÄ¹¤µ¤ò1/100ÉÃÃ±°Ì¤Ç¼èÆÀ (~MUSIC_GET_LENGTH)
- *   @param wNum: ²»³ÚÈÖ¹æ
- *   @param vRND: ¼èÆÀ¤·¤¿Ä¹¤µ¤ò³ÊÇ¼¤¹¤ëÊÑ¿ô
+ *   éŸ³æ¥½ãƒ‡ãƒ¼ã‚¿ã®é•·ã•ã‚’1/100ç§’å˜ä½ã§å–å¾— (~MUSIC_GET_LENGTH)
+ *   @param wNum: éŸ³æ¥½ç•ªå·
+ *   @param vRND: å–å¾—ã—ãŸé•·ã•ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
  */
 void MusicGetLength() {
 	int wNum = getCaliValue();
@@ -1794,9 +1794,9 @@ void MusicGetLength() {
 
 /**
  * SACT.MusicGetPos (1.0~)
- *   ²»³Ú¥Ç¡¼¥¿¤ÎºÆÀ¸°ÌÃÖ¤ò1/100ÉÃÃ±°Ì¤Ç¼èÆÀ (~MUSIC_GET_POS)
- *   @param wNum: ²»³ÚÈÖ¹æ
- *   @param vRND: ¼èÆÀ¤·¤¿°ÌÃÖ¤ò³ÊÇ¼¤¹¤ëÊÑ¿ô
+ *   éŸ³æ¥½ãƒ‡ãƒ¼ã‚¿ã®å†ç”Ÿä½ç½®ã‚’1/100ç§’å˜ä½ã§å–å¾— (~MUSIC_GET_POS)
+ *   @param wNum: éŸ³æ¥½ç•ªå·
+ *   @param vRND: å–å¾—ã—ãŸä½ç½®ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
  */
 void MusicGetPos() {
 	int wNum = getCaliValue();
@@ -1809,10 +1809,10 @@ void MusicGetPos() {
 
 /**
  * SACT.MusicPlay (1.0~)
- *   ºÆÀ¸ (~MUSIC_PLAY)
- *   @param wNum: ²»³ÚÈÖ¹æ
- *   @param wFadeTime: ¥Õ¥§¡¼¥É¥¤¥ó»ş´Ö(1/100ÉÃ)
- *   @param wVolume: ²»ÎÌ(0-100)
+ *   å†ç”Ÿ (~MUSIC_PLAY)
+ *   @param wNum: éŸ³æ¥½ç•ªå·
+ *   @param wFadeTime: ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³æ™‚é–“(1/100ç§’)
+ *   @param wVolume: éŸ³é‡(0-100)
  */
 void MusicPlay() {
 	int wNum = getCaliValue();
@@ -1826,9 +1826,9 @@ void MusicPlay() {
 
 /**
  * SACT.MusicStop (1.0~)
- *   ²»³ÚÄä»ß (~MUSIC_STOP)
- *   @param wNum: ²»³ÚÈÖ¹æ
- *   @param wFadeTime: ½ªÎ»¤¹¤ë¤Ş¤Ç¤Î»ş´Ö(1/100ÉÃ)
+ *   éŸ³æ¥½åœæ­¢ (~MUSIC_STOP)
+ *   @param wNum: éŸ³æ¥½ç•ªå·
+ *   @param wFadeTime: çµ‚äº†ã™ã‚‹ã¾ã§ã®æ™‚é–“(1/100ç§’)
  */
 void MusicStop() {
 	int wNum = getCaliValue();
@@ -1841,8 +1841,8 @@ void MusicStop() {
 
 /**
  * SACT.MusicStopAll (1.2~)
- *   ¤¹¤Ù¤Æ¤Î²»³Ú¤òÄä»ß
- *   @param wFadeTime: ½ªÎ»¤¹¤ë¤Ş¤Ç¤Î»ş´Ö(1/100ÉÃ)
+ *   ã™ã¹ã¦ã®éŸ³æ¥½ã‚’åœæ­¢
+ *   @param wFadeTime: çµ‚äº†ã™ã‚‹ã¾ã§ã®æ™‚é–“(1/100ç§’)
  */
 void MusicStopAll() {
 	int wFadeTime = getCaliValue();
@@ -1854,10 +1854,10 @@ void MusicStopAll() {
 
 /**
  * SACT.MusicFade (1.0~)
- *   »ØÄê¤Î¥Ü¥ê¥å¡¼¥à¤Ş¤Ç¥Õ¥§¡¼¥É (~MUSIC_FADE)
- *   @param wNum: ²»³ÚÈÖ¹æ
- *   @param wFadeTime: ¥Õ¥§¡¼¥É»ş´Ö(1/100ÉÃ)
- *   @param wVolume: ²»ÎÌ (1-100)
+ *   æŒ‡å®šã®ãƒœãƒªãƒ¥ãƒ¼ãƒ ã¾ã§ãƒ•ã‚§ãƒ¼ãƒ‰ (~MUSIC_FADE)
+ *   @param wNum: éŸ³æ¥½ç•ªå·
+ *   @param wFadeTime: ãƒ•ã‚§ãƒ¼ãƒ‰æ™‚é–“(1/100ç§’)
+ *   @param wVolume: éŸ³é‡ (1-100)
  */
 void MusicFade() {
 	int wNum = getCaliValue();
@@ -1871,8 +1871,8 @@ void MusicFade() {
 
 /**
  * SACT.MusicWait (1.0~)
- *   ºÆÀ¸¤¬½ªÎ»¤¹¤ë¤Ş¤ÇÂÔ¤Ä (~MUSIC_WAIT)
- *   @param wNum: ²»³ÚÈÖ¹æ
+ *   å†ç”ŸãŒçµ‚äº†ã™ã‚‹ã¾ã§å¾…ã¤ (~MUSIC_WAIT)
+ *   @param wNum: éŸ³æ¥½ç•ªå·
  *   @param nTimeOut: (1.1~)
  */
 void MusicWait() {
@@ -1890,10 +1890,10 @@ void MusicWait() {
 
 /**
  * SACT.MusicWatiPos (1.0~)
- *   »ØÄê¤Î²»³Ú¤¬wIndexÈÖ¤Î¥Ş¡¼¥¯¤Ç»ØÄê¤µ¤ì¤¿ºÆÀ¸°ÌÃÖ¤ËÍè¤ë¤Ş¤ÇÂÔ¤Ä 
+ *   æŒ‡å®šã®éŸ³æ¥½ãŒwIndexç•ªã®ãƒãƒ¼ã‚¯ã§æŒ‡å®šã•ã‚ŒãŸå†ç”Ÿä½ç½®ã«æ¥ã‚‹ã¾ã§å¾…ã¤ 
  *   (~MUSIC_WAIT_POS)
- *   @param wNum: ²»³ÚÈÖ¹æ
- *   @param wIndex: °ÌÃÖ¥Ş¡¼¥¯ÈÖ¹æ
+ *   @param wNum: éŸ³æ¥½ç•ªå·
+ *   @param wIndex: ä½ç½®ãƒãƒ¼ã‚¯ç•ªå·
  */
 void MusicWaitPos() {
 	int wNum = getCaliValue();
@@ -1906,9 +1906,9 @@ void MusicWaitPos() {
 
 /**
  * SACT.SoundGetLinkNum (1.0~)
- *   »ØÄê¥Á¥ã¥ó¥Í¥ë¤Î¥ê¥ó¥¯ÈÖ¹æ¤ò¼èÆÀ (~SOUND_GET_LINK_NUM)
- *   @param wNum: ¥Á¥ã¥ó¥Í¥ëÈÖ¹æ
- *   @param vRND: ¥ê¥ó¥¯ÈÖ¹æ(Ì¤»ÈÍÑ¡á£°)
+ *   æŒ‡å®šãƒãƒ£ãƒ³ãƒãƒ«ã®ãƒªãƒ³ã‚¯ç•ªå·ã‚’å–å¾— (~SOUND_GET_LINK_NUM)
+ *   @param wNum: ãƒãƒ£ãƒ³ãƒãƒ«ç•ªå·
+ *   @param vRND: ãƒªãƒ³ã‚¯ç•ªå·(æœªä½¿ç”¨ï¼ï¼)
  */
 void SoundGetLinkNum() {
 	int wNum = getCaliValue();
@@ -1921,13 +1921,13 @@ void SoundGetLinkNum() {
 
 /**
  * SACT.ChartPos (1.0~)
- *   ¥°¥é¥ÕÍÑ¥Á¥ã¡¼¥ÈºîÀ®
- *   @param pos : ·ë²Ì½ĞÎÏÊÑ¿ô
- *   @param pos1: ºÇ¾®ÃÍ
- *   @param pos2: ºÇÂçÃÍ
- *   @param val1: Ê¬Î¨ºÇ¾®ÃÍ
- *   @param val2: Ê¬Î¨ºÇÂçÃÍ
- *   @param val : Ê¬Î¨
+ *   ã‚°ãƒ©ãƒ•ç”¨ãƒãƒ£ãƒ¼ãƒˆä½œæˆ
+ *   @param pos : çµæœå‡ºåŠ›å¤‰æ•°
+ *   @param pos1: æœ€å°å€¤
+ *   @param pos2: æœ€å¤§å€¤
+ *   @param val1: åˆ†ç‡æœ€å°å€¤
+ *   @param val2: åˆ†ç‡æœ€å¤§å€¤
+ *   @param val : åˆ†ç‡
  *
  *     pos = ((pos2-pos1) / (val2-val1)) * (val-val1) + pos1
  */
@@ -1946,11 +1946,11 @@ void ChartPos() {
 
 /**
  * SACT.NumToStr (1.0~)
- *   ¿ôÃÍ -> Ê¸»úÎóÊÑ´¹
- *   @param strno: ÊÑ´¹ºÑ¤ßÊ¸»úÎóÊÑ¿ôÈÖ¹æ
- *   @param fig:   ¤±¤¿¿ô
- *   @param zeropad: 0: ¥¼¥íËä¤á¤·¤Ê¤¤, 1: ¥¼¥íËä¤á¤¹¤ë
- *   @param num: ÊÑ´¹¤¹¤ë¿ôÃÍ
+ *   æ•°å€¤ -> æ–‡å­—åˆ—å¤‰æ›
+ *   @param strno: å¤‰æ›æ¸ˆã¿æ–‡å­—åˆ—å¤‰æ•°ç•ªå·
+ *   @param fig:   ã‘ãŸæ•°
+ *   @param zeropad: 0: ã‚¼ãƒ­åŸ‹ã‚ã—ãªã„, 1: ã‚¼ãƒ­åŸ‹ã‚ã™ã‚‹
+ *   @param num: å¤‰æ›ã™ã‚‹æ•°å€¤
  */
 void NumToStr() {
 	int strno   = getCaliValue();
@@ -2040,7 +2040,7 @@ void DecryptString() {
 
 /**
  * SACT.XMenuClear (1.0~)
- *   ³ÈÄ¥¥á¥Ë¥å¡¼½é´ü²½
+ *   æ‹¡å¼µãƒ¡ãƒ‹ãƒ¥ãƒ¼åˆæœŸåŒ–
  */
 void XMenuClear() {
 	spxm_clear();
@@ -2050,9 +2050,9 @@ void XMenuClear() {
 
 /**
  * SACT.XMenuRegister (1.0~)
- *   ¸½ºß¥Ğ¥Ã¥Õ¥¡¤Ë¤¢¤ëÊ¸»úÎó¤ò³ÈÄ¥¥á¥Ë¥å¡¼¤Î¥¢¥¤¥Æ¥à¤È¤·¤ÆÅĞÏ¿
- *   @param nRegiNum: ³ÈÄ¥¥á¥Ë¥å¡¼¤ÎÆâÉô¥¤¥ó¥Ç¥Ã¥¯¥¹ÈÖ¹æ
- *   @param nMenuID: ÁªÂò¤µ¤ì¤¿¤È¤­¤ËÊÖ¤¹ÈÖ¹æ(ID)
+ *   ç¾åœ¨ãƒãƒƒãƒ•ã‚¡ã«ã‚ã‚‹æ–‡å­—åˆ—ã‚’æ‹¡å¼µãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¢ã‚¤ãƒ†ãƒ ã¨ã—ã¦ç™»éŒ²
+ *   @param nRegiNum: æ‹¡å¼µãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®å†…éƒ¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·
+ *   @param nMenuID: é¸æŠã•ã‚ŒãŸã¨ãã«è¿”ã™ç•ªå·(ID)
  */
 void XMenuRegister() {
 	int nRegiNum = getCaliValue();
@@ -2065,9 +2065,9 @@ void XMenuRegister() {
 
 /**
  * SACT.XMenuGetNum (1.0~)
- *   XMenuRegister¤ÇÅĞÏ¿¤µ¤ì¤¿ID¤òÊÖ¤¹
- *   @param nRegiNum: ÆâÉô¥¤¥ó¥Ç¥Ã¥¯¥¹ÈÖ¹æ
- *   @param vMenuID: ÅĞÏ¿¤µ¤ì¤Æ¤¤¤ëID¤ò³ÊÇ¼¤¹¤ëÊÑ¿ô
+ *   XMenuRegisterã§ç™»éŒ²ã•ã‚ŒãŸIDã‚’è¿”ã™
+ *   @param nRegiNum: å†…éƒ¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·
+ *   @param vMenuID: ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹IDã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
  */
 void XMenuGetNum() {
 	int nRegiNum = getCaliValue();
@@ -2080,9 +2080,9 @@ void XMenuGetNum() {
 
 /**
  * SACT.XMenuGetText (1.0~)
- *   XMenuRegister¤ÇÅĞÏ¿¤·¤¿¥¢¥¤¥Æ¥à¤ò»ØÄê¤ÎÊ¸»úÎóÊÑ¿ô¤Ë¥³¥Ô¡¼¤¹¤ë
- *   @param nRegiNum: ÆâÉô¥¤¥ó¥Ç¥Ã¥¯¥¹ÈÖ¹æ
- *   @param strno: ¥³¥Ô¡¼ÀèÊ¸»úÎóÊÑ¿ôÈÖ¹æ
+ *   XMenuRegisterã§ç™»éŒ²ã—ãŸã‚¢ã‚¤ãƒ†ãƒ ã‚’æŒ‡å®šã®æ–‡å­—åˆ—å¤‰æ•°ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
+ *   @param nRegiNum: å†…éƒ¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ç•ªå·
+ *   @param strno: ã‚³ãƒ”ãƒ¼å…ˆæ–‡å­—åˆ—å¤‰æ•°ç•ªå·
  */
 void XMenuGetText() {
 	int nRegiNum = getCaliValue();
@@ -2095,7 +2095,7 @@ void XMenuGetText() {
 
 /**
  * SACT.XMenuTitleRegister (1.0~)
- *   ¸½ºß¥Ğ¥Ã¥Õ¥¡¤Ë¤¢¤ëÊ¸»úÎó¤ò³ÈÄ¥¥á¥Ë¥å¡¼¤Î¥¿¥¤¥È¥ë¤È¤·¤ÆÅĞÏ¿
+ *   ç¾åœ¨ãƒãƒƒãƒ•ã‚¡ã«ã‚ã‚‹æ–‡å­—åˆ—ã‚’æ‹¡å¼µãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¿ã‚¤ãƒˆãƒ«ã¨ã—ã¦ç™»éŒ²
  */
 void XMenuTitleRegister() {
 	spxm_titlereg();
@@ -2105,8 +2105,8 @@ void XMenuTitleRegister() {
 
 /**
  * SACT.XMenuTitleGet (1.0~)
- *   ³ÈÄ¥¥á¥Ë¥å¡¼¤Î¥¿¥¤¥È¥ë¤ò»ØÄê¤ÎÊ¸»úÎóÊÑ¿ô¤Ë¥³¥Ô¡¼
- *   @param strno: ¥³¥Ô¡¼ÀèÊ¸»úÎóÊÑ¿ôÈÖ¹æ
+ *   æ‹¡å¼µãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¿ã‚¤ãƒˆãƒ«ã‚’æŒ‡å®šã®æ–‡å­—åˆ—å¤‰æ•°ã«ã‚³ãƒ”ãƒ¼
+ *   @param strno: ã‚³ãƒ”ãƒ¼å…ˆæ–‡å­—åˆ—å¤‰æ•°ç•ªå·
  */
 void XMenuTitleGet() {
 	int strno = getCaliValue();

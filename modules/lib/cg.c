@@ -1,5 +1,5 @@
 /*
- * cg.c  DLLÍÑ¤Ë CG¤ò surface ¤ËÅ¸³«
+ * cg.c  DLLç”¨ã« CGã‚’ surface ã«å±•é–‹
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -38,10 +38,10 @@
 #include "ald_manager.h"
 
 /**
- * ¥Ğ¥Ã¥Õ¥¡¤Î¥Ç¡¼¥¿¤¬¤É¤ÎCG·Á¼°¤«¤òºÇ½é¤Î¿ô¥Ğ¥¤¥È¤ò¤ß¤Æ¥Á¥§¥Ã¥¯
+ * ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ãƒ¼ã‚¿ãŒã©ã®CGå½¢å¼ã‹ã‚’æœ€åˆã®æ•°ãƒã‚¤ãƒˆã‚’ã¿ã¦ãƒã‚§ãƒƒã‚¯
  *
- * @param data: ¥Ç¡¼¥¿Îó
- * @return CG¤Î¼ïÎà(QNT/PMS8/PMS16¤Î¤¤¤º¤ì¤«)
+ * @param data: ãƒ‡ãƒ¼ã‚¿åˆ—
+ * @return CGã®ç¨®é¡(QNT/PMS8/PMS16ã®ã„ãšã‚Œã‹)
  */
 static CG_TYPE check_cgformat(BYTE *data) {
 	if (qnt_checkfmt(data)) {
@@ -55,11 +55,11 @@ static CG_TYPE check_cgformat(BYTE *data) {
 }
 
 /**
- * ¥Õ¥¡¥¤¥ëÅù¤«¤éÆÉ¤ß¹ş¤ó¤ÀCG¥Ç¡¼¥¿¤òsurface¤ËÅ¸³«
+ * ãƒ•ã‚¡ã‚¤ãƒ«ç­‰ã‹ã‚‰èª­ã¿è¾¼ã‚“ã CGãƒ‡ãƒ¼ã‚¿ã‚’surfaceã«å±•é–‹
  *
- * @param b: ¥Ç¡¼¥¿Îó
- * @return CG ¤¬Å¸³«¤µ¤ì¤¿ surface
- *         Ì¤ÃÎ¤Î·Á¼°¤Î¤È¤­¤Ï NULL ¤¬ÊÖ¤ë
+ * @param b: ãƒ‡ãƒ¼ã‚¿åˆ—
+ * @return CG ãŒå±•é–‹ã•ã‚ŒãŸ surface
+ *         æœªçŸ¥ã®å½¢å¼ã®ã¨ãã¯ NULL ãŒè¿”ã‚‹
  */
 surface_t *sf_getcg(void *b) {
 	surface_t *sf = NULL;
@@ -124,10 +124,10 @@ surface_t *sf_getcg(void *b) {
 }
 
 /**
- * ALD¥Õ¥¡¥¤¥ë¤«¤é»ØÄê¤ÎÈÖ¹æ¤ÎCG¤òÆÉ¤ß¹ş¤ó¤Ç surface¤ËÅ¸³«
+ * ALDãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰æŒ‡å®šã®ç•ªå·ã®CGã‚’èª­ã¿è¾¼ã‚“ã§ surfaceã«å±•é–‹
  * 
- * @param no: ¥Õ¥¡¥¤¥ëÈÖ¹æ (0-)
- * @return CG¤¬Å¸³«¤µ¤ì¤¿ surface
+ * @param no: ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå· (0-)
+ * @return CGãŒå±•é–‹ã•ã‚ŒãŸ surface
  */
 surface_t *sf_loadcg_no(int no) {
 	dridata *dfile;

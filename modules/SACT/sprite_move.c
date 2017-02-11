@@ -1,5 +1,5 @@
 /*
- * sprite_move.c: ¥¹¥×¥é¥¤¥È¤Î°ÜÆ°¤Ë´Ø¤¹¤ë³Æ¼ï½èÍı
+ * sprite_move.c: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹•ã«é–¢ã™ã‚‹å„ç¨®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -37,11 +37,11 @@
 
 /*
 
-  SP_MOVE ¤Ë¤è¤ë¥¹¥×¥é¥¤¥È¤Î°ÜÆ°¤Ï¡¢SACT.Draw¤¬È¯¹Ô¤µ¤ì¤ë¤ÈÆ±»ş¤Ë
-  °ÜÆ°¤ò³«»Ï¤·¡¢Á´¤Æ¤Î°ÜÆ°¤¬½ªÎ»¤¹¤ë¤Ş¤ÇÂÔ¤Ä¡£
+  SP_MOVE ã«ã‚ˆã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹•ã¯ã€SACT.DrawãŒç™ºè¡Œã•ã‚Œã‚‹ã¨åŒæ™‚ã«
+  ç§»å‹•ã‚’é–‹å§‹ã—ã€å…¨ã¦ã®ç§»å‹•ãŒçµ‚äº†ã™ã‚‹ã¾ã§å¾…ã¤ã€‚
 
-  °ÜÆ°¤¬³«»Ï¤µ¤ì¤ë¤Ş¤Ç¤Ëºï½ü¡¢¤Ş¤¿¤Ï¿·µ¬¤ËºîÀ®¤µ¤ì¤¿¥¹¥×¥é¥¤¥È¤Ï
-  °ÜÆ°¤·¤Ê¤¤¤Î¤ÇÃí°Õ
+  ç§»å‹•ãŒé–‹å§‹ã•ã‚Œã‚‹ã¾ã§ã«å‰Šé™¤ã€ã¾ãŸã¯æ–°è¦ã«ä½œæˆã•ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯
+  ç§»å‹•ã—ãªã„ã®ã§æ³¨æ„
   
 */
 
@@ -49,54 +49,54 @@
 static void move_drain(sprite_t *sp);
 static int move_cb(sprite_t *sp, agsevent_t *e);
 
-// SP_MOVE¥³¥Ş¥ó¥É¤Î¸å»ÏËö
+// SP_MOVEã‚³ãƒãƒ³ãƒ‰ã®å¾Œå§‹æœ«
 static void move_drain(sprite_t *sp) {
-	// ¸Å¤¤¾ì½ê¤Îupdate
+	// å¤ã„å ´æ‰€ã®update
 	sp_updateme(sp);
 
-	// ºÇ½ª°ÜÆ°¾ì½ê¤Ë¥¹¥×¥é¥¤¥È°ÌÃÖ¤ò¥»¥Ã¥È
+	// æœ€çµ‚ç§»å‹•å ´æ‰€ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä½ç½®ã‚’ã‚»ãƒƒãƒˆ
 	sp->cur = sp->loc = sp->move.to;
 
-	// ¤¢¤¿¤é¤·¤¤¾ì½ê¤Îupdate
+	// ã‚ãŸã‚‰ã—ã„å ´æ‰€ã®update
 	sp_updateme(sp);
 	
-	// ¸å¤Ç¡¢movelist ¤«¤é³°¤·¤Æ¤â¤é¤¦¤¿¤á¤Î½èÍı
+	// å¾Œã§ã€movelist ã‹ã‚‰å¤–ã—ã¦ã‚‚ã‚‰ã†ãŸã‚ã®å‡¦ç†
 	sact.teventremovelist = g_slist_append(sact.teventremovelist, sp);
 	
 	sp->move.moving = FALSE;
-	sp->move.time = 0; // °ÜÆ°»ş´Ö¤Î½é´ü²½
+	sp->move.time = 0; // ç§»å‹•æ™‚é–“ã®åˆæœŸåŒ–
 }
 
-// SP_MOVE ¤Î timer event callback
+// SP_MOVE ã® timer event callback
 static int move_cb(sprite_t *sp, agsevent_t *e) {
 	int t, update = 0;
 	int now, newx, newy;
 
-	// ¸½ºß»ş¹ï¤Î¼èÆÀ
+	// ç¾åœ¨æ™‚åˆ»ã®å–å¾—
 	now = sact.movecurtime;
 	
 	WARNING("no = %d now = %d st = %d, ed = %d\n",
 		sp->no, now, sp->move.starttime, sp->move.endtime);
 	
 	if (now >= sp->move.endtime) {
-		// »ş´Ö¥ª¡¼¥Ğ¡¼¤Ê¤é¡¢ºÇ½ª°ÌÃÖ¤Ë°ÜÆ°¤·¤ÆMOVE½ªÎ»
+		// æ™‚é–“ã‚ªãƒ¼ãƒãƒ¼ãªã‚‰ã€æœ€çµ‚ä½ç½®ã«ç§»å‹•ã—ã¦MOVEçµ‚äº†
 		move_drain(sp);
 		return 1;
 	}
 	
-	// ·Ğ²á»ş´Ö
+	// çµŒéæ™‚é–“
 	t = now - sp->move.starttime;
 	
 	newx = sp->loc.x + t * (sp->move.to.x - sp->loc.x) / sp->move.time;
 	newy = sp->loc.y + t * (sp->move.to.y - sp->loc.y) / sp->move.time;
 	
-	// °ÜÆ°¤·¤Æ¤¤¤¿¤é¿·¤·¤¤°ÌÃÖ¤òµ­Ï¿¤·¤Æ½ñ¤­´¹¤¨¤ò»Ø¼¨
+	// ç§»å‹•ã—ã¦ã„ãŸã‚‰æ–°ã—ã„ä½ç½®ã‚’è¨˜éŒ²ã—ã¦æ›¸ãæ›ãˆã‚’æŒ‡ç¤º
 	if (newx != sp->cur.x || newy != sp->cur.y) {
-		// ¸Å¤¤¾ì½ê¤Îupdate
+		// å¤ã„å ´æ‰€ã®update
 		sp_updateme(sp);
 		sp->cur.x = newx;
 		sp->cur.y = newy;
-		// ¿·¤·¤¤¾ì½ê¤Îupdate
+		// æ–°ã—ã„å ´æ‰€ã®update
 		sp_updateme(sp);
 		update++;
 	} else {
@@ -107,33 +107,33 @@ static int move_cb(sprite_t *sp, agsevent_t *e) {
 }
 
 /*
- SP_MOVE¥³¥Ş¥ó¥É¡¢°ÜÆ°¤Î½àÈ÷
+ SP_MOVEã‚³ãƒãƒ³ãƒ‰ã€ç§»å‹•ã®æº–å‚™
  @param data: sprite
- @param userdata: Ì¤»ÈÍÑ
+ @param userdata: æœªä½¿ç”¨
 */
 void spev_move_setup(gpointer data, gpointer userdata) {
 	sprite_t *sp = (sprite_t *)data;
 	
-	// ÈóÉ½¼¨¤Î¤â¤Î¤Ï°ÜÆ°¤·¤Ê¤¤(¤¤¤¤¤Î¤«¤Ê)
+	// éè¡¨ç¤ºã®ã‚‚ã®ã¯ç§»å‹•ã—ãªã„(ã„ã„ã®ã‹ãª)
 	if (!sp->show) return;
 	
-	// move ³«»Ï»ş¹ï¤Îµ­Ï¿
+	// move é–‹å§‹æ™‚åˆ»ã®è¨˜éŒ²
 	sp->move.starttime = sact.movestarttime;
 	sp->move.moving = TRUE;
 	
-	// MOVE_SPEED ¤ÇÀßÄê¤·¤¿¾ì¹ç¤Ï¡¢°ÜÆ°ÎÌ¤ò¹ÍÎ¸¤·¤Æ°ÜÆ°»ş´Ö¤ò·èÄê
+	// MOVE_SPEED ã§è¨­å®šã—ãŸå ´åˆã¯ã€ç§»å‹•é‡ã‚’è€ƒæ…®ã—ã¦ç§»å‹•æ™‚é–“ã‚’æ±ºå®š
 	if (sp->move.time == -1) {
-		// speed ¤«¤é time¤Ø
+		// speed ã‹ã‚‰ timeã¸
 		int dx = sp->move.to.x - sp->loc.x;
 		int dy = sp->move.to.y - sp->loc.y;
 		int d = (int)sqrt(dx*dx+dy*dy);
 		sp->move.time = d * 100 / sp->move.speed;
 	}
 	
-	// move ½ªÎ»Í½Äê»ş¹ï
+	// move çµ‚äº†äºˆå®šæ™‚åˆ»
 	sp->move.endtime = sp->move.starttime + sp->move.time;
 	
-	// ¥¿¥¤¥Ş¥³¡¼¥ë¥Ğ¥Ã¥¯ÅĞÏ¿
+	// ã‚¿ã‚¤ãƒã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ç™»éŒ²
 	spev_add_teventlistener(sp, move_cb);
 	
 	WARNING("no=%d,from(%d,%d@%d)to(%d,%d@%d),time=%d\n", sp->no,
@@ -144,11 +144,11 @@ void spev_move_setup(gpointer data, gpointer userdata) {
 }
 
 /*
-  ¥¹¥×¥é¥¤¥È¤Î°ÜÆ°Àè¤ò»ØÄê¤·¡¢°ÜÆ°Àè¤Ë¤¯¤ë¤Ş¤ÇÂÔ¤Ä
-  @param sp: ÂĞ¾İ¥¹¥×¥é¥¤¥È
-  @param dx: °ÜÆ°Àè£ØºÂÉ¸
-  @param dy: °ÜÆ°Àè£ÙºÂÉ¸
-  @param time: °ÜÆ°Â®ÅÙ
+  ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹•å…ˆã‚’æŒ‡å®šã—ã€ç§»å‹•å…ˆã«ãã‚‹ã¾ã§å¾…ã¤
+  @param sp: å¯¾è±¡ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+  @param dx: ç§»å‹•å…ˆï¼¸åº§æ¨™
+  @param dy: ç§»å‹•å…ˆï¼¹åº§æ¨™
+  @param time: ç§»å‹•é€Ÿåº¦
 */
 void spev_move_waitend(sprite_t *sp, int dx, int dy, int time) {
 	sp->loc = sp->cur;
@@ -169,13 +169,13 @@ void spev_move_waitend(sprite_t *sp, int dx, int dy, int time) {
 }
 
 /*
-  Á´¤Æ¤Î°ÜÆ°Ãæ¤Î¥¹¥×¥é¥¤¥È¤¬°ÜÆ°´°Î»¤¹¤ë¤Î¤òÂÔ¤Ä
+  å…¨ã¦ã®ç§»å‹•ä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒç§»å‹•å®Œäº†ã™ã‚‹ã®ã‚’å¾…ã¤
 */
 void spev_wait4moving_sp() {
 	GSList *node;
 	
-	// °ÜÆ°Ãæ¤Î¥¹¥×¥é¥¤¥È¤Ï sact.updatelist ¤Ë¤¢¤ë¤Ï¤º¤À¤«¤é
-	// ¤½¤Î¤Ê¤«¤Î¥¹¥×¥é¥¤¥È¤Ë¤Ä¤¤¤Æ¡¢°ÜÆ°Ãæ¤«¤É¤¦¤«¤Î¥Õ¥é¥°¤ò¥Á¥§¥Ã¥¯
+	// ç§»å‹•ä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯ sact.updatelist ã«ã‚ã‚‹ã¯ãšã ã‹ã‚‰
+	// ãã®ãªã‹ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«ã¤ã„ã¦ã€ç§»å‹•ä¸­ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°ã‚’ãƒã‚§ãƒƒã‚¯
 	for (node = sact.updatelist; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;
 		if (sp == NULL) continue;

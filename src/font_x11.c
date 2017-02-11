@@ -40,7 +40,7 @@
 #include "eucsjis.h"
 #include "antialiase.h"
 
-/* fontset ¤Î°Ù¤Î¾ğÊó */
+/* fontset ã®ç‚ºã®æƒ…å ± */
 typedef struct {
 	int      size;
 	int      type;
@@ -53,14 +53,14 @@ static int       fontcnt = 0;
 static XFontSet  fontset;
 static int       font_ascent, font_descent;
 
-/* Font Glyph ¤ò¼èÆÀ¤¹¤ë¤¿¤á¤ÎPixmap¤ÈGC */
+/* Font Glyph ã‚’å–å¾—ã™ã‚‹ãŸã‚ã®Pixmapã¨GC */
 static Pixmap    pix_glyph;
 static GC        gc_pix_glyph;
 static agsurface_t  img_glyph;
 
 static FONT *this;
 
-#define GLYPH_PIXMAP_WIDTH  800  /* Ê¸»ú¥¤¥á¡¼¥¸¤ò¼èÆÀ¤¹¤ë°Ù¤ÎPixmap¤ÎÂç¤­¤µ */
+#define GLYPH_PIXMAP_WIDTH  800  /* æ–‡å­—ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’å–å¾—ã™ã‚‹ç‚ºã®Pixmapã®å¤§ãã• */
 #define GLYPH_PIXMAP_HEIGHT 150
 
 static void font_insert(int size, int type, XFontSet fontset) {
@@ -117,7 +117,7 @@ static void font_x11_sel_font(int type, int size) {
 		fontset = tbl->id;
 	}
 	
-	/* ºÇÂç¤Î¥Õ¥©¥ó¥È¤Î¹â¤µ¤Î¼èÆÀ */
+	/* æœ€å¤§ã®ãƒ•ã‚©ãƒ³ãƒˆã®é«˜ã•ã®å–å¾— */
 	num_fonts = XFontsOfFontSet(fontset, &font_structs, &font_names);
 	font_ascent = font_descent = 0;
 	for (i = 0; i < num_fonts; i++) {
@@ -198,7 +198,7 @@ static int font_x11_draw_glyph(int x, int y, unsigned char *str, int col) {
 	}
 	
 	if (!x11_dibinfo->shared) {
-		/* °ìÅÙ Pixmap ¤Ë½ñ¤¤¤Æ¤«¤é¥¤¥á¡¼¥¸¤ò¼èÆÀ¤·¤ÆDIB¤Ø */
+		/* ä¸€åº¦ Pixmap ã«æ›¸ã„ã¦ã‹ã‚‰ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’å–å¾—ã—ã¦DIBã¸ */
 		agsurface_t *dst = get_drawn_glyph(conv, w);
 		
 		if (DIB_DEPTH == dib_depth_candidate) {
@@ -229,7 +229,7 @@ FONT *font_x11_new() {
 	f->self_drawable = drawable;
 	f->antialiase_on = FALSE;
 	
-	/* Glyph¼èÆÀ¤Î¤¿¤á¤ÎPixmap¤ÈGC¤Èagsurface_t¤òÍÑ°Õ */
+	/* Glyphå–å¾—ã®ãŸã‚ã®Pixmapã¨GCã¨agsurface_tã‚’ç”¨æ„ */
 	pix_glyph = XCreatePixmap(x11_display, x11_window,
 				  GLYPH_PIXMAP_WIDTH, GLYPH_PIXMAP_HEIGHT, WIN_DEPTH);
 	gc_pix_glyph = XCreateGC(x11_display, pix_glyph, 0, 0);

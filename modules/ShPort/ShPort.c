@@ -1,8 +1,8 @@
 /*
- * ShPort.c  Widget ¸Æ¤Ó½Ğ¤·¡© module
+ * ShPort.c  Widget å‘¼ã³å‡ºã—ï¼Ÿ module
  *
- *    ¤«¤¨¤ë¤Ë¤ç¹ñ¤Ë¤ç¥¢¥ê¥¹(Ì¤»ÈÍÑ)
- *    Âç°­»Ê
+ *    ã‹ãˆã‚‹ã«ã‚‡å›½ã«ã‚‡ã‚¢ãƒªã‚¹(æœªä½¿ç”¨)
+ *    å¤§æ‚ªå¸
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -36,7 +36,7 @@
 #include "xsystem35.h"
 #include "graphicsdevice.h"
 
-// ¥­¡¼ÊÑ´¹¥Æ¡¼¥Ö¥ë
+// ã‚­ãƒ¼å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«
 #define KEYMAP_MAX 8
 static BYTE *keymap[KEYMAP_MAX];
 
@@ -65,7 +65,7 @@ void InputListNum(void) { /* 1 */
 
 /**
  * ShPort:Init
- *   ShPort¥µ¥Ö¥·¥¹¥Æ¥àÁ´ÂÎ¤Î½é´ü²½
+ *   ShPortã‚µãƒ–ã‚·ã‚¹ãƒ†ãƒ å…¨ä½“ã®åˆæœŸåŒ–
  *   @param p1: ISys3x
  */
 void Init(void) {
@@ -76,8 +76,8 @@ void Init(void) {
 
 /**
  * ShPort:InitKeyStatus
- *   »ØÄê¤Î¥­¡¼¥³¡¼¥É¥Ş¥Ã¥×¤Î½é´ü²½
- *   @param no: ¥­¡¼¥³¡¼¥É¥Ş¥Ã¥×¤ÎÈÖ¹æ(1~)
+ *   æŒ‡å®šã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ãƒãƒƒãƒ—ã®åˆæœŸåŒ–
+ *   @param no: ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ãƒãƒƒãƒ—ã®ç•ªå·(1~)
  */
 void InitKeyStatus(void) {
 	int no = getCaliValue();
@@ -98,10 +98,10 @@ void InitKeyStatus(void) {
 
 /**
  * ShPort:SetKeyStatus
- *   »ØÄê¥Ş¥Ã¥×¤Î¥­¡¼¥³¡¼¥É¤Ø¤Îµ¡Ç½¤Î³ä¤êÉÕ¤±¡£
- *   @param no: ¥Ş¥Ã¥×ÈÖ¹æ
- *   @param key: ¥­¡¼¥³¡¼¥É
- *   @param func: µ¡Ç½¥­¡¼¥³¡¼¥É
+ *   æŒ‡å®šãƒãƒƒãƒ—ã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã¸ã®æ©Ÿèƒ½ã®å‰²ã‚Šä»˜ã‘ã€‚
+ *   @param no: ãƒãƒƒãƒ—ç•ªå·
+ *   @param key: ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰
+ *   @param func: æ©Ÿèƒ½ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰
  */
 void SetKeyStatus(void) {
 	int no   = getCaliValue();
@@ -120,9 +120,9 @@ void SetKeyStatus(void) {
 
 /**
  * ShPort:GetKeyStatus
- *   »ØÄê¥Ş¥Ã¥×¤Î¥­¡¼¤Î²¡²¼¾õÂÖ¤Î¼èÆÀ
- *   @param no:  ¥Ş¥Ã¥×ÈÖ¹æ
- *   @param var: ²¡²¼¥­¡¼¤ËÂĞ±ş¤¹¤ëµ¡Ç½¥³¡¼¥É¤òÊÖ¤¹ÊÑ¿ô
+ *   æŒ‡å®šãƒãƒƒãƒ—ã®ã‚­ãƒ¼ã®æŠ¼ä¸‹çŠ¶æ…‹ã®å–å¾—
+ *   @param no:  ãƒãƒƒãƒ—ç•ªå·
+ *   @param var: æŠ¼ä¸‹ã‚­ãƒ¼ã«å¯¾å¿œã™ã‚‹æ©Ÿèƒ½ã‚³ãƒ¼ãƒ‰ã‚’è¿”ã™å¤‰æ•°
  */
 void GetKeyStatus(void) {
 	int no   = getCaliValue();

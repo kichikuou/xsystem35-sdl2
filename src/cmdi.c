@@ -37,7 +37,7 @@ static int repeating = 0;
 static int ik_key = 0;
 
 void commandIK() {
-	/* ¥­¡¼ÆşÎÏ´ØÏ¢¤Î¥³¥Ş¥ó¥É */
+	/* ã‚­ãƒ¼å…¥åŠ›é–¢é€£ã®ã‚³ãƒãƒ³ãƒ‰ */
 	int num = sys_getc();
 	int key;
 
@@ -97,7 +97,7 @@ void commandIK() {
 }
 
 void commandIM() {
-	/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤ÎºÂÉ¸¼èÆÀ */
+	/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®åº§æ¨™å–å¾— */
 	int *x_var = getCaliVariable();
 	int *y_var = getCaliVariable();
 	MyPoint p;
@@ -109,7 +109,7 @@ void commandIM() {
 }
 
 void commandIC() {
-	/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤Î·Á¾õÊÑ¹¹ */
+	/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®å½¢çŠ¶å¤‰æ›´ */
 	static int pre = 1;
 	int cursor_num = getCaliValue();
 	int *oldcursor  = getCaliVariable();
@@ -121,7 +121,7 @@ void commandIC() {
 }
 
 void commandIZ() {
-        /* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤ÎºÂÉ¸¤òÊÑ¹¹¤¹¤ë (¥Ş¥¦¥¹¥«¡¼¥½¥ë¤Ï¥¹¥à¡¼¥º¤Ë°ÜÆ°¤¹¤ë) */
+        /* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®åº§æ¨™ã‚’å¤‰æ›´ã™ã‚‹ (ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã¯ã‚¹ãƒ ãƒ¼ã‚ºã«ç§»å‹•ã™ã‚‹) */
 	int x = getCaliValue();
 	int y = getCaliValue();
 	
@@ -130,7 +130,7 @@ void commandIZ() {
 }
 
 void commandIX() {
-	/* ¡Ö¼¡¤ÎÁªÂò»è¤Ş¤Ç¿Ê¤à¡×¤Î¾õÂÖ¼èÆÀ */
+	/* ã€Œæ¬¡ã®é¸æŠè‚¢ã¾ã§é€²ã‚€ã€ã®çŠ¶æ…‹å–å¾— */
 	int *var = getCaliVariable();
 	
 	*var = get_skipMode() == TRUE ? 1 : 0;

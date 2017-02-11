@@ -1,11 +1,11 @@
 
 ;	Copyright (C) 1999 URURI
 
-;	nasmÍÑ¥Ş¥¯¥í
-;	1999/08/21 ºîÀ®
-;	1999/10/10 ´ö¤Ä¤«ÄÉ²Ã
-;	1999/10/27 aoutÂĞ±ş
-;	1999/11/07 pushf, popf ¤ÎNASM¤Î¥Ğ¥°ÂĞ±ş
+;	nasmç”¨ãƒã‚¯ãƒ­
+;	1999/08/21 ä½œæˆ
+;	1999/10/10 å¹¾ã¤ã‹è¿½åŠ 
+;	1999/10/27 aoutå¯¾å¿œ
+;	1999/11/07 pushf, popf ã®NASMã®ãƒã‚°å¯¾å¿œ
 ;	1999/12/02 for BCC ( Thanks to Miquel )
 
 ; for Windows Visual C++        -> define WIN32
@@ -14,7 +14,7 @@
 ; for TownsOS                   ->        __tos__
 ; otherwise                     ->   none
 
-;Ì¾Á°¤ÎÉÕ¤±Êı
+;åå‰ã®ä»˜ã‘æ–¹
 
 BITS 32
 
@@ -43,13 +43,13 @@ group CGROUP text
 group DGROUP data
 %endif
 
-;Ã±ÀºÅÙÉâÆ°¾®¿ôÅÀ·Á¼°
+;å˜ç²¾åº¦æµ®å‹•å°æ•°ç‚¹å½¢å¼
 
 %idefine float dword
 %idefine fsize 4
 %idefine fsizen(a) (fsize*(a))
 
-;¥ï¡¼¥É·Á¼°
+;ãƒ¯ãƒ¼ãƒ‰å½¢å¼
 
 %idefine wsize 2
 %idefine wsizen(a) (wsize*(a))
@@ -86,11 +86,11 @@ group DGROUP data
 %define xm6 xmm6
 %define xm7 xmm7
 
-;¥·¥ã¥Ã¥Õ¥ëÍÑ¤Î4¿Ê¥Ş¥¯¥í
+;ã‚·ãƒ£ãƒƒãƒ•ãƒ«ç”¨ã®4é€²ãƒã‚¯ãƒ­
 
 %define R4(a,b,c,d) (a*64+b*16+c*4+d)
 
-;C¥é¥¤¥¯¤Ê´Ê°×¥Ş¥¯¥í
+;Cãƒ©ã‚¤ã‚¯ãªç°¡æ˜“ãƒã‚¯ãƒ­
 
 %imacro globaldef 1
 	%ifdef _NAMING

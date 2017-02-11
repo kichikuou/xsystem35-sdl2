@@ -1,5 +1,5 @@
 /*
- * sprite_keywait.c: ¥¹¥×¥é¥¤¥È¥­¡¼ÂÔ¤Á
+ * sprite_keywait.c: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚­ãƒ¼å¾…ã¡
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -44,7 +44,7 @@ static boolean waitcond(int endtime);
 
 
 
-// ¤¸¤ï¤¸¤ï¾Ã¤¹
+// ã˜ã‚ã˜ã‚æ¶ˆã™
 static void hidesprite(sprite_t *sp) {
 	int i;
 	
@@ -61,11 +61,11 @@ static void hidesprite(sprite_t *sp) {
 }
 
 /*
-  ¥­¡¼ÂÔ¤Á½ªÎ»¤Î¾ò·ï¥Á¥§¥Ã¥¯
-   @param endtime: ½ªÎ»»ş´Ö
-   @return: ½ªÎ»¤Ê¤é TRUE¡¢·ÑÂ³¤Ê¤é FALSE
+  ã‚­ãƒ¼å¾…ã¡çµ‚äº†ã®æ¡ä»¶ãƒã‚§ãƒƒã‚¯
+   @param endtime: çµ‚äº†æ™‚é–“
+   @return: çµ‚äº†ãªã‚‰ TRUEã€ç¶™ç¶šãªã‚‰ FALSE
    
-   ¥¹¥×¥é¥¤¥È¤¬¥É¥í¥Ã¥×¤µ¤ì¤¿»ş¤Î³Æ¼ï½èÍı¤ò´Ş¤à
+   ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚ŒãŸæ™‚ã®å„ç¨®å‡¦ç†ã‚’å«ã‚€
 */
 static boolean waitcond(int endtime) {
 	int curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
@@ -74,7 +74,7 @@ static boolean waitcond(int endtime) {
 	if (sact.dropped) {
 		sact.draggedsp->u.get.dragging = FALSE;
 		if (sact.waitkey != -1) {
-			// drop¤·¤¿¥¹¥×¥é¥¤¥È¤ò¤¸¤ï¤¸¤ï¾Ã¤¹ 
+			// dropã—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ã˜ã‚ã˜ã‚æ¶ˆã™ 
 			hidesprite(sact.draggedsp);
 			sact.sp_result_get = sact.draggedsp->no;
 			sact.sp_result_put = sact.waitkey;
@@ -83,17 +83,17 @@ static boolean waitcond(int endtime) {
 			sact.dropped = FALSE;
 			return TRUE;
 		} else {
-			// PUT/SWPUT¥¹¥×¥é¥¤¥È°Ê³°¤Î¤È¤³¤í¤Ëdrop¤·¤¿¾ì¹ç
+			// PUT/SWPUTã‚¹ãƒ—ãƒ©ã‚¤ãƒˆä»¥å¤–ã®ã¨ã“ã‚ã«dropã—ãŸå ´åˆ
 			sprite_t *sp = sact.draggedsp;
 			if (sact.draggedsp->type == SPRITE_GETA) {
-				// ¤â¤È¤Î¾ì½ê¤Ë¤æ¤Ã¤¯¤êÌá¤¹
+				// ã‚‚ã¨ã®å ´æ‰€ã«ã‚†ã£ãã‚Šæˆ»ã™
 				spev_move_waitend(sp, sp->loc.x, sp->loc.y, 150); 
 			} else {
-				// ¤½¤Î¾ì½ê¤ËÎ±¤Ş¤ë
+				// ãã®å ´æ‰€ã«ç•™ã¾ã‚‹
 				sp->loc = sp->cur;
 			}
 			
-			// drop²»¤¬¤¢¤ì¤Ğ¡¢ÌÄ¤é¤¹
+			// dropéŸ³ãŒã‚ã‚Œã°ã€é³´ã‚‰ã™
 			if (sact.draggedsp->numsound3) {
 				ssnd_play(sact.draggedsp->numsound3);
 			}
@@ -102,26 +102,26 @@ static boolean waitcond(int endtime) {
 		}
 	}
 	
-	// ¤½¤ÎÂ¾¥­¡¼ÆşÎÏ¤¬¤¢¤ì¤Ğ½ªÎ»
+	// ãã®ä»–ã‚­ãƒ¼å…¥åŠ›ãŒã‚ã‚Œã°çµ‚äº†
 	return sact.waitkey == -1 ? FALSE : TRUE;
 }
 
 /*
-  ¥¹¥×¥é¥¤¥È¥­¡¼ÂÔ¤Á
-  @param vOK: 0¤Ê¤é¤Ğ±¦¥¯¥ê¥Ã¥¯ 
-  @param vRND: ¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ
-  @param vD01: ¥²¥Ã¥È¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ
-  @param vD02: ¥×¥Ã¥È¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ
-  @param vD03: ¥¿¥¤¥à¥¢¥¦¥È¤·¤¿¾ì¹ç=1, ¤·¤Ê¤¤¾ì¹ç=0
-  @param wTime: ¥¿¥¤¥à¥¢¥¦¥È»ş´Ö (1/100sec)
+  ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚­ãƒ¼å¾…ã¡
+  @param vOK: 0ãªã‚‰ã°å³ã‚¯ãƒªãƒƒã‚¯ 
+  @param vRND: ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·
+  @param vD01: ã‚²ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·
+  @param vD02: ãƒ—ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·
+  @param vD03: ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã—ãŸå ´åˆ=1, ã—ãªã„å ´åˆ=0
+  @param wTime: ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆæ™‚é–“ (1/100sec)
 */
 int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout) {
 	int curtime, endtime;
 	
-	// ¤È¤ê¤¢¤¨¤ºÁ´¹¹¿·
+	// ã¨ã‚Šã‚ãˆãšå…¨æ›´æ–°
 	sp_update_all(TRUE);
 	
-	// depthmap ¤ò½àÈ÷
+	// depthmap ã‚’æº–å‚™
 	g_slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
 	
 	sact.waittype = KEYWAIT_SPRITE;
@@ -132,8 +132,8 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	sact.draggedsp = NULL;
 	
 	{
-		// ¤È¤ê¤¢¤¨¤º¡¢¸½ºß¤Î¥Ş¥¦¥¹°ÌÃÖ¤òÁ÷¤Ã¤Æ¡¢switch sprite ¤Î
-		// ¾õÂÖ¤ò¹¹¿·¤·¤Æ¤ª¤¯
+		// ã¨ã‚Šã‚ãˆãšã€ç¾åœ¨ã®ãƒã‚¦ã‚¹ä½ç½®ã‚’é€ã£ã¦ã€switch sprite ã®
+		// çŠ¶æ…‹ã‚’æ›´æ–°ã—ã¦ãŠã
 		agsevent_t agse;
 		MyPoint p;
 		sys_getMouseInfo(&p, FALSE);
@@ -144,17 +144,17 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 		nact->ags.eventcb(&agse);
 	}
 	
-	// ½ªÎ»»ş´Ö¤Î·×»»
+	// çµ‚äº†æ™‚é–“ã®è¨ˆç®—
 	curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
 	endtime = timeout < 0 ? G_MAXINT: (curtime + timeout * 10);
 	
-	// ¥¹¥×¥é¥¤¥È¥­¡¼ÂÔ¤Á¥á¥¤¥ó
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚­ãƒ¼å¾…ã¡ãƒ¡ã‚¤ãƒ³
 	while (!waitcond(endtime)) {
 		sys_keywait(25, TRUE);
 	}
 	
 	if (sact.waitkey == 0) {
-		// ±¦¥¯¥ê¥Ã¥¯¥­¥ã¥ó¥»¥ë
+		// å³ã‚¯ãƒªãƒƒã‚¯ã‚­ãƒ£ãƒ³ã‚»ãƒ«
 		*vOK = 0;
 		if (vD03) *vD03 = 0;
 	} else if (sact.waitkey == -1) {

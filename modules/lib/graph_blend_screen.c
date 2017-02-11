@@ -1,4 +1,4 @@
-// src¤Îsurface¤Î°ìÉô¤òdst¤ËË°ÏÂ²Ã»»
+// srcã®surfaceã®ä¸€éƒ¨ã‚’dstã«é£½å’ŒåŠ ç®—
 
 #include <stdio.h>
 

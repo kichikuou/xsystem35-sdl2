@@ -35,7 +35,7 @@
 #include "cg.h"
 
 void commandLD() {
-	/* ÊÑ¿ôÎÎ°è¤Ê¤É¤Î¥Ç¡¼¥¿¤ò¥í¡¼¥É¤¹¤ë¡£¡ÊÁ´¥í¡¼¥É¡Ë*/
+	/* å¤‰æ•°é ˜åŸŸãªã©ã®ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚ï¼ˆå…¨ãƒ­ãƒ¼ãƒ‰ï¼‰*/
 	int num   = getCaliValue();
 	
 	if (num <= 0) {
@@ -47,7 +47,7 @@ void commandLD() {
 }
 
 void commandLP() {
-	/* ¥»¡¼¥Ö¥Ç¡¼¥¿¤Î°ìÉôÊ¬¤ò¥í¡¼¥É¤¹¤ë¡£(¿ôÃÍÊÑ¿ôÉô) */
+	/* ã‚»ãƒ¼ãƒ–ãƒ‡ãƒ¼ã‚¿ã®ä¸€éƒ¨åˆ†ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚(æ•°å€¤å¤‰æ•°éƒ¨) */
 	int num    = getCaliValue();
 	int *point = getCaliVariable();
 	int page   = preVarPage;
@@ -63,7 +63,7 @@ void commandLP() {
 }
 
 void commandLT() {
-	/* ¥¿¥¤¥à¥¹¥¿¥ó¥×¤ÎÆÉ¤ß¹ş¤ß */
+	/* ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã®èª­ã¿è¾¼ã¿ */
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 	int status;
@@ -83,7 +83,7 @@ void commandLT() {
 	
 	status = stat(save_get_file(num - 1), &buf);
 	if (status) {
-		/* ¤ó¤Ê¤ó¤É¤³¤Ë¤â¤«¤¤¤Æ¤Ê¤¤¤ä¤ó¡ª */
+		/* ã‚“ãªã‚“ã©ã“ã«ã‚‚ã‹ã„ã¦ãªã„ã‚„ã‚“ï¼ */
 		*var       = 0;
 		*(var + 1) = 0;
 		*(var + 2) = 0;
@@ -154,7 +154,7 @@ void commandLL() {
 		
 		if (dfile->size < num * sizeof(WORD)) {
 			WARNING("data shortage (req = %d, result = %d)\n", num, dfile->size/ sizeof(WORD));
-			/* sysVar[0] = 254; Âç±³*/
+			/* sysVar[0] = 254; å¤§å˜˜*/
 			/* return; */
 			num = dfile->size / sizeof(WORD);
 		}
@@ -187,50 +187,50 @@ void commandLL() {
 }
 
 void commandLHD() {
-	// £Ã£Ä¤Î¥Ç¡¼¥¿¤ò£È£Ä£Ä¤ØÅĞÏ¿¡¿ºï½ü¤¹¤ë
+	// ï¼£ï¼¤ã®ãƒ‡ãƒ¼ã‚¿ã‚’ï¼¨ï¼¤ï¼¤ã¸ç™»éŒ²ï¼å‰Šé™¤ã™ã‚‹
 	int p1 = sys_getc();
 	int no = getCaliValue();
-	// XÈÇ¤Ç¤ÏÁ´¤Æ¤òHDD¤ËÃÖ¤¯¤Î¤Ç¥µ¥İ¡¼¥È¤·¤Ê¤¤
+	// Xç‰ˆã§ã¯å…¨ã¦ã‚’HDDã«ç½®ãã®ã§ã‚µãƒãƒ¼ãƒˆã—ãªã„
 	
 	sysVar[0] = 255;
 	DEBUG_COMMAND("LHD %d,%d:\n",p1,no);
 }
 
 void commandLHG() {
-	// £Ã£Ä¤Î¥Ç¡¼¥¿¤ò£È£Ä£Ä¤ØÅĞÏ¿¡¿ºï½ü¤¹¤ë
+	// ï¼£ï¼¤ã®ãƒ‡ãƒ¼ã‚¿ã‚’ï¼¨ï¼¤ï¼¤ã¸ç™»éŒ²ï¼å‰Šé™¤ã™ã‚‹
 	int p1 = sys_getc();
 	int no = getCaliValue();
-	/* XÈÇ¤Ç¤ÏÁ´¤Æ¤òHDD¤ËÃÖ¤¯¤Î¤Ç¥µ¥İ¡¼¥È¤·¤Ê¤¤ */
+	/* Xç‰ˆã§ã¯å…¨ã¦ã‚’HDDã«ç½®ãã®ã§ã‚µãƒãƒ¼ãƒˆã—ãªã„ */
 	
 	sysVar[0] = 255;
 	DEBUG_COMMAND("LHG %d,%d:\n",p1,no);
 }
 
 void commandLHM() {
-	// £Ã£Ä¤Î¥Ç¡¼¥¿¤ò£È£Ä£Ä¤ØÅĞÏ¿¡¿ºï½ü¤¹¤ë
+	// ï¼£ï¼¤ã®ãƒ‡ãƒ¼ã‚¿ã‚’ï¼¨ï¼¤ï¼¤ã¸ç™»éŒ²ï¼å‰Šé™¤ã™ã‚‹
 	int p1 = sys_getc();
 	int no = getCaliValue();
-	// XÈÇ¤Ç¤ÏÁ´¤Æ¤òHDD¤ËÃÖ¤¯¤Î¤Ç¥µ¥İ¡¼¥È¤·¤Ê¤¤
+	// Xç‰ˆã§ã¯å…¨ã¦ã‚’HDDã«ç½®ãã®ã§ã‚µãƒãƒ¼ãƒˆã—ãªã„
 	
 	sysVar[0] = 255;
 	DEBUG_COMMAND("LHM %d,%d:\n",p1,no);
 }
 
 void commandLHS() {
-	// £Ã£Ä¤Î¥Ç¡¼¥¿¤ò£È£Ä£Ä¤ØÅĞÏ¿¡¿ºï½ü¤¹¤ë
+	// ï¼£ï¼¤ã®ãƒ‡ãƒ¼ã‚¿ã‚’ï¼¨ï¼¤ï¼¤ã¸ç™»éŒ²ï¼å‰Šé™¤ã™ã‚‹
 	int p1 = sys_getc();
 	int no = getCaliValue();
-	// XÈÇ¤Ç¤ÏÁ´¤Æ¤òHDD¤ËÃÖ¤¯¤Î¤Ç¥µ¥İ¡¼¥È¤·¤Ê¤¤
+	// Xç‰ˆã§ã¯å…¨ã¦ã‚’HDDã«ç½®ãã®ã§ã‚µãƒãƒ¼ãƒˆã—ãªã„
 	
 	sysVar[0] = 255;
 	DEBUG_COMMAND("LHS %d,%d:\n",p1,no);
 }
 
 void commandLHW() {
-	// £Ã£Ä¤Î¥Ç¡¼¥¿¤ò£È£Ä£Ä¤ØÅĞÏ¿¡¿ºï½ü¤¹¤ë
+	// ï¼£ï¼¤ã®ãƒ‡ãƒ¼ã‚¿ã‚’ï¼¨ï¼¤ï¼¤ã¸ç™»éŒ²ï¼å‰Šé™¤ã™ã‚‹
 	int p1 = sys_getc();
 	int no = getCaliValue();
-	// XÈÇ¤Ç¤ÏÁ´¤Æ¤òHDD¤ËÃÖ¤¯¤Î¤Ç¥µ¥İ¡¼¥È¤·¤Ê¤¤
+	// Xç‰ˆã§ã¯å…¨ã¦ã‚’HDDã«ç½®ãã®ã§ã‚µãƒãƒ¼ãƒˆã—ãªã„
 	
 	sysVar[0] = 255;
 	DEBUG_COMMAND("LHW %d,%d:\n",p1,no);
@@ -247,7 +247,7 @@ void commandLC() {
 }
 
 void commandLXG() {
-	/* ¥Õ¥¡¥¤¥ë¤òÁªÂò¤¹¤ë */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é¸æŠã™ã‚‹ */
 	int file_name = getCaliValue();
 	char *title   = sys_getString(':');
 	char *filter  = sys_getString(':');
@@ -256,7 +256,7 @@ void commandLXG() {
 }
 
 void commandLXO() {
-	/* ¥Õ¥¡¥¤¥ë¤òºîÀ®¤Ş¤¿¤Ï¥ª¡¼¥×¥ó¤¹¤ë */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã¾ãŸã¯ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹ */
 	int num           = getCaliValue();
 	int file_name     = getCaliValue();
 	int how_to_create = getCaliValue();
@@ -266,14 +266,14 @@ void commandLXO() {
 }
 
 void commandLXC() {
-	/* ¥Õ¥¡¥¤¥ë¤ò¥¯¥í¡¼¥º¤¹¤ë */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚¯ãƒ­ãƒ¼ã‚ºã™ã‚‹ */
 	int num = getCaliValue();
 	
 	DEBUG_COMMAND_YET("LXC %d:\n",num);
 }
 
 void commandLXL() {
-	/* CG¥Õ¥¡¥¤¥ë¥í¡¼¥É */
+	/* CGãƒ•ã‚¡ã‚¤ãƒ«ãƒ­ãƒ¼ãƒ‰ */
 	int x         = getCaliValue();
 	int y         = getCaliValue();
 	int file_name = getCaliValue();
@@ -282,7 +282,7 @@ void commandLXL() {
 }
 
 void commandLXS() {
-	/* ¥Õ¥¡¥¤¥ë¥µ¥¤¥º(¥Ğ¥¤¥È¿ô)¤ò¼èÆÀ¤¹¤ë */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚º(ãƒã‚¤ãƒˆæ•°)ã‚’å–å¾—ã™ã‚‹ */
 	int num = getCaliValue();
 	int *hi = getCaliVariable();
 	int *lo = getCaliVariable();
@@ -291,7 +291,7 @@ void commandLXS() {
 }
 
 void commandLXP() {
-	/* ¥Õ¥¡¥¤¥ë¥İ¥¤¥ó¥¿¤Î°ÌÃÖ¤ò(ÀèÆ¬¤«¤é¤Î¥Ğ¥¤¥È¿ô)ÀßÄê¤¹¤ë */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ãƒã‚¤ãƒ³ã‚¿ã®ä½ç½®ã‚’(å…ˆé ­ã‹ã‚‰ã®ãƒã‚¤ãƒˆæ•°)è¨­å®šã™ã‚‹ */
 	int num = getCaliValue();
 	int hi  = getCaliValue();
 	int lo  = getCaliValue();
@@ -300,7 +300,7 @@ void commandLXP() {
 }
 
 void commandLXR() {
-	/* ¥Õ¥¡¥¤¥ë¤«¤é¥Ç¡¼¥¿¤òÆÉ¤ß¼è¤ë */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿å–ã‚‹ */
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 	int size = getCaliValue();
@@ -309,7 +309,7 @@ void commandLXR() {
 }
 
 void commandLXW() {
-	/* ¥Õ¥¡¥¤¥ë¤Ë¥Ç¡¼¥¿¤ò½ñ¤­¹ş¤à */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã«ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã‚€ */
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 	int size = getCaliValue();

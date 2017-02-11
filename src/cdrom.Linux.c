@@ -1,5 +1,5 @@
 /*
- * cdrom.Linux.c  CD-ROM¥¢¥¯¥»¥¹
+ * cdrom.Linux.c  CD-ROMã‚¢ã‚¯ã‚»ã‚¹
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -62,11 +62,11 @@ cdromdevice_t cdrom = {
 static int     cd_fd;
 static boolean enabled = FALSE;
 static struct  cdrom_msf0 tocmsf[100];
-static boolean msfmode = TRUE;        /* default ¤Ï MSFPLAY mode */
-static int     lastindex;             /* ºÇ½ª¥È¥é¥Ã¥¯ */
+static boolean msfmode = TRUE;        /* default ã¯ MSFPLAY mode */
+static int     lastindex;             /* æœ€çµ‚ãƒˆãƒ©ãƒƒã‚¯ */
 
 
-/* ioctl¤¬¥¨¥é¡¼¤Çµ¢¤Ã¤ÆÍè¤ë¾ì¹ç IOCTL_RETRY_TIME ²ó¥ê¥È¥é¥¤¤¹¤ë */
+/* ioctlãŒã‚¨ãƒ©ãƒ¼ã§å¸°ã£ã¦æ¥ã‚‹å ´åˆ IOCTL_RETRY_TIME å›ãƒªãƒˆãƒ©ã‚¤ã™ã‚‹ */
 static int do_ioctl(int cmd, void *data) {
 	int i;
 	for (i = 0; i < CDROM_IOCTL_RETRY_TIME; i++) {
@@ -78,27 +78,27 @@ static int do_ioctl(int cmd, void *data) {
 	return -1;
 }
 
-/* CD-ROM ¤ÎÌÜ¼¡¤òÆÉ¤ß½Ğ¤·¤Æ¤ª¤¯ */
+/* CD-ROM ã®ç›®æ¬¡ã‚’èª­ã¿å‡ºã—ã¦ãŠã */
 static int get_cd_entry() {
 	int    endtrk, i;
 	struct cdrom_tochdr   tochdr;
 	struct cdrom_tocentry toc;
 	struct cdrom_msf      msf;
 	
-	/* ºÇ½ª¥È¥é¥Ã¥¯ÈÖ¹æ¤òÆÀ¤ë */
+	/* æœ€çµ‚ãƒˆãƒ©ãƒƒã‚¯ç•ªå·ã‚’å¾—ã‚‹ */
 	if (do_ioctl(CDROMREADTOCHDR, &tochdr) < 0) {
 		perror("CDROMREADTOCHDR");
 		return NG;
 	}
 	lastindex = endtrk = tochdr.cdth_trk1;
-	if (endtrk <= 1) { /* £²¥È¥é¥Ã¥¯°Ê¾å¤Ê¤¤¤È¥À¥á */
+	if (endtrk <= 1) { /* ï¼’ãƒˆãƒ©ãƒƒã‚¯ä»¥ä¸Šãªã„ã¨ãƒ€ãƒ¡ */
 		fprintf(stderr, "No CD-AUDIO in CD-ROM\n");
 		return NG; 
 	}
 	
 	prv.cd_maxtrk = lastindex;
 	
-	/* ¤¹¤Ù¤Æ¤Î¥È¥é¥Ã¥¯¤ÎÌÜ¼¡¤òÆÉ¤ß¤À¤·¤Æ¥­¥ã¥Ã¥·¥å¤·¤Æ¤ª¤¯ */
+	/* ã™ã¹ã¦ã®ãƒˆãƒ©ãƒƒã‚¯ã®ç›®æ¬¡ã‚’èª­ã¿ã ã—ã¦ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã—ã¦ãŠã */
 	toc.cdte_format = CDROM_MSF;
 	for (i = 1; i <= endtrk; i++) {
 		toc.cdte_track = i;
@@ -110,7 +110,7 @@ static int get_cd_entry() {
 		tocmsf[i - 1].second = toc.cdte_addr.msf.second;
 		tocmsf[i - 1].frame  = toc.cdte_addr.msf.frame;
 	}
-	/* ¥ê¡¼¥É¥¢¥¦¥È¤òÆÉ¤ß½Ğ¤¹ */
+	/* ãƒªãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆã‚’èª­ã¿å‡ºã™ */
 	toc.cdte_track = CDROM_LEADOUT;
 	if (do_ioctl(CDROMREADTOCENTRY, &toc) < 0) {
 		perror("CDROMREADTOCENTRY");
@@ -118,7 +118,7 @@ static int get_cd_entry() {
 	}
 	
 #ifdef PPC
-	/* Linux PPC ÂĞºö  ;last track -1 frame */
+	/* Linux PPC å¯¾ç­–  ;last track -1 frame */
 	FRAMES_TO_MSF(MSF_TO_FRAMES(toc.cdte_addr.msf.minute,
 				    toc.cdte_addr.msf.second,
 				    toc.cdte_addr.msf.frame) - 1,
@@ -136,7 +136,7 @@ static int get_cd_entry() {
 	return OK;
 #endif
 
-	/* CDROMPLAYMSF ¤¬Í­¸ú¤«¥Á¥§¥Ã¥¯ */
+	/* CDROMPLAYMSF ãŒæœ‰åŠ¹ã‹ãƒã‚§ãƒƒã‚¯ */
 	msf.cdmsf_min0   = tocmsf[1].minute;
 	msf.cdmsf_sec0   = tocmsf[1].second;
 	msf.cdmsf_frame0 = tocmsf[1].frame;
@@ -156,7 +156,7 @@ static int get_cd_entry() {
 	return OK;
 }
 
-/* ¥Ç¥Ğ¥¤¥¹¤Î½é´ü²½ */
+/* ãƒ‡ãƒã‚¤ã‚¹ã®åˆæœŸåŒ– */
 static int cdrom_init(char *dev_cd) {
 	if (dev_cd == NULL) return NG;
 
@@ -173,7 +173,7 @@ static int cdrom_init(char *dev_cd) {
 	return NG;
 }
 
-/* ¥Ç¥Ğ¥¤¥¹¤Î¸å»ÏËö */
+/* ãƒ‡ãƒã‚¤ã‚¹ã®å¾Œå§‹æœ« */
 static int cdrom_exit() {
 	if (enabled) {
 		cdrom_stop();
@@ -182,14 +182,14 @@ static int cdrom_exit() {
 	return OK;
 }
 
-/* ¥È¥é¥Ã¥¯ÈÖ¹æ trk ¤Î±éÁÕ trk = 1~ */
+/* ãƒˆãƒ©ãƒƒã‚¯ç•ªå· trk ã®æ¼”å¥ trk = 1~ */
 static int cdrom_start(int trk) {
 	struct cdrom_msf msf;
 	struct cdrom_ti  ti;
 
 	if (!enabled) return NG;
 
-	/* ¶Ê¿ô¤è¤ê¤âÂ¿¤¤»ØÄê¤ÏÉÔ²Ä*/
+	/* æ›²æ•°ã‚ˆã‚Šã‚‚å¤šã„æŒ‡å®šã¯ä¸å¯*/
 	if (trk > lastindex) {
 		return NG;
 	}
@@ -222,7 +222,7 @@ static int cdrom_start(int trk) {
 	}
 }
 
-/* ±éÁÕÄä»ß */
+/* æ¼”å¥åœæ­¢ */
 static int cdrom_stop() {
 	if (enabled) {
 		/* if (do_ioctl(CDROMSTOP, NULL) < 0) { */
@@ -236,7 +236,7 @@ static int cdrom_stop() {
 	return NG;
 }
 
-/* ¸½ºß±éÁÕÃæ¤Î¥È¥é¥Ã¥¯¾ğÊó¤Î¼èÆÀ */
+/* ç¾åœ¨æ¼”å¥ä¸­ã®ãƒˆãƒ©ãƒƒã‚¯æƒ…å ±ã®å–å¾— */
 static int cdrom_getPlayingInfo (cd_time *info) {
 	struct cdrom_subchnl sc;
 	

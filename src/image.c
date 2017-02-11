@@ -1,5 +1,5 @@
 /*
- * image.c  imageÁàºî
+ * image.c  imageæ“ä½œ
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -37,7 +37,7 @@
 #include "ags.h"
 
 /* private variables */
-static Pallet xpal[256];   /* pal & pixel ÃÍ */
+static Pallet xpal[256];   /* pal & pixel å€¤ */
 
 /* fader */
 static int fadeX[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
@@ -77,7 +77,7 @@ static void (*copy_area_sprite)(agsurface_t *, BYTE *, BYTE *, int, int, int);
 static void (*draw_antialiased_pattern)(agsurface_t *, agsurface_t *, int, int, int, int, int);
 
 /*
- * dib ¤Î depth ¤Ë±ş¤¸¤¿´Ø¿ô¤ÎÀßÄê
+ * dib ã® depth ã«å¿œã˜ãŸé–¢æ•°ã®è¨­å®š
  *   depth: dib depth
 */
 void image_setdepth(int depth) {
@@ -268,7 +268,7 @@ static int trans_index2pixel(int depth, int i) {
 	}
 }
 
-/* 16bitCG¤Î ALPHALEVEL¤ò»ØÄê */
+/* 16bitCGã® ALPHALEVELã‚’æŒ‡å®š */
 static WORD *changeImageAlphaLevel(cgdata *cg) {
 	WORD *new_pic = g_new(WORD, cg->width * cg->height), *new_pic_;
 	WORD *pic = (WORD *)cg->pic;
@@ -284,7 +284,7 @@ static WORD *changeImageAlphaLevel(cgdata *cg) {
 }
 
 
-/* ¿§¤Î³ÈÂç */
+/* è‰²ã®æ‹¡å¤§ */
 void image_expandPixel(agsurface_t *img_src, agsurface_t *img_dst, int lv) {
 	static int prelv = 0;
 	if (img_src->depth != 8) return;
@@ -340,7 +340,7 @@ void image_fadeIn(agsurface_t *src, agsurface_t *dst, int lv) {
 }
 
 /*
- * ³ÈÂç¡¦½Ì¾®¥³¥Ô¡¼
+ * æ‹¡å¤§ãƒ»ç¸®å°ã‚³ãƒ”ãƒ¼
  */
 void image_scaledCopyArea(agsurface_t *src, agsurface_t *dst, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
 	float    a1, a2, xd, yd;
@@ -349,7 +349,7 @@ void image_scaledCopyArea(agsurface_t *src, agsurface_t *dst, int sx, int sy, in
 	BYTE    *sdata, *ddata;
 	agsurface_t *srccpy = NULL;
 	
-	/* src ¤¬ NULL ¤Î¾ì¹ç,ÎÎ°è¤¬½Å¤Ê¤ë¾ì¹ç¤ò¹Í¤¨¤Æ copy ¤òºî¤ë */
+	/* src ãŒ NULL ã®å ´åˆ,é ˜åŸŸãŒé‡ãªã‚‹å ´åˆã‚’è€ƒãˆã¦ copy ã‚’ä½œã‚‹ */
 	if (src == NULL) {
 		srccpy = image_saveRegion(dst, sx, sy, sw, sh);
 		src = srccpy;
@@ -361,14 +361,14 @@ void image_scaledCopyArea(agsurface_t *src, agsurface_t *dst, int sx, int sy, in
 	
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
-	// src width ¤È dst width ¤¬Æ±¤¸¤È¤­¤ËÌäÂê¤¬¤¢¤ë¤Î¤Ç+1
+	// src width ã¨ dst width ãŒåŒã˜ã¨ãã«å•é¡ŒãŒã‚ã‚‹ã®ã§+1
 	row = g_new0(int, dw+1);
-	// 1¤ª¤ª¤­¤¯¤·¤Æ½é´ü²½¤·¤Ê¤¤¤È col[dw-1]¤Ècol[dw]¤¬Æ±¤¸¤Ë¤Ê¤ë
-	// ²ÄÇ½À­¤¬¤¢¤ë¡£
+	// 1ãŠãŠããã—ã¦åˆæœŸåŒ–ã—ãªã„ã¨ col[dw-1]ã¨col[dw]ãŒåŒã˜ã«ãªã‚‹
+	// å¯èƒ½æ€§ãŒã‚ã‚‹ã€‚
 	col = g_new0(int, dh+1);
 
 	if (mirror & 1) {
-		/* ¾å²¼È¿Å¾ added by  tajiri@wizard */
+		/* ä¸Šä¸‹åè»¢ added by  tajiri@wizard */
 		for (yd = sh - a2, y = 0; y < dh; y++) {
 			col[y] = yd; yd -= a2;
 		}
@@ -378,7 +378,7 @@ void image_scaledCopyArea(agsurface_t *src, agsurface_t *dst, int sx, int sy, in
 		}
 	}
 	if (mirror & 2) {
-		/* º¸±¦È¿Å¾ added by  tajiri@wizard */
+		/* å·¦å³åè»¢ added by  tajiri@wizard */
 		for (xd = sw - a1, x = 0; x < dw; x++) {
 			row[x] = xd; xd -= a1;
 		}
@@ -429,7 +429,7 @@ void image_scaledCopyArea(agsurface_t *src, agsurface_t *dst, int sx, int sy, in
 }
 
 /*
- * dib¤Ë8bitCG¤ÎÉÁ²è
+ * dibã«8bitCGã®æç”»
  */
 void image_drawImage8_fromData(agsurface_t *dib, cgdata *cg, int dx, int dy, int w, int h) {
 #define DRAWSPRITEFROMDATA8(type) {                              \
@@ -526,7 +526,7 @@ void image_drawImage8_fromData(agsurface_t *dib, cgdata *cg, int dx, int dy, int
 }
 
 /*
- * dib¤Ë16bitCG¤ÎÉÁ²è
+ * dibã«16bitCGã®æç”»
  */
 void image_drawImage16_fromData(agsurface_t *dib, cgdata *cg, int x, int y, int w, int h) {
 	WORD *pic_save = NULL;
@@ -550,21 +550,21 @@ void image_drawImage16_fromData(agsurface_t *dib, cgdata *cg, int x, int y, int 
 }
 
 /*
- * dib ¤ËÀş¤òÉÁ²è
+ * dib ã«ç·šã‚’æç”»
  */
 void image_drawLine(agsurface_t *dib, int x0, int y0, int x1, int y1, int col) {
 	draw_line(dib, x0, y0, x1, y1, col);
 }
 
 /*
- * dib ¤Ë¶ë·Á¤òÉÁ²è
+ * dib ã«çŸ©å½¢ã‚’æç”»
  */
 void image_drawRectangle(agsurface_t *dib, int x, int y, int w, int h, int col) {
 	draw_rectangle(dib, x, y, w, h, col);
 }
 
 /*
- * dib ¤Ë¶ë·ÁÅÉ¤ê¤Ä¤Ö¤·¤òÉÁ²è
+ * dib ã«çŸ©å½¢å¡—ã‚Šã¤ã¶ã—ã‚’æç”»
  */
 void image_fillRectangle(agsurface_t *dib, int x, int y, int w, int h, int col) {
 	fill_rectangle(dib, x, y, w, h, col);
@@ -575,14 +575,14 @@ void image_fillRectangleNeg(agsurface_t *dib, int x, int y, int w, int h, int co
 }
 
 /*
- * dib ¤Î»ØÄêÎÎ°è¤ò¥³¥Ô¡¼
+ * dib ã®æŒ‡å®šé ˜åŸŸã‚’ã‚³ãƒ”ãƒ¼
  */
 void image_copyArea(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy) {
 	copy_area(dib, sx, sy, w, h, dx, dy);
 }
 
 /*
- * 16bitÀìÍÑ¤Î dib ¤Î»ØÄêÎÎ°è¥³¥Ô¡¼ alpha¤Ä¤­
+ * 16bitå°‚ç”¨ã® dib ã®æŒ‡å®šé ˜åŸŸã‚³ãƒ”ãƒ¼ alphaã¤ã
  */
 void image_copyAreaSP16_shadow(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int lv) {
 	BYTE    *sdata = GETOFFSET_PIXEL(dib, sx, sy);
@@ -593,8 +593,8 @@ void image_copyAreaSP16_shadow(agsurface_t *dib, int sx, int sy, int w, int h, i
 }
 
 /*
- * 16bitÀìÍÑ¤Î dib ¤Î»ØÄêÎÎ°è¥³¥Ô¡¼
- * src¤Î¥¤¥á¡¼¥¸¤ò lv¤ÎÌÀÅÙ¤Ç¥³¥Ô¡¼ CE 2001
+ * 16bitå°‚ç”¨ã® dib ã®æŒ‡å®šé ˜åŸŸã‚³ãƒ”ãƒ¼
+ * srcã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’ lvã®æ˜åº¦ã§ã‚³ãƒ”ãƒ¼ CE 2001
  */
 void image_copyAreaSP16_alphaBlend(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int lv) {
 	BYTE    *sdata = GETOFFSET_PIXEL(dib, sx, sy);
@@ -633,7 +633,7 @@ void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx,
 
 
 /*
- * »ØÄêÈÏ°Ï¤Ë¥Ñ¥ì¥Ã¥È col ¤ò rate ¤Î³ä¹ç¤Ç½Å¤Í¤ë CK1
+ * æŒ‡å®šç¯„å›²ã«ãƒ‘ãƒ¬ãƒƒãƒˆ col ã‚’ rate ã®å‰²åˆã§é‡ã­ã‚‹ CK1
  */
 void image_wrapColor(agsurface_t *dib, int sx, int sy, int w, int h, int col, int rate) {
 	BYTE *sdata = GETOFFSET_PIXEL(dib, sx, sy);
@@ -642,7 +642,7 @@ void image_wrapColor(agsurface_t *dib, int sx, int sy, int w, int h, int col, in
 }
 
 /*
- * dib ¤Î¥Ô¥¯¥»¥ë¾ğÊó¤ò¼èÆÀ
+ * dib ã®ãƒ”ã‚¯ã‚»ãƒ«æƒ…å ±ã‚’å–å¾—
  */
 void image_getPixel(agsurface_t *dib, int x, int y, Pallet *cell) {
 	BYTE *dst = GETOFFSET_PIXEL(dib, x, y);
@@ -672,7 +672,7 @@ void image_getPixel(agsurface_t *dib, int x, int y, Pallet *cell) {
 }
 
 /*
- * dib ¤«¤éÎÎ°è¤ÎÀÚ¤ê½Ğ¤·
+ * dib ã‹ã‚‰é ˜åŸŸã®åˆ‡ã‚Šå‡ºã—
  */
 agsurface_t* image_saveRegion(agsurface_t *dib, int x, int y, int w, int h) {
 	agsurface_t *i = g_new(agsurface_t ,1);
@@ -697,7 +697,7 @@ agsurface_t* image_saveRegion(agsurface_t *dib, int x, int y, int w, int h) {
 }
 
 /*
- * dib ¤Ë¥»¡¼¥Ö¤·¤¿ÎÎ°è¤ò²óÉü
+ * dib ã«ã‚»ãƒ¼ãƒ–ã—ãŸé ˜åŸŸã‚’å›å¾©
  */
 void image_putRegion(agsurface_t *dib, agsurface_t *dst, int x, int y) {
 	BYTE *yd = GETOFFSET_PIXEL(dib, x, y);
@@ -723,7 +723,7 @@ void image_putRegion(agsurface_t *dib, agsurface_t *dst, int x, int y) {
 }
 
 /*
- * dib ¤Ë dst¤òÉÁ²è¸å¡¢¸å»ÏËö
+ * dib ã« dstã‚’æç”»å¾Œã€å¾Œå§‹æœ«
  */
 void image_restoreRegion(agsurface_t *dib, agsurface_t *dst, int x, int y) {
 	image_putRegion(dib, dst, x, y);
@@ -732,7 +732,7 @@ void image_restoreRegion(agsurface_t *dib, agsurface_t *dst, int x, int y) {
 }
 
 /*
- * save ¤·¤¿ÎÎ°è¤Î²òÊü
+ * save ã—ãŸé ˜åŸŸã®è§£æ”¾
  */
 void image_delRegion(agsurface_t *r) {
 	g_free(r->pixel);
@@ -741,7 +741,7 @@ void image_delRegion(agsurface_t *r) {
 
 
 /*
- * dib ¤Ë¥»¡¼¥Ö¤·¤¿ÎÎ°è¤«¤é¥³¥Ô¡¼
+ * dib ã«ã‚»ãƒ¼ãƒ–ã—ãŸé ˜åŸŸã‹ã‚‰ã‚³ãƒ”ãƒ¼
  */
 void image_copyRegion(agsurface_t *src, int sx, int sy, int w, int h, agsurface_t *dib, int dx, int dy) {
 	int y;
@@ -757,7 +757,7 @@ void image_copyRegion(agsurface_t *src, int sx, int sy, int w, int h, agsurface_
 						       
 
 /*
- * dib¤Ë gpyph¥¤¥á¡¼¥¸¤òÉÁ²è
+ * dibã« gpyphã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’æç”»
  */
 void image_getGlyphImage(agsurface_t *dib, agsurface_t *glyph, int dx, int dy, int col) {
 	switch(glyph->bytes_per_pixel) {
@@ -775,10 +775,10 @@ void image_getGlyphImage(agsurface_t *dib, agsurface_t *glyph, int dx, int dy, i
 }
 
 /* 
- *  img    : 8bit DIB ¤ÎÀèÆ¬
- *  glyph  : Ê¸»ú¤Î½ñ¤«¤ì¤Æ¤¤¤ë¥¤¥á¡¼¥¸ (Âç¤­¤µ¹ş) depth 15/16 
- *  dx, dy : É½¼¨°ÌÃÖ
- *  col    : ¿§
+ *  img    : 8bit DIB ã®å…ˆé ­
+ *  glyph  : æ–‡å­—ã®æ›¸ã‹ã‚Œã¦ã„ã‚‹ã‚¤ãƒ¡ãƒ¼ã‚¸ (å¤§ãã•è¾¼) depth 15/16 
+ *  dx, dy : è¡¨ç¤ºä½ç½®
+ *  col    : è‰²
  */
 static void image_getGlyphImage16to8(agsurface_t *dib, agsurface_t *glyph, int dx, int dy, int col) {
 	int   x, y;
@@ -850,7 +850,7 @@ void image_getGlyphImageNto8(agsurface_t *dib, agsurface_t *glyph, int dx, int d
 
 
 /*
- * dib ¤Ë»ØÄê¤Î¥Ñ¥ì¥Ã¥È sp ¤òÈ´¤¤¤Æ¥³¥Ô¡¼
+ * dib ã«æŒ‡å®šã®ãƒ‘ãƒ¬ãƒƒãƒˆ sp ã‚’æŠœã„ã¦ã‚³ãƒ”ãƒ¼
  */
 void image_copyAreaSP(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int col) {
 	BYTE    *sdata = GETOFFSET_PIXEL(dib, sx, sy);
@@ -955,7 +955,7 @@ void image_draw_pattern(agsurface_t *dib, agsurface_t *pattern, int dx, int dy, 
 	}
 }
 
-/* ¥â¥¶¥¤¥¯ */
+/* ãƒ¢ã‚¶ã‚¤ã‚¯ */
 
 void image_Mosaic(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int slice) {
 #define m_mozaic(type) {                                                      \
@@ -999,7 +999,7 @@ void image_Mosaic(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy
 }
 
 /******************************************************************************/
-/* private methods  imageÁàºî 8bpp                                            */
+/* private methods  imageæ“ä½œ 8bpp                                            */
 /******************************************************************************/
 
 static void image_drawLine8(agsurface_t *dib, int x0, int y0, int x1, int y1, int col) {

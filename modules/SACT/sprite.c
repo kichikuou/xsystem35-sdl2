@@ -1,5 +1,5 @@
 /*
- * sprite.c: ¥¹¥×¥é¥¤¥È´ğËÜ³Æ¼ï½èÍı
+ * sprite.c: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆåŸºæœ¬å„ç¨®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -56,7 +56,7 @@ static gint compare_spriteno_smallfirst(gconstpointer a, gconstpointer b);
 }G_STMT_END
 
 
-// ¥¹¥×¥é¥¤¥È¤ÎÈÖ¹æ½ç¤Ë¹¹¿·¤¹¤ë¤¿¤á¤Ë¥ê¥¹¥È¤Ë½çÈÖ¤ËÍ×¤ì¤ë¤¿¤á¤Îcallbck
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç•ªå·é †ã«æ›´æ–°ã™ã‚‹ãŸã‚ã«ãƒªã‚¹ãƒˆã«é †ç•ªã«è¦ã‚Œã‚‹ãŸã‚ã®callbck
 static gint compare_spriteno_smallfirst(gconstpointer a, gconstpointer b) {
 	sprite_t *sp1 = (sprite_t *)a;
 	sprite_t *sp2 = (sprite_t *)b;
@@ -70,7 +70,7 @@ static gint compare_spriteno_smallfirst(gconstpointer a, gconstpointer b) {
 	return 0;
 }
 
-// ¥Ç¥Õ¥©¥ë¥È¤ÎÊÉ»æupdate
+// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®å£ç´™update
 static int sp_draw_wall(sprite_t *sp) {
 	int sx, sy, w, h;
 	
@@ -87,14 +87,14 @@ static int sp_draw_wall(sprite_t *sp) {
 }
 
 /**
- * sprite ´ØÏ¢¤Î½é´ü²½
+ * sprite é–¢é€£ã®åˆæœŸåŒ–
  * @param  none
- * @return OK:À®¸ù, NG:¼ºÇÔ
+ * @return OK:æˆåŠŸ, NG:å¤±æ•—
  */
 int sp_init() {
 	int i;
 	
-	// DLLÍÑ¥á¥Ã¥»¡¼¥¸É½¼¨
+	// DLLç”¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤º
 	nact->msgout = smsg_add;
 
 	// mouse/key event handler
@@ -103,7 +103,7 @@ int sp_init() {
 	// main callback
 	nact->callback = spev_main;
 	
-	// ¤¤¤í¤¤¤í¤ÊÍıÍ³¤«¤éÁ´¤Æ¤Î¥¹¥×¥é¥¤¥È¤ò¤¢¤é¤«¤¸¤áºîÀ®¤·¤Æ¤ª¤¯
+	// ã„ã‚ã„ã‚ãªç†ç”±ã‹ã‚‰å…¨ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ã‚ã‚‰ã‹ã˜ã‚ä½œæˆã—ã¦ãŠã
 	for (i = 0; i < SPRITEMAX; i++) {
 		sact.sp[i] = g_new0(sprite_t, 1);
 		sact.sp[i]->no   = i;
@@ -111,22 +111,22 @@ int sp_init() {
 		sact.sp[i]->show = FALSE;
 	}
 	
-	// ÊÉ»æ(¥¹¥×¥é¥¤¥ÈÈÖ¹æ£°)¤Ï¥Ç¥Õ¥©¥ë¥È¤Ø
+	// å£ç´™(ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·ï¼)ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¸
 	sp_set_wall_paper(0);
 	
-	// ÊÉ»æ¤ò update¥ê¥¹¥È¤ËÄÉ²Ã
+	// å£ç´™ã‚’ updateãƒªã‚¹ãƒˆã«è¿½åŠ 
 	sact.updatelist = g_slist_append(sact.updatelist, sact.sp[0]);
 	
 	return OK;
 }
 
 /**
- * ¿·µ¬¥¹¥×¥é¥¤¥È¤ÎºîÀ®
- * @param no: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
- * @param cg1: 1ËçÌÜ¤ÎCG
- * @param cg2: 2ËçÌÜ¤ÎCG (¤Ê¤¤¾ì¹ç¤Ï0)
- * @param cg3: 3ËçÌÜ¤ÎCG (¤Ê¤¤¾ì¹ç¤Ï0)
- * @param type: ¥¹¥×¥é¥¤¥È¤Î¼ïÎà
+ * æ–°è¦ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ä½œæˆ
+ * @param no: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+ * @param cg1: 1æšç›®ã®CG
+ * @param cg2: 2æšç›®ã®CG (ãªã„å ´åˆã¯0)
+ * @param cg3: 3æšç›®ã®CG (ãªã„å ´åˆã¯0)
+ * @param type: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç¨®é¡
  */
 int sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	sprite_t *sp;
@@ -139,27 +139,27 @@ int sp_new(int no, int cg1, int cg2, int cg3, int type) {
 		sp_free(no);
 	}
 	
-	// ¹¹¿·¥ê¥¹¥È¤ËÅĞÏ¿
+	// æ›´æ–°ãƒªã‚¹ãƒˆã«ç™»éŒ²
 	sact.updatelist = g_slist_insert_sorted(sact.updatelist, sp, compare_spriteno_smallfirst);
 	
 	sp->type = type;
 	sp->no   = no;
 	
-	// set»şÅÀ¤Ç¤Îcg¤¬»ÈÍÑ¤µ¤ì¤ë(draw»ş¤Ç¤Ï¤Ê¤¤)
+	// setæ™‚ç‚¹ã§ã®cgãŒä½¿ç”¨ã•ã‚Œã‚‹(drawæ™‚ã§ã¯ãªã„)
 	if (cg1) sp->cg1 = scg_loadcg_no(cg1, TRUE); else sp->cg1 = NULL;
 	if (cg2) sp->cg2 = scg_loadcg_no(cg2, TRUE); else sp->cg2 = NULL;
 	if (cg3) sp->cg3 = scg_loadcg_no(cg3, TRUE); else sp->cg3 = NULL;
 	
-	//½é´ü¤Îcurcg¤Ïcg1
+	//åˆæœŸã®curcgã¯cg1
 	sp->curcg = sp->cg1;
 	
-	sp->show = TRUE; // ½é´ü¾õÂÖ¤ÏÉ½¼¨
-	sp->blendrate = 255; // ¥Ö¥ì¥ó¥ÉÌµ¤·
-	sp->loc.x = 0;   // ½é´üÉ½¼¨°ÌÃÖ¤Ï(0,0)
+	sp->show = TRUE; // åˆæœŸçŠ¶æ…‹ã¯è¡¨ç¤º
+	sp->blendrate = 255; // ãƒ–ãƒ¬ãƒ³ãƒ‰ç„¡ã—
+	sp->loc.x = 0;   // åˆæœŸè¡¨ç¤ºä½ç½®ã¯(0,0)
 	sp->loc.y = 0;
 	sp->cur = sp->loc;
 	
-	// cg1¤ÎÂç¤­¤µ¤ò¥¹¥×¥é¥¤¥È¤ÎÂç¤­¤µ¤È¤¹¤ë
+	// cg1ã®å¤§ãã•ã‚’ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¤§ãã•ã¨ã™ã‚‹
 	if (sp->curcg == NULL) {
 		sp->cursize.width = 0;
 		sp->cursize.height = 0;
@@ -168,10 +168,10 @@ int sp_new(int no, int cg1, int cg2, int cg3, int type) {
 		sp->cursize.height = sp->curcg->sf->height;
 	}
 	
-	sp->freezed_state = 0; // ¾õÂÖ¸ÇÄê¤ÏÌµ¤·
-	sp->update = DEFAULT_UPDATE;  // default ¤Î update¥ë¡¼¥Á¥ó
+	sp->freezed_state = 0; // çŠ¶æ…‹å›ºå®šã¯ç„¡ã—
+	sp->update = DEFAULT_UPDATE;  // default ã® updateãƒ«ãƒ¼ãƒãƒ³
 	
-	// ³Æ¥¹¥×¥é¥¤¥È¥¿¥¤¥×Ëè¤Î½é´ü²½
+	// å„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚¿ã‚¤ãƒ—æ¯ã®åˆæœŸåŒ–
 	switch(type) {
 	case SPRITE_SWITCH:
 		sp_sw_setup(sp);
@@ -195,7 +195,7 @@ int sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	return OK;
 }
 
-// ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥È¤ÎºîÀ®
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ä½œæˆ
 int sp_new_msg(int no, int x, int y, int width, int height) {
 	sprite_t *sp;
 	
@@ -206,34 +206,34 @@ int sp_new_msg(int no, int x, int y, int width, int height) {
 	if (sp->type != SPRITE_NONE) {
 		sp_free(no);
 	}
-	// ¹¹¿·¥ê¥¹¥È¤ËÅĞÏ¿
+	// æ›´æ–°ãƒªã‚¹ãƒˆã«ç™»éŒ²
 	sact.updatelist = g_slist_insert_sorted(sact.updatelist, sp, compare_spriteno_smallfirst);
 	
 	
 	sp->type = SPRITE_MSG;
 	sp->no   = no;
-	sp->show = TRUE; // ½é´ü¾õÂÖ¤ÏÉ½¼¨
-	sp->blendrate = 255; // ¥Ö¥ì¥ó¥ÉÌµ¤·
-	sp->freezed_state = 0; // ¾õÂÖ¸ÇÄêÌµ¤·
-	sp->loc.x = x - sact.origin.x; // ½é´üÉ½¼¨°ÌÃÖ
+	sp->show = TRUE; // åˆæœŸçŠ¶æ…‹ã¯è¡¨ç¤º
+	sp->blendrate = 255; // ãƒ–ãƒ¬ãƒ³ãƒ‰ç„¡ã—
+	sp->freezed_state = 0; // çŠ¶æ…‹å›ºå®šç„¡ã—
+	sp->loc.x = x - sact.origin.x; // åˆæœŸè¡¨ç¤ºä½ç½®
 	sp->loc.y = y - sact.origin.y;
-	sp->u.msg.dspcur.x = 0; // Ê¸»úÉÁ²è³«»Ï°ÌÃÖ
+	sp->u.msg.dspcur.x = 0; // æ–‡å­—æç”»é–‹å§‹ä½ç½®
 	sp->u.msg.dspcur.y = 0;
-	sp->cursize.width = width;  // ¥¹¥×¥é¥¤¥È¤ÎÂç¤­¤µ
+	sp->cursize.width = width;  // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¤§ãã•
 	sp->cursize.height = height;
 	sp->cur = sp->loc;
 	sp->u.msg.buf = NULL;
 	
-	// Ê¸»úÉÁ²èÍÑ¥­¥ã¥ó¥Ğ¥¹
+	// æ–‡å­—æç”»ç”¨ã‚­ãƒ£ãƒ³ãƒã‚¹
 	sp->u.msg.canvas = sf_create_surface(width, height, sf0->depth);
 	
-	// ¥¹¥×¥é¥¤¥ÈºÆÉÁ²èÍÑ¥³¡¼¥ë¥Ğ¥Ã¥¯
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†æç”»ç”¨ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯
 	sp->update = smsg_update;
 	
 	return OK;
 }
 
-// ÊÉ»æ¤ÎÀßÄê
+// å£ç´™ã®è¨­å®š
 int sp_set_wall_paper(int no) {
 	sprite_t *sp = sact.sp[0];
 	
@@ -241,12 +241,12 @@ int sp_set_wall_paper(int no) {
 		scg_free_cgobj(sp->curcg);
 	}
 	
-	if (no) { // »ØÄê¤ÎCG¤òÉ½¼¨
+	if (no) { // æŒ‡å®šã®CGã‚’è¡¨ç¤º
 		sp->curcg = scg_loadcg_no(no, TRUE);
 		sp->update = DEFAULT_UPDATE;
 		sp->cursize.width  = sp->curcg->sf->width;
 		sp->cursize.height = sp->curcg->sf->height;
-	} else { // ¿¿¹õ
+	} else { // çœŸé»’
 		sp->cursize.width  = sf0->width;
 		sp->cursize.height = sf0->height;
 		sp->curcg = NULL;
@@ -262,7 +262,7 @@ int sp_set_wall_paper(int no) {
 	return OK;
 }
 
-// Á´¤Æ¤Î sprite ¤ò¾Ãµî
+// å…¨ã¦ã® sprite ã‚’æ¶ˆå»
 int sp_free_all() {
 	int i;
 	
@@ -272,7 +272,7 @@ int sp_free_all() {
 	return OK;
 }
 
-// »ØÄê¤Îsprite ¤ò¾Ãµî
+// æŒ‡å®šã®sprite ã‚’æ¶ˆå»
 int sp_free(int no) {
 	sprite_t *sp;
 	
@@ -280,23 +280,23 @@ int sp_free(int no) {
 	
 	sp = sact.sp[no];
 
-	// °ÜÆ°³«»Ï¤·¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ï¥ê¥¹¥È¤«¤éºï½ü
+	// ç§»å‹•é–‹å§‹ã—ã¦ã„ãªã„å ´åˆã¯ãƒªã‚¹ãƒˆã‹ã‚‰å‰Šé™¤
 	if (!sp->move.moving) {
 		sact.movelist = g_slist_remove(sact.movelist, sp);
 	}
 	
-	// CG¥ª¥Ö¥¸¥§¥¯¥È¤Îºï½ü
+	// CGã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å‰Šé™¤
 	if (sp->cg1) scg_free_cgobj(sp->cg1);
 	if (sp->cg2) scg_free_cgobj(sp->cg2);
 	if (sp->cg3) scg_free_cgobj(sp->cg3);
 	
-	// remove»ş¤Î½èÍı¤¬¤¢¤ì¤Ğ¼Â¹Ô
+	// removeæ™‚ã®å‡¦ç†ãŒã‚ã‚Œã°å®Ÿè¡Œ
 	if (sp->remove) {
 		sp->remove(sp);
 	}
 	
-	// ÀâÌÀ¥¹¥×¥é¥¤¥È¤Îºï½ü
-	//   ¤³¤³¤Ç¾Ã¤·¤Á¤ã¤Ş¤º¤¤¤«¤â
+	// èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‰Šé™¤
+	//   ã“ã“ã§æ¶ˆã—ã¡ã‚ƒã¾ãšã„ã‹ã‚‚
 	g_slist_free(sp->expsp);
 	sp->expsp = NULL;
 	
@@ -306,7 +306,7 @@ int sp_free(int no) {
 	}
 	sact.updatelist = g_slist_remove(sact.updatelist, sp);
 	
-	// SACT.Numeral_XXX ¤Ï»Ä¤·¤Æ¤ª¤¯
+	// SACT.Numeral_XXX ã¯æ®‹ã—ã¦ãŠã
 	{
 		sprite_t back;
 		memcpy(&(back.numeral), &(sp->numeral), sizeof(sp->numeral));
@@ -319,7 +319,7 @@ int sp_free(int no) {
 	return OK;
 }
 
-// É½¼¨¾õÂÖ¤ÎÊÑ¹¹
+// è¡¨ç¤ºçŠ¶æ…‹ã®å¤‰æ›´
 int sp_set_show(int wNum, int wCount, int sShow) {
 	int i;
 	boolean oldstate;
@@ -337,7 +337,7 @@ int sp_set_show(int wNum, int wCount, int sShow) {
 	return OK;
 }
 
-// É½¼¨°ÌÃÖ¤ÎÀßÄê
+// è¡¨ç¤ºä½ç½®ã®è¨­å®š
 int sp_set_pos(int wNum, int wX, int wY) {
 	sprite_t *sp;
 	
@@ -352,7 +352,7 @@ int sp_set_pos(int wNum, int wX, int wY) {
 	
 }
 
-// ¥¹¥×¥é¥¤¥È¤Î°ÜÆ°
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹•
 int sp_set_move(int wNum, int wX, int wY) {
 	sprite_t *sp;
 	
@@ -369,14 +369,14 @@ int sp_set_move(int wNum, int wX, int wY) {
 	
 	sp->cur = sp->loc;
 	
-	// move¤¹¤ë¥¹¥×¥é¥¤¥È¥ê¥¹¥È¤ËÅĞÏ¿
-	// ¼Âºİ¤Ë move ¤ò³«»Ï¤¹¤ë¤Î¤Ï ~SP_DRAW(sp_update_all)¤¬¸Æ¤Ğ¤ì¤¿¤È¤­
+	// moveã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãƒªã‚¹ãƒˆã«ç™»éŒ²
+	// å®Ÿéš›ã« move ã‚’é–‹å§‹ã™ã‚‹ã®ã¯ ~SP_DRAW(sp_update_all)ãŒå‘¼ã°ã‚ŒãŸã¨ã
 	sact.movelist = g_slist_append(sact.movelist, sp);
 	
 	return OK;
 }
 
-// ¥¹¥×¥é¥¤¥È°ÜÆ°»ş´Ö¤ÎÀßÄê
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç§»å‹•æ™‚é–“ã®è¨­å®š
 int sp_set_movetime(int wNum, int wTime) {
 	sp_assert_no(wNum);
 	
@@ -384,7 +384,7 @@ int sp_set_movetime(int wNum, int wTime) {
 	return OK;
 }
 
-// ¥¹¥×¥é¥¤¥È°ÜÆ°Â®ÅÙ¤ÎÀßÄê
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç§»å‹•é€Ÿåº¦ã®è¨­å®š
 int sp_set_movespeed(int wNum, int wTime) {
 	sp_assert_no(wNum);
 	
@@ -396,29 +396,29 @@ int sp_set_movespeed(int wNum, int wTime) {
 	return OK;
 }
 
-// Z¥­¡¼¤ò²¡¤·¤¿¤È¤­¤Ë±£¤¹¥¹¥×¥é¥¤¥È¤ÎÅĞÏ¿
+// Zã‚­ãƒ¼ã‚’æŠ¼ã—ãŸã¨ãã«éš ã™ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç™»éŒ²
 int sp_add_zkey_hidesprite(int wNum) {
 	sprite_t *sp;
 	
 	sp_assert_no(wNum);
 	sp = sact.sp[wNum];
 
-	// ÅĞÏ¿»şÅÀ¤Ç¤Ş¤ÀÀ¸À®¤·¤Æ¤¤¤Ê¤¤¥¹¥×¥é¥¤¥È¤Ï±£¤µ¤Ê¤¤
-	//   ¥·¥§¥ë¥¯¥ì¥¤¥ë¤Ç¤Ş¤º¤¤¤Î¤¬¤¢¤Ã¤¿¤Î¤ÇÃæ»ß
+	// ç™»éŒ²æ™‚ç‚¹ã§ã¾ã ç”Ÿæˆã—ã¦ã„ãªã„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¯éš ã•ãªã„
+	//   ã‚·ã‚§ãƒ«ã‚¯ãƒ¬ã‚¤ãƒ«ã§ã¾ãšã„ã®ãŒã‚ã£ãŸã®ã§ä¸­æ­¢
 	// if (sp->type == SPRITE_NONE) return NG;
 	
 	sact.sp_zhide = g_slist_append(sact.sp_zhide, sp);
 	return OK;
 }
 
-// ¾å¤ÇÅĞÏ¿¤·¤¿¥¹¥×¥é¥¤¥È¤Îºï½ü
+// ä¸Šã§ç™»éŒ²ã—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‰Šé™¤
 int sp_clear_zkey_hidesprite_all() {
 	g_slist_free(sact.sp_zhide);
 	sact.sp_zhide = NULL;
 	return OK;
 }
 
-// ¥¹¥×¥é¥¤¥È¾õÂÖ¤Î¸Ç²½
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆçŠ¶æ…‹ã®å›ºåŒ–
 int sp_freeze_sprite(int wNum, int wIndex) {
 	sprite_t *sp;
 	void *oldstate;
@@ -440,7 +440,7 @@ int sp_freeze_sprite(int wNum, int wIndex) {
 	return OK;
 }
 
-// ¾å¤Ç¸Ç²½¤·¤¿¾õÂÖ¤Î²ò½ü
+// ä¸Šã§å›ºåŒ–ã—ãŸçŠ¶æ…‹ã®è§£é™¤
 int sp_thaw_sprite(int wNum) {
 	sp_assert_no(wNum);
 	
@@ -448,7 +448,7 @@ int sp_thaw_sprite(int wNum) {
 	return OK;
 }
 
-// SP_QUAKE¤ÇÍÉ¤é¤¹¥¹¥×¥é¥¤¥È¤ÎÅĞÏ¿
+// SP_QUAKEã§æºã‚‰ã™ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç™»éŒ²
 int sp_add_quakesprite(int wNum) {
 	sp_assert_no(wNum);
 	
@@ -456,14 +456,14 @@ int sp_add_quakesprite(int wNum) {
 	return OK;
 }
 
-// ¾å¤ÇÅĞÏ¿¤·¤¿¥¹¥×¥é¥¤¥È¤Îºï½ü
+// ä¸Šã§ç™»éŒ²ã—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‰Šé™¤
 int sp_clear_quakesprite_all() {
 	g_slist_free(sact.sp_quake);
 	sact.sp_quake = NULL;
 	return OK;
 }
 
-// ¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È¤Î´Ö³Ö¤ÎÀßÄê
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®é–“éš”ã®è¨­å®š
 int sp_set_animeinterval(int wNum, int wTime) {
 	sp_assert_no(wNum);
 
@@ -474,7 +474,7 @@ int sp_set_animeinterval(int wNum, int wTime) {
 	return OK;
 }
 
-// ¥¹¥×¥é¥¤¥È¤Î¥Ö¥ì¥ó¥ÉÎ¨¤ÎÀßÄê
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒ–ãƒ¬ãƒ³ãƒ‰ç‡ã®è¨­å®š
 int sp_set_blendrate(int wNum, int wCount, int rate) {
 	int i;
 	sprite_t *sp;
@@ -490,7 +490,7 @@ int sp_set_blendrate(int wNum, int wCount, int rate) {
 	return OK;
 }
 
-// ¥¹¥×¥é¥¤¥È¤¬ create ¤µ¤ì¤Æ¤¤¤ë¤«¤É¤¦¤«¤Î¼èÆÀ
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒ create ã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ã®å–å¾—
 int sp_query_isexist(int wNum, int *ret) {
 	if (wNum >= SPRITEMAX) goto errexit;
 	if (sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
@@ -503,7 +503,7 @@ int sp_query_isexist(int wNum, int *ret) {
 	return NG;
 }
 
-// ¥¹¥×¥é¥¤¥È¤Î¥¿¥¤¥×¤È²¿ÈÖ¤ÎCG¤¬¥»¥Ã¥È¤µ¤ì¤Æ¤¤¤ë¤«¤Î¼èÆÀ
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¿ã‚¤ãƒ—ã¨ä½•ç•ªã®CGãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ã„ã‚‹ã‹ã®å–å¾—
 int sp_query_info(int wNum, int *vtype, int *vcg1, int *vcg2, int *vcg3) {
 	sprite_t *sp;
 	
@@ -527,7 +527,7 @@ int sp_query_info(int wNum, int *vtype, int *vcg1, int *vcg2, int *vcg3) {
 	return NG;
 }
 
-// ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨¾õÂÖ¤Î¼èÆÀ
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºçŠ¶æ…‹ã®å–å¾—
 int sp_query_show(int wNum, int *vShow) {
 	if (wNum >= SPRITEMAX) goto errexit;
 	if (sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
@@ -540,7 +540,7 @@ int sp_query_show(int wNum, int *vShow) {
 	return NG;
 }
 
-// ¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨°ÌÃÖ¤Î¼èÆÀ
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºä½ç½®ã®å–å¾—
 int sp_query_pos(int wNum, int *vx, int *vy) {
 	if (wNum >= SPRITEMAX) goto errexit;
 	if (sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
@@ -555,7 +555,7 @@ int sp_query_pos(int wNum, int *vx, int *vy) {
 	return NG;
 }
 
-// ¥¹¥×¥é¥¤¥È¤ÎÂç¤­¤µ¤Î¼èÆÀ
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¤§ãã•ã®å–å¾—
 int sp_query_size(int wNum, int *vw, int *vh) {
 	sprite_t *sp;
 	
@@ -576,7 +576,7 @@ int sp_query_size(int wNum, int *vw, int *vh) {
 	return NG;
 }
 
-// ¥Æ¥­¥¹¥È¥¹¥×¥é¥¤¥È¤Î¸½ºß¤ÎÊ¸»úÉ½¼¨°ÌÃÖ¤Î¼èÆÀ
+// ãƒ†ã‚­ã‚¹ãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç¾åœ¨ã®æ–‡å­—è¡¨ç¤ºä½ç½®ã®å–å¾—
 int sp_query_textpos(int wNum, int *vx, int *vy) {
 	if (wNum >= SPRITEMAX) goto errexit;
 	if (sact.sp[wNum]->type != SPRITE_MSG) goto errexit;
@@ -591,7 +591,7 @@ int sp_query_textpos(int wNum, int *vx, int *vy) {
 	return NG;
 }
 
-// NumeralXXX¤ÎCG¤Î¥»¥Ã¥È
+// NumeralXXXã®CGã®ã‚»ãƒƒãƒˆ
 int sp_num_setcg(int nNum, int nIndex, int nCG) {
 	sp_assert_no(nNum);
 
@@ -600,7 +600,7 @@ int sp_num_setcg(int nNum, int nIndex, int nCG) {
 	return OK;
 }
 
-// NumeralXXX¤ÎCG¤Î¼èÆÀ
+// NumeralXXXã®CGã®å–å¾—
 int sp_num_getcg(int nNum, int nIndex, int *vCG) {
 	sp_assert_no(nNum);
 	
@@ -609,7 +609,7 @@ int sp_num_getcg(int nNum, int nIndex, int *vCG) {
 	return OK;
 }
 
-// NumeralXXX¤Î°ÌÃÖ¤Î¥»¥Ã¥È
+// NumeralXXXã®ä½ç½®ã®ã‚»ãƒƒãƒˆ
 int sp_num_setpos(int nNum, int nX, int nY) {
 	sp_assert_no(nNum);
 
@@ -619,7 +619,7 @@ int sp_num_setpos(int nNum, int nX, int nY) {
 	return OK;
 }
 
-// NumeralXXX¤Î°ÌÃÖ¤Î¼èÆÀ
+// NumeralXXXã®ä½ç½®ã®å–å¾—
 int sp_num_getpos(int nNum, int *vX, int *vY) {
 	sp_assert_no(nNum);
 	
@@ -629,7 +629,7 @@ int sp_num_getpos(int nNum, int *vX, int *vY) {
 	return OK;
 }
 
-// NumeralXXX¤Î¥¹¥Ñ¥ó¤Î¥»¥Ã¥È
+// NumeralXXXã®ã‚¹ãƒ‘ãƒ³ã®ã‚»ãƒƒãƒˆ
 int sp_num_setspan(int nNum, int nSpan) {
 	sp_assert_no(nNum);
 	
@@ -638,7 +638,7 @@ int sp_num_setspan(int nNum, int nSpan) {
 	return OK;
 }
 
-// NumeralXXX¤Î¥¹¥Ñ¥ó¤Î¼èÆÀ
+// NumeralXXXã®ã‚¹ãƒ‘ãƒ³ã®å–å¾—
 int sp_num_getspan(int nNum, int *vSpan) {
 	sp_assert_no(nNum);
 
@@ -647,7 +647,7 @@ int sp_num_getspan(int nNum, int *vSpan) {
 	return OK;
 }
 
-// ¤¹¤Ù¤Æ¤ÎÀâÌÀ¥¹¥×¥é¥¤¥È¤Îºï½ü
+// ã™ã¹ã¦ã®èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‰Šé™¤
 int sp_exp_clear() {
 	GSList *node;
 	
@@ -660,7 +660,7 @@ int sp_exp_clear() {
 	return OK;
 }
 
-// ÀâÌÀ¥¹¥×¥é¥¤¥È¤ÎÅĞÏ¿
+// èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç™»éŒ²
 int sp_exp_add(int nNumSP1, int nNumSP2) {
 	sprite_t *swsp, *expsp;
 	sp_assert_no(nNumSP1);
@@ -674,7 +674,7 @@ int sp_exp_add(int nNumSP1, int nNumSP2) {
 	return OK;
 }
 
-// ÀâÌÀ¥¹¥×¥é¥¤¥È¤Îºï½ü
+// èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‰Šé™¤
 int sp_exp_del(int nNum) {
 	sprite_t *sp;
 	
@@ -688,7 +688,7 @@ int sp_exp_del(int nNum) {
 	return OK;
 }
 
-// ¥¹¥×¥é¥¤¥È¥µ¥¦¥ó¥É¤Î¥»¥Ã¥È
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚µã‚¦ãƒ³ãƒ‰ã®ã‚»ãƒƒãƒˆ
 int sp_sound_set(int wNumSP, int wNumWave1, int wNumWave2, int wNumWave3) {
 	sprite_t *sp;
 	
@@ -702,23 +702,23 @@ int sp_sound_set(int wNumSP, int wNumWave1, int wNumWave2, int wNumWave3) {
 	return OK;
 }
 
-// ¤¹¤Ù¤Æ¤Î¥¹¥×¥é¥¤¥È¥µ¥¦¥ó¥É¤Î½ªÎ»¤òÂÔ¤Ä
+// ã™ã¹ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚µã‚¦ãƒ³ãƒ‰ã®çµ‚äº†ã‚’å¾…ã¤
 int sp_sound_wait() {
 	WARNING("NOT IMPLEMENTED\n");
 	return OK;
 }
 
-// ÈÏ°Ï³°¤ò¥¯¥ê¥Ã¥¯¤·¤¿¤È¤­¤Î¥µ¥¦¥ó¥É¤ÎÀßÄê
+// ç¯„å›²å¤–ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã®ã‚µã‚¦ãƒ³ãƒ‰ã®è¨­å®š
 int sp_sound_ob(int wNumWave) {
 	sact.numsoundob = wNumWave;
 	return OK;
 }
 
 /**
- * »ØÄê¤ÎºÂÉ¸¤¬¸½ºß¤Î¥¹¥×¥é¥¤¥È¤Î°ÌÃÖ¤ÎÈÏ°Ï¤ËÆş¤Ã¤Æ¤¤¤ë¤«¡©
- * @param sp: Ä´¤Ù¤ëÂĞ¾İ¤Î¥¹¥×¥é¥¤¥È
- * @param x,y: ºÂÉ¸
- * @return: TRUE:Æş¤Ã¤Æ¤¤¤ë, FALSE: Æş¤Ã¤Æ¤¤¤Ê¤¤
+ * æŒ‡å®šã®åº§æ¨™ãŒç¾åœ¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ä½ç½®ã®ç¯„å›²ã«å…¥ã£ã¦ã„ã‚‹ã‹ï¼Ÿ
+ * @param sp: èª¿ã¹ã‚‹å¯¾è±¡ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+ * @param x,y: åº§æ¨™
+ * @return: TRUE:å…¥ã£ã¦ã„ã‚‹, FALSE: å…¥ã£ã¦ã„ãªã„
  */
 boolean sp_is_insprite(sprite_t *sp, int x, int y) {
 	BYTE *dp;

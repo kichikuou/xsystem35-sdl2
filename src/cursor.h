@@ -1,5 +1,5 @@
 /*
- * cursor.h ¥«¡¼¥½¥ë½èÍı(general)
+ * cursor.h ã‚«ãƒ¼ã‚½ãƒ«å‡¦ç†(general)
  *
  * Copyright (C) 2000- TAJIRI Yasuhiro  <tajiri@venus.dti.ne.jp>
  *

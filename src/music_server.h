@@ -51,26 +51,26 @@ struct _musprvdat {
 	
 	// pcm object
 	/*
-	  0:     S comman ÍÑ 
-	  1-128: wavXXX ÍÑ
-	  129:   cdrom pipe ÍÑ
-	  130:   midi pipe ÍÑ
+	  0:     S comman ç”¨ 
+	  1-128: wavXXX ç”¨
+	  129:   cdrom pipe ç”¨
+	  130:   midi pipe ç”¨
 	*/
 	pcmobj_t *pcm[128 + 1 + 2];
 	
-	// ¥²¡¼¥àÆâ¤Ç¤Î volume ÀßÄê (%ÃÍ)
+	// ã‚²ãƒ¼ãƒ å†…ã§ã® volume è¨­å®š (%å€¤)
 	int vol_master;
 	int vol_pcm;
 	int vol_midi;
 	int vol_cd;
-	int vol_pcm_sub[128 + 1 + 2]; // volval ¤Î channel
-	int volval[16]; // ³Æchannel Ëè¤Î volume valance
+	int vol_pcm_sub[128 + 1 + 2]; // volval ã® channel
+	int volval[16]; // å„channel æ¯ã® volume valance
 	
-	// ºÇÂç¥È¥é¥Ã¥¯¿ô
+	// æœ€å¤§ãƒˆãƒ©ãƒƒã‚¯æ•°
 	int cd_maxtrk;
 	
-	GList *pcmplist; // PCMÂ¿½ÅºÆÀ¸ÍÑ¥ê¥¹¥È
-	GList *fadelist; // Fader¥ê¥¹¥È
+	GList *pcmplist; // PCMå¤šé‡å†ç”Ÿç”¨ãƒªã‚¹ãƒˆ
+	GList *fadelist; // Faderãƒªã‚¹ãƒˆ
 	
 	// for polling
 	int nfds;

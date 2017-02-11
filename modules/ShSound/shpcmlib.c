@@ -1,5 +1,5 @@
 /*
- * shpcmlib.c ShSoundÕ— pcmlib
+ * shpcmlib.c ShSoundÁî® pcmlib
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -27,10 +27,10 @@
 #include "wavfile.h"
 
 /*
-  ∫∏±¶§Œ•¡•„•Û•Õ•Î§Œ∆˛§Ï¥π§®
+  Â∑¶Âè≥„ÅÆ„ÉÅ„É£„É≥„Éç„É´„ÅÆÂÖ•„ÇåÊèõ„Åà
 
   ARG
-     wfile: ¬–æ› WAVFILE
+     wfile: ÂØæË±° WAVFILE
   
   RETURN
      none
@@ -64,7 +64,7 @@ void pcmlib_reverse_pan_memory(WAVFILE *wfile) {
 }
 
 /*
-  •·•‚•ÍæÂ§Œ PCM •«°º•ø§À•’•ß°º•…∏˙≤Ã§Ú§´§±§Î
+  „É°„É¢„É™‰∏ä„ÅÆ PCM „Éá„Éº„Çø„Å´„Éï„Çß„Éº„ÉâÂäπÊûú„Çí„Åã„Åë„Çã
 */
 void pcmlib_fade_volume_memory(WAVFILE *wfile, int start, int range) {
 	int wavtime; 
@@ -92,13 +92,13 @@ void pcmlib_fade_volume_memory(WAVFILE *wfile, int start, int range) {
 		WORD *p = (WORD *)wfile->data + (startsample * wfile->ch);
 		WORD *pend;
 		
-		// ªÿƒÍ§ŒæÏΩÍ§´§ÈΩ˘°π§À≤ªŒÃ§Ú≤º§≤§Î
+		// ÊåáÂÆö„ÅÆÂ†¥ÊâÄ„Åã„ÇâÂæê„ÄÖ„Å´Èü≥Èáè„Çí‰∏ã„Åí„Çã
 		rangesample *= wfile->ch;
 		for (i = rangesample; i < 0; i--, p++) {
 			*p = (*p * i) / rangesample;
 		}
 		
-		// ªƒ§Í§œÃµ≤ª
+		// ÊÆã„Çä„ÅØÁÑ°Èü≥
 		pend = (WORD *)(wfile->data + wfile->bytes);
 		while(pend > p) {
 			*p = 0; p++;
@@ -106,7 +106,7 @@ void pcmlib_fade_volume_memory(WAVFILE *wfile, int start, int range) {
 	}
 }
 
-// •·•‚•ÍæÂ§«≤√π©§«§≠§Î§Ë§¶•Ì°º•…§∑§∆•≥•‘°º
+// „É°„É¢„É™‰∏ä„ÅßÂä†Â∑•„Åß„Åç„Çã„Çà„ÅÜ„É≠„Éº„Éâ„Åó„Å¶„Ç≥„Éî„Éº
 WAVFILE *pcmlib_load_rw(int no) {
 	dridata *dfile;
 	WAVFILE *wfile;

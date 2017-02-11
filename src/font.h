@@ -27,10 +27,10 @@
 #include "config.h"
 #include "portab.h"
 
-/* font ¤Î¼ïÎà */
+/* font ã®ç¨®é¡ */
 #define FONTTYPEMAX 2
 
-/* font¤ÎÌ¾Á° */
+/* fontã®åå‰ */
 #define FONT_GOTHIC (0)
 #define FONT_MINCHO (1)
 
@@ -69,7 +69,7 @@ extern FONT *font_sdlttf_new();
 extern FONT *font_x11_new();
 #endif
 
-/* ¥Ç¥Õ¥©¥ë¥È¤Î¥Õ¥©¥ó¥ÈÌ¾ */
+/* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ•ã‚©ãƒ³ãƒˆå */
 #define FONT_DEFAULTNAME_X "-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0201.1976-0,*"
 
 #define FONT_DEFAULTNAME_TTF "/usr/share/fonts/TrueType/mincho.ttc"

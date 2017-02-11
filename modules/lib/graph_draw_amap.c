@@ -1,4 +1,4 @@
-// 8bit surface (or dataÎó)¤«¤é surface ¤Î alpha map ¤Ø¥³¥Ô¡¼
+// 8bit surface (or dataåˆ—)ã‹ã‚‰ surface ã® alpha map ã¸ã‚³ãƒ”ãƒ¼
 
 #include <string.h>
 #include "portab.h"

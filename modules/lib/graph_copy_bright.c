@@ -1,4 +1,4 @@
-// �����surface�ΰ�����뤵�� lv/255 �ܤ��ƥ��ԡ�
+// 指定のsurface領域を明るさを lv/255 倍してコピー
 
 #include <string.h>
 

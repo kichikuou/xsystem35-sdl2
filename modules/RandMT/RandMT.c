@@ -1,5 +1,5 @@
 /*
- * RandMT.c  ²¦»Ò¤µ¤Ş Lv1: (¤ª¤½¤é¤¯ Mersenne Twister»ÈÍÑ¤Î)Íğ¿ôÀ¸À®
+ * RandMT.c  ç‹å­ã•ã¾ Lv1: (ãŠãã‚‰ã Mersenne Twisterä½¿ç”¨ã®)ä¹±æ•°ç”Ÿæˆ
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -33,9 +33,9 @@
 
 void Init() {
 	/*
-	  Íğ¿ô½é´ü²½
+	  ä¹±æ•°åˆæœŸåŒ–
 
-	   p1: ½é´ü²½ÍÑ seed
+	   p1: åˆæœŸåŒ–ç”¨ seed
 	*/
 	int p1 = getCaliValue(); /* ITimer */
 	
@@ -44,10 +44,10 @@ void Init() {
 
 void Get() {
 	/*
-	  1 ¤«¤é num ¤Ş¤Ç¤ÎÍğ¿ô¤òÀ¸À®
+	  1 ã‹ã‚‰ num ã¾ã§ã®ä¹±æ•°ã‚’ç”Ÿæˆ
 	  
-	  num: ºÇÂçÃÍ
-	  var: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
+	  num: æœ€å¤§å€¤
+	  var: çµæœã‚’è¿”ã™å¤‰æ•°
 	*/
 	int num  = getCaliValue();
 	int *var = getCaliVariable();

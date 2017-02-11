@@ -41,7 +41,7 @@ void commandH() {
 	if (fig != 0) {
 		len = strlen(work1);
 		if (fig > len) {
-			/* ∂ı«Ú§«§¶§·§Î */
+			/* Á©∫ÁôΩ„Åß„ÅÜ„ÇÅ„Çã */
 			len = fig - len;
 			while(len--) {
 				strcat(work2, num2sjis(10));

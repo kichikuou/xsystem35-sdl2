@@ -124,7 +124,7 @@ int gr_buller(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 	return OK;
 }
 
-// ½ÄÊı¸ş¥Ö¥é¡¼
+// ç¸¦æ–¹å‘ãƒ–ãƒ©ãƒ¼
 int gr_buller_v(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int step) {
 	BYTE *dp, *sp;
 	int x, y;

@@ -33,8 +33,8 @@
 #include "music.h"
 #include "s39init.h"
 
-boolean menu_ok_exit;   /* exit window ¤Ç OK ¤¬²¡¤µ¤ì¤¿¤«¤É¤¦¤« */
-boolean menu_ok_input;  /* Ê¸»úÎó/¿ôÃÍÆşÎÏ window ¤Ç OK ¤¬... */
+boolean menu_ok_exit;   /* exit window ã§ OK ãŒæŠ¼ã•ã‚ŒãŸã‹ã©ã†ã‹ */
+boolean menu_ok_input;  /* æ–‡å­—åˆ—/æ•°å€¤å…¥åŠ› window ã§ OK ãŒ... */
 
 GtkWidget *menu_item_pcm;
 GtkWidget *menu_item_cdrom;

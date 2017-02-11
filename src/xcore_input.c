@@ -1,5 +1,5 @@
 /*
- * xcore_input.c  ¥­¡¼ÆşÎÏ½èÍı
+ * xcore_input.c  ã‚­ãƒ¼å…¥åŠ›å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

@@ -1,5 +1,5 @@
 /*
- * music_client.h  music client ÉôÊ¬
+ * music_client.h  music client éƒ¨åˆ†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

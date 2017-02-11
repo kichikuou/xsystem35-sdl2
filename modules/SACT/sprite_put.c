@@ -1,5 +1,5 @@
 /*
- * sprite_put.c: ¥×¥Ã¥È¡¦¥¹¥¤¥Ã¥Á¥×¥Ã¥È¥¹¥×¥é¥¤¥ÈÆÃÍ­¤Î½èÍı
+ * sprite_put.c: ãƒ—ãƒƒãƒˆãƒ»ã‚¹ã‚¤ãƒƒãƒãƒ—ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç‰¹æœ‰ã®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -35,7 +35,7 @@
 static int eventCB_PUT(sprite_t *sp, agsevent_t *e);
 static void cb_remove(sprite_t *sp);
 
-// ¥×¥Ã¥È¥¹¥×¥é¥¤¥È¤Î¥¤¥Ù¥ó¥È½èÍı
+// ãƒ—ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†
 static int eventCB_PUT(sprite_t *sp, agsevent_t *e) {
 	int update = 0;
 	
@@ -43,7 +43,7 @@ static int eventCB_PUT(sprite_t *sp, agsevent_t *e) {
 	case AGSEVENT_BUTTON_PRESS:
 		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
 		
-		// ¥Ü¥¿¥ó²¡²¼»ş¤Î¥¹¥×¥é¥¤¥È¤¬¤¢¤ì¤Ğ¡¢¤½¤ì¤òÉ½¼¨
+		// ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒã‚ã‚Œã°ã€ãã‚Œã‚’è¡¨ç¤º
 		if (sp->cg3) {
 			sp->curcg = sp->cg3;
 			update++;
@@ -62,14 +62,14 @@ static int eventCB_PUT(sprite_t *sp, agsevent_t *e) {
 				ssnd_play(sp->numsound3);
 			}
 		} else {
-			// ¥¹¥¤¥Ã¥Á¥×¥Ã¥È¥¹¥×¥é¥¤¥È¤Î·èÄê¤Î½èÍı
+			// ã‚¹ã‚¤ãƒƒãƒãƒ—ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æ±ºå®šã®å‡¦ç†
 			if (sp->cg2) {
 				sp->curcg = sp->cg2;
 				update++;
 			}
 			
-			// press¤µ¤ì¤¿¥¹¥×¥é¥¤¥È¤Èrelease¤µ¤ì¤¿¥¹¥×¥é¥¤¥È
-			// ¤¬Æ±¤¸¾ì¹ç¤Î¤ß¡¢¤½¤Î¥¹¥×¥é¥¤¥È¤¬²¡¤µ¤ì¤¿¤ÈÈ½ÃÇ
+			// pressã•ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¨releaseã•ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+			// ãŒåŒã˜å ´åˆã®ã¿ã€ãã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒæŠ¼ã•ã‚ŒãŸã¨åˆ¤æ–­
 			if (sp->pressed) {
 				sact.sp_result_sw = sp->no;
 				sact.waitkey = sp->no;
@@ -89,15 +89,15 @@ static int eventCB_PUT(sprite_t *sp, agsevent_t *e) {
 	return update;
 }
 
-// ¥¹¥×¥é¥¤¥Èºï½ü»ş¤Î½èÍı
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå‰Šé™¤æ™‚ã®å‡¦ç†
 static void cb_remove(sprite_t *sp) {
-	// event listener ¤Îºï½ü
+	// event listener ã®å‰Šé™¤
 	spev_remove_eventlistener(sp);
 }
 
 /*
-  sp_new ¤Î»ş¤Ë¥¹¥×¥é¥¤¥È¤Î¼ïÎàËè¤Î½é´ü²½
-  @param sp: ½é´ü²½¤¹¤ë¥¹¥×¥é¥¤¥È
+  sp_new ã®æ™‚ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç¨®é¡æ¯ã®åˆæœŸåŒ–
+  @param sp: åˆæœŸåŒ–ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 int sp_put_setup(sprite_t *sp) {
 	spev_add_eventlistener(sp, eventCB_PUT);

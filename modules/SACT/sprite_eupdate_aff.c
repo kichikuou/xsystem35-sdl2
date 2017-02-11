@@ -1,4 +1,4 @@
-// ¥¢¥Õ¥£¥óÊÑ´¹ (²óÅ¾)
+// ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ› (å›è»¢)
 
 static void do_aff(surface_t *in, surface_t *out, int deg, double zx, double zy) {
 	int xs = in->width  / 2;
@@ -56,9 +56,9 @@ static void do_aff(surface_t *in, surface_t *out, int deg, double zx, double zy)
 
 
 
-//²óÅ¾¥¢¥¦¥È
+//å›è»¢ã‚¢ã‚¦ãƒˆ
 static void ec20_cb(surface_t *sfsrc, surface_t *sfdst) {
-	//£±²óÅ¾¤À¤±
+	//ï¼‘å›è»¢ã ã‘
 	int maxstep, curstep;
 	maxstep = 360;
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
@@ -68,7 +68,7 @@ static void ec20_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-//²óÅ¾¥¤¥ó
+//å›è»¢ã‚¤ãƒ³
 static void ec21_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int maxstep, curstep;
 	maxstep = 360;
@@ -79,7 +79,7 @@ static void ec21_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-//²óÅ¾¥¢¥¦¥È(»ş·×²ó¤ê)
+//å›è»¢ã‚¢ã‚¦ãƒˆ(æ™‚è¨ˆå›ã‚Š)
 static void ec22_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int maxstep, curstep;
 	maxstep = 360;
@@ -90,7 +90,7 @@ static void ec22_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-//²óÅ¾¥¤¥ó(»ş·×²ó¤ê)
+//å›è»¢ã‚¤ãƒ³(æ™‚è¨ˆå›ã‚Š)
 static void ec23_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int maxstep, curstep;
 	maxstep = 360;

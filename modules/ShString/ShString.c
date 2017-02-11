@@ -1,8 +1,8 @@
 /*
- * ShString.c  ʸ������� module
+ * ShString.c  文字列操作 module
  *
- *   ������ˤ��ˤ祢�ꥹ(̤����)
- *   �簭��
+ *   かえるにょ国にょアリス(未使用)
+ *   大悪司
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -39,7 +39,7 @@
 
 void ExchangeString(void) {
 	/*
-	  ʸ����(target)��ΰ���(pat)���̤�ʸ����(patr)���֤�������
+	  文字列(target)中の一部(pat)を別の文字列(patr)で置き換える
 	*/
 	int target = getCaliValue();
 	int pat    = getCaliValue();
@@ -113,11 +113,11 @@ void SetWindowTitle(void) { /* 6 */
 
 void FillString() {
 	/*
-	  ������ֹ��ʸ�����¾��ʸ����˥��ԡ�
+	  指定の番号の文字列を他の文字列にコピー
 	  
-	  st:  ���ԡ����ʸ����κǽ���ֹ�
-	  cnt: ���ԡ�����ʸ����ο�
-	  src: ���ԡ�����ʸ�����ֹ�
+	  st:  コピー先の文字列の最初の番号
+	  cnt: コピーする文字列の数
+	  src: コピー元の文字列番号
 	*/
 	int st  = getCaliValue();
 	int cnt = getCaliValue();
@@ -134,11 +134,11 @@ void FillString() {
 
 void SetStringNum16(void) {
 	/*
-	  ʸ�������ͤ��Ѵ�
-	    ��ʸ������ʸ�������߲�
+	  文字列を数値に変換
+	    大文字、小文字、混在可
 	  
-	  p1: �Ѵ���ʸ�����ֹ�
-	  p2: �Ѵ����줿���ͤ��Ǽ�����ѿ�
+	  p1: 変換元文字列番号
+	  p2: 変換された数値を格納する変数
 	*/
 	int st = getCaliValue();
 	int *var = getCaliVariable();

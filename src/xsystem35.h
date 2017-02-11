@@ -1,5 +1,5 @@
 /*
- * xsystem35.h  SYSTEM35 ¥Ç¥³¡¼¥À
+ * xsystem35.h  SYSTEM35 ãƒ‡ã‚³ãƒ¼ãƒ€
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -56,18 +56,18 @@
 #define DEBUG_COMMAND_YET
 #endif
 
-/* ÇÛÎó³°»²¾È¥Á¥§¥Ã¥¯/cali°Û¾ïÃÍ¸¡½Ğ */
+/* é…åˆ—å¤–å‚ç…§ãƒã‚§ãƒƒã‚¯/caliç•°å¸¸å€¤æ¤œå‡º */
 #define DEBUG_CHECKALING
 
 /* defined in cali.c */
-extern int preVarPage;      /* Ä¾Á°¤Ë¥¢¥¯¥»¥¹¤·¤¿ÊÑ¿ô¤Î¥Ú¡¼¥¸ */
-extern int preVarIndex;     /* Ä¾Á°¤Ë¥¢¥¯¥»¥¹¤·¤¿ÊÑ¿ô¤ÎINDEX */
-extern int preVarNo;        /* Ä¾Á°¤Ë¥¢¥¯¥»¥¹¤·¤¿ÊÑ¿ô¤ÎÈÖ¹æ */
+extern int preVarPage;      /* ç›´å‰ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ãŸå¤‰æ•°ã®ãƒšãƒ¼ã‚¸ */
+extern int preVarIndex;     /* ç›´å‰ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ãŸå¤‰æ•°ã®INDEX */
+extern int preVarNo;        /* ç›´å‰ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ãŸå¤‰æ•°ã®ç•ªå· */
 
 #define System_idle(msec) usleep(1000l * (msec));
 // extern void System_idle(int msec);
 
-/* system35 ²èÌÌ¥Ç¥Õ¥©¥ë¥È */
+/* system35 ç”»é¢ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ */
 #define SYS35_DEFAULT_WIDTH 640
 #define SYS35_DEFAULT_HEIGHT 480
 #define SYS35_DEFAULT_DEPTH 8

@@ -59,7 +59,7 @@ void sdl_vm_init(void) {
 static int search_preferable_fullscreen_mode() {
 	int i, vm = 0, delta = INT_MAX;
 	
-	/* ¤¹¤Ù¤Æ¤Îmode¤Î¤Ê¤«¤ÇºÇ¤âÅ¬ÀÚ¤Ê¥â¡¼¥É¤òÁªÂò */
+	/* ã™ã¹ã¦ã®modeã®ãªã‹ã§æœ€ã‚‚é©åˆ‡ãªãƒ¢ãƒ¼ãƒ‰ã‚’é¸æŠ */
 	for (i = 0;  modes[i]; i++) {
 		if (modes[i]->w >= view_w && 
 		    modes[i]->h >= view_y) {
@@ -99,7 +99,7 @@ void sdl_FullScreen(boolean on) {
 }
 
 
-/* Window¤ÎÂç¤­¤µ¤ÎÊÑ¹¹ */
+/* Windowã®å¤§ãã•ã®å¤‰æ›´ */
 void sdl_setWindowSize(int x, int y, int w, int h) {
 	Uint32 mode = sdl_vflag;
 	

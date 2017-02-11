@@ -1,5 +1,5 @@
 /*
- * drawtext.c  DLLÍÑ¤Ë surface ¾å¤ËÊ¸»ú¤òÉÁ¤¯
+ * drawtext.c  DLLç”¨ã« surface ä¸Šã«æ–‡å­—ã‚’æã
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -33,14 +33,14 @@
 #include "surface.h"
 #include "ngraph.h"
 
-static int ftype;  // ¥Õ¥©¥ó¥È¤Î¼ïÎà
-static int fsize;  // ¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ
+static int ftype;  // ãƒ•ã‚©ãƒ³ãƒˆã®ç¨®é¡
+static int fsize;  // ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã•
 
 /**
- * ¼¡¤ËÉÁ¤¯Ê¸»ú¤Î¥Õ¥©¥ó¥È¤Î¼ïÎà¤ÈÂç¤­¤µ¤òÀßÄê
+ * æ¬¡ã«æãæ–‡å­—ã®ãƒ•ã‚©ãƒ³ãƒˆã®ç¨®é¡ã¨å¤§ãã•ã‚’è¨­å®š
  * 
- * @param type: ¥Õ¥©¥ó¥È¼ïÎà (FONT_MINCHO, FONT_GOTHIC)
- * @param size: ¥Õ¥©¥ó¥È¥µ¥¤¥º
+ * @param type: ãƒ•ã‚©ãƒ³ãƒˆç¨®é¡ (FONT_MINCHO, FONT_GOTHIC)
+ * @param size: ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º
  */
 int dt_setfont(int type, int size) {
 	ftype = type;
@@ -49,14 +49,14 @@ int dt_setfont(int type, int size) {
 }
 
 /**
- * surface ¤Ë¥â¥Î¥¯¥íÊ¸»ú¤òÉÁ²è¡£¥¢¥ó¥Á¥¨¥¤¥ê¥¢¥¹¤µ¤ì¤Æ¤ª¤ê256³¬Ä´
- * ½ñ¤­½Ğ¤¹surface¤Ï8¥Ó¥Ã¥È¤Ç¤¢¤ëÉ¬Í×¤¢¤ê
+ * surface ã«ãƒ¢ãƒã‚¯ãƒ­æ–‡å­—ã‚’æç”»ã€‚ã‚¢ãƒ³ãƒã‚¨ã‚¤ãƒªã‚¢ã‚¹ã•ã‚Œã¦ãŠã‚Š256éšèª¿
+ * æ›¸ãå‡ºã™surfaceã¯8ãƒ“ãƒƒãƒˆã§ã‚ã‚‹å¿…è¦ã‚ã‚Š
  *
- * @param sf: ÉÁ²è¤¹¤ë surface
- * @param x: ÉÁ²è°ÌÃÖ£ØºÂÉ¸
- * @param y: ÉÁ²è°ÌÃÖ£ÙºÂÉ¸
- * @param buf: ÉÁ²èÊ¸»úÎó (SJIS)
- * @return: ¼Âºİ¤ËÉÁ²è¤·¤¿Éı
+ * @param sf: æç”»ã™ã‚‹ surface
+ * @param x: æç”»ä½ç½®ï¼¸åº§æ¨™
+ * @param y: æç”»ä½ç½®ï¼¹åº§æ¨™
+ * @param buf: æç”»æ–‡å­—åˆ— (SJIS)
+ * @return: å®Ÿéš›ã«æç”»ã—ãŸå¹…
 */
 int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
 	agsurface_t *glyph;
@@ -79,17 +79,17 @@ int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
 }
 
 /**
- * surface ¤Ë¥«¥é¡¼Ê¸»ú¤òÉÁ²è¡£alphamap ¤Ë256³¬Ä´¤Î¥¢¥ó¥Á¥¨¥¤¥ê¥¢¥¹¤µ¤ì¤¿
- * Ê¸»ú¤òÉÁ¤­¡¢pixelmap ¤Ë¤Ï¡¢¿§¾ğÊó¤ò¶ë·Á¤ÇÉÁ¤¯
+ * surface ã«ã‚«ãƒ©ãƒ¼æ–‡å­—ã‚’æç”»ã€‚alphamap ã«256éšèª¿ã®ã‚¢ãƒ³ãƒã‚¨ã‚¤ãƒªã‚¢ã‚¹ã•ã‚ŒãŸ
+ * æ–‡å­—ã‚’æãã€pixelmap ã«ã¯ã€è‰²æƒ…å ±ã‚’çŸ©å½¢ã§æã
  * 
- * @param sf: ÉÁ²è¤¹¤ë surface
- * @param x: ÉÁ²è°ÌÃÖ£ØºÂÉ¸
- * @param y: ÉÁ²è°ÌÃÖ£ÙºÂÉ¸
- * @param buf: ÉÁ²èÊ¸»úÎó(SJIS)
- * @param r: Ê¸»ú¿§ÀÖ
- * @param g: Ê¸»ú¿§ÎĞ
- * @param b: Ê¸»ú¿§ÀÄ
- * @return: ¼Âºİ¤ËÉÁ²è¤·¤¿Éı
+ * @param sf: æç”»ã™ã‚‹ surface
+ * @param x: æç”»ä½ç½®ï¼¸åº§æ¨™
+ * @param y: æç”»ä½ç½®ï¼¹åº§æ¨™
+ * @param buf: æç”»æ–‡å­—åˆ—(SJIS)
+ * @param r: æ–‡å­—è‰²èµ¤
+ * @param g: æ–‡å­—è‰²ç·‘
+ * @param b: æ–‡å­—è‰²é’
+ * @return: å®Ÿéš›ã«æç”»ã—ãŸå¹…
  */ 
 int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b) {
 	agsurface_t *glyph;
@@ -106,10 +106,10 @@ int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b)
 	sh = glyph->height;
 	if (!gr_clip_xywh(sf, &sx, &sy, &sw, &sh)) return 0;
 	
-	// alpha map ¤ËÊ¸»ú¤½¤Î¤â¤Î¤òÉÁ¤¯
+	// alpha map ã«æ–‡å­—ãã®ã‚‚ã®ã‚’æã
 	gr_draw_amap(sf, sx, sy, glyph->pixel, sw, sh, glyph->bytes_per_line);
 	
-	// pixel map ¤Ë¤Ï¿§¾ğÊó¤ò¶ë·Á¤ÇÉÁ¤¯
+	// pixel map ã«ã¯è‰²æƒ…å ±ã‚’çŸ©å½¢ã§æã
 	gr_fill(sf, sx, sy, sw, sh, r, g, b);
 	
 	return sw;

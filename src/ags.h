@@ -32,7 +32,7 @@
 #include "font.h"
 
 
-/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤Î¼ïÎà */
+/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®ç¨®é¡ */
 #define IDC_ARROW     1
 #define IDC_CROSS     2
 #define IDC_IBEAM     3
@@ -105,14 +105,14 @@ typedef struct _agsevent agsevent_t;
 
 
 /*
- * fader ´ÉÍı¾ğÊó
+ * fader ç®¡ç†æƒ…å ±
  */
 struct ags_faderinfo {
-	int step_max;    /* ºÇÂç step ¿ô */
-	int effect_time; /* Á´ÂÎ¤Î½èÍı¤Ë¤«¤±¤ë»ş´Ö */
+	int step_max;    /* æœ€å¤§ step æ•° */
+	int effect_time; /* å…¨ä½“ã®å‡¦ç†ã«ã‹ã‘ã‚‹æ™‚é–“ */
 	
-	boolean cancel;  /* ÅÓÃæ¤Ç key È´¤±¤ò¤¦¤±¤Ä¤±¤ë¤« */
-	void (*callback)(int); /* callback ´Ø¿ô */
+	boolean cancel;  /* é€”ä¸­ã§ key æŠœã‘ã‚’ã†ã‘ã¤ã‘ã‚‹ã‹ */
+	void (*callback)(int); /* callback é–¢æ•° */
 };
 typedef struct ags_faderinfo ags_faderinfo_t;
 
@@ -144,11 +144,11 @@ typedef struct _ags ags_t;
 
 
 
-/* ½é´ü²½´Ø·¸ */
+/* åˆæœŸåŒ–é–¢ä¿‚ */
 extern void ags_init();
 extern void ags_remove();
 
-/* ¥¦¥£¥ó¥É´Ø·¸ */
+/* ã‚¦ã‚£ãƒ³ãƒ‰é–¢ä¿‚ */
 extern void ags_setWorldSize(int width, int height, int depth);
 extern void ags_setViewArea(int x, int y, int width, int height);
 extern void ags_setWindowTitle(char *str);
@@ -163,17 +163,17 @@ extern void    ags_intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *r
 extern agsurface_t *ags_getDIB();
 extern void ags_sync();
 
-/* ²èÌÌ¹¹¿· */
+/* ç”»é¢æ›´æ–° */
 extern void ags_setExposeSwitch(boolean bool);
 extern void ags_updateFull(void);
 extern void ags_updateArea(int x, int y, int width, int height);
 
-/* ¥Ñ¥ì¥Ã¥È´Ø·¸ */
+/* ãƒ‘ãƒ¬ãƒƒãƒˆé–¢ä¿‚ */
 extern void ags_setPallets(Pallet256 *src_pal, int src, int dst, int cnt);
 extern void ags_setPallet(int no, int red, int green, int blue);
 extern void ags_setPalletToSystem(int src, int cnt);
 
-/* ÉÁ²è´Ø·¸ */
+/* æç”»é–¢ä¿‚ */
 extern void ags_drawRectangle(int x, int y, int w, int h, int col);
 extern void ags_fillRectangle(int x, int y, int w, int h, int col);
 extern void ags_fillRectangleNeg(int x, int y, int w, int h, int col);
@@ -206,7 +206,7 @@ extern void ags_copyArea_whiteLevel(int sx, int sy, int w, int h, int dx, int dy
 extern MyRectangle* ags_imageFlood(int x, int y, int c);
 extern void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int type, int opt, boolean flg, int spCol);
 
-/* alpha channel Áàºî */
+/* alpha channel æ“ä½œ */
 extern void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg);
 extern void ags_copyToAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg);
 extern void ags_alpha_uppercut(int sx, int sy, int w, int h, int s, int d);
@@ -223,10 +223,10 @@ extern void ags_whiteIn(int rate, boolean flg);
 extern void ags_whiteOut(int rate, boolean flg);
 extern void ags_fader_callback();
 
-/* ¥Õ¥©¥ó¥È´ØÏ¢ */
+/* ãƒ•ã‚©ãƒ³ãƒˆé–¢é€£ */
 extern void ags_setFont(int type, int size);
 
-/* ¥«¡¼¥½¥ë´Ø·¸ */
+/* ã‚«ãƒ¼ã‚½ãƒ«é–¢ä¿‚ */
 extern void ags_setCursorType(int type);
 extern void ags_loadCursor(int ,int);
 extern void ags_setCursorLocation(int x, int y, boolean dibgeo);

@@ -25,7 +25,7 @@
 
 #include "portab.h"
 
-/* Ê¸»úÎóÆşÎÏ¤Î¥Ñ¥é¥á¡¼¥¿ */
+/* æ–‡å­—åˆ—å…¥åŠ›ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */
 typedef struct {
 	char *title;
 	char *oldstring;
@@ -36,7 +36,7 @@ typedef struct {
 	int     x, y, h;
 } INPUTSTRING_PARAM;
 
-/* ¿ôÃÍÆşÎÏ¤Î¥Ñ¥é¥á¡¼¥¿ */
+/* æ•°å€¤å…¥åŠ›ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */
 typedef struct {
 	char *title;
 	int value;

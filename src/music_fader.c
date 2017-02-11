@@ -30,10 +30,10 @@
 #include "counter.h"
 
 struct _fadeobj {
-	/* ¥Õ¥§¡¼¥É volume ¤òÀßÄê¤¹¤ë callback */
+	/* ãƒ•ã‚§ãƒ¼ãƒ‰ volume ã‚’è¨­å®šã™ã‚‹ callback */
 	int (*setvol)(int mdev, int subdev, int vol);
 	
-	/* ¥Õ¥§¡¼¥É½ªÎ»»þ¤Ë±éÁÕ¤ò½ªÎ»¤µ¤»¤ë callback */
+	/* ãƒ•ã‚§ãƒ¼ãƒ‰çµ‚äº†æ™‚ã«æ¼”å¥ã‚’çµ‚äº†ã•ã›ã‚‹ callback */
 	// int (*stop_playback)();
 	
 	/* mixer main device type */
@@ -48,7 +48,7 @@ struct _fadeobj {
 	/* start / end / current time in 10 msec */
 	long st_time, ed_time, cur_time;
 	
-        /* ½ªÎ»»þ¤Ë cd/midi/pcm ¤ò»ß¤á¤ë¤«¤É¤¦¤« */
+        /* çµ‚äº†æ™‚ã« cd/midi/pcm ã‚’æ­¢ã‚ã‚‹ã‹ã©ã†ã‹ */
         boolean stop_at_end;
 };
 typedef struct _fadeobj fadeobj_t;
@@ -101,12 +101,12 @@ static int setvolmidi(int lv) {
 }
 
 /*
- * ¿·¤·¤¤¥Õ¥§¡¼¥ÉÍÑ¥ª¥Ö¥¸¥§¥¯¥È¤ÎºîÀ®
- *   dev      : ÂÐ¾Ý¥ß¥­¥µ¡¼ device (MASTER/CD/MIDI/PCM)
- *   subdev   : PCM device ¤Î¾ì¹ç¡¢subdevice ÈÖ¹æ (0-130)
- *   time     : ¥Õ¥§¡¼¥É½ªÎ»»þ´Ö
- *   ed_vol   : ¥Õ¥§¡¼¥ÉºÇ½ª¥Ü¥ê¥å¡¼¥à
- *   stop     : ¥Õ¥§¡¼¥É½ªÎ»»þ¤ËºÆÀ¸¤ò½ªÎ»¤¹¤ë¤«¤É¤¦¤« (1:»ß¤á¤ë, 0:»ß¤á¤Ê¤¤)
+ * æ–°ã—ã„ãƒ•ã‚§ãƒ¼ãƒ‰ç”¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ
+ *   dev      : å¯¾è±¡ãƒŸã‚­ã‚µãƒ¼ device (MASTER/CD/MIDI/PCM)
+ *   subdev   : PCM device ã®å ´åˆã€subdevice ç•ªå· (0-130)
+ *   time     : ãƒ•ã‚§ãƒ¼ãƒ‰çµ‚äº†æ™‚é–“
+ *   ed_vol   : ãƒ•ã‚§ãƒ¼ãƒ‰æœ€çµ‚ãƒœãƒªãƒ¥ãƒ¼ãƒ 
+ *   stop     : ãƒ•ã‚§ãƒ¼ãƒ‰çµ‚äº†æ™‚ã«å†ç”Ÿã‚’çµ‚äº†ã™ã‚‹ã‹ã©ã†ã‹ (1:æ­¢ã‚ã‚‹, 0:æ­¢ã‚ãªã„)
  */
 int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
 	fadeobj_t *obj = g_new0(fadeobj_t, 1);
@@ -117,7 +117,7 @@ int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
 	obj->subdev = subdev;
 	
 	obj->st_time = get_high_counter(SYSTEMCOUNTER_FADE);
-	obj->ed_time = obj->st_time + time / 10; /* fade counter ¤Ï 10msec */
+	obj->ed_time = obj->st_time + time / 10; /* fade counter ã¯ 10msec */
 	
 	obj->ed_vol = ed_vol;
 	obj->stop_at_end = (stop == 1 ? TRUE : FALSE);
@@ -144,8 +144,8 @@ int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
 		
 		// set start volume
 		if (prv.pcm[subdev] == NULL) {
-			// null ¤Ë¤Ê¤ë¤Ã¤Æ¤³¤È¤Ï start¤·¤Æ¤¤¤Ê¤¤ pcm ¤ò stop
-			// ¤·¤è¤¦¤È¤·¤Æ¤¤¤ë¤ó¤À¤±¤É¡¢¤â¤Ã¤ÈÁ°¤ÇÃÆ¤¯¤Ù¤­¤«¡©
+			// null ã«ãªã‚‹ã£ã¦ã“ã¨ã¯ startã—ã¦ã„ãªã„ pcm ã‚’ stop
+			// ã—ã‚ˆã†ã¨ã—ã¦ã„ã‚‹ã‚“ã ã‘ã©ã€ã‚‚ã£ã¨å‰ã§å¼¾ãã¹ãã‹ï¼Ÿ
 			obj->st_vol = -1;
 		} else {
 			obj->st_vol = prv.pcm[subdev]->vollv;
@@ -158,8 +158,8 @@ int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
 }
 
 /*
-  »ØÄê¤Î¥Õ¥§¡¼¥É¥ª¥Ö¥¸¥§¥¯¥È¤òºï½ü
-    obj: ¾Ã¤¹¥ª¥Ö¥¸¥§¥¯¥È
+  æŒ‡å®šã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤
+    obj: æ¶ˆã™ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 */
 static int musfade_free(fadeobj_t *obj) {
 	prv.fadelist = g_list_remove(prv.fadelist, (gpointer)obj);
@@ -168,7 +168,7 @@ static int musfade_free(fadeobj_t *obj) {
 }
 
 /*
-  ¥Õ¥§¡¼¥ÉÄä»ß
+  ãƒ•ã‚§ãƒ¼ãƒ‰åœæ­¢
     dev:    main device
     subdev: sub device
 */
@@ -190,7 +190,7 @@ int musfade_stop(int dev, int subdev) {
 }
 
 /*
-  ¥Õ¥§¡¼¥ÉÃæ¤«¤É¤¦¤«
+  ãƒ•ã‚§ãƒ¼ãƒ‰ä¸­ã‹ã©ã†ã‹
     dev:    main device
     subdev: sub device
 
@@ -214,8 +214,8 @@ boolean musfade_getstate(int dev, int subdev) {
 }
 
 /*
-  »ØÄê¤Î¥Ç¥Ð¥¤¥¹¤Î¥²¡¼¥àÆâ¤Ç¤Î¥Ü¥ê¥å¡¼¥à¤Î¼èÆÀ
-    dev: ¼èÆÀ¤¹¤ë¥Ç¥Ð¥¤¥¹
+  æŒ‡å®šã®ãƒ‡ãƒã‚¤ã‚¹ã®ã‚²ãƒ¼ãƒ å†…ã§ã®ãƒœãƒªãƒ¥ãƒ¼ãƒ ã®å–å¾—
+    dev: å–å¾—ã™ã‚‹ãƒ‡ãƒã‚¤ã‚¹
 */
 int musfade_getvol(int dev) {
 	switch(dev) {
@@ -233,9 +233,9 @@ int musfade_getvol(int dev) {
 }
 
 /*
-  »ØÄê¤Î¥Ç¥Ð¥¤¥¹¤Î¥²¡¼¥àÆâ¤Ç¤Î¥Ü¥ê¥å¡¼¥à¤ÎÀßÄê
-    dev: ÀßÄê¤¹¤ë¥Ç¥Ð¥¤¥¹
-    val: ÀßÄê¤¹¤ëÃÍ
+  æŒ‡å®šã®ãƒ‡ãƒã‚¤ã‚¹ã®ã‚²ãƒ¼ãƒ å†…ã§ã®ãƒœãƒªãƒ¥ãƒ¼ãƒ ã®è¨­å®š
+    dev: è¨­å®šã™ã‚‹ãƒ‡ãƒã‚¤ã‚¹
+    val: è¨­å®šã™ã‚‹å€¤
 */
 static int musfade_setvol(int dev, int lv) {
 	switch(dev) {
@@ -298,29 +298,29 @@ static int musfade_stop_playback(int dev, int subdev) {
 }
 
 static void fade_calc_time(fadeobj_t *obj) {
-	/* ¸½ºß¤Î»þ¹ï¤ò¼èÆÀ */
+	/* ç¾åœ¨ã®æ™‚åˆ»ã‚’å–å¾— */
 	// usleep(1);
 	obj->cur_time = get_high_counter(SYSTEMCOUNTER_FADE);
 
 	obj->pre_vol = obj->cur_vol;
 	
-	/* ½ªÎ»»þ¹ï¤¬²á¤®¤Æ¤¤¤¿¤éºÇ½ª¥Ü¥ê¥å¡¼¥à¤Ø */
+	/* çµ‚äº†æ™‚åˆ»ãŒéŽãŽã¦ã„ãŸã‚‰æœ€çµ‚ãƒœãƒªãƒ¥ãƒ¼ãƒ ã¸ */
 	if (obj->cur_time > obj->ed_time) {
 		obj->cur_vol = obj->ed_vol;
 		goto out;
 	}
 	
-	/* ¥Õ¥§¡¼¥É»þ´Ö¤¬£°¤Î¾ì¹ç¤âºÇ½ª¥Ü¥ê¥å¡¼¥à¤Ø */
+	/* ãƒ•ã‚§ãƒ¼ãƒ‰æ™‚é–“ãŒï¼ã®å ´åˆã‚‚æœ€çµ‚ãƒœãƒªãƒ¥ãƒ¼ãƒ ã¸ */
 	if (obj->ed_time == obj->st_time) {
 		obj->cur_vol = obj->ed_vol;
 		goto out;
 	}
 	
-	/* Àþ·Á¤Ç¥Ü¥ê¥å¡¼¥àÀ©¸æ */
+	/* ç·šå½¢ã§ãƒœãƒªãƒ¥ãƒ¼ãƒ åˆ¶å¾¡ */
 	obj->cur_vol  = ((obj->ed_vol - obj->st_vol) * (obj->cur_time - obj->st_time) / ( obj->ed_time - obj->st_time)) + obj->st_vol;
 	
  out:
-	/* prv. ÎÎ°è¤ØÈ¿±Ç */
+	/* prv. é ˜åŸŸã¸åæ˜  */
 	if (obj->subdev == 0) {
 		musfade_setvol(obj->mdev, obj->cur_vol);
 	}
@@ -334,18 +334,18 @@ int musfade_cb() {
 		obj = (fadeobj_t *)node->data;
 		if (obj == NULL) continue;
 		
-		// ed_vol = -1 : ¤¹¤°¤Ë½ªÎ»
+		// ed_vol = -1 : ã™ãã«çµ‚äº†
 		if (obj->ed_vol == -1) {
 			musfade_stop_playback(obj->mdev, obj->subdev);
 			musfade_free(obj);
 			continue;
 		}
 		
-		// ¥Õ¥§¡¼¥É»þ´Ö·×»»
+		// ãƒ•ã‚§ãƒ¼ãƒ‰æ™‚é–“è¨ˆç®—
 		fade_calc_time(obj);
 		
 		if (obj->cur_vol != obj->pre_vol) {
-			// set Æâ¤Ç¤Ï¸½ºß¤Î volume ¤Î obj->cur_vol % ¤Ç½ÐÎÏ
+			// set å†…ã§ã¯ç¾åœ¨ã® volume ã® obj->cur_vol % ã§å‡ºåŠ›
 			obj->setvol(obj->mdev, obj->subdev, obj->cur_vol);
 		}
 		

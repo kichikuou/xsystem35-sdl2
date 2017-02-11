@@ -1,5 +1,5 @@
 /*
- * sprite_anime.c: ¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥ÈÆÃÍ­¤Î½èÍı
+ * sprite_anime.c: ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç‰¹æœ‰ã®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -37,23 +37,23 @@ static int eventCB_ANIM(sprite_t *sp, agsevent_t *e);
 static void cb_remove(sprite_t *sp);
 
 
-// ¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 static int eventCB_ANIM(sprite_t *sp, agsevent_t *e) {
 	int now;
 	
-	// ¥³¡¼¥ë¥Ğ¥Ã¥¯¤¬¥¿¥¤¥Ş¥¤¥Ù¥ó¥È¤«¤É¤¦¤«
+	// ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ãŒã‚¿ã‚¤ãƒã‚¤ãƒ™ãƒ³ãƒˆã‹ã©ã†ã‹
 	if (e->type != AGSEVENT_TIMER) return 0;
 	
-	// ¸½ºß»ş¹ï¤Î¼èÆÀ
+	// ç¾åœ¨æ™‚åˆ»ã®å–å¾—
 	now = get_high_counter(SYSTEMCOUNTER_MSEC);
 	
-	// »ØÄê»ş´Ö¤Ş¤Ç¥¹¥­¥Ã¥×
+	// æŒ‡å®šæ™‚é–“ã¾ã§ã‚¹ã‚­ãƒƒãƒ—
 	if ((now - sp->u.anime.starttime) < sp->u.anime.interval) return 0;
 	
-	// ¿·¤·¤¤»ş´Ö¤òÊİÂ¸
+	// æ–°ã—ã„æ™‚é–“ã‚’ä¿å­˜
 	sp->u.anime.starttime = now;
 	
-	// ¼¡¤ËÉ½¼¨¤¹¤ëCG¤ò¥»¥Ã¥È
+	// æ¬¡ã«è¡¨ç¤ºã™ã‚‹CGã‚’ã‚»ãƒƒãƒˆ
 	switch(sp->u.anime.tick % sp->u.anime.npat) {
 	case 0:
 		sp->curcg = sp->cg1; break;
@@ -65,7 +65,7 @@ static int eventCB_ANIM(sprite_t *sp, agsevent_t *e) {
 	
 	// WARNING("anime update\n");
 	
-	// ¥«¥¦¥ó¥È¥¢¥Ã¥×
+	// ã‚«ã‚¦ãƒ³ãƒˆã‚¢ãƒƒãƒ—
 	sp->u.anime.tick++;
 	
 	sp_updateme(sp);
@@ -73,23 +73,23 @@ static int eventCB_ANIM(sprite_t *sp, agsevent_t *e) {
 	return 1;
 }
 
-// ¥¹¥×¥é¥¤¥Èºï½ü»ş¤Î½èÍı
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå‰Šé™¤æ™‚ã®å‡¦ç†
 static void cb_remove(sprite_t *sp) {
 	spev_remove_teventlistener(sp);
 }
 
 /*
-  sp_new ¤Î»ş¤Ë¥¹¥×¥é¥¤¥È¤Î¼ïÎàËè¤Î½é´ü²½
-  @param sp: ½é´ü²½¤¹¤ë¥¹¥×¥é¥¤¥È
+  sp_new ã®æ™‚ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç¨®é¡æ¯ã®åˆæœŸåŒ–
+  @param sp: åˆæœŸåŒ–ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 int sp_anime_setup(sprite_t *sp) {
 	int n = 0;
 	
-	sp->u.anime.interval = 500; // ¥Ç¥Õ¥©¥ë¥È¤Î´Ö³Ö 0.5ÉÃ
-	sp->u.anime.starttime = get_high_counter(SYSTEMCOUNTER_MSEC); // ³«»Ï»ş¹ï
-	sp->u.anime.tick = 0;      // ¥«¥¦¥ó¥¿½é´ü²½
+	sp->u.anime.interval = 500; // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®é–“éš” 0.5ç§’
+	sp->u.anime.starttime = get_high_counter(SYSTEMCOUNTER_MSEC); // é–‹å§‹æ™‚åˆ»
+	sp->u.anime.tick = 0;      // ã‚«ã‚¦ãƒ³ã‚¿åˆæœŸåŒ–
 	
-	// ¥¢¥Ë¥á¥Ñ¥¿¡¼¥ó¤Ï¤¤¤¯¤Ä¤¢¤ë¤«
+	// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ã¯ã„ãã¤ã‚ã‚‹ã‹
 	if (sp->cg1) n++;
 	if (sp->cg2) n++;
 	if (sp->cg3) n++;

@@ -1,5 +1,5 @@
 /*
- * sprite_eupdate.c: ¸ú²Ì¤Ä¤­¹¹¿·
+ * sprite_eupdate.c: åŠ¹æœã¤ãæ›´æ–°
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -78,7 +78,7 @@ static void ec_dummy_cb(surface_t *sfsrc, surface_t *sfdst) {
 	WARNING("NOT IMPLEMENTED\n");
 }
 
-// ¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec1_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep;
 	
@@ -95,7 +95,7 @@ static void ec1_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// ¤¹¤À¤ìÍî¤Á
+// ã™ã ã‚Œè½ã¡
 static void ec7_cb(surface_t *sfsrc, surface_t *sfdst) {
 #define EC7DELTA 16
 	int curstep, maxstep = sfsrc->height / EC7DELTA + EC7DELTA;
@@ -123,7 +123,7 @@ static void ec7_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ags_updateFull();
 }
 
-// ¤¹¤À¤ìº¸->±¦
+// ã™ã ã‚Œå·¦->å³
 static void ec8_cb(surface_t *sfsrc, surface_t *sfdst) {
 #define EC8DELTA 16
 	int curstep, maxstep = sfsrc->width / EC8DELTA + EC8DELTA;
@@ -151,7 +151,7 @@ static void ec8_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ags_updateFull();
 }
 
-// ¤¹¤À¤ìÍî¤Á¡õº¸->±¦
+// ã™ã ã‚Œè½ã¡ï¼†å·¦->å³
 static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
 #define EC9DELTA 16
 	int curstep, maxstep; 
@@ -188,7 +188,7 @@ static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ags_updateFull();
 }
 
-// ¾å->²¼¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ä¸Š->ä¸‹ã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec12_cb(surface_t *src, surface_t *dst) {
 #define EC12DELTA 256
 	int curstep, maxstep = src->height + EC12DELTA;
@@ -216,7 +216,7 @@ static void ec12_cb(surface_t *src, surface_t *dst) {
 	ecp.oldstep = st_i;
 }
 
-// ²¼->¾å¥¯¥í¥¹¥Õ¥§¡¼¥É
+// ä¸‹->ä¸Šã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 static void ec13_cb(surface_t *src, surface_t *dst) {
 #define EC13DELTA 256
 	int curstep, maxstep = src->height + EC12DELTA;
@@ -247,7 +247,7 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 	ecp.oldstep = st_i;
 }
 
-// ¸ŞçêÀ± (Æâ->³°)
+// äº”èŠ’æ˜Ÿ (å†…->å¤–)
 static void ec14_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -260,7 +260,7 @@ static void ec14_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// ¸ŞçêÀ± (³°->Æâ)
+// äº”èŠ’æ˜Ÿ (å¤–->å†…)
 static void ec15_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -273,7 +273,7 @@ static void ec15_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// Ï»çêÀ± (Æâ->³°)
+// å…­èŠ’æ˜Ÿ (å†…->å¤–)
 static void ec16_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -286,7 +286,7 @@ static void ec16_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// Ï»çêÀ± (³°->Æâ)
+// å…­èŠ’æ˜Ÿ (å¤–->å†…)
 static void ec17_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep;
 	maxstep = 256;
@@ -299,7 +299,7 @@ static void ec17_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// ¥Õ¥§¡¼¥É¥¤¥ó
+// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
 static void ec_fadein_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep;
 	
@@ -328,7 +328,7 @@ static void ec_fadeout_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ecp.oldstep = curstep;
 }
 
-// ¥Û¥ï¥¤¥È¥¤¥ó
+// ãƒ›ãƒ¯ã‚¤ãƒˆã‚¤ãƒ³
 static void ec_whitein_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep;
 	
@@ -360,24 +360,24 @@ static void ec_whiteout_cb(surface_t *sfsrc, surface_t *sfdst) {
 
 
 /*
-  ¸ú²Ì¤Ä¤­²èÌÌ¹¹¿·
-  @param type: ¸ú²Ì¤Î¼ïÎà
-  @param time: ¼Â¹Ô»ş´Ö(msec)
-  @param cancel: ¥­¡¼È´¤±(0:¤Ê¤·, 1:¤¢¤ê)
+  åŠ¹æœã¤ãç”»é¢æ›´æ–°
+  @param type: åŠ¹æœã®ç¨®é¡
+  @param time: å®Ÿè¡Œæ™‚é–“(msec)
+  @param cancel: ã‚­ãƒ¼æŠœã‘(0:ãªã—, 1:ã‚ã‚Š)
 */
 int sp_eupdate(int type, int time, int cancel) {
 	surface_t *sfsrc, *sfdst;
 	int key;
 	entrypoint *cb;
 
-	// ¸½ºß¤Î sf0 ¤ò¥»¡¼¥Ö
+	// ç¾åœ¨ã® sf0 ã‚’ã‚»ãƒ¼ãƒ–
 	sfsrc = sf_dup(sf0);
 	
 	sp_update_all(FALSE);
 	
 	sfdst = sf_dup(sf0);
 	
-	sf_copyall(sf0, sfsrc); // Á´Éô¤Î¸ú²Ì¥¿¥¤¥×¤Ë¤³¤Î½èÍı¤ÏÍ×¤é¤Ê¤¤¤ó¤À¤±¤É
+	sf_copyall(sf0, sfsrc); // å…¨éƒ¨ã®åŠ¹æœã‚¿ã‚¤ãƒ—ã«ã“ã®å‡¦ç†ã¯è¦ã‚‰ãªã„ã‚“ã ã‘ã©
 
 	ecp.sttime = ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
 	ecp.edtime = ecp.curtime + time;
@@ -387,28 +387,28 @@ int sp_eupdate(int type, int time, int cancel) {
 	case 10:
 		cb = ec_dummy_cb;
 		break;
-	case 101: // ¥¯¥í¥¹¥Õ¥§¡¼¥É
+	case 101: // ã‚¯ãƒ­ã‚¹ãƒ•ã‚§ãƒ¼ãƒ‰
 		cb = ec1_cb;
 		break;
-	case 102: // ¥Õ¥§¡¼¥É¥¢¥¦¥È
+	case 102: // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
 		cb = ec_fadeout_cb;
 		break;
-	case 103: // ¥Õ¥§¡¼¥É¥¤¥ó
+	case 103: // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
 		cb = ec_fadein_cb;
 		break;
-	case 104: // ¥Û¥ï¥¤¥È¥¢¥¦¥È
+	case 104: // ãƒ›ãƒ¯ã‚¤ãƒˆã‚¢ã‚¦ãƒˆ
 		cb = ec_whiteout_cb;
 		break;
-	case 105: // ¥Û¥ï¥¤¥È¥¤¥ó
+	case 105: // ãƒ›ãƒ¯ã‚¤ãƒˆã‚¤ãƒ³
 		cb = ec_whitein_cb;
 		break;
-	case 107: // ÎüÍî¤Á
+	case 107: // ç°¾è½ã¡
 		cb = ec7_cb;
 		break;
-	case 108: // º¸->±¦¤¹¤À¤ì
+	case 108: // å·¦->å³ã™ã ã‚Œ
 		cb = ec8_cb;
 		break;
-	case 111: // Àş·Á¤Ü¤«¤·
+	case 111: // ç·šå½¢ã¼ã‹ã—
 		ec11_prepare(sfsrc, sfdst);
 		cb = ec11_cb;
 		break;

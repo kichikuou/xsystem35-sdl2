@@ -28,15 +28,15 @@
 #include "cdrom.h"
 
 struct _cdobj {
-	int st; // ¥ª¥Ö¥¸¥§¥¯¥È¤ÎÁ«°Ü¾õÂÖ
+	int st; // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é·ç§»çŠ¶æ…‹
 
-	int track; // ±éÁÕ¥È¥é¥Ã¥¯
-	int loop;  // ¤¯¤ê¤«¤¨¤·¿ô (0¤Î¾ì¹ç¤ÏÌµ¸Â)
-	int cnt;   // ¼Âºİ¤Ë·«¤êÊÖ¤·¤¿¿ô
+	int track; // æ¼”å¥ãƒˆãƒ©ãƒƒã‚¯
+	int loop;  // ãã‚Šã‹ãˆã—æ•° (0ã®å ´åˆã¯ç„¡é™)
+	int cnt;   // å®Ÿéš›ã«ç¹°ã‚Šè¿”ã—ãŸæ•°
 	
-	boolean in_play; // ±éÁÕÃæ¡©
+	boolean in_play; // æ¼”å¥ä¸­ï¼Ÿ
         
-	cd_time time; // ±éÁÕ°ÌÃÖ
+	cd_time time; // æ¼”å¥ä½ç½®
 	
 	cdromdevice_t *dev;
 };

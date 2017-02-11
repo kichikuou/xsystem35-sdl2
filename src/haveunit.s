@@ -4,18 +4,18 @@
 ;	modified by Keiichi SAKAI, URURI, Hash
 
 ;	99/07/29
-;	99/09/06	�ե饰�ɲ�
-;	99/09/07	SSE�ν������̤ˤ���
-;	99/09/29	Cx586�к�
-;	99/11/10	Cxrix�к�
+;	99/09/06	フラグ追加
+;	99/09/07	SSEの処理を別にする
+;	99/09/29	Cx586対策
+;	99/11/10	Cxrix対策
 
 ;	int haveUNIT(void);
 
-;	486̤����CPU�ޤ���FPU����ܤ��Ƥ��ʤ����0
-;	����ʳ��ϼ����ͤ�������
-;	PIII�Ǥϴݤ������ͼθ����⡼�ɤˤ���(�餷��)
+;	486未満のCPUまたはFPUを搭載していなければ0
+;	それ以外は次の値の論理和
+;	PIIIでは丸め誤差を四捨五入モードにする(らしい)
 
-;	haveunit.h�Ȥ�����������
+;	haveunit.hとの整合性注意
 
 %include "nasm.h"
 
@@ -24,21 +24,21 @@ tMMX	equ	(1<<1)
 t3DN	equ	(1<<2)
 tSSE	equ	(1<<3)
 tCMOV	equ	(1<<4)
-tE3DN	equ	(1<<5)	;/* Athlon�� (extend 3D Now!)*/
+tE3DN	equ	(1<<5)	;/* Athlon用 (extend 3D Now!)*/
 tEMMX   equ	(1<<6)  ;/* EMMX=E3DNow!_INT=SSE_INT */
 
-tSPC1	equ	(1<<16)	;/* ���̤ʥ����å� */
-tSPC2	equ	(1<<17)	;/* ���ӤϷ�ޤäƤʤ� */
+tSPC1	equ	(1<<16)	;/* 特別なスイッチ */
+tSPC2	equ	(1<<17)	;/* 用途は決まってない */
 
 tINTEL	equ	(1<<8)
 tAMD	equ	(1<<9)
 tCYRIX	equ	(1<<10)
 tIDT	equ	(1<<11)
-tUNKNOWN	equ	(1<<15)	;�٥������ʬ����ʤ�
+tUNKNOWN	equ	(1<<15)	;ベンダーが分からない
 
-tFAMILY4	equ	(1<<20)	;/* 486 ���λ��٥����Ƚ������Ƥˤʤ�ʤ� */
+tFAMILY4	equ	(1<<20)	;/* 486 この時ベンダー判定は当てにならない */
 tFAMILY5	equ	(1<<21)	;/* 586 (P5, P5-MMX, K6, K6-2, K6-III) */
-tFAMILY6	equ	(1<<22)	;/* 686�ʹ� P-Pro, P-II, P-III, Athlon */
+tFAMILY6	equ	(1<<22)	;/* 686以降 P-Pro, P-II, P-III, Athlon */
 
 		globaldef	haveUNIT
 		globaldef	setPIII_round
@@ -58,7 +58,7 @@ haveUNIT:
 		call	near haveFPU
 		jnz		near .Lexit
 		or		esi,tFPU
-		pushfd						;flag��¸
+		pushfd						;flag保存
 		pushfd
 		pop		eax					;eax=flag
 		or		eax,ACflag			;eax=flag|ACflag
@@ -66,11 +66,11 @@ haveUNIT:
 		popfd						;flag=eax
 		pushfd
 		pop		eax					;eax=flag
-		popfd						;flag����
-		test	eax,ACflag			;ACflag���Ѳ���������
+		popfd						;flag復元
+		test	eax,ACflag			;ACflagは変化したか？
 		jz		near .Lexit
-;486�ʹ�
-		pushfd						;flag��¸
+;486以降
+		pushfd						;flag保存
 		pushfd
 		pop		eax					;eax=flag
 		or		eax,IDflag			;eax=flag|IDflag
@@ -78,13 +78,13 @@ haveUNIT:
 		popfd						;flag=eax
 		pushfd
 		pop		eax					;eax=flag
-		popfd						;flag����
+		popfd						;flag復元
 		test	eax,IDflag
 ;		jz		short .Lexit
 		jnz		.L586
 
 %if 1
-	;Cyrix 486CPU check Cyrix �� HP �ˤ��ä���� by Hash
+	;Cyrix 486CPU check Cyrix の HP にあったやつ by Hash
 
         xor   ax, ax         ; clear ax
         sahf                 ; clear flags, bit 1 is always 1 in flags
@@ -131,12 +131,12 @@ haveUNIT:
 
 .L586:
 
-;cpuid �� eax,ebx,ecx,edx���˲�����Τ����ա�����
+;cpuid は eax,ebx,ecx,edxを破壊するので注意！！！
 
 		xor		eax,eax
 		cpuid
 ;		cmp		ecx,"letn"
-		cmp		ecx,"ntel"	;�����NASM��ȿ�Ф����֤�����
+		cmp		ecx,"ntel"	;うわ〜NASMと反対に配置するんだ
 		jne		.F00
 		or		esi,tINTEL
 		jmp		.F09
@@ -179,7 +179,7 @@ haveUNIT:
 		or		esi,tFAMILY6
 		jmp		.F19
 .F12:
-		or		esi,tFAMILY6	; 7�ʾ��6�ȸ��ʤ�
+		or		esi,tFAMILY6	; 7以上は6と見なす
 .F19:
 
 		;for AMD, IDT
@@ -191,11 +191,11 @@ haveUNIT:
 .F20:
 		test	edx,(1 << 15)	;CMOVcc
 		jz		.F21
-;		test	edx,(1 << 16)	;FCMOVcc ;K7�����ѹ� by URURI
+;		test	edx,(1 << 16)	;FCMOVcc ;K7から変更 by URURI
 ;		jz		.F21
 		or		esi,tCMOV
 .F21:
-		test	edx,(1 << 30)	;��ĥ 3D Now!
+		test	edx,(1 << 30)	;拡張 3D Now!
 		jz		.F22
 %ifdef USE_E3DN
 		or		esi,tE3DN
@@ -205,7 +205,7 @@ haveUNIT:
 		jz		.F23
 		or		esi,tEMMX
 .F23:
-	;Intel��
+	;Intel系
 		mov		eax,1
 		cpuid
 		test	edx,(1 << 23)
@@ -229,7 +229,7 @@ haveUNIT:
 		ret
 
 ;	  in:none
-;	 out:ZF FPU����=1, �ʤ�=0
+;	 out:ZF FPUあり=1, なし=0
 ;	dest:eax
 
 		align	16
@@ -249,7 +249,7 @@ haveFPU:
 		ret
 
 setPIII_round:
-		;P-III��SSE��μ¤˻ͼθ����⡼�ɤ�
+		;P-IIIのSSEを確実に四捨五入モードに
 ;		mov		eax,0x1f80	; default mode
 		mov		eax,0x9f80	; flush to ZERO mode
 		push	eax

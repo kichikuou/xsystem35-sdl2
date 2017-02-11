@@ -46,7 +46,7 @@
 static boolean xcore_getEvent(void);
 static int check_button(void);
 
-/* pointer ¤Î¾õÂÖ */
+/* pointer ã®çŠ¶æ…‹ */
 static int mousex, mousey;
 
 static boolean xcore_getEvent(void) {
@@ -212,7 +212,7 @@ int Xcore_keywait(int msec, boolean cancel) {
 	return key;
 }
 
-/* ¥­¡¼¾ğÊó¤Î¼èÆÀ */
+/* ã‚­ãƒ¼æƒ…å ±ã®å–å¾— */
 int Xcore_getKeyInfo() {
 	xcore_getEvent();
 	
@@ -226,7 +226,7 @@ int Xcore_getKeyInfo() {
 		(RawKeyInfo[KEY_TAB]   << 7));
 }
 
-/* mouse ¾ğÊó¤Î¼èÆÀ */
+/* mouse æƒ…å ±ã®å–å¾— */
 int Xcore_getMouseInfo(MyPoint *p) {
 	xcore_getEvent();
 	
@@ -244,7 +244,7 @@ int Xcore_getMouseInfo(MyPoint *p) {
 	return check_button();
 }
 
-/* mouse ¤Î¥Ü¥¿¥ó¾õÂÖ¤Î¼èÆÀ */
+/* mouse ã®ãƒœã‚¿ãƒ³çŠ¶æ…‹ã®å–å¾— */
 static int check_button(void) {
 	int m1, m2;
 	

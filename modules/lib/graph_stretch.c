@@ -1,4 +1,4 @@
-// ³ÈÂç¡¦½Ì¾®
+// æ‹¡å¤§ãƒ»ç¸®å°
 
 #include <string.h>
 #include <glib.h>
@@ -23,10 +23,10 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
 	
-	// src width ¤È dst width ¤¬Æ±¤¸¤È¤­¤ËÌäÂê¤¬¤¢¤ë¤Î¤Ç+1
+	// src width ã¨ dst width ãŒåŒã˜ã¨ãã«å•é¡ŒãŒã‚ã‚‹ã®ã§+1
 	row = g_new0(int, dw+1);
-	// 1¤ª¤ª¤­¤¯¤·¤Æ½é´ü²½¤·¤Ê¤¤¤È col[dw-1]¤Ècol[dw]¤¬Æ±¤¸¤Ë¤Ê¤ë
-	// ²ÄÇ½À­¤¬¤¢¤ë¡£
+	// 1ãŠãŠããã—ã¦åˆæœŸåŒ–ã—ãªã„ã¨ col[dw-1]ã¨col[dw]ãŒåŒã˜ã«ãªã‚‹
+	// å¯èƒ½æ€§ãŒã‚ã‚‹ã€‚
 	col = g_new0(int, dh+1);
 	
 	for (yd = 0.0, y = 0; y < dh; y++) {

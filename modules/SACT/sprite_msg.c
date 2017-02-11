@@ -1,5 +1,5 @@
 /*
- * sprite_msg.c: ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥È¤Î½èÍı
+ * sprite_msg.c: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -41,7 +41,7 @@
 #include "sactlog.h"
 #include "eucsjis.h"
 
-// ¥á¥Ã¥»¡¼¥¸¥­¡¼ÂÔ¤Á¤Î»ş¡¢É½¼¨¤¹¤ë¥¢¥Ë¥á¡¼¥·¥ç¥ó¤Ë´Ø¤¹¤ë¾ğÊó
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚­ãƒ¼å¾…ã¡ã®æ™‚ã€è¡¨ç¤ºã™ã‚‹ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã«é–¢ã™ã‚‹æƒ…å ±
 struct markinfo {
 	sprite_t *sp;
 	cginfo_t *cg;
@@ -60,13 +60,13 @@ static void sactlog_newline();
 static void set_align(char *msg, sprite_t *sp, int wSize, int wAlign);
 
 
-// Ê¸»úÎóÃÖ¤­´¹¤¨ÍÑ (É½¼¨»ş¤Ëon-the-fly¤ÇÊÑ´¹¤·¤ÆÉ½¼¨)
+// æ–‡å­—åˆ—ç½®ãæ›ãˆç”¨ (è¡¨ç¤ºæ™‚ã«on-the-flyã§å¤‰æ›ã—ã¦è¡¨ç¤º)
 #define REPLACEBUFSIZE MSGBUFMAX+100
 static char repbuf[2][REPLACEBUFSIZE];
 static char *replacesrc;
 static char *replacedst;
 
-// »ØÄê¤ÎÈÖ¹æ¤Î¥¹¥×¥é¥¤¥È¤¬¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥È¤«¤É¤¦¤«¤ò¥Á¥§¥Ã¥¯
+// æŒ‡å®šã®ç•ªå·ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯
 static boolean is_messagesprite(int wNum) {
 	// check sprite number is sane
 	if (wNum >= (SPRITEMAX -1) || wNum <= 0) return FALSE;
@@ -80,7 +80,7 @@ static boolean is_messagesprite(int wNum) {
 	return TRUE;
 }
 
-// Ê¸»úÎó¤ÎÃÖ¤­´¹¤¨½èÍı
+// æ–‡å­—åˆ—ã®ç½®ãæ›ãˆå‡¦ç†
 static void replacestr_cb(gpointer data, gpointer userdata) {
 	strexchange_t *ex = (strexchange_t *)data;
 	char *start, *next, *out;
@@ -104,7 +104,7 @@ static void replacestr_cb(gpointer data, gpointer userdata) {
 	replacedst[0] = '\0';
 }
 
-// Ê¸»úÎó¤ÎÃÖ¤­´¹¤¨
+// æ–‡å­—åˆ—ã®ç½®ãæ›ãˆ
 static char *replacestr(char *msg) {
 	if (sact.strreplace == NULL) return msg;
 	
@@ -118,7 +118,7 @@ static char *replacestr(char *msg) {
 	return (repbuf[0][0] == '\0') ? repbuf[1] : repbuf[0];
 }
 
-// ¥¢¥Ë¥á¥Ñ¥¿¡¼¥ó¤ÎÉÁ²è
+// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ã®æç”»
 static void update_mark(sprite_t *sp, cginfo_t *cg) {
 	boolean show = sp->show;
 	cginfo_t *curcg = sp->curcg;
@@ -133,7 +133,7 @@ static void update_mark(sprite_t *sp, cginfo_t *cg) {
 	sp->curcg = curcg;
 }
 
-// ¥¢¥Ë¥á¥Ñ¥¿¡¼¥ó¤Î½é´ü²½
+// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ã®åˆæœŸåŒ–
 static int setupmark(int wNum1, int wNum2, struct markinfo *minfo) {
 	sprite_t *sp1, *sp2;
 	int i = 0;
@@ -184,10 +184,10 @@ static int setupmark(int wNum1, int wNum2, struct markinfo *minfo) {
 }
 
 /*
-  ¥á¥Ã¥»¡¼¥¸¤ò¥Ğ¥Ã¥Õ¥¡¤ËÄÉ²Ã
-    nact.c¤Î¥á¥Ã¥»¡¼¥¸¡¦¥³¥Ş¥ó¥É²òÀÏ¥ë¡¼¥Á¥ó¤«¤é¸Æ¤Ğ¤ì¤ë
+  ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ãƒãƒƒãƒ•ã‚¡ã«è¿½åŠ 
+    nact.cã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ»ã‚³ãƒãƒ³ãƒ‰è§£æãƒ«ãƒ¼ãƒãƒ³ã‹ã‚‰å‘¼ã°ã‚Œã‚‹
     
-  @param msg: ÄÉ²Ã¤¹¤ëÊ¸»úÎó
+  @param msg: è¿½åŠ ã™ã‚‹æ–‡å­—åˆ—
 */
 void smsg_add(char *msg) {
 	int len;
@@ -211,11 +211,11 @@ void smsg_add(char *msg) {
 }
 
 /*
-  ²ş¹Ô
-    ²ş¹Ô¤Ï¥á¥Ã¥»¡¼¥¸¾ğÊóÆâ¤Ë¤Ä¤Ã¤³¤ß¡¢½ĞÎÏ»ş¤Ë²ş¹ÔÉı¤ò¼è¤ê½Ğ¤·¤Æ²ş¹Ô
+  æ”¹è¡Œ
+    æ”¹è¡Œã¯ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æƒ…å ±å†…ã«ã¤ã£ã“ã¿ã€å‡ºåŠ›æ™‚ã«æ”¹è¡Œå¹…ã‚’å–ã‚Šå‡ºã—ã¦æ”¹è¡Œ
 
-  @param wNum: ²ş¹Ô¤¹¤ë¥¹¥×¥é¥¤¥ÈÈÖ¹æ
-  @param size: ²ş¹ÔÉı
+  @param wNum: æ”¹è¡Œã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+  @param size: æ”¹è¡Œå¹…
 */
 void smsg_newline(int wNum, int size) {
 	BYTE buf[3];
@@ -229,48 +229,48 @@ void smsg_newline(int wNum, int size) {
 }
 
 /*
-  (¥ë¥Ó¤Ä¤­)¥á¥Ã¥»¡¼¥¸¤Î½ĞÎÏ
+  (ãƒ«ãƒ“ã¤ã)ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®å‡ºåŠ›
 
-  @param wSpriteNumber: ¥á¥Ã¥»¡¼¥¸¤òÉ½¼¨¤¹¤ë¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥ÈÈÖ¹æ
-  @param wSize: ¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ
-  @param wColorR: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Red)
-  @param wColorG: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Green)
-  @param wColorB: ¥á¥Ã¥»¡¼¥¸¤Î¿§(Blue)
-  @param wFont: ¥á¥Ã¥»¡¼¥¸¤Î¥Õ¥©¥ó¥È(0:¥´¥·¥Ã¥¯, 1:ÌÀÄ«)
-  @param wSpeed: ¥á¥Ã¥»¡¼¥¸¤ÎÉ½¼¨Â®ÅÙ (msec)
-  @param wLineSpace: ¹Ô´Ö¥¹¥Ú¡¼¥¹
-  @param wAlign: ¹Ô¤½¤í¤¨
-  @param wRSize: ¥ë¥Ó¥Õ¥©¥ó¥È¥µ¥¤¥º
-  @param wRFont: ¥ë¥Ó¥Õ¥©¥ó¥È
-  @param wRLineSpace: ¥ë¥Ó¤ÈËÜÊ¸¤ÎÊ¸»ú´Ö³Ö
+  @param wSpriteNumber: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+  @param wSize: ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã•
+  @param wColorR: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Red)
+  @param wColorG: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Green)
+  @param wColorB: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è‰²(Blue)
+  @param wFont: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ãƒ•ã‚©ãƒ³ãƒˆ(0:ã‚´ã‚·ãƒƒã‚¯, 1:æ˜æœ)
+  @param wSpeed: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è¡¨ç¤ºé€Ÿåº¦ (msec)
+  @param wLineSpace: è¡Œé–“ã‚¹ãƒšãƒ¼ã‚¹
+  @param wAlign: è¡Œãã‚ãˆ
+  @param wRSize: ãƒ«ãƒ“ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º
+  @param wRFont: ãƒ«ãƒ“ãƒ•ã‚©ãƒ³ãƒˆ
+  @param wRLineSpace: ãƒ«ãƒ“ã¨æœ¬æ–‡ã®æ–‡å­—é–“éš”
   @param vLength: ???
 */
 void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, int *wLength) {
 	char *msg;
 	sprite_t *sp;
-	int len = 0; // ½èÍı¤·¤¿Ê¸»ú¿ô?
+	int len = 0; // å‡¦ç†ã—ãŸæ–‡å­—æ•°?
 	boolean needupdate = FALSE;
 	MyRectangle uparea = {0,0,0,0};
 	
-	// wRSize == 0 -> ¥ë¥ÓÌµ¤·(SACT.MessageOutput¤«¤é¤Î¸Æ½Ğ)
+	// wRSize == 0 -> ãƒ«ãƒ“ç„¡ã—(SACT.MessageOutputã‹ã‚‰ã®å‘¼å‡º)
 
 	if (sact.msgbuf[0] == '\0') return;
 	
 	if (!is_messagesprite(wNum)) return;
 	
-	// MessageSkipÃæ¤ÏÊ¸»úÁ÷¤êÂ®ÅÙ¤òºÇÂç¤Ë
+	// MessageSkipä¸­ã¯æ–‡å­—é€ã‚Šé€Ÿåº¦ã‚’æœ€å¤§ã«
 	if (sact.waitskiplv > 1) wSpeed = 0;
 	
 	// shortcut
 	sp = sact.sp[wNum];
 	
-	// update³«»ÏYºÂÉ¸ (XºÂÉ¸¤Ï0¸ÇÄê)
+	// updateé–‹å§‹Yåº§æ¨™ (Xåº§æ¨™ã¯0å›ºå®š)
 	uparea.y = sp->u.msg.dspcur.y;
 
-	// Ê¸»úÎóÃÖ´¹
+	// æ–‡å­—åˆ—ç½®æ›
 	msg = replacestr(sact.msgbuf);
 	
-	// Ê¸»ú¥¢¥é¥¤¥ó¥á¥ó¥È¤ÎÄ´À°
+	// æ–‡å­—ã‚¢ãƒ©ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆã®èª¿æ•´
 	set_align(msg, sp, wSize, wAlign);
 	
 	while (*msg) {
@@ -345,10 +345,10 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	
 	sactlog_newline();
 	
-	// ¥Ğ¥Ã¥Õ¥¡¥ê¥ó¥°Ãæ¤ÎÊ¸»ú¤Î¥¯¥ê¥¢
+	// ãƒãƒƒãƒ•ã‚¡ãƒªãƒ³ã‚°ä¸­ã®æ–‡å­—ã®ã‚¯ãƒªã‚¢
 	sact.msgbuf[0] = '\0';
 	
-	// Wait¤Ê¤·¤Î½ĞÎÏ¤ÏºÇ¸å¤Ëupdate
+	// Waitãªã—ã®å‡ºåŠ›ã¯æœ€å¾Œã«update
 	if (needupdate) {
 		uparea.width  = sp->cursize.width;
 		uparea.height = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
@@ -362,8 +362,8 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 }
 
 /*
-  ¥á¥Ã¥»¡¼¥¸ÎÎ°è¤Î¥¯¥ê¥¢
-  @param wNum: ¥¯¥ê¥¢¤¹¤ë¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+  ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é ˜åŸŸã®ã‚¯ãƒªã‚¢
+  @param wNum: ã‚¯ãƒªã‚¢ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
  */
 void smsg_clear(int wNum) {
 	sprite_t *sp;
@@ -371,7 +371,7 @@ void smsg_clear(int wNum) {
 	
 	if (!is_messagesprite(wNum)) return;
 	
-	// É½¼¨°ÌÃÖ¤Î½é´ü²½
+	// è¡¨ç¤ºä½ç½®ã®åˆæœŸåŒ–
 	sp = sact.sp[wNum];
 	sp->u.msg.dspcur.x = 0;
 	sp->u.msg.dspcur.y = 0;
@@ -379,7 +379,7 @@ void smsg_clear(int wNum) {
 	sact.msgbuf[0]  = '\0';
 	sact.msgbuf2[0] = '\0';
 	
-	// ¥­¥ã¥ó¥Ğ¥¹¤Î¥¯¥ê¥¢
+	// ã‚­ãƒ£ãƒ³ãƒã‚¹ã®ã‚¯ãƒªã‚¢
 	sf = sp->u.msg.canvas;
 	memset(sf->pixel, 0, sf->bytes_per_line * sf->height);
 	memset(sf->alpha, 0, sf->width * sf->height);
@@ -392,17 +392,17 @@ void smsg_clear(int wNum) {
 }
 
 /*
-  ½ĞÎÏÃæ¤ÎÊ¸»úÎó¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
-  @return: ¤Ê¤·(0) , ¤¢¤ê(1)
+  å‡ºåŠ›ä¸­ã®æ–‡å­—åˆ—ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+  @return: ãªã—(0) , ã‚ã‚Š(1)
  */
 int smsg_is_empty() {
 	return (sact.msgbuf[0] != '\0');
 }
 
 /*
-  ¥á¥Ã¥»¡¼¥¸¥­¡¼ÆşÎÏÂÔ¤Á
-   @param wNum1: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ1(¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È)
-   @param wNum2: ¥¹¥×¥é¥¤¥ÈÈÖ¹æ2(¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È)
+  ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚­ãƒ¼å…¥åŠ›å¾…ã¡
+   @param wNum1: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·1(ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ)
+   @param wNum2: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·2(ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ)
    @param msglen: ?
  */
 int smsg_keywait(int wNum1, int wNum2, int msglen) {
@@ -411,7 +411,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	
 	if (sact.waitskiplv > 0) return 0;
 	
-	// ¥¢¥Ë¥á¥Ñ¥¿¡¼¥ó¤Î½é´ü²½
+	// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ã®åˆæœŸåŒ–
 	maxstep = setupmark(wNum1, wNum2, minfo);
 	
 	sact.waittype = KEYWAIT_MESSAGE;
@@ -421,9 +421,9 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 		int st = get_high_counter(SYSTEMCOUNTER_MSEC);
 		int interval = 25;
 		
-		// ¥¢¥Ë¥á¥Ñ¥¿¡¼¥ó¤¬¤¢¤ë¾ì¹ç¡¢¤½¤Î¹¹¿·
-		// Z¥­¡¼¤Ç±£¤µ¤ì¤Æ¤¤¤ë¤È¤ÏÉ½¼¨¤·¤Ê¤¤
-		// (¥¢¥Ë¥á¥Ñ¥¿¡¼¥ó¤¬±£¤¹ÂĞ¾İ¤Ç¤Ê¤¤»ş¤Ï¤É¤¦¤·¤è¤¦...)
+		// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ãŒã‚ã‚‹å ´åˆã€ãã®æ›´æ–°
+		// Zã‚­ãƒ¼ã§éš ã•ã‚Œã¦ã„ã‚‹ã¨ã¯è¡¨ç¤ºã—ãªã„
+		// (ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ãŒéš ã™å¯¾è±¡ã§ãªã„æ™‚ã¯ã©ã†ã—ã‚ˆã†...)
 		if (maxstep &&
 		    !sact.zhiding &&
 		    sact.waittype != KEYWAIT_BACKLOG) {
@@ -441,15 +441,15 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 }
 
 /*
-  ¥¹¥×¥é¥¤¥ÈºÆÉÁ²è¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯
-  @param sp: ºÆÉÁ²è¤¹¤ë¥¹¥×¥é¥¤¥È
+  ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†æç”»ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯
+  @param sp: å†æç”»ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
  */
 int smsg_update(sprite_t *sp) {
 	int sx, sy, w, h, dx, dy;
 	surface_t update;
 	
-	// canvas ¤¬ clean ¤Î¤È¤­¤Ï¤Ê¤Ë¤â¤·¤Ê¤¤
-	//  -> ÀâÌÀ¥¹¥×¥é¥¤¥È¤Î¤è¤¦¤Ë¡¢SetShow¤µ¤ì¤¿¤È¤­¤ËÂĞ±ş¤Ç¤­¤Ê¤¤¤«¤é¤À¤á 
+	// canvas ãŒ clean ã®ã¨ãã¯ãªã«ã‚‚ã—ãªã„
+	//  -> èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚ˆã†ã«ã€SetShowã•ã‚ŒãŸã¨ãã«å¯¾å¿œã§ããªã„ã‹ã‚‰ã ã‚ 
 	//if (sact.msgbufempty) return OK;
 	
 	update.width  = sact.updaterect.width;
@@ -478,7 +478,7 @@ int smsg_update(sprite_t *sp) {
 	return OK;
 }
 
-// ²ş¹Ô¤ò´Ş¤àÊ¸»úÎó¥Ğ¥Ã¥Õ¥¡Ãæ¤«¤é¡¢²ş¹Ô¤Ş¤Ç¤ÎÊ¸»úÎó¤ÎÄ¹¤µ¤ò¼è¤ê½Ğ¤¹
+// æ”¹è¡Œã‚’å«ã‚€æ–‡å­—åˆ—ãƒãƒƒãƒ•ã‚¡ä¸­ã‹ã‚‰ã€æ”¹è¡Œã¾ã§ã®æ–‡å­—åˆ—ã®é•·ã•ã‚’å–ã‚Šå‡ºã™
 static int get_linelen(BYTE *msg) {
 	int c = 0;
 	
@@ -501,14 +501,14 @@ static int get_linelen(BYTE *msg) {
 	return c;
 }
 
-// ²ş¹Ô¤ä¥ë¥Ó¤ò´Ş¤àÊ¸»úÎó¥Ğ¥Ã¥Õ¥¡¤«¤é¤½¤ì¤é¤ò¼è¤ê½Ğ¤¹
-//   ²ş¹Ô¤Î¾ì¹ç        : ²ş¹ÔÉı¤â¤¤¤Ã¤·¤ç¤Ë
-//   ¥ë¥Ó¤Ä¤­Ê¸»ú¤Î¾ì¹ç: ¥á¥Ã¥»¡¼¥¸ËÜÂÎ¤ÈÂĞ±ş¤¹¤ë¥ë¥ÓÊ¸»úÎó
-//   ¤½¤ì°Ê³°          : Á´³Ñ|È¾³ÑÊ¸»ú£±Ê¸»ú
+// æ”¹è¡Œã‚„ãƒ«ãƒ“ã‚’å«ã‚€æ–‡å­—åˆ—ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰ãã‚Œã‚‰ã‚’å–ã‚Šå‡ºã™
+//   æ”¹è¡Œã®å ´åˆ        : æ”¹è¡Œå¹…ã‚‚ã„ã£ã—ã‚‡ã«
+//   ãƒ«ãƒ“ã¤ãæ–‡å­—ã®å ´åˆ: ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æœ¬ä½“ã¨å¯¾å¿œã™ã‚‹ãƒ«ãƒ“æ–‡å­—åˆ—
+//   ãã‚Œä»¥å¤–          : å…¨è§’|åŠè§’æ–‡å­—ï¼‘æ–‡å­—
 static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 	int c1, i;
 
-	//  ²ş¹Ô
+	//  æ”¹è¡Œ
 	if (msg[0] == '\n') {
 		mbuf[0] = '\n';
 		mbuf[1] = msg[1];
@@ -516,7 +516,7 @@ static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 		return msg +2;
 	}
 	
-	// ¥ë¥Ó¤Ä¤­Ê¸»ú
+	// ãƒ«ãƒ“ã¤ãæ–‡å­—
 	if (0 == strncmp("|RB|", msg, 4)) {
 		msg += 4;
 		for (i = 0; *msg != '|' && i < bufmax; i++) {
@@ -540,7 +540,7 @@ static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 	return msg;
 }
 
-// ¥Ğ¥Ã¥¯¥í¥°ÍÑ¥Ğ¥Ã¥Õ¥¡¤ËÄÉ²Ã
+// ãƒãƒƒã‚¯ãƒ­ã‚°ç”¨ãƒãƒƒãƒ•ã‚¡ã«è¿½åŠ 
 static void append_to_log(char *msg) {
 	if (sact.logging) {
 		int len = MSGBUFMAX - (int)strlen(sact.msgbuf2);
@@ -549,7 +549,7 @@ static void append_to_log(char *msg) {
 	}
 }
 
-// ¥Ğ¥Ã¥¯¥í¥°¤òÊİÂ¸¤¹¤ë¥ê¥¹¥È¤ËÄÉ²Ã
+// ãƒãƒƒã‚¯ãƒ­ã‚°ã‚’ä¿å­˜ã™ã‚‹ãƒªã‚¹ãƒˆã«è¿½åŠ 
 static void sactlog_newline() {
 	if (sact.logging) {
 		if (sact.msgbuf2[0] == '\0') return;
@@ -558,17 +558,17 @@ static void sactlog_newline() {
 	}
 }
 
-// ½ñ¤­½Ğ¤·°ÌÃÖ¤¬x=0¤Î»ş¤Î¤ß¥¢¥é¥¤¥ó¥á¥ó¥È¤ÎÄ´À°¤ò¹Ô¤¦
+// æ›¸ãå‡ºã—ä½ç½®ãŒx=0ã®æ™‚ã®ã¿ã‚¢ãƒ©ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆã®èª¿æ•´ã‚’è¡Œã†
 static void set_align(char *msg, sprite_t *sp, int wSize, int wAlign) {
 	if (sp->u.msg.dspcur.x == 0) {
 		int mlen = get_linelen(msg) * wSize/2;
 		int adjx = 0;
 		
 		switch (wAlign) {
-		case 1: // ¥»¥ó¥¿¥ê¥ó¥°
+		case 1: // ã‚»ãƒ³ã‚¿ãƒªãƒ³ã‚°
 			adjx = (sp->cursize.width - mlen) / 2;
 			break;
-		case 2: // ±¦´ó¤»
+		case 2: // å³å¯„ã›
 			adjx = (sp->cursize.width - mlen);
 			break;
 		}

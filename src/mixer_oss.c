@@ -112,7 +112,7 @@ static int mixer_init(audiodevice_t *dev, char *devmix) {
 		mix->vols_org[i] = lv;
 	}
 	
-	/* ½é´üÀÜÂ³ÀßÄê */
+	/* åˆæœŸæŽ¥ç¶šè¨­å®š */
 	mix->connect[MIX_MASTER] = SOUND_MIXER_VOLUME;
 	mix->connect[MIX_CD]     = SOUND_MIXER_CD;
 	mix->connect[MIX_MIDI]   = SOUND_MIXER_SYNTH;

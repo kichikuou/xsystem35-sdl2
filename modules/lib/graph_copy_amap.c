@@ -1,5 +1,5 @@
 /*
- * graph_copy_amap.c  alpha map ¤Î¥³¥Ô¡¼
+ * graph_copy_amap.c  alpha map ã®ã‚³ãƒ”ãƒ¼
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -30,16 +30,16 @@
 #include "ags.h"
 
 /**
- * »ØÄê¤Î surface ¤Î alphamap ¤òÊÌ¤Î surface ¤Î»ØÄêÎÎ°è¤Ë¥³¥Ô¡¼¤¹¤ë
+ * æŒ‡å®šã® surface ã® alphamap ã‚’åˆ¥ã® surface ã®æŒ‡å®šé ˜åŸŸã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
  *
- * @param dst: Å¾Á÷Àè surface
- * @param dx:  Å¾Á÷Àè£ØºÂÉ¸
- * @param dy:  Å¾Á÷Àè£ÙºÂÉ¸
- * @param src: Å¾Á÷¸µsurface
- * @param sx:  Å¾Á÷¸µ£ØºÂÉ¸
- * @param sy:  Å¾Á÷¸µ£ÙºÂÉ¸
- * @param sw:  Å¾Á÷Éı
- * @param sh:  Å¾Á÷¹â¤µ
+ * @param dst: è»¢é€å…ˆ surface
+ * @param dx:  è»¢é€å…ˆï¼¸åº§æ¨™
+ * @param dy:  è»¢é€å…ˆï¼¹åº§æ¨™
+ * @param src: è»¢é€å…ƒsurface
+ * @param sx:  è»¢é€å…ƒï¼¸åº§æ¨™
+ * @param sy:  è»¢é€å…ƒï¼¹åº§æ¨™
+ * @param sw:  è»¢é€å¹…
+ * @param sh:  è»¢é€é«˜ã•
  */
 int gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
 	BYTE *sp, *dp;

@@ -1,5 +1,5 @@
 /*
- * sactchart.c: SACT.ChartPos ½èÍı
+ * sactchart.c: SACT.ChartPos å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 
-// ¥°¥é¥ÕÍÑ¥Á¥ã¡¼¥ÈºîÀ®
+// ã‚°ãƒ©ãƒ•ç”¨ãƒãƒ£ãƒ¼ãƒˆä½œæˆ
 int schart_pos(int *pos, int pos1, int pos2, int val1, int val2, int val) {
 	if (val1 == val2) {
 		*pos = 0;

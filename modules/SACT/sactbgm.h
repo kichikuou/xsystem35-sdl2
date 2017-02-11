@@ -1,5 +1,5 @@
 /*
- * sactbgm.h: SACT Music ´ØÏ¢
+ * sactbgm.h: SACT Music é–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

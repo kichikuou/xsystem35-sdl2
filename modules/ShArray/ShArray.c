@@ -1,8 +1,8 @@
 /*
- * ShArray.c  ³Æ¼ïÇÛÎó±é»» module
+ * ShArray.c  å„ç¨®é…åˆ—æ¼”ç®— module
  *
- *    ¤«¤¨¤ë¤Ë¤ç¹ñ¤Ë¤ç¥¢¥ê¥¹
- *    Âç°­»Ê
+ *    ã‹ãˆã‚‹ã«ã‚‡å›½ã«ã‚‡ã‚¢ãƒªã‚¹
+ *    å¤§æ‚ªå¸
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -35,12 +35,12 @@
 
 void GetAtArray(void) { /* 0 */
 	/*
-	  ÇÛÎó¤«¤é±é»»¤·¤Ê¤¬¤éÃÍ¤ò¼è¤ê½Ğ¤¹
+	  é…åˆ—ã‹ã‚‰æ¼”ç®—ã—ãªãŒã‚‰å€¤ã‚’å–ã‚Šå‡ºã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  type: ±é»»¤Î¼ïÎà
-	  vResult: ±é»»·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  type: æ¼”ç®—ã®ç¨®é¡
+	  vResult: æ¼”ç®—çµæœã‚’è¿”ã™å¤‰æ•°
 	*/
 	int *vAry    = getCaliVariable();
 	int cnt      = getCaliValue();
@@ -81,11 +81,11 @@ void GetAtArray(void) { /* 0 */
 
 void AddAtArray(void) { /* 1 */
 	/*
-	  ÇÛÎó£±¤ËÇÛÎó£²¤òÂ­¤¹¡£65535 ¤òÄ¶¤¨¤¿¤é 65535 ¤Ë¡£
+	  é…åˆ—ï¼‘ã«é…åˆ—ï¼’ã‚’è¶³ã™ã€‚65535 ã‚’è¶…ãˆãŸã‚‰ 65535 ã«ã€‚
 	  
-	  vAry1: ÇÛÎó£±
-	  vAry2: ÇÛÎó£²
-	  cnt  : ¸Ä¿ô
+	  vAry1: é…åˆ—ï¼‘
+	  vAry2: é…åˆ—ï¼’
+	  cnt  : å€‹æ•°
 	*/
 	int *vAry1 = getCaliVariable();
 	int *vAry2 = getCaliVariable();
@@ -107,11 +107,11 @@ void AddAtArray(void) { /* 1 */
 
 void SubAtArray(void) { /* 2 */
 	/*
-	  ÇÛÎó£±¤«¤éÇÛÎó£²¤ò°ú¤¯¡£Éé¤Ë¤Ê¤Ã¤¿¤é£°¤ò¤«¤¯
+	  é…åˆ—ï¼‘ã‹ã‚‰é…åˆ—ï¼’ã‚’å¼•ãã€‚è² ã«ãªã£ãŸã‚‰ï¼ã‚’ã‹ã
 	  
- 	  vAry1: ÇÛÎó£±
-	  vAry2: ÇÛÎó£²
-	  cnt  : ¸Ä¿ô
+ 	  vAry1: é…åˆ—ï¼‘
+	  vAry2: é…åˆ—ï¼’
+	  cnt  : å€‹æ•°
 	*/
 	int *vAry1 = getCaliVariable();
 	int *vAry2 = getCaliVariable();
@@ -133,11 +133,11 @@ void SubAtArray(void) { /* 2 */
 
 void MulAtArray(void) { /* 3 */
 	/*
-	  ÇÛÎó£±¤ËÇÛÎó£²¤ò¤«¤±¤Æ¡¢ÇÛÎó£±¤Ë³ÊÇ¼¡¢65535¤Ş¤Ç¡£
+	  é…åˆ—ï¼‘ã«é…åˆ—ï¼’ã‚’ã‹ã‘ã¦ã€é…åˆ—ï¼‘ã«æ ¼ç´ã€65535ã¾ã§ã€‚
 
- 	  vAry1: ÇÛÎó£±
-	  vAry2: ÇÛÎó£²
-	  cnt  : ¸Ä¿ô
+ 	  vAry1: é…åˆ—ï¼‘
+	  vAry2: é…åˆ—ï¼’
+	  cnt  : å€‹æ•°
 	*/
 	int *vAry1 = getCaliVariable();
 	int *vAry2 = getCaliVariable();
@@ -159,11 +159,11 @@ void MulAtArray(void) { /* 3 */
 
 void DivAtArray(void) { /* 4 */
 	/*
-	  ÇÛÎó£±¤òÇÛÎó£²¤Ç³ä¤Ã¤Æ¡¢ÇÛÎó£±¤Ë³ÊÇ¼¡¢65535¤Ş¤Ç¡£
+	  é…åˆ—ï¼‘ã‚’é…åˆ—ï¼’ã§å‰²ã£ã¦ã€é…åˆ—ï¼‘ã«æ ¼ç´ã€65535ã¾ã§ã€‚
 	  
- 	  vAry1: ÇÛÎó£±
-	  vAry2: ÇÛÎó£²
-	  cnt  : ¸Ä¿ô
+ 	  vAry1: é…åˆ—ï¼‘
+	  vAry2: é…åˆ—ï¼’
+	  cnt  : å€‹æ•°
 	*/
 	int *vAry1 = getCaliVariable();
 	int *vAry2 = getCaliVariable();
@@ -189,11 +189,11 @@ void DivAtArray(void) { /* 4 */
 
 void MinAtArray(void) { /* 5 */
 	/*
-	  ÇÛÎó vAry1 ¤ÎÃæ¿È¤òÇÛÎó vAry2 ¤Ç²¼¸Â¤ËÀßÄê¤¹¤ë
+	  é…åˆ— vAry1 ã®ä¸­èº«ã‚’é…åˆ— vAry2 ã§ä¸‹é™ã«è¨­å®šã™ã‚‹
 
- 	  vAry1: ÇÛÎó£±
-	  vAry2: ÇÛÎó£²
-	  cnt  : ¸Ä¿ô
+ 	  vAry1: é…åˆ—ï¼‘
+	  vAry2: é…åˆ—ï¼’
+	  cnt  : å€‹æ•°
 	*/
 	int *vAry1 = getCaliVariable();
 	int *vAry2 = getCaliVariable();
@@ -212,11 +212,11 @@ void MinAtArray(void) { /* 5 */
 
 void MaxAtArray(void) { /* 6 */
 	/*
-	  ÇÛÎó vAry1 ¤ÎÃæ¿È¤òÇÛÎó vAry2 ¤Ç¾å¸Â¤ËÀßÄê¤¹¤ë
+	  é…åˆ— vAry1 ã®ä¸­èº«ã‚’é…åˆ— vAry2 ã§ä¸Šé™ã«è¨­å®šã™ã‚‹
 	  
- 	  vAry1: ÇÛÎó£±
-	  vAry2: ÇÛÎó£²
-	  cnt  : ¸Ä¿ô
+ 	  vAry1: é…åˆ—ï¼‘
+	  vAry2: é…åˆ—ï¼’
+	  cnt  : å€‹æ•°
 	*/
 	int *vAry1 = getCaliVariable();
 	int *vAry2 = getCaliVariable();
@@ -235,11 +235,11 @@ void MaxAtArray(void) { /* 6 */
 
 void AndNumArray(void) { /* 7 */
 	/*
-	  ÇÛÎó¤Î¥Ç¡¼¥¿¤È val ¤Ç AND ¤ò¤È¤ë
+	  é…åˆ—ã®ãƒ‡ãƒ¼ã‚¿ã¨ val ã§ AND ã‚’ã¨ã‚‹
 
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : AND¤ò¤È¤ëÃÍ
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : ANDã‚’ã¨ã‚‹å€¤
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -256,11 +256,11 @@ void AndNumArray(void) { /* 7 */
 
 void OrNumArray(void) { /* 8 */
 	/*
-	  ÇÛÎó¤Î¥Ç¡¼¥¿¤È val ¤Ç OR ¤ò¤È¤ë
+	  é…åˆ—ã®ãƒ‡ãƒ¼ã‚¿ã¨ val ã§ OR ã‚’ã¨ã‚‹
 
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : OR¤ò¤È¤ëÃÍ
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : ORã‚’ã¨ã‚‹å€¤
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -277,11 +277,11 @@ void OrNumArray(void) { /* 8 */
 
 void XorNumArray(void) { /* 9 */
 	/*
-	  ÇÛÎó¤Î¥Ç¡¼¥¿¤È val ¤Ç XOR ¤ò¤È¤ë
+	  é…åˆ—ã®ãƒ‡ãƒ¼ã‚¿ã¨ val ã§ XOR ã‚’ã¨ã‚‹
 
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : XOR¤ò¤È¤ëÃÍ
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : XORã‚’ã¨ã‚‹å€¤
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -298,13 +298,13 @@ void XorNumArray(void) { /* 9 */
 
 void SetEquArray(void) { /* 10 */
 	/*
-	  ÇÛÎó¤¬ val ¤ÈÅù¤·¤±¤ì¤Ğ ÇÛÎó vResults ¤Ë 1 ¤ò¡¢¤½¤¦¤Ç¤Ê¤±¤ì¤Ğ
-	  0 ¤òÂåÆş
+	  é…åˆ—ãŒ val ã¨ç­‰ã—ã‘ã‚Œã° é…åˆ— vResults ã« 1 ã‚’ã€ãã†ã§ãªã‘ã‚Œã°
+	  0 ã‚’ä»£å…¥
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : Èæ³Ó¤¹¤ëÃÍ
-	  vResults  : ·ë²Ì¤ò³ÊÇ¼¤¹¤ëÇÛÎó
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : æ¯”è¼ƒã™ã‚‹å€¤
+	  vResults  : çµæœã‚’æ ¼ç´ã™ã‚‹é…åˆ—
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -322,13 +322,13 @@ void SetEquArray(void) { /* 10 */
 
 void SetNotArray(void) { /* 11 */
 	/*
-	  ÇÛÎó¤¬ val ¤ÈÅù¤·¤¯¤Ê¤±¤ì¤ĞÇÛÎó vResults ¤Ë 1 ¤ò¡¢¤½¤¦¤Ç¤Ê¤±¤ì¤Ğ
-	  0 ¤òÂåÆş
+	  é…åˆ—ãŒ val ã¨ç­‰ã—ããªã‘ã‚Œã°é…åˆ— vResults ã« 1 ã‚’ã€ãã†ã§ãªã‘ã‚Œã°
+	  0 ã‚’ä»£å…¥
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : Èæ³Ó¤¹¤ëÃÍ
-	  vResults  : ·ë²Ì¤ò³ÊÇ¼¤¹¤ëÇÛÎó
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : æ¯”è¼ƒã™ã‚‹å€¤
+	  vResults  : çµæœã‚’æ ¼ç´ã™ã‚‹é…åˆ—
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -346,12 +346,12 @@ void SetNotArray(void) { /* 11 */
 
 void SetLowArray(void) { /* 12 */
 	/*
-	  ÇÛÎó¥Ç¡¼¥¿¤¬ val ¤è¤ê¤â¾®¤µ¤±¤ì¤Ğ vResult ¤Ë 1 ¤ò¥»¥Ã¥È
+	  é…åˆ—ãƒ‡ãƒ¼ã‚¿ãŒ val ã‚ˆã‚Šã‚‚å°ã•ã‘ã‚Œã° vResult ã« 1 ã‚’ã‚»ãƒƒãƒˆ
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : ïçÃÍ
-	  vResult: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : é–¾å€¤
+	  vResult: çµæœã‚’è¿”ã™å¤‰æ•°
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -369,12 +369,12 @@ void SetLowArray(void) { /* 12 */
 
 void SetHighArray(void) { /* 13 */
 	/*
-	  ÇÛÎó¥Ç¡¼¥¿¤¬ val ¤è¤ê¤âÂç¤­¤±¤ì¤Ğ vResult ¤Ë 1 ¤ò¥»¥Ã¥È
+	  é…åˆ—ãƒ‡ãƒ¼ã‚¿ãŒ val ã‚ˆã‚Šã‚‚å¤§ãã‘ã‚Œã° vResult ã« 1 ã‚’ã‚»ãƒƒãƒˆ
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : ïçÃÍ
-	  vResults: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : é–¾å€¤
+	  vResults: çµæœã‚’è¿”ã™å¤‰æ•°
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -392,15 +392,15 @@ void SetHighArray(void) { /* 13 */
 
 void SetRangeArray(void) { /* 14 */
 	/* 
-	   ÇÛÎó¥Ç¡¼¥¿¤¬¤¢¤ëÈÏ°Ï(min¡Ámax)¤Ë¤¢¤ë¤«¥Á¥§¥Ã¥¯
+	   é…åˆ—ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚‹ç¯„å›²(minã€œmax)ã«ã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 	   
-	   vAry: ÇÛÎó
-	   cnt : ¸Ä¿ô
-	   min : ºÇ¾®ÃÍ
-	   max : ºÇÂçÃÍ
-	   vResults: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
-	     min < vAry < max ¤Î»ş vResults = 1;
-             ¤½¤ì°Ê³°              vResults = 0;
+	   vAry: é…åˆ—
+	   cnt : å€‹æ•°
+	   min : æœ€å°å€¤
+	   max : æœ€å¤§å€¤
+	   vResults: çµæœã‚’è¿”ã™å¤‰æ•°
+	     min < vAry < max ã®æ™‚ vResults = 1;
+             ãã‚Œä»¥å¤–              vResults = 0;
 	 */
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -419,14 +419,14 @@ void SetRangeArray(void) { /* 14 */
 
 void SetAndEquArray(void) { /* 15 */
 	/*
-	  ÇÛÎó vAry ¤È mask ¤È¤Î AND ¤ò¤È¤Ã¤Æ val ¤ËÅù¤·¤±¤ì¤Ğ
-	  ÇÛÎó vResults ¤Ë£±¤ò¡¢Åù¤·¤¯¤Ê¤±¤ì¤Ğ 0 ¤ò½ñ¤¯
+	  é…åˆ— vAry ã¨ mask ã¨ã® AND ã‚’ã¨ã£ã¦ val ã«ç­‰ã—ã‘ã‚Œã°
+	  é…åˆ— vResults ã«ï¼‘ã‚’ã€ç­‰ã—ããªã‘ã‚Œã° 0 ã‚’æ›¸ã
 
-	   vAry: ÇÛÎó
-	   mask: ÇÛÎó¤Ë¤«¤±¤ë¥Ş¥¹¥¯
-	   cnt : ¸Ä¿ô
-	   val : Èæ³Ó¤¹¤ëÃÍ
-	   vResults  : ·ë²Ì¤òÂåÆş¤¹¤ëÇÛÎó
+	   vAry: é…åˆ—
+	   mask: é…åˆ—ã«ã‹ã‘ã‚‹ãƒã‚¹ã‚¯
+	   cnt : å€‹æ•°
+	   val : æ¯”è¼ƒã™ã‚‹å€¤
+	   vResults  : çµæœã‚’ä»£å…¥ã™ã‚‹é…åˆ—
 
 	*/
 	int *vAry = getCaliVariable();
@@ -446,13 +446,13 @@ void SetAndEquArray(void) { /* 15 */
 
 void AndEquArray(void) { /* 16 */
 	/*
-	  ÇÛÎó vAry Ãæ¤Ç val ¤ÈÆ±¤¸¤Ê¤é¤Ğ¡¢vResult ¤È 1 ¤Î AND ¤ò
-	  °ã¤¦¤Ê¤é¤Ğ 0 ¤ò¤«¤¯¡£
+	  é…åˆ— vAry ä¸­ã§ val ã¨åŒã˜ãªã‚‰ã°ã€vResult ã¨ 1 ã® AND ã‚’
+	  é•ã†ãªã‚‰ã° 0 ã‚’ã‹ãã€‚
 	   
-	   vAry: ÇÛÎó
-	   cnt : ¸Ä¿ô
-	   val : Èæ³Ó¤¹¤ëÃÍ
-	   vResults  : ·ë²Ì¤òÂåÆş¤¹¤ëÇÛÎó
+	   vAry: é…åˆ—
+	   cnt : å€‹æ•°
+	   val : æ¯”è¼ƒã™ã‚‹å€¤
+	   vResults  : çµæœã‚’ä»£å…¥ã™ã‚‹é…åˆ—
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -470,13 +470,13 @@ void AndEquArray(void) { /* 16 */
 
 void AndNotArray(void) { /* 17 */
 	/*
-	  ÇÛÎó vAry Ãæ¤Ç val ¤ÈÅù¤·¤¯¤Ê¤¤¤Ê¤é¤Ğ¡¢vResult ¤È 1 ¤Î AND ¤ò
-	  °ã¤¦¾ì¹ç¤Ï 0 ¤ò¤«¤¯¡£
+	  é…åˆ— vAry ä¸­ã§ val ã¨ç­‰ã—ããªã„ãªã‚‰ã°ã€vResult ã¨ 1 ã® AND ã‚’
+	  é•ã†å ´åˆã¯ 0 ã‚’ã‹ãã€‚
 	  
-	   vAry: ÇÛÎó
-	   cnt : ¸Ä¿ô
-	   val : Èæ³Ó¤¹¤ëÃÍ
-	   vResults  : ·ë²Ì¤òÂåÆş¤¹¤ëÇÛÎó
+	   vAry: é…åˆ—
+	   cnt : å€‹æ•°
+	   val : æ¯”è¼ƒã™ã‚‹å€¤
+	   vResults  : çµæœã‚’ä»£å…¥ã™ã‚‹é…åˆ—
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -494,13 +494,13 @@ void AndNotArray(void) { /* 17 */
 
 void AndLowArray(void) { /* 18 */
 	/*
-	  ÇÛÎó vAry ¤¬ min ¤è¤ê¤â¾®¤µ¤¤¤Ê¤é¤Ğ¡¢vResult ¤È 1 ¤Î AND ¤ò
-	  ¤½¤¦¤Ç¤Ê¤¤¤Ê¤é¤Ğ 0 ¤ò¤«¤¯¡£
+	  é…åˆ— vAry ãŒ min ã‚ˆã‚Šã‚‚å°ã•ã„ãªã‚‰ã°ã€vResult ã¨ 1 ã® AND ã‚’
+	  ãã†ã§ãªã„ãªã‚‰ã° 0 ã‚’ã‹ãã€‚
 	  
-	   vAry: ÇÛÎó
-	   cnt : ¸Ä¿ô
-	   min : ºÇ¾®ÃÍ
-	   vResults  : ·ë²Ì¤òÂåÆş¤¹¤ëÇÛÎó
+	   vAry: é…åˆ—
+	   cnt : å€‹æ•°
+	   min : æœ€å°å€¤
+	   vResults  : çµæœã‚’ä»£å…¥ã™ã‚‹é…åˆ—
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -518,13 +518,13 @@ void AndLowArray(void) { /* 18 */
 
 void AndHighArray(void) { /* 19 */
 	/*
-	  ÇÛÎó vAry ¤¬ min ¤è¤ê¤âÂç¤­¤¤¤Ê¤é¤Ğ¡¢vResult ¤È 1 ¤Î AND ¤ò
-	  ¤½¤¦¤Ç¤Ê¤¤¤Ê¤é¤Ğ 0 ¤ò¤«¤¯¡£
+	  é…åˆ— vAry ãŒ min ã‚ˆã‚Šã‚‚å¤§ãã„ãªã‚‰ã°ã€vResult ã¨ 1 ã® AND ã‚’
+	  ãã†ã§ãªã„ãªã‚‰ã° 0 ã‚’ã‹ãã€‚
 	  
-	   vAry: ÇÛÎó
-	   cnt : ¸Ä¿ô
-	   max : ºÇ¾®ÃÍ
-	   vResults  : ·ë²Ì¤òÂåÆş¤¹¤ëÇÛÎó
+	   vAry: é…åˆ—
+	   cnt : å€‹æ•°
+	   max : æœ€å°å€¤
+	   vResults  : çµæœã‚’ä»£å…¥ã™ã‚‹é…åˆ—
 	*/
 	int *vAry     = getCaliVariable();
 	int cnt       = getCaliValue();
@@ -542,14 +542,14 @@ void AndHighArray(void) { /* 19 */
 
 void AndRangeArray(void) { /* 20 */
 	/*
-	  vAry ¤¬ min ¤«¤é max ¤Ë¤¢¤ë¾ì¹ç¡¢vResults ¤È 1 ¤Î AND ¤ò
-	  ¤½¤¦¤Ç¤Ê¤±¤ì¤Ğ 0 ¤ò¤«¤¯¡£
+	  vAry ãŒ min ã‹ã‚‰ max ã«ã‚ã‚‹å ´åˆã€vResults ã¨ 1 ã® AND ã‚’
+	  ãã†ã§ãªã‘ã‚Œã° 0 ã‚’ã‹ãã€‚
 	  
-	  vAry: ÇÛÎó
-	  cnt:  ¸Ä¿ô
-	  min:  ºÇ¾®ÃÍ
-	  max:  ºÇÂçÃÍ
-	  vResults:   ·ë²Ì¤òÊÖ¤¹ÇÛÎó
+	  vAry: é…åˆ—
+	  cnt:  å€‹æ•°
+	  min:  æœ€å°å€¤
+	  max:  æœ€å¤§å€¤
+	  vResults:   çµæœã‚’è¿”ã™é…åˆ—
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -568,14 +568,14 @@ void AndRangeArray(void) { /* 20 */
 
 void AndAndEquArray(void) { /* 21 */
 	/*
-	  ÇÛÎó vAry ¤È mask ¤È¤Î AND ¤ò¤È¤Ã¤Æ val ¤ËÅù¤·¤±¤ì¤Ğ
-	  ÇÛÎó vResults ¤È£±¤Î AND¡¢Åù¤·¤¯¤Ê¤±¤ì¤Ğ 0 ¤ò½ñ¤¯
+	  é…åˆ— vAry ã¨ mask ã¨ã® AND ã‚’ã¨ã£ã¦ val ã«ç­‰ã—ã‘ã‚Œã°
+	  é…åˆ— vResults ã¨ï¼‘ã® ANDã€ç­‰ã—ããªã‘ã‚Œã° 0 ã‚’æ›¸ã
 
-	   vAry: ÇÛÎó
-	   mask: ÇÛÎó¤Ë¤«¤±¤ë¥Ş¥¹¥¯
-	   cnt : ¸Ä¿ô
-	   val : Èæ³Ó¤¹¤ëÃÍ
-	   vResults  : ·ë²Ì¤òÂåÆş¤¹¤ëÇÛÎó
+	   vAry: é…åˆ—
+	   mask: é…åˆ—ã«ã‹ã‘ã‚‹ãƒã‚¹ã‚¯
+	   cnt : å€‹æ•°
+	   val : æ¯”è¼ƒã™ã‚‹å€¤
+	   vResults  : çµæœã‚’ä»£å…¥ã™ã‚‹é…åˆ—
 
 	*/
 	int *vAry = getCaliVariable();
@@ -604,12 +604,12 @@ void OrEquArray(void) { /* 22 */
 
 void OrNotArray(void) { /* 23 */
 	/*
-	  ÇÛÎó¤ÎÃÍ¤¬ val ¤ÈÅù¤·¤¯¤Ê¤±¤ì¤Ğ vResult ¤Ë 1 ¤ò½ñ¤­¹ş¤à
+	  é…åˆ—ã®å€¤ãŒ val ã¨ç­‰ã—ããªã‘ã‚Œã° vResult ã« 1 ã‚’æ›¸ãè¾¼ã‚€
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : Èæ³Ó¤¹¤ëÃÍ
-	  vResults: ·ë²Ì¤ò½ñ¤­¹ş¤àÊÑ¿ô
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : æ¯”è¼ƒã™ã‚‹å€¤
+	  vResults: çµæœã‚’æ›¸ãè¾¼ã‚€å¤‰æ•°
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -666,12 +666,12 @@ void OrAndEquArray(void) { /* 27 */
 
 void EnumEquArray(void) { /* 28 */
 	/*
-	  ÇÛÎó¤Î¥Ç¡¼¥¿Ãæ¤Ë val ¤ÈÆ±¤¸¥Ç¡¼¥¿¤ò¿ô¤ò vResult ¤ËÊÖ¤¹
+	  é…åˆ—ã®ãƒ‡ãƒ¼ã‚¿ä¸­ã« val ã¨åŒã˜ãƒ‡ãƒ¼ã‚¿ã‚’æ•°ã‚’ vResult ã«è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : Èæ³Ó¤¹¤ëÃÍ
-	  vResult: °ìÃ×¤¹¤ë¸Ä¿ô¤òÊÖ¤¹ÊÑ¿ô
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : æ¯”è¼ƒã™ã‚‹å€¤
+	  vResult: ä¸€è‡´ã™ã‚‹å€‹æ•°ã‚’è¿”ã™å¤‰æ•°
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -702,15 +702,15 @@ void EnumEquArray2(void) { /* 29 */
 
 void EnumEquNotArray2(void) { /* 30 */
 	/*
-	  ÇÛÎó£±¤¬ val1 ¤ËÅù¤·¤¯¡¢ÇÛÎó£²¤¬val2 ¤ËÅù¤·¤¯¤Ê¤¤¤â¤Î¤Î¿ô¤ò
-	  vResult ¤ËÊÖ¤¹¡£
+	  é…åˆ—ï¼‘ãŒ val1 ã«ç­‰ã—ãã€é…åˆ—ï¼’ãŒval2 ã«ç­‰ã—ããªã„ã‚‚ã®ã®æ•°ã‚’
+	  vResult ã«è¿”ã™ã€‚
 
-	  vAry1: ÇÛÎó£±
-	  vAry2: ÇÛÎó£²
-	  cnt:   ¸Ä¿ô
-	  val1: ÇÛÎó£±¤ÈÈæ³Ó¤¹¤ëÃÍ
-	  val2: ÇÛÎó£²¤ÈÈæ³Ó¤¹¤ëÃÍ
-	  vResult: ¾ò·ï¤Ë°ìÃ×¤¹¤ë¿ô¤òÊÖ¤¹ÊÑ¿ô
+	  vAry1: é…åˆ—ï¼‘
+	  vAry2: é…åˆ—ï¼’
+	  cnt:   å€‹æ•°
+	  val1: é…åˆ—ï¼‘ã¨æ¯”è¼ƒã™ã‚‹å€¤
+	  val2: é…åˆ—ï¼’ã¨æ¯”è¼ƒã™ã‚‹å€¤
+	  vResult: æ¡ä»¶ã«ä¸€è‡´ã™ã‚‹æ•°ã‚’è¿”ã™å¤‰æ•°
 	*/
 	int *vAry1 = getCaliVariable();
 	int *vAry2 = getCaliVariable();
@@ -734,12 +734,12 @@ void EnumEquNotArray2(void) { /* 30 */
 
 void EnumNotArray(void) { /* 31 */
 	/*
-	  ÇÛÎó¤Î¤Ê¤«¤Ç val ¤ÈÅù¤·¤¯¤Ê¤¤¤â¤Î¤Î¸Ä¿ô¤òÊÖ¤¹
+	  é…åˆ—ã®ãªã‹ã§ val ã¨ç­‰ã—ããªã„ã‚‚ã®ã®å€‹æ•°ã‚’è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt: ¸Ä¿ô
-	  val: Èæ³Ó¤¹¤ëÃÍ
-	  vResult: Åù¤·¤¯¤Ê¤¤¤â¤Î¤Î¿ô
+	  vAry: é…åˆ—
+	  cnt: å€‹æ•°
+	  val: æ¯”è¼ƒã™ã‚‹å€¤
+	  vResult: ç­‰ã—ããªã„ã‚‚ã®ã®æ•°
 	*/
 	int *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
@@ -790,13 +790,13 @@ void EnumHighArray(void) { /* 34 */
 
 void EnumRangeArray(void) { /* 35 */
 	/*
-	  ÇÛÎó¤ÎÃÍ¤Î¤¦¤Á¤¬ min ¤È max ¤Î´Ö¤¢¤ë¤â¤Î¤Î¿ô¤ò vResult ¤ËÊÖ¤¹
+	  é…åˆ—ã®å€¤ã®ã†ã¡ãŒ min ã¨ max ã®é–“ã‚ã‚‹ã‚‚ã®ã®æ•°ã‚’ vResult ã«è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  min : ºÇ¾®ÃÍ
-	  max : ºÇÂçÃÍ
-	  vResult: °ìÃ×¤·¤¿¿ô¤òÊÖ¤¹ÊÑ¿ô
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  min : æœ€å°å€¤
+	  max : æœ€å¤§å€¤
+	  vResult: ä¸€è‡´ã—ãŸæ•°ã‚’è¿”ã™å¤‰æ•°
 	*/
 	int *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
@@ -820,14 +820,14 @@ void EnumRangeArray(void) { /* 35 */
 
 void GrepEquArray(void) { /* 36 */
 	/*
-	  ÇÛÎó¤ÎÃÍ¤¬ val ¤ÈÅù¤·¤±¤ì¤Ğ vLastMatch ¤Ë°ìÃ×¤·¤¿ index ¤òÊÖ¤·
-	  vResult ¤Ë 1 ¤òÊÖ¤¹
+	  é…åˆ—ã®å€¤ãŒ val ã¨ç­‰ã—ã‘ã‚Œã° vLastMatch ã«ä¸€è‡´ã—ãŸ index ã‚’è¿”ã—
+	  vResult ã« 1 ã‚’è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : Èæ³Ó¤¹¤ëÃÍ
-	  vMatch: °ìÃ×¤·¤¿¥¤¥ó¥Ç¥Ã¥¯¥¹
-	  vResult: °ì¤Ä¤Ç¤â val ¤ÈÆ±¤¸ÃÍ¤¬¤¢¤ì¤Ğ 1
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : æ¯”è¼ƒã™ã‚‹å€¤
+	  vMatch: ä¸€è‡´ã—ãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	  vResult: ä¸€ã¤ã§ã‚‚ val ã¨åŒã˜å€¤ãŒã‚ã‚Œã° 1
 	*/
 	int *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
@@ -852,14 +852,14 @@ void GrepEquArray(void) { /* 36 */
 
 void GrepNotArray(void) { /* 37 */
 	/*
-	  ÇÛÎó¤ÎÃÍ¤¬ val ¤ÈÅù¤·¤¯¤Ê¤±¤ì¤Ğ vLastMatch ¤Ë¤½¤Î index ¤òÊÖ¤·
-	  vResult ¤Ë 1 ¤òÊÖ¤¹
+	  é…åˆ—ã®å€¤ãŒ val ã¨ç­‰ã—ããªã‘ã‚Œã° vLastMatch ã«ãã® index ã‚’è¿”ã—
+	  vResult ã« 1 ã‚’è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  val : Èæ³Ó¤¹¤ëÃÍ
-	  vMatch: °ìÃ×¤¹¤ëindex
-	  vResult: °ì¤Ä¤Ç¤â val ¤ÈÆ±¤¸ÃÍ¤¬¤¢¤ì¤Ğ 1
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  val : æ¯”è¼ƒã™ã‚‹å€¤
+	  vMatch: ä¸€è‡´ã™ã‚‹index
+	  vResult: ä¸€ã¤ã§ã‚‚ val ã¨åŒã˜å€¤ãŒã‚ã‚Œã° 1
 	*/
 	int *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
@@ -920,14 +920,14 @@ void GrepEquNotArray2(void) { /* 40 */
 
 void GrepLowArray(void) { /* 41 */
 	/*
-	  ÇÛÎó¤ÎÃÍ¤¬ min ¤è¤ê¤â¾®¤µ¤±¤ì¤Ğ vMatch ¤Ë°ìÃ×¤·¤¿ index 
-	  ¤òÊÖ¤· vResult ¤Ë 1 ¤òÊÖ¤¹
+	  é…åˆ—ã®å€¤ãŒ min ã‚ˆã‚Šã‚‚å°ã•ã‘ã‚Œã° vMatch ã«ä¸€è‡´ã—ãŸ index 
+	  ã‚’è¿”ã— vResult ã« 1 ã‚’è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  min : ºÇ¾®ÃÍ
-	  vMatch: °ìÃ×¤·¤¿¥¤¥ó¥Ç¥Ã¥¯¥¹
-	  vResult: °ì¤Ä¤Ç¤â val ¤ÈÆ±¤¸ÃÍ¤¬¤¢¤ì¤Ğ 1
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  min : æœ€å°å€¤
+	  vMatch: ä¸€è‡´ã—ãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	  vResult: ä¸€ã¤ã§ã‚‚ val ã¨åŒã˜å€¤ãŒã‚ã‚Œã° 1
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -952,14 +952,14 @@ void GrepLowArray(void) { /* 41 */
 
 void GrepHighArray(void) { /* 42 */
 	/*
-	  ÇÛÎó¤ÎÃÍ¤¬ min ¤è¤ê¤âÂç¤­¤±¤ì¤Ğ vMatch ¤Ë°ìÃ×¤·¤¿ index 
-	  ¤òÊÖ¤· vResult ¤Ë 1 ¤òÊÖ¤¹
+	  é…åˆ—ã®å€¤ãŒ min ã‚ˆã‚Šã‚‚å¤§ãã‘ã‚Œã° vMatch ã«ä¸€è‡´ã—ãŸ index 
+	  ã‚’è¿”ã— vResult ã« 1 ã‚’è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  max : ºÇÂçÃÍ
-	  vMatch: °ìÃ×¤·¤¿¥¤¥ó¥Ç¥Ã¥¯¥¹
-	  vResult: °ì¤Ä¤Ç¤â val ¤ÈÆ±¤¸ÃÍ¤¬¤¢¤ì¤Ğ 1
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  max : æœ€å¤§å€¤
+	  vMatch: ä¸€è‡´ã—ãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	  vResult: ä¸€ã¤ã§ã‚‚ val ã¨åŒã˜å€¤ãŒã‚ã‚Œã° 1
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -984,15 +984,15 @@ void GrepHighArray(void) { /* 42 */
 
 void GrepRangeArray(void) { /* 43 */
 	/*
-	  ÇÛÎó¤ÎÃÍ¤¬ max ¤È min ¤Î´Ö¤Ë¤¢¤ì¤Ğ vMatch ¤Ë°ìÃ×¤·¤¿ index 
-	  ¤òÊÖ¤· vResult ¤Ë 1 ¤òÊÖ¤¹
+	  é…åˆ—ã®å€¤ãŒ max ã¨ min ã®é–“ã«ã‚ã‚Œã° vMatch ã«ä¸€è‡´ã—ãŸ index 
+	  ã‚’è¿”ã— vResult ã« 1 ã‚’è¿”ã™
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  min : ºÇ¾®ÃÍ
-	  max : ºÇÂçÃÍ
-	  vMatch: °ìÃ×¤·¤¿¥¤¥ó¥Ç¥Ã¥¯¥¹
-	  vResult: °ì¤Ä¤Ç¤â val ¤ÈÆ±¤¸ÃÍ¤¬¤¢¤ì¤Ğ 1
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  min : æœ€å°å€¤
+	  max : æœ€å¤§å€¤
+	  vMatch: ä¸€è‡´ã—ãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	  vResult: ä¸€ã¤ã§ã‚‚ val ã¨åŒã˜å€¤ãŒã‚ã‚Œã° 1
 	*/
 	int *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
@@ -1018,17 +1018,17 @@ void GrepRangeArray(void) { /* 43 */
 
 void GrepLowOrderArray(void) { /* 44 */
 	/*
-	  ÇÛÎó vAry ¤ÎÃæ¤Ç min¤è¤ê¤âÂç¤­¤¯¡¢ max ¤è¤ê¤â¾®¤µ¤¤¤â¤Î
-	  ¤Î¤¦¤Á¡¢ºÇ¤â¾®¤µ¤¤¤â¤Î¤Î index ¤ò vLastMatch ¤ËÊÖ¤¹¡£
-	  ¤¿¤À¤·¡£v1[index] ¤Ï 0 ¤Ç¤¢¤ëÉ¬Í×¤¬¤¢¤ë¡£
+	  é…åˆ— vAry ã®ä¸­ã§ minã‚ˆã‚Šã‚‚å¤§ããã€ max ã‚ˆã‚Šã‚‚å°ã•ã„ã‚‚ã®
+	  ã®ã†ã¡ã€æœ€ã‚‚å°ã•ã„ã‚‚ã®ã® index ã‚’ vLastMatch ã«è¿”ã™ã€‚
+	  ãŸã ã—ã€‚v1[index] ã¯ 0 ã§ã‚ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  min : ºÇ¾®ÃÍ
-	  max : ºÇÂçÃÍ
-	  v1  : ·ë²Ì¤òÊÖ¤¹ÇÛÎó(0 ¤Î¾ì½ê¤·¤«Èæ³Ó¤»¤º¡¢ºÇ¾®¤Î¾ì½ê¤Ë 1 ¤ò½ñ¤¯
-	  vLastMatch: ºÇ¾®ÃÍ¤ò¼¨¤¹ÇÛÎó¤Îindex
-	  vResult: ºÇ¾®ÃÍ¤¬¸«¤Ä¤«¤ì¤Ğ 1, ¸«¤Ä¤«¤é¤Ê¤±¤ì¤Ğ 0
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  min : æœ€å°å€¤
+	  max : æœ€å¤§å€¤
+	  v1  : çµæœã‚’è¿”ã™é…åˆ—(0 ã®å ´æ‰€ã—ã‹æ¯”è¼ƒã›ãšã€æœ€å°ã®å ´æ‰€ã« 1 ã‚’æ›¸ã
+	  vLastMatch: æœ€å°å€¤ã‚’ç¤ºã™é…åˆ—ã®index
+	  vResult: æœ€å°å€¤ãŒè¦‹ã¤ã‹ã‚Œã° 1, è¦‹ã¤ã‹ã‚‰ãªã‘ã‚Œã° 0
 	*/
 	int *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
@@ -1069,17 +1069,17 @@ void GrepLowOrderArray(void) { /* 44 */
 
 void GrepHighOrderArray(void) { /* 45 */
 	/*
-	  ÇÛÎó vAry ¤ÎÃæ¤Ç min¤è¤ê¤âÂç¤­¤¯¡¢ max ¤è¤ê¤â¾®¤µ¤¤¤â¤Î
-	  ¤Î¤¦¤Á¡¢ºÇ¤âÂç¤­¤¤¤â¤Î¤Î index ¤ò vLastMatch ¤ËÊÖ¤¹¡£
-	  ¤¿¤À¤·¡£v1[index] ¤Ï 0 ¤Ç¤¢¤ëÉ¬Í×¤¬¤¢¤ë¡£
+	  é…åˆ— vAry ã®ä¸­ã§ minã‚ˆã‚Šã‚‚å¤§ããã€ max ã‚ˆã‚Šã‚‚å°ã•ã„ã‚‚ã®
+	  ã®ã†ã¡ã€æœ€ã‚‚å¤§ãã„ã‚‚ã®ã® index ã‚’ vLastMatch ã«è¿”ã™ã€‚
+	  ãŸã ã—ã€‚v1[index] ã¯ 0 ã§ã‚ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  min : ºÇ¾®ÃÍ
-	  max : ºÇÂçÃÍ
-	  v1  : ·ë²Ì¤òÊÖ¤¹ÇÛÎó(0 ¤Î¾ì½ê¤·¤«Èæ³Ó¤»¤º¡¢ºÇ¾®¤Î¾ì½ê¤Ë 1 ¤ò½ñ¤¯
-	  vLastMatch: ºÇÂçÃÍ¤ò¼¨¤¹ÇÛÎó¤Îindex
-	  vResult: ºÇÂçÃÍ¤¬¸«¤Ä¤«¤ì¤Ğ 1, ¸«¤Ä¤«¤é¤Ê¤±¤ì¤Ğ 0
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  min : æœ€å°å€¤
+	  max : æœ€å¤§å€¤
+	  v1  : çµæœã‚’è¿”ã™é…åˆ—(0 ã®å ´æ‰€ã—ã‹æ¯”è¼ƒã›ãšã€æœ€å°ã®å ´æ‰€ã« 1 ã‚’æ›¸ã
+	  vLastMatch: æœ€å¤§å€¤ã‚’ç¤ºã™é…åˆ—ã®index
+	  vResult: æœ€å¤§å€¤ãŒè¦‹ã¤ã‹ã‚Œã° 1, è¦‹ã¤ã‹ã‚‰ãªã‘ã‚Œã° 0
 	*/
 	int *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
@@ -1163,13 +1163,13 @@ void ChangeHighArray(void) { /* 49 */
 
 void ChangeRangeArray(void) { /* 50 */
 	/*
-	  ÇÛÎóÆâ¥Ç¡¼¥¿¤¬ min ¤«¤é max ¤Î´Ö¤Ë¤¢¤ë¤È¤­¤Ï val ¤ÇÃÖ¤­´¹¤¨
+	  é…åˆ—å†…ãƒ‡ãƒ¼ã‚¿ãŒ min ã‹ã‚‰ max ã®é–“ã«ã‚ã‚‹ã¨ãã¯ val ã§ç½®ãæ›ãˆ
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  min : ºÇ¾®ÃÍ
-	  max : ºÇÂçÃÍ
-	  val : ÃÖ¤­´¹¤¨¤ëÃÍ
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  min : æœ€å°å€¤
+	  max : æœ€å¤§å€¤
+	  val : ç½®ãæ›ãˆã‚‹å€¤
 	*/
 	int *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
@@ -1190,16 +1190,16 @@ void ChangeRangeArray(void) { /* 50 */
 
 void CopyArrayToRect(void) { /* 51 */
 	/*
-	  vSrc ¤Î sw * sh ¤ÎÎÎ°è¤ò vDst ¤Î dx,dy ¤Î°ÌÃÖ¤Ë¥³¥Ô¡¼ 
+	  vSrc ã® sw * sh ã®é ˜åŸŸã‚’ vDst ã® dx,dy ã®ä½ç½®ã«ã‚³ãƒ”ãƒ¼ 
 	  
-	  vSrc: ¥³¥Ô¡¼¸µÇÛÎó
-	  sw  : ¥³¥Ô¡¼¸µ width
-	  sh  : ¥³¥Ô¡¼¸µ height
-	  sx  : ¥³¥Ô¡¼¸µ x
-	  sy  : ¥³¥Ô¡¼¸µ y
-	  vDst: ¥³¥Ô¡¼ÀèÇÛÎó
-	  dw  : ¥³¥Ô¡¼Àè width
-	  dh  : ¥³¥Ô¡¼Àè height
+	  vSrc: ã‚³ãƒ”ãƒ¼å…ƒé…åˆ—
+	  sw  : ã‚³ãƒ”ãƒ¼å…ƒ width
+	  sh  : ã‚³ãƒ”ãƒ¼å…ƒ height
+	  sx  : ã‚³ãƒ”ãƒ¼å…ƒ x
+	  sy  : ã‚³ãƒ”ãƒ¼å…ƒ y
+	  vDst: ã‚³ãƒ”ãƒ¼å…ˆé…åˆ—
+	  dw  : ã‚³ãƒ”ãƒ¼å…ˆ width
+	  dh  : ã‚³ãƒ”ãƒ¼å…ˆ height
 	*/
 	int *vSrc = getCaliVariable();
 	int sw    = getCaliValue();
@@ -1224,16 +1224,16 @@ void CopyArrayToRect(void) { /* 51 */
 
 void CopyRectToArray(void) { /* 52 */
 	/*
-	  vSrc ¤Î sw * sh ¤ÎÎÎ°è¤ò vDst ¤Î dx,dy ¤Î°ÌÃÖ¤Ë¥³¥Ô¡¼ 
+	  vSrc ã® sw * sh ã®é ˜åŸŸã‚’ vDst ã® dx,dy ã®ä½ç½®ã«ã‚³ãƒ”ãƒ¼ 
 	  
-	  vSrc: ¥³¥Ô¡¼¸µÇÛÎó
-	  sw  : ¥³¥Ô¡¼¸µ width
-	  sh  : ¥³¥Ô¡¼¸µ height
-	  vDst: ¥³¥Ô¡¼ÀèÇÛÎó
-	  dw  : ¥³¥Ô¡¼Àè width
-	  dh  : ¥³¥Ô¡¼Àè height
-	  dx  : ¥³¥Ô¡¼Àè x
-	  dy  : ¥³¥Ô¡¼Àè y
+	  vSrc: ã‚³ãƒ”ãƒ¼å…ƒé…åˆ—
+	  sw  : ã‚³ãƒ”ãƒ¼å…ƒ width
+	  sh  : ã‚³ãƒ”ãƒ¼å…ƒ height
+	  vDst: ã‚³ãƒ”ãƒ¼å…ˆé…åˆ—
+	  dw  : ã‚³ãƒ”ãƒ¼å…ˆ width
+	  dh  : ã‚³ãƒ”ãƒ¼å…ˆ height
+	  dx  : ã‚³ãƒ”ãƒ¼å…ˆ x
+	  dy  : ã‚³ãƒ”ãƒ¼å…ˆ y
 	*/
 	int *vSrc = getCaliVariable();
 	int sw    = getCaliValue();
@@ -1258,12 +1258,12 @@ void CopyRectToArray(void) { /* 52 */
 
 void ChangeSecretArray(void) { /* 53 */
 	/*
-	  ÎÉ¤¯Ê¬¤«¤é¤Ê¤¤¤¬¡¢¥Ç¡¼¥¿¤ò¥³¡¼¥É²½¤·¤Æ¤¤¤ë¤è¤¦¤À
+	  è‰¯ãåˆ†ã‹ã‚‰ãªã„ãŒã€ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ¼ãƒ‰åŒ–ã—ã¦ã„ã‚‹ã‚ˆã†ã 
 	  
-	  vAry: ÇÛÎó
-	  cnt : ¸Ä¿ô
-	  type: µ¡Ç½ÈÖ¹æ
-	  vResult: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
+	  vAry: é…åˆ—
+	  cnt : å€‹æ•°
+	  type: æ©Ÿèƒ½ç•ªå·
+	  vResult: çµæœã‚’è¿”ã™å¤‰æ•°
 	*/
 	int *vAry    = getCaliVariable();
 	int cnt      = getCaliValue();
@@ -1278,7 +1278,7 @@ void ChangeSecretArray(void) { /* 53 */
 	switch(type) {
 	case 0:
 		/*
-		  cnt -1 ÈÖÌÜ¤Î¥­¡¼¤ò vAry ¤Ë¼è¤ê½Ğ¤¹
+		  cnt -1 ç•ªç›®ã®ã‚­ãƒ¼ã‚’ vAry ã«å–ã‚Šå‡ºã™
 		*/
 		if (cnt > 0 && cnt < 5) {
 			*vAry = key[cnt -1];
@@ -1287,7 +1287,7 @@ void ChangeSecretArray(void) { /* 53 */
 		break;
 	case 1:
 		/*
-		  vAry ¤ò cnt -1 ÈÖÌÜ¤Î¥­¡¼¤Ë¥»¥Ã¥È¤¹¤ë
+		  vAry ã‚’ cnt -1 ç•ªç›®ã®ã‚­ãƒ¼ã«ã‚»ãƒƒãƒˆã™ã‚‹
 		*/
 		if (cnt > 0 && cnt < 5) {
 			key[cnt -1] = *vAry;
@@ -1297,7 +1297,7 @@ void ChangeSecretArray(void) { /* 53 */
 	case 2:
 		{
 			/*
-			  ¥¨¥ó¥³¡¼¥É¤½¤Î£±
+			  ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ãã®ï¼‘
 			*/
 			int i, j = 0;
 			WORD ax = key[3] ^ 0x5a5a;
@@ -1318,7 +1318,7 @@ void ChangeSecretArray(void) { /* 53 */
 	case 3:
 		{
 			/*
-			  ¥¨¥ó¥³¡¼¥É¤½¤Î£²
+			  ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ãã®ï¼’
 			*/
 			int i, j = 0, k;
 			WORD ax = key[3] ^ 0x5a5a;

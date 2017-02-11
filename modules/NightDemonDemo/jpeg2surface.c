@@ -67,7 +67,7 @@ static void ppm2surface(surface_t *sf, int curscanline, unsigned char *src, int 
 	}}
 }
 
-// sf0 ¤ËÄ¾ÀÜÉÁ¤¯(¤½¤ì¤Ç¤âÃÙ¤¤¤±¤É)
+// sf0 ã«ç›´æ¥æã(ãã‚Œã§ã‚‚é…ã„ã‘ã©)
 surface_t *jpeg2surface(FILE *fp, int offset) {
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;

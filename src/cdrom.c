@@ -63,10 +63,10 @@ static char *dev = CDROM_DEVICE;
 
 
 /*
-  ½é´ü²½
-    dev: cdromdevice ¤Ë´Ø¤¹¤ë¾ğÊó¤ò³ÊÇ¼¤¹¤ë¾ì½ê
-    RET: À®¸ù  0
-         ¼ºÇÔ -1
+  åˆæœŸåŒ–
+    dev: cdromdevice ã«é–¢ã™ã‚‹æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹å ´æ‰€
+    RET: æˆåŠŸ  0
+         å¤±æ•— -1
 */
 int cd_init(cdromdevice_t *cd) {
 	struct stat st;

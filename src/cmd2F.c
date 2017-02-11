@@ -39,7 +39,7 @@
 #include "ald_manager.h"
 #include "LittleEndian.h"
 
-/* ÁªÂò Window OPEN »ş callback */
+/* é¸æŠ Window OPEN æ™‚ callback */
 static int cb_sel_init_page = 0;
 static int cb_sel_init_address = 0;
 
@@ -57,7 +57,7 @@ typedef struct {
 static fncall_table fnctbl[FCTBL_MAX];
 
 void commands2F00() {
-	/* ¥Æ¥­¥¹¥È¥«¥é¡¼¤ò¥¹¥¿¥Ã¥¯¤«¤é¥İ¥Ã¥×¤·¤ÆÀßÄê¤¹¤ë */
+	/* ãƒ†ã‚­ã‚¹ãƒˆã‚«ãƒ©ãƒ¼ã‚’ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰ãƒãƒƒãƒ—ã—ã¦è¨­å®šã™ã‚‹ */
 	int data[3];
 	
 	sl_popData(data, 3);
@@ -73,7 +73,7 @@ void commands2F00() {
 }
 
 void commands2F01() {
-	/* ¥Æ¥­¥¹¥È¥Õ¥©¥ó¥È¥µ¥¤¥º¤ò¥¹¥¿¥Ã¥¯¤«¤é¥İ¥Ã¥×¤·¤ÆÀßÄê¤¹¤ë */
+	/* ãƒ†ã‚­ã‚¹ãƒˆãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰ãƒãƒƒãƒ—ã—ã¦è¨­å®šã™ã‚‹ */
 	int data[3];
 	
 	sl_popData(data, 3);
@@ -89,7 +89,7 @@ void commands2F01() {
 }
 
 void commands2F02() {
-	/* ¸½ºß¤Î¥Æ¥­¥¹¥È¥«¥é¡¼¤ò¥¹¥¿¥Ã¥¯¤Ë¥×¥Ã¥·¥å¤¹¤ë */
+	/* ç¾åœ¨ã®ãƒ†ã‚­ã‚¹ãƒˆã‚«ãƒ©ãƒ¼ã‚’ã‚¹ã‚¿ãƒƒã‚¯ã«ãƒ—ãƒƒã‚·ãƒ¥ã™ã‚‹ */
 	int exp = getCaliValue();
 	int data[] = {TxxTEXTCOLOR,0,0};
 	
@@ -101,7 +101,7 @@ void commands2F02() {
 }
 
 void commands2F03() {
-	/* ¸½ºß¤Î¥Æ¥­¥¹¥È¥Õ¥©¥ó¥È¥µ¥¤¥º¤ò¥¹¥¿¥Ã¥¯¤Ë¥×¥Ã¥·¥å¤¹¤ë */
+	/* ç¾åœ¨ã®ãƒ†ã‚­ã‚¹ãƒˆãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’ã‚¹ã‚¿ãƒƒã‚¯ã«ãƒ—ãƒƒã‚·ãƒ¥ã™ã‚‹ */
 	int exp = getCaliValue();
 	int data[] = {TxxTEXTSIZE, 0, 0};
 	
@@ -113,7 +113,7 @@ void commands2F03() {
 }
 
 void commands2F04() {
-	/* ¥Æ¥­¥¹¥ÈÉ½¼¨°ÌÃÖ¤ò¥¹¥¿¥Ã¥¯¤«¤é¥İ¥Ã¥×¤·¤ÆÀßÄê¤¹¤ë */
+	/* ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºä½ç½®ã‚’ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰ãƒãƒƒãƒ—ã—ã¦è¨­å®šã™ã‚‹ */
 	int data[3];
 	
 	sl_popData(data, 3);
@@ -125,7 +125,7 @@ void commands2F04() {
 }
 
 void commands2F05() {
-	/* ¸½ºß¤Î¥Æ¥­¥¹¥ÈÉ½¼¨°ÌÃÖ¤ò¥¹¥¿¥Ã¥¯¤Ë¥×¥Ã¥·¥å¤¹¤ë */
+	/* ç¾åœ¨ã®ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºä½ç½®ã‚’ã‚¹ã‚¿ãƒƒã‚¯ã«ãƒ—ãƒƒã‚·ãƒ¥ã™ã‚‹ */
 	int data[] = {TxxTEXTLOC, 0, 0};
 	MyPoint loc;
 	
@@ -138,7 +138,7 @@ void commands2F05() {
 }
 
 void commands2F08() {
-	/* ¥¢¥ó¥Á¥¨¥¤¥ê¥¢¥·¥ó¥°ÉÕ¤­¥Æ¥­¥¹¥ÈÉÁ²è¤Î¥Õ¥é¥°ÀßÄê */
+	/* ã‚¢ãƒ³ãƒã‚¨ã‚¤ãƒªã‚¢ã‚·ãƒ³ã‚°ä»˜ããƒ†ã‚­ã‚¹ãƒˆæç”»ã®ãƒ•ãƒ©ã‚°è¨­å®š */
 	int exp = getCaliValue();
 	
 	ags_setAntialiasedStringMode(exp == 1);
@@ -147,7 +147,7 @@ void commands2F08() {
 }
 
 void commands2F09() {
-	/* ¥¢¥ó¥Á¥¨¥¤¥ê¥¢¥·¥ó¥°ÉÕ¤­¥Æ¥­¥¹¥ÈÉÁ²è¤Î¥Õ¥é¥°¼èÆÀ */
+	/* ã‚¢ãƒ³ãƒã‚¨ã‚¤ãƒªã‚¢ã‚·ãƒ³ã‚°ä»˜ããƒ†ã‚­ã‚¹ãƒˆæç”»ã®ãƒ•ãƒ©ã‚°å–å¾— */
 	int *var = getCaliVariable();
 
 	*var = ags_getAntialiasedStringMode() ? 1 : 0;
@@ -156,7 +156,7 @@ void commands2F09() {
 }
 
 void commands2F0A() {
-	/* Wav¥Ç¡¼¥¿¤òÆÉ¤ß¹ş¤à */
+	/* Wavãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€ */
 	int eCh = getCaliValue();
 	int eLinkNum = getCaliValue();
 
@@ -166,7 +166,7 @@ void commands2F0A() {
 }
 
 void commands2F0B() {
-	/* Wav¤òºÆÀ¸¤¹¤ë */
+	/* Wavã‚’å†ç”Ÿã™ã‚‹ */
 	int eCh = getCaliValue();
 	int eLoopFlag = getCaliValue();
 
@@ -417,7 +417,7 @@ void commands2F26() {
 	
 	t3 = lang2sjis(mi_param.newstring);
 	
-	/* Á´³ÑÊ¸»ú°Ê³°¤ÏÉÔ²Ä */
+	/* å…¨è§’æ–‡å­—ä»¥å¤–ã¯ä¸å¯ */
 	if (!sjis_has_hankaku(t3)) {
 		v_strcpy(dst_no -1, t3);
 	}
@@ -500,7 +500,7 @@ void commands2F2D() {
 	int eCh = getCaliValue();
 	int eTime = getCaliValue();
 	
-	/* ³ºÅö¤¹¤ë eCh ¤¬±éÁÕÃæ¤Î¾ì¹ç eTime ¤À¤± wait ¤ò¤¤¤ì¤ë */
+	/* è©²å½“ã™ã‚‹ eCh ãŒæ¼”å¥ä¸­ã®å ´åˆ eTime ã ã‘ wait ã‚’ã„ã‚Œã‚‹ */
 	mus_wav_waittime(eCh, eTime);
 	
 	DEBUG_COMMAND("wavWaitTime %d, %d:\n", eCh, eTime);
@@ -518,8 +518,8 @@ void commands2F2E() {
 void commands2F2F() {
 	int eCh = getCaliValue();
 	
-	/* ³ºÅö¤¹¤ë eCh ¤¬±éÁÕÃæ¤Î¾ì¹ç¡¢½ªÎ»¤Ş¤ÇÂÔ¤Ä  */
-	/* ¤¿¤À¤·¡¢Ìµ¸Â¥ë¡¼¥×¤Î¾ì¹ç¤Ï£±²óÌÜ½ªÎ»»ş¤Ş¤Ç */
+	/* è©²å½“ã™ã‚‹ eCh ãŒæ¼”å¥ä¸­ã®å ´åˆã€çµ‚äº†ã¾ã§å¾…ã¤  */
+	/* ãŸã ã—ã€ç„¡é™ãƒ«ãƒ¼ãƒ—ã®å ´åˆã¯ï¼‘å›ç›®çµ‚äº†æ™‚ã¾ã§ */
 	mus_wav_waitend(eCh);
 	
 	DEBUG_COMMAND("wavWaitEnd %d:\n", eCh);

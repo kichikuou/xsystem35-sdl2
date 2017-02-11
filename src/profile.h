@@ -27,7 +27,7 @@
 
 #define RC_NAME ".xsys35rc"
 
-/* °ì¹Ô¤Ï 256 Ê¸»ú¤ò±Û¤¨¤Ê¤¤ */
+/* ä¸€è¡Œã¯ 256 æ–‡å­—ã‚’è¶Šãˆãªã„ */
 #define RC_LINE_CHARS_MAX 256
 
 int  load_profile(char *path);

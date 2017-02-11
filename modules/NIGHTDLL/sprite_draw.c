@@ -1,5 +1,5 @@
 /*
- * sprite_draw.c: ¥¹¥×¥é¥¤¥ÈºÆÉÁ²è³Æ¼ï
+ * sprite_draw.c: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†æç”»å„ç¨®
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -35,9 +35,9 @@
 #include "sprite.h"
 
 /*
- »ØÄê¤Î sprite (¤Î¸½ºß¤ÎCG)¤ò surface0 ¤Ë½ñ¤¯
- @param sp: ÉÁ²è¤¹¤ë¥¹¥×¥é¥¤¥È
- @param r : ºÆÉÁ²è¤¹¤ëÎÎ°è
+ æŒ‡å®šã® sprite (ã®ç¾åœ¨ã®CG)ã‚’ surface0 ã«æ›¸ã
+ @param sp: æç”»ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+ @param r : å†æç”»ã™ã‚‹é ˜åŸŸ
 */
 int sp_draw(sprite_t *sp, MyRectangle *r) {
 	if (sp == NULL) return NG;
@@ -46,12 +46,12 @@ int sp_draw(sprite_t *sp, MyRectangle *r) {
 }
 
 /*
-  »ØÄê¤Î sprite¤Î»ØÄê¤ÎCG¤ò surface0 ¤Ë½ñ¤¯
-  (¤³¤Î¥¤¥ó¥¿¡¼¥Õ¥§¥¤¥¹¤Ï¤â¤¦ÉÔÍ×?)
+  æŒ‡å®šã® spriteã®æŒ‡å®šã®CGã‚’ surface0 ã«æ›¸ã
+  (ã“ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¯ã‚‚ã†ä¸è¦?)
 
-  @param sp: ÉÁ²è¤¹¤ë¥¹¥×¥é¥¤¥È
-  @param cg: ÉÁ²è¤¹¤ëCG
- @param r : ºÆÉÁ²è¤¹¤ëÎÎ°è
+  @param sp: æç”»ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+  @param cg: æç”»ã™ã‚‹CG
+ @param r : å†æç”»ã™ã‚‹é ˜åŸŸ
 */
 int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	surface_t update;
@@ -60,7 +60,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	if (cg == NULL) return NG;
 	if (cg->sf == NULL) return NG;
 
-	// ¹¹¿·ÎÎ°è¤Î³ÎÄê
+	// æ›´æ–°é ˜åŸŸã®ç¢ºå®š
 	update.width  = r->width;
 	update.height = r->height;
 	sx = 0;
@@ -78,7 +78,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	dy += r->y;
 	
 	if (cg->sf->has_alpha) {
-		// alpha map ¤¬¤¢¤ë¾ì¹ç
+		// alpha map ãŒã‚ã‚‹å ´åˆ
 		gre_BlendUseAMap(sf0, dx, dy,
 				 sf0, dx, dy,
 				 cg->sf, sx, sy, w, h,
@@ -86,10 +86,10 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 				 sp->blendrate);
 	} else {
 		if (sp->blendrate == 255) {
-			// alphaÃÍ»ØÄê¤¬Ìµ¤¤¾ì¹ç
+			// alphaå€¤æŒ‡å®šãŒç„¡ã„å ´åˆ
 			gr_copy(sf0, dx, dy, cg->sf, sx, sy, w, h);
 		} else if (sp->blendrate > 0) {
-			// alphaÃÍ»ØÄê¤¬¤¢¤ë¾ì¹ç
+			// alphaå€¤æŒ‡å®šãŒã‚ã‚‹å ´åˆ
 			gre_Blend(sf0, dx, dy,
 				  sf0, dx, dy,
 				  cg->sf, sx, sy, w, h,
@@ -103,7 +103,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	return OK;
 }
 
-// BlendScreen¤Ë¤è¤ëÉÁ²è
+// BlendScreenã«ã‚ˆã‚‹æç”»
 int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	surface_t update;
 	cginfo_t *cg;
@@ -116,7 +116,7 @@ int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	if (cg == NULL) return NG;
 	if (cg->sf == NULL) return NG;
 	
-	// ¹¹¿·ÎÎ°è¤Î³ÎÄê
+	// æ›´æ–°é ˜åŸŸã®ç¢ºå®š
 	update.width  = r->width;
 	update.height = r->height;
 	sx = 0;

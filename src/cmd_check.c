@@ -1,5 +1,5 @@
 /*
- * cmd_check.c  SYSTEM35¤Î¥³¥Ş¥ó¥É²òÀÏ
+ * cmd_check.c  SYSTEM35ã®ã‚³ãƒãƒ³ãƒ‰è§£æ
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -44,7 +44,7 @@ static void commandsDEC() {
         if (*var > 0) (*var)--;
 }
 
-/* ÊÑ¿ô¤ÎÂåÆş */
+/* å¤‰æ•°ã®ä»£å…¥ */
 static void letVar(int type) {
 	int *varno = getVariable();
 	int val    = getCaliValue();
@@ -82,7 +82,7 @@ static void letVar(int type) {
 	// printf("letvar %p=%d\n",varno, val);
 }
 
-/* ¥Ç¡¼¥¿¥Æ¡¼¥Ö¥ë¤ÎÀßÄê */
+/* ãƒ‡ãƒ¼ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã®è¨­å®š */
 static void getDataTableAdr() {
 	int index  = sys_getaddress();
 	int offset = sys_getCaliValue();
@@ -96,7 +96,7 @@ static void getDataTableAdr() {
 	}
 }
 
-/* < ¥ë¡¼¥×³«»Ï */
+/* < ãƒ«ãƒ¼ãƒ—é–‹å§‹ */
 static void loopStart() {
 	int p1 = sys_getc();
 	int exitadr, limit, direction, step;
@@ -153,7 +153,7 @@ void check_command(int c0) {
 	
 	switch(c0) {
 	case 0:
-		/* ¥á¥Ã¥»¡¼¥¸¤Î¥´¥ß¡© */
+		/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®ã‚´ãƒŸï¼Ÿ */
 		break;
 	case '!':
 	case 0x10:
@@ -164,15 +164,15 @@ void check_command(int c0) {
 	case 0x15:
 	case 0x16:
 	case 0x17:
-		/* ÊÑ¿ôÂåÆş */
+		/* å¤‰æ•°ä»£å…¥ */
 		letVar(c0);
 		break;
 	case '#':
-		/* ¥Ç¡¼¥¿¥Æ¡¼¥Ö¥ë¥¢¥É¥ì¥¹»ØÄê */
+		/* ãƒ‡ãƒ¼ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹æŒ‡å®š */
 		getDataTableAdr();
 		break;
 	case '$':
-		/* ÁªÂò»è¤ÎÅĞÏ¿ */
+		/* é¸æŠè‚¢ã®ç™»éŒ² */
 		if (nact->sel.in_setting) {
 			sel_fixElement();
 			nact->sel.in_setting = FALSE;
@@ -182,7 +182,7 @@ void check_command(int c0) {
 		}
 		break;
 	case '%':
-		/* ¥Ú¡¼¥¸¥³¡¼¥ë */
+		/* ãƒšãƒ¼ã‚¸ã‚³ãƒ¼ãƒ« */
 		page = getCaliValue();
 		if (page == 0) {
 			sl_retFar();
@@ -191,11 +191,11 @@ void check_command(int c0) {
 		}
 		break;
 	case '&':
-		/* ¥Ú¡¼¥¸¥¸¥ã¥ó¥× */
+		/* ãƒšãƒ¼ã‚¸ã‚¸ãƒ£ãƒ³ãƒ— */
 		sl_jmpFar(getCaliValue());
 		break;
 	case '@':
-		/* puts("¥é¥Ù¥ë¥¸¥ã¥ó¥×") */
+		/* puts("ãƒ©ãƒ™ãƒ«ã‚¸ãƒ£ãƒ³ãƒ—") */
 		sl_jmpNear(sys_getaddress());
 		break;
 	case '<':
@@ -207,7 +207,7 @@ void check_command(int c0) {
 		sl_jmpNear(sys_getaddress());
 		break;
 	case '/':
-		/* ¾®Ê¸»ú¥³¥Ş¥ó¥É */
+		/* å°æ–‡å­—ã‚³ãƒãƒ³ãƒ‰ */
 		switch(sl_getc()) {
 		case 0x00:
 			commands2F00(); break;
@@ -910,7 +910,7 @@ void check_command(int c0) {
 		}
 		break;
 	case 'R':
-		/* ²ş¹Ô */
+		/* æ”¹è¡Œ */
 		DEBUG_MESSAGE("\n");
 		msg_nextLine();
 		break;
@@ -1152,11 +1152,11 @@ void check_command(int c0) {
 		}
 		break;
 	case ']':
-		/* puts("ÁªÂò"); */
+		/* puts("é¸æŠ"); */
 		sel_select();
 		break;
 	case '{':
-		/* puts("¾ò·ïÊ¸"); */
+		/* puts("æ¡ä»¶æ–‡"); */
 		bool = getCaliValue();
 		index = sys_getaddress();
 		if (bool == 0) {

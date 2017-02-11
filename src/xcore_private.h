@@ -35,9 +35,9 @@
 #include "ags.h"
 #include "image.h"
 
-/* dib/work image ¾ğÊó */
+/* dib/work image æƒ…å ± */
 typedef struct {
-	XImage          *ximg;  /* XImage/ShmXImage »ÈÍÑ»ş¤Î XImage */
+	XImage          *ximg;  /* XImage/ShmXImage ä½¿ç”¨æ™‚ã® XImage */
 	XShmSegmentInfo info;   /* Shared Pixmap info */
 	boolean         shared; /* is Shared Pixmap ? */
 	agsurface_t     cimg;   /* Common Image for image manupilate */
@@ -69,10 +69,10 @@ struct xcore_private_data {
 
 	boolean packed24bpp;  /* window is packed 24 bpp? */
 	
-	/* SharedPixmap¤ò»ÈÍÑÃæ¤ËX¤ÎÉÁ²è¤¬Æş¤Ã¤¿¾ì¹ç XSync¤òÈ¯¹Ô¤¹¤ë¤¿¤á¤Î¥Õ¥é¥° */
+	/* SharedPixmapã‚’ä½¿ç”¨ä¸­ã«Xã®æç”»ãŒå…¥ã£ãŸå ´åˆ XSyncã‚’ç™ºè¡Œã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚° */
 	boolean needSync;     
 
-	boolean fullscreen;   /* FullScreen Mode ¤Ç¤¢¤ë */
+	boolean fullscreen;   /* FullScreen Mode ã§ã‚ã‚‹ */
 	
 	IMAGEINFO *dib;       /* DIB? information */
 	int view_x;

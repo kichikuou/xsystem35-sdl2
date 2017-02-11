@@ -40,11 +40,11 @@ extern char *num2sjis(int num);
 extern boolean Y3waitCancel;
 
 
-/* MI ÍÑ¥Ñ¥é¥á¡¼¥¿ */
+/* MI ç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ */
 INPUTSTRING_PARAM mi_param;
 
 void commandMS() {
-	/* X¥³¥Ş¥ó¥É¤ÇÉ½¼¨¤µ¤ì¤ëÊ¸»úÎóÎÎ°è¤ËÊ¸»úÎó¤òÆş¤ì¤ë */
+	/* Xã‚³ãƒãƒ³ãƒ‰ã§è¡¨ç¤ºã•ã‚Œã‚‹æ–‡å­—åˆ—é ˜åŸŸã«æ–‡å­—åˆ—ã‚’å…¥ã‚Œã‚‹ */
 	int num = getCaliValue();
 	char *str = sys_getString(':');
 	
@@ -57,7 +57,7 @@ void commandMS() {
 }
 
 void commandMP() {
-	/* »ØÄê¤ÎÊ¸»úÎó¤ò»ØÄêÊ¸»ú¿ô¤À¤±É½¼¨¤¹¤ë¡Ê£Ø¥³¥Ş¥ó¥É¤Î·å¿ô»ØÄê¡Ë */
+	/* æŒ‡å®šã®æ–‡å­—åˆ—ã‚’æŒ‡å®šæ–‡å­—æ•°ã ã‘è¡¨ç¤ºã™ã‚‹ï¼ˆï¼¸ã‚³ãƒãƒ³ãƒ‰ã®æ¡æ•°æŒ‡å®šï¼‰ */
 	int    num1 = getCaliValue();
 	int    num2 = getCaliValue();
 	u_char bstr[3] = { 0x81,0x40,0x00 }; // white blank
@@ -82,7 +82,7 @@ void commandMP() {
 }
 
 void commandMI() { /* T2 */
-	/* ¥æ¡¼¥¶¡¼¤Ë¤è¤ëÊ¸»úÎó¤ÎÆşÎÏ */
+	/* ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«ã‚ˆã‚‹æ–‡å­—åˆ—ã®å…¥åŠ› */
 	int dst_no  = getCaliValue();
 	int max_len = getCaliValue();
 	char *title = sys_getString(':');
@@ -104,7 +104,7 @@ void commandMI() { /* T2 */
 	
 	t3 = lang2sjis(mi_param.newstring);
 	
-	/* Á´³ÑÊ¸»ú°Ê³°¤ÏÉÔ²Ä */
+	/* å…¨è§’æ–‡å­—ä»¥å¤–ã¯ä¸å¯ */
 	if (!sjis_has_hankaku(t3)) {
 		v_strcpy(dst_no -1, t3);
 	}
@@ -115,7 +115,7 @@ void commandMI() { /* T2 */
 }
 
 void commandMA() {
-	/* num1 ¤ÎÊ¸»úÎó¤Î¸å¤í¤Ë num2 ¤ò¤Ä¤Ê¤²¤ë */
+	/* num1 ã®æ–‡å­—åˆ—ã®å¾Œã‚ã« num2 ã‚’ã¤ãªã’ã‚‹ */
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
@@ -125,7 +125,7 @@ void commandMA() {
 }
 
 void commandMC() {
-	/* num1 , num2 ¤òÈæ³Ó¤·¤Æ·ë²Ì¤ò RND ¤ËÊÖ¤¹ (RND=0 ÉÔ°ìÃ× , RND=1 °ìÃ×) */
+	/* num1 , num2 ã‚’æ¯”è¼ƒã—ã¦çµæœã‚’ RND ã«è¿”ã™ (RND=0 ä¸ä¸€è‡´ , RND=1 ä¸€è‡´) */
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
@@ -135,18 +135,18 @@ void commandMC() {
 }
 
 void commandMT() {
-	/* ¥¦¥¤¥ó¥É¥¦¤Î¥¿¥¤¥È¥ëÊ¸»úÎó¤òÀßÄê¤¹¤ë */
+	/* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã®ã‚¿ã‚¤ãƒˆãƒ«æ–‡å­—åˆ—ã‚’è¨­å®šã™ã‚‹ */
 	char *str = sys_getString(':');
 	
 	strncpy(nact->game_title_name, str, sizeof(nact->game_title_name) -1);
 	ags_setWindowTitle(str);
 	
-	/* Æ®¿ÀÅÔ»ÔII ÂĞºö */
+	/* é—˜ç¥éƒ½å¸‚II å¯¾ç­– */
 	if (0 == strcmp(str, GT_TOSHIN2)) {
 		dummy_pcm_su_flag = TRUE;
 	}
 	
-	/* Rance4 ÂĞºö¡© */
+	/* Rance4 å¯¾ç­–ï¼Ÿ */
 	if (0 == strcmp(str, GT_RANCE4)) {
 		Y3waitCancel = FALSE;
 	}
@@ -155,7 +155,7 @@ void commandMT() {
 }
 
 void commandMM() {
-	/* num1 ¤ÎÊ¸»úÎó¤Ë num2 ¤ò¥³¥Ô¡¼¤¹¤ë */
+	/* num1 ã®æ–‡å­—åˆ—ã« num2 ã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
@@ -165,7 +165,7 @@ void commandMM() {
 }
 
 void commandMH() {
-	/* ¿ôÃÍ¤òÊ¸»úÎó¤ËÊÑ´¹¤¹¤ë (»²¹Í H¥³¥Ş¥ó¥É) */
+	/* æ•°å€¤ã‚’æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹ (å‚è€ƒ Hã‚³ãƒãƒ³ãƒ‰) */
 	int num1 = getCaliValue();
 	int fig  = getCaliValue();
 	int num2 = getCaliValue();
@@ -178,7 +178,7 @@ void commandMH() {
 	if (fig != 0) {
 		len = strlen(work1);
 		if (fig > len) {
-			/* ¶õÇò¤Ç¤¦¤á¤ë */
+			/* ç©ºç™½ã§ã†ã‚ã‚‹ */
 			len = fig - len;
 			while(len--) {
 				strcat(work2, num2sjis(10));
@@ -196,7 +196,7 @@ void commandMH() {
 }
 
 void commandMV() {
-	/* ¥·¥Ê¥ê¥ª¥Ğ¡¼¥¸¥ç¥ó¤ò¥·¥¹¥Æ¥à¤ØÄÌÃÎ¤¹¤ë */
+	/* ã‚·ãƒŠãƒªã‚ªãƒãƒ¼ã‚¸ãƒ§ãƒ³ã‚’ã‚·ã‚¹ãƒ†ãƒ ã¸é€šçŸ¥ã™ã‚‹ */
 	int version = getCaliValue();
 
 	nact->scenario_version = version;
@@ -204,7 +204,7 @@ void commandMV() {
 }
 
 void commandML() {
-	/* Ê¸»úÎó¤ÎÄ¹¤µ¤ò¼èÆÀ¤¹¤ë */
+	/* æ–‡å­—åˆ—ã®é•·ã•ã‚’å–å¾—ã™ã‚‹ */
 	int *var   = getCaliVariable();
 	int str_no = getCaliValue();
 	
@@ -214,7 +214,7 @@ void commandML() {
 }
 
 void commandMD() {
-	/* Ê¸»úÎóÊÑ¿ô¤ò»ØÄêÄ¹¤µÊ¬¥³¥Ô¡¼¤¹¤ë */
+	/* æ–‡å­—åˆ—å¤‰æ•°ã‚’æŒ‡å®šé•·ã•åˆ†ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	int dst_str_no = getCaliValue();
 	int src_str_no = getCaliValue();
 	int len        = getCaliValue();
@@ -226,7 +226,7 @@ void commandMD() {
 }
 
 void commandME() {
-	/* °ÌÃÖ»ØÄê¤Ä¤­¤ÎÊ¸»úÎó¥³¥Ô¡¼ */
+	/* ä½ç½®æŒ‡å®šã¤ãã®æ–‡å­—åˆ—ã‚³ãƒ”ãƒ¼ */
 	int dst_str_no = getCaliValue();
 	int dst_pos    = getCaliValue();
 	int src_str_no = getCaliValue();
@@ -240,7 +240,7 @@ void commandME() {
 }
 
 void commandMF() {
-	/* Ê¸»úÎóÃæ¤«¤é»ØÄêÊ¸»úÎó¤Î°ÌÃÖ¤òÃµ¤¹ */
+	/* æ–‡å­—åˆ—ä¸­ã‹ã‚‰æŒ‡å®šæ–‡å­—åˆ—ã®ä½ç½®ã‚’æ¢ã™ */
 	int *var      = getCaliVariable();
 	int dst_no    = getCaliValue();
 	int key_no    = getCaliValue();
@@ -260,14 +260,14 @@ void commandMF() {
 }
 
 void commandMZ0() {
-	/* Ê¸»úÎóÊÑ¿ô¤ÎÊ¸»ú¿ô¡¦¸Ä¿ô¤ÎÀßÄê¤ÎÊÑ¹¹ */
+	/* æ–‡å­—åˆ—å¤‰æ•°ã®æ–‡å­—æ•°ãƒ»å€‹æ•°ã®è¨­å®šã®å¤‰æ›´ */
 	int max_len = getCaliValue();
 	int max_num = getCaliValue();
 	int rsv     = getCaliValue();
 	
 	DEBUG_COMMAND("MZ0 %d,%d,%d:\n",max_len, max_num, rsv);
 	
-	/* ¤¤¤Ä¤«¤é¤«¡¢Ê¸»úÎóÊÑ¿ô¤ÎºÇÂçÄ¹¤µ¤Ï¡ç¤Ë¤Ê¤Ã¤¿¤è¤¦¤À */
+	/* ã„ã¤ã‹ã‚‰ã‹ã€æ–‡å­—åˆ—å¤‰æ•°ã®æœ€å¤§é•·ã•ã¯âˆã«ãªã£ãŸã‚ˆã†ã  */
 	if (max_len == 0) max_len = STRVAR_LEN * 2;
 	
 	v_initStringVars(max_num,max_len * 2 + 1);
@@ -325,7 +325,7 @@ void commandMG() {
 }
 
 void commandMJ() {
-	/* Ê¸»úÎóÆşÎÏ (¥¦¥£¥ó¥ÉÌµ¤·) */
+	/* æ–‡å­—åˆ—å…¥åŠ› (ã‚¦ã‚£ãƒ³ãƒ‰ç„¡ã—) */
 	int num = getCaliValue();
 	int x   = getCaliValue();
 	int y   = getCaliValue();
@@ -363,7 +363,7 @@ void commandMN() {
 	
 	switch(no) {
 	case 0:
-		/* Ê¸»úÎó¤òÇÛÎó¤ËÊÑ´¹¤¹¤ë */
+		/* æ–‡å­—åˆ—ã‚’é…åˆ—ã«å¤‰æ›ã™ã‚‹ */
 		len = v_strlen(num -1);
 		b = v_str(num -1);
 		for (i = 0; i < len; i++) {
@@ -373,7 +373,7 @@ void commandMN() {
 		*var = 0;
 		break;
 	case 1:
-		/* ÇÛÎó¤òÊ¸»úÎó¤ËÊÑ´¹¤¹¤ë */
+		/* é…åˆ—ã‚’æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹ */
 		b = v_str(num -1);
 		while(*var) {
 			*b = *var; b++; var++;

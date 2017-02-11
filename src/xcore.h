@@ -1,5 +1,5 @@
 /*
- * xcore.h  Xlib¤È¤ÎÄÌ¿®
+ * xcore.h  Xlibã¨ã®é€šä¿¡
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -32,11 +32,11 @@
 #include "cursor.h"
 #include "ags.h"
 
-/* ½é´ü²½´Ø·¸ */
+/* åˆæœŸåŒ–é–¢ä¿‚ */
 extern int  Xcore_Initilize(void);
 extern void Xcore_Remove(void);
 
-/* ¥¦¥£¥ó¥É´Ø·¸ */
+/* ã‚¦ã‚£ãƒ³ãƒ‰é–¢ä¿‚ */
 extern void Xcore_setWorldSize(int width, int height, int depth);
 extern void Xcore_setWindowSize(int x, int y, int width, int height);
 extern void Xcore_setWindowTitle(char *name);
@@ -44,15 +44,15 @@ extern void Xcore_getWindowInfo(DispInfo *info);
 extern void Xcore_fullScreen(boolean on);
 extern agsurface_t *Xcore_getDIB();
 
-/* ²èÌÌ¹¹¿· */
+/* ç”»é¢æ›´æ–° */
 extern void Xcore_updateArea(MyRectangle *src, MyPoint *dst);
 extern void Xcore_sync();
 
-/* ¥Ñ¥ì¥Ã¥È´Ø·¸ */
+/* ãƒ‘ãƒ¬ãƒƒãƒˆé–¢ä¿‚ */
 extern void Xcore_setPallet(Pallet256 *pal, int src, int cnt);
 extern void Xcore_setForeground(u_long col);
 
-/* ÉÁ²è´Ø·¸ */
+/* æç”»é–¢ä¿‚ */
 extern void Xcore_drawRectangle(int x, int y, int w, int h, u_long col);
 extern void Xcore_fillRectangle(int x, int y, int w, int h, u_long col);
 extern void Xcore_drawLine(int x0, int y0, int x1, int y1, u_long col);
@@ -68,7 +68,7 @@ extern void *Xcore_saveRegion(int x, int y, int w, int h);
 extern void Xcore_copyRegion(void *i, int sx, int sy, int w, int h, int dx, int dy);
 extern void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step);
 
-/* ¥Õ¥©¥ó¥È´ØÏ¢ */
+/* ãƒ•ã‚©ãƒ³ãƒˆé–¢é€£ */
 // extern FONT *Xcore_getFontDevice(void);
 extern void Xcore_setFontDevice(FONT *f);
 
@@ -78,7 +78,7 @@ extern void Xcore_fadeOut(int step);
 extern void Xcore_whiteIn(int step);
 extern void Xcore_whiteOut(int step);
 
-/* key/pointer ´Ø·¸ */
+/* key/pointer é–¢ä¿‚ */
 extern int  Xcore_getMouseInfo(MyPoint *p);
 extern int  Xcore_getKeyInfo();
 extern void Xcore_setCursorLocation(int x, int y);
@@ -94,27 +94,27 @@ extern void Xcore_setNoShmMode();
 extern void Xcore_mainIterarion();
 extern boolean   RawKeyInfo[256];
 
-/* ½é´ü²½´Ø·¸ */
+/* åˆæœŸåŒ–é–¢ä¿‚ */
 #define GraphicsInitilize() Xcore_Initilize()
 #define GraphicsRemove() Xcore_Remove()
 
-/* ¥¦¥£¥ó¥É´Ø·¸ */
+/* ã‚¦ã‚£ãƒ³ãƒ‰é–¢ä¿‚ */
 #define GetWindowInfo(info) Xcore_getWindowInfo(info)
 #define SetWorldSize(w,h,d) Xcore_setWorldSize((w),(h),(d))
 #define SetWindowSize(x,y,w,h) Xcore_setWindowSize((x),(y),(w),(h))
 #define SetWindowTitle(size) Xcore_setWindowTitle((size))
 #define GetDIB() Xcore_getDIB()
 
-/* ²èÌÌ¹¹¿· */
+/* ç”»é¢æ›´æ–° */
 #define DspDeviceSync() Xcore_sync()
 #define UpdateArea(src,dst) Xcore_updateArea((src),(dst))
 #define FullScreen(on) Xcore_fullScreen(on)
 
-/* ¥Ñ¥ì¥Ã¥È´Ø·¸ */
+/* ãƒ‘ãƒ¬ãƒƒãƒˆé–¢ä¿‚ */
 #define SetPallet(pal,src,cnt) Xcore_setPallet((pal),(src),(cnt))
 #define SetForeground(col) Xcore_setForeground((col))
 
-/* ÉÁ²è´Ø·¸ */
+/* æç”»é–¢ä¿‚ */
 #define DrawString(x,y,str,col) Xcore_drawString((x),(y),(str),(col))
 #define FillRectangle(x,y,w,h,col) Xcore_fillRectangle((x),(y),(w),(h),(col))
 #define CopyArea(sx,sy,w,h,dx,dy) Xcore_copyArea((sx),(sy),(w),(h),(dx),(dy)) 
@@ -144,16 +144,16 @@ extern boolean   RawKeyInfo[256];
 #define CopyRegion(i,sx,sy,w,h,dx,dy) image_copyRegion(i,sx,sy,w,h,nact->ags.dib,dx,dy)
 #define Maskupdate(sx,sy,w,h,dx,dy,f,st) Xcore_maskupdate(sx,sy,w,h,dx,dy,f,st)
 
-/* ¥Õ¥©¥ó¥È´ØÏ¢ */
+/* ãƒ•ã‚©ãƒ³ãƒˆé–¢é€£ */
 #define SetFontDevice(f) Xcore_setFontDevice(f)
 
-/* fader ´ØÏ¢ */
+/* fader é–¢é€£ */
 #define FadeOut  Xcore_fadeOut
 #define FadeIn   Xcore_fadeIn
 #define WhiteIn  Xcore_whiteIn
 #define WhiteOut Xcore_whiteOut
 
-/* key/pointer ´Ø·¸ */
+/* key/pointer é–¢ä¿‚ */
 #define GetKeyInfo() Xcore_getKeyInfo()
 #define SetCursorType(t) Xcore_setCursorType((t))
 #define GetMouseInfo(info) Xcore_getMouseInfo(info)

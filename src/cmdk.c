@@ -26,7 +26,7 @@
 #include "network.h"
 
 void commandKI() {
-	/* ¥Í¥Ã¥È¥ï¡¼¥¯¤Î¥Á¥ã¥ó¥Í¥ë¤ò¿·µ¬ºîÀ®¤¹¤ë¡¿¥Í¥Ã¥È¥ï¡¼¥¯¤Î¥Á¥ã¥ó¥Í¥ë¤ËÀÜÂ³¤¹¤ë */
+	/* ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã®ãƒãƒ£ãƒ³ãƒãƒ«ã‚’æ–°è¦ä½œæˆã™ã‚‹ï¼ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã®ãƒãƒ£ãƒ³ãƒãƒ«ã«æ¥ç¶šã™ã‚‹ */
 	int *var     = getCaliVariable();
 	int port_num = getCaliValue();
 	int user_max = getCaliValue();
@@ -38,7 +38,7 @@ void commandKI() {
 }
 
 void commandKK() {
-	/* user_numÈÖ¤Î¥æ¡¼¥¶¡¼¤òÀÚÃÇ¤¹¤ë */
+	/* user_numç•ªã®ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚’åˆ‡æ–­ã™ã‚‹ */
 	int use_num = getCaliValue();
 
 	network_close(use_num);
@@ -48,7 +48,7 @@ void commandKK() {
 }
 
 void commandKN() {
-	/* ¼«Ê¬¼«¿È¤ÎÀÜÂ³ÈÖ¹æ¤ò¼èÆÀ¤¹¤ë */
+	/* è‡ªåˆ†è‡ªèº«ã®æ¥ç¶šç•ªå·ã‚’å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 
 	*var = network_get_channel();
@@ -58,7 +58,7 @@ void commandKN() {
 }
 
 void commandKP() {
-	/* ¥Ç¡¼¥¿¼õ¿®¥Ğ¥Ã¥Õ¥¡¤Ë¥Ç¡¼¥¿¤¬¤¢¤ë¤«Ä´¤Ù¤ë */
+	/* ãƒ‡ãƒ¼ã‚¿å—ä¿¡ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚‹ã‹èª¿ã¹ã‚‹ */
 	int *var = getCaliVariable();
 	
 	*var = network_check_buffer();
@@ -68,7 +68,7 @@ void commandKP() {
 }
 
 void commandKQ() {
-	/* ¥æ¡¼¥¶¡¼¤¬ÀÜÂ³¤µ¤ì¤Æ¤¤¤ë¤«¤É¤¦¤«³ÎÇ§¤¹¤ë */
+	/* ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒæ¥ç¶šã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ç¢ºèªã™ã‚‹ */
 	int *var = getCaliVariable();
 	int user_num = getCaliValue();
 	
@@ -79,7 +79,7 @@ void commandKQ() {
 }
 
 void commandKR() {
-	/* ¥Ç¡¼¥¿¼õ¿®¥Ğ¥Ã¥Õ¥¡¤«¤é¥Ç¡¼¥¿¤ò¼èÆÀ¤¹¤ë */
+	/* ãƒ‡ãƒ¼ã‚¿å—ä¿¡ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ */
 	int *var = getCaliVariable();
 	
 	network_read_buffer(var);
@@ -89,7 +89,7 @@ void commandKR() {
 }
 
 void commandKW() {
-	/* ¥Ç¡¼¥¿¤òÁ÷¿®¤¹¤ë */
+	/* ãƒ‡ãƒ¼ã‚¿ã‚’é€ä¿¡ã™ã‚‹ */
 	int *var = getCaliVariable();
 	int num  = getCaliValue();
 

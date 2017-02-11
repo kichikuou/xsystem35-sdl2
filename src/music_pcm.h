@@ -39,24 +39,24 @@
 
 struct _pcmobj;
 
-// PCM ÊÑ´¹¤Ë´Ø¤¹¤ë¥ª¥Ö¥¸¥§¥¯¥È
+// PCM å¤‰æ›ã«é–¢ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 struct _sndcnv {
-	// ÆşÎÏ¥Õ¥©¡¼¥Ş¥Ã¥È
+	// å…¥åŠ›ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
 	chanfmt_t ifmt;
 
-	// ½ĞÎÏ¥Õ¥©¡¼¥Ş¥Ã¥È
+	// å‡ºåŠ›ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
 	chanfmt_t ofmt;
 	
 	/* private area for effect */
         char priv[MAX_PRIVATE * 8];
 
-	// src ¤«¤éÆÉ¤ß¹ş¤àÄ¹¤µ
+	// src ã‹ã‚‰èª­ã¿è¾¼ã‚€é•·ã•
 	int isample;
 	
-	// ¼şÇÈ¿ôÊÑ´¹¤¢¤ê¤Ê¤·ÊÌÊÑ´¹´Ø¿ô
+	// å‘¨æ³¢æ•°å¤‰æ›ã‚ã‚Šãªã—åˆ¥å¤‰æ›é–¢æ•°
 	int (*convert)(struct _pcmobj *, int, int);
 	
-	// ¥Ğ¥Ã¥Õ¥¡
+	// ãƒãƒƒãƒ•ã‚¡
 	void *buf;
 };
 typedef struct _sndcnv sndcnv_t;
@@ -65,33 +65,33 @@ struct _pcmobj {
 	chanfmt_t fmt;
 	musstream_t *src;
 	
-	sndcnv_t conv; // ¥Õ¥©¡¼¥Ş¥Ã¥ÈÊÑ´¹ÍÑ
+	sndcnv_t conv; // ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆå¤‰æ›ç”¨
 	
 	int vollv;   /* volume level */
-	int loop;    /* ¤¯¤ê¤«¤¨¤·¿ô */
-	int cnt;     /* ¼Âºİ¤Ë·«¤êÊÖ¤·¤¿¿ô */
+	int loop;    /* ãã‚Šã‹ãˆã—æ•° */
+	int cnt;     /* å®Ÿéš›ã«ç¹°ã‚Šè¿”ã—ãŸæ•° */
 	
-	int slot; // ¥í¡¼¥É¤µ¤ì¤Æ¤¤¤ë¥¹¥í¥Ã¥ÈÈÖ¹æ
+	int slot; // ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚‹ã‚¹ãƒ­ãƒƒãƒˆç•ªå·
 
-	int stype;   // ¥½¡¼¥¹¥Ç¡¼¥¿¥ª¥Ö¥¸¥§¥¯¥È¥¿¥¤¥× (FILE,MEM,PIPE)
-	void *sdata; // ¥½¡¼¥¹¥Ç¡¼¥¿¥ª¥Ö¥¸¥§¥¯¥È
+	int stype;   // ã‚½ãƒ¼ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚¿ã‚¤ãƒ— (FILE,MEM,PIPE)
+	void *sdata; // ã‚½ãƒ¼ã‚¹ãƒ‡ãƒ¼ã‚¿ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	
-	/* ½ªÎ»»ş¤Ë client ¤ËÃÎ¤é¤»¤ë¤«¤É¤¦¤« */
+	/* çµ‚äº†æ™‚ã« client ã«çŸ¥ã‚‰ã›ã‚‹ã‹ã©ã†ã‹ */
 	void (* cb_atend)(int fd);
 	
-	/* ½ªÎ»»ş¤ËÃÎ¤é¤»¤ë client ¤Î file discpriter */
+	/* çµ‚äº†æ™‚ã«çŸ¥ã‚‰ã›ã‚‹ client ã® file discpriter */
 	int fd;
 
-	/* wavefile ¤Î¥Ç¡¼¥¿¤ÎÄ¹¤µ(msÃ±°Ì) */
+	/* wavefile ã®ãƒ‡ãƒ¼ã‚¿ã®é•·ã•(mså˜ä½) */
 	long data_len;
 	
-	/* ¹ç·×ºÆÀ¸»ş´Ö(¥Ğ¥¤¥È¿ô) */
+	/* åˆè¨ˆå†ç”Ÿæ™‚é–“(ãƒã‚¤ãƒˆæ•°) */
 	long written_len;
 
-	/* °ì»şÄä»ßÃæ */
+	/* ä¸€æ™‚åœæ­¢ä¸­ */
 	boolean paused;
 
-	/* ±éÁÕÃæ */
+	/* æ¼”å¥ä¸­ */
 	boolean playing;
 };
 typedef struct _pcmobj pcmobj_t;

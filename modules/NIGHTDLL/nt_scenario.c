@@ -61,7 +61,7 @@ static void ntmain(struct _scoadr inadr) {
 			check_command(sl_getc());
 			if (sl_getPage()  == inadr.page &&
 			    sl_getIndex() == inadr.index) {
-				// ~E%05d¤«¤é¤ÎÌá¤ê
+				// ~E%05dã‹ã‚‰ã®æˆ»ã‚Š
 				if (nact->fnc_return_value == 0) {
 					break;
 				} else {
@@ -88,8 +88,8 @@ static void ntmain(struct _scoadr inadr) {
 }
 
 /*
-  mode = 0: ¤Ï¤¸¤á¤«¤é
-         1: ÅÓÃæ¤«¤é
+  mode = 0: ã¯ã˜ã‚ã‹ã‚‰
+         1: é€”ä¸­ã‹ã‚‰
 */
 int nt_sco_main(int mode) {
 	int scono = 1, cnt = 0;
@@ -103,11 +103,11 @@ int nt_sco_main(int mode) {
 void nt_sco_callevent(int ev) {
 	struct _scoadr stadr, curadr;
 	
-	// InitGameMain¤¬¸Æ¤Ğ¤ì¤¿¤È¤­¤Î¥¢¥É¥ì¥¹=´Ø¿ô½ªÎ»»ş¤ÎÌá¤ê¥¢¥É¥ì¥¹
+	// InitGameMainãŒå‘¼ã°ã‚ŒãŸã¨ãã®ã‚¢ãƒ‰ãƒ¬ã‚¹=é–¢æ•°çµ‚äº†æ™‚ã®æˆ»ã‚Šã‚¢ãƒ‰ãƒ¬ã‚¹
 	stadr.page = sl_getPage();
 	stadr.index = sl_getIndex();
 	
-	// ¥·¡¼¥ó£±
+	// ã‚·ãƒ¼ãƒ³ï¼‘
 	curadr = scene2adr(ev);
 	sl_callFar2(curadr.page -1, curadr.index);
 	

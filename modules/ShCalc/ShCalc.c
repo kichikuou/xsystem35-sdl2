@@ -1,8 +1,8 @@
 /*
- * ShCalc.c  £¶£´¥Ó¥Ã¥È±é»» module
+ * ShCalc.c  ï¼–ï¼”ãƒ“ãƒƒãƒˆæ¼”ç®— module
  *
- *      ¤«¤¨¤ë¤Ë¤ç¹ñ¤Ë¤ç¥¢¥ê¥¹
- *      Âç°­»Ê
+ *      ã‹ãˆã‚‹ã«ã‚‡å›½ã«ã‚‡ã‚¢ãƒªã‚¹
+ *      å¤§æ‚ªå¸
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -53,9 +53,9 @@ static gint64 div64(gint64 a1, gint64 a2) {
 
 void SetIntNumBase(void) { /* 0 */
 	/*
-	  64 bit ±é»»¤Î¤¿¤á¤ÎÇÜ¿ô¤ò¥»¥Ã¥È
+	  64 bit æ¼”ç®—ã®ãŸã‚ã®å€æ•°ã‚’ã‚»ãƒƒãƒˆ
 	  
-	  base: ÇÜ¿ô
+	  base: å€æ•°
 	*/
 	int base = getCaliValue();
 	
@@ -67,9 +67,9 @@ void SetIntNumBase(void) { /* 0 */
 
 void SetIntNum16(void) { /* 1 */
 	/*
-	  64 bit ±é»»¤Î¤¿¤á¤Î¿ôÃÍ¤ò¥»¥Ã¥È
+	  64 bit æ¼”ç®—ã®ãŸã‚ã®æ•°å€¤ã‚’ã‚»ãƒƒãƒˆ
 
-	  var: ¿ôÃÍ¤ÎÆş¤Ã¤¿ÊÑ¿ô
+	  var: æ•°å€¤ã®å…¥ã£ãŸå¤‰æ•°
 	*/
 	int *var = getCaliVariable();
 	
@@ -86,9 +86,9 @@ void SetIntNum32(void) { /* 2 */
 
 void GetIntNum16(void) { /* 3 */
 	/*
-	  64 bit ±é»»¤·¤¿·ë²Ì¤òÆÀ¤ë
+	  64 bit æ¼”ç®—ã—ãŸçµæœã‚’å¾—ã‚‹
 
-	  var: ¿ôÃÍ¤ò¤¤¤ì¤ëÊÑ¿ô
+	  var: æ•°å€¤ã‚’ã„ã‚Œã‚‹å¤‰æ•°
 	 */
 	int *var = getCaliVariable();
 	gint64 i;
@@ -112,9 +112,9 @@ void GetIntNum32(void) { /* 4 */
 
 void AddIntNum16(void) { /* 5 */
 	/*
-	  64 bit ²Ã»»
+	  64 bit åŠ ç®—
 
-	  var: Â­¤¹¿ô¤ÎÆş¤Ã¤¿ÊÑ¿ô
+	  var: è¶³ã™æ•°ã®å…¥ã£ãŸå¤‰æ•°
 	 */
 	int *var = getCaliVariable();
 	
@@ -143,9 +143,9 @@ void SubIntNum32(void) { /* 8 */
 
 void MulIntNum16(void) {  /* 9 */
 	/*
-	  64 bit ¾è»»
+	  64 bit ä¹—ç®—
 	  
-	  var: ³İ¤±¤ë¿ô¤ÎÆş¤Ã¤¿ÊÑ¿ô
+	  var: æ›ã‘ã‚‹æ•°ã®å…¥ã£ãŸå¤‰æ•°
 	 */
 	int *var = getCaliVariable();
 	
@@ -162,9 +162,9 @@ void MulIntNum32(void) {  /* 10 */
 
 void DivIntNum16(void) { /* 11 */
 	/*
-	  64 bit ½ü»»
+	  64 bit é™¤ç®—
 
-	   var: Â­¤¹¿ô¤ÎÆş¤Ã¤¿ÊÑ¿ô
+	   var: è¶³ã™æ•°ã®å…¥ã£ãŸå¤‰æ•°
 	 */
 	int *var = getCaliVariable();
 	gint64 i;
@@ -201,9 +201,9 @@ void CmpIntNum32(void) { /* 14 */
 	
 void GetLengthNum16(void) { /* 15 */
 	/*
-	  ¿ôÃÍ¤Î·å¿ô¤òÊÖ¤¹
-	   var: ¿ôÃÍ
-	   vResult: ¿ôÃÍ¤Î·å¿ô¤òÊÖ¤¹ÊÑ¿ô
+	  æ•°å€¤ã®æ¡æ•°ã‚’è¿”ã™
+	   var: æ•°å€¤
+	   vResult: æ•°å€¤ã®æ¡æ•°ã‚’è¿”ã™å¤‰æ•°
 	 */
 	int *var     = getCaliVariable();
 	int *vResult = getCaliVariable();
@@ -232,14 +232,14 @@ void GetLengthNum32(void) { /* 16 */
 
 void NumToRate(void) { /* 17 */
 	/*
-	  p1 * (p3/p2) ¤Î±é»»·ë²Ì¤òÊÖ¤¹¡£
+	  p1 * (p3/p2) ã®æ¼”ç®—çµæœã‚’è¿”ã™ã€‚
 
-	   p1: ¿ôÃÍ£±
-	   p2: ¿ôÃÍ£²
-	   p3: ¿ôÃÍ£³
-	   flag: 0  ÀÚ¼Î¤Æ
-	         1  ÀÚ¤ê¾å¤²
-	   vResult: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô 
+	   p1: æ•°å€¤ï¼‘
+	   p2: æ•°å€¤ï¼’
+	   p3: æ•°å€¤ï¼“
+	   flag: 0  åˆ‡æ¨ã¦
+	         1  åˆ‡ã‚Šä¸Šã’
+	   vResult: çµæœã‚’è¿”ã™å¤‰æ•° 
 	 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
@@ -264,14 +264,14 @@ void NumToRate(void) { /* 17 */
 
 void NumToRateNum(void) { /* 18 */
 	/*
-	  p1 * (p2/p3) ¤Î±é»»·ë²Ì¤òÊÖ¤¹¡£
+	  p1 * (p2/p3) ã®æ¼”ç®—çµæœã‚’è¿”ã™ã€‚
 
-	   p1: ¿ôÃÍ£±
-	   p2: ¿ôÃÍ£²
-	   p3: ¿ôÃÍ£³
-	   flag: 0  ÀÚ¼Î¤Æ
-	         1  ÀÚ¤ê¾å¤²
-	   vResult: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô 
+	   p1: æ•°å€¤ï¼‘
+	   p2: æ•°å€¤ï¼’
+	   p3: æ•°å€¤ï¼“
+	   flag: 0  åˆ‡æ¨ã¦
+	         1  åˆ‡ã‚Šä¸Šã’
+	   vResult: çµæœã‚’è¿”ã™å¤‰æ•° 
 	*/
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
@@ -295,9 +295,9 @@ void NumToRateNum(void) { /* 18 */
 
 void SetRandomSeed() {
 	/*
-	  Íğ¿ô¤Î¼ï¤ÎÀßÄê
+	  ä¹±æ•°ã®ç¨®ã®è¨­å®š
 	  
-	    seed: ¼ï
+	    seed: ç¨®
 	*/
 	int seed = getCaliValue();
 
@@ -323,7 +323,7 @@ void NumToBit() {
 	/*
 	  2^(beki-1)
 	  
-	  var: ÃÍ¤òÊÖ¤¹ÊÑ¿ô
+	  var: å€¤ã‚’è¿”ã™å¤‰æ•°
 	*/
 	int beki = getCaliValue();
 	int *var = getCaliVariable();
@@ -351,7 +351,7 @@ void BitToNum() {
           16  -> 5 ....
 	  others -> 0
 	  
-	  var: ÃÍ¤òÊÖ¤¹ÊÑ¿ô
+	  var: å€¤ã‚’è¿”ã™å¤‰æ•°
 	*/
 	int val = getCaliValue();
 	int *var = getCaliVariable();

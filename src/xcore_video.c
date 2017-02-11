@@ -174,13 +174,13 @@ void Xcore_Remove(void) {
 
 
 
-/* SHMext ¤ò»ÈÍÑ¤·¤Ê¤¤¥â¡¼¥É¤ËÀßÄê */
+/* SHMext ã‚’ä½¿ç”¨ã—ãªã„ãƒ¢ãƒ¼ãƒ‰ã«è¨­å®š */
 void Xcore_setNoShmMode(void) {
 	// x11_noSHM = TRUE;
 	noshm = TRUE;
 }
 
-/* SHMext ¤¬»ÈÍÑ¤Ç¤­¤ë¤«¥Á¥§¥Ã¥¯ */
+/* SHMext ãŒä½¿ç”¨ã§ãã‚‹ã‹ãƒã‚§ãƒƒã‚¯ */
 static void check_SHMext(void) {
 	int  major, minor;
 	Bool pixmaps;
@@ -247,7 +247,7 @@ static void init_window(void) {
 	memset(&at, 0, sizeof(at));
 	
 	if (depth == 8) {
-		/* 8bit ¤Î»ş 15/16/24bit True Color ¤Î visual ¤ò»ı¤Ã¤Æ¤¤¤ë¤«¡© */
+		/* 8bit ã®æ™‚ 15/16/24bit True Color ã® visual ã‚’æŒã£ã¦ã„ã‚‹ã‹ï¼Ÿ */
 		if (True == XMatchVisualInfo(x11_display, None, 16, TrueColor, &vinfo)) {
 			WIN_DEPTH = 16;
 		} else if (True == XMatchVisualInfo(x11_display, None, 15, TrueColor, &vinfo)) {
@@ -325,7 +325,7 @@ static void init_offscreen(void) {
 	x11_makeWorkImage(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 }
 
-/* OffScreenImage¤Ë´Ø¤¹¤ë¾ğÊó¤Î²òÊü */
+/* OffScreenImageã«é–¢ã™ã‚‹æƒ…å ±ã®è§£æ”¾ */
 static void releaseDIB(void) {
 	XFreePixmap(x11_display, x11_pixmap);
 	XFreeGC(x11_display, x11_gc_pix);
@@ -441,7 +441,7 @@ static void makeDIB(int w, int h, int depth) {
 	alloced = TRUE;
 }
 
-/* faderÍÑ¤ÎImage¤ò²òÊü */
+/* faderç”¨ã®Imageã‚’è§£æ”¾ */
 static void releaseWorkImage() {
 	if (x11_workinfo->shared) {
 		releaseShmXImage(x11_workinfo);
@@ -450,7 +450,7 @@ static void releaseWorkImage() {
 	}
 }
 
-/* fader/ecopyÍÑ¤ÎImage¤ò³ÎÊİ */
+/* fader/ecopyç”¨ã®Imageã‚’ç¢ºä¿ */
 void x11_makeWorkImage(int w, int h) {
 	static boolean alloced = FALSE;
 	
@@ -496,14 +496,14 @@ void Xcore_setWindowTitle(char *name) {
 			    name, name, NULL, 0, NULL, NULL, NULL);
 }
 
-/* offscreen ¤ÎÀßÄê */
+/* offscreen ã®è¨­å®š */
 void Xcore_setWorldSize(int width, int height, int depth) {
 	makeDIB(width, height, depth);
 	Xcore_fillRectangle(0, 0, width, height, 0);
 	XSync(x11_display, False);
 }
 
-/* Window¤Î size ¤È depth ¤Î¼èÆÀ */
+/* Windowã® size ã¨ depth ã®å–å¾— */
 void Xcore_getWindowInfo(DispInfo *info) {
 	info->width  = DisplayWidth(x11_display, 0);
 	info->height = DisplayHeight(x11_display, 0);
@@ -511,14 +511,14 @@ void Xcore_getWindowInfo(DispInfo *info) {
 }
 
 /*
- DIB¤Î¼èÆÀ
- SharedPixma / XImage / MemoryImage¤Î¤¤¤º¤ì¤«
+ DIBã®å–å¾—
+ SharedPixma / XImage / MemoryImageã®ã„ãšã‚Œã‹
  */
 agsurface_t *Xcore_getDIB(void) {
 	return DIB;
 }
 
-/* AutoRepeat ¤ÎÀßÄê */
+/* AutoRepeat ã®è¨­å®š */
 void Xcore_setAutoRepeat(boolean bool) {
 	if (bool) {
 		XAutoRepeatOn(x11_display);

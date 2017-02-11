@@ -181,7 +181,7 @@ static void midi_controlparameter(int chan, int cnt, int val) {
 	
 	if (check_sys35mark(&fnc, &val1, &val2) > 0) {
 		midi->event[midi->ceptr - 5].type = 3;
-		/* ¥é¥Ù¥ëÅÐÏ¿ */
+		/* ãƒ©ãƒ™ãƒ«ç™»éŒ² */
 		if (fnc == 0) {
 			midi->sys35_label[val1] = midi->ceptr -5;
 		}

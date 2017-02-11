@@ -42,14 +42,14 @@ int load_profile(char *path)
 	char *p, *q;
 	int now_values = 0, is_flag, line = 0;
 	
-	/* »ØÄê¤Î path ¤ò¤Ş¤ºÃµ¤¹ */
+	/* æŒ‡å®šã® path ã‚’ã¾ãšæ¢ã™ */
 	if (path) {
 		
 	} else {
 		
 	}
 
-	/* $(HOME)/.xsys35rc ¤òÃµ¤¹ */
+	/* $(HOME)/.xsys35rc ã‚’æ¢ã™ */
 	home_dir = getenv("HOME");
 	if (home_dir) {
 		sprintf(profile_path, "%s/%s", home_dir, RC_NAME);
@@ -57,11 +57,11 @@ int load_profile(char *path)
 	}
 	
 	if (!fp) {
-		/* ¸«¤Ä¤«¤é¤Ê¤«¤Ã¤¿¤é¡¢CWD ¤«¤é .gicqjarc ¤òÃµ¤¹ */
+		/* è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã‚‰ã€CWD ã‹ã‚‰ .gicqjarc ã‚’æ¢ã™ */
 		strcpy(profile_path, RC_NAME);
 		fp = fopen(RC_NAME, "r");
 		if (!fp) {
-			/* CWD ¤«¤é¤â¸«¤Ä¤«¤é¤Ê¤«¤Ã¤¿¤é¡¢¥¨¥é¡¼¤òÉ½¼¨¤·¤Æ½ªÎ» */
+			/* CWD ã‹ã‚‰ã‚‚è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã‚‰ã€ã‚¨ãƒ©ãƒ¼ã‚’è¡¨ç¤ºã—ã¦çµ‚äº† */
 			char *error_msg;
 			error_msg = g_malloc(strlen(profile_path) + 12);
 			sprintf(error_msg, "fopen() '%s'", profile_path);
@@ -82,7 +82,7 @@ int load_profile(char *path)
 		}
 		line++;
 		
-		/* ÆÉ¤ß¹ş¤ó¤À¹Ô¤ò¥Ñ¡¼¥¹¤¹¤ë */
+		/* èª­ã¿è¾¼ã‚“ã è¡Œã‚’ãƒ‘ãƒ¼ã‚¹ã™ã‚‹ */
 		p = q = rc_line;
 		is_flag = FALSE;
 		
@@ -98,7 +98,7 @@ int load_profile(char *path)
 		
 		*p = '\0';
 		
-		/* ¹ÔÆ¬¤¬ # ¤À¤Ã¤¿¾ì¹ç¤È¡¢¶õ¹Ô¤Î¾ì¹ç¤Ïµ­²±¤·¤Ê¤¤ */
+		/* è¡Œé ­ãŒ # ã ã£ãŸå ´åˆã¨ã€ç©ºè¡Œã®å ´åˆã¯è¨˜æ†¶ã—ãªã„ */
 		if (rc_line[0] == '#' || rc_line[0] == '\0')
 			continue;
 		
@@ -113,8 +113,8 @@ int load_profile(char *path)
 			if (!isspace(*p) && !iscntrl(*p))
 				break;
 		
-		/* ANSI ¤Î realloc ¤È glib ¤Î g_realloc ¤Ï ptr ¤Ë NULL ¥İ¥¤¥ó¥¿¤¬ */
-		/* ´Ş¤Ş¤ì¤Æ¤¤¤¿¾ì¹ç¤ÎµóÆ°¤¬°ã¤¦¤è¤¦¤À */
+		/* ANSI ã® realloc ã¨ glib ã® g_realloc ã¯ ptr ã« NULL ãƒã‚¤ãƒ³ã‚¿ãŒ */
+		/* å«ã¾ã‚Œã¦ã„ãŸå ´åˆã®æŒ™å‹•ãŒé•ã†ã‚ˆã†ã  */
 		profile_name = realloc(profile_name, sizeof(char *) * (now_values + 1));
 		if (!profile_name) {
 			perror("realloc()");

@@ -1,5 +1,5 @@
 /*
- * sprite_quake.c: ¥¹¥×¥é¥¤¥È¤òÍÉ¤é¤¹
+ * sprite_quake.c: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æºã‚‰ã™
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -37,14 +37,14 @@
 #include "randMT.h"
 
 /*
-   QuakeSpriteAdd¤ÇÀßÄê¤·¤¿¥¹¥×¥é¥¤¥È¤òÍÉ¤é¤¹
+   QuakeSpriteAddã§è¨­å®šã—ãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æºã‚‰ã™
    
-   @param wType: 0:½Ä²£(Á´¤Æ¤Î¥¹¥×¥é¥¤¥È¤òÆ±¤¸¤è¤¦¤ËÍÉ¤é¤¹)
-                 1:½Ä²£(Á´¤Æ¤Î¥¹¥×¥é¥¤¥È¤ò¥Ğ¥é¥Ğ¥é¤ËÍÉ¤é¤¹)
-   @param wAmplitudeX: £ØÊı¸ş¤Î¿¶Éı
-   @param wAmplitudeY: £ÙÊı¸ş¤Î¿¶Éı
-   @param wCount: »ş´Ö(1/100ÉÃ)
-   @param cancel: ¥­¡¼¥­¥ã¥ó¥»¥ë¤¢¤ê(=1)
+   @param wType: 0:ç¸¦æ¨ª(å…¨ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åŒã˜ã‚ˆã†ã«æºã‚‰ã™)
+                 1:ç¸¦æ¨ª(å…¨ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’ãƒãƒ©ãƒãƒ©ã«æºã‚‰ã™)
+   @param wAmplitudeX: ï¼¸æ–¹å‘ã®æŒ¯å¹…
+   @param wAmplitudeY: ï¼¹æ–¹å‘ã®æŒ¯å¹…
+   @param wCount: æ™‚é–“(1/100ç§’)
+   @param cancel: ã‚­ãƒ¼ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã‚ã‚Š(=1)
 */
 int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int cancel) {
 	int edtime, curtime;
@@ -54,7 +54,7 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 	edtime = wCount * 10 + get_high_counter(SYSTEMCOUNTER_MSEC);
 	
 	while ((curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < edtime) {
-		if (wType == 0) { // Á´¤Æ¤Î¥¹¥×¥é¥¤¥È¤òÆ±¤¸¤è¤¦¤ËÆ°¤«¤¹
+		if (wType == 0) { // å…¨ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åŒã˜ã‚ˆã†ã«å‹•ã‹ã™
 			int adjx = (int)(genrand() * wAmplitudeX/2);
 			int adjy = (int)(genrand() * wAmplitudeY/2);
 			adjx *= ((-1)*(i%2) + ((i+1)%2));
@@ -67,7 +67,7 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 				sp->cur.y = sp->loc.y + adjy;
 				sp_updateme(sp);
 			}
-		} else { //  Á´¤Æ¤Î¥¹¥×¥é¥¤¥È¤òÊÌ¡¹¤ËÆ°¤«¤¹
+		} else { //  å…¨ã¦ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆ¥ã€…ã«å‹•ã‹ã™
 			for (node = sact.sp_quake; node; node = node->next) {
 				sprite_t *sp = (sprite_t *)node->data;
 				int adjx = (int)(genrand() * wAmplitudeX/2);
@@ -84,12 +84,12 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 		sp_update_clipped();
 		i++;
 		
-		// ¥¦¥§¥¤¥È¤È¥­¥ã¥ó¥»¥ë¥Á¥§¥Ã¥¯
+		// ã‚¦ã‚§ã‚¤ãƒˆã¨ã‚­ãƒ£ãƒ³ã‚»ãƒ«ãƒã‚§ãƒƒã‚¯
 		key = sys_keywait(10, cancel);
 		if (cancel && key != 0) break;
 	}
 	
-	// ¸µ¤Î¤¢¤Ã¤¿¾ì½ê¤ËÌá¤¹
+	// å…ƒã®ã‚ã£ãŸå ´æ‰€ã«æˆ»ã™
 	for (node = sact.sp_quake; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;
 		if (sp == NULL) continue;

@@ -1,5 +1,5 @@
 /*
- * screen_quake.c: ¥¹¥¯¥ê¡¼¥óÁ´ÂÎ¤òÍÉ¤é¤¹
+ * screen_quake.c: ã‚¹ã‚¯ãƒªãƒ¼ãƒ³å…¨ä½“ã‚’æºã‚‰ã™
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -42,7 +42,7 @@
 
 typedef void entrypoint (double step, int p1, int p2, int *retx, int *rety);
 
-// ¾å²¼º¸±¦Êı¸ş¤ÎÍÉ¤é¤·
+// ä¸Šä¸‹å·¦å³æ–¹å‘ã®æºã‚‰ã—
 static void quake0(double step, int ampx, int ampy, int *adjx, int *adjy) {
 	static int i = 0;
 	
@@ -53,7 +53,7 @@ static void quake0(double step, int ampx, int ampy, int *adjx, int *adjy) {
 	i++;
 }
 
-// ²óÅ¾¤ÎÍÉ¤é¤·
+// å›è»¢ã®æºã‚‰ã—
 static void quake1(double curstep, int diam, int round, int *adjx, int *adjy) {
 	double R = (1 - curstep) * diam / 2;
 	double th = curstep * 2 * M_PI * round;
@@ -63,14 +63,14 @@ static void quake1(double curstep, int diam, int round, int *adjx, int *adjy) {
 }
 
 /*
-   ²èÌÌÍÉ¤é¤·
-   @param wType: 0=½Ä²£, 1:²óÅ¾
-   @param wParam1: wType=0¤Î¤È¤­xÊı¸ş¤Î¿¶Éı
-                   wType=1¤Î¤È¤­¿¶Éı
-   @param wParam2: wType=0¤Î¤È¤­yÊı¸ş¤Î¿¶Éı
-                   wType=1¤Î¤È¤­²óÅ¾¿ô
-   @param wCount: »ş´Ö(1/100ÉÃ)
-   @param nfKeyEnable: ¥­¡¼È´¤± (1¤ÇÍ­¸ú)
+   ç”»é¢æºã‚‰ã—
+   @param wType: 0=ç¸¦æ¨ª, 1:å›è»¢
+   @param wParam1: wType=0ã®ã¨ãxæ–¹å‘ã®æŒ¯å¹…
+                   wType=1ã®ã¨ãæŒ¯å¹…
+   @param wParam2: wType=0ã®ã¨ãyæ–¹å‘ã®æŒ¯å¹…
+                   wType=1ã®ã¨ãå›è»¢æ•°
+   @param wCount: æ™‚é–“(1/100ç§’)
+   @param nfKeyEnable: ã‚­ãƒ¼æŠœã‘ (1ã§æœ‰åŠ¹)
 */
 int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	int sttime, edtime, curtime;

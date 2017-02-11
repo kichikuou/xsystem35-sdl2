@@ -6,9 +6,9 @@
 #include "ald_manager.h"
 
 struct _midiobj {
-	int st; // ¥ª¥Ö¥¸¥§¥¯¥È¤ÎÁ«°Ü¾õÂÖ
+	int st; // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é·ç§»çŠ¶æ…‹
 	
-	boolean in_play; // ±éÁÕÃæ¡©
+	boolean in_play; // æ¼”å¥ä¸­ï¼Ÿ
 
 	int no;
 	int loop;

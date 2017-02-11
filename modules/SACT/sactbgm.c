@@ -1,5 +1,5 @@
 /*
- * sactbgm.c: SACT Music ´ØÏ¢
+ * sactbgm.c: SACT Music é–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -31,7 +31,7 @@
 #include "ald_manager.h"
 #include "music_client.h"
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤¬Â¸ºß¤¹¤ë¤«¥Á¥§¥Ã¥¯
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ãŒå­˜åœ¨ã™ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 int smus_check(int no) {
 	dridata *dfile = ald_getdata(DRIFILE_BGM, no -1);
 	int st = 0;
@@ -46,47 +46,47 @@ int smus_check(int no) {
 	return st;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤ÎÄ¹¤µ¤ò¼èÆÀ
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ã®é•·ã•ã‚’å–å¾—
 int smus_getlength(int no) {
 	return mus_bgm_getlength(no);
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤ÎºÆÀ¸°ÌÃÖ¤ò¼èÆÀ
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ã®å†ç”Ÿä½ç½®ã‚’å–å¾—
 int smus_getpos(int no) {
 	return mus_bgm_getpos(no);
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤ÎºÆÀ¸³«»Ï
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ã®å†ç”Ÿé–‹å§‹
 int smus_play(int no, int time, int vol) {
 	mus_bgm_play(no, time, vol);
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤ÎºÆÀ¸Ää»ß
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ã®å†ç”Ÿåœæ­¢
 int smus_stop(int no, int fadetime) {
 	mus_bgm_stop(no, fadetime);
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤Î¥Ü¥ê¥å¡¼¥à¥Õ¥§¡¼¥É
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ã®ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒ•ã‚§ãƒ¼ãƒ‰
 int smus_fade(int no, int time, int vol) {
 	mus_bgm_fade(no, time, vol);
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤¬½ªÎ»¤¹¤ë¤Î¤òÂÔ¤Ä
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ãŒçµ‚äº†ã™ã‚‹ã®ã‚’å¾…ã¤
 int smus_wait(int no, int timeout) {
 	mus_bgm_wait(no, timeout);
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î²»³Ú¤¬»ØÄê¤Î°ÌÃÖ¤Ş¤ÇºÆÀ¸¤µ¤ì¤ë¤Î¤òÂÔ¤Ä
+// æŒ‡å®šã®ç•ªå·ã®éŸ³æ¥½ãŒæŒ‡å®šã®ä½ç½®ã¾ã§å†ç”Ÿã•ã‚Œã‚‹ã®ã‚’å¾…ã¤
 int smus_waitpos(int no, int index) {
 	mus_bgm_waitpos(no, index);
 	return OK;
 }
 
-// Á´¤Æ¤Î²»³Ú¤ÎºÆÀ¸¤òÄä»ß
+// å…¨ã¦ã®éŸ³æ¥½ã®å†ç”Ÿã‚’åœæ­¢
 int smus_stopall(int time) {
 	mus_bgm_stopall(time);
 	return OK;

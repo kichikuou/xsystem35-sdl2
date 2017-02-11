@@ -96,10 +96,10 @@ static boolean enabled = FALSE;
 static char    midi_player[256];
 static int     argc;
 static char    **argv;
-static int     midino;    // ¸½ºß±éÁÕÃæ¤ÎÈÖ¹æ
-static pid_t   midipid;   // ³°Éô¥×¥ì¡¼¥ä¡¼¤Î pid
-static int     counter;   // ±éÁÕ»ş´Ö
-static boolean pipedplay; // pipe play ¥â¡¼¥É¤«¤É¤¦¤«
+static int     midino;    // ç¾åœ¨æ¼”å¥ä¸­ã®ç•ªå·
+static pid_t   midipid;   // å¤–éƒ¨ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ã® pid
+static int     counter;   // æ¼”å¥æ™‚é–“
+static boolean pipedplay; // pipe play ãƒ¢ãƒ¼ãƒ‰ã‹ã©ã†ã‹
 
 static void player_set(char *buf) {
 	char *b, *bb;

@@ -51,7 +51,7 @@ static int       fontcnt = 0;
 static FT_Library eng;
 static FontTable *fontset;
 
-#define GLYPH_PIXMAP_WIDTH  800  /* Ê¸»ú¥¤¥á¡¼¥¸¤ò¼èÆÀ¤¹¤ë°Ù¤ÎPixmap¤ÎÂç¤­¤µ */
+#define GLYPH_PIXMAP_WIDTH  800  /* æ–‡å­—ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’å–å¾—ã™ã‚‹ç‚ºã®Pixmapã®å¤§ãã• */
 #define GLYPH_PIXMAP_HEIGHT 150
 
 static agsurface_t img_glyph;
@@ -248,15 +248,15 @@ static void *font_ttf_get_glyph(unsigned char *_msg) {
 		
 		if (this->antialiase_on) {
 			loadflag = FT_LOAD_RENDER;
-			// if( Ëä¤á¹þ¤ß¥Ó¥Ã¥È¥Þ¥Ã¥×¤ò»È¤¤¤¿¤¯¤Ê¤¤»þ)
+			// if( åŸ‹ã‚è¾¼ã¿ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’ä½¿ã„ãŸããªã„æ™‚)
 			//	loadglag |= FT_LOAD_NO_BITMAP;
 		} else {
 			loadflag = (FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
 		}
 		
 		err = FT_Load_Char(fontset->face, code, loadflag);
-		/* gray scale¤Ç¤â¥â¥Î¥¯¥í¤Ç¤â¤Ê¤¤Ëä¤á¹þ¤ß¥Ó¥Ã¥È¥Þ¥Ã¥×¤Ï»È¤ï¤º¡¢
-		   ¥¢¥¦¥È¥é¥¤¥ó¥Õ¥©¥ó¥È¤ò»ÈÍÑ */
+		/* gray scaleã§ã‚‚ãƒ¢ãƒŽã‚¯ãƒ­ã§ã‚‚ãªã„åŸ‹ã‚è¾¼ã¿ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã¯ä½¿ã‚ãšã€
+		   ã‚¢ã‚¦ãƒˆãƒ©ã‚¤ãƒ³ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ */
 		pixelmode = fontset->face->glyph->bitmap.pixel_mode ;
 		if (!err &&
 		    pixelmode != ft_pixel_mode_mono &&

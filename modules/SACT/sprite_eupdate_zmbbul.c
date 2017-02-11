@@ -4,7 +4,7 @@
 static surface_t *ec10_sf[6];
 
 
-// ¥º¡¼¥à¥Ö¥ì¥ó¥É¥Ö¥é¡¼
+// ã‚ºãƒ¼ãƒ ãƒ–ãƒ¬ãƒ³ãƒ‰ãƒ–ãƒ©ãƒ¼
 static void ec10_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep, turstep;
 	surface_t *sf;
@@ -18,13 +18,13 @@ static void ec10_cb(surface_t *sfsrc, surface_t *sfdst) {
 	WARNING("step = %d/%d\n", curstep, maxstep);
 	
 	if (curstep > turstep) {
-		// µ¢¤ê
+		// å¸°ã‚Š
 		sx = (maxstep - curstep) * (sfsrc->width - sfsrc->width/10) / maxstep;
 		sy = (maxstep - curstep) * (sfsrc->height - sfsrc->height/10) / maxstep;
 		sw = sfsrc->width - sx*2;
 		sh = sfsrc->height - sy*2;
 	} else {
-		// ¹Ô¤­
+		// è¡Œã
 		sx = curstep * (sfsrc->width - sfsrc->width/10) / maxstep;
 		sy = curstep * (sfsrc->height - sfsrc->height/10) / maxstep;
 		sw = sfsrc->width - sx*2;

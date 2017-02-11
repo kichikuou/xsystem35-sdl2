@@ -1,5 +1,5 @@
 /*
- * imput.c ¥­¡¼¥Ü¡¼¥É¥Þ¥¦¥¹´ØÏ¢
+ * imput.c ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒžã‚¦ã‚¹é–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -97,7 +97,7 @@ int sys_getInputInfo() {
 		skipToNextSel = FALSE;		
 	}
 
-	/* Éü³è !! */
+	/* å¾©æ´» !! */
         if (key == (SYS35KEY_SPC | SYS35KEY_RET | SYS35KEY_ESC)) sys_exit(0);
 	
  	return key;

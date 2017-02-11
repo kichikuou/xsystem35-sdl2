@@ -118,7 +118,7 @@ WAVFILE *ogg_getinfo(char *data, long size) {
 	wfile->ch   = vinfo->channels;
 	wfile->bits = 16; // ?
 	wfile->samples = wfile->bytes / (wfile->ch * 2);
-	wfile->data = vf; // ¤È¤ê¤¢¤¨¤ºÆÍ¤Ã¹ş¤ó¤É¤±
+	wfile->data = vf; // ã¨ã‚Šã‚ãˆãšçªã£è¾¼ã‚“ã©ã‘
 	
 	return wfile;
  eexit:

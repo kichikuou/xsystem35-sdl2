@@ -1,5 +1,5 @@
 //  color expansion and blending
-//  8bpp§Œ•‚•Œ•Ø•Ì§Úcol§«•÷•Ï•Û•…
+//  8bpp„ÅÆ„É¢„Éé„ÇØ„É≠„Çícol„Åß„Éñ„É¨„É≥„Éâ
 
 #include "portab.h"
 #include "surface.h"

@@ -1,4 +1,4 @@
-# 20À¤µª¥¢¥ê¥¹ ¤«¤¨¤ë¤Ë¤ç¹ñ¤Ë¤ç¥¢¥ê¥¹ Install infomation
+# 20ä¸–ç´€ã‚¢ãƒªã‚¹ ã‹ãˆã‚‹ã«ã‚‡å›½ã«ã‚‡ã‚¢ãƒªã‚¹ Install infomation
 # Tag,		#origin,		#destination
 ScenarioA,	gamedata/*SA.ald,	20cKaeru_sa.ald
 GraphicsA,	gamedata/*GA.ald,	20cKaeru_ga.ald

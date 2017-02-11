@@ -33,7 +33,7 @@
 #include "message.h"
 #include "ags.h"
 
-/* ¥³¥Ş¥ó¥É²òÀÏ»ş¤Ë»²¾È¤¹¤ë */
+/* ã‚³ãƒãƒ³ãƒ‰è§£ææ™‚ã«å‚ç…§ã™ã‚‹ */
 #define sys_getc            sl_getc
 #define sys_getw            sl_getw
 #define sys_getdw           sl_getdw
@@ -56,12 +56,12 @@ extern void nact_init();
 typedef struct {
 	/* general */
 	boolean   is_quit;             /* quit command */
-	void     (*callback)(void);    /* main ¤Î callback */
+	void     (*callback)(void);    /* main ã® callback */
 	boolean   is_va_animation;     /* VA command working */
 	boolean   is_cursor_animation; /* animation cursor working */
-	boolean   is_message_locked;   /* pointer Åù¤Î event handler ¤ò¸Æ¤Ó½Ğ¤µ¤Ê¤¤ */
-	boolean   popupmenu_opened;    /* popup menu ¤¬ ³«¤¤¤Æ¤¤¤ë¤« */
-	boolean   mmx_is_ok;           /* MMX ¤¬Í­¸ú¤«¤É¤¦¤« */
+	boolean   is_message_locked;   /* pointer ç­‰ã® event handler ã‚’å‘¼ã³å‡ºã•ãªã„ */
+	boolean   popupmenu_opened;    /* popup menu ãŒ é–‹ã„ã¦ã„ã‚‹ã‹ */
+	boolean   mmx_is_ok;           /* MMX ãŒæœ‰åŠ¹ã‹ã©ã†ã‹ */
 	
 	char      *tmpdir;
 	char       game_title_name[31];
@@ -69,8 +69,8 @@ typedef struct {
 
 	
 	/* variables */
-	void *datatbl_addr; /* ¥Ç¡¼¥¿¥Æ¡¼¥Ö¥ë¤Î¥¢¥É¥ì¥¹ */
-	int fnc_return_value; /* ´Ø¿ô¤ÎÌá¤êÃÍ¤È¤·¤ÆÊÖ¤¹ÃÍ (~0,cali:¤ÇÅÏ¤¹ÃÍ) */
+	void *datatbl_addr; /* ãƒ‡ãƒ¼ã‚¿ãƒ†ãƒ¼ãƒ–ãƒ«ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ */
+	int fnc_return_value; /* é–¢æ•°ã®æˆ»ã‚Šå€¤ã¨ã—ã¦è¿”ã™å€¤ (~0,cali:ã§æ¸¡ã™å€¤) */
 	
 #if 1
 	/* ags info */
@@ -79,7 +79,7 @@ typedef struct {
 	MyRectangle sys_view_area;
 	MyDimension sys_world_size;
 	int         sys_world_depth;
-	int         sys_mouse_movesw; /* 0:IZ¤òÌµ»ë, 1: Ä¾ÀÜ»ØÄê¾ì½ê¤Ø, 2: ¥¹¥à¡¼¥º¤Ë»ØÄê¾ì½ê¤Ë */
+	int         sys_mouse_movesw; /* 0:IZã‚’ç„¡è¦–, 1: ç›´æ¥æŒ‡å®šå ´æ‰€ã¸, 2: ã‚¹ãƒ ãƒ¼ã‚ºã«æŒ‡å®šå ´æ‰€ã« */
 	boolean     sys_fullscreen_capable;
 	boolean     sys_fullscreen_on;
 	
@@ -87,7 +87,7 @@ typedef struct {
 
 	/* for fader/ecopy */
 	int     effect_rate;
-	int     effect_step; /* 0 to 255 , 0 ¤È 255 ¤ÏÉ¬¤ºÄÌ¤ë*/
+	int     effect_step; /* 0 to 255 , 0 ã¨ 255 ã¯å¿…ãšé€šã‚‹*/
 
 	/* key wait */
 	int     waittime;
@@ -104,27 +104,27 @@ typedef struct {
 	
 	/* ags */
 	ags_t ags;
-	boolean noantialias; /* antialias ¤ò»ÈÍÑ¤·¤Ê¤¤ */
-	boolean noimagecursor; /* ¥ê¥½¡¼¥¹¥Õ¥¡¥¤¥ë¤Î¥«¡¼¥½¥ë¤òÆÉ¤ß¤³¤Ş¤Ê¤¤ */
-	fontdev_t fontdev; // ÁªÂò¤µ¤ì¤¿ fontdevice
+	boolean noantialias; /* antialias ã‚’ä½¿ç”¨ã—ãªã„ */
+	boolean noimagecursor; /* ãƒªã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚«ãƒ¼ã‚½ãƒ«ã‚’èª­ã¿ã“ã¾ãªã„ */
+	fontdev_t fontdev; // é¸æŠã•ã‚ŒãŸ fontdevice
 	
-	/* ¥á¥Ã¥»¡¼¥¸´ØÏ¢ */
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é–¢é€£ */
 	msg_t msg;
- 	boolean   is_msg_out;          /* ÄÌ¾ï¥á¥Ã¥»¡¼¥¸¤òÉ½¼¨¤¹¤ë¤« */
-	void (*msgout)(char *msg);     // ÄÌ¾ï°Ê³°(DLLÅù)¤Î¥á¥Ã¥»¡¼¥¸É½¼¨´Ø¿ô
+ 	boolean   is_msg_out;          /* é€šå¸¸ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹ã‹ */
+	void (*msgout)(char *msg);     // é€šå¸¸ä»¥å¤–(DLLç­‰)ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºé–¢æ•°
 	
-	/* ÁªÂò»è´ØÏ¢ */
+	/* é¸æŠè‚¢é–¢é€£ */
 	sel_t sel;
 	
-	/* patch ´ØÏ¢ */
+	/* patch é–¢é€£ */
 	int patch_ec;   /* see patch_ec command   */
 	int patch_emen; /* see patch_emen command */
 	int patch_g0;   /* see patch g0 command */
 	
-	/* ain ´ØÏ¢ */
+	/* ain é–¢é€£ */
 	S39AIN ain;
 
-	/* ¥Ç¡¼¥¿¤Î¥Õ¥¡¥¤¥ëÌ¾ */
+	/* ãƒ‡ãƒ¼ã‚¿ã®ãƒ•ã‚¡ã‚¤ãƒ«å */
 	struct {
 		char *scenario[2];
 		char *graphics[2];

@@ -26,8 +26,8 @@
 #include "xsystem35.h"
 #include "scenario.h"
 
-void commandUC() { /* ²¦Æ»Í¦¼Ô */
-	/* ¥é¥Ù¥ë¡¦¥·¥Ê¥ê¥ª¥³¡¼¥ë¤Î¥¹¥¿¥Ã¥¯¥Õ¥ì¡¼¥à¤òºï½ü¤¹¤ë¡£*/
+void commandUC() { /* ç‹é“å‹‡è€… */
+	/* ãƒ©ãƒ™ãƒ«ãƒ»ã‚·ãƒŠãƒªã‚ªã‚³ãƒ¼ãƒ«ã®ã‚¹ã‚¿ãƒƒã‚¯ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’å‰Šé™¤ã™ã‚‹ã€‚*/
 	int mode = sys_getc();
 	int num  = getCaliValue();
 	
@@ -60,14 +60,14 @@ void commandUD() {
 }
 
 void commandUR() {
-	/* ºÇ¸å¤ËÀÑ¤Ş¤ì¤¿¥¹¥¿¥Ã¥¯¤ÎÂ°À­¤ò¥ê¡¼¥É */
+	/* æœ€å¾Œã«ç©ã¾ã‚ŒãŸã‚¹ã‚¿ãƒƒã‚¯ã®å±æ€§ã‚’ãƒªãƒ¼ãƒ‰ */
 	int *var = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("UR %p:\n",var);
 }
 
 void commandUS() {
-	/* ¥í¡¼¥«¥ëÊÑ¿ô»ØÄê(ÊÑ¿ô PUSH) */
+	/* ãƒ­ãƒ¼ã‚«ãƒ«å¤‰æ•°æŒ‡å®š(å¤‰æ•° PUSH) */
 	int *var = getCaliVariable();
 	int cnt = getCaliValue();
 	
@@ -76,7 +76,7 @@ void commandUS() {
 }
 
 void commandUG() {
-	/* ¥í¡¼¥«¥ëÊÑ¿ô»ØÄê(ÊÑ¿ô POP) */
+	/* ãƒ­ãƒ¼ã‚«ãƒ«å¤‰æ•°æŒ‡å®š(å¤‰æ•° POP) */
 	int *var = getCaliVariable();
 	int cnt = getCaliValue();
 	
@@ -85,7 +85,7 @@ void commandUG() {
 }
 
 void commandUP0() {
-	/* »Ò¥×¥í¥»¥¹¤òµ¯Æ°¤¹¤ë */
+	/* å­ãƒ—ãƒ­ã‚»ã‚¹ã‚’èµ·å‹•ã™ã‚‹ */
 	int no = getCaliValue();
 	int mode = getCaliValue();
 	
@@ -93,7 +93,7 @@ void commandUP0() {
 }
 
 void commandUP1() {
-	/* »Ò¥×¥í¥»¥¹¤òµ¯Æ°¤¹¤ë */
+	/* å­ãƒ—ãƒ­ã‚»ã‚¹ã‚’èµ·å‹•ã™ã‚‹ */
 	char *str = sys_getString(':');
 	int mode = getCaliValue();
 	
@@ -101,7 +101,7 @@ void commandUP1() {
 }
 
 void commandUP3() {
-	/* ³°Éô¥×¥í¥°¥é¥àµ¯Æ°¸åSYSTEM3.6½ªÎ»*/
+	/* å¤–éƒ¨ãƒ—ãƒ­ã‚°ãƒ©ãƒ èµ·å‹•å¾ŒSYSTEM3.6çµ‚äº†*/
 	char *str1 = sys_getString(':');
 	char *str2 = sys_getString(':');
 	

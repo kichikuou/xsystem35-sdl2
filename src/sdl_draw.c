@@ -52,7 +52,7 @@ static int fadestep[256] =
  251,251,252,252,252,252,253,253,253,253,254,254,254,254,254,254,255,255,255,
  255,255,255,255,255,255,255,255,255,255,255};
 
-static SDL_Surface *s_fader;  /* fade in /out ÍÑ work surface */
+static SDL_Surface *s_fader;  /* fade in /out ç”¨ work surface */
 
 static void sdl_pal_check(void) {
 	if (nact->sys_pal_changed) {
@@ -61,7 +61,7 @@ static void sdl_pal_check(void) {
 	}
 }
 
-/* off-screen ¤Î»ØÄêÎÎ°è¤ò Main Window ¤ØÅ¾Á÷ */
+/* off-screen ã®æŒ‡å®šé ˜åŸŸã‚’ Main Window ã¸è»¢é€ */
 void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 	SDL_Rect rect_s, rect_d;
 	
@@ -74,7 +74,7 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 		       src->width, src->height);
 }
 
-/* Á´²èÌÌ¹¹¿· */
+/* å…¨ç”»é¢æ›´æ–° */
 static void sdl_updateAll() {
 	SDL_Rect rect;
 
@@ -86,7 +86,7 @@ static void sdl_updateAll() {
 
 }
 
-/* Color ¤ÎÊ£¿ô¸Ä»ØÄê */
+/* Color ã®è¤‡æ•°å€‹æŒ‡å®š */
 void sdl_setPallet(Pallet256 *pal, int src, int cnt) {
 	int i;
 	
@@ -101,7 +101,7 @@ void sdl_setPallet(Pallet256 *pal, int src, int cnt) {
 	}
 }
 
-/* ¶ë·Á¤ÎÉÁ²è */
+/* çŸ©å½¢ã®æç”» */
 void sdl_drawRectangle(int x, int y, int w, int h, int c) {
 	SDL_Rect rect;
 	
@@ -123,7 +123,7 @@ void sdl_drawRectangle(int x, int y, int w, int h, int c) {
 	SDL_FillRect(sdl_dib, &rect, c);
 }
 
-/* ¶ë·ÁÅÉ¤ê¤Ä¤Ö¤· */
+/* çŸ©å½¢å¡—ã‚Šã¤ã¶ã— */
 void sdl_fillRectangle(int x, int y, int w, int h, u_long c) {
 	SDL_Rect rect;
 	
@@ -137,7 +137,7 @@ void sdl_fillRectangle(int x, int y, int w, int h, u_long c) {
 	SDL_FillRect(sdl_dib, &rect, c);
 }
 
-/* ÎÎ°è¥³¥Ô¡¼ */
+/* é ˜åŸŸã‚³ãƒ”ãƒ¼ */
 void sdl_copyArea(int sx,int sy, int w, int h, int dx, int dy) {
 	SDL_Rect r_src, r_dst;
 	
@@ -148,7 +148,7 @@ void sdl_copyArea(int sx,int sy, int w, int h, int dx, int dy) {
 }
 
 /*
- * dib ¤Ë»ØÄê¤Î¥Ñ¥ì¥Ã¥È sp ¤òÈ´¤¤¤Æ¥³¥Ô¡¼
+ * dib ã«æŒ‡å®šã®ãƒ‘ãƒ¬ãƒƒãƒˆ sp ã‚’æŠœã„ã¦ã‚³ãƒ”ãƒ¼
  */
 void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int sp) {
 	SDL_Rect r_src, r_dst;
@@ -230,7 +230,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	SDL_FreeSurface(s);
 }
 
-/* Ä¾ÀşÉÁ²è */
+/* ç›´ç·šæç”» */
 void sdl_drawLine(int x1, int y1, int x2, int y2, u_long cl) {
 
 	sdl_pal_check();
@@ -512,7 +512,7 @@ void sdl_whiteOut(int step) {
 }
 
 /*
- * »ØÄêÈÏ°Ï¤Ë¥Ñ¥ì¥Ã¥È col ¤ò rate ¤Î³ä¹ç¤Ç½Å¤Í¤ë CK1
+ * æŒ‡å®šç¯„å›²ã«ãƒ‘ãƒ¬ãƒƒãƒˆ col ã‚’ rate ã®å‰²åˆã§é‡ã­ã‚‹ CK1
  */
 void sdl_wrapColor(int sx, int sy, int w, int h, int cl, int rate) {
 	SDL_Surface *s;
@@ -537,7 +537,7 @@ void sdl_wrapColor(int sx, int sy, int w, int h, int cl, int rate) {
 	SDL_FreeSurface(s);
 }
 
-/* mask update ¤Ş¤À */
+/* mask update ã¾ã  */
 void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step) {
 
 	if (step == 256) {

@@ -1,5 +1,5 @@
 /*
- * selection.h  ÁªÂò
+ * selection.h  é¸æŠ
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -46,17 +46,17 @@ extern void sel_fixElement();
 extern void sel_select();
 
 struct _selection {
-	/* WindowÏÈ¤Î¼ïÎà */
+	/* Windowæ ã®ç¨®é¡ */
 	int WindowFrameType;
 	int FrameCgNoTop;
 	int FrameCgNoMid;
 	int FrameCgNoBot;
 	int Framedot;
 	
-        /* ¥á¥Ã¥»¡¼¥¸¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ */
+        /* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã• */
 	int MsgFontSize;
 	
-	/* ³Æ¼ï¿§ */
+	/* å„ç¨®è‰² */
 	int MsgFontColor;
 	int WinFrameColor;
 	int WinBackgroundColor;
@@ -65,19 +65,19 @@ struct _selection {
 	int WinBackgroundTransparent;
 	int EncloseType;
 	
-	/* ÁªÂò¤·¤¿¤¢¤È¥á¥Ã¥»¡¼¥¸ÎÎ°è¤ò½é´ü²½¤¹¤ë¤« */
+	/* é¸æŠã—ãŸã‚ã¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é ˜åŸŸã‚’åˆæœŸåŒ–ã™ã‚‹ã‹ */
 	boolean ClearMsgWindow;
 	
-	/* ÁªÂòWindow¤ÎÂç¤­¤µ¤ÎÊÑ¹¹ */
+	/* é¸æŠWindowã®å¤§ãã•ã®å¤‰æ›´ */
 	boolean WinResizeWidth;
 	boolean WinResizeHeight;
 	
-	/* ÁªÂò»è Window */
+	/* é¸æŠè‚¢ Window */
 	int              winno;  
-	Bcom_WindowInfo *win; // ¸½ºß»ÈÍÑÃæ¤Î window
+	Bcom_WindowInfo *win; // ç¾åœ¨ä½¿ç”¨ä¸­ã® window
 	Bcom_WindowInfo  wininfo[SELWINMAX];
 	
-        /* ÁªÂò»è¤òÅĞÏ¿Ãæ */
+        /* é¸æŠè‚¢ã‚’ç™»éŒ²ä¸­ */
 	boolean in_setting;
 };
 typedef struct _selection sel_t;

@@ -1,5 +1,5 @@
 /*
- * Math.c  ÈÆÍÑ¿ô³Ø´Ø¿ô¡© OnlyYou -¥ê¡¦¥¯¥¹¥ëÂ¾
+ * Math.c  æ±ç”¨æ•°å­¦é–¢æ•°ï¼Ÿ OnlyYou -ãƒªãƒ»ã‚¯ã‚¹ãƒ«ä»–
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -35,9 +35,9 @@ static int numtblmax;
 
 void RandMTInit() {
 	/*
-	  (¤ª¤½¤é¤¯ Mersenne Twister»ÈÍÑ¤Î) Íğ¿ô½é´ü²½
+	  (ãŠãã‚‰ã Mersenne Twisterä½¿ç”¨ã®) ä¹±æ•°åˆæœŸåŒ–
 
-	   p1: ½é´ü²½ÍÑ seed
+	   p1: åˆæœŸåŒ–ç”¨ seed
 	*/
 	int p1 = getCaliValue(); /* ITimer */
 	
@@ -46,10 +46,10 @@ void RandMTInit() {
 
 void RandMTGet() {
 	/*
-	  1 ¤«¤é num ¤Ş¤Ç¤ÎÍğ¿ô¤òÀ¸À®
+	  1 ã‹ã‚‰ num ã¾ã§ã®ä¹±æ•°ã‚’ç”Ÿæˆ
 	  
-	  num: ºÇÂçÃÍ
-	  var: ·ë²Ì¤òÊÖ¤¹ÊÑ¿ô
+	  num: æœ€å¤§å€¤
+	  var: çµæœã‚’è¿”ã™å¤‰æ•°
 	*/
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
@@ -65,9 +65,9 @@ void RandMTGet() {
 
 void RandMTMakeNumTable() {
 	/*
-	  Íğ¿ô¥Æ¡¼¥Ö¥ë¤ÎºÇÂçÃÍ¤òÀßÄê
+	  ä¹±æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã®æœ€å¤§å€¤ã‚’è¨­å®š
 
-	  p1: ºÇÂçÃÍ
+	  p1: æœ€å¤§å€¤
 	*/
 	int p1 = getCaliValue();
 	
@@ -78,9 +78,9 @@ void RandMTMakeNumTable() {
 
 void RandMTGetNumTable() {
 	/*
-	  Íğ¿ô¥Æ¡¼¥Ö¥ë¤«¤éÃÍ¤ò¼èÆÀ
+	  ä¹±æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã‹ã‚‰å€¤ã‚’å–å¾—
 
-	  var: Íğ¿ô¤ò³ÊÇ¼¤¹¤ëÊÑ¿ô
+	  var: ä¹±æ•°ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
 	*/
 	int *var = getCaliVariable();
 	

@@ -202,7 +202,7 @@ static void send_reset() {
 
 #define WRBFSIZE	16384
 static unsigned char wrbuff[WRBFSIZE];
-static int nwr = 0; /* wrbuff §Œ index */
+static int nwr = 0; /* wrbuff „ÅÆ index */
 
 static long raw_myflush() {
 	struct timeval st, et;

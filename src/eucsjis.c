@@ -31,7 +31,7 @@
 #include "portab.h"
 #include "eucsjis.h"
 
-/* SJIS ¤«¤é EUC ¤Ø¤ÎÊÑ´¹ */
+/* SJIS ã‹ã‚‰ EUC ã¸ã®å¤‰æ› */
 BYTE *sjis2euc(BYTE *src) {
 	BYTE *dst , *_dst;
 		
@@ -89,7 +89,7 @@ static void _jis_shift(int *p1, int *p2) {
 	*p2 += cellOffset;
 }
 
-/* EUC ¤«¤é SJIS ¤Ø¤ÎÊÑ´¹ */
+/* EUC ã‹ã‚‰ SJIS ã¸ã®å¤‰æ› */
 BYTE *euc2sjis(BYTE* src) {
 	BYTE *dst , *_dst;
 		
@@ -117,7 +117,7 @@ BYTE *euc2sjis(BYTE* src) {
 	return _dst;
 }
 
-/* src Æâ¤ËÈ¾³Ñ¥«¥Ê¤â¤·¤¯¤ÏASCIIÊ¸»ú¤¬¤¢¤ë¤«¤É¤¦¤« */
+/* src å†…ã«åŠè§’ã‚«ãƒŠã‚‚ã—ãã¯ASCIIæ–‡å­—ãŒã‚ã‚‹ã‹ã©ã†ã‹ */
 boolean sjis_has_hankaku(BYTE *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
@@ -130,7 +130,7 @@ boolean sjis_has_hankaku(BYTE *src) {
 	return FALSE;
 }
 
-/* src Æâ¤Ë Á´³ÑÊ¸»ú¤¬¤¢¤ë¤«¤É¤¦¤« */
+/* src å†…ã« å…¨è§’æ–‡å­—ãŒã‚ã‚‹ã‹ã©ã†ã‹ */
 boolean sjis_has_zenkaku(BYTE *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
@@ -141,7 +141,7 @@ boolean sjis_has_zenkaku(BYTE *src) {
 	return FALSE;
 }
 
-/* src Ãæ¤ÎÊ¸»ú¿ô¤ò¿ô¤¨¤ë Á´³ÑÊ¸»ú¤â£±Ê¸»ú */
+/* src ä¸­ã®æ–‡å­—æ•°ã‚’æ•°ãˆã‚‹ å…¨è§’æ–‡å­—ã‚‚ï¼‘æ–‡å­— */
 int sjis_count_char(BYTE *src) {
 	int c = 0;
 	
@@ -154,7 +154,7 @@ int sjis_count_char(BYTE *src) {
 	return c;
 }
 
-/* SJIS(EUC) ¤ò´Ş¤àÊ¸»úÎó¤Î ASCII ¤òÂçÊ¸»ú²½¤¹¤ë */
+/* SJIS(EUC) ã‚’å«ã‚€æ–‡å­—åˆ—ã® ASCII ã‚’å¤§æ–‡å­—åŒ–ã™ã‚‹ */
 void sjis_toupper(BYTE *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
@@ -168,7 +168,7 @@ void sjis_toupper(BYTE *src) {
 	}
 }
 
-/* SJIS ¤ò´Ş¤àÊ¸»úÎó¤Î ASCII ¤òÂçÊ¸»ú²½¤¹¤ë2 */
+/* SJIS ã‚’å«ã‚€æ–‡å­—åˆ—ã® ASCII ã‚’å¤§æ–‡å­—åŒ–ã™ã‚‹2 */
 BYTE *sjis_toupper2(BYTE *src) {
 	BYTE *dst;
 		

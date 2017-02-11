@@ -1,4 +1,4 @@
-// alpha map �ζ���ɤ�Ĥ֤�
+// alpha map の矩形塗りつぶし
 
 #include <string.h>
 #include "portab.h"

@@ -1,5 +1,5 @@
 /*
- * sactstring.h: SACT¤ÎÊ¸»úÎóÁàºî´ØÏ¢
+ * sactstring.h: SACTã®æ–‡å­—åˆ—æ“ä½œé–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

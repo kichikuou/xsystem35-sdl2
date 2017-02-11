@@ -20,14 +20,14 @@
  * 
  * @version 1.0     01/07/30 initial version
  * @version 1.1     01/08/10 fix alpha map extraction
- * @version 1.2     01/11/26 zlib��Ÿ���Хåե������������������礭�ʤ�Τ�
- *                           �׵᤹��Ȥ��� workaround
- * @version 1.2     01/11/28 format version 1 ���б�
+ * @version 1.2     01/11/26 zlibの展開バッファが画像サイズよりも大きなものを
+ *                           要求するときの workaround
+ * @version 1.2     01/11/28 format version 1 に対応
  *                           *(top + 4) is  0 -> version 0
  *                           *(top + 4) is  1 -> version 1
- * @version 1.3     03/02/22 �Ĳ��������������pixel/alpha�Ȥ⤪�������ä��Τ�fix
- *                           zlibŸ���Хåե���Ĳ����줾��1byte�Ť�¿���Ȥ�
- *                           �褦�ˤ���
+ * @version 1.3     03/02/22 縦横奇数サイズ時にpixel/alphaともおかしかったのをfix
+ *                           zlib展開バッファを縦横それぞれ1byteづつ多くとる
+ *                           ようにした
 */
 /* $Id: qnt.c,v 1.4 2003/04/22 16:34:28 chikama Exp $ */
 
@@ -41,8 +41,8 @@
 #include "system.h"
 
 /*
-  zlib ��Ÿ���Хåե��ǡ����߹⤵�ߣ��ˡ�����ˤɤ줯�餤;͵��Ȥ뤫
-   (�ꥯ�륹�� 1164�Х��ȤȤ����Τ����ä�)
+  zlib の展開バッファで、幅×高さ×３に、さらにどれくらい余裕をとるか
+   (リクルスで 1164バイトというのがあった)
 */
 #define ZLIBBUF_MARGIN 5*1024
 

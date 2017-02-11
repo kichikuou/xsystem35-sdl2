@@ -51,7 +51,7 @@ static int ndemo_nums[3] = {150, 603, 467};
 
 extern surface_t *jpeg2surface(FILE *fp, int offset);
 
-// ALK¥Õ¥¡¥¤¥ë¤ÎÅĞÏ¿
+// ALKãƒ•ã‚¡ã‚¤ãƒ«ã®ç™»éŒ²
 void ndd_init(char *files[], int n) {
 	int i;
 	ndd.fn = g_new(char *, n);
@@ -61,17 +61,17 @@ void ndd_init(char *files[], int n) {
 	}
 }
 
-// ¥Ç¥âËÜÂÎ
+// ãƒ‡ãƒ¢æœ¬ä½“
 void ndd_run(int demonum) {
 	FILE *fp;
 	alk_t *alk;
 	int i, start, ct;
 	
-	// ¥Õ¥¡¥¤¥ë¥ª¥Õ¥»¥Ã¥È¤À¤± alk ¤«¤é¤â¤é¤¦
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ•ã‚»ãƒƒãƒˆã ã‘ alk ã‹ã‚‰ã‚‚ã‚‰ã†
 	alk = alk_new(ndd.fn[ndemo_alk[demonum]]);
 	if (alk == NULL) return;
 	
-	// libjpeg ¤Ë¤Ï FILE* ¤òÅÏ¤¹
+	// libjpeg ã«ã¯ FILE* ã‚’æ¸¡ã™
 	if (NULL == (fp = fopen(ndd.fn[ndemo_alk[demonum]], "rb"))) {
 		WARNING("%s not found\n", ndd.fn[ndemo_alk[demonum]]);
 		return;

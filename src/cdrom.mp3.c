@@ -1,5 +1,5 @@
 /*
- * cdrom.mp3.c  CD-ROM¤Î¤«¤ï¤ê¤ËMP3file¤À¡ª
+ * cdrom.mp3.c  CD-ROMã®ã‹ã‚ã‚Šã«MP3fileã ï¼
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -51,13 +51,13 @@ extern char *__xpg_basename __P ((char *__path));
 extern void sys_set_signalhandler(int SIG, void (*handler)(int));
 
 /*
-   CPU¥Ñ¥ï¡¼¤¬¤¢¤Ş¤Ã¤Æ¤¢¤Ş¤Ã¤Æ¤É¤¦¤·¤è¤¦¤â¤Ê¤¤¿Í¤Ø :-)
+   CPUãƒ‘ãƒ¯ãƒ¼ãŒã‚ã¾ã£ã¦ã‚ã¾ã£ã¦ã©ã†ã—ã‚ˆã†ã‚‚ãªã„äººã¸ :-)
 
-  »È¤¤Êı
+  ä½¿ã„æ–¹
 
-   1. ¤È¤ê¤¢¤¨¤º mpg123 ¤Ê¤É¤Î ¥×¥ì¥¤¥ä¡¼¤òÍÑ°Õ¤¹¤ë¡£
-      esd ¤ò»È¤¤¤¿¤¤¾ì¹ç¤Ï Ver 0.59q °Ê¹ß¤òÆş¤ì¤è¤¦¡£
-      ¥×¥ì¡¼¥ä¡¼¤Ë¤Ï¤¢¤é¤«¤¸¤á¥Ñ¥¹¤òÄÌ¤·¤Æ¤ª¤¯¡£
+   1. ã¨ã‚Šã‚ãˆãš mpg123 ãªã©ã® ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ç”¨æ„ã™ã‚‹ã€‚
+      esd ã‚’ä½¿ã„ãŸã„å ´åˆã¯ Ver 0.59q ä»¥é™ã‚’å…¥ã‚Œã‚ˆã†ã€‚
+      ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ã«ã¯ã‚ã‚‰ã‹ã˜ã‚ãƒ‘ã‚¹ã‚’é€šã—ã¦ãŠãã€‚
 
    2. % cat ~/game/kichiku.playlist
        mpg123 -quite
@@ -67,18 +67,18 @@ extern void sys_set_signalhandler(int SIG, void (*handler)(int));
        $(HOME)/game/kichiku/mp3/trk05.mp3
        $(HOME)/game/kichiku/mp3/trk06.mp3
 
-       ¤Ã¤Æ¤Ê¥Õ¥¡¥¤¥ë¤òÍÑ°Õ¤¹¤ë¡£( $(HOME)¤ÏÅ¬Åö¤Ë¤«¤¨¤Æ¤Í )
-       £±¹ÔÌÜ¤Ï¥×¥ì¡¼¥ä¡¼¤È¤½¤Î¥ª¥×¥·¥ç¥ó
-       £²¹ÔÌÜ°Ê¹ß¤Ï¥È¥é¥Ã¥¯£²¤«¤é½ç¤Ë¥Õ¥¡¥¤¥ë¤ò¤Ê¤é¤Ù¤ë
+       ã£ã¦ãªãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç”¨æ„ã™ã‚‹ã€‚( $(HOME)ã¯é©å½“ã«ã‹ãˆã¦ã­ )
+       ï¼‘è¡Œç›®ã¯ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ã¨ãã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³
+       ï¼’è¡Œç›®ä»¥é™ã¯ãƒˆãƒ©ãƒƒã‚¯ï¼’ã‹ã‚‰é †ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãªã‚‰ã¹ã‚‹
 
-       £±¹ÔÌÜ¤ÎºÇ½é¤ÎÊ¸»ú¤¬ - ¤Ç»Ï¤Ş¤Ã¤Æ¤¤¤ë¾ì¹ç xsystem35 ¤Î audio device ¤Ë
-       Î®¤·¹ş¤à (piped play mode) (ex. -mpg123 -quite)
-       player ¤ÎºÆÀ¸¥Õ¥©¡¼¥Ş¥Ã¥È¤Ï 44kHz,16bit,Stereo¤Î¤ß
+       ï¼‘è¡Œç›®ã®æœ€åˆã®æ–‡å­—ãŒ - ã§å§‹ã¾ã£ã¦ã„ã‚‹å ´åˆ xsystem35 ã® audio device ã«
+       æµã—è¾¼ã‚€ (piped play mode) (ex. -mpg123 -quite)
+       player ã®å†ç”Ÿãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¯ 44kHz,16bit,Stereoã®ã¿
        
 
-   3 configure ¤Ç --enable-cdrom=mp3 ¤òÄÉ²Ã¤¹¤ë
+   3 configure ã§ --enable-cdrom=mp3 ã‚’è¿½åŠ ã™ã‚‹
 
-   4 ¼Â¹Ô»ş¥ª¥×¥·¥ç¥ó¤Ë -devcd ~/game/kichiku.playlist ¤Î¤è¤¦¤Ë¾å¤ÇºîÀ®¤·¤¿¥Õ¥¡¥¤¥ë¤ò»ØÄê
+   4 å®Ÿè¡Œæ™‚ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã« -devcd ~/game/kichiku.playlist ã®ã‚ˆã†ã«ä¸Šã§ä½œæˆã—ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®š
 
 */
 
@@ -110,17 +110,17 @@ static char         mp3_player[256];
 static int          argc;
 static char         **argv;
 static char         *playlist[PLAYLIST_MAX];
-static int          lastindex; // ºÇ½ª¥È¥é¥Ã¥¯ÈÖ¹æ
-static pid_t        cdpid;   // ³°Éô¥×¥ì¡¼¥ä¡¼¤Î pid
-static int          trackno; // ¸½ºß±éÁÕÃæ¤Î¥È¥é¥Ã¥¯
-static int          counter; // ±éÁÕ»ş´ÖÂ¬ÄêÍÑ¥«¥¦¥ó¥¿
-static boolean      pipedplay; // pipe play ¥â¡¼¥É¤«¤É¤¦¤«
+static int          lastindex; // æœ€çµ‚ãƒˆãƒ©ãƒƒã‚¯ç•ªå·
+static pid_t        cdpid;   // å¤–éƒ¨ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ã® pid
+static int          trackno; // ç¾åœ¨æ¼”å¥ä¸­ã®ãƒˆãƒ©ãƒƒã‚¯
+static int          counter; // æ¼”å¥æ™‚é–“æ¸¬å®šç”¨ã‚«ã‚¦ãƒ³ã‚¿
+static boolean      pipedplay; // pipe play ãƒ¢ãƒ¼ãƒ‰ã‹ã©ã†ã‹
 
 /*
-  ³°Éô¥×¥ì¡¼¥ä¡¼¤Î¹Ô¤Î²òÀÏ
-  1. ºÇ½é¤ÎÊ¸»ú¤¬ - ¤Ç¤¢¤Ã¤¿¾ì¹ç¡¢piped play mode
-  2. ¥×¥í¥°¥é¥à¤È°ú¿ô¤ÎÊ¬Î¥ (!pipe)
-  3. ¥×¥í¥°¥é¥à¤«¤é¥×¥í¥°¥é¥àÌ¾(argv[0])¤òÊ¬Î¥ (!piped)
+  å¤–éƒ¨ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼ã®è¡Œã®è§£æ
+  1. æœ€åˆã®æ–‡å­—ãŒ - ã§ã‚ã£ãŸå ´åˆã€piped play mode
+  2. ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¨å¼•æ•°ã®åˆ†é›¢ (!pipe)
+  3. ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‹ã‚‰ãƒ—ãƒ­ã‚°ãƒ©ãƒ å(argv[0])ã‚’åˆ†é›¢ (!piped)
 */
 
 static void player_set(char *buf) {
@@ -141,7 +141,7 @@ static void player_set(char *buf) {
 		/* count arguments */
 		/* devide argument */
 		char *tok_buf = NULL;
-		char *str_buf[MAX_ARGS]; //MAX_ARGS°Ê¾å¤Î°ú¿ô¤¬¤¢¤ë¤È¤À¤á
+		char *str_buf[MAX_ARGS]; //MAX_ARGSä»¥ä¸Šã®å¼•æ•°ãŒã‚ã‚‹ã¨ã ã‚
 		
 		memset(str_buf, 0, sizeof(char *) * MAX_ARGS);
 		
@@ -172,9 +172,9 @@ static void player_set(char *buf) {
 		argv[0] = basename(argv[0]);
 	} else {
 		/*
-		  pipe ½ĞÎÏ¤¹¤ë¤¿¤á¤Ë¥Õ¥¡¥¤¥ëÌ¾¤Î¸å¤Ë - ¤ò¤Ä¤±¤ëÉ¬Í×¤Î
-		  ¤¢¤ë¥×¥ì¡¼¤ä¤Î¤¿¤á¤Ë¡¢¥Õ¥¡¥¤¥ëÌ¾¤ò %s ¤Ç»ØÄê¤Ç¤­¤ë¤è¤¦¤Ë
-		  ¤¹¤ë¤¿¤á¤Î½èÍı (by Fumihiko Murata)
+		  pipe å‡ºåŠ›ã™ã‚‹ãŸã‚ã«ãƒ•ã‚¡ã‚¤ãƒ«åã®å¾Œã« - ã‚’ã¤ã‘ã‚‹å¿…è¦ã®
+		  ã‚ã‚‹ãƒ—ãƒ¬ãƒ¼ã‚„ã®ãŸã‚ã«ã€ãƒ•ã‚¡ã‚¤ãƒ«åã‚’ %s ã§æŒ‡å®šã§ãã‚‹ã‚ˆã†ã«
+		  ã™ã‚‹ãŸã‚ã®å‡¦ç† (by Fumihiko Murata)
 		*/
 		int pf = FALSE;
 		
@@ -184,7 +184,7 @@ static void player_set(char *buf) {
 			b++;
 		}
 		*b = 0;
-		if (!pf) strcat(b, " \"%s\""); // space ¤ò´Ş¤à¥Ñ¥¹¤Î¾ì¹ç
+		if (!pf) strcat(b, " \"%s\""); // space ã‚’å«ã‚€ãƒ‘ã‚¹ã®å ´åˆ
 	}
 }
 
@@ -248,14 +248,14 @@ static int cdrom_exit() {
 	return OK;
 }
 
-/* ¥È¥é¥Ã¥¯ÈÖ¹æ trk ¤Î±éÁÕ trk = 1~ */
+/* ãƒˆãƒ©ãƒƒã‚¯ç•ªå· trk ã®æ¼”å¥ trk = 1~ */
 static int cdrom_start(int trk) {
 	char cmd_pipe[256];
 	pid_t pid;
 	
 	if (!enabled) return 0;
 	
-	/* ¶Ê¿ô¤è¤ê¤âÂ¿¤¤»ØÄê¤ÏÉÔ²Ä*/
+	/* æ›²æ•°ã‚ˆã‚Šã‚‚å¤šã„æŒ‡å®šã¯ä¸å¯*/
 	if (trk > lastindex) {
 		return NG;
 	}
@@ -292,7 +292,7 @@ static int cdrom_start(int trk) {
 	return OK;
 }
 
-/* ±éÁÕÄä»ß */
+/* æ¼”å¥åœæ­¢ */
 static int cdrom_stop() {
 	if (!enabled || cdpid == 0) {
 		return OK;
@@ -313,7 +313,7 @@ static int cdrom_stop() {
 	return OK;
 }
 
-/* ¸½ºß±éÁÕÃæ¤Î¥È¥é¥Ã¥¯¾ğÊó¤Î¼èÆÀ */
+/* ç¾åœ¨æ¼”å¥ä¸­ã®ãƒˆãƒ©ãƒƒã‚¯æƒ…å ±ã®å–å¾— */
 static int cdrom_getPlayingInfo (cd_time *inf) {
 	int status, cnt, err;
 	

@@ -80,7 +80,7 @@ static int search_preferable_fullscreen_mode() {
 #ifdef HAVE_XF86VMODE
 	int i, vm = 0, delta = INT_MAX;
 	
-	/* ¤¹¤Ù¤Æ¤Îmode¤Î¤Ê¤«¤ÇºÇ¤âÅ¬ÀÚ¤Ê¥â¡¼¥É¤òÁªÂò */
+	/* ã™ã¹ã¦ã®modeã®ãªã‹ã§æœ€ã‚‚é©åˆ‡ãªãƒ¢ãƒ¼ãƒ‰ã‚’é¸æŠ */
 	for (i = 0; i < vm_count; i++) {
 		if (vm_modelines[i]->hdisplay >= view_w && 
 		    vm_modelines[i]->vdisplay >= view_y) {
@@ -105,7 +105,7 @@ static void set_vidmode(int mode) {
 #endif
 }
 
-/* Fullscreen °Ü¹ÔÁ°¤Î Window ¤ÎºÂÉ¸ */
+/* Fullscreen ç§»è¡Œå‰ã® Window ã®åº§æ¨™ */
 static int winsave_x, winsave_y;
 
 static void enter_fullscreen() {
@@ -144,7 +144,7 @@ void Xcore_fullScreen(boolean on) {
 #endif
 }
 
-/* Window¤ÎÂç¤­¤µ¤ÎÊÑ¹¹ */
+/* Windowã®å¤§ãã•ã®å¤‰æ›´ */
 void Xcore_setWindowSize(int x, int y, int width, int height) {
 	
 	view_x = x;

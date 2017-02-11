@@ -1,5 +1,5 @@
 /*
- * message.h  Ê¸»úÎóÉ½¼¨´Ø·¸
+ * message.h  æ–‡å­—åˆ—è¡¨ç¤ºé–¢ä¿‚
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -42,12 +42,12 @@ extern void msg_getMessageLocation(MyPoint *loc);
 extern void msg_mg6_command(int cmd);
 
 struct __message {
-	/* ¥á¥Ã¥»¡¼¥¸¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ */
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã• */
 	int MsgFontSize;
 	int MsgFontBoldSize;
 	int MsgFont;
 	
-	/* ³Æ¼ï¿§ */
+	/* å„ç¨®è‰² */
 	int MsgFontColor;
 	int WinFrameColor;
 	int WinBackgroundColor;
@@ -58,7 +58,7 @@ struct __message {
 	int     LineIncrement;
 	int     WinBackgroundTransparent;
 	
-	/* MG command´ØÏ¢ */
+	/* MG commandé–¢é€£ */
 	boolean mg_getString;
 	boolean mg_dspMsg;
 	int     mg_startStrVarNo;
@@ -66,9 +66,9 @@ struct __message {
 	int     mg_policyR;
 	int     mg_policyA;
 	
-	/* ¥á¥Ã¥»¡¼¥¸ window */
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ window */
 	int              winno;  
-	Bcom_WindowInfo *win;  // ¸½ºß»ÈÍÑÃæ¤Î window
+	Bcom_WindowInfo *win;  // ç¾åœ¨ä½¿ç”¨ä¸­ã® window
 	Bcom_WindowInfo  wininfo[MSGWINMAX];
 };
 typedef struct __message msg_t;

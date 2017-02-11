@@ -18,8 +18,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *          0.00    99/01/04 ����
- *          0.01    99/01/20 �ѥ�åȤ��ɤ߹���ݤ�rgb���¤Ӥ�ľ����
+ *          0.00    99/01/04 初版
+ *          0.01    99/01/20 パレットを読み込む際のrgbの並びを直した
  * @version 1.1     00/09/17 rewrite for changing interface
  *
 */
@@ -90,9 +90,9 @@ static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b) {
 	int LineNeed = (bmp->bmpXW * bmp->bmpBpp) / 8;
 	
 	if (LineNeed % 4)
-		LineNeed = (((LineNeed / 4) + 1) * 4);   /* DWORD���� */
+		LineNeed = (((LineNeed / 4) + 1) * 4);   /* DWORD整列化 */
 	
-	pos = LineNeed * (bmp->bmpYW);           /* �Ǿ�Ԥΰ��� */
+	pos = LineNeed * (bmp->bmpYW);           /* 最上行の位置 */
 	for (i = 0; i < bmp->bmpYW; i++) {
 		const BYTE* p;
 		pos -= LineNeed;
@@ -114,9 +114,9 @@ static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
 	int LineNeed = (bmp->bmpXW * bmp->bmpBpp) / 8;
 	
 	if (LineNeed % 4)
-		LineNeed = (((LineNeed / 4) + 1) * 4);   /* DWORD���� */
+		LineNeed = (((LineNeed / 4) + 1) * 4);   /* DWORD整列化 */
 	
-	pos = LineNeed * (bmp->bmpYW); /* �Ǿ�Ԥΰ��� */
+	pos = LineNeed * (bmp->bmpYW); /* 最上行の位置 */
 	for (i = 0; i < bmp->bmpYW; i++) {
 		const BYTE* p;
 		pos -= LineNeed;
@@ -131,8 +131,8 @@ static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
 			g >>= 2;
 			b >>= 3;
 			*pic = (r << 11 | g << 5 | b);
-			/* ������PIX24�ʤ���������ɡ����θ�ɽ������ؿ��ʤ�����
-			   �Ȥꤢ������
+			/* 本当はPIX24なんだろうけど、その後表示する関数ないし、
+			   とりあえず。
 			   *pic = PIX16(r,g,b);
 			   */
 			pic++;

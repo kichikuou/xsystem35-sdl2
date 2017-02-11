@@ -1,5 +1,5 @@
 /*
- * pcmlib.h  PCM misc¥é¥¤¥Ö¥é¥ê
+ * pcmlib.h  PCM miscãƒ©ã‚¤ãƒ–ãƒ©ãƒª
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

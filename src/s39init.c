@@ -34,10 +34,10 @@
 #include "eucsjis.h"
 #include "music_client.h"
 
-// Volume Valancer ¤Ç°·¤¦ºÇÂç¥Á¥ã¥ó¥Í¥ë¿ô
+// Volume Valancer ã§æ‰±ã†æœ€å¤§ãƒãƒ£ãƒ³ãƒãƒ«æ•°
 #define MAXVOLCH 16
 
-static int vval_max;  // ºÇÂç¥Á¥ã¥ó¥Í¥ëÈÖ¹æ
+static int vval_max;  // æœ€å¤§ãƒãƒ£ãƒ³ãƒãƒ«ç•ªå·
 struct _volval {
 	char *label;
 	int vol;
@@ -48,7 +48,7 @@ static GtkWidget *vval_win;
 
 #include "menu_gui_volval.c"
 
-// ½é´ü²½
+// åˆæœŸåŒ–
 int s39ini_init(void) {
 	FILE *fp;
 	char s[256], s1[256];
@@ -72,10 +72,10 @@ int s39ini_init(void) {
 	
 	if (vval_max <= 0) return NG;
 	
-	// Volume.sav ¤¬¤¢¤ì¤Ğ¤½¤ì¤òÆÉ¤ß¹ş¤à
+	// Volume.sav ãŒã‚ã‚Œã°ãã‚Œã‚’èª­ã¿è¾¼ã‚€
 	g_snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
 	if (NULL == (fp = fopen(fn, "r"))) {
-		// ¤È¤ê¤¢¤¨¤º¡¢½é´ü¥Ü¥ê¥å¡¼¥à¤Ï 100
+		// ã¨ã‚Šã‚ãˆãšã€åˆæœŸãƒœãƒªãƒ¥ãƒ¼ãƒ ã¯ 100
 		for (i = 0; i < MAXVOLCH; i++) {
 			vol[i] = vval[i].vol = 100;
 		}
@@ -86,10 +86,10 @@ int s39ini_init(void) {
 			vval[i].vol = vol[i];
 		}
 	}
-	// ¤É¤Á¤é¤Ë¤·¤Æ¤â music server ¤ËÁ÷¤ë
+	// ã©ã¡ã‚‰ã«ã—ã¦ã‚‚ music server ã«é€ã‚‹
 	mus_vol_set_valance(vol, MAXVOLCH);
 	
-	// System39.ini ¤Ë VolumeValancer ¤¬Ìµ¤«¤Ã¤¿¤é¤Ê¤·
+	// System39.ini ã« VolumeValancer ãŒç„¡ã‹ã£ãŸã‚‰ãªã—
 	if (vval_max > 0) {
 		vval_win = vval_win_open(vval, vval_max);
 	}
@@ -97,7 +97,7 @@ int s39ini_init(void) {
 	return OK;
 }
 
-// PopupMenu¤«¤é¸Æ¤Ğ¤ì¤ë
+// PopupMenuã‹ã‚‰å‘¼ã°ã‚Œã‚‹
 int s39ini_winopen() {
 	if (vval_win) {
 		gtk_widget_show(vval_win);
@@ -106,7 +106,7 @@ int s39ini_winopen() {
 	return OK;
 }
 
-// ¥Ü¥ê¥å¡¼¥àÀßÄêWindow¤¬ÊÄ¤¸¤é¤ì¤¿¤È¤­¤Ë¸Æ¤Ğ¤ì¤ë
+// ãƒœãƒªãƒ¥ãƒ¼ãƒ è¨­å®šWindowãŒé–‰ã˜ã‚‰ã‚ŒãŸã¨ãã«å‘¼ã°ã‚Œã‚‹
 int s39ini_winclose() {
 	if (vval_win) {
 		gtk_widget_hide(vval_win);
@@ -115,7 +115,7 @@ int s39ini_winclose() {
 	return OK;
 }
 
-// ¥Ü¥ê¥å¡¼¥àÀßÄê¤Ç¥¹¥±¡¼¥ë¤òÆ°¤«¤¹¤¿¤Ó¤Ë¸Æ¤Ğ¤ì¤ë
+// ãƒœãƒªãƒ¥ãƒ¼ãƒ è¨­å®šã§ã‚¹ã‚±ãƒ¼ãƒ«ã‚’å‹•ã‹ã™ãŸã³ã«å‘¼ã°ã‚Œã‚‹
 int s39ini_setvol() {
 	int vol[MAXVOLCH] = {0};
 	int i;
@@ -130,7 +130,7 @@ int s39ini_setvol() {
 	return OK;
 }
 
-// Volume Valance ¤ò¥»¡¼¥Ö
+// Volume Valance ã‚’ã‚»ãƒ¼ãƒ–
 int s39ini_remove() {
 	int vol[MAXVOLCH] = {0};
 	FILE *fp;

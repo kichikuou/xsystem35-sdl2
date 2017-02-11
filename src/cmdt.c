@@ -27,7 +27,7 @@
 #include "message.h"
 
 void commandT() {
-	/* 矢机の山绩倡幌郝筛を回年する */
+	/* 鏂囧瓧銇〃绀洪枊濮嬪骇妯欍倰鎸囧畾銇欍倠 */
 	int x = getCaliValue();
 	int y = getCaliValue();
 	msg_setMessageLocation(x, y);

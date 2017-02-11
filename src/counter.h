@@ -1,5 +1,5 @@
 /*
- * counter.h  ÆâÉô¥«¥¦¥ó¥¿
+ * counter.h  å†…éƒ¨ã‚«ã‚¦ãƒ³ã‚¿
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

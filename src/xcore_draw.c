@@ -50,7 +50,7 @@ static void workImageToWindow();
 static void DIBToWorkImage(int sx, int sy, int w, int h, int dx, int dy);
 
 
-/* Á´²èÌÌ¹¹¿· */
+/* å…¨ç”»é¢æ›´æ–° */
 static void Xcore_updateAll() {
 	MyRectangle src;
 	MyPoint     dst;
@@ -63,7 +63,7 @@ static void Xcore_updateAll() {
 	Xcore_updateArea(&src, &dst);
 }
 
-/* offscreen¤Î»ØÄêÎÎ°è¤òWindow¤ØÅ¾Á÷ */
+/* offscreenã®æŒ‡å®šé ˜åŸŸã‚’Windowã¸è»¢é€ */
 void Xcore_updateArea(MyRectangle *src, MyPoint *dst) {
 	agsurface_t _dib, _work;
 	
@@ -161,7 +161,7 @@ void Xcore_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	}
 }
 
-/* Ä¾ÀþÉÁ²è */
+/* ç›´ç·šæç”» */
 void Xcore_drawLine(int x1, int y1, int x2, int y2, u_long col) {
 	if (!x11_dibinfo->shared) {
 		image_drawLine(DIB, x1, y1, x2, y2, PAL2PIC(col));
@@ -215,7 +215,7 @@ void Xcore_zoom(int x, int y, int w, int h) {
 	}
 }
 
-/* Color ¤ÎÊ£¿ô¸Ä»ØÄê */
+/* Color ã®è¤‡æ•°å€‹æŒ‡å®š */
 void Xcore_setPallet(Pallet256 *pal, int src, int cnt) {
 	int i;
 	
@@ -231,7 +231,7 @@ void Xcore_setPallet(Pallet256 *pal, int src, int cnt) {
 	}
 }
 
-/* foreground ¤Î¥»¥Ã¥È */
+/* foreground ã®ã‚»ãƒƒãƒˆ */
 void Xcore_setForeground(u_long col) {
 	static u_long fc = 0;
 	
@@ -246,7 +246,7 @@ void Xcore_setForeground(u_long col) {
 	}
 }
 
-/* background ¤Î¥»¥Ã¥È */
+/* background ã®ã‚»ãƒƒãƒˆ */
 void Xcore_setBackground(u_long col) {
 	static u_long bc = 0;
 	
@@ -261,7 +261,7 @@ void Xcore_setBackground(u_long col) {
 	}
 }
 
-/* X-Server¤È¤ÎÆ±´ü¤ò¼è¤ë */
+/* X-Serverã¨ã®åŒæœŸã‚’å–ã‚‹ */
 void Xcore_sync() {
 	if (x11_needSync) { XSync(x11_display, False); x11_needSync = FALSE; }
 }
@@ -276,7 +276,7 @@ static void rect_comimg(agsurface_t *src, agsurface_t *dst, int sx, int sy, int 
 	dst->pixel  = GETOFFSET_PIXEL(src, sx, sy);
 }
 
-/* fader ¤Ç workImage ¤ÎÆâÍÆ¤òWindow¤ËÉÁ²è */
+/* fader ã§ workImage ã®å†…å®¹ã‚’Windowã«æç”» */
 static void workImageToWindow() {
 	if (x11_workinfo->shared) {
 		XSync(x11_display, False);
@@ -294,7 +294,7 @@ static void workImageToWindow() {
 	}
 }
 
-/* DIB ¤«¤é work image ¤Ø¤ÎÅ¸³« */
+/* DIB ã‹ã‚‰ work image ã¸ã®å±•é–‹ */
 static void DIBToWorkImage(int sx, int sy, int w, int h, int dx, int dy) {
 	if (DIB_DEPTH == dib_depth_candidate) {
 		int y;
@@ -313,7 +313,7 @@ static void DIBToWorkImage(int sx, int sy, int w, int h, int dx, int dy) {
 	}
 }
 
-/* »ØÄê¤ÎÌÀÅÙ°Ê¾å¤ËÌÀ¤ë¤µ¤òÀßÄê */
+/* æŒ‡å®šã®æ˜Žåº¦ä»¥ä¸Šã«æ˜Žã‚‹ã•ã‚’è¨­å®š */
 /* (255-col)/255 * val + col */
 static void setWhiteness8(int val) {
 	int i;
@@ -329,7 +329,7 @@ static void setWhiteness8(int val) {
 	XStoreColors(x11_display, x11_cm, x11_col, 256);
 }
 
-/* »ØÄê¤ÎÌÀÅÙ°Ê²¼¤ËÌÀ¤ë¤µ¤òÍÞ¤¨¤ë */
+/* æŒ‡å®šã®æ˜Žåº¦ä»¥ä¸‹ã«æ˜Žã‚‹ã•ã‚’æŠ‘ãˆã‚‹ */
 static void setBlightness8(int val) {
 	int i;
 	Pallet256 *pal = nact->sys_pal;

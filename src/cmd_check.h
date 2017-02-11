@@ -1,5 +1,5 @@
 /*
- * cmd_check.h  SYSTEM35§Œ•≥•ﬁ•Û•…≤Ú¿œ
+ * cmd_check.h  SYSTEM35„ÅÆ„Ç≥„Éû„É≥„ÉâËß£Êûê
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

@@ -1,8 +1,8 @@
-// 11 ¤È 19 ¤Ç¶¦Í­
+// 11 ã¨ 19 ã§å…±æœ‰
 static surface_t *ec11_ss[6];
 static surface_t *ec11_sd[6];
 
-// Àş·Á¥Ö¥é¡¼
+// ç·šå½¢ãƒ–ãƒ©ãƒ¼
 static void ec11_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep = 6; 
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
@@ -36,7 +36,7 @@ static void ec11_drain(surface_t *src, surface_t *dst) {
 	}
 }
 
-// ½ÄÀş·Á¥Ö¥é¡¼
+// ç¸¦ç·šå½¢ãƒ–ãƒ©ãƒ¼
 static void ec19_cb(surface_t *sfsrc, surface_t *sfdst) {
 	ec11_cb(sfsrc, sfdst);
 }

@@ -1,5 +1,5 @@
 /*
- * graph_cg.c  surface ¤Ë ¼Âºİ¤Ëcg¥Ç¡¼¥¿¤òÉÁ¤¯
+ * graph_cg.c  surface ã« å®Ÿéš›ã«cgãƒ‡ãƒ¼ã‚¿ã‚’æã
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -33,12 +33,12 @@
 #include "ngraph.h"
 
 /**
- * surface ¤Ë 24bpp CG (QNT)¤òÉÁ²è
+ * surface ã« 24bpp CG (QNT)ã‚’æç”»
  * 
- * @param ds: ÉÁ²è surface
- * @param cg: ÉÁ²è¤¹¤ëCG¥Ç¡¼¥¿
- * @param x: ÉÁ²è£ØºÂÉ¸
- * @param y: ÉÁ²è£ÙºÂÉ¸
+ * @param ds: æç”» surface
+ * @param cg: æç”»ã™ã‚‹CGãƒ‡ãƒ¼ã‚¿
+ * @param x: æç”»ï¼¸åº§æ¨™
+ * @param y: æç”»ï¼¹åº§æ¨™
  */
 void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 	int dx, dy, dw, dh;
@@ -113,12 +113,12 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 }
 
 /**
- * surface ¤Ë 16bpp CG (PMS16/BMP)¤òÉÁ²è
+ * surface ã« 16bpp CG (PMS16/BMP)ã‚’æç”»
  * 
- * @param ds: ÉÁ²è surface
- * @param cg: ÉÁ²è¤¹¤ëCG¥Ç¡¼¥¿
- * @param x: ÉÁ²è£ØºÂÉ¸
- * @param y: ÉÁ²è£ÙºÂÉ¸
+ * @param ds: æç”» surface
+ * @param cg: æç”»ã™ã‚‹CGãƒ‡ãƒ¼ã‚¿
+ * @param x: æç”»ï¼¸åº§æ¨™
+ * @param y: æç”»ï¼¹åº§æ¨™
  */
 void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 	int dx, dy, dw, dh;

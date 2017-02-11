@@ -1,5 +1,5 @@
 /*
- * sactstring.c: SACT¤ÎÊ¸»úÎóÁàºî´ØÏ¢
+ * sactstring.c: SACTã®æ–‡å­—åˆ—æ“ä½œé–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -29,18 +29,18 @@
 #include "system.h"
 #include "variable.h"
 
-// Ê¸»úÎóÃÖ´¹ÍÑ
+// æ–‡å­—åˆ—ç½®æ›ç”¨
 typedef struct {
-	char *src; // ÃÖ¤­´¹¤¨¸µÊ¸»úÎó
-	char *dst; // ÃÖ¤­´¹¤¨Ê¸»úÎó
+	char *src; // ç½®ãæ›ãˆå…ƒæ–‡å­—åˆ—
+	char *dst; // ç½®ãæ›ãˆæ–‡å­—åˆ—
 } strexchange_t;
 
 #define DEFSTACKSIZE 100
-static char **stack;   // stackËÜÂÎ
+static char **stack;   // stackæœ¬ä½“
 static int idx;        // stack pointer
-static int idxmax;     // stack pointer¤ÎºÇÂç
+static int idxmax;     // stack pointerã®æœ€å¤§
 
-// Ê¸»úÎóÃÖ¤­´¹¤¨ÍÑ (É½¼¨»ş¤Ëon-the-fly¤ÇÊÑ´¹¤·¤ÆÉ½¼¨)
+// æ–‡å­—åˆ—ç½®ãæ›ãˆç”¨ (è¡¨ç¤ºæ™‚ã«on-the-flyã§å¤‰æ›ã—ã¦è¡¨ç¤º)
 #define REPLACEBUFSIZE 3000
 static char repbuf[2][REPLACEBUFSIZE];
 static GSList *strreplace;
@@ -48,7 +48,7 @@ static char *replacesrc;
 static char *replacedst;
 
 /**
- * Ê¸»úÎóÊÑ¿ô¥¹¥¿¥Ã¥¯¤Î½é´ü²½
+ * æ–‡å­—åˆ—å¤‰æ•°ã‚¹ã‚¿ãƒƒã‚¯ã®åˆæœŸåŒ–
  */
 int sstr_init() {
 	stack = g_new(char *, DEFSTACKSIZE);
@@ -58,8 +58,8 @@ int sstr_init() {
 }
 
 /**
- * Ê¸»úÎóÊÑ¿ô¥¹¥¿¥Ã¥¯¤ËÊ¸»úÎó¤òÀÑ¤à
- * @param strno: ¥·¥Ê¥ê¥ª¾å¤Ç¤ÎÊ¸»úÎóÊÑ¿ôÈÖ¹æ
+ * æ–‡å­—åˆ—å¤‰æ•°ã‚¹ã‚¿ãƒƒã‚¯ã«æ–‡å­—åˆ—ã‚’ç©ã‚€
+ * @param strno: ã‚·ãƒŠãƒªã‚ªä¸Šã§ã®æ–‡å­—åˆ—å¤‰æ•°ç•ªå·
  */
 int sstr_push(char *str) {
 	if (idx >= idxmax) {
@@ -73,8 +73,8 @@ int sstr_push(char *str) {
 }
 
 /**
- * Ê¸»úÎóÊÑ¿ô¥¹¥¿¥Ã¥¯¤«¤éÊ¸»úÎó¤ò¼è¤ê½Ğ¤¹
- * @param strno: ¥¹¥¿¥Ã¥¯¤«¤éÌá¤·¤¿Ê¸»úÎó¤ò³ÊÇ¼¤¹¤ëÊ¸»úÎóÊÑ¿ôÈÖ¹æ
+ * æ–‡å­—åˆ—å¤‰æ•°ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰æ–‡å­—åˆ—ã‚’å–ã‚Šå‡ºã™
+ * @param strno: ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰æˆ»ã—ãŸæ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹æ–‡å­—åˆ—å¤‰æ•°ç•ªå·
  */
 int sstr_pop(char *str, int maxlen) {
 	if (idx == 0) return NG;
@@ -86,9 +86,9 @@ int sstr_pop(char *str, int maxlen) {
 }
 
 /**
- * Ê¸»úÎó¤ÎÃÖ¤­´¹¤¨
- * @param sstrno: ÊÑ´¹¸µÊ¸»úÎóÊÑ¿ôÈÖ¹æ
- * @param dstrno: ÊÑ´¹ÀèÊ¸»úÎóÊÑ¿ôÈÖ¹æ
+ * æ–‡å­—åˆ—ã®ç½®ãæ›ãˆ
+ * @param sstrno: å¤‰æ›å…ƒæ–‡å­—åˆ—å¤‰æ•°ç•ªå·
+ * @param dstrno: å¤‰æ›å…ˆæ–‡å­—åˆ—å¤‰æ•°ç•ªå·
  */
 int sstr_regist_replace(char *sstr, char *dstr) {
 	strexchange_t *ex;
@@ -103,7 +103,7 @@ int sstr_regist_replace(char *sstr, char *dstr) {
 }
 
 /**
- * ¿ôÃÍ -> Ê¸»úÎó²½
+ * æ•°å€¤ -> æ–‡å­—åˆ—åŒ–
  */
 int sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	char s[256], ss[256];
@@ -122,7 +122,7 @@ int sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	return OK;
 }
 
-// Ê¸»úÎó¤ÎÃÖ¤­´¹¤¨½èÍı
+// æ–‡å­—åˆ—ã®ç½®ãæ›ãˆå‡¦ç†
 static void replacestr_cb(gpointer data, gpointer userdata) {
 	strexchange_t *ex = (strexchange_t *)data;
 	char *start, *next, *out;
@@ -146,7 +146,7 @@ static void replacestr_cb(gpointer data, gpointer userdata) {
 	replacedst[0] = '\0';
 }
 
-// Ê¸»úÎó¤ÎÃÖ¤­´¹¤¨
+// æ–‡å­—åˆ—ã®ç½®ãæ›ãˆ
 char *sstr_replacestr(char *msg) {
 	if (strreplace == NULL) return msg;
 	

@@ -27,7 +27,7 @@ void SetKeyCancelFlag() {
 
 void SetLoopFlag() {
         /* Loop Flag */
-        int loopflag = getCaliValue(); /* 0 ¤Ê¤éÌµ¸Â·«¤êÊÖ¤· */
+        int loopflag = getCaliValue(); /* 0 ãªã‚‰ç„¡é™ç¹°ã‚Šè¿”ã— */
         
         DEBUG_COMMAND_YET("eDEMO.SetLoopFlag %d:\n", loopflag);
 }

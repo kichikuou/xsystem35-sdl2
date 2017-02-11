@@ -31,7 +31,7 @@
 if (st > 200) fprintf(stderr, "WARNING: Fail to save (cmd=%s, stat=%d)\n", cmd, st)
 
 void commandQD() {
-	/* ÊÑ¿ôÎÎ°è¤Ê¤É¤Î¥Ç¡¼¥¿¤ò¥»¡¼¥Ö¤¹¤ë¡£¡ÊÁ´¥»¡¼¥Ö¡Ë*/
+	/* å¤‰æ•°é ˜åŸŸãªã©ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã‚»ãƒ¼ãƒ–ã™ã‚‹ã€‚ï¼ˆå…¨ã‚»ãƒ¼ãƒ–ï¼‰*/
 	int num   = getCaliValue();
 	
 	if (num <= 0) {
@@ -46,7 +46,7 @@ void commandQD() {
 }
 
 void commandQP() {
-	/* ÊÑ¿ôÎÎ°è¤Ê¤É¤Î¥Ç¡¼¥¿¤ò°ìÉô¥»¡¼¥Ö¤¹¤ë¡£(¿ôÃÍÊÑ¿ôÉô) */
+	/* å¤‰æ•°é ˜åŸŸãªã©ã®ãƒ‡ãƒ¼ã‚¿ã‚’ä¸€éƒ¨ã‚»ãƒ¼ãƒ–ã™ã‚‹ã€‚(æ•°å€¤å¤‰æ•°éƒ¨) */
 	int num    = getCaliValue();
 	int *point = getCaliVariable();
 	int page   = preVarPage;
@@ -65,7 +65,7 @@ void commandQP() {
 }
 
 void commandQC() {
-	/* ¥»¡¼¥Ö¥Õ¥¡¥¤¥ë¤ònum2¤ÎÎÎ°è¤«¤énum1¤ÎÎÎ°è¤Ø¥³¥Ô¡¼ */
+	/* ã‚»ãƒ¼ãƒ–ãƒ•ã‚¡ã‚¤ãƒ«ã‚’num2ã®é ˜åŸŸã‹ã‚‰num1ã®é ˜åŸŸã¸ã‚³ãƒ”ãƒ¼ */
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	

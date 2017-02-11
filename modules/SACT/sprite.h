@@ -1,5 +1,5 @@
 /*
- * sprite.h: ¥¹¥×¥é¥¤¥È´ğËÜ³Æ¼ï½èÍı
+ * sprite.h: ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆåŸºæœ¬å„ç¨®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

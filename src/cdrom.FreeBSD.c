@@ -1,5 +1,5 @@
 /*
- * cdrom.FreeBSD.c  CD-ROM¥¢¥¯¥»¥¹
+ * cdrom.FreeBSD.c  CD-ROMã‚¢ã‚¯ã‚»ã‚¹
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -53,10 +53,10 @@ cdromdevice_t cdrom = {
 static int     cd_fd;
 static boolean enabled = FALSE;
 static struct  cd_toc_entry toc_buffer[100];
-static boolean msfmode = TRUE;               /* default ¤Ï MSFPLAY mode */
-static int     lastindex;                    /* ºÇ½ª¥È¥é¥Ã¥¯ */
+static boolean msfmode = TRUE;               /* default ã¯ MSFPLAY mode */
+static int     lastindex;                    /* æœ€çµ‚ãƒˆãƒ©ãƒƒã‚¯ */
 
-/* ioctl¤¬¥¨¥é¡¼¤Çµ¢¤Ã¤ÆÍè¤ë¾ì¹ç IOCTL_RETRY_TIME ²ó¥ê¥È¥é¥¤¤¹¤ë */
+/* ioctlãŒã‚¨ãƒ©ãƒ¼ã§å¸°ã£ã¦æ¥ã‚‹å ´åˆ IOCTL_RETRY_TIME å›ãƒªãƒˆãƒ©ã‚¤ã™ã‚‹ */
 static int do_ioctl(int cmd, void *data) {
 	int i;
 	for (i = 0; i < CDROM_IOCTL_RETRY_TIME; i++) {
@@ -68,14 +68,14 @@ static int do_ioctl(int cmd, void *data) {
 	return -1;
 }
 
-/* CD-ROM ¤ÎÌÜ¼¡¤òÆÉ¤ß½Ğ¤·¤Æ¤ª¤¯ */
+/* CD-ROM ã®ç›®æ¬¡ã‚’èª­ã¿å‡ºã—ã¦ãŠã */
 static int get_cd_entry() {
 	int    endtrk, i;
 	struct ioc_toc_header     tochdr;
 	struct ioc_read_toc_entry toc;
 	struct ioc_play_msf       msf;
 
-	/* ºÇ½ª¥È¥é¥Ã¥¯ÈÖ¹æ¤òÆÀ¤ë */
+	/* æœ€çµ‚ãƒˆãƒ©ãƒƒã‚¯ç•ªå·ã‚’å¾—ã‚‹ */
 	if (do_ioctl(CDIOREADTOCHEADER, &tochdr) < 0) {
 		perror("CDIOREADTOCHEADER");
 		return NG;
@@ -83,14 +83,14 @@ static int get_cd_entry() {
 	
 	lastindex = endtrk = tochdr.ending_track;
 	i = tochdr.ending_track - tochdr.starting_track + 1;
-	if (endtrk <= 1) {  /* £²¥È¥é¥Ã¥¯°Ê¾å¤Ê¤¤¤È¥À¥á */
+	if (endtrk <= 1) {  /* ï¼’ãƒˆãƒ©ãƒƒã‚¯ä»¥ä¸Šãªã„ã¨ãƒ€ãƒ¡ */
 		fprintf(stderr, "No CD-AUDIO in CD-ROM\n");
 		return NG;
 	}
 	
 	prv.cd_maxtrk = lastindex;
 	
-	/* ¤¹¤Ù¤Æ¤Î¥È¥é¥Ã¥¯¤ÎÌÜ¼¡¤òÆÉ¤ß¤À¤·¤Æ¥­¥ã¥Ã¥·¥å¤·¤Æ¤ª¤¯ */
+	/* ã™ã¹ã¦ã®ãƒˆãƒ©ãƒƒã‚¯ã®ç›®æ¬¡ã‚’èª­ã¿ã ã—ã¦ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã—ã¦ãŠã */
 	toc.address_format = CD_MSF_FORMAT;
 	toc.starting_track = 0;
 	toc.data_len = (i + 1) * sizeof(struct cd_toc_entry);
@@ -105,7 +105,7 @@ static int get_cd_entry() {
 	return OK;
 #endif
 
-	/* CDROMPLAYMSF ¤¬Í­¸ú¤«¥Á¥§¥Ã¥¯ */
+	/* CDROMPLAYMSF ãŒæœ‰åŠ¹ã‹ãƒã‚§ãƒƒã‚¯ */
 	msf.start_m = toc_buffer[1].addr.msf.minute;
 	msf.start_s = toc_buffer[1].addr.msf.second;
 	msf.start_f = toc_buffer[1].addr.msf.frame;
@@ -125,7 +125,7 @@ static int get_cd_entry() {
 	return OK;
 }
 
-/* ¥Ç¥Ğ¥¤¥¹¤Î½é´ü²½ */
+/* ãƒ‡ãƒã‚¤ã‚¹ã®åˆæœŸåŒ– */
 int cdrom_init(char *dev_cd) {
 	if (dev_cd == NULL) return NG;
 
@@ -142,7 +142,7 @@ int cdrom_init(char *dev_cd) {
 	return NG;
 }
 
-/* ¥Ç¥Ğ¥¤¥¹¤Î¸å»ÏËö */
+/* ãƒ‡ãƒã‚¤ã‚¹ã®å¾Œå§‹æœ« */
 int cdrom_exit() {
 	if (enabled) {
 		cdrom_stop();
@@ -151,14 +151,14 @@ int cdrom_exit() {
 	return OK;
 }
 
-/* ¥È¥é¥Ã¥¯ÈÖ¹æ trk ¤Î±éÁÕ trk = 1~ */
+/* ãƒˆãƒ©ãƒƒã‚¯ç•ªå· trk ã®æ¼”å¥ trk = 1~ */
 int cdrom_start(int trk) {
 	struct ioc_play_msf   msf;
 	struct ioc_play_track track;
 	
 	if (!enabled) return NG;
 
-	/* ¶Ê¿ô¤è¤ê¤âÂ¿¤¤»ØÄê¤ÏÉÔ²Ä*/
+	/* æ›²æ•°ã‚ˆã‚Šã‚‚å¤šã„æŒ‡å®šã¯ä¸å¯*/
 	if (trk > lastindex) {
 		return NG;
 	}
@@ -189,7 +189,7 @@ int cdrom_start(int trk) {
 	return OK;
 }
 
-/* ±éÁÕÄä»ß */
+/* æ¼”å¥åœæ­¢ */
 int cdrom_stop() {
 	if (enabled) {
 		/* if (do_ioctl(CDIOCSTOP, NULL) < 0) { */
@@ -202,7 +202,7 @@ int cdrom_stop() {
 	return NG;
 }
 
-/* ¸½ºß±éÁÕÃæ¤Î¥È¥é¥Ã¥¯¾ğÊó¤Î¼èÆÀ */
+/* ç¾åœ¨æ¼”å¥ä¸­ã®ãƒˆãƒ©ãƒƒã‚¯æƒ…å ±ã®å–å¾— */
 int cdrom_getPlayingInfo (cd_time *info) {
 	struct ioc_read_subchannel s;
 	struct cd_sub_channel_info data;

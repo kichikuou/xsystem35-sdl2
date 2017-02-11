@@ -1,5 +1,5 @@
 /*
- * sactlog.c: •–•√•Ø•Ì•∞
+ * sactlog.c: „Éê„ÉÉ„ÇØ„É≠„Ç∞
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -43,9 +43,9 @@
 #include "sactlog_sjismsg.c"
 
 /*
-  •€•§°º•Î§«æÂ≤º•π•Ø•Ì°º•Î
-  ESC•≠°º§«Ω™Œª
-  PageUP/Down§«£±•⁄°º•∏¡˜§Í
+  „Éõ„Ç§„Éº„É´„Åß‰∏ä‰∏ã„Çπ„ÇØ„É≠„Éº„É´
+  ESC„Ç≠„Éº„ÅßÁµÇ‰∫Ü
+  PageUP/Down„ÅßÔºë„Éö„Éº„Ç∏ÈÄÅ„Çä
 */
 
 #define FONTSIZEINDEX 10
@@ -64,13 +64,13 @@ static void draw_log() {
 	// canvas clear
 	memset(chr->pixel, 0, chr->bytes_per_line * chr->height);
 	
-	// •⁄°º•∏∞Ã√÷æ Û
+	// „Éö„Éº„Ç∏‰ΩçÁΩÆÊÉÖÂ†±
 	len = g_snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, g_list_length(sact.log));
 	
 	dt_setfont(FONT_GOTHIC, FONTSIZEINDEX);
 	dt_drawtext(chr, sf0->width - FONTSIZEINDEX *len /2, 0, pinfo);
 	
-	// …Ωº®ªœ§·∞Ã√÷
+	// Ë°®Á§∫Âßã„ÇÅ‰ΩçÁΩÆ
 	node = g_list_nth(sact.log, g_list_length(sact.log) - curline);
 	for (i = 0; i < LOGLINENUM; i++) {
 		char *str, *streuc;
@@ -103,7 +103,7 @@ static void draw_log() {
 
 
 int sblog_start(void) {
-	// ¿‚Ã¿ ∏æœ§Úƒ…≤√
+	// Ë™¨ÊòéÊñáÁ´†„ÇíËøΩÂä†
 	sact.log = g_list_append(sact.log, "\n");
 	sact.log = g_list_append(sact.log, LOGMSG1);
 	sact.log = g_list_append(sact.log, LOGMSG2);
@@ -128,7 +128,7 @@ int sblog_end(void) {
 	sf_free(back);
 	sf_free(chr);
 	
-	// ¿‚Ã¿ ∏æœ§Ú∫ÔΩ¸
+	// Ë™¨ÊòéÊñáÁ´†„ÇíÂâäÈô§
 	for (i = 0; i < 6; i++) {
 		node = g_list_last(sact.log);
 		sact.log = g_list_remove(sact.log, node->data);

@@ -1,5 +1,5 @@
 /*
- * graph_copy.c  pixel ¥Ç¡¼¥¿¤Î¥³¥Ô¡¼
+ * graph_copy.c  pixel ãƒ‡ãƒ¼ã‚¿ã®ã‚³ãƒ”ãƒ¼
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -29,17 +29,17 @@
 #include "ags.h"
 
 /**
- * »ØÄê¤Î surface ¤ÎÎÎ°è¤ò ÊÌ¤Î surface ¤Î»ØÄê°ÌÃÖ¤Ø¥³¥Ô¡¼¤¹¤ë
- * pixel¥Ç¡¼¥¿¤Î¤ß¥³¥Ô¡¼
+ * æŒ‡å®šã® surface ã®é ˜åŸŸã‚’ åˆ¥ã® surface ã®æŒ‡å®šä½ç½®ã¸ã‚³ãƒ”ãƒ¼ã™ã‚‹
+ * pixelãƒ‡ãƒ¼ã‚¿ã®ã¿ã‚³ãƒ”ãƒ¼
  * 
- * @param dst: Å¾Á÷Àè surface
- * @param dx: Å¾Á÷Àè£ØºÂÉ¸
- * @param dy: Å¾Á÷Àè£ÙºÂÉ¸
- * @param src: Å¾Á÷¸µsurface
- * @param sx: Å¾Á÷¸µ£ØºÂÉ¸
- * @param sy: Å¾Á÷¸µ£ÙºÂÉ¸
- * @param sw: Å¾Á÷Éı
- * @param sh: Å¾Á÷¹â¤µ
+ * @param dst: è»¢é€å…ˆ surface
+ * @param dx: è»¢é€å…ˆï¼¸åº§æ¨™
+ * @param dy: è»¢é€å…ˆï¼¹åº§æ¨™
+ * @param src: è»¢é€å…ƒsurface
+ * @param sx: è»¢é€å…ƒï¼¸åº§æ¨™
+ * @param sy: è»¢é€å…ƒï¼¹åº§æ¨™
+ * @param sw: è»¢é€å¹…
+ * @param sh: è»¢é€é«˜ã•
  */
 int gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
 	BYTE *sp, *dp;

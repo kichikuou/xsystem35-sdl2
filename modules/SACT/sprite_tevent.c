@@ -1,5 +1,5 @@
 /*
- * sprite_tevent.c: ¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È¤È¥¹¥×¥é¥¤¥È¤Î°ÜÆ°
+ * sprite_tevent.c: ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¨ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹•
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -37,18 +37,18 @@
 
 /*
 
- ¥¿¥¤¥Ş¥¤¥Ù¥ó¥È¤Ë¤è¤ë¥¹¥×¥é¥¤¥È¤Î°ÜÆ°¤È¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È¤Î¹¹¿·
+ ã‚¿ã‚¤ãƒã‚¤ãƒ™ãƒ³ãƒˆã«ã‚ˆã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹•ã¨ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æ›´æ–°
 
- ¼Âºİ¤Ë¤Ï¡¢nact->callback()¤òÁ´ÎÏ¤Ç¸Æ¤Ó½Ğ¤·¤Ç¤¤¤ë¤³¤È¤¬¤Û¤È¤ó¤É¤Ç¡¢
- ¥¿¥¤¥Ş¥¤¥Ù¥ó¥È¤¬Íß¤·¤¤¥¹¥×¥é¥¤¥ÈÆâÉô¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯¤Ç·Ğ²á»ş´Ö¤ò·×»»¤·¡¢
- ¾õÂÖ¤ò¹¹¿·¤·¤Æ¤¤¤ë¡£
+ å®Ÿéš›ã«ã¯ã€nact->callback()ã‚’å…¨åŠ›ã§å‘¼ã³å‡ºã—ã§ã„ã‚‹ã“ã¨ãŒã»ã¨ã‚“ã©ã§ã€
+ ã‚¿ã‚¤ãƒã‚¤ãƒ™ãƒ³ãƒˆãŒæ¬²ã—ã„ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†…éƒ¨ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã§çµŒéæ™‚é–“ã‚’è¨ˆç®—ã—ã€
+ çŠ¶æ…‹ã‚’æ›´æ–°ã—ã¦ã„ã‚‹ã€‚
 
- Â¾¤Ë¤Ï system35 ¤Î¥á¥¤¥ó¥ë¡¼¥× nact_main() ¤«¤é¸Æ¤Ğ¤ì¤ë¤³¤È¤ä¡¢
- X|SDL¤Î¥­¡¼ÂÔ¤ÁÃæÅù¤Ë¸Æ¤Ğ¤ì¤ë¡£
+ ä»–ã«ã¯ system35 ã®ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ— nact_main() ã‹ã‚‰å‘¼ã°ã‚Œã‚‹ã“ã¨ã‚„ã€
+ X|SDLã®ã‚­ãƒ¼å¾…ã¡ä¸­ç­‰ã«å‘¼ã°ã‚Œã‚‹ã€‚
  
- ¥¹¥×¥é¥¤¥È¤Î°ÜÆ°¤Ï SACT.Draw ¤¬¸Æ¤Ğ¤ì¤Æ¤«¤é°ÜÆ°¤ò³«»Ï¤·¡¢°ÜÆ°½ªÎ»¤Ş¤Ç
- ÂÔ¤Ã¤Æ¤¤¤ë¤Î¤Ç¡¢nact_main¤«¤é¸Æ¤Ğ¤ì¤ë¤È¤­¤Ï¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È
- ¤Î¹¹¿·½èÍı¤À¤±¡£
+ ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç§»å‹•ã¯ SACT.Draw ãŒå‘¼ã°ã‚Œã¦ã‹ã‚‰ç§»å‹•ã‚’é–‹å§‹ã—ã€ç§»å‹•çµ‚äº†ã¾ã§
+ å¾…ã£ã¦ã„ã‚‹ã®ã§ã€nact_mainã‹ã‚‰å‘¼ã°ã‚Œã‚‹ã¨ãã¯ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+ ã®æ›´æ–°å‡¦ç†ã ã‘ã€‚
  
 */
 
@@ -56,13 +56,13 @@ static void tevent_callback(agsevent_t *e);
 
 
 /*
- ¥¿¥¤¥Ş¥¤¥Ù¥ó¥È callback ¥á¥¤¥ó
+ ã‚¿ã‚¤ãƒã‚¤ãƒ™ãƒ³ãƒˆ callback ãƒ¡ã‚¤ãƒ³
 */
 static void tevent_callback(agsevent_t *e) {
 	GSList *node;
 	int update = 0;
 	
-	// SP_MOVE ¤ÎÆ±´ü°ÜÆ°¤Î¤¿¤á¤Î¥«¥¦¥ó¥¿¤ÎÆÉ¤ß¹ş¤ß
+	// SP_MOVE ã®åŒæœŸç§»å‹•ã®ãŸã‚ã®ã‚«ã‚¦ãƒ³ã‚¿ã®èª­ã¿è¾¼ã¿
 	sact.movecurtime = get_high_counter(SYSTEMCOUNTER_MSEC);
 	
 	for (node = sact.teventlisteners; node; node = node->next) {
@@ -70,19 +70,19 @@ static void tevent_callback(agsevent_t *e) {
 		if (sp == NULL) continue;
 		if (sp->teventcb == NULL) continue;
 		
-		// ÈóÉ½¼¨¤Ç¤Ï¥¤¥Ù¥ó¥È¤ËÈ¿±ş¤·¤Ê¤¤
+		// éè¡¨ç¤ºã§ã¯ã‚¤ãƒ™ãƒ³ãƒˆã«åå¿œã—ãªã„
 		if (!sp->show) continue;
 
-		// ¥¹¥×¥é¥¤¥ÈËè¤Î¥¿¥¤¥Ş¥¤¥Ù¥ó¥È¥Ï¥ó¥É¥é¤Î¸Æ¤Ó½Ğ¤·
+		// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ¯ã®ã‚¿ã‚¤ãƒã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ã®å‘¼ã³å‡ºã—
 		update += sp->teventcb(sp, e);
 	}
 	
-	// ÊÑ¹¹¤¬¤¢¤ì¤Ğ²èÌÌ¤ò¹¹¿·
+	// å¤‰æ›´ãŒã‚ã‚Œã°ç”»é¢ã‚’æ›´æ–°
 	if (update) {
 		sp_update_clipped();
 	}
 	
-	// timer event litener ¤Îºï½ü (¾å¤Î¥ë¡¼¥×Æâ¤Çºï½ü¤Ç¤­¤Ê¤¤¤Î¤Ç)
+	// timer event litener ã®å‰Šé™¤ (ä¸Šã®ãƒ«ãƒ¼ãƒ—å†…ã§å‰Šé™¤ã§ããªã„ã®ã§)
 	for (node = sact.teventremovelist; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;
 		if (sp == NULL) continue;
@@ -93,9 +93,9 @@ static void tevent_callback(agsevent_t *e) {
 }
 
 /*
-  ¥¿¥¤¥Ş¥¤¥Ù¥ó¥È callback ¤ÎÅĞÏ¿
-  @param sp: ÅĞÏ¿¤¹¤ë¥¹¥×¥é¥¤¥È
-  @param cb: ¸Æ¤Ó½Ğ¤µ¤ì¤ëcallback
+  ã‚¿ã‚¤ãƒã‚¤ãƒ™ãƒ³ãƒˆ callback ã®ç™»éŒ²
+  @param sp: ç™»éŒ²ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+  @param cb: å‘¼ã³å‡ºã•ã‚Œã‚‹callback
 */
 void spev_add_teventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) {
 	sp->teventcb = cb;
@@ -103,15 +103,15 @@ void spev_add_teventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) 
 }
 
 /*
-  ¾å¤ÇÅĞÏ¿¤·¤¿ callback ¤Îºï½ü
-  @param sp: ºï½ü¤¹¤ë¥¹¥×¥é¥¤¥È
+  ä¸Šã§ç™»éŒ²ã—ãŸ callback ã®å‰Šé™¤
+  @param sp: å‰Šé™¤ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 void spev_remove_teventlistener(sprite_t *sp) {
 	sact.teventlisteners = g_slist_remove(sact.teventlisteners, sp);
 }
 
 /*
-  system35¤Î¥á¥¤¥ó¥ë¡¼¥×¤«¤é¤Ç¸Æ¤Ğ¤ì¤ë¥³¡¼¥ë¥Ğ¥Ã¥¯
+  system35ã®ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ—ã‹ã‚‰ã§å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯
 */
 void spev_main() {
 	agsevent_t e;
@@ -119,8 +119,8 @@ void spev_main() {
 	e.type = AGSEVENT_TIMER;
 	tevent_callback(&e);
 
-	// ¥Ç¥Õ¥©¥ë¥È¤Î¥³¡¼¥ë¥Ğ¥Ã¥¯¤Î¤¦¤Á¡¢¤³¤³¤ÇÉ¬Í×¤Ê¤â¤Î¤À¤±
-	// ½èÍı¡£(VA¥³¥Ş¥ó¥Écallback¤Ï¤Ê¤·)
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã®ã†ã¡ã€ã“ã“ã§å¿…è¦ãªã‚‚ã®ã ã‘
+	// å‡¦ç†ã€‚(VAã‚³ãƒãƒ³ãƒ‰callbackã¯ãªã—)
 	if (nact->popupmenu_opened) {
 		menu_gtkmainiteration();
 		if (nact->is_quit) sys_exit(0);

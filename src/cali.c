@@ -1,5 +1,5 @@
 /*
- * cali.c  ·×»»¼°¤ÎÉ¾²Á
+ * cali.c  è¨ˆç®—å¼ã®è©•ä¾¡
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -19,9 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  *
- *          0.00    97/11/27 ½éÈÇ
- *          0.01    97/12/06 ·×»»¼°¤ÎÉ¾²Á½ç½ø¤¬¤ª¤«¤·¤«¤Ã¤¿
- * @version 0.01-01 97/12/06 ¥á¥Ã¥»¡¼¥¸¤«¤éÆüËÜ¸ì¤òºï½ü
+ *          0.00    97/11/27 åˆç‰ˆ
+ *          0.01    97/12/06 è¨ˆç®—å¼ã®è©•ä¾¡é †åºãŒãŠã‹ã—ã‹ã£ãŸ
+ * @version 0.01-01 97/12/06 ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‹ã‚‰æ—¥æœ¬èªã‚’å‰Šé™¤
  *
 */
 /* $Id: cali.c,v 1.16 2002/12/31 04:11:19 chikama Exp $ */
@@ -48,18 +48,18 @@ int getCaliValue();
 int *getCaliVariable();
 int *getVariable();
 
-int preVarPage;      /* Ä¾Á°¤Ë¥¢¥¯¥»¥¹¤·¤¿ÊÑ¿ô¤Î¥Ú¡¼¥¸ */
-int preVarIndex;     /* Ä¾Á°¤Ë¥¢¥¯¥»¥¹¤·¤¿ÊÑ¿ô¤ÎINDEX */
-int preVarNo;        /* Ä¾Á°¤Ë¥¢¥¯¥»¥¹¤·¤¿ÊÑ¿ô¤ÎÈÖ¹æ */
+int preVarPage;      /* ç›´å‰ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ãŸå¤‰æ•°ã®ãƒšãƒ¼ã‚¸ */
+int preVarIndex;     /* ç›´å‰ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ãŸå¤‰æ•°ã®INDEX */
+int preVarNo;        /* ç›´å‰ã«ã‚¢ã‚¯ã‚»ã‚¹ã—ãŸå¤‰æ•°ã®ç•ªå· */
 
-static int buf[CALI_DEPTH_MAX]; /* ·×»»¼°¥Ğ¥Ã¥Õ¥¡ */
-static int *cali = buf;         /* ¥¤¥ó¥Ç¥Ã¥¯¥¹ */
+static int buf[CALI_DEPTH_MAX]; /* è¨ˆç®—å¼ãƒãƒƒãƒ•ã‚¡ */
+static int *cali = buf;         /* ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ */
 
 static void undeferr() {
 	SYSERROR("Undefined Command:@ %03d,%05x\n", sl_getPage(), sl_getIndex());
 }
 
-/* ÇÛÎó¤Î¥ª¥Õ¥»¥Ã¥È¤ò³ÎÄê¤¹¤ë */
+/* é…åˆ—ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’ç¢ºå®šã™ã‚‹ */
 static int *fixOffset(int base, int offset2) {
 	int page, offset;
 	int *index;
@@ -114,38 +114,38 @@ static int *fixOffset(int base, int offset2) {
 	}
 }
 
-/* ÊÑ¿ôÈÖ¹æ¤òÊÖ¤¹ */
+/* å¤‰æ•°ç•ªå·ã‚’è¿”ã™ */
 static int *getVar(int c0) {
 	int c1;
 	
-	if ((c0 & 0x40) != 0) { /* 2byte·Ï */
+	if ((c0 & 0x40) != 0) { /* 2byteç³» */
 		c1 = sl_getc();
 		if (c0 == 0xc0) {
 			if (c1 == 0) {
 				SYSERROR("Unknown Parameter\n");
 			} else if (c1 == 1) {
-				/* SYSTEM35³ÈÄ¥ */
+				/* SYSTEM35æ‹¡å¼µ */
 				c0 = (sl_getc() << 8) + sl_getc();  /* varbase */
 				c1 = getCaliValue();                /* offset */
 				return fixOffset(c0, c1);
 			} else if (c1 < 0x40) {
 				WARNING("Unknown Parameter\n");
 				undeferr();
-			} else { /* 2byte·Ï 40h - ffh */
+			} else { /* 2byteç³» 40h - ffh */
 				return fixOffset(c1, -1);
 			}
-		} else { /* 2byte·Ï 100h - 3fffh */
+		} else { /* 2byteç³» 100h - 3fffh */
 			return fixOffset(((c0 & 0x3f) * 256) + c1, -1);
 		}
-	} else { /* 1byte·Ï */
+	} else { /* 1byteç³» */
 		return fixOffset(c0 & 0x3f, -1);
 	}
-	/* Íè¤Ê¤¤¤Ï¤º */
+	/* æ¥ãªã„ã¯ãš */
 	SYSERROR("Something was wrong\n");
 	return NULL;
 }
 
-/* ÊÑ¿ôÈÖ¹æ¤¬ÊÖ¤ë */
+/* å¤‰æ•°ç•ªå·ãŒè¿”ã‚‹ */
 int *getCaliVariable() {
 	int *c0 = getVar(sl_getc());
 	if (sl_getc() != 0x7f) {
@@ -154,12 +154,12 @@ int *getCaliVariable() {
 	return c0;
 }
 
-/* ÊÑ¿ôÂåÆş¥³¥Ş¥ó¥ÉÍÑ */
+/* å¤‰æ•°ä»£å…¥ã‚³ãƒãƒ³ãƒ‰ç”¨ */
 int *getVariable() {
 	return getVar(sl_getc());
 }
 
-/* ·×»»¼°¤ÎÉ¾²Á¸å¤ÎÃÍ¤¬ÊÖ¤ë */
+/* è¨ˆç®—å¼ã®è©•ä¾¡å¾Œã®å€¤ãŒè¿”ã‚‹ */
 int getCaliValue() {
 	register int ingVal,edVal,rstVal;
 	int c0,c1;

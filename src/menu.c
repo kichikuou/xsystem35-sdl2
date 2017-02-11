@@ -130,7 +130,7 @@ boolean menu_inputnumber(INPUTNUM_PARAM *p) {
 	
 	adj = gtk_adjustment_new (p->def, p->min, p->max, 1, 1, 1);
 	gtk_spin_button_set_adjustment(GTK_SPIN_BUTTON(menu_spinbutton), GTK_ADJUSTMENT(adj));
-	/* ¤³¤¦¤·¤Ê¤¤¤ÈÁ°¤Î value ¤¬É½¼¨¤µ¤ì¤ë */
+	/* ã“ã†ã—ãªã„ã¨å‰ã® value ãŒè¡¨ç¤ºã•ã‚Œã‚‹ */
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(menu_spinbutton), p->def);
 	
 	gtk_widget_show(menu_window_in);

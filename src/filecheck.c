@@ -123,7 +123,7 @@ char *fc_add(char *req) {
 	return b;
 }
 
-/* QE ¤Ç¿·µ¬¥Õ¥¡¥¤¥ë¤ò¥»¡¼¥Ö¤¹¤ë»ş¤Î¥Õ¥¡¥¤¥ëÌ¾¤Î´Á»ú¥³¡¼¥É */
+/* QE ã§æ–°è¦ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚»ãƒ¼ãƒ–ã™ã‚‹æ™‚ã®ãƒ•ã‚¡ã‚¤ãƒ«åã®æ¼¢å­—ã‚³ãƒ¼ãƒ‰ */
 void fc_set_default_kanjicode(int c) {
 	if (c == 0) {
 		newfile_kanjicode_euc = TRUE;

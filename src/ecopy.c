@@ -1152,7 +1152,7 @@ static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, 
 }
 
 static int eCopyArea1001(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
-	/* �ѥ�åȥ��ե� */
+	/* パレットシフト */
 	return sys_getInputInfo();
 }
 

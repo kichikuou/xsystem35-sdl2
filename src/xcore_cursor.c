@@ -1,5 +1,5 @@
 /*
- * xcore_cursor.c ¥«¡¼¥½¥ë½èÍı for Xcore
+ * xcore_cursor.c ã‚«ãƒ¼ã‚½ãƒ«å‡¦ç† for Xcore
  *
  * Copyright (C) 2000- TAJIRI Yasuhiro  <tajiri@venus.dti.ne.jp>
  *
@@ -34,7 +34,7 @@
 #include "cursor.h"
 #include "xcore_private.h"
 
-/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¥Õ¥©¥ó¥È¥¤¥á¡¼¥¸*/
+/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ãƒ•ã‚©ãƒ³ãƒˆã‚¤ãƒ¡ãƒ¼ã‚¸*/
 #include "bitmaps/curbm0.xbm"
 #include "bitmaps/curbm1.xbm"
 #include "bitmaps/curbm2.xbm"
@@ -53,7 +53,7 @@
 static Cursor          cursor[256];
 static GC              cursorGC;
 
-/* mouse cursur ¤Î½é´ü²½ */
+/* mouse cursur ã®åˆæœŸåŒ– */
 void x11_init_cursor(void) {
 	XColor black, white;
 	Pixmap curPix[7], maskPix[7],tmpPixmap;
@@ -181,8 +181,8 @@ boolean Xcore_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCursorDi
 	xorPix = XCreateBitmapFromData(x11_display, x11_window, buf3, width, height);
 	andPix = XCreateBitmapFromData(x11_display, x11_window, buf4, width, height);
 	
-	/*¤³¤³¤«¤é¡¢XOR,AND¤¬¤¿¤«¤é¡¢XÍÑ¤Î¥«¡¼¥½¥ë¤Ëºî¤ê¤«¤¨*/
-	/*wine-991114 windows/x11drv/mouse.c¤è¤ê°úÍÑ
+	/*ã“ã“ã‹ã‚‰ã€XOR,ANDãŒãŸã‹ã‚‰ã€Xç”¨ã®ã‚«ãƒ¼ã‚½ãƒ«ã«ä½œã‚Šã‹ãˆ*/
+	/*wine-991114 windows/x11drv/mouse.cã‚ˆã‚Šå¼•ç”¨
 	 * X11 mouse driver
 	 *
 	 * Copyright 1998 Ulrich Weigand
@@ -243,7 +243,7 @@ boolean Xcore_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCursorDi
 	return TRUE;
 }
 
-/* ¥Ş¥¦¥¹¤Î°ÌÃÖ¤Î°ÜÆ° */
+/* ãƒã‚¦ã‚¹ã®ä½ç½®ã®ç§»å‹• */
 void Xcore_setCursorLocation(int x, int y) {
 	XWarpPointer(x11_display, x11_window, x11_window,
 		     0, 0, 0, 0,
@@ -251,7 +251,7 @@ void Xcore_setCursorLocation(int x, int y) {
 	XFlush(x11_display);
 }
 
-/* ¥Ş¥¦¥¹¥«¡¼¥½¥ë¤Î·Á¾õ¤ÎÀßÄê */
+/* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®å½¢çŠ¶ã®è¨­å®š */
 void Xcore_setCursorType(int type) {
 	XDefineCursor(x11_display, x11_window, cursor[type]);
 }

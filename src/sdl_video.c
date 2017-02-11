@@ -43,7 +43,7 @@ struct sdl_private_data *sdl_videodev;
 boolean RawKeyInfo[256];
 
 
-/* SDL ¤Î½é´ü²½ */
+/* SDL ã®åˆæœŸåŒ– */
 int sdl_Initilize(void) {
 	sdl_videodev = g_new0(struct sdl_private_data, 1);
 
@@ -92,7 +92,7 @@ void sdl_setWindowTitle(char *name) {
 	SDL_WM_SetCaption(name, NULL);
 }
 
-/* Visual ¤Ë±ş¤¸¤Æ Window ¤òÀ¸À®¤¹¤ë */
+/* Visual ã«å¿œã˜ã¦ Window ã‚’ç”Ÿæˆã™ã‚‹ */
 static void window_init(void) {
 	char s[256];
 	
@@ -194,25 +194,25 @@ void sdl_setFontDevice(FONT *f) {
         sdl_font = f;
 }
 
-/* offscreen ¤ÎÀßÄê */
+/* offscreen ã®è¨­å®š */
 void sdl_setWorldSize(int width, int height, int depth) {
 	makeDIB(width, height, depth);
 	SDL_FillRect(sdl_dib, NULL, 0);
 }
 
-/* Window¤Î size ¤È depth ¤Î¼èÆÀ */
+/* Windowã® size ã¨ depth ã®å–å¾— */
 void sdl_getWindowInfo(DispInfo *info) {
 	info->width  = sdl_display->w;
 	info->height = sdl_display->h;
 	info->depth  = sdl_display->format->BitsPerPixel;
 }
 
-/*  DIB¤Î¼èÆÀ */
+/*  DIBã®å–å¾— */
 agsurface_t *sdl_getDIB(void) {
 	return sdl_dibinfo;
 }
 
-/* AutoRepeat ¤ÎÀßÄê */
+/* AutoRepeat ã®è¨­å®š */
 void sdl_setAutoRepeat(boolean bool) {
 	if (bool) {
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);

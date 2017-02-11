@@ -34,20 +34,20 @@
 #include "variable.h"
 
 
-// ¥¹¥×¥é¥¤¥È¤ÎºÇÂç¿ô
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®æœ€å¤§æ•°
 #define SPRITEMAX 21845
 
-// CG¤ÎºÇÂç¿ô
+// CGã®æœ€å¤§æ•°
 #define CGMAX 63336
 
-// ¥á¥Ã¥»¡¼¥¸¤ÎºÇÂçÄ¹¤µ
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®æœ€å¤§é•·ã•
 #define MSGBUFMAX 257*10
 
-// ÁªÂò»è¤ÎºÇÂçÍ×ÁÇ¿ô
+// é¸æŠè‚¢ã®æœ€å¤§è¦ç´ æ•°
 #define SEL_ELEMENT_MAX 20
 
 
-// ¥­¡¼¥¦¥§¥¤¥È¤Î¼ïÎà
+// ã‚­ãƒ¼ã‚¦ã‚§ã‚¤ãƒˆã®ç¨®é¡
 #define KEYWAIT_NONE 0
 #define KEYWAIT_SIMPLE 1
 #define KEYWAIT_SPRITE 2
@@ -55,24 +55,24 @@
 #define KEYWAIT_SELECT 4
 #define KEYWAIT_BACKLOG 5
 
-// Ê¸»úÎóÃÖ´¹ÍÑ
+// æ–‡å­—åˆ—ç½®æ›ç”¨
 typedef struct {
-	char *src; // ÃÖ¤­´¹¤¨¸µÊ¸»úÎó
-	char *dst; // ÃÖ¤­´¹¤¨Ê¸»úÎó
+	char *src; // ç½®ãæ›ãˆå…ƒæ–‡å­—åˆ—
+	char *dst; // ç½®ãæ›ãˆæ–‡å­—åˆ—
 } strexchange_t;
 
-// SACTEFAM ¤ò»È¤Ã¤¿¥Ş¥¹¥¯
+// SACTEFAM ã‚’ä½¿ã£ãŸãƒã‚¹ã‚¯
 typedef struct {
-	int fd;       // SACTEFAM.KLD ¤Î¥Õ¥¡¥¤¥ë¥Ç¥£¥¹¥¯¥×¥ê¥¿
-	char *mapadr; // mmap ¤µ¤ì¤¿ºÇ½é¤Î¥¢¥É¥ì¥¹
-	off_t size;   // mmap ¤·¤¿Âç¤­¤µ
-	int datanum;  // SACTEFAM.KLD Ãæ¤Î¥Ş¥¹¥¯¥Õ¥¡¥¤¥ë¤Î¿ô
-	int *no;      // ¥·¥Ê¥ê¥ªÂ¦¤Ç¤ÎÈÖ¹æ
-	int *offset;  // ¥Ç¡¼¥¿¤Ø¤Î¥ª¥Õ¥»¥Ã¥È
+	int fd;       // SACTEFAM.KLD ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒ—ãƒªã‚¿
+	char *mapadr; // mmap ã•ã‚ŒãŸæœ€åˆã®ã‚¢ãƒ‰ãƒ¬ã‚¹
+	off_t size;   // mmap ã—ãŸå¤§ãã•
+	int datanum;  // SACTEFAM.KLD ä¸­ã®ãƒã‚¹ã‚¯ãƒ•ã‚¡ã‚¤ãƒ«ã®æ•°
+	int *no;      // ã‚·ãƒŠãƒªã‚ªå´ã§ã®ç•ªå·
+	int *offset;  // ãƒ‡ãƒ¼ã‚¿ã¸ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 } SACTEFAM_t;
 
 
-// CG_XX ¤Çºî¤ëCG¤Î¼ïÎà
+// CG_XX ã§ä½œã‚‹CGã®ç¨®é¡
 enum cgtype {
 	CG_NOTUSED = 0,
 	CG_LINKED  = 1,
@@ -81,16 +81,16 @@ enum cgtype {
 	CG_STRETCH = 4
 };
 
-// cg¤Ë´Ø¤¹¤ë¾ğÊó
+// cgã«é–¢ã™ã‚‹æƒ…å ±
 struct _cginfo {
-	enum cgtype type;  // CG¤Î¼ïÎà, 0: Ì¤»ÈÍÑ, 1:¥ê¥ó¥¯¤µ¤ì¤Æ¤¤¤ë, ...
-	int no;            // CG¤ÎÈÖ¹æ
-	surface_t *sf;     // CGËÜÂÎ
-	int refcnt;        // »²¾È¥«¥¦¥ó¥¿¡££°¤Ë¤Ê¤Ã¤¿¤é³«Êü¤·¤Æ¤â¤è¤¤¡£
+	enum cgtype type;  // CGã®ç¨®é¡, 0: æœªä½¿ç”¨, 1:ãƒªãƒ³ã‚¯ã•ã‚Œã¦ã„ã‚‹, ...
+	int no;            // CGã®ç•ªå·
+	surface_t *sf;     // CGæœ¬ä½“
+	int refcnt;        // å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ã€‚ï¼ã«ãªã£ãŸã‚‰é–‹æ”¾ã—ã¦ã‚‚ã‚ˆã„ã€‚
 };
 typedef struct _cginfo cginfo_t;
 
-// ¥¹¥×¥é¥¤¥È¤Î¥¿¥¤¥×
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¿ã‚¤ãƒ—
 enum spritetype {
 	SPRITE_NORMAL = 0,
 	SPRITE_SWITCH = 1,
@@ -104,149 +104,149 @@ enum spritetype {
 	SPRITE_NONE   =-1
 };
 
-// (Á°Êı»²¾ÈÍÑ)
+// (å‰æ–¹å‚ç…§ç”¨)
 struct _sprite;
 
-// ¥¹¥×¥é¥¤¥È¤Ë´Ø¤¹¤ë³Æ¼ï¾ğÊó
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«é–¢ã™ã‚‹å„ç¨®æƒ…å ±
 struct _sprite {
-	// ¥¹¥×¥é¥¤¥È¤Î¥¿¥¤¥×
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¿ã‚¤ãƒ—
 	enum spritetype type;
 	
-	// ¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
 	int no;
 	
-	// ¤½¤ì¤¾¤ì¤Î¾õÂÖ¤Î»ş¤ËÌÄ¤é¤¹¥µ¥¦¥ó¥ÉÈÖ¹æ
+	// ãã‚Œãã‚Œã®çŠ¶æ…‹ã®æ™‚ã«é³´ã‚‰ã™ã‚µã‚¦ãƒ³ãƒ‰ç•ªå·
 	int numsound1, numsound2, numsound3;
 	
-	// ½é´ü sprite ¤ÎÂç¤­¤µ(cg1¤ÎÂç¤­¤µ)
+	// åˆæœŸ sprite ã®å¤§ãã•(cg1ã®å¤§ãã•)
 	MyDimension cursize;
 	
-	// ¤½¤ì¤¾¤ì¤Î¾õÂÖ¤ÇÉ½¼¨¤¹¤ë CG
+	// ãã‚Œãã‚Œã®çŠ¶æ…‹ã§è¡¨ç¤ºã™ã‚‹ CG
 	cginfo_t *cg1, *cg2, *cg3;
 	
-	// update ¤¹¤ë¤È¤­¤ËÉ½¼¨¤¹¤ëcg
+	// update ã™ã‚‹ã¨ãã«è¡¨ç¤ºã™ã‚‹cg
 	cginfo_t *curcg;
 	
-	// ¥¹¥×¥é¥¤¥È¤òÉ½¼¨¤¹¤ë¤«
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’è¡¨ç¤ºã™ã‚‹ã‹
 	boolean show;
-	boolean show_save; // Zkey hide saveÍÑ
+	boolean show_save; // Zkey hide saveç”¨
 	
-	// É½¼¨¤¹¤ëºİ¤Î¥Ö¥ì¥ó¥ÉÎ¨ 0:Á´¤¯¸«¤¨¤Ê¤¤, 255: ÄÌ¾ïÉ½¼¨
+	// è¡¨ç¤ºã™ã‚‹éš›ã®ãƒ–ãƒ¬ãƒ³ãƒ‰ç‡ 0:å…¨ãè¦‹ãˆãªã„, 255: é€šå¸¸è¡¨ç¤º
 	int blendrate; 
 	
-	// ¥¹¥×¥é¥¤¥È¤¬ Freeze ¤µ¤ì¤Æ¤¤¤ë¤«(0:No 1-3: ¤½¤ÎÈÖ¹æ)
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒ Freeze ã•ã‚Œã¦ã„ã‚‹ã‹(0:No 1-3: ãã®ç•ªå·)
 	int freezed_state;
 	
-	// É½¼¨°ÌÃÖ (SetPos)
+	// è¡¨ç¤ºä½ç½® (SetPos)
 	MyPoint loc;
 	
-	// ¸½ºß¤Î¥¹¥×¥é¥¤¥È¤ÎÉ½¼¨°ÌÃÖ
+	// ç¾åœ¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è¡¨ç¤ºä½ç½®
 	MyPoint cur;
 	
 	// event callback
 	int (* eventcb)(struct _sprite *sp, agsevent_t *e);  // for key/mouse
 	int (* teventcb)(struct _sprite *sp, agsevent_t *e); // for timer
-        // spriteºï½ü»ş¤Î callback
+        // spriteå‰Šé™¤æ™‚ã® callback
 	void (* remove)(struct _sprite *sp);
-	// sprite¤òºÆÉÁ²è¤¹¤ë¤È¤­¤Î callback
+	// spriteã‚’å†æç”»ã™ã‚‹ã¨ãã® callback
 	int  (* update)(struct _sprite *sp);
 	
-	boolean focused; // forcus¤òÆÀ¤Æ¤¤¤ë¤«
-	boolean pressed; // ¤³¤Îsprite¾å¤Ç¥Ş¥¦¥¹¤¬²¡¤µ¤ì¤Æ¤¤¤ë¤«
+	boolean focused; // forcusã‚’å¾—ã¦ã„ã‚‹ã‹
+	boolean pressed; // ã“ã®spriteä¸Šã§ãƒã‚¦ã‚¹ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹
 	
-	GSList *expsp; // ÀâÌÀ¥¹¥×¥é¥¤¥È¤Î¥ê¥¹¥È
+	GSList *expsp; // èª¬æ˜ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒªã‚¹ãƒˆ
 	
-	// move command ÍÑ¥Ñ¥é¥á¡¼¥¿
+	// move command ç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	struct {
-		MyPoint to;     // °ÜÆ°Àè
-		int time;       // °ÜÆ°´°Î»»ş´Ö
-		int speed;      // °ÜÆ°Â®ÅÙ
-		int starttime;  // °ÜÆ°³«»Ï»ş¹ï
-		int endtime;    // °ÜÆ°½ªÎ»Í½Äê»ş¹ï
-		boolean moving; // °ÜÆ°Ãæ¤«¤É¤¦¤«
+		MyPoint to;     // ç§»å‹•å…ˆ
+		int time;       // ç§»å‹•å®Œäº†æ™‚é–“
+		int speed;      // ç§»å‹•é€Ÿåº¦
+		int starttime;  // ç§»å‹•é–‹å§‹æ™‚åˆ»
+		int endtime;    // ç§»å‹•çµ‚äº†äºˆå®šæ™‚åˆ»
+		boolean moving; // ç§»å‹•ä¸­ã‹ã©ã†ã‹
 	} move;
 	
-	// SACT.NumeralÍÑ¥Ñ¥é¥á¡¼¥¿
+	// SACT.Numeralç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	struct {
 		int cg[10];
 		MyPoint pos;
 		int span;
 	} numeral;
 	
-	// ¥¹¥×¥é¥¤¥È¤Î¼ïÎàËè¤Î¾ğÊó
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç¨®é¡æ¯ã®æƒ…å ±
 	union {
-		// ¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥È
+		// ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 		struct {
 			
 		} sw;
 		
-		// ¥²¥Ã¥È¥¹¥×¥é¥¤¥È
+		// ã‚²ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 		struct {
-			boolean dragging;  // ¥É¥é¥Ã¥°Ãæ
-			MyPoint dragstart; // ¥É¥é¥Ã¥°³«»Ï°ÌÃÖ
+			boolean dragging;  // ãƒ‰ãƒ©ãƒƒã‚°ä¸­
+			MyPoint dragstart; // ãƒ‰ãƒ©ãƒƒã‚°é–‹å§‹ä½ç½®
 		} get;
 
-		// ¥×¥Ã¥È¥¹¥×¥é¥¤¥È
+		// ãƒ—ãƒƒãƒˆã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 		struct {
 			
 		} put;
 
-		// ¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥×¥é¥¤¥È
+		// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 		struct {
-			int interval;      // £±¥³¥Ş¤Î´Ö³Ö(10msec)
-			int starttime;     // ³«»Ï»ş¹ï
-			int npat;          // ¥¢¥Ë¥á¥³¥Ş¿ô(1/2/3)
-			unsigned int tick; // ¥«¥¦¥ó¥¿
+			int interval;      // ï¼‘ã‚³ãƒã®é–“éš”(10msec)
+			int starttime;     // é–‹å§‹æ™‚åˆ»
+			int npat;          // ã‚¢ãƒ‹ãƒ¡ã‚³ãƒæ•°(1/2/3)
+			unsigned int tick; // ã‚«ã‚¦ãƒ³ã‚¿
 		} anime;
 		
-		// ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥È
+		// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 		struct {
-			GSList    *buf;       // É½¼¨¤¹¤ëÊ¸»ú¤Î¥ê¥¹¥È
-			surface_t *canvas;    // Ê¸»ú¤òÉÁ²è¤¹¤ësurface
-			MyPoint    dspcur;    // ¸½ºß¤ÎÉ½¼¨°ÌÃÖ
+			GSList    *buf;       // è¡¨ç¤ºã™ã‚‹æ–‡å­—ã®ãƒªã‚¹ãƒˆ
+			surface_t *canvas;    // æ–‡å­—ã‚’æç”»ã™ã‚‹surface
+			MyPoint    dspcur;    // ç¾åœ¨ã®è¡¨ç¤ºä½ç½®
 		} msg;
 	} u;
 };
 typedef struct _sprite sprite_t;
 
-// SACTÁ´ÂÎ¤Î¾ğÊó
+// SACTå…¨ä½“ã®æƒ…å ±
 struct _sact {
-	// SACT¤Î¥Ğ¡¼¥¸¥ç¥ó
+	// SACTã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 	int version;
 	
-	// ¥¹¥×¥é¥¤¥ÈÁ´ÂÎ
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå…¨ä½“
 	sprite_t *sp[SPRITEMAX];
 	
-	GSList *sp_zhide;  // Z¥­¡¼¤Ç¾Ã¤¹¥¹¥×¥é¥¤¥È¤Î¥ê¥¹¥È
-	GSList *sp_quake;  // Quake¤ÇÍÉ¤é¤¹¥¹¥×¥é¥¤¥È¤Î¥ê¥¹¥È
+	GSList *sp_zhide;  // Zã‚­ãƒ¼ã§æ¶ˆã™ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒªã‚¹ãƒˆ
+	GSList *sp_quake;  // Quakeã§æºã‚‰ã™ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒªã‚¹ãƒˆ
 	
-	GSList *updatelist; // ºÆÉÁ²è¤¹¤ë¥¹¥×¥é¥¤¥È¤Î¥ê¥¹¥È
+	GSList *updatelist; // å†æç”»ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒªã‚¹ãƒˆ
 	
-	cginfo_t *cg[CGMAX]; // cg¤Ş¤¿¤ÏCG_xx¤Çºî¤Ã¤¿ CG
+	cginfo_t *cg[CGMAX]; // cgã¾ãŸã¯CG_xxã§ä½œã£ãŸ CG
 	
-	// ºÂÉ¸·Ï¤Î¸¶ÅÀ
+	// åº§æ¨™ç³»ã®åŸç‚¹
 	MyPoint origin;
 	
-	// Ê¸»úÎó push/pop/replce ÍÑ
+	// æ–‡å­—åˆ— push/pop/replce ç”¨
 	GSList *strstack;
 	GSList *strreplace;
 	char   *strreplacesrc;
 	char   *strreplacedst; 
 	
-	// ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥ÈÍÑ¥á¥Ã¥»¡¼¥¸¥Ğ¥Ã¥Õ¥¡
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç”¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒãƒƒãƒ•ã‚¡
 	char msgbuf[MSGBUFMAX];
 	char msgbuf2[MSGBUFMAX];
 	
-	// ÁªÂò¥¦¥£¥ó¥É
+	// é¸æŠã‚¦ã‚£ãƒ³ãƒ‰
 	struct {
-		char *elem[SEL_ELEMENT_MAX]; // ÁªÂò»èÊ¸»úÎó
-		int spno; // ÇØ·Ê¥¹¥×¥é¥¤¥ÈÈÖ¹æ
-		int font_size; // ÁªÂò»èÊ¸»ú¥µ¥¤¥º
-		int font_type; // ÁªÂò»è¥Õ¥©¥ó¥È
-		int frame_dot; // ÏÈ¥¹¥×¥é¥¤¥È¤Î³°Â¦¤«¤é¤Î¥Ô¥¯¥»¥ë¿ô
-		int linespace; // ÁªÂò»è¤Î¹Ô´Ö
-		int movecursor; // ½é´üÁªÂò
-		int align; // ¹Ô¤½¤í¤¨
+		char *elem[SEL_ELEMENT_MAX]; // é¸æŠè‚¢æ–‡å­—åˆ—
+		int spno; // èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+		int font_size; // é¸æŠè‚¢æ–‡å­—ã‚µã‚¤ã‚º
+		int font_type; // é¸æŠè‚¢ãƒ•ã‚©ãƒ³ãƒˆ
+		int frame_dot; // æ ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¤–å´ã‹ã‚‰ã®ãƒ”ã‚¯ã‚»ãƒ«æ•°
+		int linespace; // é¸æŠè‚¢ã®è¡Œé–“
+		int movecursor; // åˆæœŸé¸æŠ
+		int align; // è¡Œãã‚ãˆ
 		void (* cbmove)(agsevent_t *);
 		void (* cbrelease)(agsevent_t *);
 		surface_t   *charcanvas;
@@ -257,21 +257,21 @@ struct _sact {
 	GSList *teventlisteners;
 	GSList *teventremovelist;
 	
-	// MOVE¤¹¤ë¥¹¥×¥é¥¤¥È¤Î¥ê¥¹¥È
+	// MOVEã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ãƒªã‚¹ãƒˆ
 	GSList *movelist;
-	int movestarttime; // °ìÀÆ¤Ë°ÜÆ°¤ò³«»Ï¤¹¤ë¤¿¤á¤Î³«»Ï»ş´Ö
+	int movestarttime; // ä¸€æ–‰ã«ç§»å‹•ã‚’é–‹å§‹ã™ã‚‹ãŸã‚ã®é–‹å§‹æ™‚é–“
 	int movecurtime;
 	
-	MyRectangle updaterect; // ¹¹¿·¤¬É¬Í×¤Êsprite¤ÎÎÎ°è¤ÎÏÂ
+	MyRectangle updaterect; // æ›´æ–°ãŒå¿…è¦ãªspriteã®é ˜åŸŸã®å’Œ
 	
 	// sact timer
 	stimer_t timer[65536];
 	
-	// DnD¤Ë´Ø¤¹¤ë¤â¤Î
-	sprite_t *draggedsp;  // dragÃæ¤Î¥¹¥×¥é¥¤¥È
-	boolean dropped;      // ¥¹¥×¥é¥¤¥È¤¬¥É¥í¥Ã¥×¤µ¤ì¤¿¤«¤É¤¦¤«
+	// DnDã«é–¢ã™ã‚‹ã‚‚ã®
+	sprite_t *draggedsp;  // dragä¸­ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
+	boolean dropped;      // ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚ŒãŸã‹ã©ã†ã‹
 	
-	// keywait¤Î¼ïÎà
+	// keywaitã®ç¨®é¡
 	int waittype;
 	int waitkey;
 	int sp_result_sw;
@@ -279,12 +279,12 @@ struct _sact {
 	int sp_result_put;
 	
 	// wait skip level
-	//  0 ÄÌ¾ï¥­¡¼ÂÔ¤Á
-	//  1 ´ûÆÉ¤Î¤ß¥¹¥­¥Ã¥×
-	//  2 Ì¤ÆÉ¤â¥¹¥­¥Ã¥×
+	//  0 é€šå¸¸ã‚­ãƒ¼å¾…ã¡
+	//  1 æ—¢èª­ã®ã¿ã‚¹ã‚­ãƒƒãƒ—
+	//  2 æœªèª­ã‚‚ã‚¹ã‚­ãƒƒãƒ—
 	int waitskiplv;
 	
-	// ÈÏ°Ï³°¤ò¥¯¥ê¥Ã¥¯¤·¤¿¤È¤­¤Î²»
+	// ç¯„å›²å¤–ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã®éŸ³
 	int numsoundob;
 	
 	// depth map
@@ -293,11 +293,11 @@ struct _sact {
 	// SACTEFAM.KLD
 	SACTEFAM_t am;
 	
-	boolean zhiding;  // Zkey¤Ë¤è¤ë±£¤·Ãæ
+	boolean zhiding;  // Zkeyã«ã‚ˆã‚‹éš ã—ä¸­
 	int     zofftime;
 	boolean zdooff;
 	
-	// ¥Ğ¥Ã¥¯¥í¥°
+	// ãƒãƒƒã‚¯ãƒ­ã‚°
 	boolean logging;
 	GList  *log;
 };

@@ -1,4 +1,4 @@
-// ³ÈÂç½Ì¾®
+// æ‹¡å¤§ç¸®å°
 static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	surface_t *dst = g_new0(surface_t, 1);
 	float    a1, a2, xd, yd;
@@ -31,12 +31,12 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
 	row = g_new(int, dw);
-	// 1¤ª¤ª¤­¤¯¤·¤Æ½é´ü²½¤·¤Ê¤¤¤È col[dw-1]¤Ècol[dw]¤¬Æ±¤¸¤Ë¤Ê¤ë
-	// ²ÄÇ½À­¤¬¤¢¤ë¡£
+	// 1ãŠãŠããã—ã¦åˆæœŸåŒ–ã—ãªã„ã¨ col[dw-1]ã¨col[dw]ãŒåŒã˜ã«ãªã‚‹
+	// å¯èƒ½æ€§ãŒã‚ã‚‹ã€‚
 	col = g_new0(int, dh +1);
 	
 	if (mirror & 1) {
-		/* ¾å²¼È¿Å¾ added by  tajiri@wizard */
+		/* ä¸Šä¸‹åè»¢ added by  tajiri@wizard */
 		for (yd = sh - a2, y = 0; y < dh; y++) {
 			col[y] = yd; yd -= a2;
 		}
@@ -46,7 +46,7 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 		}
 	}
 	if (mirror & 2) {
-		/* º¸±¦È¿Å¾ added by  tajiri@wizard */
+		/* å·¦å³åè»¢ added by  tajiri@wizard */
 		for (xd = sw - a1, x = 0; x < dw; x++) {
 			row[x] = xd; xd -= a1;
 		}

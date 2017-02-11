@@ -46,31 +46,31 @@ typedef struct {
 } UnitMapSrcImg;
 
 typedef struct {
-	int unitWidth;     /* Unit¤ÎÂç¤­¤µ */
+	int unitWidth;     /* Unitã®å¤§ãã• */
 	int unitHeight;
-	int patternNum;    /* ¥Ñ¥¿¡¼¥ó¿ô */
-	int intervaltime;  /* ½ñ´¹¤¨´Ö³Ö */
-	int srcX;          /* ¼èÆÀ°ÌÃÖ */
+	int patternNum;    /* ãƒ‘ã‚¿ãƒ¼ãƒ³æ•° */
+	int intervaltime;  /* æ›¸æ›ãˆé–“éš” */
+	int srcX;          /* å–å¾—ä½ç½® */
 	int srcY;
-	int startX;        /* É½¼¨°ÌÃÖ */
+	int startX;        /* è¡¨ç¤ºä½ç½® */
 	int startY;
-	int endX;          /* °ÜÆ°Àè */
+	int endX;          /* ç§»å‹•å…ˆ */
 	int endY;
-	int saveX;         /* ÇØ·ÊÂàÈò°ÌÃÖ */
+	int saveX;         /* èƒŒæ™¯é€€é¿ä½ç½® */
 	int saveY;
-	int spType;        /* ¥¹¥×¥é¥¤¥ÈÊıË¡ */
-	int spCol;         /* ¥¹¥×¥é¥¤¥È¿§ */
-	int state;         /* ¸½ºß¤Î¾õÂÖ  0:Ää»ß 1:Æ° */
-	int elaspCut;      /* ·Ğ²á¥³¥Ş¿ô */
-	int quantmsec;     /* ·Ğ²áÉÃ¿ô */
-	int totalCut;      /* Á´¥³¥Ş¿ô */
-	int preX;          /* Á°²ó¤Î°ÌÃÖ */
+	int spType;        /* ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ–¹æ³• */
+	int spCol;         /* ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆè‰² */
+	int state;         /* ç¾åœ¨ã®çŠ¶æ…‹  0:åœæ­¢ 1:å‹• */
+	int elaspCut;      /* çµŒéã‚³ãƒæ•° */
+	int quantmsec;     /* çµŒéç§’æ•° */
+	int totalCut;      /* å…¨ã‚³ãƒæ•° */
+	int preX;          /* å‰å›ã®ä½ç½® */
 	int preY;
-	int curX;          /* ¸½ºß°ÌÃÖ */
+	int curX;          /* ç¾åœ¨ä½ç½® */
 	int curY;
-	boolean draw;      /* UNIT¤òÉÁ¤¯¡© */
-	boolean nomove;    /* °ÜÆ°¤¢¤ê¡¦¤Ê¤· */
-	boolean rewrite;   /* ²èÌÌ¹¹¿·¤ÎÉ¬Í×¤¢¤ê */
+	boolean draw;      /* UNITã‚’æãï¼Ÿ */
+	boolean nomove;    /* ç§»å‹•ã‚ã‚Šãƒ»ãªã— */
+	boolean rewrite;   /* ç”»é¢æ›´æ–°ã®å¿…è¦ã‚ã‚Š */
 } VaParam;
 
 typedef struct {
@@ -78,16 +78,16 @@ typedef struct {
 	int y;
 } VhMark;
 
-#define UNITMAP_DISPLAY_PAGE_MAX       16  /* VS¤ÎºÇÂç¥Ú¡¼¥¸¿ô */
-#define UNITMAP_VARIABLE_IMMOVALE     255  /* Êâ¿ô¥Ú¥¤¥ó¥È¤Î°ÜÆ°ÉÔ²ÄÇ½¥Ş¡¼¥¯ */
-#define UNITMAP_VARIABLE_OUTOFRANGE 65535  /* ÈÏ°Ï³°¤Î¥Ş¡¼¥¯ */
+#define UNITMAP_DISPLAY_PAGE_MAX       16  /* VSã®æœ€å¤§ãƒšãƒ¼ã‚¸æ•° */
+#define UNITMAP_VARIABLE_IMMOVALE     255  /* æ­©æ•°ãƒšã‚¤ãƒ³ãƒˆã®ç§»å‹•ä¸å¯èƒ½ãƒãƒ¼ã‚¯ */
+#define UNITMAP_VARIABLE_OUTOFRANGE 65535  /* ç¯„å›²å¤–ã®ãƒãƒ¼ã‚¯ */
 #define UNITMAP_ATTRIB_DEPTH      (4)
 #define UNITMAP_ATTRIB_UNITNUMBER (0)
 #define UNITMAP_ATTRIB_VARIABLE   (1)
 #define UNITMAP_ATTRIB_WALKPAINT  (2)
 #define UNITMAP_ATTRIB_WALKRESULT (3)
 
-/* UnitMAP Á´ÂÎ¤Ø¤Î¥İ¥¤¥ó¥¿ */
+/* UnitMAP å…¨ä½“ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
 static int *UnitMap = NULL;
 /* VC command */
 static int nPageNum;
@@ -105,11 +105,11 @@ static UnitMapSrcImg *srcimg;
 /* VA command state */
 #define VA_STOPPED     0
 #define VA_RUNNING     1
-#define VACMD_MAX 20                      /* Panyo¤Ç18¤Ş¤Ç */
+#define VACMD_MAX 20                      /* Panyoã§18ã¾ã§ */
 static  VaParam VAcmd[VACMD_MAX];         
-static  boolean inAnimation      = FALSE; /* ²èÌÌ¹¹¿·Ãæ */
+static  boolean inAnimation      = FALSE; /* ç”»é¢æ›´æ–°ä¸­ */
 
-/* UnitMap ³Æ¼ï¥Ş¥¯¥í */
+/* UnitMap å„ç¨®ãƒã‚¯ãƒ­ */
 #define MAPSIZE_PER_ATTRIB (cxMap * cyMap)
 #define MAPSIZE_PER_PAGE   ((MAPSIZE_PER_ATTRIB) * UNITMAP_ATTRIB_DEPTH)
 
@@ -229,7 +229,7 @@ void commandVS() { /* from Rance4 */
 		return;
 	}
 
-	/* ¤É¤¦¤ä¤é¡¢ sysVar[0] ¤ËÃÍ¤òÊÖ¤·¤Æ¤Ï¤¤¤±¤Ê¤¤¤é¤·¤¤ thanx Â¼ÅÄ¤µ¤ó*/
+	/* ã©ã†ã‚„ã‚‰ã€ sysVar[0] ã«å€¤ã‚’è¿”ã—ã¦ã¯ã„ã‘ãªã„ã‚‰ã—ã„ thanx æ‘ç”°ã•ã‚“*/
 	switch(nType) {
 	case 1:
 		/* sysVar[0] = *UNITMAP_UNITNUMBER(nPage, x, y); */
@@ -324,7 +324,7 @@ void commandVH() { /* from Rance4 */
 				*UNITMAP_WALKRESULT(nPage, xx , yy) = UNITMAP_VARIABLE_IMMOVALE;;
 			}
 		}
-		/* ¼«Ê¬¼«¿È¤Ï 0 */
+		/* è‡ªåˆ†è‡ªèº«ã¯ 0 */
 		*UNITMAP_WALKRESULT(nPage, x , y) = 0;
 		return;
 	}
@@ -344,20 +344,20 @@ void commandVH() { /* from Rance4 */
   
 	for (yy = 0; yy < cyMap; yy++) {
 		for (xx = 0; xx < cxMap; xx++) {
-			/* ºÇÂçÊâ¿ô¤Î³°¤ÏÉÔ²Ä */
+			/* æœ€å¤§æ­©æ•°ã®å¤–ã¯ä¸å¯ */
 			if (maxfoot < (abs(yy-y)+abs(xx-x))) {
 				*UNITMAP_WALKRESULT(nPage, xx , yy) = UNITMAP_VARIABLE_IMMOVALE;
 			} else if (*UNITMAP_WALKPAINT(nPage, xx, yy) >= UNITMAP_VARIABLE_IMMOVALE) {
-				/* ¾ã³²Êª¤Ê¤é */
+				/* éšœå®³ç‰©ãªã‚‰ */
 				*UNITMAP_WALKRESULT(nPage, xx , yy) = UNITMAP_VARIABLE_IMMOVALE;
 			} else {
-				/* ¤¤¤º¤ì¤Ç¤â¤Ê¤¤¤È¤­¤Ï 0 ¤Ç¤Ê¤é¤¹ */
+				/* ã„ãšã‚Œã§ã‚‚ãªã„ã¨ãã¯ 0 ã§ãªã‚‰ã™ */
 				*UNITMAP_WALKRESULT(nPage, xx , yy) = 0;
 			}
 		}
 	}
 	
-	/* °ÜÆ°ÉÔ²ÄÎÎ°è¤Î·èÄê */
+	/* ç§»å‹•ä¸å¯é ˜åŸŸã®æ±ºå®š */
 	if (width > 1 || height > 1) {
 		for (yy = 0; yy < lmth; yy++) {
 			for (xx = 0; xx < lmtw; xx++) {
@@ -368,10 +368,10 @@ void commandVH() { /* from Rance4 */
 		}
 	}
 
-	/* list ¤Î½é´ü²½ */
+	/* list ã®åˆæœŸåŒ– */
 	vh_src = _vh_src;
 	vh_dst = _vh_dst;
-	/* ½é´ü°ÌÃÖ¤ÎÀßÄê */
+	/* åˆæœŸä½ç½®ã®è¨­å®š */
 	vh_src -> x = x;
 	vh_src -> y = y;
 	vh_cnt_src = n = 1;
@@ -381,13 +381,13 @@ void commandVH() { /* from Rance4 */
 		for (i = 0; i < vh_cnt_src; i++) {
 			vh_check_udlr(n, nPage, (vh_src + i)->x, (vh_src + i)->y);
 		}
-		if (vh_cnt_dst == 0) break;  /* Ì¤Æ§ÃÏ¤¬Ìµ¤¯¤Ê¤Ã¤¿¤é½ªÎ» */
+		if (vh_cnt_dst == 0) break;  /* æœªè¸åœ°ãŒç„¡ããªã£ãŸã‚‰çµ‚äº† */
 		vh_copy_to_src();
-		if (n >= maxfoot)    break;  /* maxfoot ¤Ş¤Ç¥Ş¡¼¥¯¤·¤¿¤é½ªÎ» */
+		if (n >= maxfoot)    break;  /* maxfoot ã¾ã§ãƒãƒ¼ã‚¯ã—ãŸã‚‰çµ‚äº† */
 		n++;
 	}
 	
-	/* ÊÄÎÎ°è¤ò255¤Ë */
+	/* é–‰é ˜åŸŸã‚’255ã« */
 	for (yy = 0; yy < lmth; yy++) {
 		for (xx = 0; xx < lmtw; xx++) {
 			if (*UNITMAP_WALKRESULT(nPage, xx + lmtx, yy + lmty) == 0) {
@@ -396,7 +396,7 @@ void commandVH() { /* from Rance4 */
 		}
 	}
 	
-	/* ¼«Ê¬¼«¿È¤Ï 0 */
+	/* è‡ªåˆ†è‡ªèº«ã¯ 0 */
 	*UNITMAP_WALKRESULT(nPage, x , y) = 0;
 	
 	/*
@@ -534,7 +534,7 @@ void commandVE() { /* from T2 */
 	
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
-		/* VV ¤Ë¤è¤ë */
+		/* VV ã«ã‚ˆã‚‹ */
 		if (img->fEnable == FALSE) continue;
 		
 		for (yy = y; yy < (y+height); yy++) {
@@ -604,7 +604,7 @@ void commandVX() { /* from T2 */
 	case 2:
 		srcimg[p2].bSpCol = p3; break;
 	case 3:
-		/* ¤«¤¨¤ë¤Ë¤ç¹ñ¤Ë¤ç¥¢¥ê¥¹¤ÇÌäÂê¤¬½Ğ¤¿¤Î¤Ç¤È¤ê¤¢¤¨¤º */
+		/* ã‹ãˆã‚‹ã«ã‚‡å›½ã«ã‚‡ã‚¢ãƒªã‚¹ã§å•é¡ŒãŒå‡ºãŸã®ã§ã¨ã‚Šã‚ãˆãš */
 		// commandVF();
 		break;
 	default:
@@ -709,7 +709,7 @@ void commandVIP() {
 }
 
 void commandVJ() {
-	/* ½Å¤ßÉÕ¤­Êâ¿ô¥Ú¥¤¥ó¥È */
+	/* é‡ã¿ä»˜ãæ­©æ•°ãƒšã‚¤ãƒ³ãƒˆ */
 	int page  = getCaliValue();
 	int x     = getCaliValue();
 	int y     = getCaliValue();
@@ -744,22 +744,22 @@ void commandVA() { /* from Panyo */
 	switch(no) {
 	case 0:
 		if (p2 == 0) {
-			/* Ää»ß */
+			/* åœæ­¢ */
 			inAnimation = TRUE;
 			VAcmd[p1].state = VA_STOPPED;
 			VAcmd[p1].draw  = TRUE;
 			if (p3 == 0) {
-				/* ¥æ¥Ë¥Ã¥È¾Ã¤· */
+				/* ãƒ¦ãƒ‹ãƒƒãƒˆæ¶ˆã— */
 				va_restoreUnit(p1);
 				va_updatePreArea(p1);
 			} else {
-				/* ¥æ¥Ë¥Ã¥È½ñ¤¯ */
+				/* ãƒ¦ãƒ‹ãƒƒãƒˆæ›¸ã */
 				va_drawUnit(p1);
 				va_updateUnit(p1);
 			}
 			VAcmd[p1].draw  = FALSE;
 		} else {
-			/* ³«»Ï (p3=¥³¥Ş¿ô,0:Ìµ¸Â(³«»Ï°ÌÃÖ==½ªÎ»°ÌÃÖ¤Î¤È¤­))*/
+			/* é–‹å§‹ (p3=ã‚³ãƒæ•°,0:ç„¡é™(é–‹å§‹ä½ç½®==çµ‚äº†ä½ç½®ã®ã¨ã))*/
 			inAnimation = TRUE;
 			VAcmd[p1].elaspCut  = 0;
 			VAcmd[p1].quantmsec = 0;
@@ -788,7 +788,7 @@ void commandVA() { /* from Panyo */
 			va_updateUnit(p1);
 			if (p2 == 2) {
 				VAcmd[p1].rewrite = TRUE;
-				/* ¥­¡¼È´¤±Ìµ¤· ,p3=0¤Ï»ØÄêÉÔ²Ä */
+				/* ã‚­ãƒ¼æŠœã‘ç„¡ã— ,p3=0ã¯æŒ‡å®šä¸å¯ */
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
 					usleep(10*1000);
@@ -796,7 +796,7 @@ void commandVA() { /* from Panyo */
 				va_drawUnit(p1);
 				va_updateUnit(p1);
 			} else if (p2 == 3) {
-				/* ¥­¡¼È´¤±¤¢¤ê ,p3=0¤Ï»ØÄêÉÔ²Ä*/
+				/* ã‚­ãƒ¼æŠœã‘ã‚ã‚Š ,p3=0ã¯æŒ‡å®šä¸å¯*/
 				int key = 0;
 				VAcmd[p1].rewrite = TRUE;
 				while(VAcmd[p1].state == VA_RUNNING) {
@@ -812,44 +812,44 @@ void commandVA() { /* from Panyo */
 				va_drawUnit(p1);
 				va_updateUnit(p1);
 			} else {
-				/* ¤¹¤°¤ËÀ©¸æ¤òÌá¤¹ */
+				/* ã™ãã«åˆ¶å¾¡ã‚’æˆ»ã™ */
 			}
 		}
 		break;
 	case 1:
-		/* É½¼¨°ÌÃÖ */
+		/* è¡¨ç¤ºä½ç½® */
 		VAcmd[p1].curX = VAcmd[p1].preX = VAcmd[p1].startX = p2;
 		VAcmd[p1].curY = VAcmd[p1].preY = VAcmd[p1].startY = p3; break;
 	case 2:
-		/* °ÜÆ°Àè(½ª¤Ã¤¿¤é¼«Æ°Åª¤ËÄä»ß */
+		/* ç§»å‹•å…ˆ(çµ‚ã£ãŸã‚‰è‡ªå‹•çš„ã«åœæ­¢ */
 		VAcmd[p1].endX = p2;
 		VAcmd[p1].endY = p3; break;
 	case 3:
-		/* ¥µ¥¤¥º */
+		/* ã‚µã‚¤ã‚º */
 		VAcmd[p1].unitWidth  = p2;
 		VAcmd[p1].unitHeight = p3; break;
 	case 4:
-		/* ¥Ñ¥¿¡¼¥ó¿ô¡¦ÉÁÂØ´Ö³Ö(1/100sec) */
+		/* ãƒ‘ã‚¿ãƒ¼ãƒ³æ•°ãƒ»ææ›¿é–“éš”(1/100sec) */
 		VAcmd[p1].patternNum   = p2;
 		VAcmd[p1].intervaltime = p3; break;
 	case 5:
-		/* ¼èÆÀ°ÌÃÖ */
+		/* å–å¾—ä½ç½® */
 		VAcmd[p1].srcX = p2;
 		VAcmd[p1].srcY = p3; break;
 	case 6:
-		/* ÇØ·ÊÂàÈò°ÌÃÖ */
+		/* èƒŒæ™¯é€€é¿ä½ç½® */
 		VAcmd[p1].saveX = p2;
 		VAcmd[p1].saveY = p3; break;
 	case 7:
-		/* ¥¹¥×¥é¥¤¥ÈÊıË¡¡¦¿§ */
-		VAcmd[p1].spType = p2;             /* p2=0:ÄÌ¾ï¥³¥Ô¡¼ , p2=1:¿§»ØÄê¥¹¥×¥é¥¤¥È, p2=2:±Æ¥Ç¡¼¥¿¥¹¥×¥é¥¤¥È */
+		/* ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæ–¹æ³•ãƒ»è‰² */
+		VAcmd[p1].spType = p2;             /* p2=0:é€šå¸¸ã‚³ãƒ”ãƒ¼ , p2=1:è‰²æŒ‡å®šã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ, p2=2:å½±ãƒ‡ãƒ¼ã‚¿ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ */
 		VAcmd[p1].spCol  = p3; break;
 	case 10:
-		/* ¾õÂÖ¼èÆÀ(var1=0:Ää»ß1:Æ°,var2=ÈÖ¹æ) */
+		/* çŠ¶æ…‹å–å¾—(var1=0:åœæ­¢1:å‹•,var2=ç•ªå·) */
 		*var1 = VAcmd[p1].state == 0 ? 0 : 1;
 		*var2 = VAcmd[p1].elaspCut; break;
 	case 11:
-		/* °ÌÃÖ¼èÆÀ */
+		/* ä½ç½®å–å¾— */
 		*var1 = VAcmd[p1].curX;
 		*var2 = VAcmd[p1].curY; break;
 	default:
@@ -874,7 +874,7 @@ static boolean vh_checkImmovableArea(int page, int x, int y, int w, int h) {
 }
 
 static void vh_append_pos(int x, int y) {
-	/* x, y ¤ò list ¤ËÄÉ²Ã */
+	/* x, y ã‚’ list ã«è¿½åŠ  */
 	(vh_dst + vh_cnt_dst)->x = x;
 	(vh_dst + vh_cnt_dst)->y = y;
 	vh_cnt_dst++;
@@ -883,7 +883,7 @@ static void vh_append_pos(int x, int y) {
 static void vh_copy_to_src() {
 	VhMark *tmp;
 
-	/* src list ¤È dst list ¤ÎÆş¤ì´¹¤¨ */
+	/* src list ã¨ dst list ã®å…¥ã‚Œæ›ãˆ */
 	tmp    = vh_src;
 	vh_src = vh_dst;
 	vh_dst = tmp;
@@ -893,7 +893,7 @@ static void vh_copy_to_src() {
 }
 
 static void vh_check_udlr(int n, int nPage, int x, int y) {
-	/* ¾å²¼º¸±¦¤¬Ì¤Æ§ÃÏ¤Ê¤éÃÍ¤ò¥»¥Ã¥È¤·¤Ælist¤ËÄÉ²Ã */
+	/* ä¸Šä¸‹å·¦å³ãŒæœªè¸åœ°ãªã‚‰å€¤ã‚’ã‚»ãƒƒãƒˆã—ã¦listã«è¿½åŠ  */
 	if (x > 0) {
                 if (*UNITMAP_WALKRESULT(nPage, x -1, y) == 0) {
                         *UNITMAP_WALKRESULT(nPage, x -1, y) = n;
@@ -922,7 +922,7 @@ static void vh_check_udlr(int n, int nPage, int x, int y) {
 
 static void va_drawUnit(int no) {
 	int unitno = VAcmd[no].elaspCut % VAcmd[no].patternNum;
-	int unitX = unitno % 10; /* ¤·¡Á¤é¤Ê¤¤¤Ã¤È :-p */
+	int unitX = unitno % 10; /* ã—ã€œã‚‰ãªã„ã£ã¨ :-p */
 	int unitY = unitno / 10;
 
 	/* save */
@@ -1009,28 +1009,28 @@ static void va_interval_process() {
 			VAcmd[i].quantmsec++;
 			
 			if (VAcmd[i].quantmsec >= VAcmd[i].intervaltime) {
-				/* ¤Ş¤À¹¹¿·¤·¤Æ¤¤¤Ê¤¤¾ì¹ç¤Ïskip */
+				/* ã¾ã æ›´æ–°ã—ã¦ã„ãªã„å ´åˆã¯skip */
 				if (VAcmd[i].rewrite) continue;
 				VAcmd[i].rewrite = TRUE;
 				VAcmd[i].quantmsec = 0;
  				VAcmd[i].elaspCut++;
-				/* ¸Å¤¤¾ì½ê */
+				/* å¤ã„å ´æ‰€ */
 				VAcmd[i].preX = VAcmd[i].curX;
 				VAcmd[i].preY = VAcmd[i].curY;
-				/* Á´¥³¥Ş½ª¤Ã¤¿¤é½ªÎ» */
+				/* å…¨ã‚³ãƒçµ‚ã£ãŸã‚‰çµ‚äº† */
 				if (VAcmd[i].elaspCut >= VAcmd[i].totalCut) {
 					VAcmd[i].state = VA_STOPPED;
 					continue;
 				}
-				/* °ÜÆ°¤Ê¤·¤Î¾ì¹ç¤Ï skip */
+				/* ç§»å‹•ãªã—ã®å ´åˆã¯ skip */
 				if (VAcmd[i].nomove)  continue;
-				/* ¿·¤·¤¤¾ì½ê */
+				/* æ–°ã—ã„å ´æ‰€ */
 				VAcmd[i].curX = VAcmd[i].startX + VAcmd[i].elaspCut * (VAcmd[i].endX - VAcmd[i].startX) / VAcmd[i].totalCut;
 				VAcmd[i].curY = VAcmd[i].startY + VAcmd[i].elaspCut * (VAcmd[i].endY - VAcmd[i].startY) / VAcmd[i].totalCut;
  			}
 		}
 	}
-	/* ¹¹¿·¤¹¤ë¤â¤Î¤¬Ìµ¤¤¾ì¹ç¤Ï¡¢¥¿¥¤¥Ş¡¼¤ò»ß¤á¤Æ¡¢¥¢¥Ë¥á¡¼¥·¥ç¥ó¥¹¥È¥Ã¥× */
+	/* æ›´æ–°ã™ã‚‹ã‚‚ã®ãŒç„¡ã„å ´åˆã¯ã€ã‚¿ã‚¤ãƒãƒ¼ã‚’æ­¢ã‚ã¦ã€ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒˆãƒƒãƒ— */
 	if (!proceeding) {
 		va_pause_itimer();
 		nact->is_va_animation = FALSE;

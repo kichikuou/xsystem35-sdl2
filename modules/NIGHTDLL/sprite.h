@@ -12,38 +12,38 @@
 
 
 #define SPRITEMAX 20
-#define SPNO_WALL    0  // ╩╔╗ц
-#define SPNO_SCENERY 1  // ╟╪╖╩
-#define SPNO_TACHI_L 2  // ╬йд┴│и║╕
-#define SPNO_TACHI_M 3  // ╬йд┴│и├ц▒√
-#define SPNO_TACHI_R 4  // ╬йд┴│и▒ж
-#define SPNO_MSGBG   5  // ╩╕╗·▓╝├╧
-#define SPNO_MSGFRAME_BG 6 // есе├е╗б╝е╕ежегеєе╔╧╚
-#define SPNO_MSGFRAME_FG 7 // есе├е╗б╝е╕╩╕╗·╔┴▓шенеуеєе╨е╣
-#define SPNO_FACE 11        // ┐═╩к┤щCG
-#define SPNO_MSG_KEYANIM 12 // есе├е╗б╝е╕енб╝╞■╬╧еве╦есб╝е╖ечеє
-#define SPNO_MSG_ICON_MUTE 13 // есе├е╗б╝е╕ежегеєе╔еведе│еє
+#define SPNO_WALL    0  // хгБч┤Щ
+#define SPNO_SCENERY 1  // шГМцЩп
+#define SPNO_TACHI_L 2  // члЛуБбч╡╡х╖ж
+#define SPNO_TACHI_M 3  // члЛуБбч╡╡ф╕нхдо
+#define SPNO_TACHI_R 4  // члЛуБбч╡╡хП│
+#define SPNO_MSGBG   5  // цЦЗхнЧф╕ЛхЬ░
+#define SPNO_MSGFRAME_BG 6 // уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙцЮа
+#define SPNO_MSGFRAME_FG 7 // уГбуГГуВ╗уГ╝уВ╕цЦЗхнЧцППчФ╗уВнуГгуГ│уГРуВ╣
+#define SPNO_FACE 11        // ф║║чЙйщбФCG
+#define SPNO_MSG_KEYANIM 12 // уГбуГГуВ╗уГ╝уВ╕уВнуГ╝хЕехКЫуВвуГЛуГбуГ╝уВ╖уГзуГ│
+#define SPNO_MSG_ICON_MUTE 13 // уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙуВвуВдуВ│уГ│
 
 #define CGMAX 65536
 // 0-9999: reserve for Link CG
-// 2051: есе├е╗б╝е╕ежегеєе╔╧╚CG
+// 2051: уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙцЮаCG
 #define CGNO_MSGFRAME_LCG 2051
-// 4017: есе├е╗б╝е╕ежегеєе╔д╟└╝дЄmuteд╦д╣дыCG
+// 4017: уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙуБзхг░уВТmuteуБлуБЩуВЛCG
 #define CGNO_MSGFRAME_NOVICE_LCG 4017
-// 4018: есе├е╗б╝е╕ежегеєе╔д╬еведе│еєд╦е▐еже╣дм╜┼д╩д├д┐д╚днд╬CG
+// 4018: уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙуБоуВвуВдуВ│уГ│уБлуГЮуВжуВ╣уБМщЗНуБкуБгуБЯуБиуБНуБоCG
 #define CGNO_MSGFRAME_ICONREV_LCG 4018
-// 4034: енб╝╞■╬╧дЄ┬ед╣еве╦есб╝е╖ечеєCG
+// 4034: уВнуГ╝хЕехКЫуВТф┐ГуБЩуВвуГЛуГбуГ╝уВ╖уГзуГ│CG
 #define CGNO_MSGHAK_LCG 4034
 
-// 10000: есе├е╗б╝е╕ежегеєе╔д╟д╬енб╝┬╘д┴еве╦ес д╜д╬1
+// 10000: уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙуБзуБоуВнуГ╝х╛ЕуБбуВвуГЛуГб уБЭуБо1
 #define CGNO_MSGHAK_1 10000
-// 10001: есе├е╗б╝е╕ежегеєе╔д╟д╬енб╝┬╘д┴еве╦ес д╜д╬2
+// 10001: уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙуБзуБоуВнуГ╝х╛ЕуБбуВвуГЛуГб уБЭуБо2
 #define CGNO_MSGHAK_2 10001
-// 10002: ╩╕╗·▓╝├╧CG
+// 10002: цЦЗхнЧф╕ЛхЬ░CG
 #define CGNO_MSGFR_BG 10002
 
 
-// CG_XX д╟║юдыCGд╬╝я╬р
+// CG_XX уБзф╜ЬуВЛCGуБочиощбЮ
 enum cgtype {
 	CG_NOTUSED = 0,
 	CG_LINKED  = 1,
@@ -52,12 +52,12 @@ enum cgtype {
 	CG_STRETCH = 4
 };
 
-// cgд╦┤╪д╣ды╛Ё╩є
+// cgуБлщЦвуБЩуВЛцГЕха▒
 struct _cginfo {
-	enum cgtype type;  // CGд╬╝я╬р, 0: ╠д╗╚═╤, 1:еъеєепд╡дьд╞ддды, ...
-	int no;            // CGд╬╚╓╣ц
-	surface_t *sf;     // CG╦▄┬╬
-	int refcnt;        // ╗▓╛╚ележеєе┐бгг░д╦д╩д├д┐дщ│л╩№д╖д╞дтдшддбг
+	enum cgtype type;  // CGуБочиощбЮ, 0: цЬкф╜┐чФи, 1:уГкуГ│уВпуБХуВМуБжуБДуВЛ, ...
+	int no;            // CGуБочХкхП╖
+	surface_t *sf;     // CGцЬмф╜У
+	int refcnt;        // хПВчЕзуВлуВжуГ│уВ┐уАВя╝РуБлуБкуБгуБЯуВЙщЦЛцФ╛уБЧуБжуВВуВИуБДуАВ
 };
 typedef struct _cginfo cginfo_t;
 

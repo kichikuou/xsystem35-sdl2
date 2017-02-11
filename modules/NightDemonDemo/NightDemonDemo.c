@@ -46,7 +46,7 @@ void Init() {
 }
 
 void Run() {
-	int p1 = getCaliValue(); // ¥Ç¥âÈÖ¹æ 0,1,2
+	int p1 = getCaliValue(); // ãƒ‡ãƒ¢ç•ªå· 0,1,2
 	int p2 = getCaliValue();
 	
 	ndd_run(p1);

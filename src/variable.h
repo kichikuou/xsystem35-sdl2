@@ -1,5 +1,5 @@
 /*
- * variable.h  ÊÑ¿ô´ÉÍı
+ * variable.h  å¤‰æ•°ç®¡ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

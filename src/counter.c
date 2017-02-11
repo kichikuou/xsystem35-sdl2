@@ -1,5 +1,5 @@
 /*
- * counter.c  ÆâÉô¥«¥¦¥ó¥¿
+ * counter.c  å†…éƒ¨ã‚«ã‚¦ãƒ³ã‚¿
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -47,8 +47,8 @@ int get_counter(int division) {
 	return counter_init + (int)(usec2 / division);
 }
 
-/* ¥«¥¦¥ó¥¿¡Á¤ò val¤Ç¥ê¥»¥Ã¥È */
-/* ½é´ü²½»ş¤Ë°ìÅÙ¸Æ¤ó¤Ç¤ª¤¯ */
+/* ã‚«ã‚¦ãƒ³ã‚¿ã€œã‚’ valã§ãƒªã‚»ãƒƒãƒˆ */
+/* åˆæœŸåŒ–æ™‚ã«ä¸€åº¦å‘¼ã‚“ã§ãŠã */
 void reset_counter(int val) {
 	counter_init = val;
 	gettimeofday(&tv_base, NULL);
@@ -68,9 +68,9 @@ int get_high_counter(int num) {
 	return counter_init_high[num -1] + usec2;
 }
 
-/* ¹âÀºÅÙ¥«¥¦¥ó¥¿¡Á thanx tajiri@wizard */
-/* ¥«¥¦¥ó¥¿¡Á¤ò val¤Ç¥ê¥»¥Ã¥È */
-/* ½é´ü²½»ş¤Ë°ìÅÙ¸Æ¤ó¤Ç¤ª¤¯ */
+/* é«˜ç²¾åº¦ã‚«ã‚¦ãƒ³ã‚¿ã€œ thanx tajiri@wizard */
+/* ã‚«ã‚¦ãƒ³ã‚¿ã€œã‚’ valã§ãƒªã‚»ãƒƒãƒˆ */
+/* åˆæœŸåŒ–æ™‚ã«ä¸€åº¦å‘¼ã‚“ã§ãŠã */
 void reset_counter_high(int num,int division,int val) {
 	if (num == 0) {
 		int i;

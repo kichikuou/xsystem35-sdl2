@@ -1,5 +1,5 @@
 /*
- * sprite_switch.c: ¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥ÈÆÃÍ­¤Î½èÍı
+ * sprite_switch.c: ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç‰¹æœ‰ã®å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -36,7 +36,7 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e);
 static void cb_remove(sprite_t *sp);
 
 
-// ¥¹¥¤¥Ã¥Á¥¹¥×¥é¥¤¥È¤Î¥¤¥Ù¥ó¥È½èÍı
+// ã‚¹ã‚¤ãƒƒãƒã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†
 static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 	int update = 0;
 	
@@ -44,7 +44,7 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 	case AGSEVENT_BUTTON_PRESS:
 		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
 		
-		// ¥Ü¥¿¥ó²¡²¼»ş¤Î¥¹¥×¥é¥¤¥È¤¬¤¢¤ì¤Ğ¡¢¤½¤ì¤òÉ½¼¨
+		// ãƒœã‚¿ãƒ³æŠ¼ä¸‹æ™‚ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒã‚ã‚Œã°ã€ãã‚Œã‚’è¡¨ç¤º
 		if (sp->cg3) {
 			sp->curcg = sp->cg3;
 			update++;
@@ -56,15 +56,15 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 	case AGSEVENT_BUTTON_RELEASE:
 		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
 		
-		// ¤³¤³¤Ë¤¯¤ë¤È¤­¤Ï forcus¤¬Åö¤¿¤Ã¤Æ¤¤¤ë¤È¤­¤·¤«¤³¤Ê¤¤¤Î¤Ç¡¢
-		// curcg ¤Ï cg2 ¤ËÌá¤»¤Ğ¤è¤¤
+		// ã“ã“ã«ãã‚‹ã¨ãã¯ forcusãŒå½“ãŸã£ã¦ã„ã‚‹ã¨ãã—ã‹ã“ãªã„ã®ã§ã€
+		// curcg ã¯ cg2 ã«æˆ»ã›ã°ã‚ˆã„
 		if (sp->cg2) {
 			sp->curcg = sp->cg2;
 			update++;
 		}
 		
-		// press¤µ¤ì¤¿¥¹¥×¥é¥¤¥È¤Èrelease¤µ¤ì¤¿¥¹¥×¥é¥¤¥È¤¬Æ±¤¸¾ì¹ç
-		// ¤Ë¤Î¤ß¡¢¤½¤Î¥¹¥×¥é¥¤¥È¤¬²¡¤µ¤ì¤¿¤ÈÈ½ÃÇ
+		// pressã•ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã¨releaseã•ã‚ŒãŸã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒåŒã˜å ´åˆ
+		// ã«ã®ã¿ã€ãã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆãŒæŠ¼ã•ã‚ŒãŸã¨åˆ¤æ–­
 		if (sp->pressed) {
 			sact.sp_result_sw = sp->no;
 			sact.waitkey = sp->no;
@@ -83,16 +83,16 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 	return update;
 }
 
-// ¥¹¥×¥é¥¤¥Èºï½ü»ş¤Î½èÍı
+// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå‰Šé™¤æ™‚ã®å‡¦ç†
 static void cb_remove(sprite_t *sp) {
-	// event listener ¤Îºï½ü
+	// event listener ã®å‰Šé™¤
 	spev_remove_eventlistener(sp);
 }
 
 
 /*
-  sp_new ¤Î»ş¤Ë¥¹¥×¥é¥¤¥È¤Î¼ïÎàËè¤Î½é´ü²½
-  @param sp: ½é´ü²½¤¹¤ë¥¹¥×¥é¥¤¥È
+  sp_new ã®æ™‚ã«ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ç¨®é¡æ¯ã®åˆæœŸåŒ–
+  @param sp: åˆæœŸåŒ–ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 */
 int sp_sw_setup(sprite_t *sp) {
 	spev_add_eventlistener(sp, eventCB_switch);

@@ -16,7 +16,7 @@
 
 #include "sactstring.h"
 
-// NIGHTDLLÍÑ¥Ç¡¼¥¿
+// NIGHTDLLç”¨ãƒ‡ãƒ¼ã‚¿
 night_t nightprv;
 
 
@@ -53,190 +53,190 @@ void InitGame() { /* 1 */
 	DEBUG_COMMAND_YET("NIGHTDLL.InitGame:\n");
 }	
 
-// ¥á¥Ã¥»¡¼¥¸¤ÎÏÈ¤ÎÉ½¼¨
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®æ ã®è¡¨ç¤º
 void SetMsgFrame() { /* 2 */
-	int p1 = getCaliValue(); // 0=ÏÈ¾Ãµî, 1=ÏÈ¤¢¤ê, 2=Ãæ±û
+	int p1 = getCaliValue(); // 0=æ æ¶ˆå», 1=æ ã‚ã‚Š, 2=ä¸­å¤®
 	
 	ntmsg_set_frame(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgFram %d:\n", p1);
 }
 
-// ¥á¥Ã¥»¡¼¥¸¤ÎÉ½¼¨°ÌÃÖ¤ÎÀßÄê
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®è¡¨ç¤ºä½ç½®ã®è¨­å®š
 void SetMsgPlaceMethod(void) { /* 3 */
-	int p1 = getCaliValue(); // 0=¥á¥Ã¥»¡¼¥¸ÏÈÆâ, 1=Ãæ±û, 
-	                         // 2=¥á¥Ã¥»¡¼¥¸ÏÈ+´é¤Ä¤­ 
+	int p1 = getCaliValue(); // 0=ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ å†…, 1=ä¸­å¤®, 
+	                         // 2=ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æ +é¡”ã¤ã 
 	ntmsg_set_place(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgPlaceMethod %d:\n", p1);
 }
 
-// Ì¤¼ÂÁõ?
+// æœªå®Ÿè£…?
 void SetMsgDrawEffect(void) { /* 4 */
-	int p1 = getCaliValue(); // 0, 1, 2, 3 (¼Âºİ¤Ë¤Ï¤É¤ì¤âµ¡Ç½¤·¤Ê¤¤?)
+	int p1 = getCaliValue(); // 0, 1, 2, 3 (å®Ÿéš›ã«ã¯ã©ã‚Œã‚‚æ©Ÿèƒ½ã—ãªã„?)
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgDrawEffect %d:\n", p1);
 }
 
-// Ì¤¼ÂÁõ?
+// æœªå®Ÿè£…?
 void SetMsgClearEffect(void) { /* 5 */
-	int p1 = getCaliValue(); // 0, 1, 2, 4 (¼Âºİ¤Ë¤Ï¤É¤ì¤âµ¡Ç½¤·¤Ê¤¤?)
+	int p1 = getCaliValue(); // 0, 1, 2, 4 (å®Ÿéš›ã«ã¯ã©ã‚Œã‚‚æ©Ÿèƒ½ã—ãªã„?)
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgClearEffect %d:\n", p1);
 }
 
-// ÊÉ»æCG¤ÎÀßÄê
+// å£ç´™CGã®è¨­å®š
 void SetWallPaper(void) { /* 6 */
-	int p1 = getCaliValue(); // ÊÉ»æCGÈÖ¹æ
+	int p1 = getCaliValue(); // å£ç´™CGç•ªå·
 	
 	nt_gr_set_wallpaper(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetWallPaper %d:\n", p1);
 }
 
-// ÇØ·ÊCG¤ÎÀßÄê
+// èƒŒæ™¯CGã®è¨­å®š
 void SetScenery(void) { /* 7 */
-	int p1 = getCaliValue(); // ÇØ·ÊGCÈÖ¹æ
+	int p1 = getCaliValue(); // èƒŒæ™¯GCç•ªå·
 	
 	nt_gr_set_scenery(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetScenery %d:\n", p1);
 }
 
-// ´éCG¤ÎÀßÄê
+// é¡”CGã®è¨­å®š
 void SetFace(void) { /* 8 */
-	int p1 = getCaliValue(); // ´éCGÈÖ¹æ
+	int p1 = getCaliValue(); // é¡”CGç•ªå·
 	
 	nt_gr_set_face(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetFace %d:\n", p1);
 }
 
-// Î©¤Á³¨º¸¤ÎÀßÄê
+// ç«‹ã¡çµµå·¦ã®è¨­å®š
 void SetSpriteL(void) { /* 9 */
-	int p1 = getCaliValue(); // º¸¿ÍÊª¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+	int p1 = getCaliValue(); // å·¦äººç‰©ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
 	
 	nt_gr_set_spL(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteL %d:\n", p1);
 }
 
-// Î©¤Á³¨Ãæ±û¤ÎÀßÄê
+// ç«‹ã¡çµµä¸­å¤®ã®è¨­å®š
 void SetSpriteM(void) { /* 10 */
-	int p1 = getCaliValue(); // Ãæ±û¿ÍÊª¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+	int p1 = getCaliValue(); // ä¸­å¤®äººç‰©ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
 	
 	nt_gr_set_spM(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteM %d:\n", p1);
 }
 
-// Î©¤Á³¨±¦¤ÎÀßÄê
+// ç«‹ã¡çµµå³ã®è¨­å®š
 void SetSpriteR(void) { /* 11 */
-	int p1 = getCaliValue(); // ±¦¿ÍÊª¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+	int p1 = getCaliValue(); // å³äººç‰©ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
 	
 	nt_gr_set_spR(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteR %d:\n", p1);
 }
 
-// Î©¤Á³¨º¸¤ÎÀßÄê¡Êµ¨Àá°ã¤¤?)
+// ç«‹ã¡çµµå·¦ã®è¨­å®šï¼ˆå­£ç¯€é•ã„?)
 void SetSpriteSeasonL(void) { /* 12 */
-	int p1 = getCaliValue(); // º¸¿ÍÊª¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+	int p1 = getCaliValue(); // å·¦äººç‰©ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
 	
 	nt_gr_set_spsL(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteSeasonL %d:\n", p1);
 }
 
-// Î©¤Á³¨Ãæ±û¤ÎÀßÄê¡Êµ¨Àá°ã¤¤?)
+// ç«‹ã¡çµµä¸­å¤®ã®è¨­å®šï¼ˆå­£ç¯€é•ã„?)
 void SetSpriteSeasonM(void) { /* 13 */
-	int p1 = getCaliValue(); // Ãæ±û¿ÍÊª¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+	int p1 = getCaliValue(); // ä¸­å¤®äººç‰©ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
 	
 	nt_gr_set_spM(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteSeasonM %d:\n", p1);
 }
 
-// Î©¤Á³¨±¦¤ÎÀßÄê¡Êµ¨Àá°ã¤¤?)
+// ç«‹ã¡çµµå³ã®è¨­å®šï¼ˆå­£ç¯€é•ã„?)
 void SetSpriteSeasonR(void) { /* 14 */
-	int p1 = getCaliValue(); // ±¦¿ÍÊª¥¹¥×¥é¥¤¥ÈÈÖ¹æ
+	int p1 = getCaliValue(); // å³äººç‰©ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
 	
 	nt_gr_set_spsR(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteSeasonR %d:\n", p1);
 }
 
-// ²ş¹Ô
+// æ”¹è¡Œ
 void StartNewLine(void) { /* 15 */
 	ntmsg_newline();
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.StartNewLine:\n");
 }
 
-// ¥á¥Ã¥»¡¼¥¸¥Õ¥©¥ó¥È¥µ¥¤¥º¤ÎÀßÄê
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã®è¨­å®š
 void SetFontSize(void) { /* 16 */
-	int p1 = getCaliValue(); // ¥á¥Ã¥»¡¼¥¸¥Õ¥©¥ó¥È¥µ¥¤¥º
+	int p1 = getCaliValue(); // ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º
 	
 	night.fontsize = p1;
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetFontSize %d:\n", p1);
 }
 
-// ¥Õ¥©¥ó¥È¤Î¼ïÎà¤ÎÀßÄê
+// ãƒ•ã‚©ãƒ³ãƒˆã®ç¨®é¡ã®è¨­å®š
 void SetFont(void) { /* 17 */
-	int p1 = getCaliValue(); // 0: ¥´¥·¥Ã¥¯, 1: ÌÀÄ«
+	int p1 = getCaliValue(); // 0: ã‚´ã‚·ãƒƒã‚¯, 1: æ˜æœ
 	
 	night.fonttype = p1;
 
 	DEBUG_COMMAND_YET("NIGHTDLL.SetFont %d:\n", p1);
 }
 
-// ÁªÂò»è¥â¡¼¥É ON
+// é¸æŠè‚¢ãƒ¢ãƒ¼ãƒ‰ ON
 void SetSelMode(void) { /* 18 */
-	int p1 = getCaliValue(); // 0, 1(¤Û¤È¤ó¤É0)
+	int p1 = getCaliValue(); // 0, 1(ã»ã¨ã‚“ã©0)
 	
 	night.selmode = p1;
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetSelMode %d:\n", p1);
 }
 
-// ¥­¡¼ÆşÎÏÂÔ¤Á¸å¡¢²ş¥Ú¡¼¥¸
+// ã‚­ãƒ¼å…¥åŠ›å¾…ã¡å¾Œã€æ”¹ãƒšãƒ¼ã‚¸
 void AnalyzeMessage(void) { /* 19 */
-	int *var = getCaliVariable(); // ÆşÎÏ¤µ¤ì¤¿¥­¡¼
+	int *var = getCaliVariable(); // å…¥åŠ›ã•ã‚ŒãŸã‚­ãƒ¼
 
 	*var = ntmsg_ana();
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.AnalyzeMessage %p:\n", var);
 }
 
-// ~DRAW¤Î¸ú²Ì»ş´Ö
+// ~DRAWã®åŠ¹æœæ™‚é–“
 void SetDrawTime(void) { /* 20 */
-	int p1 = getCaliValue(); // ¸ú²Ì»ş´Ö (Ì¤»ÈÍÑ¡©)
+	int p1 = getCaliValue(); // åŠ¹æœæ™‚é–“ (æœªä½¿ç”¨ï¼Ÿ)
 	
 	nt_gr_set_drawtime(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetDrawTime %d:\n", p1);
 }
 
-// ¸ú²Ì¤Ä¤­²èÌÌ¹¹¿·
+// åŠ¹æœã¤ãç”»é¢æ›´æ–°
 void Draw(void) { /* 21 */
-	int p1 = getCaliValue(); // ¸ú²ÌÈÖ¹æ
+	int p1 = getCaliValue(); // åŠ¹æœç•ªå·
 	
 	nt_gr_draw(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.Draw %d:\n", p1);
 }
 
-// ²»À¼¥Ç¡¼¥¿¤òºÆÀ¸
+// éŸ³å£°ãƒ‡ãƒ¼ã‚¿ã‚’å†ç”Ÿ
 void SetVoice(void) { /* 22 */
-	int p1 = getCaliValue(); // ¥Õ¥¡¥¤¥ëÈÖ¹æ
+	int p1 = getCaliValue(); // ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå·
 	
 	nt_voice_set(p1);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SetVoice %d:\n", p1);
 }
 
-// Ì¤»ÈÍÑ
+// æœªä½¿ç”¨
 void WaitKey(void) { /* 23 */
 	int p1 = getCaliValue(); // 
 
@@ -244,7 +244,7 @@ void WaitKey(void) { /* 23 */
 }
 
 void AddFeeling(void) { /* 24 */
-	int p1 = getCaliValue(); // person(1:¿·³«,2:À±Àî,3:É´À¥,4:¤¤¤º¤ß,5:¶À²Ö,6:¿¿¸ÀÈş,7:¥Ş¥³¥È	 
+	int p1 = getCaliValue(); // person(1:æ–°é–‹,2:æ˜Ÿå·,3:ç™¾ç€¬,4:ã„ãšã¿,5:é¡èŠ±,6:çœŸè¨€ç¾,7:ãƒã‚³ãƒˆ	 
 	int p2 = getCaliValue(); // val
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.AddFeeling %d:\n", p1);
@@ -268,11 +268,11 @@ void CallEvent(void) { /* 26 */
 
 void ScreenCG(void) { /* 27 */
 	/*
-	    CG ¤òÆÉ¤ß¹ş¤ó¤Ç¡¢surface0 ¤È BlendScreen ¤Ç½Å¤Í¹ç¤ï¤»
+	    CG ã‚’èª­ã¿è¾¼ã‚“ã§ã€surface0 ã¨ BlendScreen ã§é‡ã­åˆã‚ã›
 
-	   x : É½¼¨°ÌÃÖ X
-	   y : É½¼¨°ÌÃÖ Y
-	   no: ÆÉ¤ß¹ş¤àCGÈÖ¹æ
+	   x : è¡¨ç¤ºä½ç½® X
+	   y : è¡¨ç¤ºä½ç½® Y
+	   no: èª­ã¿è¾¼ã‚€CGç•ªå·
 	*/
 	int p1 = getCaliValue(); /* ISys3xDIB */
 	int p2 = getCaliValue(); /* ISys3xCG  */
@@ -290,7 +290,7 @@ void RunGameMain(void) { /* 28 */
 	int p2 = getCaliValue();     // month
 	int p3 = getCaliValue();     // day
 	int p4 = getCaliValue();     // day of week
-	int p5 = getCaliValue();     // 0=¤Ï¤¸¤á¤«¤é,1=ÅÓÃæ¤«¤é
+	int p5 = getCaliValue();     // 0=ã¯ã˜ã‚ã‹ã‚‰,1=é€”ä¸­ã‹ã‚‰
 	
 	night.Month = p2;
 	night.Day   = p3;
@@ -361,12 +361,12 @@ void RunEventDungeon(void) { /* 36 */
 }
 
 void RunEventBattle(void) { /* 37 */
-	int p1 = getCaliValue(); // ¼Âºİ¤Ë¤Ïµ¡Ç½¤·¤Ê¤¤¡©
+	int p1 = getCaliValue(); // å®Ÿéš›ã«ã¯æ©Ÿèƒ½ã—ãªã„ï¼Ÿ
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.RunEventBattle %d:\n", p1);
 }
 
-// CDºÆÀ¸³«»Ï
+// CDå†ç”Ÿé–‹å§‹
 void CDPlay(void) { /* 38 */
 	int p1 = getCaliValue(); // no
 	
@@ -375,7 +375,7 @@ void CDPlay(void) { /* 38 */
 	DEBUG_COMMAND_YET("NIGHTDLL.CDPlay %d:\n", p1);
 }
 
-// CDºÆÀ¸Ää»ß
+// CDå†ç”Ÿåœæ­¢
 void CDStop(void) { /* 39 */
 	int p1 = getCaliValue(); // time(msec)
 	
@@ -384,7 +384,7 @@ void CDStop(void) { /* 39 */
 	DEBUG_COMMAND_YET("NIGHTDLL.CDStop %d:\n", p1);
 }
 
-// CD¤Îmute
+// CDã®mute
 void CDMute(void) { /* 40 */
 	int p1 = getCaliValue(); // 0: mute off, 1: mute on
 	
@@ -393,7 +393,7 @@ void CDMute(void) { /* 40 */
 	DEBUG_COMMAND_YET("NIGHTDLL.CDMute %d:\n", p1);
 }
 
-// ch ¤Ë¸ú²Ì²»ÈÖ¹æ¤ò¥»¥Ã¥È
+// ch ã«åŠ¹æœéŸ³ç•ªå·ã‚’ã‚»ãƒƒãƒˆ
 void SoundEffectSetWave(void) { /* 41 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // linkno
@@ -403,7 +403,7 @@ void SoundEffectSetWave(void) { /* 41 */
 	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetWave %d,%d:\n", p1, p2);
 }
 
-// ch ¤Ë¤¯¤êÊÖ¤·¿ô¤ò¥»¥Ã¥È
+// ch ã«ãã‚Šè¿”ã—æ•°ã‚’ã‚»ãƒƒãƒˆ
 void SoundEffectSetLoop(void) { /* 42 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // numloop
@@ -413,7 +413,7 @@ void SoundEffectSetLoop(void) { /* 42 */
 	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetLoop %d,%d:\n", p1, p2);
 }
 
-// ch ¤Ë²»ÎÌ¤ò¥»¥Ã¥È
+// ch ã«éŸ³é‡ã‚’ã‚»ãƒƒãƒˆ
 void SoundEffectSetVolume(void) { /* 43 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // vol
@@ -423,17 +423,17 @@ void SoundEffectSetVolume(void) { /* 43 */
 	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetVolue %d,%d:\n", p1, p2);
 }
 
-// ¸ú²Ì²»¤ÎºÆÀ¸¤ò½ª¤ë¤Ş¤ÇÂÔ¤Ä¤«ÂÔ¤¿¤Ê¤¤¤«¡©
+// åŠ¹æœéŸ³ã®å†ç”Ÿã‚’çµ‚ã‚‹ã¾ã§å¾…ã¤ã‹å¾…ãŸãªã„ã‹ï¼Ÿ
 void SoundEffectSetSyncFlag(void) { /* 44 */
 	int p1 = getCaliValue(); // ch
-	int p2 = getCaliValue(); // 0: ½ª¤ë¤Ş¤ÇÂÔ¤¿¤Ê¤¤, 1: ÂÔ¤Ä
+	int p2 = getCaliValue(); // 0: çµ‚ã‚‹ã¾ã§å¾…ãŸãªã„, 1: å¾…ã¤
 	
 	nt_snd_waitend(p1, p2 == 0 ? FALSE : TRUE);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetSyncFlag %d,%d:\n", p1, p2);
 }
 
-// ch ¤Î¸ú²Ì²»¤òºÆÀ¸
+// ch ã®åŠ¹æœéŸ³ã‚’å†ç”Ÿ
 void SoundEffectPlay(void) { /* 45 */
 	int p1 = getCaliValue(); // ch
 	
@@ -442,19 +442,19 @@ void SoundEffectPlay(void) { /* 45 */
 	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectPlay %d:\n", p1);
 }
 
-// ch ¤Î¸ú²Ì²»¤òÄä»ß
+// ch ã®åŠ¹æœéŸ³ã‚’åœæ­¢
 void SoundEffectStop(void) { /* 46 */
 	int p1 = getCaliValue(); // ch
-	int p2 = getCaliValue(); // time (»ß¤Ş¤ë¤Ş¤Ç¤Î»ş´Ö)
+	int p2 = getCaliValue(); // time (æ­¢ã¾ã‚‹ã¾ã§ã®æ™‚é–“)
 	
 	nt_snd_stop(p1, p2);
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectStop %d,%d:\n", p1,p2);
 }
 
-// Á´¤Æ¤Î¥Á¥ã¥ó¥Í¥ë¤ÎºÆÀ¸¤òÄä»ß
+// å…¨ã¦ã®ãƒãƒ£ãƒ³ãƒãƒ«ã®å†ç”Ÿã‚’åœæ­¢
 void SoundEffectStopAll(void) { /* 47 */
-	int p1 = getCaliValue(); // time (»ß¤Ş¤ë¤Ş¤Ç¤Î»ş´Ö)
+	int p1 = getCaliValue(); // time (æ­¢ã¾ã‚‹ã¾ã§ã®æ™‚é–“)
 	
 	nt_snd_stopall(p1);
 
@@ -491,8 +491,8 @@ void GetLocalCountCG(void) { /* 52 */
 }
 
 void PlayMemory(void) { /* 53 */
-	int *p1 = getCaliVariable(); // ²óÁÛ¥Ú¡¼¥¸
-	int *p2 = getCaliVariable(); // ²óÁÛRESULT
+	int *p1 = getCaliVariable(); // å›æƒ³ãƒšãƒ¼ã‚¸
+	int *p2 = getCaliVariable(); // å›æƒ³RESULT
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.PlayMemory %p,%p:\n", p1, p2);
 }

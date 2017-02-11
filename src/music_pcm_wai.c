@@ -17,7 +17,7 @@ static char *wai_mapadr;
 // Volume mixer channel
 #define WAIMIXCH(no) LittleEndian_getDW(wai_mapadr, 36 + (no -1) * 4 * 3 + 8)
 
-// WAVFILE ¥Þ¡¼¥«¡¼?
+// WAVFILE ãƒžãƒ¼ã‚«ãƒ¼?
 #define WAIMARK(no)  LittleEndian_getDW(wai_mapadr, 36 + (no -1) * 4 * 3 + 4)
 
 

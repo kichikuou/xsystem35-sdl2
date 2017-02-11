@@ -26,16 +26,16 @@
 
 #include "portab.h"
 
-/* ╧╚д╬╝я╬р */
+/* цЮауБочиощбЮ */
 #define WINDOW_FRAME_EMPTY 0
 #define WINDOW_FRAME_LINE  1
 #define WINDOW_FRAME_CG    2
 
-/* ┴к┬Єбжесе├е╗б╝е╕ежегеєе╔д╬║╟┬ч */
+/* щБ╕цКЮуГ╗уГбуГГуВ╗уГ╝уВ╕уВжуВгуГ│уГЙуБоцЬАхдз */
 #define SELWINMAX 128
 #define MSGWINMAX 128
 
-/* есе├е╗б╝е╕бж┴к┬Єежегеєе╔д╬╛Ё╩є */
+/* уГбуГГуВ╗уГ╝уВ╕уГ╗щБ╕цКЮуВжуВгуГ│уГЙуБоцГЕха▒ */
 typedef struct {
 	int x;
 	int y;

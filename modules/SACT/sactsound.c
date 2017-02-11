@@ -1,5 +1,5 @@
 /*
- * sactsound.c: SACT¤Î¸ú²Ì²»´ØÏ¢
+ * sactsound.c: SACTã®åŠ¹æœéŸ³é–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -35,13 +35,13 @@
 #include "music_client.h"
 #include "sact.h"
 
-// slotÈÖ¹æ¤Î 1¤«¤é 20¤ò SACTÍÑ¤Ë»ÈÍÑ
+// slotç•ªå·ã® 1ã‹ã‚‰ 20ã‚’ SACTç”¨ã«ä½¿ç”¨
 #define CACHEMAX 20
 #define SLOTOFFSET 1
 static int cache[CACHEMAX];
 static int cachei;
 
-// ºÆÀ¸¤¹¤ë¸ú²Ì²»ÍÑ¤Î¶õ¤¤¤Æ¤¤¤ë¥¹¥í¥Ã¥È¤òÃµ¤¹
+// å†ç”Ÿã™ã‚‹åŠ¹æœéŸ³ç”¨ã®ç©ºã„ã¦ã„ã‚‹ã‚¹ãƒ­ãƒƒãƒˆã‚’æ¢ã™
 static int slt_getnext(int no) {
 	int indx;
 	
@@ -52,7 +52,7 @@ static int slt_getnext(int no) {
 	return indx + SLOTOFFSET;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î¸ú²Ì²»¤¬Æş¤Ã¤Æ¤¤¤ë¥¹¥í¥Ã¥È¤òÃµ¤¹
+// æŒ‡å®šã®ç•ªå·ã®åŠ¹æœéŸ³ãŒå…¥ã£ã¦ã„ã‚‹ã‚¹ãƒ­ãƒƒãƒˆã‚’æ¢ã™
 static int slt_find(int no) {
 	int i;
 	
@@ -63,15 +63,15 @@ static int slt_find(int no) {
 }
 
 /*
- SACT ¸ú²Ì²» subsystem ½é´ü²½
+ SACT åŠ¹æœéŸ³ subsystem åˆæœŸåŒ–
 */
 int ssnd_init() {
-	// ch 1-8 ¤ò¥­¥ã¥Ã¥·¥å¤È¤·¤Æ»È¤ª¤¦
+	// ch 1-8 ã‚’ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã¨ã—ã¦ä½¿ãŠã†
 	cachei = 0;
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î¸ú²Ì²»¤ò¥á¥â¥ê¤ËÆÉ¤ß¹ş¤ß
+// æŒ‡å®šã®ç•ªå·ã®åŠ¹æœéŸ³ã‚’ãƒ¡ãƒ¢ãƒªã«èª­ã¿è¾¼ã¿
 int ssnd_prepare(int no) {
 	int slot = slt_find(no);
 	
@@ -83,7 +83,7 @@ int ssnd_prepare(int no) {
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î¸ú²Ì²»¤òºÆÀ¸
+// æŒ‡å®šã®ç•ªå·ã®åŠ¹æœéŸ³ã‚’å†ç”Ÿ
 int ssnd_play(int no) {
 	int slot = slt_find(no);
 	
@@ -96,7 +96,7 @@ int ssnd_play(int no) {
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î¸ú²Ì²»¤òºÆÀ¸Ää»ß
+// æŒ‡å®šã®ç•ªå·ã®åŠ¹æœéŸ³ã‚’å†ç”Ÿåœæ­¢
 int ssnd_stop(int no, int fadetime) {
 	int slot = slt_find(no);
 
@@ -108,7 +108,7 @@ int ssnd_stop(int no, int fadetime) {
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î¸ú²Ì²»¤¬ºÆÀ¸½ªÎ»¤¹¤ë¤Î¤òÂÔ¤Ä
+// æŒ‡å®šã®ç•ªå·ã®åŠ¹æœéŸ³ãŒå†ç”Ÿçµ‚äº†ã™ã‚‹ã®ã‚’å¾…ã¤
 int ssnd_wait(int no) {
 	int slot = slt_find(no);
 
@@ -119,7 +119,7 @@ int ssnd_wait(int no) {
 	return OK;
 }
 
-// »ØÄê¤Î¸ú²Ì²»¤¬½ªÎ»¤¹¤ë¤«¡¢¥­¡¼¤¬²¡¤µ¤ì¤ë¤Ş¤ÇÂÔ¤Ä
+// æŒ‡å®šã®åŠ¹æœéŸ³ãŒçµ‚äº†ã™ã‚‹ã‹ã€ã‚­ãƒ¼ãŒæŠ¼ã•ã‚Œã‚‹ã¾ã§å¾…ã¤
 int ssnd_waitkey(int no, int *res) {
 	int slot = slt_find(no);
 	
@@ -152,13 +152,13 @@ int ssnd_waitkey(int no, int *res) {
 	return OK;
 }
 
-// º¸±¦¥Á¥ã¥ó¥Í¥ë¤ÎÈ¿Å¾¤·¤¿¸ú²Ì²»¤ò¥á¥â¥ê¤ËÆÉ¤ß¹ş¤à
+// å·¦å³ãƒãƒ£ãƒ³ãƒãƒ«ã®åè»¢ã—ãŸåŠ¹æœéŸ³ã‚’ãƒ¡ãƒ¢ãƒªã«èª­ã¿è¾¼ã‚€
 int ssnd_prepareLRrev(int no) {
-	mus_wav_load_lrsw(30, no); // slot ¤Ï 30¸ÇÄê¤Ç¤¤¤¤¡©
+	mus_wav_load_lrsw(30, no); // slot ã¯ 30å›ºå®šã§ã„ã„ï¼Ÿ
 	return OK;
 }
 
-// º¸±¦¥Á¥ã¥ó¥Í¥ë¤ÎÈ¿Å¾¤·¤¿¸ú²Ì²»¤òºÆÀ¸
+// å·¦å³ãƒãƒ£ãƒ³ãƒãƒ«ã®åè»¢ã—ãŸåŠ¹æœéŸ³ã‚’å†ç”Ÿ
 int ssnd_playLRrev(int no) {
 	mus_wav_load_lrsw(30, no);
 	mus_wav_play(30, 1);
@@ -166,13 +166,13 @@ int ssnd_playLRrev(int no) {
 	return OK;
 }
 
-// »ØÄê¤ÎÈÖ¹æ¤Î¸ú²Ì²»¤¬Â¸ºß¤¹¤ë¤«¤É¤¦¤«¤ò¥Á¥§¥Ã¥¯
+// æŒ‡å®šã®ç•ªå·ã®åŠ¹æœéŸ³ãŒå­˜åœ¨ã™ã‚‹ã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯
 int ssnd_getlinknum(int no) {
 	WARNING("NOT IMPLEMENTED\n");
 	return OK;
 }
 
-// ¤¹¤Ù¤Æ¤ÎºÆÀ¸Ãæ¤Î¸ú²Ì²»¤¬ºÆÀ¸¤ò½ªÎ»¤¹¤ë¤Î¤òÂÔ¤Ä
+// ã™ã¹ã¦ã®å†ç”Ÿä¸­ã®åŠ¹æœéŸ³ãŒå†ç”Ÿã‚’çµ‚äº†ã™ã‚‹ã®ã‚’å¾…ã¤
 int ssnd_stopall(int time) {
 	int i;
 	

@@ -1,7 +1,7 @@
 /*
- * ShSound.c ���ڴ�Ϣ module
+ * ShSound.c 音楽関連 module
  *
- *    �簭��
+ *    大悪司
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -43,7 +43,7 @@ static WAVFILE *wfile;
 
 void Init() {
 	/*
-	  �⥸�塼������
+	  モジュール初期化
 	*/
 	int p1 = getCaliValue(); /* ISys3x */
 	
@@ -52,10 +52,10 @@ void Init() {
 
 void wavLoad() {
 	/*
-	  ����Υ����åȤ�PCM�ե�����������
+	  指定のスロットにPCMファイルをロード
 	  
-	  slot: �����ɤ��륹���å�(�����ͥ�)�ֹ�
-	  no  : �����ɤ���ե������ֹ�
+	  slot: ロードするスロット(チャンネル)番号
+	  no  : ロードするファイル番号
 	*/
 	int slot = getCaliValue();
 	int no   = getCaliValue();
@@ -67,9 +67,9 @@ void wavLoad() {
 
 void wavUnload() {
 	/*
-	  ����Υ����åȤ�PCM�ե��������
+	  指定のスロットのPCMファイルを削除
 	  
-	  slot: ������륹���å��ֹ�
+	  slot: 削除するスロット番号
 	*/
 	int slot = getCaliValue();
 	
@@ -80,10 +80,10 @@ void wavUnload() {
 
 void wavUnloadRange() {
 	/*
-	  ����Υ����å�(ʣ��)��PCM�ե��������
+	  指定のスロット(複数)のPCMファイルを削除
 	  
-	  slot:  �������ǽ�Υ����å��ֹ�
-	  range: �������Ŀ�
+	  slot:  削除する最初のスロット番号
+	  range: 削除する個数
 	*/
 	int slot  = getCaliValue();
 	int range = getCaliValue();
@@ -98,7 +98,7 @@ void wavUnloadRange() {
 
 void wavUnloadAll() {
 	/*
-	  ���٤ƤΥ����åȤ�PCM�ե��������
+	  すべてのスロットのPCMファイルを削除
 	*/
 	int i;
 	
@@ -111,9 +111,9 @@ void wavUnloadAll() {
 
 void wavLoadMemory() {
 	/*
-	  ������ֹ�� WAV �ե������������ɤ߹���
+	  指定の番号の WAV ファイルをメモリ上に読み込み
 	  
-	  no: �ɤ߹���ե������ֹ�
+	  no: 読み込むファイル番号
 	*/
 	int no = getCaliValue();
 	
@@ -124,9 +124,9 @@ void wavLoadMemory() {
 
 void wavSendMemory() {
 	/*
-	  wavLoadMemory ���ɤ߹�����ǡ��������Υ����åȤ�����
+	  wavLoadMemory で読み込んだデータを指定のスロットに投入
 	  
-	  slot: PCM�ǡ��������륹���å��ֹ�
+	  slot: PCMデータを送るスロット番号
 	*/
 	int slot = getCaliValue();
 	
@@ -141,10 +141,10 @@ void wavSendMemory() {
 
 void wavFadeVolumeMemory() {
 	/*
-	  wavLoadMemory ���ɤ߹�����ǡ����Υܥ�塼��Υե�����
+	  wavLoadMemory で読み込んだデータのボリュームのフェード
 	  
-	  start: �ե����ɳ��ϻ��� (10msecñ��)
-	  range: �ե����ɷ�³���� (10msecñ��)
+	  start: フェード開始時間 (10msec単位)
+	  range: フェード継続時間 (10msec単位)
 	*/
 	int start = getCaliValue();
 	int range = getCaliValue();
@@ -158,7 +158,7 @@ void wavFadeVolumeMemory() {
 
 void wavReversePanMemory() {
 	/*
-	  wavLoadMemory���ɤ߹�����ǡ����κ����Υ����ͥ��ȿž
+	  wavLoadMemoryで読み込んだデータの左右のチャンネルを反転
 	*/
 	
 	if (wfile == NULL) return;
@@ -170,10 +170,10 @@ void wavReversePanMemory() {
 
 void wavPlay() {
 	/*
-	  ����Υ����åȤ�PCM�����
+	  指定のスロットのPCMを再生
 	  
-	  slot: �������륹���å��ֹ�
-	  loop: 0�ʤ飱�����������!0�ʤ�̵�¤˷����֤�
+	  slot: 再生するスロット番号
+	  loop: 0なら１回だけ再生、!0なら無限に繰り返し
 	*/
 	int slot = getCaliValue();
 	int loop = getCaliValue();
@@ -185,11 +185,11 @@ void wavPlay() {
 
 void wavPlayRing() {
 	/*
-	  ������ϰϤΥ����åȤ�PCM��ƤФ����˷����֤�
+	  指定の範囲のスロットのPCMを呼ばれる毎に繰り返し
 	  
-	  start: �ǽ�Υ����å��ֹ�
-	  cnt:   �����֤������åȤθĿ�
-	  *cur:  ���ߺ������Ƥ��륹���åȤΥ���ǥå���
+	  start: 最初のスロット番号
+	  cnt:   繰り返すスロットの個数
+	  *cur:  現在再生しているスロットのインデックス
 	*/
 	int start = getCaliValue();
 	int cnt   = getCaliValue();
@@ -203,9 +203,9 @@ void wavPlayRing() {
 
 void wavStop() {
 	/*
-	  ����Υ����åȤκ��������
+	  指定のスロットの再生を停止
 	  
-	  slot: ��ߤ��륹���å��ֹ�
+	  slot: 停止するスロット番号
 	*/
 	int slot = getCaliValue();
 	
@@ -216,7 +216,7 @@ void wavStop() {
 
 void wavStopAll() {
 	/*
-	  ���ƤΥ����åȤκ��������
+	  全てのスロットの再生を停止
 	*/
 	int i;
 	
@@ -229,9 +229,9 @@ void wavStopAll() {
 
 void wavPause() {
 	/*
-	  ����Υ����åȤκ����������
+	  指定のスロットの再生を一時停止
 	  
-	  slot: �����ߤ��륹���å��ֹ�
+	  slot: 一時停止するスロット番号
 	*/
 	int slot = getCaliValue();
 	
@@ -240,10 +240,10 @@ void wavPause() {
 
 void wavIsPlay() {
 	/*
-	  ����Υ����åȤ������椫�ɤ�����Ĵ�٤�
+	  指定のスロットが再生中かどうかを調べる
 	  
-	  slot:    Ĵ�٤륹���å��ֹ�
-	  *result: 0�ʤ�����桢!0�ʤ������
+	  slot:    調べるスロット番号
+	  *result: 0なら停止中、!0なら再生中
 	*/ 
 	int slot = getCaliValue();
 	int *result = getCaliVariable();
@@ -255,11 +255,11 @@ void wavIsPlay() {
 
 void wavIsPlayRange() {
 	/*
-	  ������ϰϤΥ����åȤ������椫�ɤ�����Ĵ�٤�
+	  指定の範囲のスロットが再生中かどうかを調べる
 	  
-	  slot: Ĵ�٤�ǽ�Υ����å�
-	  range: Ĵ�٤륹���åȤθĿ�
-	  *result: 0:���٤ƤΥ����åȤ������, 1: �ɤ줫�Υ����åȤ�������
+	  slot: 調べる最初のスロット
+	  range: 調べるスロットの個数
+	  *result: 0:すべてのスロットが停止中, 1: どれかのスロットが再生中
 	*/
 	int slot  = getCaliValue();
 	int range = getCaliValue();

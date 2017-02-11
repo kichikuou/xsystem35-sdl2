@@ -22,31 +22,31 @@
 
 extern int ntsel_dosel(void);
 
-// ÄÌ¾ï¥á¥Ã¥»¡¼¥¸É½¼¨°ÌÃÖ¤ÈÂç¤­¤µ
+// é€šå¸¸ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºä½ç½®ã¨å¤§ãã•
 #define MSGFRAME_0_X 6
 #define MSGFRAME_0_Y 347
 #define MSGFRAME_0_WIDTH 628
 #define MSGFRAME_0_HEIGHT 125
 
-// ²èÌÌÁ´ÂÎ¥á¥Ã¥»¡¼¥¸É½¼¨°ÌÃÖ¤ÈÂç¤­¤µ
+// ç”»é¢å…¨ä½“ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºä½ç½®ã¨å¤§ãã•
 #define MSGFRAME_1_X 0
 #define MSGFRAME_1_Y 0
 #define MSGFRAME_1_WIDTH 640
 #define MSGFRAME_1_HEIGHT 480
 
-// ÄÌ¾ï¥á¥Ã¥»¡¼¥¸(´é¤Ä¤­)É½¼¨°ÌÃÖ¤ÈÂç¤­¤µ
+// é€šå¸¸ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸(é¡”ã¤ã)è¡¨ç¤ºä½ç½®ã¨å¤§ãã•
 #define MSGFRAME_2_X (6+160)
 #define MSGFRAME_2_Y 347
 #define MSGFRAME_2_WIDTH (628-160)
 #define MSGFRAME_2_HEIGHT 125
 
-// ¥­¡¼ÆþÎÏ¥¢¥Ë¥á¡¼¥·¥ç¥ó°ÌÃÖ
+// ã‚­ãƒ¼å…¥åŠ›ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ä½ç½®
 #define HAKANIM_LOC_X 620
 #define HAKANIM_LOC_Y 450
-// ¥­¡¼ÆþÎÏ¥¢¥Ë¥á¡¼¥·¥ç¥ó´Ö³Ö
+// ã‚­ãƒ¼å…¥åŠ›ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é–“éš”
 #define HAKANIM_INTERVAL 250
 
-// ¥Ç¥Õ¥©¥ë¥È¥á¥Ã¥»¡¼¥¸¥Õ¥©¥ó¥È¥µ¥¤¥º
+// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º
 #define MSG_DEFFONTSIZE 24
 
 
@@ -61,29 +61,29 @@ static int ntmsg_keywait();
 static void ntmsg_clear(int wNum);
 
 
-// ½é´ü²½
+// åˆæœŸåŒ–
 void ntmsg_init() {
 	sprite_t *sp;
 
-	// ¥á¥Ã¥»¡¼¥¸¥¹¥×¥é¥¤¥È
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆ
 	sp = night.sp[SPNO_MSGFRAME_FG] = sp_msg_new(SPNO_MSGFRAME_FG, 0, 0, sf0->width, sf0->height);
 	sp_add_updatelist(sp);
 	
-	// ¥á¥Ã¥»¡¼¥¸ÇØ·ÊÍÑCG
+	// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸èƒŒæ™¯ç”¨CG
 	sp = night.sp[SPNO_MSGFRAME_BG] = sp_new(SPNO_MSGFRAME_BG, CGNO_MSGFRAME_LCG, 0, 0, SPRITE_NORMAL);
 	sp_add_updatelist(sp);
 	
-	// Ê¸»úÇØ·ÊCGºîÀ®
+	// æ–‡å­—èƒŒæ™¯CGä½œæˆ
 	scg_create(CGNO_MSGFR_BG,
 		   sf0->width, sf0->height,
 		   0, 0, 0, 255);
 	// night.cg[CGNO_MSGFR_BG]->refcnt++;
 	
-	// Ê¸»úÇØ·ÊCG¤Î¤¿¤á¤Îsprite
+	// æ–‡å­—èƒŒæ™¯CGã®ãŸã‚ã®sprite
 	sp = night.sp[SPNO_MSGBG] = sp_new(SPNO_MSGBG, CGNO_MSGFR_BG, 0, 0, SPRITE_NORMAL);
 	sp_add_updatelist(sp);
 	
-	// ¥­¡¼ÆþÎÏ¥¢¥Ë¥á¡¼¥·¥ç¥óCGºîÀ®
+	// ã‚­ãƒ¼å…¥åŠ›ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³CGä½œæˆ
 	scg_cut(CGNO_MSGHAK_1, CGNO_MSGHAK_LCG, 0, 0, 9, 9);
 	//night.cg[CGNO_MSGHAK_1]->refcnt++;
 	scg_cut(CGNO_MSGHAK_2, CGNO_MSGHAK_LCG, 0, 9, 9, 9);
@@ -100,7 +100,7 @@ void ntmsg_init() {
 	
 
 
-	// ¼ç¿Í¸øÌ¾Á°
+	// ä¸»äººå…¬åå‰
 	sstr_regist_replace(SNAME_RYO, SNAME_RYO_DEF);
 	
 	night.msg.cbmove = cb_mousemove;
@@ -113,10 +113,10 @@ void ntmsg_init() {
 	
 }
 
-// ¥á¥Ã¥»¡¼¥¸ÏÈ¤Î¼ïÎà
-//   type=0 ¾Ãµî
-//   type=1 ÏÈ¤¢¤ê
-//   type=2 Ãæ±û
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æž ã®ç¨®é¡ž
+//   type=0 æ¶ˆåŽ»
+//   type=1 æž ã‚ã‚Š
+//   type=2 ä¸­å¤®
 void ntmsg_set_frame(int type) {
 	surface_t *sf;
 	
@@ -163,7 +163,7 @@ void ntmsg_set_frame(int type) {
 }
 
 /*
-  ¥á¥Ã¥»¡¼¥¸ÎÎ°è¤ÎÀßÄê
+  ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸é ˜åŸŸã®è¨­å®š
   type=0: 628x125+6+347
   type=1: 640x480+0+0
   type=2: (628-120)x125+(6+120)+347
@@ -235,7 +235,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 	
 	msg = sstr_replacestr(night.msgbuf);
 	
-	// Ê¸»ú¥¢¥é¥¤¥ó¥á¥ó¥È¤ÎÄ´À°
+	// æ–‡å­—ã‚¢ãƒ©ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆã®èª¿æ•´
 	set_align(msg, sp, wSize);
 	savex = sp->u.msg.dspcur.x;
 	
@@ -293,10 +293,10 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 		sp->u.msg.dspcur.x += cw;
 	}
 	
-	// ¥Ð¥Ã¥Õ¥¡¥ê¥ó¥°Ãæ¤ÎÊ¸»ú¤Î¥¯¥ê¥¢
+	// ãƒãƒƒãƒ•ã‚¡ãƒªãƒ³ã‚°ä¸­ã®æ–‡å­—ã®ã‚¯ãƒªã‚¢
 	night.msgbuf[0] = '\0';
 	
-	// Wait¤Ê¤·¤Î½ÐÎÏ¤ÏºÇ¸å¤Ëupdate
+	// Waitãªã—ã®å‡ºåŠ›ã¯æœ€å¾Œã«update
 	if (needupdate) {
 		uparea.width  = sp->cursize.width;
 		uparea.height = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace);
@@ -306,16 +306,16 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 }
 
 /*
-  ¥á¥Ã¥»¡¼¥¸¥­¡¼ÆþÎÏÂÔ¤Á
+  ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚­ãƒ¼å…¥åŠ›å¾…ã¡
   @param: none
-  @return: ÆþÎÏ¤µ¤ì¤¿¥­¡¼ 
+  @return: å…¥åŠ›ã•ã‚ŒãŸã‚­ãƒ¼ 
  */
 static int ntmsg_keywait() {
 	int i = 0;
 	
 	if (night.waitskiplv > 0) return 0;
 	
-	// ¥¢¥Ë¥á¥Ñ¥¿¡¼¥ó¤Î½é´ü²½
+	// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ã®åˆæœŸåŒ–
 	setup_hakanim();
 	
 	night.waittype = KEYWAIT_MESSAGE;
@@ -348,8 +348,8 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 		break;
 		
 	case 1:
-                // ¤â¤Ã¤È¤âÄ¹¤¤¹Ô¤¬Ãæ¿´¤Ë¤¯¤ë¤è¤¦¤Ë¤·¡¢
-		// Â¾¤Î¹Ô¤Ï¤½¤Î¹Ô¤ÎÀèÆ¬¤ËÀèÆ¬¤ò¤¢¤ï¤»¤ë
+                // ã‚‚ã£ã¨ã‚‚é•·ã„è¡ŒãŒä¸­å¿ƒã«ãã‚‹ã‚ˆã†ã«ã—ã€
+		// ä»–ã®è¡Œã¯ãã®è¡Œã®å…ˆé ­ã«å…ˆé ­ã‚’ã‚ã‚ã›ã‚‹
 		line = 0; maxchar = 0;
 		
 		c = 0;
@@ -380,7 +380,7 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 static BYTE *get_char(BYTE *msg, char *mbuf, int bufmax) {
 	int c1;
 	
-	//  ²þ¹Ô
+	//  æ”¹è¡Œ
 	if (msg[0] == '\n') {
 		mbuf[0] = '\n';
 		mbuf[1] = '\0';
@@ -430,17 +430,17 @@ static void cb_keyrelease(agsevent_t *e) {
 static void cb_mousemove(agsevent_t *e) {
 	int x = e->d1, y = e->d2;
 	
-	// ²»À¼mute/¥á¥Ã¥»¡¼¥¸¥¹¥­¥Ã¥×/¥á¥Ã¥»¡¼¥¸ÏÈ¾Ãµî¤ÎÎÎ°è¤Ë
-	// ¥Þ¥¦¥¹¤¬°ÜÆ°¤·¤¿¤é¡¢¤½¤ÎÉôÊ¬¤Î¥¢¥¤¥³¥ó¤òÊÑ²½¤µ¤»¤ë
+	// éŸ³å£°mute/ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ã‚­ãƒƒãƒ—/ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸æž æ¶ˆåŽ»ã®é ˜åŸŸã«
+	// ãƒžã‚¦ã‚¹ãŒç§»å‹•ã—ãŸã‚‰ã€ãã®éƒ¨åˆ†ã®ã‚¢ã‚¤ã‚³ãƒ³ã‚’å¤‰åŒ–ã•ã›ã‚‹
 
 	
 }
 
-// ¥á¥Ã¥»¡¼¥¸É½¼¨»þ¤Ë¡¢¥­¡¼ÆþÎÏ¤òÂ¥¤¹¥¢¥Ë¥á¡¼¥·¥ç¥ó¤ÎÀßÄê
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºæ™‚ã«ã€ã‚­ãƒ¼å…¥åŠ›ã‚’ä¿ƒã™ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®è¨­å®š
 static void setup_hakanim() {
 }
 
-// ¥á¥Ã¥»¡¼¥¸É½¼¨»þ¤Î¥­¡¼ÆþÎÏ¤òÂ¥¤¹¥¢¥Ë¥á¡¼¥·¥ç¥ó
+// ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤ºæ™‚ã®ã‚­ãƒ¼å…¥åŠ›ã‚’ä¿ƒã™ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 static void hakanim(int i) {
 	sprite_t *sp;
 	boolean show;
@@ -464,8 +464,8 @@ int ntmsg_update(sprite_t *sp, MyRectangle *r) {
 	int sx, sy, w, h, dx, dy;
 	surface_t update;
 	
-	// canvas ¤¬ clean ¤Î¤È¤­¤Ï¤Ê¤Ë¤â¤·¤Ê¤¤
-	//  -> ÀâÌÀ¥¹¥×¥é¥¤¥È¤Î¤è¤¦¤Ë¡¢SetShow¤µ¤ì¤¿¤È¤­¤ËÂÐ±þ¤Ç¤­¤Ê¤¤¤«¤é¤À¤á 
+	// canvas ãŒ clean ã®ã¨ãã¯ãªã«ã‚‚ã—ãªã„
+	//  -> èª¬æ˜Žã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®ã‚ˆã†ã«ã€SetShowã•ã‚ŒãŸã¨ãã«å¯¾å¿œã§ããªã„ã‹ã‚‰ã ã‚ 
 	//if (sact.msgbufempty) return OK;
 	
 	update.width  = r->width;
@@ -503,7 +503,7 @@ static void ntmsg_clear(int wNum) {
 	
 	night.msgbuf[0]  = '\0';
 	
-	// ¥­¥ã¥ó¥Ð¥¹¤Î¥¯¥ê¥¢
+	// ã‚­ãƒ£ãƒ³ãƒã‚¹ã®ã‚¯ãƒªã‚¢
 	sf = sp->u.msg.canvas;
 	memset(sf->pixel, 0, sf->bytes_per_line * sf->height);
 	memset(sf->alpha, 0, sf->width * sf->height);

@@ -1,5 +1,5 @@
 /*
- * xcore_maskupdate.c  X11 mask ÉÕ¤­ update
+ * xcore_maskupdate.c  X11 mask ä»˜ã update
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -32,11 +32,11 @@
 #include "portab.h"
 #include "xcore_private.h"
 
-static Pixmap maskpix;  /* clipmask ÍÑ Bitmap */
-static Pixmap clippix;  /* copy ¸µ Pixmap */
-static Pixmap savepix;  /* copy Àè Pixmap */
-static Pixmap doublepix;/* double buffer ÍÑ Pixmap */
-static GC     maskgc;   /* clipmask Bitmap ÍÑ GC */
+static Pixmap maskpix;  /* clipmask ç”¨ Bitmap */
+static Pixmap clippix;  /* copy å…ƒ Pixmap */
+static Pixmap savepix;  /* copy å…ˆ Pixmap */
+static Pixmap doublepix;/* double buffer ç”¨ Pixmap */
+static GC     maskgc;   /* clipmask Bitmap ç”¨ GC */
 
 static void draw_5star(double mul, double rad, int off_x, int off_y);
 static void draw_6star(double mul, double rad, int off_x, int off_y);
@@ -45,11 +45,11 @@ static void draw_windwheel_180(double rad, int r, int off_x, int off_y);
 static void draw_windwheel_360(double rad, int r, int off_x, int off_y);
 
 /*
- * ¸ŞçêÀ±¤òÉÁ¤¯
- *  mul  : ÇÜÎ¨ (1 ¤Ç 100 * 100) ¤ÎÀ±¤¬ÉÁ¤«¤ì¤ë
- *  rad  : ²óÅ¾³ÑÅÙ(radian)
- *  off_x: Ãæ¿´ºÂÉ¸¤Î x Êı¸ş offset
- *  off_y: Ãæ¿´ºÂÉ¸¤Î y Êı¸ş offset
+ * äº”èŠ’æ˜Ÿã‚’æã
+ *  mul  : å€ç‡ (1 ã§ 100 * 100) ã®æ˜ŸãŒæã‹ã‚Œã‚‹
+ *  rad  : å›è»¢è§’åº¦(radian)
+ *  off_x: ä¸­å¿ƒåº§æ¨™ã® x æ–¹å‘ offset
+ *  off_y: ä¸­å¿ƒåº§æ¨™ã® y æ–¹å‘ offset
  */
 static void draw_5star(double mul, double rad, int off_x, int off_y) {
 	static XPoint pt[] = {
@@ -76,11 +76,11 @@ static void draw_5star(double mul, double rad, int off_x, int off_y) {
 }
 
 /*
- * Ï»çêÀ±¤òÉÁ¤¯
- *  mul  : ÇÜÎ¨ (1 ¤Ç 100 * 100) ¤ÎÀ±¤¬ÉÁ¤«¤ì¤ë
- *  rad  : ²óÅ¾³ÑÅÙ(radian)
- *  off_x: Ãæ¿´ºÂÉ¸¤Î x Êı¸ş offset
- *  off_y: Ãæ¿´ºÂÉ¸¤Î y Êı¸ş offset
+ * å…­èŠ’æ˜Ÿã‚’æã
+ *  mul  : å€ç‡ (1 ã§ 100 * 100) ã®æ˜ŸãŒæã‹ã‚Œã‚‹
+ *  rad  : å›è»¢è§’åº¦(radian)
+ *  off_x: ä¸­å¿ƒåº§æ¨™ã® x æ–¹å‘ offset
+ *  off_y: ä¸­å¿ƒåº§æ¨™ã® y æ–¹å‘ offset
  */
 static void draw_6star(double mul, double rad, int off_x, int off_y) {
 	static XPoint pt1[] = {
@@ -112,17 +112,17 @@ static void draw_6star(double mul, double rad, int off_x, int off_y) {
 }
 
 /*
- * Àğ·¿¤ÎÃæ¿´³Ñ (¤Æ¤­¤È¡¼)
+ * æ‰‡å‹ã®ä¸­å¿ƒè§’ (ã¦ãã¨ãƒ¼)
  *   0.2 radian
  */
 #define WHEELDELTA 0.2
 
 /*
- * É÷¼Ö£¹£°¡ë
- *  rad  : ²óÅ¾³Ñ (radian) 0 - pi/2
- *  r    : È¾·Â
- *  off_x: Ãæ¿´ºÂÉ¸¤Î x Êı¸ş offset
- *  off_y: Ãæ¿´ºÂÉ¸¤Î y Êı¸ş offset
+ * é¢¨è»Šï¼™ï¼Â°
+ *  rad  : å›è»¢è§’ (radian) 0 - pi/2
+ *  r    : åŠå¾„
+ *  off_x: ä¸­å¿ƒåº§æ¨™ã® x æ–¹å‘ offset
+ *  off_y: ä¸­å¿ƒåº§æ¨™ã® y æ–¹å‘ offset
  */
 static void draw_windwheel_90(double rad, int r, int off_x, int off_y) {
 	XPoint p[3];
@@ -163,11 +163,11 @@ static void draw_windwheel_90(double rad, int r, int off_x, int off_y) {
 }
 
 /*
- * É÷¼Ö£±£¸£°¡ë
- *  rad  : ²óÅ¾³Ñ (radian) 0 - pi
- *  r    : È¾·Â
- *  off_x: Ãæ¿´ºÂÉ¸¤Î x Êı¸ş offset
- *  off_y: Ãæ¿´ºÂÉ¸¤Î y Êı¸ş offset
+ * é¢¨è»Šï¼‘ï¼˜ï¼Â°
+ *  rad  : å›è»¢è§’ (radian) 0 - pi
+ *  r    : åŠå¾„
+ *  off_x: ä¸­å¿ƒåº§æ¨™ã® x æ–¹å‘ offset
+ *  off_y: ä¸­å¿ƒåº§æ¨™ã® y æ–¹å‘ offset
  */
 static void draw_windwheel_180(double rad, int r, int off_x, int off_y) {
 	XPoint p[3];
@@ -194,11 +194,11 @@ static void draw_windwheel_180(double rad, int r, int off_x, int off_y) {
 }
 
 /*
- * É÷¼Ö£±£¸£°¡ë
- *  rad  : ²óÅ¾³Ñ (radian) 0 - 2pi
- *  r    : È¾·Â
- *  off_x: Ãæ¿´ºÂÉ¸¤Î x Êı¸ş offset
- *  off_y: Ãæ¿´ºÂÉ¸¤Î y Êı¸ş offset
+ * é¢¨è»Šï¼‘ï¼˜ï¼Â°
+ *  rad  : å›è»¢è§’ (radian) 0 - 2pi
+ *  r    : åŠå¾„
+ *  off_x: ä¸­å¿ƒåº§æ¨™ã® x æ–¹å‘ offset
+ *  off_y: ä¸­å¿ƒåº§æ¨™ã® y æ–¹å‘ offset
  */
 static void draw_windwheel_360(double rad, int r, int off_x, int off_y) {
 	XPoint p[3];
@@ -217,22 +217,22 @@ static void draw_windwheel_360(double rad, int r, int off_x, int off_y) {
 }
 
 /*
- * ¥Ş¥¹¥¯ÉÕ¤­ÎÎ°è¹¹¿·
- *   sx: ¥³¥Ô¡¼¸µ x ºÂÉ¸
- *   sy: ¥³¥Ô¡¼¸µ y ºÂÉ¸
- *   w : ¥³¥Ô¡¼¸µ width
- *   h : ¥³¥Ô¡¼¸µ height
- *   dx: ¥³¥Ô¡¼Àè x ºÂÉ¸
- *   dy: ¥³¥Ô¡¼Àè y ºÂÉ¸
- *   func: ¥Ş¥¹¥¯¼ïÎà
- *      44: ¸ŞçêÀ±(Æâ->³°)
- *      45: ¸ŞçêÀ±(³°->Æâ)
- *      46: Ï»çêÀ±(Æâ->³°)
- *      47: Ï»çêÀ±(³°->Æâ)
- *      50: É÷¼Ö£¹£°¡ë
- *      51: É÷¼Ö£±£¸£°¡ë
- *      52: É÷¼Ö£³£¶£°¡ë
- *   step: ¸Æ¤Ó½Ğ¤·ÈÖ¹æ 0 - 256
+ * ãƒã‚¹ã‚¯ä»˜ãé ˜åŸŸæ›´æ–°
+ *   sx: ã‚³ãƒ”ãƒ¼å…ƒ x åº§æ¨™
+ *   sy: ã‚³ãƒ”ãƒ¼å…ƒ y åº§æ¨™
+ *   w : ã‚³ãƒ”ãƒ¼å…ƒ width
+ *   h : ã‚³ãƒ”ãƒ¼å…ƒ height
+ *   dx: ã‚³ãƒ”ãƒ¼å…ˆ x åº§æ¨™
+ *   dy: ã‚³ãƒ”ãƒ¼å…ˆ y åº§æ¨™
+ *   func: ãƒã‚¹ã‚¯ç¨®é¡
+ *      44: äº”èŠ’æ˜Ÿ(å†…->å¤–)
+ *      45: äº”èŠ’æ˜Ÿ(å¤–->å†…)
+ *      46: å…­èŠ’æ˜Ÿ(å†…->å¤–)
+ *      47: å…­èŠ’æ˜Ÿ(å¤–->å†…)
+ *      50: é¢¨è»Šï¼™ï¼Â°
+ *      51: é¢¨è»Šï¼‘ï¼˜ï¼Â°
+ *      52: é¢¨è»Šï¼“ï¼–ï¼Â°
+ *   step: å‘¼ã³å‡ºã—ç•ªå· 0 - 256
  */
 void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step) {
 	GC gc;
@@ -241,28 +241,28 @@ void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, in
 	dy -= view_y;
 
 	if (step == 0) {
-		/* ºÇ½é¤Ë¤¤¤í¤¤¤í¤È½àÈ÷ */
+		/* æœ€åˆã«ã„ã‚ã„ã‚ã¨æº–å‚™ */
 		XSync(x11_display, False);
-		/* ¥³¥Ô¡¼¸µ¤ò DIB ¤«¤é pixmap ¤Ë»ı¤Ã¤ÆÍè¤ë */
+		/* ã‚³ãƒ”ãƒ¼å…ƒã‚’ DIB ã‹ã‚‰ pixmap ã«æŒã£ã¦æ¥ã‚‹ */
 		clippix = x11_clip_from_DIB(sx, sy, w, h);
 
-		/* clip mask ÍÑ Pixmap ¤ÎÀ¸À® */
+		/* clip mask ç”¨ Pixmap ã®ç”Ÿæˆ */
 		maskpix = XCreatePixmap(x11_display, x11_window, w, h, 1);
 		maskgc = XCreateGC(x11_display, maskpix, None, NULL);
 		
-		/* clipmask ÍÑ Pixmap ¤Î½é´ü²½ */
+		/* clipmask ç”¨ Pixmap ã®åˆæœŸåŒ– */
 		XSetForeground(x11_display, maskgc, 0);
 		XFillRectangle(x11_display, maskpix, maskgc, 0, 0, w, h);
 		
-		/* Àş¤¬¸òº¹¤¹¤ë¤È¤­¤ÎÅÉ¤ê¤Ä¤Ö¤·¤Î¥ë¡¼¥ë¤òÀßÄê */
+		/* ç·šãŒäº¤å·®ã™ã‚‹ã¨ãã®å¡—ã‚Šã¤ã¶ã—ã®ãƒ«ãƒ¼ãƒ«ã‚’è¨­å®š */
 		XSetFillRule(x11_display, maskgc, WindingRule);	
 
-		/* ¹¹¿·Àè¤Î Window ¤ÎÎÎ°è¤òÊİÂ¸ */
+		/* æ›´æ–°å…ˆã® Window ã®é ˜åŸŸã‚’ä¿å­˜ */
 		savepix = XCreatePixmap(x11_display, x11_window, w, h, WIN_DEPTH);
 		XCopyArea(x11_display, x11_window, savepix, x11_gc_pix,
 			  winoffset_x + dx, winoffset_y + dy, w, h, 0, 0);
 		
-		/* ¥À¥Ö¥ë¥Ğ¥Ã¥Õ¥¡ÍÑ¤Ë Pixmap ¤ò³ÎÊİ */
+		/* ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ç”¨ã« Pixmap ã‚’ç¢ºä¿ */
 		doublepix = XCreatePixmap(x11_display, x11_window, w, h, WIN_DEPTH);
 		XCopyArea(x11_display, x11_window, doublepix, x11_gc_pix,
 			  winoffset_x + dx, winoffset_y + dy, w, h, 0, 0);
@@ -270,7 +270,7 @@ void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, in
 		XSync(x11_display, False);
 		return;
 	} else if (step == 256) {
-		/* ºÇ¸å¤Ë¸å»ÏËö */
+		/* æœ€å¾Œã«å¾Œå§‹æœ« */
 #if 0
 		XCopyArea(x11_display, clippix, x11_window, x11_gc_pix,
 			  0, 0, w, h, winoffset_x + dx, winoffset_y + dy);
@@ -292,7 +292,7 @@ void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, in
 		return;
 	}
 	
-	/* clipmask ÍÑ¤Î GC ¤òÀ¸À® (Ëè²óÀ¸À®¤·¤Ê¤¯¤Æ¤âÎÉ¤¤¤«¤â¡©) */
+	/* clipmask ç”¨ã® GC ã‚’ç”Ÿæˆ (æ¯å›ç”Ÿæˆã—ãªãã¦ã‚‚è‰¯ã„ã‹ã‚‚ï¼Ÿ) */
 	gc = XCreateGC(x11_display, clippix, None, NULL);
 	XSetClipMask(x11_display, gc, maskpix);
 	XSetClipOrigin(x11_display, gc, 0, 0);
@@ -300,14 +300,14 @@ void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, in
 	switch(func) {
 	case 44:	
 	case 46:
-		/* Æâ¤«¤é³°¤Ø */
+		/* å†…ã‹ã‚‰å¤–ã¸ */
 		XSetForeground(x11_display, maskgc, 0);
 		XFillRectangle(x11_display, maskpix, maskgc, 0, 0, w, h);
 		XSetForeground(x11_display, maskgc, 1);
 		break;
 	case 45:
 	case 47:
-		/* ³°¤«¤éÆâ¤Ø */
+		/* å¤–ã‹ã‚‰å†…ã¸ */
 		XSetForeground(x11_display, maskgc, 1);
 		XFillRectangle(x11_display, maskpix, maskgc, 0, 0, w, h);
 		XSetForeground(x11_display, maskgc, 0);
@@ -316,7 +316,7 @@ void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, in
 		XSetForeground(x11_display, maskgc, 1);
 	}
 
-	/* mask ¤òÉÁ²è */
+	/* mask ã‚’æç”» */
 	switch(func) {
 	case 44:
 		draw_5star(1.5 * (max(w,h) * step) / (256 * 50.0),
@@ -352,21 +352,21 @@ void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, in
 		break;
 	}
 	
-	/* double buffer ¤Ø ÊİÂ¸¤·¤¿ window ¤ÎÆâÍÆ¤ò¥³¥Ô¡¼ */
+	/* double buffer ã¸ ä¿å­˜ã—ãŸ window ã®å†…å®¹ã‚’ã‚³ãƒ”ãƒ¼ */
 	XCopyArea(x11_display, savepix, doublepix, x11_gc_win,
 		  0, 0, w, h, 0, 0);
 	
-	/* ¥³¥Ô¡¼¸µ¤ÎÆâÍÆ¤ò maskÉÕ¤­¤Ç double buffer ¤Ø¥³¥Ô¡¼ */
+	/* ã‚³ãƒ”ãƒ¼å…ƒã®å†…å®¹ã‚’ maskä»˜ãã§ double buffer ã¸ã‚³ãƒ”ãƒ¼ */
 	XCopyArea(x11_display, clippix, doublepix, gc,
 		  0, 0, w, h, 0, 0);
 	
-	/* double buffer ¤«¤é window ¤Ø¥³¥Ô¡¼ */
+	/* double buffer ã‹ã‚‰ window ã¸ã‚³ãƒ”ãƒ¼ */
 	XCopyArea(x11_display, doublepix, x11_window, x11_gc_win,
 		  0, 0, w, h, winoffset_x + dx, winoffset_y + dy);
 	
-	/* Æ±´ü */
+	/* åŒæœŸ */
 	XSync(x11_display, False);
 	
-	/* clipmask ÍÑ gc ¤ÎÇË´ş */
+	/* clipmask ç”¨ gc ã®ç ´æ£„ */
 	XFreeGC(x11_display, gc);
 }

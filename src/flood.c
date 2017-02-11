@@ -1,5 +1,5 @@
 /*
- * flood.c  ÅÉ¤ê¤Ä¤Ö¤·Áàºî 
+ * flood.c  å¡—ã‚Šã¤ã¶ã—æ“ä½œ 
  *
  * Copyright (C) 1998- TAJIRI Yasuhiro <tajiri@wizard.elec.waseda.ac.jp>
  *               2000-                 <tajiri@venus.dti.ne.jp>
@@ -29,31 +29,31 @@
 #include "flood.h"
 
 typedef struct shdw {
-    struct shdw *next;      /* ¼¡¤Î±Æ¤Ø¤Î¥İ¥¤¥ó¥¿ */
-    int left, right;        /* Ã¼ÅÀ */
-    int row, par;           /* ¤³¤Î±Æ¤È¿Æ¥é¥¤¥ó¤ÎÎó */
-    boolean ok;             /* Í­¸ú/Ìµ¸ú ¥Õ¥é¥° */
+    struct shdw *next;      /* æ¬¡ã®å½±ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+    int left, right;        /* ç«¯ç‚¹ */
+    int row, par;           /* ã“ã®å½±ã¨è¦ªãƒ©ã‚¤ãƒ³ã®åˆ— */
+    boolean ok;             /* æœ‰åŠ¹/ç„¡åŠ¹ ãƒ•ãƒ©ã‚° */
 } shadow;
 
-/* ±Æ·¿¤ÎÊÑ¿ô */
+/* å½±å‹ã®å¤‰æ•° */
 
 
-static int currentRow;         /* ½èÍıÃæ¤ÎÎó */
-static shadow *seedShadow;  /* ½èÍıÃæ¤Î±Æ */
-static shadow *rowHead;     /* Îó¥ê¥¹¥È¤ÎÀèÆ¬¤Ø¤Î¥İ¥¤¥ó¥¿ */
-static shadow *pendHead;    /* ¥¹¥¿¥Ã¥¯¥ê¥¹¥È¤ÎÀèÆ¬¤Ø¤Î¥İ¥¤¥ó¥¿ */
-static shadow *freeHead;    /* ¶õ¥ê¥¹¥È¤ÎÀèÆ¬¤Ø¤Î¥İ¥¤¥ó¥¿ */
+static int currentRow;         /* å‡¦ç†ä¸­ã®åˆ— */
+static shadow *seedShadow;  /* å‡¦ç†ä¸­ã®å½± */
+static shadow *rowHead;     /* åˆ—ãƒªã‚¹ãƒˆã®å…ˆé ­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+static shadow *pendHead;    /* ã‚¹ã‚¿ãƒƒã‚¯ãƒªã‚¹ãƒˆã®å…ˆé ­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+static shadow *freeHead;    /* ç©ºãƒªã‚¹ãƒˆã®å…ˆé ­ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
 
-/* ÆâÉôÅÀ¤ò¤«¤É¤¦¤«È½Äê¤·¤Æ¿§¤ÎÊÑ¹¹¤ò¤¹¤ë´Ø¿ô¥İ¥¤¥ó¥¿ */
+/* å†…éƒ¨ç‚¹ã‚’ã‹ã©ã†ã‹åˆ¤å®šã—ã¦è‰²ã®å¤‰æ›´ã‚’ã™ã‚‹é–¢æ•°ãƒã‚¤ãƒ³ã‚¿ */
 static int (*isInterior)(int, int);
 
-/* ¥¨¥é¡¼²óÉüÍÑ */
+/* ã‚¨ãƒ©ãƒ¼å›å¾©ç”¨ */
 
 static jmp_buf errBuf;
 
 /*****************************************************/
 
-/* ¥ê¥¹¥È¤ò³«Êü¤¹¤ë */
+/* ãƒªã‚¹ãƒˆã‚’é–‹æ”¾ã™ã‚‹ */
 
 static void free_shadows(shadow *s) {
     shadow *t;
@@ -64,7 +64,7 @@ static void free_shadows(shadow *s) {
     }
 }
 
-/* Î¾Ã¼ÅÀ¤ÈÎó¤ò»ØÄê¤·¤Æ¿·¤·¤¤±Æ¤òºî¤ë */
+/* ä¸¡ç«¯ç‚¹ã¨åˆ—ã‚’æŒ‡å®šã—ã¦æ–°ã—ã„å½±ã‚’ä½œã‚‹ */
 static void newshadow(int sleft, int sright, int srow, int prow) 
 {
 
@@ -87,7 +87,7 @@ static void newshadow(int sleft, int sright, int srow, int prow)
     pendHead = new_list;
 }
 
-/* Îó¥ê¥¹¥È¤òºî¤ë */
+/* åˆ—ãƒªã‚¹ãƒˆã‚’ä½œã‚‹ */
 
 static void make_row(void) {
 
@@ -130,7 +130,7 @@ static void make_row(void) {
     }
 }
 
-/* ±Æ¤«¤é¥é¥¤¥ó¤Ë½Å¤Ê¤é¤Ê¤¤ÉôÊ¬¤òÈ´¤­¤À¤·¡¢¿·¤·¤¤±Æ¤È¤¹¤ë */
+/* å½±ã‹ã‚‰ãƒ©ã‚¤ãƒ³ã«é‡ãªã‚‰ãªã„éƒ¨åˆ†ã‚’æŠœãã ã—ã€æ–°ã—ã„å½±ã¨ã™ã‚‹ */
 
 static void clipshadow(int left, int right, int row, shadow *line) 
 {
@@ -141,7 +141,7 @@ static void clipshadow(int left, int right, int row, shadow *line)
         newshadow(line->right + 2, right, row, line->row);
 }
 
-/* ¥é¥¤¥ó¤Ë½Å¤Ê¤ë±Æ¤ò½¤Àµ/½üµî(Ìµ¸ú¤Î¥Ş¡¼¥¯¤ò¤Ä¤±¤ë)¤¹¤ë */
+/* ãƒ©ã‚¤ãƒ³ã«é‡ãªã‚‹å½±ã‚’ä¿®æ­£/é™¤å»(ç„¡åŠ¹ã®ãƒãƒ¼ã‚¯ã‚’ã¤ã‘ã‚‹)ã™ã‚‹ */
 
 static void removeoverlap(shadow *rw) {
 
@@ -159,7 +159,7 @@ static void removeoverlap(shadow *rw) {
 
 }
 
-/* »Ò¥é¥¤¥ó¤«¤é±Æ¤òºî¤ë */
+/* å­ãƒ©ã‚¤ãƒ³ã‹ã‚‰å½±ã‚’ä½œã‚‹ */
 static void make_shadows(int left, int right) {
 
     shadow *p;
@@ -182,7 +182,7 @@ static void make_shadows(int left, int right) {
             removeoverlap(p);
 }
 
-/* ±Æ¤ÎÃæ¤Ë¤¢¤ëÁ´¤Æ¤ÎÌ¤Ãµº÷¤Î¥é¥¤¥ó¤ò¸«¤Ä¤±½Ğ¤¹ */
+/* å½±ã®ä¸­ã«ã‚ã‚‹å…¨ã¦ã®æœªæ¢ç´¢ã®ãƒ©ã‚¤ãƒ³ã‚’è¦‹ã¤ã‘å‡ºã™ */
 
 static void visitshadow(void)
 {
@@ -203,7 +203,7 @@ static void visitshadow(void)
     }
 }
 
-/* ÅÉ¤ê¤Ä¤Ö¤· */
+/* å¡—ã‚Šã¤ã¶ã— */
 static void do_flood(int seedx, int seedy, int (*visit)(int, int)) 
 {
 
@@ -226,7 +226,7 @@ static void do_flood(int seedx, int seedy, int (*visit)(int, int))
     free_shadows(freeHead);
 }
 
-/* ¥¬¡¼¥É´Ø¿ô¤ò»È¤Ã¤ÆÅÉ¤ê¤Ä¤Ö¤·´Ø¿ô(flood)¤ò¼Â¹Ô¤¹¤ë */
+/* ã‚¬ãƒ¼ãƒ‰é–¢æ•°ã‚’ä½¿ã£ã¦å¡—ã‚Šã¤ã¶ã—é–¢æ•°(flood)ã‚’å®Ÿè¡Œã™ã‚‹ */
 int flood(int seed_x, int seed_y, int (*visit)(int, int))
 {
 	if (setjmp(errBuf) != 0)

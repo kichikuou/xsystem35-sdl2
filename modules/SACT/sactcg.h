@@ -1,5 +1,5 @@
 /*
- * sactcg.h: CG∫Ó¿Æ
+ * sactcg.h: CG‰ΩúÊàê
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

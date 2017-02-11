@@ -1,5 +1,5 @@
 /*
- * message.c  Ê¸»úÎóÉ½¼¨´Ø·¸
+ * message.c  æ–‡å­—åˆ—è¡¨ç¤ºé–¢ä¿‚
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -36,22 +36,22 @@
 #include "ags.h"
 #include "nact.h"
 
-/* ¥·¥ç¡¼¥È¥«¥Ã¥È */
+/* ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆ */
 #define msg nact->msg
 
 /* Private Variables */
-/* ¸½ºß»ÈÍÑÃæ¤Î¥á¥Ã¥»¡¼¥¸Window¾ğÊó */
+/* ç¾åœ¨ä½¿ç”¨ä¸­ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸Windowæƒ…å ± */
 // static Bcom_WindowInfo winInfo = {8,311,616,80,0};
-/* WindowÏÈ¤Î¼ïÎà */
+/* Windowæ ã®ç¨®é¡ */
 static int frameType;
 static int frameCgNoTop;
 static int frameCgNoMid;
 static int frameCgNoBot;
 static int frameDot;
-/* Ê¸»ú¾ş¤ê¤ÎÀßÄê */
+/* æ–‡å­—é£¾ã‚Šã®è¨­å®š */
 static int msgDecorateColor   = 0;
 static int msgDecorateType    = 0;
-/* ¸½ºß¤ÎÊ¸»úÉ½¼¨°ÌÃÖ */
+/* ç¾åœ¨ã®æ–‡å­—è¡¨ç¤ºä½ç½® */
 static MyPoint msgcur;
 static boolean nextLineIsAfterKaigyou = FALSE;
 
@@ -63,23 +63,23 @@ static void msgget_at_a();
 
 
 void msg_init() {
-	/* ¥á¥Ã¥»¡¼¥¸¥Õ¥©¥ó¥È¤ÎÂç¤­¤µ */
+	/* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ•ã‚©ãƒ³ãƒˆã®å¤§ãã• */
 	msg.MsgFontSize     = 16;
 	msg.MsgFontBoldSize = 0;
 	msg.MsgFont         = FONT_GOTHIC;
 	
-	/* ³Æ¼ï¿§ */
+	/* å„ç¨®è‰² */
 	msg.MsgFontColor             = 255;
 	msg.WinFrameColor            = 255;
 	msg.WinBackgroundColor       = 0;
 	msg.HitAnyKeyMsgColor        = 255;
 	msg.WinBackgroundTransparent = 255;
 	
-	msg.AutoPageChange = TRUE;  /* ¼«Æ°²ş¥Ú¡¼¥¸ */
-	msg.LineIncrement  = 2;     /* ²ş¹ÔÉı */
-	msg.WinBackgroundTransparentColor = -1; /* WindowÇØ·Ê¤ÎÆ©²á¿§ -1:»ØÄêÌµ¤·*/
+	msg.AutoPageChange = TRUE;  /* è‡ªå‹•æ”¹ãƒšãƒ¼ã‚¸ */
+	msg.LineIncrement  = 2;     /* æ”¹è¡Œå¹… */
+	msg.WinBackgroundTransparentColor = -1; /* WindowèƒŒæ™¯ã®é€éè‰² -1:æŒ‡å®šç„¡ã—*/
 	
-	/* MG ¥³¥Ş¥ó¥É¤Ë¤è¤ë¥á¥Ã¥»¡¼¥¸¤ÎÊ¸»úÎóÊÑ¿ô¤Ø¤Î¼è¤ê¹ş¤ß */
+	/* MG ã‚³ãƒãƒ³ãƒ‰ã«ã‚ˆã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®æ–‡å­—åˆ—å¤‰æ•°ã¸ã®å–ã‚Šè¾¼ã¿ */
 	msg.mg_getString     = FALSE;
 	msg.mg_dspMsg        = TRUE;
 	msg.mg_startStrVarNo = 1;
@@ -109,7 +109,7 @@ void msg_putMessage(char *m) {
 		msg_nextPage(TRUE);
 	}
 	
-	/* É½¼¨Ê¸»úÎó¤òÊ¸»úÎóÊÑ¿ô¤Ë¥³¥Ô¡¼¤¹¤ë */
+	/* è¡¨ç¤ºæ–‡å­—åˆ—ã‚’æ–‡å­—åˆ—å¤‰æ•°ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	if (msg.mg_getString) {
 		copyMsgToStrVar(m);
 	}
@@ -302,7 +302,7 @@ void msg_getMessageLocation(MyPoint *loc) {
 
 void msg_hitAnyKey() {
 	int w;
-	static BYTE hak[] = {0x81, 0xa5, 0x00}; /* ¢§ */
+	static BYTE hak[] = {0x81, 0xa5, 0x00}; /* â–¼ */
 	
 	w = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
 			   msg.win->y + msg.win->height - msg.MsgFontSize,
@@ -367,7 +367,7 @@ void msg_mg6_command(int sw) {
 		msg.mg_curStrVarNo++;
 		break;
 	case 2:
-		/* ¤Ş¤À */
+		/* ã¾ã  */
 		break;
 	default:
 		break;

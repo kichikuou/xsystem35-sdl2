@@ -1,5 +1,5 @@
 /*
- * sndcnv_rate.c  PCM ¼şÇÈ¿ôÊÑ´¹
+ * sndcnv_rate.c  PCM å‘¨æ³¢æ•°å¤‰æ›
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>

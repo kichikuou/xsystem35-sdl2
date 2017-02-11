@@ -1,5 +1,5 @@
 int ntsel_dosel(int mode) {
-	// ÁªÂò»è¤òÉÁ²è
+	// é¸æŠè‚¢ã‚’æç”»
 	// 
 	return 0;
 }

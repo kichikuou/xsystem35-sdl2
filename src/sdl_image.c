@@ -1,5 +1,5 @@
 /*
- * sdl_image.c  imageÁàºî for SDL
+ * sdl_image.c  imageæ“ä½œ for SDL
  *
  * Copyright (C) 2000-   Fumihiko Murata <fmurata@p1.tcnet.ne.jp>
  *
@@ -38,7 +38,7 @@
 static unsigned char shlv_tbl[256*256];
 
 /*
- * dibÆâ¤Ç¤Î³ÈÂç¡¦½Ì¾®¥³¥Ô¡¼
+ * dibå†…ã§ã®æ‹¡å¤§ãƒ»ç¸®å°ã‚³ãƒ”ãƒ¼
  */
 void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
 	float    a1, a2, xd, yd;
@@ -65,14 +65,14 @@ void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int 
 	
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
-	// src width ¤È dst width ¤¬Æ±¤¸¤È¤­¤ËÌäÂê¤¬¤¢¤ë¤Î¤Ç+1
+	// src width ã¨ dst width ãŒåŒã˜ã¨ãã«å•é¡ŒãŒã‚ã‚‹ã®ã§+1
 	row = g_new0(int, dw+1);
-	// 1¤ª¤ª¤­¤¯¤·¤Æ½é´ü²½¤·¤Ê¤¤¤È col[dw-1]¤Ècol[dw]¤¬Æ±¤¸¤Ë¤Ê¤ë
-	// ²ÄÇ½À­¤¬¤¢¤ë¡£
+	// 1ãŠãŠããã—ã¦åˆæœŸåŒ–ã—ãªã„ã¨ col[dw-1]ã¨col[dw]ãŒåŒã˜ã«ãªã‚‹
+	// å¯èƒ½æ€§ãŒã‚ã‚‹ã€‚
 	col = g_new0(int, dh+1);
 	
 	if(mirror & 1){
-		/*¾å²¼È¿Å¾ added by  tajiri@wizard*/
+		/*ä¸Šä¸‹åè»¢ added by  tajiri@wizard*/
 		for (yd = sh-a2, y = 0; y<dh; y++) {
 			col[y] = yd; yd -= a2;
 		}
@@ -82,7 +82,7 @@ void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int 
 		}
 	}
 	if(mirror & 2){
-		/*º¸±¦È¿Å¾ added by  tajiri@wizard*/
+		/*å·¦å³åè»¢ added by  tajiri@wizard*/
 		for (xd = sw-a1, x = 0; x <dw; x++) {
 			row[x] = xd; xd -= a1;
 		}
@@ -152,7 +152,7 @@ void sdl_zoom(int x, int y, int w, int h) {
 
 
 /*
- * dib¤Ë16bitCG¤ÎÉÁ²è
+ * dibã«16bitCGã®æç”»
  */
 void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	/* draw alpha pixel */
@@ -229,7 +229,7 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 }
 
 /*
- * 16bitÀìÍÑ¤Î dib ¤Î»ØÄêÎÎ°è¥³¥Ô¡¼ alpha¤Ä¤­
+ * 16bitå°‚ç”¨ã® dib ã®æŒ‡å®šé ˜åŸŸã‚³ãƒ”ãƒ¼ alphaã¤ã
  */
 void sdl_shadow_init(void) {
 	int i, j;
@@ -345,7 +345,7 @@ void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 }
 
 /*
- * dib ¤Î¥Ô¥¯¥»¥ë¾ğÊó¤ò¼èÆÀ
+ * dib ã®ãƒ”ã‚¯ã‚»ãƒ«æƒ…å ±ã‚’å–å¾—
  */
 void sdl_getPixel(int x, int y, Pallet *cell) {
 	SDL_LockSurface(sdl_dib);
@@ -385,7 +385,7 @@ void sdl_getPixel(int x, int y, Pallet *cell) {
 }
 
 /*
- * dib ¤«¤éÎÎ°è¤ÎÀÚ¤ê½Ğ¤·
+ * dib ã‹ã‚‰é ˜åŸŸã®åˆ‡ã‚Šå‡ºã—
  */
 SDL_Surface* sdl_saveRegion(int x, int y, int w, int h) {
 	SDL_Surface *s;
@@ -404,7 +404,7 @@ SDL_Surface* sdl_saveRegion(int x, int y, int w, int h) {
 }
 
 /*
- * dib ¤Ë¥»¡¼¥Ö¤·¤¿ÎÎ°è¤ò²óÉü
+ * dib ã«ã‚»ãƒ¼ãƒ–ã—ãŸé ˜åŸŸã‚’å›å¾©
  */
 void sdl_putRegion(SDL_Surface *src, int x, int y) {
 	SDL_Rect r_src,r_dst;
@@ -416,7 +416,7 @@ void sdl_putRegion(SDL_Surface *src, int x, int y) {
 }
 
 /*
- * dib ¤Ë¥»¡¼¥Ö¤·¤¿ÎÎ°è¤«¤é¥³¥Ô¡¼
+ * dib ã«ã‚»ãƒ¼ãƒ–ã—ãŸé ˜åŸŸã‹ã‚‰ã‚³ãƒ”ãƒ¼
  */
 void sdl_CopyRegion(SDL_Surface *src, int sx, int sy, int w,int h, int dx, int dy) {
 	SDL_Rect r_src,r_dst;
@@ -428,7 +428,7 @@ void sdl_CopyRegion(SDL_Surface *src, int sx, int sy, int w,int h, int dx, int d
 }
 
 /*
- * dib ¤Ë dst¤òÉÁ²è¸å¡¢¸å»ÏËö
+ * dib ã« dstã‚’æç”»å¾Œã€å¾Œå§‹æœ«
  */
 void sdl_restoreRegion(SDL_Surface *src, int x, int y) {
 	sdl_putRegion(src, x ,y);
@@ -436,11 +436,11 @@ void sdl_restoreRegion(SDL_Surface *src, int x, int y) {
 }
 
 void sdl_sync() {
-	// imageXXÅù¤ÇsurfaceÆâ¤òÄ¾ÀÜÁàºî¤¹¤ëºİ¤Ë¡¢ËÜÅö¤Ïlock/unlock¤Ç
-	// ¤Ï¤µ¤Ş¤Ê¤¤¤È¤¤¤±¤Ê¤¤¤ó¤À¤±¤É¡¢lock¤¹¤ì¤Ğ¤½¤ì¤Ş¤Ç¥­¥å¡¼¤ËÆş¤Ã¤Æ
-	// ¤¤¤¿ SDLÆâÉô¤Î½èÍı¤¬¤¹¤Ù¤Æ½ª¤ë¤ÈÍ½ÁÛ¤µ¤ì¤ë¤Î¤ÇXsync¤ÈÆ±ÍÍ¤Î
-	// ¸ú²Ì¤¬¤¢¤ë¤È»×¤¦¡£¤·¤«¤·Unlock¤·¤Æ¤¤¤ë¤Î¤ÇÈóÆ±´ü¤ÇimageXX¤Î½èÍıÃæ
-	// ¤ËSDL¤ÎÉÁ²èÌ¿Îá¤¬Æş¤ë²ÄÇ½À­¤â¤¢¤ë¤¬¡¢X11¤Ç¤Ï¤¿¤Ö¤óÂç¾æÉ×¡©
+	// imageXXç­‰ã§surfaceå†…ã‚’ç›´æ¥æ“ä½œã™ã‚‹éš›ã«ã€æœ¬å½“ã¯lock/unlockã§
+	// ã¯ã•ã¾ãªã„ã¨ã„ã‘ãªã„ã‚“ã ã‘ã©ã€lockã™ã‚Œã°ãã‚Œã¾ã§ã‚­ãƒ¥ãƒ¼ã«å…¥ã£ã¦
+	// ã„ãŸ SDLå†…éƒ¨ã®å‡¦ç†ãŒã™ã¹ã¦çµ‚ã‚‹ã¨äºˆæƒ³ã•ã‚Œã‚‹ã®ã§Xsyncã¨åŒæ§˜ã®
+	// åŠ¹æœãŒã‚ã‚‹ã¨æ€ã†ã€‚ã—ã‹ã—Unlockã—ã¦ã„ã‚‹ã®ã§éåŒæœŸã§imageXXã®å‡¦ç†ä¸­
+	// ã«SDLã®æç”»å‘½ä»¤ãŒå…¥ã‚‹å¯èƒ½æ€§ã‚‚ã‚ã‚‹ãŒã€X11ã§ã¯ãŸã¶ã‚“å¤§ä¸ˆå¤«ï¼Ÿ
 	SDL_LockSurface(sdl_dib);
 	SDL_UnlockSurface(sdl_dib);
 }

@@ -1,5 +1,5 @@
 /*
- * sprite_sel.c: ÁªÂò»è½èÍı
+ * sprite_sel.c: é¸æŠè‚¢å‡¦ç†
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -36,16 +36,16 @@
 #include "ngraph.h"
 #include "drawtext.h"
 
-// ÁªÂò¤µ¤ì¤¿Í×ÁÇ(1~) ¥­¥ã¥ó¥»¥ë¤Î¾ì¹ç¤Ï0¡¢½é´ü¾õÂÖ¤Ï -1
+// é¸æŠã•ã‚ŒãŸè¦ç´ (1~) ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã®å ´åˆã¯0ã€åˆæœŸçŠ¶æ…‹ã¯ -1
 static int selected_item;
 static int selected_item_cur;
 
-// ÁªÂò»è¤òÉÁ²è¤¹¤ësurface
+// é¸æŠè‚¢ã‚’æç”»ã™ã‚‹surface
 static surface_t *selcanvas;
 
-// Á°¤Î¥«¡¼¥½¥ë¤Î¾õÂÖ
-static boolean oldstate; // sprite¤ÎÃæ¤«³°¤«
-static int oldindex; // ²¿ÈÖÌÜ¤ÎÍ×ÁÇ¤«(0~)
+// å‰ã®ã‚«ãƒ¼ã‚½ãƒ«ã®çŠ¶æ…‹
+static boolean oldstate; // spriteã®ä¸­ã‹å¤–ã‹
+static int oldindex; // ä½•ç•ªç›®ã®è¦ç´ ã‹(0~)
 
 
 static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin);
@@ -60,8 +60,8 @@ static int sel_main();
 
 
 /**
- *  ÆâÂ¦¤Ë¥Ş¡¼¥¸¥ó¤ò´Ş¤à spriteÆâÎÎ°è¥Á¥§¥Ã¥¯
- *  ¥Ş¡¼¥¸¥óÆâ¤ÏspriteÆâÉô¤È¤ÏÈ½ÃÇ¤·¤Ê¤¤
+ *  å†…å´ã«ãƒãƒ¼ã‚¸ãƒ³ã‚’å«ã‚€ spriteå†…é ˜åŸŸãƒã‚§ãƒƒã‚¯
+ *  ãƒãƒ¼ã‚¸ãƒ³å†…ã¯spriteå†…éƒ¨ã¨ã¯åˆ¤æ–­ã—ãªã„
  */
 static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
 	MyRectangle r;
@@ -74,32 +74,32 @@ static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
 	return ags_regionContains(&r, x, y);
 }
 
-// ¥Ş¥¦¥¹¤¬°ÜÆ°¤·¤¿¤È¤­¤Î callback
+// ãƒã‚¦ã‚¹ãŒç§»å‹•ã—ãŸã¨ãã® callback
 static void cb_select_move(agsevent_t *e) {
 	int x = e->d1, y = e->d2;
 	sprite_t *sp = sact.sp[sact.sel.spno];
 	boolean newstate;
 	int newindex;
 	
-	// spriteÆâ¤«¡©
+	// spriteå†…ã‹ï¼Ÿ
 	newstate = sp_is_insprite2(sp, x, y, sact.sel.frame_dot);
 	newindex = (y - (sp->cur.y + sact.sel.frame_dot)) / (sact.sel.font_size + sact.sel.linespace);
 	
 	if (newstate == oldstate) {
 		if ((newstate == FALSE) || (newindex == oldindex)) {
-			// Á°¤È¾õÂÖ¤¬Æ±¤¸¤Ç¤«¤Ä¡¢¿·¤·¤¤¾õÂÖ¤¬sprite¤Î³°¤«¡¢
-			// index¤¬ÊÑ¤ï¤é¤Ê¤¤¾ì¹ç¤Ï¤Ê¤Ë¤â¤·¤Ê¤¤¡£
+			// å‰ã¨çŠ¶æ…‹ãŒåŒã˜ã§ã‹ã¤ã€æ–°ã—ã„çŠ¶æ…‹ãŒspriteã®å¤–ã‹ã€
+			// indexãŒå¤‰ã‚ã‚‰ãªã„å ´åˆã¯ãªã«ã‚‚ã—ãªã„ã€‚
 			return;
 		}
 	}
 	
 	if (newstate) {
-		// sprite¤ÎÆâÉô
+		// spriteã®å†…éƒ¨
 		// fprintf(stderr, "in region %d\n", newindex);
 		//update_selwindow(newindex + 1);
 		selected_item_cur = newindex + 1;
 	} else {
-		// sprite¤Î³°Éô
+		// spriteã®å¤–éƒ¨
 		//update_selwindow(0);
 		selected_item_cur = 0;
 	}
@@ -107,12 +107,12 @@ static void cb_select_move(agsevent_t *e) {
 	oldstate = newstate;
 	oldindex = newindex;
 	
-	// ºÆÉÁ²è
+	// å†æç”»
 	sp_updateme(sp);
 	sp_update_clipped();
 }
 
-// ¥Ü¥¿¥ó¤¬¥ê¥ê¡¼¥¹¤µ¤ì¤¿¤È¤­¤Î callback
+// ãƒœã‚¿ãƒ³ãŒãƒªãƒªãƒ¼ã‚¹ã•ã‚ŒãŸã¨ãã® callback
 static void cb_select_release(agsevent_t *e) {
 	int x = e->d1, y = e->d2;
 	sprite_t *sp = sact.sp[sact.sel.spno];
@@ -124,35 +124,35 @@ static void cb_select_release(agsevent_t *e) {
 		st = sp_is_insprite2(sp, x, y, sact.sel.frame_dot);
 		iy = (y - (sp->cur.y + sact.sel.frame_dot)) / (sact.sel.font_size + sact.sel.linespace);
 
-		// ¥«¡¼¥½¥ë¤¬ sprite ¤Î³°¤Î¾ì¹ç¤ÏÌµ»ë
+		// ã‚«ãƒ¼ã‚½ãƒ«ãŒ sprite ã®å¤–ã®å ´åˆã¯ç„¡è¦–
 		if (st == FALSE) {
 			return;
 		}
 		
-		// ÁªÂòÍ×ÁÇ¤¬¶õ¤Î¾ì¹ç¤âÌµ»ë
+		// é¸æŠè¦ç´ ãŒç©ºã®å ´åˆã‚‚ç„¡è¦–
 		if (sact.sel.elem[iy + 1] == NULL) return;
 		
 		selected_item = iy + 1;
 		break;
 		
 	case AGSEVENT_BUTTON_RIGHT:
-		// ¥­¥ã¥ó¥»¥ë
+		// ã‚­ãƒ£ãƒ³ã‚»ãƒ«
 		selected_item = 0;
 		break;
 	}
 }
 
-// ÁªÂò¥¦¥£¥ó¥É¤ò¹¹¿·¤¹¤ë¤È¤­¤Î callback
+// é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ã‚’æ›´æ–°ã™ã‚‹ã¨ãã® callback
 static int update_selwindow(sprite_t *sp) {
 	int selno = selected_item_cur;
 	int x0, y0;
 
 	x0 = sp->cur.x;
 	y0 = sp->cur.y;
-	// ÇØ·Ê CG
+	// èƒŒæ™¯ CG
 	sp_draw(sp);
 	
-	// ÁªÂò¤µ¤ì¤Æ¤¤¤ëÍ×ÁÇ
+	// é¸æŠã•ã‚Œã¦ã„ã‚‹è¦ç´ 
 	if (selno && sact.sel.elem[selno] != NULL) {
 		int w = selcanvas->width - 2 * sact.sel.frame_dot;
 		int h = sact.sel.font_size + sact.sel.linespace;
@@ -162,7 +162,7 @@ static int update_selwindow(sprite_t *sp) {
 		gr_drawrect(sf0, x, y, w, h, 255, 255, 255);
 	}
 	
-	// ÁªÂò»èÊ¸»úÎó
+	// é¸æŠè‚¢æ–‡å­—åˆ—
 	gr_expandcolor_blend(sf0, x0, y0, 
 			     sact.sel.charcanvas, 0, 0,
 			     selcanvas->width, selcanvas->height, 255, 255, 255);
@@ -170,32 +170,32 @@ static int update_selwindow(sprite_t *sp) {
 	return OK;
 }
 
-// ÁªÂò¥¦¥£¥ó¥É¤Î½àÈ÷
+// é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ã®æº–å‚™
 static void setup_selwindow() {
 	sprite_t *sp = sact.sp[sact.sel.spno];
 	int i;
 	
-	//ÁªÂò¥¦¥£¥ó¥Éºî¶È surface¤ÎÀ¸À®
+	//é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ä½œæ¥­ surfaceã®ç”Ÿæˆ
 	selcanvas = sf_dup(sp->cg1->sf);
 	
-	// ÁªÂò»èÊ¸»úÍÑ canvas
+	// é¸æŠè‚¢æ–‡å­—ç”¨ canvas
 	sact.sel.charcanvas = sf_create_pixel(selcanvas->width, selcanvas->height, 8);
 	
 	dt_setfont(sact.sel.font_type, sact.sel.font_size);
 	
-	// »ØÄê¤Î¥¹¥×¥é¥¤¥È¤ËÊ¸»ú(ÁªÂò»è¤ò½ñ¤¯)
+	// æŒ‡å®šã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«æ–‡å­—(é¸æŠè‚¢ã‚’æ›¸ã)
 	for (i = 1; i < SEL_ELEMENT_MAX; i++) {
 		int x, y;
 		if (sact.sel.elem[i] == NULL) continue;
-		// Ê¸»ú¤Î¾ì½ê·×»»
-		x = 0; // ¹Ô¤½¤í¤¨¤ÏÌµ¤·
+		// æ–‡å­—ã®å ´æ‰€è¨ˆç®—
+		x = 0; // è¡Œãã‚ãˆã¯ç„¡ã—
 		y = (i - 1) * (sact.sel.font_size + sact.sel.linespace);
 		dt_drawtext(sact.sel.charcanvas,
 			    x + sact.sel.frame_dot, y + sact.sel.frame_dot,
 			    sact.sel.elem[i]);
 	}
 	
-	// ¥Ç¥Õ¥©¥ë¥È¤ÇÁªÂò¤µ¤ì¤ëÁªÂò»è¤¬¤¢¤ë¾ì¹ç¡¢¤½¤³¤Ø¥«¡¼¥½¥ë¤ò°ÜÆ°
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§é¸æŠã•ã‚Œã‚‹é¸æŠè‚¢ãŒã‚ã‚‹å ´åˆã€ãã“ã¸ã‚«ãƒ¼ã‚½ãƒ«ã‚’ç§»å‹•
 	if (sact.sel.movecursor) {
 		ags_setCursorLocation(sp->cur.x + sact.sel.frame_dot + 2,
 				      sp->cur.y + sact.sel.frame_dot + 2 + (sact.sel.font_size + sact.sel.linespace)*(sact.sel.movecursor -1), TRUE);
@@ -204,31 +204,31 @@ static void setup_selwindow() {
 		oldindex = selected_item -1;
 	}
 
-	// ¤½¤ÎÂ¾½é´ü²½
+	// ãã®ä»–åˆæœŸåŒ–
 	selected_item_cur = 0;
 
-	// ¥¹¥×¥é¥¤¥ÈºÆÉÁ²è callback ¤ÎÅĞÏ¿
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†æç”» callback ã®ç™»éŒ²
 	sp->update = update_selwindow;
 }
 
-// ÁªÂò¥¦¥£¥ó¥É¤Îºï½ü
+// é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ã®å‰Šé™¤
 static void remove_selwindow() {
 	sprite_t *sp = sact.sp[sact.sel.spno];
 
-	// ¥¹¥×¥é¥¤¥ÈºÆÉÁ²è callback ¤ò¸µ¤Ë¤â¤É¤¹
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå†æç”» callback ã‚’å…ƒã«ã‚‚ã©ã™
 	sp->update = sp_draw;
 
-	// ¥¹¥×¥é¥¤¥È¤òºÆÉÁ²è¤·¤Æ(¤ª¤½¤é¤¯¾Ã¤¹)
+	// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’å†æç”»ã—ã¦(ãŠãã‚‰ãæ¶ˆã™)
 	sp_updateme(sp);
 	sp_update_clipped();
 	
-	// ºî¶ÈÍÑ surface ¤Îºï½ü
+	// ä½œæ¥­ç”¨ surface ã®å‰Šé™¤
 	sf_free(selcanvas);
 	sf_free(sact.sel.charcanvas);
 }
 
 
-// ÁªÂò¥á¥¤¥ó¥ë¡¼¥×
+// é¸æŠãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ—
 static int sel_main() {
 	sact.waittype = KEYWAIT_SELECT;
 	sact.waitkey = -1;
@@ -245,20 +245,20 @@ static int sel_main() {
 }
 
 /*
- ÁªÂò»è´ØÏ¢¤Î½é´ü²½
+ é¸æŠè‚¢é–¢é€£ã®åˆæœŸåŒ–
 */
 void ssel_init() {
-	// callback¤ÎÀßÄê
+	// callbackã®è¨­å®š
 	sact.sel.cbmove = cb_select_move;
 	sact.sel.cbrelease = cb_select_release;
 
-	// ¥Ç¥Õ¥©¥ë¥È¥Õ¥©¥ó¥È
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ•ã‚©ãƒ³ãƒˆ
 	sact.sel.font_type = FONT_GOTHIC;
 }
 
 
 /*
-  ÆâÉô¤ÎÁªÂò»è¾ğÊó¤ò¥¯¥ê¥¢
+  å†…éƒ¨ã®é¸æŠè‚¢æƒ…å ±ã‚’ã‚¯ãƒªã‚¢
 */
 void ssel_clear() {
 	int i;
@@ -270,9 +270,9 @@ void ssel_clear() {
 }
 
 /*
-  ÅĞÏ¿Ê¸»úÎó¤òÆâÉôÁªÂò»è¾ğÊó¤ËÄÉ²Ã
-  @param nString: ÅĞÏ¿Ê¸»úÎóÊÑ¿ô
-  @param wI     : ÅĞÏ¿°ÌÃÖ
+  ç™»éŒ²æ–‡å­—åˆ—ã‚’å†…éƒ¨é¸æŠè‚¢æƒ…å ±ã«è¿½åŠ 
+  @param nString: ç™»éŒ²æ–‡å­—åˆ—å¤‰æ•°
+  @param wI     : ç™»éŒ²ä½ç½®
 */
 void ssel_add(int nString, int wI) {
 	if ((wI >= SEL_ELEMENT_MAX -1) || (wI <= 0)) {
@@ -287,14 +287,14 @@ void ssel_add(int nString, int wI) {
 }
 
 /*
-  ÁªÂò¥¦¥£¥ó¥É¤ò³«¤¤¤ÆÁªÂò
+  é¸æŠã‚¦ã‚£ãƒ³ãƒ‰ã‚’é–‹ã„ã¦é¸æŠ
 
-  @param wNum: ÏÈ,ÇØ·Ê¤È¤¹¤ë¥¹¥×¥é¥¤¥ÈÈÖ¹æ
-  @param wChoiceSize: ÁªÂò»èÊ¸»ú¥µ¥¤¥º
-  @param wMenuOutSpc: ÏÈ¥¹¥×¥é¥¤¥È¤Î³°Â¦¤«¤é¤Î¥Ô¥¯¥»¥ë¿ô
-  @param wChoiceLineSpace: ÁªÂò»è¤Î¹Ô´Ö
-  @param wChoiceAutoMoveCursor: ¥ª¡¼¥×¥ó»ş¤Ë¼«Æ°Åª¤Ë°ÜÆ°¤¹¤ëÁªÂò»è¤ÎÈÖ¹æ
-  @param nAlign: ¹Ô¤½¤í¤¨ (0:º¸, 1:Ãæ±û, 2: ±¦)
+  @param wNum: æ ,èƒŒæ™¯ã¨ã™ã‚‹ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç•ªå·
+  @param wChoiceSize: é¸æŠè‚¢æ–‡å­—ã‚µã‚¤ã‚º
+  @param wMenuOutSpc: æ ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¤–å´ã‹ã‚‰ã®ãƒ”ã‚¯ã‚»ãƒ«æ•°
+  @param wChoiceLineSpace: é¸æŠè‚¢ã®è¡Œé–“
+  @param wChoiceAutoMoveCursor: ã‚ªãƒ¼ãƒ—ãƒ³æ™‚ã«è‡ªå‹•çš„ã«ç§»å‹•ã™ã‚‹é¸æŠè‚¢ã®ç•ªå·
+  @param nAlign: è¡Œãã‚ãˆ (0:å·¦, 1:ä¸­å¤®, 2: å³)
 */
 int ssel_select(int wNum, int wChoiceSize, int wMenuOutSpc, int wChoiceLineSpace, int wChoiceAutoMoveCursor, int nAlign) {
 	int ret = 0;
@@ -316,14 +316,14 @@ int ssel_select(int wNum, int wChoiceSize, int wMenuOutSpc, int wChoiceLineSpace
 	sact.sel.movecursor = wChoiceAutoMoveCursor;
 	sact.sel.align      = nAlign;
 
-	// ¸Å¤¤ sprite ¤ÎÉ½¼¨¥Õ¥é¥°¤òÊİÂ¸
+	// å¤ã„ sprite ã®è¡¨ç¤ºãƒ•ãƒ©ã‚°ã‚’ä¿å­˜
 	saveflag = sact.sp[wNum]->show;
 	sact.sp[wNum]->show = TRUE;
 	setup_selwindow();
 	
 	ret = sel_main();
 
-	// É½¼¨¥Õ¥é¥°¤ò¸µ¤ËÌá¤¹
+	// è¡¨ç¤ºãƒ•ãƒ©ã‚°ã‚’å…ƒã«æˆ»ã™
 	sact.sp[wNum]->show = saveflag;
 	
 	remove_selwindow();

@@ -47,7 +47,7 @@
 #define msgnum nact->ain.msgnum
 
 /*
-  system39.ain ¤ÎÆÉ¤ß¹ş¤ß
+  system39.ain ã®èª­ã¿è¾¼ã¿
 */
 int s39ain_init(void) {
 	FILE *fp;
@@ -75,7 +75,7 @@ int s39ain_init(void) {
 	fseek(fp, 0, SEEK_END);
 	len = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
-	buf = malloc(len + 4); /* +4 : VARI/MSGI... ³ÈÄ¥¤Î¤¿¤á */
+	buf = malloc(len + 4); /* +4 : VARI/MSGI... æ‹¡å¼µã®ãŸã‚ */
 	fread(buf, 1, len, fp);
 	fclose(fp);
 	
@@ -189,14 +189,14 @@ int s39ain_init(void) {
 		
 		if (dll[i].function_num == 0) continue;
 		
-		// ºÇ½é¤Ë¥«¥ì¥ó¥È¥Ç¥£¥ì¥¯¥È¥ê¤Î¥½¡¼¥¹¥Ä¥ê¡¼¤Î²¼¤Î
-		// ¥â¥¸¥å¡¼¥ë¤ò¸¡º÷
+		// æœ€åˆã«ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ã‚½ãƒ¼ã‚¹ãƒ„ãƒªãƒ¼ã®ä¸‹ã®
+		// ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’æ¤œç´¢
 		g_snprintf(searchpath, sizeof(searchpath) -1, "%s/%s",
 			   path_to_dll, dll[i].name);
 		
 		lt_dlsetsearchpath(searchpath);
 		
-		// ¼¡¤Ë¥Ç¥Õ¥©¥ë¥È¤Î¥â¥¸¥å¡¼¥ë¤ò¸¡º÷
+		// æ¬¡ã«ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’æ¤œç´¢
 		/* package default path, ex. /usr/local/lib/xsystem35/ */
 		lt_dladdsearchdir(MODULE_PATH);
 		

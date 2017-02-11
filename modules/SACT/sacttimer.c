@@ -1,5 +1,5 @@
 /*
- * sacttimer.c: SACT¤Î¥¿¥¤¥Ş´ØÏ¢
+ * sacttimer.c: SACTã®ã‚¿ã‚¤ãƒé–¢é€£
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -30,21 +30,21 @@
 #include "sacttimer.h"
 
 /*
-  sact timer subsystem ½é´ü²½
+  sact timer subsystem åˆæœŸåŒ–
 */
 int stimer_init() {
 	stimer_reset(0, 0);
 	return OK;
 }
 
-// »ØÄêID¤Î¥¿¥¤¥Ş¡¼¤Î¥ê¥»¥Ã¥È
+// æŒ‡å®šIDã®ã‚¿ã‚¤ãƒãƒ¼ã®ãƒªã‚»ãƒƒãƒˆ
 int stimer_reset(int id, int val) {
 	gettimeofday(&(sact.timer[id].tv_base), NULL);
 	sact.timer[id].val = val;
 	return OK;
 }
 
-// »ØÄêID¤Î¥¿¥¤¥Ş¡¼¤Î¼èÆÀ
+// æŒ‡å®šIDã®ã‚¿ã‚¤ãƒãƒ¼ã®å–å¾—
 int stimer_get(int id) {
 	long sec, usec, usec2;
 	struct timeval tv;
