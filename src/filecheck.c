@@ -87,7 +87,7 @@ char *fc_search(char *req) {
 		}
 		
 		/* euc match */
-		b = sjis2euc(req);
+		b = sjis2lang(req);
 		sjis_toupper(b);
 		if (0 == strcmp(b, tbl[i].transname)) {
 			free(b);
@@ -110,7 +110,7 @@ char *fc_add(char *req) {
 	}
 
 	if (newfile_kanjicode_euc) {
-		tbl[fnametable_cnt].realname = sjis2euc(req);
+		tbl[fnametable_cnt].realname = sjis2lang(req);
 	} else {
 		tbl[fnametable_cnt].realname = strdup(req);
 	}

@@ -27,94 +27,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
 
 #include "portab.h"
 #include "eucsjis.h"
 
-/* SJIS から EUC への変換 */
-BYTE *sjis2euc(BYTE *src) {
-	BYTE *dst , *_dst;
-		
-	dst = _dst = malloc(strlen(src) * 2 + 1);
-	if (dst == NULL) return NULL;
-	
-	while(*src) {
-		if (*src < 0x81)
-			*dst++ = *src++;
-		else if (*src >= 0xa0 && *src <= 0xdf) {
-			/* JIS X0201 katakana */
-			*dst++ = 0x8e; /* ISO-2022 SS2 */
-			*dst++ = *src++;
-		} else {
-			unsigned char c1, c2;
-			c1 = *src++;
-			if (!*src) {
-				*dst++ = '*';
-				break;
-			}
-			c2 = *src++;
-			if (c1 >= 0xe0)
-				c1 -= 0x40;
-			c1 -= 0x81;
-			if (c2 >= 0x80)
-				c2--;
-			c2 -= 0x40;
-			
-			if (c2 >= 94*2 || c1 > 94/2) {
-				/* invalid code */
-				*dst++ = '*';
-				*dst++ = '*';
-				continue;
-			}
-			c1 *= 2;
-			if (c2 >= 94) {
-				c2 -= 94;
-				c1++;
-			}
-			*dst++ = 0xa1 + c1;
-			*dst++ = 0xa1 + c2;
-		}
-	}
-	*dst = '\0';
-	return _dst;
+BYTE *sjis2utf(BYTE *src) {
+	gchar *gbuf = g_convert_with_fallback(src, -1, "utf-8", "shift-jis", NULL, NULL, NULL, NULL);
+	BYTE *dst = strdup(gbuf);
+	g_free(gbuf);
+	return dst;
 }
 
-static void _jis_shift(int *p1, int *p2) {
-	unsigned char c1 = *p1;
-	unsigned char c2 = *p2;
-	int rowOffset = c1 < 95 ? 112 : 176;
-	int cellOffset = c1 % 2 ? (c2 > 95 ? 32 : 31) : 126;
-	
-	*p1 = ((c1 + 1) >> 1) + rowOffset;
-	*p2 += cellOffset;
-}
-
-/* EUC から SJIS への変換 */
-BYTE *euc2sjis(BYTE* src) {
-	BYTE *dst , *_dst;
-		
-	dst = _dst = malloc(strlen(src) +1);
-	if (dst == NULL) return NULL;
-	
-	while(*src) {
-		if (*src < 0x81) {
-			*dst++ = *src++;
-		} else if (*src == 0x8e) {
-			src++;
-			*dst++ = *src++;
-		} else {
-			int c1, c2;
-			c1 = *src++;
-			c2 = *src++;
-			c1 -= 128;
-			c2 -= 128;
-			_jis_shift(&c1, &c2);
-			*dst++= (char)c1;
-			*dst++= (char)c2;
-		}
-	}
-	*dst = '\0';
-	return _dst;
+BYTE *utf2sjis(BYTE *src) {
+	gchar *gbuf = g_convert_with_fallback(src, -1, "shift-jis", "utf-8", "?", NULL, NULL, NULL);
+	BYTE *dst = strdup(gbuf);
+	g_free(gbuf);
+	return dst;
 }
 
 /* src 内に半角カナもしくはASCII文字があるかどうか */

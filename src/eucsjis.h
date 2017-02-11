@@ -27,13 +27,13 @@
 #include "portab.h"
 
 /* for future */
-#define sjis2lang sjis2euc
-#define lang2sjis euc2sjis 
+#define sjis2lang sjis2utf
+#define lang2sjis utf2sjis
 
 #define CHECKSJIS1BYTE(b) ( ((b) & 0xe0) == 0x80 || ((b) & 0xe0) == 0xe0 )
 
-extern BYTE*   sjis2euc(BYTE *src);
-extern BYTE*   euc2sjis(BYTE *src);
+extern BYTE*   sjis2utf(BYTE *src);
+extern BYTE*   utf2sjis(BYTE *src);
 extern boolean sjis_has_hankaku(BYTE *src);
 extern boolean sjis_has_zenkaku(BYTE *src);
 extern int     sjis_count_char(BYTE *src);
