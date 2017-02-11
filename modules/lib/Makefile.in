@@ -98,7 +98,7 @@ am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
 	$(top_srcdir)/macros/ltversion.m4 \
 	$(top_srcdir)/macros/lt~obsolete.m4 \
 	$(top_srcdir)/macros/ogg.m4 $(top_srcdir)/macros/progtest.m4 \
-	$(top_srcdir)/macros/sdl.m4 $(top_srcdir)/macros/vorbis.m4 \
+	$(top_srcdir)/macros/sdl2.m4 $(top_srcdir)/macros/vorbis.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -302,8 +302,8 @@ PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
 SDL = @SDL@
+SDL2_CONFIG = @SDL2_CONFIG@
 SDL_CFLAGS = @SDL_CFLAGS@
-SDL_CONFIG = @SDL_CONFIG@
 SDL_LIBS = @SDL_LIBS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@

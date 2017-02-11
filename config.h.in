@@ -186,12 +186,6 @@
 /* define this if you use SDL joystick interface */
 #undef HAVE_SDLJOY
 
-/* define this if you have SDLRALPHA */
-#undef HAVE_SDLRALPHA
-
-/* define this if you have SDLRLE */
-#undef HAVE_SDLRLE
-
 /* Define if you have the shl_load function. */
 #undef HAVE_SHL_LOAD
 

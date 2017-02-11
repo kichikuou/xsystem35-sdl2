@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <glib.h>
 
 #include "portab.h"
@@ -147,7 +147,7 @@ void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int 
 
 void sdl_zoom(int x, int y, int w, int h) {
 	sdl_scaledCopyArea(sdl_dib, sdl_display, x, y, w, h, 0, 0, view_w, view_h, 0);
-	SDL_UpdateRect(sdl_display, 0, 0, view_w, view_h);
+	sdl_updateScreen();
 }
 
 
@@ -173,11 +173,6 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 		s = SDL_AllocSurface(SDL_ANYFORMAT,w, h, 32,
 				     0xf800, 0x07e0, 0x001f, 0xFF000000);
 #endif
-#if 0
-#ifdef HAVE_SDLRLE
-		SDL_SetAlpha(s,RLEFLAG(SDL_SRCALPHA),0);
-#endif
-#endif
 		SDL_LockSurface(s);
 		p_ds = s->pixels;
 		l = s->pitch/2;
@@ -187,9 +182,9 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 			for (x = 0; x < w; x++) {
 #ifndef WORDS_BIGENDIAN
 				*(p_dst++) = *(p_src++);
-				*(p_dst++) = R_ALPHA(*(a_src++));
+				*(p_dst++) = *(a_src++);
 #else
-				*(p_dst++) = R_ALPHA(*(a_src++));
+				*(p_dst++) = *(a_src++);
 				*(p_dst++) = *(p_src++);
 #endif
 			}
@@ -237,7 +232,7 @@ void sdl_shadow_init(void) {
 
 	for (i = 0; i < 255; i++) {
 		for (j = 0; j < 256; j++) {
-			*(c++) = (unsigned char)(R_ALPHA(i * j / 255));
+			*(c++) = (unsigned char)(i * j / 255);
 		}
 	}
 }
@@ -269,7 +264,7 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 			p_src = adata;
 			p_dst = p_ds;
 			for (x = 0; x < w; x++) {
-				*p_dst = R_ALPHA(*(p_src++));
+				*p_dst = *(p_src++);
 				p_dst += 4;
 			}
 			adata += sdl_dibinfo->width;
@@ -293,11 +288,6 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 		break;
 	}
 	SDL_UnlockSurface(s);
-#if 0
-#ifdef HAVE_SDLRLE
-	SDL_SetAlpha(s, RLEFLAG(SDL_SRCALPHA), 0);
-#endif
-#endif
 
 	setRect(r_dst, dx, dy, w, h);
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
@@ -309,28 +299,25 @@ void sdl_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, i
 
 	setRect(r_src, sx, sy, w, h);
 	setRect(r_dst, dx, dy, w, h);
-	SDL_SetAlpha(sdl_dib, RLEFLAG(SDL_SRCALPHA), R_ALPHA(lv));
+	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceAlphaMod(sdl_dib, lv);
 	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
-	SDL_SetAlpha(sdl_dib, 0, 0);
+	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_NONE);
 }
 
 #define copyAreaSP_level(fn, cn, v) void sdl_copyAreaSP16_##fn(int sx, int sy, int w, int h, int dx, int dy, int lv) { \
 	SDL_Rect r_src,r_dst; \
 	setRect(r_src, sx, sy, w, h); \
 	setRect(r_dst, dx, dy, w, h); \
-	SDL_SetAlpha(sdl_dib, RLEFLAG(SDL_SRCALPHA), v); \
+	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_BLEND); \
+	SDL_SetSurfaceAlphaMod(sdl_dib, v); \
 	SDL_FillRect(sdl_dib, &r_dst, cn); \
 	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst); \
-	SDL_SetAlpha(sdl_dib, 0, 0); \
+	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_NONE); \
 }
 
-#ifdef HAVE_SDLRALPHA
 copyAreaSP_level(alphaLevel, 0, lv);
 copyAreaSP_level(whiteLevel, sdl_white, 255 - lv);
-#else
-copyAreaSP_level(alphaLevel, 0, 255 - lv);
-copyAreaSP_level(whiteLevel, sdl_white, lv);
-#endif
 
 void sdl_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	SDL_LockSurface(sdl_dib);

@@ -24,85 +24,30 @@
 
 #include <stdio.h>
 #include <limits.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
 #include "sdl_private.h"
 
 
-static SDL_Rect **modes;
-
-
 void sdl_vm_init(void) {
-	modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
-	
-        /* Check is there are any modes available */
-	if (modes == (SDL_Rect **)0) {
-		SYSERROR("No modes available!\n");
-	}
-	
-        /* Check if or resolution is restricted */
-	if (modes == (SDL_Rect **)-1){
-		NOTICE("All resolutions available.\n");
-	} else {
-		int i;
-		/* Print valid modes */
-		NOTICE("Available Modes\n");
-		for(i = 0; modes[i]; i++) {
-			NOTICE("  %d x %d\n", modes[i]->w, modes[i]->h);
-		}
-	}
-	
 }
-
-static int search_preferable_fullscreen_mode() {
-	int i, vm = 0, delta = INT_MAX;
-	
-	/* すべてのmodeのなかで最も適切なモードを選択 */
-	for (i = 0;  modes[i]; i++) {
-		if (modes[i]->w >= view_w && 
-		    modes[i]->h >= view_y) {
-			int deltaw = modes[i]->w - view_w;
-			int deltah = modes[i]->h - view_h;
-			if (delta > (deltaw + deltah)) {
-				vm = i;
-				delta = deltaw + deltah;
-			}
-		}
-	}
-	return vm;
-}
-
-static void enter_fullscreen() {
-	Uint32 mode = sdl_vflag;
-
-	mode |= SDL_FULLSCREEN;
-	
-	sdl_display = SDL_SetVideoMode(view_w, view_h, sdl_vinfo->vfmt->BitsPerPixel, mode);
-}
-
-static void quit_fullscreen() {
-
-}
-
 
 void sdl_FullScreen(boolean on) {
 	
 	if (on && !sdl_fs_on) {
 		sdl_fs_on = TRUE;
-		enter_fullscreen();
+		SDL_SetWindowFullscreen(sdl_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 	} else if (!on && sdl_fs_on) {
-		quit_fullscreen();
 		sdl_fs_on = FALSE;
+		SDL_SetWindowFullscreen(sdl_window, 0);
 	}
 }
 
 
 /* Windowの大きさの変更 */
 void sdl_setWindowSize(int x, int y, int w, int h) {
-	Uint32 mode = sdl_vflag;
-	
  	view_x = x;
 	view_y = y;
 	
@@ -111,21 +56,8 @@ void sdl_setWindowSize(int x, int y, int w, int h) {
 	view_w = w;
 	view_h = h;
 	
-	if (sdl_fs_on) {
-		int m = search_preferable_fullscreen_mode();
-		
-		if (modes[m]->w != view_w || modes[m]->h != view_h) {
-			winoffset_x = (modes[m]->w - view_w) / 2;
-			winoffset_y = (modes[m]->h - view_h) / 2;
-			w = modes[m]->w;
-			h = modes[m]->h;
-		} else {
-			winoffset_x = winoffset_y = 0;
-		}
-		
-		mode |= SDL_FULLSCREEN;
-	}
-	
-	sdl_display = SDL_SetVideoMode(w, h, sdl_vinfo->vfmt->BitsPerPixel, mode);
-	ms_active = (SDL_GetAppState() & SDL_APPMOUSEFOCUS) ? TRUE : FALSE;
+	SDL_SetWindowSize(sdl_window, w, h);
+	sdl_display = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+
+	//ms_active = (SDL_GetAppState() & SDL_APPMOUSEFOCUS) ? TRUE : FALSE;
 }

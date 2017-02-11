@@ -25,18 +25,16 @@
 
 #include "config.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "ags.h"
 #include "font.h"
 
 struct sdl_private_data {
-	const SDL_VideoInfo   *vf; /* sdl video information */
-
+	SDL_Window *window;
+	SDL_Renderer *renderer;
 	SDL_Surface     *dsp; /* toplevel surface */
-
-	Uint32 vflag; /* video mode flag */
 
 	SDL_Surface     *dib; /* offscreen surface */
 	
@@ -62,13 +60,15 @@ struct sdl_private_data {
 extern void sdl_cursor_init(void);
 extern void sdl_shadow_init(void);
 extern void sdl_vm_init(void);
+extern void sdl_updateScreen(void);
 
+#define SDL_AllocSurface(flags,w,h,d,r,g,b,a) SDL_CreateRGBSurface(0,w,h,d,r,g,b,a)
 
 extern struct sdl_private_data *sdl_videodev;
 
-#define sdl_vinfo (sdl_videodev->vf)
+#define sdl_window (sdl_videodev->window)
+#define sdl_renderer (sdl_videodev->renderer)
 #define sdl_display (sdl_videodev->dsp)
-#define sdl_vflag (sdl_videodev->vflag)
 #define sdl_dib (sdl_videodev->dib)
 #define sdl_col (sdl_videodev->col)
 #define sdl_white (sdl_videodev->white)
@@ -86,17 +86,5 @@ extern struct sdl_private_data *sdl_videodev;
 
 #define setRect(r,xx,yy,ww,hh) (r).x=(xx),(r).y=(yy),(r).w=(ww),(r).h=(hh)
 #define setOffset(s,x,y) (s->pixels) + (x) * (s->format->BytesPerPixel) + (y) * s->pitch
-
-#ifdef HAVE_SDLRLE
-#define RLEFLAG(v) ((v)|SDL_RLEACCEL)
-#ifdef HAVE_SDLRALPHA
-#define R_ALPHA(v) (v)
-#else
-#define R_ALPHA(v) (255-(v))
-#endif
-#else
-#define RLEFLAG(v) (v)
-#define R_ALPHA(v) (v)
-#endif
 
 #endif /* __SDL_PRIVATE_H__ */

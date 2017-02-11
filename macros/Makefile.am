@@ -29,7 +29,7 @@ MACROS= \
   ltversion.m4 \
   ogg.m4 \
   progtest.m4 \
-  sdl.m4 \
+  sdl2.m4 \
   stdint_h.m4 \
   uintmax_t.m4 \
   ulonglong.m4 \

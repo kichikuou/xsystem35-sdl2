@@ -23,7 +23,7 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <glib.h>
 
 #include "portab.h"
@@ -53,9 +53,6 @@ int sdl_Initilize(void) {
 	/* offscreen Pixmap */
 	makeDIB(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SYS35_DEFAULT_DEPTH);
 	
-	/* title */
-	SDL_WM_SetCaption("XSystem3.5 Version "VERSION, NULL);
-	
 	/* init cursor */
 	sdl_cursor_init();
 	
@@ -78,6 +75,8 @@ void sdl_Remove(void) {
 		NOTICE("Now SDL shutdown ... ");
 		
 		SDL_FreeSurface(sdl_dib);
+
+		SDL_DestroyRenderer(sdl_renderer);
 		
 		joy_close();
 		
@@ -89,12 +88,11 @@ void sdl_Remove(void) {
 
 /* name is UTF-8 */
 void sdl_setWindowTitle(char *name) {
-	SDL_WM_SetCaption(name, NULL);
+	SDL_SetWindowTitle(sdl_window, name);
 }
 
 /* Visual に応じて Window を生成する */
 static void window_init(void) {
-	char s[256];
 	
 	SDL_Init(SDL_INIT_VIDEO
 #ifdef HAVE_SDLJOY
@@ -102,61 +100,21 @@ static void window_init(void) {
 #endif
 		);
 	
-	sdl_vinfo = SDL_GetVideoInfo();
-	
-	SDL_VideoDriverName(s, 256);
-	
-	NOTICE("Video Info %s\n", s);
-	NOTICE("  hw_available %d\n", sdl_vinfo->hw_available);
-	NOTICE("  wm_available %d\n", sdl_vinfo->wm_available);
-	NOTICE("  Accelerated blits HW --> HW %d\n", sdl_vinfo->blit_hw);
-	NOTICE("  Accelerated blits with Colorkey %d\n", sdl_vinfo->blit_hw_CC);
-	NOTICE("  Accelerated blits with Alpha %d\n", sdl_vinfo->blit_hw_A);
-	NOTICE("  Accelerated blits SW --> HW %d\n", sdl_vinfo->blit_sw);
-	NOTICE("  Accelerated blits with Colorkey %d\n", sdl_vinfo->blit_sw_CC);
-	NOTICE("  Accelerated blits with Alpha %d\n", sdl_vinfo->blit_sw_A);
-	NOTICE("  Accelerated color fill %d\n", sdl_vinfo->blit_fill);
-	NOTICE("  The total amount of video memory %dK\n", sdl_vinfo->video_mem);
-	NOTICE("    BitsPerPixel %d\n", sdl_vinfo->vfmt->BitsPerPixel);
-	NOTICE("    R %04x G %04x B %04x A %04x\n",
-	       sdl_vinfo->vfmt->Rmask, sdl_vinfo->vfmt->Gmask,
-	       sdl_vinfo->vfmt->Bmask, sdl_vinfo->vfmt->Amask);
-	
-	sdl_vflag = SDL_HWSURFACE | SDL_ANYFORMAT;
-	
-	sdl_display = SDL_SetVideoMode(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
-				       sdl_vinfo->vfmt->BitsPerPixel, sdl_vflag);
-	
-	NOTICE("Dsp_depth %d flag %x\n",
-	       sdl_display->format->BitsPerPixel, sdl_display->flags);
+	sdl_window = SDL_CreateWindow("XSystem3.5 Version "VERSION,
+								  SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, 0);
+	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
+	sdl_display = SDL_CreateRGBSurface(0, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
+									   32, 0, 0, 0, 0);
 }
 
 static void makeDIB(int width, int height, int depth) {
-	
-	if (sdl_display->format->BitsPerPixel == 8 && depth != 8) {
-		SYSERROR("You cannot play highcolor game in 256 color mode\n");
-	}
-	
-	if (depth == 24) {
-		WARNING("SDL warning: if you are using SDL version 1.1.x (x<=3) and someting is wrong with graphics, please use version 1.1.4 or later\n");
-	}
 	
 	if (sdl_dib) {
 		SDL_FreeSurface(sdl_dib);
 	}
 	
-	if (depth == 8) {
-		if (sdl_display->format->BitsPerPixel == depth) {
-			sdl_dib = SDL_AllocSurface(SDL_SWSURFACE, width, height,
-						   depth, 0, 0, 0, 0);
-		} else {
-			sdl_dib = SDL_AllocSurface(SDL_HWSURFACE, width, height,
-						   depth, 0, 0, 0, 0);
-		}
-	} else {
-		sdl_dib = SDL_AllocSurface(SDL_HWSURFACE, width, height,
-					   sdl_display->format->BitsPerPixel, 0, 0, 0, 0);
-	}
+	sdl_dib = SDL_CreateRGBSurface(0, width, height, depth, 0, 0, 0, 0);
 	
 #if 0
 	if (sdl_dib->format->BitsPerPixel == 8) {
@@ -200,11 +158,13 @@ void sdl_setWorldSize(int width, int height, int depth) {
 	SDL_FillRect(sdl_dib, NULL, 0);
 }
 
-/* Windowの size と depth の取得 */
+/* display の size と depth の取得 */
 void sdl_getWindowInfo(DispInfo *info) {
-	info->width  = sdl_display->w;
-	info->height = sdl_display->h;
-	info->depth  = sdl_display->format->BitsPerPixel;
+	SDL_DisplayMode dm;
+	SDL_GetCurrentDisplayMode(0, &dm);
+	info->width  = dm.w;
+	info->height = dm.h;
+	info->depth  = SDL_BITSPERPIXEL(dm.format);
 }
 
 /*  DIBの取得 */
@@ -215,8 +175,8 @@ agsurface_t *sdl_getDIB(void) {
 /* AutoRepeat の設定 */
 void sdl_setAutoRepeat(boolean bool) {
 	if (bool) {
-		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+		// SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	} else {
-		SDL_EnableKeyRepeat(0, 0);
+		// SDL_EnableKeyRepeat(0, 0);
 	}
 }

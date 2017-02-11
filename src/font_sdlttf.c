@@ -1,7 +1,7 @@
 #include "config.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 #include "portab.h"
 #include "system.h"

@@ -12,16 +12,16 @@ while(<FX>) {
 close(fp);
 
 @sdlk_list=();
-open(FS,"</usr/include/SDL/SDL_keysym.h") || exit;
+open(FS,"</usr/include/SDL2/SDL_scancode.h") || exit;
 while(<FS>) {
-    if( /SDLK_([^\s]+)\s+=\s*([^,]*),/ ) {
+    if( /SDL_SCANCODE_([^\s]+)\s+=\s*([^,]*),/ ) {
 	$sdlk_list[eval($2)]="$1";
     }
 }
 close(FS);
 
 
-print "static int sdl_keytable[SDLK_LAST] = {\n\t";
+print "static int sdl_keytable[SDL_NUM_SCANCODES] = {\n\t";
 for( $i = 0 ; $i < scalar(@sdlk_list) ; $i ++ ) {
     #print "$i @sdlk_list[$i] $keyh_list{@sdlk_list[$i]}\n";
     $x = @sdlk_list[$i];
@@ -31,13 +31,13 @@ for( $i = 0 ; $i < scalar(@sdlk_list) ; $i ++ ) {
 	print "KEY_@key_list[$keyh_list{$x}], ";
     } elsif ( $x =~ /[a-z]/ ) {
 	print "KEY_".uc($x).", ";
-    } elsif ( $x =~ /KP/ ) {
-	if( $x =~ /[0-9]/ ) {
-	    $x =~ s/^KP/PAD_/;
+    } elsif ( $x =~ /KP_/ ) {
+	$x =~ s/^KP_/PAD_/;
+	if ( $keyh_list{$x} ) {
+	    print "KEY_$x, ";
 	} else {
-	    $x =~ s/^KP/PAD/;
+	    print "0 /* SDL_$x */, ";
 	}
-	print "KEY_$x, ";
     } elsif ( $i < 0x61) {
 	print "$i, ";
     } else {

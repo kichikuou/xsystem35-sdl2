@@ -25,7 +25,7 @@
 
 #include "config.h"
 #include <sys/types.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include "portab.h"
 #include "ags.h"
 #include "cursor.h"

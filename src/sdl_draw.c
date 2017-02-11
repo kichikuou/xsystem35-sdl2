@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <glib.h>
 
 #include "portab.h"
@@ -61,6 +61,14 @@ static void sdl_pal_check(void) {
 	}
 }
 
+void sdl_updateScreen(void) {
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(sdl_renderer, sdl_display);
+	SDL_RenderClear(sdl_renderer);
+	SDL_RenderCopy(sdl_renderer, texture, NULL, NULL);
+	SDL_RenderPresent(sdl_renderer);
+	SDL_DestroyTexture(texture);
+}
+
 /* off-screen の指定領域を Main Window へ転送 */
 void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 	SDL_Rect rect_s, rect_d;
@@ -70,8 +78,7 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 	
 	SDL_BlitSurface(sdl_dib, &rect_s, sdl_display, &rect_d);
 	
-	SDL_UpdateRect(sdl_display, winoffset_x + dst->x, winoffset_y + dst->y,
-		       src->width, src->height);
+	sdl_updateScreen();
 }
 
 /* 全画面更新 */
@@ -81,9 +88,8 @@ static void sdl_updateAll() {
 	setRect(rect, winoffset_x, winoffset_y, view_w, view_h);
 	
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &rect);
-	
-	SDL_UpdateRect(sdl_display, 0, 0, 0, 0);
 
+	sdl_updateScreen();
 }
 
 /* Color の複数個指定 */
@@ -97,7 +103,7 @@ void sdl_setPallet(Pallet256 *pal, int src, int cnt) {
 	}
 	
 	if (sdl_dib->format->BitsPerPixel == 8) {
-		SDL_SetColors(sdl_dib, sdl_col, src, cnt);
+		SDL_SetPaletteColors(sdl_dib->format->palette, sdl_col, src, cnt);
 	}
 }
 
@@ -162,13 +168,13 @@ void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int sp) {
 				sdl_col[sp].b & 0xf8);
 	}
 	
-	SDL_SetColorKey(sdl_dib, SDL_SRCCOLORKEY, sp);
+	SDL_SetColorKey(sdl_dib, SDL_TRUE, sp);
 	
 	setRect(r_src, sx, sy, w, h);
 	setRect(r_dst, dx, dy, w, h);
 	
 	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
-	SDL_SetColorKey(sdl_dib, 0, 0);
+	SDL_SetColorKey(sdl_dib, SDL_FALSE, 0);
 }
 
 void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
@@ -220,7 +226,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	}
 	
 	if (cg->spritecolor != -1) {
-		SDL_SetColorKey(s, SDL_SRCCOLORKEY, cg->spritecolor);
+		SDL_SetColorKey(s, SDL_TRUE, cg->spritecolor);
 	}
 	
 	setRect(r_src,  0,  0, w, h);
@@ -309,7 +315,7 @@ static SDL_Surface *com2alphasurface(agsurface_t *src, int cl) {
 #endif
 		
 		for (x = 0; x < src->width; x++) {
-			*dp =  R_ALPHA(*sp);
+			*dp = *sp;
 			sp++;
 			dp += s->format->BytesPerPixel;
 		}
@@ -347,7 +353,7 @@ int sdl_drawString(int x, int y, char *msg, u_long col) {
 				memcpy(src->format->palette->colors + i, &sdl_col[col],
 				       sizeof(SDL_Color));
 			}
-			SDL_SetColorKey(src, SDL_SRCCOLORKEY, 0);
+			SDL_SetColorKey(src, SDL_TRUE, 0);
 			SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
 			SDL_FreeSurface(src);
 		}
@@ -378,7 +384,7 @@ static void setBligtness(SDL_Surface *s, int val) {
 		cl->b = (val * (*(b++))) / 255;
 		cl++;
 	}
-	SDL_SetColors(s, sdl_col, 0, 256);
+	SDL_SetPaletteColors(s->format->palette, sdl_col, 0, 256);
 }
 
 static void setWhiteness(SDL_Surface *s, int val) {
@@ -393,7 +399,7 @@ static void setWhiteness(SDL_Surface *s, int val) {
 		cl->b = (((255- *b) * val) / 256) + *b; b++;
 		cl++;
 	}
-	SDL_SetColors(s, sdl_col, 0, 256);
+	SDL_SetPaletteColors(s->format->palette, sdl_col, 0, 256);
 }
 
 static void fader_in(int n) {
@@ -433,7 +439,7 @@ static void fader_in(int n) {
 	
 	SDL_UnlockSurface(sdl_display);
 	SDL_UnlockSurface(s_fader);
-	SDL_UpdateRect(sdl_display,0,0,0,0);
+	sdl_updateScreen();
 }
 
 static void fader_out(int n,Uint32 c) {
@@ -455,7 +461,7 @@ static void fader_out(int n,Uint32 c) {
 	
 	SDL_UnlockSurface(sdl_display);
 	
-	SDL_UpdateRect(sdl_display,0,0,0,0);
+	sdl_updateScreen();
 }
 
 static __inline void sdl_fade_blit(void) {
@@ -463,13 +469,11 @@ static __inline void sdl_fade_blit(void) {
 	setRect(r_dst, winoffset_x, winoffset_y, view_w, view_h);
 
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &r_dst);
-	SDL_UpdateRect(sdl_display, 0, 0, view_w, view_h);
+	sdl_updateScreen();
 }
 
 void sdl_fadeIn(int step) {
-	if (sdl_display->flags & SDL_HWPALETTE) {
-		setBligtness(sdl_display, fadestep[step]);
-	} else if (sdl_dib->format->BitsPerPixel == 8) {
+	if (sdl_dib->format->BitsPerPixel == 8) {
 		setBligtness(sdl_dib, fadestep[step]);
 		sdl_fade_blit();
 	} else {
@@ -478,9 +482,7 @@ void sdl_fadeIn(int step) {
 }
 
 void sdl_fadeOut(int step) {
-	if (sdl_display->flags & SDL_HWPALETTE) {
-		setBligtness(sdl_display, fadestep[255 - step]);
-	} else if (sdl_dib->format->BitsPerPixel == 8) {
+	if (sdl_dib->format->BitsPerPixel == 8) {
 		setBligtness(sdl_dib, fadestep[255 - step]);
 		sdl_fade_blit();
 	} else {
@@ -489,9 +491,7 @@ void sdl_fadeOut(int step) {
 }
 
 void sdl_whiteIn(int step) {
-	if (sdl_display->flags & SDL_HWPALETTE) {
-		setWhiteness(sdl_display, fadestep[step]);
-	} else if (sdl_dib->format->BitsPerPixel == 8) {
+	if (sdl_dib->format->BitsPerPixel == 8) {
 		setWhiteness(sdl_dib, fadestep[255 - step]); /* ??? */
 		sdl_fade_blit();
 	} else {
@@ -500,9 +500,7 @@ void sdl_whiteIn(int step) {
 }
 
 void sdl_whiteOut(int step) {
-	if (sdl_display->flags & SDL_HWPALETTE) {
-		setWhiteness(sdl_display, fadestep[255 - step]);
-	} else if (sdl_dib->format->BitsPerPixel == 8) {
+	if (sdl_dib->format->BitsPerPixel == 8) {
 		setWhiteness(sdl_dib, fadestep[step]); /* ??? */
 		sdl_fade_blit();
 	} else {
@@ -530,7 +528,8 @@ void sdl_wrapColor(int sx, int sy, int w, int h, int cl, int rate) {
 	setRect(r_src, 0, 0, w, h);
 	SDL_FillRect(s, &r_src, cl);
 	
-	SDL_SetAlpha(s, RLEFLAG(SDL_SRCALPHA), R_ALPHA(rate));
+	SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceAlphaMod(s, rate);
 	setRect(r_dst, sx, sy, w, h);
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);

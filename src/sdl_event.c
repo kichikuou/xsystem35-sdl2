@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -69,22 +69,23 @@ static void sdl_getEvent(void) {
 	
 	while (SDL_PollEvent(&e)) {
 		switch (e.type) {
-		case SDL_ACTIVEEVENT:
-			if (e.active.state & SDL_APPMOUSEFOCUS) {
-				ms_active = e.active.gain;
+		case SDL_WINDOWEVENT:
+			switch (e.window.event) {
+			case SDL_WINDOWEVENT_ENTER:
+				ms_active = true;
 #if 0
-				if (sdl_fs_on) {
-					if (ms_active) {
-						SDL_WM_GrabInput(SDL_GRAB_ON);
-					} else {
-						SDL_WM_GrabInput(SDL_GRAB_OFF);
-					}
-				}
+				if (sdl_fs_on)
+					SDL_WM_GrabInput(SDL_GRAB_ON);
 #endif
+				break;
+			case SDL_WINDOWEVENT_LEAVE:
+				ms_active = false;
+#if 0
+				if (sdl_fs_on)
+					SDL_WM_GrabInput(SDL_GRAB_OFF);
+#endif
+				break;
 			}
-			if (e.active.state & SDL_APPINPUTFOCUS) {
-			}
-			
 			break;
 		case SDL_KEYDOWN:
 			keyEventProsess(&e.key, TRUE);
@@ -93,8 +94,8 @@ static void sdl_getEvent(void) {
 			keyEventProsess(&e.key, FALSE);
 			if (e.key.keysym.sym == SDLK_F1) msg_skip = TRUE;
 			if (e.key.keysym.sym == SDLK_F4) {
-				SDL_WM_ToggleFullScreen(sdl_display);
 				sdl_fs_on = !sdl_fs_on;
+				SDL_SetWindowFullscreen(sdl_window, sdl_fs_on ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 			}
 			break;
 		case SDL_MOUSEMOTION:
@@ -183,7 +184,7 @@ int sdl_keywait(int msec, boolean cancel) {
 
 /* キー情報の取得 */
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool) {
-	RawKeyInfo[sdl_keytable[e->keysym.sym]] = bool;
+	RawKeyInfo[sdl_keytable[e->keysym.scancode]] = bool;
 }
 
 int sdl_getKeyInfo() {

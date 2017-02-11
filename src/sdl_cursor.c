@@ -23,7 +23,7 @@
 #include "config.h"
 
 #include <glib.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -149,7 +149,7 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 
 /* マウスの位置の移動 */
 void sdl_setCursorLocation(int x, int y) {
-	if (ms_active) SDL_WarpMouse(x, y);
+	if (ms_active) SDL_WarpMouseInWindow(sdl_window, x, y);
 }
 
 /* マウスカーソルの形状の設定 */

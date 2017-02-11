@@ -605,63 +605,16 @@ AC_ARG_ENABLE(sdl,
 	  [  --enable-sdl            SDL [default=no]    ],,
 	  [ enable_sdl=no ])
 if test "x$enable_sdl" = xyes ; then
-  KEEPLIBS=$LIBS
-  KEEPCFLAGS=$CFLAGS
-  KEEPLDFLAGS=$LDFLAGS
-  AM_PATH_SDL(1.0.0,have_sdl=yes,have_sdl=no)
+  AM_PATH_SDL2(2.0.0,have_sdl=yes,have_sdl=no)
   LIBS=$SDL_LIBS
   CFLAGS=$SDL_CFLAGS
   AC_CHECK_LIB(SDL,SDL_NumJoysticks,have_sdljoy=yes)
-  AC_MSG_CHECKING(for SDL RLE accell)
-  sdlrle=no
-  sdlralpha=no
-  AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <SDL.h>
-int main( int argc,char **argv) {
-#ifndef SDL_RLEACCEL
-  exit(1);
-#else
-  exit(0);
-#endif
-}
-  ]])],[AC_MSG_RESULT("yes");sdlrle=yes],[AC_MSG_RESULT("no")],[AC_MSG_RESULT("unknown")
-  ])
-  if test "x$sdlrle" = xyes ; then
-    AC_MSG_CHECKING(for SDL alpha value)
-    AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <SDL.h>
-int main( int argc,char **argv) {
-	SDL_Surface *s1,*s2;
-	unsigned short *x;
-	s1=SDL_AllocSurface(SDL_SWSURFACE,8,8,16,0,0,0,0);
-	s2=SDL_AllocSurface(SDL_SWSURFACE,8,8,16,0,0,0,0);
-	SDL_FillRect(s1,NULL,0);
-	SDL_FillRect(s2,NULL,0xFFFF);
-	SDL_SetAlpha(s2,SDL_SRCALPHA|SDL_RLEACCEL,255);
-	SDL_BlitSurface(s2,NULL,s1,NULL);
-	x=s1->pixels;
-	if( *x )
-		exit(1);
-	exit(0);
-}
-      ]])],[AC_MSG_RESULT("normal")],[AC_MSG_RESULT("revese");sdlralpha=yes],[AC_MSG_RESULT("unknown")
-    ])
-  fi
-  LIBS=$KEEPLIBS
-  CFLAGS=$KEEPCFLAGS
-  LDFLAGS=$KEEPLDFLAGS
 fi
 if test "x$have_sdl" = xyes ; then
   AC_DEFINE(ENABLE_SDL,1,[define this if you use SDL])
   SDL=1
   SRC_GRAPHDEV="sdl_video.c sdl_mode.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c"
   AC_SUBST(SDL)
-  if test "x$sdlrle" = xyes ; then
-    AC_DEFINE(HAVE_SDLRLE,1,[define this if you have SDLRLE])
-  fi
-  if test "x$sdlralpha" = xyes ; then
-    AC_DEFINE(HAVE_SDLRALPHA,1,[define this if you have SDLRALPHA])
-  fi
 fi
 AC_SUBST(SRC_GRAPHDEV)
 
