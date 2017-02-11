@@ -39,7 +39,7 @@
 #include "ngraph.h"
 #include "drawtext.h"
 #include "sactlog.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 
 // メッセージキー待ちの時、表示するアニメーションに関する情報
 struct markinfo {

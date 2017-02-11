@@ -27,7 +27,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-#include "eucsjis.h"
+#include "utfsjis.h"
 
 struct fnametable {
 	char *realname;

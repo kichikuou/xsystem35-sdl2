@@ -1,5 +1,5 @@
 /*
- * eucsjis.c -- euc/sjis related function
+ * utfsjis.c -- utf-8/sjis related function
  *
  * Copyright (C) 1997 Yutaka OIWA <oiwa@is.s.u-tokyo.ac.jp>
  *
@@ -30,7 +30,7 @@
 #include <glib.h>
 
 #include "portab.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 
 BYTE *sjis2utf(BYTE *src) {
 	gchar *gbuf = g_convert_with_fallback(src, -1, "utf-8", "shift-jis", NULL, NULL, NULL, NULL);

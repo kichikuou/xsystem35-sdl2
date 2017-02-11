@@ -27,7 +27,7 @@
 
 #include "portab.h"
 #include "xsystem35.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 #include "menu.h"
 #include "ags.h"
 #include "message.h"

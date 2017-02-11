@@ -33,7 +33,7 @@
 #include "selection.h"
 #include "message.h"
 #include "music_client.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 #include "ags.h"
 #include "graphicsdevice.h"
 #include "ald_manager.h"

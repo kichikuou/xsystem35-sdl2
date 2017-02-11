@@ -35,7 +35,7 @@
 #include "graphicsdevice.h"
 #include "alpha_plane.h"
 #include "counter.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 #include "imput.h"
 #include "flood.h"
 #include "font.h"

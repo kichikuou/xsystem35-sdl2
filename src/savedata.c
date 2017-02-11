@@ -33,7 +33,7 @@
 #include "scenario.h"
 #include "xsystem35.h"
 #include "LittleEndian.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 #include "filecheck.h"
 #include "windowframe.h"
 #include "selection.h"

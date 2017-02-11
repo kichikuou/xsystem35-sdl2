@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "portab.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 #include "xsystem35.h"
 #include "menu.h"
 

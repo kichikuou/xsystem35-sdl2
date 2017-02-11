@@ -39,7 +39,7 @@
 #include "sprite.h"
 #include "ngraph.h"
 #include "drawtext.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 #include "sactlog_sjismsg.c"
 
 /*

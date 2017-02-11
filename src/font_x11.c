@@ -37,7 +37,7 @@
 #include "ags.h"
 #include "xcore.h"
 #include "xcore_private.h"
-#include "eucsjis.h"
+#include "utfsjis.h"
 #include "antialiase.h"
 
 /* fontset の為の情報 */

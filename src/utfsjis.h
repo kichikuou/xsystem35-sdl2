@@ -1,5 +1,5 @@
 /*
- * eucsjis.h -- euc/sjis related function
+ * utfsjis.h -- utf-8/sjis related function
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -21,8 +21,8 @@
 */
 /* $Id: eucsjis.h,v 1.2 2000/09/20 10:33:16 chikama Exp $ */
 
-#ifndef __EUCSJIS__
-#define __EUCSJIS__
+#ifndef __UTFSJIS__
+#define __UTFSJIS__
 
 #include "portab.h"
 
@@ -40,4 +40,4 @@ extern int     sjis_count_char(BYTE *src);
 extern void    sjis_toupper(BYTE *src);
 extern BYTE*   sjis_toupper2(BYTE *src);
 
-#endif /* __EUCSJIS__ */
+#endif /* __UTFSJIS__ */
