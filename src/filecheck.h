@@ -24,7 +24,7 @@
 #ifndef __FILECHECK_H__
 #define __FILECHECK_H__
 
-#define FILENAME_KANJI_CODE_EUC  0
+#define FILENAME_KANJI_CODE_UTF8 0
 #define FILENAME_KANJI_CODE_SJIS 1
 
 extern void fc_init(char *name);

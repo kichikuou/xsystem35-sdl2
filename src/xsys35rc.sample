@@ -133,8 +133,8 @@ font_gothic: -*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-no
 # -----------------------------------------------------------
 # system35のシナリオが新規にセーブファイルを作る時
 # (*.gr ファイルの支配下にないファイル)
-# 漢字コードを EUC/SJIS のどちらで書くか
-# 0 : EUC (default)
+# 漢字コードを UTF-8/SJIS のどちらで書くか
+# 0 : UTF-8 (default)
 # 1 : SJIS 
 
 #qe_kanjicode: 0

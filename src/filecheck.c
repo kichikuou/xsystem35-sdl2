@@ -38,7 +38,7 @@ struct fnametable {
 static struct fnametable tbl[FILEMAX];
 static int fnametable_cnt;
 static boolean initilized = FALSE;
-static boolean newfile_kanjicode_euc = TRUE;
+static boolean newfile_kanjicode_utf8 = TRUE;
 
 /* list up file in current directory */
 /*   name : save/load directory      */
@@ -86,7 +86,7 @@ char *fc_search(char *req) {
 			return tbl[i].realname;
 		}
 		
-		/* euc match */
+		/* utf-8 match */
 		b = sjis2lang(req);
 		sjis_toupper(b);
 		if (0 == strcmp(b, tbl[i].transname)) {
@@ -109,7 +109,7 @@ char *fc_add(char *req) {
 		return req;
 	}
 
-	if (newfile_kanjicode_euc) {
+	if (newfile_kanjicode_utf8) {
 		tbl[fnametable_cnt].realname = sjis2lang(req);
 	} else {
 		tbl[fnametable_cnt].realname = strdup(req);
@@ -126,8 +126,8 @@ char *fc_add(char *req) {
 /* QE で新規ファイルをセーブする時のファイル名の漢字コード */
 void fc_set_default_kanjicode(int c) {
 	if (c == 0) {
-		newfile_kanjicode_euc = TRUE;
+		newfile_kanjicode_utf8 = TRUE;
 	} else {
-		newfile_kanjicode_euc = FALSE;
+		newfile_kanjicode_utf8 = FALSE;
 	}
 }		

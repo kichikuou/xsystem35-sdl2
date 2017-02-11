@@ -161,7 +161,7 @@ static void sys35_usage(boolean verbose) {
 	puts(" -devmix device : set mixer device name to 'device' (effective only for oss)");
 	puts(" -devjoy device : set joystic device name to 'device'");
 	puts("                    if 'device' is set to 'none', don't use the device");
-	puts(" -savekanji #   : kanji code of filename (0 or 1 ... 0:euc, 1:sjis)");
+	puts(" -savekanji #   : kanji code of filename (0 or 1 ... 0:utf-8, 1:sjis)");
 #ifdef DEBUG
 
 	puts(" -devfont device: select font device");

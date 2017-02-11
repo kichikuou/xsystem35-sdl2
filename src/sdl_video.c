@@ -87,7 +87,7 @@ void sdl_Remove(void) {
 	}
 }
 
-/* name is EUC */
+/* name is UTF-8 */
 void sdl_setWindowTitle(char *name) {
 	SDL_WM_SetCaption(name, NULL);
 }

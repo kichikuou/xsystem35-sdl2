@@ -490,7 +490,7 @@ void Xcore_setFontDevice(FONT *f) {
 	x11_font = f;
 }
 
-/* name is EUC */
+/* name is UTF-8 */
 void Xcore_setWindowTitle(char *name) {
 	XmbSetWMProperties (x11_display, x11_window,
 			    name, name, NULL, 0, NULL, NULL, NULL);

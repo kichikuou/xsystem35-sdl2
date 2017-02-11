@@ -321,7 +321,6 @@ static SDL_Surface *com2alphasurface(agsurface_t *src, int cl) {
 
 
 
-/* msg is EUC */
 int sdl_drawString(int x, int y, char *msg, u_long col) {
 	int w;
 

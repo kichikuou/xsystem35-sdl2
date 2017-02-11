@@ -157,7 +157,7 @@ static void *font_x11_get_glyph(unsigned char *str) {
 	int w;
 	BYTE *conv;
 	
-	/* convert string code from sjis to euc (or LANG) */
+	/* convert string code from sjis to utf-8 */
 	conv = sjis2lang(str);
 	
 	w = XmbTextEscapement(fontset, conv, strlen(conv)); 
@@ -187,7 +187,7 @@ static int font_x11_draw_glyph(int x, int y, unsigned char *str, int col) {
 	int w;
 	BYTE *conv;
 	
-	/* convert string code from sjis to euc (or LANG) */
+	/* convert string code from sjis to utf-8 */
 	conv = sjis2lang(str);
 	
 	w = XmbTextEscapement(fontset, conv, strlen(conv)); 
