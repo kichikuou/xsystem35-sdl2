@@ -147,7 +147,7 @@ void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int 
 
 void sdl_zoom(int x, int y, int w, int h) {
 	sdl_scaledCopyArea(sdl_dib, sdl_display, x, y, w, h, 0, 0, view_w, view_h, 0);
-	sdl_updateScreen();
+	sdl_dirty = TRUE;
 }
 
 

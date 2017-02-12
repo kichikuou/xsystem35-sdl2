@@ -99,6 +99,7 @@ extern void sdl_setAutoRepeat(boolean bool);
 /* misc */
 extern void sdl_mainIteration();
 extern boolean RawKeyInfo[];
+extern void sdl_sleep(int msec);
 
 /* 初期化関係 */
 #define GraphicsInitilize() sdl_Initilize()
@@ -168,5 +169,6 @@ extern boolean RawKeyInfo[];
 /* misc */
 #define ResourceInit(c,v) sdl_ResourceInit((c),(v))
 #define SetNoShmMode() /* NO */
+#define Sleep(ms) sdl_sleep(ms)
 
 #endif /* !__SDL_CORE__ */

@@ -48,6 +48,8 @@ struct sdl_private_data {
 	
 	FONT *font;
 
+	boolean dirty;
+
 	boolean ms_active;   /* mouse is active */
 
 	boolean fs_on;
@@ -79,6 +81,7 @@ extern struct sdl_private_data *sdl_videodev;
 #define view_y (sdl_videodev->view.y)
 #define view_w (sdl_videodev->view.w)
 #define view_h (sdl_videodev->view.h)
+#define sdl_dirty (sdl_videodev->dirty)
 #define ms_active (sdl_videodev->ms_active)
 #define sdl_fs_on (sdl_videodev->fs_on)
 #define winoffset_x (sdl_videodev->winoffset_x)

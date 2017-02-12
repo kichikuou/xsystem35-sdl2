@@ -167,5 +167,6 @@ extern boolean   RawKeyInfo[256];
 #define SetNoShmMode Xcore_setNoShmMode
 // #define MainIteration() Xcore_mainIteration()
 #define EventCallback Xcore_eventCallback
+#define Sleep(ms) usleep((ms) * 1000)
 
 #endif /* !__XCORE_H__ */

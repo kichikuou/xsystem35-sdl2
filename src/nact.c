@@ -200,7 +200,7 @@ void nact_main() {
 			}
 		}
 		if (cnt == 10000) {
-			usleep(10); /* XXXX */
+			Sleep(1); /* XXXX */
 			cnt = 0;
 		}
 		cnt++;

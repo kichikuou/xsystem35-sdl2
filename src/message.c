@@ -170,7 +170,7 @@ void msg_putMessage(char *m) {
 						       w + adj.width, msg.MsgFontSize + adj.height);
 					break;
 				}
-				usleep(nact->messagewait_time * 10000);
+				Sleep(nact->messagewait_time * 10);
 			}
 			nact->callback();
 		}

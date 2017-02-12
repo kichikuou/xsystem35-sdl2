@@ -67,6 +67,8 @@ static void sdl_getEvent(void) {
 	boolean m2b = FALSE, msg_skip = FALSE;
 	int i;
 	
+	sdl_updateScreen();
+
 	while (SDL_PollEvent(&e)) {
 		switch (e.type) {
 		case SDL_WINDOWEVENT:
@@ -172,9 +174,9 @@ int sdl_keywait(int msec, boolean cancel) {
 		n = msec - (get_high_counter(SYSTEMCOUNTER_MSEC) - cnt);
 		if (n < 0) break;
 		if (n < 10) {
-			usleep(1000 * n);
+			sdl_sleep(n);
 		} else {
-			usleep(10000);
+			sdl_sleep(10);
 		}
 		nact->callback();
 	}

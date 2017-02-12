@@ -655,7 +655,7 @@ void ags_fader(ags_faderinfo_t *i) {
 		i->callback(step);
 		key = sys_getInputInfo();
 		/* 実際の fade にかかった時間 */
-		usleep(0); /* It's a magic !!! */
+		Sleep(0); /* It's a magic !!! */
 		cnt2 = get_high_counter(SYSTEMCOUNTER_MSEC) - cnt1;
 		
 		lefttime = i->effect_time - (cnt1 + cnt2 - cnt_st); /* fade 残り時間 */

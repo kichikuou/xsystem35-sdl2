@@ -62,11 +62,19 @@ static void sdl_pal_check(void) {
 }
 
 void sdl_updateScreen(void) {
+	if (!sdl_dirty)
+		return;
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(sdl_renderer, sdl_display);
 	SDL_RenderClear(sdl_renderer);
 	SDL_RenderCopy(sdl_renderer, texture, NULL, NULL);
 	SDL_RenderPresent(sdl_renderer);
 	SDL_DestroyTexture(texture);
+	sdl_dirty = false;
+}
+
+void sdl_sleep(int msec) {
+	sdl_updateScreen();
+	SDL_Delay(msec);
 }
 
 /* off-screen の指定領域を Main Window へ転送 */
@@ -78,7 +86,7 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 	
 	SDL_BlitSurface(sdl_dib, &rect_s, sdl_display, &rect_d);
 	
-	sdl_updateScreen();
+	sdl_dirty = TRUE;
 }
 
 /* 全画面更新 */
@@ -89,7 +97,7 @@ static void sdl_updateAll() {
 	
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &rect);
 
-	sdl_updateScreen();
+	sdl_dirty = TRUE;
 }
 
 /* Color の複数個指定 */
@@ -439,7 +447,7 @@ static void fader_in(int n) {
 	
 	SDL_UnlockSurface(sdl_display);
 	SDL_UnlockSurface(s_fader);
-	sdl_updateScreen();
+	sdl_dirty = TRUE;
 }
 
 static void fader_out(int n,Uint32 c) {
@@ -461,7 +469,7 @@ static void fader_out(int n,Uint32 c) {
 	
 	SDL_UnlockSurface(sdl_display);
 	
-	sdl_updateScreen();
+	sdl_dirty = TRUE;
 }
 
 static __inline void sdl_fade_blit(void) {
@@ -469,7 +477,7 @@ static __inline void sdl_fade_blit(void) {
 	setRect(r_dst, winoffset_x, winoffset_y, view_w, view_h);
 
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &r_dst);
-	sdl_updateScreen();
+	sdl_dirty = TRUE;
 }
 
 void sdl_fadeIn(int step) {
