@@ -64,11 +64,10 @@ static void sdl_pal_check(void) {
 void sdl_updateScreen(void) {
 	if (!sdl_dirty)
 		return;
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(sdl_renderer, sdl_display);
+	SDL_UpdateTexture(sdl_texture, NULL, sdl_display->pixels, sdl_display->pitch);
 	SDL_RenderClear(sdl_renderer);
-	SDL_RenderCopy(sdl_renderer, texture, NULL, NULL);
+	SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 	SDL_RenderPresent(sdl_renderer);
-	SDL_DestroyTexture(texture);
 	sdl_dirty = false;
 }
 

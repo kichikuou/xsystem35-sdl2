@@ -106,6 +106,9 @@ static void window_init(void) {
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 	sdl_display = SDL_CreateRGBSurface(0, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
 									   32, 0, 0, 0, 0);
+	sdl_texture = SDL_CreateTexture(sdl_renderer, sdl_display->format->format,
+									SDL_TEXTUREACCESS_STATIC,
+									SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 }
 
 static void makeDIB(int width, int height, int depth) {

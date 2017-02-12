@@ -34,6 +34,7 @@
 struct sdl_private_data {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
+	SDL_Texture *texture;
 	SDL_Surface     *dsp; /* toplevel surface */
 
 	SDL_Surface     *dib; /* offscreen surface */
@@ -70,6 +71,7 @@ extern struct sdl_private_data *sdl_videodev;
 
 #define sdl_window (sdl_videodev->window)
 #define sdl_renderer (sdl_videodev->renderer)
+#define sdl_texture (sdl_videodev->texture)
 #define sdl_display (sdl_videodev->dsp)
 #define sdl_dib (sdl_videodev->dib)
 #define sdl_col (sdl_videodev->col)

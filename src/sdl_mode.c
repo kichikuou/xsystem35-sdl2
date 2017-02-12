@@ -57,7 +57,11 @@ void sdl_setWindowSize(int x, int y, int w, int h) {
 	view_h = h;
 	
 	SDL_SetWindowSize(sdl_window, w, h);
+	SDL_FreeSurface(sdl_display);
+	SDL_DestroyTexture(sdl_texture);
 	sdl_display = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+	sdl_texture = SDL_CreateTexture(sdl_renderer, sdl_display->format->format,
+									SDL_TEXTUREACCESS_STATIC, w, h);
 
 	//ms_active = (SDL_GetAppState() & SDL_APPMOUSEFOCUS) ? TRUE : FALSE;
 }
