@@ -203,7 +203,7 @@ dnl fi
 AM_CONDITIONAL(HAVE_GTK, test "x$have_gtk" = xyes)
 SRC_MENU=
 if test "x$have_gtk" = xyes ; then
-  SRC_MENU="menu.c menu_callback.c menu_gui.c"
+  SRC_MENU="menu.c menu_callback.c menu_gui.c s39init.c"
 else
   SRC_MENU="menu_null.c"
 fi
