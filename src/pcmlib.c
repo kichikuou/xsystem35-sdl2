@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"
@@ -111,8 +111,8 @@ void pcmlib_free(WAVFILE *wfile) {
 	if (wfile->dfile) {
 		ald_freedata((dridata *)(wfile->dfile));
 	} else {
-		g_free(wfile->data);
+		free(wfile->data);
 	}
 	
-	g_free(wfile);
+	free(wfile);
 }

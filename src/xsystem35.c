@@ -855,13 +855,13 @@ int main(int argc, char **argv) {
 	if (!rc_name) {
 		rc_name = GTK_RC_NAME;
 	}
-	rc_path = (char *)g_malloc(sizeof(char) * (strlen(homedir) + strlen(rc_name)) + 2);
+	rc_path = (char *)malloc(sizeof(char) * (strlen(homedir) + strlen(rc_name)) + 2);
 	strcpy(rc_path, homedir);
 	strcat(rc_path, "/");
 	strcat(rc_path, rc_name);
 	
 	gtk_rc_parse(rc_path);
-	g_free(rc_path);
+	free(rc_path);
 	menu_init();
 #endif
 	

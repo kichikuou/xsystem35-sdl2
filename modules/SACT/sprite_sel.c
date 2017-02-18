@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "nact.h"
@@ -264,7 +263,7 @@ void ssel_clear() {
 	int i;
 	
 	for (i = 0; i < SEL_ELEMENT_MAX; i++) {
-		g_free(sact.sel.elem[i]);
+		free(sact.sel.elem[i]);
 		sact.sel.elem[i] = NULL;
 	}
 }
@@ -280,10 +279,10 @@ void ssel_add(int nString, int wI) {
 		return;
 	}
 	if (sact.sel.elem[wI] != NULL) {
-		g_free(sact.sel.elem[wI]);
+		free(sact.sel.elem[wI]);
 	}
 	
-	sact.sel.elem[wI] = g_strdup(v_str(nString -1));
+	sact.sel.elem[wI] = strdup(v_str(nString -1));
 }
 
 /*

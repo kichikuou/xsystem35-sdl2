@@ -22,10 +22,11 @@
 /* $Id: music_fader.c,v 1.5 2003/07/14 16:22:51 chikama Exp $ */
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "music_server.h"
 #include "counter.h"
 
@@ -109,7 +110,7 @@ static int setvolmidi(int lv) {
  *   stop     : フェード終了時に再生を終了するかどうか (1:止める, 0:止めない)
  */
 int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
-	fadeobj_t *obj = g_new0(fadeobj_t, 1);
+	fadeobj_t *obj = calloc(1, sizeof(fadeobj_t));
 
 	// printf("fade new %d, %d, %d, %d, %d\n", dev, subdev, time, vol, stop);
 	
@@ -152,7 +153,7 @@ int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
 		}
 	}
 	
-	prv.fadelist = g_list_append(prv.fadelist, obj);
+	prv.fadelist = list_append(prv.fadelist, obj);
 	
 	return OK;
 }
@@ -162,8 +163,8 @@ int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
     obj: 消すオブジェクト
 */
 static int musfade_free(fadeobj_t *obj) {
-	prv.fadelist = g_list_remove(prv.fadelist, (gpointer)obj);
-	g_free(obj);
+	prv.fadelist = list_remove(prv.fadelist, (void*)obj);
+	free(obj);
 	return OK;
 }
 
@@ -173,10 +174,10 @@ static int musfade_free(fadeobj_t *obj) {
     subdev: sub device
 */
 int musfade_stop(int dev, int subdev) {
-	GList *node;
+	List *node;
 	fadeobj_t *obj;
 
-	for (node = prv.fadelist; node; node = g_list_next(node)) {
+	for (node = prv.fadelist; node; node = list_next(node)) {
 		obj = (fadeobj_t *)node->data;
 		if (obj == NULL) continue;
 		
@@ -197,10 +198,10 @@ int musfade_stop(int dev, int subdev) {
     ret: TRUE or FALSE
 */
 boolean musfade_getstate(int dev, int subdev) {
-	GList *node;
+	List *node;
 	fadeobj_t *obj;
 	
-	for (node = prv.fadelist; node; node = g_list_next(node)) {
+	for (node = prv.fadelist; node; node = list_next(node)) {
 		obj = (fadeobj_t *)node->data;
 		if (obj == NULL) continue;
 		
@@ -328,9 +329,9 @@ static void fade_calc_time(fadeobj_t *obj) {
         
 int musfade_cb() {
 	fadeobj_t *obj;
-	GList *node;
+	List *node;
 	
-	for (node = prv.fadelist; node; node = g_list_next(node)) {
+	for (node = prv.fadelist; node; node = list_next(node)) {
 		obj = (fadeobj_t *)node->data;
 		if (obj == NULL) continue;
 		
@@ -365,7 +366,7 @@ int musfade_cb() {
 int musfade_setvolval(int *valance, int num) {
 	int i;
 	
-	for (i = 0; i < MIN(num, 16); i++) {
+	for (i = 0; i < min(num, 16); i++) {
 		prv.volval[i] = valance[i];
 	}
 	

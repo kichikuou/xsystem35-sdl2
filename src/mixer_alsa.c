@@ -48,11 +48,11 @@ static int mixer_get_level(audiodevice_t *dev, int ch) {
 }
 
 void mixer_exit(audiodevice_t *dev) {
-	g_free(dev->data_mix);
+	free(dev->data_mix);
 }
 
 int mixer_init(audiodevice_t *dev) {
-        mixer_alsa_t *mix = g_new0(mixer_alsa_t, 1);
+        mixer_alsa_t *mix = calloc(1, sizeof(mixer_alsa_t));
 	mix->card = 0;
 	mix->mix_dev = 0;
 	dev->data_mix = mix;

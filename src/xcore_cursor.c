@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/cursorfont.h>
@@ -152,15 +151,15 @@ boolean Xcore_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCursorDi
 	cursorImage->andmasklen = andmasklen;
 	
 
-	buf1 = g_new(BYTE, xornum);
-	buf2 = g_new(BYTE, xornum);
-	buf3 = g_new(BYTE, xornum);
-	buf4 = g_new(BYTE, xornum);
+	buf1 = malloc(sizeof(BYTE) * xornum);
+	buf2 = malloc(sizeof(BYTE) * xornum);
+	buf3 = malloc(sizeof(BYTE) * xornum);
+	buf4 = malloc(sizeof(BYTE) * xornum);
 	
-	memcpy(buf1, data, MIN(xormasklen, xornum));
+	memcpy(buf1, data, min(xormasklen, xornum));
 	data += xormasklen;
 	
-	memcpy(buf2, data, MIN(andmasklen, xornum));
+	memcpy(buf2, data, min(andmasklen, xornum));
 	data += andmasklen;
 	
 #define height cursordirentry->bHeight
@@ -232,10 +231,10 @@ boolean Xcore_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCursorDi
 		if (pixmapMaskInv) XFreePixmap( x11_display, pixmapMaskInv );
 	}
 	
-	g_free(buf1);
-	g_free(buf2);
-	g_free(buf3);
-	g_free(buf4);
+	free(buf1);
+	free(buf2);
+	free(buf3);
+	free(buf4);
 	
 #undef height
 #undef width

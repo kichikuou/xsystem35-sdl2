@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -309,7 +308,7 @@ static boolean drawable() {
 
 FONT *font_ft2_new() {
 	int err;
-	FONT *f = g_new(FONT, 1);
+	FONT *f = malloc(sizeof(FONT));
 	
 	f->sel_font   = font_ttf_sel_font;
 	f->get_glyph  = font_ttf_get_glyph;
@@ -324,7 +323,7 @@ FONT *font_ft2_new() {
 	img_glyph.bytes_per_line  = GLYPH_PIXMAP_WIDTH;
 	img_glyph.depth           = 8;
 	img_glyph.bytes_per_pixel = 1;
-	img_glyph.pixel = g_malloc(GLYPH_PIXMAP_WIDTH * GLYPH_PIXMAP_HEIGHT);
+	img_glyph.pixel = malloc(GLYPH_PIXMAP_WIDTH * GLYPH_PIXMAP_HEIGHT);
 	
 	this = f;
 	

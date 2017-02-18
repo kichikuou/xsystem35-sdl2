@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -76,8 +75,8 @@
 */
 
 
-static void cb_focused_swsp(gpointer s, gpointer data);
-static void cb_defocused_swsp(gpointer s, gpointer data);
+static void cb_focused_swsp(void* s, void* data);
+static void cb_defocused_swsp(void* s, void* data);
 static int  cb_focused(sprite_t *sp);
 static int  cb_defocused(sprite_t *sp);
 static void cb_waitkey_simple(agsevent_t *e);
@@ -88,7 +87,7 @@ static void cb_waitkey_selection(agsevent_t *e);
  フォーカスを得たスプライトに説明スプライトが登録されていた場合の
  説明スプライトの表示ON
 */
-static void cb_focused_swsp(gpointer s, gpointer data) {
+static void cb_focused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
 	boolean oldstate = sp->show;
@@ -106,7 +105,7 @@ static void cb_focused_swsp(gpointer s, gpointer data) {
  フォーカスを得たスプライトに説明スプライトが登録されていた場合の
  説明スプライトの表示OFF
 */
-static void cb_defocused_swsp(gpointer s, gpointer data) {
+static void cb_defocused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
 	boolean oldstate = sp->show;
@@ -121,7 +120,7 @@ static void cb_defocused_swsp(gpointer s, gpointer data) {
 }
 
 // zkey hide off
-static void cb_focused_zkey(gpointer s, gpointer data) {
+static void cb_focused_zkey(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
 	boolean oldstate = sp->show;
@@ -134,7 +133,7 @@ static void cb_focused_zkey(gpointer s, gpointer data) {
 }
 
 // zkey hide on
-static void cb_defocused_zkey(gpointer s, gpointer data) {
+static void cb_defocused_zkey(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
 	boolean oldstate = sp->show;
@@ -215,7 +214,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 		if (e->d3 == KEY_Z) {
 			cur = get_high_counter(SYSTEMCOUNTER_MSEC);
 			if (!sact.zhiding) {
-				g_slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
+				slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
 				sact.zhiding = TRUE;
 				sact.zdooff = TRUE;
 				sact.zofftime = cur;
@@ -236,7 +235,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 			break;
 		}
 		if (sact.zhiding) {
-			g_slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
+			slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
 			sact.zhiding = FALSE;
 		}
 		// fall through
@@ -246,7 +245,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 		case KEY_Z:
 			cur = get_high_counter(SYSTEMCOUNTER_MSEC);
 			if (500 < (cur - sact.zofftime) || !sact.zdooff) {
-				g_slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
+				slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
 				sact.zhiding = FALSE;
 			}
 			break;
@@ -272,7 +271,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
   WaitKeySpriteのcallback
 */
 static void cb_waitkey_sprite(agsevent_t *e) {
-	GSList *node;
+	SList *node;
 	sprite_t *focused_sp = NULL;   // focus を得ている sprite
 	sprite_t *defocused_sp = NULL; // focus を失った sprite
 	int update = 0;
@@ -347,7 +346,7 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		if (defocused_sp) {
 			sprite_t *sp = defocused_sp;
 			if (sp->expsp) {
-				g_slist_foreach(sp->expsp, cb_defocused_swsp, &update);
+				slist_foreach(sp->expsp, cb_defocused_swsp, &update);
 			}
 		}
 		
@@ -355,7 +354,7 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		if (focused_sp) {
 			sprite_t *sp = focused_sp;
 			if (sp->expsp) {
-				g_slist_foreach(sp->expsp, cb_focused_swsp, &update);
+				slist_foreach(sp->expsp, cb_focused_swsp, &update);
 			}
 		}
 	}
@@ -475,13 +474,13 @@ void spev_callback(agsevent_t *e) {
 */
 void spev_add_eventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) {
 	sp->eventcb = cb;
-	sact.eventlisteners = g_slist_append(sact.eventlisteners, sp);
+	sact.eventlisteners = slist_append(sact.eventlisteners, sp);
 }
 
 /*
   上で登録した callback の削除
 */
 void spev_remove_eventlistener(sprite_t *sp) {
-	sact.eventlisteners = g_slist_remove(sact.eventlisteners, sp);
+	sact.eventlisteners = slist_remove(sact.eventlisteners, sp);
 }
 

@@ -29,7 +29,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include <esd.h>
-#include <glib.h>
 
 #include "system.h"
 #include "audio.h"
@@ -162,8 +161,8 @@ int esd_exit(audiodevice_t *dev) {
 	
 	esd_close(esd->fdh);
 	
-	g_free(dev->data_pcm);
-	g_free(dev->data_mix);
+	free(dev->data_pcm);
+	free(dev->data_mix);
 	return OK;
 }
 
@@ -175,7 +174,7 @@ int esd_init(audiodevice_t *dev, char *host) {
 		return NG;
 	}
 	
-	esd = g_new0(audio_esd_t, 1);
+	esd = calloc(1, sizeof(audio_esd_t));
 	esd->fdh = fd;  /* socket to host */
 	dev->data_pcm = esd;
 	

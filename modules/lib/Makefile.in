@@ -87,7 +87,6 @@ am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
 	$(top_srcdir)/macros/alsa.m4 $(top_srcdir)/macros/argz.m4 \
 	$(top_srcdir)/macros/esd.m4 $(top_srcdir)/macros/freetype2.m4 \
 	$(top_srcdir)/macros/gettext.m4 \
-	$(top_srcdir)/macros/glib-2.0.m4 \
 	$(top_srcdir)/macros/gtk-2.0.m4 $(top_srcdir)/macros/iconv.m4 \
 	$(top_srcdir)/macros/lib-ld.m4 \
 	$(top_srcdir)/macros/lib-link.m4 \
@@ -107,17 +106,17 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libalk_la_DEPENDENCIES =
+libalk_la_LIBADD =
 am_libalk_la_OBJECTS = alk.lo
 libalk_la_OBJECTS = $(am_libalk_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libdrawtext_la_DEPENDENCIES =
+libdrawtext_la_LIBADD =
 am_libdrawtext_la_OBJECTS = drawtext.lo
 libdrawtext_la_OBJECTS = $(am_libdrawtext_la_OBJECTS)
-libgraph_la_DEPENDENCIES =
+libgraph_la_LIBADD =
 am_libgraph_la_OBJECTS = graph.lo surface.lo cg.lo \
 	graph_expandcolor_blend.lo graph_fillrect.lo \
 	graph_fillrect_amap.lo graph_fillrect_acolor.lo graph_rect.lo \
@@ -229,13 +228,7 @@ FGREP = @FGREP@
 FT2_CFLAGS = @FT2_CFLAGS@
 FT2_CONFIG = @FT2_CONFIG@
 FT2_LIBS = @FT2_LIBS@
-GLIB_CFLAGS = @GLIB_CFLAGS@
-GLIB_COMPILE_RESOURCES = @GLIB_COMPILE_RESOURCES@
-GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
-GLIB_LIBS = @GLIB_LIBS@
-GLIB_MKENUMS = @GLIB_MKENUMS@
 GMSGFMT = @GMSGFMT@
-GOBJECT_QUERY = @GOBJECT_QUERY@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
@@ -392,7 +385,6 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libgraph.la libalk.la libdrawtext.la
-libgraph_la_LIBADD = @GLIB_LIBS@
 libgraph_la_SOURCES = graph.c surface.c cg.c \
 	graph_expandcolor_blend.c \
 	graph_fillrect.c \
@@ -415,10 +407,8 @@ libgraph_la_SOURCES = graph.c surface.c cg.c \
 	gre_blend_screen.c
 
 libalk_la_SOURCES = alk.c 
-libalk_la_LIBADD = @GLIB_LIBS@ 
 libdrawtext_la_SOURCES = drawtext.c
-libdrawtext_la_LIBADD = @GLIB_LIBS@
-AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
+AM_CFLAGS = @DEBUG_CFLAGS@
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \
 	$(LTDLINCL) \

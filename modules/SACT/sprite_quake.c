@@ -24,10 +24,10 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "imput.h"
 #include "sact.h"
 #include "surface.h"
@@ -49,7 +49,7 @@
 int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int cancel) {
 	int edtime, curtime;
 	int i = 0, key;
-	GSList *node;
+	SList *node;
 	
 	edtime = wCount * 10 + get_high_counter(SYSTEMCOUNTER_MSEC);
 	

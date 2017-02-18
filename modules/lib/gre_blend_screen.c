@@ -1,6 +1,5 @@
 // 
 #include "config.h"
-#include <glib.h>
 
 #include "portab.h"
 #include "surface.h"

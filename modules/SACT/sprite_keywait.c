@@ -24,10 +24,11 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <limits.h>
 
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "counter.h"
 #include "ags.h"
 #include "nact.h"
@@ -122,7 +123,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	sp_update_all(TRUE);
 	
 	// depthmap を準備
-	g_slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
+	slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
 	
 	sact.waittype = KEYWAIT_SPRITE;
 	sact.waitkey = -1;
@@ -146,7 +147,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	
 	// 終了時間の計算
 	curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
-	endtime = timeout < 0 ? G_MAXINT: (curtime + timeout * 10);
+	endtime = timeout < 0 ? INT_MAX : (curtime + timeout * 10);
 	
 	// スプライトキー待ちメイン
 	while (!waitcond(endtime)) {

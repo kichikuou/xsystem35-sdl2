@@ -1,6 +1,5 @@
 noinst_LTLIBRARIES  = libgraph.la libalk.la libdrawtext.la
 
-libgraph_la_LIBADD = @GLIB_LIBS@
 libgraph_la_SOURCES = graph.c surface.c cg.c \
 	graph_expandcolor_blend.c \
 	graph_fillrect.c \
@@ -23,12 +22,10 @@ libgraph_la_SOURCES = graph.c surface.c cg.c \
 	gre_blend_screen.c
 
 libalk_la_SOURCES = alk.c 
-libalk_la_LIBADD = @GLIB_LIBS@ 
 
 libdrawtext_la_SOURCES = drawtext.c
-libdrawtext_la_LIBADD = @GLIB_LIBS@
 
-AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
+AM_CFLAGS = @DEBUG_CFLAGS@
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \

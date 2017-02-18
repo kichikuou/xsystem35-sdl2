@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -61,7 +60,7 @@ static void move_drain(sprite_t *sp) {
 	sp_updateme(sp);
 	
 	// 後で、movelist から外してもらうための処理
-	sact.teventremovelist = g_slist_append(sact.teventremovelist, sp);
+	sact.teventremovelist = slist_append(sact.teventremovelist, sp);
 	
 	sp->move.moving = FALSE;
 	sp->move.time = 0; // 移動時間の初期化
@@ -111,7 +110,7 @@ static int move_cb(sprite_t *sp, agsevent_t *e) {
  @param data: sprite
  @param userdata: 未使用
 */
-void spev_move_setup(gpointer data, gpointer userdata) {
+void spev_move_setup(void* data, void* userdata) {
 	sprite_t *sp = (sprite_t *)data;
 	
 	// 非表示のものは移動しない(いいのかな)
@@ -157,10 +156,10 @@ void spev_move_waitend(sprite_t *sp, int dx, int dy, int time) {
 	sp->move.speed = time;
 	sp->move.time = -1;
 	
-	sact.movelist = g_slist_append(sact.movelist, sp);
+	sact.movelist = slist_append(sact.movelist, sp);
 	sact.movestarttime = get_high_counter(SYSTEMCOUNTER_MSEC);
-	g_slist_foreach(sact.movelist, spev_move_setup, NULL);
-	g_slist_free(sact.movelist);
+	slist_foreach(sact.movelist, spev_move_setup, NULL);
+	slist_free(sact.movelist);
 	sact.movelist = NULL;
 	
 	while (sp->move.moving) {
@@ -172,7 +171,7 @@ void spev_move_waitend(sprite_t *sp, int dx, int dy, int time) {
   全ての移動中のスプライトが移動完了するのを待つ
 */
 void spev_wait4moving_sp() {
-	GSList *node;
+	SList *node;
 	
 	// 移動中のスプライトは sact.updatelist にあるはずだから
 	// そのなかのスプライトについて、移動中かどうかのフラグをチェック

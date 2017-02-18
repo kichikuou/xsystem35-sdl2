@@ -87,7 +87,6 @@ am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
 	$(top_srcdir)/macros/alsa.m4 $(top_srcdir)/macros/argz.m4 \
 	$(top_srcdir)/macros/esd.m4 $(top_srcdir)/macros/freetype2.m4 \
 	$(top_srcdir)/macros/gettext.m4 \
-	$(top_srcdir)/macros/glib-2.0.m4 \
 	$(top_srcdir)/macros/gtk-2.0.m4 $(top_srcdir)/macros/iconv.m4 \
 	$(top_srcdir)/macros/lib-ld.m4 \
 	$(top_srcdir)/macros/lib-link.m4 \
@@ -135,7 +134,7 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-ShSound_la_DEPENDENCIES =
+ShSound_la_LIBADD =
 am_ShSound_la_OBJECTS = ShSound.lo
 ShSound_la_OBJECTS = $(am_ShSound_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -244,13 +243,7 @@ FGREP = @FGREP@
 FT2_CFLAGS = @FT2_CFLAGS@
 FT2_CONFIG = @FT2_CONFIG@
 FT2_LIBS = @FT2_LIBS@
-GLIB_CFLAGS = @GLIB_CFLAGS@
-GLIB_COMPILE_RESOURCES = @GLIB_COMPILE_RESOURCES@
-GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
-GLIB_LIBS = @GLIB_LIBS@
-GLIB_MKENUMS = @GLIB_MKENUMS@
 GMSGFMT = @GMSGFMT@
-GOBJECT_QUERY = @GOBJECT_QUERY@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
@@ -409,8 +402,7 @@ top_srcdir = @top_srcdir@
 pkglib_LTLIBRARIES = ShSound.la
 ShSound_la_LDFLAGS = -module -export-dynamic -avoid-version
 ShSound_la_SOURCES = ShSound.c
-ShSound_la_LIBADD = @GLIB_LIBS@
-AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
+AM_CFLAGS = @DEBUG_CFLAGS@
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \
 	-I$(top_builddir)/libltdl -I$(top_srcdir)/libltdl \

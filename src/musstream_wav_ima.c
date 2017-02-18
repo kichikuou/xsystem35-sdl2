@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
 
@@ -158,7 +158,7 @@ int ImaSamplesIn(int dataLen, WORD chans, WORD blockAlign, WORD samplesPerBlock)
 }
 
 static int wav_read(musstream_t *this, void *ptr, int size, int nmemb) {
-	int len = MIN(size * nmemb, this->hidden.ima.end - this->hidden.ima.cur);
+	int len = min(size * nmemb, this->hidden.ima.end - this->hidden.ima.cur);
 	WAVFILE *w = (WAVFILE *)this->hidden.ima.wf;
 	char *obuff;
 	int i, offset = 0;
@@ -237,19 +237,19 @@ static int wav_seek(musstream_t *this, int offset, int whence) {
 }
 
 static int wav_close(musstream_t *this) {
-	g_free(this->hidden.ima.obuf);
-	g_free(this);
+	free(this->hidden.ima.obuf);
+	free(this);
 	return 0;
 }
 
 musstream_t *ms_wav_ima(WAVFILE *snd) {
-	musstream_t *ms = g_new0(musstream_t, 1);
+	musstream_t *ms = calloc(1, sizeof(musstream_t));
 
 	ms->hidden.ima.wf = snd;
 	ms->hidden.ima.base = snd->data;
 	ms->hidden.ima.cur = snd->data;
 	ms->hidden.ima.end = snd->data + snd->bytes;
-	ms->hidden.ima.obuf = g_malloc(snd->samples_per_block * 2);
+	ms->hidden.ima.obuf = malloc(snd->samples_per_block * 2);
 	ms->hidden.ima.obufcur = ms->hidden.ima.obuf;
 	ms->hidden.ima.left = 0;
 	

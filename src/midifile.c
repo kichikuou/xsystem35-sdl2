@@ -27,7 +27,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -89,7 +88,7 @@ static void make_chunk(struct midievent *ev, int n) {
 	ev->port  = 0;
 	
 	if (n != 0) {
-		ev->data = g_new(unsigned char, n + 1);
+		ev->data = malloc(sizeof(unsigned char) * (n + 1));
 	}
 }
 
@@ -351,7 +350,7 @@ static void msginit() {
 static void msgadd(int c) {
 	if (midi->msgindex >= midi->msgsize) {
 		midi->msgsize *= 2;
-		midi->msgbuffer = (unsigned char *)g_realloc(midi->msgbuffer, midi->msgsize);
+		midi->msgbuffer = (unsigned char *)realloc(midi->msgbuffer, midi->msgsize);
 	}
 	midi->msgbuffer[midi->msgindex++] = (unsigned char)c;
 }
@@ -555,10 +554,10 @@ static int read_header(BYTE *stream, off_t len) {
 }
 
 struct midiinfo *mf_read_midifile(BYTE *stream, off_t len) {
-	midi = g_new(struct midiinfo, 1);
+	midi = malloc(sizeof(struct midiinfo));
 	
 	midi->msgsize = 128; /* Initial msg buffer size */
-	midi->msgbuffer = g_new0(unsigned char, midi->msgsize);
+	midi->msgbuffer = calloc(midi->msgsize, sizeof(unsigned char));
 	
 	if (0 > read_header(stream, len)) {
 		return NULL;
@@ -572,10 +571,10 @@ struct midiinfo *mf_read_midifile(BYTE *stream, off_t len) {
 void mf_remove_midifile(struct midiinfo *m) {
 	int i;
 	
-	g_free(m->msgbuffer);
+	free(m->msgbuffer);
 	
 	for (i = 0; i < m->eventsize; i ++) {
-		g_free(m->event[i].data);
+		free(m->event[i].data);
 	}
-	g_free(m);
+	free(m);
 }

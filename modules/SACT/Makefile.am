@@ -1,7 +1,7 @@
 pkglib_LTLIBRARIES = SACT.la
 
 SACT_la_LDFLAGS = -module -export-dynamic -avoid-version
-SACT_la_LIBADD  = ../lib/libgraph.la ../lib/libdrawtext.la @GLIB_LIBS@
+SACT_la_LIBADD  = ../lib/libgraph.la ../lib/libdrawtext.la
 SACT_la_SOURCES = \
 	SACT.c \
 	sactcg.c \
@@ -32,7 +32,7 @@ SACT_la_SOURCES = \
 	sprite_xmenu.c
 
 
-AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
+AM_CFLAGS = @DEBUG_CFLAGS@
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \

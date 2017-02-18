@@ -22,7 +22,6 @@
 /* $Id: cg.c,v 1.12 2001/09/16 15:59:11 chikama Exp $ */
 
 #include <stdio.h>
-#include <glib.h>
 #include "portab.h"
 #include "system.h"
 #include "graphics.h"
@@ -110,10 +109,10 @@ static void set_vspbank(BYTE *pic, int bank, int width, int height) {
  *  cg: freeing data object
 */
 static void cgdata_free(cgdata *cg) {
-	if (cg->pic) g_free(cg->pic);
-	if (cg->pal) g_free(cg->pal);
-	if (cg->alpha) g_free(cg->alpha);
-	g_free(cg);
+	if (cg->pic) free(cg->pic);
+	if (cg->pal) free(cg->pal);
+	if (cg->alpha) free(cg->alpha);
+	free(cg);
 }
 
 /*

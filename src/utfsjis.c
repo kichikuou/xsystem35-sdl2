@@ -23,26 +23,52 @@
 */
 /* $Id: eucsjis.c,v 1.2 2000/09/20 10:33:16 chikama Exp $ */
 
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
 
 #include "portab.h"
 #include "utfsjis.h"
 
+static char* convert(char* src, const char* tocode, const char* fromcode, int size_multiplier) {
+#ifdef HAVE_ICONV
+	iconv_t cd = iconv_open(tocode, fromcode);
+	if (cd == (iconv_t)-1)
+		return NULL;
+
+	size_t srclen = strlen(src);
+	size_t dstlen = srclen * size_multiplier + 1;
+	char* dst = malloc(dstlen);
+	char *srcp = src, *dstp = dst;
+	if (iconv(cd, &srcp, &srclen, &dstp, &dstlen) == (size_t)-1 || !dstlen) {
+		free(dst);
+		iconv_close(cd);
+		return NULL;
+	}
+	*dstp = '\0';
+	iconv_close(cd);
+	return dst;
+#else
+	return NULL;
+#endif
+}
+
 BYTE *sjis2utf(BYTE *src) {
-	gchar *gbuf = g_convert_with_fallback(src, -1, "utf-8", "shift-jis", NULL, NULL, NULL, NULL);
-	BYTE *dst = strdup(gbuf);
-	g_free(gbuf);
+	char* dst = convert(src, "utf-8", "shift-jis", 3);
+	if (!dst)
+		dst = strdup(src);
 	return dst;
 }
 
 BYTE *utf2sjis(BYTE *src) {
-	gchar *gbuf = g_convert_with_fallback(src, -1, "shift-jis", "utf-8", "?", NULL, NULL, NULL);
-	BYTE *dst = strdup(gbuf);
-	g_free(gbuf);
+	char* dst = convert(src, "shift-jis", "utf-8", 1);
+	if (!dst)
+		dst = strdup(src);
 	return dst;
 }
 

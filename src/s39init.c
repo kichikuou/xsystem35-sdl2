@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 #include <gtk/gtk.h>
 #include "portab.h"
 #include "system.h"
@@ -66,14 +65,14 @@ int s39ini_init(void) {
 		if (i >= MAXVOLCH || i < 0) continue;
 		s1[strlen(s1)-1] = '\0'; // remove last '"'
 		vval[i].label = sjis2lang(s1);
-		vval_max = MAX(vval_max, i);
+		vval_max = max(vval_max, i);
 		//WARNING("VolumeValancer[%d] = %s\n", i, vval[i].label);
 	}
 	
 	if (vval_max <= 0) return NG;
 	
 	// Volume.sav があればそれを読み込む
-	g_snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
+	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
 	if (NULL == (fp = fopen(fn, "r"))) {
 		// とりあえず、初期ボリュームは 100
 		for (i = 0; i < MAXVOLCH; i++) {
@@ -143,7 +142,7 @@ int s39ini_remove() {
 		vol[i] = vval[i].vol;
 	}
 	
-	g_snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
+	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
 	if (NULL == (fp = fopen(fn, "w"))) {
 		WARNING("Fail to save Volume.save\n");
 		return NG;

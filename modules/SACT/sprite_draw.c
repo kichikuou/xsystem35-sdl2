@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -146,7 +145,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 /*
   スプライトキー待ち用のdepthmap を更新
 */
-void sp_draw_dmap(gpointer data, gpointer userdata) {
+void sp_draw_dmap(void* data, void* userdata) {
 	sprite_t *sp = (sprite_t *)data;
 	cginfo_t *cg;
 	surface_t update;

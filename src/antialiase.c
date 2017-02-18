@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
+#include <stdlib.h>
 
 #include "portab.h"
 
@@ -58,8 +58,8 @@ void aa_make(BYTE *data, int w, int h, int bytes_per_line) {
 	BYTE *b, *_b, *__b;
 	BYTE *d = data;
 	
-	 b = g_new0(BYTE, w*h);
-	_b = g_new0(BYTE, (w+2)*(h+2));
+	 b = calloc(w*h, sizeof(BYTE));
+	_b = calloc((w+2)*(h+2), sizeof(BYTE));
 	
 	__b = b;
 	for (y = 0; y < h; y++) {
@@ -75,6 +75,6 @@ void aa_make(BYTE *data, int w, int h, int bytes_per_line) {
 		memcpy(d, __b, w+2);
 		__b += (w+2); d+=bytes_per_line;
 	}
-	g_free(b);
-	g_free(_b);
+	free(b);
+	free(_b);
 }

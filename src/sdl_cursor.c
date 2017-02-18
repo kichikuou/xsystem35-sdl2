@@ -22,7 +22,6 @@
 
 #include "config.h"
 
-#include <glib.h>
 #include <SDL.h>
 
 #include "portab.h"
@@ -112,15 +111,15 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	cursorImage->xormasklen = xormasklen;
 	cursorImage->andmasklen = andmasklen;
 	
-	buf1 = g_new(BYTE, xornum);
-	buf2 = g_new(BYTE, xornum);
-	buf3 = g_new(BYTE, xornum);
-	buf4 = g_new(BYTE, xornum);
+	buf1 = malloc(sizeof(BYTE) * xornum);
+	buf2 = malloc(sizeof(BYTE) * xornum);
+	buf3 = malloc(sizeof(BYTE) * xornum);
+	buf4 = malloc(sizeof(BYTE) * xornum);
 	
-	memcpy(buf1, data, MIN(xormasklen, xornum));
+	memcpy(buf1, data, min(xormasklen, xornum));
 	data += xormasklen;
 	
-	memcpy(buf2, data, MIN(andmasklen, xornum));
+	memcpy(buf2, data, min(andmasklen, xornum));
 	data += andmasklen;
 	
 #define height cursordirentry->bHeight
@@ -136,10 +135,10 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	
 	cursor[no] = SDL_CreateCursor(buf3, buf4, 32, 32, cursordirentry->wxHotspot, cursordirentry->wyHotspot);
 	
-	g_free(buf1);
-	g_free(buf2);
-	g_free(buf3);
-	g_free(buf4);
+	free(buf1);
+	free(buf2);
+	free(buf3);
+	free(buf4);
 	
 #undef height
 #undef width

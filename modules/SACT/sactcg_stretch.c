@@ -1,6 +1,6 @@
 // 拡大縮小
 static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
-	surface_t *dst = g_new0(surface_t, 1);
+	surface_t *dst = calloc(1, sizeof(surface_t));
 	float    a1, a2, xd, yd;
 	int      sw, sh;
 	int      *row, *col;
@@ -16,10 +16,10 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	dst->has_alpha = src->has_alpha;
 	
 	if (src->has_pixel) {
-		dst->pixel = g_malloc(dh * dst->bytes_per_line);
+		dst->pixel = malloc(dh * dst->bytes_per_line);
 	}
 	if (src->has_alpha) {
-		dst->alpha = g_malloc(dw * dh);
+		dst->alpha = malloc(dw * dh);
 	}
 	
 	
@@ -30,10 +30,10 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
-	row = g_new(int, dw);
+	row = malloc(sizeof(int) * dw);
 	// 1おおきくして初期化しないと col[dw-1]とcol[dw]が同じになる
 	// 可能性がある。
-	col = g_new0(int, dh +1);
+	col = calloc(dh +1, sizeof(int));
 	
 	if (mirror & 1) {
 		/* 上下反転 added by  tajiri@wizard */
@@ -110,8 +110,8 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 		}
 	}
 	
-	g_free(row);
-	g_free(col);
+	free(row);
+	free(col);
 	
 	return dst;
 }

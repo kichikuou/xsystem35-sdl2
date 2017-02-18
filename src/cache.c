@@ -24,7 +24,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <limits.h>
-#include <glib.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "cache.h"
 
@@ -65,7 +65,7 @@ static void remove_in_cache(cacher *id) {
 		} else {
 			ip = ic;
 		}
-		g_free(ic);
+		free(ic);
 		ic = ip->next;
 	}
 	return;
@@ -77,10 +77,10 @@ static void remove_in_cache(cacher *id) {
  *   return: new cache handler
 */
 cacher *cache_new(void *delcallback) {
-	cacher *c = g_new0(cacher, 1);
+	cacher *c = calloc(1, sizeof(cacher));
 	
 	c->id = id;
-	c->top = g_new0(cacheinfo, 1);
+	c->top = calloc(1, sizeof(cacheinfo));
 	c->top->next = NULL;
 	c->top->in_use = &dummytrue;
 	c->free_ = delcallback;
@@ -110,7 +110,7 @@ void cache_insert(cacher *id, int key, void *data, int size, boolean *in_use) {
 	i->key = key;
 	i->data = data;
 	i->size = size;
-	i->next = g_new0(cacheinfo, 1);
+	i->next = calloc(1, sizeof(cacheinfo));
 	i->next->next = NULL;
 	if (in_use) {
 		i->in_use = in_use;

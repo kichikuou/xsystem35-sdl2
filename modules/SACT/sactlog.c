@@ -26,10 +26,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "counter.h"
 #include "menu.h"
 #include "imput.h"
@@ -59,19 +59,19 @@ static void draw_log() {
 	int i, y = 0, len;
 	int cur = curline;
 	char pinfo[256];
-	GList *node;
+	List *node;
 
 	// canvas clear
 	memset(chr->pixel, 0, chr->bytes_per_line * chr->height);
 	
 	// ページ位置情報
-	len = g_snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, g_list_length(sact.log));
+	len = snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, list_length(sact.log));
 	
 	dt_setfont(FONT_GOTHIC, FONTSIZEINDEX);
 	dt_drawtext(chr, sf0->width - FONTSIZEINDEX *len /2, 0, pinfo);
 	
 	// 表示始め位置
-	node = g_list_nth(sact.log, g_list_length(sact.log) - curline);
+	node = list_nth(sact.log, list_length(sact.log) - curline);
 	for (i = 0; i < LOGLINENUM; i++) {
 		char *str, *streuc;
 		if (cur <= 0) continue;
@@ -91,7 +91,7 @@ static void draw_log() {
 		}
 		y += FONTSIZE;
 		cur--;
-		node = g_list_next(node);
+		node = list_next(node);
 	}
 	
 	gr_copy_bright(sf0, 0, 0, back, 0, 0, sf0->width, sf0->height, 128);
@@ -104,12 +104,12 @@ static void draw_log() {
 
 int sblog_start(void) {
 	// 説明文章を追加
-	sact.log = g_list_append(sact.log, "\n");
-	sact.log = g_list_append(sact.log, LOGMSG1);
-	sact.log = g_list_append(sact.log, LOGMSG2);
-	sact.log = g_list_append(sact.log, LOGMSG3);
-	sact.log = g_list_append(sact.log, LOGMSG4);
-	sact.log = g_list_append(sact.log, "\n");
+	sact.log = list_append(sact.log, "\n");
+	sact.log = list_append(sact.log, LOGMSG1);
+	sact.log = list_append(sact.log, LOGMSG2);
+	sact.log = list_append(sact.log, LOGMSG3);
+	sact.log = list_append(sact.log, LOGMSG4);
+	sact.log = list_append(sact.log, "\n");
 	
 	back = sf_dup(sf0);
 	chr  = sf_create_surface(sf0->width, sf0->height, 8);
@@ -119,7 +119,7 @@ int sblog_start(void) {
 }
 
 int sblog_end(void) {
-	GList *node;
+	List *node;
 	int i;
 	
 	sf_copyall(sf0, back);
@@ -130,33 +130,33 @@ int sblog_end(void) {
 	
 	// 説明文章を削除
 	for (i = 0; i < 6; i++) {
-		node = g_list_last(sact.log);
-		sact.log = g_list_remove(sact.log, node->data);
+		node = list_last(sact.log);
+		sact.log = list_remove(sact.log, node->data);
 	}
 	
 	return OK;
 }
 
 int sblog_pageup(void) {
-	curline = MIN(g_list_length(sact.log), curline + (LOGLINENUM -1));
+	curline = min(list_length(sact.log), curline + (LOGLINENUM -1));
 	draw_log();
 	return OK;
 }
 
 int sblog_pagedown(void) {
-	curline = MAX(1, curline - (LOGLINENUM -1));
+	curline = max(1, curline - (LOGLINENUM -1));
 	draw_log();
 	return OK;
 }
 
 int sblog_pagepre(void) {
-	curline = MAX(1, curline - 1);
+	curline = max(1, curline - 1);
 	draw_log();
 	return OK;
 }
 
 int sblog_pagenext(void) {
-	curline = MIN(g_list_length(sact.log), curline + 1);
+	curline = min(list_length(sact.log), curline + 1);
 	draw_log();
 	return OK;
 }

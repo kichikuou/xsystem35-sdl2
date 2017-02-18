@@ -27,7 +27,7 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/un.h>
-#include <glib.h>
+#include <stdint.h>
 
 #include "portab.h"
 #include "music.h"
@@ -66,13 +66,13 @@ static void *cl_read_packet(int fd, ServerPktHeader *pkt_hdr) {
 	void *data = NULL;
 	
 	if (sizeof(ServerPktHeader) == read(fd, pkt_hdr, sizeof (ServerPktHeader))) {
-                if (pkt_hdr->data_length) {
-                        data = g_malloc0(pkt_hdr->data_length);
-                        read(fd, data, pkt_hdr->data_length);
-                }
-        }
+		if (pkt_hdr->data_length) {
+			data = calloc(1, pkt_hdr->data_length);
+			read(fd, data, pkt_hdr->data_length);
+		}
+	}
 	
-        return data;
+	return data;
 }
 
 static void cl_read_ack(int fd) {
@@ -81,7 +81,7 @@ static void cl_read_ack(int fd) {
 	
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
-		g_free(data);
+		free(data);
 	}
 }
 
@@ -99,14 +99,14 @@ static void cl_send_packet(int fd, int command, void * data, int data_length) {
 	}
 }
 
-static void cl_send_guint32(int cmd, guint32 val) {
+static void cl_send_uint32(int cmd, uint32_t val) {
 	int fd;
 
 	if (-1 == (fd = connect_to_server())) {
 		return;
 	}
 	
-	cl_send_packet(fd, cmd, &val, sizeof(guint32));
+	cl_send_packet(fd, cmd, &val, sizeof(uint32_t));
 	cl_read_ack(fd);
 	close(fd);
 }
@@ -149,7 +149,7 @@ static boolean cl_get_boolean(int cmd) {
         data = cl_read_packet(fd, &pkt_hdr);
         if (data) {
                 ret = *((boolean *) data);
-                g_free(data);
+                free(data);
         }
         cl_read_ack(fd);
         close(fd);
@@ -157,7 +157,7 @@ static boolean cl_get_boolean(int cmd) {
         return ret;
 }
 
-static int cl_get_guint32(int cmd) {
+static int cl_get_uint32(int cmd) {
         ServerPktHeader pkt_hdr;
         void *data;
         int fd, ret = 0;
@@ -170,7 +170,7 @@ static int cl_get_guint32(int cmd) {
         data = cl_read_packet(fd, &pkt_hdr);
         if (data) {
                 ret = *((int *) data);
-                g_free(data);
+                free(data);
         }
         cl_read_ack(fd);
         close(fd);
@@ -203,7 +203,7 @@ int musclient_init() {
 		cdrom_available = ((ValidSubsystem *)data)->cdrom;
 		midi_available  = ((ValidSubsystem *)data)->midi;
 		audio_available = ((ValidSubsystem *)data)->pcm;
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -273,7 +273,7 @@ int mus_cdrom_get_playposition(cd_time *tm) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		*tm = *((cd_time *)data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -289,7 +289,7 @@ int mus_cdrom_get_maxtrack() {
 	
 	if (!cdrom_available) return 0;
 	
-	trk = cl_get_guint32(MUS_CDROM_GETMAXTRACK);
+	trk = cl_get_uint32(MUS_CDROM_GETMAXTRACK);
 	
 	return trk;
 }
@@ -379,7 +379,7 @@ int mus_midi_get_playposition(midiplaystate *state) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		*state = *(midiplaystate *)data;
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -440,7 +440,7 @@ int mus_midi_get_flag(int mode, int index) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		val = *((int *)data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -630,7 +630,7 @@ int mus_pcm_get_playposition(int *pos) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		*pos = *(int *)(data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -699,7 +699,7 @@ boolean mus_mixer_fadeout_get_state(int device) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		bool = *((boolean *)data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -757,7 +757,7 @@ int mus_mixer_get_level(int device) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		lv = *((int *)data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -818,7 +818,7 @@ int mus_wav_unload(int ch) {
 	
 	if (ch < 0 || ch > 128) return NG;
 	
-	cl_send_guint32(MUS_PCM_UNLOAD, (guint32)(ch + 1));
+	cl_send_uint32(MUS_PCM_UNLOAD, (uint32_t)(ch + 1));
 	return OK;
 }
 
@@ -858,7 +858,7 @@ int mus_wav_stop(int ch) {
 	
 	if (ch < 0 || ch > 128) return NG;
 	
-	cl_send_guint32(MUS_PCM_STOP, (guint32)(ch +1));
+	cl_send_uint32(MUS_PCM_STOP, (uint32_t)(ch +1));
 	return OK;
 }
 
@@ -890,7 +890,7 @@ int mus_wav_get_playposition(int ch) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		ret = *(int *)(data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -993,7 +993,7 @@ boolean mus_wav_fadeout_get_state(int ch) {
 	
 	if (data) {
 		bool = *((boolean *)data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -1058,7 +1058,7 @@ int mus_wav_waittime(int ch, int time) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		ret = *(int *)(data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -1110,7 +1110,7 @@ int mus_wav_wavtime(int ch) {
 	
 	if (data) {
 		ret = *((boolean *)data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -1262,7 +1262,7 @@ int mus_bgm_getpos(int no) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		ret = *(int *)(data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);
@@ -1293,7 +1293,7 @@ int mus_bgm_wait(int no, int timeout) {
 		data = cl_read_packet(fd, &pkt_hdr);
 		if (data) {
 			ret = *(int *)(data);
-			g_free(data);
+			free(data);
 		}
 		cl_read_ack(fd);
 		close(fd);
@@ -1328,7 +1328,7 @@ int mus_bgm_waitpos(int no, int index) {
 int mus_bgm_stopall(int time) {
 	if (!audio_available) return NG;
 	
-	cl_send_guint32(MUS_BGM_STOPALL, (guint32)time * 10);
+	cl_send_uint32(MUS_BGM_STOPALL, (uint32_t)time * 10);
 	return OK;
 }
 
@@ -1352,7 +1352,7 @@ int mus_bgm_getlength(int no) {
 	data = cl_read_packet(fd, &pkt_hdr);
 	if (data) {
 		ret = *(int *)(data);
-		g_free(data);
+		free(data);
 	}
 	cl_read_ack(fd);
 	close(fd);

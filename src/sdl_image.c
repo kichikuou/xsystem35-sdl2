@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <SDL.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -66,10 +65,10 @@ void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int 
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
 	// src width と dst width が同じときに問題があるので+1
-	row = g_new0(int, dw+1);
+	row = calloc(dw+1, sizeof(int));
 	// 1おおきくして初期化しないと col[dw-1]とcol[dw]が同じになる
 	// 可能性がある。
-	col = g_new0(int, dh+1);
+	col = calloc(dh+1, sizeof(int));
 	
 	if(mirror & 1){
 		/*上下反転 added by  tajiri@wizard*/
@@ -141,8 +140,8 @@ void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int 
 	
 	SDL_FreeSurface(ss);
 	
-	g_free(row);
-	g_free(col);
+	free(row);
+	free(col);
 }
 
 void sdl_zoom(int x, int y, int w, int h) {

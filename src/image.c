@@ -25,7 +25,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 #include "portab.h"
 #include "system.h"
 #include "image.h"
@@ -270,7 +269,7 @@ static int trans_index2pixel(int depth, int i) {
 
 /* 16bitCGの ALPHALEVELを指定 */
 static WORD *changeImageAlphaLevel(cgdata *cg) {
-	WORD *new_pic = g_new(WORD, cg->width * cg->height), *new_pic_;
+	WORD *new_pic = malloc(sizeof(WORD) * cg->width * cg->height), *new_pic_;
 	WORD *pic = (WORD *)cg->pic;
 	int   pixels = cg->width * cg->height;
 	
@@ -362,10 +361,10 @@ void image_scaledCopyArea(agsurface_t *src, agsurface_t *dst, int sx, int sy, in
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
 	// src width と dst width が同じときに問題があるので+1
-	row = g_new0(int, dw+1);
+	row = calloc(dw+1, sizeof(int));
 	// 1おおきくして初期化しないと col[dw-1]とcol[dw]が同じになる
 	// 可能性がある。
-	col = g_new0(int, dh+1);
+	col = calloc(dh+1, sizeof(int));
 
 	if (mirror & 1) {
 		/* 上下反転 added by  tajiri@wizard */
@@ -420,8 +419,8 @@ void image_scaledCopyArea(agsurface_t *src, agsurface_t *dst, int sx, int sy, in
 		break;
 	}
 	
-	g_free(row);
-	g_free(col);
+	free(row);
+	free(col);
 	
 	if (srccpy != NULL) {
 		image_delRegion(srccpy);
@@ -544,7 +543,7 @@ void image_drawImage16_fromData(agsurface_t *dib, cgdata *cg, int x, int y, int 
 	}
 	
 	if (cg->alphalevel != 255) {
-		g_free(cg->pic);
+		free(cg->pic);
 		cg->pic = (BYTE *)pic_save;
 	}
 }
@@ -675,7 +674,7 @@ void image_getPixel(agsurface_t *dib, int x, int y, Pallet *cell) {
  * dib から領域の切り出し
  */
 agsurface_t* image_saveRegion(agsurface_t *dib, int x, int y, int w, int h) {
-	agsurface_t *i = g_new(agsurface_t ,1);
+	agsurface_t *i = malloc(sizeof(agsurface_t));
 	int    j;
 	BYTE *ys = GETOFFSET_PIXEL(dib, x, y);
 	BYTE *yd;
@@ -686,7 +685,7 @@ agsurface_t* image_saveRegion(agsurface_t *dib, int x, int y, int w, int h) {
 	i->height         = h;
 	i->bytes_per_line = w * dib->bytes_per_pixel;
 	i->bytes_per_pixel = dib->bytes_per_pixel;
-	i->pixel = yd = g_new(char, w * h * dib->bytes_per_pixel);
+	i->pixel = yd = malloc(sizeof(char) * (w * h * dib->bytes_per_pixel));
 	
 	for (j = 0; j < h; j++) {
 		memcpy(yd, ys, w * dib->bytes_per_pixel);
@@ -727,16 +726,16 @@ void image_putRegion(agsurface_t *dib, agsurface_t *dst, int x, int y) {
  */
 void image_restoreRegion(agsurface_t *dib, agsurface_t *dst, int x, int y) {
 	image_putRegion(dib, dst, x, y);
-	g_free(dst->pixel);
-	g_free(dst);
+	free(dst->pixel);
+	free(dst);
 }
 
 /*
  * save した領域の解放
  */
 void image_delRegion(agsurface_t *r) {
-	g_free(r->pixel);
-	g_free(r);
+	free(r->pixel);
+	free(r);
 }
 
 

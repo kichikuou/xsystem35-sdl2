@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <alsa/asoundlib.h>
-#include <glib.h>
 #include <sys/poll.h>
 
 #include "system.h"
@@ -186,8 +185,8 @@ static int alsa_exit(audiodevice_t *dev) {
 	if (dev == NULL) return OK;
 	
 	mixer_exit(dev);
-	g_free(dev->data_pcm);
-	g_free(dev->data_mix);
+	free(dev->data_pcm);
+	free(dev->data_mix);
 	
 	return OK;
 }
@@ -195,7 +194,7 @@ static int alsa_exit(audiodevice_t *dev) {
 int alsa_init(audiodevice_t *dev, char *devname, boolean automix) {
 	audio_alsa_t *alsa;
 	
-	alsa = g_new0(audio_alsa_t, 1);
+	alsa = calloc(1, sizeof(audio_alsa_t));
 	alsa->dev = devname;
 	dev->data_pcm = alsa;
 	

@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <esd.h>
-#include <glib.h>
 
 #include "audio.h"
 #include "audio_esd.h"

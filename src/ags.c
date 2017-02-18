@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "xsystem35.h"
@@ -164,9 +163,9 @@ void ags_setWorldSize(int width, int height, int depth) {
 	/* DIBが8以上の場合は、alpha plane を用意 */
 	if (depth > 8) {
 		if (nact->ags.dib->alpha != NULL) {
-			g_free(nact->ags.dib->alpha);
+			free(nact->ags.dib->alpha);
 		}
-		nact->ags.dib->alpha = g_new0(BYTE, width * height);
+		nact->ags.dib->alpha = calloc(width * height, sizeof(BYTE));
 		nact->ags.dib->has_alpha = TRUE;
 	}
 	

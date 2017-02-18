@@ -15,7 +15,7 @@ static int mixer_exit(audiodevice_t *dev) {
 static int mixer_init(audiodevice_t *dev, char *devmix) {
 	mixer_sun_t *mix;
 	
-	// mix = g_new0(mixer_sun_t, 1);
+	// mix = calloc(1, sizeof(mixer_sun_t));
 
 	
 	return OK;

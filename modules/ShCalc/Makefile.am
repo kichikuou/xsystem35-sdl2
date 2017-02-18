@@ -2,9 +2,8 @@ pkglib_LTLIBRARIES = ShCalc.la
 
 ShCalc_la_LDFLAGS = -module -export-dynamic -avoid-version
 ShCalc_la_SOURCES = ShCalc.c
-ShCalc_la_LIBADD = @GLIB_LIBS@
 
-AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
+AM_CFLAGS = @DEBUG_CFLAGS@
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \

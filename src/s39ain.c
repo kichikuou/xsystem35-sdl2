@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <glib.h>
 #include <ltdl.h>
 
 #include "portab.h"
@@ -105,7 +104,7 @@ int s39ain_init(void) {
 	}
 	p += 8;
 	dllnum = LittleEndian_getDW(p, 0);
-	dll = g_new(S39AIN_DLLINF, dllnum);
+	dll = malloc(sizeof(S39AIN_DLLINF) * dllnum);
 	
 	p += 4;
 	for (i = 0; i < dllnum; i++) {
@@ -118,7 +117,7 @@ int s39ain_init(void) {
 		p += 4;
 		
 		dll[i].function_num = fn;
-		dll[i].function = g_new(S39AIN_DLLFN, fn);
+		dll[i].function = malloc(sizeof(S39AIN_DLLFN) * fn);
 		for (j = 0; j < fn; j++) {
 			int argc, k;
 			
@@ -129,7 +128,7 @@ int s39ain_init(void) {
 			p += 4;
 			
 			dll[i].function[j].argc = argc;
-			dll[i].function[j].argv = g_new(int, argc);
+			dll[i].function[j].argv = malloc(sizeof(int) * argc);
 			for (k = 0; k < argc; k++) {
 				dll[i].function[j].argv[k] = LittleEndian_getDW(p, 0);
 				p += 4;
@@ -141,7 +140,7 @@ int s39ain_init(void) {
 	if (0 == strncmp(p, "FUNC", 4)) {
 		fncnum = LittleEndian_getDW(p, 8);
 		
-		fnc = g_new(S39AIN_FUNCNAME, fncnum);
+		fnc = malloc(sizeof(S39AIN_FUNCNAME) * fncnum);
 		p += 12;
 		
 		for (i = 0; i < fncnum; i++) {
@@ -166,7 +165,7 @@ int s39ain_init(void) {
 	if (0 == strncmp(p, "MSGI", 4)) {
 		msgnum = LittleEndian_getDW(p, 8);
 		
-		msg = g_new(char *, msgnum);
+		msg = malloc(sizeof(char *) * msgnum);
 		p += 12;
 		
 		for (i = 0; i < msgnum; i++) {
@@ -191,8 +190,8 @@ int s39ain_init(void) {
 		
 		// 最初にカレントディレクトリのソースツリーの下の
 		// モジュールを検索
-		g_snprintf(searchpath, sizeof(searchpath) -1, "%s/%s",
-			   path_to_dll, dll[i].name);
+		snprintf(searchpath, sizeof(searchpath) -1, "%s/%s",
+				 path_to_dll, dll[i].name);
 		
 		lt_dlsetsearchpath(searchpath);
 		

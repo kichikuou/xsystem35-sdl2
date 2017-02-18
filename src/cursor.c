@@ -22,7 +22,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -231,7 +230,7 @@ static int read_rgbquad(BYTE* data) {
 	int colors=2;
 	BYTE* p = data;
 	
-	cursorImage.icColors = g_new(TRGBQuad, colors);
+	cursorImage.icColors = malloc(sizeof(TRGBQuad) * colors);
 	
 	if (cursorImage.icColors == NULL) {  /* shouldn't happen */
 		NOMEMERR();
@@ -338,7 +337,7 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 			NOTICE("rate size = %d\n", c.size);
 			if (anicurHeader.fl & 0x01) {
 				int i;
-				anicurHeader.rate = g_new(int, anicurHeader.cSteps);
+				anicurHeader.rate = malloc(sizeof(int) * anicurHeader.cSteps);
 				for (i = 0; i < anicurHeader.cSteps; i++) {
 					anicurHeader.rate[i] = LittleEndian_getW(src, i*4);
 					// printf("rate %d, %d\n", i, anicurHeader.rate[i]);

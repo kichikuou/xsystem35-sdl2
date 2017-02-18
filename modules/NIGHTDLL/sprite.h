@@ -2,8 +2,6 @@
 #ifndef __SPRITE_H__
 #define __SPRITE_H__
 
-#include <glib.h>
-
 #include "portab.h"
 #include "surface.h"
 #include "graphics.h"
@@ -128,7 +126,7 @@ extern int sp_draw_wall(sprite_t *sp, MyRectangle *r);
 /* in nt_sprite_draw.c */
 extern int sp_draw(sprite_t *sp, MyRectangle *r);
 extern int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r);
-extern void sp_draw_dmap(gpointer data, gpointer userdata);
+extern void sp_draw_dmap(void* data, void* userdata);
 extern int sp_draw_scg(sprite_t *sp, MyRectangle *r);
 
 /* in nt_sprite_eupdate.c */

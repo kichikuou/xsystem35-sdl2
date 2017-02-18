@@ -24,10 +24,10 @@
 #ifndef __MUSIC_SERVER_H__
 #define __MUSIC_SERVER_H__
 
-#include <glib.h>
 #include <sys/poll.h>
 
 #include "portab.h"
+#include "list.h"
 #include "cdrom.h"
 #include "midi.h"
 #include "audio.h"
@@ -69,8 +69,8 @@ struct _musprvdat {
 	// 最大トラック数
 	int cd_maxtrk;
 	
-	GList *pcmplist; // PCM多重再生用リスト
-	GList *fadelist; // Faderリスト
+	List *pcmplist; // PCM多重再生用リスト
+	List *fadelist; // Faderリスト
 	
 	// for polling
 	int nfds;

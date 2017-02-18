@@ -31,7 +31,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -88,8 +87,8 @@ int smask_init(char *path) {
 	am->fd = fd;
 	
 	am->datanum = LittleEndian_getDW(adr, 0);
-	am->no = g_new(int, am->datanum);
-	am->offset = g_new(int, am->datanum);
+	am->no = malloc(sizeof(int) * am->datanum);
+	am->offset = malloc(sizeof(int) * am->datanum);
 	
 	for (i = 0; i < am->datanum; i++) {
 		am->no[i] = LittleEndian_getDW(adr, 16 + i * 16);

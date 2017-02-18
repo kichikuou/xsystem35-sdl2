@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <glib.h>
+#include <stdint.h>
 
 #include "portab.h"
 #include "nact.h"
@@ -37,15 +37,15 @@
 #include "randMT.h"
 
 static int numbase;
-static gint64  l_1000A0C8;
-static gint64  l_1000A0D0;
-static gint64  l_1000A0D8;
+static int64_t  l_1000A0C8;
+static int64_t  l_1000A0D0;
+static int64_t  l_1000A0D8;
 
-static gint64 mul64(gint64 a1, gint64 a2) {
+static int64_t mul64(int64_t a1, int64_t a2) {
 	return a1 * a2;
 }
 
-static gint64 div64(gint64 a1, gint64 a2) {
+static int64_t div64(int64_t a1, int64_t a2) {
 	if (a1 == 0 || a2 == 0) return 0;
 	
 	return a1 / a2;
@@ -91,7 +91,7 @@ void GetIntNum16(void) { /* 3 */
 	  var: 数値をいれる変数
 	 */
 	int *var = getCaliVariable();
-	gint64 i;
+	int64_t i;
 	
 	i = div64(l_1000A0D8, numbase);
 	
@@ -167,7 +167,7 @@ void DivIntNum16(void) { /* 11 */
 	   var: 足す数の入った変数
 	 */
 	int *var = getCaliVariable();
-	gint64 i;
+	int64_t i;
 	
 	l_1000A0C8 = *var;
 	

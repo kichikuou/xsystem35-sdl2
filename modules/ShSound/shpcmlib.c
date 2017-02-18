@@ -21,7 +21,7 @@
 */
 /* $Id: shpcmlib.c,v 1.2 2003/08/02 13:10:32 chikama Exp $ */
 #include <stdio.h>
-#include <glib.h>
+#include <limits.h>
 
 #include "portab.h"
 #include "wavfile.h"
@@ -73,7 +73,7 @@ void pcmlib_fade_volume_memory(WAVFILE *wfile, int start, int range) {
 	
 	if (wfile == NULL) return;
 	
-	if (wfile->samples > (G_MAXINT / 100)) {
+	if (wfile->samples > (INT_MAX / 100)) {
 		wavtime = (wfile->samples / wfile->rate) * 100;
 	} else {
 		wavtime = (wfile->samples * 100) / wfile->rate;
@@ -119,7 +119,7 @@ WAVFILE *pcmlib_load_rw(int no) {
 	
 	wfile = wav_getinfo(dfile->data);
 	if (wfile) {
-		void *p = g_malloc(wfile->bytes);
+		void *p = malloc(wfile->bytes);
 		memcpy(p, wfile->data, wfile->bytes);
 		wfile->data = (BYTE *)p;
 		wfile->dfile = NULL;

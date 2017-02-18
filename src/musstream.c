@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
 
@@ -61,14 +61,14 @@ static int file_read(struct _musstream *this, void *ptr, int size, int maxnum) {
 static int file_close(struct _musstream *this) {
 	if (this) {
 		fclose(this->hidden.stdio.fp);
-		g_free(this);
+		free(this);
 	}
 	return 0;
 }
 
 static int pipe_seek(struct _musstream *this, int off, int where) {
 	FILE *fp;
-	char *tbuf = g_new(char, off);
+	char *tbuf = malloc(sizeof(char) * off);
 	int num = 0;
 	
 	switch(where) {
@@ -96,11 +96,11 @@ static int pipe_seek(struct _musstream *this, int off, int where) {
 		break;
 	default:
 		WARNING("Unknown value for 'whence'\n");
-		g_free(tbuf);
+		free(tbuf);
 		return -1;
 	}
 	
-	g_free(tbuf);
+	free(tbuf);
 	return num;
 }
 
@@ -125,7 +125,7 @@ static int pipe_close(struct _musstream *this) {
 			pclose(this->hidden.pipe.fp);
 			this->hidden.pipe.fp = NULL;
 		}
-		g_free(this);
+		free(this);
 	}
 	return 0;
 }
@@ -178,7 +178,7 @@ static int mem_read(struct _musstream *this, void *ptr, int size, int maxnum) {
 
 static int mem_close(struct _musstream *this) {
 	if (this) {
-		g_free(this);
+		free(this);
 	}
 	return 0;
 }
@@ -193,7 +193,7 @@ musstream_t *ms_file(char *filename) {
 		return NULL;
 	}
 	
-	s = g_new0(musstream_t, 1);
+	s = calloc(1, sizeof(musstream_t));
 	s->hidden.stdio.fp = fp;
 	s->seek = file_seek;
 	s->read = file_read;
@@ -215,7 +215,7 @@ musstream_t *ms_pipe(char *cmd) {
 #endif
 	fp = NULL;
 	
-	s = g_new0(musstream_t, 1);
+	s = calloc(1, sizeof(musstream_t));
 	s->hidden.pipe.fp = fp;
 	s->hidden.pipe.cmd = cmd;
 	
@@ -229,7 +229,7 @@ musstream_t *ms_pipe(char *cmd) {
 musstream_t *ms_memory(void *ptr, int size) {
 	musstream_t *s;
 	
-	s = g_new0(musstream_t, 1);
+	s = calloc(1, sizeof(musstream_t));
 	s->hidden.mem.base = ptr;
 	s->hidden.mem.cur = ptr;
 	s->hidden.mem.end = ptr + size;

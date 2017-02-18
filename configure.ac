@@ -142,29 +142,9 @@ dnl      [enable_pkgc=yes])
 dnl fi
 
 dnl
-dnl check glib
+dnl check iconv
 dnl
-AM_PATH_GLIB_2_0(2.0.0,
-  AC_DEFINE(ENABLE_GLIB,1,[Define this if you have glib >= 2.0.0]),
-  AC_MSG_ERROR(*** check for glib-2.x failed ***)
-)
-
-
-dnl if test x"$enable_pkgc" = "xno"; then
-dnl  AM_PATH_GLIB(1.2.0,
-dnl	       AC_DEFINE(ENABLE_GLIB,1,[Define this if you have glib >= 1.2.0]),must_gtk=yes)
-dnl  if test x"$must_gtk" = "xyes"; then
-dnl    AC_MSG_RESULT("May be 1.0.x ?. You can't be disable gtk")
-dnl  fi
-dnl else
-dnl  AC_ARG_WITH(glib-target,
-dnl             [  --with-glib-target       target glib [default=glib]],
-dnl             [glibtarget="glib$withval"],[glibtarget="glib"])
-dnl  PKG_CHECK_MODULES(BASE_DEPENDENCEIS, $glibtarget >= 1.2.0)
-dnl  GLIB_CFLAGS="`$PKGCONFIG --cflags $glibtarget`"
-dnl  GLIB_LIBS="`$PKGCONFIG --libs $glibtarget`"
-dnl  AC_DEFINE(ENABLE_GLIB,1,[Define this if you have glib >= 1.2.0])
-dnl fi
+AM_ICONV
 
 dnl
 dnl check for gtk

@@ -29,7 +29,6 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -101,7 +100,7 @@ static void font_x11_sel_font(int type, int size) {
 		if (type > 3) type = FONT_GOTHIC;
 		
 		/* set size */
-		g_snprintf(name, sizeof(name), this->name[type], size, size);
+		snprintf(name, sizeof(name), this->name[type], size, size);
 		
 		fs = XCreateFontSet(x11_display, name, &miss, &n_miss, &def);
 		if (n_miss > 0) {
@@ -138,7 +137,7 @@ static agsurface_t *get_drawn_glyph(const char *str, int w) {
 	
 	src = XGetImage(x11_display, pix_glyph, 0, 0, w, font_ascent + font_descent, AllPlanes, ZPixmap);
 
-	dst = g_new(agsurface_t, 1);
+	dst = malloc(sizeof(agsurface_t));
 
 	dst->width          = w;
 	dst->height         = font_ascent + font_descent;
@@ -178,7 +177,7 @@ static void *font_x11_get_glyph(unsigned char *str) {
 	img_glyph.height = dst->height;
 	
 	free(dst->pixel);
-	g_free(dst);
+	free(dst);
 	free(conv);
 	return &img_glyph;
 }
@@ -206,7 +205,7 @@ static int font_x11_draw_glyph(int x, int y, unsigned char *str, int col) {
 		} else {
 			image_getGlyphImageNto8(DIB, dst, x, y, col);
 		}
-		g_free(dst);
+		free(dst);
 	} else {
 		Xcore_setForeground(col);
 		XmbDrawString(x11_display, x11_pixmap, fontset, x11_gc_pix, x, y + font_ascent, conv, strlen(conv));
@@ -221,7 +220,7 @@ static boolean drawable() {
 
 
 FONT *font_x11_new() {
-	FONT *f = g_new(FONT, 1);
+	FONT *f = malloc(sizeof(FONT));
 	
 	f->sel_font   = font_x11_sel_font;
 	f->get_glyph  = font_x11_get_glyph;
@@ -239,7 +238,7 @@ FONT *font_x11_new() {
 	img_glyph.bytes_per_line  = GLYPH_PIXMAP_WIDTH;
 	img_glyph.depth           = 8;
 	img_glyph.bytes_per_pixel = 1;
-	img_glyph.pixel = g_malloc(GLYPH_PIXMAP_WIDTH * GLYPH_PIXMAP_HEIGHT);
+	img_glyph.pixel = malloc(GLYPH_PIXMAP_WIDTH * GLYPH_PIXMAP_HEIGHT);
 	
 	this = f;
 

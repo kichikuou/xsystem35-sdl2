@@ -22,7 +22,6 @@
 
 #if !(HAVE_MKDTEMP)
 
-#include <glib.h>
 
 #include <sys/types.h>
 #include <assert.h>

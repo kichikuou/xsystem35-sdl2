@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
+#include <stdint.h>
 
 #include "portab.h"
 #include "system.h"
@@ -136,7 +136,7 @@ static bgi_t *bgi_read() {
 	fseek(fp, 0, SEEK_END);
 	len = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
-	_b = b = g_malloc(len);
+	_b = b = malloc(len);
 	fread(b, len, 1, fp);
 	fclose(fp);
 
@@ -155,9 +155,9 @@ static bgi_t *bgi_read() {
 		b = findterm(b);
 	}
 	
-	bgi = g_new(bgi_t, 1);
+	bgi = malloc(sizeof(bgi_t));
 	bgi->nfile = 1 + (len - (b - _b)) / 29; // だいたいこれくらい?
-	bgi->i = g_new(struct _bgii, bgi->nfile);
+	bgi->i = malloc(sizeof(struct _bgii) * bgi->nfile);
 	
 	while (b < blast) {
 		int len;
@@ -179,7 +179,7 @@ static bgi_t *bgi_read() {
 		b = findterm(b);
 	}
 	
-	g_free(_b);
+	free(_b);
 	return bgi;
 }
 
@@ -285,7 +285,7 @@ int musbgm_play(int no, int time, int vol) {
 		return NG;
 	}
 	
-	obj = g_new0(pcmobj_t, 1);
+	obj = calloc(1, sizeof(pcmobj_t));
 	obj->sdata = (void *)wfile;
 	obj->stype = OBJSRC_FILE;
 	if (bgmindex->i[dno].len == 0) {
@@ -313,8 +313,8 @@ int musbgm_play(int no, int time, int vol) {
 	obj->written_len = 0;
 	obj->playing = TRUE;
 	
-	if (-1 == g_list_index(prv.pcmplist, obj)) {
-		prv.pcmplist = g_list_append(prv.pcmplist, (gpointer)obj);
+	if (-1 == list_index(prv.pcmplist, obj)) {
+		prv.pcmplist = list_append(prv.pcmplist, (void*)obj);
 	}
 	
 	musfade_new(MIX_PCM, slot, time, vol, 0);
@@ -357,7 +357,7 @@ int musbgm_fade(int no, int time, int vol) {
 int musbgm_getpos(int no) {
 	int slot;
 	pcmobj_t *obj;
-	guint64 len;
+	uint64_t len;
 
 	if (bgmindex == NULL) return 0;
 	
@@ -369,13 +369,13 @@ int musbgm_getpos(int no) {
 	obj = prv.pcm[slot];
 	len = obj->src->hidden.mem.cur - obj->src->hidden.mem.base;
 	
-	return (int)(((guint64)len * 100) / (obj->fmt.rate * (obj->fmt.bit/8) * obj->fmt.ch));
+	return (int)(((uint64_t)len * 100) / (obj->fmt.rate * (obj->fmt.bit/8) * obj->fmt.ch));
 }
 
 int musbgm_getlen(int no) {
 	int slot;
 	pcmobj_t *obj;
-	guint64 len;
+	uint64_t len;
 	int ilen;
 	
 	if (bgmindex == NULL) return 0;
@@ -388,12 +388,12 @@ int musbgm_getlen(int no) {
 		// load and get
 		wfile = bgm_load(no);
 		len = wfile->bytes;
-		ilen = (int)(((guint64)len * 100) / (wfile->rate * (wfile->bits/8) * wfile->ch));
+		ilen = (int)(((uint64_t)len * 100) / (wfile->rate * (wfile->bits/8) * wfile->ch));
 		pcmlib_free(wfile);
 	} else {
 		obj = prv.pcm[slot];
 		len = obj->src->hidden.mem.end - obj->src->hidden.mem.base;
-		ilen = (int)(((guint64)len * 100) / (obj->fmt.rate * (obj->fmt.bit/8) * obj->fmt.ch));
+		ilen = (int)(((uint64_t)len * 100) / (obj->fmt.rate * (obj->fmt.bit/8) * obj->fmt.ch));
 	}
 	
 	return ilen;

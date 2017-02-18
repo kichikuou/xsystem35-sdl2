@@ -22,9 +22,9 @@
 /* $Id: music_ctrlsocket.c,v 1.1 2002/08/18 09:35:29 chikama Exp $ */
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 
-static void ctrl_write_packet(gint fd, gpointer data, gint length) {
+static void ctrl_write_packet(int fd, void* data, int length) {
 	ServerPktHeader pkthdr;
 
 	pkthdr.version = XSYS35_PROTOCOL_VERSION;
@@ -35,19 +35,19 @@ static void ctrl_write_packet(gint fd, gpointer data, gint length) {
 	}
 }
 
-static void ctrl_write_gint(gint fd, gint val) {
-	ctrl_write_packet(fd, &val, sizeof (gint));
+static void ctrl_write_int(int fd, int val) {
+	ctrl_write_packet(fd, &val, sizeof (int));
 }
 
-static void ctrl_write_gfloat(gint fd, gfloat val) {
-	ctrl_write_packet(fd, &val, sizeof (gfloat));
+static void ctrl_write_float(int fd, float val) {
+	ctrl_write_packet(fd, &val, sizeof (float));
 }
 
-static void ctrl_write_gboolean(gint fd, gboolean bool) {
-	ctrl_write_packet(fd, &bool, sizeof (gboolean));
+static void ctrl_write_boolean(int fd, boolean bool) {
+	ctrl_write_packet(fd, &bool, sizeof (boolean));
 }
 
-static void ctrl_write_string(gint fd, gchar * string) {
+static void ctrl_write_string(int fd, char* string) {
 	ctrl_write_packet(fd, string, string ? strlen(string) + 1 : 0);
 }
 
@@ -55,7 +55,7 @@ static void ctrl_ack_packet(PacketNode * pkt) {
         ctrl_write_packet(pkt->fd, NULL, 0);
 	close(pkt->fd);
 	if (pkt->data) {
-		g_free(pkt->data);
+		free(pkt->data);
 	}
-	g_free(pkt);
+	free(pkt);
 }

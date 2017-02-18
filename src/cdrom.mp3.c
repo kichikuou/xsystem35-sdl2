@@ -31,7 +31,6 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <glib.h>
 
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
@@ -261,7 +260,7 @@ static int cdrom_start(int trk) {
 	}
 	
 	if (pipedplay) {
-		g_snprintf(cmd_pipe, sizeof(cmd_pipe) -1, mp3_player, playlist[trk -2]);
+		snprintf(cmd_pipe, sizeof(cmd_pipe) -1, mp3_player, playlist[trk -2]);
 		if (-1 == muspcm_load_pipe(SLOT_CDROMPIPE, cmd_pipe)) {
 			return NG;
 		}

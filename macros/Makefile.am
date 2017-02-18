@@ -8,7 +8,6 @@ MACROS= \
   esd.m4 \
   freetype2.m4 \
   gettext.m4 \
-  glib-2.0.m4 \
   glibc21.m4 \
   gtk-2.0.m4 \
   iconv.m4 \

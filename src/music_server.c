@@ -29,7 +29,6 @@
 #include <sys/poll.h>
 #include <sys/un.h>
 #include <sys/wait.h>
-#include <glib.h>
 #include <signal.h>
 
 #include "portab.h"
@@ -86,12 +85,12 @@ static int get_command() {
 		return 0;
 	}
 	
-	pkt = g_malloc0(sizeof(PacketNode));
+	pkt = calloc(1, sizeof(PacketNode));
 	read(fd, &pkt->hdr, sizeof(ClientPktHeader));
 	if (pkt->hdr.data_length) {
 		BYTE *p;
 		int l;
-		p = pkt->data = g_malloc0(pkt->hdr.data_length);
+		p = pkt->data = calloc(1, pkt->hdr.data_length);
 		l = pkt->hdr.data_length;
 		while(l) {
 			int len;
@@ -156,7 +155,7 @@ static int get_command() {
 		muspcm_load_mem(v[0], pkt->data);
 		ctrl_write_packet(pkt->fd, NULL, 0);
 		close(pkt->fd);
-		g_free(pkt);
+		free(pkt);
 		break;
 
 	case MUS_PCM_LOAD_LRSW:
@@ -176,7 +175,7 @@ static int get_command() {
 		int time;
 		v[0] = ((int *)pkt->data)[0]; /* ch */
 		time = muspcm_getpos(v[0]);
-		ctrl_write_gint(pkt->fd, time);
+		ctrl_write_int(pkt->fd, time);
 		ctrl_ack_packet(pkt);
 		break;
 	}
@@ -189,15 +188,15 @@ static int get_command() {
 		}
 		prv.pcm[v[0]]->cb_atend = musserv_send_ack;
 		prv.pcm[v[0]]->fd = pkt->fd;
-		g_free(pkt->data);
-		g_free(pkt);
+		free(pkt->data);
+		free(pkt);
 		break;
 		
 	case MUS_PCM_GETWAVETIME: {
 		int time;
 		v[0] = ((int *)pkt->data)[0]; /* ch */
 		time = muspcm_getwavelen(v[0]);
-		ctrl_write_gint(pkt->fd, time);
+		ctrl_write_int(pkt->fd, time);
 		ctrl_ack_packet(pkt);
 		break;
 	}
@@ -244,7 +243,7 @@ static int get_command() {
 		v[0] = ((int *)pkt->data)[0]; /* mode */
 		v[1] = ((int *)pkt->data)[1]; /* index */
 		val = musmidi_getflag(v[0], v[1]);
-		ctrl_write_gint(pkt->fd, val);
+		ctrl_write_int(pkt->fd, val);
 		ctrl_ack_packet(pkt);
 		break;
 	}
@@ -272,7 +271,7 @@ static int get_command() {
 		v[0] = ((int *)pkt->data)[0]; /* device */
 		v[1] = ((int *)pkt->data)[1]; /* pcm subdev  */
 		st = musfade_getstate(v[0], v[1]);
-		ctrl_write_gboolean(pkt->fd, st);
+		ctrl_write_boolean(pkt->fd, st);
 		ctrl_ack_packet(pkt);
 		break;
 	}
@@ -282,7 +281,7 @@ static int get_command() {
 		v[0] = ((int *)pkt->data)[0]; /* dev */
 		
 		lv = musfade_getvol(v[0]);
-		ctrl_write_gint(pkt->fd, lv);
+		ctrl_write_int(pkt->fd, lv);
 		ctrl_ack_packet(pkt);
 		break;
 	}
@@ -331,7 +330,7 @@ static int get_command() {
 		} else {
 			val = musbgm_getpos(v[0]);
 		}
-		ctrl_write_gint(pkt->fd, val);
+		ctrl_write_int(pkt->fd, val);
 		ctrl_ack_packet(pkt);
 		break;
 	}
@@ -344,7 +343,7 @@ static int get_command() {
 		} else {
 			val = musbgm_getlen(v[0]);
 		}
-		ctrl_write_gint(pkt->fd, val);
+		ctrl_write_int(pkt->fd, val);
 		ctrl_ack_packet(pkt);
 		break;
 	}

@@ -21,7 +21,7 @@
 */
 /* $Id: ald_manager.c,v 1.3 2001/05/08 05:36:07 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "dri.h"
 #include "cache.h"
@@ -43,8 +43,8 @@ static void ald_free(dridata *dfile);
  *   dfile: dridata to be free
 */
 static void ald_free(dridata *dfile) {
-	g_free(dfile->data_raw);
-	g_free(dfile);
+	free(dfile->data_raw);
+	free(dfile);
 }
 
 /*
@@ -88,7 +88,7 @@ void ald_freedata(dridata *data) {
 	if (data == NULL) return;
 	
 	if (data->a->mmapped) {
-		g_free(data);
+		free(data);
 	} else {
 		data->in_use = FALSE;
 	}

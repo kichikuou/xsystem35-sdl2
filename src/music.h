@@ -24,7 +24,7 @@
 #ifndef __MUSIC_H__
 #define __MUSIC_H__
 
-#include <glib.h>
+#include <stdint.h>
 
 /* music command */
 enum {
@@ -79,20 +79,20 @@ enum {
 #define XSYS35_PROTOCOL_VERSION 1
 
 typedef struct {
-	guint16 version;
-	guint16 command;
-	guint32 data_length;
+	uint16_t version;
+	uint16_t command;
+	uint32_t data_length;
 } ClientPktHeader;
 
 typedef struct {
-	guint16 version;
-	guint32 data_length;
+	uint16_t version;
+	uint32_t data_length;
 } ServerPktHeader;
 
 typedef struct {
 	ClientPktHeader hdr;
-	gpointer data;
-	gint fd;
+	void* data;
+	int fd;
 } PacketNode;
 
 typedef struct {

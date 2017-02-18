@@ -1,7 +1,7 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"
@@ -9,7 +9,7 @@
 #include "system.h"
 
 static surface_t *create(int width, int height, int depth, boolean has_pixel, boolean has_alpha) {
-	surface_t *s = g_new0(surface_t, 1);
+	surface_t *s = calloc(1, sizeof(surface_t));
 	
 	s->width = width;
 	s->height = height;
@@ -23,19 +23,19 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 	if (s->has_pixel) {
 		switch (s->depth) {
 		case 8:
-			s->pixel = g_new0(BYTE, width * (height +1));
+			s->pixel = calloc(width * (height +1), sizeof(BYTE));
 			s->bytes_per_line = width;
 			s->bytes_per_pixel = 1;
 			break;
 		case 15:
 		case 16:
-			s->pixel = g_new0(BYTE, width * (height +1) * 2);
+			s->pixel = calloc(width * (height +1) * 2, sizeof(BYTE));
 			s->bytes_per_line = width * 2;
 			s->bytes_per_pixel = 2;
 			break;
 		case 24:
 		case 32:
-			s->pixel = g_new0(BYTE, width * (height +1) * 4);
+			s->pixel = calloc(width * (height +1) * 4, sizeof(BYTE));
 			s->bytes_per_line = width * 4;
 			s->bytes_per_pixel = 4;
 			break;
@@ -47,7 +47,7 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 	}
 	
 	if (s->has_alpha) {
-		s->alpha = g_new0(BYTE, width * (height +1));
+		s->alpha = calloc(width * (height +1), sizeof(BYTE));
 	}
 	
 	return s;
@@ -92,9 +92,9 @@ surface_t *sf_create_pixel(int width, int height, int depth) {
  */
 void sf_free(surface_t *s) {
 	if (s == NULL) return;
-	if (s->pixel) g_free(s->pixel);
-	if (s->alpha) g_free(s->alpha);
-	g_free(s);
+	if (s->pixel) free(s->pixel);
+	if (s->alpha) free(s->alpha);
+	free(s);
 }
 
 /**
@@ -108,18 +108,18 @@ surface_t *sf_dup(surface_t *in) {
 	
 	if (in == NULL) return NULL;
 	
-	sf = g_new(surface_t, 1);
+	sf = malloc(sizeof(surface_t));
 	memcpy(sf, in, sizeof(surface_t));
 	
 	if (in->has_pixel) {
 		len = sf->bytes_per_line * sf->height;
-		sf->pixel = g_new(BYTE, len + sf->bytes_per_line);
+		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
 		memcpy(sf->pixel, in->pixel, len);
 	}
 	
 	if (in->has_alpha) {
 		len = sf->width * sf->height;
-		sf->alpha = g_new(BYTE, len + sf->width);
+		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
 		memcpy(sf->alpha, in->alpha, len);
 	}
 	
@@ -167,12 +167,12 @@ surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 	
 	if (in == NULL) return NULL;
 	
-	sf = g_new(surface_t, 1);
+	sf = malloc(sizeof(surface_t));
 	memcpy(sf, in, sizeof(surface_t));
 	
 	if (in->has_pixel) {
 		len = sf->bytes_per_line * sf->height;
-		sf->pixel = g_new(BYTE, len + sf->bytes_per_line);
+		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
 		if (copypixel) {
 			memcpy(sf->pixel, in->pixel, len);
 		}
@@ -180,7 +180,7 @@ surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 	
 	if (in->has_alpha) {
 		len = sf->width * sf->height;
-		sf->alpha = g_new(BYTE, len + sf->width);
+		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
 		if (copyalpha) {
 			memcpy(sf->alpha, in->alpha, len);
 		}

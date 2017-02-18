@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -49,7 +48,7 @@ struct markinfo {
 };
 
 static boolean is_messagesprite(int wNum);
-static void replacestr_cb(gpointer data, gpointer userdata);
+static void replacestr_cb(void* data, void* userdata);
 static char *replacestr(char *msg);
 static void update_mark(sprite_t *sp, cginfo_t *cg);
 static int  setupmark(int wNum1, int wNum2, struct markinfo *minfo);
@@ -81,7 +80,7 @@ static boolean is_messagesprite(int wNum) {
 }
 
 // 文字列の置き換え処理
-static void replacestr_cb(gpointer data, gpointer userdata) {
+static void replacestr_cb(void* data, void* userdata) {
 	strexchange_t *ex = (strexchange_t *)data;
 	char *start, *next, *out;
 	
@@ -113,7 +112,7 @@ static char *replacestr(char *msg) {
 	strncpy(repbuf[0], msg, REPLACEBUFSIZE);
 	replacesrc = repbuf[0];
 	replacedst = repbuf[1];
-	g_slist_foreach(sact.strreplace, replacestr_cb, NULL);
+	slist_foreach(sact.strreplace, replacestr_cb, NULL);
 
 	return (repbuf[0][0] == '\0') ? repbuf[1] : repbuf[0];
 }
@@ -387,7 +386,7 @@ void smsg_clear(int wNum) {
 	sp_updateme(sp);
 	
 	if (sact.logging) {
-		sact.log = g_list_append(sact.log, g_strdup("\n"));
+		sact.log = list_append(sact.log, strdup("\n"));
 	}
 }
 
@@ -553,7 +552,7 @@ static void append_to_log(char *msg) {
 static void sactlog_newline() {
 	if (sact.logging) {
 		if (sact.msgbuf2[0] == '\0') return;
-		sact.log = g_list_append(sact.log, g_strdup(sact.msgbuf2));
+		sact.log = list_append(sact.log, strdup(sact.msgbuf2));
 		sact.msgbuf2[0] = '\0';
 	}
 }

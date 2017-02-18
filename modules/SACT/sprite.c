@@ -25,10 +25,10 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "ngraph.h"
 #include "ags.h"
 #include "nact.h"
@@ -38,26 +38,26 @@
 #include "sactcg.h"
 #include "sactsound.h"
 
-static gint compare_spriteno_smallfirst(gconstpointer a, gconstpointer b);
+static int compare_spriteno_smallfirst(const void *a, const void *b);
 
 
-#define sp_assert_no(no) G_STMT_START{                               \
+#define sp_assert_no(no) do {                                        \
   if ((no) >= SPRITEMAX) {                                           \
     WARNING("no is too large (should be %d < %d)\n", no, SPRITEMAX); \
     return NG;                                                       \
   }                                                                  \
-}G_STMT_END
+} while (0)
 
-#define sp_assert_null(no) G_STMT_START{                             \
+#define sp_assert_null(no) do {                                      \
   if (sact.sp[no] == NULL) {                                         \
     WARNING("sprite %d is NULL\n", no);                              \
     return NG;                                                       \
   }                                                                  \
-}G_STMT_END
+} while (0)
 
 
 // スプライトの番号順に更新するためにリストに順番に要れるためのcallbck
-static gint compare_spriteno_smallfirst(gconstpointer a, gconstpointer b) {
+static int compare_spriteno_smallfirst(const void *a, const void *b) {
 	sprite_t *sp1 = (sprite_t *)a;
 	sprite_t *sp2 = (sprite_t *)b;
 	
@@ -105,7 +105,7 @@ int sp_init() {
 	
 	// いろいろな理由から全てのスプライトをあらかじめ作成しておく
 	for (i = 0; i < SPRITEMAX; i++) {
-		sact.sp[i] = g_new0(sprite_t, 1);
+		sact.sp[i] = calloc(1, sizeof(sprite_t));
 		sact.sp[i]->no   = i;
 		sact.sp[i]->type = SPRITE_NONE;
 		sact.sp[i]->show = FALSE;
@@ -115,7 +115,7 @@ int sp_init() {
 	sp_set_wall_paper(0);
 	
 	// 壁紙を updateリストに追加
-	sact.updatelist = g_slist_append(sact.updatelist, sact.sp[0]);
+	sact.updatelist = slist_append(sact.updatelist, sact.sp[0]);
 	
 	return OK;
 }
@@ -140,7 +140,7 @@ int sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	}
 	
 	// 更新リストに登録
-	sact.updatelist = g_slist_insert_sorted(sact.updatelist, sp, compare_spriteno_smallfirst);
+	sact.updatelist = slist_insert_sorted(sact.updatelist, sp, compare_spriteno_smallfirst);
 	
 	sp->type = type;
 	sp->no   = no;
@@ -207,7 +207,7 @@ int sp_new_msg(int no, int x, int y, int width, int height) {
 		sp_free(no);
 	}
 	// 更新リストに登録
-	sact.updatelist = g_slist_insert_sorted(sact.updatelist, sp, compare_spriteno_smallfirst);
+	sact.updatelist = slist_insert_sorted(sact.updatelist, sp, compare_spriteno_smallfirst);
 	
 	
 	sp->type = SPRITE_MSG;
@@ -282,7 +282,7 @@ int sp_free(int no) {
 
 	// 移動開始していない場合はリストから削除
 	if (!sp->move.moving) {
-		sact.movelist = g_slist_remove(sact.movelist, sp);
+		sact.movelist = slist_remove(sact.movelist, sp);
 	}
 	
 	// CGオブジェクトの削除
@@ -297,14 +297,14 @@ int sp_free(int no) {
 	
 	// 説明スプライトの削除
 	//   ここで消しちゃまずいかも
-	g_slist_free(sp->expsp);
+	slist_free(sp->expsp);
 	sp->expsp = NULL;
 	
 	if (sp->type == SPRITE_MSG) {
-		g_slist_free(sp->u.msg.buf);
+		slist_free(sp->u.msg.buf);
 		sf_free(sp->u.msg.canvas);
 	}
-	sact.updatelist = g_slist_remove(sact.updatelist, sp);
+	sact.updatelist = slist_remove(sact.updatelist, sp);
 	
 	// SACT.Numeral_XXX は残しておく
 	{
@@ -371,7 +371,7 @@ int sp_set_move(int wNum, int wX, int wY) {
 	
 	// moveするスプライトリストに登録
 	// 実際に move を開始するのは ~SP_DRAW(sp_update_all)が呼ばれたとき
-	sact.movelist = g_slist_append(sact.movelist, sp);
+	sact.movelist = slist_append(sact.movelist, sp);
 	
 	return OK;
 }
@@ -407,13 +407,13 @@ int sp_add_zkey_hidesprite(int wNum) {
 	//   シェルクレイルでまずいのがあったので中止
 	// if (sp->type == SPRITE_NONE) return NG;
 	
-	sact.sp_zhide = g_slist_append(sact.sp_zhide, sp);
+	sact.sp_zhide = slist_append(sact.sp_zhide, sp);
 	return OK;
 }
 
 // 上で登録したスプライトの削除
 int sp_clear_zkey_hidesprite_all() {
-	g_slist_free(sact.sp_zhide);
+	slist_free(sact.sp_zhide);
 	sact.sp_zhide = NULL;
 	return OK;
 }
@@ -452,13 +452,13 @@ int sp_thaw_sprite(int wNum) {
 int sp_add_quakesprite(int wNum) {
 	sp_assert_no(wNum);
 	
-	sact.sp_quake = g_slist_append(sact.sp_quake, sact.sp[wNum]);
+	sact.sp_quake = slist_append(sact.sp_quake, sact.sp[wNum]);
 	return OK;
 }
 
 // 上で登録したスプライトの削除
 int sp_clear_quakesprite_all() {
-	g_slist_free(sact.sp_quake);
+	slist_free(sact.sp_quake);
 	sact.sp_quake = NULL;
 	return OK;
 }
@@ -649,7 +649,7 @@ int sp_num_getspan(int nNum, int *vSpan) {
 
 // すべての説明スプライトの削除
 int sp_exp_clear() {
-	GSList *node;
+	SList *node;
 	
 	for (node = sact.updatelist; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;
@@ -669,7 +669,7 @@ int sp_exp_add(int nNumSP1, int nNumSP2) {
 	swsp  = sact.sp[nNumSP1];
 	expsp = sact.sp[nNumSP2];
 	
-	swsp->expsp = g_slist_append(swsp->expsp, expsp);
+	swsp->expsp = slist_append(swsp->expsp, expsp);
 	
 	return OK;
 }
@@ -682,7 +682,7 @@ int sp_exp_del(int nNum) {
 	
 	sp  = sact.sp[nNum];
 	
-	g_slist_free(sp->expsp);
+	slist_free(sp->expsp);
 	sp->expsp = NULL;
 
 	return OK;

@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -110,7 +109,7 @@ static void ec7_cb(surface_t *sfsrc, surface_t *sfdst) {
 	}
 	t = ecp.oldstep;
 	while(t < curstep) {
-		for (i = 0; i < MIN(t + 1, EC7DELTA); i++) {
+		for (i = 0; i < min(t + 1, EC7DELTA); i++) {
 			y = i + EC7DELTA * (t - i);
 			if (y < 0 || y >= sfsrc->height) continue;
 			gr_copy(sf0, 0, y,
@@ -138,7 +137,7 @@ static void ec8_cb(surface_t *sfsrc, surface_t *sfdst) {
 	}
 	t = ecp.oldstep;
 	while(t < curstep) {
-		for (i = 0; i < MIN(t + 1, EC8DELTA); i++) {
+		for (i = 0; i < min(t + 1, EC8DELTA); i++) {
 			x = i + EC8DELTA * (t - i);
 			if (x < 0 || x >= sfsrc->width) continue;
 			gr_copy(sf0,   x, 0,
@@ -157,7 +156,7 @@ static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int curstep, maxstep; 
 	int i, t, x, y;
 
-	maxstep = MAX(sfsrc->height / EC9DELTA + EC9DELTA,
+	maxstep = max(sfsrc->height / EC9DELTA + EC9DELTA,
 		      sfsrc->width  / EC9DELTA + EC9DELTA);
 	
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
@@ -169,13 +168,13 @@ static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
 	}
 	t = ecp.oldstep;
 	while(t < curstep) {
-		for (i = 0; i < MIN(t + 1, EC9DELTA); i++) {
+		for (i = 0; i < min(t + 1, EC9DELTA); i++) {
 			y = i + EC9DELTA * (t - i);
 			if (y < 0 || y >= sfsrc->height) continue;
 			gr_copy(sf0, 0, y,
 				sfdst, 0, y, sfsrc->width, 1);
 		}
-		for (i = 0; i < MIN(t + 1, EC9DELTA); i++) {
+		for (i = 0; i < min(t + 1, EC9DELTA); i++) {
 			x = i + EC9DELTA * (t - i);
 			if (x < 0 || x >= sfsrc->width) continue;
 			gr_copy(sf0,   x, 0,
@@ -201,8 +200,8 @@ static void ec12_cb(surface_t *src, surface_t *dst) {
 		usleep(0); return;
 	}
 	
-	st_i = MAX(0, curstep - EC12DELTA + 1);
-	ed_i = MIN(src->height -1, curstep);
+	st_i = max(0, curstep - EC12DELTA + 1);
+	ed_i = min(src->height -1, curstep);
 	l = ed_i - st_i + 1;
 	for (j = st_i; j < ed_i; j++) {
 		gre_Blend(sf0, 0, j, src, 0, j, dst, 0, j, src->width, 1, curstep - j);
@@ -232,8 +231,8 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 		usleep(0); return;
 	}
 	
-	st_i = MAX(0, curstep - EC13DELTA + 1);
-	ed_i = MIN(src->height -1, curstep);
+	st_i = max(0, curstep - EC13DELTA + 1);
+	ed_i = min(src->height -1, curstep);
 	l = ed_i - st_i + 1;
 	for (j = st_i; j < ed_i; j++) {
 		gre_Blend(sf0, 0, dyy - j, src, 0, syy1-j, dst, 0, syy2-j, src->width, 1, curstep - j);

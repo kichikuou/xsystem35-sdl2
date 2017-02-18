@@ -28,7 +28,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#include <glib.h>
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -74,7 +73,7 @@ static boolean noshm;
 int Xcore_Initilize(void) {
 	char *display;
 
-	x11_videodev = g_new0(struct xcore_private_data, 1);
+	x11_videodev = calloc(1, sizeof(struct xcore_private_data));
 	x11_noSHM = noshm;
 	
 	/* locale init ( for no gtk option ) */
@@ -404,10 +403,10 @@ static void makeDIB(int w, int h, int depth) {
 	
 	if (alloced) {
 		releaseDIB();
-		g_free(x11_dibinfo);
+		free(x11_dibinfo);
 	}
 	
-	x11_dibinfo = g_new(IMAGEINFO, 1);
+	x11_dibinfo = malloc(sizeof(IMAGEINFO));
 	
 	if (depth != 8) {
 		depth = dib_depth_candidate;
@@ -456,10 +455,10 @@ void x11_makeWorkImage(int w, int h) {
 	
 	if (alloced) {
 		releaseWorkImage();
-		g_free(x11_workinfo);
+		free(x11_workinfo);
 	}
 	
-	x11_workinfo = g_new(IMAGEINFO, 1);
+	x11_workinfo = malloc(sizeof(IMAGEINFO));
 	
 	if (x11_noSHM ||
 	    packed24bpp ||

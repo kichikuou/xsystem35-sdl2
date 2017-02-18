@@ -24,10 +24,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
+#include <stdint.h>
 
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "music_pcm.h"
 #include "music_server.h"
 #include "musstream.h"
@@ -75,8 +76,8 @@ int muspcm_init() {
 		// device buffer の設定
 		audiodevbuf_t *buf = &prv.audiodev.buf;
 		
-		buf->b[0] = g_malloc0(buf->len);
-		buf->b[1] = g_malloc0(buf->len);
+		buf->b[0] = calloc(1, buf->len);
+		buf->b[1] = calloc(1, buf->len);
 		
 		buf->cur = buf->b[0];
 		buf->end = (char *)(buf->cur + buf->len);
@@ -120,7 +121,7 @@ int muspcm_load_no(int slot, int no) {
 	}
 	//printf("rate = %d, bits = %d, ch = %d\n", wfile->rate, wfile->bits, wfile->ch);
 	
-	obj = g_new0(pcmobj_t, 1);
+	obj = calloc(1, sizeof(pcmobj_t));
 	obj->sdata = (void *)wfile;
 	obj->stype = OBJSRC_FILE;
 	
@@ -159,7 +160,7 @@ int muspcm_load_mem(int slot, void *mem) {
 	wfile = (WAVFILE *)((BYTE *)mem + sizeof(int));
 	// printf("rate = %d, bits = %d, ch = %d\n", wfile->rate, wfile->bits, wfile->ch);
 	
-	obj = g_new0(pcmobj_t, 1);
+	obj = calloc(1, sizeof(pcmobj_t));
 	obj->sdata = mem;
 	obj->stype = OBJSRC_MEM;
 	obj->src   = ms_memory((BYTE *)mem + sizeof(int) + sizeof(WAVFILE), wfile->bytes);
@@ -185,7 +186,7 @@ int muspcm_load_pipe(int slot, char *cmd) {
 	
 	if (IS_LOADED(slot)) muspcm_unload(slot);
 	
-	obj = g_new0(pcmobj_t, 1);
+	obj = calloc(1, sizeof(pcmobj_t));
 	obj->sdata = NULL;
 	obj->stype = OBJSRC_PIPE;
 	obj->src   = ms_pipe(cmd);
@@ -232,8 +233,8 @@ int muspcm_start(int slot, int loop) {
 	obj->src->seek(obj->src, 0, SEEK_SET);
 	obj->playing = TRUE;
 	
-	if (-1 == g_list_index(prv.pcmplist, obj)) {
-		prv.pcmplist = g_list_append(prv.pcmplist, (gpointer)obj);
+	if (-1 == list_index(prv.pcmplist, obj)) {
+		prv.pcmplist = list_append(prv.pcmplist, (void*)obj);
 	}
 	
 	return OK;
@@ -246,7 +247,7 @@ int muspcm_stop(int slot) {
 	obj = prv.pcm[slot];
 	if (obj == NULL) return NG;
 	
-	prv.pcmplist = g_list_remove(prv.pcmplist, obj);
+	prv.pcmplist = list_remove(prv.pcmplist, obj);
 	obj->playing = FALSE;
 	
 	return OK;
@@ -266,12 +267,12 @@ int muspcm_unload(int slot) {
 		pcmlib_free((WAVFILE *)(obj->sdata));
 		break;
 	case OBJSRC_MEM:
-		g_free(obj->sdata);
+		free(obj->sdata);
 		break;
 	}
 	sndcnv_drain(obj);
 	obj->src->close(obj->src);
-	g_free(obj);
+	free(obj);
 	
 	prv.pcm[slot] = NULL;
 	
@@ -307,7 +308,7 @@ static int pcmmix_mix(short *src, int len) {
 	
 	// WARNING("mix to buf (%d) ptr=%p len = %d\n", buf->sw, buf->cur, len);
 	
-	buf->lenmax = MAX(buf->lenmax, len);
+	buf->lenmax = max(buf->lenmax, len);
 	
 	if (buf->cur + len >= buf->end) {
 		len1 = buf->end - buf->cur;
@@ -354,16 +355,16 @@ static int pcmmix_send2devbuf() {
 }
 
 // defice にデータが送られたときに cb を設定してあるとそれを呼ぶ
-static GSList *cb_flush[2];
-static void cb_at_devflush4each(gpointer data, gpointer userdata) {
+static SList *cb_flush[2];
+static void cb_at_devflush4each(void* data, void* userdata) {
 	pcmobj_t *obj = (pcmobj_t *)data;
 	obj->cb_atend(obj->fd);
 }
 
 static void cb_at_devflush(int sw) {
 	if (cb_flush[sw]) {
-		g_slist_foreach(cb_flush[sw],cb_at_devflush4each, NULL);
-		g_slist_free(cb_flush[sw]);
+		slist_foreach(cb_flush[sw],cb_at_devflush4each, NULL);
+		slist_free(cb_flush[sw]);
 		cb_flush[sw] = NULL;
 	}
 }
@@ -372,12 +373,12 @@ static void cb_at_devflush(int sw) {
 int muspcm_cb() {
 	audiodevbuf_t *buf = &prv.audiodev.buf;
 	pcmobj_t *obj;
-	GList *node;
-	GSList *removelist = NULL, *snode;
+	List *node;
+	SList *removelist = NULL, *snode;
 	int len;
 	
 	// 再生リストが空の場合はなにもしない
-	if (g_list_length(prv.pcmplist) == 0) {
+	if (list_length(prv.pcmplist) == 0) {
 		return 0;
 	}
 	
@@ -388,7 +389,7 @@ int muspcm_cb() {
 	}
 	
 	// 全ての再生リスト中のチャンネルを合成
-	for (node = prv.pcmplist; node; node = g_list_next(node)) {
+	for (node = prv.pcmplist; node; node = list_next(node)) {
 		obj = (pcmobj_t *)node->data;
 		if (obj == NULL) continue;  // why ?
 		
@@ -400,7 +401,7 @@ int muspcm_cb() {
 			if (obj->cb_atend) {
 				// 演奏終了を知らせて欲しい
 				// フェードやpcm_stopでの終了の際は知らせなくてよい？
-				cb_flush[buf->sw] = g_slist_append(cb_flush[buf->sw], obj);
+				cb_flush[buf->sw] = slist_append(cb_flush[buf->sw], obj);
 			}
 			// loop check
 			if (obj->loop == 0) { // 無限ループ
@@ -411,7 +412,7 @@ int muspcm_cb() {
 			if (--obj->loop == 0) { // 繰り返し終了
 				// remove
 				// muspcm_stop(obj->slot);
-				removelist = g_slist_append(removelist, obj);
+				removelist = slist_append(removelist, obj);
 				continue;
 			} else { // 先頭へ
 				obj->src->seek(obj->src, 0, SEEK_SET);
@@ -428,7 +429,7 @@ int muspcm_cb() {
 	if (len > 0) pcmmix_send2devbuf();
 	
 	// 最後に pcm playlist から stop した pcmobj を削除
-	for (snode = removelist; snode; snode = g_slist_next(snode)) {
+	for (snode = removelist; snode; snode = slist_next(snode)) {
 		obj = (pcmobj_t *)snode->data;
 		if (obj == NULL) continue;
 		muspcm_stop(obj->slot);
@@ -446,7 +447,7 @@ int muspcm_write2dev(void) {
 	sw = (buf->ready[0] ? 0 : buf->ready[1] ? 1 : -1);
 	while (sw < 0) {
 		int len = 0;
-		if (g_list_length(prv.pcmplist) != 0) {
+		if (list_length(prv.pcmplist) != 0) {
 			// playlist中にPCMデータソースがある場合は
 			// バッファがいっぱいになるまで読み込む
 			len = muspcm_cb();
@@ -483,7 +484,7 @@ int muspcm_write2dev(void) {
 // 現在の再生位置を返す
 int muspcm_getpos(int slot) {
 	pcmobj_t *obj;
-	guint64 len;
+	uint64_t len;
 	
 	obj = prv.pcm[slot];
 	if (obj == NULL) return 0;
@@ -497,7 +498,7 @@ int muspcm_getpos(int slot) {
 	}
 	if (len < 0) return 0;
 #endif	
-	return (int)(((guint64)(len * 1000) / (obj->fmt.rate * (obj->fmt.bit/8) * obj->fmt.ch)));
+	return (int)(((uint64_t)(len * 1000) / (obj->fmt.rate * (obj->fmt.bit/8) * obj->fmt.ch)));
 }
 
 // PCMオブジェクトに対してボリュームをセット

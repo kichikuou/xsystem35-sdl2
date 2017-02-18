@@ -348,10 +348,10 @@ extern void    ags_autorepeat(boolean bool);
 
 #define WHITELEVEL24(p, lv) ALPHABLEND24(0xffffffff, p, lv)
 
-#define SUTURADD15(pa, pb) PIX15(MIN(255,PIXR15(pa)+PIXR15(pb)), MIN(255, PIXG15(pa)+PIXG15(pb)), MIN(255, PIXB15(pa)+PIXB15(pb)));
-#define SUTURADD16(pa, pb) PIX16(MIN(255,PIXR16(pa)+PIXR16(pb)), MIN(255, PIXG16(pa)+PIXG16(pb)), MIN(255, PIXB16(pa)+PIXB16(pb)));
-//#define SUTURADD16(pa, pb) PIX16(MIN(255,(int)(PIXR16(pa))+(int)(PIXR16(pb))), MIN(255, (int)(PIXG16(pa))+(int)(PIXG16(pb))), MIN(255, (int)(PIXB16(pa))+(int)(PIXB16(pb))));
-#define SUTURADD24(pa, pb) PIX24(MIN(255,PIXR24(pa)+PIXR24(pb)), MIN(255, PIXG24(pa)+PIXG24(pb)), MIN(255, PIXB24(pa)+PIXB24(pb)));
+#define SUTURADD15(pa, pb) PIX15(min(255,PIXR15(pa)+PIXR15(pb)), min(255, PIXG15(pa)+PIXG15(pb)), min(255, PIXB15(pa)+PIXB15(pb)));
+#define SUTURADD16(pa, pb) PIX16(min(255,PIXR16(pa)+PIXR16(pb)), min(255, PIXG16(pa)+PIXG16(pb)), min(255, PIXB16(pa)+PIXB16(pb)));
+//#define SUTURADD16(pa, pb) PIX16(min(255,(int)(PIXR16(pa))+(int)(PIXR16(pb))), min(255, (int)(PIXG16(pa))+(int)(PIXG16(pb))), min(255, (int)(PIXB16(pa))+(int)(PIXB16(pb))));
+#define SUTURADD24(pa, pb) PIX24(min(255,PIXR24(pa)+PIXR24(pb)), min(255, PIXG24(pa)+PIXG24(pb)), min(255, PIXB24(pa)+PIXB24(pb)));
 
 
 /* exter methods */

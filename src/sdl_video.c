@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <SDL.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -45,7 +44,7 @@ boolean RawKeyInfo[256];
 
 /* SDL の初期化 */
 int sdl_Initilize(void) {
-	sdl_videodev = g_new0(struct sdl_private_data, 1);
+	sdl_videodev = calloc(1, sizeof(struct sdl_private_data));
 
 	/* make topleve window */
 	window_init();
@@ -136,10 +135,10 @@ static void makeDIB(int width, int height, int depth) {
 	}
 	
 	if (sdl_dibinfo) {
-		g_free(sdl_dibinfo);
+		free(sdl_dibinfo);
 	}
 	
-	sdl_dibinfo = g_new0(agsurface_t, 1);
+	sdl_dibinfo = calloc(1, sizeof(agsurface_t));
 	sdl_dibinfo->depth           = sdl_dib->format->BitsPerPixel;
 	sdl_dibinfo->bytes_per_pixel = sdl_dib->format->BytesPerPixel;
 	sdl_dibinfo->bytes_per_line  = sdl_dib->pitch;

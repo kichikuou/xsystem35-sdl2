@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
 
@@ -34,7 +34,7 @@
 #include "wavfile.h"
 
 static int wav_read(musstream_t *this, void *ptr, int size, int nmemb) {
-	int len = MIN(size * nmemb, this->hidden.mem.end - this->hidden.mem.cur);
+	int len = min(size * nmemb, this->hidden.mem.end - this->hidden.mem.cur);
 	int i;
 	
 	if (len <= 0) return 0;
@@ -137,13 +137,13 @@ static int wav_seek2(struct _musstream *this, int offset, int where) {
 
 
 static int wav_close(musstream_t *this) {
-	g_free(this);
+	free(this);
 	return 0;
 }
 
 
 musstream_t *ms_wav(WAVFILE *snd) {
-	musstream_t *ms = g_new0(musstream_t, 1);
+	musstream_t *ms = calloc(1, sizeof(musstream_t));
 
 	ms->hidden.mem.base = snd->data;
 	ms->hidden.mem.cur = snd->data;
@@ -162,7 +162,7 @@ musstream_t *ms_wav(WAVFILE *snd) {
 }
 
 musstream_t *ms_wav2(WAVFILE *snd, int size, int looptop) {
-	musstream_t *ms = g_new0(musstream_t, 1);
+	musstream_t *ms = calloc(1, sizeof(musstream_t));
 	
 	ms->hidden.mem.base = snd->data;
 	ms->hidden.mem.cur = snd->data;

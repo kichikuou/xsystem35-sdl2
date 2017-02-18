@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "nact.h"
@@ -78,14 +77,14 @@ cginfo_t *scg_loadcg_no(int no, boolean refinc) {
 		return cgs[no];
 	}
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_LINKED;
 	i->no   = no;
 	i->refcnt = (refinc ? 1 : 0);
 	i->sf   = sf_loadcg_no(no -1);
 	if (i->sf == NULL) {
 		WARNING("load fail (%d)\n", no -1);
-		g_free(i);
+		free(i);
 		return NULL;
 	}
 	
@@ -100,7 +99,7 @@ int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int 
 	
 	spcg_assert_no(wNumCG);
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no   = wNumCG;
 	i->refcnt = 1;
@@ -129,7 +128,7 @@ int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) 
 		return NG;
 	}
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_REVERSE;
 	i->no   = wNumCG;
 	i->refcnt = 0;
@@ -157,7 +156,7 @@ int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 		return NG;
 	}
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_STRETCH;
 	i->no   = wNumCG;
 	i->refcnt = 0;
@@ -186,7 +185,7 @@ int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlen
 	blendcg = scg_loadcg_no(wNumBlendCG, FALSE);
 	if (basecg == NULL || blendcg == NULL) return NG;
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumDstCG;
 	i->refcnt = 0;
@@ -222,7 +221,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) 
 	font->sel_font(FONT_GOTHIC, wSize);
 	
 	glyph = font->get_glyph(cText);
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumCG;
 	i->refcnt = 0;
@@ -261,7 +260,7 @@ int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs,
 	font->sel_font(FONT_GOTHIC, wSize);
 	glyph = font->get_glyph(s);
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumCG;
 	i->refcnt = 0;
@@ -289,7 +288,7 @@ int scg_copy(int wNumDstCG, int wNumSrcCG) {
 		return NG;
 	}
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumDstCG;
 	i->refcnt = 0;
@@ -316,7 +315,7 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 		return NG;
 	}
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumDstCG;
 	i->refcnt = 0;
@@ -357,7 +356,7 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 		return NG;
 	}
 	
-	i = g_new(cginfo_t, 1);
+	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumDstCG;
 	i->refcnt = 0;
@@ -442,7 +441,7 @@ int scg_free_cgobj(cginfo_t *cg) {
 		cgs[cg->no] = NULL;
 	}
 	
-	g_free(cg);
+	free(cg);
 	
 	return OK;
 }

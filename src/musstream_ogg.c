@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <vorbis/vorbisfile.h>
 
 #include "portab.h"
@@ -53,7 +53,7 @@ static ov_callbacks ovcb = {
 
 static size_t ovcb_read(void *ptr, size_t size, size_t nmemb, void *ds) {
 	ogg2pcm_t *i = (ogg2pcm_t *)ds;
-	int len = MIN(size * nmemb, i->size - (i->cur - i->top));
+	int len = min(size * nmemb, i->size - (i->cur - i->top));
 	// fprintf(stderr, "my read %d, %d, %ld\n", size, nmemb, len);
 
 	if (len < 0) len = 0;
@@ -81,7 +81,7 @@ static int ovcb_seek(void *ds, ogg_int64_t offset, int whence) {
 }
 
 static int ovcb_close(void *ds) {
-	g_free(ds);
+	free(ds);
 	return 0;
 }
 
@@ -100,16 +100,16 @@ WAVFILE *ogg_getinfo(char *data, long size) {
 	OggVorbis_File *vf;
 	vorbis_info *vinfo;
 	
-	o2p = g_new(ogg2pcm_t, 1);
+	o2p = malloc(sizeof(ogg2pcm_t));
 	o2p->top = o2p->cur = data;
 	o2p->size = size;
 	
-	vf = g_new(OggVorbis_File, 1);
+	vf = malloc(sizeof(OggVorbis_File));
 	
 	if (0 > ov_open_callbacks(o2p, vf, NULL, 0, ovcb)) {
 		goto eexit;
 	}
-	wfile = g_new0(WAVFILE, 1);
+	wfile = calloc(1, sizeof(WAVFILE));
 	
 	wfile->bytes = (int)ov_pcm_total(vf, -1);
 	vinfo = ov_info(vf, -1);
@@ -122,8 +122,8 @@ WAVFILE *ogg_getinfo(char *data, long size) {
 	
 	return wfile;
  eexit:
-	g_free(vf);
-	g_free(o2p);
+	free(vf);
+	free(o2p);
 	
 	return NULL;
 }
@@ -182,12 +182,12 @@ static int ogg_seek(musstream_t *this, int offset, int whence) {
 
 static int ogg_close(musstream_t *this) {
 	ov_clear(this->hidden.ogg.vf);
-	g_free(this);
+	free(this);
 	return 0;
 }
 
 musstream_t *ms_ogg(WAVFILE *wfile) {
-	musstream_t *ms = g_new0(musstream_t, 1);
+	musstream_t *ms = calloc(1, sizeof(musstream_t));
 	
 	ms->hidden.ogg.vf = wfile->data;
 

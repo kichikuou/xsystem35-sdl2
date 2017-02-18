@@ -2,9 +2,8 @@ pkglib_LTLIBRARIES = ShPort.la
 
 ShPort_la_LDFLAGS = -module -export-dynamic -avoid-version
 ShPort_la_SOURCES = ShPort.c
-ShPort_la_LIBADD = @GLIB_LIBS@
 
-AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
+AM_CFLAGS = @DEBUG_CFLAGS@
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \

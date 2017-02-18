@@ -22,7 +22,6 @@
 /* $Id: ndd.c,v 1.2 2003/11/09 15:06:12 chikama Exp $ */
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "ags.h"
@@ -54,7 +53,7 @@ extern surface_t *jpeg2surface(FILE *fp, int offset);
 // ALKファイルの登録
 void ndd_init(char *files[], int n) {
 	int i;
-	ndd.fn = g_new(char *, n);
+	ndd.fn = malloc(sizeof(char *) * n);
 
 	for (i = 1; i <= n; i++) {
 		ndd.fn[i] = files[i];

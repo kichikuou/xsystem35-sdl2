@@ -23,13 +23,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <glib.h>
 #include "portab.h"
 #include "system.h"
 #include "LittleEndian.h"
@@ -103,7 +103,7 @@ static void get_filemap(drifiles *d, FILE *fp) {
 	mapsize = LittleEndian_get3B(b, 3) - ptrsize;
 	
 	/* allocate read buffer */
-	_b = g_new(char, mapsize << 8);
+	_b = malloc(sizeof(char) * (mapsize << 8));
 	
 	/* read filemap */
 	fseek(fp, ptrsize << 8L , SEEK_SET);
@@ -113,9 +113,9 @@ static void get_filemap(drifiles *d, FILE *fp) {
 	d->maxfile = (mapsize << 8) / 3;
 	
 	/* map of disk */
-	d->map_disk = g_new(char , d->maxfile);
+	d->map_disk = malloc(sizeof(char ) * d->maxfile);
 	/* map of data in disk */ 
-	d->map_ptr  = g_new(short, d->maxfile);
+	d->map_ptr  = malloc(sizeof(short) * d->maxfile);
 	
 	for (i = 0; i < d->maxfile; i++) {	
 		/* map_disk[?] and map_ptr[?] are from 0 */
@@ -123,7 +123,7 @@ static void get_filemap(drifiles *d, FILE *fp) {
 		*(d->map_ptr  + i) = LittleEndian_getW(_b, i * 3 + 1) - 1;
 	}
 	
-	g_free(_b);
+	free(_b);
 	return;
 }
 
@@ -148,21 +148,21 @@ static void get_fileptr(drifiles *d, FILE *fp, int disk) {
 	filecnt = (ptrsize << 8) / 3;
 	
 	/* allocate read buffer */
-	_b = g_new(char, ptrsize << 8);
+	_b = malloc(sizeof(char) * (ptrsize << 8));
 	
 	/* read pointers */
 	fseek(fp, 0L, SEEK_SET);
 	fread(_b, 256, ptrsize, fp);
 	
 	/* allocate pointers buffer */
-	d->fileptr[disk] = g_new0(int, filecnt);
+	d->fileptr[disk] = calloc(filecnt, sizeof(int));
 	
 	/* store pointers */
 	for (i = 0; i < filecnt; i++) {
 		*(d->fileptr[disk] + i) = (LittleEndian_get3B(_b, i * 3 + 3) << 8);
 	}
 	
-	g_free(_b);
+	free(_b);
 	return;
 }
 
@@ -174,7 +174,7 @@ static void get_fileptr(drifiles *d, FILE *fp, int disk) {
  *   return: drifile object
 */
 drifiles *dri_init(char **file, int cnt, boolean mmapping) {
-	drifiles *d = g_new0(drifiles, 1);
+	drifiles *d = calloc(1, sizeof(drifiles));
 	FILE *fp;
 	int i;
 	boolean gotmap = FALSE;
@@ -256,7 +256,7 @@ dridata *dri_getdata(drifiles *d, int no) {
 	} else {
 		int readsize = dataptr2 - dataptr;
 		FILE *fp;
-		data = g_new(char, readsize);
+		data = malloc(sizeof(char) * readsize);
 		fp = fopen(d->fnames[disk], "r");
 		fseek(fp, dataptr, SEEK_SET);
 		fread(data, 1, readsize, fp);
@@ -267,7 +267,7 @@ dridata *dri_getdata(drifiles *d, int no) {
 	ptr  = LittleEndian_getDW(data, 0);
 	size = LittleEndian_getDW(data, 4);
 	
-	dfile = g_new0(dridata, 1);
+	dfile = calloc(1, sizeof(dridata));
 	dfile->data_raw = data;    /* dri data header  */
 	dfile->data = data + ptr;  /* real data */
 	dfile->size = size;

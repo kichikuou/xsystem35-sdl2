@@ -23,7 +23,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
+#include <stdlib.h>
+#include <limits.h>
 
 #include "portab.h"
 #include "music_pcm.h"
@@ -48,7 +49,7 @@ int sndcnv_prepare(pcmobj_t *pcm, int outlen) {
 		pcm->conv.convert = sndcnv_norateconvert;
 	}		
 	
-	pcm->conv.buf = g_malloc(outlen);
+	pcm->conv.buf = malloc(outlen);
 	pcm->conv.isample = 
 		(outlen * (pcm->fmt.bit/8) * pcm->fmt.ch * pcm->fmt.rate) /
 		((prv.ofmt.bit/8) * prv.ofmt.ch * prv.ofmt.rate);
@@ -74,16 +75,16 @@ static int sndcnv_norateconvert(pcmobj_t *pcm, int lv, int outlen) {
 		return len;
 	}
 	
-	ibuf = g_malloc(outlen*2);
+	ibuf = malloc(outlen*2);
 	
 	len = pcm->src->read(pcm->src, ibuf, 1, pcm->conv.isample);
 	
 	if (len == 0) {
-		g_free(ibuf);
+		free(ibuf);
 		return 0;
 	}
 	
-	buf0  = g_malloc(outlen*2);
+	buf0  = malloc(outlen*2);
 	
 	// 8bit -> 16bit
 	switch(pcm->fmt.bit) {
@@ -107,8 +108,8 @@ static int sndcnv_norateconvert(pcmobj_t *pcm, int lv, int outlen) {
 	default:
 		isample  = 0;
 		printf("no supported\n");
-		g_free(ibuf);
-		g_free(buf0);
+		free(ibuf);
+		free(buf0);
 		return 0;
 	}
 	
@@ -141,8 +142,8 @@ static int sndcnv_norateconvert(pcmobj_t *pcm, int lv, int outlen) {
 		isample *= 2;
 	}
 	
-	g_free(buf0);
-	g_free(ibuf);
+	free(buf0);
+	free(ibuf);
 
 	return isample;
 }
@@ -154,21 +155,21 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 	LONG isample = 0, osample = 0;
 	LONG osampler = LONG_MAX, osamplel = LONG_MAX;
 
-	ibuf = g_malloc(outlen*2);
+	ibuf = malloc(outlen*2);
 	
 	// printf("pcm->src = %p, sample = %d, outlen = %d\n", pcm->src, pcm->conv.isample, outlen);
 	len = pcm->src->read(pcm->src, ibuf, 1, pcm->conv.isample);
 	
 	if (len == 0) {
-		g_free(ibuf);
+		free(ibuf);
 		return 0;
 	}
 	
-	buf0  = g_malloc(outlen*2);
-	bufr  = g_malloc(outlen*2);
-	bufl  = g_malloc(outlen*2);
-	bufrw = g_malloc(outlen*2);
-	buflw = g_malloc(outlen*2);
+	buf0  = malloc(outlen*2);
+	bufr  = malloc(outlen*2);
+	bufl  = malloc(outlen*2);
+	bufrw = malloc(outlen*2);
+	buflw = malloc(outlen*2);
 	
 	// 8|16 bit -> LONG 変換
 	switch(pcm->fmt.bit) {
@@ -243,7 +244,7 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 		st_rate_flow(&pcm->conv, pr, bufrw, &isample, &osampler);
 		//printf("insample = %d, osample = %d\n", isample, osampler);
 	}
-	osample = MIN(osampler, osamplel);
+	osample = min(osampler, osamplel);
 	
 	// LONG -> 16bit 変換
 	if (pcm->fmt.ch == 2) {
@@ -286,18 +287,18 @@ static int sndcnv_convert(pcmobj_t *pcm, int lv, int outlen) {
 		}
 	}
 
-	g_free(buflw);
-	g_free(bufrw);
-	g_free(bufl);
-	g_free(bufr);
-	g_free(buf0);
-	g_free(ibuf);
+	free(buflw);
+	free(bufrw);
+	free(bufl);
+	free(bufr);
+	free(buf0);
+	free(ibuf);
 
 	//printf("outlen = %d\n", osample * 4);
 	return osample * 4;  // 変換後の長さ(byte数)
 }
 
 int sndcnv_drain(pcmobj_t *pcm) {
-	g_free(pcm->conv.buf);
+	free(pcm->conv.buf);
 	return OK;
 }

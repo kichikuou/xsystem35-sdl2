@@ -28,7 +28,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -75,9 +74,9 @@ static int sf_free_one(int no) {
 	s = suf[no];
 	if (s == NULL) return NG;
 	
-	if (s->pixel) g_free(s->pixel);
-	if (s->alpha) g_free(s->alpha);
-	g_free(s);
+	if (s->pixel) free(s->pixel);
+	if (s->alpha) free(s->alpha);
+	free(s);
 	
 	suf[no] = NULL;
 	pre_freesurfno = no;
@@ -91,9 +90,9 @@ static int sf_free_all() {
 	for (i = 1; i < MAX_SURFACE; i++) {
 		if (suf[i] == NULL) continue;
 		s = suf[i];
-		if (s->pixel) g_free(s->pixel);
-		if (s->alpha) g_free(s->alpha);
-		g_free(s);
+		if (s->pixel) free(s->pixel);
+		if (s->alpha) free(s->alpha);
+		free(s);
 		suf[i] = NULL;
 	}
 	

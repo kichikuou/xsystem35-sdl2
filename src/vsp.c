@@ -30,7 +30,7 @@
 */
 /* $Id: vsp.c,v 1.6 2000/11/25 18:31:49 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 #include "portab.h"
 #include "LittleEndian.h"
@@ -59,7 +59,7 @@ static BYTE *bp[4];
  *   return: acquired vsp information object
 */
 static vsp_header *extract_header(BYTE *b) {
-	vsp_header *vsp = g_new(vsp_header, 1);
+	vsp_header *vsp = malloc(sizeof(vsp_header));
 	
 	vsp->vspX0 = LittleEndian_getW(b, 0);
 	vsp->vspY0 = LittleEndian_getW(b, 2);
@@ -201,14 +201,14 @@ boolean vsp_checkfmt(BYTE *data) {
  *   return: extracted image data and information
 */
 cgdata *vsp_extract(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	vsp_header *vsp = extract_header(data);
 	
-	cg->pal = g_new(Pallet256, 1);
+	cg->pal = malloc(sizeof(Pallet256));
 	getpal(cg->pal, data + vsp->vspPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = g_new(BYTE, (vsp->vspXW * 8 + 10) * (vsp->vspYW + 10));
+	cg->pic = malloc(sizeof(BYTE) * ((vsp->vspXW * 8 + 10) * (vsp->vspYW + 10)));
 	extract(vsp, cg->pic, data + vsp->vspDp);
 	
 	cg->type = ALCG_VSP;
@@ -219,7 +219,7 @@ cgdata *vsp_extract(BYTE *data) {
 	cg->vsp_bank = vsp->vspPb;
 	cg->alpha = NULL;
 	
-	g_free(vsp);
+	free(vsp);
 	
 	return cg;
 }
@@ -230,17 +230,17 @@ cgdata *vsp_extract(BYTE *data) {
  *   return: extracted pallet data
 */
 cgdata *vsp_getpal(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	vsp_header *vsp = extract_header(data);
 	
-	cg->pal = g_new(Pallet256, 1);
+	cg->pal = malloc(sizeof(Pallet256));
 	getpal(cg->pal, data + vsp->vspPp);
 	
 	cg->type  = ALCG_VSP;
 	cg->pic   = NULL;
 	cg->alpha = NULL;
 	
-	g_free(vsp);
+	free(vsp);
 	
 	return cg;
 }

@@ -11,7 +11,6 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/audioio.h>
-#include <glib.h>
 
 #include "system.h"
 #include "audio.h"
@@ -88,15 +87,15 @@ int sunaudio_exit(audiodevice_t *dev) {
 	
 	mixer_exit(dev);
 	
-	g_free(dev->data_pcm);
-	g_free(dev->data_mix);
+	free(dev->data_pcm);
+	free(dev->data_mix);
 	return OK;
 }
 
 int sunaudio_init(audiodevice_t *dev, char *devaudio, char *devaudioctl) {
 	audio_sun_t *asun;
 
-	asun = g_new0(audio_sun_t, 1);
+	asun = calloc(1, sizeof(audio_sun_t));
 	
 	asun->fd = -1;
 	asun->dev = (devaudio == NULL ? "/dev/audio" : devaudio);

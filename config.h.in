@@ -39,9 +39,6 @@
 /* Define this if you have freetype2 installed */
 #undef ENABLE_FT2
 
-/* Define this if you have glib >= 2.0.0 */
-#undef ENABLE_GLIB
-
 /* Define this if you have gtk+ >= 2.0.0 */
 #undef ENABLE_GTK
 
@@ -224,6 +221,9 @@
 
 /* Define this if you have libXxf86vm installed */
 #undef HAVE_XF86VMODE
+
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
 
 /* joystick device */
 #undef JOY_DEVICE

@@ -31,7 +31,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -182,7 +181,7 @@ static int midi_exit() {
 	}
 	
 	for (i = 0; i < 256; i++) {
-		g_snprintf(tmpfilename, sizeof(tmpfilename)-1, "%s/xsys35-midi_%03d.mid", nact->tmpdir, i);
+		snprintf(tmpfilename, sizeof(tmpfilename)-1, "%s/xsys35-midi_%03d.mid", nact->tmpdir, i);
 		unlink(tmpfilename);
 	}
 	
@@ -197,7 +196,7 @@ static int midi_start(int no, char *data, int datalen) {
 	char cmd_pipe[256];
 	pid_t pid;
 	
-	g_snprintf(tmpfilename, sizeof(tmpfilename) -1, "%s/xsys35-midi_%03d.mid", nact->tmpdir, no);
+	snprintf(tmpfilename, sizeof(tmpfilename) -1, "%s/xsys35-midi_%03d.mid", nact->tmpdir, no);
 	if (NULL == (fd = fopen(tmpfilename, "rb"))) {	
 		if (NULL == (fd = fopen(tmpfilename, "wb"))) {
 			WARNING("cannot open tmporaryfile");
@@ -208,7 +207,7 @@ static int midi_start(int no, char *data, int datalen) {
 	fclose(fd);
 	
 	if (pipedplay) {
-		g_snprintf(cmd_pipe, sizeof(cmd_pipe) -1, "%s %s", midi_player, tmpfilename);
+		snprintf(cmd_pipe, sizeof(cmd_pipe) -1, "%s %s", midi_player, tmpfilename);
 		if (-1 == muspcm_load_pipe(SLOT_MIDIPIPE, cmd_pipe)) {
 			return NG;
 		}

@@ -26,13 +26,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -69,13 +69,13 @@ alk_t *alk_new(char *path) {
 		return NULL;
 	}		
 
-	alk = g_new0(alk_t, 1);
+	alk = calloc(1, sizeof(alk_t));
 	alk->mapadr = adr;
 	alk->size = sbuf.st_size;
 	alk->fd = fd;
 	
 	alk->datanum = LittleEndian_getDW(adr, 4);
-	alk->offset = g_new(int, alk->datanum);
+	alk->offset = malloc(sizeof(int) * alk->datanum);
 	
 	for (i = 0; i < alk->datanum; i++) {
 		alk->offset[i] = LittleEndian_getDW(adr, 8 + i * 8);
@@ -89,8 +89,8 @@ int alk_free(alk_t *alk) {
 
 	munmap(alk->mapadr, alk->size);
 	close(alk->fd);
-	g_free(alk->offset);
-	g_free(alk);
+	free(alk->offset);
+	free(alk);
 
 	return OK;
 }

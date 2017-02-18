@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -37,12 +36,12 @@
 #include "sprite.h"
 
 // スプライト再描画間の間に変更のあったスプライトの領域の和
-static GSList *updatearea;
+static SList *updatearea;
 
 static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst);
-static void disjunction(gpointer region, gpointer data);
+static void disjunction(void* region, void* data);
 static void get_updatearea();
-static void do_update_each(gpointer data, gpointer userdata);
+static void do_update_each(void* data, void* userdata);
 
 // 領域１と領域２の積を計算
 static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst) {
@@ -58,7 +57,7 @@ static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst) {
 }
 
 // 領域１と領域２をすべて含む矩形領域を計算
-static void disjunction(gpointer region, gpointer data) {
+static void disjunction(void* region, void* data) {
 	MyRectangle *r1 = (MyRectangle *)region;
 	MyRectangle *r2 = (MyRectangle *)data;
 	int x1, x2, y1, y2;
@@ -92,9 +91,9 @@ static void get_updatearea() {
 	MyRectangle clip = {0, 0, 0, 0};
 	MyRectangle rsf0 = {0, 0, sf0->width, sf0->height};
 	
-	g_slist_foreach(updatearea, disjunction, &clip);
+	slist_foreach(updatearea, disjunction, &clip);
 	
-	g_slist_free(updatearea);
+	slist_free(updatearea);
 	updatearea = NULL;
 	
 	// surface0との領域の積をとる
@@ -108,7 +107,7 @@ static void get_updatearea() {
 }
 
 // updatelist に登録してあるすべてのスプライトを更新
-static void do_update_each(gpointer data, gpointer userdata) {
+static void do_update_each(void* data, void* userdata) {
 	sprite_t *sp = (sprite_t *)data;
 	
 	// 非表示の場合はなにもしない
@@ -132,8 +131,8 @@ int sp_update_all(boolean syncscreen) {
 	if (sact.movelist) {
 		// 移動開始時間を合わせる
 		sact.movestarttime = get_high_counter(SYSTEMCOUNTER_MSEC);
-		g_slist_foreach(sact.movelist, spev_move_setup, NULL);
-		g_slist_free(sact.movelist);
+		slist_foreach(sact.movelist, spev_move_setup, NULL);
+		slist_free(sact.movelist);
 		sact.movelist = NULL;
 	}
 
@@ -145,7 +144,7 @@ int sp_update_all(boolean syncscreen) {
 	
 	// updatelistに登録してあるスプライトを再描画
 	// updatelistはスプライトの番号順に並んでいる
-	g_slist_foreach(sact.updatelist, do_update_each, NULL);
+	slist_foreach(sact.updatelist, do_update_each, NULL);
 
 	// このルーチンが呼ばれるときはスプライトはドラッグ中ではない
 	
@@ -175,7 +174,7 @@ int sp_update_clipped() {
 	}
 
 	// 更新領域に入っているスプライトの再描画
-	g_slist_foreach(sact.updatelist, do_update_each, NULL);
+	slist_foreach(sact.updatelist, do_update_each, NULL);
 	
 	// drag中のスプライトを最後に描画
 	if (sact.draggedsp) {
@@ -198,13 +197,13 @@ int sp_updateme(sprite_t *sp) {
 	if (sp == NULL) return NG;
 	if (sp->cursize.width == 0 || sp->cursize.height == 0) return NG;
 	
-	r = g_new(MyRectangle, 1);
+	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x;
 	r->y = sp->cur.y;
 	r->width = sp->cursize.width;
 	r->height = sp->cursize.height;
 	
-	updatearea = g_slist_append(updatearea, r);
+	updatearea = slist_append(updatearea, r);
 	
 	WARNING("x = %d, y = %d, spno = %d w=%d,h=%d\n",
 		r->x, r->y, sp->no, r->width, r->height);
@@ -226,13 +225,13 @@ int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	if (sp == NULL) return NG;
 	if (w == 0 || h == 0) return NG;
 	
-	r = g_new(MyRectangle, 1);
+	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x + x;
 	r->y = sp->cur.y + y;
 	r->width = w;
 	r->height = h;
 	
-	updatearea = g_slist_append(updatearea, r);
+	updatearea = slist_append(updatearea, r);
 	
 	WARNING("x = %d, y = %d, spno = %d w=%d,h=%d\n",
 		r->x, r->y, sp->no, r->width, r->height);

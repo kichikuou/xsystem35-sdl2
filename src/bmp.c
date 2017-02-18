@@ -25,7 +25,7 @@
 */
 /* $Id: bmp.c,v 1.3 2000/11/25 13:08:59 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "LittleEndian.h"
 #include "graphics.h"
@@ -46,7 +46,7 @@ static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b);
  *   return: acquired bmp information object
 */
 static bmp_header *extract_header(BYTE *b) {
-	bmp_header *bmp = g_new(bmp_header, 1);
+	bmp_header *bmp = malloc(sizeof(bmp_header));
 	
 	bmp->bmpSize    = LittleEndian_getDW(b, 2);
 	/*data[4]-data[7]reserv*/
@@ -166,13 +166,13 @@ boolean bmp256_checkfmt(BYTE *data) {
 */
 cgdata *bmp256_extract(BYTE *data) {
 	bmp_header *bmp = extract_header(data);
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	
-	cg->pal = g_new(Pallet256, 1);
+	cg->pal = malloc(sizeof(Pallet256));
 	getpal(cg->pal, data + bmp->bmpPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = g_new(BYTE, (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
+	cg->pic = malloc(sizeof(BYTE) * ((bmp->bmpXW + 10) * (bmp->bmpYW + 10)));
 	extract_8bit(bmp, cg->pic, data + bmp->bmpDp);
 	
 	cg->type = ALCG_BMP8;
@@ -182,7 +182,7 @@ cgdata *bmp256_extract(BYTE *data) {
 	cg->height = bmp->bmpYW;
 	cg->alpha  = NULL;
 	
-	g_free(bmp);
+	free(bmp);
 	
 	return cg;
 }
@@ -213,11 +213,11 @@ boolean bmp16m_checkfmt(BYTE *data) {
  *   return: extracted image data and information
 */
 cgdata *bmp16m_extract(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	bmp_header *bmp = extract_header(data);
 	
 	/* +10: margin for broken cg */
-	cg->pic = (BYTE *)g_new(WORD, (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
+	cg->pic = (BYTE *)malloc(sizeof(WORD) * (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
 	extract_24bit(bmp, (WORD *)cg->pic, data + bmp->bmpDp);
 	
 	cg->type = ALCG_BMP24;
@@ -228,7 +228,7 @@ cgdata *bmp16m_extract(BYTE *data) {
 	cg->alpha = NULL;
 	cg->pal   = NULL;
 	
-	g_free(bmp);
+	free(bmp);
 	
 	return cg;
 }
@@ -239,17 +239,17 @@ cgdata *bmp16m_extract(BYTE *data) {
  *   return: extracted pallet data
 */
 cgdata *bmp_getpal(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	bmp_header *bmp = extract_header(data);
 	
-	cg->pal = g_new(Pallet256, 1);
+	cg->pal = malloc(sizeof(Pallet256));
 	getpal(cg->pal, data + bmp->bmpPp);
 	
 	cg->type  = ALCG_BMP8;
 	cg->pic   = NULL;
 	cg->alpha = NULL;
 	
-	g_free(bmp);
+	free(bmp);
 	
 	return cg;
 }

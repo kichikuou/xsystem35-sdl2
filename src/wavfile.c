@@ -32,7 +32,6 @@
 #include <sys/types.h>
 #include <string.h>
 #include <errno.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -167,10 +166,10 @@ static int header_check(char *wave_buf, WAVFILE *wfile) {
 }
 
 WAVFILE * wav_getinfo(char *data) {
-	WAVFILE *wfile = g_new(WAVFILE, 1);
+	WAVFILE *wfile = malloc(sizeof(WAVFILE));
 	
 	if (NG == header_check(data, wfile)) {
-		g_free(wfile);
+		free(wfile);
 		return NULL;
 	}
 	

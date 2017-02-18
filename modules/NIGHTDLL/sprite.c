@@ -1,6 +1,5 @@
 #include "config.h"
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "sprite.h"
@@ -12,7 +11,7 @@
 sprite_t *sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	sprite_t *sp;
 	
-	sp = g_new0(sprite_t, 1);
+	sp = calloc(1, sizeof(sprite_t));
 	
 	sp->no = no;
 	sp->type = type;
@@ -50,7 +49,7 @@ sprite_t *sp_new(int no, int cg1, int cg2, int cg3, int type) {
 sprite_t *sp_msg_new(int no, int x, int y, int width, int height) {
 	sprite_t *sp;
 	
-	sp = g_new0(sprite_t, 1);
+	sp = calloc(1, sizeof(sprite_t));
 	
 	sp->no = no;
 	sp->type = SPRITE_MSG;
@@ -80,7 +79,7 @@ void sp_free(sprite_t *sp) {
 		sf_free(sp->u.msg.canvas);
 	}
 	
-	g_free(sp);
+	free(sp);
 }
 
 void sp_set_show(sprite_t *sp, boolean show) {

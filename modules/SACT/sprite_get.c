@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "ags.h"
@@ -32,7 +31,7 @@
 #include "sprite.h"
 #include "sactsound.h"
 
-static void cb_defocused_swsp(gpointer s, gpointer data);
+static void cb_defocused_swsp(void* s, void* data);
 static int eventCB_GET(sprite_t *sp, agsevent_t *e);
 static void cb_remove(sprite_t *sp);
 
@@ -40,7 +39,7 @@ static void cb_remove(sprite_t *sp);
   説明スプライトの消去
     dragが始まったら説明スプライトは消去する
 */
-static void cb_defocused_swsp(gpointer s, gpointer data) {
+static void cb_defocused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update = (int *)data;
 	boolean oldstate = sp->show;
@@ -78,7 +77,7 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		
 		// 説明スプライトがある場合は、それを非表示にする
 		if (sp->expsp) {
-			g_slist_foreach(sp->expsp, cb_defocused_swsp, &update);
+			slist_foreach(sp->expsp, cb_defocused_swsp, &update);
 		}
 		
 		// SpriteSoundがあれば、それを鳴らす

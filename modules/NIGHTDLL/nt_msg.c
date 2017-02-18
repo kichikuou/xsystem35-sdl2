@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -356,7 +355,7 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 		while (*msg) {
 			if (*msg == '\n') {
 				line++; 
-				maxchar = MAX(maxchar, c);
+				maxchar = max(maxchar, c);
 				c = 0;
 				msg++;
 				continue;
@@ -364,7 +363,7 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 			msg++; c++;
 		}
 		
-		maxchar = MAX(maxchar, c);
+		maxchar = max(maxchar, c);
 		line++;
 		sp->u.msg.dspcur.x = (sp->cursize.width - (maxchar * wSize/2)) /2;
 		sp->u.msg.dspcur.y = (sp->cursize.height - (line * (wSize+2))) /2;

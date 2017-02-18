@@ -44,7 +44,6 @@
 #else
 #  include <sys/soundcard.h>
 #endif
-#include <glib.h>
 
 #include "audio.h"
 #include "audio_oss.h"
@@ -97,7 +96,7 @@ static int mixer_init(audiodevice_t *dev, char *devmix) {
 	
 	if ((fd = open(devmix, O_RDWR)) < 0) return NG;
 	
-	mix = g_new0(mixer_oss_t, 1);
+	mix = calloc(1, sizeof(mixer_oss_t));
 	mix->mdev = devmix;
 	dev->data_mix = mix;
 	

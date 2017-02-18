@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <glib.h>
 #include <limits.h>
 
+#include "portab.h"
 #include "profile.h"
 
 static char **profile_name = NULL, **profile_value = NULL;
@@ -63,10 +63,10 @@ int load_profile(char *path)
 		if (!fp) {
 			/* CWD からも見つからなかったら、エラーを表示して終了 */
 			char *error_msg;
-			error_msg = g_malloc(strlen(profile_path) + 12);
+			error_msg = malloc(strlen(profile_path) + 12);
 			sprintf(error_msg, "fopen() '%s'", profile_path);
 			perror(error_msg);
-			g_free(error_msg);
+			free(error_msg);
 			return 1;
 		}
 	}
@@ -127,9 +127,9 @@ int load_profile(char *path)
 			return 1;
 		}
 		
-		*(profile_name + now_values) = g_malloc(strlen(rc_line) + 1);
+		*(profile_name + now_values) = malloc(strlen(rc_line) + 1);
 		strcpy(*(profile_name + now_values), rc_line);
-		*(profile_value + now_values) = g_malloc(strlen(p) + 1);
+		*(profile_value + now_values) = malloc(strlen(p) + 1);
 		strcpy(*(profile_value + now_values), p);
 		now_values++;
 	}

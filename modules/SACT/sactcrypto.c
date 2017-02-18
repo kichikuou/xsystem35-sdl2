@@ -22,7 +22,6 @@
 /* $Id: sactcrypto.c,v 1.1 2003/04/22 16:29:52 chikama Exp $ */
 
 #include <stdio.h>
-#include <glib.h>
 #include "portab.h"
 #include "system.h"
 #include "variable.h"

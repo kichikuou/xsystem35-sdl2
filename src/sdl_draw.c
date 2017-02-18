@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SDL.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -262,7 +261,7 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, u_long cl) {
 }
 
 static agsurface_t* surface2com(SDL_Surface *src) {
-	agsurface_t *dst = g_new(agsurface_t, 1);
+	agsurface_t *dst = malloc(sizeof(agsurface_t));
 	
 	dst->depth           = src->format->BitsPerPixel;
 	dst->bytes_per_pixel = src->format->BytesPerPixel;
@@ -434,8 +433,8 @@ static void fader_in(int n) {
 	if (n == 255) {
 		SDL_FreeSurface(s_fader);
 		sdl_updateAll();
-		g_free(work);
-		g_free(disp);
+		free(work);
+		free(disp);
 		return;
 	}
 	
@@ -458,7 +457,7 @@ static void fader_out(int n,Uint32 c) {
 	
 	if (n == 255) {
 		SDL_FillRect(sdl_display, NULL, c);
-		g_free(disp);
+		free(disp);
 		return;
 	}
 	

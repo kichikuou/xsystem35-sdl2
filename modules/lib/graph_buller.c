@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "surface.h"
@@ -39,9 +38,9 @@ int gr_buller(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 				r2 = PIXR15((*(yls-step)));
 				g2 = PIXG15((*(yls-step)));
 				b2 = PIXB15((*(yls-step)));
-				r3 = MIN(255, (r1+r2) >> 1);
-				g3 = MIN(255, (g1+g2) >> 1);
-				b3 = MIN(255, (b1+b2) >> 1);
+				r3 = min(255, (r1+r2) >> 1);
+				g3 = min(255, (g1+g2) >> 1);
+				b3 = min(255, (b1+b2) >> 1);
 				
 				*yld = PIX15(r3, g3, b3);
 				yld++; yls++;
@@ -72,9 +71,9 @@ int gr_buller(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 				r2 = PIXR16((*(yls-step)));
 				g2 = PIXG16((*(yls-step)));
 				b2 = PIXB16((*(yls-step)));
-				r3 = MIN(255, (r1+r2) >> 1);
-				g3 = MIN(255, (g1+g2) >> 1);
-				b3 = MIN(255, (b1+b2) >> 1);
+				r3 = min(255, (r1+r2) >> 1);
+				g3 = min(255, (g1+g2) >> 1);
+				b3 = min(255, (b1+b2) >> 1);
 				
 				*yld = PIX16(r3, g3, b3);
 				yld++; yls++;
@@ -106,9 +105,9 @@ int gr_buller(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 				r2 = PIXR24((*(yls-step)));
 				g2 = PIXG24((*(yls-step)));
 				b2 = PIXB24((*(yls-step)));
-				r3 = MIN(255, (r1+r2) >> 1);
-				g3 = MIN(255, (g1+g2) >> 1);
-				b3 = MIN(255, (b1+b2) >> 1);
+				r3 = min(255, (r1+r2) >> 1);
+				g3 = min(255, (g1+g2) >> 1);
+				b3 = min(255, (b1+b2) >> 1);
 				
 				*yld = PIX24(r3, g3, b3);
 				yld++; yls++;
@@ -156,9 +155,9 @@ int gr_buller_v(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, 
 				r2 = PIXR15((*(yls+(y-step)*src->width)));
 				g2 = PIXG15((*(yls+(y-step)*src->width)));
 				b2 = PIXB15((*(yls+(y-step)*src->width)));
-				r3 = MIN(255, (r1+r2) >> 1);
-				g3 = MIN(255, (g1+g2) >> 1);
-				b3 = MIN(255, (b1+b2) >> 1);
+				r3 = min(255, (r1+r2) >> 1);
+				g3 = min(255, (g1+g2) >> 1);
+				b3 = min(255, (b1+b2) >> 1);
 				
 				*(yld+y*dst->width) = PIX15(r3, g3, b3);
 			}
@@ -186,9 +185,9 @@ int gr_buller_v(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, 
 				r2 = PIXR16((*(yls+(y-step)*src->width)));
 				g2 = PIXG16((*(yls+(y-step)*src->width)));
 				b2 = PIXB16((*(yls+(y-step)*src->width)));
-				r3 = MIN(255, (r1+r2) >> 1);
-				g3 = MIN(255, (g1+g2) >> 1);
-				b3 = MIN(255, (b1+b2) >> 1);
+				r3 = min(255, (r1+r2) >> 1);
+				g3 = min(255, (g1+g2) >> 1);
+				b3 = min(255, (b1+b2) >> 1);
 				
 				*(yld+y*dst->width) = PIX16(r3, g3, b3);
 			}
@@ -217,9 +216,9 @@ int gr_buller_v(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, 
 				r2 = PIXR24((*(yls+(y-step)*src->width)));
 				g2 = PIXG24((*(yls+(y-step)*src->width)));
 				b2 = PIXB24((*(yls+(y-step)*src->width)));
-				r3 = MIN(255, (r1+r2) >> 1);
-				g3 = MIN(255, (g1+g2) >> 1);
-				b3 = MIN(255, (b1+b2) >> 1);
+				r3 = min(255, (r1+r2) >> 1);
+				g3 = min(255, (g1+g2) >> 1);
+				b3 = min(255, (b1+b2) >> 1);
 				
 				*(yld+y*dst->width) = PIX24(r3, g3, b3);
 			}

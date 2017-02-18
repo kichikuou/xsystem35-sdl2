@@ -23,10 +23,10 @@
 */
 /* $Id: sndcnv_rate.c,v 1.1 2002/08/18 09:35:29 chikama Exp $ */
 
-#include <glib.h>
+#include <stdint.h>
 
-#define LONG    gint32
-#define ULONG   guint32
+#define LONG    int32_t
+#define ULONG   uint32_t
 
 #define FRAC_BITS 16
 

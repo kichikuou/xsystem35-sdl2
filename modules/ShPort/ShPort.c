@@ -28,7 +28,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "nact.h"
@@ -88,7 +87,7 @@ void InitKeyStatus(void) {
 	}
 	
 	if (keymap[no -1] == NULL) {
-		keymap[no -1] = g_new0(BYTE, 256);
+		keymap[no -1] = calloc(256, sizeof(BYTE));
 	} else {
 		memset(keymap[no -1], 0, 256);
 	}

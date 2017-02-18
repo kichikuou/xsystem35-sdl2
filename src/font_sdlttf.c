@@ -100,7 +100,7 @@ static boolean drawable() {
 }
 
 FONT *font_ttf_new() {
-	FONT *f = g_new(FONT, 1);
+	FONT *f = malloc(sizeof(FONT));
 	
 	f->sel_font   = font_sdlttf_sel_font;
 	f->get_glyph  = font_sdlttf_get_glyph;

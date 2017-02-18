@@ -1,5 +1,4 @@
 #include <string.h>
-#include <glib.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>

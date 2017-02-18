@@ -1,7 +1,7 @@
 pkglib_LTLIBRARIES = NIGHTDLL.la
 
 NIGHTDLL_la_LDFLAGS = -module -export-dynamic -avoid-version
-NIGHTDLL_la_LIBADD  = ../lib/libgraph.la ../lib/libdrawtext.la @GLIB_LIBS@
+NIGHTDLL_la_LIBADD  = ../lib/libgraph.la ../lib/libdrawtext.la
 NIGHTDLL_la_SOURCES = \
 	NIGHTDLL.c \
 	nt_scenario.c \
@@ -17,7 +17,7 @@ NIGHTDLL_la_SOURCES = \
 	nt_graph.c \
 	nt_sound.c
 
-AM_CFLAGS = @DEBUG_CFLAGS@ @GLIB_CFLAGS@
+AM_CFLAGS = @DEBUG_CFLAGS@
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \

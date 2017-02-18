@@ -45,7 +45,6 @@
 #else
 #  include <sys/soundcard.h>
 #endif
-#include <glib.h>
 
 #include "system.h"
 #include "audio.h"
@@ -208,15 +207,15 @@ int oss_exit(audiodevice_t *dev) {
 	
 	mixer_exit(dev);
 	
-	g_free(dev->data_pcm);
-	g_free(dev->data_mix);
+	free(dev->data_pcm);
+	free(dev->data_mix);
 	return OK;
 }
 
 int oss_init(audiodevice_t *dev, char *devdsp, char *devmix) {
 	audio_oss_t *oss;
 	
-	oss = g_new0(audio_oss_t, 1);
+	oss = calloc(1, sizeof(audio_oss_t));
 	
 	oss->fd = -1;
 	oss->dev = devdsp;
