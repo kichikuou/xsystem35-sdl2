@@ -18383,8 +18383,10 @@ fi
 CFLAGS="$ac_save_CFLAGS"
 LIBS="$ac_save_LIBS"
 
-if test "x$available_jpeg" != xyes; then
-   as_fn_error $? "libjpeg needed" "$LINENO" 5
+if test "x$available_jpeg" = xyes; then
+
+$as_echo "#define HAVE_JPEG 1" >>confdefs.h
+,
 fi
 
  if test "x$available_jpeg" = xyes; then

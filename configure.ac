@@ -731,8 +731,8 @@ fi
 CFLAGS="$ac_save_CFLAGS"
 LIBS="$ac_save_LIBS"
 
-if test "x$available_jpeg" != xyes; then
-   AC_MSG_ERROR(libjpeg needed)
+if test "x$available_jpeg" = xyes; then
+   AC_DEFINE(HAVE_JPEG,1,[Define this if you have libjpeg installed]),
 fi
 
 AM_CONDITIONAL(ENABLE_JPEG, test "x$available_jpeg" = xyes)

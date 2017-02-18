@@ -134,9 +134,12 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-NightDemonDemo_la_DEPENDENCIES = ../lib/libgraph.la ../lib/libalk.la
-am_NightDemonDemo_la_OBJECTS = NightDemonDemo.lo ndd.lo \
-	jpeg2surface.lo
+@ENABLE_JPEG_TRUE@NightDemonDemo_la_DEPENDENCIES = ../lib/libgraph.la \
+@ENABLE_JPEG_TRUE@	../lib/libalk.la
+am__NightDemonDemo_la_SOURCES_DIST = NightDemonDemo.c ndd.c \
+	jpeg2surface.c
+@ENABLE_JPEG_TRUE@am_NightDemonDemo_la_OBJECTS = NightDemonDemo.lo \
+@ENABLE_JPEG_TRUE@	ndd.lo jpeg2surface.lo
 NightDemonDemo_la_OBJECTS = $(am_NightDemonDemo_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -146,6 +149,7 @@ NightDemonDemo_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(NightDemonDemo_la_LDFLAGS) $(LDFLAGS) \
 	-o $@
+@ENABLE_JPEG_TRUE@am_NightDemonDemo_la_rpath = -rpath $(pkglibdir)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -181,7 +185,7 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(NightDemonDemo_la_SOURCES)
-DIST_SOURCES = $(NightDemonDemo_la_SOURCES)
+DIST_SOURCES = $(am__NightDemonDemo_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -401,16 +405,16 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-pkglib_LTLIBRARIES = NightDemonDemo.la
-NightDemonDemo_la_LDFLAGS = -module -export-dynamic -avoid-version
-NightDemonDemo_la_SOURCES = NightDemonDemo.c ndd.c jpeg2surface.c
-NightDemonDemo_la_LIBADD = ../lib/libgraph.la ../lib/libalk.la @JPEG_LIBS@
-AM_CFLAGS = @DEBUG_CFLAGS@ @JPEG_CFLAGS@
-AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
-	-I$(top_builddir)/src -I$(top_srcdir)/src \
-	-I$(top_builddir)/modules/lib -I$(top_srcdir)/modules/lib \
-	-I$(top_builddir)/libltdl -I$(top_srcdir)/libltdl \
-	-I$(top_builddir)/modules/NightDemonDemo -I$(top_srcdir)/modules/NightDemonDemo
+@ENABLE_JPEG_TRUE@pkglib_LTLIBRARIES = NightDemonDemo.la
+@ENABLE_JPEG_TRUE@NightDemonDemo_la_LDFLAGS = -module -export-dynamic -avoid-version
+@ENABLE_JPEG_TRUE@NightDemonDemo_la_SOURCES = NightDemonDemo.c ndd.c jpeg2surface.c
+@ENABLE_JPEG_TRUE@NightDemonDemo_la_LIBADD = ../lib/libgraph.la ../lib/libalk.la @JPEG_LIBS@
+@ENABLE_JPEG_TRUE@AM_CFLAGS = @DEBUG_CFLAGS@ @JPEG_CFLAGS@
+@ENABLE_JPEG_TRUE@AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
+@ENABLE_JPEG_TRUE@	-I$(top_builddir)/src -I$(top_srcdir)/src \
+@ENABLE_JPEG_TRUE@	-I$(top_builddir)/modules/lib -I$(top_srcdir)/modules/lib \
+@ENABLE_JPEG_TRUE@	-I$(top_builddir)/libltdl -I$(top_srcdir)/libltdl \
+@ENABLE_JPEG_TRUE@	-I$(top_builddir)/modules/NightDemonDemo -I$(top_srcdir)/modules/NightDemonDemo
 
 all: all-am
 
@@ -483,7 +487,7 @@ clean-pkglibLTLIBRARIES:
 	}
 
 NightDemonDemo.la: $(NightDemonDemo_la_OBJECTS) $(NightDemonDemo_la_DEPENDENCIES) $(EXTRA_NightDemonDemo_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(NightDemonDemo_la_LINK) -rpath $(pkglibdir) $(NightDemonDemo_la_OBJECTS) $(NightDemonDemo_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(NightDemonDemo_la_LINK) $(am_NightDemonDemo_la_rpath) $(NightDemonDemo_la_OBJECTS) $(NightDemonDemo_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

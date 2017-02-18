@@ -1,3 +1,5 @@
+if ENABLE_JPEG
+
 pkglib_LTLIBRARIES = NightDemonDemo.la
 
 NightDemonDemo_la_LDFLAGS = -module -export-dynamic -avoid-version
@@ -11,3 +13,5 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/modules/lib -I$(top_srcdir)/modules/lib \
 	-I$(top_builddir)/libltdl -I$(top_srcdir)/libltdl \
 	-I$(top_builddir)/modules/NightDemonDemo -I$(top_srcdir)/modules/NightDemonDemo
+
+endif
