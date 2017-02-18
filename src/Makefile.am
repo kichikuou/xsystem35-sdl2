@@ -16,7 +16,7 @@ SRC_SYS35CMD = cmdb.c cmdc.c cmdd.c cmde.c cmdf.c cmdg.c cmdh.c cmdi.c cmdj.c cm
 SRC_CG    = pms.c vsp.c bmp.c qnt.c
 SRC_MUS   = music.c music_client.c music_server.c music_cdrom.c music_midi.c music_pcm.c music_fader.c wavfile.c wavmix.c audio.c midi.c cdrom.c sndcnv.c musstream.c pcmlib.c music_bgm.c musstream_wav.c musstream_ogg.c musstream_wav_ima.c
 SRC_MISC  = LittleEndian.c counter.c imput.c profile.c mt19937-1.c @JOY_S@.c utfsjis.c filecheck.c tempname.c list.c
-SRC_SCO   = cali.c scenario.c variable.c cmd_check.c hankana2sjis.c nact.c selection.c message.c savedata.c hankaku.c s39ain.c s39init.c
+SRC_SCO   = cali.c scenario.c variable.c cmd_check.c hankana2sjis.c nact.c selection.c message.c savedata.c hankaku.c s39ain.c
 SRC_GRAPH = ags.c font.c flood.c cg.c ecopy.c antialiase.c alpha_plane.c cursor.c
 
 SRC_NET = network.c

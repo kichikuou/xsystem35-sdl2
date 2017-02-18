@@ -531,13 +531,17 @@ static void sys35_init() {
 	sel_init();
 
 	s39ain_init();
+#ifdef ENABLE_GTK
 	s39ini_init();
+#endif
 }
 
 static void sys35_remove() {
 	mus_exit(); 
 	ags_remove();
+#ifdef ENABLE_GTK
 	s39ini_remove();
+#endif
 	/* joy_close(); */
 #if DEBUG
 	if (debuglv >= 3) {
@@ -552,7 +556,9 @@ static void sys35_remove() {
 void sys_reset() {
 	mus_exit();
 	ags_remove();
+#ifdef ENABLE_GTK
 	s39ini_remove();
+#endif
 	
 	if (0 != strcmp(nact->tmpdir, "/tmp")) {
 		rmdir(nact->tmpdir);
