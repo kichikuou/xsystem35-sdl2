@@ -21,6 +21,7 @@
 /* $Id: cursor.c,v 1.6 2001/04/04 21:55:39 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"

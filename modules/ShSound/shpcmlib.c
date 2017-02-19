@@ -21,6 +21,7 @@
 */
 /* $Id: shpcmlib.c,v 1.2 2003/08/02 13:10:32 chikama Exp $ */
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
 
 #include "portab.h"

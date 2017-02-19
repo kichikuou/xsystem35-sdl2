@@ -2,10 +2,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "portab.h"
 #include "system.h"
 #include "counter.h"
+#include "utfsjis.h"
 #include "ags.h"
 #include "nact.h"
 #include "imput.h"
@@ -185,7 +187,7 @@ void ntmsg_add(char *msg) {
 	if (msg[0] == '\0') return;
 	
 	if (0) {
-		char *b = sjis2euc(msg);
+		char *b = sjis2lang(msg);
 		fprintf(stderr, "add msg '%s'\n", b);
 		free(b);
 	}
@@ -257,7 +259,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 		dt_setfont(wFont, wSize);
 
 		if (1) {
-			char *b = sjis2euc(mbuf);
+			char *b = sjis2lang(mbuf);
 			fprintf(stderr, "msg '%s'\n", b);
 			free(b);
 		}

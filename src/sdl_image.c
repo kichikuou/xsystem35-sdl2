@@ -387,6 +387,13 @@ void* sdl_saveRegion(int x, int y, int w, int h) {
 }
 
 /*
+ * セーブした領域を破棄
+ */
+void sdl_delRegion(void *psrc) {
+	SDL_FreeSurface((SDL_Surface *)psrc);
+}
+
+/*
  * dib にセーブした領域を回復
  */
 void sdl_putRegion(void *psrc, int x, int y) {

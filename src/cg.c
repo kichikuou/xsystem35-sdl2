@@ -22,6 +22,7 @@
 /* $Id: cg.c,v 1.12 2001/09/16 15:59:11 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "system.h"
 #include "graphics.h"

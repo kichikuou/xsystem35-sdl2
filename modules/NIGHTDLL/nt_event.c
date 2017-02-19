@@ -82,7 +82,7 @@ void ntev_callback(agsevent_t *e) {
 		break;
 		
 	case KEYWAIT_SPRITE:
-		cb_waitkey_sprite(e);
+		// cb_waitkey_sprite(e);
 		break;
 		
 	case KEYWAIT_SELECT:

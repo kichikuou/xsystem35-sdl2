@@ -22,6 +22,8 @@
 /* $Id: music_client.c,v 1.18 2004/10/31 04:18:06 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>

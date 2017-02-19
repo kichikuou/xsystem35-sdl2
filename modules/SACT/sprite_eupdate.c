@@ -31,6 +31,7 @@
 #include "ngraph.h"
 #include "ags.h"
 #include "nact.h"
+#include "image.h"
 #include "imput.h"
 #include "sact.h"
 #include "sprite.h"

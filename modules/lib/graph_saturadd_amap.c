@@ -1,5 +1,7 @@
 // alpha map の飽和加算
 
+#include <stdio.h>
+
 #include "portab.h"
 #include "system.h"
 #include "surface.h"

@@ -39,6 +39,7 @@
 #include "flood.h"
 #include "font.h"
 #include "cursor.h"
+#include "image.h"
 
 #define check_param    ags_check_param
 #define check_param_xy ags_check_param_xy

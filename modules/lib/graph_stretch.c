@@ -1,5 +1,6 @@
 // 拡大・縮小
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"

@@ -73,6 +73,7 @@ extern void sdl_putRegion(void *src, int x, int y);
 extern void sdl_CopyRegion(void *src, int sx, int sy, int w, int h, int dx, int dy);
 extern void sdl_restoreRegion(void *src, int x, int y);
 extern void* sdl_saveRegion(int x, int y, int w, int h);
+extern void sdl_delRegion(void *src);
 extern void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step);
 
 /* フォント関連 */
@@ -99,6 +100,7 @@ extern void sdl_setAutoRepeat(boolean bool);
 extern void sdl_mainIteration();
 extern boolean RawKeyInfo[];
 extern void sdl_sleep(int msec);
+extern void sdl_sync();
 
 /* 初期化関係 */
 #define GraphicsInitilize() sdl_Initilize()
@@ -142,7 +144,7 @@ extern void sdl_sleep(int msec);
 #define Mosaic(sx,sy,w,h,dx,dy,sl) sdl_Mosaic((sx),(sy),(w),(h),(dx),(dy),(sl))
 #define RestoreRegion(img,x,y) sdl_restoreRegion((img),(x),(y));
 #define SaveRegion(x,y,w,h) sdl_saveRegion(x,y,w,h)
-#define DelRegion(i) SDL_FreeSurface(i)
+#define DelRegion(i) sdl_delRegion(i)
 #define PutRegion(i,x,y) sdl_putRegion(i,x,y)
 #define CopyRegion(i,sx,sy,w,h,dx,dy) sdl_CopyRegion(i,sx,sy,w,h,dx,dy)
 #define Maskupdate(sx,sy,w,h,dx,dy,f,st) sdl_maskupdate(sx,sy,w,h,dx,dy,f,st)

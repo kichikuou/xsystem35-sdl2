@@ -30,6 +30,7 @@
 #include "portab.h"
 #include "nact.h"
 #include "system.h"
+#include "utfsjis.h"
 #include "ags.h"
 #include "surface.h"
 #include "ngraph.h"
@@ -207,7 +208,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) 
 	FONT *font;
 	
 	if (0) {
-		char *b = sjis2euc(cText);
+		char *b = sjis2lang(cText);
 		WARNING("str = '%s'\n", b);
 		free(b);
 	}
