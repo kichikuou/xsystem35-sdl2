@@ -39,20 +39,13 @@ static unsigned char shlv_tbl[256*256];
 /*
  * dib内での拡大・縮小コピー
  */
-void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
+static void sdl_scaledCopyAreaInternal(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
 	float    a1, a2, xd, yd;
 	int      *row, *col;
 	int      x, y;
 	SDL_Surface *ss;
 	SDL_Rect r_src, r_dst;
 	
-	if (src == NULL) {
-		src = sdl_dib;
-	}
-
-	if (dst == NULL) {
-		dst = sdl_dib;
-	}
 	ss = SDL_AllocSurface(SDL_ANYFORMAT, dw, dh, dst->format->BitsPerPixel, 0, 0, 0, 0);
 	
 	SDL_LockSurface(ss);
@@ -144,8 +137,12 @@ void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int 
 	free(col);
 }
 
+void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
+	sdl_scaledCopyAreaInternal(sdl_dib, sdl_dib, sx, sy, sw, sh, dx, dy, dw, dh, mirror);
+}
+
 void sdl_zoom(int x, int y, int w, int h) {
-	sdl_scaledCopyArea(sdl_dib, sdl_display, x, y, w, h, 0, 0, view_w, view_h, 0);
+	sdl_scaledCopyAreaInternal(sdl_dib, sdl_display, x, y, w, h, 0, 0, view_w, view_h, 0);
 	sdl_dirty = TRUE;
 }
 
@@ -373,7 +370,7 @@ void sdl_getPixel(int x, int y, Pallet *cell) {
 /*
  * dib から領域の切り出し
  */
-SDL_Surface* sdl_saveRegion(int x, int y, int w, int h) {
+void* sdl_saveRegion(int x, int y, int w, int h) {
 	SDL_Surface *s;
 	SDL_Rect r_src, r_dst;
 
@@ -392,7 +389,8 @@ SDL_Surface* sdl_saveRegion(int x, int y, int w, int h) {
 /*
  * dib にセーブした領域を回復
  */
-void sdl_putRegion(SDL_Surface *src, int x, int y) {
+void sdl_putRegion(void *psrc, int x, int y) {
+	SDL_Surface *src = (SDL_Surface *)psrc;
 	SDL_Rect r_src,r_dst;
 	
 	setRect(r_src, 0, 0, src->w, src->h);
@@ -404,7 +402,8 @@ void sdl_putRegion(SDL_Surface *src, int x, int y) {
 /*
  * dib にセーブした領域からコピー
  */
-void sdl_CopyRegion(SDL_Surface *src, int sx, int sy, int w,int h, int dx, int dy) {
+void sdl_CopyRegion(void *psrc, int sx, int sy, int w,int h, int dx, int dy) {
+	SDL_Surface *src = (SDL_Surface *)psrc;
 	SDL_Rect r_src,r_dst;
 
 	setRect(r_src, sx, sy, w, h);
@@ -416,7 +415,8 @@ void sdl_CopyRegion(SDL_Surface *src, int sx, int sy, int w,int h, int dx, int d
 /*
  * dib に dstを描画後、後始末
  */
-void sdl_restoreRegion(SDL_Surface *src, int x, int y) {
+void sdl_restoreRegion(void *psrc, int x, int y) {
+	SDL_Surface *src = (SDL_Surface *)psrc;
 	sdl_putRegion(src, x ,y);
 	SDL_FreeSurface(src);
 }

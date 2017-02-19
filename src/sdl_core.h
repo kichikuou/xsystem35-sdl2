@@ -25,7 +25,6 @@
 
 #include "config.h"
 #include <sys/types.h>
-#include <SDL.h>
 #include "portab.h"
 #include "ags.h"
 #include "cursor.h"
@@ -60,7 +59,7 @@ extern void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int sp)
 extern void sdl_drawImage8_fromData(cgdata *cg, int x, int y, int w, int h);
 extern void sdl_Mosaic(int sx, int sy, int w, int h, int dx, int dy, int slice);
 extern void sdl_wrapColor(int sx, int sy, int w, int h, int cl, int rate);
-extern void sdl_scaledCopyArea(SDL_Surface *src, SDL_Surface *dst, int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror);
+extern void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror);
 extern void sdl_zoom(int x, int y, int w, int h);
 extern void sdl_drawImage16_fromData(cgdata *cg, int x, int y, int w, int h);
 extern void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv);
@@ -70,10 +69,10 @@ extern void sdl_copyAreaSP16_whiteLevel(int sx, int sy, int w, int h, int dx, in
 extern void sdl_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 extern void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 extern void sdl_getPixel(int x, int y, Pallet *cell);
-extern void sdl_putRegion(SDL_Surface *src, int x, int y);
-extern void sdl_CopyRegion(SDL_Surface *src, int sx, int sy, int w, int h, int dx, int dy);
-extern void sdl_restoreRegion(SDL_Surface *src, int x, int y);
-extern SDL_Surface* sdl_saveRegion(int x, int y, int w, int h);
+extern void sdl_putRegion(void *src, int x, int y);
+extern void sdl_CopyRegion(void *src, int sx, int sy, int w, int h, int dx, int dy);
+extern void sdl_restoreRegion(void *src, int x, int y);
+extern void* sdl_saveRegion(int x, int y, int w, int h);
 extern void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step);
 
 /* フォント関連 */
@@ -126,7 +125,7 @@ extern void sdl_sleep(int msec);
 #define CopyArea(sx,sy,w,h,dx,dy) sdl_copyArea((sx),(sy),(w),(h),(dx),(dy))
 #define CopyAreaSP(sx,sy,w,h,dx,dy,col) sdl_copyAreaSP((sx),(sy),(w),(h),(dx),(dy),(col)) 
 #define DrawLine(x0,y0,x1,y1,col) sdl_drawLine((x0),(y0),(x1),(y1),(col))
-#define ScaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw) sdl_scaledCopyArea(NULL, NULL, sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw)
+#define ScaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw) sdl_scaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw)
 #define Zoom(x,y,w,h) sdl_zoom(x,y,w,h)
 #define WrapColor(x,y,w,h,col,rate) sdl_wrapColor((x),(y),(w),(h),(col),(rate))
 #define GetPixel(x, y, cell) sdl_getPixel(x, y, cell)
