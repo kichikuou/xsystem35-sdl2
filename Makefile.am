@@ -1,7 +1,10 @@
 ## Makefile.am for xsystem35
 
-#SUBDIRS = m4 po libltdl macros modules src 
-SUBDIRS = po libltdl macros modules src 
+SUBDIRS = po macros src
+
+if ENABLE_LTDL
+SUBDIRS += libltdl modules
+endif
 
 ACLOCAL_AMFLAGS = -I macros
 

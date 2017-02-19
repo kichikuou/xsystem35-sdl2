@@ -22,7 +22,9 @@
 /* $Id: cmd2F60.c,v 1.11 2003/01/12 10:48:50 chikama Exp $ */
 
 #include <stdio.h>
+#ifdef ENABLE_LTDL
 #include <ltdl.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
@@ -40,6 +42,7 @@ void commands2F60() {
 	int fnum = sys_getdw();  /* function number */
 	entrypoint *function = NULL;
 
+#ifdef ENABLE_LTDL
 	if (dll == NULL) {
 		SYSERROR("No DLL initilized\n");
 	}
@@ -58,6 +61,7 @@ void commands2F60() {
 		(*function)();
 		return;
 	}
+#endif
 	
  eexit:
 	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)\n", type, fnum, dll[type].name, dll[type].function[fnum].name);

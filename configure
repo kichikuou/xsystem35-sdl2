@@ -639,7 +639,6 @@ ltdl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-LIBOBJS
 EXTRALDFLAGS
 EXTRALIBS
 EXTRACFLAGS
@@ -702,6 +701,7 @@ XGETTEXT
 GMSGFMT
 MSGFMT
 MKINSTALLDIRS
+LIBOBJS
 LTDLOPEN
 LT_CONFIG_H
 subdirs
@@ -721,6 +721,8 @@ INCLTDL
 LTDLINCL
 LTDLDEPS
 LIBLTDL
+ENABLE_LTDL_FALSE
+ENABLE_LTDL_TRUE
 CPP
 OTOOL64
 OTOOL
@@ -3326,7 +3328,6 @@ fi
 	test -n "$ACLOCAL_FLAGS" && ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
 
 	for k in macros ; do ACLOCAL="$ACLOCAL -I $k" ; done
-
 
 
 ac_ext=c
@@ -11894,6 +11895,15 @@ CC="$lt_save_CC"
 # Only expand once:
 
 
+ if test "x$enable_shared" = xyes; then
+  ENABLE_LTDL_TRUE=
+  ENABLE_LTDL_FALSE='#'
+else
+  ENABLE_LTDL_TRUE='#'
+  ENABLE_LTDL_FALSE=
+fi
+
+if test "x$enable_shared" = xyes; then
 
 
 
@@ -11901,24 +11911,7 @@ CC="$lt_save_CC"
 
 
 
-case $enable_ltdl_convenience in
-  no) as_fn_error $? "this package needs a convenience libltdl" "$LINENO" 5 ;;
-  "") enable_ltdl_convenience=yes
-      ac_configure_args="$ac_configure_args --enable-ltdl-convenience" ;;
-esac
-LIBLTDL='${top_build_prefix}'"${lt_ltdl_dir+$lt_ltdl_dir/}libltdlc.la"
-LTDLDEPS=$LIBLTDL
-LTDLINCL='-I${top_srcdir}'"${lt_ltdl_dir+/$lt_ltdl_dir}"
-
-
-
-
-
-# For backwards non-gettext consistent compatibility...
-INCLTDL="$LTDLINCL"
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which extension is used for runtime loadable modules" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking which extension is used for runtime loadable modules" >&5
 $as_echo_n "checking which extension is used for runtime loadable modules... " >&6; }
 if ${libltdl_cv_shlibext+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -12994,89 +12987,123 @@ eval "LTDLOPEN=\"$libname_spec\""
 
 
 
+$as_echo "#define ENABLE_LTDL 1" >>confdefs.h
 
-
-if test -f $prefix/lib/libltdl.la; then
-  lt_save_LDFLAGS="$LDFLAGS"
-  LDFLAGS="-L$prefix/lib $LDFLAGS"
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lt_dlinit in -lltdl" >&5
-$as_echo_n "checking for lt_dlinit in -lltdl... " >&6; }
-if ${ac_cv_lib_ltdl_lt_dlinit+:} false; then :
-  $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lltdl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
 
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char lt_dlinit ();
-int
-main ()
-{
-return lt_dlinit ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_ltdl_lt_dlinit=yes
-else
-  ac_cv_lib_ltdl_lt_dlinit=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ltdl_lt_dlinit" >&5
-$as_echo "$ac_cv_lib_ltdl_lt_dlinit" >&6; }
-if test "x$ac_cv_lib_ltdl_lt_dlinit" = xyes; then :
-  lt_lib_ltdl=yes
+
+# Check whether --enable-ltdl-install was given.
+if test "${enable_ltdl_install+set}" = set; then :
+  enableval=$enable_ltdl_install;
 fi
 
-  LDFLAGS="$lt_save_LDFLAGS"
-  if test x"${lt_lib_ltdl-no}" = xyes; then
-    if test x"$enable_ltdl_install" != xyes; then
-      # Don't overwrite $prefix/lib/libltdl.la without --enable-ltdl-install
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: not overwriting libltdl at $prefix, force with \`--enable-ltdl-install'" >&5
-$as_echo "$as_me: WARNING: not overwriting libltdl at $prefix, force with \`--enable-ltdl-install'" >&2;}
-      enable_ltdl_install=no
-    fi
-  elif test x"$enable_ltdl_install" = xno; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libltdl not installed, but installation disabled" >&5
-$as_echo "$as_me: WARNING: libltdl not installed, but installation disabled" >&2;}
-  fi
-fi
 
-# If configure.ac declared an installable ltdl, and the user didn't override
-# with --disable-ltdl-install, we will install the shipped libltdl.
-case $enable_ltdl_install in
-  no) ac_configure_args="$ac_configure_args --enable-ltdl-install=no"
-      LIBLTDL="-lltdl"
-      LTDLDEPS=
-      LTDLINCL=
-      ;;
-  *)  enable_ltdl_install=yes
-      ac_configure_args="$ac_configure_args --enable-ltdl-install"
-      LIBLTDL='${top_build_prefix}'"${lt_ltdl_dir+$lt_ltdl_dir/}libltdl.la"
-      LTDLDEPS=$LIBLTDL
-      LTDLINCL='-I${top_srcdir}'"${lt_ltdl_dir+/$lt_ltdl_dir}"
-      ;;
+case ,${enable_ltdl_install},${enable_ltdl_convenience} in
+  *yes*) ;;
+  *) enable_ltdl_convenience=yes ;;
 esac
 
+ if test x"${enable_ltdl_install-no}" != xno; then
+  INSTALL_LTDL_TRUE=
+  INSTALL_LTDL_FALSE='#'
+else
+  INSTALL_LTDL_TRUE='#'
+  INSTALL_LTDL_FALSE=
+fi
+
+  if test x"${enable_ltdl_convenience-no}" != xno; then
+  CONVENIENCE_LTDL_TRUE=
+  CONVENIENCE_LTDL_FALSE='#'
+else
+  CONVENIENCE_LTDL_TRUE='#'
+  CONVENIENCE_LTDL_FALSE=
+fi
 
 
 
 
-# For backwards non-gettext consistent compatibility...
-INCLTDL="$LTDLINCL"
+
+# In order that ltdl.c can compile, find out the first AC_CONFIG_HEADERS
+# the user used.  This is so that ltdl.h can pick up the parent projects
+# config.h file, The first file in AC_CONFIG_HEADERS must contain the
+# definitions required by ltdl.c.
+# FIXME: Remove use of undocumented AC_LIST_HEADERS (2.59 compatibility).
 
 
+
+for ac_header in unistd.h dl.h sys/dl.h dld.h mach-o/dyld.h dirent.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default
+"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
+
+for ac_func in closedir opendir readdir
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+else
+  case " $LIBOBJS " in
+  *" lt__dirent.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS lt__dirent.$ac_objext"
+ ;;
+esac
+
+fi
+done
+
+for ac_func in strlcat strlcpy
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+else
+  case " $LIBOBJS " in
+  *" lt__strl.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS lt__strl.$ac_objext"
+ ;;
+esac
+
+fi
+done
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define LT_LIBEXT "$libext"
+_ACEOF
+
+
+name=
+eval "lt_libprefix=\"$libname_spec\""
+
+cat >>confdefs.h <<_ACEOF
+#define LT_LIBPREFIX "$lt_libprefix"
+_ACEOF
+
+
+name=ltdl
+eval "LTDLOPEN=\"$libname_spec\""
+
+
+fi
 
 
         MKINSTALLDIRS=
@@ -18384,7 +18411,7 @@ LIBS="$ac_save_LIBS"
 if test "x$available_jpeg" = xyes; then
 
 $as_echo "#define HAVE_JPEG 1" >>confdefs.h
-,
+
 fi
 
  if test "x$available_jpeg" = xyes; then
@@ -18622,6 +18649,10 @@ if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${ENABLE_LTDL_TRUE}" && test -z "${ENABLE_LTDL_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_LTDL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${INSTALL_LTDL_TRUE}" && test -z "${INSTALL_LTDL_FALSE}"; then
   as_fn_error $? "conditional \"INSTALL_LTDL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -18647,6 +18678,15 @@ LT_CONFIG_H=config.h
     ltdl_LTLIBOBJS=$_ltdl_ltlibobjs
 
 
+if test -z "${INSTALL_LTDL_TRUE}" && test -z "${INSTALL_LTDL_FALSE}"; then
+  as_fn_error $? "conditional \"INSTALL_LTDL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CONVENIENCE_LTDL_TRUE}" && test -z "${CONVENIENCE_LTDL_FALSE}"; then
+  as_fn_error $? "conditional \"CONVENIENCE_LTDL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+LT_CONFIG_H=config.h
 
 if test -z "${HAVE_GTK_TRUE}" && test -z "${HAVE_GTK_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_GTK\" was never defined.

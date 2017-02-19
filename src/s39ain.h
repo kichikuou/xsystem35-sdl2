@@ -24,7 +24,12 @@
 #ifndef __S39AIN_H__
 #define __S39AIN_H__
 
+#ifdef ENABLE_LTDL
 #include <ltdl.h>
+#else
+typedef void lt_dlhandle;
+#endif
+
 #include "portab.h"
 
 /* DLL 内関数情報 */

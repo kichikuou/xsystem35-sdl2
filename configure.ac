@@ -51,11 +51,6 @@ dnl AM_ACLOCAL_INCLUDE(m4)
 AM_ACLOCAL_INCLUDE(macros)
 
 dnl
-dnl add subdirectory for libltdl
-dnl
-dnl AC_CONFIG_SUBDIRS(libltdl)
-
-dnl
 dnl Checks for programs.
 dnl
 AC_PROG_CC
@@ -67,21 +62,15 @@ dnl AC_C_VAR_FUNC
 dnl
 dnl Check for libltdl
 dnl 
-dnl AC_CONFIG_SUBDIRS(libltdl)
 LT_INIT([dlopen])
-LT_CONFIG_LTDL_DIR([libltdl])
-_LTDL_CONVENIENCE
-LTDL_INIT([])
-AC_SUBST([LTDLINCL])
-AC_SUBST([LIBLTDL])
-
-dnl LT_INIT
-dnl AC_SUBST(INCLTDL)
-dnl AC_SUBST(LIBLTDL)
-dnl AC_SUBST(LIBADD_DL)
-dnl _LT_CONFIG_LTDL_DIR([m4_default([], [libltdl])])
-_LTDL_INSTALLABLE
-dnl LTDL_INIT([])
+AM_CONDITIONAL(ENABLE_LTDL, test "x$enable_shared" = xyes)
+if test "x$enable_shared" = xyes; then
+  LT_CONFIG_LTDL_DIR([libltdl])
+  LTDL_INIT
+  AC_DEFINE(ENABLE_LTDL,1,[define this if you use ltdl])
+else
+  _LTDL_SETUP
+fi
 
 dnl
 dnl Check for gettext
@@ -730,7 +719,7 @@ CFLAGS="$ac_save_CFLAGS"
 LIBS="$ac_save_LIBS"
 
 if test "x$available_jpeg" = xyes; then
-   AC_DEFINE(HAVE_JPEG,1,[Define this if you have libjpeg installed]),
+   AC_DEFINE(HAVE_JPEG,1,[Define this if you have libjpeg installed])
 fi
 
 AM_CONDITIONAL(ENABLE_JPEG, test "x$available_jpeg" = xyes)

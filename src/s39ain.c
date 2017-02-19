@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <ltdl.h>
 
 #include "portab.h"
 #include "system.h"
@@ -49,6 +48,7 @@
   system39.ain の読み込み
 */
 int s39ain_init(void) {
+#ifdef ENABLE_LTDL
 	FILE *fp;
 	long len;
 	char *buf;
@@ -211,4 +211,7 @@ int s39ain_init(void) {
 	
 	free(buf);
 	return OK;
+#else
+	return NG;
+#endif // ENABLE_LTDL
 }
