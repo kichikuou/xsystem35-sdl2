@@ -17346,8 +17346,6 @@ rm -f core conftest.err conftest.$ac_objext \
 
   rm -f conf.sdltest
 
-  LIBS=$SDL_LIBS
-  CFLAGS=$SDL_CFLAGS
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SDL_NumJoysticks in -lSDL" >&5
 $as_echo_n "checking for SDL_NumJoysticks in -lSDL... " >&6; }
 if ${ac_cv_lib_SDL_SDL_NumJoysticks+:} false; then :

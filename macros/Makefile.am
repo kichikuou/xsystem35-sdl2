@@ -27,6 +27,7 @@ MACROS= \
   ltsugar.m4 \
   ltversion.m4 \
   ogg.m4 \
+  pkg.m4 \
   progtest.m4 \
   sdl2.m4 \
   stdint_h.m4 \

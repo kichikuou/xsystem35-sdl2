@@ -586,8 +586,6 @@ AC_ARG_ENABLE(sdl,
 	  [ enable_sdl=no ])
 if test "x$enable_sdl" = xyes ; then
   AM_PATH_SDL2(2.0.0,have_sdl=yes,have_sdl=no)
-  LIBS=$SDL_LIBS
-  CFLAGS=$SDL_CFLAGS
   AC_CHECK_LIB(SDL,SDL_NumJoysticks,have_sdljoy=yes)
 fi
 if test "x$have_sdl" = xyes ; then
