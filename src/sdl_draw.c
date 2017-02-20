@@ -150,13 +150,21 @@ void sdl_fillRectangle(int x, int y, int w, int h, u_long c) {
 }
 
 /* 領域コピー */
-void sdl_copyArea(int sx,int sy, int w, int h, int dx, int dy) {
+void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
+	if (sx == dx && sy == dy)
+		return;
+
 	SDL_Rect r_src, r_dst;
-	
 	setRect(r_src, sx, sy, w, h);
 	setRect(r_dst, dx, dy, w, h);
 
-	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
+	SDL_Rect intersect;
+	if (SDL_IntersectRect(&r_src, &r_dst, &intersect)) {
+		void* region = sdl_saveRegion(sx, sy, w, h);
+		sdl_restoreRegion(region, dx, dy);
+	} else {
+		SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
+	}
 }
 
 /*
