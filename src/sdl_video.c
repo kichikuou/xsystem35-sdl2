@@ -118,11 +118,9 @@ static void makeDIB(int width, int height, int depth) {
 	
 	sdl_dib = SDL_CreateRGBSurface(0, width, height, depth, 0, 0, 0, 0);
 	
-#if 0
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		memset(sdl_dib->format->palette->colors, 0, sizeof(SDL_Color)*256);
 	}
-#endif
 
 #if 0
 	printf("DIB depth %d\n", sdl_dib->format->BitsPerPixel);
