@@ -26,6 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
@@ -72,7 +75,12 @@ void sdl_updateScreen(void) {
 
 void sdl_sleep(int msec) {
 	sdl_updateScreen();
+
+#ifdef __EMSCRIPTEN__
+	emscripten_sleep(msec);
+#else
 	SDL_Delay(msec);
+#endif
 }
 
 /* off-screen の指定領域を Main Window へ転送 */

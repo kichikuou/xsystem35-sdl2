@@ -1,0 +1,31 @@
+# -*- Makefile -*-
+
+EMPORTS := -s USE_ZLIB=1 -s USE_VORBIS=1 -s USE_FREETYPE=1 -s USE_SDL=2
+EMFLAGS := $(EMPORTS)
+
+#EMFLAGS += -O1 -s SAFE_HEAP=1
+EMFLAGS += -O2
+
+EMFLAGS += -s TOTAL_MEMORY=134217728
+EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
+
+LFLAGS := $(EMFLAGS)
+LFLAGS += -s EXPORTED_FUNCTIONS="['_main']"
+LFLAGS += --preload-file gamedata@/
+
+xsystem35.html: xsystem35.bc emterpretify_whitelist src/xsystem35
+	$(CC) $< $(LFLAGS) $(shell grep '^ *-s' emterpretify_whitelist) -o $@
+
+xsystem35.bc:
+	ln -s src/xsystem35 $@
+
+emterpretify_whitelist: xsystem35.bc
+	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 xsystem35.bc > $@
+
+src/xsystem35: src src/Makefile
+	$(MAKE) -C src
+
+src/Makefile:
+	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-music-server=no  --disable-oggtest --disable-vorbistest CFLAGS='-s USE_ZLIB=1 -s USE_VORBIS=1' FT2_CONFIG=tools/freetype-config
+
+.PHONY: src
