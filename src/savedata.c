@@ -773,19 +773,19 @@ static void* loadGameData(int no, int *status, int *size) {
 }
 
 static int saveGameData(int no, char *buf, int size) {
-        FILE *fp;
-        int status = SAVE_SAVEOK1;
+	FILE *fp;
+	int status = SAVE_SAVEOK1;
 	
 	backup_oldfile(saveDataFile[no]);
-        fp = fopen(saveDataFile[no],"wb");
-        if (fp == NULL) {
-                return SAVE_SAVEERR;
-        }
-        if (size != fwrite(buf, size, 1, fp)) {
-                status = SAVE_SAVEERR;
-        }
-        fclose(fp);
-        return status;
+	fp = fopen(saveDataFile[no],"wb");
+	if (fp == NULL) {
+		return SAVE_SAVEERR;
+	}
+	if (1 != fwrite(buf, size, 1, fp)) {
+		status = SAVE_SAVEERR;
+	}
+	fclose(fp);
+	return status;
 }
 
 /* 指定ファイルからの画像の読み込み thanx tajiru@wizard */

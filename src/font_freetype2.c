@@ -279,14 +279,14 @@ static void *font_ttf_get_glyph(unsigned char *_msg) {
 				      x + slot->bitmap_left,
 				      max(0, fontset->size * 0.9 - slot->metrics.horiBearingY/64),
 				      slot->bitmap.width,
-				      slot->metrics.height/64,
+				      slot->bitmap.rows,
 				      slot->bitmap.pitch);
 		} else if (pixelmode == ft_pixel_mode_mono) {
 			pixmapmono2comimg(slot->bitmap.buffer,
 					  x + slot->bitmap_left,
 					  max(0, fontset->size * 0.9 - slot->metrics.horiBearingY/64),
 					  slot->bitmap.width,
-					  slot->metrics.height/64,
+					  slot->bitmap.rows,
 					  slot->bitmap.pitch);
 		}
 		x += slot->metrics.horiAdvance/64;
