@@ -33,7 +33,7 @@
 #include <signal.h>
 
 #include "portab.h"
-#include "music.h"
+#include "music_ipc.h"
 #include "system.h"
 #include "music_server.h"
 #include "music_fader.h"

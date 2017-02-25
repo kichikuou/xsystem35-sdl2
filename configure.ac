@@ -200,6 +200,22 @@ AC_SUBST(SRC_GRAPHDEV)
 
 
 dnl
+dnl music architecture
+dnl
+AC_ARG_ENABLE(music-server,
+  [  --enable-music-server     Server/client music architecture [default=yes]    ],,
+  [ enable_music_server=yes ])
+SRC_MUSIC=
+if test "x$enable_music_server" = xyes ; then
+  AC_DEFINE(ENABLE_MUSIC_SERVER,1,[define this if you use music server])
+  SRC_MUSIC="music.c music_client.c music_server.c"
+else
+  SRC_MUSIC="music_inprocess.c"
+fi
+AC_SUBST(SRC_MUSIC)
+
+
+dnl
 dnl audio check
 dnl
 AC_ARG_ENABLE(audio,

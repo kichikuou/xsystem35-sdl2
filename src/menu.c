@@ -30,7 +30,6 @@
 #include "menu_callback.h"
 #include "nact.h"
 #include "imput.h"
-#include "music.h"
 
 
 static boolean menu_initilized = FALSE;

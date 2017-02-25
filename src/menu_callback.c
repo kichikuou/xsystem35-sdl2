@@ -30,7 +30,6 @@
 #include "menu_gui.h"
 #include "nact.h"
 #include "imput.h"
-#include "music.h"
 #include "s39init.h"
 
 boolean menu_ok_exit;   /* exit window で OK が押されたかどうか */

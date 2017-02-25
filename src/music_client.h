@@ -86,10 +86,9 @@ extern int mus_bgm_stop(int no, int time);
 extern int mus_bgm_stopall(int time);
 extern int mus_bgm_fade(int no, int time, int vol);
 extern int mus_bgm_getpos(int no);
-extern int mus_bgm_getlen(int no);
+extern int mus_bgm_getlength(int no);
 extern int mus_bgm_wait(int no, int timeout);
 extern int mus_bgm_waitpos(int no, int index);
-extern int mus_bgm_getlength(int no);
 
 /* volume valaner */
 extern int mus_vol_set_valance(int *vols, int num);

@@ -32,7 +32,7 @@
 #include <stdint.h>
 
 #include "portab.h"
-#include "music.h"
+#include "music_ipc.h"
 #include "music_client.h"
 #include "counter.h"
 #include "pcmlib.h"

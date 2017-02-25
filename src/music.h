@@ -1,5 +1,5 @@
 /*
- * music.h  music sever/client shared information
+ * music.h  music interface
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -19,87 +19,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: music.h,v 1.25 2003/11/16 15:29:52 chikama Exp $ */
 
 #ifndef __MUSIC_H__
 #define __MUSIC_H__
-
-#include <stdint.h>
-
-/* music command */
-enum {
-	MUS_CDROM_START, /* 0 */
-	MUS_CDROM_STOP,
-	MUS_CDROM_GETPOSITION,
-	MUS_CDROM_GETMAXTRACK,
-	
-	MUS_PCM_START,
-	MUS_PCM_STOP,
-	MUS_PCM_LOAD_NO,
-	MUS_PCM_LOAD_MEM,
-	MUS_PCM_LOAD_LRSW,
-	MUS_PCM_UNLOAD,
-	MUS_PCM_GETPOSITION,
-	MUS_PCM_WAITEND,
-	MUS_PCM_WAITTIME,
-	MUS_PCM_GETWAVETIME,
-	
-	MUS_FADE_START,
-	MUS_FADE_STOP,
-	MUS_FADE_GETSTATE,
-	MUS_FADE_GETLEVEL,
-	
-	MUS_MIDI_START,
-	MUS_MIDI_STOP,
-	MUS_MIDI_PAUSE,
-	MUS_MIDI_UNPAUSE,
-	MUS_MIDI_GETPOSITION,
-	MUS_MIDI_GETFLAG,
-	MUS_MIDI_SETFLAG,
-
-	MUS_MIXER_GETLEVEL,
-	MUS_MIXER_SETVOLVAL,
-	
-	MUS_BGM_PLAY,
-	MUS_BGM_STOP,
-	MUS_BGM_STOPALL,
-	MUS_BGM_FADE,
-	MUS_BGM_GETPOS,
-	MUS_BGM_GETLEN,
-	MUS_BGM_WAIT,
-	MUS_BGM_WAITPOS,
-	
-	MUS_GET_VALIDSUBSYSTEM,
-	MUS_EXIT
-};
-
-/* socket file */
-#define XSYS35MUSSOCK "/xsystem35_sock"
-
-#define XSYS35_PROTOCOL_VERSION 1
-
-typedef struct {
-	uint16_t version;
-	uint16_t command;
-	uint32_t data_length;
-} ClientPktHeader;
-
-typedef struct {
-	uint16_t version;
-	uint32_t data_length;
-} ServerPktHeader;
-
-typedef struct {
-	ClientPktHeader hdr;
-	void* data;
-	int fd;
-} PacketNode;
-
-typedef struct {
-	boolean cdrom;
-	boolean midi;
-	boolean pcm;
-} ValidSubsystem;
 
 /* init and exit */
 extern int mus_init();
