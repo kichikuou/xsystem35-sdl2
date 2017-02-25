@@ -24,14 +24,26 @@
 #include "music.h"
 #include "music_client.h"
 #include "music_private.h"
+#include "music_fader.h"
+#include "music_bgm.h"
+#include "pcmlib.h"
 
 struct _musprvdat musprv;
 
 int mus_init() {
+	muscd_init();
+	musmidi_init();
+	muspcm_init();
+	musfade_init();
+	musbgm_init();
 	return OK;
 }
 
 int mus_exit() {
+	if (prv.cd_valid) muscd_exit();
+	if (prv.midi_valid) musmidi_exit();
+	if (prv.pcm_valid) musfade_exit();
+	if (prv.pcm_valid) muspcm_exit();
 	return OK;
 }
 
@@ -167,8 +179,10 @@ boolean mus_midi_get_state() {
  *   loop: 繰り返し回数 (0の場合は無限)
  */
 int mus_pcm_start(int no, int loop) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+	if (muspcm_load_no(0, no) == NG)
+		return NG;
+	return muspcm_start(0, loop);
 }
 
 /*
@@ -178,8 +192,21 @@ int mus_pcm_start(int no, int loop) {
  *   loop: 繰り返し数(0の場合は無限ループ)
  */
 int mus_pcm_mix(int noL, int noR, int loop) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+
+	/* mix 2 wave files */
+	WAVFILE* wfile = pcmlib_mixlr(noL, noR);
+	if (wfile == NULL) {
+		puts("mixlr fail");
+		return NG;
+	}
+
+	if (muspcm_load_wfile(0, wfile) == NG) {
+		pcmlib_free(wfile);
+		return NG;
+	}
+
+	return muspcm_start(0, loop);
 }
 
 /*
@@ -187,8 +214,11 @@ int mus_pcm_mix(int noL, int noR, int loop) {
  *   msec: 止まるまでの時間(msec), 0の場合はすぐに止まる
  */
 int mus_pcm_stop(int msec) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+	printf("%s not tested\n", __func__);
+
+	musfade_new(MIX_PCM, 0, msec, -1, 1);
+	return OK;
 }
 
 /*
@@ -196,8 +226,9 @@ int mus_pcm_stop(int msec) {
  *   no  : ファイル番号( no >= 1)
  */
 int mus_pcm_load(int no) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+
+	return muspcm_load_no(0, no);
 }
 
 /*
@@ -207,8 +238,11 @@ int mus_pcm_load(int no) {
  *        loopしている場合は合計時間
  */
 int mus_pcm_get_playposition(int *pos) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+	printf("%s not tested\n", __func__);
+
+	*pos = muspcm_getpos(0);
+	return OK;
 }
 
 /* pcm (Scommand) related function */
@@ -220,9 +254,12 @@ int mus_pcm_get_playposition(int *pos) {
  *   able: 可能かどうかの状態を受け取る場所
  */
 int mus_pcm_check_ability(int bit, int rate, int ch, boolean *able) {
-	printf("%s not implemented\n", __func__);
-	*able = FALSE;
-	return NG;
+	if (!prv.pcm_valid) {
+		*able = FALSE;
+		return NG;
+	}
+	*able = TRUE;
+	return OK;
 }
 
 /*
@@ -231,8 +268,7 @@ int mus_pcm_check_ability(int bit, int rate, int ch, boolean *able) {
  *           TRUE   -> 有効
  */
 boolean mus_pcm_get_state() {
-	printf("%s not implemented\n", __func__);
-	return FALSE;
+	return prv.pcm_valid;
 }
 
 /*

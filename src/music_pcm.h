@@ -101,6 +101,7 @@ extern int muspcm_init();
 extern int muspcm_exit();
 extern int muspcm_load_no(int slot, int no);
 extern int muspcm_load_no_lrsw(int slot, int no);
+extern int muspcm_load_wfile(int slot, WAVFILE *wfile);
 extern int muspcm_load_mem(int slot, void *mem);
 extern int muspcm_load_pipe(int slot, char *cmd);
 extern int muspcm_start(int slot, int loop);

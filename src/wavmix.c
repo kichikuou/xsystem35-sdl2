@@ -43,7 +43,7 @@ WAVFILE *wav_mix(WAVFILE *wfileL, WAVFILE *wfileR) {
 	if (wfileL->bits != wfileR->bits) return NULL;
 	
 	rate    = wfileL->rate;
-        channel = 2;
+	channel = 2;
 	bits    = wfileL->bits;
 	
 	if (wfileL->bytes > wfileR->bytes) {
@@ -61,6 +61,7 @@ WAVFILE *wav_mix(WAVFILE *wfileL, WAVFILE *wfileR) {
 		NOMEMERR();
 	}
 	
+	wfileM->type    = wfileL->type;
 	wfileM->rate    = rate;
 	wfileM->ch      = channel;
 	wfileM->samples = max_samples;

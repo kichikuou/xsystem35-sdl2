@@ -102,7 +102,6 @@ int muspcm_exit() {
 
 // 番号指定のPCMファイル読み込み
 int muspcm_load_no(int slot, int no) {
-	pcmobj_t *obj;
 	WAVFILE *wfile;
 	
 	if (IS_LOADED(slot)) muspcm_unload(slot);
@@ -119,6 +118,15 @@ int muspcm_load_no(int slot, int no) {
 	} else {
 		prv.vol_pcm_sub[slot] = 0;
 	}
+
+	return muspcm_load_wfile(slot, wfile);
+}
+
+int muspcm_load_wfile(int slot, WAVFILE *wfile) {
+	pcmobj_t *obj;
+
+	if (IS_LOADED(slot)) muspcm_unload(slot);
+
 	//printf("rate = %d, bits = %d, ch = %d\n", wfile->rate, wfile->bits, wfile->ch);
 	
 	obj = calloc(1, sizeof(pcmobj_t));
@@ -144,8 +152,6 @@ int muspcm_load_no(int slot, int no) {
 	sndcnv_prepare(obj, prv.audiodev.buf.len / SLICE);
 	
 	prv.pcm[slot] = obj;
-	
-	// printf("pcm load slot = %d, no = %d\n", slot, no);
 	
 	return OK;
 }
