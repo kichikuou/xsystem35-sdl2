@@ -180,6 +180,26 @@ AC_SUBST(SRC_MENU)
 
 
 dnl
+dnl SDL
+dnl
+SRC_GRAPHDEV="xcore_draw.c xcore_video.c xcore_mode.c xcore_event.c xcore_cursor.c xcore_maskupdate.c image.c"
+AC_ARG_ENABLE(sdl,
+	  [  --enable-sdl            SDL [default=no]    ],,
+	  [ enable_sdl=no ])
+if test "x$enable_sdl" = xyes ; then
+  AM_PATH_SDL2(2.0.0,have_sdl=yes,have_sdl=no)
+  AC_CHECK_LIB(SDL,SDL_NumJoysticks,have_sdljoy=yes)
+fi
+if test "x$have_sdl" = xyes ; then
+  AC_DEFINE(ENABLE_SDL,1,[define this if you use SDL])
+  SDL=1
+  SRC_GRAPHDEV="sdl_video.c sdl_mode.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c"
+  AC_SUBST(SDL)
+fi
+AC_SUBST(SRC_GRAPHDEV)
+
+
+dnl
 dnl audio check
 dnl
 AC_ARG_ENABLE(audio,
@@ -316,7 +336,7 @@ dnl
 DEFAULT_PLAYMODE=
 AC_ARG_WITH(default-output,
   [  --with-default-output=<mode>  Specify default output mode (optional):
-                                   default|oss|alsa|esd|sun],
+                                   default|oss|alsa|esd|sun|sdl],
   [ if test "$enable_audio" != no; then
       DEFAULT_PLAYMODE=$withval
       eval "enable_$DEFAULT_PLAYMODE=yes"
@@ -334,6 +354,7 @@ case ".$DEFAULT_PLAYMODE" in
   .alsa)     def_am=AUDIO_PCM_ALSA ;;
   .esd)      def_am=AUDIO_PCM_ESD ;;
   .sun)      def_am=AUDIO_PCM_SUN ;;
+  .sdl)      def_am=AUDIO_PCM_SDL ;;
   *)         def_am= ;;
 esac
 AC_MSG_RESULT($def_am)
@@ -358,6 +379,9 @@ if test "x$have_alsa" = xyes; then
 fi
 if test "x$no_esd" != xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_esd.c"
+fi
+if test "x$have_sdl" = xyes; then
+  SRC_AUDIO="$SRC_AUDIO audio_sdl.c"
 fi
 AC_SUBST(SRC_AUDIO)
 
@@ -565,26 +589,6 @@ dnl
 AC_ARG_WITH(cachesize,[  --with-cachesize=#      General Cache size (MB)],
   AC_DEFINE_UNQUOTED(CACHE_TOTALSIZE,$withval,[General Cache size (MB)]))
 
-
-dnl
-dnl SDL
-dnl
-SRC_GRAPHDEV="xcore_draw.c xcore_video.c xcore_mode.c xcore_event.c xcore_cursor.c xcore_maskupdate.c image.c"
-AC_ARG_ENABLE(sdl,
-	  [  --enable-sdl            SDL [default=no]    ],,
-	  [ enable_sdl=no ])
-if test "x$enable_sdl" = xyes ; then
-  AM_PATH_SDL2(2.0.0,have_sdl=yes,have_sdl=no)
-  AC_CHECK_LIB(SDL,SDL_NumJoysticks,have_sdljoy=yes)
-fi
-if test "x$have_sdl" = xyes ; then
-  AC_DEFINE(ENABLE_SDL,1,[define this if you use SDL])
-  SDL=1
-  SRC_GRAPHDEV="sdl_video.c sdl_mode.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c"
-  AC_SUBST(SDL)
-fi
-AC_SUBST(SRC_GRAPHDEV)
-
 dnl
 dnl joystick
 dnl
@@ -766,6 +770,9 @@ if test "x$have_alsa" = xyes; then
 fi
 if test "x$no_esd" != xyes; then
   echo "    - esd (Enlightened Sound Daemon)"
+fi
+if test "x$have_sdl" = xyes; then
+  echo "    - sdl (SDL audio)"
 fi
 echo ""
 

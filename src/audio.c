@@ -70,6 +70,10 @@ extern int esd_init(audiodevice_t *, char *);
 extern int sunaudio_init(audiodevice_t *dev, char *devaudio, char *devaudioctl);
 #endif /* ENABLE_SUNAUDIO */
 
+#ifdef ENABLE_SDL
+extern int sdlaudio_init();
+#endif /* ENABLE_SDL */
+
 int audio_init(audiodevice_t *a) {
 	switch(mode) {
 	case AUDIO_PCM_ANY:
@@ -104,8 +108,8 @@ int audio_init(audiodevice_t *a) {
 #endif
 #ifdef ENABLE_SDL
 	case AUDIO_PCM_SDL:
-		// if (sdlaudio_initilize(a) == 0) break;
-		// if (audiomode_strict) break;
+		if (sdlaudio_init(a) == 0) break;
+		if (mode_onlyone) break;
 #endif
 #ifdef ENABLE_ARTS
 	case AUDIO_PCM_ARTS:
@@ -131,6 +135,10 @@ void audio_set_output_device(char c) {
 	case 's':
 		/* ALSA */
 		mode = AUDIO_PCM_ALSA;
+		break;
+	case 'd':
+		/* SDL */
+		mode = AUDIO_PCM_SDL;
 		break;
 	case '0':
 		/* no audio */
