@@ -17901,7 +17901,7 @@ if test "x$no_ft" != xyes; then
    EXTRALIBS="$EXTRALIBS $FT2_LIBS"
    EXTRACFLAGS="$EXTRACFLAGS $FT2_CFLAGS"
 fi
-if test x"SRC_FONT" = "x"; then
+if test x"$SRC_FONT" = "x"; then
   as_fn_error $? "\"*** No font device available ***\"" "$LINENO" 5;
 fi
 

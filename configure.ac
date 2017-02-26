@@ -707,7 +707,7 @@ if test "x$no_ft" != xyes; then
 fi
 dnl
 dnl check null
-if test x"SRC_FONT" = "x"; then
+if test x"$SRC_FONT" = "x"; then
   AC_MSG_ERROR("*** No font device available ***");
 fi
 AC_SUBST(SRC_FONT)
