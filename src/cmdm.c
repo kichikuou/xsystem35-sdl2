@@ -60,7 +60,7 @@ void commandMP() {
 	/* 指定の文字列を指定文字数だけ表示する（Ｘコマンドの桁数指定） */
 	int    num1 = getCaliValue();
 	int    num2 = getCaliValue();
-	u_char bstr[3] = { 0x81,0x40,0x00 }; // white blank
+	unsigned char bstr[3] = { 0x81,0x40,0x00 }; // white blank
 	int    len  = min(num2 * 2, v_strlen(num1 - 1));
 	int    blen = num2 * 2 - len;
 	char   *str = malloc(num2 * 2 + 1);

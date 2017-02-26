@@ -136,7 +136,7 @@ void sdl_drawRectangle(int x, int y, int w, int h, int c) {
 }
 
 /* 矩形塗りつぶし */
-void sdl_fillRectangle(int x, int y, int w, int h, u_long c) {
+void sdl_fillRectangle(int x, int y, int w, int h, unsigned long c) {
 	SDL_Rect rect;
 	
 	sdl_pal_check();
@@ -251,7 +251,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 }
 
 /* 直線描画 */
-void sdl_drawLine(int x1, int y1, int x2, int y2, u_long cl) {
+void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long cl) {
 
 	sdl_pal_check();
 	
@@ -341,7 +341,7 @@ static SDL_Surface *com2alphasurface(agsurface_t *src, int cl) {
 
 
 
-int sdl_drawString(int x, int y, char *msg, u_long col) {
+int sdl_drawString(int x, int y, char *msg, unsigned long col) {
 	int w;
 
 	sdl_pal_check();

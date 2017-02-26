@@ -129,7 +129,7 @@ void Xcore_updateArea(MyRectangle *src, MyPoint *dst) {
 }
 
 /* draw rectangle */
-void Xcore_drawRectangle(int x, int y, int w, int h, u_long col) {
+void Xcore_drawRectangle(int x, int y, int w, int h, unsigned long col) {
 	if (!x11_dibinfo->shared) {
 		image_drawRectangle(DIB, x, y, w, h, PAL2PIC(col));
 	} else {
@@ -140,7 +140,7 @@ void Xcore_drawRectangle(int x, int y, int w, int h, u_long col) {
 }
 
 /* fill rectangle */
-void Xcore_fillRectangle(int x, int y, int w, int h, u_long col) {
+void Xcore_fillRectangle(int x, int y, int w, int h, unsigned long col) {
 	if (!x11_dibinfo->shared) {
 		image_fillRectangle(DIB, x, y, w, h, PAL2PIC(col));
 	} else {
@@ -162,7 +162,7 @@ void Xcore_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 }
 
 /* 直線描画 */
-void Xcore_drawLine(int x1, int y1, int x2, int y2, u_long col) {
+void Xcore_drawLine(int x1, int y1, int x2, int y2, unsigned long col) {
 	if (!x11_dibinfo->shared) {
 		image_drawLine(DIB, x1, y1, x2, y2, PAL2PIC(col));
 	} else {
@@ -172,7 +172,7 @@ void Xcore_drawLine(int x1, int y1, int x2, int y2, u_long col) {
 	}
 } 
 
-int Xcore_drawString(int x, int y, char *msg, u_long col) {
+int Xcore_drawString(int x, int y, char *msg, unsigned long col) {
 	int w;
 	
 	if (x11_font->self_drawable()) {
@@ -232,8 +232,8 @@ void Xcore_setPallet(Pallet256 *pal, int src, int cnt) {
 }
 
 /* foreground のセット */
-void Xcore_setForeground(u_long col) {
-	static u_long fc = 0;
+void Xcore_setForeground(unsigned long col) {
+	static unsigned long fc = 0;
 	
 	if (fc == col && x11_visual->class == PseudoColor) return;
 	
@@ -247,8 +247,8 @@ void Xcore_setForeground(u_long col) {
 }
 
 /* background のセット */
-void Xcore_setBackground(u_long col) {
-	static u_long bc = 0;
+void Xcore_setBackground(unsigned long col) {
+	static unsigned long bc = 0;
 	
 	if (bc == col) return;
 	
