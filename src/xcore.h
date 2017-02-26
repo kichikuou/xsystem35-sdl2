@@ -50,13 +50,13 @@ extern void Xcore_sync();
 
 /* パレット関係 */
 extern void Xcore_setPallet(Pallet256 *pal, int src, int cnt);
-extern void Xcore_setForeground(u_long col);
+extern void Xcore_setForeground(unsigned long col);
 
 /* 描画関係 */
-extern void Xcore_drawRectangle(int x, int y, int w, int h, u_long col);
-extern void Xcore_fillRectangle(int x, int y, int w, int h, u_long col);
-extern void Xcore_drawLine(int x0, int y0, int x1, int y1, u_long col);
-extern int  Xcore_drawString(int x, int y, char *msg, u_long col);
+extern void Xcore_drawRectangle(int x, int y, int w, int h, unsigned long col);
+extern void Xcore_fillRectangle(int x, int y, int w, int h, unsigned long col);
+extern void Xcore_drawLine(int x0, int y0, int x1, int y1, unsigned long col);
+extern int  Xcore_drawString(int x, int y, char *msg, unsigned long col);
 extern void Xcore_copyArea(int sx, int sy, int w, int h, int dx, int dy);
 // extern void Xcore_drawTT(int x, int y, int w, int h, const char *bitmap, int ww, boolean antialiased);
 extern int  Xcore_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int t,int opt, boolean flg, int spCol);

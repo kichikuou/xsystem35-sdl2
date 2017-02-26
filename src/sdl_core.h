@@ -51,9 +51,9 @@ extern void sdl_setPallet(Pallet256 *pal, int src, int cnt);
 
 /* 描画関係 */
 extern void sdl_drawRectangle(int x, int y, int w, int h, int cl);
-extern void sdl_fillRectangle(int x, int y, int w, int h, u_long c);
-extern void sdl_drawLine(int x1, int y1, int x2, int y2, u_long col);
-extern int  sdl_drawString(int x, int y, char *msg, u_long col);
+extern void sdl_fillRectangle(int x, int y, int w, int h, unsigned long c);
+extern void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long col);
+extern int  sdl_drawString(int x, int y, char *msg, unsigned long col);
 extern void sdl_copyArea(int sx,int sy, int w, int h, int dx, int dy);
 extern void sdl_drawTT(int x,int y,int w,int h,const char *bitmap,int ww, boolean antialiased);
 extern void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int sp);
