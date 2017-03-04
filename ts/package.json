@@ -1,0 +1,8 @@
+{
+  "name": "xsystem35-shell",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "@types/emscripten": "0.0.29"
+  }
+}

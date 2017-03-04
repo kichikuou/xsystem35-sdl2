@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "outDir": "../docs",
+        "lib": ["es6", "webworker"],
+        "noImplicitAny": true,
+        "sourceMap": false
+    }
+}

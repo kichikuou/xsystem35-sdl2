@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "outDir": "../docs",
+        "noImplicitAny": true,
+        "sourceMap": false
+    }
+}
