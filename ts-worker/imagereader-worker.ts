@@ -20,9 +20,9 @@ class Installer {
             postMessage({command:'readyState', img:imgName, cue:cueName});
             break;
         case 'extractFiles':
-        if (this.ready())
-            this.extractFiles();
-        break;
+            if (this.ready())
+                this.extractFiles();
+            break;
         case 'getTrack':
             if (this.ready())
                 this.getTrack(evt.data.track);
@@ -51,8 +51,7 @@ class Installer {
     private extractFiles() {
         var isofs = new ISO9660FileSystem(this.imageReader);
         //this.walk(isofs, isofs.rootDir(), '/');
-        var gamedata = isofs.getDirEnt('gamedata', isofs.rootDir()) ||
-            isofs.getDirEnt('mugen', isofs.rootDir());
+        var gamedata = isofs.getDirEnt('gamedata', isofs.rootDir());
         if (!gamedata) {
             postMessage({command:'error', message:'インストールできません。GAMEDATAフォルダが見つかりません。'});
             return;
@@ -60,7 +59,7 @@ class Installer {
         var files: any = {};
         var transfers = [];
         for (var e of isofs.readDir(gamedata)) {
-            if (e.name.toLowerCase().endsWith('.dat')) {
+            if (e.name.toLowerCase().endsWith('.ald')) {
                 var buffer = new ArrayBuffer(e.size);
                 var uint8 = new Uint8Array(buffer);
                 var ptr = 0;

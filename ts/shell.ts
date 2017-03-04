@@ -129,10 +129,15 @@ class ImageLoader {
     }
 
     private populateFiles(files:any, volumeLabel:string) {
+        var grGenerator = new GameResourceGenerator();
         for (var name in files) {
             var data: ArrayBufferView = new Uint8Array(files[name]);
             FS.writeFile(name, data, { encoding: 'binary' });
+            grGenerator.addFile(name);
         }
+        var gr = grGenerator.generate();
+        console.log(gr);
+        FS.writeFile('xsystem35.gr', gr);
         Module.callMain();
     }
 
@@ -195,5 +200,29 @@ class ImageLoader {
     }
 }
 
+class GameResourceGenerator {
+    static resourceType: {[ch:string]:string} = {s:'Scenario', g:'Graphics', w:'Wave', d:'Data', r:'Resource', m:'Midi'};
+    private basename:string;
+    private lines:string[] = [];
+
+    addFile(name:string) {
+        var type = name.charAt(name.length - 6).toLowerCase();
+        var id = name.charAt(name.length - 5);
+        this.basename = name.slice(0, -6);
+        this.lines.push(GameResourceGenerator.resourceType[type] + id.toUpperCase() + ' ' + name);
+    }
+
+    generate(): string {
+        for (var i = 0; i < 26; i++) {
+            var id = String.fromCharCode(65 + i);
+            this.lines.push('Save' + id + ' save/' + this.basename + 's' + id.toLowerCase() + '.asd');
+        }
+        return this.lines.join('\n') + '\n';
+    }
+
+    isEmpty(): boolean {
+        return this.lines.length == 0;
+    }
+}
 
 var shell = new Sys3Shell();
