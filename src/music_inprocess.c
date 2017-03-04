@@ -53,16 +53,20 @@ int mus_exit() {
  *   loop : 繰り返し回数 (0の場合は無限)
  */
 int mus_cdrom_start(int track, int loop) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.cd_valid) return NG;
+	muscd_start(track, loop);
+	muscd_cb();
+	return OK;
 }
 
 /*
  * cdrom の演奏停止
  */
 int mus_cdrom_stop() {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.cd_valid) return NG;
+	muscd_stop();
+	muscd_cb();
+	return OK;
 }
 
 /*
@@ -71,8 +75,9 @@ int mus_cdrom_stop() {
  *         停止している場合は 999/999/999/999 が返る
  */
 int mus_cdrom_get_playposition(cd_time *tm) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.cd_valid) return NG;
+	*tm = muscd_getpos();
+	return OK;
 }
 
 /*
@@ -80,8 +85,8 @@ int mus_cdrom_get_playposition(cd_time *tm) {
  *   
  */
 int mus_cdrom_get_maxtrack() {
-	printf("%s not implemented\n", __func__);
-	return 0;
+	if (!prv.cd_valid) return 0;
+	return prv.cd_maxtrk;
 }
 
 /*
@@ -90,8 +95,7 @@ int mus_cdrom_get_maxtrack() {
  *           TRUE   -> 有効
  */
 boolean mus_cdrom_get_state() {
-	printf("%s not implemented\n", __func__);
-	return FALSE;
+	return prv.cd_valid;
 }
 
 /*
