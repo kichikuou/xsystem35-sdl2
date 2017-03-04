@@ -449,6 +449,9 @@ if test "x$enable_cd_linux" = xyes; then
 elif test "x$enable_cd_bsd" = xyes; then
   SRC_CDROM="$SRC_CROM cdrom.FreeBSD.c"
   AC_DEFINE(ENABLE_CDROM_BSD,1,[Define this if you use cdrom iotctl in *BSD])
+elif test "x$enable_cd_emscripten" = xyes; then
+  SRC_CDROM="$SRC_CROM cdrom.emscripten.c"
+  AC_DEFINE(ENABLE_CDROM_EMSCRIPTEN,1,[Define this if you use cdrom support for emscripten])
 else
   SRC_CDROM="$SRC_CDROM cdrom.empty.c"
 fi
@@ -799,6 +802,9 @@ if test "x$enable_cd_linux" = xyes; then
 fi
 if test "x$enable_cd_bsd" = xyes; then
   echo "    - *BSD ioctl"
+fi
+if test "x$enable_cd_emscripten" = xyes; then
+  echo "    - emscripten"
 fi
 if test "x$enable_cd_mp3" = xyes; then
   echo "    - External player (wav|mp3|ogg...)"

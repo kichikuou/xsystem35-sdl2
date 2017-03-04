@@ -40,6 +40,10 @@ extern cdromdevice_t cdrom_linux;
 extern cdromdevice_t cdrom_bsd;
 #define DEV_PLAY_MODE &cdrom_bsd
 
+#elif defined(ENABLE_CDROM_EMSCRIPTEN)
+extern cdromdevice_t cdrom_emscripten;
+#define DEV_PLAY_MODE &cdrom_emscripten
+
 #else
 
 extern cdromdevice_t cdrom_empty;
@@ -69,6 +73,10 @@ static char *dev = CDROM_DEVICE;
          失敗 -1
 */
 int cd_init(cdromdevice_t *cd) {
+#ifdef ENABLE_CDROM_EMSCRIPTEN
+	memcpy(cd, DEV_PLAY_MODE, sizeof(cdromdevice_t));
+	return cd->init(dev);
+#else
 	struct stat st;
 	int ret = NG;
 	
@@ -94,6 +102,7 @@ int cd_init(cdromdevice_t *cd) {
 		ret = NG;
 	}
 	return ret;
+#endif  // ENABLE_CDROM_EMSCRIPTEN
 }
 
 void cd_set_devicename(char *name) {

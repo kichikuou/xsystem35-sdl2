@@ -17213,6 +17213,11 @@ elif test "x$enable_cd_bsd" = xyes; then
 
 $as_echo "#define ENABLE_CDROM_BSD 1" >>confdefs.h
 
+elif test "x$enable_cd_emscripten" = xyes; then
+  SRC_CDROM="$SRC_CROM cdrom.emscripten.c"
+
+$as_echo "#define ENABLE_CDROM_EMSCRIPTEN 1" >>confdefs.h
+
 else
   SRC_CDROM="$SRC_CDROM cdrom.empty.c"
 fi
@@ -18504,6 +18509,9 @@ if test "x$enable_cd_linux" = xyes; then
 fi
 if test "x$enable_cd_bsd" = xyes; then
   echo "    - *BSD ioctl"
+fi
+if test "x$enable_cd_emscripten" = xyes; then
+  echo "    - emscripten"
 fi
 if test "x$enable_cd_mp3" = xyes; then
   echo "    - External player (wav|mp3|ogg...)"
