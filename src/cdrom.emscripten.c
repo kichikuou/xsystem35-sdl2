@@ -50,12 +50,12 @@ int cdrom_exit() {
 }
 
 int cdrom_start(int trk) {
-	EM_ASM_ARGS({ Module.cdPlayer.play($0); }, trk);
+	EM_ASM_ARGS({ xsystem35.cdPlayer.play($0); }, trk);
 	return OK;
 }
 
 int cdrom_stop() {
-	EM_ASM( Module.cdPlayer.stop(); );
+	EM_ASM( xsystem35.cdPlayer.stop(); );
 	return OK;
 }
 

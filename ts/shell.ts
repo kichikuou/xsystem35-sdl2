@@ -8,8 +8,6 @@ declare namespace Module {
     function setStatus(status: string): void;
     function monitorRunDependencies(left: number): void;
     function callMain(): void;
-
-    var cdPlayer: CDPlayer;
 }
 
 declare namespace FS {
@@ -23,6 +21,8 @@ namespace xsystem35 {
         'ttfont_mincho: ' + Font.fname,
         'ttfont_gothic: ' + Font.fname, ''
     ].join('\n');
+    export var cdPlayer: CDPlayer;
+    export var shell: System35Shell;
 }
 
 class System35Shell {
@@ -46,10 +46,10 @@ class System35Shell {
         Module.noInitialRun = true;
         Module.setStatus = this.setStatus.bind(this);
         Module.monitorRunDependencies = this.monitorRunDependencies.bind(this);
-        Module.cdPlayer = new CDPlayer(this.imageLoader);
         Module.preRun = [
             () => { FS.createPreloadedFile('/', xsystem35.Font.fname, xsystem35.Font.url, true, false); }
         ];
+        xsystem35.cdPlayer = new CDPlayer(this.imageLoader);
     }
 
     setStatus(text: string) {
@@ -235,4 +235,4 @@ class GameResourceGenerator {
     }
 }
 
-var shell = new System35Shell();
+xsystem35.shell = new System35Shell();
