@@ -11,7 +11,6 @@ EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
 
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main']"
-LFLAGS += --preload-file gamedata@/
 
 docs/xsystem35.js: xsystem35.bc emterpretify_whitelist src/xsystem35
 	$(CC) $< $(LFLAGS) $(shell grep '^ *-s' emterpretify_whitelist) -o $@

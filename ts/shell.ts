@@ -10,13 +10,22 @@ declare namespace Module {
     function callMain(): void;
 
     var cdPlayer: CDPlayer;
-};
+}
 
 declare namespace FS {
     function writeFile(path: string, data: ArrayBufferView | string, opts?: {encoding?: string; flags?: string}): void;
-};
+}
 
-class Sys3Shell {
+namespace xsystem35 {
+    export const Font = { url: 'fonts/MTLc3m.ttf', fname: 'MTLc3m.ttf'};
+    export const xsys35rc = [
+        'font_device: ttf',
+        'ttfont_mincho: ' + Font.fname,
+        'ttfont_gothic: ' + Font.fname, ''
+    ].join('\n');
+}
+
+class System35Shell {
     private imageLoader: ImageLoader;
     status: HTMLElement = document.getElementById('status');
     progress: HTMLProgressElement = <HTMLProgressElement>document.getElementById('progress');
@@ -37,8 +46,10 @@ class Sys3Shell {
         Module.noInitialRun = true;
         Module.setStatus = this.setStatus.bind(this);
         Module.monitorRunDependencies = this.monitorRunDependencies.bind(this);
-
         Module.cdPlayer = new CDPlayer(this.imageLoader);
+        Module.preRun = [
+            () => { FS.createPreloadedFile('/', xsystem35.Font.fname, xsystem35.Font.url, true, false); }
+        ];
     }
 
     setStatus(text: string) {
@@ -99,7 +110,7 @@ class ImageLoader {
     private worker: Worker;
     private cddaCallback: (wab:Blob)=>void;
 
-    constructor(private shell:Sys3Shell) {
+    constructor(private shell:System35Shell) {
         this.initWorker();
         $('#fileselect').addEventListener('change', this.handleFileSelect.bind(this), false);
         document.body.ondragover = this.handleDragOver.bind(this);
@@ -135,9 +146,8 @@ class ImageLoader {
             FS.writeFile(name, data, { encoding: 'binary' });
             grGenerator.addFile(name);
         }
-        var gr = grGenerator.generate();
-        console.log(gr);
-        FS.writeFile('xsystem35.gr', gr);
+        FS.writeFile('xsystem35.gr', grGenerator.generate());
+        FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
         Module.callMain();
     }
 
@@ -225,4 +235,4 @@ class GameResourceGenerator {
     }
 }
 
-var shell = new Sys3Shell();
+var shell = new System35Shell();
