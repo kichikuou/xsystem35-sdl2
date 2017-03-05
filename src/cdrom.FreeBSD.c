@@ -35,7 +35,7 @@
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();
-static int  cdrom_start(int);
+static int  cdrom_start(int, int);
 static int  cdrom_stop();
 static int  cdrom_getPlayingInfo(cd_time *);
 
@@ -152,7 +152,7 @@ int cdrom_exit() {
 }
 
 /* トラック番号 trk の演奏 trk = 1~ */
-int cdrom_start(int trk) {
+int cdrom_start(int trk, int loop) {
 	struct ioc_play_msf   msf;
 	struct ioc_play_track track;
 	

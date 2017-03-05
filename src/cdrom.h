@@ -39,7 +39,7 @@ typedef struct {
 struct _cdromdevice {
 	int  (* init)(char *);
 	int  (* exit)(void);
-	int  (* start)(int trk);
+	int  (* start)(int trk, boolean loop);
 	int  (* stop)(void);
 	int  (* getpos)(cd_time *);
 	int  (* setvol)(int);

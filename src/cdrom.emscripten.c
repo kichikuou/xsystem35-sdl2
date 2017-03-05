@@ -25,7 +25,7 @@
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();
-static int  cdrom_start(int);
+static int  cdrom_start(int, boolean);
 static int  cdrom_stop();
 static int  cdrom_getPlayingInfo(cd_time *);
 
@@ -49,8 +49,8 @@ int cdrom_exit() {
 	return OK;
 }
 
-int cdrom_start(int trk) {
-	EM_ASM_ARGS({ xsystem35.cdPlayer.play($0); }, trk);
+int cdrom_start(int trk, boolean loop) {
+	EM_ASM_ARGS({ xsystem35.cdPlayer.play($0, $1); }, trk, loop);
 	return OK;
 }
 

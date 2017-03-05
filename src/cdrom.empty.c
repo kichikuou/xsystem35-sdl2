@@ -27,7 +27,7 @@
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();
-static int  cdrom_start(int);
+static int  cdrom_start(int, int);
 static int  cdrom_stop();
 static int  cdrom_getPlayingInfo(cd_time *);
 
@@ -50,7 +50,7 @@ int cdrom_exit() {
 	return OK;
 }
 
-int cdrom_start(int trk) {
+int cdrom_start(int trk, int loop) {
 	return OK;
 }
 

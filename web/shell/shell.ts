@@ -86,12 +86,12 @@ class CDPlayer {
 
     play(track:number, loop:number) {
         if (this.blobs[track]) {
-            this.startPlayback(this.blobs[track]);
+            this.startPlayback(this.blobs[track], loop);
             return;
         }
         this.imageLoader.getCDDA(track, (blob) => {
             this.blobs[track] = blob;
-            this.startPlayback(blob);
+            this.startPlayback(blob, loop);
         });
     }
 
@@ -99,8 +99,9 @@ class CDPlayer {
         this.audio.pause();
     }
 
-    private startPlayback(blob:Blob) {
+    private startPlayback(blob:Blob, loop:number) {
         this.audio.setAttribute('src', URL.createObjectURL(blob));
+        this.audio.loop = (loop != 0);
         this.audio.load();
         this.audio.play();
     }
