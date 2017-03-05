@@ -66,10 +66,12 @@ static void sdl_getEvent(void) {
 	SDL_Event e;
 	boolean m2b = FALSE, msg_skip = FALSE;
 	int i;
-	
-	sdl_updateScreen();
+
+	if (nact->input_state == InputNotChecked)
+		nact->input_state = InputCheckMissed;
 
 	while (SDL_PollEvent(&e)) {
+		nact->input_state = HadInput;
 		switch (e.type) {
 		case SDL_WINDOWEVENT:
 			switch (e.window.event) {

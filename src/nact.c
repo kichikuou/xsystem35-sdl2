@@ -24,6 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "scenario.h"
@@ -179,14 +182,51 @@ static int checkMessage() {
 }
 
 #define MAINLOOP_EVENTCHECK_INTERVAL 16 /* 16 msec */
+
+#ifdef __EMSCRIPTEN__
+
+static void mainloop() {
+	if (nact->is_quit)
+		emscripten_cancel_main_loop();
+
+	for (int cnt = 0; cnt < 10000; cnt++) {
+		nact->input_state = InputNotChecked;
+
+		DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
+		if (!nact->popupmenu_opened) {
+			int c0 = checkMessage();
+			check_command(c0);
+		}
+		nact->callback();
+
+		if (nact->input_state == InputCheckMissed)
+			break;
+	}
+	if (!nact->is_message_locked && nact->input_state == InputNotChecked)
+		sys_getInputInfo();
+	sdl_updateScreen();
+}
+
+#endif // __EMSCRIPTEN__
+
 void nact_main() {
+	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
+	reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
+#ifdef __EMSCRIPTEN__
+#ifdef EMTERPRETIFY_ADVISE
+	// Using mainloop as a function pointer screws up EMTERPRETIFY_ADVISE!
+	mainloop();
+#else
+	emscripten_set_main_loop(mainloop, 0, TRUE);
+#endif
+#else
 	int c0;
 	static int cnt = 0;
 	
-	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
-	reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
-	
 	while (!nact->is_quit) {
+#ifdef ENABLE_SDL
+		nact->input_state = InputNotChecked;
+#endif
 		DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
 		if (!nact->popupmenu_opened) {
 			c0 = checkMessage();
@@ -204,7 +244,14 @@ void nact_main() {
 		}
 		cnt++;
 		nact->callback();
+#ifdef ENABLE_SDL
+		if (nact->input_state == InputCheckMissed) {
+			sdl_updateScreen();
+			Sleep(10);
+		}
+#endif
 	}
+#endif // __EMSCRIPTEN__
 }
 
 static void nact_callback() {

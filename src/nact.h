@@ -142,6 +142,10 @@ typedef struct {
 		char *alk[10];
 	} files;
 	
+#ifdef ENABLE_SDL
+	enum { InputNotChecked, InputCheckMissed, HadInput } input_state;
+#endif
+
 } NACTINFO;
 
 extern NACTINFO *nact;

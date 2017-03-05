@@ -12,17 +12,18 @@ EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main']"
 
-docs/xsystem35.js: xsystem35.bc emterpretify_whitelist src/xsystem35
-	$(CC) $< $(LFLAGS) $(shell grep '^ *-s' emterpretify_whitelist) -o $@
+docs/xsystem35.js: emterpretify_whitelist src/xsystem35
+	$(CC) xsystem35.bc $(LFLAGS) @emterpretify_whitelist -o $@
 
-xsystem35.bc:
-	ln -s src/xsystem35 $@
-
-emterpretify_whitelist: xsystem35.bc
-	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 xsystem35.bc > $@
+emterpretify_whitelist:
+	$(MAKE) -C src clean
+	$(MAKE) -C src CPPFLAGS=-DEMTERPRETIFY_ADVISE
+	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 xsystem35.bc |grep EMTERPRETIFY_WHITELIST > $@
+	$(MAKE) -C src clean
 
 src/xsystem35: src src/Makefile
 	$(MAKE) -C src
+	ln -sf src/xsystem35 xsystem35.bc
 
 src/Makefile:
 	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-music-server=no --enable-cdrom=emscripten --disable-oggtest --disable-vorbistest CFLAGS='-s USE_ZLIB=1 -s USE_VORBIS=1' FT2_CONFIG=tools/freetype-config
