@@ -1,0 +1,17 @@
+*~
+*.o
+*.lo
+*.la
+*.js
+/config.h
+/config.log
+/config.status
+/emterpretify_whitelist
+/libtool
+/stamp-h1
+/xsystem35.bc
+/src/xsystem35
+Makefile
+.deps/
+.libs/
+node_modules/
