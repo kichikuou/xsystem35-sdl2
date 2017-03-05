@@ -1,10 +1,7 @@
-pkglib_LTLIBRARIES = MsgSkip.la MSGSKIP.la
+pkglib_LTLIBRARIES = MsgSkip.la
 
 MsgSkip_la_LDFLAGS = -module -export-dynamic -avoid-version
 MsgSkip_la_SOURCES = MsgSkip.c
-
-MSGSKIP_la_LDFLAGS = -module -export-dynamic -avoid-version
-MSGSKIP_la_SOURCES = MsgSkip.c
 
 AM_CFLAGS = @DEBUG_CFLAGS@
 

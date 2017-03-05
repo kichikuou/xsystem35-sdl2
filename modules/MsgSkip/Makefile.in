@@ -134,19 +134,13 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-MSGSKIP_la_LIBADD =
-am_MSGSKIP_la_OBJECTS = MsgSkip.lo
-MSGSKIP_la_OBJECTS = $(am_MSGSKIP_la_OBJECTS)
+MsgSkip_la_LIBADD =
+am_MsgSkip_la_OBJECTS = MsgSkip.lo
+MsgSkip_la_OBJECTS = $(am_MsgSkip_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-MSGSKIP_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(MSGSKIP_la_LDFLAGS) $(LDFLAGS) -o $@
-MsgSkip_la_LIBADD =
-am_MsgSkip_la_OBJECTS = MsgSkip.lo
-MsgSkip_la_OBJECTS = $(am_MsgSkip_la_OBJECTS)
 MsgSkip_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(MsgSkip_la_LDFLAGS) $(LDFLAGS) -o $@
@@ -184,8 +178,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(MSGSKIP_la_SOURCES) $(MsgSkip_la_SOURCES)
-DIST_SOURCES = $(MSGSKIP_la_SOURCES) $(MsgSkip_la_SOURCES)
+SOURCES = $(MsgSkip_la_SOURCES)
+DIST_SOURCES = $(MsgSkip_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -406,11 +400,9 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-pkglib_LTLIBRARIES = MsgSkip.la MSGSKIP.la
+pkglib_LTLIBRARIES = MsgSkip.la
 MsgSkip_la_LDFLAGS = -module -export-dynamic -avoid-version
 MsgSkip_la_SOURCES = MsgSkip.c
-MSGSKIP_la_LDFLAGS = -module -export-dynamic -avoid-version
-MSGSKIP_la_SOURCES = MsgSkip.c
 AM_CFLAGS = @DEBUG_CFLAGS@
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
 	-I$(top_builddir)/src -I$(top_srcdir)/src \
@@ -486,9 +478,6 @@ clean-pkglibLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-
-MSGSKIP.la: $(MSGSKIP_la_OBJECTS) $(MSGSKIP_la_DEPENDENCIES) $(EXTRA_MSGSKIP_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(MSGSKIP_la_LINK) -rpath $(pkglibdir) $(MSGSKIP_la_OBJECTS) $(MSGSKIP_la_LIBADD) $(LIBS)
 
 MsgSkip.la: $(MsgSkip_la_OBJECTS) $(MsgSkip_la_DEPENDENCIES) $(EXTRA_MsgSkip_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(MsgSkip_la_LINK) -rpath $(pkglibdir) $(MsgSkip_la_OBJECTS) $(MsgSkip_la_LIBADD) $(LIBS)
