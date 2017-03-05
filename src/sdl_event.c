@@ -175,11 +175,7 @@ int sdl_keywait(int msec, boolean cancel) {
 		if (cancel && key) break;
 		n = msec - (get_high_counter(SYSTEMCOUNTER_MSEC) - cnt);
 		if (n < 0) break;
-		if (n < 10) {
-			sdl_sleep(n);
-		} else {
-			sdl_sleep(10);
-		}
+		sdl_sleep(n < 16 ? n : 16);
 		nact->callback();
 	}
 	
