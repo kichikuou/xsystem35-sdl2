@@ -79,12 +79,14 @@ class System35Shell {
 class CDPlayer {
     audio = <HTMLAudioElement>$('audio');
     private blobs: Blob[];
+    private currentTrack: number;
 
     constructor(private imageLoader:ImageLoader) {
         this.blobs = [];
     }
 
     play(track:number, loop:number) {
+        this.currentTrack = track;
         if (this.blobs[track]) {
             this.startPlayback(this.blobs[track], loop);
             return;
@@ -97,6 +99,14 @@ class CDPlayer {
 
     stop() {
         this.audio.pause();
+        this.currentTrack = null;
+    }
+
+    getPosition(): number {
+        if (!this.currentTrack)
+            return 0;
+        var time = Math.round(this.audio.currentTime * 75);
+        return this.currentTrack | time << 8;
     }
 
     private startPlayback(blob:Blob, loop:number) {

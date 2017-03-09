@@ -59,7 +59,9 @@ int cdrom_stop() {
 	return OK;
 }
 
-int cdrom_getPlayingInfo (cd_time *info) {
-	info->t = info->m = info->s = info->f = 999;
-	return NG;
+int cdrom_getPlayingInfo(cd_time *info) {
+	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
+	info->t = t & 0xff;
+	FRAMES_TO_MSF(t >> 8, &info->m, &info->s, &info->f);
+	return OK;
 }
