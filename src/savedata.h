@@ -24,6 +24,12 @@
 #ifndef __SAVEDATA__
 #define __SAVEDATA__
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+typedef int emscripten_align1_int;
+#endif
+
 #include "portab.h"
 #include "cg.h"
 #include "windowframe.h"
@@ -97,10 +103,10 @@ typedef struct {
 } Ald_stackHdr;
 
 typedef struct {
-	int size;
-	int pageNo;
-	int rsv1;
-	int rsv2;
+	emscripten_align1_int size;
+	emscripten_align1_int pageNo;
+	emscripten_align1_int rsv1;
+	emscripten_align1_int rsv2;
 } Ald_sysVarHdr;
 
 /* defined by cmdb.c */
