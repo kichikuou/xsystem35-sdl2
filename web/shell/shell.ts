@@ -47,7 +47,15 @@ class System35Shell {
         Module.setStatus = this.setStatus.bind(this);
         Module.monitorRunDependencies = this.monitorRunDependencies.bind(this);
         Module.preRun = [
-            () => { FS.createPreloadedFile('/', xsystem35.Font.fname, xsystem35.Font.url, true, false); }
+            function loadFont() {
+                FS.createPreloadedFile('/', xsystem35.Font.fname, xsystem35.Font.url, true, false);
+            },
+            function prepareSaveDir() {
+                FS.mkdir('/save');
+                FS.mount(IDBFS, {}, '/save');
+                Module.addRunDependency('syncfs');
+                FS.syncfs(true, (err) => { Module.removeRunDependency('syncfs') });
+            }
         ];
         xsystem35.cdPlayer = new CDPlayer(this.imageLoader);
     }
@@ -73,6 +81,17 @@ class System35Shell {
     monitorRunDependencies(left: number) {
         this.totalDependencies = Math.max(this.totalDependencies, left);
         this.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+    }
+
+    private fsyncTimer: number;
+    syncfs(fname: string) {
+        window.clearTimeout(this.fsyncTimer);
+        this.fsyncTimer = window.setTimeout(() => {
+            FS.syncfs(false, (err) => {
+                if (err)
+                    console.log("FS.syncfs error: ", err);
+            });
+        }, 100);
     }
 }
 

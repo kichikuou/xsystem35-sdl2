@@ -27,6 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "savedata.h"
@@ -53,7 +56,11 @@ static int   loadSysVar(char *buf);
 static void* loadGameData(int no, int *status, int *size);
 static int   saveGameData(int no, char *buf, int size);
 
-
+static void scheduleSync() {
+#ifdef __EMSCRIPTEN__
+	EM_ASM( xsystem35.shell.syncfs(); );
+#endif
+}
 
 /* savefile がある directory を登録 */
 void save_set_path(char *path) {
@@ -161,6 +168,7 @@ int save_save_var_with_file(char *filename, int *start, int cnt) {
 	}
 	
 	fclose(fp);
+	scheduleSync();
  errexit:	
 	free(_tmp);
 	
@@ -239,6 +247,7 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 	}
 	
 	fclose(fp);
+	scheduleSync();
  errexit:      
 	free(_tmp);
 	
@@ -589,6 +598,7 @@ int save_saveAll(int no) {
 		goto errexit;
 	
 	fclose(fp);
+	scheduleSync();
 	free(save_base);
 
 	return SAVE_SAVEOK1;
@@ -785,6 +795,7 @@ static int saveGameData(int no, char *buf, int size) {
 		status = SAVE_SAVEERR;
 	}
 	fclose(fp);
+	scheduleSync();
 	return status;
 }
 
