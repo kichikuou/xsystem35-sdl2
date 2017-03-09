@@ -165,18 +165,14 @@ static void sdl_getEvent(void) {
 
 int sdl_keywait(int msec, boolean cancel) {
 	int key=0, n;
-	int cnt = get_high_counter(SYSTEMCOUNTER_MSEC);
+	int end = get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
 	
-	if (msec < 0) return 0;
-	
-	while (msec > (get_high_counter(SYSTEMCOUNTER_MSEC) - cnt)) {
+	while ((n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
+		sdl_sleep(n < 16 ? n : 16);
+		nact->callback();
 		sdl_getEvent();
 		key = check_button() | sdl_getKeyInfo() | joy_getinfo();
 		if (cancel && key) break;
-		n = msec - (get_high_counter(SYSTEMCOUNTER_MSEC) - cnt);
-		if (n < 0) break;
-		sdl_sleep(n < 16 ? n : 16);
-		nact->callback();
 	}
 	
 	return key;
