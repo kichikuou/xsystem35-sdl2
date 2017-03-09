@@ -1,3 +1,5 @@
+importScripts('text-decoder.js');
+
 class ISO9660FileSystem {
     private pvd: PVD;
 
