@@ -28,6 +28,7 @@ namespace xsystem35 {
 class System35Shell {
     private imageLoader: ImageLoader;
     status: HTMLElement = document.getElementById('status');
+    private zoom:ZoomManager;
 
     constructor() {
         this.imageLoader = new ImageLoader(this);
@@ -56,11 +57,16 @@ class System35Shell {
             }
         ];
         xsystem35.cdPlayer = new CDPlayer(this.imageLoader);
+        this.zoom = new ZoomManager();
     }
 
     setStatus(text: string) {
         console.log(text);
         this.status.innerHTML = text;
+    }
+
+    windowSizeChanged() {
+        this.zoom.handleZoom();
     }
 
     private fsyncTimer: number;
@@ -113,6 +119,47 @@ class CDPlayer {
         this.audio.loop = (loop != 0);
         this.audio.load();
         this.audio.play();
+    }
+}
+
+class ZoomManager {
+    private canvas: HTMLCanvasElement;
+    private zoomSelect: HTMLInputElement;
+    private smoothingCheckbox: HTMLInputElement;
+
+    constructor() {
+        this.canvas = <HTMLCanvasElement>$('#canvas');
+        this.zoomSelect = <HTMLInputElement>$('#zoom');
+        this.zoomSelect.addEventListener('change', this.handleZoom.bind(this));
+        this.zoomSelect.value = localStorage.getItem('zoom');
+        this.smoothingCheckbox = <HTMLInputElement>$('#smoothing');
+        this.smoothingCheckbox.addEventListener('change', this.handleSmoothing.bind(this));
+        if (localStorage.getItem('smoothing') == 'false') {
+            this.smoothingCheckbox.checked = false;
+            this.handleSmoothing();
+        }
+    }
+
+    handleZoom() {
+        var value = this.zoomSelect.value;
+        localStorage.setItem('zoom', value);
+        var contentsStyle = $('.contents').style;
+        if (value == 'fit') {
+            contentsStyle.maxWidth = 'none';
+            contentsStyle.width = this.canvas.style.width = '100%';
+        } else {
+            var ratio = Number(value);
+            contentsStyle.maxWidth = 'none';
+            contentsStyle.width = this.canvas.style.width = this.canvas.width * ratio + 'px';
+        }
+    }
+
+    private handleSmoothing() {
+        localStorage.setItem('smoothing', String(this.smoothingCheckbox.checked));
+        if (this.smoothingCheckbox.checked)
+            this.canvas.classList.remove('pixelated');
+        else
+            this.canvas.classList.add('pixelated');
     }
 }
 

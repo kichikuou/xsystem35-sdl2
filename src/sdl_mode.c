@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <limits.h>
 #include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
@@ -64,4 +67,7 @@ void sdl_setWindowSize(int x, int y, int w, int h) {
 									SDL_TEXTUREACCESS_STATIC, w, h);
 
 	//ms_active = (SDL_GetAppState() & SDL_APPMOUSEFOCUS) ? TRUE : FALSE;
+#ifdef __EMSCRIPTEN__
+	EM_ASM( xsystem35.shell.windowSizeChanged(); );
+#endif
 }

@@ -26,8 +26,16 @@
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 
       <div>
-        <label for="smoothing">
-          <input type="checkbox" id="smoothing" checked onclick="document.getElementById('canvas').classList.toggle('pixelated')">Smoothing
+        <select id="zoom" class="form-select">
+          <option value="1">100%</option>
+          <option value="1.25">125%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="3">300%</option>
+          <option value="fit">自動</option>
+        </select>
+        <label for="smoothing" class="form-checkbox">
+          <input type="checkbox" id="smoothing" checked><i class="form-icon"></i>Smoothing
         </label>
       </div>
     </div>
