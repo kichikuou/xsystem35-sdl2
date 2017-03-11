@@ -1,0 +1,31 @@
+.contents {
+    max-width: 640px;
+    margin: 4ex auto 0;
+}
+
+#loader ul {
+    list-style-type: none;
+}
+#loader li {
+    color: #5764c6;
+}
+#loader li:before {
+  font-family: FontAwesome;
+  content: "\f15b";
+  padding-right: 0.5em;
+}
+#loader li.notready {
+    color: #808080;
+}
+#loader li.notready:after {
+    content: " (未選択)";
+}
+
+/* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+canvas.emscripten {
+	border: 0px none;
+}
+.pixelated {
+	image-rendering: pixelated;
+	image-rendering: -moz-crisp-edges;
+}

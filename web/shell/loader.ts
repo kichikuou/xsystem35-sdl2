@@ -23,11 +23,11 @@ class ImageLoader {
     private setReadyState(imgName:string, cueName:string) {
         if (imgName) {
             $('#imgReady').classList.remove('notready');
-            $('#imgReady code').textContent = imgName;
+            $('#imgReady').textContent = imgName;
         }
         if (cueName) {
             $('#cueReady').classList.remove('notready');
-            $('#cueReady code').textContent = cueName;
+            $('#cueReady').textContent = cueName;
         }
     }
 
@@ -40,7 +40,10 @@ class ImageLoader {
         }
         FS.writeFile('xsystem35.gr', grGenerator.generate());
         FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
-        Module.callMain();
+
+        $('#loader').hidden = true;
+        $('#xsystem35').hidden = false;
+        setTimeout(() => { Module.callMain(); }, 0);
     }
 
     private handleFileSelect(evt:Event) {

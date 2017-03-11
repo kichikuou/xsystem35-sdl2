@@ -2,61 +2,42 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>xsystem35 for web</title>
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.2.8/spectre.min.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css">
-    <style>
-      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
-      textarea.emscripten { font-family: monospace; width: 80%; }
-      div.emscripten { text-align: center; }
-      div.emscripten_border { border: 1px solid black; }
-      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 0px none; }
-      .pixelated { image-rendering: pixelated; image-rendering: -moz-crisp-edges; }
-    </style>
   </head>
   <body>
   <div class="contents">
-    <div class="files">
+
+    <div id="loader">
+      <p>以下のファイルをドラッグ＆ドロップするか、「ファイルを選択」ボタンを押して選択してください。</p>
       <ul>
-        <li id="imgReady" class="notready"><i class="fa fa-file"></i> <code>KICHIKUOU.img</code></li>
-        <li id="cueReady" class="notready"><i class="fa fa-file"></i> <code>KICHIKUOU.cue</code></li>
+        <li id="imgReady" class="notready">KICHIKUOU.img</li>
+        <li id="cueReady" class="notready">KICHIKUOU.cue</li>
       </ul>
-      <input type="file" id="fileselect" multiple/>
+      <input type="file" id="fileselect" class="form-input" multiple/>
     </div>
 
-    <audio id="audio" controls></audio>
+    <div id="xsystem35" hidden>
+      <audio id="audio" controls></audio>
+
+      <div class="emscripten" id="status"></div>
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+
+      <div>
+        <label for="smoothing">
+          <input type="checkbox" id="smoothing" checked onclick="document.getElementById('canvas').classList.toggle('pixelated')">Smoothing
+        </label>
+      </div>
+    </div>
 
   </div>
-    <hr/>
-    <div class="emscripten" id="status">Downloading...</div>
-    <div class="emscripten">
-      <progress value="0" max="100" id="progress" hidden=1></progress>  
-    </div>
-    <div class="emscripten_border">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-    </div>
-    <hr/>
-    <div class="emscripten">
-      <label for="smoothing">
-        <input type="checkbox" id="smoothing" checked onclick="document.getElementById('canvas').classList.toggle('pixelated')">Smoothing
-      </label>
-      <input type="checkbox" id="resize">Resize canvas
-      <input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer
-      &nbsp;&nbsp;&nbsp;
-      <input type="button" value="Fullscreen" onclick="Module.requestFullScreen(document.getElementById('pointerLock').checked, 
-                                                                                document.getElementById('resize').checked)">
-    </div>
-    
-    <hr/>
-
-    <script>
-      var Module = {};
-    </script>
-    <script src="loader.js"></script>
-    <script src="shell.js"></script>
-    <script src="xsystem35.js" async></script>
+  <script>
+    var Module = {};
+  </script>
+  <script src="loader.js"></script>
+  <script src="shell.js"></script>
+  <script src="xsystem35.js" async></script>
   </body>
 </html>
