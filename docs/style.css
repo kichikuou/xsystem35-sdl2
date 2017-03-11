@@ -29,3 +29,21 @@ canvas.emscripten {
 	image-rendering: pixelated;
 	image-rendering: -moz-crisp-edges;
 }
+
+#volume-control {
+    float: right;
+    margin-right: 20px;
+}
+
+#volume-control-icon {
+    font-size: 20px;
+    width: 26px;
+    padding: 5px;
+    vertical-align: middle;
+}
+
+#volume-control-slider {
+    width: 60px;
+    height: 30px;
+    vertical-align: middle;
+}

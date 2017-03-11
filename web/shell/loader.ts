@@ -41,9 +41,7 @@ class ImageLoader {
         FS.writeFile('xsystem35.gr', grGenerator.generate());
         FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
 
-        $('#loader').hidden = true;
-        $('#xsystem35').hidden = false;
-        setTimeout(() => { Module.callMain(); }, 0);
+        this.shell.run();
     }
 
     private handleFileSelect(evt:Event) {

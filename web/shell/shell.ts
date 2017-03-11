@@ -1,5 +1,8 @@
 var $: (selector:string)=>HTMLElement = document.querySelector.bind(document);
 
+// xsystem35 exported functions
+declare function _musfade_setvolval_all(vol: number): void;
+
 declare namespace Module {
     var noInitialRun: boolean;
 
@@ -29,6 +32,7 @@ class System35Shell {
     private imageLoader: ImageLoader;
     status: HTMLElement = document.getElementById('status');
     private zoom:ZoomManager;
+    private volumeControl: VolumeControl;
 
     constructor() {
         this.imageLoader = new ImageLoader(this);
@@ -56,8 +60,19 @@ class System35Shell {
                 FS.syncfs(true, (err) => { Module.removeRunDependency('syncfs') });
             }
         ];
-        xsystem35.cdPlayer = new CDPlayer(this.imageLoader);
+        this.volumeControl = new VolumeControl();
+        this.volumeControl.addEventListener(this.updateVolume.bind(this));
+        xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
         this.zoom = new ZoomManager();
+    }
+
+    run() {
+        $('#loader').hidden = true;
+        $('#xsystem35').hidden = false;
+        setTimeout(() => {
+            Module.callMain();
+            this.updateVolume();
+        }, 0);
     }
 
     setStatus(text: string) {
@@ -79,6 +94,10 @@ class System35Shell {
             });
         }, 100);
     }
+
+    private updateVolume() {
+        _musfade_setvolval_all(Math.round(this.volumeControl.volume() * 100));
+    }
 }
 
 class CDPlayer {
@@ -86,8 +105,10 @@ class CDPlayer {
     private blobs: Blob[];
     private currentTrack: number;
 
-    constructor(private imageLoader:ImageLoader) {
+    constructor(private imageLoader:ImageLoader, private volumeControl: VolumeControl) {
         this.blobs = [];
+        this.volumeControl.addEventListener(this.onVolumeChanged.bind(this));
+        this.audio.volume = this.volumeControl.volume();
     }
 
     play(track:number, loop:number) {
@@ -120,6 +141,10 @@ class CDPlayer {
         this.audio.load();
         this.audio.play();
     }
+
+    private onVolumeChanged(evt: CustomEvent) {
+        this.audio.volume = evt.detail;
+    }
 }
 
 class ZoomManager {
@@ -131,7 +156,7 @@ class ZoomManager {
         this.canvas = <HTMLCanvasElement>$('#canvas');
         this.zoomSelect = <HTMLInputElement>$('#zoom');
         this.zoomSelect.addEventListener('change', this.handleZoom.bind(this));
-        this.zoomSelect.value = localStorage.getItem('zoom');
+        this.zoomSelect.value = localStorage.getItem('zoom') || '1';
         this.smoothingCheckbox = <HTMLInputElement>$('#smoothing');
         this.smoothingCheckbox.addEventListener('change', this.handleSmoothing.bind(this));
         if (localStorage.getItem('smoothing') == 'false') {
@@ -160,6 +185,69 @@ class ZoomManager {
             this.canvas.classList.remove('pixelated');
         else
             this.canvas.classList.add('pixelated');
+    }
+}
+
+class VolumeControl {
+    private vol: number;  // 0.0 - 1.0
+    private muted: boolean;
+    private elem: HTMLElement;
+    private icon: HTMLElement;
+    private slider: HTMLInputElement;
+
+    constructor() {
+        this.vol = Number(localStorage.getItem('volume') || 1);
+        this.muted = false;
+
+        this.elem = document.getElementById('volume-control');
+        this.icon = document.getElementById('volume-control-icon');
+        this.slider = <HTMLInputElement>document.getElementById('volume-control-slider');
+        this.slider.value = String(Math.round(this.vol * 100));
+
+        this.icon.addEventListener('click', this.onIconClicked.bind(this));
+        this.slider.addEventListener('input', this.onSliderValueChanged.bind(this));
+        this.slider.addEventListener('change', this.onSliderValueSettled.bind(this));
+    }
+
+    volume(): number {
+        return this.muted ? 0 : parseInt(this.slider.value) / 100;
+    }
+
+    addEventListener(handler: (evt: CustomEvent) => any) {
+        this.elem.addEventListener('volumechange', handler);
+    }
+
+    private onIconClicked(e: Event) {
+        this.muted = !this.muted;
+        if (this.muted) {
+            this.icon.classList.remove('fa-volume-up');
+            this.icon.classList.add('fa-volume-off');
+            this.slider.value = '0';
+        } else {
+            this.icon.classList.remove('fa-volume-off');
+            this.icon.classList.add('fa-volume-up');
+            this.slider.value = String(Math.round(this.vol * 100));
+        }
+        this.dispatchEvent();
+    }
+
+    private onSliderValueChanged(e: Event) {
+        this.vol = parseInt(this.slider.value) / 100;
+        if (this.vol > 0 && this.muted) {
+            this.muted = false;
+            this.icon.classList.remove('fa-volume-off');
+            this.icon.classList.add('fa-volume-up');
+        }
+        this.dispatchEvent();
+    }
+
+    private onSliderValueSettled(e: Event) {
+        localStorage.setItem('volume', this.vol + '');
+    }
+
+    private dispatchEvent() {
+        var event = new CustomEvent('volumechange', {detail: this.volume()});
+        this.elem.dispatchEvent(event);
     }
 }
 

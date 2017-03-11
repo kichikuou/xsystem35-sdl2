@@ -372,3 +372,10 @@ int musfade_setvolval(int *valance, int num) {
 	
 	return OK;
 }
+
+int musfade_setvolval_all(int val) {
+	for (int i = 0; i < 16; i++) {
+		prv.volval[i] = val;
+	}
+	return OK;
+}

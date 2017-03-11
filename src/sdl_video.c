@@ -24,6 +24,9 @@
 
 #include <stdio.h>
 #include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
@@ -63,6 +66,11 @@ int sdl_Initilize(void) {
 
 	sdl_shadow_init();
 	
+#ifdef __EMSCRIPTEN__
+	// Workaround for https://github.com/emscripten-ports/SDL2/issues/41
+	SDL_EventState(SDL_RELEASED, 0);
+#endif
+
 	joy_open();
 	return 0;
 }
