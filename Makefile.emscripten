@@ -10,7 +10,7 @@ EMFLAGS += -s TOTAL_MEMORY=134217728
 EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
 
 LFLAGS := $(EMFLAGS)
-LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_musfade_setvolval_all']"
+LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_musfade_setvolval_all','_ags_setAntialiasedStringMode']"
 
 docs/xsystem35.js: emterpretify_whitelist src/xsystem35
 	$(CC) xsystem35.bc $(LFLAGS) @emterpretify_whitelist -o $@

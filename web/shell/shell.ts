@@ -2,6 +2,7 @@ var $: (selector:string)=>HTMLElement = document.querySelector.bind(document);
 
 // xsystem35 exported functions
 declare function _musfade_setvolval_all(vol: number): void;
+declare function _ags_setAntialiasedStringMode(on: number): void;
 
 declare namespace Module {
     var noInitialRun: boolean;
@@ -33,6 +34,7 @@ class System35Shell {
     status: HTMLElement = document.getElementById('status');
     private zoom:ZoomManager;
     private volumeControl: VolumeControl;
+    private antialiasCheckbox: HTMLInputElement;
 
     constructor() {
         this.imageLoader = new ImageLoader(this);
@@ -64,6 +66,9 @@ class System35Shell {
         this.volumeControl.addEventListener(this.updateVolume.bind(this));
         xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
         this.zoom = new ZoomManager();
+        this.antialiasCheckbox = <HTMLInputElement>$('#antialias');
+        this.antialiasCheckbox.addEventListener('change', this.antialiasChanged.bind(this));
+        this.antialiasCheckbox.checked = localStorage.getItem('antialias') != 'false';
     }
 
     run() {
@@ -72,6 +77,7 @@ class System35Shell {
         setTimeout(() => {
             Module.callMain();
             this.updateVolume();
+            this.antialiasChanged();
         }, 0);
     }
 
@@ -97,6 +103,11 @@ class System35Shell {
 
     private updateVolume() {
         _musfade_setvolval_all(Math.round(this.volumeControl.volume() * 100));
+    }
+
+    private antialiasChanged() {
+        localStorage.setItem('antialias', String(this.antialiasCheckbox.checked));
+        _ags_setAntialiasedStringMode(this.antialiasCheckbox.checked ? 1 : 0);
     }
 }
 
