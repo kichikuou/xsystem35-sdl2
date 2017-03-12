@@ -190,6 +190,9 @@ static void mainloop() {
 		emscripten_cancel_main_loop();
 
 	for (int cnt = 0; cnt < 10000; cnt++) {
+		if (EM_ASM_INT_V( return xsystem35.cdPlayer.waiting ? 1 : 0; ))
+			break;
+
 		nact->input_state = InputNotChecked;
 
 		DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());

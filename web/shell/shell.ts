@@ -112,18 +112,21 @@ class System35Shell {
 }
 
 class CDPlayer {
-    audio = <HTMLAudioElement>$('audio');
+    private audio = <HTMLAudioElement>$('audio');
     private blobs: Blob[];
     private currentTrack: number;
+    waiting: boolean;
 
     constructor(private imageLoader:ImageLoader, private volumeControl: VolumeControl) {
         this.blobs = [];
         this.volumeControl.addEventListener(this.onVolumeChanged.bind(this));
         this.audio.volume = this.volumeControl.volume();
+        this.waiting = false;
     }
 
     play(track:number, loop:number) {
         this.currentTrack = track;
+        this.waiting = true;
         if (this.blobs[track]) {
             this.startPlayback(this.blobs[track], loop);
             return;
@@ -151,6 +154,7 @@ class CDPlayer {
         this.audio.loop = (loop != 0);
         this.audio.load();
         this.audio.play();
+        this.waiting = false;
     }
 
     private onVolumeChanged(evt: CustomEvent) {
