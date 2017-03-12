@@ -55,8 +55,6 @@ int sdl_Initilize(void) {
 	/* init cursor */
 	sdl_cursor_init();
 	
-	sdl_vm_init();
-	
 	memset(RawKeyInfo, 0, sizeof(RawKeyInfo));
 
 	sdl_setWindowSize(0, 0, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
@@ -103,11 +101,6 @@ static void window_init(void) {
 								  SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, 0);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
-	sdl_display = SDL_CreateRGBSurface(0, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
-									   32, 0, 0, 0, 0);
-	sdl_texture = SDL_CreateTexture(sdl_renderer, sdl_display->format->format,
-									SDL_TEXTUREACCESS_STATIC,
-									SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 }
 
 static void makeDIB(int width, int height, int depth) {
