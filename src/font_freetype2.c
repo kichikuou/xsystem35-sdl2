@@ -190,6 +190,7 @@ static void font_ttf_sel_font(int type, int size) {
 static void pixmap2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl) {
 	int yy;
 	BYTE *dst = GETOFFSET_PIXEL(&img_glyph, x, y);
+	if (w <= 0) return;
 	
 	for (yy = 0; yy < h; yy++) {
 		memcpy(dst, src, w);
@@ -203,6 +204,7 @@ static void pixmapmono2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl
 	int w1,w2;
 	BYTE *dst = GETOFFSET_PIXEL(&img_glyph, x, y);
 	unsigned int ch;
+	if (w <= 0) return;
 	
 	w1 = w / 8;
 	w2 = w % 8;
