@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include <SDL/SDL.h>
 #include <glib.h>
 
@@ -319,7 +320,55 @@ static SDL_Surface *com2alphasurface(agsurface_t *src, int cl) {
 	return s;
 }
 
+static int nearest_color(int r, int g, int b) {
+	int i, col, mind = INT_MAX;
+	for (i = 0; i < 256; i++) {
+		int dr = r - sdl_col[i].r;
+		int dg = g - sdl_col[i].g;
+		int db = b - sdl_col[i].b;
+		int d = dr*dr*30 + dg*dg*59 + db*db*11;
+		if (d < mind) {
+			mind = d;
+			col = i;
+		}
+	}
+	return col;
+}
 
+static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, agsurface_t *src, unsigned long col) {
+	int x, y;
+	SDL_LockSurface(sdl_dib);
+
+	Uint8 cache[256*7];
+	memset(cache, 0, 256);
+
+	for (y = 0; y < src->height; y++) {
+		BYTE* sp = src->pixel + y * src->bytes_per_line;
+		BYTE* dp = sdl_dib->pixels + (dsty + y) * sdl_dib->pitch + dstx;
+		for (x = 0; x < src->width; x++) {
+			int alpha = *sp >> 5;
+			if (alpha == 0) {
+				// Transparent, do nothing
+			} else if (alpha == 7) {
+				*dp = col;
+			} else if (cache[*dp] & 1 << alpha) {
+				*dp = cache[alpha << 8 | *dp];
+			} else {
+				cache[*dp] |= 1 << alpha;
+				int c = nearest_color(
+					(sdl_col[col].r * alpha + sdl_col[*dp].r * (7 - alpha)) / 7,
+					(sdl_col[col].g * alpha + sdl_col[*dp].g * (7 - alpha)) / 7,
+					(sdl_col[col].b * alpha + sdl_col[*dp].b * (7 - alpha)) / 7);
+				cache[alpha << 8 | *dp] = c;
+				*dp = c;
+			}
+			sp++;
+			dp++;
+		}
+	}
+
+	SDL_UnlockSurface(sdl_dib);
+}
 
 int sdl_drawString(int x, int y, char *msg, unsigned long col) {
 	int w;
@@ -335,12 +384,7 @@ int sdl_drawString(int x, int y, char *msg, unsigned long col) {
 		if (glyph == NULL) return 0;
 		setRect(r_src, 0, 0, glyph->width, glyph->height);
 		setRect(r_dst, x, y, glyph->width, glyph->height);
-		if (sdl_font->antialiase_on && sdl_dib->format->BitsPerPixel != 8) {
-			SDL_Surface *src = com2alphasurface(glyph, col);
-			
-			SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
-			SDL_FreeSurface(src);
-		} else {
+		if (!sdl_font->antialiase_on) {
 			int i;
 			SDL_Surface *src = com2surface(glyph);
 			for (i = 1; i < 256; i++) { 
@@ -348,6 +392,13 @@ int sdl_drawString(int x, int y, char *msg, unsigned long col) {
 				       sizeof(SDL_Color));
 			}
 			SDL_SetColorKey(src, SDL_SRCCOLORKEY, 0);
+			SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
+			SDL_FreeSurface(src);
+		} else if (sdl_dib->format->BitsPerPixel == 8) {
+			sdl_drawAntiAlias_8bpp(x, y, glyph, col);
+		} else {
+			SDL_Surface *src = com2alphasurface(glyph, col);
+
 			SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
 			SDL_FreeSurface(src);
 		}
