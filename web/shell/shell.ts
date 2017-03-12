@@ -47,6 +47,7 @@ class System35Shell {
         };
 
         // Initialize the Module object
+        Module.TOTAL_MEMORY = 96*1024*1024;
         Module.print = Module.printErr = console.log.bind(console);
         Module.canvas = document.getElementById('canvas');
         Module.noInitialRun = true;
