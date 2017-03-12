@@ -63,12 +63,10 @@ class Installer {
                 var buffer = new ArrayBuffer(e.size);
                 var uint8 = new Uint8Array(buffer);
                 var ptr = 0;
-                isofs.readFile(e, (bufs) => {
-                    for (var buf of bufs) {
-                        uint8.set(buf, ptr);
-                        ptr += buf.byteLength;
-                    }
-                });
+                for (var buf of isofs.readFile(e)) {
+                    uint8.set(buf, ptr);
+                    ptr += buf.byteLength;
+                }
                 if (ptr != e.size)
                     throw('expected ' + e.size + ' bytes, but read ' + ptr + 'bytes');
                 files[e.name] = buffer;

@@ -53,8 +53,8 @@ class ISO9660FileSystem {
         return entries;
     }
 
-    readFile(dirent:DirEnt, callback: (data:Uint8Array[]) => void) {
-        this.sectorReader.readSequentialSectors(dirent.sector, dirent.size, callback);
+    readFile(dirent:DirEnt): Uint8Array[] {
+        return this.sectorReader.readSequentialSectors(dirent.sector, dirent.size);
     }
 }
 
@@ -101,7 +101,7 @@ class DirEnt {
 
 interface CDImageReader {
     readSector(sector:number): ArrayBuffer;
-    readSequentialSectors(startSector: number, length: number, callback:(data:Uint8Array[])=>void): void;
+    readSequentialSectors(startSector: number, length: number): Uint8Array[];
     maxTrack(): number;
     extractTrack(track:number): Blob;
 }
@@ -113,24 +113,16 @@ class ImageReaderBase {
                    bytesToRead:number,
                    blockSize:number,
                    sectorSize:number,
-                   sectorOffset:number,
-                   callback:(data:Uint8Array[])=>void) {
+                   sectorOffset:number): Uint8Array[] {
         var sectors = Math.ceil(bytesToRead / sectorSize);
-        var chunk = 256;
-        var reader = new FileReaderSync();
-        while (sectors > 0) {
-            var n = Math.min(chunk, sectors);
-            var blob = this.image.slice(startOffset, startOffset + n * blockSize);
-            var buf = reader.readAsArrayBuffer(blob);
-            var bufs:Uint8Array[] = [];
-            for (var i = 0; i < n; i++) {
-                bufs.push(new Uint8Array(buf, i * blockSize + sectorOffset, Math.min(bytesToRead, sectorSize)));
-                bytesToRead -= sectorSize;
-            }
-            callback(bufs);
-            sectors -= n;
-            startOffset += n * blockSize;
+        var blob = this.image.slice(startOffset, startOffset + sectors * blockSize);
+        var buf = new FileReaderSync().readAsArrayBuffer(blob);
+        var bufs:Uint8Array[] = [];
+        for (var i = 0; i < sectors; i++) {
+            bufs.push(new Uint8Array(buf, i * blockSize + sectorOffset, Math.min(bytesToRead, sectorSize)));
+            bytesToRead -= sectorSize;
         }
+        return bufs;
     }
 }
 
@@ -148,8 +140,8 @@ class ImgCueReader extends ImageReaderBase implements CDImageReader {
         return new FileReaderSync().readAsArrayBuffer(this.image.slice(start, end));
     }
 
-    readSequentialSectors(startSector: number, length: number, callback:(data:Uint8Array[])=>void) {
-        this.readSequential(startSector * 2352, length, 2352, 2048, 16, callback);
+    readSequentialSectors(startSector: number, length: number): Uint8Array[] {
+        return this.readSequential(startSector * 2352, length, 2352, 2048, 16);
     }
 
     private parseCue(cueFile:File) {
@@ -239,9 +231,9 @@ class MdfMdsReader extends ImageReaderBase implements CDImageReader {
         return new FileReaderSync().readAsArrayBuffer(this.image.slice(start, end));
     }
 
-    readSequentialSectors(startSector: number, length: number, callback:(data:Uint8Array[])=>void) {
+    readSequentialSectors(startSector: number, length: number): Uint8Array[] {
         var track = this.tracks[1];
-        this.readSequential(track.offset + startSector * track.sectorSize, length, track.sectorSize, 2048, 16, callback);
+        return this.readSequential(track.offset + startSector * track.sectorSize, length, track.sectorSize, 2048, 16);
     }
 
     maxTrack():number {
@@ -253,12 +245,8 @@ class MdfMdsReader extends ImageReaderBase implements CDImageReader {
             return;
 
         var size = this.tracks[track].sectors * 2352;
-        var chunks: any[] = [createWaveHeader(size)];
-
-        this.readSequential(this.tracks[track].offset, size, this.tracks[track].sectorSize, 2352, 0,
-            buf => chunks.push(buf));
-
-        return new Blob(chunks);
+        var chunks = this.readSequential(this.tracks[track].offset, size, this.tracks[track].sectorSize, 2352, 0);
+        return new Blob([<any>createWaveHeader(size)].concat(chunks), {type : 'audio/wav'});
     }
 }
 
