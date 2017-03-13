@@ -34,8 +34,11 @@ class ImageLoader {
     private populateFiles(files:any, volumeLabel:string) {
         var grGenerator = new GameResourceGenerator();
         for (var name in files) {
-            var data: ArrayBufferView = new Uint8Array(files[name]);
-            FS.writeFile(name, data, { encoding: 'binary' });
+            var data: ArrayBuffer = files[name];
+            // Store contents in the emscripten heap, so that it can be mmap-ed without copying
+            var ptr = Module.getMemory(data.byteLength);
+            Module.HEAPU8.set(new Uint8Array(data), ptr);
+            FS.writeFile(name, Module.HEAPU8.subarray(ptr, ptr + data.byteLength), { encoding: 'binary', canOwn: true });
             grGenerator.addFile(name);
         }
         FS.writeFile('xsystem35.gr', grGenerator.generate());

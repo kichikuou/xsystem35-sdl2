@@ -12,10 +12,11 @@ declare namespace Module {
     function setStatus(status: string): void;
     function monitorRunDependencies(left: number): void;
     function callMain(): void;
+    function getMemory(size: number): number;
 }
 
 declare namespace FS {
-    function writeFile(path: string, data: ArrayBufferView | string, opts?: {encoding?: string; flags?: string}): void;
+    function writeFile(path: string, data: ArrayBufferView | string, opts?: {encoding?: string; flags?: string; canOwn?: boolean}): void;
 }
 
 namespace xsystem35 {
