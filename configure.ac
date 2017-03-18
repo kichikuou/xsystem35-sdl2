@@ -200,63 +200,6 @@ AC_SUBST(SRC_GRAPHDEV)
 
 
 dnl
-dnl audio check
-dnl
-AC_ARG_ENABLE(audio,
-  [  --enable-audio[=mode_list]  Enable audio (Specify comma separated mode list):
-                              default:  Automatically select audio device.
-                              sdlmixer: SDL mixer],
-  [ enable_audio=$enableval],
-  [ enable_audio=yes])
-
-dnl yes -> default
-test "x$enable_audio" = xyes && enable_audio=default
-
-if test "x$enable_audio" != xno; then
-  for i in `echo $enable_audio | sed 's/,/ /g'`; do
-    eval "enable_$i=yes"
-  done
-  if test "x$enable_default" = xyes; then
-    enable_audio=default
-  fi
-fi
-
-if test "x$enable_audio" = xdefault; then
-  enable_sdlmixer=yes
-fi
-
-
-dnl
-dnl Turn on default audio output mode
-dnl
-DEFAULT_PLAYMODE=
-AC_ARG_WITH(default-output,
-  [  --with-default-output=<mode>  Specify default output mode (optional):
-                                   default|sdl],
-  [ if test "$enable_audio" != no; then
-      DEFAULT_PLAYMODE=$withval
-      eval "enable_$DEFAULT_PLAYMODE=yes"
-    else
-      AC_MSG_WARN(--with-default-output=$withval: audio is not enabled)
-    fi]
-)
-AC_MSG_CHECKING(default output mode)
-if test "x$DEFAULT_PLAYMODE" = x; then
-  DEFAULT_PLAYMODE=`echo $enable_audio | sed 's/,.*//'`
-fi
-case ".$DEFAULT_PLAYMODE" in
-  .default)  def_am=AUDIO_PCM_ANY ;;
-  .sdl)      def_am=AUDIO_PCM_SDL ;;
-  *)         def_am= ;;
-esac
-AC_MSG_RESULT($def_am)
-if test "x$def_am" != x; then
-  AC_DEFINE_UNQUOTED(DEFAULT_AUDIO_MODE, $def_am, [default audio mode])
-fi
-
-
-
-dnl
 dnl Audio
 dnl
 SRC_AUDIO=

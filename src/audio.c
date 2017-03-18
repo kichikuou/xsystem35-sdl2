@@ -37,11 +37,7 @@
 /* static variable */
 static boolean mode_onlyone = FALSE; /* if true, only probe selected device */
 
-#ifdef DEFAULT_AUDIO_MODE
-static int mode = DEFAULT_AUDIO_MODE;
-#else 
 static int mode = AUDIO_PCM_ANY;
-#endif
 
 #ifdef ENABLE_SDL
 extern int sdlaudio_init();

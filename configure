@@ -869,8 +869,6 @@ enable_sdl
 with_sdl_prefix
 with_sdl_exec_prefix
 enable_sdltest
-enable_audio
-with_default_output
 enable_cdrom
 with_cdromdev
 with_locale
@@ -1556,9 +1554,6 @@ Optional Features:
   --disable-gtktest       do not try to compile and run a test GTK+ program
   --enable-sdl            SDL default=no
   --disable-sdltest       Do not try to compile and run a test SDL program
-  --enable-audio=mode_list  Enable audio (Specify comma separated mode list):
-                              default:  Automatically select audio device.
-                              sdlmixer: SDL mixer
   --enable-cdrom=mode_list  Enable CD-adio (Specify comma separated mode list):
                               (default:  Automatically select cdrom device)
                               linux:    linux API (Linux/Solaris)
@@ -1600,8 +1595,6 @@ Optional Packages:
   --with-x                use the X Window System
   --with-sdl-prefix=PFX   Prefix where SDL is installed (optional)
   --with-sdl-exec-prefix=PFX Exec prefix where SDL is installed (optional)
-  --with-default-output=<mode>  Specify default output mode (optional):
-                                   default|sdl
   --with-cdromdev=#       CDROM Device Name. [default=/dev/cdrom]
   --with-locale=LOCALE    locale name you want to use(ex. ja_JP.ujis)
   --with-midi-player=xxx  External Midi Player default=playmidi -4
@@ -16465,66 +16458,6 @@ $as_echo "#define ENABLE_SDL 1" >>confdefs.h
 
   SDL=1
   SRC_GRAPHDEV="sdl_video.c sdl_mode.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c"
-
-fi
-
-
-
-# Check whether --enable-audio was given.
-if test "${enable_audio+set}" = set; then :
-  enableval=$enable_audio;  enable_audio=$enableval
-else
-   enable_audio=yes
-fi
-
-
-test "x$enable_audio" = xyes && enable_audio=default
-
-if test "x$enable_audio" != xno; then
-  for i in `echo $enable_audio | sed 's/,/ /g'`; do
-    eval "enable_$i=yes"
-  done
-  if test "x$enable_default" = xyes; then
-    enable_audio=default
-  fi
-fi
-
-if test "x$enable_audio" = xdefault; then
-  enable_sdlmixer=yes
-fi
-
-
-DEFAULT_PLAYMODE=
-
-# Check whether --with-default-output was given.
-if test "${with_default_output+set}" = set; then :
-  withval=$with_default_output;  if test "$enable_audio" != no; then
-      DEFAULT_PLAYMODE=$withval
-      eval "enable_$DEFAULT_PLAYMODE=yes"
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --with-default-output=$withval: audio is not enabled" >&5
-$as_echo "$as_me: WARNING: --with-default-output=$withval: audio is not enabled" >&2;}
-    fi
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default output mode" >&5
-$as_echo_n "checking default output mode... " >&6; }
-if test "x$DEFAULT_PLAYMODE" = x; then
-  DEFAULT_PLAYMODE=`echo $enable_audio | sed 's/,.*//'`
-fi
-case ".$DEFAULT_PLAYMODE" in
-  .default)  def_am=AUDIO_PCM_ANY ;;
-  .sdl)      def_am=AUDIO_PCM_SDL ;;
-  *)         def_am= ;;
-esac
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $def_am" >&5
-$as_echo "$def_am" >&6; }
-if test "x$def_am" != x; then
-
-cat >>confdefs.h <<_ACEOF
-#define DEFAULT_AUDIO_MODE $def_am
-_ACEOF
 
 fi
 

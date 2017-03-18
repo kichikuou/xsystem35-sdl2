@@ -15,9 +15,6 @@
 /* Define this if you want to Debug */
 #undef DEBUG
 
-/* default audio mode */
-#undef DEFAULT_AUDIO_MODE
-
 /* Define this if you use cdrom iotctl in *BSD */
 #undef ENABLE_CDROM_BSD
 
