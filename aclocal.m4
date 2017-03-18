@@ -1213,9 +1213,7 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([macros/aclocal-include.m4])
-m4_include([macros/alsa.m4])
 m4_include([macros/argz.m4])
-m4_include([macros/esd.m4])
 m4_include([macros/freetype2.m4])
 m4_include([macros/gettext.m4])
 m4_include([macros/gtk-2.0.m4])

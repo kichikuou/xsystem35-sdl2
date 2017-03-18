@@ -9,7 +9,7 @@ AM_CPPFLAGS = $(LTDLINCL)
 
 xsystem35_LDFLAGS = @EXTRALDFLAGS@
 
-AM_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@ @GTK_CFLAGS@ @ESD_CFLAGS@ @SDL_CFLAGS@ @EXTRACFLAGS@ @VORBIS_CFLAGS@ -DMODULE_PATH=\"$(libdir)/@PACKAGE@\" -DLOCALEDIR=\""$(datadir)/locale"\"
+AM_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@ @GTK_CFLAGS@ @SDL_CFLAGS@ @EXTRACFLAGS@ @VORBIS_CFLAGS@ -DMODULE_PATH=\"$(libdir)/@PACKAGE@\" -DLOCALEDIR=\""$(datadir)/locale"\"
 
 
 SRC_SYS35CMD = cmdb.c cmdc.c cmdd.c cmde.c cmdf.c cmdg.c cmdh.c cmdi.c cmdj.c cmdk.c cmdl.c cmdm.c cmdn.c cmdo.c cmdp.c cmdq.c cmds.c cmdt.c cmdu.c cmdv.c cmdw.c cmdy.c cmdz.c cmd2F.c cmd2F60.c
@@ -49,8 +49,6 @@ xsystem35_LDADD = \
 	@ZLIB_LIBS@ \
 	@X_LIBS@ \
 	@GTK_LIBS@ \
-	@ALSA_LIBS@ \
-	@ESD_LIBS@ \
 	@SDL_LIBS@ \
 	@EXTRALIBS@ \
 	@LIBINTL@ \
@@ -64,12 +62,6 @@ xsystem35_LDADD = \
 	$(SRC_GRAPHDEV:.c=.o) \
 	$(SRC_FONT:.c=.o) \
 	$(SRC_MENU:.c=.o)
-
-audio_oss.o: audio_oss.c audio_oss.h mixer_oss.c
-
-audio_alsa.o: audio_alsa.c audio_alsa.h mixer_alsa.c
-
-audio_esd.o: audio_esd.c audio_esd.h mixer_esd.c
 
 image.o: image.c image15.c image16.c image24.c image24p.c
 

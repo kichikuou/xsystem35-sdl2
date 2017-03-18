@@ -123,25 +123,8 @@ static void sys35_usage(boolean verbose) {
 	puts(" -no-shm        : don't use MIT-SHM (use in another display)");
 	puts(" -devcd device  : set cdrom device name to 'device'");
 	puts(" -devmidi device: set midi device name to 'device'");
-	puts(" -devdsp device : set audio device name to 'device'");
-	
-#ifdef ENABLE_OSS
-	puts("                :  /dev/dsp : oss type (device name)");
-#endif
-#ifdef ENABLE_ALSA
-	puts("                :  hw:0,0   : alsa hardware");
-#endif
 	
 	puts(" -O?            : select output audio device");
-#ifdef ENABLE_OSS
-	puts(" -Oo            : OSS mode");
-#endif
-#ifdef ENABLE_ALSA
-	puts(" -Os            : ALSA mode");
-#endif
-#ifdef ENABLE_ESD
-	puts(" -Oe            : Enlightened Sound Daemon mode");
-#endif
 	puts(" -O0            : Disable Audio output");
 	
 	puts(" -M?            : select output midi methos");
@@ -157,7 +140,6 @@ static void sys35_usage(boolean verbose) {
 	puts(" -M0            : Disable MIDI output");
 	puts(" -midiplayer cmd: set external midi player to 'cmd'");
 	
-	puts(" -devmix device : set mixer device name to 'device' (effective only for oss)");
 	puts(" -devjoy device : set joystic device name to 'device'");
 	puts("                    if 'device' is set to 'none', don't use the device");
 	puts(" -savekanji #   : kanji code of filename (0 or 1 ... 0:utf-8, 1:sjis)");
@@ -621,16 +603,8 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				subdev = (argv[i][3] - '0') << 8;
 			}
 			midi_set_output_device(argv[i][2] | subdev);
-		} else if (0 == strcmp(argv[i], "-devdsp")) {
-			if (argv[i + 1] != NULL) {
-				audio_set_pcm_devicename(argv[i + 1]);
-			}
 		} else if (0 == strncmp(argv[i], "-O", 2)) {
 			audio_set_output_device(argv[i][2]);
-		} else if (0 == strcmp(argv[i], "-devmix")) {
-			if (argv[i + 1] != NULL) {
-				audio_set_mixer_devicename(argv[i + 1]);
-			}
 		} else if (0 == strcmp(argv[i], "-devjoy")) {
 			if (argv[i + 1] != NULL) {
 				joy_set_devicename(argv[i + 1]);
@@ -730,16 +704,6 @@ static void check_profile() {
 	param = get_profile("cdrom_device");
 	if (param) {
 		cd_set_devicename(param);
-	}
-	/* DSP device name の設定 */
-	param = get_profile("dsp_device");
-	if (param) {
-		audio_set_pcm_devicename(param);
-	}
-	/* mixer device name の設定 */
-	param = get_profile("mixer_device");
-	if (param) {
-		audio_set_mixer_devicename(param);
 	}
 	/* audio output device の設定 */
 	param = get_profile("audio_output_device");

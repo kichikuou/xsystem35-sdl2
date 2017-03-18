@@ -205,10 +205,7 @@ dnl
 AC_ARG_ENABLE(audio,
   [  --enable-audio[=mode_list]  Enable audio (Specify comma separated mode list):
                               default:  Automatically select audio device.
-                              oss:      OSS (Open Sound System) device
-                              sun:      sun style interface
-                              alsa:     ALSA pcm device
-                              esd:      EsounD],
+                              sdlmixer: SDL mixer],
   [ enable_audio=$enableval],
   [ enable_audio=yes])
 
@@ -225,108 +222,7 @@ if test "x$enable_audio" != xno; then
 fi
 
 if test "x$enable_audio" = xdefault; then
-  case "$target" in
-    *-*-linux*)
-      enable_alsa=yes
-      ;;
-    *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
-      enable_oss=yes
-      ;;
-    *-*-solaris*)
-      enable_sun=yes
-      ;;
-    *)
-      enable_esd=yes
-      ;;
-  esac
-fi
-
-
-dnl
-dnl Sun style audio interface
-dnl
-have_sunaudio=no
-if test "x$enable_sun" = xyes; then
-  AC_MSG_CHECKING(for Sun audio support)
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-            #include <sys/types.h>
-            #include <sys/audioio.h>
-        ]], [[
-            audio_info_t audio_info;
-            AUDIO_INITINFO(&audio_info);
-        ]])],[
-            have_sunaudio=yes
-        ],[])
-  AC_MSG_RESULT($have_sunaudio)
-  if test "x$have_sunaudio" = xyes; then
-    AC_DEFINE(ENABLE_SUNAUDIO,1,[define this if you use sun stlye audio interface])
- fi
-fi
-
-
-dnl
-dnl OSS
-dnl
-have_ossaudio=no
-if test "x$enable_oss" = xyes; then
-  AC_MSG_CHECKING(for OSS audio support)
-  case "$target" in
-      *-*-netbsd*)
-        EXTRALIBS="$EXTRALIBS -lossaudio"
-        have_ossaudio=yes
-        ;;
-      *-*-openbsd*)
-        EXTRACFLAGS="$EXTRACFLAGS -I/usr/local/lib/oss/include"
-        EXTRALIBS="$EXTRALIBS -lossaudio"
-        have_ossaudio=yes
-        ;;
-      *-*-linux*|*-*-freebsd*)
-        have_ossaudio=yes
-        ;;
-      *)
-        have_ossaudio=no
-        ;;
-  esac
-  AC_MSG_RESULT($have_ossaudio)
-  if test "x$have_ossaudio" = xyes; then
-    AC_DEFINE(ENABLE_OSS,1,[define this if you use OSS audio interface])
-  fi
-fi
-
-
-dnl
-dnl ALSA
-dnl
-dnl if test x"$enable_alsa" = "xyes"; then
-dnl   AM_PATH_ALSA(0.5.0,
-dnl           [ AC_DEFINE(ENABLE_ALSA,1,[Define this if you have Alsa (libasound) installed])
-dnl           if test x"$have_alsa09" = "xyes"; then
-dnl             AC_DEFINE(ENABLE_ALSA09,1,[Define this if you have alsa 0.9.x and more installed])
-dnl           fi
-dnl           if test x"$have_alsa05" = "xyes"; then
-dnl             AC_DEFINE(ENABLE_ALSA05,1,[Define this if you have alsa 0.5.x installed])
-dnl           fi
-dnl         ],
-dnl   AC_MSG_RESULT(*** All of ALSA dependent parts will be disabled ***))
-dnl fi
-have_alsa=no
-if test "x$enable_alsa" = xyes; then
-  AM_PATH_ALSA(0.9.0,
-               [ AC_DEFINE(ENABLE_ALSA,1,[Define this if you have Alsa (libasound) installed])
-	         have_alsa=yes
-               ],
-               AC_MSG_RESULT(*** All of ALSA dependent parts will be disabled ***))
-fi
-
-
-dnl
-dnl ESD
-dnl
-no_esd=yes
-if test "x$enable_esd" = xyes; then
-  AM_PATH_ESD(0.2.8,
-	  AC_DEFINE(ENABLE_ESD,1,[Define this if you have ESD (libesd) installed]),
-	  AC_MSG_RESULT(*** All of ESD dependent parts will be disabled ***))
+  enable_sdlmixer=yes
 fi
 
 
@@ -336,7 +232,7 @@ dnl
 DEFAULT_PLAYMODE=
 AC_ARG_WITH(default-output,
   [  --with-default-output=<mode>  Specify default output mode (optional):
-                                   default|oss|alsa|esd|sun|sdl],
+                                   default|sdl],
   [ if test "$enable_audio" != no; then
       DEFAULT_PLAYMODE=$withval
       eval "enable_$DEFAULT_PLAYMODE=yes"
@@ -350,10 +246,6 @@ if test "x$DEFAULT_PLAYMODE" = x; then
 fi
 case ".$DEFAULT_PLAYMODE" in
   .default)  def_am=AUDIO_PCM_ANY ;;
-  .oss)      def_am=AUDIO_PCM_OSS ;;
-  .alsa)     def_am=AUDIO_PCM_ALSA ;;
-  .esd)      def_am=AUDIO_PCM_ESD ;;
-  .sun)      def_am=AUDIO_PCM_SUN ;;
   .sdl)      def_am=AUDIO_PCM_SDL ;;
   *)         def_am= ;;
 esac
@@ -365,21 +257,9 @@ fi
 
 
 dnl
-dnl OSS/ALSA/ESD
+dnl Audio
 dnl
 SRC_AUDIO=
-if test "x$have_ossaudio" = xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_oss.c"
-fi
-if test "x$have_sunaudio" = xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_sun.c"
-fi
-if test "x$have_alsa" = xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_alsa.c"
-fi
-if test "x$no_esd" != xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_esd.c"
-fi
 if test "x$have_sdl" = xyes; then
   SRC_AUDIO="$SRC_AUDIO audio_sdl.c"
 fi
@@ -499,20 +379,6 @@ if test "x$enable_bgr" = xyes; then
   AC_DEFINE(BGR_ORDER,1,[Define this if X11 Pixmap color order is BGR])
 else
   AC_DEFINE(RGB_ORDER,1,[Define this if X11 Pixmap color order is RGB])
-fi
-
-dnl
-dnl set OSS param
-dnl
-if test "x$have_ossaudio" = xyes ; then
-    AC_ARG_WITH(audiodev,[  --with-oss-audiodev=DEVFILE DSP DEVICE],
-       audiodev="$withval",ossaudiodev="/dev/dsp")
-    AC_ARG_WITH(mixerdev,[  --with-oss-mixerdev=DEVFILE MIXER DEVICE],
-       mixerdev="Ec$withval",ossmixerdev="/dev/mixer")
-    AUDIODEV_OSS=$ossaudiodev
-    MIXERDEV_OSS=$ossmixerdev
-    AC_DEFINE_UNQUOTED(AUDIODEV_OSS,"$AUDIODEV_OSS",[aduio device])
-    AC_DEFINE_UNQUOTED(MIXERDEV_OSS,"$MIXERDEV_OSS",[mixer device])
 fi
 
 
@@ -762,18 +628,6 @@ echo "------------------"
 
 dnl Audio
 echo " * audio output:"
-if test "x$have_ossaudio" = xyes; then
-    echo "    - oss (Open Sound System)"
-fi
-if test "x$have_sunaudio" = xyes; then
-    echo "    - sun ()"
-fi
-if test "x$have_alsa" = xyes; then
-  echo "    - alsa"
-fi
-if test "x$no_esd" != xyes; then
-  echo "    - esd (Enlightened Sound Daemon)"
-fi
 if test "x$have_sdl" = xyes; then
   echo "    - sdl (SDL audio)"
 fi

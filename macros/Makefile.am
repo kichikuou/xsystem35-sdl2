@@ -2,10 +2,8 @@
 
 MACROS= \
   aclocal-include.m4 \
-  alsa.m4 \
   argz.m4 \
   codeset.m4 \
-  esd.m4 \
   freetype2.m4 \
   gettext.m4 \
   glibc21.m4 \

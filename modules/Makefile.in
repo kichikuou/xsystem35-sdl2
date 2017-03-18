@@ -83,8 +83,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
-	$(top_srcdir)/macros/alsa.m4 $(top_srcdir)/macros/argz.m4 \
-	$(top_srcdir)/macros/esd.m4 $(top_srcdir)/macros/freetype2.m4 \
+	$(top_srcdir)/macros/argz.m4 $(top_srcdir)/macros/freetype2.m4 \
 	$(top_srcdir)/macros/gettext.m4 \
 	$(top_srcdir)/macros/gtk-2.0.m4 $(top_srcdir)/macros/iconv.m4 \
 	$(top_srcdir)/macros/lib-ld.m4 \
@@ -186,8 +185,6 @@ am__relativize = \
   done; \
   reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
-ALSA_CFLAGS = @ALSA_CFLAGS@
-ALSA_LIBS = @ALSA_LIBS@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
@@ -212,9 +209,6 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ESD_CFLAGS = @ESD_CFLAGS@
-ESD_CONFIG = @ESD_CONFIG@
-ESD_LIBS = @ESD_LIBS@
 EXEEXT = @EXEEXT@
 EXTRACFLAGS = @EXTRACFLAGS@
 EXTRALDFLAGS = @EXTRALDFLAGS@

@@ -3,9 +3,6 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
-/* aduio device */
-#undef AUDIODEV_OSS
-
 /* Define this if X11 Pixmap color order is BGR */
 #undef BGR_ORDER
 
@@ -21,9 +18,6 @@
 /* default audio mode */
 #undef DEFAULT_AUDIO_MODE
 
-/* Define this if you have Alsa (libasound) installed */
-#undef ENABLE_ALSA
-
 /* Define this if you use cdrom iotctl in *BSD */
 #undef ENABLE_CDROM_BSD
 
@@ -35,9 +29,6 @@
 
 /* Define this if you use external player for cdrom audio */
 #undef ENABLE_CDROM_MP3
-
-/* Define this if you have ESD (libesd) installed */
-#undef ENABLE_ESD
 
 /* Define this if you have freetype2 installed */
 #undef ENABLE_FT2
@@ -64,14 +55,8 @@
    language is requested. */
 #undef ENABLE_NLS
 
-/* define this if you use OSS audio interface */
-#undef ENABLE_OSS
-
 /* define this if you use SDL */
 #undef ENABLE_SDL
-
-/* define this if you use sun stlye audio interface */
-#undef ENABLE_SUNAUDIO
 
 /* define this if you use X11 font interface */
 #undef ENABLE_X11FONT
@@ -152,9 +137,6 @@
 
 /* Define this if you have libjpeg installed */
 #undef HAVE_JPEG
-
-/* Define to 1 if you have the `asound' library (-lasound). */
-#undef HAVE_LIBASOUND
 
 /* Define if you have the libdl library or equivalent. */
 #undef HAVE_LIBDL
@@ -268,9 +250,6 @@
 
 /* midi player */
 #undef MIDI_PLAYER
-
-/* mixer device */
-#undef MIXERDEV_OSS
 
 /* Define if dlsym() requires a leading underscore in symbol names. */
 #undef NEED_USCORE

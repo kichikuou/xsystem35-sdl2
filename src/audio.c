@@ -33,17 +33,6 @@
 
 #include "audio.h"
 
-#ifndef AUDIODEV_OSS
-#define AUDIODEV_OSS "/dev/dsp"
-#endif
-#ifndef MIXERDEV_OSS
-#define MIXERDEV_OSS "/dev/mixer"
-#endif
-
-
-/* extern variable */
-static char*  audio_dev_dsp;
-static char*  audio_dev_mixer;
 
 /* static variable */
 static boolean mode_onlyone = FALSE; /* if true, only probe selected device */
@@ -54,22 +43,6 @@ static int mode = DEFAULT_AUDIO_MODE;
 static int mode = AUDIO_PCM_ANY;
 #endif
 
-#ifdef ENABLE_OSS
-extern int oss_init(audiodevice_t *dev, char *devdsp, char *devmix);
-#endif /* ENABLE_OSS */
-
-#ifdef ENABLE_ALSA
-extern int alsa_init(audiodevice_t *dev, char *hw, boolean automix);
-#endif
-	
-#ifdef ENABLE_ESD
-extern int esd_init(audiodevice_t *, char *);
-#endif /* ENABLE_ESD */
-
-#ifdef ENABLE_SUNAUDIO
-extern int sunaudio_init(audiodevice_t *dev, char *devaudio, char *devaudioctl);
-#endif /* ENABLE_SUNAUDIO */
-
 #ifdef ENABLE_SDL
 extern int sdlaudio_init();
 #endif /* ENABLE_SDL */
@@ -77,44 +50,10 @@ extern int sdlaudio_init();
 int audio_init(audiodevice_t *a) {
 	switch(mode) {
 	case AUDIO_PCM_ANY:
-#ifdef ENABLE_OSS
-	case AUDIO_PCM_OSS:
-		if (audio_dev_dsp == NULL) {
-			audio_dev_dsp = AUDIODEV_OSS;
-		}
-		if (audio_dev_mixer == NULL) {
-			audio_dev_mixer = MIXERDEV_OSS;
-		}
-		if (oss_init(a, audio_dev_dsp, audio_dev_mixer) == 0) break;
-		if (mode_onlyone) break;
-#endif
-#ifdef ENABLE_SUNAUDIO
-	case AUDIO_PCM_SUN:
-		if (sunaudio_init(a, audio_dev_dsp, audio_dev_mixer) == 0) break;
-		if (mode_onlyone) break;
-#endif
-#ifdef ENABLE_ALSA
-	case AUDIO_PCM_ALSA:
-		if (audio_dev_dsp == NULL) {
-			audio_dev_dsp = "hw:0";
-		}
-		if (alsa_init(a, audio_dev_dsp, FALSE) == 0) break;
-		if (mode_onlyone) break;
-#endif
-#ifdef ENABLE_ESD
-	case AUDIO_PCM_ESD:
-		if (esd_init(a, NULL) == 0) break;
-		if (mode_onlyone) break;
-#endif
 #ifdef ENABLE_SDL
 	case AUDIO_PCM_SDL:
 		if (sdlaudio_init(a) == 0) break;
 		if (mode_onlyone) break;
-#endif
-#ifdef ENABLE_ARTS
-	case AUDIO_PCM_ARTS:
-		// if (arts_initilize(a) == 0) break;
-		// if (audiomode_strict) break;
 #endif
 	default:
 		return -1;
@@ -124,18 +63,6 @@ int audio_init(audiodevice_t *a) {
 
 void audio_set_output_device(char c) {
 	switch(c) {
-	case 'o':
-		/* OSS */
-		mode = AUDIO_PCM_OSS;
-		break;
-	case 'e':
-		/* ESD */
-		mode = AUDIO_PCM_ESD;
-		break;
-	case 's':
-		/* ALSA */
-		mode = AUDIO_PCM_ALSA;
-		break;
 	case 'd':
 		/* SDL */
 		mode = AUDIO_PCM_SDL;
@@ -149,16 +76,4 @@ void audio_set_output_device(char c) {
 	}
 	
 	mode_onlyone = TRUE;
-}
-
-void audio_set_pcm_devicename(char *name) {
-	if (0 == strcmp("none", name)) {
-		mode = AUDIO_PCM_DMY;
-	} else {
-		audio_dev_dsp = strdup(name);
-	}
-}
-
-void audio_set_mixer_devicename(char *name) {
-        audio_dev_mixer = strdup(name);
 }

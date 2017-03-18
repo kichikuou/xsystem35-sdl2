@@ -79,21 +79,13 @@ typedef struct _audiodevice audiodevice_t;
 
 
 enum {
-	AUDIO_PCM_OSS,
-	AUDIO_PCM_ALSA,
-	AUDIO_PCM_ESD,
 	AUDIO_PCM_SDL,
-	AUDIO_PCM_ARTS,
-	AUDIO_PCM_SUN,
 	AUDIO_PCM_ANY,
 	AUDIO_PCM_DMY
 };
 
 extern int audio_init(audiodevice_t *dev);
 extern void audio_set_output_device(char c);
-extern void audio_set_pcm_devicename(char *name);
-extern void audio_set_mixer_devicename(char *name);
-extern void audio_set_alsa_mixser_element(char *fn);
 
 
 #endif /* __AUDIO_H__ */

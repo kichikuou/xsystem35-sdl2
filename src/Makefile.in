@@ -89,8 +89,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/mkinstalldirs $(top_srcdir)/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
-	$(top_srcdir)/macros/alsa.m4 $(top_srcdir)/macros/argz.m4 \
-	$(top_srcdir)/macros/esd.m4 $(top_srcdir)/macros/freetype2.m4 \
+	$(top_srcdir)/macros/argz.m4 $(top_srcdir)/macros/freetype2.m4 \
 	$(top_srcdir)/macros/gettext.m4 \
 	$(top_srcdir)/macros/gtk-2.0.m4 $(top_srcdir)/macros/iconv.m4 \
 	$(top_srcdir)/macros/lib-ld.m4 \
@@ -217,8 +216,6 @@ ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-ALSA_CFLAGS = @ALSA_CFLAGS@
-ALSA_LIBS = @ALSA_LIBS@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
@@ -243,9 +240,6 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ESD_CFLAGS = @ESD_CFLAGS@
-ESD_CONFIG = @ESD_CONFIG@
-ESD_LIBS = @ESD_LIBS@
 EXEEXT = @EXEEXT@
 EXTRACFLAGS = @EXTRACFLAGS@
 EXTRALDFLAGS = @EXTRALDFLAGS@
@@ -412,7 +406,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(LTDLINCL)
 xsystem35_LDFLAGS = @EXTRALDFLAGS@
-AM_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@ @GTK_CFLAGS@ @ESD_CFLAGS@ @SDL_CFLAGS@ @EXTRACFLAGS@ @VORBIS_CFLAGS@ -DMODULE_PATH=\"$(libdir)/@PACKAGE@\" -DLOCALEDIR=\""$(datadir)/locale"\"
+AM_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@ @GTK_CFLAGS@ @SDL_CFLAGS@ @EXTRACFLAGS@ @VORBIS_CFLAGS@ -DMODULE_PATH=\"$(libdir)/@PACKAGE@\" -DLOCALEDIR=\""$(datadir)/locale"\"
 SRC_SYS35CMD = cmdb.c cmdc.c cmdd.c cmde.c cmdf.c cmdg.c cmdh.c cmdi.c cmdj.c cmdk.c cmdl.c cmdm.c cmdn.c cmdo.c cmdp.c cmdq.c cmds.c cmdt.c cmdu.c cmdv.c cmdw.c cmdy.c cmdz.c cmd2F.c cmd2F60.c
 SRC_CG = pms.c vsp.c bmp.c qnt.c
 SRC_MUS = music.c music_cdrom.c music_midi.c music_pcm.c music_fader.c wavfile.c wavmix.c audio.c midi.c cdrom.c sndcnv.c musstream.c pcmlib.c music_bgm.c musstream_wav.c musstream_ogg.c musstream_wav_ima.c
@@ -448,8 +442,6 @@ xsystem35_LDADD = \
 	@ZLIB_LIBS@ \
 	@X_LIBS@ \
 	@GTK_LIBS@ \
-	@ALSA_LIBS@ \
-	@ESD_LIBS@ \
 	@SDL_LIBS@ \
 	@EXTRALIBS@ \
 	@LIBINTL@ \
@@ -871,12 +863,6 @@ uninstall-am: uninstall-binPROGRAMS
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS
 
-
-audio_oss.o: audio_oss.c audio_oss.h mixer_oss.c
-
-audio_alsa.o: audio_alsa.c audio_alsa.h mixer_alsa.c
-
-audio_esd.o: audio_esd.c audio_esd.h mixer_esd.c
 
 image.o: image.c image15.c image16.c image24.c image24p.c
 
