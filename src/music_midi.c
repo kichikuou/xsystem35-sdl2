@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 #include "portab.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "music_midi.h"
 #include "midi.h"
 #include "ald_manager.h"

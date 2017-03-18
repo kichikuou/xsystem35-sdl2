@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include "portab.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "music_cdrom.h"
 #include "cdrom.h"
 

@@ -36,7 +36,7 @@
 #include "system.h"
 #include "counter.h"
 #include "midi.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "music_pcm.h"
 #include "nact.h"
 

@@ -30,7 +30,7 @@
 #include "system.h"
 #include "list.h"
 #include "music_pcm.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "musstream.h"
 #include "audio.h"
 #include "ald_manager.h"

@@ -27,7 +27,7 @@
 #include "portab.h"
 #include "system.h"
 #include "list.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "counter.h"
 
 struct _fadeobj {

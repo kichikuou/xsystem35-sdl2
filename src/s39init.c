@@ -31,7 +31,7 @@
 #include "nact.h"
 #include "s39init.h"
 #include "utfsjis.h"
-#include "music_client.h"
+#include "music.h"
 
 // Volume Valancer で扱う最大チャンネル数
 #define MAXVOLCH 16

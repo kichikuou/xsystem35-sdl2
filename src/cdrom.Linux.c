@@ -40,7 +40,7 @@ struct cdrom_msf0 {
 
 #include "portab.h"
 #include "cdrom.h"
-#include "music_server.h"
+#include "music_private.h"
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();

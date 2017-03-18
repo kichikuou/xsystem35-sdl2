@@ -33,7 +33,7 @@
 #include "dri.h"
 #include "ald_manager.h"
 #include "wavfile.h"
-#include "music_client.h"
+#include "music.h"
 #include "pcmlib.h"
 #include "shpcmlib.c"
 

@@ -54,7 +54,7 @@
 #include "portab.h"
 #include "system.h"
 #include "midi.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "midifile.h"
 #include "counter.h"
 

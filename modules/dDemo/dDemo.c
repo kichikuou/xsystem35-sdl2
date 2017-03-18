@@ -9,7 +9,7 @@
 #include "xsystem35.h"
 #include "nact.h"
 #include "imput.h"
-#include "music_client.h"
+#include "music.h"
 
 #ifdef DDEMODEV
 #include "dDemo.h"

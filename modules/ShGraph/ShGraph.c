@@ -35,7 +35,7 @@
 #include "nact.h"
 #include "ags.h"
 #include "counter.h"
-#include "music_client.h"
+#include "music.h"
 
 #define SLOT 40
 

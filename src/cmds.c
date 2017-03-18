@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
-#include "music_client.h"
+#include "music.h"
 
 /* ぱにょ〜ん 異常シナリオ対策 */
 static boolean dummy_pcm_in_play = FALSE;

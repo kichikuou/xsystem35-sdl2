@@ -32,7 +32,7 @@
 #include "system.h"
 #include "nact.h"
 #include "music_bgm.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "music_fader.h"
 #include "musstream.h"
 #include "audio.h"

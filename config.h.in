@@ -60,9 +60,6 @@
 /* define this if you want to use MMX instructions */
 #undef ENABLE_MMX
 
-/* define this if you use music server */
-#undef ENABLE_MUSIC_SERVER
-
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS

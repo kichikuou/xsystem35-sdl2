@@ -44,7 +44,7 @@ extern char *__xpg_basename __P ((char *__path));
 #include "system.h"
 #include "counter.h"
 #include "cdrom.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "music_pcm.h"
 
 extern void sys_set_signalhandler(int SIG, void (*handler)(int));

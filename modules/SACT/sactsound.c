@@ -31,7 +31,7 @@
 #include "nact.h"
 #include "imput.h"
 #include "sactsound.h"
-#include "music_client.h"
+#include "music.h"
 #include "sact.h"
 
 // slot番号の 1から 20を SACT用に使用

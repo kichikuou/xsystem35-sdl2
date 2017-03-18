@@ -32,7 +32,7 @@
 #include "menu.h"
 #include "selection.h"
 #include "message.h"
-#include "music_client.h"
+#include "music.h"
 #include "utfsjis.h"
 #include "ags.h"
 #include "graphicsdevice.h"

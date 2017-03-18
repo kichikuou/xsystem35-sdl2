@@ -670,7 +670,6 @@ ESD_CFLAGS
 ESD_CONFIG
 ALSA_LIBS
 ALSA_CFLAGS
-SRC_MUSIC
 SRC_GRAPHDEV
 SDL
 SDL2_CONFIG
@@ -875,7 +874,6 @@ enable_sdl
 with_sdl_prefix
 with_sdl_exec_prefix
 enable_sdltest
-enable_music_server
 enable_audio
 with_alsa_prefix
 with_alsa_inc_prefix
@@ -1571,7 +1569,6 @@ Optional Features:
   --disable-gtktest       do not try to compile and run a test GTK+ program
   --enable-sdl            SDL default=no
   --disable-sdltest       Do not try to compile and run a test SDL program
-  --enable-music-server     Server/client music architecture default=yes
   --enable-audio=mode_list  Enable audio (Specify comma separated mode list):
                               default:  Automatically select audio device.
                               oss:      OSS (Open Sound System) device
@@ -16493,25 +16490,6 @@ $as_echo "#define ENABLE_SDL 1" >>confdefs.h
   SDL=1
   SRC_GRAPHDEV="sdl_video.c sdl_mode.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c"
 
-fi
-
-
-
-# Check whether --enable-music-server was given.
-if test "${enable_music_server+set}" = set; then :
-  enableval=$enable_music_server;
-else
-   enable_music_server=yes
-fi
-
-SRC_MUSIC=
-if test "x$enable_music_server" = xyes ; then
-
-$as_echo "#define ENABLE_MUSIC_SERVER 1" >>confdefs.h
-
-  SRC_MUSIC="music.c music_client.c music_server.c"
-else
-  SRC_MUSIC="music_inprocess.c"
 fi
 
 

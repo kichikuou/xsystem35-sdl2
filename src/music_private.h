@@ -22,8 +22,6 @@
 #ifndef __MUSIC_PRIVATE_H__
 #define __MUSIC_PRIVATE_H__
 
-#include <sys/poll.h>
-
 #include "portab.h"
 #include "list.h"
 #include "cdrom.h"
@@ -69,10 +67,6 @@ struct _musprvdat {
 	
 	List *pcmplist; // PCM多重再生用リスト
 	List *fadelist; // Faderリスト
-	
-	// for polling
-	int nfds;
-	struct pollfd ufds[2];
 
 };
 

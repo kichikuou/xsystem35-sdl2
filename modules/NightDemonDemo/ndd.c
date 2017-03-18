@@ -28,7 +28,7 @@
 #include "alk.h"
 #include "system.h"
 #include "surface.h"
-#include "music_client.h"
+#include "music.h"
 #include "counter.h"
 #include "ngraph.h"
 #include "imput.h"
