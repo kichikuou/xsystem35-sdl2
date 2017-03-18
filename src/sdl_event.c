@@ -122,6 +122,26 @@ static void sdl_getEvent(void) {
 				m2b = TRUE;
 			}
 			break;
+
+		case SDL_FINGERDOWN:
+			mouseb |= 1 << SDL_BUTTON_LEFT;
+			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = TRUE;
+			mousex = e.tfinger.x;
+			mousey = e.tfinger.y;
+			break;
+
+		case SDL_FINGERUP:
+			mouseb &= ~(1 << SDL_BUTTON_LEFT);
+			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
+			mousex = e.tfinger.x;
+			mousey = e.tfinger.y;
+			break;
+
+		case SDL_FINGERMOTION:
+			mousex = e.tfinger.x;
+			mousey = e.tfinger.y;
+			break;
+
 #if HAVE_SDLJOY
 		case SDL_JOYAXISMOTION:
 			if (abs(e.jaxis.value) < 0x4000) {
@@ -233,3 +253,9 @@ int sdl_getjoyinfo(void) {
 }
 #endif
 
+void sdl_rightButton(int down) {
+	SDL_Event sdlevent;
+	sdlevent.type = down ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
+	sdlevent.button.button = SDL_BUTTON_RIGHT;
+	SDL_PushEvent(&sdlevent);
+}

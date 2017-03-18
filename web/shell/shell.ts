@@ -3,6 +3,7 @@ var $: (selector:string)=>HTMLElement = document.querySelector.bind(document);
 // xsystem35 exported functions
 declare function _musfade_setvolval_all(vol: number): void;
 declare function _ags_setAntialiasedStringMode(on: number): void;
+declare function _sdl_rightButton(down: number): void;
 
 declare namespace Module {
     var noInitialRun: boolean;
@@ -81,6 +82,7 @@ class System35Shell {
             this.updateVolume();
             this.antialiasChanged();
         }, 0);
+        this.addRightClickEmulation();
     }
 
     setStatus(text: string) {
@@ -110,6 +112,22 @@ class System35Shell {
     private antialiasChanged() {
         localStorage.setItem('antialias', String(this.antialiasCheckbox.checked));
         _ags_setAntialiasedStringMode(this.antialiasCheckbox.checked ? 1 : 0);
+    }
+
+    private addRightClickEmulation() {
+        var emulatingRightClick = false;
+        document.body.addEventListener('touchstart', (e) => {
+            if (e.target !== document.body)
+                return;
+            _sdl_rightButton(1);
+            emulatingRightClick = true;
+        });
+        document.body.addEventListener('touchend', (e) => {
+            if (!emulatingRightClick)
+                return;
+            _sdl_rightButton(0);
+            emulatingRightClick = false;
+        });
     }
 }
 
