@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
-EMPORTS := -s USE_ZLIB=1 -s USE_VORBIS=1 -s USE_FREETYPE=1 -s USE_SDL=2
+EMPORTS := -s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2
 EMFLAGS := $(EMPORTS)
 
 #EMFLAGS += -O1 -s SAFE_HEAP=1
@@ -25,6 +25,6 @@ src/xsystem35: src src/Makefile
 	ln -sf src/xsystem35 xsystem35.bc
 
 src/Makefile:
-	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-music-server=no --enable-cdrom=emscripten --disable-oggtest --disable-vorbistest CFLAGS='-s USE_ZLIB=1 -s USE_VORBIS=1' FT2_CONFIG=tools/freetype-config
+	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-music-server=no --enable-cdrom=emscripten CFLAGS='-s USE_ZLIB=1' FT2_CONFIG=tools/freetype-config
 
 .PHONY: src

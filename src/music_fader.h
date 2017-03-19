@@ -26,6 +26,12 @@
 
 #include "portab.h"
 
+#define MIX_NRDEVICES 4
+#define MIX_MASTER 0
+#define MIX_CD     1
+#define MIX_MIDI   2
+#define MIX_PCM    3
+
 extern int musfade_init();
 extern int musfade_exit();
 extern int musfade_new(int dev, int subdev, int time, int ed_vol, int stop);

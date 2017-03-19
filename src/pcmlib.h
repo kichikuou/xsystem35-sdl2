@@ -24,12 +24,8 @@
 #ifndef __PCMLIB_H__
 #define __PCMLIB_H__
 
-#include "wavfile.h"
-#include "dri.h"
-
-extern WAVFILE *pcmlib_mixlr(int noL, int noR);
-extern WAVFILE *pcmlib_load(int no);
-extern void pcmlib_free(WAVFILE *wfile);
+extern Mix_Chunk *pcmlib_mixlr(int noL, int noR);
+extern Mix_Chunk *pcmlib_load(int no);
 
 #endif /*__PCM_LIB_H__ */
 

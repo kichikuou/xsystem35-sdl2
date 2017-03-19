@@ -23,96 +23,78 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL_mixer.h>
 
 #include "portab.h"
 #include "system.h"
 #include "ald_manager.h"
 #include "dri.h"
-#include "wavfile.h"
 #include "pcmlib.h"
-
-extern WAVFILE *ogg_getinfo(char *data, long size);
 
 /**
  * noL と noR の .WAV をロードし、左右合成
  *
  * @param noL: 左の WAV ファイルの番号
  * @param noR: 右の WAV ファイルの番号
- * @return   : 合成後の WAVFILE データ
+ * @return   : 合成後の Mix_Chunk
  */
-WAVFILE *pcmlib_mixlr(int noL, int noR) {
-	WAVFILE *wfileL, *wfileR, *wfile;
-	
-	wfileL = pcmlib_load(noL);
-	wfileR = pcmlib_load(noR);
-	if (wfileL == NULL || wfileR == NULL) {
-		goto eexit;
+Mix_Chunk *pcmlib_mixlr(int noL, int noR) {
+	Mix_Chunk *chunkL = pcmlib_load(noL);
+	Mix_Chunk *chunkR = pcmlib_load(noR);
+	if (chunkL == NULL || chunkR == NULL) {
+		if (chunkL)
+			Mix_FreeChunk(chunkL);
+		if (chunkR)
+			Mix_FreeChunk(chunkR);
+		return NULL;
 	}
 	
-	wfile = wav_mix(wfileL, wfileR);
-	if (wfile == NULL) {
-		goto eexit;
+	short *lbuf = (short*)chunkL->abuf;
+	short *rbuf = (short*)chunkR->abuf;
+	if (chunkL->alen >= chunkR->alen) {
+		int i;
+		for (i = 0; i < chunkR->alen / 4; i++) {
+			lbuf[i * 2 + 1] = rbuf[i * 2 + 1];
+		}
+		for (; i < chunkL->alen / 4; i++) {
+			lbuf[i * 2 + 1] = 0;
+		}
+		Mix_FreeChunk(chunkR);
+		return chunkL;
+	} else {
+		int i;
+		for (i = 0; i < chunkL->alen / 4; i++) {
+			rbuf[i * 2] = lbuf[i * 2];
+		}
+		for (; i < chunkR->alen / 4; i++) {
+			rbuf[i * 2] = 0;
+		}
+		Mix_FreeChunk(chunkL);
+		return chunkR;
 	}
-	
-	pcmlib_free(wfileL);
-	pcmlib_free(wfileR);
-	
-	wfile->dfile = NULL;
-	
-	return wfile;
-	    
- eexit:
-	pcmlib_free(wfileL);
-	pcmlib_free(wfileR);
-	
-	return NULL;
 }
 
 /**
  * 指定の番号の .WAV|.OGG をロードする。
  * @param no: DRIファイル番号
- * @return: WAVFILE object
  */
-WAVFILE *pcmlib_load(int no) {
-	dridata *dfile;
-	WAVFILE *wfile;
-	
-	dfile = ald_getdata(DRIFILE_WAVE, no -1);
+Mix_Chunk *pcmlib_load(int no) {
+	dridata *dfile = ald_getdata(DRIFILE_WAVE, no -1);
 	if (dfile == NULL) {
 		WARNING("DRIFILE_WAVE fail to open %d\n", no -1);
 		return NULL;
 	}
 	
-	wfile = wav_getinfo(dfile->data);
-	if (wfile == NULL) {
-		wfile = ogg_getinfo(dfile->data, dfile->size);
-		if (wfile == NULL) {
-			WARNING("not .wav or .ogg file\n");
-			ald_freedata(dfile);
-			return NULL;
-		}
+	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(dfile->data, dfile->size), 1);
+	ald_freedata(dfile);
+	if (chunk == NULL) {
+		WARNING("DRIFILE_WAVE %d: not a valid wav file\n", no-1);
+		return NULL;
 	}
+	assert(chunk->allocated);
 	
-	wfile->dfile = dfile;
-	
-	return wfile;
-}
-
-/**
- * pcmlib_{load|mixlr}で読み込んだWAVFILEの解放
- * @param wfile: 解放するデータ
- * @return なし
- */
-void pcmlib_free(WAVFILE *wfile) {
-	if (wfile == NULL) return;
-	
-	if (wfile->dfile) {
-		ald_freedata((dridata *)(wfile->dfile));
-	} else {
-		free(wfile->data);
-	}
-	
-	free(wfile);
+	return chunk;
 }

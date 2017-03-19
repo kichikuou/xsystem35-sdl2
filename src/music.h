@@ -27,8 +27,6 @@
 #include "portab.h"
 #include "cdrom.h"
 #include "midi.h"
-#include "audio.h"
-#include "wavfile.h"
 
 /* init and exit */
 extern int mus_init();
@@ -78,7 +76,6 @@ extern boolean mus_wav_fadeout_get_state(int ch);
 extern int mus_wav_waitend(int ch);
 extern int mus_wav_waittime(int ch, int time);
 extern int mus_wav_wavtime(int ch);
-extern int mus_wav_sendfile(int ch, WAVFILE *wfile);
 extern int mus_wav_load_lrsw(int ch, int num);
 
 /* Music Stream */

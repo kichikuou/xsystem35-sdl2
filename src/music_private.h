@@ -26,7 +26,6 @@
 #include "list.h"
 #include "cdrom.h"
 #include "midi.h"
-#include "audio.h"
 #include "music_cdrom.h"
 #include "music_midi.h"
 #include "music_pcm.h"
@@ -38,9 +37,6 @@ struct _musprvdat {
 	
 	cdromdevice_t cddev;
 	mididevice_t  mididev;
-	audiodevice_t audiodev;
-	
-	chanfmt_t ofmt; /* audio output format */
 	
 	cdobj_t cdrom;   // cdrom object
 	midiobj_t midi;  // midi object

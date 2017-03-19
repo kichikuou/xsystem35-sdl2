@@ -100,9 +100,8 @@ am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
 	$(top_srcdir)/macros/ltsugar.m4 \
 	$(top_srcdir)/macros/ltversion.m4 \
 	$(top_srcdir)/macros/lt~obsolete.m4 \
-	$(top_srcdir)/macros/ogg.m4 $(top_srcdir)/macros/pkg.m4 \
-	$(top_srcdir)/macros/progtest.m4 $(top_srcdir)/macros/sdl2.m4 \
-	$(top_srcdir)/macros/vorbis.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/macros/pkg.m4 $(top_srcdir)/macros/progtest.m4 \
+	$(top_srcdir)/macros/sdl2.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -126,11 +125,7 @@ am__objects_3 = cali.$(OBJEXT) scenario.$(OBJEXT) variable.$(OBJEXT) \
 	hankaku.$(OBJEXT) s39ain.$(OBJEXT)
 am__objects_4 = music.$(OBJEXT) music_cdrom.$(OBJEXT) \
 	music_midi.$(OBJEXT) music_pcm.$(OBJEXT) music_fader.$(OBJEXT) \
-	wavfile.$(OBJEXT) wavmix.$(OBJEXT) audio.$(OBJEXT) \
-	midi.$(OBJEXT) cdrom.$(OBJEXT) sndcnv.$(OBJEXT) \
-	musstream.$(OBJEXT) pcmlib.$(OBJEXT) music_bgm.$(OBJEXT) \
-	musstream_wav.$(OBJEXT) musstream_ogg.$(OBJEXT) \
-	musstream_wav_ima.$(OBJEXT)
+	midi.$(OBJEXT) cdrom.$(OBJEXT) pcmlib.$(OBJEXT)
 am__objects_5 = ags.$(OBJEXT) font.$(OBJEXT) flood.$(OBJEXT) \
 	cg.$(OBJEXT) ecopy.$(OBJEXT) antialiase.$(OBJEXT) \
 	alpha_plane.$(OBJEXT) cursor.$(OBJEXT)
@@ -297,8 +292,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OGG_CFLAGS = @OGG_CFLAGS@
-OGG_LIBS = @OGG_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -315,6 +308,8 @@ PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
 SDL = @SDL@
+SDL2MIXER_CFLAGS = @SDL2MIXER_CFLAGS@
+SDL2MIXER_LIBS = @SDL2MIXER_LIBS@
 SDL2_CONFIG = @SDL2_CONFIG@
 SDL_CFLAGS = @SDL_CFLAGS@
 SDL_LIBS = @SDL_LIBS@
@@ -333,10 +328,6 @@ USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 VERSION_MA = @VERSION_MA@
 VERSION_MI = @VERSION_MI@
-VORBISENC_LIBS = @VORBISENC_LIBS@
-VORBISFILE_LIBS = @VORBISFILE_LIBS@
-VORBIS_CFLAGS = @VORBIS_CFLAGS@
-VORBIS_LIBS = @VORBIS_LIBS@
 XGETTEXT = @XGETTEXT@
 XMKMF = @XMKMF@
 X_CFLAGS = @X_CFLAGS@
@@ -406,10 +397,10 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = $(LTDLINCL)
 xsystem35_LDFLAGS = @EXTRALDFLAGS@
-AM_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@ @GTK_CFLAGS@ @SDL_CFLAGS@ @EXTRACFLAGS@ @VORBIS_CFLAGS@ -DMODULE_PATH=\"$(libdir)/@PACKAGE@\" -DLOCALEDIR=\""$(datadir)/locale"\"
+AM_CFLAGS = @DEBUG_CFLAGS@ @X_CFLAGS@ @GTK_CFLAGS@ @SDL_CFLAGS@ @SDL2MIXER_CFLAGS@ @EXTRACFLAGS@ -DMODULE_PATH=\"$(libdir)/@PACKAGE@\" -DLOCALEDIR=\""$(datadir)/locale"\"
 SRC_SYS35CMD = cmdb.c cmdc.c cmdd.c cmde.c cmdf.c cmdg.c cmdh.c cmdi.c cmdj.c cmdk.c cmdl.c cmdm.c cmdn.c cmdo.c cmdp.c cmdq.c cmds.c cmdt.c cmdu.c cmdv.c cmdw.c cmdy.c cmdz.c cmd2F.c cmd2F60.c
 SRC_CG = pms.c vsp.c bmp.c qnt.c
-SRC_MUS = music.c music_cdrom.c music_midi.c music_pcm.c music_fader.c wavfile.c wavmix.c audio.c midi.c cdrom.c sndcnv.c musstream.c pcmlib.c music_bgm.c musstream_wav.c musstream_ogg.c musstream_wav_ima.c
+SRC_MUS = music.c music_cdrom.c music_midi.c music_pcm.c music_fader.c midi.c cdrom.c pcmlib.c
 SRC_MISC = LittleEndian.c counter.c imput.c profile.c mt19937-1.c @JOY_S@.c utfsjis.c filecheck.c tempname.c list.c
 SRC_SCO = cali.c scenario.c variable.c cmd_check.c hankana2sjis.c nact.c selection.c message.c savedata.c hankaku.c s39ain.c
 SRC_GRAPH = ags.c font.c flood.c cg.c ecopy.c antialiase.c alpha_plane.c cursor.c
@@ -443,11 +434,10 @@ xsystem35_LDADD = \
 	@X_LIBS@ \
 	@GTK_LIBS@ \
 	@SDL_LIBS@ \
+	@SDL2MIXER_LIBS@ \
 	@EXTRALIBS@ \
 	@LIBINTL@ \
 	$(LIBLTDL) \
-	@VORBIS_LIBS@ \
-	@VORBISFILE_LIBS@ \
 	$(SRC_ABLEND:.s=.o) \
 	$(SRC_AUDIO:.c=.o) \
 	$(SRC_CDROM:.c=.o) \
@@ -556,7 +546,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ald_manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alpha_plane.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/antialiase.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/audio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cali.Po@am__quote@
@@ -603,15 +592,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mt19937-1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music_bgm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music_cdrom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music_fader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music_midi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/music_pcm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musstream.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musstream_ogg.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musstream_wav.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/musstream_wav_ima.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/network.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pcmlib.Po@am__quote@
@@ -622,13 +606,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/savedata.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scenario.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/selection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sndcnv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tempname.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utfsjis.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vsp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wavfile.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wavmix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xsystem35.Po@am__quote@
 
 .c.o:

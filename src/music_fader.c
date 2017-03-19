@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "music_fader.h"
 #include "portab.h"
 #include "system.h"
 #include "list.h"
@@ -92,12 +93,14 @@ int musfade_exit() {
 }
 
 static int setvolcd(int lv) {
-	prv.audiodev.mix_set(&prv.audiodev, MIX_CD, lv);
+	printf("%s not implemented\n", __func__);
+	// prv.audiodev.mix_set(&prv.audiodev, MIX_CD, lv);
 	return OK;
 }
 
 static int setvolmidi(int lv) {
-	prv.audiodev.mix_set(&prv.audiodev, MIX_MIDI, lv);
+	printf("%s not implemented\n", __func__);
+	// prv.audiodev.mix_set(&prv.audiodev, MIX_MIDI, lv);
 	return OK;
 }
 
@@ -149,7 +152,7 @@ int musfade_new(int dev, int subdev, int time, int ed_vol, int stop) {
 			// しようとしているんだけど、もっと前で弾くべきか？
 			obj->st_vol = -1;
 		} else {
-			obj->st_vol = prv.pcm[subdev]->vollv;
+			obj->st_vol = prv.pcm[subdev]->chunk->volume * 100 / 128;
 		}
 	}
 	
@@ -266,7 +269,8 @@ static int musfade_setvol_dev(int dev, int subdev, int lv) {
 	switch(dev) {
 	case MIX_MASTER:
 	case MIX_PCM:
-		prv.audiodev.mix_set(&prv.audiodev, dev, lv);
+		printf("%s not implemented\n", __func__);
+		// prv.audiodev.mix_set(&prv.audiodev, dev, lv);
 		break;
 	case MIX_CD:
 		prv.cddev.setvol(lv);

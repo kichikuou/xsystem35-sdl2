@@ -24,75 +24,15 @@
 #ifndef __MUSIC_PCM_H__
 #define __MUSIC_PCM_H__
 
-#include "musstream.h"
-#include "dri.h"
-#include "audio.h"
-
-#define SLOT_CDROMPIPE 129
-#define SLOT_MIDIPIPE  130
-
-#define OBJSRC_FILE 1
-#define OBJSRC_MEM  2
-#define OBJSRC_PIPE 3
-
-#define MAX_PRIVATE 10
-
-struct _pcmobj;
-
-// PCM 変換に関するオブジェクト
-struct _sndcnv {
-	// 入力フォーマット
-	chanfmt_t ifmt;
-
-	// 出力フォーマット
-	chanfmt_t ofmt;
-	
-	/* private area for effect */
-        char priv[MAX_PRIVATE * 8];
-
-	// src から読み込む長さ
-	int isample;
-	
-	// 周波数変換ありなし別変換関数
-	int (*convert)(struct _pcmobj *, int, int);
-	
-	// バッファ
-	void *buf;
-};
-typedef struct _sndcnv sndcnv_t;
+#include <SDL_mixer.h>
 
 struct _pcmobj {
-	chanfmt_t fmt;
-	musstream_t *src;
-	
-	sndcnv_t conv; // フォーマット変換用
-	
-	int vollv;   /* volume level */
-	int loop;    /* くりかえし数 */
-	int cnt;     /* 実際に繰り返した数 */
+	Mix_Chunk* chunk;
 	
 	int slot; // ロードされているスロット番号
+	int channel; // 再生中のチャネル
 
-	int stype;   // ソースデータオブジェクトタイプ (FILE,MEM,PIPE)
-	void *sdata; // ソースデータオブジェクト
-	
-	/* 終了時に client に知らせるかどうか */
-	void (* cb_atend)(int fd);
-	
-	/* 終了時に知らせる client の file discpriter */
-	int fd;
-
-	/* wavefile のデータの長さ(ms単位) */
-	long data_len;
-	
-	/* 合計再生時間(バイト数) */
-	long written_len;
-
-	/* 一時停止中 */
-	boolean paused;
-
-	/* 演奏中 */
-	boolean playing;
+	boolean playing; // 演奏中
 };
 typedef struct _pcmobj pcmobj_t;
 
@@ -100,10 +40,7 @@ typedef struct _pcmobj pcmobj_t;
 extern int muspcm_init();
 extern int muspcm_exit();
 extern int muspcm_load_no(int slot, int no);
-extern int muspcm_load_no_lrsw(int slot, int no);
-extern int muspcm_load_wfile(int slot, WAVFILE *wfile);
-extern int muspcm_load_mem(int slot, void *mem);
-extern int muspcm_load_pipe(int slot, char *cmd);
+extern int muspcm_load_mixlr(int slot, int noL, int noR);
 extern int muspcm_start(int slot, int loop);
 extern int muspcm_stop(int slot);
 extern int muspcm_unload(int slot);
@@ -112,10 +49,6 @@ extern int muspcm_unpause(int slot);
 extern int muspcm_getpos(int slot);
 extern int muspcm_setvol(int dev, int slot, int lv);
 extern int muspcm_getwavelen(int slot);
-extern int muspcm_cb();
-extern int muspcm_write2dev(void);
 extern boolean muspcm_isplaying(int slot);
-extern int sndcnv_prepare(pcmobj_t *pcm, int outlen);
-extern int sndcnv_drain(pcmobj_t *pcm);
 
 #endif /* __MUSIC_PCM_H__ */

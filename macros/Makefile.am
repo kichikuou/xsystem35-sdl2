@@ -24,14 +24,12 @@ MACROS= \
   ltoptions.m4 \
   ltsugar.m4 \
   ltversion.m4 \
-  ogg.m4 \
   pkg.m4 \
   progtest.m4 \
   sdl2.m4 \
   stdint_h.m4 \
   uintmax_t.m4 \
-  ulonglong.m4 \
-  vorbis.m4
+  ulonglong.m4
 
 
 EXTRA_DIST=$(MACROS)

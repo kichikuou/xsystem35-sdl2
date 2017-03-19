@@ -45,7 +45,6 @@ extern char *__xpg_basename __P ((char *__path));
 #include "counter.h"
 #include "cdrom.h"
 #include "music_private.h"
-#include "music_pcm.h"
 
 extern void sys_set_signalhandler(int SIG, void (*handler)(int));
 
@@ -69,10 +68,6 @@ extern void sys_set_signalhandler(int SIG, void (*handler)(int));
        ってなファイルを用意する。( $(HOME)は適当にかえてね )
        １行目はプレーヤーとそのオプション
        ２行目以降はトラック２から順にファイルをならべる
-
-       １行目の最初の文字が - で始まっている場合 xsystem35 の audio device に
-       流し込む (piped play mode) (ex. -mpg123 -quite)
-       player の再生フォーマットは 44kHz,16bit,Stereoのみ
        
 
    3 configure で --enable-cdrom=mp3 を追加する
@@ -86,8 +81,6 @@ static int cdrom_exit();
 static int cdrom_start(int, int);
 static int cdrom_stop();
 static int cdrom_getPlayingInfo(cd_time *);
-static int cdrom_setVolumePipe(int vol);
-static int cdrom_getVolumePipe();
 
 #define cdrom cdrom_mp3
 cdromdevice_t cdrom = {
@@ -113,78 +106,52 @@ static int          lastindex; // 最終トラック番号
 static pid_t        cdpid;   // 外部プレーヤーの pid
 static int          trackno; // 現在演奏中のトラック
 static int          counter; // 演奏時間測定用カウンタ
-static boolean      pipedplay; // pipe play モードかどうか
 
 /*
   外部プレーヤーの行の解析
-  1. 最初の文字が - であった場合、piped play mode
-  2. プログラムと引数の分離 (!pipe)
-  3. プログラムからプログラム名(argv[0])を分離 (!piped)
+  1. プログラムと引数の分離
+  2. プログラムからプログラム名(argv[0])を分離
 */
 
 static void player_set(char *buf) {
 	char *b;
 	int i, j;
 	
-	if (buf[0] == '-') {
-		pipedplay = TRUE;
-		buf++;
-	} else {
-		pipedplay = FALSE;
-	}
-	
 	strncpy(mp3_player, buf, sizeof(mp3_player));
 	b = mp3_player;
 	
-	if (!pipedplay) {
-		/* count arguments */
-		/* devide argument */
-		char *tok_buf = NULL;
-		char *str_buf[MAX_ARGS]; //MAX_ARGS以上の引数があるとだめ
+	/* count arguments */
+	/* devide argument */
+	char *tok_buf = NULL;
+	char *str_buf[MAX_ARGS]; //MAX_ARGS以上の引数があるとだめ
 		
-		memset(str_buf, 0, sizeof(char *) * MAX_ARGS);
+	memset(str_buf, 0, sizeof(char *) * MAX_ARGS);
 		
-		i = 0;
-		str_buf[i] = strtok_r(b, WHITE, &tok_buf) ;
+	i = 0;
+	str_buf[i] = strtok_r(b, WHITE, &tok_buf) ;
 		
-		if (str_buf[i] == NULL) return;
+	if (str_buf[i] == NULL) return;
 		
-		while (str_buf[i] != NULL){
-			i++;
-			if (i >= MAX_ARGS){
-				return;
-			}
-			str_buf[i] = strtok_r(NULL, WHITE, &tok_buf);
+	while (str_buf[i] != NULL){
+		i++;
+		if (i >= MAX_ARGS){
+			return;
 		}
-		argv = (char **)malloc(sizeof(char *) * (i + 2));
-		
-		if (argv == NULL) return;
-		
-		argc = i;
-		
-		for (j = 0; j < i; j++) {
-			argv[j] = str_buf[j];
-		}
-		argv[i + 1] = NULL;
-		
-		/* cut down argv[0] */
-		argv[0] = basename(argv[0]);
-	} else {
-		/*
-		  pipe 出力するためにファイル名の後に - をつける必要の
-		  あるプレーやのために、ファイル名を %s で指定できるように
-		  するための処理 (by Fumihiko Murata)
-		*/
-		int pf = FALSE;
-		
-		b = mp3_player;
-		while (*b > 0x1f) {
-			if (*b == '%' && *(b + 1) == 's') pf = TRUE;
-			b++;
-		}
-		*b = 0;
-		if (!pf) strcat(b, " \"%s\""); // space を含むパスの場合
+		str_buf[i] = strtok_r(NULL, WHITE, &tok_buf);
 	}
+	argv = (char **)malloc(sizeof(char *) * (i + 2));
+		
+	if (argv == NULL) return;
+		
+	argc = i;
+		
+	for (j = 0; j < i; j++) {
+		argv[j] = str_buf[j];
+	}
+	argv[i + 1] = NULL;
+
+	/* cut down argv[0] */
+	argv[0] = basename(argv[0]);
 }
 
 static int cdrom_init(char *config_file) {
@@ -229,13 +196,7 @@ static int cdrom_init(char *config_file) {
 	reset_counter_high(SYSTEMCOUNTER_MP3, 10, 0);
 	enabled = TRUE;
 
-	if (pipedplay) {
-		cdrom_mp3.setvol = cdrom_setVolumePipe;
-		cdrom_mp3.getvol = cdrom_getVolumePipe;
-		NOTICE("cdrom mp3 piped play mode\n");
-	} else {
-		NOTICE("cdrom mp3 external player mode\n");
-	}
+	NOTICE("cdrom mp3 external player mode\n");
 	
 	return OK;
 }
@@ -249,7 +210,6 @@ static int cdrom_exit() {
 
 /* トラック番号 trk の演奏 trk = 1~ */
 static int cdrom_start(int trk, int loop) {
-	char cmd_pipe[256];
 	pid_t pid;
 	
 	if (!enabled) return 0;
@@ -259,29 +219,20 @@ static int cdrom_start(int trk, int loop) {
 		return NG;
 	}
 	
-	if (pipedplay) {
-		snprintf(cmd_pipe, sizeof(cmd_pipe) -1, mp3_player, playlist[trk -2]);
-		if (-1 == muspcm_load_pipe(SLOT_CDROMPIPE, cmd_pipe)) {
-			return NG;
-		}
-		muspcm_start(SLOT_CDROMPIPE, 1);
-		pid = 1; // dummy
-	} else {
-		argv[argc] = playlist[trk -2];
-		argv[argc +1] = NULL;
-		pid = fork();
-		if (pid == 0) {
-			/* child process */
-			pid_t mine = getpid();
-			setpgid(mine, mine);
-			sys_set_signalhandler(SIGTERM, SIG_DFL);
-			execvp(mp3_player, argv);
-			perror("execvp");
-			_exit(-1);
-		} else if (pid < 0) {
-			WARNING("fork failed");
-			return NG;
-		}
+	argv[argc] = playlist[trk -2];
+	argv[argc +1] = NULL;
+	pid = fork();
+	if (pid == 0) {
+		/* child process */
+		pid_t mine = getpid();
+		setpgid(mine, mine);
+		sys_set_signalhandler(SIGTERM, SIG_DFL);
+		execvp(mp3_player, argv);
+		perror("execvp");
+		_exit(-1);
+	} else if (pid < 0) {
+		WARNING("fork failed");
+		return NG;
 	}
 	
 	cdpid = pid;
@@ -297,14 +248,10 @@ static int cdrom_stop() {
 		return OK;
 	}
 	
-	if (!pipedplay) {
-		int status = 0;
-		kill(cdpid, SIGTERM);
-		killpg(cdpid, SIGTERM);
-		while (0 >= waitpid(cdpid, &status, WNOHANG));
-	} else {
-		muspcm_stop(SLOT_CDROMPIPE);
-	}
+	int status = 0;
+	kill(cdpid, SIGTERM);
+	killpg(cdpid, SIGTERM);
+	while (0 >= waitpid(cdpid, &status, WNOHANG));
 	
 	cdpid   = 0;
 	trackno = 0;
@@ -320,19 +267,11 @@ static int cdrom_getPlayingInfo (cd_time *inf) {
 		goto errout;
 	}
 	
-	if (pipedplay) {
-		cnt = muspcm_getpos(SLOT_CDROMPIPE);
-		if (cnt == 0) {
-			goto errout;
-		}
-		cnt /= 10;
-	} else {
-		if (cdpid == (err = waitpid(cdpid, &status, WNOHANG))) {
-			cdpid = 0;
-			goto errout;
-		}
-		cnt = get_high_counter(SYSTEMCOUNTER_MP3) - counter;
+	if (cdpid == (err = waitpid(cdpid, &status, WNOHANG))) {
+		cdpid = 0;
+		goto errout;
 	}
+	cnt = get_high_counter(SYSTEMCOUNTER_MP3) - counter;
 	
 	inf->t = trackno;
 	inf->m = cnt / (60*100); cnt %= (60*100); 
@@ -344,18 +283,4 @@ static int cdrom_getPlayingInfo (cd_time *inf) {
  errout:
 	inf->t = inf->m = inf->s = inf->f = 999;
 	return NG;
-}
-
-static int cdrom_setVolumePipe(int vol) {
-	if (prv.pcm[SLOT_CDROMPIPE] != NULL) {
-		prv.pcm[SLOT_CDROMPIPE]->vollv = vol;
-	}
-	return OK;
-}
-
-static int cdrom_getVolumePipe() {
-	if (prv.pcm[SLOT_CDROMPIPE] != NULL) {
-		return prv.pcm[SLOT_CDROMPIPE]->vollv;
-	}
-	return 100;
 }

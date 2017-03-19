@@ -603,8 +603,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				subdev = (argv[i][3] - '0') << 8;
 			}
 			midi_set_output_device(argv[i][2] | subdev);
-		} else if (0 == strncmp(argv[i], "-O", 2)) {
-			audio_set_output_device(argv[i][2]);
 		} else if (0 == strcmp(argv[i], "-devjoy")) {
 			if (argv[i + 1] != NULL) {
 				joy_set_devicename(argv[i + 1]);
@@ -704,11 +702,6 @@ static void check_profile() {
 	param = get_profile("cdrom_device");
 	if (param) {
 		cd_set_devicename(param);
-	}
-	/* audio output device の設定 */
-	param = get_profile("audio_output_device");
-	if (param) {
-		audio_set_output_device(*param);
 	}
 	/* joystick device name の設定 */
 	param = get_profile("joy_device");

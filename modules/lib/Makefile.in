@@ -95,9 +95,8 @@ am__aclocal_m4_deps = $(top_srcdir)/macros/aclocal-include.m4 \
 	$(top_srcdir)/macros/ltsugar.m4 \
 	$(top_srcdir)/macros/ltversion.m4 \
 	$(top_srcdir)/macros/lt~obsolete.m4 \
-	$(top_srcdir)/macros/ogg.m4 $(top_srcdir)/macros/pkg.m4 \
-	$(top_srcdir)/macros/progtest.m4 $(top_srcdir)/macros/sdl2.m4 \
-	$(top_srcdir)/macros/vorbis.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/macros/pkg.m4 $(top_srcdir)/macros/progtest.m4 \
+	$(top_srcdir)/macros/sdl2.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -271,8 +270,6 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OGG_CFLAGS = @OGG_CFLAGS@
-OGG_LIBS = @OGG_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -289,6 +286,8 @@ PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
 SDL = @SDL@
+SDL2MIXER_CFLAGS = @SDL2MIXER_CFLAGS@
+SDL2MIXER_LIBS = @SDL2MIXER_LIBS@
 SDL2_CONFIG = @SDL2_CONFIG@
 SDL_CFLAGS = @SDL_CFLAGS@
 SDL_LIBS = @SDL_LIBS@
@@ -307,10 +306,6 @@ USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 VERSION_MA = @VERSION_MA@
 VERSION_MI = @VERSION_MI@
-VORBISENC_LIBS = @VORBISENC_LIBS@
-VORBISFILE_LIBS = @VORBISFILE_LIBS@
-VORBIS_CFLAGS = @VORBIS_CFLAGS@
-VORBIS_LIBS = @VORBIS_LIBS@
 XGETTEXT = @XGETTEXT@
 XMKMF = @XMKMF@
 X_CFLAGS = @X_CFLAGS@

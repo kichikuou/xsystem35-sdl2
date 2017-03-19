@@ -14,7 +14,7 @@ dnl
 dnl EXTRAxxx is for misc CFLAGS and LIBS
 dnl
 EXTRACFLAGS=
-EXTRALIBS=
+EXTRALIBS=-lm
 EXTRALDFLAGS="-rdynamic"
 
 dnl
@@ -203,10 +203,13 @@ dnl
 dnl Audio
 dnl
 SRC_AUDIO=
-if test "x$have_sdl" = xyes; then
-  SRC_AUDIO="$SRC_AUDIO audio_sdl.c"
-fi
+dnl if test "x$have_sdl" = xyes; then
+dnl   SRC_AUDIO="$SRC_AUDIO audio_sdl.c"
+dnl fi
 AC_SUBST(SRC_AUDIO)
+if test "x$have_sdl" = xyes; then
+  PKG_CHECK_MODULES([SDL2MIXER], [SDL2_mixer])
+fi
 
 dnl
 dnl cdrom device
@@ -485,16 +488,6 @@ if test "x$HAVE_NASM" != xno; then
 fi
 AC_SUBST(SRC_ABLEND)
 
-
-dnl
-dnl Vorbis input
-dnl
-XIPH_PATH_OGG(
-             [ XIPH_PATH_VORBIS([],
-                                AC_MSG_ERROR([OGG/VORBIS needed]))
-             ],
-             AC_MSG_ERROR([OGG/VORBIS needed]))
-AM_CONDITIONAL(HAVE_VORBIS, [test "x$no_ogg" != xyes -a "x$no_vorbis" != xyes])
 
 dnl
 dnl Test for libjpeg

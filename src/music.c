@@ -24,8 +24,6 @@
 #include "music.h"
 #include "music_private.h"
 #include "music_fader.h"
-#include "music_bgm.h"
-#include "pcmlib.h"
 
 struct _musprvdat musprv;
 
@@ -34,7 +32,6 @@ int mus_init() {
 	musmidi_init();
 	muspcm_init();
 	musfade_init();
-	musbgm_init();
 	return OK;
 }
 
@@ -196,19 +193,8 @@ int mus_pcm_start(int no, int loop) {
  */
 int mus_pcm_mix(int noL, int noR, int loop) {
 	if (!prv.pcm_valid) return NG;
-
-	/* mix 2 wave files */
-	WAVFILE* wfile = pcmlib_mixlr(noL, noR);
-	if (wfile == NULL) {
-		puts("mixlr fail");
+	if (muspcm_load_mixlr(0, noL, noR) == NG)
 		return NG;
-	}
-
-	if (muspcm_load_wfile(0, wfile) == NG) {
-		pcmlib_free(wfile);
-		return NG;
-	}
-
 	return muspcm_start(0, loop);
 }
 
@@ -435,16 +421,6 @@ int mus_wav_waittime(int ch, int time) {
 int mus_wav_wavtime(int ch) {
 	printf("%s not implemented\n", __func__);
 	return 0;
-}
-
-/*
- * 指定の channel に WAVFILE をセット
- *   ch:    channel
- *   wfile: WAVFILE
- */
-int mus_wav_sendfile(int ch, WAVFILE *wfile) {
-	printf("%s not implemented\n", __func__);
-	return NG;
 }
 
 /*
