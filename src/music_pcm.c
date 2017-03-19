@@ -36,6 +36,15 @@
 #include "music_private.h"
 #include "counter.h"
 
+struct _pcmobj {
+	Mix_Chunk* chunk;
+
+	int slot; // ロードされているスロット番号
+	int channel; // 再生中のチャネル
+
+	boolean playing; // 演奏中
+};
+typedef struct _pcmobj pcmobj_t;
 
 #define IS_LOADED(slot) (prv.pcm[(slot)])
 
@@ -200,6 +209,22 @@ int muspcm_stop(int slot) {
 		obj->playing = FALSE;
 	}
 	
+	return OK;
+}
+
+// 指定時間のフェードアウトの後に再生停止
+int muspcm_fadeout(int slot, int msec) {
+	if (msec == 0)
+		return muspcm_stop(slot);
+
+	pcmobj_t *obj = prv.pcm[slot];
+	if (obj == NULL) return NG;
+
+	if (obj->playing) {
+		Mix_FadeOutChannel(obj->channel, msec);
+		obj->playing = FALSE;  // FXIME: 停止後にFALSEにするべき
+	}
+
 	return OK;
 }
 

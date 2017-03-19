@@ -45,10 +45,8 @@ struct _musprvdat {
 	/*
 	  0:     S comman 用 
 	  1-128: wavXXX 用
-	  129:   cdrom pipe 用
-	  130:   midi pipe 用
 	*/
-	pcmobj_t *pcm[128 + 1 + 2];
+	struct _pcmobj *pcm[128 + 1];
 	
 	// ゲーム内での volume 設定 (%値)
 	int vol_master;

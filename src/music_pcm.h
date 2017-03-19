@@ -26,16 +26,7 @@
 
 #include <SDL_mixer.h>
 
-struct _pcmobj {
-	Mix_Chunk* chunk;
-	
-	int slot; // ロードされているスロット番号
-	int channel; // 再生中のチャネル
-
-	boolean playing; // 演奏中
-};
-typedef struct _pcmobj pcmobj_t;
-
+struct _pcmobj;
 
 extern int muspcm_init();
 extern int muspcm_exit();
@@ -43,6 +34,7 @@ extern int muspcm_load_no(int slot, int no);
 extern int muspcm_load_mixlr(int slot, int noL, int noR);
 extern int muspcm_start(int slot, int loop);
 extern int muspcm_stop(int slot);
+extern int muspcm_fadeout(int slot, int msec);
 extern int muspcm_unload(int slot);
 extern int muspcm_pause(int slot);
 extern int muspcm_unpause(int slot);

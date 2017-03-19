@@ -23,7 +23,6 @@
 
 #include "music.h"
 #include "music_private.h"
-#include "music_fader.h"
 
 struct _musprvdat musprv;
 
@@ -31,14 +30,12 @@ int mus_init() {
 	muscd_init();
 	musmidi_init();
 	muspcm_init();
-	musfade_init();
 	return OK;
 }
 
 int mus_exit() {
 	if (prv.cd_valid) muscd_exit();
 	if (prv.midi_valid) musmidi_exit();
-	if (prv.pcm_valid) musfade_exit();
 	if (prv.pcm_valid) muspcm_exit();
 	return OK;
 }
@@ -206,7 +203,7 @@ int mus_pcm_stop(int msec) {
 	if (!prv.pcm_valid) return NG;
 	printf("%s not tested\n", __func__);
 
-	musfade_new(MIX_PCM, 0, msec, -1, 1);
+	muspcm_fadeout(0, msec);
 	return OK;
 }
 
