@@ -22,10 +22,16 @@
 /* $Id: music_pcm.c,v 1.16 2003/11/09 15:06:13 chikama Exp $ */
 
 #include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <SDL_mixer.h>
 
 #include "portab.h"
@@ -35,6 +41,8 @@
 #include "music_pcm.h"
 #include "music_private.h"
 #include "counter.h"
+#include "nact.h"
+#include "LittleEndian.h"
 
 struct _pcmobj {
 	Mix_Chunk* chunk;
@@ -49,8 +57,11 @@ typedef struct _pcmobj pcmobj_t;
 #define IS_LOADED(slot) (prv.pcm[(slot)])
 
 static int load_chunk(int slot, Mix_Chunk *chunk);
+static int load_wai();
+static char *wai_mapadr;
 
-#include "music_pcm_wai.c"
+// Volume mixer channel
+#define WAIMIXCH(no) LittleEndian_getDW(wai_mapadr, 36 + (no -1) * 4 * 3 + 8)
 
 /**
  * 指定の番号の .WAV|.OGG をロードする。
@@ -124,7 +135,7 @@ int muspcm_init() {
 		return NG;
 	}
 	
-	muspcm_load_wai();
+	load_wai();
 	
 	prv.pcm_valid = TRUE;
 	return OK;
@@ -307,4 +318,43 @@ boolean muspcm_isplaying(int slot) {
 	if (obj == NULL)   return FALSE;
 	
 	return obj->playing;
+}
+
+
+static int load_wai() {
+	struct stat sbuf;
+	char *adr;
+	int fd;
+
+	wai_mapadr = NULL;
+	if (nact->files.wai == NULL) goto endwai;
+	
+	if (0 > (fd = open(nact->files.wai, O_RDONLY))) {
+		WARNING("open: %s\n", strerror(errno));
+		goto endwai;
+	}
+	
+	if (0 > fstat(fd, &sbuf)) {
+		WARNING("fstat:%s\n", strerror(errno));
+		close(fd);
+		goto endwai;
+	}
+	
+	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
+		WARNING("mmap: %s\n", strerror(errno));
+		close(fd);
+		goto endwai;
+	}
+	
+	if (*adr != 'X' || *(adr+1) != 'I' || *(adr+2) != '2') {
+		WARNING("not WAI file\n");
+		munmap(adr, sbuf.st_size);
+		close(fd);
+		goto endwai;
+	}
+	
+	wai_mapadr = adr;
+	
+ endwai:
+	return OK;
 }
