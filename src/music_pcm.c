@@ -21,6 +21,7 @@
 */
 /* $Id: music_pcm.c,v 1.16 2003/11/09 15:06:13 chikama Exp $ */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,17 +30,83 @@
 
 #include "portab.h"
 #include "system.h"
+#include "ald_manager.h"
+#include "dri.h"
 #include "music_pcm.h"
 #include "music_private.h"
 #include "counter.h"
-#include "pcmlib.h"
+
 
 #define IS_LOADED(slot) (prv.pcm[(slot)])
 
 static int load_chunk(int slot, Mix_Chunk *chunk);
 
-
 #include "music_pcm_wai.c"
+
+/**
+ * 指定の番号の .WAV|.OGG をロードする。
+ * @param no: DRIファイル番号
+ */
+static Mix_Chunk *pcm_load(int no) {
+	dridata *dfile = ald_getdata(DRIFILE_WAVE, no -1);
+	if (dfile == NULL) {
+		WARNING("DRIFILE_WAVE fail to open %d\n", no -1);
+		return NULL;
+	}
+
+	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(dfile->data, dfile->size), 1);
+	ald_freedata(dfile);
+	if (chunk == NULL) {
+		WARNING("DRIFILE_WAVE %d: not a valid wav file\n", no-1);
+		return NULL;
+	}
+	assert(chunk->allocated);
+
+	return chunk;
+}
+
+/**
+ * noL と noR の .WAV をロードし、左右合成
+ *
+ * @param noL: 左の WAV ファイルの番号
+ * @param noR: 右の WAV ファイルの番号
+ * @return   : 合成後の Mix_Chunk
+ */
+static Mix_Chunk *pcm_mixlr(int noL, int noR) {
+	Mix_Chunk *chunkL = pcm_load(noL);
+	Mix_Chunk *chunkR = pcm_load(noR);
+	if (chunkL == NULL || chunkR == NULL) {
+		if (chunkL)
+			Mix_FreeChunk(chunkL);
+		if (chunkR)
+			Mix_FreeChunk(chunkR);
+		return NULL;
+	}
+
+	short *lbuf = (short*)chunkL->abuf;
+	short *rbuf = (short*)chunkR->abuf;
+	if (chunkL->alen >= chunkR->alen) {
+		int i;
+		for (i = 0; i < chunkR->alen / 4; i++) {
+			lbuf[i * 2 + 1] = rbuf[i * 2 + 1];
+		}
+		for (; i < chunkL->alen / 4; i++) {
+			lbuf[i * 2 + 1] = 0;
+		}
+		Mix_FreeChunk(chunkR);
+		return chunkL;
+	} else {
+		int i;
+		for (i = 0; i < chunkL->alen / 4; i++) {
+			rbuf[i * 2] = lbuf[i * 2];
+		}
+		for (; i < chunkR->alen / 4; i++) {
+			rbuf[i * 2] = 0;
+		}
+		Mix_FreeChunk(chunkL);
+		return chunkR;
+	}
+}
 
 int muspcm_init() {
 	Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
@@ -64,7 +131,7 @@ int muspcm_exit() {
 int muspcm_load_no(int slot, int no) {
 	if (IS_LOADED(slot)) muspcm_unload(slot);
 	
-	Mix_Chunk *chunk = pcmlib_load(no);
+	Mix_Chunk *chunk = pcm_load(no);
 	if (chunk == NULL) {
 		return NG;
 	}
@@ -82,7 +149,7 @@ int muspcm_load_no(int slot, int no) {
 
 int muspcm_load_mixlr(int slot, int noL, int noR) {
 	/* mix 2 wave files */
-	Mix_Chunk* chunk = pcmlib_mixlr(noL, noR);
+	Mix_Chunk* chunk = pcm_mixlr(noL, noR);
 	if (chunk == NULL) {
 		puts("mixlr fail");
 		return NG;
