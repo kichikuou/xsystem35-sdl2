@@ -23,7 +23,6 @@
 #define __MUSIC_PRIVATE_H__
 
 #include "portab.h"
-#include "list.h"
 #include "cdrom.h"
 #include "midi.h"
 #include "music_cdrom.h"
@@ -41,13 +40,6 @@ struct _musprvdat {
 	cdobj_t cdrom;   // cdrom object
 	midiobj_t midi;  // midi object
 	
-	// pcm object
-	/*
-	  0:     S comman 用 
-	  1-128: wavXXX 用
-	*/
-	struct _pcmobj *pcm[128 + 1];
-	
 	// ゲーム内での volume 設定 (%値)
 	int vol_master;
 	int vol_pcm;
@@ -58,10 +50,6 @@ struct _musprvdat {
 	
 	// 最大トラック数
 	int cd_maxtrk;
-	
-	List *pcmplist; // PCM多重再生用リスト
-	List *fadelist; // Faderリスト
-
 };
 
 #define prv musprv

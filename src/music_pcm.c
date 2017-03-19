@@ -54,7 +54,12 @@ struct _pcmobj {
 };
 typedef struct _pcmobj pcmobj_t;
 
-#define IS_LOADED(slot) (prv.pcm[(slot)])
+// 0:     S comman 用
+// 1-128: wavXXX 用
+static pcmobj_t *pcmobj[128 + 1];
+
+
+#define IS_LOADED(slot) (pcmobj[(slot)])
 
 static int load_chunk(int slot, Mix_Chunk *chunk);
 static int load_wai();
@@ -187,7 +192,7 @@ static int load_chunk(int slot, Mix_Chunk *chunk) {
 	obj->slot     = slot;
 	obj->playing  = FALSE;
 	
-	prv.pcm[slot] = obj;
+	pcmobj[slot] = obj;
 	
 	return OK;
 }
@@ -197,7 +202,7 @@ int muspcm_start(int slot, int loop) {
 	pcmobj_t *obj;
 	// printf("pcm start slot = %d, loop = %d\n", slot, loop);
 	
-	obj = prv.pcm[slot];
+	obj = pcmobj[slot];
 	if (obj == NULL) return NG;
 	
 	obj->channel = Mix_PlayChannel(-1, obj->chunk, loop - 1);
@@ -212,7 +217,7 @@ int muspcm_start(int slot, int loop) {
 int muspcm_stop(int slot) {
 	pcmobj_t *obj;
 	
-	obj = prv.pcm[slot];
+	obj = pcmobj[slot];
 	if (obj == NULL) return NG;
 	
 	if (obj->playing) {
@@ -228,7 +233,7 @@ int muspcm_fadeout(int slot, int msec) {
 	if (msec == 0)
 		return muspcm_stop(slot);
 
-	pcmobj_t *obj = prv.pcm[slot];
+	pcmobj_t *obj = pcmobj[slot];
 	if (obj == NULL) return NG;
 
 	if (obj->playing) {
@@ -243,7 +248,7 @@ int muspcm_fadeout(int slot, int msec) {
 int muspcm_unload(int slot) {
 	pcmobj_t *obj;
 	
-	obj = prv.pcm[slot];
+	obj = pcmobj[slot];
 	if (obj == NULL) return NG;
 	
 	if (obj->playing) muspcm_stop(slot);
@@ -251,23 +256,23 @@ int muspcm_unload(int slot) {
 	Mix_FreeChunk(obj->chunk);
 	free(obj);
 	
-	prv.pcm[slot] = NULL;
+	pcmobj[slot] = NULL;
 	
 	return OK;
 }
 
 // PCMデータ再生一時停止
 int muspcm_pause(int slot) {
-	if (prv.pcm[slot] != NULL) {
-		Mix_Pause(prv.pcm[slot]->channel);
+	if (pcmobj[slot] != NULL) {
+		Mix_Pause(pcmobj[slot]->channel);
 	}
 	return OK;
 }
 
 // PCMデータ再生一時停止解除
 int muspcm_unpause(int slot) {
-	if (prv.pcm[slot] != NULL) {
-		Mix_Resume(prv.pcm[slot]->channel);
+	if (pcmobj[slot] != NULL) {
+		Mix_Resume(pcmobj[slot]->channel);
 	}
 	return OK;
 }
@@ -277,7 +282,7 @@ int muspcm_getpos(int slot) {
 	pcmobj_t *obj;
 	uint64_t len;
 	
-	obj = prv.pcm[slot];
+	obj = pcmobj[slot];
 	if (obj == NULL) return 0;
 	
 	if (!obj->playing) return 0;
@@ -290,7 +295,7 @@ int muspcm_getpos(int slot) {
 int muspcm_setvol(int dev, int slot, int lv) {
 	pcmobj_t *obj;
 	
-	obj = prv.pcm[slot];
+	obj = pcmobj[slot];
 	if (obj == NULL) return NG;
 	
 	Mix_VolumeChunk(obj->chunk, lv * MIX_MAX_VOLUME / 100);
@@ -302,7 +307,7 @@ int muspcm_setvol(int dev, int slot, int lv) {
 int muspcm_getwavelen(int slot) {
 	pcmobj_t *obj;
 	
-	obj = prv.pcm[slot];
+	obj = pcmobj[slot];
 	if (obj == NULL) return 0;
 	
 	long len = obj->chunk->alen * 1000 / (44100 * 4);
@@ -314,7 +319,7 @@ int muspcm_getwavelen(int slot) {
 boolean muspcm_isplaying(int slot) {
 	pcmobj_t *obj;
 	
-	obj = prv.pcm[slot];
+	obj = pcmobj[slot];
 	if (obj == NULL)   return FALSE;
 	
 	return obj->playing;
