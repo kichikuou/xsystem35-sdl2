@@ -4316,6 +4316,33 @@ fi
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if the C compiler is emcc" >&5
+$as_echo_n "checking if the C compiler is emcc... " >&6; }
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef __EMSCRIPTEN__
+ error: This isn't emscripten!
+#endif
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: \"yes\"" >&5
+$as_echo "\"yes\"" >&6; };is_emscripten=yes
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: \"no\"" >&5
+$as_echo "\"no\"" >&6; };is_emscripten=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
 case `pwd` in
   *\ * | *\	*)
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Libtool does not cope well with whitespace in \`pwd\`" >&5
@@ -5825,7 +5852,6 @@ fi
 $as_echo "$lt_cv_sharedlib_from_linklib_cmd" >&6; }
 sharedlib_from_linklib_cmd=$lt_cv_sharedlib_from_linklib_cmd
 test -z "$sharedlib_from_linklib_cmd" && sharedlib_from_linklib_cmd=$ECHO
-
 
 
 
@@ -16442,7 +16468,9 @@ fi
 
 SRC_AUDIO=
 
-if test "x$have_sdl" = xyes; then
+if test "x$is_emscripten" = xyes; then
+  SRC_AUDIO=pcm.emscripten.c
+elif test "x$have_sdl" = xyes; then
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SDL2MIXER" >&5
@@ -16534,6 +16562,7 @@ else
 $as_echo "yes" >&6; }
 
 fi
+  SRC_AUDIO=pcm.sdlmixer.c
 fi
 
 # Check whether --enable-cdrom was given.

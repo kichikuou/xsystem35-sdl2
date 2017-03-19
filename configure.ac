@@ -60,6 +60,16 @@ dnl AC_SEARCH_LIBS([strerror],[cposix])
 dnl AC_C_VAR_FUNC 
 
 dnl
+dnl Emscripten environment?
+dnl
+AC_MSG_CHECKING([if the C compiler is emcc])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+#ifndef __EMSCRIPTEN__
+ error: This isn't emscripten!
+#endif
+]])],[AC_MSG_RESULT(yes);is_emscripten=yes],[AC_MSG_RESULT(no);is_emscripten=no])
+
+dnl
 dnl Check for libltdl
 dnl 
 LT_INIT([dlopen])
@@ -207,8 +217,11 @@ dnl if test "x$have_sdl" = xyes; then
 dnl   SRC_AUDIO="$SRC_AUDIO audio_sdl.c"
 dnl fi
 AC_SUBST(SRC_AUDIO)
-if test "x$have_sdl" = xyes; then
+if test "x$is_emscripten" = xyes; then
+  SRC_AUDIO=pcm.emscripten.c
+elif test "x$have_sdl" = xyes; then
   PKG_CHECK_MODULES([SDL2MIXER], [SDL2_mixer])
+  SRC_AUDIO=pcm.sdlmixer.c
 fi
 
 dnl
