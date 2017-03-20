@@ -417,10 +417,23 @@ class AudioManager {
         } else if (typeof(webkitAudioContext) !== 'undefined') {
             this.context = new webkitAudioContext();
             this.isSafari = true;
+            this.unlockAudioContextForiOS();
         }
         this.masterGain = this.context.createGain();
         this.masterGain.connect(this.context.destination);
         this.slots = [];
+    }
+
+    private unlockAudioContextForiOS() {
+        var hanlder = () => {
+            var src = this.context.createBufferSource();
+            src.buffer = this.context.createBuffer(1, 1, 22050);
+            src.connect(this.context.destination);
+            src.start();
+            console.log('AudioContext unlocked');
+            window.removeEventListener('touchend', hanlder);
+        };
+        window.addEventListener('touchend', hanlder);
     }
 
     private load(ptr: number, size: number): Promise<AudioBuffer> {
