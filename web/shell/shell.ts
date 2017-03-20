@@ -4,6 +4,8 @@ var $: (selector:string)=>HTMLElement = document.querySelector.bind(document);
 declare function _musfade_setvolval_all(vol: number): void;
 declare function _ags_setAntialiasedStringMode(on: number): void;
 declare function _sdl_rightButton(down: number): void;
+declare function _ald_getdata(type: number, no: number): number;
+declare function _ald_freedata(data: number): void;
 
 declare namespace Module {
     var noInitialRun: boolean;
@@ -409,6 +411,7 @@ class AudioManager {
     private context: AudioContext;
     private masterGain: GainNode;
     private slots: PCMSound[];
+    private buffers: AudioBuffer[];
     private isSafari: boolean;
 
     constructor() {
@@ -422,6 +425,7 @@ class AudioManager {
         this.masterGain = this.context.createGain();
         this.masterGain.connect(this.context.destination);
         this.slots = [];
+        this.buffers = [];
     }
 
     private unlockAudioContextForiOS() {
@@ -436,31 +440,64 @@ class AudioManager {
         window.addEventListener('touchend', hanlder);
     }
 
-    private load(ptr: number, size: number): Promise<AudioBuffer> {
-        var buf = Module.HEAPU8.buffer.slice(ptr, ptr + size);
+    private load(no: number): Promise<AudioBuffer> {
+        var buf = this.getWave(no);
+        if (!buf)
+            return Promise.reject('Failed to open wave ' + no);
+
+        var decoded: Promise<AudioBuffer>;
         if (this.isSafari) {
-            return new Promise((resolve, reject) => {
+            decoded = new Promise((resolve, reject) => {
                 this.context.decodeAudioData(buf, resolve, reject);
             });
+        } else {
+            decoded = this.context.decodeAudioData(buf);
         }
-        return this.context.decodeAudioData(buf);
-    }
-
-    pcm_load(slot: number, ptr: number, size: number): Promise<any> {
-        this.pcm_stop(slot);
-        var start = performance.now();
-        return this.load(ptr, size).then((audioBuf) => {
-            console.log('pcm_load: ' + (performance.now() - start) + ' ms');
-            this.slots[slot] = new PCMSoundSimple(this.masterGain, audioBuf);
+        return decoded.then((audioBuf) => {
+            this.buffers[no] = audioBuf;
+            return audioBuf;
         });
     }
 
-    pcm_load_mixlr(slot: number, lptr: number, lsize: number, rptr: number, rsize: number): Promise<any> {
-        this.pcm_stop(slot);
-        var start = performance.now();
-        return Promise.all([this.load(lptr, lsize), this.load(rptr, rsize)]).then((bufs) => {
-            console.log('pcm_load_mixlr: ' + (performance.now() - start) + ' ms');
-            this.slots[slot] = new PCMSoundMixLR(this.masterGain, bufs[0], bufs[1]);
+    private getWave(no: number): ArrayBuffer {
+        var dfile = _ald_getdata(2 /* DRIFILE_WAVE */, no-1);
+        if (!dfile)
+            return null;
+        var ptr = Module.getValue(dfile + 8, '*');
+        var size = Module.getValue(dfile, 'i32');
+        var buf = Module.HEAPU8.buffer.slice(ptr, ptr + size);
+        _ald_freedata(dfile);
+        return buf;
+    }
+
+    pcm_load(slot: number, no: number) {
+        EmterpreterAsync.handle((resume) => {
+            this.pcm_stop(slot);
+            if (this.buffers[no]) {
+                this.slots[slot] = new PCMSoundSimple(this.masterGain, this.buffers[no]);
+                return resume();
+            }
+            this.load(no).then((audioBuf) => {
+                this.slots[slot] = new PCMSoundSimple(this.masterGain, audioBuf);
+                resume();
+            });
+        });
+    }
+
+    pcm_load_mixlr(slot: number, noL: number, noR: number) {
+        EmterpreterAsync.handle((resume) => {
+            this.pcm_stop(slot);
+            if (this.buffers[noL] && this.buffers[noR]) {
+                this.slots[slot] = new PCMSoundMixLR(this.masterGain, this.buffers[noL], this.buffers[noR]);
+                return resume();
+            }
+            var ps = [];
+            if (!this.buffers[noL]) ps.push(this.load(noL));
+            if (!this.buffers[noR]) ps.push(this.load(noR));
+            Promise.all(ps).then(() => {
+                this.slots[slot] = new PCMSoundMixLR(this.masterGain, this.buffers[noL], this.buffers[noR]);
+                resume();
+            });
         });
     }
 

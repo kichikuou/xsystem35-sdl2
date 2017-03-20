@@ -23,8 +23,6 @@
 
 #include "portab.h"
 #include "system.h"
-#include "ald_manager.h"
-#include "dri.h"
 #include "music_pcm.h"
 #include "music_private.h"
 #include "nact.h"
@@ -41,49 +39,19 @@ int muspcm_exit() {
 
 // 番号指定のPCMファイル読み込み
 int muspcm_load_no(int slot, int no) {
-	dridata *dfile = ald_getdata(DRIFILE_WAVE, no -1);
-	if (dfile == NULL) {
-		WARNING("DRIFILE_WAVE fail to open %d\n", no -1);
-		return NG;
-	}
-
-	EM_ASM_({
-		xsystem35.waitPromise(function(){
-			return xsystem35.audio.pcm_load($0, $1, $2);
-		});
-	}, slot, dfile->data, dfile->size);
+	EM_ASM_({ xsystem35.audio.pcm_load($0, $1); }, slot, no);
 #ifdef EMTERPRETIFY_ADVISE
 	emscripten_sleep(0);
 #endif
-
-	ald_freedata(dfile);
 	return OK;
 }
 
 int muspcm_load_mixlr(int slot, int noL, int noR) {
-	dridata *dfileL = ald_getdata(DRIFILE_WAVE, noL -1);
-	if (dfileL == NULL) {
-		WARNING("DRIFILE_WAVE fail to open %d\n", noL -1);
-		return NG;
-	}
-	dridata *dfileR = ald_getdata(DRIFILE_WAVE, noR -1);
-	if (dfileR == NULL) {
-		ald_freedata(dfileL);
-		WARNING("DRIFILE_WAVE fail to open %d\n", noR -1);
-		return NG;
-	}
 
-	EM_ASM_({
-		xsystem35.waitPromise(function() {
-			return xsystem35.audio.pcm_load_mixlr($0, $1, $2, $3, $4);
-		});
-	}, slot, dfileL->data, dfileL->size, dfileR->data, dfileR->size);
+	EM_ASM_({ xsystem35.audio.pcm_load_mixlr($0, $1, $2); }, slot, noL, noR);
 #ifdef EMTERPRETIFY_ADVISE
 	emscripten_sleep(0);
 #endif
-
-	ald_freedata(dfileL);
-	ald_freedata(dfileR);
 	return OK;
 }
 
@@ -152,4 +120,5 @@ boolean muspcm_isplaying(int slot) {
 
 int musfade_setvolval_all(int val) {
 	EM_ASM_(xsystem35.audio.setVolume($0), val);
+	return OK;
 }
