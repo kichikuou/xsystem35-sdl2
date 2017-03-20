@@ -24,8 +24,6 @@
 #ifndef __MUSIC_PCM_H__
 #define __MUSIC_PCM_H__
 
-#include <SDL_mixer.h>
-
 extern int muspcm_init();
 extern int muspcm_exit();
 extern int muspcm_load_no(int slot, int no);

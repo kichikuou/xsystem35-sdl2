@@ -25,6 +25,6 @@ src/xsystem35: src src/Makefile
 	ln -sf src/xsystem35 xsystem35.bc
 
 src/Makefile:
-	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-music-server=no --enable-cdrom=emscripten CFLAGS='-s USE_ZLIB=1' FT2_CONFIG=tools/freetype-config
+	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-cdrom=emscripten --enable-midi=no CFLAGS='-s USE_ZLIB=1' FT2_CONFIG=tools/freetype-config
 
 .PHONY: src
