@@ -61,6 +61,7 @@ static pcmobj_t *pcmobj[128 + 1];
 
 #define IS_LOADED(slot) (pcmobj[(slot)])
 
+static int unload(int slot);
 static int load_chunk(int slot, Mix_Chunk *chunk);
 static int load_wai();
 static char *wai_mapadr;
@@ -135,14 +136,9 @@ static Mix_Chunk *pcm_mixlr(int noL, int noR) {
 
 int muspcm_init() {
 	Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
-	if (Mix_OpenAudio(44100, AUDIO_S16LSB, 2, 4096) < 0) {
-		prv.pcm_valid = FALSE;
+	if (Mix_OpenAudio(44100, AUDIO_S16LSB, 2, 4096) < 0)
 		return NG;
-	}
-	
 	load_wai();
-	
-	prv.pcm_valid = TRUE;
 	return OK;
 }
 
@@ -154,7 +150,7 @@ int muspcm_exit() {
 
 // 番号指定のPCMファイル読み込み
 int muspcm_load_no(int slot, int no) {
-	if (IS_LOADED(slot)) muspcm_unload(slot);
+	if (IS_LOADED(slot)) unload(slot);
 	
 	Mix_Chunk *chunk = pcm_load(no);
 	if (chunk == NULL) {
@@ -184,7 +180,7 @@ int muspcm_load_mixlr(int slot, int noL, int noR) {
 }
 
 static int load_chunk(int slot, Mix_Chunk *chunk) {
-	if (IS_LOADED(slot)) muspcm_unload(slot);
+	if (IS_LOADED(slot)) unload(slot);
 
 	pcmobj_t *obj = calloc(1, sizeof(pcmobj_t));
 	
@@ -245,7 +241,7 @@ int muspcm_fadeout(int slot, int msec) {
 }
 
 // PCMデータのメモリ上からのアンロード
-int muspcm_unload(int slot) {
+static int unload(int slot) {
 	pcmobj_t *obj;
 	
 	obj = pcmobj[slot];

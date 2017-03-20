@@ -24,12 +24,9 @@
 #include "portab.h"
 #include "system.h"
 #include "music_pcm.h"
-#include "music_private.h"
-#include "nact.h"
 
 
 int muspcm_init() {
-	prv.pcm_valid = TRUE;
 	return OK;
 }
 

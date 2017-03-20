@@ -21,6 +21,8 @@
 */
 #include "portab.h"
 
+#include <stdio.h>
+
 #include "music.h"
 #include "music_private.h"
 
@@ -29,7 +31,7 @@ struct _musprvdat musprv;
 int mus_init() {
 	muscd_init();
 	musmidi_init();
-	muspcm_init();
+	prv.pcm_valid = muspcm_init() == OK;
 	return OK;
 }
 

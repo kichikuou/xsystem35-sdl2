@@ -31,7 +31,6 @@ extern int muspcm_load_mixlr(int slot, int noL, int noR);
 extern int muspcm_start(int slot, int loop);
 extern int muspcm_stop(int slot);
 extern int muspcm_fadeout(int slot, int msec);
-extern int muspcm_unload(int slot);
 extern int muspcm_pause(int slot);
 extern int muspcm_unpause(int slot);
 extern int muspcm_getpos(int slot);
