@@ -155,6 +155,7 @@ class CDPlayer {
         this.volumeControl.addEventListener(this.onVolumeChanged.bind(this));
         this.audio.volume = this.volumeControl.volume();
         this.waiting = false;
+        this.removeUserGestureRestriction()
     }
 
     play(track:number, loop:number) {
@@ -192,6 +193,15 @@ class CDPlayer {
 
     private onVolumeChanged(evt: CustomEvent) {
         this.audio.volume = evt.detail;
+    }
+
+    private removeUserGestureRestriction() {
+        var hanlder = () => {
+            this.audio.load();
+            console.log('CDDA unlocked');
+            window.removeEventListener('touchend', hanlder);
+        };
+        window.addEventListener('touchend', hanlder);
     }
 }
 
@@ -420,7 +430,7 @@ class AudioManager {
         } else if (typeof(webkitAudioContext) !== 'undefined') {
             this.context = new webkitAudioContext();
             this.isSafari = true;
-            this.unlockAudioContextForiOS();
+            this.removeUserGestureRestriction();
         }
         this.masterGain = this.context.createGain();
         this.masterGain.connect(this.context.destination);
@@ -428,7 +438,7 @@ class AudioManager {
         this.buffers = [];
     }
 
-    private unlockAudioContextForiOS() {
+    private removeUserGestureRestriction() {
         var hanlder = () => {
             var src = this.context.createBufferSource();
             src.buffer = this.context.createBuffer(1, 1, 22050);
