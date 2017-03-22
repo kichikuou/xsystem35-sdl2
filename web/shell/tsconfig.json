@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
         "target": "es6",
-        "outDir": "../../docs",
+        "outFile": "../../docs/shell.js",
         "noImplicitAny": true,
         "sourceMap": false
-    }
+    },
+    "files": [
+        "shell.ts"
+    ]
 }
