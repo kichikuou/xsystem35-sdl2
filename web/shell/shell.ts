@@ -50,13 +50,12 @@ namespace xsystem35 {
                 }
             ];
             this.volumeControl = new VolumeControl();
-            this.volumeControl.addEventListener(this.updateVolume.bind(this));
             xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
             this.zoom = new ZoomManager();
             this.antialiasCheckbox = <HTMLInputElement>$('#antialias');
             this.antialiasCheckbox.addEventListener('change', this.antialiasChanged.bind(this));
             this.antialiasCheckbox.checked = localStorage.getItem('antialias') != 'false';
-            xsystem35.audio = new AudioManager();
+            xsystem35.audio = new AudioManager(this.volumeControl);
         }
 
         run() {
@@ -64,7 +63,6 @@ namespace xsystem35 {
             $('#xsystem35').hidden = false;
             setTimeout(() => {
                 Module.callMain();
-                this.updateVolume();
                 this.antialiasChanged();
             }, 0);
             this.addRightClickEmulation();
@@ -88,10 +86,6 @@ namespace xsystem35 {
                         console.log("FS.syncfs error: ", err);
                 });
             }, 100);
-        }
-
-        private updateVolume() {
-            _musfade_setvolval_all(Math.round(this.volumeControl.volume() * 100));
         }
 
         private antialiasChanged() {

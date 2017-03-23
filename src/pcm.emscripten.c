@@ -114,8 +114,3 @@ boolean muspcm_isplaying(int slot) {
 		return xsystem35.audio.pcm_isplaying($0);
 	}, slot) ? TRUE : FALSE;
 }
-
-int musfade_setvolval_all(int val) {
-	EM_ASM_(xsystem35.audio.setVolume($0), val);
-	return OK;
-}

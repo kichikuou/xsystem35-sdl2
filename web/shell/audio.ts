@@ -1,4 +1,5 @@
 /// <reference path="util.ts" />
+/// <reference path="volume.ts" />
 
 namespace xsystem35 {
     abstract class PCMSound {
@@ -116,7 +117,7 @@ namespace xsystem35 {
         private buffers: AudioBuffer[];
         private isSafari: boolean;
 
-        constructor() {
+        constructor(volumeControl: VolumeControl) {
             if (typeof (AudioContext) !== 'undefined') {
                 this.context = new AudioContext();
             } else if (typeof (webkitAudioContext) !== 'undefined') {
@@ -128,6 +129,8 @@ namespace xsystem35 {
             this.masterGain.connect(this.context.destination);
             this.slots = [];
             this.buffers = [];
+            volumeControl.addEventListener(this.onVolumeChanged.bind(this));
+            this.masterGain.gain.value = volumeControl.volume();
         }
 
         private removeUserGestureRestriction() {
@@ -251,8 +254,8 @@ namespace xsystem35 {
             return this.slots[slot].isPlaying() ? 1 : 0;
         }
 
-        setVolume(vol: number) {
-            this.masterGain.gain.value = vol / 100;
+        private onVolumeChanged(evt: CustomEvent) {
+            this.masterGain.gain.value = evt.detail;
         }
     }
 }

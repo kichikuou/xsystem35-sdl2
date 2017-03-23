@@ -8,10 +8,10 @@ namespace xsystem35 {
         private currentTrack: number;
         waiting: boolean;
 
-        constructor(private imageLoader: ImageLoader, private volumeControl: VolumeControl) {
+        constructor(private imageLoader: ImageLoader, volumeControl: VolumeControl) {
             this.blobs = [];
-            this.volumeControl.addEventListener(this.onVolumeChanged.bind(this));
-            this.audio.volume = this.volumeControl.volume();
+            volumeControl.addEventListener(this.onVolumeChanged.bind(this));
+            this.audio.volume = volumeControl.volume();
             this.waiting = false;
             this.removeUserGestureRestriction()
         }
