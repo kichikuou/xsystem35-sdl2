@@ -13,7 +13,7 @@ namespace xsystem35 {
             volumeControl.addEventListener(this.onVolumeChanged.bind(this));
             this.audio.volume = volumeControl.volume();
             this.waiting = false;
-            this.removeUserGestureRestriction()
+            this.removeUserGestureRestriction();
         }
 
         play(track: number, loop: number) {
@@ -37,13 +37,13 @@ namespace xsystem35 {
         getPosition(): number {
             if (!this.currentTrack)
                 return 0;
-            var time = Math.round(this.audio.currentTime * 75);
+            let time = Math.round(this.audio.currentTime * 75);
             return this.currentTrack | time << 8;
         }
 
         private startPlayback(blob: Blob, loop: number) {
             this.audio.setAttribute('src', URL.createObjectURL(blob));
-            this.audio.loop = (loop != 0);
+            this.audio.loop = (loop !== 0);
             this.audio.load();
             this.audio.play();
             this.waiting = false;
@@ -54,7 +54,7 @@ namespace xsystem35 {
         }
 
         private removeUserGestureRestriction() {
-            var hanlder = () => {
+            let hanlder = () => {
                 this.audio.load();
                 console.log('CDDA unlocked');
                 window.removeEventListener('touchend', hanlder);

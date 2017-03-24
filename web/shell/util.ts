@@ -1,4 +1,4 @@
-var $: (selector:string)=>HTMLElement = document.querySelector.bind(document);
+let $: (selector: string) => HTMLElement = document.querySelector.bind(document);
 
 // xsystem35 exported functions
 declare function _musfade_setvolval_all(vol: number): void;
@@ -8,10 +8,10 @@ declare function _ald_getdata(type: number, no: number): number;
 declare function _ald_freedata(data: number): void;
 
 declare namespace Module {
-    var noInitialRun: boolean;
+    let noInitialRun: boolean;
 
     // Undocumented methods / attributes
-    var canvas: HTMLElement;
+    let canvas: HTMLElement;
     function setStatus(status: string): void;
     function monitorRunDependencies(left: number): void;
     function callMain(): void;
@@ -19,9 +19,10 @@ declare namespace Module {
 }
 
 declare namespace FS {
-    function writeFile(path: string, data: ArrayBufferView | string, opts?: {encoding?: string; flags?: string; canOwn?: boolean}): void;
+    function writeFile(path: string, data: ArrayBufferView | string,
+                       opts?: {encoding?: string; flags?: string; canOwn?: boolean}): void;
 }
 
 declare namespace EmterpreterAsync {
-    function handle(asyncOp: (resume:()=>void) => void): void;
+    function handle(asyncOp: (resume: () => void) => void): void;
 }

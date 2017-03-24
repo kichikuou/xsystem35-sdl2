@@ -2,113 +2,6 @@
 /// <reference path="volume.ts" />
 
 namespace xsystem35 {
-    abstract class PCMSound {
-        protected context: AudioContext;
-        protected gain: GainNode;
-        protected duration_: number;
-        protected startTime: number;
-
-        constructor(protected dst: AudioNode) {
-            this.context = dst.context;
-            this.gain = this.context.createGain();
-            this.gain.connect(dst);
-        }
-        abstract start(loop: number): void;
-        abstract stop(): void;
-        setGain(gain: number) {
-            this.gain.gain.value = gain;
-        }
-        fadeout(msec: number) {
-            this.gain.gain.linearRampToValueAtTime(0, this.context.currentTime + msec / 1000);
-        }
-        getPosition(): number {
-            if (!this.startTime)
-                return 0;
-            return this.context.currentTime - this.startTime;
-        }
-        isPlaying(): boolean {
-            return !!this.startTime;
-        }
-        get duration(): number {
-            return this.duration_;
-        }
-    }
-
-    class PCMSoundSimple extends PCMSound {
-        private node: AudioBufferSourceNode;
-
-        constructor(dst: AudioNode, buf: AudioBuffer) {
-            super(dst);
-            this.node = this.context.createBufferSource();
-            this.node.buffer = buf;
-            this.node.connect(this.gain);
-            this.node.onended = this.onended.bind(this);
-            this.duration_ = buf.duration;
-        }
-
-        start(loop: number) {
-            if (loop == 0)
-                this.node.loop = true;
-            else if (loop != 1)
-                console.warn('Unsupported PCM loop count ' + loop);
-            this.node.start();
-            this.startTime = this.context.currentTime;
-        }
-
-        stop() {
-            if (this.startTime) {
-                this.node.stop();
-                this.startTime = null;
-            }
-        }
-
-        private onended() {
-            this.startTime = null;
-        }
-    }
-
-    class PCMSoundMixLR extends PCMSound {
-        private lsrc: AudioBufferSourceNode;
-        private rsrc: AudioBufferSourceNode;
-        private endCount = 0;
-
-        constructor(dst: AudioNode, lbuf: AudioBuffer, rbuf: AudioBuffer) {
-            super(dst);
-            this.lsrc = this.context.createBufferSource();
-            this.rsrc = this.context.createBufferSource();
-            this.lsrc.buffer = lbuf;
-            this.rsrc.buffer = rbuf;
-            var merger = this.context.createChannelMerger(2);
-            merger.connect(this.gain);
-            this.lsrc.connect(merger, 0, 0);
-            this.rsrc.connect(merger, 0, 1);
-            this.lsrc.onended = this.rsrc.onended = this.onended.bind(this);
-            this.duration_ = Math.max(lbuf.duration, rbuf.duration);
-        }
-
-        start(loop: number) {
-            if (loop != 1)
-                console.warn('PCMSoundMixLR: loop is not supported ' + loop);
-            this.lsrc.start();
-            this.rsrc.start();
-            this.startTime = this.context.currentTime;
-        }
-
-        stop() {
-            if (this.startTime) {
-                this.lsrc.stop();
-                this.rsrc.stop();
-                this.startTime = null;
-            }
-        }
-
-        private onended() {
-            this.endCount++;
-            if (this.endCount == 2)
-                this.startTime = null;
-        }
-    }
-
     declare var webkitAudioContext: any;
     export class AudioManager {
         private context: AudioContext;
@@ -134,8 +27,8 @@ namespace xsystem35 {
         }
 
         private removeUserGestureRestriction() {
-            var hanlder = () => {
-                var src = this.context.createBufferSource();
+            let hanlder = () => {
+                let src = this.context.createBufferSource();
                 src.buffer = this.context.createBuffer(1, 1, 22050);
                 src.connect(this.context.destination);
                 src.start();
@@ -146,11 +39,11 @@ namespace xsystem35 {
         }
 
         private load(no: number): Promise<AudioBuffer> {
-            var buf = this.getWave(no);
+            let buf = this.getWave(no);
             if (!buf)
                 return Promise.reject('Failed to open wave ' + no);
 
-            var decoded: Promise<AudioBuffer>;
+            let decoded: Promise<AudioBuffer>;
             if (this.isSafari) {
                 decoded = new Promise((resolve, reject) => {
                     this.context.decodeAudioData(buf, resolve, reject);
@@ -165,12 +58,12 @@ namespace xsystem35 {
         }
 
         private getWave(no: number): ArrayBuffer {
-            var dfile = _ald_getdata(2 /* DRIFILE_WAVE */, no - 1);
+            let dfile = _ald_getdata(2 /* DRIFILE_WAVE */, no - 1);
             if (!dfile)
                 return null;
-            var ptr = Module.getValue(dfile + 8, '*');
-            var size = Module.getValue(dfile, 'i32');
-            var buf = Module.HEAPU8.buffer.slice(ptr, ptr + size);
+            let ptr = Module.getValue(dfile + 8, '*');
+            let size = Module.getValue(dfile, 'i32');
+            let buf = Module.HEAPU8.buffer.slice(ptr, ptr + size);
             _ald_freedata(dfile);
             return buf;
         }
@@ -196,7 +89,7 @@ namespace xsystem35 {
                     this.slots[slot] = new PCMSoundMixLR(this.masterGain, this.buffers[noL], this.buffers[noR]);
                     return resume();
                 }
-                var ps = [];
+                let ps = [];
                 if (!this.buffers[noL]) ps.push(this.load(noL));
                 if (!this.buffers[noR]) ps.push(this.load(noR));
                 Promise.all(ps).then(() => {
@@ -256,6 +149,116 @@ namespace xsystem35 {
 
         private onVolumeChanged(evt: CustomEvent) {
             this.masterGain.gain.value = evt.detail;
+        }
+    }
+
+    abstract class PCMSound {
+        protected context: AudioContext;
+        protected gain: GainNode;
+        protected startTime: number;
+
+        constructor(protected dst: AudioNode) {
+            this.context = dst.context;
+            this.gain = this.context.createGain();
+            this.gain.connect(dst);
+        }
+        abstract start(loop: number): void;
+        abstract stop(): void;
+        setGain(gain: number) {
+            this.gain.gain.value = gain;
+        }
+        fadeout(msec: number) {
+            this.gain.gain.linearRampToValueAtTime(0, this.context.currentTime + msec / 1000);
+        }
+        getPosition(): number {
+            if (!this.startTime)
+                return 0;
+            return this.context.currentTime - this.startTime;
+        }
+        isPlaying(): boolean {
+            return !!this.startTime;
+        }
+        abstract get duration(): number;
+    }
+
+    class PCMSoundSimple extends PCMSound {
+        private node: AudioBufferSourceNode;
+
+        constructor(dst: AudioNode, buf: AudioBuffer) {
+            super(dst);
+            this.node = this.context.createBufferSource();
+            this.node.buffer = buf;
+            this.node.connect(this.gain);
+            this.node.onended = this.onended.bind(this);
+        }
+
+        start(loop: number) {
+            if (loop === 0)
+                this.node.loop = true;
+            else if (loop !== 1)
+                console.warn('Unsupported PCM loop count ' + loop);
+            this.node.start();
+            this.startTime = this.context.currentTime;
+        }
+
+        stop() {
+            if (this.startTime) {
+                this.node.stop();
+                this.startTime = null;
+            }
+        }
+
+        get duration() {
+            return this.node.buffer.duration;
+        }
+
+        private onended() {
+            this.startTime = null;
+        }
+    }
+
+    class PCMSoundMixLR extends PCMSound {
+        private lsrc: AudioBufferSourceNode;
+        private rsrc: AudioBufferSourceNode;
+        private endCount = 0;
+
+        constructor(dst: AudioNode, lbuf: AudioBuffer, rbuf: AudioBuffer) {
+            super(dst);
+            this.lsrc = this.context.createBufferSource();
+            this.rsrc = this.context.createBufferSource();
+            this.lsrc.buffer = lbuf;
+            this.rsrc.buffer = rbuf;
+            let merger = this.context.createChannelMerger(2);
+            merger.connect(this.gain);
+            this.lsrc.connect(merger, 0, 0);
+            this.rsrc.connect(merger, 0, 1);
+            this.lsrc.onended = this.rsrc.onended = this.onended.bind(this);
+        }
+
+        start(loop: number) {
+            if (loop !== 1)
+                console.warn('PCMSoundMixLR: loop is not supported ' + loop);
+            this.lsrc.start();
+            this.rsrc.start();
+            this.startTime = this.context.currentTime;
+        }
+
+        stop() {
+            if (this.startTime) {
+                this.lsrc.stop();
+                this.rsrc.stop();
+                this.startTime = null;
+            }
+        }
+
+        get duration() {
+            return Math.max(this.lsrc.buffer.duration, this.rsrc.buffer.duration);
+        }
+
+        private onended() {
+            this.endCount++;
+            if (this.endCount === 2)
+                this.startTime = null;
         }
     }
 }

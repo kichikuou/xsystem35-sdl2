@@ -23,7 +23,7 @@ namespace xsystem35 {
         }
 
         volume(): number {
-            return this.muted ? 0 : parseInt(this.slider.value) / 100;
+            return this.muted ? 0 : parseInt(this.slider.value, 10) / 100;
         }
 
         addEventListener(handler: (evt: CustomEvent) => any) {
@@ -45,7 +45,7 @@ namespace xsystem35 {
         }
 
         private onSliderValueChanged(e: Event) {
-            this.vol = parseInt(this.slider.value) / 100;
+            this.vol = parseInt(this.slider.value, 10) / 100;
             if (this.vol > 0 && this.muted) {
                 this.muted = false;
                 this.icon.classList.remove('fa-volume-off');
@@ -59,7 +59,7 @@ namespace xsystem35 {
         }
 
         private dispatchEvent() {
-            var event = new CustomEvent('volumechange', { detail: this.volume() });
+            let event = new CustomEvent('volumechange', { detail: this.volume() });
             this.elem.dispatchEvent(event);
         }
     }

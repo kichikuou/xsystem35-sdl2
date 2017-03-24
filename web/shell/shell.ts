@@ -10,10 +10,10 @@ namespace xsystem35 {
     export const xsys35rc = [
         'font_device: ttf',
         'ttfont_mincho: ' + Font.fname,
-        'ttfont_gothic: ' + Font.fname, ''
+        'ttfont_gothic: ' + Font.fname, '',
     ].join('\n');
-    export var cdPlayer: CDPlayer;
-    export var audio: AudioManager;
+    export let cdPlayer: CDPlayer;
+    export let audio: AudioManager;
 
     class System35Shell {
         private imageLoader: ImageLoader;
@@ -46,15 +46,15 @@ namespace xsystem35 {
                     FS.mkdir('/save');
                     FS.mount(IDBFS, {}, '/save');
                     Module.addRunDependency('syncfs');
-                    FS.syncfs(true, (err) => { Module.removeRunDependency('syncfs') });
-                }
+                    FS.syncfs(true, (err) => { Module.removeRunDependency('syncfs'); });
+                },
             ];
             this.volumeControl = new VolumeControl();
             xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
             this.zoom = new ZoomManager();
             this.antialiasCheckbox = <HTMLInputElement>$('#antialias');
             this.antialiasCheckbox.addEventListener('change', this.antialiasChanged.bind(this));
-            this.antialiasCheckbox.checked = localStorage.getItem('antialias') != 'false';
+            this.antialiasCheckbox.checked = localStorage.getItem('antialias') !== 'false';
             xsystem35.audio = new AudioManager(this.volumeControl);
         }
 
@@ -83,7 +83,7 @@ namespace xsystem35 {
             this.fsyncTimer = window.setTimeout(() => {
                 FS.syncfs(false, (err) => {
                     if (err)
-                        console.log("FS.syncfs error: ", err);
+                        console.log('FS.syncfs error: ', err);
                 });
             }, 100);
         }
@@ -94,7 +94,7 @@ namespace xsystem35 {
         }
 
         private addRightClickEmulation() {
-            var emulatingRightClick = false;
+            let emulatingRightClick = false;
             document.body.addEventListener('touchstart', (e) => {
                 if (e.target !== document.body)
                     return;
@@ -110,5 +110,5 @@ namespace xsystem35 {
         }
     }
 
-    export var shell = new System35Shell();
+    export let shell = new System35Shell();
 }

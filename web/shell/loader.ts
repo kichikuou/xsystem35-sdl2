@@ -5,7 +5,7 @@ namespace xsystem35 {
         private worker: Worker;
         private cddaCallback: (wab: Blob) => void;
 
-        constructor(private runMain: ()=>void) {
+        constructor(private runMain: () => void) {
             this.initWorker();
             $('#fileselect').addEventListener('change', this.handleFileSelect.bind(this), false);
             document.body.ondragover = this.handleDragOver.bind(this);
@@ -13,7 +13,7 @@ namespace xsystem35 {
         }
 
         getCDDA(track: number, callback: (wav: Blob) => void) {
-            this.send({ command: 'getTrack', track: track });
+            this.send({ command: 'getTrack', track });
             this.cddaCallback = callback;
         }
 
@@ -35,13 +35,14 @@ namespace xsystem35 {
         }
 
         private populateFiles(files: any, volumeLabel: string) {
-            var grGenerator = new GameResourceGenerator();
-            for (var name in files) {
-                var data: ArrayBuffer = files[name];
+            let grGenerator = new GameResourceGenerator();
+            for (let name in files) {
+                let data: ArrayBuffer = files[name];
                 // Store contents in the emscripten heap, so that it can be mmap-ed without copying
-                var ptr = Module.getMemory(data.byteLength);
+                let ptr = Module.getMemory(data.byteLength);
                 Module.HEAPU8.set(new Uint8Array(data), ptr);
-                FS.writeFile(name, Module.HEAPU8.subarray(ptr, ptr + data.byteLength), { encoding: 'binary', canOwn: true });
+                FS.writeFile(name, Module.HEAPU8.subarray(ptr, ptr + data.byteLength),
+                             { encoding: 'binary', canOwn: true });
                 grGenerator.addFile(name);
             }
             FS.writeFile('xsystem35.gr', grGenerator.generate());
@@ -51,9 +52,9 @@ namespace xsystem35 {
         }
 
         private handleFileSelect(evt: Event) {
-            var input = <HTMLInputElement>evt.target;
-            var files = input.files;
-            for (var i = 0; i < files.length; i++)
+            let input = <HTMLInputElement>evt.target;
+            let files = input.files;
+            for (let i = 0; i < files.length; i++)
                 this.setFile(files[i]);
             input.value = '';
         }
@@ -67,13 +68,13 @@ namespace xsystem35 {
         private handleDrop(evt: DragEvent) {
             evt.stopPropagation();
             evt.preventDefault();
-            var files = evt.dataTransfer.files;
-            for (var i = 0; i < files.length; i++)
+            let files = evt.dataTransfer.files;
+            for (let i = 0; i < files.length; i++)
                 this.setFile(files[i]);
         }
 
         private setFile(file: File) {
-            this.send({ command: 'setFile', file: file });
+            this.send({ command: 'setFile', file });
         }
 
         private startInstall() {
@@ -101,6 +102,8 @@ namespace xsystem35 {
                 case 'error':
                     console.log(evt.data.message);
                     break;
+                default:
+                    throw('unknown command: ' + evt.data.command);
             }
         }
 
@@ -110,27 +113,28 @@ namespace xsystem35 {
     }
 
     class GameResourceGenerator {
-        static resourceType: { [ch: string]: string } = { s: 'Scenario', g: 'Graphics', w: 'Wave', d: 'Data', r: 'Resource', m: 'Midi' };
+        static resourceType: { [ch: string]: string } =
+            { s: 'Scenario', g: 'Graphics', w: 'Wave', d: 'Data', r: 'Resource', m: 'Midi' };
         private basename: string;
         private lines: string[] = [];
 
         addFile(name: string) {
-            var type = name.charAt(name.length - 6).toLowerCase();
-            var id = name.charAt(name.length - 5);
+            let type = name.charAt(name.length - 6).toLowerCase();
+            let id = name.charAt(name.length - 5);
             this.basename = name.slice(0, -6);
             this.lines.push(GameResourceGenerator.resourceType[type] + id.toUpperCase() + ' ' + name);
         }
 
         generate(): string {
-            for (var i = 0; i < 26; i++) {
-                var id = String.fromCharCode(65 + i);
+            for (let i = 0; i < 26; i++) {
+                let id = String.fromCharCode(65 + i);
                 this.lines.push('Save' + id + ' save/' + this.basename + 's' + id.toLowerCase() + '.asd');
             }
             return this.lines.join('\n') + '\n';
         }
 
         isEmpty(): boolean {
-            return this.lines.length == 0;
+            return this.lines.length === 0;
         }
     }
 }

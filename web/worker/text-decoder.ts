@@ -2,8 +2,8 @@ class FallbackTextDecoder {
     constructor(utfLabel?: string) {}
 
     decode(buffer: DataView): string {
-        var out = '';
-        for (var i = 0; i < buffer.byteLength; i++) {
+        let out = '';
+        for (let i = 0; i < buffer.byteLength; i++) {
             let c = buffer.getUint8(i);
             if (c < 128)
                 out += String.fromCharCode(c);

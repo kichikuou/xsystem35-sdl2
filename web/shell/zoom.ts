@@ -13,21 +13,21 @@ namespace xsystem35 {
             this.zoomSelect.value = localStorage.getItem('zoom') || '1';
             this.smoothingCheckbox = <HTMLInputElement>$('#smoothing');
             this.smoothingCheckbox.addEventListener('change', this.handleSmoothing.bind(this));
-            if (localStorage.getItem('smoothing') == 'false') {
+            if (localStorage.getItem('smoothing') === 'false') {
                 this.smoothingCheckbox.checked = false;
                 this.handleSmoothing();
             }
         }
 
         handleZoom() {
-            var value = this.zoomSelect.value;
+            let value = this.zoomSelect.value;
             localStorage.setItem('zoom', value);
-            var contentsStyle = $('.contents').style;
-            if (value == 'fit') {
+            let contentsStyle = $('.contents').style;
+            if (value === 'fit') {
                 contentsStyle.maxWidth = 'none';
                 contentsStyle.width = this.canvas.style.width = '100%';
             } else {
-                var ratio = Number(value);
+                let ratio = Number(value);
                 contentsStyle.maxWidth = 'none';
                 contentsStyle.width = this.canvas.style.width = this.canvas.width * ratio + 'px';
             }

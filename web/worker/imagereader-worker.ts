@@ -1,11 +1,11 @@
 importScripts('cdimage.js');
 
-declare function postMessage(data: any, transfers:any): void;
+declare function postMessage(data: any, transfers: any): void;
 
 class Installer {
-    private imgFile:File;
-    private cueFile:File;
-    private imageReader:CDImageReader;
+    private imgFile: File;
+    private cueFile: File;
+    private imageReader: CDImageReader;
 
     constructor() {
         addEventListener('message', this.onMessage.bind(this));
@@ -15,9 +15,9 @@ class Installer {
         switch (evt.data.command) {
         case 'setFile':
             this.setFile(evt.data.file);
-            var imgName = this.imgFile && this.imgFile.name;
-            var cueName = this.cueFile && this.cueFile.name;
-            postMessage({command:'readyState', img:imgName, cue:cueName});
+            let imgName = this.imgFile && this.imgFile.name;
+            let cueName = this.cueFile && this.cueFile.name;
+            postMessage({command: 'readyState', img: imgName, cue: cueName});
             break;
         case 'extractFiles':
             if (this.ready())
@@ -27,11 +27,13 @@ class Installer {
             if (this.ready())
                 this.getTrack(evt.data.track);
             break;
+        default:
+            throw('unknown command: ' + evt.data.command);
         }
     }
 
-    private setFile(file:File) {
-        var name = file.name.toLowerCase();
+    private setFile(file: File) {
+        let name = file.name.toLowerCase();
         if (name.endsWith('.img') || name.endsWith('.mdf'))
             this.imgFile = file;
         else if (name.endsWith('.cue') || name.endsWith('.mds'))
@@ -49,25 +51,25 @@ class Installer {
     }
 
     private extractFiles() {
-        var isofs = new ISO9660FileSystem(this.imageReader);
-        //this.walk(isofs, isofs.rootDir(), '/');
-        var gamedata = isofs.getDirEnt('gamedata', isofs.rootDir());
+        let isofs = new ISO9660FileSystem(this.imageReader);
+        // this.walk(isofs, isofs.rootDir(), '/');
+        let gamedata = isofs.getDirEnt('gamedata', isofs.rootDir());
         if (!gamedata) {
-            postMessage({command:'error', message:'インストールできません。GAMEDATAフォルダが見つかりません。'});
+            postMessage({command: 'error', message: 'インストールできません。GAMEDATAフォルダが見つかりません。'});
             return;
         }
-        var files: any = {};
-        var transfers = [];
-        for (var e of isofs.readDir(gamedata)) {
+        let files: any = {};
+        let transfers = [];
+        for (let e of isofs.readDir(gamedata)) {
             if (e.name.toLowerCase().endsWith('.ald')) {
-                var buffer = new ArrayBuffer(e.size);
-                var uint8 = new Uint8Array(buffer);
-                var ptr = 0;
-                for (var buf of isofs.readFile(e)) {
+                let buffer = new ArrayBuffer(e.size);
+                let uint8 = new Uint8Array(buffer);
+                let ptr = 0;
+                for (let buf of isofs.readFile(e)) {
                     uint8.set(buf, ptr);
                     ptr += buf.byteLength;
                 }
-                if (ptr != e.size)
+                if (ptr !== e.size)
                     throw('expected ' + e.size + ' bytes, but read ' + ptr + 'bytes');
                 files[e.name] = buffer;
                 transfers.push(buffer);
@@ -75,12 +77,12 @@ class Installer {
         }
         postMessage({command: 'extractFiles',
                      volumeLabel: isofs.volumeLabel(),
-                     files: files}, transfers);
+                     files}, transfers);
     }
 
-    private walk(isofs:ISO9660FileSystem, dir:DirEnt, dirname:string) {
-        for (var e of isofs.readDir(dir)) {
-            if (e.name != '\0' && e.name != '\x01') {
+    private walk(isofs: ISO9660FileSystem, dir: DirEnt, dirname: string) {
+        for (let e of isofs.readDir(dir)) {
+            if (e.name !== '\0' && e.name !== '\x01') {
                 console.log(dirname + e.name);
                 if (e.isDirectory)
                     this.walk(isofs, e, dirname + e.name + '/');
@@ -88,10 +90,10 @@ class Installer {
         }
     }
 
-    private getTrack(track:number) {
-        var blob = this.imageReader.extractTrack(track);
-        postMessage({command:'complete', track:track, wav:blob});
+    private getTrack(track: number) {
+        let blob = this.imageReader.extractTrack(track);
+        postMessage({command: 'complete', track, wav: blob});
     }
 }
 
-var installer = new Installer();
+let installer = new Installer();

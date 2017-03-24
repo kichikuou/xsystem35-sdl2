@@ -1,0 +1,27 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "curly": false,
+        "interface-name": false,
+        "max-classes-per-file": false,
+        "member-access": false,
+        "member-ordering": false,
+        "no-bitwise": false,
+        "no-empty": false,
+        "no-namespace": false,
+        "no-reference": false,
+        "only-arrow-functions": ["allow-declarations", "allow-named-functions"],
+        "prefer-for-of": false,
+        "quotemark": [true, "single", "avoid-escape"],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-separator",
+            "check-type"
+        ],
+
+        "no-console": false
+    }
+}
