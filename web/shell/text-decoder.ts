@@ -14,5 +14,5 @@ class FallbackTextDecoder {
     }
 }
 
-if (!(<any>self).TextDecoder)
-    (<any>self).TextDecoder = <TextEncoding.TextDecoderStatic>FallbackTextDecoder;
+if (!(<any>window).TextDecoder)
+    (<any>window).TextDecoder = <TextEncoding.TextDecoderStatic>FallbackTextDecoder;

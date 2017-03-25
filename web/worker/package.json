@@ -1,8 +1,0 @@
-{
-  "name": "xsystem35-worker",
-  "version": "1.0.0",
-  "description": "",
-  "dependencies": {
-    "@types/text-encoding": "0.0.30"
-  }
-}

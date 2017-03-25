@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "@types/emscripten": "0.0.29"
+    "@types/emscripten": "0.0.29",
+    "@types/text-encoding": "0.0.30"
   }
 }

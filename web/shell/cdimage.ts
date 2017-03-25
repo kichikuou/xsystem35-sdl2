@@ -1,4 +1,4 @@
-importScripts('text-decoder.js');
+/// <reference path="text-decoder.ts" />
 
 class ISO9660FileSystem {
     static async create(sectorReader: CDImageReader): Promise<ISO9660FileSystem> {

@@ -1,54 +1,21 @@
 /// <reference path="util.ts" />
+/// <reference path="cdimage.ts" />
 
 namespace xsystem35 {
     export class ImageLoader {
-        private worker: Worker;
-        private cddaCallback: (wab: Blob) => void;
+        private imgFile: File;
+        private cueFile: File;
+        private imageReader: CDImageReader;
 
         constructor(private runMain: () => void) {
-            this.initWorker();
             $('#fileselect').addEventListener('change', this.handleFileSelect.bind(this), false);
             document.body.ondragover = this.handleDragOver.bind(this);
             document.body.ondrop = this.handleDrop.bind(this);
         }
 
-        getCDDA(track: number, callback: (wav: Blob) => void) {
-            this.send({ command: 'getTrack', track });
-            this.cddaCallback = callback;
-        }
-
-        private initWorker() {
-            this.worker = new Worker('imagereader-worker.js');
-            this.worker.addEventListener('message', this.onMessage.bind(this));
-            this.worker.addEventListener('error', this.onWorkerError.bind(this));
-        }
-
-        private setReadyState(imgName: string, cueName: string) {
-            if (imgName) {
-                $('#imgReady').classList.remove('notready');
-                $('#imgReady').textContent = imgName;
-            }
-            if (cueName) {
-                $('#cueReady').classList.remove('notready');
-                $('#cueReady').textContent = cueName;
-            }
-        }
-
-        private populateFiles(files: any, volumeLabel: string) {
-            let grGenerator = new GameResourceGenerator();
-            for (let name in files) {
-                let data: ArrayBuffer = files[name];
-                // Store contents in the emscripten heap, so that it can be mmap-ed without copying
-                let ptr = Module.getMemory(data.byteLength);
-                Module.HEAPU8.set(new Uint8Array(data), ptr);
-                FS.writeFile(name, Module.HEAPU8.subarray(ptr, ptr + data.byteLength),
-                             { encoding: 'binary', canOwn: true });
-                grGenerator.addFile(name);
-            }
-            FS.writeFile('xsystem35.gr', grGenerator.generate());
-            FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
-
-            this.runMain();
+        async getCDDA(track: number, callback: (wav: Blob) => void) {
+            let blob = await this.imageReader.extractTrack(track);
+            callback(blob);
         }
 
         private handleFileSelect(evt: Event) {
@@ -73,42 +40,77 @@ namespace xsystem35 {
                 this.setFile(files[i]);
         }
 
-        private setFile(file: File) {
-            this.send({ command: 'setFile', file });
-        }
-
-        private startInstall() {
-            this.send({ command: 'extractFiles' });
-        }
-
-        private send(msg: any) {
-            this.worker.postMessage(msg);
-        }
-
-        private onMessage(evt: MessageEvent) {
-            switch (evt.data.command) {
-                case 'readyState':
-                    this.setReadyState(evt.data.img, evt.data.cue);
-                    if (evt.data.img && evt.data.cue)
-                        this.startInstall();
-                    break;
-                case 'extractFiles':
-                    this.populateFiles(evt.data.files, evt.data.volumeLabel);
-                    break;
-                case 'complete':
-                    this.cddaCallback(evt.data.wav);
-                    this.cddaCallback = null;
-                    break;
-                case 'error':
-                    console.log(evt.data.message);
-                    break;
-                default:
-                    throw('unknown command: ' + evt.data.command);
+        private async setFile(file: File) {
+            let name = file.name.toLowerCase();
+            if (name.endsWith('.img') || name.endsWith('.mdf')) {
+                this.imgFile = file;
+                $('#imgReady').classList.remove('notready');
+                $('#imgReady').textContent = file.name;
+            } else if (name.endsWith('.cue') || name.endsWith('.mds')) {
+                this.cueFile = file;
+                $('#cueReady').classList.remove('notready');
+                $('#cueReady').textContent = file.name;
+            }
+            if (this.imgFile && this.cueFile) {
+                if (this.cueFile.name.endsWith('.cue'))
+                    this.imageReader = await ImgCueReader.create(this.imgFile, this.cueFile);
+                else
+                    this.imageReader = await MdfMdsReader.create(this.imgFile, this.cueFile);
+                await this.installAndRun();
             }
         }
 
-        private onWorkerError(evt: Event) {
-            console.log('worker error', evt);
+        private async extractFile(isofs: ISO9660FileSystem, entry: DirEnt): Promise<ArrayBuffer> {
+            let buffer = new ArrayBuffer(entry.size);
+            let uint8 = new Uint8Array(buffer);
+            let ptr = 0;
+            for (let buf of await isofs.readFile(entry)) {
+                uint8.set(buf, ptr);
+                ptr += buf.byteLength;
+            }
+            if (ptr !== entry.size)
+                throw ('expected ' + entry.size + ' bytes, but read ' + ptr + 'bytes');
+            return buffer;
+        }
+
+        private async installAndRun() {
+            let isofs = await ISO9660FileSystem.create(this.imageReader);
+            // this.walk(isofs, isofs.rootDir(), '/');
+            let gamedata = await isofs.getDirEnt('gamedata', isofs.rootDir());
+            if (!gamedata) {
+                this.setError('インストールできません。GAMEDATAフォルダが見つかりません。');
+                return;
+            }
+            let grGenerator = new GameResourceGenerator();
+            for (let e of await isofs.readDir(gamedata)) {
+                if (e.name.toLowerCase().endsWith('.ald')) {
+                    let data = await this.extractFile(isofs, e);
+                    // Store contents in the emscripten heap, so that it can be mmap-ed without copying
+                    let ptr = Module.getMemory(data.byteLength);
+                    Module.HEAPU8.set(new Uint8Array(data), ptr);
+                    FS.writeFile(e.name, Module.HEAPU8.subarray(ptr, ptr + data.byteLength),
+                        { encoding: 'binary', canOwn: true });
+                    grGenerator.addFile(e.name);
+                }
+            }
+            FS.writeFile('xsystem35.gr', grGenerator.generate());
+            FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
+            this.runMain();
+        }
+
+        private setError(msg: string) {
+            console.log(msg);
+        }
+
+        // For debug
+        private async walk(isofs: ISO9660FileSystem, dir: DirEnt, dirname: string) {
+            for (let e of await isofs.readDir(dir)) {
+                if (e.name !== '\0' && e.name !== '\x01') {
+                    console.log(dirname + e.name);
+                    if (e.isDirectory)
+                        this.walk(isofs, e, dirname + e.name + '/');
+                }
+            }
         }
     }
 
