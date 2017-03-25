@@ -1,10 +1,12 @@
 importScripts('text-decoder.js');
 
 class ISO9660FileSystem {
-    private pvd: PVD;
+    static async create(sectorReader: CDImageReader): Promise<ISO9660FileSystem> {
+        let pvd = new PVD(await sectorReader.readSector(0x10));
+        return new ISO9660FileSystem(sectorReader, pvd);
+    }
 
-    constructor(private sectorReader: CDImageReader) {
-        this.pvd = new PVD(sectorReader.readSector(0x10));
+    private constructor(private sectorReader: CDImageReader, private pvd: PVD) {
         if (this.pvd.type !== 1)
             throw('PVD not found');
     }
@@ -17,16 +19,16 @@ class ISO9660FileSystem {
         return this.pvd.rootDirEnt();
     }
 
-    getDirEnt(name: string, parent: DirEnt): DirEnt {
+    async getDirEnt(name: string, parent: DirEnt): Promise<DirEnt> {
         name = name.toLowerCase();
-        for (let e of this.readDir(parent)) {
+        for (let e of await this.readDir(parent)) {
             if (e.name.toLowerCase() === name)
                 return e;
         }
         return null;
     }
 
-    readDir(dirent: DirEnt): DirEnt[] {
+    async readDir(dirent: DirEnt): Promise<DirEnt[]> {
         let sector = dirent.sector;
         let position = 0;
         let length = dirent.size;
@@ -34,7 +36,7 @@ class ISO9660FileSystem {
         let buf: ArrayBuffer;
         while (position < length) {
             if (position === 0)
-                buf = this.sectorReader.readSector(sector);
+                buf = await this.sectorReader.readSector(sector);
             let child = new DirEnt(buf, position);
             if (child.length === 0) {
                 // Padded end of sector
@@ -54,7 +56,7 @@ class ISO9660FileSystem {
         return entries;
     }
 
-    readFile(dirent: DirEnt): Uint8Array[] {
+    readFile(dirent: DirEnt): Promise<Uint8Array[]> {
         return this.sectorReader.readSequentialSectors(dirent.sector, dirent.size);
     }
 }
@@ -101,23 +103,41 @@ class DirEnt {
 }
 
 interface CDImageReader {
-    readSector(sector: number): ArrayBuffer;
-    readSequentialSectors(startSector: number, length: number): Uint8Array[];
+    readSector(sector: number): Promise<ArrayBuffer>;
+    readSequentialSectors(startSector: number, length: number): Promise<Uint8Array[]>;
     maxTrack(): number;
-    extractTrack(track: number): Blob;
+    extractTrack(track: number): Promise<Blob>;
+}
+
+function readAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.onload = () => { resolve(reader.result); };
+        reader.onerror = () => { reject(reader.error); };
+        reader.readAsArrayBuffer(blob);
+    });
+}
+
+function readAsText(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.onload = () => { resolve(reader.result); };
+        reader.onerror = () => { reject(reader.error); };
+        reader.readAsText(blob);
+    });
 }
 
 class ImageReaderBase {
     constructor(public image: File) {}
 
-    readSequential(startOffset: number,
-                   bytesToRead: number,
-                   blockSize: number,
-                   sectorSize: number,
-                   sectorOffset: number): Uint8Array[] {
+    async readSequential(startOffset: number,
+                         bytesToRead: number,
+                         blockSize: number,
+                         sectorSize: number,
+                         sectorOffset: number): Promise<Uint8Array[]> {
         let sectors = Math.ceil(bytesToRead / sectorSize);
         let blob = this.image.slice(startOffset, startOffset + sectors * blockSize);
-        let buf = new FileReaderSync().readAsArrayBuffer(blob);
+        let buf = await readAsArrayBuffer(blob);
         let bufs: Uint8Array[] = [];
         for (let i = 0; i < sectors; i++) {
             bufs.push(new Uint8Array(buf, i * blockSize + sectorOffset, Math.min(bytesToRead, sectorSize)));
@@ -130,23 +150,28 @@ class ImageReaderBase {
 class ImgCueReader extends ImageReaderBase implements CDImageReader {
     private tracks: Array<{ type: string; index: string[]; }>;
 
-    constructor(img: File, cue: File) {
-        super(img);
-        this.parseCue(cue);
+    static async create(img: File, cue: File): Promise<ImgCueReader> {
+        let reader = new ImgCueReader(img);
+        await reader.parseCue(cue);
+        return reader;
     }
 
-    readSector(sector: number): ArrayBuffer {
+    private constructor(img: File) {
+        super(img);
+    }
+
+    readSector(sector: number): Promise<ArrayBuffer> {
         let start = sector * 2352 + 16;
         let end = start + 2048;
-        return new FileReaderSync().readAsArrayBuffer(this.image.slice(start, end));
+        return readAsArrayBuffer(this.image.slice(start, end));
     }
 
-    readSequentialSectors(startSector: number, length: number): Uint8Array[] {
+    readSequentialSectors(startSector: number, length: number): Promise<Uint8Array[]> {
         return this.readSequential(startSector * 2352, length, 2352, 2048, 16);
     }
 
-    private parseCue(cueFile: File) {
-        let lines = new FileReaderSync().readAsText(cueFile).split('\n');
+    private async parseCue(cueFile: File) {
+        let lines = (await readAsText(cueFile)).split('\n');
         this.tracks = [];
         let currentTrack: number = null;
         for (let line of lines) {
@@ -170,7 +195,7 @@ class ImgCueReader extends ImageReaderBase implements CDImageReader {
         return this.tracks.length - 1;
     }
 
-    extractTrack(track: number): Blob {
+    async extractTrack(track: number): Promise<Blob> {
         if (!this.tracks[track] || this.tracks[track].type !== 'AUDIO')
             return;
 
@@ -197,13 +222,18 @@ enum MdsTrackMode { Audio = 0xa9, Mode1 = 0xaa };
 class MdfMdsReader extends ImageReaderBase implements CDImageReader {
     private tracks: Array<{ mode: number; sectorSize: number; offset: number; sectors: number; }>;
 
-    constructor(mdf: File, mds: File) {
-        super(mdf);
-        this.parseMds(mds);
+    static async create(mdf: File, mds: File): Promise<MdfMdsReader> {
+        let reader = new MdfMdsReader(mdf);
+        await reader.parseMds(mds);
+        return reader;
     }
 
-    private parseMds(mdsFile: File) {
-        let buf = new FileReaderSync().readAsArrayBuffer(mdsFile);
+    private constructor(mdf: File) {
+        super(mdf);
+    }
+
+    private async parseMds(mdsFile: File) {
+        let buf = await readAsArrayBuffer(mdsFile);
 
         let signature = new TextDecoder().decode(new DataView(buf, 0, 16));
         if (signature !== 'MEDIA DESCRIPTOR')
@@ -228,13 +258,13 @@ class MdfMdsReader extends ImageReaderBase implements CDImageReader {
             throw 'track 1 is not mode1';
     }
 
-    readSector(sector: number): ArrayBuffer {
+    readSector(sector: number): Promise<ArrayBuffer> {
         let start = sector * this.tracks[1].sectorSize + 16;
         let end = start + 2048;
-        return new FileReaderSync().readAsArrayBuffer(this.image.slice(start, end));
+        return readAsArrayBuffer(this.image.slice(start, end));
     }
 
-    readSequentialSectors(startSector: number, length: number): Uint8Array[] {
+    readSequentialSectors(startSector: number, length: number): Promise<Uint8Array[]> {
         let track = this.tracks[1];
         return this.readSequential(track.offset + startSector * track.sectorSize, length, track.sectorSize, 2048, 16);
     }
@@ -243,12 +273,12 @@ class MdfMdsReader extends ImageReaderBase implements CDImageReader {
         return this.tracks.length - 1;
     }
 
-    extractTrack(track: number): Blob {
+    async extractTrack(track: number): Promise<Blob> {
         if (!this.tracks[track] || this.tracks[track].mode !== MdsTrackMode.Audio)
             return;
 
         let size = this.tracks[track].sectors * 2352;
-        let chunks = this.readSequential(this.tracks[track].offset, size, this.tracks[track].sectorSize, 2352, 0);
+        let chunks = await this.readSequential(this.tracks[track].offset, size, this.tracks[track].sectorSize, 2352, 0);
         return new Blob([<any>createWaveHeader(size)].concat(chunks), {type : 'audio/wav'});
     }
 }

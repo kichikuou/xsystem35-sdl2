@@ -11,10 +11,10 @@ class Installer {
         addEventListener('message', this.onMessage.bind(this));
     }
 
-    private onMessage(evt: MessageEvent) {
+    private async onMessage(evt: MessageEvent) {
         switch (evt.data.command) {
         case 'setFile':
-            this.setFile(evt.data.file);
+            await this.setFile(evt.data.file);
             let imgName = this.imgFile && this.imgFile.name;
             let cueName = this.cueFile && this.cueFile.name;
             postMessage({command: 'readyState', img: imgName, cue: cueName});
@@ -32,7 +32,7 @@ class Installer {
         }
     }
 
-    private setFile(file: File) {
+    private async setFile(file: File) {
         let name = file.name.toLowerCase();
         if (name.endsWith('.img') || name.endsWith('.mdf'))
             this.imgFile = file;
@@ -40,9 +40,9 @@ class Installer {
             this.cueFile = file;
         if (this.imgFile && this.cueFile) {
             if (this.cueFile.name.endsWith('.cue'))
-                this.imageReader = new ImgCueReader(this.imgFile, this.cueFile);
+                this.imageReader = await ImgCueReader.create(this.imgFile, this.cueFile);
             else
-                this.imageReader = new MdfMdsReader(this.imgFile, this.cueFile);
+                this.imageReader = await MdfMdsReader.create(this.imgFile, this.cueFile);
         }
     }
 
@@ -50,22 +50,22 @@ class Installer {
         return !!this.imageReader;
     }
 
-    private extractFiles() {
-        let isofs = new ISO9660FileSystem(this.imageReader);
+    private async extractFiles() {
+        let isofs = await ISO9660FileSystem.create(this.imageReader);
         // this.walk(isofs, isofs.rootDir(), '/');
-        let gamedata = isofs.getDirEnt('gamedata', isofs.rootDir());
+        let gamedata = await isofs.getDirEnt('gamedata', isofs.rootDir());
         if (!gamedata) {
             postMessage({command: 'error', message: 'インストールできません。GAMEDATAフォルダが見つかりません。'});
             return;
         }
         let files: any = {};
         let transfers = [];
-        for (let e of isofs.readDir(gamedata)) {
+        for (let e of await isofs.readDir(gamedata)) {
             if (e.name.toLowerCase().endsWith('.ald')) {
                 let buffer = new ArrayBuffer(e.size);
                 let uint8 = new Uint8Array(buffer);
                 let ptr = 0;
-                for (let buf of isofs.readFile(e)) {
+                for (let buf of await isofs.readFile(e)) {
                     uint8.set(buf, ptr);
                     ptr += buf.byteLength;
                 }
@@ -80,8 +80,8 @@ class Installer {
                      files}, transfers);
     }
 
-    private walk(isofs: ISO9660FileSystem, dir: DirEnt, dirname: string) {
-        for (let e of isofs.readDir(dir)) {
+    private async walk(isofs: ISO9660FileSystem, dir: DirEnt, dirname: string) {
+        for (let e of await isofs.readDir(dir)) {
             if (e.name !== '\0' && e.name !== '\x01') {
                 console.log(dirname + e.name);
                 if (e.isDirectory)
@@ -90,8 +90,8 @@ class Installer {
         }
     }
 
-    private getTrack(track: number) {
-        let blob = this.imageReader.extractTrack(track);
+    private async getTrack(track: number) {
+        let blob = await this.imageReader.extractTrack(track);
         postMessage({command: 'complete', track, wav: blob});
     }
 }
