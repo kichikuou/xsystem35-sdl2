@@ -23,7 +23,7 @@ namespace xsystem35 {
                 this.startPlayback(this.blobs[track], loop);
                 return;
             }
-            this.imageLoader.getCDDA(track, (blob) => {
+            this.imageLoader.getCDDA(track).then((blob) => {
                 this.blobs[track] = blob;
                 this.startPlayback(blob, loop);
             });

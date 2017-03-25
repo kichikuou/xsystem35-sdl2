@@ -5,7 +5,7 @@ namespace xsystem35 {
     export class ImageLoader {
         private imgFile: File;
         private cueFile: File;
-        private imageReader: CDImageReader;
+        private imageReader: CDImage.Reader;
 
         constructor(private runMain: () => void) {
             $('#fileselect').addEventListener('change', this.handleFileSelect.bind(this), false);
@@ -13,9 +13,8 @@ namespace xsystem35 {
             document.body.ondrop = this.handleDrop.bind(this);
         }
 
-        async getCDDA(track: number, callback: (wav: Blob) => void) {
-            let blob = await this.imageReader.extractTrack(track);
-            callback(blob);
+        getCDDA(track: number): Promise<Blob> {
+            return this.imageReader.extractTrack(track);
         }
 
         private handleFileSelect(evt: Event) {
@@ -52,15 +51,12 @@ namespace xsystem35 {
                 $('#cueReady').textContent = file.name;
             }
             if (this.imgFile && this.cueFile) {
-                if (this.cueFile.name.endsWith('.cue'))
-                    this.imageReader = await ImgCueReader.create(this.imgFile, this.cueFile);
-                else
-                    this.imageReader = await MdfMdsReader.create(this.imgFile, this.cueFile);
+                this.imageReader = await CDImage.createReader(this.imgFile, this.cueFile);
                 await this.installAndRun();
             }
         }
 
-        private async extractFile(isofs: ISO9660FileSystem, entry: DirEnt): Promise<ArrayBuffer> {
+        private async extractFile(isofs: CDImage.ISO9660FileSystem, entry: CDImage.DirEnt): Promise<ArrayBuffer> {
             let buffer = new ArrayBuffer(entry.size);
             let uint8 = new Uint8Array(buffer);
             let ptr = 0;
@@ -74,7 +70,7 @@ namespace xsystem35 {
         }
 
         private async installAndRun() {
-            let isofs = await ISO9660FileSystem.create(this.imageReader);
+            let isofs = await CDImage.ISO9660FileSystem.create(this.imageReader);
             // this.walk(isofs, isofs.rootDir(), '/');
             let gamedata = await isofs.getDirEnt('gamedata', isofs.rootDir());
             if (!gamedata) {
@@ -103,7 +99,7 @@ namespace xsystem35 {
         }
 
         // For debug
-        private async walk(isofs: ISO9660FileSystem, dir: DirEnt, dirname: string) {
+        private async walk(isofs: CDImage.ISO9660FileSystem, dir: CDImage.DirEnt, dirname: string) {
             for (let e of await isofs.readDir(dir)) {
                 if (e.name !== '\0' && e.name !== '\x01') {
                     console.log(dirname + e.name);
