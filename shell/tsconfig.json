@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "outFile": "../../docs/shell.js",
+        "outFile": "../docs/shell.js",
         "noImplicitAny": true,
         "sourceMap": false
     },
