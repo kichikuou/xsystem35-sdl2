@@ -3,14 +3,17 @@
 
 namespace xsystem35 {
     export class ImageLoader {
+        readonly installed: Promise<any>;
+        private installDone: () => void;
         private imgFile: File;
         private cueFile: File;
         private imageReader: CDImage.Reader;
 
-        constructor(private runMain: () => void) {
+        constructor(private fileSystemReady: Promise<any>) {
             $('#fileselect').addEventListener('change', this.handleFileSelect.bind(this), false);
             document.body.ondragover = this.handleDragOver.bind(this);
             document.body.ondrop = this.handleDrop.bind(this);
+            this.installed = new Promise((resolve) => { this.installDone = resolve; });
         }
 
         getCDDA(track: number): Promise<Blob> {
@@ -52,24 +55,23 @@ namespace xsystem35 {
             }
             if (this.imgFile && this.cueFile) {
                 this.imageReader = await CDImage.createReader(this.imgFile, this.cueFile);
-                await this.installAndRun();
+                await this.fileSystemReady;
+                this.install();
             }
         }
 
-        private async extractFile(isofs: CDImage.ISO9660FileSystem, entry: CDImage.DirEnt): Promise<ArrayBuffer> {
-            let buffer = new ArrayBuffer(entry.size);
-            let uint8 = new Uint8Array(buffer);
+        private async extractFile(isofs: CDImage.ISO9660FileSystem, entry: CDImage.DirEnt,
+                                  buf: Uint8Array, offset: number) {
             let ptr = 0;
-            for (let buf of await isofs.readFile(entry)) {
-                uint8.set(buf, ptr);
-                ptr += buf.byteLength;
+            for (let chunk of await isofs.readFile(entry)) {
+                buf.set(chunk, ptr + offset);
+                ptr += chunk.byteLength;
             }
             if (ptr !== entry.size)
                 throw ('expected ' + entry.size + ' bytes, but read ' + ptr + 'bytes');
-            return buffer;
         }
 
-        private async installAndRun() {
+        private async install() {
             let isofs = await CDImage.ISO9660FileSystem.create(this.imageReader);
             // this.walk(isofs, isofs.rootDir(), '/');
             let gamedata = await isofs.getDirEnt('gamedata', isofs.rootDir());
@@ -79,19 +81,17 @@ namespace xsystem35 {
             }
             let grGenerator = new GameResourceGenerator();
             for (let e of await isofs.readDir(gamedata)) {
-                if (e.name.toLowerCase().endsWith('.ald')) {
-                    let data = await this.extractFile(isofs, e);
-                    // Store contents in the emscripten heap, so that it can be mmap-ed without copying
-                    let ptr = Module.getMemory(data.byteLength);
-                    Module.HEAPU8.set(new Uint8Array(data), ptr);
-                    FS.writeFile(e.name, Module.HEAPU8.subarray(ptr, ptr + data.byteLength),
-                        { encoding: 'binary', canOwn: true });
-                    grGenerator.addFile(e.name);
-                }
+                if (!e.name.toLowerCase().endsWith('.ald'))
+                    continue;
+                // Store contents in the emscripten heap, so that it can be mmap-ed without copying
+                let ptr = Module.getMemory(e.size);
+                await this.extractFile(isofs, e, Module.HEAPU8, ptr);
+                FS.writeFile(e.name, Module.HEAPU8.subarray(ptr, ptr + e.size), { encoding: 'binary', canOwn: true });
+                grGenerator.addFile(e.name);
             }
             FS.writeFile('xsystem35.gr', grGenerator.generate());
             FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
-            this.runMain();
+            this.installDone();
         }
 
         private setError(msg: string) {

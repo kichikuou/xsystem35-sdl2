@@ -16,6 +16,7 @@ namespace xsystem35 {
     export let audio: AudioManager;
 
     class System35Shell {
+        readonly fileSystemReady: Promise<any>;
         private imageLoader: ImageLoader;
         status: HTMLElement = document.getElementById('status');
         private zoom: ZoomManager;
@@ -23,7 +24,11 @@ namespace xsystem35 {
         private antialiasCheckbox: HTMLInputElement;
 
         constructor() {
-            this.imageLoader = new ImageLoader(this.run.bind(this));
+            let fileSystemReady: () => void;
+            this.fileSystemReady = new Promise((resolve) => { fileSystemReady = resolve; });
+
+            this.imageLoader = new ImageLoader(this.fileSystemReady);
+            this.imageLoader.installed.then(this.run.bind(this));
             this.setStatus('Downloading...');
             window.onerror = () => {
                 this.setStatus('Exception thrown, see JavaScript console');
@@ -39,6 +44,7 @@ namespace xsystem35 {
             Module.noInitialRun = true;
             Module.setStatus = this.setStatus.bind(this);
             Module.preRun = [
+                fileSystemReady,
                 function loadFont() {
                     FS.createPreloadedFile('/', Font.fname, Font.url, true, false);
                 },
