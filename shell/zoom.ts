@@ -22,14 +22,16 @@ namespace xsystem35 {
         handleZoom() {
             let value = this.zoomSelect.value;
             localStorage.setItem('zoom', value);
+            let navbarStyle = $('.navbar').style;
             let contentsStyle = $('.contents').style;
             if (value === 'fit') {
+                navbarStyle.maxWidth = 'none';
                 contentsStyle.maxWidth = 'none';
                 contentsStyle.width = this.canvas.style.width = '100%';
             } else {
                 let ratio = Number(value);
                 contentsStyle.maxWidth = 'none';
-                contentsStyle.width = this.canvas.style.width = this.canvas.width * ratio + 'px';
+                navbarStyle.maxWidth = contentsStyle.width = this.canvas.style.width = this.canvas.width * ratio + 'px';
             }
         }
 
