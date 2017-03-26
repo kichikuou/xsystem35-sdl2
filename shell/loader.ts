@@ -3,17 +3,14 @@
 
 namespace xsystem35 {
     export class ImageLoader {
-        readonly installed: Promise<any>;
-        private installDone: () => void;
         private imgFile: File;
         private cueFile: File;
         private imageReader: CDImage.Reader;
 
-        constructor(private fileSystemReady: Promise<any>) {
+        constructor(private shell: System35Shell) {
             $('#fileselect').addEventListener('change', this.handleFileSelect.bind(this), false);
             document.body.ondragover = this.handleDragOver.bind(this);
             document.body.ondrop = this.handleDrop.bind(this);
-            this.installed = new Promise((resolve) => { this.installDone = resolve; });
         }
 
         getCDDA(track: number): Promise<Blob> {
@@ -55,7 +52,7 @@ namespace xsystem35 {
             }
             if (this.imgFile && this.cueFile) {
                 this.imageReader = await CDImage.createReader(this.imgFile, this.cueFile);
-                await this.fileSystemReady;
+                await this.shell.fileSystemReady;
                 this.install();
             }
         }
@@ -79,6 +76,8 @@ namespace xsystem35 {
                 this.setError('インストールできません。GAMEDATAフォルダが見つかりません。');
                 return;
             }
+            this.shell.installStarted();
+
             let grGenerator = new GameResourceGenerator();
             for (let e of await isofs.readDir(gamedata)) {
                 if (!e.name.toLowerCase().endsWith('.ald'))
@@ -91,7 +90,7 @@ namespace xsystem35 {
             }
             FS.writeFile('xsystem35.gr', grGenerator.generate());
             FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
-            this.installDone();
+            this.shell.installed();
         }
 
         private setError(msg: string) {

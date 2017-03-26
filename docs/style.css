@@ -55,6 +55,13 @@ header {
     content: " (未選択)";
 }
 
+.bgblack-fade {
+    background-color: black;
+    transition-property: background-color;
+    transition-duration: 1s;
+    transition-timing-function: linear;
+}
+
 /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
 canvas.emscripten {
 	border: 0px none;

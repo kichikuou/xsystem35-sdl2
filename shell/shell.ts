@@ -17,7 +17,7 @@ namespace xsystem35 {
     export let audio: AudioManager;
     export let settings: Settings;
 
-    class System35Shell {
+    export class System35Shell {
         readonly fileSystemReady: Promise<any>;
         private imageLoader: ImageLoader;
         status: HTMLElement = document.getElementById('status');
@@ -29,8 +29,7 @@ namespace xsystem35 {
             let fileSystemReady: () => void;
             this.fileSystemReady = new Promise((resolve) => { fileSystemReady = resolve; });
 
-            this.imageLoader = new ImageLoader(this.fileSystemReady);
-            this.imageLoader.installed.then(this.run.bind(this));
+            this.imageLoader = new ImageLoader(this);
             this.setStatus('Downloading...');
             window.onerror = () => {
                 this.setStatus('Exception thrown, see JavaScript console');
@@ -67,8 +66,12 @@ namespace xsystem35 {
             xsystem35.settings = new Settings();
         }
 
-        run() {
+        installStarted() {
             $('#loader').hidden = true;
+            document.body.classList.add('bgblack-fade');
+        }
+
+        installed() {
             $('#xsystem35').hidden = false;
             $('#zoom').hidden = false;
             $('#volume-control').hidden = false;
