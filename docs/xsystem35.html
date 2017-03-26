@@ -3,11 +3,38 @@
   <head>
     <meta charset="utf-8">
     <title>xsystem35 for web</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.2.8/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.2.10/spectre.min.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
+
+  <header>
+    <div class="navbar">
+      <section class="navbar-primary">
+        <span class="navbar-brand">鬼畜王 on Web</span>
+      </section>
+      <section class="navbar-section">
+        <select id="zoom" class="form-select mr-10" hidden>
+          <option value="1">100%</option>
+          <option value="1.25">125%</option>
+          <option value="1.5">150%</option>
+          <option value="2">200%</option>
+          <option value="3">300%</option>
+          <option value="fit">自動</option>
+        </select>
+
+        <div id="volume-control" class="mr-10" hidden>
+          <i id="volume-control-icon" class="fa fa-volume-up"></i>
+          <input id="volume-control-slider" type="range">
+        </div>
+
+        <button id="settings-button" class="btn btn-link mr-10"><i class="fa fa-cog"></i></button>
+        <button class="btn btn-link"><i class="fa fa-question-circle"></i></button>
+      </section>
+    </div>
+  </header>
+
   <div class="contents">
 
     <div id="loader">
@@ -21,33 +48,50 @@
 
     <div id="xsystem35" hidden>
       <audio id="audio"></audio>
-
       <div class="emscripten" id="status"></div>
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+  </div>
 
-      <div>
-        <select id="zoom" class="form-select">
-          <option value="1">100%</option>
-          <option value="1.25">125%</option>
-          <option value="1.5">150%</option>
-          <option value="2">200%</option>
-          <option value="3">300%</option>
-          <option value="fit">自動</option>
-        </select>
-        <label for="smoothing" class="form-checkbox">
-          <input type="checkbox" id="smoothing" checked><i class="form-icon"></i>Smoothing
-        </label>
-        <label for="antialias" class="form-checkbox">
-          <input type="checkbox" id="antialias" checked><i class="form-icon"></i>Antialias
-        </label>
-        <div id="volume-control">
-          <i id="volume-control-icon" class="fa fa-volume-up"></i>
-          <input id="volume-control-slider" type="range">
-        </div>
+  <!-- Settings -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title">設定</div>
+      </div>
+      <div class="modal-body settings">
+        <section>
+          <h5>表示</h5>
+          <div>
+            <label for="smoothing" class="form-checkbox">
+              <input type="checkbox" id="smoothing" checked>
+              <i class="form-icon"></i>拡大時に補間する
+            </label>
+          </div>
+          <div>
+            <label for="antialias" class="form-checkbox">
+              <input type="checkbox" id="antialias" checked>
+              <i class="form-icon"></i>文字をなめらかに表示する
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h5>セーブデータ</h5>
+          <div>
+            <p>セーブデータを ZIP ファイルに保存したり、ZIP ファイルから復元できます。</p>
+            <button class="btn mr-10">保存</button>
+            <button class="btn">復元</button>
+          </div>
+        </section>
+      </div>
+      <div class="modal-footer">
+        <button id="settings-close" class="btn btn-primary">OK</button>
       </div>
     </div>
-
   </div>
+
   <script>
     var Module = {};
   </script>

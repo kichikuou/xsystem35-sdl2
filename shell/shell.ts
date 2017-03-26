@@ -1,5 +1,6 @@
 /// <reference path="util.ts" />
 /// <reference path="loader.ts" />
+/// <reference path="settings.ts" />
 /// <reference path="zoom.ts" />
 /// <reference path="volume.ts" />
 /// <reference path="cdda.ts" />
@@ -14,6 +15,7 @@ namespace xsystem35 {
     ].join('\n');
     export let cdPlayer: CDPlayer;
     export let audio: AudioManager;
+    export let settings: Settings;
 
     class System35Shell {
         readonly fileSystemReady: Promise<any>;
@@ -62,11 +64,14 @@ namespace xsystem35 {
             this.antialiasCheckbox.addEventListener('change', this.antialiasChanged.bind(this));
             this.antialiasCheckbox.checked = localStorage.getItem('antialias') !== 'false';
             xsystem35.audio = new AudioManager(this.volumeControl);
+            xsystem35.settings = new Settings();
         }
 
         run() {
             $('#loader').hidden = true;
             $('#xsystem35').hidden = false;
+            $('#zoom').hidden = false;
+            $('#volume-control').hidden = false;
             setTimeout(() => {
                 Module.callMain();
                 this.antialiasChanged();
