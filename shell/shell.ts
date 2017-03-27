@@ -13,12 +13,13 @@ namespace xsystem35 {
         'ttfont_mincho: ' + Font.fname,
         'ttfont_gothic: ' + Font.fname, '',
     ].join('\n');
+    export let fileSystemReady: Promise<any>;
+    export let saveDirReady: Promise<any>;
     export let cdPlayer: CDPlayer;
     export let audio: AudioManager;
     export let settings: Settings;
 
     export class System35Shell {
-        readonly fileSystemReady: Promise<any>;
         private imageLoader: ImageLoader;
         status: HTMLElement = document.getElementById('status');
         private zoom: ZoomManager;
@@ -26,8 +27,10 @@ namespace xsystem35 {
         private antialiasCheckbox: HTMLInputElement;
 
         constructor() {
-            let fileSystemReady: () => void;
-            this.fileSystemReady = new Promise((resolve) => { fileSystemReady = resolve; });
+            let fsReady: () => void;
+            fileSystemReady = new Promise((resolve) => { fsReady = resolve; });
+            let idbfsReady: () => void;
+            saveDirReady = new Promise((resolve) => { idbfsReady = resolve; });
 
             this.imageLoader = new ImageLoader(this);
             this.setStatus('Downloading...');
@@ -45,7 +48,7 @@ namespace xsystem35 {
             Module.noInitialRun = true;
             Module.setStatus = this.setStatus.bind(this);
             Module.preRun = [
-                fileSystemReady,
+                fsReady,
                 function loadFont() {
                     FS.createPreloadedFile('/', Font.fname, Font.url, true, false);
                 },
@@ -53,7 +56,10 @@ namespace xsystem35 {
                     FS.mkdir('/save');
                     FS.mount(IDBFS, {}, '/save');
                     Module.addRunDependency('syncfs');
-                    FS.syncfs(true, (err) => { Module.removeRunDependency('syncfs'); });
+                    FS.syncfs(true, (err) => {
+                        Module.removeRunDependency('syncfs');
+                        idbfsReady();
+                    });
                 },
             ];
             this.volumeControl = new VolumeControl();
@@ -92,14 +98,14 @@ namespace xsystem35 {
         }
 
         private fsyncTimer: number;
-        syncfs(fname: string) {
+        syncfs(timeout = 100) {
             window.clearTimeout(this.fsyncTimer);
             this.fsyncTimer = window.setTimeout(() => {
                 FS.syncfs(false, (err) => {
                     if (err)
                         console.log('FS.syncfs error: ', err);
                 });
-            }, 100);
+            }, timeout);
         }
 
         private antialiasChanged() {

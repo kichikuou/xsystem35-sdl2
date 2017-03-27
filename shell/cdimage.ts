@@ -1,3 +1,4 @@
+/// <reference path="util.ts" />
 /// <reference path="text-decoder.ts" />
 
 namespace CDImage {
@@ -122,24 +123,6 @@ namespace CDImage {
         }
     }
 
-    function readAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
-        return new Promise((resolve, reject) => {
-            let reader = new FileReader();
-            reader.onload = () => { resolve(reader.result); };
-            reader.onerror = () => { reject(reader.error); };
-            reader.readAsArrayBuffer(blob);
-        });
-    }
-
-    function readAsText(blob: Blob): Promise<string> {
-        return new Promise((resolve, reject) => {
-            let reader = new FileReader();
-            reader.onload = () => { resolve(reader.result); };
-            reader.onerror = () => { reject(reader.error); };
-            reader.readAsText(blob);
-        });
-    }
-
     class ImageReaderBase {
         constructor(public image: File) { }
 
@@ -150,7 +133,7 @@ namespace CDImage {
                              sectorOffset: number): Promise<Uint8Array[]> {
             let sectors = Math.ceil(bytesToRead / sectorSize);
             let blob = this.image.slice(startOffset, startOffset + sectors * blockSize);
-            let buf = await readAsArrayBuffer(blob);
+            let buf = await readFileAsArrayBuffer(blob);
             let bufs: Uint8Array[] = [];
             for (let i = 0; i < sectors; i++) {
                 bufs.push(new Uint8Array(buf, i * blockSize + sectorOffset, Math.min(bytesToRead, sectorSize)));
@@ -170,7 +153,7 @@ namespace CDImage {
         readSector(sector: number): Promise<ArrayBuffer> {
             let start = sector * 2352 + 16;
             let end = start + 2048;
-            return readAsArrayBuffer(this.image.slice(start, end));
+            return readFileAsArrayBuffer(this.image.slice(start, end));
         }
 
         readSequentialSectors(startSector: number, length: number): Promise<Uint8Array[]> {
@@ -178,7 +161,7 @@ namespace CDImage {
         }
 
         async parseCue(cueFile: File) {
-            let lines = (await readAsText(cueFile)).split('\n');
+            let lines = (await readFileAsText(cueFile)).split('\n');
             this.tracks = [];
             let currentTrack: number = null;
             for (let line of lines) {
@@ -234,7 +217,7 @@ namespace CDImage {
         }
 
         async parseMds(mdsFile: File) {
-            let buf = await readAsArrayBuffer(mdsFile);
+            let buf = await readFileAsArrayBuffer(mdsFile);
 
             let signature = new TextDecoder().decode(new DataView(buf, 0, 16));
             if (signature !== 'MEDIA DESCRIPTOR')
@@ -262,7 +245,7 @@ namespace CDImage {
         readSector(sector: number): Promise<ArrayBuffer> {
             let start = sector * this.tracks[1].sectorSize + 16;
             let end = start + 2048;
-            return readAsArrayBuffer(this.image.slice(start, end));
+            return readFileAsArrayBuffer(this.image.slice(start, end));
         }
 
         readSequentialSectors(startSector: number, length: number): Promise<Uint8Array[]> {

@@ -2,7 +2,7 @@
 *.o
 *.lo
 *.la
-*.js
+/docs/*.js
 /config.h
 /config.log
 /config.status

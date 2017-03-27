@@ -52,7 +52,7 @@ namespace xsystem35 {
             }
             if (this.imgFile && this.cueFile) {
                 this.imageReader = await CDImage.createReader(this.imgFile, this.cueFile);
-                await this.shell.fileSystemReady;
+                await xsystem35.fileSystemReady;
                 this.install();
             }
         }

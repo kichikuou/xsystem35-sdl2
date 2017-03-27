@@ -4,6 +4,7 @@
   "description": "",
   "dependencies": {
     "@types/emscripten": "0.0.29",
+    "@types/jszip": "0.0.32",
     "@types/text-encoding": "0.0.30"
   }
 }
