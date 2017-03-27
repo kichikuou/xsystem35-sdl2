@@ -14,6 +14,7 @@ namespace xsystem35 {
 
             $('#downloadSaveData').addEventListener('click', this.downloadSaveData.bind(this));
             $('#uploadSaveData').addEventListener('click', this.uploadSaveData.bind(this));
+            this.checkSaveData();
         }
 
         private openModal() {
@@ -26,8 +27,14 @@ namespace xsystem35 {
             document.removeEventListener('keydown', this.keyDownHandler);
         }
 
+        private checkSaveData() {
+            xsystem35.saveDirReady.then(() => {
+                if ((<string[]>FS.readdir('/save')).some((name) => { return name.toLowerCase().endsWith('.asd'); }))
+                    $('#downloadSaveData').removeAttribute('disabled');
+            });
+        }
+
         private async downloadSaveData() {
-            await xsystem35.saveDirReady;
             let zip = new JSZip();
             let folder = zip.folder('save');
             for (let name of FS.readdir('/save')) {
@@ -76,7 +83,8 @@ namespace xsystem35 {
                     throw('Unknown file type: ' + file.name);
                 }
                 xsystem35.shell.syncfs(0);
-                xsystem35.shell.addToast('成功しました。', 'success');
+                xsystem35.shell.addToast('セーブデータの復元に成功しました。', 'success');
+                this.checkSaveData();
             } catch (err) {
                 xsystem35.shell.addToast('セーブデータを復元できませんでした。', 'danger');
                 console.warn(err);
