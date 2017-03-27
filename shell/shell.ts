@@ -97,6 +97,22 @@ namespace xsystem35 {
             this.zoom.handleZoom();
         }
 
+        addToast(msg: string, type?: 'success' | 'danger') {
+            let container = $('.toast-container');
+            let div = document.createElement('div');
+            div.classList.add('toast');
+            if (type)
+                div.classList.add('toast-' + type);
+            div.innerText = msg;
+            let btn = document.createElement('button');
+            btn.setAttribute('class', 'btn btn-clear float-right');
+            function dismiss() { container.removeChild(div); }
+            btn.addEventListener('click', dismiss);
+            setTimeout(dismiss, 5000);
+            div.insertBefore(btn, div.firstChild);
+            container.insertBefore(div, container.firstChild);
+        }
+
         private fsyncTimer: number;
         syncfs(timeout = 100) {
             window.clearTimeout(this.fsyncTimer);

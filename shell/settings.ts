@@ -73,11 +73,13 @@ namespace xsystem35 {
                 } else if (file.name.toLowerCase().endsWith('.asd')) {
                     addSaveFile(file.name, await readFileAsArrayBuffer(file));
                 } else {
-                    throw('ファイルを認識できません。');
+                    throw('Unknown file type: ' + file.name);
                 }
                 xsystem35.shell.syncfs(0);
+                xsystem35.shell.addToast('成功しました。', 'success');
             } catch (err) {
-                console.log(err);
+                xsystem35.shell.addToast('セーブデータを復元できませんでした。', 'danger');
+                console.warn(err);
             }
         }
     }
