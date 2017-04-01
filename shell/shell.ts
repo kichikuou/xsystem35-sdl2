@@ -20,6 +20,7 @@ namespace xsystem35 {
     export let settings: Settings;
 
     export class System35Shell {
+        private params: URLSearchParams & Map<string, string>;
         private imageLoader: ImageLoader;
         status: HTMLElement = document.getElementById('status');
         private zoom: ZoomManager;
@@ -27,7 +28,9 @@ namespace xsystem35 {
         private antialiasCheckbox: HTMLInputElement;
 
         constructor() {
-            this.imageLoader = new ImageLoader(this);
+            this.parseParams(location.search.slice(1));
+            this.initModule();
+
             this.setStatus('Downloading...');
             window.onerror = () => {
                 this.setStatus('Exception thrown, see JavaScript console');
@@ -36,8 +39,7 @@ namespace xsystem35 {
                 };
             };
 
-            this.initModule();
-
+            this.imageLoader = new ImageLoader(this);
             this.volumeControl = new VolumeControl();
             xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
             this.zoom = new ZoomManager();
@@ -48,12 +50,35 @@ namespace xsystem35 {
             xsystem35.settings = new Settings();
         }
 
+        private parseParams(searchParams: string) {
+            if (typeof URLSearchParams !== 'undefined') {
+                this.params = <URLSearchParams & Map<string, string>>new URLSearchParams(searchParams);
+                return;
+            }
+            // For Edge
+            this.params = <URLSearchParams & Map<string, string>>new Map();
+            if (window.location.search.length > 1) {
+                for (let item of searchParams.split('&')) {
+                    let [key, value] = item.split('=');
+                    this.params.set(key, value);
+                }
+            }
+        }
+
         private initModule() {
             let fsReady: () => void;
             fileSystemReady = new Promise((resolve) => { fsReady = resolve; });
             let idbfsReady: () => void;
             saveDirReady = new Promise((resolve) => { idbfsReady = resolve; });
 
+            Module.arguments = [];
+            for (let [name, val] of this.params) {
+                if (name.startsWith('-')) {
+                    Module.arguments.push(name);
+                    if (val)
+                        Module.arguments.push(val);
+                }
+            }
             Module.print = Module.printErr = console.log.bind(console);
             Module.canvas = document.getElementById('canvas');
             Module.noInitialRun = true;
@@ -75,7 +100,8 @@ namespace xsystem35 {
             ];
 
             document.addEventListener('DOMContentLoaded', () => {
-                let src = typeof WebAssembly === 'object' ? 'xsystem35.js' : 'xsystem35.asm.js';
+                let useWasm = typeof WebAssembly === 'object' && this.params.get('wasm') !== '0';
+                let src = useWasm ? 'xsystem35.js' : 'xsystem35.asm.js';
                 let script = document.createElement('script');
                 script.src = src;
                 script.onerror = () => { this.addToast('xsystem35の読み込みに失敗しました。リロードしてください。', 'danger'); };
@@ -93,7 +119,7 @@ namespace xsystem35 {
             $('#zoom').hidden = false;
             $('#volume-control').hidden = false;
             setTimeout(() => {
-                Module.callMain();
+                Module.callMain(Module.arguments);
                 this.antialiasChanged();
             }, 0);
         }

@@ -52,7 +52,7 @@ declare namespace Module {
     let canvas: HTMLElement;
     function setStatus(status: string): void;
     function monitorRunDependencies(left: number): void;
-    function callMain(): void;
+    function callMain(args: string[]): void;
     function getMemory(size: number): number;
 }
 
