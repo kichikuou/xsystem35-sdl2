@@ -124,17 +124,27 @@ static void sdl_getEvent(void) {
 			break;
 
 		case SDL_FINGERDOWN:
-			mouseb |= 1 << SDL_BUTTON_LEFT;
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = TRUE;
-			mousex = e.tfinger.x * view_w;
-			mousey = e.tfinger.y * view_h;
+			if (SDL_GetNumTouchFingers(SDL_GetTouchDevice(0)) >= 2) {
+				mouseb &= ~(1 << SDL_BUTTON_LEFT);
+				mouseb |= 1 << SDL_BUTTON_RIGHT;
+				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
+				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = TRUE;
+			} else {
+				mouseb |= 1 << SDL_BUTTON_LEFT;
+				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = TRUE;
+				mousex = e.tfinger.x * view_w;
+				mousey = e.tfinger.y * view_h;
+			}
 			break;
 
 		case SDL_FINGERUP:
-			mouseb &= ~(1 << SDL_BUTTON_LEFT);
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
-			mousex = e.tfinger.x * view_w;
-			mousey = e.tfinger.y * view_h;
+			if (SDL_GetNumTouchFingers(SDL_GetTouchDevice(0)) == 0) {
+				mouseb &= ~(1 << SDL_BUTTON_LEFT | 1 << SDL_BUTTON_RIGHT);
+				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
+				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = FALSE;
+				mousex = e.tfinger.x * view_w;
+				mousey = e.tfinger.y * view_h;
+			}
 			break;
 
 		case SDL_FINGERMOTION:
@@ -252,10 +262,3 @@ int sdl_getjoyinfo(void) {
 	return joyinfo;
 }
 #endif
-
-void sdl_rightButton(int down) {
-	SDL_Event sdlevent;
-	sdlevent.type = down ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
-	sdlevent.button.button = SDL_BUTTON_RIGHT;
-	SDL_PushEvent(&sdlevent);
-}

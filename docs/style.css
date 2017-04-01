@@ -37,7 +37,6 @@ header {
 }
 
 .contents {
-    -webkit-user-select: none;
     max-width: 640px;
     margin: 2ex auto 0;
 }

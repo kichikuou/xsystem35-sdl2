@@ -96,7 +96,6 @@ namespace xsystem35 {
                 Module.callMain();
                 this.antialiasChanged();
             }, 0);
-            this.addRightClickEmulation();
         }
 
         setStatus(text: string) {
@@ -139,22 +138,6 @@ namespace xsystem35 {
         private antialiasChanged() {
             localStorage.setItem('antialias', String(this.antialiasCheckbox.checked));
             _ags_setAntialiasedStringMode(this.antialiasCheckbox.checked ? 1 : 0);
-        }
-
-        private addRightClickEmulation() {
-            let emulatingRightClick = false;
-            document.body.addEventListener('touchstart', (e) => {
-                if (e.target !== document.body)
-                    return;
-                _sdl_rightButton(1);
-                emulatingRightClick = true;
-            });
-            document.body.addEventListener('touchend', (e) => {
-                if (!emulatingRightClick)
-                    return;
-                _sdl_rightButton(0);
-                emulatingRightClick = false;
-            });
         }
     }
 
