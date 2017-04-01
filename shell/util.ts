@@ -18,6 +18,25 @@ function readFileAsText(blob: Blob): Promise<string> {
     });
 }
 
+function ASCIIArrayToString(buffer: Uint8Array): string {
+    return String.fromCharCode.apply(null, buffer);
+}
+
+function SJISArrayToString(buffer: DataView): string {
+    if (typeof TextDecoder !== 'undefined')
+        return new TextDecoder('shift_jis').decode(buffer);
+
+    let out = '';
+    for (let i = 0; i < buffer.byteLength; i++) {
+        let c = buffer.getUint8(i);
+        if (c < 128)
+            out += String.fromCharCode(c);
+        else
+            out += '%' + c.toString(16);
+    }
+    return out;
+}
+
 declare var WebAssembly: any;
 
 // xsystem35 exported functions

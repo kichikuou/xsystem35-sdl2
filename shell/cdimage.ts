@@ -1,5 +1,4 @@
 /// <reference path="util.ts" />
-/// <reference path="text-decoder.ts" />
 
 namespace CDImage {
     export class ISO9660FileSystem {
@@ -72,8 +71,7 @@ namespace CDImage {
             return this.view.getUint8(0);
         }
         volumeLabel(): string {
-            let decoder = new TextDecoder('shift_jis');
-            return decoder.decode(new DataView(this.buf, 40, 32)).trim();
+            return SJISArrayToString(new DataView(this.buf, 40, 32)).trim();
         }
         rootDirEnt(): DirEnt {
             return new DirEnt(this.buf, 156);
@@ -99,8 +97,7 @@ namespace CDImage {
         }
         get name(): string {
             let len = this.view.getUint8(32);
-            let decoder = new TextDecoder('shift_jis');
-            return decoder.decode(new DataView(this.buf, this.offset + 33, len)).split(';')[0];
+            return SJISArrayToString(new DataView(this.buf, this.offset + 33, len)).split(';')[0];
         }
     }
 
@@ -219,7 +216,7 @@ namespace CDImage {
         async parseMds(mdsFile: File) {
             let buf = await readFileAsArrayBuffer(mdsFile);
 
-            let signature = new TextDecoder().decode(new DataView(buf, 0, 16));
+            let signature = ASCIIArrayToString(new Uint8Array(buf, 0, 16));
             if (signature !== 'MEDIA DESCRIPTOR')
                 throw mdsFile.name + ': not a mds file';
 
