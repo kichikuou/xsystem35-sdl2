@@ -50,9 +50,13 @@ struct ecopyparam {
 typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
 
-#define EC_WAIT                                               \
+#define EC_WAIT \
 	if ((key |= sys_getInputInfo()) && ecp.cancel) break; \
-	key = sys_keywait(cnt - get_ecounter(), ecp.cancel);
+	do {												  \
+		int wait_ms = cnt - get_ecounter();				  \
+		if (wait_ms >= 16)								  \
+			key = sys_keywait(wait_ms, ecp.cancel);		  \
+	} while (0)
 
 
 static int get_ecounter(void) {
