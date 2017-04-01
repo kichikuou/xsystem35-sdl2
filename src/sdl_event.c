@@ -126,20 +126,20 @@ static void sdl_getEvent(void) {
 		case SDL_FINGERDOWN:
 			mouseb |= 1 << SDL_BUTTON_LEFT;
 			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = TRUE;
-			mousex = e.tfinger.x;
-			mousey = e.tfinger.y;
+			mousex = e.tfinger.x * view_w;
+			mousey = e.tfinger.y * view_h;
 			break;
 
 		case SDL_FINGERUP:
 			mouseb &= ~(1 << SDL_BUTTON_LEFT);
 			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
-			mousex = e.tfinger.x;
-			mousey = e.tfinger.y;
+			mousex = e.tfinger.x * view_w;
+			mousey = e.tfinger.y * view_h;
 			break;
 
 		case SDL_FINGERMOTION:
-			mousex = e.tfinger.x;
-			mousey = e.tfinger.y;
+			mousex = e.tfinger.x * view_w;
+			mousey = e.tfinger.y * view_h;
 			break;
 
 #if HAVE_SDLJOY
