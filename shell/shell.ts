@@ -27,11 +27,6 @@ namespace xsystem35 {
         private antialiasCheckbox: HTMLInputElement;
 
         constructor() {
-            let fsReady: () => void;
-            fileSystemReady = new Promise((resolve) => { fsReady = resolve; });
-            let idbfsReady: () => void;
-            saveDirReady = new Promise((resolve) => { idbfsReady = resolve; });
-
             this.imageLoader = new ImageLoader(this);
             this.setStatus('Downloading...');
             window.onerror = () => {
@@ -41,8 +36,24 @@ namespace xsystem35 {
                 };
             };
 
-            // Initialize the Module object
-            Module.TOTAL_MEMORY = 96 * 1024 * 1024;
+            this.initModule();
+
+            this.volumeControl = new VolumeControl();
+            xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
+            this.zoom = new ZoomManager();
+            this.antialiasCheckbox = <HTMLInputElement>$('#antialias');
+            this.antialiasCheckbox.addEventListener('change', this.antialiasChanged.bind(this));
+            this.antialiasCheckbox.checked = localStorage.getItem('antialias') !== 'false';
+            xsystem35.audio = new AudioManager(this.volumeControl);
+            xsystem35.settings = new Settings();
+        }
+
+        private initModule() {
+            let fsReady: () => void;
+            fileSystemReady = new Promise((resolve) => { fsReady = resolve; });
+            let idbfsReady: () => void;
+            saveDirReady = new Promise((resolve) => { idbfsReady = resolve; });
+
             Module.print = Module.printErr = console.log.bind(console);
             Module.canvas = document.getElementById('canvas');
             Module.noInitialRun = true;
@@ -62,14 +73,14 @@ namespace xsystem35 {
                     });
                 },
             ];
-            this.volumeControl = new VolumeControl();
-            xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
-            this.zoom = new ZoomManager();
-            this.antialiasCheckbox = <HTMLInputElement>$('#antialias');
-            this.antialiasCheckbox.addEventListener('change', this.antialiasChanged.bind(this));
-            this.antialiasCheckbox.checked = localStorage.getItem('antialias') !== 'false';
-            xsystem35.audio = new AudioManager(this.volumeControl);
-            xsystem35.settings = new Settings();
+
+            document.addEventListener('DOMContentLoaded', () => {
+                let src = typeof WebAssembly === 'object' ? 'xsystem35.js' : 'xsystem35.asm.js';
+                let script = document.createElement('script');
+                script.src = src;
+                script.onerror = () => { this.addToast('xsystem35の読み込みに失敗しました。リロードしてください。', 'danger'); };
+                document.body.appendChild(script);
+            });
         }
 
         installStarted() {
@@ -108,7 +119,8 @@ namespace xsystem35 {
             btn.setAttribute('class', 'btn btn-clear float-right');
             function dismiss() { container.removeChild(div); }
             btn.addEventListener('click', dismiss);
-            setTimeout(dismiss, 5000);
+            if (type !== 'danger')
+                setTimeout(dismiss, 5000);
             div.insertBefore(btn, div.firstChild);
             container.insertBefore(div, container.firstChild);
         }

@@ -18,6 +18,8 @@ function readFileAsText(blob: Blob): Promise<string> {
     });
 }
 
+declare var WebAssembly: any;
+
 // xsystem35 exported functions
 declare function _musfade_setvolval_all(vol: number): void;
 declare function _ags_setAntialiasedStringMode(on: number): void;

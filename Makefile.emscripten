@@ -11,8 +11,16 @@ EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode','_sdl_rightButton', '_ald_getdata', '_ald_freedata']"
 
+WASMFLAGS := -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s "BINARYEN_TRAP_MODE='allow'"
+ASMJSFLAGS := -s TOTAL_MEMORY=100663296
+
+all: docs/xsystem35.js docs/xsystem35.asm.js
+
 docs/xsystem35.js: emterpretify_whitelist src/xsystem35
-	$(CC) xsystem35.bc $(LFLAGS) @emterpretify_whitelist -o $@
+	$(CC) xsystem35.bc $(LFLAGS) $(WASMFLAGS) @emterpretify_whitelist -o $@
+
+docs/xsystem35.asm.js: emterpretify_whitelist src/xsystem35
+	$(CC) xsystem35.bc $(LFLAGS) $(ASMJSFLAGS) @emterpretify_whitelist -o $@
 
 emterpretify_whitelist:
 	$(MAKE) -C src clean

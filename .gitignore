@@ -3,6 +3,8 @@
 *.lo
 *.la
 /docs/*.js
+/docs/*.js.mem
+/docs/*.wasm
 /config.h
 /config.log
 /config.status
