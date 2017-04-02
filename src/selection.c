@@ -403,7 +403,7 @@ static void drawLineFrame(int x, int y, int width, int height) {
 void sel_select() {
 	int curElement = -1;
 	int preElement = -1;
-	int key, i;
+	int key, prevkey = 0, i;
 	
 	saveimg2 = NULL;
 	keymode = 0;
@@ -426,8 +426,9 @@ void sel_select() {
 	sys_key_releasewait(SYS35KEY_RET, FALSE);
 	while (1) {
 		key = sys_keywait(25, TRUE);
-		if (key == SYS35KEY_SPC) break;
-		if (key == SYS35KEY_RET && curElement != -1) break;
+		if (!key && prevkey == SYS35KEY_SPC) break;
+		if (!key && prevkey == SYS35KEY_RET && curElement != -1) break;
+		prevkey = key;
 		if (key & 3) {
 			curElement = -1;
 			if ((key & 1)) {
@@ -467,7 +468,6 @@ void sel_select() {
 			}
 		}
 	}
-	sys_key_releasewait(SYS35KEY_RET, FALSE);
 	
 	if (saveimg2 != NULL) {
 		ags_delRegion(saveimg2);
@@ -486,7 +486,7 @@ void sel_select() {
 		msg_nextPage(TRUE);
 	}
 	
-	if (key == SYS35KEY_RET) {
+	if (prevkey == SYS35KEY_RET) {
 		sl_jmpNear(elmv[curElement]);
 		if (cb_select_page != 0) {
 			sl_callFar2(cb_select_page -1, cb_select_address);
