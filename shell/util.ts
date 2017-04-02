@@ -26,15 +26,17 @@ function SJISArrayToString(buffer: DataView): string {
     if (typeof TextDecoder !== 'undefined')
         return new TextDecoder('shift_jis').decode(buffer);
 
-    let out = '';
+    let out = [];
     for (let i = 0; i < buffer.byteLength; i++) {
         let c = buffer.getUint8(i);
-        if (c < 128)
-            out += String.fromCharCode(c);
+        if (c >= 0xa0 && c <= 0xdf)
+            out.push(0xff60 + c - 0xa0);
+        else if (c < 0x80)
+            out.push(c);
         else
-            out += '%' + c.toString(16);
+            out.push(_sjis2unicode(c, buffer.getUint8(++i)));
     }
-    return out;
+    return String.fromCharCode.apply(null, out);
 }
 
 declare var WebAssembly: any;
@@ -44,6 +46,7 @@ declare function _musfade_setvolval_all(vol: number): void;
 declare function _ags_setAntialiasedStringMode(on: number): void;
 declare function _ald_getdata(type: number, no: number): number;
 declare function _ald_freedata(data: number): void;
+declare function _sjis2unicode(byte1: number, byte2: number): void;
 
 declare namespace Module {
     let noInitialRun: boolean;

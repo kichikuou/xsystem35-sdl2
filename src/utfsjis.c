@@ -133,3 +133,12 @@ BYTE *sjis_toupper2(BYTE *src) {
 	sjis_toupper(dst);
 	return dst;
 }
+
+#ifdef __EMSCRIPTEN__
+extern unsigned short *s2u[];
+
+int sjis2unicode(int byte1, int byte2) {
+	return s2u[byte1 - 0x80][byte2 - 0x40];
+}
+
+#endif
