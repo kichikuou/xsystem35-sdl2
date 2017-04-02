@@ -49,13 +49,9 @@ declare function _ald_freedata(data: number): void;
 declare function _sjis2unicode(byte1: number, byte2: number): void;
 
 declare namespace Module {
-    let noInitialRun: boolean;
-
     // Undocumented methods / attributes
     let canvas: HTMLElement;
-    function callMain(args: string[]): void;
     function getMemory(size: number): number;
-    function monitorRunDependencies(left: number): void;
     function setStatus(status: string): void;
     function setWindowTitle(title: string): void;
 }

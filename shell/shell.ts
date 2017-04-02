@@ -86,9 +86,9 @@ namespace xsystem35 {
                     $('.navbar-brand').textContent = title.slice(colon + 1);
             };
             Module.canvas = document.getElementById('canvas');
-            Module.noInitialRun = true;
             Module.setStatus = this.setStatus.bind(this);
             Module.preRun = [
+                () => { Module.addRunDependency('gameFiles'); },
                 fsReady,
                 function loadFont() {
                     FS.createPreloadedFile('/', Font.fname, Font.url, true, false);
@@ -124,8 +124,9 @@ namespace xsystem35 {
             $('#zoom').hidden = false;
             $('#volume-control').hidden = false;
             setTimeout(() => {
-                Module.callMain(Module.arguments);
-                this.antialiasChanged();
+                if (this.antialiasCheckbox.checked)
+                    Module.arguments.push('-antialias');
+                Module.removeRunDependency('gameFiles');
             }, 0);
         }
 
