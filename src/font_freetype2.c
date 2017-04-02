@@ -34,9 +34,9 @@
 #include "system.h"
 #include "font.h"
 #include "ags.h"
-#include "s2utbl.h"
 
 extern int cp932tosjis0213(int code);
+extern unsigned short *s2u[];
 
 typedef struct {
 	int      size;

@@ -53,10 +53,11 @@ declare namespace Module {
 
     // Undocumented methods / attributes
     let canvas: HTMLElement;
-    function setStatus(status: string): void;
-    function monitorRunDependencies(left: number): void;
     function callMain(args: string[]): void;
     function getMemory(size: number): number;
+    function monitorRunDependencies(left: number): void;
+    function setStatus(status: string): void;
+    function setWindowTitle(title: string): void;
 }
 
 declare namespace FS {

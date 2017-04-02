@@ -141,11 +141,6 @@ dnl      [enable_pkgc=yes])
 dnl fi
 
 dnl
-dnl check iconv
-dnl
-AM_ICONV
-
-dnl
 dnl check for gtk
 dnl
 AC_ARG_ENABLE(gtk,

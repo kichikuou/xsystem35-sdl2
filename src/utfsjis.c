@@ -28,48 +28,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef HAVE_ICONV
-#include <iconv.h>
-#endif
 
 #include "portab.h"
 #include "utfsjis.h"
-
-static char* convert(char* src, const char* tocode, const char* fromcode, int size_multiplier) {
-#ifdef HAVE_ICONV
-	iconv_t cd = iconv_open(tocode, fromcode);
-	if (cd == (iconv_t)-1)
-		return NULL;
-
-	size_t srclen = strlen(src);
-	size_t dstlen = srclen * size_multiplier + 1;
-	char* dst = malloc(dstlen);
-	char *srcp = src, *dstp = dst;
-	if (iconv(cd, &srcp, &srclen, &dstp, &dstlen) == (size_t)-1 || !dstlen) {
-		free(dst);
-		iconv_close(cd);
-		return NULL;
-	}
-	*dstp = '\0';
-	iconv_close(cd);
-	return dst;
-#else
-	return NULL;
-#endif
-}
+#include "s2utbl.h"
 
 BYTE *sjis2utf(BYTE *src) {
-	char* dst = convert(src, "utf-8", "shift-jis", 3);
-	if (!dst)
-		dst = strdup(src);
+	BYTE* dst = malloc(strlen(src) * 3 + 1);
+	BYTE* dstp = dst;
+
+	while (*src) {
+		if (*src <= 0x7f) {
+			*dstp++ = *src++;
+			continue;
+		}
+
+		int c;
+		if (*src >= 0xa0 && *src <= 0xdf) {
+			c = 0xff60 + *src - 0xa0;
+			src++;
+		} else {
+			c = s2u[*src - 0x80][*(src+1) - 0x40];
+			src += 2;
+		}
+
+		if (c <= 0x7f) {
+			*dstp++ = c;
+		} else if (c <= 0x7ff) {
+			*dstp++ = 0xc0 | c >> 6;
+			*dstp++ = 0x80 | (c & 0x3f);
+		} else {
+			*dstp++ = 0xe0 | c >> 12;
+			*dstp++ = 0x80 | (c >> 6 & 0x3f);
+			*dstp++ = 0x80 | (c & 0x3f);
+		}
+	}
+	*dstp = '\0';
 	return dst;
 }
 
 BYTE *utf2sjis(BYTE *src) {
-	char* dst = convert(src, "shift-jis", "utf-8", 1);
-	if (!dst)
-		dst = strdup(src);
-	return dst;
+	printf("%s not implemented\n", __func__);
+	return strdup(src);
 }
 
 /* src 内に半角カナもしくはASCII文字があるかどうか */

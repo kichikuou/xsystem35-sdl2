@@ -210,9 +210,6 @@
 /* Define this if you have libXxf86vm installed */
 #undef HAVE_XF86VMODE
 
-/* Define as const if the declaration of iconv() needs const. */
-#undef ICONV_CONST
-
 /* joystick device */
 #undef JOY_DEVICE
 
