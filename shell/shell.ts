@@ -114,12 +114,12 @@ namespace xsystem35 {
             });
         }
 
-        installStarted() {
+        loadStarted() {
             $('#loader').hidden = true;
             document.body.classList.add('bgblack-fade');
         }
 
-        installed() {
+        loaded() {
             $('#xsystem35').hidden = false;
             $('#zoom').hidden = false;
             $('#volume-control').hidden = false;
