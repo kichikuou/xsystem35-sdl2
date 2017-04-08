@@ -14,6 +14,9 @@ namespace xsystem35 {
             this.audio.volume = volumeControl.volume();
             this.waiting = false;
             this.removeUserGestureRestriction();
+            this.audio.addEventListener('error', (err) => {
+                xsystem35.shell.addToast('BGMの再生に失敗しました。', 'danger');
+            });
         }
 
         play(track: number, loop: number) {
