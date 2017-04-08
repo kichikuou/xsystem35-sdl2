@@ -78,7 +78,7 @@ namespace xsystem35 {
             }
             this.shell.loadStarted();
 
-            let grGenerator = new GameResourceGenerator();
+            let aldFiles = [];
             for (let e of await isofs.readDir(gamedata)) {
                 if (!e.name.toLowerCase().endsWith('.ald'))
                     continue;
@@ -86,15 +86,34 @@ namespace xsystem35 {
                 let ptr = Module.getMemory(e.size);
                 await this.extractFile(isofs, e, Module.HEAPU8, ptr);
                 FS.writeFile(e.name, Module.HEAPU8.subarray(ptr, ptr + e.size), { encoding: 'binary', canOwn: true });
-                grGenerator.addFile(e.name);
+                aldFiles.push(e.name);
             }
-            FS.writeFile('xsystem35.gr', grGenerator.generate());
+            FS.writeFile('xsystem35.gr', this.createGr(aldFiles));
             FS.writeFile('.xsys35rc', xsystem35.xsys35rc);
             this.shell.loaded();
         }
 
         private setError(msg: string) {
             console.log(msg);
+        }
+
+        private createGr(files: string[]): string {
+            const resourceType: { [ch: string]: string } = {
+                d: 'Data', g: 'Graphics', m: 'Midi', r: 'Resource', s: 'Scenario', w: 'Wave',
+            };
+            let basename: string;
+            let lines: string[] = [];
+            for (let name of files) {
+                let type = name.charAt(name.length - 6).toLowerCase();
+                let id = name.charAt(name.length - 5);
+                basename = name.slice(0, -6);
+                lines.push(resourceType[type] + id.toUpperCase() + ' ' + name);
+            }
+            for (let i = 0; i < 26; i++) {
+                let id = String.fromCharCode(65 + i);
+                lines.push('Save' + id + ' save/' + basename + 's' + id.toLowerCase() + '.asd');
+            }
+            return lines.join('\n') + '\n';
         }
 
         // For debug
@@ -106,32 +125,6 @@ namespace xsystem35 {
                         this.walk(isofs, e, dirname + e.name + '/');
                 }
             }
-        }
-    }
-
-    class GameResourceGenerator {
-        static resourceType: { [ch: string]: string } =
-            { s: 'Scenario', g: 'Graphics', w: 'Wave', d: 'Data', r: 'Resource', m: 'Midi' };
-        private basename: string;
-        private lines: string[] = [];
-
-        addFile(name: string) {
-            let type = name.charAt(name.length - 6).toLowerCase();
-            let id = name.charAt(name.length - 5);
-            this.basename = name.slice(0, -6);
-            this.lines.push(GameResourceGenerator.resourceType[type] + id.toUpperCase() + ' ' + name);
-        }
-
-        generate(): string {
-            for (let i = 0; i < 26; i++) {
-                let id = String.fromCharCode(65 + i);
-                this.lines.push('Save' + id + ' save/' + this.basename + 's' + id.toLowerCase() + '.asd');
-            }
-            return this.lines.join('\n') + '\n';
-        }
-
-        isEmpty(): boolean {
-            return this.lines.length === 0;
         }
     }
 }
