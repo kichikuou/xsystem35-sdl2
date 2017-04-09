@@ -177,10 +177,9 @@ canvas.emscripten {
 
 .toast-container {
     position: fixed;
-    bottom: 0;
-    left: 0;
+    bottom: 30px;
+    left: 30px;
     width: 400px;
-    padding: 30px;
     z-index: 500;
 }
 
