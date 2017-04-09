@@ -19,19 +19,22 @@ namespace xsystem35 {
             }
         }
 
+        init() {
+            this.zoomSelect.hidden = false;
+        }
+
         handleZoom() {
             let value = this.zoomSelect.value;
             localStorage.setItem('zoom', value);
             let navbarStyle = $('.navbar').style;
-            let contentsStyle = $('.contents').style;
             if (value === 'fit') {
+                $('#xsystem35').classList.add('fit');
                 navbarStyle.maxWidth = 'none';
-                contentsStyle.maxWidth = 'none';
-                contentsStyle.width = this.canvas.style.width = '100%';
+                this.canvas.style.width = null;
             } else {
+                $('#xsystem35').classList.remove('fit');
                 let ratio = Number(value);
-                contentsStyle.maxWidth = 'none';
-                navbarStyle.maxWidth = contentsStyle.width = this.canvas.style.width = this.canvas.width * ratio + 'px';
+                navbarStyle.maxWidth = this.canvas.style.width = this.canvas.width * ratio + 'px';
             }
         }
 

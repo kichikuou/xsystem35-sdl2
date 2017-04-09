@@ -1,6 +1,59 @@
+body {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 header {
+  background-color: #444;
+  color: #ccc;
+}
+
+@media all and (max-height: 480px) {
+  #toolbar-handler {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 50px;
+    height: 10px;
     background-color: #444;
-    color: #ccc;
+  }
+
+  .toolbar-handler-icon {
+    width: 5px;
+    height: 5px;
+    margin-left: 21px;
+    border: solid #ccc;
+    border-width: 2px 2px 0 0;
+    -webkit-transform: rotate(135deg);
+    transform: rotate(135deg);
+  }
+
+  header.closeable {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    transition: top 0.4s ease;
+  }
+
+  header.closeable.closed {
+    top: -42px;
+  }
+}
+
+@media not all and (max-height: 480px) {
+  #toolbar-handler {
+    display: none;
+  }
+
+  #toolbar-close-button {
+    display: none;
+  }
 }
 
 .navbar {
@@ -37,6 +90,11 @@ header {
 }
 
 .contents {
+  flex: 1;
+  display: flex;
+}
+
+#loader {
     max-width: 640px;
     margin: 2ex auto 0;
 }
@@ -66,10 +124,38 @@ header {
     transition-timing-function: linear;
 }
 
+#xsystem35 {
+  margin: auto;
+}
+
+#xsystem35.fit {
+  margin: 0;
+  flex: 1;
+}
+
 /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
 canvas.emscripten {
 	border: 0px none;
 }
+
+@media all and (min-aspect-ratio: 640/400) {
+  .fit canvas.emscripten {
+    height: 100%;
+    max-height: 100vh;
+    margin: auto;
+    display: block;
+  }
+}
+@media not all and (min-aspect-ratio: 640/400) {
+  #xsystem35.fit {
+    display: flex;
+    align-items: center;
+  }
+  .fit canvas.emscripten {
+    width: 100%;
+  }
+}
+
 .pixelated {
 	image-rendering: pixelated;
 	image-rendering: -moz-crisp-edges;

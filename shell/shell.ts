@@ -5,6 +5,7 @@
 /// <reference path="volume.ts" />
 /// <reference path="cdda.ts" />
 /// <reference path="audio.ts" />
+/// <reference path="toolbar.ts" />
 
 namespace xsystem35 {
     const Font = { url: 'fonts/MTLc3m.ttf', fname: 'MTLc3m.ttf'};
@@ -25,6 +26,7 @@ namespace xsystem35 {
         status: HTMLElement = document.getElementById('status');
         private zoom: ZoomManager;
         private volumeControl: VolumeControl;
+        private toolbar: ToolBar;
         private antialiasCheckbox: HTMLInputElement;
 
         constructor() {
@@ -43,6 +45,7 @@ namespace xsystem35 {
             this.volumeControl = new VolumeControl();
             xsystem35.cdPlayer = new CDPlayer(this.imageLoader, this.volumeControl);
             this.zoom = new ZoomManager();
+            this.toolbar = new ToolBar();
             this.antialiasCheckbox = <HTMLInputElement>$('#antialias');
             this.antialiasCheckbox.addEventListener('change', this.antialiasChanged.bind(this));
             this.antialiasCheckbox.checked = localStorage.getItem('antialias') !== 'false';
@@ -117,12 +120,13 @@ namespace xsystem35 {
         loadStarted() {
             $('#loader').hidden = true;
             document.body.classList.add('bgblack-fade');
+            this.toolbar.setCloseable();
         }
 
         loaded() {
             $('#xsystem35').hidden = false;
-            $('#zoom').hidden = false;
-            $('#volume-control').hidden = false;
+            this.zoom.init();
+            this.volumeControl.init();
             setTimeout(() => {
                 if (this.antialiasCheckbox.checked)
                     Module.arguments.push('-antialias');

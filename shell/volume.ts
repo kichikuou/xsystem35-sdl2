@@ -30,6 +30,10 @@ namespace xsystem35 {
             this.elem.addEventListener('volumechange', handler);
         }
 
+        init() {
+            this.elem.hidden = false;
+        }
+
         private onIconClicked(e: Event) {
             this.muted = !this.muted;
             if (this.muted) {
