@@ -179,10 +179,6 @@ canvas.emscripten {
     vertical-align: middle;
 }
 
-.settings section {
-	margin-bottom: 2rem;
-}
-
 .settings section > div {
 	padding-left: 2rem;
 }
