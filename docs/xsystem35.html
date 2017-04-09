@@ -19,15 +19,6 @@
         <span class="navbar-brand ml-5">鬼畜王 on Web</span>
       </section>
       <section class="navbar-section">
-        <select id="zoom" class="form-select mr-10" hidden>
-          <option value="1">100%</option>
-          <option value="1.25">125%</option>
-          <option value="1.5">150%</option>
-          <option value="2">200%</option>
-          <option value="3">300%</option>
-          <option value="fit">自動</option>
-        </select>
-
         <div id="volume-control" class="mr-10" hidden>
           <i id="volume-control-icon" class="fa fa-volume-up"></i>
           <input id="volume-control-slider" type="range">
@@ -68,6 +59,17 @@
       <div class="modal-body settings">
         <section>
           <h5>表示</h5>
+          <div class="form-group">
+            <span class="mr-5">拡大率:</span>
+            <select id="zoom" class="form-select">
+              <option value="1">100%</option>
+              <option value="1.25">125%</option>
+              <option value="1.5">150%</option>
+              <option value="2">200%</option>
+              <option value="3">300%</option>
+              <option value="fit">自動</option>
+            </select>
+          </div>
           <div>
             <label for="smoothing" class="form-checkbox">
               <input type="checkbox" id="smoothing" checked>

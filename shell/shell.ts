@@ -125,7 +125,6 @@ namespace xsystem35 {
 
         loaded() {
             $('#xsystem35').hidden = false;
-            this.zoom.init();
             this.volumeControl.init();
             setTimeout(() => {
                 if (this.antialiasCheckbox.checked)

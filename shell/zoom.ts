@@ -2,25 +2,18 @@
 
 namespace xsystem35 {
     export class ZoomManager {
-        private canvas: HTMLCanvasElement;
-        private zoomSelect: HTMLInputElement;
-        private smoothingCheckbox: HTMLInputElement;
+        private canvas = <HTMLCanvasElement>$('#canvas');
+        private zoomSelect = <HTMLInputElement>$('#zoom');
+        private smoothingCheckbox = <HTMLInputElement>$('#smoothing');
 
         constructor() {
-            this.canvas = <HTMLCanvasElement>$('#canvas');
-            this.zoomSelect = <HTMLInputElement>$('#zoom');
             this.zoomSelect.addEventListener('change', this.handleZoom.bind(this));
-            this.zoomSelect.value = localStorage.getItem('zoom') || '1';
-            this.smoothingCheckbox = <HTMLInputElement>$('#smoothing');
+            this.zoomSelect.value = localStorage.getItem('zoom') || 'fit';
             this.smoothingCheckbox.addEventListener('change', this.handleSmoothing.bind(this));
             if (localStorage.getItem('smoothing') === 'false') {
                 this.smoothingCheckbox.checked = false;
                 this.handleSmoothing();
             }
-        }
-
-        init() {
-            this.zoomSelect.hidden = false;
         }
 
         handleZoom() {
