@@ -9,7 +9,7 @@ body {
 }
 
 header {
-  background-color: #444;
+  background-color: rgb(68,68,68);
   color: #ccc;
 }
 
@@ -18,15 +18,15 @@ header {
     position: absolute;
     right: 0px;
     top: 0px;
-    width: 50px;
+    width: 40px;
     height: 10px;
-    background-color: #444;
+    background-color: rgba(68,68,68,0.7);
   }
 
   .toolbar-handler-icon {
     width: 5px;
     height: 5px;
-    margin-left: 21px;
+    margin: auto;
     border: solid #ccc;
     border-width: 2px 2px 0 0;
     -webkit-transform: rotate(135deg);
@@ -39,6 +39,7 @@ header {
     left: 0;
     right: 0;
     transition: top 0.4s ease;
+    background-color: rgba(68,68,68,0.85);
   }
 
   header.closeable.closed {
@@ -60,10 +61,20 @@ header {
     max-width: 640px;
     margin: 0 auto;
     padding: 0.5rem 0;
+    flex-wrap: nowrap;
+}
+
+.navbar .navbar-primary {
+  flex: 1;
+  min-width: 0;
 }
 
 .navbar-brand {
-    color: #ccc;
+  color: #ccc;
+}
+
+.navbar .navbar-section {
+  flex: 0;
 }
 
 .navbar .btn-link {
@@ -152,6 +163,7 @@ canvas.emscripten {
 
 #volume-control {
     float: right;
+    white-space: nowrap;
 }
 
 #volume-control-icon {
