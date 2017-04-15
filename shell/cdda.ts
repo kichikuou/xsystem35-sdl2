@@ -6,19 +6,34 @@ namespace xsystem35 {
         private audio = <HTMLAudioElement>$('audio');
         private blobs: Blob[];
         private currentTrack: number;
+        private isVolumeSupported: boolean;
+        private unmute: () => void;  // Non-null if emulating mute by pause
         waiting: boolean;
 
         constructor(private imageLoader: ImageLoader, volumeControl: VolumeControl) {
+            // Volume control of <audio> is not supported in iOS
+            this.audio.volume = 0.5;
+            this.isVolumeSupported = this.audio.volume !== 1;
+
             this.blobs = [];
             volumeControl.addEventListener(this.onVolumeChanged.bind(this));
             this.audio.volume = volumeControl.volume();
             this.audio.addEventListener('error', this.onAudioError.bind(this));
             this.waiting = false;
             this.removeUserGestureRestriction();
+            if (!this.isVolumeSupported) {
+                volumeControl.hideSlider();
+                if (this.audio.volume === 0)
+                    this.unmute = () => {};
+            }
         }
 
         play(track: number, loop: number) {
             this.currentTrack = track;
+            if (this.unmute) {
+                this.unmute = () => { this.play(track, loop); };
+                return;
+            }
             this.waiting = true;
             if (this.blobs[track]) {
                 this.startPlayback(this.blobs[track], loop);
@@ -33,12 +48,16 @@ namespace xsystem35 {
         stop() {
             this.audio.pause();
             this.currentTrack = null;
+            if (this.unmute)
+                this.unmute = () => {};
         }
 
         getPosition(): number {
             if (!this.currentTrack)
                 return 0;
             let time = Math.round(this.audio.currentTime * 75);
+            if (this.unmute || this.audio.error)
+                time += 750;  // unblock Kichikuou OP
             return this.currentTrack | time << 8;
         }
 
@@ -51,7 +70,21 @@ namespace xsystem35 {
         }
 
         private onVolumeChanged(evt: CustomEvent) {
-            this.audio.volume = evt.detail;
+            if (this.isVolumeSupported) {
+                this.audio.volume = evt.detail;
+                return;
+            }
+            let muted = evt.detail === 0;
+            if (!!this.unmute === muted)
+                return;
+            if (muted) {
+                this.audio.pause();
+                this.unmute = () => { this.audio.play(); };
+            } else {
+                let unmute = this.unmute;
+                this.unmute = null;
+                unmute();
+            }
         }
 
         private onAudioError(err: ErrorEvent) {

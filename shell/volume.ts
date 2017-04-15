@@ -30,6 +30,10 @@ namespace xsystem35 {
             this.elem.addEventListener('volumechange', handler);
         }
 
+        hideSlider() {
+            this.slider.hidden = true;
+        }
+
         init() {
             this.elem.hidden = false;
         }
