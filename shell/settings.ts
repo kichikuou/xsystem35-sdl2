@@ -29,7 +29,7 @@ namespace xsystem35 {
 
         private checkSaveData() {
             xsystem35.saveDirReady.then(() => {
-                if ((<string[]>FS.readdir('/save')).some((name) => { return name.toLowerCase().endsWith('.asd'); }))
+                if ((<string[]>FS.readdir('/save')).some((name) => name.toLowerCase().endsWith('.asd')))
                     $('#downloadSaveData').removeAttribute('disabled');
             });
         }
@@ -80,7 +80,7 @@ namespace xsystem35 {
                 } else if (file.name.toLowerCase().endsWith('.asd')) {
                     addSaveFile(file.name, await readFileAsArrayBuffer(file));
                 } else {
-                    throw('Unknown file type: ' + file.name);
+                    throw new Error('Unknown file type: ' + file.name);
                 }
                 xsystem35.shell.syncfs(0);
                 xsystem35.shell.addToast('セーブデータの復元に成功しました。', 'success');

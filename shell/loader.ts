@@ -65,7 +65,7 @@ namespace xsystem35 {
                 ptr += chunk.byteLength;
             }
             if (ptr !== entry.size)
-                throw ('expected ' + entry.size + ' bytes, but read ' + ptr + 'bytes');
+                throw new Error('expected ' + entry.size + ' bytes, but read ' + ptr + 'bytes');
         }
 
         private async startLoad() {

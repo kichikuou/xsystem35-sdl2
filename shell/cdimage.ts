@@ -9,7 +9,7 @@ namespace CDImage {
 
         private constructor(private sectorReader: Reader, private pvd: PVD) {
             if (this.pvd.type !== 1)
-                throw ('PVD not found');
+                throw new Error('PVD not found');
         }
 
         volumeLabel(): string {
@@ -47,7 +47,7 @@ namespace CDImage {
                     position += child.length;
                 }
                 if (position > 2048)
-                    throw ('dirent across sector boundary');
+                    throw new Error('dirent across sector boundary');
                 if (position === 2048) {
                     sector++;
                     position = 0;
@@ -173,7 +173,7 @@ namespace CDImage {
                             this.tracks[currentTrack].index[Number(fields[1])] = fields[2];
                         break;
                     default:
-                        ; // Do nothing
+                        // Do nothing
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace CDImage {
         }
     }
 
-    enum MdsTrackMode { Audio = 0xa9, Mode1 = 0xaa };
+    enum MdsTrackMode { Audio = 0xa9, Mode1 = 0xaa }
 
     class MdfMdsReader extends ImageReaderBase implements Reader {
         private tracks: Array<{ mode: number; sectorSize: number; offset: number; sectors: number; }>;
@@ -218,7 +218,7 @@ namespace CDImage {
 
             let signature = ASCIIArrayToString(new Uint8Array(buf, 0, 16));
             if (signature !== 'MEDIA DESCRIPTOR')
-                throw mdsFile.name + ': not a mds file';
+                throw new Error(mdsFile.name + ': not a mds file');
 
             let header = new DataView(buf, 0, 0x70);
             let entries = header.getUint8(0x62);
@@ -236,7 +236,7 @@ namespace CDImage {
                     this.tracks[track] = { mode, sectorSize, offset, sectors };
             }
             if (this.tracks[1].mode !== MdsTrackMode.Mode1)
-                throw 'track 1 is not mode1';
+                throw new Error('track 1 is not mode1');
         }
 
         readSector(sector: number): Promise<ArrayBuffer> {

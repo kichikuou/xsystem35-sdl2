@@ -6,11 +6,13 @@
         "max-classes-per-file": false,
         "member-access": false,
         "member-ordering": false,
+        "no-angle-bracket-type-assertion": false,
         "no-bitwise": false,
         "no-empty": false,
         "no-namespace": false,
         "no-reference": false,
         "only-arrow-functions": ["allow-declarations", "allow-named-functions"],
+        "prefer-const": false,
         "prefer-for-of": false,
         "quotemark": [true, "single", "avoid-escape"],
         "whitespace": [
