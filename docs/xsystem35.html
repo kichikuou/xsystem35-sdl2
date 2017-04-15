@@ -48,6 +48,10 @@
       <div class="emscripten" id="status"></div>
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
     </div>
+
+    <div id="unsupported" hidden>
+      このブラウザでは利用できません。
+    </div>
   </div>
 
   <!-- Settings -->
@@ -110,5 +114,11 @@
   </script>
   <script src="shell.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" async></script>
+  <script>
+    if (xsystem35.shell === undefined) {
+      loader.hidden = true;
+      unsupported.hidden = false;
+    }
+  </script>
   </body>
 </html>

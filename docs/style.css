@@ -117,6 +117,12 @@ header {
     content: " (未選択)";
 }
 
+#unsupported {
+  max-width: 640px;
+  margin: 2ex auto 0;
+  color: red;
+}
+
 .bgblack-fade {
     background-color: black;
     transition-property: background-color;
