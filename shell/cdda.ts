@@ -12,11 +12,9 @@ namespace xsystem35 {
             this.blobs = [];
             volumeControl.addEventListener(this.onVolumeChanged.bind(this));
             this.audio.volume = volumeControl.volume();
+            this.audio.addEventListener('error', this.onAudioError.bind(this));
             this.waiting = false;
             this.removeUserGestureRestriction();
-            this.audio.addEventListener('error', (err) => {
-                xsystem35.shell.addToast('BGMの再生に失敗しました。', 'danger');
-            });
         }
 
         play(track: number, loop: number) {
@@ -54,6 +52,17 @@ namespace xsystem35 {
 
         private onVolumeChanged(evt: CustomEvent) {
             this.audio.volume = evt.detail;
+        }
+
+        private onAudioError(err: ErrorEvent) {
+            let clone = document.importNode((<HTMLTemplateElement>$('#cdda-error')).content, true);
+            let toast = xsystem35.shell.addToast(clone, 'danger');
+            toast.querySelector('.cdda-reload-button').addEventListener('click', () => {
+                this.imageLoader.reloadImage().then(() => {
+                    this.play(this.currentTrack, this.audio.loop ? 1 : 0);
+                    (<HTMLElement>toast.querySelector('.btn-clear')).click();
+                });
+            });
         }
 
         private removeUserGestureRestriction() {

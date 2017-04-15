@@ -106,6 +106,7 @@ namespace CDImage {
         readSequentialSectors(startSector: number, length: number): Promise<Uint8Array[]>;
         maxTrack(): number;
         extractTrack(track: number): Promise<Blob>;
+        resetImage(image: File): void;
     }
 
     export async function createReader(img: File, cue: File) {
@@ -137,6 +138,10 @@ namespace CDImage {
                 bytesToRead -= sectorSize;
             }
             return bufs;
+        }
+
+        resetImage(image: File) {
+            this.image = image;
         }
     }
 

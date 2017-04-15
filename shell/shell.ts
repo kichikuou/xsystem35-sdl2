@@ -142,13 +142,16 @@ namespace xsystem35 {
             this.zoom.handleZoom();
         }
 
-        addToast(msg: string, type?: 'success' | 'danger') {
+        addToast(msg: string | Node, type?: 'success' | 'danger'): HTMLElement {
             let container = $('.toast-container');
             let div = document.createElement('div');
             div.classList.add('toast');
             if (type)
                 div.classList.add('toast-' + type);
-            div.innerText = msg;
+            if (typeof msg === 'string')
+                div.innerText = msg;
+            else
+                div.appendChild(msg);
             let btn = document.createElement('button');
             btn.setAttribute('class', 'btn btn-clear float-right');
             function dismiss() { container.removeChild(div); }
@@ -157,6 +160,7 @@ namespace xsystem35 {
                 setTimeout(dismiss, 5000);
             div.insertBefore(btn, div.firstChild);
             container.insertBefore(div, container.firstChild);
+            return div;
         }
 
         private fsyncTimer: number;

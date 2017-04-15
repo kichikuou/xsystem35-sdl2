@@ -17,6 +17,12 @@ namespace xsystem35 {
             return this.imageReader.extractTrack(track);
         }
 
+        reloadImage(): Promise<any> {
+            return openFileInput().then((file) => {
+                this.imageReader.resetImage(file);
+            });
+        }
+
         private handleFileSelect(evt: Event) {
             let input = <HTMLInputElement>evt.target;
             let files = input.files;

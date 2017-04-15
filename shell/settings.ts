@@ -51,15 +51,9 @@ namespace xsystem35 {
         }
 
         private uploadSaveData() {
-            let input = document.createElement('input');
-            input.type = 'file';
-            input.addEventListener('change', (evt: Event) => {
-                this.extractSaveData(input.files[0]);
-                document.body.removeChild(input);
+            openFileInput().then((file) => {
+                this.extractSaveData(file);
             });
-            input.style.display = 'none';
-            document.body.appendChild(input);
-            input.click();
         }
 
         private async extractSaveData(file: File) {

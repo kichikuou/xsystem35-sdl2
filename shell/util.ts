@@ -39,6 +39,20 @@ function SJISArrayToString(buffer: DataView): string {
     return String.fromCharCode.apply(null, out);
 }
 
+function openFileInput(): Promise<File> {
+    return new Promise((resolve) => {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.addEventListener('change', (evt: Event) => {
+            document.body.removeChild(input);
+            resolve(input.files[0]);
+        });
+        input.style.display = 'none';
+        document.body.appendChild(input);
+        input.click();
+    });
+}
+
 declare var WebAssembly: any;
 
 // xsystem35 exported functions
