@@ -4,15 +4,19 @@ namespace xsystem35 {
     export class ZoomManager {
         private canvas = <HTMLCanvasElement>$('#canvas');
         private zoomSelect = <HTMLInputElement>$('#zoom');
-        private smoothingCheckbox = <HTMLInputElement>$('#smoothing');
+        private pixelateCheckbox = <HTMLInputElement>$('#pixelate');
 
         constructor() {
             this.zoomSelect.addEventListener('change', this.handleZoom.bind(this));
             this.zoomSelect.value = localStorage.getItem('zoom') || 'fit';
-            this.smoothingCheckbox.addEventListener('change', this.handleSmoothing.bind(this));
-            if (localStorage.getItem('smoothing') === 'false') {
-                this.smoothingCheckbox.checked = false;
-                this.handleSmoothing();
+            if (CSS.supports('image-rendering', 'pixelated') || CSS.supports('image-rendering', '-moz-crisp-edges')) {
+                this.pixelateCheckbox.addEventListener('change', this.handlePixelate.bind(this));
+                if (localStorage.getItem('pixelate') === 'true') {
+                    this.pixelateCheckbox.checked = true;
+                    this.handlePixelate();
+                }
+            } else {
+                this.pixelateCheckbox.setAttribute('disabled', 'true');
             }
         }
 
@@ -31,12 +35,12 @@ namespace xsystem35 {
             }
         }
 
-        private handleSmoothing() {
-            localStorage.setItem('smoothing', String(this.smoothingCheckbox.checked));
-            if (this.smoothingCheckbox.checked)
-                this.canvas.classList.remove('pixelated');
-            else
+        private handlePixelate() {
+            localStorage.setItem('pixelate', String(this.pixelateCheckbox.checked));
+            if (this.pixelateCheckbox.checked)
                 this.canvas.classList.add('pixelated');
+            else
+                this.canvas.classList.remove('pixelated');
         }
     }
 }
