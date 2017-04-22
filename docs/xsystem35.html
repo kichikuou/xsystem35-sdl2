@@ -11,7 +11,7 @@
   </head>
   <body>
 
-  <div id="toolbar-handler" hidden>
+  <div id="toolbar-handler" class="tooltip tooltip-bottom" data-tooltip="メニュー" hidden>
     <div class="toolbar-handler-icon"></div>
   </div>
   <header id="toolbar">
@@ -21,12 +21,12 @@
       </section>
       <section class="navbar-section">
         <div id="volume-control" class="mr-10" hidden>
-          <i id="volume-control-icon" class="fa fa-volume-up"></i>
-          <input id="volume-control-slider" type="range">
+          <i id="volume-control-icon" class="fa fa-volume-up tooltip tooltip-bottom" data-tooltip="ミュート"></i>
+          <input id="volume-control-slider" type="range" class="tooltip tooltip-bottom" data-tooltip="音量">
         </div>
 
-        <button id="settings-button" class="btn btn-link mr-10"><i class="fa fa-cog"></i></button>
-        <a class="btn btn-link" target="_blank" href="help.html"><i class="fa fa-question-circle mr-10"></i></a>
+        <button id="settings-button" class="btn btn-link tooltip tooltip-bottom mr-10" data-tooltip="設定"><i class="fa fa-cog"></i></button>
+        <a class="btn btn-link tooltip tooltip-bottom" target="_blank" href="help.html" data-tooltip="ヘルプ"><i class="fa fa-question-circle mr-10"></i></a>
         <button id="toolbar-close-button" class="btn btn-link"><i class="fa fa-angle-up"></i></button>
       </section>
     </div>

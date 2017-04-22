@@ -13,12 +13,14 @@ namespace xsystem35 {
             this.close();
         }
 
-        open() {
+        private open() {
             this.toolbar.classList.remove('closed');
+            this.handler.hidden = true;
         }
 
-        close() {
+        private close() {
             this.toolbar.classList.add('closed');
+            this.handler.hidden = false;
         }
     }
 }
