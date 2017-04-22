@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>鬼畜王 on Web ヘルプ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.2.10/spectre.min.css">
+<style>
+header {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  background-color: rgb(68,68,68);
+  color: #ccc;
+}
+
+.navbar {
+  height: 42px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+  flex-wrap: nowrap;
+}
+
+.navbar-brand {
+  color: #ccc;
+}
+
+body > section {
+  max-width: 640px;
+  margin: 42px auto;
+  padding: 2rem 1rem;
+}
+
+ol, ul {
+  list-style-position: outside;
+}
+</style>
+</head>
+<body>
+<header id="toolbar">
+  <div class="navbar">
+    <section class="navbar-primary">
+      <span class="navbar-brand text-ellipsis ml-5">鬼畜王 on Web ヘルプ</span>
+    </section>
+  </div>
+</header>
+<section>
+  <h3>鬼畜王 on Web</h3>
+  <p>アリスソフトのゲームエンジン System3.5 の有志によるフリー実装である xsystem35 を JavaScript / WebAssembly に移植したものです。以下の環境で動きます。</p>
+  <ul>
+    <li>Google Chrome (PC / Android)</li>
+    <li>Mozilla Firefox</li>
+    <li>Safari (<a href="#bug">iOSでは一部動作に制限があります。</a>)</li>
+    <li>Microsoft Edge</li>
+    <li>Opera</li>
+  </ul>
+  <p>素晴らしいゲームがせっかくフリーで提供されているのに遊ぶためには仮想CDソフトが必要だったりというハードルの高さを改善できれば、という試みです。</p>
+
+  <h3>遊び方</h3>
+  <p>このサイト自体は実行環境のみ提供するもので、ゲームのCDイメージを読み込んで動作します。</p>
+  <ol>
+  <li>以下のどちらかのサイトで、鬼畜王ランスのCDイメージをダウンロードします。
+  <ul>
+  <li><a href="http://retropc.net/alice/">アリスソフト アーカイブズ</a></li>
+  <li><a href="http://www.geocities.jp/webmst_kitana/alicefree/index.html">アリスソフト『配布フリー宣言』対象ソフト配布</a></li>
+  </ul>
+  </li>
+  <li>ダウンロードしたファイルはRAR形式の圧縮ファイルなので、展開してCD-ROMイメージを取り出します。Windowsなら <a href="http://www.forest.impress.co.jp/library/software/lhaplus/">LhaPlus</a>、Macなら <a href="https://itunes.apple.com/jp/app/the-unarchiver/id425424353">The Unarchiver</a> で展開できます。ChromeOSは標準機能でRARを展開できます。</li>
+  <li>展開したフォルダにある <code>KICHIKUOU.img</code> と <code>KICHIKUOU.cue</code> (または <code>DISC.img</code> と <code>DISC.cue</code>) を、鬼畜王 on Web のページにドラッグ＆ドロップするか、ページにある「ファイルを選択」ボタンを押して選択します。</li>
+  <li>ゲームが始まります。セーブデータはブラウザ内に保存されるので、次回ページを開いたときは再度CDイメージを読み込ませればセーブしたところから再開できます。</li>
+  </ol>
+
+  <h3>操作方法</h3>
+  <p>スマートフォン / タブレットでは２本指でタッチすると右クリック扱いになります。</p>
+
+  <h3>設定</h3>
+  <p>画面上部の歯車アイコンをクリックすると設定ウィンドウが表示されます。</p>
+  <h4>表示</h4>
+  <dl>
+    <dt>拡大率</dt>
+    <dd>ゲーム画面の拡大率を設定します。「自動」にするとウィンドウの大きさに合わせます。<dd>
+    <dt>拡大時に補間しない</dt>
+    <dd>Google ChromeとFirefoxでのみ有効です。通常は色を補間してなめらかに画面を拡大しますが、これをオンにすると単純に拡大します。ドット絵の感じを楽しみたいとき有効にするといいでしょう。</dd>
+    <dt>文字をなめらかに表示する</dt>
+    <dd>アンチエイリアスをかけて文字表示を綺麗にします。設定を変えた場合、すでに表示されている文字はそのままで次回の文字描画から反映されます。</dd>
+  </dl>
+  <h4>セーブデータ</h4>
+  <p>ブラウザ内に保存されているセーブデータをZIPファイルに保存したり、ZIPファイルから復元できます。セーブデータをバックアップしたり、他のPCに移行する場合に使います。</p>
+
+  <h3 id="bug">バグ/制限</h3>
+  <h4>iOS</h4>
+  <p>iOSではiCloud Driveに展開済みのCDイメージを入れておけばSafariから読み込んで遊べますが、以下のような制限があります。</p>
+  <ul>
+  <li>しばらく遊んでいるとCDイメージの読み込みに失敗するようになり、BGMが再生できなくなります (おそらくSafariのバグ)。エラーが出たときは通知メッセージ上の「imgファイルの再読み込み」をタップして <code>KICHIKUOU.img</code> を再度選択してください。</li>
+  <li>ボリューム調整は本体ボタンからしかできません。ページ上ではミュートのみ可能です。</li>
+  </ul>
+
+  <h3>さいごに</h3>
+  <p>ソースコードは以下にあります。
+    <a href="https://github.com/kichikuou/xsystem35-sdl2/">https://github.com/kichikuou/xsystem35-sdl2/</a></p>
+  <p>バグ報告、要望、質問、連絡、苦情などは以下のメールアドレスまでお願いします。
+    <a href="mailto:KichikuouChrome@gmail.com">KichikuouChrome@gmail.com</a></p>
+</section>
+</body>
