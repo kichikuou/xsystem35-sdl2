@@ -181,3 +181,13 @@ void sdl_setAutoRepeat(boolean bool) {
 		// SDL_EnableKeyRepeat(0, 0);
 	}
 }
+
+#ifdef __EMSCRIPTEN__
+
+void* EMSCRIPTEN_KEEPALIVE sdl_getDisplaySurface() {
+	if (SDL_MUSTLOCK(sdl_display))
+		return NULL;
+	return sdl_display->pixels;
+}
+
+#endif

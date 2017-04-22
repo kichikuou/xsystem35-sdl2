@@ -88,7 +88,7 @@ namespace xsystem35 {
                 if (colon !== -1)
                     $('.navbar-brand').textContent = title.slice(colon + 1);
             };
-            Module.canvas = document.getElementById('canvas');
+            Module.canvas = <HTMLCanvasElement>document.getElementById('canvas');
             Module.setStatus = this.setStatus.bind(this);
             Module.preRun = [
                 () => { Module.addRunDependency('gameFiles'); },
@@ -125,7 +125,7 @@ namespace xsystem35 {
 
         loaded() {
             $('#xsystem35').hidden = false;
-            this.volumeControl.init();
+            $('#toolbar').classList.remove('before-game-start');
             setTimeout(() => {
                 if (this.antialiasCheckbox.checked)
                     Module.arguments.push('-antialias');

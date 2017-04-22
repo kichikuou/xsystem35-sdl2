@@ -14,17 +14,18 @@
   <div id="toolbar-handler" class="tooltip tooltip-bottom" data-tooltip="メニュー" hidden>
     <div class="toolbar-handler-icon"></div>
   </div>
-  <header id="toolbar">
+  <header id="toolbar" class="before-game-start">
     <div class="navbar">
       <section class="navbar-primary">
         <span class="navbar-brand text-ellipsis ml-5">鬼畜王 on Web</span>
       </section>
       <section class="navbar-section">
-        <div id="volume-control" class="mr-10" hidden>
+        <div id="volume-control" class="mr-10 hidden-until-game-start">
           <i id="volume-control-icon" class="fa fa-volume-up tooltip tooltip-bottom" data-tooltip="ミュート"></i>
           <input id="volume-control-slider" type="range" class="tooltip tooltip-bottom" data-tooltip="音量">
         </div>
 
+        <button id="screenshot-button" class="btn btn-link tooltip tooltip-bottom mr-10 hidden-until-game-start" data-tooltip="スクリーンショット"><i class="fa fa-camera"></i></button>
         <button id="settings-button" class="btn btn-link tooltip tooltip-bottom mr-10" data-tooltip="設定"><i class="fa fa-cog"></i></button>
         <a class="btn btn-link tooltip tooltip-bottom" target="_blank" href="help.html" data-tooltip="ヘルプ"><i class="fa fa-question-circle mr-10"></i></a>
         <button id="toolbar-close-button" class="btn btn-link"><i class="fa fa-angle-up"></i></button>

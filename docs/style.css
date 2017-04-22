@@ -89,6 +89,10 @@ header {
   color: #eee;
 }
 
+.before-game-start .hidden-until-game-start {
+  display: none;
+}
+
 .contents {
   flex: 1;
   display: flex;

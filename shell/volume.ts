@@ -34,10 +34,6 @@ namespace xsystem35 {
             this.slider.hidden = true;
         }
 
-        init() {
-            this.elem.hidden = false;
-        }
-
         private onIconClicked(e: Event) {
             this.muted = !this.muted;
             if (this.muted) {

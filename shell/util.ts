@@ -61,10 +61,11 @@ declare function _ags_setAntialiasedStringMode(on: number): void;
 declare function _ald_getdata(type: number, no: number): number;
 declare function _ald_freedata(data: number): void;
 declare function _sjis2unicode(byte1: number, byte2: number): void;
+declare function _sdl_getDisplaySurface(): number;
 
 declare namespace Module {
     // Undocumented methods / attributes
-    let canvas: HTMLElement;
+    let canvas: HTMLCanvasElement;
     function getMemory(size: number): number;
     function setStatus(status: string): void;
     function setWindowTitle(title: string): void;
