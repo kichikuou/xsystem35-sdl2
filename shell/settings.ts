@@ -44,10 +44,16 @@ namespace xsystem35 {
                 folder.file(name, content);
             }
             let blob = await zip.generateAsync({type: 'blob', compression: 'DEFLATE'});
-            let elem = document.createElement('a');
-            elem.setAttribute('download', 'savedata.zip');
-            elem.setAttribute('href', URL.createObjectURL(blob));
-            elem.click();
+            if (navigator.msSaveBlob) {  // Edge
+                navigator.msSaveBlob(blob, 'savedata.zip');
+            } else {
+                let elem = document.createElement('a');
+                elem.setAttribute('download', 'savedata.zip');
+                elem.setAttribute('href', URL.createObjectURL(blob));
+                document.body.appendChild(elem);
+                elem.click();
+                setTimeout(() => { document.body.removeChild(elem); }, 5000);
+            }
         }
 
         private uploadSaveData() {
@@ -66,15 +72,13 @@ namespace xsystem35 {
             }
             try {
                 await xsystem35.saveDirReady;
-                if (file.name.toLowerCase().endsWith('.zip')) {
+                if (file.name.toLowerCase().endsWith('.asd')) {
+                    addSaveFile(file.name, await readFileAsArrayBuffer(file));
+                } else {
                     let zip = new JSZip();
                     await zip.loadAsync(await readFileAsArrayBuffer(file));
                     for (let f of zip.file(/\.asd$/i))
                         addSaveFile(basename(f.name), await f.async('arraybuffer'));
-                } else if (file.name.toLowerCase().endsWith('.asd')) {
-                    addSaveFile(file.name, await readFileAsArrayBuffer(file));
-                } else {
-                    throw new Error('Unknown file type: ' + file.name);
                 }
                 xsystem35.shell.syncfs(0);
                 xsystem35.shell.addToast('セーブデータの復元に成功しました。', 'success');
