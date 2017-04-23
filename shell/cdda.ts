@@ -8,7 +8,6 @@ namespace xsystem35 {
         private currentTrack: number;
         private isVolumeSupported: boolean;
         private unmute: () => void;  // Non-null if emulating mute by pause
-        waiting: boolean;
 
         constructor(private imageLoader: ImageLoader, volumeControl: VolumeControl) {
             // Volume control of <audio> is not supported in iOS
@@ -19,7 +18,6 @@ namespace xsystem35 {
             volumeControl.addEventListener(this.onVolumeChanged.bind(this));
             this.audio.volume = volumeControl.volume();
             this.audio.addEventListener('error', this.onAudioError.bind(this));
-            this.waiting = false;
             this.removeUserGestureRestriction();
             if (!this.isVolumeSupported) {
                 volumeControl.hideSlider();
@@ -35,11 +33,11 @@ namespace xsystem35 {
                 this.unmute = () => { this.play(track, loop); };
                 return;
             }
-            this.waiting = true;
             if (this.blobCache[track]) {
                 this.startPlayback(this.blobCache[track], loop);
                 return;
             }
+            this.audio.currentTime = 0;
             this.imageLoader.getCDDA(track).then((blob) => {
                 this.blobCache[track] = blob;
                 this.startPlayback(blob, loop);
@@ -67,7 +65,6 @@ namespace xsystem35 {
             this.audio.loop = (loop !== 0);
             this.audio.load();
             this.audio.play();
-            this.waiting = false;
         }
 
         private onVisibilityChange() {
