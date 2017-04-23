@@ -185,9 +185,13 @@ static int checkMessage() {
 
 #ifdef __EMSCRIPTEN__
 
+extern int cdrom_getpos_count;
+
 static void mainloop() {
 	if (nact->is_quit)
 		emscripten_cancel_main_loop();
+
+	cdrom_getpos_count = 0;
 
 	for (int cnt = 0; cnt < 10000; cnt++) {
 		nact->input_state = InputNotChecked;
@@ -200,6 +204,8 @@ static void mainloop() {
 		nact->callback();
 
 		if (nact->input_state == InputCheckMissed)
+			break;
+		if (cdrom_getpos_count >= 2)
 			break;
 	}
 	if (!nact->is_message_locked && nact->input_state == InputNotChecked)

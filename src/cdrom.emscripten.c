@@ -23,6 +23,8 @@
 #include "portab.h"
 #include "cdrom.h"
 
+int cdrom_getpos_count;
+
 static int  cdrom_init(char *);
 static int  cdrom_exit();
 static int  cdrom_start(int, boolean);
@@ -60,6 +62,7 @@ int cdrom_stop() {
 }
 
 int cdrom_getPlayingInfo(cd_time *info) {
+	cdrom_getpos_count++;
 	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
 	info->t = t & 0xff;
 	FRAMES_TO_MSF(t >> 8, &info->m, &info->s, &info->f);
