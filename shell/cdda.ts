@@ -106,8 +106,10 @@ namespace xsystem35 {
 
         private removeUserGestureRestriction() {
             let hanlder = () => {
-                this.audio.load();
-                console.log('CDDA unlocked');
+                if (!this.currentTrack) {
+                    this.audio.load();
+                    console.log('CDDA unlocked');
+                }
                 window.removeEventListener('touchend', hanlder);
             };
             window.addEventListener('touchend', hanlder);
