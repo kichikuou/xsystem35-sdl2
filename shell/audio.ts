@@ -7,7 +7,7 @@ namespace xsystem35 {
         private context: AudioContext;
         private masterGain: GainNode;
         private slots: PCMSound[];
-        private buffers: AudioBuffer[];
+        private bufCache: AudioBuffer[];
         private isSafari: boolean;
 
         constructor(volumeControl: VolumeControl) {
@@ -21,9 +21,10 @@ namespace xsystem35 {
             this.masterGain = this.context.createGain();
             this.masterGain.connect(this.context.destination);
             this.slots = [];
-            this.buffers = [];
+            this.bufCache = [];
             volumeControl.addEventListener(this.onVolumeChanged.bind(this));
             this.masterGain.gain.value = volumeControl.volume();
+            document.addEventListener('visibilitychange', this.onVisibilityChange.bind(this));
         }
 
         private removeUserGestureRestriction() {
@@ -52,7 +53,7 @@ namespace xsystem35 {
                 decoded = this.context.decodeAudioData(buf);
             }
             return decoded.then((audioBuf) => {
-                this.buffers[no] = audioBuf;
+                this.bufCache[no] = audioBuf;
                 return audioBuf;
             });
         }
@@ -71,8 +72,8 @@ namespace xsystem35 {
         pcm_load(slot: number, no: number) {
             EmterpreterAsync.handle((resume) => {
                 this.pcm_stop(slot);
-                if (this.buffers[no]) {
-                    this.slots[slot] = new PCMSoundSimple(this.masterGain, this.buffers[no]);
+                if (this.bufCache[no]) {
+                    this.slots[slot] = new PCMSoundSimple(this.masterGain, this.bufCache[no]);
                     return resume();
                 }
                 this.load(no).then((audioBuf) => {
@@ -85,15 +86,16 @@ namespace xsystem35 {
         pcm_load_mixlr(slot: number, noL: number, noR: number) {
             EmterpreterAsync.handle((resume) => {
                 this.pcm_stop(slot);
-                if (this.buffers[noL] && this.buffers[noR]) {
-                    this.slots[slot] = new PCMSoundMixLR(this.masterGain, this.buffers[noL], this.buffers[noR]);
+                if (this.bufCache[noL] && this.bufCache[noR]) {
+                    this.slots[slot] = new PCMSoundMixLR(this.masterGain, this.bufCache[noL], this.bufCache[noR]);
                     return resume();
                 }
-                let ps = [];
-                if (!this.buffers[noL]) ps.push(this.load(noL));
-                if (!this.buffers[noR]) ps.push(this.load(noR));
-                Promise.all(ps).then(() => {
-                    this.slots[slot] = new PCMSoundMixLR(this.masterGain, this.buffers[noL], this.buffers[noR]);
+                let ps: [Promise<AudioBuffer>, Promise<AudioBuffer>] = [
+                    this.bufCache[noL] ? Promise.resolve(this.bufCache[noL]) : this.load(noL),
+                    this.bufCache[noR] ? Promise.resolve(this.bufCache[noR]) : this.load(noR),
+                ];
+                Promise.all(ps).then((bufs) => {
+                    this.slots[slot] = new PCMSoundMixLR(this.masterGain, bufs[0], bufs[1]);
                     resume();
                 });
             });
@@ -145,6 +147,11 @@ namespace xsystem35 {
             if (!this.slots[slot])
                 return 0;
             return this.slots[slot].isPlaying() ? 1 : 0;
+        }
+
+        private onVisibilityChange() {
+            if (document.hidden)
+                this.bufCache = [];
         }
 
         private onVolumeChanged(evt: CustomEvent) {

@@ -4,7 +4,7 @@
 namespace xsystem35 {
     export class CDPlayer {
         private audio = <HTMLAudioElement>$('audio');
-        private blobs: Blob[];
+        private blobCache: Blob[];
         private currentTrack: number;
         private isVolumeSupported: boolean;
         private unmute: () => void;  // Non-null if emulating mute by pause
@@ -15,7 +15,7 @@ namespace xsystem35 {
             this.audio.volume = 0.5;
             this.isVolumeSupported = this.audio.volume !== 1;
 
-            this.blobs = [];
+            this.blobCache = [];
             volumeControl.addEventListener(this.onVolumeChanged.bind(this));
             this.audio.volume = volumeControl.volume();
             this.audio.addEventListener('error', this.onAudioError.bind(this));
@@ -26,6 +26,7 @@ namespace xsystem35 {
                 if (this.audio.volume === 0)
                     this.unmute = () => {};
             }
+            document.addEventListener('visibilitychange', this.onVisibilityChange.bind(this));
         }
 
         play(track: number, loop: number) {
@@ -35,12 +36,12 @@ namespace xsystem35 {
                 return;
             }
             this.waiting = true;
-            if (this.blobs[track]) {
-                this.startPlayback(this.blobs[track], loop);
+            if (this.blobCache[track]) {
+                this.startPlayback(this.blobCache[track], loop);
                 return;
             }
             this.imageLoader.getCDDA(track).then((blob) => {
-                this.blobs[track] = blob;
+                this.blobCache[track] = blob;
                 this.startPlayback(blob, loop);
             });
         }
@@ -67,6 +68,11 @@ namespace xsystem35 {
             this.audio.load();
             this.audio.play();
             this.waiting = false;
+        }
+
+        private onVisibilityChange() {
+            if (document.hidden)
+                this.blobCache = [];
         }
 
         private onVolumeChanged(evt: CustomEvent) {
