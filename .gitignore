@@ -2,9 +2,7 @@
 *.o
 *.lo
 *.la
-/docs/*.js
-/docs/*.js.mem
-/docs/*.wasm
+/out
 /config.h
 /config.log
 /config.status
@@ -15,4 +13,3 @@
 Makefile
 .deps/
 .libs/
-node_modules/
