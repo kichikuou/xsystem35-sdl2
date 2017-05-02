@@ -7,12 +7,13 @@ EMFLAGS := $(EMPORTS)
 EMFLAGS += -O2
 
 EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
+EMFLAGS += -s TOTAL_MEMORY=100663296
 
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_sjis2unicode']"
 
-WASMFLAGS := -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s "BINARYEN_TRAP_MODE='allow'"
-ASMJSFLAGS := -s TOTAL_MEMORY=100663296
+WASMFLAGS := -s WASM=1 -s "BINARYEN_TRAP_MODE='allow'"
+ASMJSFLAGS :=
 
 all: out/xsystem35.js out/xsystem35.asm.js
 
