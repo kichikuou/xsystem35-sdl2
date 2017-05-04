@@ -144,6 +144,7 @@ typedef struct {
 	
 #ifdef ENABLE_SDL
 	enum { InputNotChecked, InputCheckMissed, HadInput } input_state;
+#define BREAK_MAINLOOP (nact->input_state = InputCheckMissed)
 #endif
 
 } NACTINFO;

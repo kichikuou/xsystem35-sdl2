@@ -44,6 +44,9 @@
 extern char *mkdtemp (char *template);
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "nact.h"
 #include "portab.h"
@@ -221,7 +224,13 @@ void sys_error(char *format, ...) {
 
 void sys_exit(int code) {
 	sys35_remove();
+#ifdef EMSCRIPTEN
+	emscripten_cancel_main_loop();
+	EM_ASM( xsystem35.shell.quit(); );
+	BREAK_MAINLOOP;
+#else
 	exit(code);
+#endif
 }
 
 static int check_fontdev(char *devname) {
