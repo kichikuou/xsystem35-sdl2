@@ -67,9 +67,55 @@ BYTE *sjis2utf(BYTE *src) {
 	return dst;
 }
 
+static int unicode_to_sjis(int u) {
+	for (int b1 = 0x80; b1 <= 0xff; b1++) {
+		if (b1 >= 0xa0 && b1 <= 0xdf)
+			continue;
+		for (int b2 = 0x40; b2 <= 0xff; b2++) {
+			if (u == s2u[b1 - 0x80][b2 - 0x40])
+				return b1 << 8 | b2;
+		}
+	}
+	return 0;
+}
+
 BYTE *utf2sjis(BYTE *src) {
-	printf("%s not implemented\n", __func__);
-	return strdup(src);
+	BYTE* dst = malloc(strlen(src) + 1);
+	BYTE* dstp = dst;
+
+	while (*src) {
+		if (*src <= 0x7f) {
+			*dstp++ = *src++;
+			continue;
+		}
+
+		int u;
+		if (*src <= 0xdf) {
+			u = (src[0] & 0x1f) << 6 | (src[1] & 0x3f);
+			src += 2;
+		} else if (*src <= 0xef) {
+			u = (src[0] & 0xf) << 12 | (src[1] & 0x3f) << 6 | (src[2] & 0x3f);
+			src += 3;
+		} else {
+			*dstp++ = '?';
+			do src++; while ((*src & 0xc0) == 0x80);
+			continue;
+		}
+
+		if (u > 0xff60 && u <= 0xff9f) {
+			*dstp++ = u - 0xff60 + 0xa0;
+		} else {
+			int c = unicode_to_sjis(u);
+			if (c) {
+				*dstp++ = c >> 8;
+				*dstp++ = c & 0xff;
+			} else {
+				*dstp++ = '?';
+			}
+		}
+	}
+	*dstp = '\0';
+	return dst;
 }
 
 /* src 内に半角カナもしくはASCII文字があるかどうか */
