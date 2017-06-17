@@ -4,10 +4,11 @@ EMPORTS := -s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2
 EMFLAGS := $(EMPORTS)
 
 #EMFLAGS += -O1 -s SAFE_HEAP=1
-EMFLAGS += -O2
+EMFLAGS += -Oz
 
 EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
 EMFLAGS += -s TOTAL_MEMORY=100663296
+EMFLAGS += -s NO_EXIT_RUNTIME=1
 
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_sjis2unicode']"
@@ -37,6 +38,6 @@ src/xsystem35: src src/Makefile
 	ln -sf src/xsystem35 xsystem35.bc
 
 src/Makefile:
-	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-cdrom=emscripten --enable-midi=no CFLAGS='-s USE_ZLIB=1' FT2_CONFIG=tools/freetype-config
+	emconfigure ./configure --disable-shared --enable-gtk=no --enable-sdl --enable-cdrom=emscripten --enable-midi=no CFLAGS='-Oz -s USE_ZLIB=1' FT2_CONFIG=tools/freetype-config
 
 .PHONY: src
