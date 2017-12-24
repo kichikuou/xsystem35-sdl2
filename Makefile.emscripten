@@ -12,6 +12,7 @@ EMFLAGS += -s NO_EXIT_RUNTIME=1
 
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_sjis2unicode']"
+LFLAGS += -s EXTRA_EXPORTED_RUNTIME_METHODS="['getValue']"
 
 WASMFLAGS := -s WASM=1 -s "BINARYEN_TRAP_MODE='allow'"
 ASMJSFLAGS :=
