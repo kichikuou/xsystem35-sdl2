@@ -7,7 +7,7 @@
 
     $ emmake make -f Makefile.emscripten
 
-実行するには、[鬼畜王 on Web](https://kichikuou.github.io/web/) のリポジトリをチェックアウトして、`docs`ディレクトリに `out/xsystem35.*` をすべてコピーしてください。
+実行するには、[鬼畜王 on Webのリポジトリ](https://github.com/kichikuou/web)をチェックアウトして、`docs`ディレクトリに `out/xsystem35.*` をすべてコピーしてください。
 
 #### Linux
 
