@@ -27,6 +27,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "counter.h"
+#include "nact.h"
 
 #define HICOUNTER_MAX (256 + EXTER_HIGHTCOUNTER_NUM)
 static struct timeval tv_base;
@@ -36,10 +37,25 @@ static int counter_init_high[HICOUNTER_MAX];
 static struct timeval tv_high[HICOUNTER_MAX];
 static int division_high[HICOUNTER_MAX] = { [0 ...( HICOUNTER_MAX-1 )]=1};
 
+// Allow up to 10 get_counter() calls in single animation frame
+void counter_throttle(void) {
+	static int frame = -1;
+	static int count = 0;
+
+	if (nact->frame_count == frame) {
+		if (++count >= 10)
+			nact->wait_vsync = TRUE;
+	} else {
+		frame = nact->frame_count;
+		count = 0;
+	}
+}
+
 int get_counter(int division) {
 	long sec, usec, usec2;
 	struct timeval tv;
 
+	counter_throttle();
 	gettimeofday(&tv, NULL);
 	sec  = tv.tv_sec - tv_base.tv_sec;
 	usec = tv.tv_usec - tv_base.tv_usec;
@@ -61,6 +77,7 @@ int get_high_counter(int num) {
 	struct timeval tv_base = tv_high[num -1];
 	int division = division_high[num -1];
 	
+	counter_throttle();
 	gettimeofday(&tv, NULL);
 	sec  = tv.tv_sec - tv_base.tv_sec;
 	usec = tv.tv_usec - tv_base.tv_usec;
