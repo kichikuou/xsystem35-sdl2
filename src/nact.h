@@ -142,11 +142,9 @@ typedef struct {
 		char *alk[10];
 	} files;
 	
-#ifdef ENABLE_SDL
 	int frame_count;
 	int cmd_count;
 	boolean wait_vsync;
-#endif
 
 } NACTINFO;
 

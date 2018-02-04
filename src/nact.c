@@ -187,41 +187,32 @@ void nact_main() {
 	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
 	reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
 	int cnt = 0;
-#ifdef ENABLE_SDL
+
 	nact->frame_count = 0;
 	nact->cmd_count = 0;
 	nact->wait_vsync = FALSE;
-#endif
 	
 	while (!nact->is_quit) {
-		DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
-		if (!nact->popupmenu_opened) {
-			int c0 = checkMessage();
-			check_command(c0);
-#ifdef ENABLE_SDL
-			nact->cmd_count++;
-#endif
-		}
-#ifndef __EMSCRIPTEN__
-		if (!nact->is_message_locked) {
-			if (get_high_counter(SYSTEMCOUNTER_MAINLOOP)) {
-				sys_getInputInfo();
-				reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
+		for (int cnt = 0; !nact->wait_vsync && cnt < 10000; cnt++) {
+			DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
+			if (!nact->popupmenu_opened) {
+				int c0 = checkMessage();
+				check_command(c0);
+				nact->cmd_count++;
 			}
-		}
+#ifndef __EMSCRIPTEN__
+			if (!nact->is_message_locked) {
+				if (get_high_counter(SYSTEMCOUNTER_MAINLOOP)) {
+					sys_getInputInfo();
+					reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
+				}
+			}
 #endif
-		if (++cnt == 10000) {
-			Sleep(1); /* XXXX */
-			cnt = 0;
+			nact->callback();
 		}
-		nact->callback();
-#ifdef ENABLE_SDL
-		if (nact->wait_vsync) {
-			nact->frame_count++;
-			nact->wait_vsync = FALSE;
-			WaitVsync();
-		}
-#endif
+		WaitVsync();
+		nact->frame_count++;
+		nact->wait_vsync = FALSE;
 	}
 }
 
