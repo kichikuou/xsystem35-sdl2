@@ -22,8 +22,9 @@
 #include <emscripten.h>
 #include "portab.h"
 #include "cdrom.h"
+#include "nact.h"
 
-int cdrom_getpos_count;
+static int frame_of_getpos = -1;
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();
@@ -62,7 +63,10 @@ int cdrom_stop() {
 }
 
 int cdrom_getPlayingInfo(cd_time *info) {
-	cdrom_getpos_count++;
+	if (nact->frame_count == frame_of_getpos)
+		nact->wait_vsync = TRUE;
+	frame_of_getpos = nact->frame_count;
+
 	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
 	info->t = t & 0xff;
 	FRAMES_TO_MSF(t >> 8, &info->m, &info->s, &info->f);

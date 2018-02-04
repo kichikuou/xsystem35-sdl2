@@ -64,15 +64,14 @@ static int mouse_to_rawkey(int button) {
 
 /* Event処理 */
 static void sdl_getEvent(void) {
+	static int cmd_count_of_prev_input = -1;
 	SDL_Event e;
 	boolean m2b = FALSE, msg_skip = FALSE;
 	int i;
-
-	if (nact->input_state == InputNotChecked)
-		nact->input_state = InputCheckMissed;
+	boolean had_input = false;
 
 	while (SDL_PollEvent(&e)) {
-		nact->input_state = HadInput;
+		had_input = true;
 		switch (e.type) {
 		case SDL_WINDOWEVENT:
 			switch (e.window.event) {
@@ -185,6 +184,11 @@ static void sdl_getEvent(void) {
 			printf("ev %x\n", e.type);
 			break;
 		}
+	}
+	if (had_input) {
+		cmd_count_of_prev_input = nact->cmd_count;
+	} else if (nact->cmd_count != cmd_count_of_prev_input) {
+		nact->wait_vsync = TRUE;
 	}
 	
 	if (m2b) {

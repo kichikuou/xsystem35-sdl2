@@ -143,7 +143,9 @@ typedef struct {
 	} files;
 	
 #ifdef ENABLE_SDL
-	enum { InputNotChecked, InputCheckMissed, HadInput } input_state;
+	int frame_count;
+	int cmd_count;
+	boolean wait_vsync;
 #endif
 
 } NACTINFO;

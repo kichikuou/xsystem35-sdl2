@@ -183,29 +183,24 @@ static int checkMessage() {
 
 #define MAINLOOP_EVENTCHECK_INTERVAL 16 /* 16 msec */
 
-#ifdef __EMSCRIPTEN__
-
-extern int cdrom_getpos_count;
-
-#endif // __EMSCRIPTEN__
-
 void nact_main() {
 	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
 	reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
-	int c0;
-	static int cnt = 0;
-	
-#ifdef __EMSCRIPTEN__
-	cdrom_getpos_count = 0;
-#endif
-	while (!nact->is_quit) {
+	int cnt = 0;
 #ifdef ENABLE_SDL
-		nact->input_state = InputNotChecked;
+	nact->frame_count = 0;
+	nact->cmd_count = 0;
+	nact->wait_vsync = FALSE;
 #endif
+	
+	while (!nact->is_quit) {
 		DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
 		if (!nact->popupmenu_opened) {
-			c0 = checkMessage();
+			int c0 = checkMessage();
 			check_command(c0);
+#ifdef ENABLE_SDL
+			nact->cmd_count++;
+#endif
 		}
 #ifndef __EMSCRIPTEN__
 		if (!nact->is_message_locked) {
@@ -215,22 +210,15 @@ void nact_main() {
 			}
 		}
 #endif
-		if (cnt == 10000) {
+		if (++cnt == 10000) {
 			Sleep(1); /* XXXX */
 			cnt = 0;
 		}
-		cnt++;
 		nact->callback();
-#ifdef __EMSCRIPTEN__
-		if (cdrom_getpos_count >= 2) {
-			if (!nact->is_message_locked && nact->input_state == InputNotChecked)
-				sys_getInputInfo();
-			WaitVsync();
-			cdrom_getpos_count = 0;
-		}
-#endif
 #ifdef ENABLE_SDL
-		if (nact->input_state == InputCheckMissed) {
+		if (nact->wait_vsync) {
+			nact->frame_count++;
+			nact->wait_vsync = FALSE;
 			WaitVsync();
 		}
 #endif
