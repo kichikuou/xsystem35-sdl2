@@ -224,10 +224,9 @@ void sys_error(char *format, ...) {
 
 void sys_exit(int code) {
 	sys35_remove();
-#ifdef EMSCRIPTEN
-	emscripten_cancel_main_loop();
+#ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.quit(); );
-	BREAK_MAINLOOP;
+	nact->is_quit = TRUE;
 #else
 	exit(code);
 #endif
@@ -837,6 +836,9 @@ int main(int argc, char **argv) {
 #endif
 	
 	nact_main();
+#ifdef __EMSCRIPTEN__
+	Sleep(1000000000);
+#endif
 	sys35_remove();
 	
 	return 0;

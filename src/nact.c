@@ -187,48 +187,17 @@ static int checkMessage() {
 
 extern int cdrom_getpos_count;
 
-static void mainloop() {
-	if (nact->is_quit)
-		emscripten_cancel_main_loop();
-
-	cdrom_getpos_count = 0;
-
-	for (int cnt = 0; cnt < 10000; cnt++) {
-		nact->input_state = InputNotChecked;
-
-		DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
-		if (!nact->popupmenu_opened) {
-			int c0 = checkMessage();
-			check_command(c0);
-		}
-		nact->callback();
-
-		if (nact->input_state == InputCheckMissed)
-			break;
-		if (cdrom_getpos_count >= 2)
-			break;
-	}
-	if (!nact->is_message_locked && nact->input_state == InputNotChecked)
-		sys_getInputInfo();
-	sdl_updateScreen();
-}
-
 #endif // __EMSCRIPTEN__
 
 void nact_main() {
 	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
 	reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
-#ifdef __EMSCRIPTEN__
-#ifdef EMTERPRETIFY_ADVISE
-	// Using mainloop as a function pointer screws up EMTERPRETIFY_ADVISE!
-	mainloop();
-#else
-	emscripten_set_main_loop(mainloop, 0, TRUE);
-#endif
-#else
 	int c0;
 	static int cnt = 0;
 	
+#ifdef __EMSCRIPTEN__
+	cdrom_getpos_count = 0;
+#endif
 	while (!nact->is_quit) {
 #ifdef ENABLE_SDL
 		nact->input_state = InputNotChecked;
@@ -238,18 +207,29 @@ void nact_main() {
 			c0 = checkMessage();
 			check_command(c0);
 		}
+#ifndef __EMSCRIPTEN__
 		if (!nact->is_message_locked) {
 			if (get_high_counter(SYSTEMCOUNTER_MAINLOOP)) {
 				sys_getInputInfo();
 				reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
 			}
 		}
+#endif
 		if (cnt == 10000) {
 			Sleep(1); /* XXXX */
 			cnt = 0;
 		}
 		cnt++;
 		nact->callback();
+#ifdef __EMSCRIPTEN__
+		if (cdrom_getpos_count >= 2) {
+			if (!nact->is_message_locked && nact->input_state == InputNotChecked)
+				sys_getInputInfo();
+			sdl_updateScreen();
+			Sleep(10);
+			cdrom_getpos_count = 0;
+		}
+#endif
 #ifdef ENABLE_SDL
 		if (nact->input_state == InputCheckMissed) {
 			sdl_updateScreen();
@@ -257,7 +237,6 @@ void nact_main() {
 		}
 #endif
 	}
-#endif // __EMSCRIPTEN__
 }
 
 static void nact_callback() {
