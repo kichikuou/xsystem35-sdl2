@@ -210,6 +210,7 @@ int sdl_keywait(int msec, boolean cancel) {
 		nact->callback();
 		sdl_getEvent();
 		key = check_button() | sdl_getKeyInfo() | joy_getinfo();
+		nact->wait_vsync = FALSE;  // We just waited!
 		if (cancel && key) break;
 	}
 	
