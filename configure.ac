@@ -202,9 +202,7 @@ dnl if test "x$have_sdl" = xyes; then
 dnl   SRC_AUDIO="$SRC_AUDIO audio_sdl.c"
 dnl fi
 AC_SUBST(SRC_AUDIO)
-if test "x$is_emscripten" = xyes; then
-  SRC_AUDIO=pcm.emscripten.c
-elif test "x$have_sdl" = xyes; then
+if test "x$is_emscripten" != xyes && test "x$have_sdl" = xyes; then
   PKG_CHECK_MODULES([SDL2MIXER], [SDL2_mixer])
   SRC_AUDIO=pcm.sdlmixer.c
 fi

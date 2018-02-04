@@ -16306,9 +16306,7 @@ fi
 
 SRC_AUDIO=
 
-if test "x$is_emscripten" = xyes; then
-  SRC_AUDIO=pcm.emscripten.c
-elif test "x$have_sdl" = xyes; then
+if test "x$is_emscripten" != xyes && test "x$have_sdl" = xyes; then
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SDL2MIXER" >&5
