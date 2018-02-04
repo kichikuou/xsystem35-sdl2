@@ -84,6 +84,15 @@ void sdl_sleep(int msec) {
 #endif
 }
 
+void sdl_wait_vsync() {
+	sdl_updateScreen();
+#ifdef __EMSCRIPTEN__
+	wait_vsync();
+#else
+	SDL_Delay(16);
+#endif
+}
+
 /* off-screen の指定領域を Main Window へ転送 */
 void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 	SDL_Rect rect_s, rect_d;

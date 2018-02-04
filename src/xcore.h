@@ -168,5 +168,6 @@ extern boolean   RawKeyInfo[256];
 // #define MainIteration() Xcore_mainIteration()
 #define EventCallback Xcore_eventCallback
 #define Sleep(ms) usleep((ms) * 1000)
+#define WaitVsync() Sleep(16)
 
 #endif /* !__XCORE_H__ */

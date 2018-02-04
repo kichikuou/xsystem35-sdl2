@@ -101,6 +101,7 @@ extern void sdl_setAutoRepeat(boolean bool);
 extern void sdl_mainIteration();
 extern boolean RawKeyInfo[];
 extern void sdl_sleep(int msec);
+extern void sdl_wait_vsync();
 extern void sdl_sync();
 
 /* 初期化関係 */
@@ -172,5 +173,11 @@ extern void sdl_sync();
 #define ResourceInit(c,v) sdl_ResourceInit((c),(v))
 #define SetNoShmMode() /* NO */
 #define Sleep(ms) sdl_sleep(ms)
+#define WaitVsync() sdl_wait_vsync()
+
+#ifdef __EMSCRIPTEN__
+// library.js
+void wait_vsync(void);
+#endif
 
 #endif /* !__SDL_CORE__ */

@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -195,10 +196,13 @@ static void sdl_getEvent(void) {
 
 int sdl_keywait(int msec, boolean cancel) {
 	int key=0, n;
-	int end = get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
+	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
 	
 	while ((n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
-		sdl_sleep(n < 16 ? n : 16);
+		if (n <= 16)
+			sdl_sleep(n);
+		else
+			sdl_wait_vsync();
 		nact->callback();
 		sdl_getEvent();
 		key = check_button() | sdl_getKeyInfo() | joy_getinfo();

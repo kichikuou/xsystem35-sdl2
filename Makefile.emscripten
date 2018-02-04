@@ -13,8 +13,9 @@ EMFLAGS += -s NO_EXIT_RUNTIME=1
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_sjis2unicode']"
 LFLAGS += -s EXTRA_EXPORTED_RUNTIME_METHODS="['getValue','getMemory','addRunDependency','removeRunDependency']"
+LFLAGS += --js-library emscripten/library.js
 
-SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr']"
+SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr','_wait_vsync']"
 
 WASMFLAGS := -s WASM=1 -s "BINARYEN_TRAP_MODE='allow'"
 ASMJSFLAGS :=

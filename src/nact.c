@@ -225,15 +225,13 @@ void nact_main() {
 		if (cdrom_getpos_count >= 2) {
 			if (!nact->is_message_locked && nact->input_state == InputNotChecked)
 				sys_getInputInfo();
-			sdl_updateScreen();
-			Sleep(10);
+			WaitVsync();
 			cdrom_getpos_count = 0;
 		}
 #endif
 #ifdef ENABLE_SDL
 		if (nact->input_state == InputCheckMissed) {
-			sdl_updateScreen();
-			Sleep(10);
+			WaitVsync();
 		}
 #endif
 	}
