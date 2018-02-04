@@ -37,18 +37,12 @@ int muspcm_exit() {
 // 番号指定のPCMファイル読み込み
 int muspcm_load_no(int slot, int no) {
 	EM_ASM_({ xsystem35.audio.pcm_load($0, $1); }, slot, no);
-#ifdef EMTERPRETIFY_ADVISE
-	emscripten_sleep(0);
-#endif
 	return OK;
 }
 
 int muspcm_load_mixlr(int slot, int noL, int noR) {
 
 	EM_ASM_({ xsystem35.audio.pcm_load_mixlr($0, $1, $2); }, slot, noL, noR);
-#ifdef EMTERPRETIFY_ADVISE
-	emscripten_sleep(0);
-#endif
 	return OK;
 }
 

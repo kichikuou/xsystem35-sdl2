@@ -14,6 +14,8 @@ LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_sjis2unicode']"
 LFLAGS += -s EXTRA_EXPORTED_RUNTIME_METHODS="['getValue','getMemory','addRunDependency','removeRunDependency']"
 
+SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr']"
+
 WASMFLAGS := -s WASM=1 -s "BINARYEN_TRAP_MODE='allow'"
 ASMJSFLAGS :=
 
@@ -28,11 +30,8 @@ out/xsystem35.js: emterpretify_whitelist src/xsystem35 out
 out/xsystem35.asm.js: emterpretify_whitelist src/xsystem35 out
 	$(CC) xsystem35.bc $(LFLAGS) $(ASMJSFLAGS) @emterpretify_whitelist -o $@
 
-emterpretify_whitelist:
-	$(MAKE) -C src clean
-	$(MAKE) -C src CPPFLAGS=-DEMTERPRETIFY_ADVISE
-	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 xsystem35.bc |grep EMTERPRETIFY_WHITELIST > $@
-	$(MAKE) -C src clean
+emterpretify_whitelist: xsystem35.bc
+	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 $(SYNCLIST) xsystem35.bc |grep EMTERPRETIFY_WHITELIST > $@
 
 src/xsystem35: src src/Makefile
 	$(MAKE) -C src
