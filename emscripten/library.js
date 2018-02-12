@@ -20,7 +20,7 @@ mergeInto(LibraryManager.library, {
 		return xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
 	},
 	muspcm_start: function(slot, loop) {
-		return xsystem35.audio.pcm_start($slot, loop);
+		return xsystem35.audio.pcm_start(slot, loop);
 	},
 	muspcm_stop: function(slot) {
 		return xsystem35.audio.pcm_stop(slot);

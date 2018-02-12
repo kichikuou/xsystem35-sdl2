@@ -31,7 +31,7 @@ out/xsystem35.js: emterpretify_whitelist src/xsystem35 out
 out/xsystem35.asm.js: emterpretify_whitelist src/xsystem35 out
 	$(CC) xsystem35.bc $(LFLAGS) $(ASMJSFLAGS) @emterpretify_whitelist -o $@
 
-emterpretify_whitelist: xsystem35.bc
+emterpretify_whitelist:
 	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 $(SYNCLIST) xsystem35.bc |grep EMTERPRETIFY_WHITELIST > $@
 
 src/xsystem35: src src/Makefile
