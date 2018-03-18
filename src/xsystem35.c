@@ -227,6 +227,7 @@ void sys_exit(int code) {
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.quit(); );
 	nact->is_quit = TRUE;
+	nact->wait_vsync = TRUE;
 #else
 	exit(code);
 #endif
