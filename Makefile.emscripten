@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 
 EMPORTS := -s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2
-EMFLAGS := $(EMPORTS)
+EMFLAGS := -s ENVIRONMENT=web $(EMPORTS)
 
 #EMFLAGS += -O1 -s SAFE_HEAP=1
 EMFLAGS += -Oz
