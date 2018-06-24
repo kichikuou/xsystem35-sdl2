@@ -18,7 +18,7 @@ LFLAGS += --js-library emscripten/library.js
 SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr','_wait_vsync']"
 
 WASMFLAGS := -s WASM=1 -s "BINARYEN_TRAP_MODE='allow'"
-ASMJSFLAGS :=
+ASMJSFLAGS := -s WASM=0
 
 all: out/xsystem35.js out/xsystem35.asm.js
 
