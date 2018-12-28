@@ -17590,7 +17590,8 @@ fi
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XF86VidModeQueryExtension in -lXxf86vm" >&5
+if test "x$no_x" != xyes; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XF86VidModeQueryExtension in -lXxf86vm" >&5
 $as_echo_n "checking for XF86VidModeQueryExtension in -lXxf86vm... " >&6; }
 if ${ac_cv_lib_Xxf86vm_XF86VidModeQueryExtension+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -17630,11 +17631,11 @@ if test "x$ac_cv_lib_Xxf86vm_XF86VidModeQueryExtension" = xyes; then :
 
 $as_echo "#define HAVE_XF86VMODE 1" >>confdefs.h
 
-        XXF86VM_LIB="-lXxf86vm"
+			XXF86VM_LIB="-lXxf86vm"
 fi
 
-X_LIBS="$X_LIBS $XXF86VM_LIB -lXext"
-
+	X_LIBS="$X_LIBS $XXF86VM_LIB -lXext"
+fi
 # Check whether --enable-xrender was given.
 if test "${enable_xrender+set}" = set; then :
   enableval=$enable_xrender;

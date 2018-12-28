@@ -452,12 +452,13 @@ AC_SUBST(SRC_FONT)
 dnl
 dnl XFree86extendions
 dnl
-AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension,
-	[ AC_DEFINE(HAVE_XF86VMODE,1,[Define this if you have libXxf86vm installed])
-        XXF86VM_LIB="-lXxf86vm"],,
-	$X_LIBS $X_PRE_LIBS -lXext -lX11 $X_EXTRA_LIBS)
-X_LIBS="$X_LIBS $XXF86VM_LIB -lXext"
-
+if test "x$no_x" != xyes; then
+	AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension,
+		[ AC_DEFINE(HAVE_XF86VMODE,1,[Define this if you have libXxf86vm installed])
+			XXF86VM_LIB="-lXxf86vm"],,
+		$X_LIBS $X_PRE_LIBS -lXext -lX11 $X_EXTRA_LIBS)
+	X_LIBS="$X_LIBS $XXF86VM_LIB -lXext"
+fi
 AC_ARG_ENABLE(xrender,
   [  --enable-xrender        Use XRender extension (future work) [default=disable]],,
   enable_xrender="no")
