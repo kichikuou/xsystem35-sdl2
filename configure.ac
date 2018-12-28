@@ -3,6 +3,7 @@ dnl configure.ac for xsystem35
 dnl -----
 AC_INIT(xsystem35, 1.7.3pre5)
 AC_CONFIG_SRCDIR([configure.ac])
+AC_CONFIG_MACRO_DIRS([macros])
 AC_CANONICAL_TARGET
 
 dnl
