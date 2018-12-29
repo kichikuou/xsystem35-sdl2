@@ -200,7 +200,7 @@ void nact_main() {
 				check_command(c0);
 				nact->cmd_count++;
 			}
-#ifndef __EMSCRIPTEN__
+#ifndef ENABLE_SDL
 			if (!nact->is_message_locked) {
 				if (get_high_counter(SYSTEMCOUNTER_MAINLOOP)) {
 					sys_getInputInfo();
