@@ -97,7 +97,7 @@ static char *fontname_tt[FONTTYPEMAX];
 static boolean isjix0213_tt[FONTTYPEMAX];
 static char fontface[FONTTYPEMAX];
 
-#ifdef ENABLE_EDL
+#ifdef ENABLE_SDL
 static fontdev_t fontdev = FONT_FT2;
 #else
 static fontdev_t fontdev = FONT_X11;
