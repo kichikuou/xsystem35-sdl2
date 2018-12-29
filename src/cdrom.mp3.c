@@ -26,27 +26,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-#ifdef HAVE_LIBGEN_H
-#include <libgen.h>
-#else  /* for FreeBSD 3.x ? */
-#include "xpg_basename.c"
-extern char *__xpg_basename __P ((char *__path));
-#define basename(path)  __xpg_basename (path)
-#endif
+#include <SDL_mixer.h>
 
 #include "portab.h"
 #include "system.h"
 #include "counter.h"
 #include "cdrom.h"
 #include "music_private.h"
-
-extern void sys_set_signalhandler(int SIG, void (*handler)(int));
 
 /*
    CPUパワーがあまってあまってどうしようもない人へ :-)
@@ -78,7 +64,7 @@ extern void sys_set_signalhandler(int SIG, void (*handler)(int));
 
 static int cdrom_init(char *);
 static int cdrom_exit();
-static int cdrom_start(int, int);
+static int cdrom_start(int, boolean);
 static int cdrom_stop();
 static int cdrom_getPlayingInfo(cd_time *);
 
@@ -94,65 +80,13 @@ cdromdevice_t cdrom = {
 };
 
 #define PLAYLIST_MAX 256
-#define WHITE " \t\n"
-#define MAX_ARGS 512
 
 static boolean      enabled = FALSE;
-static char         mp3_player[256];
-static int          argc;
-static char         **argv;
 static char         *playlist[PLAYLIST_MAX];
 static int          lastindex; // 最終トラック番号
-static pid_t        cdpid;   // 外部プレーヤーの pid
+static Mix_Music    *mix_music;
 static int          trackno; // 現在演奏中のトラック
 static int          counter; // 演奏時間測定用カウンタ
-
-/*
-  外部プレーヤーの行の解析
-  1. プログラムと引数の分離
-  2. プログラムからプログラム名(argv[0])を分離
-*/
-
-static void player_set(char *buf) {
-	char *b;
-	int i, j;
-	
-	strncpy(mp3_player, buf, sizeof(mp3_player));
-	b = mp3_player;
-	
-	/* count arguments */
-	/* devide argument */
-	char *tok_buf = NULL;
-	char *str_buf[MAX_ARGS]; //MAX_ARGS以上の引数があるとだめ
-		
-	memset(str_buf, 0, sizeof(char *) * MAX_ARGS);
-		
-	i = 0;
-	str_buf[i] = strtok_r(b, WHITE, &tok_buf) ;
-		
-	if (str_buf[i] == NULL) return;
-		
-	while (str_buf[i] != NULL){
-		i++;
-		if (i >= MAX_ARGS){
-			return;
-		}
-		str_buf[i] = strtok_r(NULL, WHITE, &tok_buf);
-	}
-	argv = (char **)malloc(sizeof(char *) * (i + 2));
-		
-	if (argv == NULL) return;
-		
-	argc = i;
-		
-	for (j = 0; j < i; j++) {
-		argv[j] = str_buf[j];
-	}
-	argv[i + 1] = NULL;
-
-	/* cut down argv[0] */
-	argv[0] = basename(argv[0]);
-}
 
 static int cdrom_init(char *config_file) {
 	FILE *fp;
@@ -161,9 +95,8 @@ static int cdrom_init(char *config_file) {
 	char *s;
 	
 	if (NULL == (fp = fopen(config_file, "rt"))) return NG;
+	// Skip the first line
 	fgets(lbuf, sizeof(lbuf), fp); lcnt++;
-	
-	player_set(lbuf);
 	
 	while (TRUE) {
 		if (++lcnt >= (PLAYLIST_MAX +2)) {
@@ -209,9 +142,7 @@ static int cdrom_exit() {
 }
 
 /* トラック番号 trk の演奏 trk = 1~ */
-static int cdrom_start(int trk, int loop) {
-	pid_t pid;
-	
+static int cdrom_start(int trk, boolean loop) {
 	if (!enabled) return 0;
 	
 	/* 曲数よりも多い指定は不可*/
@@ -219,23 +150,18 @@ static int cdrom_start(int trk, int loop) {
 		return NG;
 	}
 	
-	argv[argc] = playlist[trk -2];
-	argv[argc +1] = NULL;
-	pid = fork();
-	if (pid == 0) {
-		/* child process */
-		pid_t mine = getpid();
-		setpgid(mine, mine);
-		sys_set_signalhandler(SIGTERM, SIG_DFL);
-		execvp(mp3_player, argv);
-		perror("execvp");
-		_exit(-1);
-	} else if (pid < 0) {
-		WARNING("fork failed");
+	if (mix_music)
+		Mix_FreeMusic(mix_music);
+
+	mix_music = Mix_LoadMUS(playlist[trk -2]);
+	if (!mix_music)
+		return NG;
+	if (Mix_PlayMusic(mix_music, loop ? -1 : 1) != 0) {
+		Mix_FreeMusic(mix_music);
+		mix_music = NULL;
 		return NG;
 	}
-	
-	cdpid = pid;
+
 	trackno = trk;
 	counter = get_high_counter(SYSTEMCOUNTER_MP3);
 	
@@ -244,16 +170,11 @@ static int cdrom_start(int trk, int loop) {
 
 /* 演奏停止 */
 static int cdrom_stop() {
-	if (!enabled || cdpid == 0) {
+	if (!enabled || !mix_music) {
 		return OK;
 	}
-	
-	int status = 0;
-	kill(cdpid, SIGTERM);
-	killpg(cdpid, SIGTERM);
-	while (0 >= waitpid(cdpid, &status, WNOHANG));
-	
-	cdpid   = 0;
+	Mix_FreeMusic(mix_music);
+	mix_music = NULL;
 	trackno = 0;
 	
 	return OK;
@@ -261,14 +182,15 @@ static int cdrom_stop() {
 
 /* 現在演奏中のトラック情報の取得 */
 static int cdrom_getPlayingInfo (cd_time *inf) {
-	int status, cnt, err;
+	int cnt;
 	
-	if (!enabled || cdpid == 0) {
+	if (!enabled || !mix_music) {
 		goto errout;
 	}
 	
-	if (cdpid == (err = waitpid(cdpid, &status, WNOHANG))) {
-		cdpid = 0;
+	if (!Mix_PlayingMusic()) {
+		Mix_FreeMusic(mix_music);
+		mix_music = NULL;
 		goto errout;
 	}
 	cnt = get_high_counter(SYSTEMCOUNTER_MP3) - counter;
