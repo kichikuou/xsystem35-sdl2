@@ -92,7 +92,6 @@ dnl AC_TYPE_SIZE_T
 dnl AC_HEADER_TIME
 dnl AC_STRUCT_TM
 AC_C_BIGENDIAN
-AC_CHECK_HEADERS(libgen.h)
 
 
 dnl
@@ -221,7 +220,7 @@ AC_ARG_ENABLE(cdrom,
   [ enable_cdrom=yes])
 
 dnl yes -> default
-test "x$enable_cdrom" = xyes -a enable_cdrom=default
+test "x$enable_cdrom" = xyes && enable_cdrom=default
 
 if test "x$enable_cdrom" != xno; then
   for i in `echo $enable_cdrom | sed 's/,/ /g'`; do
@@ -233,20 +232,24 @@ if test "x$enable_cdrom" != xno; then
 fi
 
 if test "x$enable_cdrom" = xdefault; then
-  case "$target" in
-    *-*-linux*|*-*-solaris*)
-      enable_cd_linux=yes
-      ;;
-    *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
-      enable_cd_bsd=yes
-      ;;
-    *-dec-*)
-      enable_cd_mp3=yes
-      ;;
-    *)
-      AC_MSG_WARN(No --enable-cdrom=default cdrom for $target)
-      ;;
-  esac
+  if test "x$is_emscripten" != xyes && test "x$have_sdl" = xyes; then
+    enable_cd_mp3=yes
+  else
+    case "$target" in
+      *-*-linux*|*-*-solaris*)
+        enable_cd_linux=yes
+        ;;
+      *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
+        enable_cd_bsd=yes
+        ;;
+      *-dec-*)
+        enable_cd_mp3=yes
+        ;;
+      *)
+        AC_MSG_WARN(No --enable-cdrom=default cdrom for $target)
+        ;;
+    esac
+  fi
 fi
 
 SRC_CDROM=

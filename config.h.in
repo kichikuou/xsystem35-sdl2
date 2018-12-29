@@ -141,9 +141,6 @@
 /* Define if libdlloader will be built on this platform */
 #undef HAVE_LIBDLLOADER
 
-/* Define to 1 if you have the <libgen.h> header file. */
-#undef HAVE_LIBGEN_H
-
 /* Define to 1 if you have the <linux/joystick.h> header file. */
 #undef HAVE_LINUX_JOYSTICK_H
 

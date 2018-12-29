@@ -15427,18 +15427,6 @@ $as_echo "#define AC_APPLE_UNIVERSAL_BUILD 1" >>confdefs.h
  presetting ac_cv_c_bigendian=no (or yes) will help" "$LINENO" 5 ;;
  esac
 
-for ac_header in libgen.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "libgen.h" "ac_cv_header_libgen_h" "$ac_includes_default"
-if test "x$ac_cv_header_libgen_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBGEN_H 1
-_ACEOF
-
-fi
-
-done
-
 
 
 if test "$no_x" = yes; then
@@ -16922,7 +16910,7 @@ else
 fi
 
 
-test "x$enable_cdrom" = xyes -a enable_cdrom=default
+test "x$enable_cdrom" = xyes && enable_cdrom=default
 
 if test "x$enable_cdrom" != xno; then
   for i in `echo $enable_cdrom | sed 's/,/ /g'`; do
@@ -16934,21 +16922,25 @@ if test "x$enable_cdrom" != xno; then
 fi
 
 if test "x$enable_cdrom" = xdefault; then
-  case "$target" in
-    *-*-linux*|*-*-solaris*)
-      enable_cd_linux=yes
-      ;;
-    *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
-      enable_cd_bsd=yes
-      ;;
-    *-dec-*)
-      enable_cd_mp3=yes
-      ;;
-    *)
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No --enable-cdrom=default cdrom for $target" >&5
+  if test "x$is_emscripten" != xyes && test "x$have_sdl" = xyes; then
+    enable_cd_mp3=yes
+  else
+    case "$target" in
+      *-*-linux*|*-*-solaris*)
+        enable_cd_linux=yes
+        ;;
+      *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
+        enable_cd_bsd=yes
+        ;;
+      *-dec-*)
+        enable_cd_mp3=yes
+        ;;
+      *)
+        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No --enable-cdrom=default cdrom for $target" >&5
 $as_echo "$as_me: WARNING: No --enable-cdrom=default cdrom for $target" >&2;}
-      ;;
-  esac
+        ;;
+    esac
+  fi
 fi
 
 SRC_CDROM=
