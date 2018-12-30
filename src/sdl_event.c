@@ -73,6 +73,12 @@ static void sdl_getEvent(void) {
 	while (SDL_PollEvent(&e)) {
 		had_input = true;
 		switch (e.type) {
+#ifndef __EMSCRIPTEN__
+		case SDL_QUIT:
+			nact->is_quit = TRUE;
+			nact->wait_vsync = TRUE;
+			break;
+#endif
 		case SDL_WINDOWEVENT:
 			switch (e.window.event) {
 			case SDL_WINDOWEVENT_ENTER:
