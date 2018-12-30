@@ -24,11 +24,10 @@
 #ifndef __XSYSTEM35_COUNTER__
 #define __XSYSTEM35_COUNTER__
 
-#define EXTER_HIGHTCOUNTER_NUM 4
+#define EXTER_HIGHTCOUNTER_NUM 3
 #define SYSTEMCOUNTER_MP3      (256 + 1)
 #define SYSTEMCOUNTER_MIDI     (256 + 2)
-#define SYSTEMCOUNTER_FADE     (256 + 3)
-#define SYSTEMCOUNTER_MSEC     (256 + 4) /* 1msec no reset counter */
+#define SYSTEMCOUNTER_MSEC     (256 + 3) /* 1msec no reset counter */
 
 extern int  get_counter(int division);
 extern void reset_counter(int val);
