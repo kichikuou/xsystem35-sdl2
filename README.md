@@ -15,3 +15,9 @@
 
     $ ./configure
     $ make
+
+#### MacOS
+
+    $ brew install sdl2 sdl2_mixer
+    $ ./configure --enable-sdl --disable-gtk --disable-shared --disable-midi
+    $ make
