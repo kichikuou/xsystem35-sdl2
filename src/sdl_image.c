@@ -156,33 +156,24 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	SDL_Rect r_src,r_dst;
 
 	if (cg->alpha != NULL && cg->spritecolor != -1) {
-		unsigned short *p_ds, *p_src = (WORD *)(cg->pic + cg->data_offset);
-		unsigned short *p_dst;
+		unsigned short *p_src = (WORD *)(cg->pic + cg->data_offset);
+		DWORD *p_ds, *p_dst;
 		BYTE *a_src = cg->alpha;
 		BYTE *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
 		int x, y, l;
 		
-#ifndef WORDS_BIGENDIAN
-		s = SDL_AllocSurface(SDL_ANYFORMAT, w, h, 32,
-				     0xf800, 0x07e0, 0x001f, 0xFF0000);
-#else
-		s = SDL_AllocSurface(SDL_ANYFORMAT,w, h, 32,
-				     0xf800, 0x07e0, 0x001f, 0xFF000000);
-#endif
+		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
 		SDL_LockSurface(s);
 		p_ds = s->pixels;
-		l = s->pitch/2;
+		l = s->pitch/4;
 		for (y = 0; y < h; y++) {
 			p_dst = p_ds;
 			memcpy(adata, a_src, w);
 			for (x = 0; x < w; x++) {
-#ifndef WORDS_BIGENDIAN
-				*(p_dst++) = *(p_src++);
-				*(p_dst++) = *(a_src++);
-#else
-				*(p_dst++) = *(a_src++);
-				*(p_dst++) = *(p_src++);
-#endif
+				*p_dst++ = *a_src++ << 24 | RGB_PIX24(RGB_PIXR16(*p_src),
+													  RGB_PIXG16(*p_src),
+													  RGB_PIXB16(*p_src));
+				p_src++;
 			}
 			p_ds  += l;
 			adata += sdl_dibinfo->width;
