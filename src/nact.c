@@ -181,11 +181,8 @@ static int checkMessage() {
 	return c0;
 }
 
-#define MAINLOOP_EVENTCHECK_INTERVAL 16 /* 16 msec */
-
 void nact_main() {
 	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
-	reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
 	int cnt = 0;
 
 	nact->frame_count = 0;
@@ -200,16 +197,12 @@ void nact_main() {
 				check_command(c0);
 				nact->cmd_count++;
 			}
-#ifndef ENABLE_SDL
-			if (!nact->is_message_locked) {
-				if (get_high_counter(SYSTEMCOUNTER_MAINLOOP)) {
-					sys_getInputInfo();
-					reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
-				}
-			}
-#endif
 			nact->callback();
 		}
+#ifndef __EMSCRIPTEN__
+		if (!nact->is_message_locked)
+			sys_getInputInfo();
+#endif
 		WaitVsync();
 		nact->frame_count++;
 		nact->wait_vsync = FALSE;
