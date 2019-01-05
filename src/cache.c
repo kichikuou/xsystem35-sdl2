@@ -52,20 +52,14 @@ static void remove_in_cache(cacher *id) {
 	cacheinfo *ic = ip->next;
 	
 	while(ic->next != NULL) {
-		if (!(boolean)*(ic->in_use)) {
-			if (ic->refcnt-- == 0) {
-				totalsize -= ic->size;
-				if (ic->next != NULL) {
-					ip->next = ic->next;
-				} else {
-					ip->next = NULL;
-				}
-				id->free_(ic->data);
-			}
+		if (!(boolean)*(ic->in_use) && ic->refcnt-- == 0) {
+			totalsize -= ic->size;
+			ip->next = ic->next;
+			id->free_(ic->data);
+			free(ic);
 		} else {
 			ip = ic;
 		}
-		free(ic);
 		ic = ip->next;
 	}
 	return;
