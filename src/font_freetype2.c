@@ -203,24 +203,24 @@ static void pixmapmono2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl
 	int i, xx, yy;
 	int w1,w2;
 	BYTE *dst = GETOFFSET_PIXEL(&img_glyph, x, y);
-	unsigned int ch;
 	if (w <= 0) return;
 	
 	w1 = w / 8;
 	w2 = w % 8;
 	for (yy = 0; yy < h; yy++) {
-		ch = *src;
 		for (xx = 0; xx < w1; xx++){
-			
+			BYTE ch = src[xx];
 			for (i = 0; i < 8; i++){
 				*(dst + i + xx * 8) = (ch & 0x80 ? 255 : 0);
 				ch <<= 1;
 			}
-			ch = *(src + xx + 1);
 		}
-		for (i = 0; i < w2; i++){
-			*(dst + i + w1 * 8) = (ch & 0x80 ? 255 : 0);
-			ch <<= 1;
+		if (w2) {
+			BYTE ch = src[w1];
+			for (i = 0; i < w2; i++){
+				*(dst + i + w1 * 8) = (ch & 0x80 ? 255 : 0);
+				ch <<= 1;
+			}
 		}
 		src += src_bpl;
 		dst += img_glyph.bytes_per_line;

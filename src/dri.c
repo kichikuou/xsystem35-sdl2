@@ -158,7 +158,7 @@ static void get_fileptr(drifiles *d, FILE *fp, int disk) {
 	d->fileptr[disk] = calloc(filecnt, sizeof(int));
 	
 	/* store pointers */
-	for (i = 0; i < filecnt; i++) {
+	for (i = 0; i < filecnt - 1; i++) {
 		*(d->fileptr[disk] + i) = (LittleEndian_get3B(_b, i * 3 + 3) << 8);
 	}
 	
