@@ -18,6 +18,8 @@
 
 #### MacOS
 
-    $ brew install sdl2 sdl2_mixer
+[Homebrew](https://brew.sh/index_ja) が必要です。
+
+    $ brew install pkg-config sdl2 sdl2_mixer freetype
     $ ./configure --enable-sdl --disable-gtk --disable-shared --disable-midi
     $ make
