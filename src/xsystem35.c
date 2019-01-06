@@ -538,7 +538,7 @@ static void sys35_remove() {
 		fclose(fpdebuglog);
 	}
 #endif
-	if (0 != strcmp(nact->tmpdir, "/tmp")) {
+	if (nact->tmpdir && 0 != strcmp(nact->tmpdir, "/tmp")) {
 		rmdir(nact->tmpdir);
 	}
 }
