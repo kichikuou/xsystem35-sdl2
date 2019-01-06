@@ -67,5 +67,7 @@ extern void image_trans_pixel_24to24p(agsurface_t *src, agsurface_t *dst);
 extern void image_Mosaic(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int slice);
 extern void image_fillRectangleNeg(agsurface_t *dib, int x, int y, int w, int h, int col);
 
+extern BYTE *changeImage16AlphaLevel(cgdata *cg);
+
 #endif  /* __IMAGE__ */
 

@@ -154,6 +154,13 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	/* draw alpha pixel */
 	SDL_Surface *s;
 	SDL_Rect r_src,r_dst;
+	BYTE *pic_save = NULL;
+
+	/* set alpha Level */
+	if (cg->alphalevel != 255) {
+		pic_save = cg->pic;
+		cg->pic = changeImage16AlphaLevel(cg);
+	}
 
 	if (cg->alpha != NULL && cg->spritecolor != -1) {
 		unsigned short *p_src = (WORD *)(cg->pic + cg->data_offset);
@@ -208,6 +215,11 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	setRect(r_dst, dx, dy, w, h);
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
+
+	if (cg->alphalevel != 255) {
+		free(cg->pic);
+		cg->pic = pic_save;
+	}
 }
 
 /*

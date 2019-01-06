@@ -268,7 +268,7 @@ static int trans_index2pixel(int depth, int i) {
 }
 
 /* 16bitCGの ALPHALEVELを指定 */
-static WORD *changeImageAlphaLevel(cgdata *cg) {
+BYTE *changeImage16AlphaLevel(cgdata *cg) {
 	WORD *new_pic = malloc(sizeof(WORD) * cg->width * cg->height), *new_pic_;
 	WORD *pic = (WORD *)cg->pic;
 	int   pixels = cg->width * cg->height;
@@ -279,7 +279,7 @@ static WORD *changeImageAlphaLevel(cgdata *cg) {
 		*new_pic = RGB_ALPHALEVEL16(*pic, cg->alphalevel);
 		new_pic++; pic++;
 	}
-	return new_pic_;
+	return (BYTE *)new_pic_;
 }
 
 
@@ -528,12 +528,12 @@ void image_drawImage8_fromData(agsurface_t *dib, cgdata *cg, int dx, int dy, int
  * dibに16bitCGの描画
  */
 void image_drawImage16_fromData(agsurface_t *dib, cgdata *cg, int x, int y, int w, int h) {
-	WORD *pic_save = NULL;
+	BYTE *pic_save = NULL;
 	
 	/* set alpha Level */
 	if (cg->alphalevel != 255) {
-		pic_save = (WORD *)cg->pic;
-		cg->pic = (BYTE *)changeImageAlphaLevel(cg);
+		pic_save = cg->pic;
+		cg->pic = changeImage16AlphaLevel(cg);
 	}
 	
 	if (cg->spritecolor >= 0) {
@@ -544,7 +544,7 @@ void image_drawImage16_fromData(agsurface_t *dib, cgdata *cg, int x, int y, int 
 	
 	if (cg->alphalevel != 255) {
 		free(cg->pic);
-		cg->pic = (BYTE *)pic_save;
+		cg->pic = pic_save;
 	}
 }
 
