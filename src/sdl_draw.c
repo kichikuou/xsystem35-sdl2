@@ -327,15 +327,10 @@ static SDL_Surface *com2alphasurface(agsurface_t *src, int cl) {
 	BYTE *sp, *dp;
 	SDL_Rect r_src;
 	
-	s = SDL_AllocSurface(SDL_SWSURFACE, src->width, src->height, 
-			     sdl_dib->format->BitsPerPixel <= 24 ? sdl_dib->format->BitsPerPixel+8:32,
-			     sdl_dib->format->Rmask,sdl_dib->format->Gmask,
-			     sdl_dib->format->Bmask,
-			     sdl_dib->format->BitsPerPixel<24?0xFF0000:0xFF000000);
+	s = SDL_CreateRGBSurfaceWithFormat(0, src->width, src->height, 32, SDL_PIXELFORMAT_ARGB8888);
 	
 	setRect(r_src, 0, 0, src->width, src->height);
-	SDL_FillRect(s, &r_src,
-		     SDL_MapRGB(sdl_dib->format, sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b));
+	SDL_FillRect(s, &r_src, RGB_PIX24(sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b));
 
 	SDL_LockSurface(s);
 	
