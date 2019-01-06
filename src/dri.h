@@ -50,7 +50,7 @@ struct _dridata {
 	char    *data_raw; /* dri header pointer */
 	char    *data;     /* real data */
 	char    *name;     /* not used */
-	boolean in_use;    /* dont remove from cache if TRUE */
+	int     refcnt;    /* reference count */
 	drifiles *a;       /* archive file obj */
 };
 typedef struct _dridata dridata;

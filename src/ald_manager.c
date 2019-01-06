@@ -72,10 +72,12 @@ dridata *ald_getdata(DRIFILETYPE type, int no) {
 	if (NULL == (ddata = (dridata *)cache_foreach(cacheid, (type << 16) + no))) {
 		ddata = dri_getdata(dri[type], no);
 		if (ddata != NULL) {
-			cache_insert(cacheid, (type << 16) + no, (void *)ddata, ddata->size, &(ddata->in_use));
-			ddata->in_use = TRUE;
+			ddata->refcnt = 0;
+			cache_insert(cacheid, (type << 16) + no, (void *)ddata, ddata->size, &(ddata->refcnt));
 		}
 	}
+	if (ddata != NULL)
+		ddata->refcnt++;
 	
 	return ddata;
 }
@@ -90,7 +92,7 @@ void ald_freedata(dridata *data) {
 	if (data->a->mmapped) {
 		free(data);
 	} else {
-		data->in_use = FALSE;
+		data->refcnt--;
 	}
 }
 
