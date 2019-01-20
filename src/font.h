@@ -81,4 +81,8 @@ typedef enum {
 	FONT_SDLTTF
 } fontdev_t;
 
+#ifdef __EMSCRIPTEN__
+int load_mincho_font(void);
+#endif
+
 #endif  /* __FONT_H__ */

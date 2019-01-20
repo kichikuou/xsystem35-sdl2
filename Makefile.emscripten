@@ -13,9 +13,10 @@ EMFLAGS += -s NO_EXIT_RUNTIME=1
 LFLAGS := $(EMFLAGS)
 LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_sjis2unicode']"
 LFLAGS += -s EXTRA_EXPORTED_RUNTIME_METHODS="['getValue','getMemory','addRunDependency','removeRunDependency']"
-LFLAGS += --js-library emscripten/library.js
 
-SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr','_wait_vsync']"
+JSLIB := --js-library emscripten/library.js
+
+SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr','_wait_vsync','_load_mincho_font']"
 
 WASMFLAGS := -s WASM=1 -s "BINARYEN_TRAP_MODE='allow'"
 ASMJSFLAGS := -s WASM=0
@@ -26,13 +27,13 @@ out:
 	mkdir out
 
 out/xsystem35.js: emterpretify_whitelist src/xsystem35 out
-	$(CC) xsystem35.bc $(LFLAGS) $(WASMFLAGS) @emterpretify_whitelist -o $@
+	$(CC) xsystem35.bc $(LFLAGS) $(JSLIB) $(WASMFLAGS) @emterpretify_whitelist -o $@
 
 out/xsystem35.asm.js: emterpretify_whitelist src/xsystem35 out
-	$(CC) xsystem35.bc $(LFLAGS) $(ASMJSFLAGS) @emterpretify_whitelist -o $@
+	$(CC) xsystem35.bc $(LFLAGS) $(JSLIB) $(ASMJSFLAGS) @emterpretify_whitelist -o $@
 
 emterpretify_whitelist:
-	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 $(SYNCLIST) xsystem35.bc |grep EMTERPRETIFY_WHITELIST > $@
+	$(CC) $(EMPORTS) -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 $(SYNCLIST) $(JSLIB) xsystem35.bc |grep EMTERPRETIFY_WHITELIST > $@
 
 src/xsystem35: src src/Makefile
 	$(MAKE) -C src

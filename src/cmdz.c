@@ -436,7 +436,12 @@ void commandZZ10() {
 void commandZZ13() {
 	/* 表示フォントを設定する */
 	int num = getCaliValue();
-	
+#ifdef __EMSCRIPTEN__
+	if (num == FONT_MINCHO) {
+		if (load_mincho_font() != OK)
+			num = FONT_GOTHIC;
+	}
+#endif
 	nact->msg.MsgFont = num;
 	
 	DEBUG_COMMAND("ZZ13 %d:\n",num);

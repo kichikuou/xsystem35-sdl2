@@ -7,6 +7,14 @@ mergeInto(LibraryManager.library, {
 			});
 		});
 	},
+	load_mincho_font: function() {
+		return EmterpreterAsync.handle(function(resume) {
+			xsystem35.load_mincho_font().then(function(result) {
+				if (ABORT) return; // do this manually; we can't call into Browser.safeSetTimeout, because that is paused/resumed!
+				resume(function() { return result; });
+			});
+		});
+	},
 	muspcm_init: function() {
 		return 0; // OK
 	},
