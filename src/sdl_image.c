@@ -240,9 +240,7 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 	BYTE *adata = GETOFFSET_ALPHA(sdl_dibinfo, sx, sy);
 	BYTE *p_src, *p_dst, *p_ds;
 	
-	SDL_Surface *s = SDL_AllocSurface(SDL_ANYFORMAT, w, h, 32, sdl_dib->format->Rmask,
-					  sdl_dib->format->Gmask, sdl_dib->format->Bmask,
-					  0xFF000000);
+	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
 	SDL_Rect r_src, r_dst;
 	int x, y;
 
