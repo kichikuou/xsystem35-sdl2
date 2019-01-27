@@ -203,7 +203,6 @@ int mus_pcm_mix(int noL, int noR, int loop) {
  */
 int mus_pcm_stop(int msec) {
 	if (!prv.pcm_valid) return NG;
-	printf("%s not tested\n", __func__);
 
 	muspcm_fadeout(0, msec);
 	return OK;
@@ -227,7 +226,6 @@ int mus_pcm_load(int no) {
  */
 int mus_pcm_get_playposition(int *pos) {
 	if (!prv.pcm_valid) return NG;
-	printf("%s not tested\n", __func__);
 
 	*pos = muspcm_getpos(0);
 	return OK;

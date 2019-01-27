@@ -24,8 +24,8 @@
 #ifndef __MUSIC_PCM_H__
 #define __MUSIC_PCM_H__
 
-extern int muspcm_init();
-extern int muspcm_exit();
+extern int muspcm_init(void);
+extern int muspcm_exit(void);
 extern int muspcm_load_no(int slot, int no);
 extern int muspcm_load_mixlr(int slot, int noL, int noR);
 extern int muspcm_start(int slot, int loop);
