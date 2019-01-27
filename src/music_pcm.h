@@ -28,6 +28,7 @@ extern int muspcm_init(void);
 extern int muspcm_exit(void);
 extern int muspcm_load_no(int slot, int no);
 extern int muspcm_load_mixlr(int slot, int noL, int noR);
+extern int muspcm_unload(int slot);
 extern int muspcm_start(int slot, int loop);
 extern int muspcm_stop(int slot);
 extern int muspcm_fadeout(int slot, int msec);
@@ -37,5 +38,6 @@ extern int muspcm_getpos(int slot);
 extern int muspcm_setvol(int dev, int slot, int lv);
 extern int muspcm_getwavelen(int slot);
 extern boolean muspcm_isplaying(int slot);
+extern int muspcm_waitend(int slot);
 
 #endif /* __MUSIC_PCM_H__ */

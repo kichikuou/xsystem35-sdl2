@@ -267,7 +267,7 @@ boolean mus_pcm_get_state() {
  *           1: する
  */ 
 int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
-	printf("%s not implemented\n", __func__);
+	printf("%s(%d, %d, %d, %d) not implemented\n", __func__, device, time, volume, stop);
 	return NG;
 }
 
@@ -279,7 +279,7 @@ int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
  *           FALSE -> フェード中でない
  */
 boolean mus_mixer_fadeout_get_state(int device) {
-	printf("%s not implemented\n", __func__);
+	printf("%s(%d) not implemented\n", __func__, device);
 	return FALSE;
 }
 
@@ -309,8 +309,10 @@ int mus_mixer_get_level(int device) {
  *   num: ファイル番号 (1-65535)
  */
 int mus_wav_load(int ch, int num) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+
+	if (ch < 0 || ch > 128) return NG;
+	return muspcm_load_no(ch + 1, num);
 }
 
 /*
@@ -318,8 +320,10 @@ int mus_wav_load(int ch, int num) {
  *   ch : channel
  */
 int mus_wav_unload(int ch) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+
+	if (ch < 0 || ch > 128) return NG;
+	return muspcm_unload(ch + 1);
 }
 
 /*
@@ -329,8 +333,10 @@ int mus_wav_unload(int ch) {
  *   loop: 繰り返し回数       (0の場合は無限, それ以外は１回のみ)
  */
 int mus_wav_play(int ch, int loop) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+
+	if (ch < 0 || ch > 128) return NG;
+	return muspcm_start(ch + 1, loop);
 }
 
 /*
@@ -338,8 +344,10 @@ int mus_wav_play(int ch, int loop) {
  *   ch: channel
  */
 int mus_wav_stop(int ch) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+
+	if (ch < 0 || ch > 128) return NG;
+	return muspcm_stop(ch + 1);
 }
 
 /*
@@ -393,8 +401,10 @@ boolean mus_wav_fadeout_get_state(int ch) {
  *   ch: channel (0-127)
  */
 int mus_wav_waitend(int ch) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	if (!prv.pcm_valid) return NG;
+
+	if (ch < 0 || ch > 128) return NG;
+	return muspcm_waitend(ch + 1);
 }
 
 /*

@@ -16,7 +16,7 @@ LFLAGS += -s EXTRA_EXPORTED_RUNTIME_METHODS="['getValue','getMemory','addRunDepe
 
 JSLIB := --js-library emscripten/library.js
 
-SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr','_wait_vsync','_load_mincho_font']"
+SYNCLIST := -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr','_muspcm_waitend','_wait_vsync','_load_mincho_font']"
 
 WASMFLAGS := -s WASM=1 -s "BINARYEN_TRAP_MODE='allow'"
 ASMJSFLAGS := -s WASM=0

@@ -179,6 +179,10 @@ int muspcm_load_mixlr(int slot, int noL, int noR) {
 	return load_chunk(slot, chunk);
 }
 
+int muspcm_unload(int slot) {
+	return unload(slot);
+}
+
 static int load_chunk(int slot, Mix_Chunk *chunk) {
 	if (IS_LOADED(slot)) unload(slot);
 
@@ -321,6 +325,11 @@ boolean muspcm_isplaying(int slot) {
 	return obj->playing;
 }
 
+// 指定のチャンネルの再生が終了するまで待つ
+int muspcm_waitend(int slot) {
+	printf("%s not implemented\n", __func__);
+	return NG;
+}
 
 static int load_wai() {
 	struct stat sbuf;

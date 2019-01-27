@@ -27,6 +27,9 @@ mergeInto(LibraryManager.library, {
 	muspcm_load_mixlr: function(slot, noL, noR) {  // emterpreter sync
 		return xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
 	},
+	muspcm_unload: function(slot) {
+		return xsystem35.audio.pcm_unload(slot);
+	},
 	muspcm_start: function(slot, loop) {
 		return xsystem35.audio.pcm_start(slot, loop);
 	},
@@ -56,5 +59,8 @@ mergeInto(LibraryManager.library, {
 	},
 	muspcm_isplaying: function(slot) {
 		return xsystem35.audio.pcm_isplaying(slot);
+	},
+	muspcm_waitend: function(slot) {  // emterpreter sync
+		return xsystem35.audio.pcm_waitend(slot);
 	}
 });
