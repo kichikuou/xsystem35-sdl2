@@ -3,7 +3,7 @@
 EMPORTS := -s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2
 EMFLAGS := -s ENVIRONMENT=web $(EMPORTS)
 
-#EMFLAGS += -O1 -s SAFE_HEAP=1
+#EMFLAGS += -O1 -s ASSERTIONS=1
 EMFLAGS += -Oz
 
 EMFLAGS += -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
@@ -11,7 +11,7 @@ EMFLAGS += -s ALLOW_MEMORY_GROWTH=1
 EMFLAGS += -s NO_EXIT_RUNTIME=1
 
 LFLAGS := $(EMFLAGS)
-LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata']"
+LFLAGS += -s EXPORTED_FUNCTIONS="['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_va_alarm_handler']"
 LFLAGS += -s EXTRA_EXPORTED_RUNTIME_METHODS="['getValue','getMemory','addRunDependency','removeRunDependency']"
 
 JSLIB := --js-library emscripten/library.js

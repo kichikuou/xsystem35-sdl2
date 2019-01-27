@@ -31,6 +31,9 @@
 #include "xsystem35.h"
 #include "ags.h"
 #include "imput.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 extern void sys_set_signalhandler(int SIG, void (*handler)(int));
 
@@ -136,7 +139,6 @@ static void    va_interval_process();
 static void    va_init_itimer();
 static void    va_pause_itimer();
 static void    va_unpause_itimer();
-static void    alarmHandler();
 
 void commandVC() { /* from Rance4 */
 	nPageNum = getCaliValue();
@@ -1037,14 +1039,38 @@ static void va_interval_process() {
 	}
 }
 
-static void alarmHandler() {
+void va_alarm_handler() {
 	if (!inAnimation) {
 		va_interval_process();
 	}
 }
 
+#ifdef __EMSCRIPTEN__
+
 static void va_init_itimer() {
-	sys_set_signalhandler(SIGALRM, alarmHandler);
+	va_unpause_itimer();
+}
+
+static void va_pause_itimer() {
+	EM_ASM({
+			if (xsystem35.va_timer) {
+				clearInterval(xsystem35.va_timer);
+				xsystem35.va_timer = null;
+			}
+		});
+}
+
+static void va_unpause_itimer() {
+	EM_ASM({
+			if (!xsystem35.va_timer)
+				xsystem35.va_timer = setInterval(_va_alarm_handler, 10);
+		});
+}
+
+#else // __EMSCRIPTEN__
+
+static void va_init_itimer() {
+	sys_set_signalhandler(SIGALRM, va_alarm_handler);
 	va_unpause_itimer();
 }
 
@@ -1068,3 +1094,5 @@ static void va_unpause_itimer() {
 	setitimer(ITIMER_REAL, &value, NULL);
 	nact->is_va_animation = TRUE;
 }
+
+#endif // __EMSCRIPTEN__
