@@ -66,7 +66,7 @@ static char *fc_search(const char *fname_sjis) {
 	while ((entry = readdir(dir)) != NULL) {
 		if (strcasecmp(fname_sjis, entry->d_name) == 0 ||
 			strcasecmp(fname_utf, entry->d_name) == 0) {
-			found = strdup(entry->d_name);
+			found = get_fullpath(entry->d_name);
 			break;
 		}
 	}
@@ -76,17 +76,19 @@ static char *fc_search(const char *fname_sjis) {
 }
 
 FILE *fc_open(char *filename, char type) {
-	char *fc = fc_search(filename);
-	if (fc == NULL) {
+	char *fullpath = fc_search(filename);
+	if (fullpath == NULL) {
 		if (type == 'r')
 			return NULL;
-		if (newfile_kanjicode_utf8)
-			fc = sjis2lang(filename);
+
+		if (newfile_kanjicode_utf8) {
+			char *fc = sjis2lang(filename);
+			fullpath = get_fullpath(fc);
+			free(fc);
+		}
 		else
-			fc = strdup(filename);
+			fullpath = get_fullpath(filename);
 	}
-	char *fullpath = get_fullpath(fc);
-	free(fc);
 
 	FILE *fp;
 	if (type == 'w') {
