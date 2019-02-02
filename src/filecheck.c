@@ -38,12 +38,12 @@ struct fnametable {
 static char *saveDataPath;
 static boolean newfile_kanjicode_utf8 = TRUE;
 
-static char *get_fullpath(char *filename) {
-	char *fn = malloc(strlen(filename) + strlen(saveDataPath) + 3);
+static char *get_fullpath(char* dir, char *filename) {
+	char *fn = malloc(strlen(filename) + strlen(dir) + 3);
 	if (fn == NULL) {
 		return NULL;
 	}
-	strcpy(fn, saveDataPath);
+	strcpy(fn, dir);
 	strcat(fn, "/");
 	strcat(fn, filename);
 	return fn;
@@ -55,39 +55,44 @@ void fc_init(char *name) {
 	saveDataPath = strdup(name);
 }
 
-static char *fc_search(const char *fname_sjis) {
-	DIR *dir = opendir(saveDataPath);
-	if (dir == NULL)
+static char *fc_search(const char *fname_sjis, const char *dir) {
+	DIR *d = opendir(dir);
+	if (d == NULL)
 		return NULL;
 
 	BYTE *fname_utf = sjis2lang(fname_sjis);
 	char *found = NULL;
 	struct dirent *entry;
-	while ((entry = readdir(dir)) != NULL) {
+	while ((entry = readdir(d)) != NULL) {
 		if (strcasecmp(fname_sjis, entry->d_name) == 0 ||
 			strcasecmp(fname_utf, entry->d_name) == 0) {
-			found = get_fullpath(entry->d_name);
+			found = get_fullpath(dir, entry->d_name);
 			break;
 		}
 	}
-	closedir(dir);
+	closedir(d);
 	free(fname_utf);
 	return found;
 }
 
 FILE *fc_open(char *filename, char type) {
-	char *fullpath = fc_search(filename);
+	char *fullpath = fc_search(filename, saveDataPath);
 	if (fullpath == NULL) {
-		if (type == 'r')
-			return NULL;
-
-		if (newfile_kanjicode_utf8) {
-			char *fc = sjis2lang(filename);
-			fullpath = get_fullpath(fc);
-			free(fc);
+		if (type == 'r') {
+#ifdef __EMSCRIPTEN__
+			fullpath = fc_search(filename, ".");
+#endif
+			if (fullpath == NULL)
+				return NULL;
+		} else {
+			if (newfile_kanjicode_utf8) {
+				char *fc = sjis2lang(filename);
+				fullpath = get_fullpath(saveDataPath, fc);
+				free(fc);
+			}
+			else
+				fullpath = get_fullpath(saveDataPath, filename);
 		}
-		else
-			fullpath = get_fullpath(filename);
 	}
 
 	FILE *fp;
