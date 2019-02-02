@@ -28,8 +28,8 @@
 #define FILENAME_KANJI_CODE_SJIS 1
 
 extern void fc_init(char *name);
-extern char *fc_search(char *req);
-extern char *fc_add(char *req);
+extern FILE *fc_open(char *filename, char type);
+extern void fc_backup_oldfile(char *filename);
 extern void fc_set_default_kanjicode(int c);
 
 #endif /* !__FILECHECK_H__ */

@@ -44,7 +44,6 @@
 
 /* セーブデータ */
 static char *saveDataFile[SAVE_MAXNUMBER];
-static char *saveDataPath;
 static int savefile_sysvar_cnt = SYSVAR_MAX;
 
 static void* saveStackInfo(Ald_stackHdr *head);
@@ -65,7 +64,6 @@ static void scheduleSync() {
 /* savefile がある directory を登録 */
 void save_set_path(char *path) {
 	nact->files.savedir = strdup(path);
-	saveDataPath = strdup(path);
 	fc_init(path);
 }
 
@@ -89,51 +87,6 @@ int save_delete_file(int index) {
 	return 1; /* とりあえず */
 }
 
-static char *get_fullpath(char *filename) {
-	char *fn = malloc(strlen(filename) + strlen(saveDataPath) + 3);
-	if (fn == NULL) {
-		return NULL;
-	}
-	strcpy(fn, saveDataPath);
-	strcat(fn, "/");
-	strcat(fn, filename);
-	return fn;
-}
-
-static void backup_oldfile(char *filename) {
-	char *newname;
-	
-	if (!filename) return;
-	newname = malloc(strlen(filename) + 3);
-	
-	strcpy(newname, filename);
-	strcat(newname, ".");
-	rename(filename, newname);
-	
-	free(newname);
-}
-
-static FILE *fileopen(char *filename, char type) {
-	char *fc = fc_search(filename);
-	char *fullpath;
-	FILE *fp;
-	
-	if (fc == NULL) { /* if file does not exist */
-		if (type == 'r') return NULL;
-		fc = fc_add(filename);
-	}
-	fullpath = get_fullpath(fc);
-	
-	if (type == 'w') {
-		backup_oldfile(fullpath);
-		fp = fopen(fullpath, "w");
-	} else {
-		fp = fopen(fullpath, "r");
-	}
-	free(fullpath);
-	return fp;
-}
-
 /* 指定ファイルへの変数の書き込み */
 int save_save_var_with_file(char *filename, int *start, int cnt) {
 	int status = 0, size, i;
@@ -155,7 +108,7 @@ int save_save_var_with_file(char *filename, int *start, int cnt) {
 #endif
 	}
 	
-	if (NULL == (fp = fileopen(filename, 'w'))) {
+	if (NULL == (fp = fc_open(filename, 'w'))) {
 		status = SAVE_SAVEERR; goto errexit;
 	}
 	
@@ -188,7 +141,7 @@ int save_load_var_with_file(char *filename, int *start, int cnt) {
 		return SAVE_LOADERR;
 	}
 	
-	if (NULL == (fp = fileopen(filename, 'r'))) {
+	if (NULL == (fp = fc_open(filename, 'r'))) {
 		status = SAVE_LOADERR; goto errexit;
 	}
 	
@@ -234,7 +187,7 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 	}
 	
 	
-	if (NULL == (fp = fileopen(filename, 'w'))) {
+	if (NULL == (fp = fc_open(filename, 'w'))) {
 		status = SAVE_SAVEERR; goto errexit;
 	}
 	size = tmp - _tmp;
@@ -261,7 +214,7 @@ int save_load_str_with_file(char *filename, int start, int cnt) {
 	char *tmp, *_tmp=NULL;
 	long filesize;
 	
-	if (NULL == (fp = fileopen(filename, 'r'))) {
+	if (NULL == (fp = fc_open(filename, 'r'))) {
 		return SAVE_LOADERR;
 	}
 	
@@ -509,7 +462,7 @@ int save_saveAll(int no) {
 	if (save_base == NULL)
 		return SAVE_SAVEERR;
 	
-	backup_oldfile(saveDataFile[no]);
+	fc_backup_oldfile(saveDataFile[no]);
 	fp = fopen(saveDataFile[no],"wb");
 	
 	if (fp == NULL)
@@ -786,7 +739,7 @@ static int saveGameData(int no, char *buf, int size) {
 	FILE *fp;
 	int status = SAVE_SAVEOK1;
 	
-	backup_oldfile(saveDataFile[no]);
+	fc_backup_oldfile(saveDataFile[no]);
 	fp = fopen(saveDataFile[no],"wb");
 	if (fp == NULL) {
 		return SAVE_SAVEERR;
@@ -808,7 +761,7 @@ BYTE* load_cg_with_file(char *filename, int *status){
 	
 	*status = 0;
 	
-	if (NULL == (fp = fileopen(filename, 'r'))) {
+	if (NULL == (fp = fc_open(filename, 'r'))) {
 		*status = SAVE_LOADERR; return NULL;
 	}
 	

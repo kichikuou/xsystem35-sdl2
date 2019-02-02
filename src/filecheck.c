@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 
+#include "filecheck.h"
 #include "utfsjis.h"
 
 struct fnametable {
@@ -37,8 +38,20 @@ struct fnametable {
 #define FILEMAX 100 /* ???? */
 static struct fnametable tbl[FILEMAX];
 static int fnametable_cnt;
+static char *saveDataPath;
 static boolean initilized = FALSE;
 static boolean newfile_kanjicode_utf8 = TRUE;
+
+static char *get_fullpath(char *filename) {
+	char *fn = malloc(strlen(filename) + strlen(saveDataPath) + 3);
+	if (fn == NULL) {
+		return NULL;
+	}
+	strcpy(fn, saveDataPath);
+	strcat(fn, "/");
+	strcat(fn, filename);
+	return fn;
+}
 
 /* list up file in current directory */
 /*   name : save/load directory      */
@@ -49,6 +62,7 @@ void fc_init(char *name) {
 	
 	initilized = FALSE;
 	
+	saveDataPath = strdup(name);
 	if (NULL == (dir = opendir(name))) {
 		return;
 	}
@@ -69,7 +83,7 @@ void fc_init(char *name) {
 }
 
 /* req must sjis */
-char *fc_search(char *req) {
+static char *fc_search(char *req) {
 	int i;
 	BYTE *b;
 	
@@ -99,7 +113,7 @@ char *fc_search(char *req) {
 }
 
 /* add new file to entry */
-char *fc_add(char *req) {
+static char *fc_add(char *req) {
 	BYTE *b;
 	
 	if (!initilized) return req;
@@ -121,6 +135,40 @@ char *fc_add(char *req) {
 	b = tbl[fnametable_cnt].realname;
 	fnametable_cnt++;
 	return b;
+}
+
+FILE *fc_open(char *filename, char type) {
+	char *fc = fc_search(filename);
+	char *fullpath;
+	FILE *fp;
+	
+	if (fc == NULL) { /* if file does not exist */
+		if (type == 'r') return NULL;
+		fc = fc_add(filename);
+	}
+	fullpath = get_fullpath(fc);
+	
+	if (type == 'w') {
+		fc_backup_oldfile(fullpath);
+		fp = fopen(fullpath, "w");
+	} else {
+		fp = fopen(fullpath, "r");
+	}
+	free(fullpath);
+	return fp;
+}
+
+void fc_backup_oldfile(char *filename) {
+	char *newname;
+	
+	if (!filename) return;
+	newname = malloc(strlen(filename) + 3);
+	
+	strcpy(newname, filename);
+	strcat(newname, ".");
+	rename(filename, newname);
+	
+	free(newname);
 }
 
 /* QE で新規ファイルをセーブする時のファイル名の漢字コード */
