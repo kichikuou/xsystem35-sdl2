@@ -35,11 +35,7 @@ struct fnametable {
 	char *transname;
 };
 
-#define FILEMAX 100 /* ???? */
-static struct fnametable tbl[FILEMAX];
-static int fnametable_cnt;
 static char *saveDataPath;
-static boolean initilized = FALSE;
 static boolean newfile_kanjicode_utf8 = TRUE;
 
 static char *get_fullpath(char *filename) {
@@ -56,98 +52,43 @@ static char *get_fullpath(char *filename) {
 /* list up file in current directory */
 /*   name : save/load directory      */
 void fc_init(char *name) {
-	DIR *dir;
-	struct dirent *entry;
-	int c = 0;
-	
-	initilized = FALSE;
-	
 	saveDataPath = strdup(name);
-	if (NULL == (dir = opendir(name))) {
-		return;
-	}
-	
-	while(0 < (entry = readdir(dir))) {
-		if (c >= FILEMAX) {
-			fprintf(stderr, "Over " "FILEMAX" "files in savefile directry\n");
+}
+
+static char *fc_search(const char *fname_sjis) {
+	DIR *dir = opendir(saveDataPath);
+	if (dir == NULL)
+		return NULL;
+
+	BYTE *fname_utf = sjis2lang(fname_sjis);
+	char *found = NULL;
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL) {
+		if (strcasecmp(fname_sjis, entry->d_name) == 0 ||
+			strcasecmp(fname_utf, entry->d_name) == 0) {
+			found = strdup(entry->d_name);
 			break;
 		}
-		tbl[c].realname = strdup(entry->d_name);
-		tbl[c].transname = strdup(entry->d_name);
-		sjis_toupper(tbl[c].transname);
-		c++;
 	}
-	fnametable_cnt = c;
 	closedir(dir);
-	initilized = TRUE;
-}
-
-/* req must sjis */
-static char *fc_search(char *req) {
-	int i;
-	BYTE *b;
-	
-	if (!initilized) return req;
-	
-	for (i = 0; i < fnametable_cnt; i++) {
-		/* match exeactly */
-		if (0 == strcmp(req, tbl[i].realname)) return req;
-
-		/* capital match */
-		b = sjis_toupper2(req);
-		if (0 == strcmp(b, tbl[i].transname)) {
-			free(b);
-			return tbl[i].realname;
-		}
-		
-		/* utf-8 match */
-		b = sjis2lang(req);
-		sjis_toupper(b);
-		if (0 == strcmp(b, tbl[i].transname)) {
-			free(b);
-			return tbl[i].realname;
-		} 
-		free(b);
-	}
-	return NULL;
-}
-
-/* add new file to entry */
-static char *fc_add(char *req) {
-	BYTE *b;
-	
-	if (!initilized) return req;
-	
-	if (fnametable_cnt >= FILEMAX) {
-		fprintf(stderr, "Over " "FILEMAX" "files in savefile directry\n");
-		return req;
-	}
-
-	if (newfile_kanjicode_utf8) {
-		tbl[fnametable_cnt].realname = sjis2lang(req);
-	} else {
-		tbl[fnametable_cnt].realname = strdup(req);
-	}
-
-	b = sjis_toupper2(req);
-	tbl[fnametable_cnt].transname = b;
-	
-	b = tbl[fnametable_cnt].realname;
-	fnametable_cnt++;
-	return b;
+	free(fname_utf);
+	return found;
 }
 
 FILE *fc_open(char *filename, char type) {
 	char *fc = fc_search(filename);
-	char *fullpath;
-	FILE *fp;
-	
-	if (fc == NULL) { /* if file does not exist */
-		if (type == 'r') return NULL;
-		fc = fc_add(filename);
+	if (fc == NULL) {
+		if (type == 'r')
+			return NULL;
+		if (newfile_kanjicode_utf8)
+			fc = sjis2lang(filename);
+		else
+			fc = strdup(filename);
 	}
-	fullpath = get_fullpath(fc);
-	
+	char *fullpath = get_fullpath(fc);
+	free(fc);
+
+	FILE *fp;
 	if (type == 'w') {
 		fc_backup_oldfile(fullpath);
 		fp = fopen(fullpath, "w");
