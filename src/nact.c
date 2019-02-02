@@ -230,4 +230,5 @@ void nact_init() {
 	nact->is_message_locked = FALSE;
 	nact->is_msg_out = TRUE;
 	nact->callback = nact_callback;
+	nact->patch_ec = 1;  // TODO: revisit
 }
