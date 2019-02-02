@@ -107,6 +107,7 @@ FILE *fc_open(char *filename, char type) {
 }
 
 void fc_backup_oldfile(char *filename) {
+#ifndef __EMSCRIPTEN__
 	char *newname;
 	
 	if (!filename) return;
@@ -117,6 +118,7 @@ void fc_backup_oldfile(char *filename) {
 	rename(filename, newname);
 	
 	free(newname);
+#endif
 }
 
 /* QE で新規ファイルをセーブする時のファイル名の漢字コード */
