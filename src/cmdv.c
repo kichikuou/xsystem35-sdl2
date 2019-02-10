@@ -111,6 +111,9 @@ static UnitMapSrcImg *srcimg;
 #define VACMD_MAX 20                      /* Panyoで18まで */
 static  VaParam VAcmd[VACMD_MAX];         
 static  boolean inAnimation      = FALSE; /* 画面更新中 */
+#ifdef __EMSCRIPTEN__
+static int status_check_count;
+#endif
 
 /* UnitMap 各種マクロ */
 #define MAPSIZE_PER_ATTRIB (cxMap * cyMap)
@@ -720,6 +723,15 @@ void commandVJ() {
 	DEBUG_COMMAND_YET("VJ %d,%d,%d,%d:\n", page, x, y, max);
 }
 
+static void throttle() {
+#ifdef __EMSCRIPTEN__
+	if (++status_check_count > 1) {
+		status_check_count = 0;
+		nact->wait_vsync = TRUE;
+	}
+#endif
+}
+
 void commandVA() { /* from Panyo */
 	static boolean startedItimer = FALSE;
 	int no = sys_getc();
@@ -849,11 +861,15 @@ void commandVA() { /* from Panyo */
 	case 10:
 		/* 状態取得(var1=0:停止1:動,var2=番号) */
 		*var1 = VAcmd[p1].state == 0 ? 0 : 1;
-		*var2 = VAcmd[p1].elaspCut; break;
+		*var2 = VAcmd[p1].elaspCut;
+		throttle();
+		break;
 	case 11:
 		/* 位置取得 */
 		*var1 = VAcmd[p1].curX;
-		*var2 = VAcmd[p1].curY; break;
+		*var2 = VAcmd[p1].curY;
+		throttle();
+		break;
 	default:
 		WARNING("Unknown VA command %d\n", no);
 	}
@@ -1043,6 +1059,9 @@ void va_alarm_handler() {
 	if (!inAnimation) {
 		va_interval_process();
 	}
+#ifdef __EMSCRIPTEN__
+	status_check_count = 0;
+#endif
 }
 
 #ifdef __EMSCRIPTEN__
@@ -1065,6 +1084,7 @@ static void va_unpause_itimer() {
 			if (!xsystem35.va_timer)
 				xsystem35.va_timer = setInterval(_va_alarm_handler, 10);
 		});
+	nact->is_va_animation = TRUE;
 }
 
 #else // __EMSCRIPTEN__
