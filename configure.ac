@@ -357,7 +357,9 @@ if test "x$enable_midi" = xdefault; then
 fi
 
 SRC_MIDI=
-if test "x$enable_midi_sdl" = xyes; then
+if test "x$is_emscripten" = xyes; then
+  SRC_MIDI="midi.emscripten.c"
+elif test "x$enable_midi_sdl" = xyes; then
   SRC_MIDI="midi.sdlmixer.c"
   AC_DEFINE(ENABLE_MIDI_SDLMIXER,1,[define this if you use SDL_mixer for midi])
 fi

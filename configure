@@ -17080,7 +17080,9 @@ if test "x$enable_midi" = xdefault; then
 fi
 
 SRC_MIDI=
-if test "x$enable_midi_sdl" = xyes; then
+if test "x$is_emscripten" = xyes; then
+  SRC_MIDI="midi.emscripten.c"
+elif test "x$enable_midi_sdl" = xyes; then
   SRC_MIDI="midi.sdlmixer.c"
 
 $as_echo "#define ENABLE_MIDI_SDLMIXER 1" >>confdefs.h

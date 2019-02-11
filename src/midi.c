@@ -34,6 +34,10 @@ static char *player;
 static char default_mode = 'e';
 static int subdev = -1;
 
+#ifdef __EMSCRIPTEN__
+extern mididevice_t midi_emscripten;
+#endif
+
 #ifdef ENABLE_MIDI_SDLMIXER
 extern mididevice_t midi_sdlmixer;
 #endif
@@ -54,6 +58,10 @@ int midi_init(mididevice_t *midi) {
 #endif
 		break;
 	case 'e':
+#ifdef __EMSCRIPTEN__
+		ret = midi_emscripten.init(player, 0);
+		memcpy(midi, &midi_emscripten, sizeof(mididevice_t));
+#endif
 #ifdef ENABLE_MIDI_SDLMIXER
 		ret = midi_sdlmixer.init(player, 0);
 		memcpy(midi, &midi_sdlmixer, sizeof(mididevice_t));
