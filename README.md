@@ -21,5 +21,5 @@
 [Homebrew](https://brew.sh/index_ja) が必要です。
 
     $ brew install pkg-config sdl2 sdl2_mixer freetype
-    $ ./configure --enable-sdl --disable-gtk --disable-shared --disable-midi
+    $ ./configure --enable-sdl --disable-gtk --disable-shared
     $ make
