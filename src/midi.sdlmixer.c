@@ -27,7 +27,7 @@
 
 static int midi_initilize(char *pname, int subdev);
 static int midi_exit();
-static int midi_start(int no, char *data, int datalen);
+static int midi_start(int no, int loop, char *data, int datalen);
 static int midi_stop();
 static int midi_pause(void);
 static int midi_unpause(void);
@@ -68,7 +68,7 @@ static int midi_exit() {
 	return OK;
 }
 
-static int midi_start(int no, char *data, int datalen) {
+static int midi_start(int no, int loop, char *data, int datalen) {
 	midi_stop();
 
 	SDL_RWops *rwops = SDL_RWFromConstMem(data, datalen);
@@ -76,7 +76,7 @@ static int midi_start(int no, char *data, int datalen) {
 	if (!mix_music)
 		return NG;
 
-	if (Mix_PlayMusic(mix_music, 1) != 0) {
+	if (Mix_PlayMusic(mix_music, loop ? loop : -1) != 0) {
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
 		return NG;

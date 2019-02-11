@@ -29,16 +29,6 @@
 #include "midi.h"
 #include "ald_manager.h"
 
-enum {
-	MIDI_START,
-	MIDI_STOPCHECK,
-	MIDI_LOOPCHECK,
-	MIDI_STOP,
-	MIDI_PAUSE,
-	MIDI_UNPAUSE,
-	MIDI_NOP
-};
-
 int musmidi_init() {
 	int st = midi_init(&prv.mididev);
 
@@ -48,7 +38,6 @@ int musmidi_init() {
 	} else {
 		prv.midi_valid = TRUE;
 		prv.midi.dev = &prv.mididev;
-		prv.midi.st = MIDI_NOP;
 		return OK;
 	}
 }
@@ -69,34 +58,29 @@ int musmidi_start(int no, int loop) {
 		return NG;
 	}
 	
-	prv.midi.no = no;
-	prv.midi.loop = loop;
-	prv.midi.cnt = 0;
-	
-	prv.midi.st = MIDI_START;
-	prv.midi.in_play = FALSE;
-	
 	prv.midi.dfile = dfile;
-	musmidi_cb();
+	prv.midi.dev->start(no, loop, prv.midi.dfile->data, prv.midi.dfile->size);
 
 	return OK;
 }
 
 int musmidi_stop() {
-	prv.midi.st = MIDI_STOP;
-	musmidi_cb();
+	prv.midi.dev->stop();
+
+	if (prv.midi.dfile) {
+		ald_freedata(prv.midi.dfile);
+		prv.midi.dfile = NULL;
+	}
 	return OK;
 }
 
 int musmidi_pause() {
-	prv.midi.st = MIDI_PAUSE;
-	musmidi_cb();
+	prv.midi.dev->pause();
 	return OK;
 }
 
 int musmidi_unpause() {
-	prv.midi.st = MIDI_UNPAUSE;
-	musmidi_cb();
+	prv.midi.dev->unpause();
 	return OK;
 }
 
@@ -113,62 +97,4 @@ int musmidi_setflag(int mode, int index, int val) {
 
 int musmidi_getflag(int mode, int index) {
 	return prv.midi.dev->getflag(mode, index);
-}
-
-int musmidi_cb() {
-	midiobj_t *obj = &prv.midi;
-	
-	switch(obj->st) {
-	case MIDI_START:
-		obj->in_play = TRUE;
-		obj->dev->start(obj->no, obj->dfile->data, obj->dfile->size);
-		obj->st = MIDI_STOPCHECK;
-		break;
-		
-	case MIDI_STOPCHECK: {
-		midiplaystate st;
-		if (NG == obj->dev->getpos(&st)) {
-			obj->st = MIDI_LOOPCHECK;
-		}
-		break;
-	}
-	case MIDI_LOOPCHECK:
-		obj->cnt++;
-		if (obj->loop == 0) {
-			// infinity loop
-			obj->st = MIDI_START;
-			break;
-		}
-		if (--obj->loop == 0) {
-			obj->st = MIDI_STOP;
-		} else {
-			obj->st = MIDI_START;
-		}
-		break;
-		
-	case MIDI_STOP:
-		obj->dev->stop();
-		obj->in_play = FALSE;
-		obj->st = MIDI_NOP;
-		if (obj->dfile) {
-			ald_freedata(obj->dfile);
-			obj->dfile = NULL;
-		}
-		break;
-
-	case MIDI_PAUSE:
-		obj->dev->pause();
-		obj->st = MIDI_NOP;
-		break;
-		
-	case MIDI_UNPAUSE:
-		obj->dev->unpause();
-		obj->st = MIDI_STOPCHECK;
-		break;
-		
-	case MIDI_NOP:
-		break;
-	}
-
-	return OK;
 }

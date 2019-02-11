@@ -6,15 +6,7 @@
 #include "ald_manager.h"
 
 struct _midiobj {
-	int st; // オブジェクトの遷移状態
-	
-	boolean in_play; // 演奏中？
-
-	int no;
-	int loop;
-	int cnt;
 	mididevice_t *dev;
-
 	dridata *dfile;
 };
 typedef struct _midiobj midiobj_t;
