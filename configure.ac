@@ -333,7 +333,7 @@ dnl Select Midi Play Methods
 dnl
 AC_ARG_ENABLE(midi,
   [  --enable-midi[=mode_list]  Enable midi (Specify comma separated mode list):
-                             extp:     External midi player(default)
+                             sdl:      SDL_mixer(default)
                              raw:      Raw midi interface
                              seq:      Sequencer interface],
   [ enable_midi=$enableval],
@@ -351,15 +351,15 @@ fi
 if test "x$enable_midi" = xdefault; then
   case "$target" in
     *)
-      enable_midi_extp=yes
+      enable_midi_sdl=yes
       ;;
   esac
 fi
 
 SRC_MIDI=
-if test "x$enable_midi_extp" = xyes; then
-  SRC_MIDI="midi.extplayer.c"
-  AC_DEFINE(ENABLE_MIDI_EXTPLAYER,1,[define this if you use external midi player])
+if test "x$enable_midi_sdl" = xyes; then
+  SRC_MIDI="midi.sdlmixer.c"
+  AC_DEFINE(ENABLE_MIDI_SDLMIXER,1,[define this if you use SDL_mixer for midi])
 fi
 if test "x$enable_midi_raw" = xyes || test "x$enable_midi_seq" = xyes; then
   SRC_MIDI="$SRC_MIDI midi.rawmidi.c midifile.c"
@@ -371,13 +371,6 @@ if test "x$enable_midi_raw" = xyes || test "x$enable_midi_seq" = xyes; then
   fi
 fi
 AC_SUBST(SRC_MIDI)
-
-dnl 
-dnl set midi player
-dnl 
-AC_ARG_WITH(midi-player,[  --with-midi-player=xxx  External Midi Player [default=playmidi -4]],
-	midiplayer="$withval",midiplayer="playmidi -4")
-AC_DEFINE_UNQUOTED(MIDI_PLAYER,"$midiplayer",[midi player])
 
 dnl
 dnl Quiet mode for external midi player
@@ -594,8 +587,8 @@ fi
 if test "x$enable_midi_seq" = xyes; then
   echo "    - OSS sequencer interface"
 fi
-if test "x$enable_midi_extp" = xyes; then
-  echo "    - External MIDI Player"
+if test "x$enable_midi_sdl" = xyes; then
+  echo "    - SDL_mixer MIDI Player"
 fi
 echo ""
 

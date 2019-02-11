@@ -77,22 +77,26 @@ int musmidi_start(int no, int loop) {
 	prv.midi.in_play = FALSE;
 	
 	prv.midi.dfile = dfile;
-	
+	musmidi_cb();
+
 	return OK;
 }
 
 int musmidi_stop() {
 	prv.midi.st = MIDI_STOP;
+	musmidi_cb();
 	return OK;
 }
 
 int musmidi_pause() {
 	prv.midi.st = MIDI_PAUSE;
+	musmidi_cb();
 	return OK;
 }
 
 int musmidi_unpause() {
 	prv.midi.st = MIDI_UNPAUSE;
+	musmidi_cb();
 	return OK;
 }
 

@@ -34,8 +34,8 @@ static char *player;
 static char default_mode = 'e';
 static int subdev = -1;
 
-#ifdef ENABLE_MIDI_EXTPLAYER
-extern mididevice_t midi_extplayer;
+#ifdef ENABLE_MIDI_SDLMIXER
+extern mididevice_t midi_sdlmixer;
 #endif
 
 #if defined(ENABLE_MIDI_RAWMIDI) || defined(ENABLE_MIDI_SEQMIDI)
@@ -54,9 +54,9 @@ int midi_init(mididevice_t *midi) {
 #endif
 		break;
 	case 'e':
-#ifdef ENABLE_MIDI_EXTPLAYER
-		ret = midi_extplayer.init(player, 0);
-		memcpy(midi, &midi_extplayer, sizeof(mididevice_t));
+#ifdef ENABLE_MIDI_SDLMIXER
+		ret = midi_sdlmixer.init(player, 0);
+		memcpy(midi, &midi_sdlmixer, sizeof(mididevice_t));
 #endif
 		break;
 	case '0':

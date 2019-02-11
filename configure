@@ -871,7 +871,6 @@ with_cdromdev
 with_locale
 enable_bgr
 enable_midi
-with_midi_player
 enable_qmidi
 with_mididev
 with_seqdev
@@ -1568,7 +1567,7 @@ Optional Features:
                           You should check whether your X server is RGB or
                           BGR order, especially in sparc architecture.
   --enable-midi=mode_list  Enable midi (Specify comma separated mode list):
-                             extp:     External midi player(default)
+                             sdl:      SDL_mixer(default)
                              raw:      Raw midi interface
                              seq:      Sequencer interface
   --enable-qmidi          No display midi stdout
@@ -1603,7 +1602,6 @@ Optional Packages:
   --with-sdl-exec-prefix=PFX Exec prefix where SDL is installed (optional)
   --with-cdromdev=#       CDROM Device Name. [default=/dev/cdrom]
   --with-locale=LOCALE    locale name you want to use(ex. ja_JP.ujis)
-  --with-midi-player=xxx  External Midi Player default=playmidi -4
   --with-mididev=#        MIDI Raw Device Name. [default=/dev/midi]
   --with-seqdev=#         MIDI Sequencer Device Name. [default=/dev/sequencer]
   --with-cachesize=#      General Cache size (MB)
@@ -17076,16 +17074,16 @@ fi
 if test "x$enable_midi" = xdefault; then
   case "$target" in
     *)
-      enable_midi_extp=yes
+      enable_midi_sdl=yes
       ;;
   esac
 fi
 
 SRC_MIDI=
-if test "x$enable_midi_extp" = xyes; then
-  SRC_MIDI="midi.extplayer.c"
+if test "x$enable_midi_sdl" = xyes; then
+  SRC_MIDI="midi.sdlmixer.c"
 
-$as_echo "#define ENABLE_MIDI_EXTPLAYER 1" >>confdefs.h
+$as_echo "#define ENABLE_MIDI_SDLMIXER 1" >>confdefs.h
 
 fi
 if test "x$enable_midi_raw" = xyes || test "x$enable_midi_seq" = xyes; then
@@ -17101,20 +17099,6 @@ $as_echo "#define ENABLE_MIDI_SEQMIDI 1" >>confdefs.h
 
   fi
 fi
-
-
-
-# Check whether --with-midi-player was given.
-if test "${with_midi_player+set}" = set; then :
-  withval=$with_midi_player; midiplayer="$withval"
-else
-  midiplayer="playmidi -4"
-fi
-
-
-cat >>confdefs.h <<_ACEOF
-#define MIDI_PLAYER "$midiplayer"
-_ACEOF
 
 
 # Check whether --enable-qmidi was given.
@@ -17870,8 +17854,8 @@ fi
 if test "x$enable_midi_seq" = xyes; then
   echo "    - OSS sequencer interface"
 fi
-if test "x$enable_midi_extp" = xyes; then
-  echo "    - External MIDI Player"
+if test "x$enable_midi_sdl" = xyes; then
+  echo "    - SDL_mixer MIDI Player"
 fi
 echo ""
 

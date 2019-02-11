@@ -99,32 +99,28 @@ boolean mus_cdrom_get_state() {
  *   loop: 繰り返し回数 (0の場合は無限)
  */
 int mus_midi_start(int no, int loop) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musmidi_start(no, loop);
 }
 
 /*
  * midi の演奏停止
  */
 int mus_midi_stop(void) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musmidi_stop();
 }
 
 /*
  * midi の一時停止
  */
 int mus_midi_pause(void) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musmidi_pause();
 }
 
 /*
  * midi の一時停止解除
  */
 int mus_midi_unpause(void) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musmidi_unpause();
 }
 
 /*
@@ -133,8 +129,9 @@ int mus_midi_unpause(void) {
  *         停止している場合は 0 が入る
  */
 int mus_midi_get_playposition(midiplaystate *state) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	midiplaystate st = musmidi_getpos();
+	*state = st;
+	return OK;
 }
 
 /*
@@ -145,8 +142,7 @@ int mus_midi_get_playposition(midiplaystate *state) {
  *   val  : 書き込む値
  */
 int mus_midi_set_flag(int mode, int index, int val) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musmidi_setflag(mode, index, val);
 }
 
 /*
@@ -158,8 +154,7 @@ int mus_midi_set_flag(int mode, int index, int val) {
  *   return : flag/variable の値
  */
 int mus_midi_get_flag(int mode, int index) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musmidi_getflag(mode, index);
 }
 
 /*
@@ -168,8 +163,7 @@ int mus_midi_get_flag(int mode, int index) {
  *           TRUE   -> 有効
  */
 boolean mus_midi_get_state() {
-	printf("%s not implemented\n", __func__);
-	return FALSE;
+	return prv.midi_valid;
 }
 
 /*

@@ -36,11 +36,11 @@
 /* define this if you use ltdl */
 #undef ENABLE_LTDL
 
-/* define this if you use external midi player */
-#undef ENABLE_MIDI_EXTPLAYER
-
 /* define this if you use oss raw midi interface */
 #undef ENABLE_MIDI_RAWMIDI
+
+/* define this if you use SDL_mixer for midi */
+#undef ENABLE_MIDI_SDLMIXER
 
 /* define thsi if you use oss sequencer interface */
 #undef ENABLE_MIDI_SEQMIDI
@@ -240,9 +240,6 @@
 
 /* midi device */
 #undef MIDI_DEVICE
-
-/* midi player */
-#undef MIDI_PLAYER
 
 /* Define if dlsym() requires a leading underscore in symbol names. */
 #undef NEED_USCORE

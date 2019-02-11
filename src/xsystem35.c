@@ -131,8 +131,8 @@ static void sys35_usage(boolean verbose) {
 	puts(" -O0            : Disable Audio output");
 	
 	puts(" -M?            : select output midi methos");
-#ifdef ENABLE_MIDI_EXTPLAYER
-	puts(" -Me            : External midi player");
+#ifdef ENABLE_MIDI_SDLMIXER
+	puts(" -Me            : SDL_mixer midi player");
 #endif
 #ifdef ENABLE_MIDI_RAWMIDI
 	puts(" -Mr            : Raw Midi device");
