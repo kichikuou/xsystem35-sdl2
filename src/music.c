@@ -351,8 +351,7 @@ int mus_wav_stop(int ch) {
  *   return: 遍琳箕粗(msec) 65535ms で税下
  */
 int mus_wav_get_playposition(int ch) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return muspcm_getpos(ch + 1);
 }
 
 /*
@@ -420,8 +419,7 @@ int mus_wav_waittime(int ch, int time) {
  *   return: 箕粗(msec) 65535ms で税下
  */
 int mus_wav_wavtime(int ch) {
-	printf("%s not implemented\n", __func__);
-	return 0;
+	return muspcm_getwavelen(ch + 1);
 }
 
 /*

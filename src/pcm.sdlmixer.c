@@ -51,6 +51,7 @@ struct _pcmobj {
 	int channel; // 再生中のチャネル
 
 	boolean playing; // 演奏中
+	int start_time;
 };
 typedef struct _pcmobj pcmobj_t;
 
@@ -210,6 +211,7 @@ int muspcm_start(int slot, int loop) {
 		return NG;
 	
 	obj->playing = TRUE;
+	obj->start_time = get_high_counter(SYSTEMCOUNTER_MSEC);
 	return OK;
 }
 
@@ -280,15 +282,17 @@ int muspcm_unpause(int slot) {
 // 現在の再生位置を返す
 int muspcm_getpos(int slot) {
 	pcmobj_t *obj;
-	uint64_t len;
 	
 	obj = pcmobj[slot];
 	if (obj == NULL) return 0;
 	
 	if (!obj->playing) return 0;
 	
-	printf("%s not implemented\n", __func__);
-	return 0;
+	long len = obj->chunk->alen * 1000 / (44100 * 4);
+	int pos = get_high_counter(SYSTEMCOUNTER_MSEC) - obj->start_time;
+	if (pos > len)
+		pos = 0;
+	return pos;
 }
 
 // PCMオブジェクトに対してボリュームをセット
