@@ -26,6 +26,13 @@
 #include "music.h"
 #include "music_private.h"
 
+enum MixDevice {
+	MIX_MASTER,
+	MIX_CD,
+	MIX_MIDI,
+	MIX_PCM
+};
+
 struct _musprvdat musprv;
 
 int mus_init() {
@@ -261,6 +268,8 @@ boolean mus_pcm_get_state() {
  *           1: する
  */ 
 int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
+	if (device == MIX_MIDI)
+		return musmidi_fadestart(time, volume, stop);
 	printf("%s(%d, %d, %d, %d) not implemented\n", __func__, device, time, volume, stop);
 	return NG;
 }
@@ -273,6 +282,8 @@ int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
  *           FALSE -> フェード中でない
  */
 boolean mus_mixer_fadeout_get_state(int device) {
+	if (device == MIX_MIDI)
+		return musmidi_fading();
 	printf("%s(%d) not implemented\n", __func__, device);
 	return FALSE;
 }

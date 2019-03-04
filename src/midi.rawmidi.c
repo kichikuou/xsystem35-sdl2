@@ -102,6 +102,8 @@ mididevice_t midi_rawmidi = {
 	midi_getflag,
 	midi_setflag,
 	NULL,
+	NULL,
+	NULL,
 	NULL
 };
 

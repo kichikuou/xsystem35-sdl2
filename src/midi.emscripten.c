@@ -35,6 +35,8 @@ static int midi_getflag(int mode, int index);
 static int midi_setflag(int mode, int index, int val);
 static int midi_setvol(int vol);
 static int midi_getvol();
+static int midi_fadestart(int time, int volume, int stop);
+static boolean midi_fading();
 
 #define midi midi_emscripten
 mididevice_t midi = {
@@ -48,7 +50,9 @@ mididevice_t midi = {
 	midi_getflag,
 	midi_setflag,
 	midi_setvol,
-	midi_getvol
+	midi_getvol,
+	midi_fadestart,
+	midi_fading
 };
 
 static int midino;
@@ -117,4 +121,13 @@ static int midi_setvol(int vol) {
 
 static int midi_getvol() {
 	return EM_ASM_INT_V( return xsystem35.midiPlayer.getVolume(); );
+}
+
+static int midi_fadestart(int time, int volume, int stop) {
+	return EM_ASM_ARGS({ xsystem35.midiPlayer.fadeStart($0, $1, $2); },
+					   time, volume, stop);
+}
+
+static boolean midi_fading() {
+	return EM_ASM_INT_V( return xsystem35.midiPlayer.isFading(); );
 }

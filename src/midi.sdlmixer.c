@@ -19,6 +19,7 @@
  *
 */
 
+#include <SDL.h>
 #include <SDL_mixer.h>
 
 #include "portab.h"
@@ -36,6 +37,8 @@ static int midi_getflag(int mode, int index);
 static int midi_setflag(int mode, int index, int val);
 static int midi_setvol(int vol);
 static int midi_getvol();
+static int midi_fadestart(int time, int volume, int stop);
+static boolean midi_fading();
 
 #define midi midi_sdlmixer
 mididevice_t midi = {
@@ -49,12 +52,15 @@ mididevice_t midi = {
 	midi_getflag,
 	midi_setflag,
 	midi_setvol,
-	midi_getvol
+	midi_getvol,
+	midi_fadestart,
+	midi_fading
 };
 
 static Mix_Music *mix_music;
 static int midino;
 static int counter;
+static uint32_t fade_tick;
 
 static int midi_initilize(char *pname, int subdev) {
 	if (Mix_Init(MIX_INIT_MID) != MIX_INIT_MID)
@@ -139,4 +145,25 @@ static int midi_setvol(int vol) {
 
 static int midi_getvol() {
 	return Mix_VolumeMusic(-1) * 100 / MIX_MAX_VOLUME;
+}
+
+static int midi_fadestart(int time, int volume, int stop) {
+	if (time == 0) {
+		midi_setvol(volume);
+		if (stop)
+			midi_stop();
+		return OK;
+	}
+
+	if (volume == 0) {
+		Mix_FadeOutMusic(time);  // FIXME: this always stops the music
+		fade_tick = SDL_GetTicks() + time;
+		return OK;
+	}
+	printf("midi_fadestart(%d, %d, %d) unsupported\n", time, volume, stop);
+	return NG;
+}
+
+static boolean midi_fading() {
+	return SDL_GetTicks() < fade_tick;
 }

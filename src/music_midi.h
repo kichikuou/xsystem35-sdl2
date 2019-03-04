@@ -20,6 +20,7 @@ extern int musmidi_unpause();
 extern midiplaystate musmidi_getpos();
 extern int musmidi_setflag(int mode, int index, int val);
 extern int musmidi_getflag(int mode, int index);
-extern int musmidi_cb();
+extern int musmidi_fadestart(int time, int volume, int stop);
+extern boolean musmidi_fading();
 
 #endif /* __MUSIC_MIDI_H__ */

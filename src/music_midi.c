@@ -98,3 +98,15 @@ int musmidi_setflag(int mode, int index, int val) {
 int musmidi_getflag(int mode, int index) {
 	return prv.midi.dev->getflag(mode, index);
 }
+
+int musmidi_fadestart(int time, int volume, int stop) {
+	if (!prv.midi.dev->fadestart)
+		return NG;
+	return prv.midi.dev->fadestart(time, volume, stop);
+}
+
+boolean musmidi_fading() {
+	if (!prv.midi.dev->fading)
+		return FALSE;
+	return prv.midi.dev->fading();
+}

@@ -45,6 +45,8 @@ struct mididevice {
 	int  (* setflag)(int mode, int index, int val);
 	int  (* setvol)(int);
 	int  (* getvol)(int);
+	int  (* fadestart)(int time, int volume, int stop);
+	boolean (* fading)();
 };
 
 extern int  midi_init(mididevice_t *);
