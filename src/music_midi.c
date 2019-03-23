@@ -50,6 +50,8 @@ int musmidi_exit() {
 }
 
 int musmidi_start(int no, int loop) {
+	if (!prv.midi_valid) return NG;
+
 	dridata *dfile;
 	
 	dfile = ald_getdata(DRIFILE_MIDI, no -1);
@@ -65,6 +67,8 @@ int musmidi_start(int no, int loop) {
 }
 
 int musmidi_stop() {
+	if (!prv.midi_valid) return NG;
+
 	prv.midi.dev->stop();
 
 	if (prv.midi.dfile) {
@@ -75,37 +79,51 @@ int musmidi_stop() {
 }
 
 int musmidi_pause() {
+	if (!prv.midi_valid) return NG;
+
 	prv.midi.dev->pause();
 	return OK;
 }
 
 int musmidi_unpause() {
+	if (!prv.midi_valid) return NG;
+
 	prv.midi.dev->unpause();
 	return OK;
 }
 
 midiplaystate musmidi_getpos() {
-	midiplaystate st;
+	midiplaystate st = {FALSE, 0, 0};
+	if (!prv.midi_valid) return st;
+
 	prv.midi.dev->getpos(&st);
 	return st;
 }
 
 int musmidi_setflag(int mode, int index, int val) {
+	if (!prv.midi_valid) return NG;
+
 	prv.midi.dev->setflag(mode, index, val);
 	return OK;
 }
 
 int musmidi_getflag(int mode, int index) {
+	if (!prv.midi_valid) return 0;
+
 	return prv.midi.dev->getflag(mode, index);
 }
 
 int musmidi_fadestart(int time, int volume, int stop) {
+	if (!prv.midi_valid) return NG;
+
 	if (!prv.midi.dev->fadestart)
 		return NG;
 	return prv.midi.dev->fadestart(time, volume, stop);
 }
 
 boolean musmidi_fading() {
+	if (!prv.midi_valid) return FALSE;
+
 	if (!prv.midi.dev->fading)
 		return FALSE;
 	return prv.midi.dev->fading();
