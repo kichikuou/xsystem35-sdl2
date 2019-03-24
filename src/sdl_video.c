@@ -26,6 +26,7 @@
 #include <SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/html5.h>
 #endif
 
 #include "portab.h"
@@ -65,8 +66,8 @@ int sdl_Initilize(void) {
 	sdl_shadow_init();
 	
 #ifdef __EMSCRIPTEN__
-	// Workaround for https://github.com/emscripten-ports/SDL2/issues/41
-	SDL_EventState(SDL_RELEASED, 0);
+	// Prevent SDL from calling emscripten_exit_fullscreen on visibilitychange
+	emscripten_set_visibilitychange_callback(NULL, 0, NULL);
 #endif
 
 	joy_open();
