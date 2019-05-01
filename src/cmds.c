@@ -159,7 +159,6 @@ void commandSG() {
 		if (num == 0) {
 			mus_midi_stop();
 		} else {
-			mus_midi_stop();
 			mus_midi_start(num, loopcnt);
 		}
 		DEBUG_COMMAND("SG1 %d:\n", num);

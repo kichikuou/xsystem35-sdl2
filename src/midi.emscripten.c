@@ -67,6 +67,9 @@ static int midi_exit() {
 }
 
 static int midi_start(int no, int loop, char *data, int datalen) {
+	if (midino == no)
+		return OK;
+
 	EM_ASM_ARGS({ xsystem35.midiPlayer.play($0, $1, $2); }, loop, data, datalen);
 
 	midino = no;

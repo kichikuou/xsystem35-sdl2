@@ -75,6 +75,9 @@ static int midi_exit() {
 }
 
 static int midi_start(int no, int loop, char *data, int datalen) {
+	if (midino == no)
+		return OK;
+
 	midi_stop();
 
 	SDL_RWops *rwops = SDL_RWFromConstMem(data, datalen);
