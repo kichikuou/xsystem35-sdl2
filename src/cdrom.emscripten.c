@@ -19,6 +19,7 @@
  *
 */
 
+#include <stdio.h>
 #include <emscripten.h>
 #include "portab.h"
 #include "cdrom.h"
