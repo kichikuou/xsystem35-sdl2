@@ -187,6 +187,10 @@ void msg_nextLine() {
 		msgget_at_r();
 		return;
 	}
+	if (!msg.win) {
+		WARNING("msg.win is NULL\n");
+		return;
+	}
 	
 	msgcur.x  = msg.win->x;
 	msgcur.y += (msg.MsgFontSize + msg.LineIncrement);
@@ -198,6 +202,10 @@ void msg_nextLine() {
 
 void msg_nextPage(boolean innerclear) {
 	// puts("next Page");
+	if (!msg.win) {
+		WARNING("msg.win is NULL\n");
+		return;
+	}
 	if (innerclear) {
 		if (msg.WinBackgroundTransparent == 255) {
 			ags_fillRectangle(msg.win->x,     msg.win->y,
@@ -236,7 +244,12 @@ void msg_nextPage(boolean innerclear) {
 void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	// winInfo    = *info;
 	frameType  = W;
-	
+
+	if (!msg.win) {
+		WARNING("msg.win is NULL\n");
+		return;
+	}
+
 	switch(W) {
 	case WINDOW_FRAME_EMPTY:
 		if (M == 0) {
@@ -303,7 +316,12 @@ void msg_getMessageLocation(MyPoint *loc) {
 void msg_hitAnyKey() {
 	int w;
 	static BYTE hak[] = {0x81, 0xa5, 0x00}; /* ▼ */
-	
+
+	if (!msg.win) {
+		WARNING("msg.win is NULL\n");
+		return;
+	}
+
 	w = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
 			   msg.win->y + msg.win->height - msg.MsgFontSize,
 			   hak, msg.HitAnyKeyMsgColor);
