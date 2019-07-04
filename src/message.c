@@ -86,6 +86,13 @@ void msg_init() {
 	msg.mg_curStrVarNo   = 1;
 	msg.mg_policyR       = 0;
 	msg.mg_policyA       = 0;
+
+	msg.win = &msg.wininfo[0];
+	msg.wininfo[0].x = 8;
+	msg.wininfo[0].y = 311;
+	msg.wininfo[0].width = 616;
+	msg.wininfo[0].height = 80;
+	msg.wininfo[0].save = TRUE;
 }
 
 void msg_setFontSize(int size) {

@@ -110,7 +110,6 @@ typedef struct {
 } Ald_sysVarHdr;
 
 /* defined by cmdb.c */
-extern Bcom_WindowInfo msgWinInfo[];
 extern Bcom_WindowInfo selWinInfo[];
 /* defined by variable.c */
 extern int  strvar_cnt;

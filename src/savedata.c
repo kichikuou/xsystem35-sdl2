@@ -418,12 +418,12 @@ int save_loadAll(int no) {
 		// selWinInfo[i].save   = TRUE;
 	}
 	for (i = 0; i < MSGWINMAX; i++) {
-		msgWinInfo[i].x      = save_base->msgWinInfo[i].x;
-		msgWinInfo[i].y      = save_base->msgWinInfo[i].y;
-		msgWinInfo[i].width  = save_base->msgWinInfo[i].width;
-		msgWinInfo[i].height = save_base->msgWinInfo[i].height;
-		// msgWinInfo[i].savedImage = NULL;
-		// msgWinInfo[i].save   = FALSE;
+		nact->msg.wininfo[i].x      = save_base->msgWinInfo[i].x;
+		nact->msg.wininfo[i].y      = save_base->msgWinInfo[i].y;
+		nact->msg.wininfo[i].width  = save_base->msgWinInfo[i].width;
+		nact->msg.wininfo[i].height = save_base->msgWinInfo[i].height;
+		// nact->msg.wininfo[i].savedImage = NULL;
+		// nact->msg.wininfo[i].save   = FALSE;
 	}
 	/* スタックのロード */
 	loadStackInfo(saveTop + save_base->stackinfo);
@@ -494,10 +494,10 @@ int save_saveAll(int no) {
 	}
 	
 	for (i = 0; i < MSGWINMAX; i++) {
-		save_base->msgWinInfo[i].x      = (WORD)msgWinInfo[i].x;
-		save_base->msgWinInfo[i].y      = (WORD)msgWinInfo[i].y;
-		save_base->msgWinInfo[i].width  = (WORD)msgWinInfo[i].width;
-		save_base->msgWinInfo[i].height = (WORD)msgWinInfo[i].height;
+		save_base->msgWinInfo[i].x      = (WORD)nact->msg.wininfo[i].x;
+		save_base->msgWinInfo[i].y      = (WORD)nact->msg.wininfo[i].y;
+		save_base->msgWinInfo[i].width  = (WORD)nact->msg.wininfo[i].width;
+		save_base->msgWinInfo[i].height = (WORD)nact->msg.wininfo[i].height;
 	}
 
 	fseek(fp, sizeof(Ald_baseHdr), SEEK_SET);
