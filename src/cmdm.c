@@ -60,9 +60,8 @@ void commandMP() {
 	/* 指定の文字列を指定文字数だけ表示する（Ｘコマンドの桁数指定） */
 	int    num1 = getCaliValue();
 	int    num2 = getCaliValue();
-	unsigned char bstr[3] = { 0x81,0x40,0x00 }; // white blank
-	int    len  = min(num2 * 2, v_strlen(num1 - 1));
-	int    blen = num2 * 2 - len;
+	const char bstr[3] = "\x81\x40"; // full-width whitespace
+	const char *src = v_str(num1 - 1);
 	char   *str = malloc(num2 * 2 + 1);
 
 	if (NULL == str) {
@@ -70,11 +69,18 @@ void commandMP() {
 	}
 	
 	memset(str, 0, num2 * 2 + 1);
-	strncpy(str, v_str(num1 - 1), len);
-	while(blen) {
-		strcat(str, bstr);
-		blen -= 2;
+
+	int chars = num2;
+	const char *p = src;
+	while (*p && chars > 0) {
+		p += CHECKSJIS1BYTE(*p) ? 2 : 1;
+		chars--;
 	}
+	strncpy(str, src, p - src);
+	while (chars-- > 0) {
+		strcat(str, bstr);
+	}
+
 	sys_addMsg(str);
 	DEBUG_COMMAND("MP %d,%d:\n",num1,num2);
 	
