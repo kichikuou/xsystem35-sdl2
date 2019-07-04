@@ -48,7 +48,6 @@
   system39.ain の読み込み
 */
 int s39ain_init(void) {
-#ifdef ENABLE_LTDL
 	FILE *fp;
 	long len;
 	char *buf;
@@ -174,6 +173,10 @@ int s39ain_init(void) {
 		}
 	}
 	
+#ifndef ENABLE_LTDL
+	free(buf);
+	return dllnum == 0 ? OK : NG;
+#else
 	errors = lt_dlinit();
 	if (errors) {
 		printf("lt_dlinit fail\n");
@@ -211,7 +214,5 @@ int s39ain_init(void) {
 	
 	free(buf);
 	return OK;
-#else
-	return NG;
 #endif // ENABLE_LTDL
 }
