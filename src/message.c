@@ -300,6 +300,7 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 void msg_setMessageLocation(int x, int y) {
 	msgcur.x = x;
 	msgcur.y = y;
+	nextLineIsAfterKaigyou = FALSE;
 }
 
 void msg_getMessageLocation(MyPoint *loc) {
