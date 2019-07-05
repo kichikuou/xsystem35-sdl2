@@ -13,7 +13,7 @@
 
 [オリジナルのドキュメント](https://github.com/kichikuou/xsystem35-sdl2/tree/emscripten/doc)も参考にしてください。
 
-    $ ./configure
+    $ ./configure --disable-shared
     $ make
 
 #### MacOS
