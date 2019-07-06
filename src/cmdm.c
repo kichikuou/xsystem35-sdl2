@@ -43,6 +43,8 @@ extern boolean Y3waitCancel;
 /* MI 用パラメータ */
 INPUTSTRING_PARAM mi_param;
 
+boolean have_eng_mp_patch = FALSE;
+
 void commandMS() {
 	/* Xコマンドで表示される文字列領域に文字列を入れる */
 	int num = getCaliValue();
@@ -62,21 +64,30 @@ void commandMP() {
 	int    num2 = getCaliValue();
 	const char bstr[3] = "\x81\x40"; // full-width whitespace
 	const char *src = v_str(num1 - 1);
-	char   *str = malloc(num2 * 2 + 1);
-
-	if (NULL == str) {
-		NOMEMERR();
-	}
-	
-	memset(str, 0, num2 * 2 + 1);
-
 	int chars = num2;
-	const char *p = src;
-	while (*p && chars > 0) {
-		p += CHECKSJIS1BYTE(*p) ? 2 : 1;
-		chars--;
+	char *str;
+
+	/* Patched English executable appends num2 spaces instead of truncating */
+	if (have_eng_mp_patch) {
+		str = calloc(strlen(src) + num2 * 2 + 1, 1);
+		if (NULL == str) {
+			NOMEMERR();
+		}
+		strcpy(str, src);
 	}
-	strncpy(str, src, p - src);
+	else {
+		str = calloc(num2 * 2 + 1, 1);
+		if (NULL == str) {
+			NOMEMERR();
+		}
+
+		const char *p = src;
+		while (*p && chars > 0) {
+			p += CHECKSJIS1BYTE(*p) ? 2 : 1;
+			chars--;
+		}
+		strncpy(str, src, p - src);
+	}
 	while (chars-- > 0) {
 		strcat(str, bstr);
 	}

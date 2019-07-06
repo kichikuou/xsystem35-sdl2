@@ -39,6 +39,9 @@
 #include "ald_manager.h"
 #include "LittleEndian.h"
 
+/* defined by cmdm.c */
+extern boolean have_eng_mp_patch;
+
 /* 選択 Window OPEN 時 callback */
 static int cb_sel_init_page = 0;
 static int cb_sel_init_address = 0;
@@ -446,7 +449,11 @@ void commands2F28() {
 	
 	strncpy(nact->game_title_name, title, 30);
 	ags_setWindowTitle(title);
-	
+
+	if (0 == strcmp(title, GT_RANCE3_ENG) || 0 == strcmp(title, GT_RANCE4_ENG)) {
+		have_eng_mp_patch = TRUE;
+	}
+
 	DEBUG_COMMAND("MT(new) %s:\n",title);
 }
 
