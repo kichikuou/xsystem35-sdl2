@@ -500,7 +500,7 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	
 	pid = fork();
 	if (pid == 0) {
-#ifdef QUITE_MIDI
+#ifdef QUIET_MIDI
 		close(1);
 #endif
 		sys_set_signalhandler(SIGTERM, SIG_DFL);

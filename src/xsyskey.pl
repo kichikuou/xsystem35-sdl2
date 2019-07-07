@@ -12,7 +12,7 @@ while(<FX>) {
 close(fp);
 
 @sdlk_list=();
-open(FS,"</usr/include/SDL2/SDL_scancode.h") || exit;
+open(FS,"<$ARGV[0]/SDL_scancode.h") || exit;
 while(<FS>) {
     if( /SDL_SCANCODE_([^\s]+)\s+=\s*([^,]*),/ ) {
 	$sdlk_list[eval($2)]="$1";
