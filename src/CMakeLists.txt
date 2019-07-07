@@ -37,7 +37,21 @@ add_library(objLib OBJECT
   ${SRC_MISC}
   ${SRC_NET}
   ${SRC_DLL})
+
+if (ENABLE_MODULES)
+  set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR}/../modules)
+  if (APPLE)
+	set(CMAKE_INSTALL_RPATH @loader_path/../lib/xsystem35)
+  else()
+	set(CMAKE_INSTALL_RPATH $ORIGIN/../lib/xsystem35)
+  endif()
+endif()
+
 add_executable(xsystem35 $<TARGET_OBJECTS:objLib>)
+
+if (ENABLE_MODULES)
+  target_link_libraries(xsystem35 PRIVATE -rdynamic)
+endif()
 
 if (EMSCRIPTEN)
 

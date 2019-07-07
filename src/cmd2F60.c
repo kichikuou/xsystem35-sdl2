@@ -22,15 +22,15 @@
 /* $Id: cmd2F60.c,v 1.11 2003/01/12 10:48:50 chikama Exp $ */
 
 #include <stdio.h>
-#ifdef ENABLE_LTDL
-#include <ltdl.h>
-#endif
 
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
 #include "s39ain.h"
 #include "xsystem35.h"
+#ifdef ENABLE_MODULES
+#include <dlfcn.h>
+#endif
 
 #define dll  nact->ain.dll
 #define msgi nact->ain.msg
@@ -42,7 +42,7 @@ void commands2F60() {
 	int fnum = sys_getdw();  /* function number */
 	entrypoint *function = NULL;
 
-#ifdef ENABLE_LTDL
+#ifdef ENABLE_MODULES
 	if (dll == NULL) {
 		SYSERROR("No DLL initilized\n");
 	}
@@ -55,7 +55,7 @@ void commands2F60() {
 	
 	if (dll[type].function[fnum].name == NULL) goto eexit;
 	
-	function = lt_dlsym((lt_dlhandle)(dll[type].handle), dll[type].function[fnum].name);
+	function = dlsym(dll[type].handle, dll[type].function[fnum].name);
 	
 	if (function) {
 		(*function)();

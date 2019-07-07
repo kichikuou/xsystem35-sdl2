@@ -24,12 +24,6 @@
 #ifndef __S39AIN_H__
 #define __S39AIN_H__
 
-#ifdef ENABLE_LTDL
-#include <ltdl.h>
-#else
-typedef void lt_dlhandle;
-#endif
-
 #include "portab.h"
 
 /* DLL 内関数情報 */
@@ -41,7 +35,7 @@ typedef struct {
 
 /* DLL 情報 */
 typedef struct {
-	lt_dlhandle *handle;       /* DLL handler */
+	void        *handle;       /* DLL handler */
 	char        *name;         /* DLL 名      */
 	int          function_num; /* 関数の数    */
 	S39AIN_DLLFN       *function; /* 関数本体 */

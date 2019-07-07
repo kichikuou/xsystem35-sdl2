@@ -33,6 +33,10 @@
 #include "s39ain.h"
 #include "xsystem35.h"
 
+#ifdef ENABLE_MODULES
+#include <dlfcn.h>
+#endif
+
 /* short cut */
 #define dll  nact->ain.dll
 #define msg  nact->ain.msg
@@ -173,40 +177,23 @@ int s39ain_init(void) {
 		}
 	}
 	
-#ifndef ENABLE_LTDL
+#ifndef ENABLE_MODULES
 	free(buf);
 	return dllnum == 0 ? OK : NG;
 #else
-	errors = lt_dlinit();
-	if (errors) {
-		printf("lt_dlinit fail\n");
-		free(buf);
-		return FALSE;
-	}
 	
 	/* open dll */
 	for (i = 0; i < dllnum; i++) {
-		char searchpath[512];
+		char soname[64];
 		void *handle;
 		
 		if (dll[i].function_num == 0) continue;
 		
-		// 最初にカレントディレクトリのソースツリーの下の
-		// モジュールを検索
-		snprintf(searchpath, sizeof(searchpath) -1, "%s/%s",
-				 path_to_dll, dll[i].name);
-		
-		lt_dlsetsearchpath(searchpath);
-		
-		// 次にデフォルトのモジュールを検索
-		/* package default path, ex. /usr/local/lib/xsystem35/ */
-		lt_dladdsearchdir(MODULE_PATH);
-		
-		// fprintf(stderr, "try to open %s/%s\n", searchpath, dll[i].name);
-		handle = lt_dlopenext(dll[i].name);
+		snprintf(soname, sizeof(soname), "lib%s.so", dll[i].name);
+		handle = dlopen(soname, RTLD_NOW);
 		
 		if (handle == NULL) {
-			SYSERROR("dlopen: %s(%s)\n", lt_dlerror(), dll[i].name);
+			SYSERROR("dlopen: %s(%s)\n", dlerror(), dll[i].name);
 		}
 		
 		dll[i].handle = handle;
@@ -214,5 +201,5 @@ int s39ain_init(void) {
 	
 	free(buf);
 	return OK;
-#endif // ENABLE_LTDL
+#endif // ENABLE_MODULES
 }
