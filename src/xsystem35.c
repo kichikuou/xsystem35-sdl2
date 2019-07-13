@@ -707,6 +707,13 @@ static void check_profile() {
 	if (param) {
 		fontface[FONT_MINCHO] = *param - '0';
 	}
+	/* Font antialiasing */
+	param = get_profile("antialias");
+	if (param) {
+		if (0 == strcmp(param, "Yes")) {
+			font_antialias = TRUE;
+		}
+	}
 	/* CD-ROM device name の設定 */
 	param = get_profile("cdrom_device");
 	if (param) {
