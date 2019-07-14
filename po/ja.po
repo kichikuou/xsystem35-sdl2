@@ -3,130 +3,144 @@
 # CHIKAMA Masaki <chikama@nabal.aist-nara.ac.jp>, 2001-2004
 # CHIKAMA Masaki <chika@8ne.sakura.ne.jp>, 2004.
 #
-#: src/menu_gui.c:207
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: xsystem35 1.7.3pre3\n"
-"Report-Msgid-Bugs-To: chika@8ne.sakura.ne.jp\n"
-"POT-Creation-Date: 2004-08-24 23:32+0900\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-07-14 18:38+0900\n"
 "PO-Revision-Date: 2004-08-24 14:40+0900\n"
 "Last-Translator: CHIKAMA Masaki <chika@8ne.sakura.ne.jp>\n"
 "Language-Team: Japanese <chika@8ne.sakura.ne.jp>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu.c:89
+#: src/menu_gui.c:127 src/menu_gui.c:137 src/menu_gui.c:147
+msgid "0"
+msgstr ""
+
+#: src/menu_gui.c:374 src/menu_gui.c:658
+msgid "About"
+msgstr "情報"
+
+#: src/menu_gui.c:593
+msgid "CDROM-audio"
+msgstr "CDROMオーディオ"
+
+#: src/menu_gui.c:171 src/menu_gui.c:266
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/menu_gui.c:306 src/menu_gui.c:673
+msgid "Exit"
+msgstr "終了"
+
+#: src/menu_gui.c:317
+msgid "Exit System35 ?"
+msgstr "System35を終了しますか？"
+
+#: src/menu_gui.c:400
+msgid "Information1"
+msgstr "情報１"
+
+#: src/menu_gui.c:410
+msgid "Information2"
+msgstr "情報２"
+
+#: src/menu_gui.c:420
+msgid "Information3"
+msgstr "情報３"
+
+#: src/menu_gui.c:60
+msgid "InputNumber"
+msgstr "数値入力"
+
+#: src/menu_gui.c:214
+msgid "InputString"
+msgstr "文字列入力"
+
+#: src/menu.c:69
 #, c-format
 msgid "MAX %d charater"
 msgstr "最大 %d 文字"
 
-#: src/menu_gui.c:81
-msgid "InputNumber"
-msgstr "数値入力"
-
-#: src/menu_gui.c:122 src/menu_gui.c:830
-msgid "default"
-msgstr "既定値"
-
-#: src/menu_gui.c:132
-msgid "min"
-msgstr "最小値"
-
-#: src/menu_gui.c:142
-msgid "max"
-msgstr "最大値"
-
-#: src/menu_gui.c:193 src/menu_gui.c:306 src/menu_gui.c:473 src/menu_gui.c:866
-msgid "OK"
-msgstr "ＯＫ"
-
-#: src/menu_gui.c:200 src/menu_gui.c:299
-msgid "Cancel"
-msgstr "キャンセル"
-
-#: src/menu_gui.c:247
-msgid "InputString"
-msgstr "文字列入力"
-
-#: src/menu_gui.c:258
-msgid "title"
-msgstr "タイトル"
-
-#: src/menu_gui.c:274
+#: src/menu_gui.c:241
 msgid "MAX charater"
 msgstr "最大文字数"
 
-#: src/menu_gui.c:283
-msgid "Notice) HANKAKU is not available"
-msgstr "註）全角文字のみ有効"
+#: src/menu_gui.c:621
+msgid "MIDI-audio"
+msgstr "MIDIオーディオ"
 
-#: src/menu_gui.c:343 src/menu_gui.c:758
-msgid "Exit"
-msgstr "終了"
+#: src/menu_gui.c:764
+#, fuzzy
+msgid "MessageBox"
+msgstr "メッセージスキップ"
 
-#: src/menu_gui.c:358
-msgid "Exit System35 ?"
-msgstr "System35を終了しますか？"
-
-#: src/menu_gui.c:372
-msgid "Yes"
-msgstr "はい"
-
-#: src/menu_gui.c:379
-msgid "No"
-msgstr "いいえ"
-
-#: src/menu_gui.c:415 src/menu_gui.c:743
-msgid "About"
-msgstr "情報"
-
-#: src/menu_gui.c:441
-msgid "Information1"
-msgstr "情報１"
-
-#: src/menu_gui.c:453
-msgid "Information2"
-msgstr "情報２"
-
-#: src/menu_gui.c:465
-msgid "Information3"
-msgstr "情報３"
-
-#: src/menu_gui.c:540
+#: src/menu_gui.c:485
 msgid "MessageSkip"
 msgstr "メッセージスキップ"
 
-#: src/menu_gui.c:558 src/menu_gui.c:600 src/menu_gui.c:650 src/menu_gui.c:684
-#: src/menu_gui.c:718
-msgid "ON"
-msgstr "有効"
+#: src/menu_gui.c:774
+#, fuzzy
+msgid "Messge"
+msgstr "メッセージスキップ"
 
-#: src/menu_gui.c:566 src/menu_gui.c:608 src/menu_gui.c:658 src/menu_gui.c:692
-#: src/menu_gui.c:726
-msgid "OFF"
-msgstr "無効"
-
-#: src/menu_gui.c:582
+#: src/menu_gui.c:521
 msgid "MouseAutoMove"
 msgstr "マウスカーソル移動"
 
-#: src/menu_gui.c:624 src/menu_gui_volval.c:43
-msgid "VolumeValance"
-msgstr "ボリュームバランス"
+#: src/menu_gui.c:338
+msgid "No"
+msgstr "いいえ"
 
-#: src/menu_gui.c:632
+#: src/menu_gui.c:250
+msgid "Notice) HANKAKU is not available"
+msgstr "註）全角文字のみ有効"
+
+#: src/menu_gui.c:505 src/menu_gui.c:541 src/menu_gui.c:585 src/menu_gui.c:613
+#: src/menu_gui.c:641
+msgid "OFF"
+msgstr "無効"
+
+#: src/menu_gui.c:164 src/menu_gui.c:273 src/menu_gui.c:426 src/menu_gui.c:781
+msgid "OK"
+msgstr "ＯＫ"
+
+#: src/menu_gui.c:497 src/menu_gui.c:533 src/menu_gui.c:577 src/menu_gui.c:605
+#: src/menu_gui.c:633
+msgid "ON"
+msgstr "有効"
+
+#: src/menu_gui.c:565
 msgid "PCM-audio"
 msgstr "PCMオーディオ"
 
-#: src/menu_gui.c:666
-msgid "CDROM-audio"
-msgstr "CDROMオーディオ"
+#: src/menu_gui.c:557 src/menu_gui_volval.c:43
+msgid "VolumeValance"
+msgstr "ボリュームバランス"
 
-#: src/menu_gui.c:700
-msgid "MIDI-audio"
-msgstr "MIDIオーディオ"
+#: src/menu_gui.c:331
+msgid "Yes"
+msgstr "はい"
+
+#: src/menu_gui.c:97 src/menu_gui.c:745
+msgid "default"
+msgstr "既定値"
+
+#: src/menu_gui_volval.c:122
+msgid "large"
+msgstr "大"
+
+#: src/menu_gui.c:117
+msgid "max"
+msgstr "最大値"
+
+#: src/menu_gui.c:107
+msgid "min"
+msgstr "最小値"
 
 #: src/menu_gui_volval.c:89
 msgid "mute"
@@ -136,7 +150,10 @@ msgstr "ミュート"
 msgid "small"
 msgstr "小"
 
-#: src/menu_gui_volval.c:122
-msgid "large"
-msgstr "大"
+#: src/menu_gui.c:225
+msgid "title"
+msgstr "タイトル"
 
+#: src/menu_gui_volval.c:41
+msgid "window1"
+msgstr ""
