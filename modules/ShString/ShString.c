@@ -126,7 +126,8 @@ void FillString() {
 	int i;
 	
 	for (i = 0; i < cnt; i++) {
-		v_strcpy(st -1, v_str(src));
+		if (st - 1 != src)
+			v_strcpy(st -1, v_str(src));
 	}
 	
 	DEBUG_COMMAND("ShString.FillString: %d,%d,%d,%d:\n", st, cnt, src, p4);
