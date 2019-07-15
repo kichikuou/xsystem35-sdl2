@@ -27,4 +27,6 @@ add_library(alk STATIC alk.c)
 
 add_library(drawtext STATIC drawtext.c)
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+target_include_directories(graph PUBLIC .)
+target_include_directories(alk PUBLIC .)
+target_include_directories(drawtext PUBLIC .)
