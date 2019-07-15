@@ -37,6 +37,7 @@ SList* slist_append(SList *list, void *data);
 SList* slist_remove(SList *list, const void *data);
 int slist_index(SList *list, const void *data);
 unsigned slist_length(SList *list);
+SList* slist_insert_sorted(SList *list, void* data, CompareFunc func);
 
 typedef SList List;
 
@@ -47,7 +48,6 @@ typedef SList List;
 #define list_length slist_length
 
 // Not implemented
-SList* slist_insert_sorted(SList *list, void* data, CompareFunc func);
 List* list_nth(List *list, unsigned int n);
 List* list_last(List *list);
 

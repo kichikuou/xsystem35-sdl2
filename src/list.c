@@ -45,8 +45,8 @@ SList* slist_append(SList *list, void *data) {
 		return node;
 
 	SList* last = list;
-	while (list->next)
-		last = list->next;
+	while (last->next)
+		last = last->next;
 	last->next = node;
 	return list;
 }
@@ -62,7 +62,7 @@ SList* slist_remove(SList *list, const void *data) {
 		return list;
 	}
 
-	for (; node->next; node++) {
+	for (; node->next; node = node->next) {
 		if (node->next->data == data) {
 			SList* nodeToRemove = node->next;
 			node->next = nodeToRemove->next;
@@ -87,4 +87,23 @@ unsigned slist_length(SList *list) {
 	for (len = 0; list; list = list->next)
 		len++;
 	return len;
+}
+
+SList* slist_insert_sorted(SList *list, void* data, CompareFunc func) {
+	SList* node = malloc(sizeof(SList));
+	node->data = data;
+
+	SList* prev = NULL;
+	SList* current = list;
+	while (current && func(current->data, data) <= 0) {
+		prev = current;
+		current = current->next;
+	}
+	if (!prev) {
+		node->next = list;
+		return node;
+	}
+	prev->next = node;
+	node->next = current;
+	return list;
 }
