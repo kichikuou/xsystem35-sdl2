@@ -32,13 +32,14 @@
 #include "nact.h"
 #include "dri.h"
 #include "ald_manager.h"
-#include "wavfile.h"
 #include "music.h"
-#include "pcmlib.h"
+
+#ifdef ENABLE_SDLMIXER
+#include "pcm.sdlmixer.h"
 #include "shpcmlib.c"
 
-/* for wav*Memory */
-static WAVFILE *wfile;
+static Mix_Chunk *chunk;
+#endif
 
 void Init() {
 	/*
@@ -116,7 +117,9 @@ void wavLoadMemory() {
 	*/
 	int no = getCaliValue();
 	
-	wfile = pcmlib_load_rw(no);
+#ifdef ENABLE_SDLMIXER
+	chunk = pcm_sdlmixer_load(no);
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavLoadMemory %d:\n", no);
 }
@@ -129,11 +132,12 @@ void wavSendMemory() {
 	*/
 	int slot = getCaliValue();
 	
-	if (wfile) {
-		mus_wav_sendfile(slot, wfile);
-		pcmlib_free(wfile);
-		wfile = NULL;
+#ifdef ENABLE_SDLMIXER
+	if (chunk) {
+		pcm_sdlmixer_load_chunk(slot, chunk);
+		chunk = NULL;
 	}
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavSendMemory %d:\n", slot);
 }
@@ -148,9 +152,11 @@ void wavFadeVolumeMemory() {
 	int start = getCaliValue();
 	int range = getCaliValue();
 	
-	if (wfile == NULL) return;
+#ifdef ENABLE_SDLMIXER
+	if (chunk == NULL) return;
 	
-	pcmlib_fade_volume_memory(wfile, start, range);
+	pcmlib_fade_volume_memory(chunk, start, range);
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavFadeVolumeMemory %d,%d:\n", start, range);
 }
@@ -160,9 +166,11 @@ void wavReversePanMemory() {
 	  wavLoadMemoryで読み込んだデータの左右のチャンネルを反転
 	*/
 	
-	if (wfile == NULL) return;
+#ifdef ENABLE_SDLMIXER
+	if (chunk == NULL) return;
 	
-	pcmlib_reverse_pan_memory(wfile);
+	pcmlib_reverse_pan_memory(chunk);
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavReversePanMemory:\n");
 }

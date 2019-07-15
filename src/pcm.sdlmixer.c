@@ -40,6 +40,7 @@
 #include "dri.h"
 #include "music_pcm.h"
 #include "music_private.h"
+#include "pcm.sdlmixer.h"
 #include "counter.h"
 #include "nact.h"
 #include "LittleEndian.h"
@@ -63,7 +64,6 @@ static pcmobj_t *pcmobj[128 + 1];
 #define IS_LOADED(slot) (pcmobj[(slot)])
 
 static int unload(int slot);
-static int load_chunk(int slot, Mix_Chunk *chunk);
 static int load_wai();
 static char *wai_mapadr;
 
@@ -74,7 +74,7 @@ static char *wai_mapadr;
  * 指定の番号の .WAV|.OGG をロードする。
  * @param no: DRIファイル番号
  */
-static Mix_Chunk *pcm_load(int no) {
+Mix_Chunk *pcm_sdlmixer_load(int no) {
 	dridata *dfile = ald_getdata(DRIFILE_WAVE, no -1);
 	if (dfile == NULL) {
 		WARNING("DRIFILE_WAVE fail to open %d\n", no -1);
@@ -100,8 +100,8 @@ static Mix_Chunk *pcm_load(int no) {
  * @return   : 合成後の Mix_Chunk
  */
 static Mix_Chunk *pcm_mixlr(int noL, int noR) {
-	Mix_Chunk *chunkL = pcm_load(noL);
-	Mix_Chunk *chunkR = pcm_load(noR);
+	Mix_Chunk *chunkL = pcm_sdlmixer_load(noL);
+	Mix_Chunk *chunkR = pcm_sdlmixer_load(noR);
 	if (chunkL == NULL || chunkR == NULL) {
 		if (chunkL)
 			Mix_FreeChunk(chunkL);
@@ -153,7 +153,7 @@ int muspcm_exit(void) {
 int muspcm_load_no(int slot, int no) {
 	if (IS_LOADED(slot)) unload(slot);
 	
-	Mix_Chunk *chunk = pcm_load(no);
+	Mix_Chunk *chunk = pcm_sdlmixer_load(no);
 	if (chunk == NULL) {
 		return NG;
 	}
@@ -166,7 +166,7 @@ int muspcm_load_no(int slot, int no) {
 		prv.vol_pcm_sub[slot] = 0;
 	}
 
-	return load_chunk(slot, chunk);
+	return pcm_sdlmixer_load_chunk(slot, chunk);
 }
 
 int muspcm_load_mixlr(int slot, int noL, int noR) {
@@ -177,14 +177,14 @@ int muspcm_load_mixlr(int slot, int noL, int noR) {
 		return NG;
 	}
 
-	return load_chunk(slot, chunk);
+	return pcm_sdlmixer_load_chunk(slot, chunk);
 }
 
 int muspcm_unload(int slot) {
 	return unload(slot);
 }
 
-static int load_chunk(int slot, Mix_Chunk *chunk) {
+int pcm_sdlmixer_load_chunk(int slot, Mix_Chunk *chunk) {
 	if (IS_LOADED(slot)) unload(slot);
 
 	pcmobj_t *obj = calloc(1, sizeof(pcmobj_t));
