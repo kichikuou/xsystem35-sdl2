@@ -119,6 +119,12 @@ static void makeDIB(int width, int height, int depth) {
 		SDL_FreeSurface(sdl_dib);
 	}
 	
+#ifdef ENABLE_MODULES
+	// Graphic routines in modules/ assume 4 bytes/pixel mode for 24-bit surfaces.
+	if (depth == 24)
+		depth = 32;
+#endif
+
 	sdl_dib = SDL_CreateRGBSurface(0, width, height, depth, 0, 0, 0, 0);
 	
 	if (sdl_dib->format->BitsPerPixel == 8) {
