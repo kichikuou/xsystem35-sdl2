@@ -62,6 +62,29 @@ static int mouse_to_rawkey(int button) {
 	return 0;
 }
 
+static int mouse_to_agsevent(int button) {
+	switch(button) {
+	case SDL_BUTTON_LEFT:
+		return AGSEVENT_BUTTON_LEFT;
+	case SDL_BUTTON_MIDDLE:
+		return AGSEVENT_BUTTON_MID;
+	case SDL_BUTTON_RIGHT:
+		return AGSEVENT_BUTTON_RIGHT;
+	}
+	return 0;
+}
+
+static void send_agsevent(int type, int code) {
+	if (!nact->ags.eventcb)
+		return;
+	agsevent_t agse;
+	agse.type = type;
+	agse.d1 = mousex;
+	agse.d2 = mousey;
+	agse.d3 = code;
+	nact->ags.eventcb(&agse);
+}
+
 /* Event処理 */
 static void sdl_getEvent(void) {
 	static int cmd_count_of_prev_input = -1;
@@ -116,10 +139,12 @@ static void sdl_getEvent(void) {
 		case SDL_MOUSEMOTION:
 			mousex = e.motion.x;
 			mousey = e.motion.y;
+			send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			mouseb |= (1 << e.button.button);
 			RawKeyInfo[mouse_to_rawkey(e.button.button)] = TRUE;
+			send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(e.button.button));
 #if 0
 			if (e.button.button == 2) {
 				keywait_flag=TRUE;
@@ -129,6 +154,7 @@ static void sdl_getEvent(void) {
 		case SDL_MOUSEBUTTONUP:
 			mouseb &= (0xffffffff ^ (1 << e.button.button));
 			RawKeyInfo[mouse_to_rawkey(e.button.button)] = FALSE;
+			send_agsevent(AGSEVENT_BUTTON_RELEASE, mouse_to_agsevent(e.button.button));
 			if (e.button.button == 2) {
 				m2b = TRUE;
 			}
@@ -230,7 +256,9 @@ int sdl_keywait(int msec, boolean cancel) {
 
 /* キー情報の取得 */
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool) {
-	RawKeyInfo[sdl_keytable[e->keysym.scancode]] = bool;
+	int code = sdl_keytable[e->keysym.scancode];
+	RawKeyInfo[code] = bool;
+	send_agsevent(bool ? AGSEVENT_KEY_PRESS : AGSEVENT_KEY_RELEASE, code);
 }
 
 int sdl_getKeyInfo() {
