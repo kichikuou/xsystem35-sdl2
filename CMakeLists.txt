@@ -230,7 +230,6 @@ if (X11_FOUND)
 endif()
 
 # TODO: MMX
-# TODO: libjpeg
 
 function (print_summary name)
   if (ARGN)
