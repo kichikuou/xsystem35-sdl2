@@ -28,6 +28,13 @@
 #include "cdrom.h"
 #include "midi.h"
 
+enum MixDevice {
+	MIX_MASTER,
+	MIX_CD,
+	MIX_MIDI,
+	MIX_PCM
+};
+
 /* init and exit */
 extern int mus_init();
 extern int mus_exit();

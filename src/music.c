@@ -26,13 +26,6 @@
 #include "music.h"
 #include "music_private.h"
 
-enum MixDevice {
-	MIX_MASTER,
-	MIX_CD,
-	MIX_MIDI,
-	MIX_PCM
-};
-
 struct _musprvdat musprv;
 
 int mus_init() {
