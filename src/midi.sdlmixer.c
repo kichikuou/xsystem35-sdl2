@@ -26,6 +26,11 @@
 #include "counter.h"
 #include "midi.h"
 
+// MIX_INIT_FLUIDSYNTH was renamed to MIX_INIT_MID in SDL_mixer 2.0.2
+#if (SDL_MIXER_MAJOR_VERSION == 2) && (SDL_MIXER_MINOR_VERSION == 0) && (SDL_MIXER_PATCHLEVEL < 2)
+#define MIX_INIT_MID MIX_INIT_FLUIDSYNTH
+#endif
+
 static int midi_initilize(char *pname, int subdev);
 static int midi_exit();
 static int midi_start(int no, int loop, char *data, int datalen);
