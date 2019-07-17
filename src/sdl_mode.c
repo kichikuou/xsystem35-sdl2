@@ -57,6 +57,7 @@ void sdl_setWindowSize(int x, int y, int w, int h) {
 	view_h = h;
 	
 	SDL_SetWindowSize(sdl_window, w, h);
+	SDL_RenderSetLogicalSize(sdl_renderer, w, h);
 	if (sdl_display)
 		SDL_FreeSurface(sdl_display);
 	if (sdl_texture)
