@@ -108,7 +108,8 @@ static void window_init(void) {
 	
 	sdl_window = SDL_CreateWindow("XSystem3.5 Version "VERSION,
 								  SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, 0);
+								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
+								  SDL_WINDOW_RESIZABLE);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 }
 
