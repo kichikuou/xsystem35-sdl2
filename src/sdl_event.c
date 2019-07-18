@@ -95,6 +95,9 @@ static void sdl_getEvent(void) {
 					SDL_WM_GrabInput(SDL_GRAB_OFF);
 #endif
 				break;
+			case SDL_WINDOWEVENT_EXPOSED:
+				sdl_dirty = TRUE;
+				break;
 			}
 			break;
 		case SDL_KEYDOWN:
