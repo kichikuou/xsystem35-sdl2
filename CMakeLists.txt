@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.13)
+# Old enough to support Debian stretch.
+cmake_minimum_required(VERSION 3.7)
 
 project(xsystem35 LANGUAGES C)
 
@@ -210,7 +211,11 @@ endif()
 
 function (print_summary name)
   if (ARGN)
-	list(JOIN ARGN ", " MSG)
+	if (CMAKE_VERSION VERSION_LESS 3.12)
+	  set(MSG "${ARGN}")
+	else()
+	  list(JOIN ARGN ", " MSG)
+	endif()
   else()
 	set(MSG "none")
   endif()
@@ -230,8 +235,14 @@ message("------------------")
 set(PACKAGE ${PROJECT_NAME})
 configure_file(config.h.cmake.in config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-add_compile_definitions(HAVE_CONFIG_H)
-add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
+
+if (CMAKE_VERSION VERSION_LESS 3.12)
+  add_definitions(-DHAVE_CONFIG_H)
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
+else()
+  add_compile_definitions(HAVE_CONFIG_H)
+  add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
+endif()
 
 add_subdirectory(src)
 if (ENABLE_NLS)
