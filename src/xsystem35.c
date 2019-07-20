@@ -226,8 +226,7 @@ void sys_exit(int code) {
 	sys35_remove();
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.quit(); );
-	nact->is_quit = TRUE;
-	nact->wait_vsync = TRUE;
+	Sleep(1000000000);
 #else
 	exit(code);
 #endif
