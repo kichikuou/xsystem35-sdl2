@@ -218,7 +218,9 @@ static void nact_callback() {
 	}
 	if (nact->popupmenu_opened) {
 		menu_gtkmainiteration();
-		if (nact->is_quit) sys_exit(0);
+	}
+	if (nact->is_quit) {
+		sys_exit(0);
 	}
 }
 
