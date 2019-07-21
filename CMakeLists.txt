@@ -7,6 +7,22 @@ include(CheckFunctionExists)
 include(CheckIncludeFile)
 include(CheckLibraryExists)
 
+# A wrapper around find_package() that skips the check if ENABLE_<package> is false
+macro (optional_find_package package)
+  option(ENABLE_${package} "Use ${package} if available" ON)
+  if (ENABLE_${package})
+	find_package(${package} ${ARGN})
+  endif()
+endmacro()
+
+# A wrapper around pkg_check_modules() that skips the check if ENABLE_<prefix> is false
+macro (optional_pkg_check_modules prefix)
+  option(ENABLE_${prefix} "Use ${prefix} if available" ON)
+  if (ENABLE_${prefix})
+	pkg_check_modules(${prefix} ${ARGN})
+  endif()
+endmacro()
+
 check_function_exists(mkdtemp HAVE_MKDTEMP)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 if (NOT HAVE_MKDTEMP)
@@ -26,14 +42,14 @@ else()
   TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
 
   find_package(ZLIB REQUIRED)
-  find_package(X11)
-  find_package(GTK2 COMPONENTS gtk)
-  find_package(Freetype)
+  optional_find_package(X11)
+  optional_find_package(GTK2 COMPONENTS gtk)
+  optional_find_package(Freetype)
   include(FindPkgConfig)
   if (NOT X11_FOUND)
-	pkg_check_modules(SDL2 sdl2)
+	optional_pkg_check_modules(SDL2 sdl2)
   endif()
-  pkg_check_modules(SDL2MIXER SDL2_mixer)
+  optional_pkg_check_modules(SDL2MIXER SDL2_mixer)
 
   include_directories(
 	${ZLIB_INCLUDE_DIRS}
