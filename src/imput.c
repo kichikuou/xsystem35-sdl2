@@ -110,17 +110,15 @@ void sys_hit_any_key() {
 	msg_hitAnyKey();
 	
 	/* message wait flag restore */
-	if (nact->messagewait_enable_save) {
-		/* if message wait was cancelled, consume that input */
-		if (!nact->messagewait_enable) {
-			while(0 == (key & hak_ignore_mask)) {
-				key = sys_keywait(INT_MAX, TRUE);
-			}
-			while(key & hak_releasewait_mask) {
-				key = sys_keywait(100, TRUE);
-			}
+	if (nact->messagewait_cancelled) {
+		nact->messagewait_cancelled = FALSE;
+		/* consume the input that cancelled message wait */
+		while(0 == (key & hak_ignore_mask)) {
+			key = sys_keywait(INT_MAX, TRUE);
 		}
-		nact->messagewait_enable = nact->messagewait_enable_save ;
+		while(key & hak_releasewait_mask) {
+			key = sys_keywait(100, TRUE);
+		}
 	}
 
 	while(0 == (key & hak_ignore_mask)) {

@@ -164,15 +164,14 @@ void msg_putMessage(char *m) {
 	
 	w = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
 
-	if (nact->messagewait_enable) {
+	if (nact->messagewait_enable && !nact->messagewait_cancelled) {
 		int x;
 		for (x = 0; x < w + adj.width; x+=16) {
 			ags_updateArea(msgcur.x + adj.x + x, msgcur.y + adj.y,
 				       16, msg.MsgFontSize + adj.height);
 			if (nact->messagewait_cancel) {
 				if (sys_getInputInfo()) {
-					nact->messagewait_enable_save = nact->messagewait_enable ;
-					nact->messagewait_enable = FALSE;
+					nact->messagewait_cancelled = TRUE;
 					ags_updateArea(msgcur.x + adj.x, msgcur.y + adj.y,
 						       w + adj.width, msg.MsgFontSize + adj.height);
 					break;

@@ -97,7 +97,7 @@ typedef struct {
 	
 	/* message wait */
 	boolean messagewait_enable;
-	boolean messagewait_enable_save;
+	boolean messagewait_cancelled;
 	int     messagewait_time;
 	boolean messagewait_cancel;
 	

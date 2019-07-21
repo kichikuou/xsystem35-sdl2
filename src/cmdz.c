@@ -108,8 +108,8 @@ void commandZW() {
 	int sw = getCaliValue();
 	
 	if (sw < 256) {
-		nact->messagewait_enable_save = 
-		nact->messagewait_enable      = ((sw & 0xff) <= 1) ? FALSE : TRUE;
+		nact->messagewait_enable    = ((sw & 0xff) <= 1) ? FALSE : TRUE;
+		nact->messagewait_cancelled = FALSE;
 	} else {
 		nact->messagewait_time   = sw & 0xff;
 		nact->messagewait_cancel = (sw & 0x200) ? TRUE : FALSE;
