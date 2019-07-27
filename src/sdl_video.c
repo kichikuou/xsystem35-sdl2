@@ -94,7 +94,11 @@ void sdl_Remove(void) {
 
 /* name is UTF-8 */
 void sdl_setWindowTitle(char *name) {
+#ifdef __EMSCRIPTEN__
+	EM_ASM_ARGS({ xsystem35.shell.setWindowTitle(UTF8ToString($0)); }, name);
+#else
 	SDL_SetWindowTitle(sdl_window, name);
+#endif
 }
 
 /* Visual に応じて Window を生成する */
