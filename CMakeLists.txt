@@ -52,10 +52,14 @@ else()
   optional_find_package(GTK2 COMPONENTS gtk)
   optional_find_package(Freetype)
   include(FindPkgConfig)
+  if (X11_xf86vmode_FOUND)
+	set(HAVE_XF86VMODE 1)
+  endif()
   if (NOT X11_FOUND)
 	optional_pkg_check_modules(SDL2 sdl2)
   endif()
   optional_pkg_check_modules(SDL2MIXER SDL2_mixer)
+
 
   include_directories(
 	${ZLIB_INCLUDE_DIRS}
@@ -69,6 +73,7 @@ else()
 	${ZLIB_LIBRARIES}
 	${FREETYPE_LIBRARIES}
 	${X11_LIBRARIES}
+	${X11_Xxf86vm_LIB}
 	${GTK2_LIBRARIES}
 	${SDL2_LIBRARIES}
 	${SDL2MIXER_LIBRARIES}
@@ -218,15 +223,6 @@ if (FREETYPE_FOUND)
 endif()
 if (NOT SRC_FONT)
   message(FATAL_ERROR "*** No font device available ***")
-endif()
-
-# XFree86extensions
-
-if (X11_FOUND)
-  check_library_exists(Xxf86vm XF86VidModeQueryExtension "" HAVE_XF86VMODE)
-  if (HAVE_XF86VMODE)
-    link_libraries(Xxf86vm)
-  endif()
 endif()
 
 # TODO: MMX
