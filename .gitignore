@@ -1,15 +1,2 @@
 *~
-*.o
-*.lo
-*.la
 /out
-/config.h
-/config.log
-/config.status
-/libtool
-/stamp-h1
-/xsystem35.bc
-/src/xsystem35
-Makefile
-.deps/
-.libs/
