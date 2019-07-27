@@ -1,3 +1,5 @@
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 add_library(graph STATIC
   graph.c
   surface.c
