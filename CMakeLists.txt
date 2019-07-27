@@ -48,45 +48,50 @@ else()
   endif()
 
   find_package(ZLIB REQUIRED)
+  include_directories(${ZLIB_INCLUDE_DIRS})
+  link_libraries(${ZLIB_LIBRARIES})
+
   optional_find_package(X11)
-  optional_find_package(GTK2 COMPONENTS gtk)
-  optional_find_package(Freetype)
-  include(FindPkgConfig)
-  if (X11_xf86vmode_FOUND)
-	set(HAVE_XF86VMODE 1)
+  if (X11_FOUND)
+	include_directories(${X11_INCLUDE_DIR})
+	link_libraries(${X11_LIBRARIES})
+	if (X11_xf86vmode_FOUND)
+	  set(HAVE_XF86VMODE 1)
+	  link_libraries(${X11_Xxf86vm_LIB})
+	endif()
   endif()
+
+  optional_find_package(GTK2 COMPONENTS gtk)
+  if (GTK2_FOUND)
+	set(ENABLE_GTK 1)
+	include_directories(${GTK2_INCLUDE_DIRS})
+	link_libraries(${GTK2_LIBRARIES})
+  endif()
+
+  optional_find_package(Freetype)
+  if (FREETYPE_FOUND)
+	include_directories(${FREETYPE_INCLUDE_DIRS})
+	link_libraries(${FREETYPE_LIBRARIES})
+  endif()
+
+  include(FindPkgConfig)
   if (NOT X11_FOUND)
 	optional_pkg_check_modules(SDL2 sdl2)
+	if (SDL2_FOUND)
+	  include_directories(${SDL2_INCLUDE_DIRS})
+	  link_libraries(${SDL2_LIBRARIES})
+	  link_directories(${SDL2_LIBRARY_DIRS})
+	endif()
   endif()
+
   optional_pkg_check_modules(SDL2MIXER SDL2_mixer)
-
-
-  include_directories(
-	${ZLIB_INCLUDE_DIRS}
-	${FREETYPE_INCLUDE_DIRS}
-	${X11_INCLUDE_DIR}
-	${GTK2_INCLUDE_DIRS}
-	${SDL2_INCLUDE_DIRS}
-	${SDL2MIXER_INCLUDE_DIRS}
-	)
-  link_libraries(
-	${ZLIB_LIBRARIES}
-	${FREETYPE_LIBRARIES}
-	${X11_LIBRARIES}
-	${X11_Xxf86vm_LIB}
-	${GTK2_LIBRARIES}
-	${SDL2_LIBRARIES}
-	${SDL2MIXER_LIBRARIES}
-	)
-  link_directories(
-	${SDL2_LIBRARY_DIRS}
-	${SDL2MIXER_LIBRARY_DIRS}
-	)
+  if (SDL2MIXER_FOUND)
+	include_directories(${SDL2MIXER_INCLUDE_DIRS})
+	link_libraries(${SDL2MIXER_LIBRARIES})
+	link_directories(${SDL2MIXER_LIBRARY_DIRS})
+  endif()
 endif()
 
-if (GTK2_FOUND)
-  set(ENABLE_GTK 1)
-endif()
 
 # Menu
 
