@@ -91,6 +91,8 @@ int sys_nextdebuglv;
 /* game data file name */
 static char *gamefname[DRIFILETYPEMAX][DRIFILEMAX];
 
+static int audio_buffer_size = 0;
+
 /* font name from rcfile */
 static char *fontname[FONTTYPEMAX];
 static char *fontname_tt[FONTTYPEMAX];
@@ -713,6 +715,12 @@ static void check_profile() {
 			font_antialias = TRUE;
 		}
 	}
+	/* Audio buffer size */
+	param = get_profile("audio_buffer_size");
+	if (param) {
+		audio_buffer_size = atoi(param);
+	}
+
 	/* CD-ROM device name の設定 */
 	param = get_profile("cdrom_device");
 	if (param) {
@@ -813,7 +821,7 @@ int main(int argc, char **argv) {
 		nact->tmpdir = strdup("/tmp");
 	}
 	
-	mus_init();
+	mus_init(audio_buffer_size);
 
 #ifdef ENABLE_NLS
         bindtextdomain (PACKAGE, LOCALEDIR);

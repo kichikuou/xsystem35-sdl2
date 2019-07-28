@@ -15,7 +15,7 @@ mergeInto(LibraryManager.library, {
 			});
 		});
 	},
-	muspcm_init: function() {
+	muspcm_init: function(audio_buffer_size) {
 		return 0; // OK
 	},
 	muspcm_exit: function() {

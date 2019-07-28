@@ -21,7 +21,7 @@
 #include "portab.h"
 #include "music_pcm.h"
 
-int muspcm_init(void) { return NG; }
+int muspcm_init(int audio_buffer_size) { return NG; }
 int muspcm_exit(void) { return NG; }
 int muspcm_load_no(int slot, int no) { return NG; }
 int muspcm_load_mixlr(int slot, int noL, int noR) { return NG; }

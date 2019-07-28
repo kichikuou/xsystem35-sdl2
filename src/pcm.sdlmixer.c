@@ -45,6 +45,8 @@
 #include "nact.h"
 #include "LittleEndian.h"
 
+#define DEFAULT_AUDIO_BUFFER_SIZE 2048
+
 struct _pcmobj {
 	Mix_Chunk* chunk;
 
@@ -135,9 +137,12 @@ static Mix_Chunk *pcm_mixlr(int noL, int noR) {
 	}
 }
 
-int muspcm_init(void) {
+int muspcm_init(int audio_buffer_size) {
+	if (!audio_buffer_size)
+		audio_buffer_size = DEFAULT_AUDIO_BUFFER_SIZE;
+
 	Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
-	if (Mix_OpenAudio(44100, AUDIO_S16LSB, 2, 4096) < 0)
+	if (Mix_OpenAudio(44100, AUDIO_S16LSB, 2, audio_buffer_size) < 0)
 		return NG;
 	load_wai();
 	return OK;

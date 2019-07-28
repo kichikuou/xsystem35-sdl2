@@ -28,10 +28,10 @@
 
 struct _musprvdat musprv;
 
-int mus_init() {
+int mus_init(int audio_buffer_size) {
 	muscd_init();
 	musmidi_init();
-	prv.pcm_valid = muspcm_init() == OK;
+	prv.pcm_valid = muspcm_init(audio_buffer_size) == OK;
 	return OK;
 }
 

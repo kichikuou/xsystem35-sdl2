@@ -24,7 +24,7 @@
 #ifndef __MUSIC_PCM_H__
 #define __MUSIC_PCM_H__
 
-extern int muspcm_init(void);
+extern int muspcm_init(int audio_buffer_size);
 extern int muspcm_exit(void);
 extern int muspcm_load_no(int slot, int no);
 extern int muspcm_load_mixlr(int slot, int noL, int noR);
