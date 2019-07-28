@@ -14,6 +14,6 @@ add_library(NIGHTDLL MODULE
   nt_sound.c
   )
 
-target_link_libraries(NIGHTDLL PRIVATE graph drawtext)
+target_link_libraries(NIGHTDLL PRIVATE graph drawtext list)
 
 install(TARGETS NIGHTDLL DESTINATION lib/xsystem35)

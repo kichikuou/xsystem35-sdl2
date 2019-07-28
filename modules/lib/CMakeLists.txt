@@ -29,6 +29,9 @@ add_library(alk STATIC alk.c)
 
 add_library(drawtext STATIC drawtext.c)
 
+add_library(list STATIC list.c)
+
 target_include_directories(graph PUBLIC .)
 target_include_directories(alk PUBLIC .)
 target_include_directories(drawtext PUBLIC .)
+target_include_directories(list PUBLIC .)

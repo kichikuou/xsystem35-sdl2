@@ -8,7 +8,7 @@ set(SRC_MUS
   music.c music_cdrom.c music_midi.c midi.c cdrom.c)
 set(SRC_MISC
   LittleEndian.c counter.c imput.c profile.c mt19937-1.c utfsjis.c
-  filecheck.c tempname.c list.c)
+  filecheck.c tempname.c)
 set(SRC_SCO
   cali.c scenario.c variable.c cmd_check.c hankana2sjis.c nact.c
   selection.c message.c savedata.c hankaku.c s39ain.c)

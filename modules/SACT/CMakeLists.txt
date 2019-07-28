@@ -28,6 +28,6 @@ add_library(SACT MODULE
   sprite_xmenu.c
   )
 
-target_link_libraries(SACT PRIVATE graph drawtext)
+target_link_libraries(SACT PRIVATE graph drawtext list)
 
 install(TARGETS SACT DESTINATION lib/xsystem35)
