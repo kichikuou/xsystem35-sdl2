@@ -252,7 +252,7 @@ print_summary(joystick ${SUMMARY_JOYSTICK})
 message("------------------")
 
 set(PACKAGE ${PROJECT_NAME})
-configure_file(config.h.cmake.in config.h)
+configure_file(config.h.in config.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_compile_definitions(HAVE_CONFIG_H)
 add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
