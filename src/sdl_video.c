@@ -43,8 +43,6 @@ static void makeDIB(int width, int height, int depth);
 
 struct sdl_private_data *sdl_videodev;
 
-boolean RawKeyInfo[256];
-
 
 /* SDL の初期化 */
 int sdl_Initilize(void) {
@@ -59,8 +57,6 @@ int sdl_Initilize(void) {
 	/* init cursor */
 	sdl_cursor_init();
 	
-	memset(RawKeyInfo, 0, sizeof(RawKeyInfo));
-
 	sdl_setWindowSize(0, 0, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 
 	sdl_shadow_init();
