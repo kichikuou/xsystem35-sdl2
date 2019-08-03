@@ -1,18 +1,14 @@
 mergeInto(LibraryManager.library, {
 	wait_vsync: function() {
-		EmterpreterAsync.handle(function(resume) {
+		Asyncify.handleSleep(function(wakeUp) {
 			window.requestAnimationFrame(function() {
-				if (ABORT) return; // do this manually; we can't call into Browser.safeSetTimeout, because that is paused/resumed!
-				resume();
+				wakeUp();
 			});
 		});
 	},
 	load_mincho_font: function() {
-		return EmterpreterAsync.handle(function(resume) {
-			xsystem35.load_mincho_font().then(function(result) {
-				if (ABORT) return; // do this manually; we can't call into Browser.safeSetTimeout, because that is paused/resumed!
-				resume(function() { return result; });
-			});
+		return Asyncify.handleSleep(function(wakeUp) {
+			xsystem35.load_mincho_font().then(wakeUp);
 		});
 	},
 	muspcm_init: function(audio_buffer_size) {
@@ -21,10 +17,10 @@ mergeInto(LibraryManager.library, {
 	muspcm_exit: function() {
 		return 0; // OK
 	},
-	muspcm_load_no: function(slot, no) {  // emterpreter sync
+	muspcm_load_no: function(slot, no) {  // async
 		return xsystem35.audio.pcm_load(slot, no);
 	},
-	muspcm_load_mixlr: function(slot, noL, noR) {  // emterpreter sync
+	muspcm_load_mixlr: function(slot, noL, noR) {  // async
 		return xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
 	},
 	muspcm_unload: function(slot) {
@@ -60,7 +56,7 @@ mergeInto(LibraryManager.library, {
 	muspcm_isplaying: function(slot) {
 		return xsystem35.audio.pcm_isplaying(slot);
 	},
-	muspcm_waitend: function(slot) {  // emterpreter sync
+	muspcm_waitend: function(slot) {  // async
 		return xsystem35.audio.pcm_waitend(slot);
 	}
 });

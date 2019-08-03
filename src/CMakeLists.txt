@@ -55,38 +55,25 @@ endif()
 
 if (EMSCRIPTEN)
 
-  add_executable(xsystem35.asm $<TARGET_OBJECTS:objLib>)
-
   set(LIBS "SHELL:-s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2")
   target_compile_options(objLib PRIVATE ${LIBS})
   target_link_options(xsystem35 PRIVATE ${LIBS})
-  target_link_options(xsystem35.asm PRIVATE ${LIBS})
+
+  # Without optimizations, Asyncify generates very large code.
+  list(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "-O1")
 
   set(LINK_OPTS
 	"SHELL:-s ENVIRONMENT=web"
-	"SHELL:-s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1"
+	"SHELL:-s ASYNCIFY=1 -s ASYNCIFY_IGNORE_INDIRECT=1"
+	"SHELL:-s ASYNCIFY_IMPORTS=\"['emscripten_sleep','SDL_Delay','__syscall118','muspcm_load_no','muspcm_load_mixlr','muspcm_waitend','wait_vsync','load_mincho_font']\""
 	"SHELL:-s ALLOW_MEMORY_GROWTH=1"
 	"SHELL:-s NO_EXIT_RUNTIME=1"
 	"SHELL:-s EXPORTED_FUNCTIONS=\"['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_va_alarm_handler']\""
-	"SHELL:-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['getValue','getMemory','addRunDependency','removeRunDependency']\""
-	@${CMAKE_CURRENT_SOURCE_DIR}/../emterpretify_whitelist)
+	"SHELL:-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['getValue','getMemory','addRunDependency','removeRunDependency']\"")
 
   em_link_js_library(xsystem35 ../emscripten/library.js)
-  em_link_js_library(xsystem35.asm ../emscripten/library.js)
-
-  set(SYNCLIST -s EMTERPRETIFY_SYNCLIST="['_muspcm_load_no','_muspcm_load_mixlr','_muspcm_waitend','_wait_vsync','_load_mincho_font']")
 
   target_link_options(xsystem35 PRIVATE ${LINK_OPTS})
-  target_link_options(xsystem35.asm PRIVATE ${LINK_OPTS} "SHELL:-s WASM=0")
-
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../emterpretify_whitelist
-	COMMAND ${CMAKE_CXX_COMPILER} -s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ADVISE=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 ${SYNCLIST} $<TARGET_OBJECTS:objLib>
-		| grep EMTERPRETIFY_WHITELIST
-		> ${CMAKE_CURRENT_SOURCE_DIR}/../emterpretify_whitelist
-	COMMAND_EXPAND_LISTS)
-  add_custom_target(emterpretify_whitelist DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../emterpretify_whitelist)
-  add_dependencies(xsystem35 emterpretify_whitelist)
-  add_dependencies(xsystem35.asm emterpretify_whitelist)
 
 else()  # non-emscripten
   target_link_libraries(xsystem35 PRIVATE m)
