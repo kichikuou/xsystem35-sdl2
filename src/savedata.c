@@ -55,11 +55,13 @@ static int   loadSysVar(char *buf);
 static void* loadGameData(int no, int *status, int *size);
 static int   saveGameData(int no, char *buf, int size);
 
-static void scheduleSync() {
 #ifdef __EMSCRIPTEN__
-	EM_ASM( xsystem35.shell.syncfs(); );
+EM_JS(void, scheduleSync, (), {
+	xsystem35.shell.syncfs();
+});
+#else
+#define scheduleSync()
 #endif
-}
 
 /* savefile がある directory を登録 */
 void save_set_path(char *path) {

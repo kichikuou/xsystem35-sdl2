@@ -28,15 +28,15 @@ static int midi_initilize(char *pname, int subdev);
 static int midi_exit();
 static int midi_start(int no, int loop, char *data, int datalen);
 static int midi_stop();
-static int midi_pause(void);
-static int midi_unpause(void);
+extern int midi_pause(void);
+extern int midi_unpause(void);
 static int midi_get_playing_info(midiplaystate *st);
 static int midi_getflag(int mode, int index);
 static int midi_setflag(int mode, int index, int val);
-static int midi_setvol(int vol);
-static int midi_getvol();
-static int midi_fadestart(int time, int volume, int stop);
-static boolean midi_fading();
+extern int midi_setvol(int vol);
+extern int midi_getvol();
+extern int midi_fadestart(int time, int volume, int stop);
+extern boolean midi_fading();
 
 #define midi midi_emscripten
 mididevice_t midi = {
@@ -83,15 +83,15 @@ static int midi_stop() {
 	return OK;
 }
 
-static int midi_pause(void) {
-	EM_ASM( xsystem35.midiPlayer.pause(); );
-	return OK;
-}
+EM_JS(int, midi_pause, (void), {
+	xsystem35.midiPlayer.pause();
+	return xsystem35.Status.OK;
+});
 
-static int midi_unpause(void) {
-	EM_ASM( xsystem35.midiPlayer.resume(); );
-	return OK;
-}
+EM_JS(int, midi_unpause, (void), {
+	xsystem35.midiPlayer.resume();
+	return xsystem35.Status.OK;
+});
 
 static int midi_get_playing_info(midiplaystate *st) {
 	if (midino != 0) {
@@ -117,20 +117,19 @@ static int midi_setflag(int mode, int index, int val) {
 	return NG;
 }
 
-static int midi_setvol(int vol) {
-	EM_ASM_ARGS({ xsystem35.midiPlayer.setVolume($0); }, vol);
-	return OK;
-}
+EM_JS(int, midi_setvol, (int vol), {
+	xsystem35.midiPlayer.setVolume(vol);
+	return xsystem35.Status.OK;
+});
 
-static int midi_getvol() {
-	return EM_ASM_INT_V( return xsystem35.midiPlayer.getVolume(); );
-}
+EM_JS(int, midi_getvol,(), {
+	return xsystem35.midiPlayer.getVolume();
+});
 
-static int midi_fadestart(int time, int volume, int stop) {
-	return EM_ASM_ARGS({ xsystem35.midiPlayer.fadeStart($0, $1, $2); },
-					   time, volume, stop);
-}
+EM_JS(int, midi_fadestart, (int time, int volume, int stop), {
+	return xsystem35.midiPlayer.fadeStart(time, volume, stop);
+});
 
-static boolean midi_fading() {
-	return EM_ASM_INT_V( return xsystem35.midiPlayer.isFading(); );
-}
+EM_JS(boolean, midi_fading, (), {
+	return xsystem35.midiPlayer.isFading();
+});

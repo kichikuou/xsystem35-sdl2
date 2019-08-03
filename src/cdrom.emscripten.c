@@ -29,8 +29,8 @@ static int frame_of_getpos = -1;
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();
-static int  cdrom_start(int, boolean);
-static int  cdrom_stop();
+extern int  cdrom_start(int, boolean);
+extern int  cdrom_stop();
 static int  cdrom_getPlayingInfo(cd_time *);
 
 #define cdrom cdrom_emscripten
@@ -53,15 +53,15 @@ int cdrom_exit() {
 	return OK;
 }
 
-int cdrom_start(int trk, boolean loop) {
-	EM_ASM_ARGS({ xsystem35.cdPlayer.play($0, $1); }, trk, loop);
-	return OK;
-}
+EM_JS(int, cdrom_start, (int trk, boolean loop), {
+	xsystem35.cdPlayer.play(trk, loop);
+	return xsystem35.Status.OK;
+});
 
-int cdrom_stop() {
-	EM_ASM( xsystem35.cdPlayer.stop(); );
-	return OK;
-}
+EM_JS(int, cdrom_stop, (), {
+	xsystem35.cdPlayer.stop();
+	return xsystem35.Status.OK;
+});
 
 int cdrom_getPlayingInfo(cd_time *info) {
 	if (nact->frame_count == frame_of_getpos)
