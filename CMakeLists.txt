@@ -130,6 +130,7 @@ endif()
 
 if (EMSCRIPTEN)
   list(APPEND SRC_AUDIO)
+  list(APPEND SRC_AUDIO pcm.emscripten.c)
   list(APPEND SUMMARY_AUDIO "Emscripten")
 elseif (SDL2MIXER_FOUND)
   list(APPEND SRC_AUDIO pcm.sdlmixer.c)
