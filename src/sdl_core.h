@@ -175,9 +175,4 @@ extern void sdl_sync();
 #define Sleep(ms) sdl_sleep(ms)
 #define WaitVsync() sdl_wait_vsync()
 
-#ifdef __EMSCRIPTEN__
-// library.js
-void wait_vsync(void);
-#endif
-
 #endif /* !__SDL_CORE__ */

@@ -71,8 +71,6 @@ if (EMSCRIPTEN)
 	"SHELL:-s EXPORTED_FUNCTIONS=\"['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata', '_va_alarm_handler']\""
 	"SHELL:-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['getValue','getMemory','addRunDependency','removeRunDependency']\"")
 
-  em_link_js_library(xsystem35 ../emscripten/library.js)
-
   target_link_options(xsystem35 PRIVATE ${LINK_OPTS})
 
 else()  # non-emscripten

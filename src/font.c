@@ -21,6 +21,10 @@
 */
 /* $Id: font.c,v 1.1 2002/09/18 13:16:22 chikama Exp $ */
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include "config.h"
 
 #include "portab.h"
@@ -47,3 +51,11 @@ void font_init(int dev) {
 		break;
 	}
 }
+
+#ifdef __EMSCRIPTEN__
+EM_JS(int, load_mincho_font, (void), {
+	return Asyncify.handleSleep(function(wakeUp) {
+		xsystem35.load_mincho_font().then(wakeUp);
+	});
+});
+#endif

@@ -84,6 +84,16 @@ void sdl_sleep(int msec) {
 #endif
 }
 
+#ifdef __EMSCRIPTEN__
+EM_JS(void, wait_vsync, (void), {
+	Asyncify.handleSleep(function(wakeUp) {
+		window.requestAnimationFrame(function() {
+			wakeUp();
+		});
+	});
+});
+#endif
+
 void sdl_wait_vsync() {
 	sdl_updateScreen();
 #ifdef __EMSCRIPTEN__
