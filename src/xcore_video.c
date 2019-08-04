@@ -437,6 +437,7 @@ static void makeDIB(int w, int h, int depth) {
 	x11_dibinfo->cimg.alpha = NULL;
 	
 	image_setdepth(depth);
+	xcore_image_setdepth(depth);
 	alloced = TRUE;
 }
 

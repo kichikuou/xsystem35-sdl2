@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include "portab.h"
 #include "image.h"
+#include "xcore_image.h"
 #include "font.h"
 #include "cursor.h"
 #include "ags.h"
