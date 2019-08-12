@@ -36,6 +36,7 @@
 #include "ags.h"
 #include "counter.h"
 #include "music.h"
+#include "graphicsdevice.h"
 
 #define SLOT 40
 
@@ -564,7 +565,7 @@ void PlayAnimeData() {
 		{
 			int now = get_high_counter(SYSTEMCOUNTER_MSEC);
 			if (now - cnt < interval) {
-				usleep((interval - (now-cnt)) * 1000);
+				Sleep(interval - (now-cnt));
 			}
 		}
 	}
