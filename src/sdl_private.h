@@ -62,6 +62,7 @@ struct sdl_private_data {
 
 extern void sdl_cursor_init(void);
 extern void sdl_shadow_init(void);
+extern int sdl_nearest_color(int r, int g, int b);
 
 #define SDL_AllocSurface(flags,w,h,d,r,g,b,a) SDL_CreateRGBSurface(0,w,h,d,r,g,b,a)
 

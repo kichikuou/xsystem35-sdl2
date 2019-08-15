@@ -44,6 +44,11 @@ void font_init(int dev) {
 		nact->ags.font = font_ft2_new();
 		break;
 #endif
+#ifdef ENABLE_SDLTTF
+	case FONT_SDLTTF:
+		nact->ags.font = font_sdlttf_new();
+		break;
+#endif
 	default:
 #ifndef ENABLE_SDL
 		nact->ags.font = font_x11_new();

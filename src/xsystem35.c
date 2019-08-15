@@ -99,11 +99,15 @@ static char *fontname_tt[FONTTYPEMAX];
 static boolean isjix0213_tt[FONTTYPEMAX];
 static char fontface[FONTTYPEMAX];
 
-#ifdef ENABLE_SDL
-static fontdev_t fontdev = FONT_FT2;
+#ifdef ENABLE_SDLTTF
+#define DEFAULT_FONT_DEVICE FONT_SDLTTF
+#elif defined(ENABLE_SDL)
+#define DEFAULT_FONT_DEVICE FONT_FT2
 #else
-static fontdev_t fontdev = FONT_X11;
+#define DEFAULT_FONT_DEVICE FONT_X11
 #endif
+
+static fontdev_t fontdev = DEFAULT_FONT_DEVICE;
 
 /* antialias on from command line */
 static boolean font_antialias;
@@ -235,26 +239,22 @@ void sys_exit(int code) {
 }
 
 static int check_fontdev(char *devname) {
+#ifdef ENABLE_SDLTTF
+	if (0 == strcmp(devname, "sdl")) {
+		return FONT_SDLTTF;
+	}
+#endif
 #ifdef ENABLE_FT2
 	if (0 == strcmp(devname, "ft2")) {
 		return FONT_FT2;
 	}
-	if (0 == strcmp(devname, "ttf")) {
-		return FONT_FT2;
-	}
 #endif
-
 #ifdef ENABLE_X11FONT
 	if (0 == strcmp(devname, "x11")) {
 		return FONT_X11;
 	}
 #endif
-
-#ifdef ENABLE_SDL
-	return FONT_FT2;
-#else
-	return FONT_X11;
-#endif
+	return DEFAULT_FONT_DEVICE;
 }
 
 static void storeDataName(int type, int no, char *src) {
