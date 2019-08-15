@@ -1,11 +1,15 @@
 #include "config.h"
 
+#include <limits.h>
+#include <math.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
 
 #include "portab.h"
 #include "system.h"
 #include "font.h"
+#include "sdl_private.h"
+#include "utfsjis.h"
 
 typedef struct {
 	int      size;
@@ -17,14 +21,14 @@ typedef struct {
 static FontTable fonttbl[FONTTABLEMAX];
 static int       fontcnt = 0;
 
-static TTF_Font *fontset;
+static FontTable *fontset;
 
 static FONT *this;
 
-static void font_insert(int size, int type, ttfont *fontset) {
+static void font_insert(int size, int type, TTF_Font *font) {
 	fonttbl[fontcnt].size = size;
 	fonttbl[fontcnt].type = type;
-	fonttbl[fontcnt].id   = fontset;
+	fonttbl[fontcnt].id   = font;
 	
 	if (fontcnt >= (FONTTABLEMAX -1)) {
 		WARNING("Font table is full.\n");
@@ -44,14 +48,14 @@ static FontTable *font_lookup(int size, int type) {
 	return NULL;
 }
 
-static void font_ttf_sel_font(int type, int size) {
+static void font_sdlttf_sel_font(int type, int size) {
 	FontTable *tbl;
 
 
 	if (NULL == (tbl = font_lookup(size, type))) {
 		TTF_Font *fs;
 		
-		fs = TTF_OpenFont(this->name[type], size);
+		fs = TTF_OpenFontIndex(this->name[type], size, this->face[type]);
 		
 		if (fs == NULL) {
 			WARNING("%s is not found:\n", this->name[type]);
@@ -59,38 +63,89 @@ static void font_ttf_sel_font(int type, int size) {
 		}
 		
 		font_insert(size, type, fs);
-		fontset = fs;
+		fontset = &fonttbl[fontcnt - 1];
 	} else {
-		fontset = tbl->id;
+		fontset = tbl;
 	}
 }
 
 static void *font_sdlttf_get_glyph(unsigned char *msg) {
+	return NULL;
+}
+
+// SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
+static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, unsigned long col)
+{
+	SDL_LockSurface(sdl_dib);
+
+	Uint8 cache[256*7];
+	memset(cache, 0, 256);
+
+	for (int y = 0; y < src->h && dsty + y < sdl_dib->h; y++) {
+		BYTE *sp = (BYTE*)src->pixels + y * src->pitch;
+		BYTE *dp = (BYTE*)sdl_dib->pixels + (dsty + y) * sdl_dib->pitch + dstx;
+		for (int x = 0; x < src->w && dstx + x < sdl_dib->w; x++) {
+			Uint8 r, g, b, alpha;
+			SDL_GetRGBA(*((Uint32*)sp), src->format, &r, &g, &b, &alpha);
+			alpha = alpha >> 5; // reduce bit depth
+			if (!alpha) {
+				// Transparent, do nothing
+			} else if (alpha == 7) {
+				*dp = col; // Fully opaque
+			} else if (cache[*dp] & 1 << alpha) {
+				*dp = cache[alpha << 8 | *dp]; // use cached value
+			} else {
+				// find nearest color in palette
+				cache[*dp] |= 1 << alpha;
+				int c = sdl_nearest_color(
+					(sdl_col[col].r * alpha + sdl_col[*dp].r * (7 - alpha)) / 7,
+					(sdl_col[col].g * alpha + sdl_col[*dp].g * (7 - alpha)) / 7,
+					(sdl_col[col].b * alpha + sdl_col[*dp].b * (7 - alpha)) / 7);
+				cache[alpha << 8 | *dp] = c;
+				*dp = c;
+			}
+			sp += src->format->BytesPerPixel;
+			dp++;
+		}
+	}
+
+	SDL_UnlockSurface(sdl_dib);
 }
 
 static int font_sdlttf_draw_glyph(int x, int y, unsigned char *str, int cl) {
 	SDL_Surface *fs;
-	SDL_Color fg;
 	SDL_Rect r_src, r_dst;
-	int w, h;
+	int w, h, maxy;
+	BYTE *conv;
 	
-	fg = SDL_MapRGB(sdl_dib->format,
-			sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b);
+	if (!*str)
+		return 0;
 	
+	conv = sjis2lang(str);
 	if (this->antialiase_on) {
-		fs = TTF_RenderText_Shaded(fontset, str, cl);
+		fs = TTF_RenderUTF8_Blended(fontset->id, conv, sdl_col[cl]);
 	} else {
-		fs = TTF_RenderText_Solid(fonset, str, cl);
+		fs = TTF_RenderText_Solid(fontset->id, conv, sdl_col[cl]);
+	}
+	if (!fs) {
+		WARNING("Text rendering failed: %s\n", TTF_GetError());
+		free(conv);
+		return 0;
 	}
 	
-	TTF_SizeText(fontset, str, &w, &h);
+	TTF_SizeUTF8(fontset->id, conv, &w, &h);
+	y = max(0, y - (TTF_FontAscent(fontset->id) - fontset->size * 0.9));
 	
-	setRect(r_src, 0, 0, w, h);
-	setRect(r_dst, x, y, w, h);
-	
-	SDL_LockSurface(sdl_dib);
-	SDL_BlitSurface(fs, &r_src, sdl_dib, &r_dst);
-	SDL_UnlockSurface(sdl_dib);
+	if (sdl_dib->format->BitsPerPixel == 8 && this->antialiase_on) {
+		sdl_drawAntiAlias_8bpp(x, y, fs, cl);
+	} else {
+		setRect(r_src, 0, 0, w, h);
+		setRect(r_dst, x, y, w, h);
+		SDL_BlitSurface(fs, &r_src, sdl_dib, &r_dst);
+	}
+
+	SDL_FreeSurface(fs);
+	free(conv);
 	
 	return w;
 }
@@ -99,7 +154,7 @@ static boolean drawable() {
 	return TRUE;
 }
 
-FONT *font_ttf_new() {
+FONT *font_sdlttf_new() {
 	FONT *f = malloc(sizeof(FONT));
 	
 	f->sel_font   = font_sdlttf_sel_font;
@@ -108,13 +163,12 @@ FONT *font_ttf_new() {
 	f->self_drawable = drawable;
 	f->antialiase_on = FALSE;
 	
-	for (i = 0; i < 4; i++) {
-		fontmaps[i].etype = -1;
-	}
-	
-	TTF_Init();
+	if (TTF_Init() == -1)
+		SYSERROR("Failed to intialize SDL_ttf: %s\n", TTF_GetError());
 	
 	this = f;
+	
+	NOTICE("FontDevice SDL_ttf\n");
 	
 	return f;
 }

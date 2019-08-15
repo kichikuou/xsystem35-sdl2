@@ -362,7 +362,7 @@ static SDL_Surface *com2alphasurface(agsurface_t *src, int cl) {
 	return s;
 }
 
-static int nearest_color(int r, int g, int b) {
+int sdl_nearest_color(int r, int g, int b) {
 	int i, col, mind = INT_MAX;
 	for (i = 0; i < 256; i++) {
 		int dr = r - sdl_col[i].r;
@@ -397,7 +397,7 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, agsurface_t *src, unsigne
 				*dp = cache[alpha << 8 | *dp];
 			} else {
 				cache[*dp] |= 1 << alpha;
-				int c = nearest_color(
+				int c = sdl_nearest_color(
 					(sdl_col[col].r * alpha + sdl_col[*dp].r * (7 - alpha)) / 7,
 					(sdl_col[col].g * alpha + sdl_col[*dp].g * (7 - alpha)) / 7,
 					(sdl_col[col].b * alpha + sdl_col[*dp].b * (7 - alpha)) / 7);
