@@ -125,7 +125,7 @@ static int font_sdlttf_draw_glyph(int x, int y, unsigned char *str, int cl) {
 	if (this->antialiase_on) {
 		fs = TTF_RenderUTF8_Blended(fontset->id, conv, sdl_col[cl]);
 	} else {
-		fs = TTF_RenderText_Solid(fontset->id, conv, sdl_col[cl]);
+		fs = TTF_RenderUTF8_Solid(fontset->id, conv, sdl_col[cl]);
 	}
 	if (!fs) {
 		WARNING("Text rendering failed: %s\n", TTF_GetError());
