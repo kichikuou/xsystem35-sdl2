@@ -30,7 +30,7 @@
 /* 一行は 256 文字を越えない */
 #define RC_LINE_CHARS_MAX 256
 
-int  load_profile(char *path);
+int  load_profile(void);
 char *get_profile(const char *name);
 
 #endif /* __PROFILE_H__ */

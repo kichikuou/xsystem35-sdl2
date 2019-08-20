@@ -800,7 +800,7 @@ int main(int argc, char **argv) {
 	saved_argc = argc;
 	saved_argv = argv;
 	
-	load_profile(NULL);
+	load_profile();
 	check_profile();
 	sys35_ParseOption(&argc, argv);
 	
