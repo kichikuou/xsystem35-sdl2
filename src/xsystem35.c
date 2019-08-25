@@ -149,7 +149,6 @@ static void sys35_usage(boolean verbose) {
 	puts(" -devjoy device : set joystic device name to 'device'");
 	puts("                    if 'device' is set to 'none', don't use the device");
 	puts(" -savekanji #   : kanji code of filename (0 or 1 ... 0:utf-8, 1:sjis)");
-#ifdef DEBUG
 
 	puts(" -devfont device: select font device");
 #ifdef ENABLE_SDLTTF
@@ -177,6 +176,7 @@ static void sys35_usage(boolean verbose) {
 	puts(" -font_mincho  : set X11(gtk) font for mincho");
 	puts(" -font_gothic  : set X11(gtk) font for mincho");
 	
+#ifdef DEBUG
 	puts(" -debuglv #     : debug level");
 	puts("                :  0: critical error message only ");
 	puts("                :  1: + waring message");
