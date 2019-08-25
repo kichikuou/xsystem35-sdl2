@@ -144,7 +144,6 @@ static void sys35_usage(boolean verbose) {
 	puts(" -Ms?           : Sequenceer device (?:devicenumber)");
 #endif
 	puts(" -M0            : Disable MIDI output");
-	puts(" -midiplayer cmd: set external midi player to 'cmd'");
 	
 	puts(" -devjoy device : set joystic device name to 'device'");
 	puts("                    if 'device' is set to 'none', don't use the device");
@@ -597,10 +596,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			if (argv[i + 1] != NULL) {
 				midi_set_devicename(argv[i + 1]);
 			}
-		} else if (0 == strcmp(argv[i], "-midiplayer")) {
-			if (argv[i + 1] != NULL) {
-				midi_set_playername(argv[i + 1]);
-			}
 		} else if (0 == strncmp(argv[i], "-M", 2)) {
 			int subdev = 0;
 			if (argv[i][3] != '\0') {
@@ -724,11 +719,6 @@ static void check_profile() {
 	param = get_profile("joy_device");
 	if (param) {
 		joy_set_devicename(param);
-	}
-	/* 外部MIDIプレーヤーの設定 */
-	param = get_profile("midi_player");
-	if (param) {
-		midi_set_playername(param);
 	}
 	/* Raw MIDI device name の設定 */
 	param = get_profile("midi_device");

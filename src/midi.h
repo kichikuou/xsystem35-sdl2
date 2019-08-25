@@ -50,7 +50,6 @@ struct mididevice {
 };
 
 extern int  midi_init(mididevice_t *);
-extern void midi_set_playername(char *);
 extern void midi_set_devicename(char *);
 extern void midi_set_output_device(int mode);
 

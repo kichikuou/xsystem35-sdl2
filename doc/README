@@ -223,10 +223,6 @@
   -Ms?           : Sequencer device (?:device number)
   -M0            : disable midi
 
-  -midiplayer cmd: 外部MIDIプレイヤーとして cmd を使います。
-                   -midiplayer "timidity -A 100 -s 44100 -Oe" のように指定
-                   します。
-
   -devjoy name   : joystick のデバイス名を name にします
 
   -savekanji #   : ゲーム内でファイル名を指定してセーブデータを記録するとき、
