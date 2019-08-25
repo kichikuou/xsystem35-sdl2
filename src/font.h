@@ -72,9 +72,7 @@ extern FONT *font_x11_new();
 /* デフォルトのフォント名 */
 #define FONT_DEFAULTNAME_X "-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0201.1976-0,*"
 
-#define FONT_DEFAULTNAME_TTF "/usr/share/fonts/TrueType/mincho.ttc"
-
-//
+// Font devices
 typedef enum {
 	FONT_X11,
 	FONT_FT2,

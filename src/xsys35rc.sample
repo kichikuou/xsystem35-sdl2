@@ -21,8 +21,8 @@ font_gothic: -*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-no
 # 使用するフォントの指定 for FreeType / SDL_ttf
 #
 
-ttfont_mincho: /usr/local/share/xsystem35/fonts/mincho.otf
-ttfont_gothic: /usr/local/share/xsystem35/fonts/MTLc3m.ttf
+#ttfont_mincho: /usr/local/share/xsystem35/fonts/mincho.otf
+#ttfont_gothic: /usr/local/share/xsystem35/fonts/MTLc3m.ttf
 
 # True Type フォントのエンコード方式を指定 
 # Shift JIS0213 の場合以下のように指定

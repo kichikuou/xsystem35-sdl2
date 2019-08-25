@@ -95,7 +95,7 @@ static int audio_buffer_size = 0;
 
 /* font name from rcfile */
 static char *fontname[FONTTYPEMAX];
-static char *fontname_tt[FONTTYPEMAX];
+static char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF};
 static boolean isjix0213_tt[FONTTYPEMAX];
 static char fontface[FONTTYPEMAX];
 
@@ -484,11 +484,7 @@ static void sys35_init() {
 		switch(fontdev) {
 		case FONT_FT2:
 		case FONT_SDLTTF:
-			if (fontname_tt[i] == NULL) {
-				nact->ags.font->name[i] = strdup(FONT_DEFAULTNAME_TTF);
-			} else {
-				nact->ags.font->name[i] = fontname_tt[i];
-			}
+			nact->ags.font->name[i] = fontname_tt[i];
 			nact->ags.font->isJISX0213[i] = isjix0213_tt[i];
 			nact->ags.font->face[i] = fontface[i];
 			break;
