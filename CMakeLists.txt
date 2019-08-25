@@ -242,6 +242,8 @@ add_compile_definitions(HAVE_CONFIG_H)
 add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
 
 add_subdirectory(src)
+add_subdirectory(tools)
+add_subdirectory(fonts)
 if (ENABLE_NLS)
   add_subdirectory(po)
 endif()
