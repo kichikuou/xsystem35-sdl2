@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-
-if ($ARGV[0] eq "--cflags" || $ARGV[0] eq "--libs") {
-	print "-s USE_FREETYPE=1\n";
-} elsif ($ARGV[0] eq "--version") {
-	print "18.6.12\n";
-} else {
-	print STDERR "freetype-config: unknown arg $ARGV[0]\n"
-}
