@@ -35,6 +35,7 @@
 #include "imput.h"
 #include "ags.h"
 #include "nact.h"
+#include "texthook.h"
 
 /* ショートカット */
 #define msg nact->msg
@@ -116,6 +117,8 @@ void msg_putMessage(char *m) {
 		msg_nextPage(TRUE);
 	}
 	
+	texthook_message(m);
+
 	/* 表示文字列を文字列変数にコピーする */
 	if (msg.mg_getString) {
 		copyMsgToStrVar(m);
@@ -188,6 +191,8 @@ void msg_putMessage(char *m) {
 }
 
 void msg_nextLine() {
+	texthook_newline();
+
 	// puts("next Line");
 	if (msg.mg_getString) {
 		msgget_at_r();
@@ -203,6 +208,8 @@ void msg_nextLine() {
 }
 
 void msg_nextPage(boolean innerclear) {
+	texthook_nextpage();
+
 	// puts("next Page");
 	if (innerclear) {
 		if (msg.WinBackgroundTransparent == 255) {
@@ -297,6 +304,7 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 }
 
 void msg_setMessageLocation(int x, int y) {
+	texthook_newline();
 	msgcur.x = x;
 	msgcur.y = y;
 	nextLineIsAfterKaigyou = FALSE;

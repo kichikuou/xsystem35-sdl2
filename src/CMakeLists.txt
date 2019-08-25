@@ -44,7 +44,7 @@ target_sources(xsystem35 PRIVATE
 # Scenario
 target_sources(xsystem35 PRIVATE
   cali.c scenario.c variable.c cmd_check.c hankana2sjis.c nact.c
-  selection.c message.c savedata.c hankaku.c s39ain.c)
+  selection.c message.c savedata.c hankaku.c s39ain.c texthook.c)
 
 # Graphics
 target_sources(xsystem35 PRIVATE

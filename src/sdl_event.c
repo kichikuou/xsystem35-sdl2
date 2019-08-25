@@ -38,6 +38,7 @@
 #include "imput.h"
 #include "joystick.h"
 #include "sdl_input.c"
+#include "texthook.h"
 
 static void sdl_getEvent(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool);
@@ -238,6 +239,7 @@ static void sdl_getEvent(void) {
 int sdl_keywait(int msec, boolean cancel) {
 	int key=0, n;
 	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
+	texthook_keywait();
 	
 	while ((n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
 		if (n <= 16)
