@@ -133,9 +133,6 @@ static void sys35_usage(boolean verbose) {
 	puts(" -devcd device  : set cdrom device name to 'device'");
 	puts(" -devmidi device: set midi device name to 'device'");
 	
-	puts(" -O?            : select output audio device");
-	puts(" -O0            : Disable Audio output");
-	
 	puts(" -M?            : select output midi methos");
 #ifdef ENABLE_MIDI_SDLMIXER
 	puts(" -Me            : SDL_mixer midi player");
@@ -155,19 +152,20 @@ static void sys35_usage(boolean verbose) {
 #ifdef DEBUG
 
 	puts(" -devfont device: select font device");
+#ifdef ENABLE_SDLTTF
+	puts(" -devfont sdl   : SDL_ttf");
+#endif
 #ifdef ENABLE_FT2
-	puts(" -devfont ttf   : FreerType (True Type Font)");
+	puts(" -devfont ttf   : FreeType");
 #endif
 #ifdef ENABLE_X11FONT
 	puts(" -devfont x11   : x11");
 #endif
 
-#ifdef ENABLE_EDL
-#ifdef ENABLE_GTK
-	puts("                : default is gtk");
-#else
-	puts("                : default is ttf");
-#endif
+#ifdef ENABLE_SDLTTF
+	puts("                : default is sdl");
+#elif defined(ENABLE_SDL)
+	puts("                : default is ft2");
 #else
 	puts("                : default is x11");
 #endif
@@ -186,8 +184,8 @@ static void sys35_usage(boolean verbose) {
 	puts("                :  5: + implemented command (write to logfile)");
 	puts("                :  6: + message (write to logfile)");
 #endif  
-	puts(" -antialias     : always draw antialiased string (for !256 colors game)");
-	puts(" -noantialias   : nevser use antialiased string (for !256 colors game)");
+	puts(" -antialias     : always draw antialiased string");
+	puts(" -noantialias   : nevser use antialiased string");
 	puts(" -fullscreen    : start with fullscreen");
 	puts(" -noimagecursor : disable image cursor");
 	puts(" -version       : show version");

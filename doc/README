@@ -216,13 +216,6 @@
 
   -devcd name    : CD-ROM device名を name にします。
   -devmidi name  : MIDI device名を name にします。
-  -devdsp name   : DSP device名を name にします。
-
-  -O?            : PCM の出力の種類を選択します。
-  -Oo            : OSS mode
-  -Os            : ALSA mode
-  -Oe            : Enlightened Sound Daemon mode
-  -O0            : disable audio
 
   -M?            : MIDI の出力の種類を選択します。
   -Me            : External midi player (default)
@@ -233,8 +226,6 @@
   -midiplayer cmd: 外部MIDIプレイヤーとして cmd を使います。
                    -midiplayer "timidity -A 100 -s 44100 -Oe" のように指定
                    します。
-
-  -devmix name   : OSS の mixer device の device 名をname にします。
 
   -devjoy name   : joystick のデバイス名を name にします
 
@@ -248,8 +239,7 @@
                    SDL 有効時には Widget にフォーカスが当たらないため Popup
                    menu 等が使用できません。
 
-  -antialias     : 常に文字にアンチエリアスをかけます。Hushaby Baby よりも前の
-                   ゲームのうち 256色でないものに対して有効です。
+  -antialias     : 常に文字にアンチエリアスをかけます。
 
   -noantialias   : 常に文字にアンチエリアスをかけません。シナリオ上でアンチ
                    エリアスの指定があっても無視します。
