@@ -77,13 +77,8 @@ static int load_rc_file(const char *profile_path)
 	char *p, *q;
 	int is_flag, line = 0;
 
-	if (!(fp = fopen(profile_path, "r"))) {
-		char *error_msg = malloc(strlen(profile_path) + 12);
-		sprintf(error_msg, "fopen() '%s'", profile_path);
-		perror(error_msg);
-		free(error_msg);
+	if (!(fp = fopen(profile_path, "r")))
 		return 1;
-	}
 
 	while (1) {
 		if (!fgets(rc_line, sizeof(rc_line), fp)) {
@@ -142,7 +137,7 @@ int load_profile(void)
 		sprintf(profile_path, "%s/%s", home_dir, RC_NAME);
 		load_rc_file(profile_path);
 	}
-	load_rc_file(RC_NAME);
+	return load_rc_file(RC_NAME);
 }
 
 char *get_profile(const char *name)
