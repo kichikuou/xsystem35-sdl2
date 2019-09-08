@@ -36,6 +36,7 @@ endif()
 if (EMSCRIPTEN)
   set(SDL2_FOUND 1)
   set(FREETYPE_FOUND 1)
+  set(DEFAULT_FONT_PATH .)
 else()
   include(TestBigEndian)
   TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
@@ -68,6 +69,8 @@ else()
 
   optional_pkg_check_modules(SDL2MIXER IMPORTED_TARGET SDL2_mixer)
   optional_pkg_check_modules(SDL2TTF IMPORTED_TARGET SDL2_ttf)
+
+  set(DEFAULT_FONT_PATH ${CMAKE_INSTALL_PREFIX}/share/xsystem35/fonts)
 endif()
 
 
