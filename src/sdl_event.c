@@ -219,7 +219,7 @@ static void sdl_getEvent(void) {
 			break;
 #endif
 		default:
-			printf("ev %x\n", e.type);
+			NOTICE("ev %x\n", e.type);
 			break;
 		}
 	}
