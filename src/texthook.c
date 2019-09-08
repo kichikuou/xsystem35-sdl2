@@ -62,6 +62,7 @@ void texthook_message(const char *m) {
 void texthook_newline(void) {
 	if (newlines < 2) {
 		putchar('\n');
+		fflush(stdout);
 		newlines++;
 	}
 }
@@ -69,6 +70,7 @@ void texthook_newline(void) {
 void texthook_nextpage(void) {
 	while (newlines < 2) {
 		putchar('\n');
+		fflush(stdout);
 		newlines++;
 	}
 }
