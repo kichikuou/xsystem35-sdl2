@@ -89,6 +89,20 @@ unsigned slist_length(SList *list) {
 	return len;
 }
 
+SList* slist_nth(SList* list, unsigned int n) {
+	while (list && n--)
+		list = list->next;
+	return list;
+}
+
+SList* slist_last(SList *list) {
+	if (list) {
+		while (list->next)
+			list = list->next;
+	}
+	return list;
+}
+
 SList* slist_insert_sorted(SList *list, void* data, CompareFunc func) {
 	SList* node = malloc(sizeof(SList));
 	node->data = data;

@@ -28,7 +28,7 @@ typedef struct SList_t {
 } SList;
 
 typedef void (*ListFunc)(void *data, void *user_data);
-typedef int (*CompareFunc) (const void *a, const void *b);
+typedef int (*CompareFunc)(const void *a, const void *b);
 
 #define slist_next(lst) (lst)->next
 void slist_foreach(SList *list, ListFunc func, void *user_data);
@@ -37,6 +37,8 @@ SList* slist_append(SList *list, void *data);
 SList* slist_remove(SList *list, const void *data);
 int slist_index(SList *list, const void *data);
 unsigned slist_length(SList *list);
+SList* slist_nth(SList *list, unsigned int n);
+SList* slist_last(SList *list);
 SList* slist_insert_sorted(SList *list, void* data, CompareFunc func);
 
 typedef SList List;
@@ -46,9 +48,7 @@ typedef SList List;
 #define list_remove slist_remove
 #define list_index slist_index
 #define list_length slist_length
-
-// Not implemented
-List* list_nth(List *list, unsigned int n);
-List* list_last(List *list);
+#define list_nth slist_nth
+#define list_last slist_last
 
 #endif // __LIST_H_

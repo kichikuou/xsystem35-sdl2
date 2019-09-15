@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(xsystem35 LANGUAGES C)
+enable_testing()
 
 include(CheckFunctionExists)
 include(CheckIncludeFile)
