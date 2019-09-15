@@ -80,7 +80,7 @@ static void showStackData() {
 	if (fp == NULL) return;
 	
 	fprintf(fp, "Page = %d, index = %x\n", sl_getPage(), sl_getIndex());
-	fprintf(fp, "stack top = %p, cur = %p, size=%d, index=%d\n", sco_stackbuf, sco_stackindex, sco_stacksize, (sco_stackindex - sco_stackbuf));
+	fprintf(fp, "stack top = %p, cur = %p, size=%d, index=%td\n", sco_stackbuf, sco_stackindex, sco_stacksize, (sco_stackindex - sco_stackbuf));
 	
 	var = sco_stackbuf;
 	for (i = 0; i < sco_stacksize; i+=10) {

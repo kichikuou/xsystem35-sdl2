@@ -51,9 +51,9 @@
 #define DEBUG_COMMAND     sys_nextdebuglv = 5, DEBUG_SHOWSCOADR, sys_message
 #define DEBUG_MESSAGE     sys_nextdebuglv = 6, sys_message
 #else
-#define DEBUG_MESSAGE
-#define DEBUG_COMMAND
-#define DEBUG_COMMAND_YET
+#define DEBUG_MESSAGE(...)
+#define DEBUG_COMMAND(...)
+#define DEBUG_COMMAND_YET(...)
 #endif
 
 /* 配列外参照チェック/cali異常値検出 */

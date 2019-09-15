@@ -19,13 +19,13 @@ void Init() {
 }
 
 void SetKeyCancelFlag() {
-	int p1 = getCaliVariable();
+	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("nDEMO.SetKeyCancelFlag %d:\n", p1);
 }
 
 void SetLoopFlag() {
-	int p1 = getCaliVariable();
+	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("nDEMO.SetLoopFlag %d:\n", p1);
 }

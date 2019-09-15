@@ -33,7 +33,7 @@
 #include "utfsjis.h"
 #include "s2utbl.h"
 
-BYTE *sjis2utf(BYTE *src) {
+BYTE *sjis2utf(const BYTE *src) {
 	BYTE* dst = malloc(strlen(src) * 3 + 1);
 	BYTE* dstp = dst;
 
@@ -79,7 +79,7 @@ static int unicode_to_sjis(int u) {
 	return 0;
 }
 
-BYTE *utf2sjis(BYTE *src) {
+BYTE *utf2sjis(const BYTE *src) {
 	BYTE* dst = malloc(strlen(src) + 1);
 	BYTE* dstp = dst;
 
@@ -119,7 +119,7 @@ BYTE *utf2sjis(BYTE *src) {
 }
 
 /* src 内に半角カナもしくはASCII文字があるかどうか */
-boolean sjis_has_hankaku(BYTE *src) {
+boolean sjis_has_hankaku(const BYTE *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
 			src++;
@@ -132,7 +132,7 @@ boolean sjis_has_hankaku(BYTE *src) {
 }
 
 /* src 内に 全角文字があるかどうか */
-boolean sjis_has_zenkaku(BYTE *src) {
+boolean sjis_has_zenkaku(const BYTE *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
 			return TRUE;
@@ -143,7 +143,7 @@ boolean sjis_has_zenkaku(BYTE *src) {
 }
 
 /* src 中の文字数を数える 全角文字も１文字 */
-int sjis_count_char(BYTE *src) {
+int sjis_count_char(const BYTE *src) {
 	int c = 0;
 	
 	while(*src) {
@@ -170,7 +170,7 @@ void sjis_toupper(BYTE *src) {
 }
 
 /* SJIS を含む文字列の ASCII を大文字化する2 */
-BYTE *sjis_toupper2(BYTE *src) {
+BYTE *sjis_toupper2(const BYTE *src) {
 	BYTE *dst;
 		
 	dst = malloc(strlen(src) +1);

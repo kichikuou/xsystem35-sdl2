@@ -45,8 +45,8 @@ int joy_open(void) {
 	int i;
 	const char *name;
 	for( i=0 ; i<SDL_NumJoysticks() ; i++ ) {
-		name=SDL_JoystickName(i);
 		if( (js=SDL_JoystickOpen(i)) ) {
+			name=SDL_JoystickName(js);
 			joy_axes = SDL_JoystickNumAxes(js);
 			joy_buttons = SDL_JoystickNumButtons(js);
 			SDL_JoystickEventState(ENABLE_SDL);

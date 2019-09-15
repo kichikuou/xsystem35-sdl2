@@ -17,10 +17,10 @@
 */
 
 #undef WARNING
-#define WARNING //
+#define WARNING(...)
 
 #undef NOTICE
-#define NOTICE //
+#define NOTICE(...)
 
 
 /**

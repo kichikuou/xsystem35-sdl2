@@ -32,12 +32,12 @@
 
 #define CHECKSJIS1BYTE(b) ( ((b) & 0xe0) == 0x80 || ((b) & 0xe0) == 0xe0 )
 
-extern BYTE*   sjis2utf(BYTE *src);
-extern BYTE*   utf2sjis(BYTE *src);
-extern boolean sjis_has_hankaku(BYTE *src);
-extern boolean sjis_has_zenkaku(BYTE *src);
-extern int     sjis_count_char(BYTE *src);
+extern BYTE*   sjis2utf(const BYTE *src);
+extern BYTE*   utf2sjis(const BYTE *src);
+extern boolean sjis_has_hankaku(const BYTE *src);
+extern boolean sjis_has_zenkaku(const BYTE *src);
+extern int     sjis_count_char(const BYTE *src);
 extern void    sjis_toupper(BYTE *src);
-extern BYTE*   sjis_toupper2(BYTE *src);
+extern BYTE*   sjis_toupper2(const BYTE *src);
 
 #endif /* __UTFSJIS__ */

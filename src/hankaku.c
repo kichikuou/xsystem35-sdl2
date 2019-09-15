@@ -618,7 +618,7 @@ BYTE *zen2han(BYTE *src) {
 	
 	dst = _dst = malloc(strlen(src) + 1);
 	if (dst == NULL) {
-		fprintf(stderr, "zen2han(): Out of Memory (size %d)", strlen(src) + 1);
+		fprintf(stderr, "zen2han(): Out of Memory (size %zu)", strlen(src) + 1);
 		return NULL;
 	}
 	
@@ -651,7 +651,7 @@ BYTE *han2zen(BYTE *src) {
 	dst = _dst = malloc(strlen(src) * 2 + 1);
 	
 	if (dst == NULL) {
-		fprintf(stderr, "han2zen(): Out of Memory (size %d)", strlen(src) *2 + 1);
+		fprintf(stderr, "han2zen(): Out of Memory (size %zu)", strlen(src) *2 + 1);
 		return NULL;
 	}
 	

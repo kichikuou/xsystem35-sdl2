@@ -139,4 +139,5 @@ int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
 		sp->no, sx, sy, w, h, dx, dy);
 	
+	return OK;
 }
