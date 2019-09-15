@@ -30,7 +30,6 @@
 
 #ifdef HAVE_XF86VMODE
 # include <X11/extensions/xf86vmode.h>
-# include <X11/extensions/xf86vmstr.h>
 #endif
 
 #include "portab.h"

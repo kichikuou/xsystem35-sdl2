@@ -44,7 +44,7 @@ extern GtkWidget *menu_label_msgbox;
 extern GtkWidget *menu_spinbutton;
 extern GtkWidget *menu_textentry;
 extern GtkWidget *menu_textentry2;
-extern gchar     *menu_textentry_string;
+extern const gchar *menu_textentry_string;
 
 extern GtkWidget *menu_window_popup; /* popup menu */
 extern GtkWidget *menu_window_exit;  /* exit window */

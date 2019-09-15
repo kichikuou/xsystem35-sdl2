@@ -50,7 +50,7 @@ GtkWidget *menu_label_msgbox;
 GtkWidget *menu_spinbutton;
 GtkWidget *menu_textentry;
 GtkWidget *menu_textentry2;
-gchar     *menu_textentry_string;
+const gchar *menu_textentry_string;
 
 GtkWidget *menu_window_popup; /* popup menu */
 GtkWidget *menu_window_exit;  /* exit window */

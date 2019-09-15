@@ -29,7 +29,7 @@
 typedef struct {
 	char *title;
 	char *oldstring;
-	char *newstring;
+	const char *newstring;
 	int   max;
 	/* for MJ cmd */
 	boolean need_window;

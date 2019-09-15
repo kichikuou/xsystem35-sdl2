@@ -78,9 +78,9 @@ struct midiinfo {
 	int ceptr; /* current event pointer */
 	
 	/* work info */
-	long curtime;   /* current time */
-	int msgindex;   /* midi message buffer index */
-	int msgsize;    /* size of current allocaed msg */
+	long curtime;    /* current time */
+	size_t msgindex; /* midi message buffer index */
+	size_t msgsize;  /* size of current allocaed msg */
 	unsigned char *msgbuffer; /* message buffer */
 	
 	/* system35 jump info */

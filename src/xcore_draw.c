@@ -489,7 +489,7 @@ void Xcore_fadeIn(int step) {
 	}
 }
 
-void Xcore_fadeOut(step) {
+void Xcore_fadeOut(int step) {
 	
 	if (step == 0) {
 		Xcore_sync();
