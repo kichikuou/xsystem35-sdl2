@@ -190,15 +190,15 @@ void nact_main() {
 	nact->wait_vsync = FALSE;
 	
 	while (!nact->is_quit) {
-		for (int cnt = 0; !nact->wait_vsync && cnt < 10000; cnt++) {
+		for (int cnt = 0; cnt < 10000; cnt++) {
+			if (nact->wait_vsync || nact->popupmenu_opened || nact->is_quit)
+				break;
 			DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
-			if (!nact->popupmenu_opened) {
-				int c0 = checkMessage();
-				check_command(c0);
-				nact->cmd_count++;
-			}
-			nact->callback();
+			int c0 = checkMessage();
+			check_command(c0);
+			nact->cmd_count++;
 		}
+		nact->callback();
 #ifndef __EMSCRIPTEN__
 		if (!nact->is_message_locked)
 			sys_getInputInfo();
