@@ -34,6 +34,8 @@
 #define FONT_GOTHIC (0)
 #define FONT_MINCHO (1)
 
+struct agsurface;
+
 struct _FONT {
 	
 	boolean antialiase_on;
@@ -44,7 +46,7 @@ struct _FONT {
 	
 	void (*sel_font)(int type, int size);
 	
-	void *(*get_glyph)(unsigned char *str);
+	struct agsurface *(*get_glyph)(unsigned char *str);
 	
 	int (*draw_glyph)(int x, int y, unsigned char *str, int col);
 	

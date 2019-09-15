@@ -231,7 +231,7 @@ static void clear_canvas(void) {
 	memset(img_glyph.pixel, 0, GLYPH_PIXMAP_WIDTH * GLYPH_PIXMAP_HEIGHT);
 }
 
-static void *font_ttf_get_glyph(unsigned char *_msg) {
+static agsurface_t *font_ttf_get_glyph(unsigned char *_msg) {
 	FT_GlyphSlot   slot;
 	FT_UShort      code;
 	FT_Error       err;

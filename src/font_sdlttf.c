@@ -69,7 +69,7 @@ static void font_sdlttf_sel_font(int type, int size) {
 	}
 }
 
-static void *font_sdlttf_get_glyph(unsigned char *msg) {
+static agsurface_t *font_sdlttf_get_glyph(unsigned char *msg) {
 	static SDL_Surface *fs;
 	static agsurface_t result;
 

@@ -61,7 +61,7 @@ typedef enum {
 	TO_24B
 } ALPHA_DIB_COPY_TYPE;
 
-struct __surface {
+struct agsurface {
 	int no;      /* surface number, primary DIB is 0 */
 	
 	int width;   /* width of surface  */
@@ -78,7 +78,7 @@ struct __surface {
 	boolean has_pixel;
 
 };
-typedef struct __surface agsurface_t;
+typedef struct agsurface agsurface_t;
 
 #define GETOFFSET_PIXEL(suf, x, y) ((suf)->pixel + (y) * (suf)->bytes_per_line + (x) * (suf)->bytes_per_pixel)
 #define GETOFFSET_ALPHA(suf, x, y) ((suf)->alpha + (y) * (suf)->width + (x))
