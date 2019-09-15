@@ -26,8 +26,10 @@ add_library(graph STATIC
   )
 
 add_library(alk STATIC alk.c)
+target_compile_options(alk PRIVATE -Wno-pointer-sign)
 
 add_library(drawtext STATIC drawtext.c)
+target_compile_options(drawtext PRIVATE -Wno-pointer-sign)
 
 add_library(list STATIC list.c)
 

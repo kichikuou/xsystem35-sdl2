@@ -9,6 +9,8 @@ endif()
 
 add_executable(xsystem35)
 
+target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign -Wno-invalid-source-encoding)
+
 target_sources(xsystem35 PRIVATE
   xsystem35.c
   dri.c

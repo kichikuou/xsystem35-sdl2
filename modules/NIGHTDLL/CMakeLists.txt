@@ -14,6 +14,8 @@ add_library(NIGHTDLL MODULE
   nt_sound.c
   )
 
+target_compile_options(NIGHTDLL PRIVATE -Wno-pointer-sign -Wno-invalid-source-encoding)
+
 target_link_libraries(NIGHTDLL PRIVATE graph drawtext list)
 
 install(TARGETS NIGHTDLL DESTINATION lib/xsystem35)

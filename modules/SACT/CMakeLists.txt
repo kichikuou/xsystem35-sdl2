@@ -28,6 +28,8 @@ add_library(SACT MODULE
   sprite_xmenu.c
   )
 
+target_compile_options(SACT PRIVATE -Wno-pointer-sign -Wno-invalid-source-encoding)
+
 target_link_libraries(SACT PRIVATE graph drawtext list)
 
 install(TARGETS SACT DESTINATION lib/xsystem35)
