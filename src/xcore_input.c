@@ -98,7 +98,7 @@ static void buttonEventProcess(XButtonEvent *e) {
 }
 
 static int convertKeyCode(unsigned int keycode) {
-	KeySym sym = XKeycodeToKeysym(x11_display, keycode, 0);
+	KeySym sym = XkbKeycodeToKeysym(x11_display, keycode, 0, 0);
 	switch(sym) {
 	case XK_BackSpace:
 		return KEY_BS;

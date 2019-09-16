@@ -31,6 +31,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/XKBlib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -132,7 +133,7 @@ static boolean xcore_getEvent(void) {
 			KeySym sym;
 			
 			keyEventProsess((XKeyEvent *)&e);
-			sym = XKeycodeToKeysym(x11_display, e.xkey.keycode, 0);
+			sym = XkbKeycodeToKeysym(x11_display, e.xkey.keycode, 0, 0);
 			if (sym == XK_F4) {
 				Xcore_fullScreen(!x11_fs_on);
 			} else if (sym == XK_F1) {
