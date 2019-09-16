@@ -29,7 +29,7 @@ static int frame_of_getpos = -1;
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();
-extern int  cdrom_start(int, boolean);
+extern int  cdrom_start(int, int);
 extern int  cdrom_stop();
 static int  cdrom_getPlayingInfo(cd_time *);
 
@@ -53,8 +53,8 @@ int cdrom_exit() {
 	return OK;
 }
 
-EM_JS(int, cdrom_start, (int trk, boolean loop), {
-	xsystem35.cdPlayer.play(trk, loop);
+EM_JS(int, cdrom_start, (int trk, int loop), {
+	xsystem35.cdPlayer.play(trk, loop == 0 ? 1 : 0);
 	return xsystem35.Status.OK;
 });
 

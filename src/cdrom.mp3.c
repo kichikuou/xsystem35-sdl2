@@ -64,7 +64,7 @@
 
 static int cdrom_init(char *);
 static int cdrom_exit();
-static int cdrom_start(int, boolean);
+static int cdrom_start(int, int);
 static int cdrom_stop();
 static int cdrom_getPlayingInfo(cd_time *);
 
@@ -142,7 +142,7 @@ static int cdrom_exit() {
 }
 
 /* トラック番号 trk の演奏 trk = 1~ */
-static int cdrom_start(int trk, boolean loop) {
+static int cdrom_start(int trk, int loop) {
 	if (!enabled) return 0;
 	
 	/* 曲数よりも多い指定は不可*/
@@ -156,7 +156,7 @@ static int cdrom_start(int trk, boolean loop) {
 	mix_music = Mix_LoadMUS(playlist[trk -2]);
 	if (!mix_music)
 		return NG;
-	if (Mix_PlayMusic(mix_music, loop ? -1 : 1) != 0) {
+	if (Mix_PlayMusic(mix_music, loop == 0 ? -1 : loop) != 0) {
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
 		return NG;
