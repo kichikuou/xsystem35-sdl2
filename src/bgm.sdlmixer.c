@@ -50,7 +50,7 @@ static bgi_t bgi_data[BGI_MAX];
 
 static int current_no;
 static Mix_Music *mix_music;
-static void* wave_buf;
+static dridata* dfile;
 static Uint32 start_time;
 
 static char *bgi_gets(char *buf, int n, FILE *fp) {
@@ -109,24 +109,22 @@ static void free_music() {
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
 	}
-	if (wave_buf) {
-		free(wave_buf);
-		wave_buf = NULL;
+	if (dfile) {
+		ald_freedata(dfile);
+		dfile = NULL;
 	}
 }
 
 static Mix_Music *bgm_load(int no) {
-	dridata *dfile = ald_getdata(DRIFILE_BGM, no -1);
+	free_music();
+
+	dfile = ald_getdata(DRIFILE_BGM, no -1);
 	if (dfile == NULL) {
 		WARNING("DRIFILE_BGM fail to open %d\n", no -1);
 		return NULL;
 	}
 
-	free_music();
-	wave_buf = malloc(dfile->size);
-	memcpy(wave_buf, dfile->data, dfile->size);
-	SDL_RWops *rwops = SDL_RWFromConstMem(wave_buf, dfile->size);
-	ald_freedata(dfile);
+	SDL_RWops *rwops = SDL_RWFromConstMem(dfile->data, dfile->size);
 
 	mix_music = Mix_LoadMUSType_RW(rwops, MUS_WAV, SDL_TRUE /* freesrc */);
 	if (mix_music == NULL) {
