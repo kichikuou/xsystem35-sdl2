@@ -29,6 +29,7 @@
 struct _musprvdat musprv;
 
 int mus_init(int audio_buffer_size) {
+	musbgm_init();
 	muscd_init();
 	musmidi_init();
 	prv.pcm_valid = muspcm_init(audio_buffer_size) == OK;
@@ -36,6 +37,7 @@ int mus_init(int audio_buffer_size) {
 }
 
 int mus_exit() {
+	musbgm_exit();
 	if (prv.cd_valid) muscd_exit();
 	if (prv.midi_valid) musmidi_exit();
 	if (prv.pcm_valid) muspcm_exit();
@@ -437,38 +439,31 @@ int mus_wav_load_lrsw(int ch, int num) {
 }
 
 int mus_bgm_play(int no, int time, int vol) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musbgm_play(no, time, vol);
 }
 
 int mus_bgm_stop(int no, int time) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musbgm_stop(no, time);
 }
 
 int mus_bgm_stopall(int time) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musbgm_stopall(time);
 }
 
 int mus_bgm_fade(int no, int time, int vol) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musbgm_fade(no, time, vol);
 }
 
 int mus_bgm_getpos(int no) {
-	printf("%s not implemented\n", __func__);
-	return 0;
+	return musbgm_getpos(no);
 }
 
 int mus_bgm_getlength(int no) {
-	printf("%s not implemented\n", __func__);
-	return 0;
+	return musbgm_getlen(no);
 }
 
 int mus_bgm_wait(int no, int timeout) {
-	printf("%s not implemented\n", __func__);
-	return NG;
+	return musbgm_wait(no, timeout);
 }
 
 int mus_bgm_waitpos(int no, int index) {

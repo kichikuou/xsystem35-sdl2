@@ -23,6 +23,7 @@
 #define __MUSIC_PRIVATE_H__
 
 #include "portab.h"
+#include "bgm.h"
 #include "cdrom.h"
 #include "midi.h"
 #include "music_cdrom.h"

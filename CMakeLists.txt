@@ -112,14 +112,14 @@ endif()
 
 if (EMSCRIPTEN)
   list(APPEND SRC_AUDIO)
-  list(APPEND SRC_AUDIO pcm.emscripten.c)
+  list(APPEND SRC_AUDIO pcm.emscripten.c bgm.dummy.c)
   list(APPEND SUMMARY_AUDIO "Emscripten")
 elseif (SDL2MIXER_FOUND)
-  list(APPEND SRC_AUDIO pcm.sdlmixer.c)
+  list(APPEND SRC_AUDIO pcm.sdlmixer.c bgm.sdlmixer.c)
   list(APPEND SUMMARY_AUDIO "SDL_mixer")
   set(ENABLE_SDLMIXER 1)
 else()
-  list(APPEND SRC_AUDIO pcm.dummy.c)
+  list(APPEND SRC_AUDIO pcm.dummy.c bgm.dummy.c)
 endif()
 
 # CDROM
