@@ -343,7 +343,11 @@ static boolean sys35_initGameDataDir(int* cnt)
                     storeDataName(DRIFILE_RSC, dno, s2);
                     cnt[5] = max(dno + 1, cnt[5]);
                     break;
-                    
+                case 'B':
+                case 'b':
+                    storeDataName(DRIFILE_BGM, dno, s2);
+                    cnt[6] = max(dno + 1, cnt[6]);
+                    break;
             }
         }
     }
