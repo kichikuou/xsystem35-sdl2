@@ -38,12 +38,6 @@
 #  include <gtk/gtk.h>
 #endif
 
-#ifdef HAVE_MKDTEMP
-#include <stdlib.h>
-#else
-extern char *mkdtemp (char *template);
-#endif
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -536,9 +530,6 @@ static void sys35_remove() {
 		fclose(fpdebuglog);
 	}
 #endif
-	if (nact->tmpdir && 0 != strcmp(nact->tmpdir, "/tmp")) {
-		rmdir(nact->tmpdir);
-	}
 }
 
 void sys_reset() {
@@ -547,10 +538,6 @@ void sys_reset() {
 #ifdef ENABLE_GTK
 	s39ini_remove();
 #endif
-	
-	if (0 != strcmp(nact->tmpdir, "/tmp")) {
-		rmdir(nact->tmpdir);
-	}
 	
 	execvp(saved_argv[0], saved_argv);
 	sys_error("exec fail");
@@ -803,12 +790,6 @@ int main(int argc, char **argv) {
 	
 	init_signalhandler();
 
-	nact->tmpdir = strdup("/tmp/xsystem35-XXXXXX");
-	if (NULL == mkdtemp(nact->tmpdir)) {
-		free(nact->tmpdir);
-		nact->tmpdir = strdup("/tmp");
-	}
-	
 	mus_init(audio_buffer_size);
 
 #ifdef ENABLE_NLS
