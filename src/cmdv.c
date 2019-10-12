@@ -25,17 +25,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
 #include <sys/time.h>
 #include "portab.h"
 #include "xsystem35.h"
 #include "ags.h"
+#include "counter.h"
 #include "imput.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
-
-extern void sys_set_signalhandler(int SIG, void (*handler)(int));
 
 typedef struct {
 	int x0Unit;
@@ -52,7 +50,7 @@ typedef struct {
 	int unitWidth;     /* Unitの大きさ */
 	int unitHeight;
 	int patternNum;    /* パターン数 */
-	int intervaltime;  /* 書換え間隔 */
+	int intervaltime;  /* 書換え間隔(ms) */
 	int srcX;          /* 取得位置 */
 	int srcY;
 	int startX;        /* 表示位置 */
@@ -65,7 +63,7 @@ typedef struct {
 	int spCol;         /* スプライト色 */
 	int state;         /* 現在の状態  0:停止 1:動 */
 	int elaspCut;      /* 経過コマ数 */
-	int quantmsec;     /* 経過秒数 */
+	int startTime;     /* 開始時刻(ms) */
 	int totalCut;      /* 全コマ数 */
 	int preX;          /* 前回の位置 */
 	int preY;
@@ -138,10 +136,7 @@ static void    va_restoreUnit(int no);
 static void    va_updateUnit(int i);
 static void    va_updatePreArea(int i);
 static void    va_animationAlone(int i);
-static void    va_interval_process();
-static void    va_init_itimer();
-static void    va_pause_itimer();
-static void    va_unpause_itimer();
+static void    va_update();
 
 void commandVC() { /* from Rance4 */
 	nPageNum = getCaliValue();
@@ -733,7 +728,6 @@ static void throttle() {
 }
 
 void commandVA() { /* from Panyo */
-	static boolean startedItimer = FALSE;
 	int no = sys_getc();
 	int p1 = getCaliValue();
 	int p2, p3;
@@ -776,7 +770,7 @@ void commandVA() { /* from Panyo */
 			/* 開始 (p3=コマ数,0:無限(開始位置==終了位置のとき))*/
 			inAnimation = TRUE;
 			VAcmd[p1].elaspCut  = 0;
-			VAcmd[p1].quantmsec = 0;
+			VAcmd[p1].startTime = get_high_counter(SYSTEMCOUNTER_MSEC);
 			VAcmd[p1].totalCut  = p3;
 			
 			if (p3 == 0) {
@@ -789,12 +783,7 @@ void commandVA() { /* from Panyo */
 				}
 			}
 			/* animation start */
-			if (startedItimer) {
-				va_unpause_itimer();
-			} else {
-				startedItimer = TRUE;
-				va_init_itimer();
-			}
+			nact->is_va_animation = TRUE;
 	
 			VAcmd[p1].state   = VA_RUNNING;
 			VAcmd[p1].draw    = TRUE;
@@ -845,7 +834,7 @@ void commandVA() { /* from Panyo */
 	case 4:
 		/* パターン数・描替間隔(1/100sec) */
 		VAcmd[p1].patternNum   = p2;
-		VAcmd[p1].intervaltime = p3; break;
+		VAcmd[p1].intervaltime = p3 * 10; break;
 	case 5:
 		/* 取得位置 */
 		VAcmd[p1].srcX = p2;
@@ -977,7 +966,9 @@ static void va_updatePreArea(int i) {
 void va_animation() {
 	int i;
 	int x, y, w, h;
-	
+
+	va_update();
+
 	inAnimation = TRUE;
 	
 	for (i = 0; i < VACMD_MAX; i++) {
@@ -999,7 +990,9 @@ void va_animation() {
 	
 static void va_animationAlone(int i) {
 	int x, y, w, h; /* update region */
-	
+
+	va_update();
+
 	if (!VAcmd[i].rewrite) return;
 
 	inAnimation = TRUE;
@@ -1017,21 +1010,21 @@ static void va_animationAlone(int i) {
 	inAnimation = FALSE;
 }
 
-static void va_interval_process() {
+static void va_update() {
 	boolean proceeding = FALSE;
 	int i;
+	int curTime = get_high_counter(SYSTEMCOUNTER_MSEC);
 	
 	for (i = 0; i < VACMD_MAX; i++) {
 		if (VAcmd[i].state == VA_RUNNING) {
 			proceeding = TRUE;
-			VAcmd[i].quantmsec++;
+			int cut = (curTime - VAcmd[i].startTime) / VAcmd[i].intervaltime;
 			
-			if (VAcmd[i].quantmsec >= VAcmd[i].intervaltime) {
+			if (cut > VAcmd[i].elaspCut) {
 				/* まだ更新していない場合はskip */
 				if (VAcmd[i].rewrite) continue;
 				VAcmd[i].rewrite = TRUE;
-				VAcmd[i].quantmsec = 0;
- 				VAcmd[i].elaspCut++;
+				VAcmd[i].elaspCut++;
 				/* 古い場所 */
 				VAcmd[i].preX = VAcmd[i].curX;
 				VAcmd[i].preY = VAcmd[i].curY;
@@ -1050,69 +1043,9 @@ static void va_interval_process() {
 	}
 	/* 更新するものが無い場合は、タイマーを止めて、アニメーションストップ */
 	if (!proceeding) {
-		va_pause_itimer();
 		nact->is_va_animation = FALSE;
-	}
-}
-
-void va_alarm_handler() {
-	if (!inAnimation) {
-		va_interval_process();
 	}
 #ifdef __EMSCRIPTEN__
 	status_check_count = 0;
 #endif
 }
-
-#ifdef __EMSCRIPTEN__
-
-static void va_init_itimer() {
-	va_unpause_itimer();
-}
-
-static void va_pause_itimer() {
-	EM_ASM({
-			if (xsystem35.va_timer) {
-				clearInterval(xsystem35.va_timer);
-				xsystem35.va_timer = null;
-			}
-		});
-}
-
-static void va_unpause_itimer() {
-	EM_ASM({
-			if (!xsystem35.va_timer)
-				xsystem35.va_timer = setInterval(_va_alarm_handler, 10);
-		});
-	nact->is_va_animation = TRUE;
-}
-
-#else // __EMSCRIPTEN__
-
-static void va_init_itimer() {
-	sys_set_signalhandler(SIGALRM, va_alarm_handler);
-	va_unpause_itimer();
-}
-
-static void va_pause_itimer() {
-	struct itimerval value;
-
-	value.it_interval.tv_sec  = 0;
-	value.it_interval.tv_usec = 0;
-	value.it_value.tv_sec  = 0;
-	value.it_value.tv_usec = 0;
-	setitimer(ITIMER_REAL, &value, NULL);
-}
-
-static void va_unpause_itimer() {
-	struct itimerval value;
-	
-	value.it_interval.tv_sec  = 0;
-	value.it_interval.tv_usec = 10 * 1000;
-	value.it_value.tv_sec  = 0;
-	value.it_value.tv_usec = 10 * 1000;
-	setitimer(ITIMER_REAL, &value, NULL);
-	nact->is_va_animation = TRUE;
-}
-
-#endif // __EMSCRIPTEN__
