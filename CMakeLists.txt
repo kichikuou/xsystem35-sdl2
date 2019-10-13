@@ -7,6 +7,12 @@ include(CheckIncludeFile)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 
+# In msys, `pkg-config --libs` returns `-lmingw32` but find_library() cannot
+# find it in default search paths.
+if (MSYS)
+  list(APPEND CMAKE_LIBRARY_PATH $ENV{MINGW_PREFIX}/$ENV{MINGW_CHOST}/lib)
+endif ()
+
 # A wrapper around find_package() that skips the check if ENABLE_<package> is false
 macro (optional_find_package package)
   option(ENABLE_${package} "Use ${package} if available" ON)
@@ -22,6 +28,11 @@ macro (optional_pkg_check_modules prefix)
 	pkg_check_modules(${prefix} ${ARGN})
   endif()
 endmacro()
+
+check_symbol_exists(getlogin "unistd.h" HAVE_GETLOGIN)
+check_symbol_exists(mmap "sys/mman.h" HAVE_MMAP)
+check_symbol_exists(sigaction "signal.h" HAVE_SIGACTION)
+check_symbol_exists(uname "sys/utsname.h" HAVE_UNAME)
 
 if (EMSCRIPTEN)
   set(SDL2_FOUND 1)
@@ -141,11 +152,13 @@ if (EMSCRIPTEN)
   list(APPEND SRC_MIDI midi.emscripten.c)
   list(APPEND SUMMARY_MIDI "Emscripten")
 else()
-  list(APPEND SRC_MIDI midi.rawmidi.c midifile.c)
-  list(APPEND SUMMARY_MIDI "raw")
-  set(MIDI_DEVICE "/dev/midi" CACHE STRING "midi device")
-  set(ENABLE_MIDI_RAWMIDI 1)
-  option(QUIET_MIDI "No display midi stdout" OFF)
+  if (HAVE_SIGACTION)
+    list(APPEND SRC_MIDI midi.rawmidi.c midifile.c)
+    list(APPEND SUMMARY_MIDI "raw")
+    set(MIDI_DEVICE "/dev/midi" CACHE STRING "midi device")
+    set(ENABLE_MIDI_RAWMIDI 1)
+    option(QUIET_MIDI "No display midi stdout" OFF)
+  endif()
 
   if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 	check_symbol_exists(SNDCTL_SEQ_NRSYNTHS "machine/soundcard.h" ENABLE_MIDI_SEQMIDI)

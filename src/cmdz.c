@@ -449,16 +449,16 @@ void commandZZ13() {
 
 void commandZZ14() {
 	int no = getCaliValue();
+	char *s = "xsys35_user";
+
+#ifdef HAVE_GETLOGIN
 	char *lname=getlogin();
+	if (lname)
+		s = lname;
+#endif
 	
 	if (no <= 0) return;
-	if (lname) {
-		v_strcpy(no -1, lname);
-	} else {
-		char s[256];
-		sprintf(s, "%d", getuid());
-		v_strcpy(no -1, s);
-	}
+	v_strcpy(no -1, s);
 	
 	DEBUG_COMMAND("ZZ14 %d:\n", no);
 }

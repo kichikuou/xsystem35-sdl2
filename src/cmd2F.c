@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/utsname.h>
 #include "portab.h"
 #include "xsystem35.h"
 #include "savedata.h"
@@ -38,6 +37,9 @@
 #include "graphicsdevice.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
+#if HAVE_UNAME
+#include <sys/utsname.h>
+#endif
 
 /* defined by cmdm.c */
 extern boolean have_eng_mp_patch;
@@ -868,17 +870,21 @@ void commands2F51() {
 
 void commands2F52() {
 	int eNum = getCaliValue();
+	if (eNum <= 0) return;
+
+#if HAVE_UNAME
 	struct utsname un;
 	char s[256];
-	
-	if (eNum <= 0) return;
 	if (uname(&un) < 0) return;
 	NOTICE("sysname %s nodename %s release %s version %s machine %s\n",
 	       un.sysname, un.nodename, un.release, un.version, un.machine);
 	sprintf(s,"%s %s %s",
 		un.sysname, un.release, un.machine);
+#else
+	const char *s = CMAKE_SYSTEM_NAME;
+#endif
+
 	v_strcpy(eNum -1, s);
-	
 	DEBUG_COMMAND("sysGetOsName %d: %s\n", eNum, s);
 }
 

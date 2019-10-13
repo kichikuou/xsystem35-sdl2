@@ -72,7 +72,7 @@ static void bgi_read() {
 	if (nact->files.bgi == NULL)
 		return;
 
-	FILE *fp = fopen(nact->files.bgi, "r");
+	FILE *fp = fopen(nact->files.bgi, "rb");
 	if (!fp) {
 		WARNING("Could not open %s\n", nact->files.bgi);
 		return;

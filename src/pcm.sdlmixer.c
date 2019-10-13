@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -44,6 +43,9 @@
 #include "counter.h"
 #include "nact.h"
 #include "LittleEndian.h"
+#ifdef HAVE_MMAP
+#include <sys/mman.h>
+#endif
 
 #define DEFAULT_AUDIO_BUFFER_SIZE 2048
 
@@ -359,15 +361,39 @@ static int load_wai() {
 		goto endwai;
 	}
 	
+#ifdef HAVE_MMAP
 	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
 		WARNING("mmap: %s\n", strerror(errno));
 		close(fd);
 		goto endwai;
 	}
+#else
+	adr = malloc(sbuf.st_size);
+	if (!adr) {
+		WARNING("load_wai: out of memory\n");
+		close(fd);
+		goto endwai;
+	}
+	size_t bytes = 0;
+	while (bytes < sbuf.st_size) {
+		ssize_t ret = read(fd, adr, sbuf.st_size);
+		if (ret <= 0) {
+			WARNING("load_wai: failed to read\n");
+			close(fd);
+			free(adr);
+			goto endwai;
+		}
+		bytes += ret;
+	}
+#endif
 	
 	if (*adr != 'X' || *(adr+1) != 'I' || *(adr+2) != '2') {
 		WARNING("not WAI file\n");
+#ifdef HAVE_MMAP
 		munmap(adr, sbuf.st_size);
+#else
+		free(adr);
+#endif
 		close(fd);
 		goto endwai;
 	}

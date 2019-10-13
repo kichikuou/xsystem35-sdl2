@@ -73,7 +73,7 @@ int s39ini_init(void) {
 	
 	// Volume.sav があればそれを読み込む
 	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
-	if (NULL == (fp = fopen(fn, "r"))) {
+	if (NULL == (fp = fopen(fn, "rb"))) {
 		// とりあえず、初期ボリュームは 100
 		for (i = 0; i < MAXVOLCH; i++) {
 			vol[i] = vval[i].vol = 100;
@@ -143,7 +143,7 @@ int s39ini_remove() {
 	}
 	
 	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
-	if (NULL == (fp = fopen(fn, "w"))) {
+	if (NULL == (fp = fopen(fn, "wb"))) {
 		WARNING("Fail to save Volume.save\n");
 		return NG;
 	}

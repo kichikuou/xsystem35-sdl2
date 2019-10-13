@@ -28,10 +28,13 @@
 #include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <signal.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <ctype.h>
+
+#ifdef HAVE_SIGACTION
+#include <signal.h>
+#endif
 
 #ifdef ENABLE_GTK
 #  define GTK_RC_NAME ".gtk/gtkrc"
@@ -72,10 +75,7 @@ static void    sys35_init();
 static void    sys35_remove();
 static boolean sys35_initGameDataResorce();
 static void    sys35_ParseOption(int *argc, char **argv);
-static void    signal_handler(int sig_num);
-static void    signal_handler_segv(int sig_num);
 static void    check_profile();
-static void    init_signalhandler();
 
 /* for debugging */
 static FILE *fpdebuglog;
@@ -543,17 +543,6 @@ void sys_reset() {
 	sys_error("exec fail");
 }
 
-static void signal_handler(int sig_num) {
-	sys35_remove();
-	exit(1);
-}	
-
-static void signal_handler_segv(int sig_num) {
-	fprintf(stderr, "PID(%d), sigsegv caught @ %03d, %05x\n", (int)getpid(), sl_getPage(), sl_getIndex());
-	sys35_remove();
-	exit(1);
-}	
-
 static void sys35_ParseOption(int *argc, char **argv) {
 	int i;
 	FILE *fp;
@@ -746,6 +735,18 @@ static void check_profile() {
 	}
 }
 
+#ifdef HAVE_SIGACTION
+static void signal_handler(int sig_num) {
+	sys35_remove();
+	exit(1);
+}
+
+static void signal_handler_segv(int sig_num) {
+	fprintf(stderr, "PID(%d), sigsegv caught @ %03d, %05x\n", (int)getpid(), sl_getPage(), sl_getIndex());
+	sys35_remove();
+	exit(1);
+}
+
 void sys_set_signalhandler(int SIG, void (*handler)(int)) {
 	struct sigaction act;
 	sigset_t smask;
@@ -760,17 +761,20 @@ void sys_set_signalhandler(int SIG, void (*handler)(int)) {
 	sigaction(SIG, &act, NULL);
 }
 
-void init_signalhandler() {
+static void init_signalhandler() {
 	sys_set_signalhandler(SIGINT, signal_handler);
 	sys_set_signalhandler(SIGTERM, signal_handler);
 	sys_set_signalhandler(SIGPIPE, SIG_IGN);
 	sys_set_signalhandler(SIGABRT, signal_handler);
 	sys_set_signalhandler(SIGSEGV, signal_handler_segv);
 }
+#endif
 
 int main(int argc, char **argv) {
 	char *homedir = getenv("HOME"), *rc_name, *rc_path;
+#ifdef HAVE_SIGACTION
 	sys_set_signalhandler(SIGINT, SIG_IGN);
+#endif
 	
 	saved_argc = argc;
 	saved_argv = argv;
@@ -788,7 +792,9 @@ int main(int argc, char **argv) {
 #endif
 	sys35_initGameDataResorce();
 	
+#ifdef HAVE_SIGACTION
 	init_signalhandler();
+#endif
 
 	mus_init(audio_buffer_size);
 

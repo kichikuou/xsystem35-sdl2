@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -34,6 +33,9 @@
 #include "system.h"
 #include "LittleEndian.h"
 #include "dri.h"
+#ifdef HAVE_MMAP
+#include <sys/mman.h>
+#endif
 
 /*
  * static maethods
@@ -184,7 +186,7 @@ drifiles *dri_init(char **file, int cnt, boolean mmapping) {
 	for (i = 0; i < cnt; i++) {
 		if (*(file + i) == NULL) continue;
 		/* open check */
-		if (NULL == (fp = fopen(*(file + i), "r"))) {
+		if (NULL == (fp = fopen(*(file + i), "rb"))) {
 			SYSERROR("File %s is not found\n", *(file + i));
 		}
 		/* check is drifile or noe */
@@ -204,6 +206,7 @@ drifiles *dri_init(char **file, int cnt, boolean mmapping) {
 		d->fnames[i] = strdup(*(file + i));
 		/* close */
 		fclose(fp);
+#ifdef HAVE_MMAP
 		/* mmap */
 		if (mmapping) {
 			int fd;
@@ -219,6 +222,7 @@ drifiles *dri_init(char **file, int cnt, boolean mmapping) {
 			}
 			d->mmapped = TRUE;
 		}
+#endif
 	}
 	return d;
 }
@@ -257,7 +261,7 @@ dridata *dri_getdata(drifiles *d, int no) {
 		int readsize = dataptr2 - dataptr;
 		FILE *fp;
 		data = malloc(sizeof(char) * readsize);
-		fp = fopen(d->fnames[disk], "r");
+		fp = fopen(d->fnames[disk], "rb");
 		fseek(fp, dataptr, SEEK_SET);
 		fread(data, 1, readsize, fp);
 		fclose(fp);

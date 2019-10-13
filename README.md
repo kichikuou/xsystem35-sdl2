@@ -26,6 +26,16 @@ cmake の実行でエラーになる場合は必要なライブラリをイン�
     $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
     $ make && make install
 
+### Windows
+
+[MSYS2](https://www.msys2.org) が必要です。
+
+    $ pacman -S cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+    $ mkdir -p out/debug
+    $ cd out/debug
+    $ cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../
+    $ make
+
 ### Emscripten
 
     $ mkdir -p out/wasm
