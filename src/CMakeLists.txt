@@ -65,6 +65,7 @@ if (EMSCRIPTEN)
   set(LIBS "SHELL:-s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2")
   target_compile_options(xsystem35 PRIVATE ${LIBS})
   target_link_options(xsystem35 PRIVATE ${LIBS})
+  target_link_libraries(xsystem35 PRIVATE idbfs.js)
 
   # Without optimizations, Asyncify generates very large code.
   list(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "-O1")
