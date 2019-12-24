@@ -10,7 +10,7 @@
 #include "utfsjis.h"
 #include "ags.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 #include "ngraph.h"
 #include "drawtext.h"
 #include "night.h"

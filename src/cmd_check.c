@@ -30,7 +30,7 @@
 #include "xsystem35.h"
 #include "selection.h"
 #include "message.h"
-#include "imput.h"
+#include "input.h"
 
 static void undeferr();
 

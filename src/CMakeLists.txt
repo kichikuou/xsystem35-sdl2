@@ -40,7 +40,7 @@ target_sources(xsystem35 PRIVATE
 
 # Misc
 target_sources(xsystem35 PRIVATE
-  LittleEndian.c counter.c imput.c profile.c mt19937-1.c utfsjis.c
+  LittleEndian.c counter.c input.c profile.c mt19937-1.c utfsjis.c
   filecheck.c)
 
 # Scenario

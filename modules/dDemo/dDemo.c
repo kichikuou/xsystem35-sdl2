@@ -8,7 +8,7 @@
 #include "system.h"
 #include "xsystem35.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 #include "music.h"
 
 #ifdef DDEMODEV

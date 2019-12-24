@@ -33,7 +33,7 @@
 #include "randMT.h"
 #include "selection.h"
 #include "message.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
 
 void commandZC() {

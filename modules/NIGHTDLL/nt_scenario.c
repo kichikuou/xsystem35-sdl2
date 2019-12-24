@@ -8,7 +8,7 @@
 #include "portab.h"
 #include "system.h"
 #include "counter.h"
-#include "imput.h"
+#include "input.h"
 #include "xsystem35.h"
 #include "nact.h"
 #include "scenario.h"

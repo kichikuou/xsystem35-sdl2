@@ -30,7 +30,7 @@
 #include "portab.h"
 #include "nact.h"
 #include "ags.h"
-#include "imput.h"
+#include "input.h"
 #include "key.h"
 #include "sact.h"
 #include "sprite.h"

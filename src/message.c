@@ -32,7 +32,7 @@
 #include "xsystem35.h"
 #include "message.h"
 #include "variable.h"
-#include "imput.h"
+#include "input.h"
 #include "ags.h"
 #include "nact.h"
 #include "texthook.h"

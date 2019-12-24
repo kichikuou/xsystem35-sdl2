@@ -28,7 +28,7 @@
 
 #include "portab.h"
 #include "system.h"
-#include "imput.h"
+#include "input.h"
 #include "xsystem35.h"
 #include "gametitle.h"
 #include "message.h"

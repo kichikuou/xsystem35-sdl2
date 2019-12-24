@@ -29,7 +29,7 @@
 #include "menu_gui.h"
 #include "menu_callback.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 
 
 static boolean menu_initilized = FALSE;

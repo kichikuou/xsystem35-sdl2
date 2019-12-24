@@ -30,7 +30,7 @@
 #include "ags.h"
 #include "scenario.h"
 #include "windowframe.h"
-#include "imput.h"
+#include "input.h"
 #include "message.h"
 #include "selection.h"
 

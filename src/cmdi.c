@@ -28,7 +28,7 @@
 #include "xsystem35.h"
 #include "ags.h"
 #include "graphicsdevice.h"
-#include "imput.h"
+#include "input.h"
 
 #define REPEAT_RATE_FAST 60 
 #define REPEAT_RATE_SLOW 600

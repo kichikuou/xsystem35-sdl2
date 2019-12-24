@@ -32,7 +32,7 @@
 #include "music.h"
 #include "counter.h"
 #include "ngraph.h"
-#include "imput.h"
+#include "input.h"
 
 // 0: AliceSoft
 // 1: Opening

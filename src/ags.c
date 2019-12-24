@@ -35,7 +35,7 @@
 #include "alpha_plane.h"
 #include "counter.h"
 #include "utfsjis.h"
-#include "imput.h"
+#include "input.h"
 #include "flood.h"
 #include "font.h"
 #include "cursor.h"

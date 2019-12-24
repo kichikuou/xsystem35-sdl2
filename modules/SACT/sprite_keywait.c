@@ -32,7 +32,7 @@
 #include "counter.h"
 #include "ags.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 #include "ngraph.h"
 #include "surface.h"
 #include "sact.h"

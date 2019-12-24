@@ -32,7 +32,7 @@
 #include "list.h"
 #include "counter.h"
 #include "menu.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
 #include "key.h"
 #include "sact.h"

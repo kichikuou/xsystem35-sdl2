@@ -1,5 +1,5 @@
 /*
- * imput.c キーボードマウス関連
+ * input.c キーボードマウス関連
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -19,12 +19,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: imput.c,v 1.22 2001/03/30 19:16:38 chikama Exp $ */
+/* $Id: input.c,v 1.22 2001/03/30 19:16:38 chikama Exp $ */
 
 #include <unistd.h>
 #include <limits.h>
 #include "config.h"
-#include "imput.h"
+#include "input.h"
 #include "xsystem35.h"
 #include "message.h"
 #include "joystick.h"

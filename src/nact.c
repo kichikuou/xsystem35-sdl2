@@ -36,7 +36,7 @@
 #include "nact.h"
 #include "selection.h"
 #include "message.h"
-#include "imput.h"
+#include "input.h"
 #include "menu.h"
 
 /*

@@ -35,7 +35,7 @@
 #include "sdl_private.h"
 #include "key.h"
 #include "menu.h"
-#include "imput.h"
+#include "input.h"
 #include "joystick.h"
 #include "sdl_input.c"
 #include "texthook.h"

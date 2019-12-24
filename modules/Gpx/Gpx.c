@@ -38,7 +38,7 @@
 #include "cg.h"
 #include "image.h"
 #include "counter.h"
-#include "imput.h"
+#include "input.h"
 // #include "alpha_plane.h"
 #include "surface.h"
 #include "graph.h"

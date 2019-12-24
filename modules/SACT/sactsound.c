@@ -29,7 +29,7 @@
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 #include "sactsound.h"
 #include "music.h"
 #include "sact.h"

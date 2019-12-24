@@ -39,7 +39,7 @@
 #include "xcore_private.h"
 #include "nact.h"
 #include "counter.h"
-#include "imput.h"
+#include "input.h"
 #include "menu.h"
 #include "joystick.h"
 #include "xcore_input.c"

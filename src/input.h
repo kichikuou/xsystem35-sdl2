@@ -1,5 +1,5 @@
 /*
- * imput.c キーボードマウス関連
+ * input.c キーボードマウス関連
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -19,10 +19,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: imput.h,v 1.15 2001/03/30 19:16:38 chikama Exp $ */
+/* $Id: input.h,v 1.15 2001/03/30 19:16:38 chikama Exp $ */
 
-#ifndef __IMPUT__
-#define __IMPUT__
+#ifndef __INPUT__
+#define __INPUT__
 
 #include "portab.h"
 #include "graphics.h"
@@ -52,4 +52,4 @@ extern void set_hak_keymode(int key, int mode);
 
 #define sys_keywait(r,flg) Keywait(r,flg)
 
-#endif /* __IMPUT__ */
+#endif /* __INPUT__ */

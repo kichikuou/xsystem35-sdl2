@@ -28,7 +28,7 @@
 
 #include "portab.h"
 #include "system.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"

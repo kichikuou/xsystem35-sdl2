@@ -29,7 +29,7 @@
 #include "system.h"
 #include "list.h"
 #include "menu.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"

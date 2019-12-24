@@ -30,7 +30,7 @@
 #include "xsystem35.h"
 #include "ags.h"
 #include "counter.h"
-#include "imput.h"
+#include "input.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif

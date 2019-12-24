@@ -8,7 +8,7 @@
 // #include "gleffectcopy.h"
 #include "counter.h"
 #include "ags.h"
-#include "imput.h"
+#include "input.h"
 #include "graph.h"
 #include "ngraph.h"
 

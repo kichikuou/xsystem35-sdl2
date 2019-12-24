@@ -27,7 +27,7 @@
 #include <math.h>
 
 #include "portab.h"
-#include "imput.h"
+#include "input.h"
 #include "ags.h"
 #include "system.h"
 #include "nact.h"

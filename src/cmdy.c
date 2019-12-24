@@ -28,7 +28,7 @@
 #include "xsystem35.h"
 #include "randMT.h"
 #include "message.h"
-#include "imput.h"
+#include "input.h"
 
 boolean Y3waitCancel = TRUE;
 

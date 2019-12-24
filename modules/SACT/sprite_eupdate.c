@@ -32,7 +32,7 @@
 #include "ags.h"
 #include "nact.h"
 #include "image.h"
-#include "imput.h"
+#include "input.h"
 #include "sact.h"
 #include "sprite.h"
 #include "surface.h"

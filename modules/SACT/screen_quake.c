@@ -31,7 +31,7 @@
 #include "system.h"
 // #include "LittleEndian.h"
 #include "ags.h"
-#include "imput.h"
+#include "input.h"
 #include "sact.h"
 #include "surface.h"
 #include "ngraph.h"
