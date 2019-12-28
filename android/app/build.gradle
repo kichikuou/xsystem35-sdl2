@@ -18,15 +18,11 @@ android {
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
-            ndkBuild {
-                arguments "APP_PLATFORM=android-16"
-                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            cmake {
+                arguments "-DANDROID_APP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
+                // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                abiFilters 'arm64-v8a'
             }
-            // cmake {
-            //     arguments "-DANDROID_APP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
-            //     // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-            //     abiFilters 'arm64-v8a'
-            // }
         }
     }
     buildTypes {
@@ -40,12 +36,12 @@ android {
             jniLibs.srcDir 'libs'
         }
         externalNativeBuild {
-            ndkBuild {
-                path 'jni/Android.mk'
+            cmake {
+                // xsystem35 requires CMake >=3.13, so SDK-bundled CMake
+                // (3.6 or 3.10.2) cannot be used.
+                version getInstalledCmakeVersion()
+                path 'jni/CMakeLists.txt'
             }
-            // cmake {
-            //     path 'jni/CMakeLists.txt'
-            // }
         }
        
     }
@@ -68,4 +64,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+}
+
+String getInstalledCmakeVersion() {
+    ('cmake --version'.execute().text =~ /cmake version ([0-9.]+)/)[0][1]
 }

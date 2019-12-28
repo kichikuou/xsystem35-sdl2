@@ -7,7 +7,11 @@ if (ENABLE_MODULES)
   endif()
 endif()
 
-add_executable(xsystem35)
+if (ANDROID)
+  add_library(xsystem35 SHARED)
+else()
+  add_executable(xsystem35)
+endif()
 
 target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign -Wno-invalid-source-encoding)
 
@@ -79,7 +83,11 @@ if (EMSCRIPTEN)
 	"SHELL:-s EXPORTED_FUNCTIONS=\"['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata']\""
 	"SHELL:-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['getValue','getMemory','addRunDependency','removeRunDependency']\"")
 
-else()  # non-emscripten
+elseif (ANDROID)
+
+  target_link_libraries(xsystem35 PRIVATE SDL2 SDL2_ttf SDL2_mixer ${ndk_zlib})
+
+else()  # non-emscripten, non-android
   target_link_libraries(xsystem35 PRIVATE m ZLIB::ZLIB)
   if (X11_FOUND)
 	target_include_directories(xsystem35 PRIVATE ${X11_INCLUDE_DIR})
@@ -108,7 +116,7 @@ else()  # non-emscripten
 endif()
 
 # FIXME: set up dependency for xsystem35 on this
-if (ENABLE_SDL AND NOT EMSCRIPTEN)
+if (ENABLE_SDL AND NOT EMSCRIPTEN AND NOT ANDROID)
   add_custom_target(sdl_input.c
 	COMMAND perl xsyskey.pl ${SDL2_INCLUDE_DIRS} > sdl_input.c
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

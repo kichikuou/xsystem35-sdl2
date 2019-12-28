@@ -41,6 +41,10 @@
 #  include <gtk/gtk.h>
 #endif
 
+#ifdef ENABLE_SDL
+#  include <SDL.h>
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
