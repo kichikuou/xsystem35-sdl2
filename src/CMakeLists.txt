@@ -85,7 +85,7 @@ if (EMSCRIPTEN)
 
 elseif (ANDROID)
 
-  target_link_libraries(xsystem35 PRIVATE SDL2 SDL2_ttf SDL2_mixer ${ndk_zlib})
+  target_link_libraries(xsystem35 PRIVATE SDL2 SDL2_ttf SDL2_mixer ${ndk_zlib} ${ndk_log})
 
 else()  # non-emscripten, non-android
   target_link_libraries(xsystem35 PRIVATE m ZLIB::ZLIB)

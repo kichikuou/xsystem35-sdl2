@@ -49,6 +49,10 @@
 #include <emscripten.h>
 #endif
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 #include "nact.h"
 #include "portab.h"
 #include "xsystem35.h"
@@ -192,32 +196,45 @@ static void sys35_usage(boolean verbose) {
 }
 
 void sys_message(char *format, ...) {
+	if (debuglv < sys_nextdebuglv)
+		return;
+
 	va_list args;
-	
 	va_start(args, format);
-#ifdef DEBUG
-	if (debuglv >= sys_nextdebuglv) {
-		if (sys_nextdebuglv >= 5) {
-			vfprintf(fpdebuglog, format, args);
-			fflush(fpdebuglog);
-		} else {
-			vfprintf(stderr, format, args);
-		}
-	}
-#else
-	if (debuglv >= sys_nextdebuglv) {
+
+#ifdef __ANDROID__
+	const int prio_table[] = {
+		ANDROID_LOG_FATAL,
+		ANDROID_LOG_ERROR,
+		ANDROID_LOG_WARN,
+		ANDROID_LOG_INFO,
+		ANDROID_LOG_INFO,
+		ANDROID_LOG_VERBOSE,
+	};
+	int prio = prio_table[min(sys_nextdebuglv, 5)];
+	__android_log_vprint(prio, "xsystem35", format, args);
+#elif defined (DEBUG)
+	if (sys_nextdebuglv >= 5) {
+		vfprintf(fpdebuglog, format, args);
+		fflush(fpdebuglog);
+	} else {
 		vfprintf(stderr, format, args);
 	}
+#else
+	vfprintf(stderr, format, args);
 #endif
 	va_end(args);
-
 }
 
 void sys_error(char *format, ...) {
 	va_list args;
 	
 	va_start(args, format);
+#ifdef __ANDROID__
+	__android_log_vprint(ANDROID_LOG_FATAL, "xsystem35", format, args);
+#else
 	vfprintf(stderr, format, args);
+#endif
 	va_end(args);
 	sys35_remove();
 	exit(1);
