@@ -108,10 +108,15 @@ static void window_init(void) {
 #endif
 		);
 	
+#ifdef __ANDROID__
+	Uint32 flags = 0;
+#else
+	Uint32 flags = SDL_WINDOW_RESIZABLE;
+#endif
 	sdl_window = SDL_CreateWindow("XSystem3.5 Version "VERSION,
 								  SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
-								  SDL_WINDOW_RESIZABLE);
+								  flags);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 }
 
