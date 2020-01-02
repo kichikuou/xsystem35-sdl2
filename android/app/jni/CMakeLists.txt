@@ -26,6 +26,10 @@ FetchContent_Declare(
   URL_HASH SHA1=4e62e29bd5628b262b3ffb6d5d29861c76a1500e
 )
 
+# SDL_mixer options
+set(SUPPORT_OGG ON)
+# TODO: Enable MP3 and MIDI too
+
 # Compilation of SDL and companion libraries
 FetchContent_GetProperties(SDL)
 if(NOT sdl_POPULATED)
@@ -41,7 +45,9 @@ FetchContent_GetProperties(SDL_mixer)
 if(NOT sdl_mixer_POPULATED)
   FetchContent_Populate(SDL_mixer)
   add_subdirectory(${sdl_mixer_SOURCE_DIR} ${sdl_mixer_BINARY_DIR})
-  # TODO: Fix this in upstream
+  # Workaround for CMakeLists.txt bugs of SDL_mixer.
+  # TODO: Fix these in upstream
+  add_library(vorbisfile INTERFACE)
   target_include_directories(SDL2_mixer PUBLIC ${sdl_mixer_SOURCE_DIR}/include)
 endif()
 
