@@ -162,7 +162,7 @@ static void sdl_getEvent(void) {
 			break;
 
 		case SDL_FINGERDOWN:
-			if (SDL_GetNumTouchFingers(SDL_GetTouchDevice(0)) >= 2) {
+			if (SDL_GetNumTouchFingers(e.tfinger.touchId) >= 2) {
 				mouseb &= ~(1 << SDL_BUTTON_LEFT);
 				mouseb |= 1 << SDL_BUTTON_RIGHT;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
@@ -176,7 +176,7 @@ static void sdl_getEvent(void) {
 			break;
 
 		case SDL_FINGERUP:
-			if (SDL_GetNumTouchFingers(SDL_GetTouchDevice(0)) == 0) {
+			if (SDL_GetNumTouchFingers(e.tfinger.touchId) == 0) {
 				mouseb &= ~(1 << SDL_BUTTON_LEFT | 1 << SDL_BUTTON_RIGHT);
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = FALSE;
