@@ -1,4 +1,4 @@
-# xsytem35 for Android
+# xsystem35 for Android
 
 ## Build
 Prerequisites:
@@ -39,10 +39,8 @@ cd xsystem35-sdl2/android
 3. The game starts. Two-finger touch is treated as a right click.
 4. Game data persists in the app's internal storage. Use the device's Settings app if you want to clear it (eg. before installing another game).
 
-Note that this Android port is still in early development; see below.
+Note that this Android port is still incomplete; see below.
 
 ## TODO
-- Save / Load support
 - Better launcher
 - MP3 / MIDI BGM support (currently only ogg is supported)
-- App icon
