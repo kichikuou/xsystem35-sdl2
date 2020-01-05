@@ -1,0 +1,17 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e7ab00feb..d86f0087a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2053,6 +2053,12 @@ if(SDL_SHARED)
+     set_property(TARGET SDL2 APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
+     target_compile_definitions(SDL2 PRIVATE IOS_DYLIB=1)
+   endif()
++  if (ANDROID)
++    # Link the cpufeatures library in Android NDK.
++    # Since we don't use a SDK-bundled CMAKE, AndroidNdkModules module cannot be used.
++    target_include_directories(SDL2 PRIVATE ${ANDROID_NDK}/sources/android/cpufeatures)
++    target_sources(SDL2 PRIVATE ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
++  endif()
+ endif()
+ 
+ if(ANDROID)
