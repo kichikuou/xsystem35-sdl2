@@ -801,9 +801,9 @@ int main(int argc, char **argv) {
 	saved_argv = argv;
 
 #ifdef __ANDROID__
-	// Chdir to the internal storage path where the launcher should have placed
-	// game files.
-	chdir(SDL_AndroidGetInternalStoragePath());
+	// Handle -gamedir option here so that .xsys35rc is loaded from that directory.
+	if (strcmp(argv[1], "-gamedir") == 0)
+		chdir(argv[2]);
 #endif
 	
 	load_profile();

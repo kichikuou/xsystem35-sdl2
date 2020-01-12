@@ -6,6 +6,7 @@ if (buildAsApplication) {
 else {
     apply plugin: 'com.android.library'
 }
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 26
@@ -70,6 +71,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 String getInstalledCmakeVersion() {

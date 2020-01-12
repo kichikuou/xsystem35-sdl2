@@ -35,12 +35,12 @@ cd xsystem35-sdl2/android
 
 ## How to use
 1. Create a ZIP file containing all the game files (`*.ALD`) and [configuration files](https://haniwa.technology/games/preparing-a-game-directory.html), and transfer it to your device.
-2. When you start the app, a file chooser opens. Select the zip file.
-3. The game starts. Two-finger touch is treated as a right click.
-4. Game data persists in the app's internal storage. Use the device's Settings app if you want to clear it (eg. before installing another game).
+2. Open the app. A list of installed games is displayed. Since nothing has been installed yet, only the "Install from ZIP" button is displayed. Tap it.
+3. Select the zip you created in 1.
+4. The game starts. Two-finger touch is treated as a right click.
 
-Note that this Android port is still incomplete; see below.
+To uninstall a game, long-tap the title in the game list.
 
 ## TODO
-- Better launcher
+- Improve launcher
 - MP3 / MIDI BGM support (currently only ogg is supported)
