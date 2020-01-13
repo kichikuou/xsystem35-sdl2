@@ -153,9 +153,20 @@ static int cdrom_start(int trk, int loop) {
 	if (mix_music)
 		Mix_FreeMusic(mix_music);
 
-	mix_music = Mix_LoadMUS(playlist[trk -2]);
-	if (!mix_music)
+#ifdef __ANDROID__
+	// Mix_LoadMUS uses SDL_RWFromFile which requires absolute path on Android
+	char path[PATH_MAX];
+	if (!realpath(playlist[trk -2], path))
 		return NG;
+	mix_music = Mix_LoadMUS(path);
+#else
+	mix_music = Mix_LoadMUS(playlist[trk -2]);
+#endif
+
+	if (!mix_music) {
+		WARNING("Cannot load %s: %s\n", playlist[trk -2], Mix_GetError());
+		return NG;
+	}
 	if (Mix_PlayMusic(mix_music, loop == 0 ? -1 : loop) != 0) {
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
