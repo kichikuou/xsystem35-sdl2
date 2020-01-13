@@ -28,7 +28,7 @@ FetchContent_Declare(
 )
 
 # SDL_mixer options
-set(SUPPORT_OGG ON)
+option(SUPPORT_OGG "Enable OGG support in SDL_mixer" ON)
 # TODO: Enable MP3 and MIDI too
 
 # Compilation of SDL and companion libraries
