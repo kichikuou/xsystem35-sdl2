@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">xsystem35</string>
+    <string name="cancel">Cancel</string>
+    <string name="cannot_find_ald">Cannot find System 3.x game files (*.ald)</string>
+    <string name="choose_a_file">Choose a file</string>
+    <string name="error_dialog_title">Error</string>
+    <string name="install_dialog_title">Installing...</string>
+    <string name="install_from_zip">Install from ZIP</string>
+    <string name="install_progress">Extracting %s</string>
+    <string name="ok">OK</string>
+    <string name="uninstall_dialog_message">Uninstall \"%s\"?</string>
+    <string name="uninstall_dialog_title">Confirm</string>
+    <string name="unsupported_zip">This type of ZIP is not supported.</string>
+    <string name="zip_extraction_error">Failed to extract ZIP.</string>
 </resources>

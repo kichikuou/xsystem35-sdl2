@@ -50,7 +50,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener {
         gm = GameManager(filesDir)
 
         val items = gm.titles.toMutableList()
-        items.add("Install from ZIP")
+        items.add(getString(R.string.install_from_zip))
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
         listAdapter = adapter
         listView.onItemLongClickListener = this
@@ -63,16 +63,16 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener {
         } else {
             val i = Intent(Intent.ACTION_GET_CONTENT)
             i.type = "application/zip"
-            startActivityForResult(Intent.createChooser(i, "Choose a file"), 0)
+            startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)), 0)
         }
     }
 
     override fun onItemLongClick(a: AdapterView<*>?, v: View?, position: Int, id: Long): Boolean {
         if (position < gm.games.size) {
-            AlertDialog.Builder(this).setTitle("Confirm")
-                    .setMessage("Uninstall ${gm.games[position].title}?")
-                    .setPositiveButton("OK") {_, _ -> uninstall(position)}
-                    .setNegativeButton("Cancel") {_, _ -> }
+            AlertDialog.Builder(this).setTitle(R.string.uninstall_dialog_title)
+                    .setMessage(getString(R.string.uninstall_dialog_message, gm.games[position].title))
+                    .setPositiveButton(R.string.ok) {_, _ -> uninstall(position)}
+                    .setNegativeButton(R.string.cancel) {_, _ -> }
                     .show()
         }
         return true
@@ -91,7 +91,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener {
             override fun handleMessage(msg: Message) {
                 when (msg.what) {
                     PROGRESS -> {
-                        dialog.setProgress(msg.obj as String)
+                        dialog.setProgress(getString(R.string.install_progress, msg.obj as String))
                     }
                     SUCCESS -> {
                         dialog.dismiss()
@@ -99,7 +99,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener {
                     }
                     FAILURE -> {
                         dialog.dismiss()
-                        errorDialog(msg.obj as String)
+                        errorDialog(msg.obj as Int)
                     }
                 }
             }
@@ -110,7 +110,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener {
     private fun startGame(path: File) {
         val gameRoot = findGameRoot(path)
         if (gameRoot == null) {
-            errorDialog("Cannot find game files (*.ald)")
+            errorDialog(R.string.cannot_find_ald)
             return
         }
         val i = Intent()
@@ -125,10 +125,10 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener {
         adapter.remove(adapter.getItem(id))
     }
 
-    private fun errorDialog(msg: String) {
-        AlertDialog.Builder(this).setTitle("Error")
-                .setMessage(msg)
-                .setPositiveButton("OK") {_, _ -> }
+    private fun errorDialog(msgId: Int) {
+        AlertDialog.Builder(this).setTitle(R.string.error_dialog_title)
+                .setMessage(msgId)
+                .setPositiveButton(R.string.ok) {_, _ -> }
                 .show()
     }
 }
@@ -139,7 +139,7 @@ class ProgressDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         dialog = ProgressDialog(activity)
         return dialog.apply {
-            setTitle("Installing")
+            setTitle(R.string.install_dialog_title)
             setCancelable(true)
         }
     }
@@ -205,7 +205,7 @@ private class GameManager(private val rootDir: File) {
                 if (zipEntry.isDirectory)
                     continue
                 path.parentFile.mkdirs()
-                handler.sendMessage(handler.obtainMessage(PROGRESS, "Extracting ${zipEntry.name}..."))
+                handler.sendMessage(handler.obtainMessage(PROGRESS, zipEntry.name))
                 val output = FileOutputStream(path).buffered()
                 zip.copyTo(output)
                 output.close()
@@ -214,10 +214,10 @@ private class GameManager(private val rootDir: File) {
             handler.sendMessage(handler.obtainMessage(SUCCESS, outDir))
         } catch (e: UTFDataFormatException) {
             // Attempted to read Shift_JIS zip in Android < 7
-            handler.sendMessage(handler.obtainMessage(FAILURE, "This ZIP file is unsupported."))
+            handler.sendMessage(handler.obtainMessage(FAILURE, R.string.unsupported_zip))
         } catch (e: IOException) {
             Log.e("launcher", "Failed to extract ZIP", e)
-            handler.sendMessage(handler.obtainMessage(FAILURE, "Failed to extract ZIP."))
+            handler.sendMessage(handler.obtainMessage(FAILURE, R.string.zip_extraction_error))
         }
     }
 }
