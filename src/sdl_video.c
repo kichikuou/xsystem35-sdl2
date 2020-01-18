@@ -109,7 +109,8 @@ static void window_init(void) {
 		);
 	
 #ifdef __ANDROID__
-	Uint32 flags = 0;
+	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+	Uint32 flags = SDL_WINDOW_FULLSCREEN;
 #else
 	Uint32 flags = SDL_WINDOW_RESIZABLE;
 #endif
