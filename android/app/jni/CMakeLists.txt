@@ -27,10 +27,6 @@ FetchContent_Declare(
   URL_HASH SHA1=4e62e29bd5628b262b3ffb6d5d29861c76a1500e
 )
 
-# SDL_mixer options
-option(SUPPORT_OGG "Enable OGG support in SDL_mixer" ON)
-# TODO: Enable MP3 and MIDI too
-
 # Compilation of SDL and companion libraries
 FetchContent_GetProperties(SDL)
 if(NOT sdl_POPULATED)

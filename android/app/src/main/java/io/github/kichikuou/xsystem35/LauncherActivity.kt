@@ -117,6 +117,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener {
         i.setClass(applicationContext, GameActivity::class.java)
         i.putExtra(GameActivity.EXTRA_GAME_ROOT, gameRoot.path)
         i.putExtra(GameActivity.EXTRA_TITLE_FILE, File(path, GameManager.TITLE_FILE).path)
+        i.putExtra(GameActivity.EXTRA_PLAYLIST_FILE, File(path, GameManager.PLAYLIST_FILE).path)
         startActivity(i)
     }
 
@@ -151,6 +152,7 @@ class ProgressDialogFragment : DialogFragment() {
 private class GameManager(private val rootDir: File) {
     companion object {
         const val TITLE_FILE = "title.txt"
+        const val PLAYLIST_FILE = "playlist.txt"
     }
 
     data class Entry(val path: File, val title: String)
@@ -193,6 +195,7 @@ private class GameManager(private val rootDir: File) {
 
     private fun extractFiles(input: InputStream, outDir: File, handler: Handler) {
         try {
+            val playlistWriter = PlaylistWriter()
             val zip = if (Build.VERSION.SDK_INT >= 24) {
                 ZipInputStream(input.buffered(), Charset.forName("Shift_JIS"))
             } else {
@@ -200,7 +203,7 @@ private class GameManager(private val rootDir: File) {
             }
             while (true) {
                 val zipEntry = zip.nextEntry ?: break
-                Log.d("extractFiles", zipEntry.name)
+                Log.v("extractFiles", zipEntry.name)
                 val path = File(outDir, zipEntry.name)
                 if (zipEntry.isDirectory)
                     continue
@@ -209,8 +212,10 @@ private class GameManager(private val rootDir: File) {
                 val output = FileOutputStream(path).buffered()
                 zip.copyTo(output)
                 output.close()
+                playlistWriter.maybeAdd(path.path)
             }
             zip.close()
+            playlistWriter.write(outDir)
             handler.sendMessage(handler.obtainMessage(SUCCESS, outDir))
         } catch (e: UTFDataFormatException) {
             // Attempted to read Shift_JIS zip in Android < 7
@@ -218,6 +223,24 @@ private class GameManager(private val rootDir: File) {
         } catch (e: IOException) {
             Log.e("launcher", "Failed to extract ZIP", e)
             handler.sendMessage(handler.obtainMessage(FAILURE, R.string.zip_extraction_error))
+        }
+    }
+
+    private class PlaylistWriter {
+        private val audioRegex = """.*?(\d+)\.(wav|mp3|ogg)""".toRegex(RegexOption.IGNORE_CASE)
+        private val audioFiles: Array<String?> = arrayOfNulls(100)
+
+        fun maybeAdd(path: String) {
+            audioRegex.matchEntire(path)?.let {
+                val track = it.groupValues[1].toInt()
+                if (track < audioFiles.size)
+                    audioFiles[track] = path
+            }
+        }
+
+        fun write(outDir: File) {
+            val text = audioFiles.joinToString("\n") { it ?: "" }.trimEnd('\n')
+            File(outDir, PLAYLIST_FILE).writeText(text)
         }
     }
 }

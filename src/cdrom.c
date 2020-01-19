@@ -44,6 +44,10 @@ extern cdromdevice_t cdrom_bsd;
 extern cdromdevice_t cdrom_emscripten;
 #define DEV_PLAY_MODE &cdrom_emscripten
 
+#elif defined(ENABLE_CDROM_ANDROID)
+extern cdromdevice_t cdrom_android;
+#define DEV_PLAY_MODE &cdrom_android
+
 #else
 
 extern cdromdevice_t cdrom_empty;
@@ -73,7 +77,7 @@ static char *dev = CDROM_DEVICE;
          失敗 -1
 */
 int cd_init(cdromdevice_t *cd) {
-#ifdef ENABLE_CDROM_EMSCRIPTEN
+#if defined(ENABLE_CDROM_EMSCRIPTEN) || defined(ENABLE_CDROM_ANDROID)
 	memcpy(cd, DEV_PLAY_MODE, sizeof(cdromdevice_t));
 	return cd->init(dev);
 #else
@@ -102,7 +106,7 @@ int cd_init(cdromdevice_t *cd) {
 		ret = NG;
 	}
 	return ret;
-#endif  // ENABLE_CDROM_EMSCRIPTEN
+#endif  // ENABLE_CDROM_EMSCRIPTEN || ENABLE_CDROM_ANDROID
 }
 
 void cd_set_devicename(char *name) {
