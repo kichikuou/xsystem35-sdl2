@@ -110,9 +110,6 @@ static char fontface[FONTTYPEMAX];
 #endif
 
 static fontdev_t fontdev = DEFAULT_FONT_DEVICE;
-
-/* antialias on from command line */
-static boolean font_antialias;
 static boolean font_noantialias;
 
 /* fullscreen on from command line */
@@ -185,8 +182,7 @@ static void sys35_usage(boolean verbose) {
 	puts("                :  5: + implemented command (write to logfile)");
 	puts("                :  6: + message (write to logfile)");
 #endif  
-	puts(" -antialias     : always draw antialiased string");
-	puts(" -noantialias   : nevser use antialiased string");
+	puts(" -noantialias   : never use antialiased string");
 	puts(" -fullscreen    : start with fullscreen");
 	puts(" -noimagecursor : disable image cursor");
 	puts(" -version       : show version");
@@ -519,7 +515,7 @@ static void sys35_init() {
 	
 	ags_fullscreen(fs_on);
 	nact->noantialias = font_noantialias;
-	ags_setAntialiasedStringMode(font_antialias);
+	ags_setAntialiasedStringMode(!font_noantialias);
 	
 	
 	reset_counter(0);
@@ -613,8 +609,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			}
 		} else if (0 == strcmp(argv[i], "-fullscreen")) {
 			fs_on = TRUE;
-		} else if (0 == strcmp(argv[i], "-antialias")) {
-			font_antialias = TRUE;
 		} else if (0 == strcmp(argv[i], "-noantialias")) {
 			font_noantialias = TRUE;
 		} else if (0 == strcmp(argv[i], "-devfont")) {
@@ -701,8 +695,8 @@ static void check_profile() {
 	/* Font antialiasing */
 	param = get_profile("antialias");
 	if (param) {
-		if (0 == strcmp(param, "Yes")) {
-			font_antialias = TRUE;
+		if (0 == strcmp(param, "No")) {
+			font_noantialias = TRUE;
 		}
 	}
 	/* Audio buffer size */
