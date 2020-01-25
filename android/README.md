@@ -40,7 +40,3 @@ cd xsystem35-sdl2/android
 4. The game starts. Two-finger touch is treated as a right click.
 
 To uninstall a game, long-tap the title in the game list.
-
-## TODO
-- Improve launcher
-- MIDI BGM support

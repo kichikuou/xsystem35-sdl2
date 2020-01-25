@@ -19,6 +19,7 @@ package io.github.kichikuou.xsystem35
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import org.libsdl.app.SDLActivity
 import java.io.File
@@ -35,21 +36,24 @@ class GameActivity : SDLActivity() {
         const val EXTRA_PLAYLIST_FILE = "PLAYLIST_FILE"
     }
 
-    private lateinit var player: BGMPlayer
+    private lateinit var cdda: CddaPlayer
+    private val midi = MidiPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        player = BGMPlayer(intent.getStringExtra(EXTRA_PLAYLIST_FILE))
+        cdda = CddaPlayer(intent.getStringExtra(EXTRA_PLAYLIST_FILE))
     }
 
     override fun onStop() {
         super.onStop()
-        player.onStop()
+        cdda.onActivityStop()
+        midi.onActivityStop()
     }
 
     override fun onResume() {
         super.onResume()
-        player.onResume()
+        cdda.onActivityResume()
+        midi.onActivityResume()
     }
 
     override fun getLibraries(): Array<String> {
@@ -69,12 +73,15 @@ class GameActivity : SDLActivity() {
     }
 
     // These functions are called in the SDL thread by JNI.
-    @Suppress("unused") fun cddaStart(track: Int, loop: Int) = player.cddaStart(track, loop)
-    @Suppress("unused") fun cddaStop() = player.cddaStop()
-    @Suppress("unused") fun cddaCurrentPosition(): Int = player.cddaCurrentPosition()
+    @Suppress("unused") fun cddaStart(track: Int, loop: Int) = cdda.start(track, loop)
+    @Suppress("unused") fun cddaStop() = cdda.stop()
+    @Suppress("unused") fun cddaCurrentPosition() = cdda.currentPosition()
+    @Suppress("unused") fun midiStart(buf: ByteArray, loop: Int) = midi.start(buf, loop)
+    @Suppress("unused") fun midiStop() = midi.stop()
+    @Suppress("unused") fun midiCurrentPosition() = midi.currentPosition()
 }
 
-private class BGMPlayer(playlistPath: String?) {
+private class CddaPlayer(playlistPath: String?) {
     private val playlist = playlistPath?.let {
         try {
             File(it).readLines()
@@ -87,7 +94,7 @@ private class BGMPlayer(playlistPath: String?) {
     private val player = MediaPlayer()
     private var playerPaused = false
 
-    fun cddaStart(track: Int, loop: Int) {
+    fun start(track: Int, loop: Int) {
         val f = playlist.elementAtOrNull(track)
         if (f.isNullOrEmpty()) {
             Log.w("cddaStart", "No playlist entry for track $track")
@@ -109,26 +116,76 @@ private class BGMPlayer(playlistPath: String?) {
         }
     }
 
-    fun cddaStop() {
-        if (currentTrack > 0 && player.isPlaying)
+    fun stop() {
+        if (currentTrack > 0 && player.isPlaying) {
             player.stop()
+            currentTrack = 0
+        }
     }
 
-    fun cddaCurrentPosition(): Int {
+    fun currentPosition(): Int {
         if (currentTrack == 0)
             return 0
         val frames = player.currentPosition * 75 / 1000
         return currentTrack or (frames shl 8)
     }
 
-    fun onStop() {
+    fun onActivityStop() {
         if (currentTrack > 0 && player.isPlaying) {
             player.pause()
             playerPaused = true
         }
     }
 
-    fun onResume() {
+    fun onActivityResume() {
+        if (playerPaused) {
+            player.start()
+            playerPaused = false
+        }
+    }
+}
+
+private class MidiPlayer() {
+    private val player = MediaPlayer()
+    private var playing = false
+    private var playerPaused = false
+
+    fun start(buf: ByteArray, loop: Int) {
+        val url = "data:audio/midi;base64," + Base64.encodeToString(buf, Base64.DEFAULT)
+        try {
+            player.apply {
+                reset()
+                setDataSource(url)
+                isLooping = loop == 0
+                prepare()
+                start()
+            }
+            playing = true
+        } catch (e: IOException) {
+            Log.e("midiStart", "Cannot play midi", e)
+            player.reset()
+        }
+    }
+
+    fun stop() {
+        if (playing && player.isPlaying) {
+            player.stop()
+            playing = false
+        }
+    }
+
+    fun currentPosition(): Int {
+        return if (playing) player.currentPosition else 0
+    }
+
+    fun onActivityStop() {
+        if (playing && player.isPlaying) {
+            player.pause()
+            playerPaused = true
+        }
+    }
+
+    fun onActivityResume() {
         if (playerPaused) {
             player.start()
             playerPaused = false

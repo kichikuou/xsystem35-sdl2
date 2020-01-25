@@ -37,6 +37,10 @@ static int subdev = -1;
 extern mididevice_t midi_emscripten;
 #endif
 
+#ifdef __ANDROID__
+extern mididevice_t midi_android;
+#endif
+
 #ifdef ENABLE_MIDI_SDLMIXER
 extern mididevice_t midi_sdlmixer;
 #endif
@@ -60,6 +64,10 @@ int midi_init(mididevice_t *midi) {
 #ifdef __EMSCRIPTEN__
 		ret = midi_emscripten.init(NULL, 0);
 		memcpy(midi, &midi_emscripten, sizeof(mididevice_t));
+#endif
+#ifdef __ANDROID__
+		ret = midi_android.init(NULL, 0);
+		memcpy(midi, &midi_android, sizeof(mididevice_t));
 #endif
 #ifdef ENABLE_MIDI_SDLMIXER
 		ret = midi_sdlmixer.init(NULL, 0);
