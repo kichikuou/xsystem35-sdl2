@@ -124,6 +124,9 @@ static void sdl_getEvent(void) {
 				break;
 			}
 			break;
+		case SDL_APP_DIDENTERFOREGROUND:
+			sdl_dirty = TRUE;
+			break;
 		case SDL_KEYDOWN:
 			keyEventProsess(&e.key, TRUE);
 			break;
