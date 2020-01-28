@@ -41,7 +41,7 @@ class GameActivity : SDLActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        cdda = CddaPlayer(intent.getStringExtra(EXTRA_PLAYLIST_FILE))
+        cdda = CddaPlayer(File(intent.getStringExtra(EXTRA_PLAYLIST_FILE)))
     }
 
     override fun onStop() {
@@ -81,15 +81,14 @@ class GameActivity : SDLActivity() {
     @Suppress("unused") fun midiCurrentPosition() = midi.currentPosition()
 }
 
-private class CddaPlayer(playlistPath: String?) {
-    private val playlist = playlistPath?.let {
+private class CddaPlayer(private val playlistPath: File) {
+    private val playlist =
         try {
-            File(it).readLines()
+            playlistPath.readLines()
         } catch (e: IOException) {
             Log.e("loadPlaylist", "Cannot load $playlistPath", e)
-            null
+            emptyList<String>()
         }
-    } ?: emptyList()
     private var currentTrack = 0
     private val player = MediaPlayer()
     private var playerPaused = false
@@ -104,7 +103,7 @@ private class CddaPlayer(playlistPath: String?) {
         try {
             player.apply {
                 reset()
-                setDataSource(f)
+                setDataSource(File(playlistPath.parent, f).path)
                 isLooping = loop == 0
                 prepare()
                 start()

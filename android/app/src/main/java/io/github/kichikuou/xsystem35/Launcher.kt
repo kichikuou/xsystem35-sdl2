@@ -24,6 +24,7 @@ import android.os.Message
 import android.util.Log
 import java.io.*
 import java.nio.charset.Charset
+import java.util.*
 import java.util.zip.ZipInputStream
 import kotlin.collections.ArrayList
 
@@ -61,9 +62,14 @@ class Launcher private constructor(private val rootDir: File) {
         private set
 
     init {
+        var saveDirFound = false
         for (path in rootDir.listFiles()) {
             if (!path.isDirectory)
                 continue
+            if (path.name == "save") {
+                saveDirFound = true
+                continue
+            }
             try {
                 val title = File(path, TITLE_FILE).readText()
                 games.add(Entry(path, title))
@@ -71,6 +77,9 @@ class Launcher private constructor(private val rootDir: File) {
                 // Incomplete game installation. Delete it.
                 path.deleteRecursively()
             }
+        }
+        if (!saveDirFound) {
+            File(rootDir, "save").mkdir()
         }
     }
 
@@ -118,7 +127,7 @@ class Launcher private constructor(private val rootDir: File) {
 
     private fun extractFiles(input: InputStream, outDir: File, handler: Handler) {
         try {
-            val playlistWriter = PlaylistWriter()
+            val configWriter = GameConfigWriter()
             val zip = if (Build.VERSION.SDK_INT >= 24) {
                 ZipInputStream(input.buffered(), Charset.forName("Shift_JIS"))
             } else {
@@ -135,11 +144,13 @@ class Launcher private constructor(private val rootDir: File) {
                 val output = FileOutputStream(path).buffered()
                 zip.copyTo(output)
                 output.close()
-                playlistWriter.maybeAdd(path.path)
+                configWriter.maybeAdd(zipEntry.name)
             }
             zip.close()
-            playlistWriter.write(outDir)
+            configWriter.write(outDir)
             handler.sendMessage(handler.obtainMessage(SUCCESS, outDir))
+        } catch (e: InstallFailureException) {
+            handler.sendMessage(handler.obtainMessage(FAILURE, e.msgId))
         } catch (e: UTFDataFormatException) {
             // Attempted to read Shift_JIS zip in Android < 7
             handler.sendMessage(handler.obtainMessage(FAILURE, R.string.unsupported_zip))
@@ -149,12 +160,40 @@ class Launcher private constructor(private val rootDir: File) {
         }
     }
 
-    private class PlaylistWriter {
+    class InstallFailureException(val msgId: Int) : Exception()
+
+    // A helper class which generates xsystem35.gr and playlist.txt in the game root directory.
+    private class GameConfigWriter {
+        private val grLines: ArrayList<String> = arrayListOf()
+        private var basename: String? = null
+        private val aldRegex = """(.*?)([a-z])([a-z])\.ald""".toRegex(RegexOption.IGNORE_CASE)
+        private val resourceType = mapOf(
+                "d" to "Data",
+                "g" to "Graphics",
+                "m" to "Midi",
+                "r" to "Resource",
+                "s" to "Scenario",
+                "w" to "Wave")
+
         private val audioRegex = """.*?(\d+)\.(wav|mp3|ogg)""".toRegex(RegexOption.IGNORE_CASE)
         private val audioFiles: Array<String?> = arrayOfNulls(100)
 
         fun maybeAdd(path: String) {
-            audioRegex.matchEntire(path)?.let {
+            val name = File(path).name
+
+            if (name.toLowerCase(Locale.US) == "system39.ain") {
+                grLines.add("Ain ${path}")
+                return
+            }
+            aldRegex.matchEntire(name)?.let {
+                val type = resourceType[it.groupValues[2]]
+                val id = it.groupValues[3].toUpperCase(Locale.US)
+                if (type != null) {
+                    grLines.add("$type$id $path")
+                    basename = it.groupValues[1]
+                }
+            }
+            audioRegex.matchEntire(name)?.let {
                 val track = it.groupValues[1].toInt()
                 if (track < audioFiles.size)
                     audioFiles[track] = path
@@ -162,8 +201,17 @@ class Launcher private constructor(private val rootDir: File) {
         }
 
         fun write(outDir: File) {
-            val text = audioFiles.joinToString("\n") { it ?: "" }.trimEnd('\n')
-            File(outDir, PLAYLIST_FILE).writeText(text)
+            basename ?: throw InstallFailureException(R.string.cannot_find_ald)
+            for (id in 'A' .. 'Z') {
+                grLines.add("Save$id ../save/${basename}s${id.toLowerCase()}.asd")
+            }
+            grLines.add("")
+            val gr = grLines.joinToString("\n")
+            Log.d("xsystem35.gr", gr)
+            File(outDir, "xsystem35.gr").writeText(gr)
+
+            val playlist = audioFiles.joinToString("\n") { it ?: "" }.trimEnd('\n')
+            File(outDir, PLAYLIST_FILE).writeText(playlist)
         }
     }
 }

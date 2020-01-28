@@ -26,8 +26,6 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import java.io.*
 
-import java.util.Locale
-
 class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, LauncherObserver {
     private lateinit var launcher: Launcher
     private lateinit var adapter: ArrayAdapter<String>
@@ -100,14 +98,9 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
     }
 
     private fun startGame(path: File) {
-        val gameRoot = findGameRoot(path)
-        if (gameRoot == null) {
-            errorDialog(R.string.cannot_find_ald)
-            return
-        }
         val i = Intent()
         i.setClass(applicationContext, GameActivity::class.java)
-        i.putExtra(GameActivity.EXTRA_GAME_ROOT, gameRoot.path)
+        i.putExtra(GameActivity.EXTRA_GAME_ROOT, path.path)
         i.putExtra(GameActivity.EXTRA_TITLE_FILE, File(path, Launcher.TITLE_FILE).path)
         i.putExtra(GameActivity.EXTRA_PLAYLIST_FILE, File(path, Launcher.PLAYLIST_FILE).path)
         startActivity(i)
@@ -149,13 +142,4 @@ class ProgressDialogFragment : DialogFragment() {
     fun setProgress(msg: String) {
         dialog.setMessage(msg)
     }
-}
-
-private fun findGameRoot(path: File): File? {
-    path.walkTopDown().forEach {
-        val name = it.name.toLowerCase(Locale.US)
-        if (name == "xsystem35.gr" || name.endsWith(".ald"))
-            return it.parentFile
-    }
-    return null
 }
