@@ -142,7 +142,7 @@ private class CddaPlayer(private val playlistPath: File) {
     }
 }
 
-private class MidiPlayer() {
+private class MidiPlayer {
     private val player = MediaPlayer()
     private var playing = false
     private var playerPaused = false

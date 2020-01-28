@@ -29,7 +29,7 @@ import java.io.*
 class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, LauncherObserver {
     private lateinit var launcher: Launcher
     private lateinit var adapter: ArrayAdapter<String>
-    private var progressDiaglog: ProgressDialogFragment? = null
+    private var progressDialog: ProgressDialogFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +84,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
     }
 
     override fun onInstallProgress(path: String) {
-        progressDiaglog?.setProgress(getString(R.string.install_progress, path))
+        progressDialog?.setProgress(getString(R.string.install_progress, path))
     }
 
     override fun onInstallSuccess(path: File) {
@@ -110,13 +110,13 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
     }
 
     private fun showProgressDialog() {
-        progressDiaglog = ProgressDialogFragment()
-        progressDiaglog!!.show(fragmentManager, "progress_dialog")
+        progressDialog = ProgressDialogFragment()
+        progressDialog!!.show(fragmentManager, "progress_dialog")
     }
 
     private fun dismissProgressDialog() {
-        progressDiaglog?.dismiss()
-        progressDiaglog = null
+        progressDialog?.dismiss()
+        progressDialog = null
     }
 
     private fun errorDialog(msgId: Int) {

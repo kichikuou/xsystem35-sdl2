@@ -26,7 +26,6 @@ import java.io.*
 import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.ZipInputStream
-import kotlin.collections.ArrayList
 
 private var gLauncher: Launcher? = null
 
@@ -54,7 +53,7 @@ class Launcher private constructor(private val rootDir: File) {
     }
 
     data class Entry(val path: File, val title: String)
-    val games: ArrayList<Entry> = arrayListOf()
+    val games = arrayListOf<Entry>()
     val titles: List<String>
         get() = games.map(Entry::title)
     var observer: LauncherObserver? = null
@@ -164,7 +163,7 @@ class Launcher private constructor(private val rootDir: File) {
 
     // A helper class which generates xsystem35.gr and playlist.txt in the game root directory.
     private class GameConfigWriter {
-        private val grLines: ArrayList<String> = arrayListOf()
+        private val grLines = arrayListOf<String>()
         private var basename: String? = null
         private val aldRegex = """(.*?)([a-z])([a-z])\.ald""".toRegex(RegexOption.IGNORE_CASE)
         private val resourceType = mapOf(
@@ -182,7 +181,7 @@ class Launcher private constructor(private val rootDir: File) {
             val name = File(path).name
 
             if (name.toLowerCase(Locale.US) == "system39.ain") {
-                grLines.add("Ain ${path}")
+                grLines.add("Ain $path")
                 return
             }
             aldRegex.matchEntire(name)?.let {
