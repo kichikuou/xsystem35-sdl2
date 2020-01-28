@@ -101,8 +101,6 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
         val i = Intent()
         i.setClass(applicationContext, GameActivity::class.java)
         i.putExtra(GameActivity.EXTRA_GAME_ROOT, path.path)
-        i.putExtra(GameActivity.EXTRA_TITLE_FILE, File(path, Launcher.TITLE_FILE).path)
-        i.putExtra(GameActivity.EXTRA_PLAYLIST_FILE, File(path, Launcher.PLAYLIST_FILE).path)
         startActivity(i)
     }
 

@@ -25,23 +25,21 @@ import org.libsdl.app.SDLActivity
 import java.io.File
 import java.io.IOException
 
-// Intent for this activity must have two extras:
+// Intent for this activity must have the following extra:
 // - EXTRA_GAME_ROOT (string): A path to the game installation.
-// - EXTRA_TITLE_FILE (string): A file to which the game title will be written.
-// - EXTRA_PLAYLIST_FILE (string): A path to the BGM playlist file.
 class GameActivity : SDLActivity() {
     companion object {
         const val EXTRA_GAME_ROOT = "GAME_ROOT"
-        const val EXTRA_TITLE_FILE = "TITLE_FILE"
-        const val EXTRA_PLAYLIST_FILE = "PLAYLIST_FILE"
     }
 
+    private lateinit var gameRoot: File
     private lateinit var cdda: CddaPlayer
     private val midi = MidiPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        cdda = CddaPlayer(File(intent.getStringExtra(EXTRA_PLAYLIST_FILE)))
+        gameRoot = File(intent.getStringExtra(EXTRA_GAME_ROOT))
+        cdda = CddaPlayer(File(gameRoot, Launcher.PLAYLIST_FILE))
     }
 
     override fun onStop() {
@@ -69,7 +67,7 @@ class GameActivity : SDLActivity() {
         val str = title?.toString()?.substringAfter(':', "")
         if (str.isNullOrEmpty())
             return
-        intent.getStringExtra(EXTRA_TITLE_FILE)?.let { File(it).writeText(str) }
+        File(gameRoot, Launcher.TITLE_FILE).writeText(str)
     }
 
     // These functions are called in the SDL thread by JNI.
