@@ -68,6 +68,7 @@ class GameActivity : SDLActivity() {
         if (str.isNullOrEmpty())
             return
         File(gameRoot, Launcher.TITLE_FILE).writeText(str)
+        Launcher.updateGameList()
     }
 
     // These functions are called in the SDL thread by JNI.

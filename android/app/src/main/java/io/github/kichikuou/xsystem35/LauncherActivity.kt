@@ -28,7 +28,6 @@ import java.io.*
 
 class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, LauncherObserver {
     private lateinit var launcher: Launcher
-    private lateinit var adapter: ArrayAdapter<String>
     private var progressDialog: ProgressDialogFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,10 +39,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
             showProgressDialog()
         }
 
-        val items = launcher.titles.toMutableList()
-        items.add(getString(R.string.install_from_zip))
-        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
-        listAdapter = adapter
+        onGameListChange()
         listView.onItemLongClickListener = this
     }
 
@@ -83,6 +79,12 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
         launcher.install(input)
     }
 
+    override fun onGameListChange() {
+        val items = launcher.titles.toMutableList()
+        items.add(getString(R.string.install_from_zip))
+        listAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+    }
+
     override fun onInstallProgress(path: String) {
         progressDialog?.setProgress(getString(R.string.install_progress, path))
     }
@@ -106,7 +108,6 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
 
     private fun uninstall(id: Int) {
         launcher.uninstall(id)
-        adapter.remove(adapter.getItem(id))
     }
 
     private fun showProgressDialog() {

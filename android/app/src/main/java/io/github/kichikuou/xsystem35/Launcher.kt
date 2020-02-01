@@ -30,6 +30,7 @@ import java.util.zip.ZipInputStream
 private var gLauncher: Launcher? = null
 
 interface LauncherObserver {
+    fun onGameListChange()
     fun onInstallProgress(path: String)
     fun onInstallSuccess(path: File)
     fun onInstallFailure(msgId: Int)
@@ -50,6 +51,10 @@ class Launcher private constructor(private val rootDir: File) {
             }
             return gLauncher!!
         }
+
+        fun updateGameList() {
+            gLauncher?.updateGameList()
+        }
     }
 
     data class Entry(val path: File, val title: String)
@@ -61,25 +66,7 @@ class Launcher private constructor(private val rootDir: File) {
         private set
 
     init {
-        var saveDirFound = false
-        for (path in rootDir.listFiles()) {
-            if (!path.isDirectory)
-                continue
-            if (path.name == "save") {
-                saveDirFound = true
-                continue
-            }
-            try {
-                val title = File(path, TITLE_FILE).readText()
-                games.add(Entry(path, title))
-            } catch (e: IOException) {
-                // Incomplete game installation. Delete it.
-                path.deleteRecursively()
-            }
-        }
-        if (!saveDirFound) {
-            File(rootDir, "save").mkdir()
-        }
+        updateGameList()
     }
 
     fun install(input: InputStream) {
@@ -112,6 +99,29 @@ class Launcher private constructor(private val rootDir: File) {
     fun uninstall(id: Int) {
         games[id].path.deleteRecursively()
         games.removeAt(id)
+        observer?.onGameListChange()
+    }
+
+    private fun updateGameList() {
+        var saveDirFound = false
+        for (path in rootDir.listFiles()) {
+            if (!path.isDirectory)
+                continue
+            if (path.name == "save") {
+                saveDirFound = true
+                continue
+            }
+            try {
+                val title = File(path, TITLE_FILE).readText()
+                games.add(Entry(path, title))
+            } catch (e: IOException) {
+                // Incomplete game installation. Delete it.
+                path.deleteRecursively()
+            }
+        }
+        if (!saveDirFound) {
+            File(rootDir, "save").mkdir()
+        }
     }
 
     private fun createDirForGame(): File {
