@@ -20,11 +20,20 @@ package io.github.kichikuou.xsystem35
 import android.app.*
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Toast
 import java.io.*
+
+private const val CONTENT_TYPE_ZIP = "application/zip"
+private const val INSTALL_REQUEST = 1
+private const val SAVEDATA_EXPORT_REQUEST = 2
+private const val SAVEDATA_IMPORT_REQUEST = 3
 
 class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, LauncherObserver {
     private lateinit var launcher: Launcher
@@ -54,8 +63,8 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
             startGame(launcher.games[position].path)
         } else {
             val i = Intent(Intent.ACTION_GET_CONTENT)
-            i.type = "application/zip"
-            startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)), 0)
+            i.type = CONTENT_TYPE_ZIP
+            startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)), INSTALL_REQUEST)
         }
     }
 
@@ -70,13 +79,59 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
         return true
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.launcher_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.export_savedata -> {
+                val i = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                i.type = CONTENT_TYPE_ZIP
+                i.putExtra(Intent.EXTRA_TITLE, "savedata.zip")
+                startActivityForResult(i, SAVEDATA_EXPORT_REQUEST)
+                true
+            }
+            R.id.import_savedata -> {
+                val i = Intent(Intent.ACTION_GET_CONTENT)
+                i.type = CONTENT_TYPE_ZIP
+                startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)),
+                                       SAVEDATA_IMPORT_REQUEST)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK)
             return
         val uri = data?.data ?: return
-        val input = contentResolver.openInputStream(uri) ?: return
-        showProgressDialog()
-        launcher.install(input)
+        when (requestCode) {
+            INSTALL_REQUEST -> {
+                val input = contentResolver.openInputStream(uri) ?: return
+                showProgressDialog()
+                launcher.install(input)
+            }
+            SAVEDATA_EXPORT_REQUEST -> try {
+                launcher.exportSaveData(contentResolver.openOutputStream(uri)!!)
+                Toast.makeText(this, R.string.save_data_export_success, Toast.LENGTH_SHORT).show()
+            } catch (e: IOException) {
+                Log.e("launcher", "Failed to export savedata", e)
+                errorDialog(R.string.save_data_export_error)
+            }
+            SAVEDATA_IMPORT_REQUEST -> {
+                val input = contentResolver.openInputStream(uri) ?: return
+                val errMsgId = launcher.importSaveData(input)
+                if (errMsgId == null) {
+                    Toast.makeText(this, R.string.save_data_import_success, Toast.LENGTH_SHORT).show()
+                } else {
+                    errorDialog(errMsgId)
+                }
+            }
+        }
+
     }
 
     override fun onGameListChange() {

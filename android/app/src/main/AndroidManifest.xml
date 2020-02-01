@@ -26,7 +26,7 @@
         android:required="false" />
 
     <!-- Allow reading from external storage -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- Allow access to the vibrator -->
     <!-- <uses-permission android:name="android.permission.VIBRATE" /> -->
 

@@ -25,7 +25,9 @@ import android.util.Log
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
+import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 private var gLauncher: Launcher? = null
 
@@ -36,6 +38,7 @@ interface LauncherObserver {
     fun onInstallFailure(msgId: Int)
 }
 
+private const val SAVE_DIR = "save"
 private const val PROGRESS = 0
 private const val SUCCESS = 1
 private const val FAILURE = 2
@@ -107,7 +110,7 @@ class Launcher private constructor(private val rootDir: File) {
         for (path in rootDir.listFiles()) {
             if (!path.isDirectory)
                 continue
-            if (path.name == "save") {
+            if (path.name == SAVE_DIR) {
                 saveDirFound = true
                 continue
             }
@@ -120,7 +123,7 @@ class Launcher private constructor(private val rootDir: File) {
             }
         }
         if (!saveDirFound) {
-            File(rootDir, "save").mkdir()
+            File(rootDir, SAVE_DIR).mkdir()
         }
     }
 
@@ -134,28 +137,65 @@ class Launcher private constructor(private val rootDir: File) {
         }
     }
 
+    // Throws IOException
+    fun exportSaveData(output: OutputStream) {
+        if (Build.VERSION.SDK_INT >= 24) {
+            ZipOutputStream(output.buffered(), Charset.forName("Shift_JIS"))
+        } else {
+            ZipOutputStream(output.buffered())
+        }.use { zip ->
+            for (path in File(rootDir, SAVE_DIR).listFiles()) {
+                if (path.isDirectory || path.name.endsWith(".asd."))
+                    continue
+                val pathInZip = "${SAVE_DIR}/${path.name}"
+                Log.i("exportSaveData", pathInZip)
+                zip.putNextEntry(ZipEntry(pathInZip))
+                path.inputStream().buffered().use {
+                    it.copyTo(zip)
+                }
+            }
+        }
+    }
+
+    fun importSaveData(input: InputStream): Int? {
+        try {
+            var imported = false
+            forEachZipEntry(input) { zipEntry, zip ->
+                // Process only files directly under save/
+                if (zipEntry.isDirectory || !zipEntry.name.startsWith("save/") ||
+                        zipEntry.name.count{it == '/'} != 1)
+                    return@forEachZipEntry
+                Log.i("importSaveData", zipEntry.name)
+                FileOutputStream(File(rootDir, zipEntry.name)).buffered().use {
+                    zip.copyTo(it)
+                }
+                imported = true
+            }
+            return if (imported) null else R.string.no_data_to_import
+        } catch (e: UTFDataFormatException) {
+            // Attempted to read Shift_JIS zip in Android < 7
+            return R.string.unsupported_zip
+        } catch (e: IOException) {
+            Log.e("launcher", "Failed to extract ZIP", e)
+            return R.string.zip_extraction_error
+        }
+    }
+
     private fun extractFiles(input: InputStream, outDir: File, handler: Handler) {
         try {
             val configWriter = GameConfigWriter()
-            val zip = if (Build.VERSION.SDK_INT >= 24) {
-                ZipInputStream(input.buffered(), Charset.forName("Shift_JIS"))
-            } else {
-                ZipInputStream(input.buffered())
-            }
-            while (true) {
-                val zipEntry = zip.nextEntry ?: break
-                Log.v("extractFiles", zipEntry.name)
+            forEachZipEntry(input) { zipEntry, zip ->
+                Log.i("extractFiles", zipEntry.name)
                 val path = File(outDir, zipEntry.name)
                 if (zipEntry.isDirectory)
-                    continue
+                    return@forEachZipEntry
                 path.parentFile.mkdirs()
                 handler.sendMessage(handler.obtainMessage(PROGRESS, zipEntry.name))
-                val output = FileOutputStream(path).buffered()
-                zip.copyTo(output)
-                output.close()
+                FileOutputStream(path).buffered().use {
+                    zip.copyTo(it)
+                }
                 configWriter.maybeAdd(zipEntry.name)
             }
-            zip.close()
             configWriter.write(outDir)
             handler.sendMessage(handler.obtainMessage(SUCCESS, outDir))
         } catch (e: InstallFailureException) {
@@ -195,7 +235,7 @@ class Launcher private constructor(private val rootDir: File) {
                 return
             }
             aldRegex.matchEntire(name)?.let {
-                val type = resourceType[it.groupValues[2]]
+                val type = resourceType[it.groupValues[2].toLowerCase(Locale.US)]
                 val id = it.groupValues[3].toUpperCase(Locale.US)
                 if (type != null) {
                     grLines.add("$type$id $path")
@@ -216,11 +256,25 @@ class Launcher private constructor(private val rootDir: File) {
             }
             grLines.add("")
             val gr = grLines.joinToString("\n")
-            Log.d("xsystem35.gr", gr)
+            Log.i("xsystem35.gr", gr)
             File(outDir, "xsystem35.gr").writeText(gr)
 
             val playlist = audioFiles.joinToString("\n") { it ?: "" }.trimEnd('\n')
             File(outDir, PLAYLIST_FILE).writeText(playlist)
+        }
+    }
+}
+
+private fun forEachZipEntry(input: InputStream, action: (ZipEntry, ZipInputStream) -> Unit) {
+    val zip = if (Build.VERSION.SDK_INT >= 24) {
+        ZipInputStream(input.buffered(), Charset.forName("Shift_JIS"))
+    } else {
+        ZipInputStream(input.buffered())
+    }
+    zip.use {
+        while (true) {
+            val zipEntry = zip.nextEntry ?: break
+            action(zipEntry, zip)
         }
     }
 }
