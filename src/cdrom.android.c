@@ -19,6 +19,7 @@
 
 #include <SDL.h>
 #include <jni.h>
+#include "system.h"
 #include "portab.h"
 #include "cdrom.h"
 
@@ -48,35 +49,45 @@ int cdrom_exit() {
 	return OK;
 }
 
-#define COMMAND_CDROM_START 0x8000
-
 int cdrom_start(int trk, int loop) {
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return NG;
+	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"cddaStart", "(II)V");
 	(*env)->CallVoidMethod(env, context, mid, trk, loop);
-	(*env)->DeleteLocalRef(env, context);
+	(*env)->PopLocalFrame(env, NULL);
 	return OK;
 }
 
 int cdrom_stop() {
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return NG;
+	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"cddaStop", "()V");
 	(*env)->CallVoidMethod(env, context, mid);
-	(*env)->DeleteLocalRef(env, context);
+	(*env)->PopLocalFrame(env, NULL);
 	return OK;
 }
 
 int cdrom_getPlayingInfo (cd_time *info) {
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return NG;
+	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"cddaCurrentPosition", "()I");
 	int t = (*env)->CallIntMethod(env, context, mid);
-	(*env)->DeleteLocalRef(env, context);
+	(*env)->PopLocalFrame(env, NULL);
 
 	info->t = t & 0xff;
 	FRAMES_TO_MSF(t >> 8, &info->m, &info->s, &info->f);

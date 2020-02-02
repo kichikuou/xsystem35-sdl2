@@ -19,6 +19,7 @@
 
 #include <SDL.h>
 #include <jni.h>
+#include "system.h"
 #include "portab.h"
 #include "midi.h"
 
@@ -69,10 +70,17 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 		return OK;
 
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return NG;
+	}
 
 	jbyteArray array = (*env)->NewByteArray(env, datalen);
-	if (!array)
+	if (!array) {
+		WARNING("Failed to allocate an array");
+		(*env)->PopLocalFrame(env, NULL);
 		return NG;
+	}
 	jbyte *buf = (*env)->GetByteArrayElements(env, array, NULL);
 	memcpy(buf, data, datalen);
 	(*env)->ReleaseByteArrayElements(env, array, buf, 0);
@@ -81,8 +89,7 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"midiStart", "([BI)V");
 	(*env)->CallVoidMethod(env, context, mid, array, loop);
-	(*env)->DeleteLocalRef(env, array);
-	(*env)->DeleteLocalRef(env, context);
+	(*env)->PopLocalFrame(env, NULL);
 
 	midino = no;
 	return OK;
@@ -90,11 +97,15 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 
 static int midi_stop() {
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return NG;
+	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"midiStop", "()V");
 	(*env)->CallVoidMethod(env, context, mid);
-	(*env)->DeleteLocalRef(env, context);
+	(*env)->PopLocalFrame(env, NULL);
 
 	midino = 0;
 	return OK;
@@ -116,11 +127,15 @@ static int midi_get_playing_info(midiplaystate *st) {
 		return OK;
 
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return NG;
+	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"midiCurrentPosition", "()I");
 	int pos = (*env)->CallIntMethod(env, context, mid);
-	(*env)->DeleteLocalRef(env, context);
+	(*env)->PopLocalFrame(env, NULL);
 
 	if (pos >= 0) {
 		st->in_play = TRUE;
