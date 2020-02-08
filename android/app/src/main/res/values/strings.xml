@@ -3,10 +3,10 @@
     <string name="action_export_save_data">Export Save Files</string>
     <string name="action_import_save_data">Import Save Files</string>
     <string name="cancel">Cancel</string>
-    <string name="cannot_find_ald">Cannot find System 3.x game files (*.ald)</string>
+    <string name="cannot_find_ald">Cannot find System 3.x game files (*.ald).</string>
     <string name="choose_a_file">Choose a file</string>
     <string name="error_dialog_title">Error</string>
-    <string name="install_dialog_title">Installing...</string>
+    <string name="install_dialog_title">Installing…</string>
     <string name="install_from_zip">Install from ZIP</string>
     <string name="install_progress">Extracting %s</string>
     <string name="no_data_to_import">No save/ folder in the ZIP archive.</string>
