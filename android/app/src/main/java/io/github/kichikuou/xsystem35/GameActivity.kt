@@ -72,10 +72,10 @@ class GameActivity : SDLActivity() {
     }
 
     // These functions are called in the SDL thread by JNI.
-    @Suppress("unused") fun cddaStart(track: Int, loop: Int) = cdda.start(track, loop)
+    @Suppress("unused") fun cddaStart(track: Int, loop: Boolean) = cdda.start(track, loop)
     @Suppress("unused") fun cddaStop() = cdda.stop()
     @Suppress("unused") fun cddaCurrentPosition() = cdda.currentPosition()
-    @Suppress("unused") fun midiStart(buf: ByteArray, loop: Int) = midi.start(buf, loop)
+    @Suppress("unused") fun midiStart(buf: ByteArray, loop: Boolean) = midi.start(buf, loop)
     @Suppress("unused") fun midiStop() = midi.stop()
     @Suppress("unused") fun midiCurrentPosition() = midi.currentPosition()
 }
@@ -92,18 +92,18 @@ private class CddaPlayer(private val playlistPath: File) {
     private val player = MediaPlayer()
     private var playerPaused = false
 
-    fun start(track: Int, loop: Int) {
+    fun start(track: Int, loop: Boolean) {
         val f = playlist.elementAtOrNull(track)
         if (f.isNullOrEmpty()) {
             Log.w("cddaStart", "No playlist entry for track $track")
             return
         }
-        Log.v("cddaStart", f)
+        Log.v("cddaStart", "$f Loop:$loop")
         try {
             player.apply {
                 reset()
                 setDataSource(File(playlistPath.parent, f).path)
-                isLooping = loop == 0
+                isLooping = loop
                 prepare()
                 start()
             }
@@ -148,13 +148,13 @@ private class MidiPlayer {
     private var playing = false
     private var playerPaused = false
 
-    fun start(buf: ByteArray, loop: Int) {
+    fun start(buf: ByteArray, loop: Boolean) {
         val url = "data:audio/midi;base64," + Base64.encodeToString(buf, Base64.DEFAULT)
         try {
             player.apply {
                 reset()
                 setDataSource(url)
-                isLooping = loop == 0
+                isLooping = loop
                 prepare()
                 start()
             }

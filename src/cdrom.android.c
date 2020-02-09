@@ -57,8 +57,8 @@ int cdrom_start(int trk, int loop) {
 	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
-										"cddaStart", "(II)V");
-	(*env)->CallVoidMethod(env, context, mid, trk, loop);
+										"cddaStart", "(IZ)V");
+	(*env)->CallVoidMethod(env, context, mid, trk, loop == 0);
 	(*env)->PopLocalFrame(env, NULL);
 	return OK;
 }

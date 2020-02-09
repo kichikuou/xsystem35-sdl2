@@ -36,7 +36,8 @@ typedef struct mididevice mididevice_t;
 struct mididevice {
 	int  (* init)(char *, int);
 	int  (* exit)(void);
-	int  (* start)(int, int, char*, int);
+	// Play through the music loop times. If loop == 0, loops forever.
+	int  (* start)(int no, int loop, char *data, int datalen);
 	int  (* stop)(void);
 	int  (* pause)(void);
 	int  (* unpause)(void);

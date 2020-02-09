@@ -87,8 +87,8 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
-										"midiStart", "([BI)V");
-	(*env)->CallVoidMethod(env, context, mid, array, loop);
+										"midiStart", "([BZ)V");
+	(*env)->CallVoidMethod(env, context, mid, array, loop == 0);
 	(*env)->PopLocalFrame(env, NULL);
 
 	midino = no;
