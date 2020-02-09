@@ -23,6 +23,7 @@ import android.os.Handler
 import android.os.Message
 import android.util.Log
 import java.io.*
+import java.lang.StringBuilder
 import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.ZipEntry
@@ -213,7 +214,7 @@ class Launcher private constructor(private val rootDir: File) {
 
     // A helper class which generates xsystem35.gr and playlist.txt in the game root directory.
     private class GameConfigWriter {
-        private val grLines = arrayListOf<String>()
+        private val grb = StringBuilder()
         private var basename: String? = null
         private val aldRegex = """(.*?)([a-z])([a-z])\.ald""".toRegex(RegexOption.IGNORE_CASE)
         private val resourceType = mapOf(
@@ -231,14 +232,14 @@ class Launcher private constructor(private val rootDir: File) {
             val name = File(path).name
 
             if (name.toLowerCase(Locale.US) == "system39.ain") {
-                grLines.add("Ain $path")
+                grb.appendln("Ain $path")
                 return
             }
             aldRegex.matchEntire(name)?.let {
                 val type = resourceType[it.groupValues[2].toLowerCase(Locale.US)]
                 val id = it.groupValues[3].toUpperCase(Locale.US)
                 if (type != null) {
-                    grLines.add("$type$id $path")
+                    grb.appendln("$type$id $path")
                     basename = it.groupValues[1]
                 }
             }
@@ -252,10 +253,9 @@ class Launcher private constructor(private val rootDir: File) {
         fun write(outDir: File) {
             basename ?: throw InstallFailureException(R.string.cannot_find_ald)
             for (id in 'A' .. 'Z') {
-                grLines.add("Save$id ../save/${basename}s${id.toLowerCase()}.asd")
+                grb.appendln("Save$id ../save/${basename}s${id.toLowerCase()}.asd")
             }
-            grLines.add("")
-            val gr = grLines.joinToString("\n")
+            val gr = grb.toString()
             Log.i("xsystem35.gr", gr)
             File(outDir, "xsystem35.gr").writeText(gr)
 
