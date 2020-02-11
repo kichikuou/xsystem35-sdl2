@@ -140,11 +140,7 @@ class Launcher private constructor(private val rootDir: File) {
 
     // Throws IOException
     fun exportSaveData(output: OutputStream) {
-        if (Build.VERSION.SDK_INT >= 24) {
-            ZipOutputStream(output.buffered(), Charset.forName("Shift_JIS"))
-        } else {
-            ZipOutputStream(output.buffered())
-        }.use { zip ->
+        ZipOutputStream(output.buffered()).use { zip ->
             for (path in File(rootDir, SAVE_DIR).listFiles()) {
                 if (path.isDirectory || path.name.endsWith(".asd."))
                     continue
