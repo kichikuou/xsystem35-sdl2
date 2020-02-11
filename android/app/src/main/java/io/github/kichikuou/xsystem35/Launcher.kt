@@ -61,7 +61,7 @@ class Launcher private constructor(private val rootDir: File) {
         }
     }
 
-    data class Entry(val path: File, val title: String)
+    data class Entry(val path: File, val title: String, val timestamp: Long)
     val games = arrayListOf<Entry>()
     val titles: List<String>
         get() = games.map(Entry::title)
@@ -108,6 +108,7 @@ class Launcher private constructor(private val rootDir: File) {
 
     private fun updateGameList() {
         var saveDirFound = false
+        games.clear()
         for (path in rootDir.listFiles()) {
             if (!path.isDirectory)
                 continue
@@ -116,13 +117,15 @@ class Launcher private constructor(private val rootDir: File) {
                 continue
             }
             try {
-                val title = File(path, TITLE_FILE).readText()
-                games.add(Entry(path, title))
+                val titleFile = File(path, TITLE_FILE)
+                val title = titleFile.readText()
+                games.add(Entry(path, title, titleFile.lastModified()))
             } catch (e: IOException) {
                 // Incomplete game installation. Delete it.
                 path.deleteRecursively()
             }
         }
+        games.sortByDescending(Entry::timestamp)
         if (!saveDirFound) {
             File(rootDir, SAVE_DIR).mkdir()
         }
