@@ -75,20 +75,28 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 		return NG;
 	}
 
-	jbyteArray array = (*env)->NewByteArray(env, datalen);
-	if (!array) {
-		WARNING("Failed to allocate an array");
+	char path[PATH_MAX];
+	snprintf(path, PATH_MAX, "%s/tmp.mid", SDL_AndroidGetInternalStoragePath());
+	FILE* fp = fopen(path, "w");
+	if (!fp) {
+		WARNING("Failed to create temporary file");
 		(*env)->PopLocalFrame(env, NULL);
 		return NG;
 	}
-	jbyte *buf = (*env)->GetByteArrayElements(env, array, NULL);
-	memcpy(buf, data, datalen);
-	(*env)->ReleaseByteArrayElements(env, array, buf, 0);
+	fwrite(data, datalen, 1, fp);
+	fclose(fp);
+
+	jstring path_str = (*env)->NewStringUTF(env, path);
+	if (!path_str) {
+		WARNING("Failed to allocate a string");
+		(*env)->PopLocalFrame(env, NULL);
+		return NG;
+	}
 
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
-										"midiStart", "([BZ)V");
-	(*env)->CallVoidMethod(env, context, mid, array, loop == 0);
+										"midiStart", "(Ljava/lang/String;Z)V");
+	(*env)->CallVoidMethod(env, context, mid, path_str, loop == 0);
 	(*env)->PopLocalFrame(env, NULL);
 
 	midino = no;

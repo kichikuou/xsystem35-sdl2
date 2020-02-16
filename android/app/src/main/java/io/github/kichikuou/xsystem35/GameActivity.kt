@@ -19,7 +19,6 @@ package io.github.kichikuou.xsystem35
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import org.libsdl.app.SDLActivity
 import java.io.File
@@ -75,7 +74,7 @@ class GameActivity : SDLActivity() {
     @Suppress("unused") fun cddaStart(track: Int, loop: Boolean) = cdda.start(track, loop)
     @Suppress("unused") fun cddaStop() = cdda.stop()
     @Suppress("unused") fun cddaCurrentPosition() = cdda.currentPosition()
-    @Suppress("unused") fun midiStart(buf: ByteArray, loop: Boolean) = midi.start(buf, loop)
+    @Suppress("unused") fun midiStart(path: String, loop: Boolean) = midi.start(path, loop)
     @Suppress("unused") fun midiStop() = midi.stop()
     @Suppress("unused") fun midiCurrentPosition() = midi.currentPosition()
 }
@@ -148,12 +147,11 @@ private class MidiPlayer {
     private var playing = false
     private var playerPaused = false
 
-    fun start(buf: ByteArray, loop: Boolean) {
-        val url = "data:audio/midi;base64," + Base64.encodeToString(buf, Base64.DEFAULT)
+    fun start(path: String, loop: Boolean) {
         try {
             player.apply {
                 reset()
-                setDataSource(url)
+                setDataSource(path)
                 isLooping = loop
                 prepare()
                 start()
