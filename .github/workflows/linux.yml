@@ -1,0 +1,23 @@
+name: Linux Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Deps
+      run: sudo apt install libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev
+
+    - name: Build
+      run: |
+        mkdir -p out/debug
+        cd out/debug
+        cmake -DCMAKE_BUILD_TYPE=Debug ../../
+        make
+
+    - name: Test
+      run: ctest
+      working-directory: out/debug

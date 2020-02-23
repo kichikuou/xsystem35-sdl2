@@ -1,0 +1,51 @@
+name: Emscripten Build
+on: [push]
+
+env:
+  emscripten-version: 1.39.8
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Cache emsdk
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: emsdk-cache
+        key: ${{ runner.os }}-emsdk-${{ env.emscripten-version }}
+
+    - name: Cache .emscripten_cache
+      uses: actions/cache@v1
+      with:
+        path: emscripten-cache
+        key: emscripten-cache-${{ env.emscripten-version }}
+
+    - name: Setup Emscripten toolchain
+      uses: mymindstorm/setup-emsdk@v3
+      with:
+        version: ${{ env.emscripten-version }}
+        actions-cache-folder: emsdk-cache
+        no-cache: true
+
+    - name: Build
+      env:
+        EM_CACHE: ${{ github.workspace }}/emscripten-cache/cache
+        EM_PORTS: ${{ github.workspace }}/emscripten-cache/ports
+      run: |
+        mkdir -p emscripten-cache
+        mkdir -p out/wasm
+        cd out/wasm
+        emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../../
+        make
+        mkdir xsystem35
+        mv src/xsystem35.* xsystem35/
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: xsystem35-wasm
+        path: out/wasm/xsystem35
