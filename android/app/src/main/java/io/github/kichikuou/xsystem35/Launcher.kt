@@ -184,7 +184,7 @@ class Launcher private constructor(private val rootDir: File) {
     private fun extractFiles(input: InputStream, outDir: File, handler: Handler) {
         try {
             val configWriter = GameConfigWriter()
-            forEachZipEntry(input) { zipEntry, zip ->
+            val hadDecodeError = forEachZipEntry(input) { zipEntry, zip ->
                 Log.i("extractFiles", zipEntry.name)
                 val path = File(outDir, zipEntry.name)
                 if (zipEntry.isDirectory)
@@ -196,20 +196,18 @@ class Launcher private constructor(private val rootDir: File) {
                 }
                 configWriter.maybeAdd(zipEntry.name)
             }
+            if (!configWriter.readyToWrite()) {
+                val msgId = if (hadDecodeError) R.string.unsupported_zip else R.string.cannot_find_ald
+                handler.sendMessage(handler.obtainMessage(FAILURE, msgId))
+                return
+            }
             configWriter.write(outDir)
             handler.sendMessage(handler.obtainMessage(SUCCESS, outDir))
-        } catch (e: InstallFailureException) {
-            handler.sendMessage(handler.obtainMessage(FAILURE, e.msgId))
-        } catch (e: UTFDataFormatException) {
-            // Attempted to read Shift_JIS zip in Android < 7
-            handler.sendMessage(handler.obtainMessage(FAILURE, R.string.unsupported_zip))
         } catch (e: IOException) {
             Log.e("launcher", "Failed to extract ZIP", e)
             handler.sendMessage(handler.obtainMessage(FAILURE, R.string.zip_extraction_error))
         }
     }
-
-    class InstallFailureException(val msgId: Int) : Exception()
 
     // A helper class which generates xsystem35.gr and playlist.txt in the game root directory.
     private class GameConfigWriter {
@@ -249,8 +247,9 @@ class Launcher private constructor(private val rootDir: File) {
             }
         }
 
+        fun readyToWrite() = basename != null
+
         fun write(outDir: File) {
-            basename ?: throw InstallFailureException(R.string.cannot_find_ald)
             for (id in 'A' .. 'Z') {
                 grb.appendln("Save$id ../save/${basename}s${id.toLowerCase()}.asd")
             }
@@ -264,16 +263,25 @@ class Launcher private constructor(private val rootDir: File) {
     }
 }
 
-private fun forEachZipEntry(input: InputStream, action: (ZipEntry, ZipInputStream) -> Unit) {
+private fun forEachZipEntry(input: InputStream, action: (ZipEntry, ZipInputStream) -> Unit): Boolean {
     val zip = if (Build.VERSION.SDK_INT >= 24) {
         ZipInputStream(input.buffered(), Charset.forName("Shift_JIS"))
     } else {
         ZipInputStream(input.buffered())
     }
+    var hadDecodeError = false
     zip.use {
         while (true) {
-            val zipEntry = zip.nextEntry ?: break
-            action(zipEntry, zip)
+            try {
+                val zipEntry = zip.nextEntry ?: break
+                action(zipEntry, zip)
+            } catch (e: UTFDataFormatException) {
+                // Attempted to read Shift_JIS zip in Android < 7
+                Log.w("forEachZipEntry", "UTFDataFormatException: skipping a zip entry")
+                zip.closeEntry()
+                hadDecodeError = true
+            }
         }
     }
+    return hadDecodeError
 }
