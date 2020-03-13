@@ -7,11 +7,10 @@ project(GAME)
 # android_ndk_import_module_cpufeatures()
 
 include(FetchContent)
-# TODO: Use SDL2 2.0.11 once released
 FetchContent_Declare(
   SDL
-  URL https://hg.libsdl.org/SDL/archive/a5f93b21dfe0.tar.gz # rev 13383
-  URL_HASH SHA1=a7e9696f7ef8af7c4b89671b096c38d1a4cbf90c
+  URL http://libsdl.org/release/SDL2-2.0.12.tar.gz
+  URL_HASH SHA1=e8ba91bf5eb438dbcf1fedf0530a1bcbe30d3bb6
   PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SDL.patch
 )
 # TODO: Use SDL2_ttf 2.0.16 once released
