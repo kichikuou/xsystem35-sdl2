@@ -62,7 +62,7 @@ static int eventCB_ANIM(sprite_t *sp, agsevent_t *e) {
 		sp->curcg = sp->cg3; break;
 	}
 	
-	// WARNING("anime update\n");
+	// SACT_DEBUG("anime update\n");
 	
 	// カウントアップ
 	sp->u.anime.tick++;

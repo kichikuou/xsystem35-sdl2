@@ -63,8 +63,8 @@ static void disjunction(void* region, void* data) {
 	MyRectangle *r2 = (MyRectangle *)data;
 	int x1, x2, y1, y2;
 	
-	//WARNING("r1x=%d,r1y=%d,r1w=%d,r1h=%d\n", r1->x, r1->y, r1->width, r1->height);
-	//WARNING("r2x=%d,r2y=%d,r2w=%d,r2h=%d\n", r2->x, r2->y, r2->width, r2->height);
+	//SACT_DEBUG("r1x=%d,r1y=%d,r1w=%d,r1h=%d\n", r1->x, r1->y, r1->width, r1->height);
+	//SACT_DEBUG("r2x=%d,r2y=%d,r2w=%d,r2h=%d\n", r2->x, r2->y, r2->width, r2->height);
 	
 	if (r2->width == 0) {
 		r2->x = r1->x;
@@ -84,7 +84,7 @@ static void disjunction(void* region, void* data) {
 	r2->width  = x2 - x1;
 	r2->height = y2 - y1;
 	
-	//WARNING("res:r2x=%d,r2y=%d,r2w=%d,r2h=%d\n", r2->x, r2->y, r2->width, r2->height);
+	//SACT_DEBUG("res:r2x=%d,r2y=%d,r2w=%d,r2h=%d\n", r2->x, r2->y, r2->width, r2->height);
 }
 
 // 更新の必要なスプライトの領域の和をとってクリッピングする
@@ -100,7 +100,7 @@ static void get_updatearea() {
 	// surface0との領域の積をとる
 	intersection(&rsf0, &clip, &sact.updaterect);
 	
-	WARNING("clipped area x=%d y=%d w=%d h=%d\n",
+	SACT_DEBUG("clipped area x=%d y=%d w=%d h=%d\n",
 		sact.updaterect.x, sact.updaterect.y,
 		sact.updaterect.width, sact.updaterect.height);
 	
@@ -206,7 +206,7 @@ int sp_updateme(sprite_t *sp) {
 	
 	updatearea = slist_append(updatearea, r);
 	
-	WARNING("x = %d, y = %d, spno = %d w=%d,h=%d\n",
+	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d\n",
 		r->x, r->y, sp->no, r->width, r->height);
 	
 	return OK;
@@ -234,7 +234,7 @@ int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	
 	updatearea = slist_append(updatearea, r);
 	
-	WARNING("x = %d, y = %d, spno = %d w=%d,h=%d\n",
+	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d\n",
 		r->x, r->y, sp->no, r->width, r->height);
 	
 	return OK;

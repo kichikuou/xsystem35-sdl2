@@ -81,7 +81,7 @@ static int sp_draw_wall(sprite_t *sp) {
 	h = sact.updaterect.height;
 	gr_fill(sf0, sx, sy, w, h, 0, 0, 0);
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, \n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, \n",
 		sp->no, sx, sy, w, h);
 	
 	return OK;

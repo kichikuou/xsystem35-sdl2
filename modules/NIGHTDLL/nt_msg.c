@@ -182,7 +182,7 @@ void ntmsg_newline() {
 void ntmsg_add(char *msg) {
 	int len;
 	
-	WARNING("len = %d\n", strlen(msg));
+	SACT_DEBUG("len = %d\n", strlen(msg));
 	
 	if (msg[0] == '\0') return;
 	
@@ -489,7 +489,7 @@ int ntmsg_update(sprite_t *sp, MyRectangle *r) {
 	
 	gre_BlendUseAMap(sf0, dx, dy, sf0, dx, dy, sp->u.msg.canvas, sx, sy, w, h, sp->u.msg.canvas, sx, sy, sp->blendrate);
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
 		sp->no, sx, sy, w, h, dx, dy);
 	
 	return OK;

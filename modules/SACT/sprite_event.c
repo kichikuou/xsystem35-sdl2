@@ -92,7 +92,7 @@ static void cb_focused_swsp(void* s, void* data) {
 	int *update  = (int *)data;
 	boolean oldstate = sp->show;
 	
-	WARNING("show up spex %d\n", sp->no);
+	SACT_DEBUG("show up spex %d\n", sp->no);
 
 	sp->show = TRUE;
 	if (oldstate != sp->show) {
@@ -110,7 +110,7 @@ static void cb_defocused_swsp(void* s, void* data) {
 	int *update  = (int *)data;
 	boolean oldstate = sp->show;
 	
-	WARNING("hide spex %d\n", sp->no);
+	SACT_DEBUG("hide spex %d\n", sp->no);
 	
 	sp->show = FALSE;
 	if (oldstate != sp->show) {
@@ -174,7 +174,7 @@ static int cb_focused(sprite_t *sp) {
 			update++;
 		}
 		sp->focused = TRUE;
-		WARNING("get forcused %d, type %d\n", sp->no, sp->type);
+		SACT_DEBUG("get forcused %d, type %d\n", sp->no, sp->type);
 		if (sp->numsound1) {
 			ssnd_play(sp->numsound1);
 		}
@@ -197,7 +197,7 @@ static int cb_defocused(sprite_t *sp) {
 		sp->curcg = sp->cg1;
 		update++;
 		sp->focused = FALSE;
-		WARNING("lost forcused %d\n", sp->no);
+		SACT_DEBUG("lost forcused %d\n", sp->no);
 	}
 	
 	return update;

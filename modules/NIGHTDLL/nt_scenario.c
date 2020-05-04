@@ -33,7 +33,7 @@ static struct _scoadr scene2adr(int no) {
 	struct _scoadr adr = {0, 0};
 	
 	snprintf(label, 7, "E%05d", no);
-	WARNING("seaching %6s\n", label);
+	SACT_DEBUG("seaching %6s\n", label);
 	for (i = 0; i < nact->ain.fncnum; i++) {
 		if (0 == strncmp(nact->ain.fnc[i].name, label, 6)) {
 			adr.page  = nact->ain.fnc[i].page;
@@ -57,7 +57,7 @@ static void ntmain(struct _scoadr inadr) {
 	while (!nact->is_quit) {
 		for (int cnt = 0; !nact->wait_vsync && cnt < 10000; cnt++) {
 			DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
-			//WARNING("%d:%x\n", sl_getPage(), sl_getIndex());
+			//SACT_DEBUG("%d:%x\n", sl_getPage(), sl_getIndex());
 			if (!nact->popupmenu_opened) {
 				check_command(sl_getc());
 				if (sl_getPage()  == inadr.page &&

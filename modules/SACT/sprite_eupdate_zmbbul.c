@@ -15,7 +15,7 @@ static void ec10_cb(surface_t *sfsrc, surface_t *sfdst) {
 	
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
 	turstep = maxstep / 2;
-	WARNING("step = %d/%d\n", curstep, maxstep);
+	SACT_DEBUG("step = %d/%d\n", curstep, maxstep);
 	
 	if (curstep > turstep) {
 		// 帰り

@@ -137,7 +137,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 		}
 	}
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n", sp->no, sx, sy, w, h, dx, dy);
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n", sp->no, sx, sy, w, h, dx, dy);
 	
 	return OK;
 }

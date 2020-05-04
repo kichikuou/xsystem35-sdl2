@@ -74,7 +74,7 @@ static int move_cb(sprite_t *sp, agsevent_t *e) {
 	// 現在時刻の取得
 	now = sact.movecurtime;
 	
-	WARNING("no = %d now = %d st = %d, ed = %d\n",
+	SACT_DEBUG("no = %d now = %d st = %d, ed = %d\n",
 		sp->no, now, sp->move.starttime, sp->move.endtime);
 	
 	if (now >= sp->move.endtime) {
@@ -135,7 +135,7 @@ void spev_move_setup(void* data, void* userdata) {
 	// タイマコールバック登録
 	spev_add_teventlistener(sp, move_cb);
 	
-	WARNING("no=%d,from(%d,%d@%d)to(%d,%d@%d),time=%d\n", sp->no,
+	SACT_DEBUG("no=%d,from(%d,%d@%d)to(%d,%d@%d),time=%d\n", sp->no,
 		sp->cur.x, sp->cur.y, sp->move.starttime,
 		sp->move.to.x, sp->move.to.y, sp->move.endtime,
 		sp->move.time);

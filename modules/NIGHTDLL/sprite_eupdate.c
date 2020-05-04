@@ -88,7 +88,7 @@ static void ec1_cb(surface_t *sfsrc, surface_t *sfdst) {
 	}
 	gre_Blend(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, curstep);
 
-	// WARNING("step = %d\n", curstep);
+	// SACT_DEBUG("step = %d\n", curstep);
 	ags_updateFull();
 	
 	ecp.oldstep = curstep;
@@ -101,7 +101,7 @@ static void ec7_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int i, t, y;
 	
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	//WARNING("step = %d\n", curstep);
+	//SACT_DEBUG("step = %d\n", curstep);
 	
 	if (ecp.oldstep == curstep) {
 		usleep(0);
@@ -129,7 +129,7 @@ static void ec8_cb(surface_t *sfsrc, surface_t *sfdst) {
 	int i, t, x;
 	
 	curstep = maxstep * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	//WARNING("step = %d\n", curstep);
+	//SACT_DEBUG("step = %d\n", curstep);
 	
 	if (ecp.oldstep == curstep) {
 		usleep(0);
@@ -160,7 +160,7 @@ static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
 		      sfsrc->width  / EC9DELTA + EC9DELTA);
 	
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	//WARNING("step = %d\n", curstep);
+	//SACT_DEBUG("step = %d\n", curstep);
 	
 	if (ecp.oldstep == curstep) {
 		usleep(0);
@@ -194,7 +194,7 @@ static void ec12_cb(surface_t *src, surface_t *dst) {
 	int j, st_i, ed_i, l;
 	
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	WARNING("step = %d\n", curstep);
+	SACT_DEBUG("step = %d\n", curstep);
 	
 	if (ecp.oldstep == curstep) {
 		usleep(0); return;
@@ -225,7 +225,7 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 	int dyy  = 0 + sf0->height -1;
 	
 	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	WARNING("step = %d\n", curstep);
+	SACT_DEBUG("step = %d\n", curstep);
 	
 	if (ecp.oldstep == curstep) {
 		usleep(0); return;

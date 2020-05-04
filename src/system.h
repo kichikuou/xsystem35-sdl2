@@ -59,8 +59,11 @@ extern int  sys_nextdebuglv;                 /* message level */
 #define NOTICE            sys_nextdebuglv = 2, sys_message
 
 #define WARNING           sys_nextdebuglv = 1, \
-sys_message("*WARNING*(%s): ", __func__), sys_message
+                          sys_message("*WARNING*(%s): ", __func__), sys_message
 
 #define SYSERROR          fprintf(stderr, "*ERROR*(%s): ", __func__), sys_error
+
+#define SACT_DEBUG        sys_nextdebuglv = 5, \
+                          sys_message("%s: ", __func__), sys_message
 
 #endif /* !__SYSTEM__ */
