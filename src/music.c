@@ -370,6 +370,9 @@ int mus_wav_get_playposition(int ch) {
  *             1: คนค๋
  */
 int mus_wav_fadeout_start(int ch, int time, int volume, int stop) {
+	if (volume == 0 && stop)
+		return muspcm_fadeout(ch + 1, time);
+
 	printf("%s not implemented\n", __func__);
 	return NG;
 }

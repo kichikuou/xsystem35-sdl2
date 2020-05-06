@@ -140,14 +140,13 @@ int ssnd_waitkey(int no, int *res) {
 	}
 	
 	if (sact.waitkey == -1) {
+		cache[slot - SLOTOFFSET] = 0;
 		*res = 0;
 	} else {
 		*res = sact.waitkey;
 	}
 	sact.waittype = KEYWAIT_NONE;
-	
-	cache[slot - SLOTOFFSET] = 0;
-	
+
 	return OK;
 }
 

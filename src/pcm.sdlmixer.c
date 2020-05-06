@@ -297,6 +297,8 @@ int muspcm_getpos(int slot) {
 	
 	long len = obj->chunk->alen * 1000 / (44100 * 4);
 	int pos = get_high_counter(SYSTEMCOUNTER_MSEC) - obj->start_time;
+	if (pos == 0)
+		pos = 1;  // because 0 means "not playing"
 	if (pos > len)
 		pos = 0;
 	return pos;
