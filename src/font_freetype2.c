@@ -36,7 +36,7 @@
 #include "ags.h"
 
 extern int cp932tosjis0213(int code);
-extern unsigned short *s2u[];
+extern const unsigned short *s2u[];
 
 typedef struct {
 	int      size;
