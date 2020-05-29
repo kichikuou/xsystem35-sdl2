@@ -108,6 +108,13 @@ static void window_init(void) {
 #endif
 		);
 	
+#ifdef __EMSCRIPTEN__
+	// Stop SDL from calling emscripten_sleep() in functions that are called
+	// indirectly, which does not work with ASYNCIFY_IGNORE_INDIRECT=1. For
+	// details, see https://github.com/emscripten-core/emscripten/issues/10746.
+	SDL_SetHint(SDL_HINT_EMSCRIPTEN_ASYNCIFY, "0");
+#endif
+
 #ifdef __ANDROID__
 	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 	Uint32 flags = SDL_WINDOW_FULLSCREEN;
