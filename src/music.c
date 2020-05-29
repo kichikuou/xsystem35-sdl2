@@ -45,9 +45,9 @@ int mus_exit() {
 }
 
 /*
- * cdrom ¤Î±éÁÕ³«»Ï 
- *   track: ¥È¥é¥Ã¥¯ÈÖ¹æ (Âè°ì¥È¥é¥Ã¥¯¤Ï 1)
- *   loop : ·«¤êÊÖ¤·²ó¿ô (0¤Î¾ì¹ç¤ÏÌµ¸Â)
+ * cdrom ã®æ¼”å¥é–‹å§‹ 
+ *   track: ãƒˆãƒ©ãƒƒã‚¯ç•ªå· (ç¬¬ä¸€ãƒˆãƒ©ãƒƒã‚¯ã¯ 1)
+ *   loop : ç¹°ã‚Šè¿”ã—å›æ•° (0ã®å ´åˆã¯ç„¡é™)
  */
 int mus_cdrom_start(int track, int loop) {
 	if (!prv.cd_valid) return NG;
@@ -57,7 +57,7 @@ int mus_cdrom_start(int track, int loop) {
 }
 
 /*
- * cdrom ¤Î±éÁÕÄä»ß
+ * cdrom ã®æ¼”å¥åœæ­¢
  */
 int mus_cdrom_stop() {
 	if (!prv.cd_valid) return NG;
@@ -67,9 +67,9 @@ int mus_cdrom_stop() {
 }
 
 /*
- * cdrom ¤Î±éÁÕ¾õÂÖ¤Î¼èÆÀ
- *   info: ±éÁÕ»ş´Ö(track/min/sec/frame)¤Î¾õÂÖ¤ò³ÊÇ¼¤¹¤ë¾ì½ê
- *         Ää»ß¤·¤Æ¤¤¤ë¾ì¹ç¤Ï 999/999/999/999 ¤¬ÊÖ¤ë
+ * cdrom ã®æ¼”å¥çŠ¶æ…‹ã®å–å¾—
+ *   info: æ¼”å¥æ™‚é–“(track/min/sec/frame)ã®çŠ¶æ…‹ã‚’æ ¼ç´ã™ã‚‹å ´æ‰€
+ *         åœæ­¢ã—ã¦ã„ã‚‹å ´åˆã¯ 999/999/999/999 ãŒè¿”ã‚‹
  */
 int mus_cdrom_get_playposition(cd_time *tm) {
 	if (!prv.cd_valid) return NG;
@@ -78,7 +78,7 @@ int mus_cdrom_get_playposition(cd_time *tm) {
 }
 
 /*
- * cdrom ¤ÎºÇÂç¥È¥é¥Ã¥¯¿ô¤Î¼èÆÀ
+ * cdrom ã®æœ€å¤§ãƒˆãƒ©ãƒƒã‚¯æ•°ã®å–å¾—
  *   
  */
 int mus_cdrom_get_maxtrack() {
@@ -87,48 +87,48 @@ int mus_cdrom_get_maxtrack() {
 }
 
 /*
- * CDROM ¤ÎÍ­¸ú/Ìµ¸ú ¥Õ¥é¥°¤Î¼èÆÀ
- *   return: FALASE -> Ìµ¸ú
- *           TRUE   -> Í­¸ú
+ * CDROM ã®æœ‰åŠ¹/ç„¡åŠ¹ ãƒ•ãƒ©ã‚°ã®å–å¾—
+ *   return: FALASE -> ç„¡åŠ¹
+ *           TRUE   -> æœ‰åŠ¹
  */
 boolean mus_cdrom_get_state() {
 	return prv.cd_valid;
 }
 
 /*
- * midi ¤Î±éÁÕ³«»Ï 
- *   no  : ¥Õ¥¡¥¤¥ëÈÖ¹æ( no >= 1)
- *   loop: ·«¤êÊÖ¤·²ó¿ô (0¤Î¾ì¹ç¤ÏÌµ¸Â)
+ * midi ã®æ¼”å¥é–‹å§‹ 
+ *   no  : ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå·( no >= 1)
+ *   loop: ç¹°ã‚Šè¿”ã—å›æ•° (0ã®å ´åˆã¯ç„¡é™)
  */
 int mus_midi_start(int no, int loop) {
 	return musmidi_start(no, loop);
 }
 
 /*
- * midi ¤Î±éÁÕÄä»ß
+ * midi ã®æ¼”å¥åœæ­¢
  */
 int mus_midi_stop(void) {
 	return musmidi_stop();
 }
 
 /*
- * midi ¤Î°ì»şÄä»ß
+ * midi ã®ä¸€æ™‚åœæ­¢
  */
 int mus_midi_pause(void) {
 	return musmidi_pause();
 }
 
 /*
- * midi ¤Î°ì»şÄä»ß²ò½ü
+ * midi ã®ä¸€æ™‚åœæ­¢è§£é™¤
  */
 int mus_midi_unpause(void) {
 	return musmidi_unpause();
 }
 
 /*
- * midi ¤Î±éÁÕ¾õÂÖ¤Î¼èÆÀ
- *  state: ±éÁÕ»ş´Ö¤äÈÖ¹æ¤Î¾õÂÖ¤ò³ÊÇ¼¤¹¤ë¾ì½ê
- *         Ää»ß¤·¤Æ¤¤¤ë¾ì¹ç¤Ï 0 ¤¬Æş¤ë
+ * midi ã®æ¼”å¥çŠ¶æ…‹ã®å–å¾—
+ *  state: æ¼”å¥æ™‚é–“ã‚„ç•ªå·ã®çŠ¶æ…‹ã‚’æ ¼ç´ã™ã‚‹å ´æ‰€
+ *         åœæ­¢ã—ã¦ã„ã‚‹å ´åˆã¯ 0 ãŒå…¥ã‚‹
  */
 int mus_midi_get_playposition(midiplaystate *state) {
 	midiplaystate st = musmidi_getpos();
@@ -137,41 +137,41 @@ int mus_midi_get_playposition(midiplaystate *state) {
 }
 
 /*
- * midi ¤Î±éÁÕ flag/variable ¤Î¾õÂÖ¤òÀßÄê¤¹¤ë
+ * midi ã®æ¼”å¥ flag/variable ã®çŠ¶æ…‹ã‚’è¨­å®šã™ã‚‹
  *   mode : 0 -> flag mode
  *          1 -> variable mode
- *   index: flag/variable ÈÖ¹æ
- *   val  : ½ñ¤­¹ş¤àÃÍ
+ *   index: flag/variable ç•ªå·
+ *   val  : æ›¸ãè¾¼ã‚€å€¤
  */
 int mus_midi_set_flag(int mode, int index, int val) {
 	return musmidi_setflag(mode, index, val);
 }
 
 /*
- * midi ¤Î±éÁÕ flag/variable ¤Î¾õÂÖ¤ò¼èÆÀ¤¹¤ë
+ * midi ã®æ¼”å¥ flag/variable ã®çŠ¶æ…‹ã‚’å–å¾—ã™ã‚‹
  *   mode : 0 -> flag mode
  *          1 -> variable mode
- *   index: flag/variable ÈÖ¹æ
+ *   index: flag/variable ç•ªå·
  *
- *   return : flag/variable ¤ÎÃÍ
+ *   return : flag/variable ã®å€¤
  */
 int mus_midi_get_flag(int mode, int index) {
 	return musmidi_getflag(mode, index);
 }
 
 /*
- * MIDI ¤ÎÍ­¸ú/Ìµ¸ú ¥Õ¥é¥°¤Î¼èÆÀ
- *   return: FALASE -> Ìµ¸ú
- *           TRUE   -> Í­¸ú
+ * MIDI ã®æœ‰åŠ¹/ç„¡åŠ¹ ãƒ•ãƒ©ã‚°ã®å–å¾—
+ *   return: FALASE -> ç„¡åŠ¹
+ *           TRUE   -> æœ‰åŠ¹
  */
 boolean mus_midi_get_state() {
 	return prv.midi_valid;
 }
 
 /*
- * WAV ¤Î±éÁÕ³«»Ï (command S?)
- *   no  : ¥Õ¥¡¥¤¥ëÈÖ¹æ( no >= 1)
- *   loop: ·«¤êÊÖ¤·²ó¿ô (0¤Î¾ì¹ç¤ÏÌµ¸Â)
+ * WAV ã®æ¼”å¥é–‹å§‹ (command S?)
+ *   no  : ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå·( no >= 1)
+ *   loop: ç¹°ã‚Šè¿”ã—å›æ•° (0ã®å ´åˆã¯ç„¡é™)
  */
 int mus_pcm_start(int no, int loop) {
 	if (!prv.pcm_valid) return NG;
@@ -181,10 +181,10 @@ int mus_pcm_start(int no, int loop) {
 }
 
 /*
- * WAV ¤òº¸±¦ mix ¤·¤Æ±éÁÕ
- *   noL : º¸ÍÑ¤Î¥Õ¥¡¥¤¥ëÈÖ¹æ(noL >= 1)
- *   noR : ±¦ÍÑ¤Î¥Õ¥¡¥¤¥ëÈÖ¹æ(noR >= 1)
- *   loop: ·«¤êÊÖ¤·¿ô(0¤Î¾ì¹ç¤ÏÌµ¸Â¥ë¡¼¥×)
+ * WAV ã‚’å·¦å³ mix ã—ã¦æ¼”å¥
+ *   noL : å·¦ç”¨ã®ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå·(noL >= 1)
+ *   noR : å³ç”¨ã®ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå·(noR >= 1)
+ *   loop: ç¹°ã‚Šè¿”ã—æ•°(0ã®å ´åˆã¯ç„¡é™ãƒ«ãƒ¼ãƒ—)
  */
 int mus_pcm_mix(int noL, int noR, int loop) {
 	if (!prv.pcm_valid) return NG;
@@ -194,8 +194,8 @@ int mus_pcm_mix(int noL, int noR, int loop) {
 }
 
 /*
- * WAV ¤Î±éÁÕÄä»ß (command S?)
- *   msec: »ß¤Ş¤ë¤Ş¤Ç¤Î»ş´Ö(msec), 0¤Î¾ì¹ç¤Ï¤¹¤°¤Ë»ß¤Ş¤ë
+ * WAV ã®æ¼”å¥åœæ­¢ (command S?)
+ *   msec: æ­¢ã¾ã‚‹ã¾ã§ã®æ™‚é–“(msec), 0ã®å ´åˆã¯ã™ãã«æ­¢ã¾ã‚‹
  */
 int mus_pcm_stop(int msec) {
 	if (!prv.pcm_valid) return NG;
@@ -205,8 +205,8 @@ int mus_pcm_stop(int msec) {
 }
 
 /*
- * WAV ¥Õ¥¡¥¤¥ë¤ò¥á¥â¥ê¾å¤ËºÜ¤»¤ë
- *   no  : ¥Õ¥¡¥¤¥ëÈÖ¹æ( no >= 1)
+ * WAV ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ¡ãƒ¢ãƒªä¸Šã«è¼‰ã›ã‚‹
+ *   no  : ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå·( no >= 1)
  */
 int mus_pcm_load(int no) {
 	if (!prv.pcm_valid) return NG;
@@ -215,10 +215,10 @@ int mus_pcm_load(int no) {
 }
 
 /*
- * WAV ¤Î±éÁÕ¾õÂÖ¤Î¼èÆÀ
- *   pos: ±éÁÕ»ş´Ö¤ò³ÊÇ¼¤¹¤ë¾ì½ê(msec)
- *        Ää»ß¤·¤Æ¤¤¤ë¾ì¹ç¤Ï 0 ¤¬Æş¤ë
- *        loop¤·¤Æ¤¤¤ë¾ì¹ç¤Ï¹ç·×»ş´Ö
+ * WAV ã®æ¼”å¥çŠ¶æ…‹ã®å–å¾—
+ *   pos: æ¼”å¥æ™‚é–“ã‚’æ ¼ç´ã™ã‚‹å ´æ‰€(msec)
+ *        åœæ­¢ã—ã¦ã„ã‚‹å ´åˆã¯ 0 ãŒå…¥ã‚‹
+ *        loopã—ã¦ã„ã‚‹å ´åˆã¯åˆè¨ˆæ™‚é–“
  */
 int mus_pcm_get_playposition(int *pos) {
 	if (!prv.pcm_valid) return NG;
@@ -229,11 +229,11 @@ int mus_pcm_get_playposition(int *pos) {
 
 /* pcm (Scommand) related function */
 /*
- * »ØÄê¤Î¥Õ¥©¡¼¥Ş¥Ã¥È¤ÇºÆÀ¸²ÄÇ½¤«¤É¤¦¤«Ä´¤Ù¤ë
+ * æŒ‡å®šã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã§å†ç”Ÿå¯èƒ½ã‹ã©ã†ã‹èª¿ã¹ã‚‹
  *   bit : 8 or 16 bit
  *   rate: frequency
  *   ch  : Mono or Stereo
- *   able: ²ÄÇ½¤«¤É¤¦¤«¤Î¾õÂÖ¤ò¼õ¤±¼è¤ë¾ì½ê
+ *   able: å¯èƒ½ã‹ã©ã†ã‹ã®çŠ¶æ…‹ã‚’å—ã‘å–ã‚‹å ´æ‰€
  */
 int mus_pcm_check_ability(int bit, int rate, int ch, boolean *able) {
 	if (!prv.pcm_valid) {
@@ -245,22 +245,22 @@ int mus_pcm_check_ability(int bit, int rate, int ch, boolean *able) {
 }
 
 /*
- * PCM ¤ÎÍ­¸ú/Ìµ¸ú ¥Õ¥é¥°¤Î¼èÆÀ
- *   return: FALASE -> Ìµ¸ú
- *           TRUE   -> Í­¸ú
+ * PCM ã®æœ‰åŠ¹/ç„¡åŠ¹ ãƒ•ãƒ©ã‚°ã®å–å¾—
+ *   return: FALASE -> ç„¡åŠ¹
+ *           TRUE   -> æœ‰åŠ¹
  */
 boolean mus_pcm_get_state() {
 	return prv.pcm_valid;
 }
 
 /*
- * ¥Õ¥§¡¼¥É³«»Ï
- *   device: ¥Õ¥§¡¼¥É¤¹¤ë¥Ç¥Ğ¥¤¥¹(MIX_MAXTER/MIX_PCM/....)
- *   time  : ºÇ½ª¥Ü¥ê¥å¡¼¥à¤Ş¤Ç¤ËÃ£¤¹¤ë»ş´Ö(msec)
- *   volume: ºÇ½ª¥Ü¥ê¥å¡¼¥à
- *   stop:   ¥Õ¥§¡¼¥É½ªÎ»»ş¤Ë±éÁÕ¤ò¥¹¥È¥Ã¥×¤¹¤ë¤«¤É¤¦¤«¡©
- *           0: ¤·¤Ê¤¤
- *           1: ¤¹¤ë
+ * ãƒ•ã‚§ãƒ¼ãƒ‰é–‹å§‹
+ *   device: ãƒ•ã‚§ãƒ¼ãƒ‰ã™ã‚‹ãƒ‡ãƒã‚¤ã‚¹(MIX_MAXTER/MIX_PCM/....)
+ *   time  : æœ€çµ‚ãƒœãƒªãƒ¥ãƒ¼ãƒ ã¾ã§ã«é”ã™ã‚‹æ™‚é–“(msec)
+ *   volume: æœ€çµ‚ãƒœãƒªãƒ¥ãƒ¼ãƒ 
+ *   stop:   ãƒ•ã‚§ãƒ¼ãƒ‰çµ‚äº†æ™‚ã«æ¼”å¥ã‚’ã‚¹ãƒˆãƒƒãƒ—ã™ã‚‹ã‹ã©ã†ã‹ï¼Ÿ
+ *           0: ã—ãªã„
+ *           1: ã™ã‚‹
  */ 
 int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
 	if (device == MIX_MIDI)
@@ -270,11 +270,11 @@ int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
 }
 
 /*
- * »ØÄê¤Î¥Ç¥Ğ¥¤¥¹¤¬¸½ºß¥Õ¥§¡¼¥ÉÃæ¤«¤É¤¦¤«¤òÄ´¤Ù¤ë
- *   device: »ØÄê¥Ç¥Ğ¥¤¥¹
+ * æŒ‡å®šã®ãƒ‡ãƒã‚¤ã‚¹ãŒç¾åœ¨ãƒ•ã‚§ãƒ¼ãƒ‰ä¸­ã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹
+ *   device: æŒ‡å®šãƒ‡ãƒã‚¤ã‚¹
  *
- *   return: TRUE  -> ¥Õ¥§¡¼¥ÉÃæ
- *           FALSE -> ¥Õ¥§¡¼¥ÉÃæ¤Ç¤Ê¤¤
+ *   return: TRUE  -> ãƒ•ã‚§ãƒ¼ãƒ‰ä¸­
+ *           FALSE -> ãƒ•ã‚§ãƒ¼ãƒ‰ä¸­ã§ãªã„
  */
 boolean mus_mixer_fadeout_get_state(int device) {
 	if (device == MIX_MIDI)
@@ -284,8 +284,8 @@ boolean mus_mixer_fadeout_get_state(int device) {
 }
 
 /*
- * »ØÄê¤Î¥Ç¥Ğ¥¤¥¹¤Î¥Õ¥§¡¼¥É¤òÅÓÃæ¤Ç»ß¤á¤ë
- *   device: »ØÄê¥Ç¥Ğ¥¤¥¹
+ * æŒ‡å®šã®ãƒ‡ãƒã‚¤ã‚¹ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚’é€”ä¸­ã§æ­¢ã‚ã‚‹
+ *   device: æŒ‡å®šãƒ‡ãƒã‚¤ã‚¹
  */
 int mus_mixer_fadeout_stop(int device) {
 	printf("%s not implemented\n", __func__);
@@ -293,10 +293,10 @@ int mus_mixer_fadeout_stop(int device) {
 }
 
 /*
- * »ØÄê¤Î¥Ç¥Ğ¥¤¥¹¤Î¥ß¥­¥µ¡¼¥ì¥Ù¥ë¤ò¼èÆÀ¤¹¤ë
- *   device: »ØÄê¥Ç¥Ğ¥¤¥¹
+ * æŒ‡å®šã®ãƒ‡ãƒã‚¤ã‚¹ã®ãƒŸã‚­ã‚µãƒ¼ãƒ¬ãƒ™ãƒ«ã‚’å–å¾—ã™ã‚‹
+ *   device: æŒ‡å®šãƒ‡ãƒã‚¤ã‚¹
  *
- *   return: ¥ß¥­¥µ¡¼¥ì¥Ù¥ë(0 - 100) (¥²¡¼¥àÆâ¤ÇÀßÄê¤µ¤ì¤¿ÃÍ)
+ *   return: ãƒŸã‚­ã‚µãƒ¼ãƒ¬ãƒ™ãƒ«(0 - 100) (ã‚²ãƒ¼ãƒ å†…ã§è¨­å®šã•ã‚ŒãŸå€¤)
  */
 int mus_mixer_get_level(int device) {
 	printf("%s not implemented\n", __func__);
@@ -304,9 +304,9 @@ int mus_mixer_get_level(int device) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤Ë wave file ¤ò¥í¡¼¥É
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã« wave file ã‚’ãƒ­ãƒ¼ãƒ‰
  *   ch : channel (0-127)
- *   num: ¥Õ¥¡¥¤¥ëÈÖ¹æ (1-65535)
+ *   num: ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå· (1-65535)
  */
 int mus_wav_load(int ch, int num) {
 	if (!prv.pcm_valid) return NG;
@@ -316,7 +316,7 @@ int mus_wav_load(int ch, int num) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤«¤é wave file ¤òÇË´ş
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã‹ã‚‰ wave file ã‚’ç ´æ£„
  *   ch : channel
  */
 int mus_wav_unload(int ch) {
@@ -327,10 +327,10 @@ int mus_wav_unload(int ch) {
 }
 
 /*
- * WAV ¤Î±éÁÕ³«»Ï (wavXXXX)
- *   ch  : ºÆÀ¸¤¹¤ë¥Á¥ã¥ó¥Í¥ë (0-127)
-           (¤¢¤é¤«¤¸¤á mus_wav_load¤Çload¤·¤Æ¤ª¤¯)
- *   loop: ·«¤êÊÖ¤·²ó¿ô       (0¤Î¾ì¹ç¤ÏÌµ¸Â, ¤½¤ì°Ê³°¤Ï£±²ó¤Î¤ß)
+ * WAV ã®æ¼”å¥é–‹å§‹ (wavXXXX)
+ *   ch  : å†ç”Ÿã™ã‚‹ãƒãƒ£ãƒ³ãƒãƒ« (0-127)
+           (ã‚ã‚‰ã‹ã˜ã‚ mus_wav_loadã§loadã—ã¦ãŠã)
+ *   loop: ç¹°ã‚Šè¿”ã—å›æ•°       (0ã®å ´åˆã¯ç„¡é™, ãã‚Œä»¥å¤–ã¯ï¼‘å›ã®ã¿)
  */
 int mus_wav_play(int ch, int loop) {
 	if (!prv.pcm_valid) return NG;
@@ -340,7 +340,7 @@ int mus_wav_play(int ch, int loop) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤ÎWAV¤Î±éÁÕÄä»ß (wavXXX)
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã®WAVã®æ¼”å¥åœæ­¢ (wavXXX)
  *   ch: channel
  */
 int mus_wav_stop(int ch) {
@@ -351,23 +351,23 @@ int mus_wav_stop(int ch) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤Î±éÁÕ¾õÂÖ¤Î¼èÆÀ
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã®æ¼”å¥çŠ¶æ…‹ã®å–å¾—
  *   ch: channel (0-127)
  *   
- *   return: ±éÁÕ»ş´Ö(msec) 65535ms ¤ÇË°ÏÂ
+ *   return: æ¼”å¥æ™‚é–“(msec) 65535ms ã§é£½å’Œ
  */
 int mus_wav_get_playposition(int ch) {
 	return muspcm_getpos(ch + 1);
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤ÎWAV¤Î¥Õ¥§¡¼¥É
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã®WAVã®ãƒ•ã‚§ãƒ¼ãƒ‰
  *   ch: channel(0-127)
- *   time  : ºÇ½ª¥Ü¥ê¥å¡¼¥à¤Ş¤Ç¤ËÃ£¤¹¤ë»ş´Ö(msec)
- *   volume: ºÇ½ª¥Ü¥ê¥å¡¼¥à
- *   stop  : ¥Õ¥§¡¼¥É½ªÎ»»ş¤Ë±éÁÕ¤ò¥¹¥È¥Ã¥×¤¹¤ë¤«¤É¤¦¤«¡©
- *             0: ¤·¤Ê¤¤
- *             1: ¤¹¤ë
+ *   time  : æœ€çµ‚ãƒœãƒªãƒ¥ãƒ¼ãƒ ã¾ã§ã«é”ã™ã‚‹æ™‚é–“(msec)
+ *   volume: æœ€çµ‚ãƒœãƒªãƒ¥ãƒ¼ãƒ 
+ *   stop  : ãƒ•ã‚§ãƒ¼ãƒ‰çµ‚äº†æ™‚ã«æ¼”å¥ã‚’ã‚¹ãƒˆãƒƒãƒ—ã™ã‚‹ã‹ã©ã†ã‹ï¼Ÿ
+ *             0: ã—ãªã„
+ *             1: ã™ã‚‹
  */
 int mus_wav_fadeout_start(int ch, int time, int volume, int stop) {
 	if (volume == 0 && stop)
@@ -378,7 +378,7 @@ int mus_wav_fadeout_start(int ch, int time, int volume, int stop) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤Î¥Õ¥§¡¼¥É¤òÅÓÃæ¤Ç»ß¤á¤ë
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã®ãƒ•ã‚§ãƒ¼ãƒ‰ã‚’é€”ä¸­ã§æ­¢ã‚ã‚‹
  *   ch: channel (0-127)
  */
 int mus_wav_fadeout_stop(int ch) {
@@ -387,11 +387,11 @@ int mus_wav_fadeout_stop(int ch) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤¬¸½ºß¥Õ¥§¡¼¥ÉÃæ¤«¤É¤¦¤«¤òÄ´¤Ù¤ë
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ãŒç¾åœ¨ãƒ•ã‚§ãƒ¼ãƒ‰ä¸­ã‹ã©ã†ã‹ã‚’èª¿ã¹ã‚‹
  *   ch: channel
  *
- *   return: TRUE  -> ¥Õ¥§¡¼¥ÉÃæ
- *           FALSE -> ¥Õ¥§¡¼¥ÉÃæ¤Ç¤Ê¤¤
+ *   return: TRUE  -> ãƒ•ã‚§ãƒ¼ãƒ‰ä¸­
+ *           FALSE -> ãƒ•ã‚§ãƒ¼ãƒ‰ä¸­ã§ãªã„
  */
 boolean mus_wav_fadeout_get_state(int ch) {
 	printf("%s not implemented\n", __func__);
@@ -399,7 +399,7 @@ boolean mus_wav_fadeout_get_state(int ch) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤ÎºÆÀ¸¤¬½ªÎ»¤¹¤ë¤Ş¤ÇÂÔ¤Ä
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã®å†ç”ŸãŒçµ‚äº†ã™ã‚‹ã¾ã§å¾…ã¤
  *   ch: channel (0-127)
  */
 int mus_wav_waitend(int ch) {
@@ -410,11 +410,11 @@ int mus_wav_waitend(int ch) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤Ç»ş´ÖÂÔ¤Á
- *     ºÆÀ¸¤·¤Æ¤¤¤Ê¤¤¤Ê¤é¤¹¤°¤ËÌá¤ë¡£¥³¥Ş¥ó¥É¤¬È¯¹Ô¤µ¤ì¤¿½Ö´Ö¤Ë±éÁÕÃæ¤Ç
- *     ¤¢¤ì¤Ğ¡¢±éÁÕ¤¬½ª¤Ã¤Æ¤â»ØÄê»ş´Ö·Ğ²á¤¹¤ë¤Ş¤ÇÂÔ¤Ä¡£
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã§æ™‚é–“å¾…ã¡
+ *     å†ç”Ÿã—ã¦ã„ãªã„ãªã‚‰ã™ãã«æˆ»ã‚‹ã€‚ã‚³ãƒãƒ³ãƒ‰ãŒç™ºè¡Œã•ã‚ŒãŸç¬é–“ã«æ¼”å¥ä¸­ã§
+ *     ã‚ã‚Œã°ã€æ¼”å¥ãŒçµ‚ã£ã¦ã‚‚æŒ‡å®šæ™‚é–“çµŒéã™ã‚‹ã¾ã§å¾…ã¤ã€‚
  *   ch  : channel (0-127)
- *   time: ÂÔ¤Á»ş´Ö(msec)
+ *   time: å¾…ã¡æ™‚é–“(msec)
  */
 int mus_wav_waittime(int ch, int time) {
 	printf("%s not implemented\n", __func__);
@@ -422,19 +422,19 @@ int mus_wav_waittime(int ch, int time) {
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤ÎWAV¥Ç¡¼¥¿¤Î±éÁÕ»ş´Ö¤Î¼èÆÀ
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã®WAVãƒ‡ãƒ¼ã‚¿ã®æ¼”å¥æ™‚é–“ã®å–å¾—
  *   ch: channel
  *   
- *   return: »ş´Ö(msec) 65535ms ¤ÇË°ÏÂ
+ *   return: æ™‚é–“(msec) 65535ms ã§é£½å’Œ
  */
 int mus_wav_wavtime(int ch) {
 	return muspcm_getwavelen(ch + 1);
 }
 
 /*
- * »ØÄê¤Î¥Á¥ã¥ó¥Í¥ë¤Ë wave file ¤òLRÈ¿Å¾¤·¤Æ¥í¡¼¥É
+ * æŒ‡å®šã®ãƒãƒ£ãƒ³ãƒãƒ«ã« wave file ã‚’LRåè»¢ã—ã¦ãƒ­ãƒ¼ãƒ‰
  *   ch : channel (0-127)
- *   num: ¥Õ¥¡¥¤¥ëÈÖ¹æ (1-65535)
+ *   num: ãƒ•ã‚¡ã‚¤ãƒ«ç•ªå· (1-65535)
  */
 int mus_wav_load_lrsw(int ch, int num) {
 	printf("%s not implemented\n", __func__);

@@ -41,15 +41,15 @@ struct _musprvdat {
 	cdobj_t cdrom;   // cdrom object
 	midiobj_t midi;  // midi object
 	
-	// ¥²¡¼¥àÆâ¤Ç¤Î volume ÀßÄê (%ÃÍ)
+	// ã‚²ãƒ¼ãƒ å†…ã§ã® volume è¨­å®š (%å€¤)
 	int vol_master;
 	int vol_pcm;
 	int vol_midi;
 	int vol_cd;
-	int vol_pcm_sub[128 + 1 + 2]; // volval ¤Î channel
-	int volval[16]; // ³Æchannel Ëè¤Î volume valance
+	int vol_pcm_sub[128 + 1 + 2]; // volval ã® channel
+	int volval[16]; // å„channel æ¯ã® volume valance
 	
-	// ºÇÂç¥È¥é¥Ã¥¯¿ô
+	// æœ€å¤§ãƒˆãƒ©ãƒƒã‚¯æ•°
 	int cd_maxtrk;
 };
 
