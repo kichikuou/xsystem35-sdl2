@@ -1,9 +1,9 @@
 if (ENABLE_MODULES)
   set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR}/../modules)
   if (APPLE)
-	set(CMAKE_INSTALL_RPATH @loader_path/../lib/xsystem35)
+    set(CMAKE_INSTALL_RPATH @loader_path/../lib/xsystem35)
   else()
-	set(CMAKE_INSTALL_RPATH $ORIGIN/../lib/xsystem35)
+    set(CMAKE_INSTALL_RPATH $ORIGIN/../lib/xsystem35)
   endif()
 endif()
 
@@ -75,13 +75,13 @@ if (EMSCRIPTEN)
   list(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "-O1")
 
   target_link_options(xsystem35 PRIVATE
-	"SHELL:-s ENVIRONMENT=web"
-	"SHELL:-s ASYNCIFY=1 -s ASYNCIFY_IGNORE_INDIRECT=1"
-	"SHELL:-s ASYNCIFY_IMPORTS=\"['muspcm_load_no','muspcm_load_mixlr','muspcm_waitend','wait_vsync','load_mincho_font']\""
-	"SHELL:-s ALLOW_MEMORY_GROWTH=1"
-	"SHELL:-s NO_EXIT_RUNTIME=1"
-	"SHELL:-s EXPORTED_FUNCTIONS=\"['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata']\""
-	"SHELL:-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['getValue','getMemory','addRunDependency','removeRunDependency']\"")
+    "SHELL:-s ENVIRONMENT=web"
+    "SHELL:-s ASYNCIFY=1 -s ASYNCIFY_IGNORE_INDIRECT=1"
+    "SHELL:-s ASYNCIFY_IMPORTS=\"['muspcm_load_no','muspcm_load_mixlr','muspcm_waitend','wait_vsync','load_mincho_font']\""
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+    "SHELL:-s NO_EXIT_RUNTIME=1"
+    "SHELL:-s EXPORTED_FUNCTIONS=\"['_main','_ags_setAntialiasedStringMode', '_ald_getdata', '_ald_freedata']\""
+    "SHELL:-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['getValue','getMemory','addRunDependency','removeRunDependency']\"")
 
 elseif (ANDROID)
 
@@ -90,26 +90,26 @@ elseif (ANDROID)
 else()  # non-emscripten, non-android
   target_link_libraries(xsystem35 PRIVATE m ZLIB::ZLIB)
   if (X11_FOUND)
-	target_include_directories(xsystem35 PRIVATE ${X11_INCLUDE_DIR})
-	target_link_libraries(xsystem35 PRIVATE ${X11_LIBRARIES})
-	if (X11_xf86vmode_FOUND)
-	  target_link_libraries(xsystem35 PRIVATE ${X11_Xxf86vm_LIB})
-	endif()
+    target_include_directories(xsystem35 PRIVATE ${X11_INCLUDE_DIR})
+    target_link_libraries(xsystem35 PRIVATE ${X11_LIBRARIES})
+    if (X11_xf86vmode_FOUND)
+      target_link_libraries(xsystem35 PRIVATE ${X11_Xxf86vm_LIB})
+    endif()
   endif()
   if (GTK2_FOUND)
-	target_link_libraries(xsystem35 PRIVATE GTK2::gtk)
+    target_link_libraries(xsystem35 PRIVATE GTK2::gtk)
   endif()
   if (FREETYPE_FOUND)
-	target_link_libraries(xsystem35 PRIVATE Freetype::Freetype)
+    target_link_libraries(xsystem35 PRIVATE Freetype::Freetype)
   endif()
   if (SDL2_FOUND)
-	target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2)
+    target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2)
   endif()
   if (SDL2MIXER_FOUND)
-	target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2MIXER)
+    target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2MIXER)
   endif()
   if (SDL2TTF_FOUND)
-	target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2TTF)
+    target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2TTF)
   endif()
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)
@@ -118,6 +118,6 @@ endif()
 # FIXME: set up dependency for xsystem35 on this
 if (ENABLE_SDL AND NOT EMSCRIPTEN AND NOT ANDROID)
   add_custom_target(sdl_input.c
-	COMMAND perl xsyskey.pl ${SDL2_INCLUDE_DIRS} > sdl_input.c
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    COMMAND perl xsyskey.pl ${SDL2_INCLUDE_DIRS} > sdl_input.c
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
