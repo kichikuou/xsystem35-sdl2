@@ -130,7 +130,7 @@ static void do_update_each(void* data, void* userdata) {
   画面全体の更新
   @param syncscreen: surface0 に描画したものを Screen に反映させるかどうか
  */
-int sp_update_all(boolean syncscreen) {
+int nt_sp_update_all(boolean syncscreen) {
 	// 画面全体を更新領域に
 	MyRectangle r = {0, 0, sf0->width, sf0->height };
 	
@@ -152,7 +152,7 @@ int sp_update_all(boolean syncscreen) {
   画面の一部を更新
    updateme(_part)で登録した更新が必要なspriteの和の領域をupdate
 */
-int sp_update_clipped() {
+int nt_sp_update_clipped() {
 	MyRectangle r;
 	
 	// 更新領域の確定
@@ -176,7 +176,7 @@ int sp_update_clipped() {
   sprite全体の更新を登録
   @param sp: 更新するスプライト
 */
-int sp_updateme(sprite_t *sp) {
+int nt_sp_updateme(sprite_t *sp) {
 	MyRectangle *r;
 	
 	if (sp == NULL) return NG;
@@ -204,7 +204,7 @@ int sp_updateme(sprite_t *sp) {
   @param w: 更新領域幅
   @param h: 更新領域高さ
 */
-int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
+int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	MyRectangle *r;
 	
 	if (sp == NULL) return NG;
@@ -238,16 +238,16 @@ static int compare_spriteno_smallfirst(const void *a, const void *b) {
 	return 0;
 }
 
-void sp_add_updatelist(sprite_t *sp) {
+void nt_sp_add_updatelist(sprite_t *sp) {
 	updatelist = slist_insert_sorted(updatelist, sp, compare_spriteno_smallfirst);
 }
 
-void sp_remove_updatelist(sprite_t *sp) {
+void nt_sp_remove_updatelist(sprite_t *sp) {
 	updatelist = slist_remove(updatelist, sp);
 }
 
 // デフォルトの壁紙update
-int sp_draw_wall(sprite_t *sp, MyRectangle *area) {
+int nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
 	int sx, sy, w, h;
 	
 	sx = area->x;

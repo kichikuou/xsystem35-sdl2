@@ -6,7 +6,7 @@
 #include "surface.h"
 #include "graphics.h"
 
-#define DEFAULT_UPDATE sp_draw
+#define DEFAULT_UPDATE nt_sp_draw
 
 
 #define SPRITEMAX 20
@@ -107,30 +107,30 @@ typedef struct _sprite sprite_t;
 
 
 /* in nt_sprite.c */
-extern sprite_t *sp_new(int no, int cg1, int cg2, int cg3, int type);
-extern sprite_t *sp_msg_new(int no, int x, int y, int width, int height);
-extern void sp_free(sprite_t *sp);
-extern void sp_set_show(sprite_t *sp, boolean show);
-// extern void sp_set_cg(sprite_t *sp, int no);
-extern void sp_set_loc(sprite_t *sp, int x, int y);
+extern sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type);
+extern sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height);
+extern void nt_sp_free(sprite_t *sp);
+extern void nt_sp_set_show(sprite_t *sp, boolean show);
+// extern void nt_sp_set_cg(sprite_t *sp, int no);
+extern void nt_sp_set_loc(sprite_t *sp, int x, int y);
 
 /* in nt_sprite_update.c */
-extern int sp_update_clipped();
-extern int sp_update_all(boolean syncscreen);
-extern int sp_updateme(sprite_t *sp);
-extern int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
-extern void sp_add_updatelist(sprite_t *sp);
-extern void sp_remove_updatelist(sprite_t *sp);
-extern int sp_draw_wall(sprite_t *sp, MyRectangle *r);
+extern int nt_sp_update_clipped();
+extern int nt_sp_update_all(boolean syncscreen);
+extern int nt_sp_updateme(sprite_t *sp);
+extern int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
+extern void nt_sp_add_updatelist(sprite_t *sp);
+extern void nt_sp_remove_updatelist(sprite_t *sp);
+extern int nt_sp_draw_wall(sprite_t *sp, MyRectangle *r);
 
 /* in nt_sprite_draw.c */
-extern int sp_draw(sprite_t *sp, MyRectangle *r);
-extern int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r);
-extern void sp_draw_dmap(void* data, void* userdata);
-extern int sp_draw_scg(sprite_t *sp, MyRectangle *r);
+extern int nt_sp_draw(sprite_t *sp, MyRectangle *r);
+extern int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r);
+extern void nt_sp_draw_dmap(void* data, void* userdata);
+extern int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r);
 
 /* in nt_sprite_eupdate.c */
-extern int sp_eupdate(int type, int time, int cancel);
+extern int nt_sp_eupdate(int type, int time, int cancel);
 
 
 #endif /* __SPRITE_H__ */

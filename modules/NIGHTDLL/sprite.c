@@ -9,7 +9,7 @@
 #include "ngraph.h"
 #include "nt_msg.h"
 
-sprite_t *sp_new(int no, int cg1, int cg2, int cg3, int type) {
+sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	sprite_t *sp;
 	
 	sp = calloc(1, sizeof(sprite_t));
@@ -17,9 +17,9 @@ sprite_t *sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	sp->no = no;
 	sp->type = type;
 	
-	if (cg1) sp->cg1 = scg_loadcg_no(cg1, TRUE); else sp->cg1 = NULL;
-	if (cg2) sp->cg2 = scg_loadcg_no(cg2, TRUE); else sp->cg2 = NULL;
-	if (cg3) sp->cg3 = scg_loadcg_no(cg3, TRUE); else sp->cg3 = NULL;
+	if (cg1) sp->cg1 = nt_scg_loadcg_no(cg1, TRUE); else sp->cg1 = NULL;
+	if (cg2) sp->cg2 = nt_scg_loadcg_no(cg2, TRUE); else sp->cg2 = NULL;
+	if (cg3) sp->cg3 = nt_scg_loadcg_no(cg3, TRUE); else sp->cg3 = NULL;
 	
 	sp->curcg = sp->cg1;
 	sp->show = TRUE;
@@ -47,7 +47,7 @@ sprite_t *sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	return sp;
 }
 
-sprite_t *sp_msg_new(int no, int x, int y, int width, int height) {
+sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height) {
 	sprite_t *sp;
 	
 	sp = calloc(1, sizeof(sprite_t));
@@ -69,12 +69,12 @@ sprite_t *sp_msg_new(int no, int x, int y, int width, int height) {
 	return sp;
 }
 
-void sp_free(sprite_t *sp) {
+void nt_sp_free(sprite_t *sp) {
 	if (sp == NULL) return;
 	
-	if (sp->cg1) scg_free_cgobj(sp->cg1);
-	if (sp->cg2) scg_free_cgobj(sp->cg2);
-	if (sp->cg3) scg_free_cgobj(sp->cg3);
+	if (sp->cg1) nt_scg_free_cgobj(sp->cg1);
+	if (sp->cg2) nt_scg_free_cgobj(sp->cg2);
+	if (sp->cg3) nt_scg_free_cgobj(sp->cg3);
 
 	if (sp->type == SPRITE_MSG) {
 		sf_free(sp->u.msg.canvas);
@@ -83,7 +83,7 @@ void sp_free(sprite_t *sp) {
 	free(sp);
 }
 
-void sp_set_show(sprite_t *sp, boolean show) {
+void nt_sp_set_show(sprite_t *sp, boolean show) {
 	boolean oldshow;
 	
 	if (sp == NULL) return;
@@ -92,22 +92,22 @@ void sp_set_show(sprite_t *sp, boolean show) {
 	sp->show = show;
 
 	if (oldshow != show) {
-		sp_updateme(sp);
+		nt_sp_updateme(sp);
 	}
 }
 
 #if 0
-void sp_set_cg(sprite_t *sp, int no) {
+void nt_sp_set_cg(sprite_t *sp, int no) {
 	cginfo_t *cg;
 
 	if (sp == NULL) return;
 
 	if (sp->curcg) {
-		scg_free_cgobj(sp->curcg);
+		nt_scg_free_cgobj(sp->curcg);
 	}
 	
 	if (no) {
-		cg = scg_loadcg_no(no, TRUE);
+		cg = nt_scg_loadcg_no(no, TRUE);
 	} else {
 		cg = NULL;
 	}
@@ -124,7 +124,7 @@ void sp_set_cg(sprite_t *sp, int no) {
 }
 #endif
 
-void sp_set_loc(sprite_t *sp, int x, int y) {
+void nt_sp_set_loc(sprite_t *sp, int x, int y) {
 	if (sp == NULL) return;
 	sp->cur.x = sp->loc.x = x;
 	sp->cur.y = sp->loc.y = y;

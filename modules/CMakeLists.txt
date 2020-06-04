@@ -10,20 +10,19 @@ add_library(modules STATIC
   Gpx/effectcopy.c
   Math/Math.c
   MsgSkip/MsgSkip.c
-# Tentatively disabled because many symbols in NIGHTDLL conflict with SACT.
-#  NIGHTDLL/NIGHTDLL.c
-#  NIGHTDLL/nt_scenario.c
-#  NIGHTDLL/sactcg.c
-#  NIGHTDLL/sactstring.c
-#  NIGHTDLL/sprite.c
-#  NIGHTDLL/sprite_draw.c
-#  NIGHTDLL/sprite_update.c
-#  NIGHTDLL/sprite_eupdate.c
-#  NIGHTDLL/nt_event.c
-#  NIGHTDLL/nt_msg.c
-#  NIGHTDLL/nt_sel.c
-#  NIGHTDLL/nt_graph.c
-#  NIGHTDLL/nt_sound.c
+  NIGHTDLL/NIGHTDLL.c
+  NIGHTDLL/nt_scenario.c
+  NIGHTDLL/sactcg.c
+  NIGHTDLL/sactstring.c
+  NIGHTDLL/sprite.c
+  NIGHTDLL/sprite_draw.c
+  NIGHTDLL/sprite_update.c
+  NIGHTDLL/sprite_eupdate.c
+  NIGHTDLL/nt_event.c
+  NIGHTDLL/nt_msg.c
+  NIGHTDLL/nt_sel.c
+  NIGHTDLL/nt_graph.c
+  NIGHTDLL/nt_sound.c
   NightDemonDemo/NightDemonDemo.c
   RandMT/RandMT.c
   SACT/SACT.c

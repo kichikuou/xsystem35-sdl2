@@ -67,34 +67,34 @@ void ntmsg_init() {
 	sprite_t *sp;
 
 	// メッセージスプライト
-	sp = night.sp[SPNO_MSGFRAME_FG] = sp_msg_new(SPNO_MSGFRAME_FG, 0, 0, sf0->width, sf0->height);
-	sp_add_updatelist(sp);
+	sp = night.sp[SPNO_MSGFRAME_FG] = nt_sp_msg_new(SPNO_MSGFRAME_FG, 0, 0, sf0->width, sf0->height);
+	nt_sp_add_updatelist(sp);
 	
 	// メッセージ背景用CG
-	sp = night.sp[SPNO_MSGFRAME_BG] = sp_new(SPNO_MSGFRAME_BG, CGNO_MSGFRAME_LCG, 0, 0, SPRITE_NORMAL);
-	sp_add_updatelist(sp);
+	sp = night.sp[SPNO_MSGFRAME_BG] = nt_sp_new(SPNO_MSGFRAME_BG, CGNO_MSGFRAME_LCG, 0, 0, SPRITE_NORMAL);
+	nt_sp_add_updatelist(sp);
 	
 	// 文字背景CG作成
-	scg_create(CGNO_MSGFR_BG,
+	nt_scg_create(CGNO_MSGFR_BG,
 		   sf0->width, sf0->height,
 		   0, 0, 0, 255);
 	// night.cg[CGNO_MSGFR_BG]->refcnt++;
 	
 	// 文字背景CGのためのsprite
-	sp = night.sp[SPNO_MSGBG] = sp_new(SPNO_MSGBG, CGNO_MSGFR_BG, 0, 0, SPRITE_NORMAL);
-	sp_add_updatelist(sp);
+	sp = night.sp[SPNO_MSGBG] = nt_sp_new(SPNO_MSGBG, CGNO_MSGFR_BG, 0, 0, SPRITE_NORMAL);
+	nt_sp_add_updatelist(sp);
 	
 	// キー入力アニメーションCG作成
-	scg_cut(CGNO_MSGHAK_1, CGNO_MSGHAK_LCG, 0, 0, 9, 9);
+	nt_scg_cut(CGNO_MSGHAK_1, CGNO_MSGHAK_LCG, 0, 0, 9, 9);
 	//night.cg[CGNO_MSGHAK_1]->refcnt++;
-	scg_cut(CGNO_MSGHAK_2, CGNO_MSGHAK_LCG, 0, 9, 9, 9);
+	nt_scg_cut(CGNO_MSGHAK_2, CGNO_MSGHAK_LCG, 0, 9, 9, 9);
 	//night.cg[CGNO_MSGHAK_2]->refcnt++;
-	sp = night.sp[SPNO_MSG_KEYANIM] = sp_new(SPNO_MSG_KEYANIM, CGNO_MSGHAK_1, CGNO_MSGHAK_2, 0, SPRITE_ANIME);
+	sp = night.sp[SPNO_MSG_KEYANIM] = nt_sp_new(SPNO_MSG_KEYANIM, CGNO_MSGHAK_1, CGNO_MSGHAK_2, 0, SPRITE_ANIME);
 	sp->u.anime.interval = HAKANIM_INTERVAL;
-	sp_add_updatelist(sp);
-	sp_set_loc(sp, HAKANIM_LOC_X, HAKANIM_LOC_Y);
-	sp_set_show(sp, FALSE);
-	sp->update = sp_draw_scg;
+	nt_sp_add_updatelist(sp);
+	nt_sp_set_loc(sp, HAKANIM_LOC_X, HAKANIM_LOC_Y);
+	nt_sp_set_show(sp, FALSE);
+	sp->update = nt_sp_draw_scg;
 
 	
 
@@ -102,7 +102,7 @@ void ntmsg_init() {
 
 
 	// 主人公名前
-	sstr_regist_replace(SNAME_RYO, SNAME_RYO_DEF);
+	nt_sstr_regist_replace(SNAME_RYO, SNAME_RYO_DEF);
 	
 	night.msg.cbmove = cb_mousemove;
 	night.msg.cbrelease = cb_keyrelease;
@@ -129,14 +129,14 @@ void ntmsg_set_frame(int type) {
 	
 	switch(type) {
 	case 0:
-		sp_set_show(night.sp[SPNO_MSGBG], FALSE);
-		sp_set_show(night.sp[SPNO_MSGFRAME_BG], FALSE);
-		sp_set_show(night.sp[SPNO_MSGFRAME_FG], FALSE);
+		nt_sp_set_show(night.sp[SPNO_MSGBG], FALSE);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], FALSE);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], FALSE);
 		break;
 	case 1:
-		sp_set_show(night.sp[SPNO_MSGBG], TRUE);
-		sp_set_show(night.sp[SPNO_MSGFRAME_BG], TRUE);
-		sp_set_show(night.sp[SPNO_MSGFRAME_FG], TRUE);
+		nt_sp_set_show(night.sp[SPNO_MSGBG], TRUE);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], TRUE);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], TRUE);
 		
 		gr_fill(sf, MSGFRAME_0_X, MSGFRAME_0_Y,
 			MSGFRAME_0_WIDTH, MSGFRAME_0_HEIGHT,
@@ -144,12 +144,12 @@ void ntmsg_set_frame(int type) {
 		gr_fill_alpha_map(sf, MSGFRAME_0_X, MSGFRAME_0_Y,
 				  MSGFRAME_0_WIDTH, MSGFRAME_0_HEIGHT, 192);
 		ntmsg_clear(SPNO_MSGFRAME_FG);
-		sp_update_all(TRUE);
+		nt_sp_update_all(TRUE);
 		break;
 	case 2:
-		sp_set_show(night.sp[SPNO_MSGBG], TRUE);
-		sp_set_show(night.sp[SPNO_MSGFRAME_BG], FALSE);
-		sp_set_show(night.sp[SPNO_MSGFRAME_FG], TRUE);
+		nt_sp_set_show(night.sp[SPNO_MSGBG], TRUE);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], FALSE);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], TRUE);
 		
 		gr_fill(sf, MSGFRAME_1_X, MSGFRAME_1_Y,
 			MSGFRAME_1_WIDTH, MSGFRAME_1_HEIGHT,
@@ -157,7 +157,7 @@ void ntmsg_set_frame(int type) {
 		gr_fill_alpha_map(sf, MSGFRAME_1_X, MSGFRAME_1_Y,
 				  MSGFRAME_1_WIDTH, MSGFRAME_1_HEIGHT, 128);
 		ntmsg_clear(SPNO_MSGFRAME_FG);
-		sp_update_all(TRUE);
+		nt_sp_update_all(TRUE);
 	
 		break;
 	}
@@ -210,12 +210,12 @@ int ntmsg_ana(void) {
 	} else {
 		// msg newpage
 		ntmsg_out(SPNO_MSGFRAME_FG, night.fontsize, 255, 255, 255, night.fonttype, 0, 2);
-		sp_update_clipped();
+		nt_sp_update_clipped();
 		ret = ntmsg_keywait();
 		
 		// clear msgsprite
 		ntmsg_clear(SPNO_MSGFRAME_FG);
-		//sp_update_clipped();
+		//nt_sp_update_clipped();
 	}
 	
 	night.selmode = -1;
@@ -234,7 +234,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 	// shortcut
 	sp = night.sp[wNum];
 	
-	msg = sstr_replacestr(night.msgbuf);
+	msg = nt_sstr_replacestr(night.msgbuf);
 	
 	// 文字アラインメントの調整
 	set_align(msg, sp, wSize);
@@ -273,12 +273,12 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 		needupdate = TRUE;
 		
 		if (wSpeed > 0) {
-			sp_updateme_part(sp,
+			nt_sp_updateme_part(sp,
 					 sp->u.msg.dspcur.x,
 					 sp->u.msg.dspcur.y,
 					 cw,
 					 wSize);
-			sp_update_clipped();
+			nt_sp_update_clipped();
 			needupdate = FALSE;
 			
 			// keywait
@@ -301,7 +301,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 	if (needupdate) {
 		uparea.width  = sp->cursize.width;
 		uparea.height = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace);
-		sp_updateme_part(sp, uparea.x, uparea.y, uparea.width, uparea.height);
+		nt_sp_updateme_part(sp, uparea.x, uparea.y, uparea.width, uparea.height);
 	}
 	
 }
@@ -455,8 +455,8 @@ static void hakanim(int i) {
 		sp->curcg = sp->cg2;
 	}
 	sp->show = TRUE;
-	sp_updateme(sp);
-	sp_update_clipped();
+	nt_sp_updateme(sp);
+	nt_sp_update_clipped();
 	
 	sp->show = show;
 }
@@ -509,5 +509,5 @@ static void ntmsg_clear(int wNum) {
 	memset(sf->pixel, 0, sf->bytes_per_line * sf->height);
 	memset(sf->alpha, 0, sf->width * sf->height);
 	
-	sp_updateme(sp);
+	nt_sp_updateme(sp);
 }

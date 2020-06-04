@@ -61,7 +61,7 @@ static cginfo_t *cgs[CGMAX];
                  spriteから参照されるときは増やし、CG_xxxを作る時に
                  参照されるときは増やさない。
 */
-cginfo_t *scg_loadcg_no(int no, boolean refinc) {
+cginfo_t *nt_scg_loadcg_no(int no, boolean refinc) {
 	cginfo_t *i;
 	
 	if (no >= (CGMAX -1)) {
@@ -95,7 +95,7 @@ cginfo_t *scg_loadcg_no(int no, boolean refinc) {
 }
 
 //  指定の大きさ、色の矩形の CG を作成
-int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
+int nt_scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
 	cginfo_t *i;
 	
 	spcg_assert_no(wNumCG);
@@ -109,7 +109,7 @@ int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int 
 	gr_fill_alpha_map(i->sf, 0, 0, wWidth, wHeight, wBlendRate);
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumCG);
+	nt_scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
 	
@@ -117,7 +117,7 @@ int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int 
 }
 
 // 指定のCGを反転させたCGを作成
-int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) {
+int nt_scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) {
 	cginfo_t *i, *srccg;
 	surface_t *src;
 	
@@ -125,7 +125,7 @@ int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) 
 	spcg_assert_no(wNumSrcCG);
 	
 	// 元にするCGを参照 (LINKCGなら読み込み)
-	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
+	if (NULL == (srccg = nt_scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
 	
@@ -137,7 +137,7 @@ int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) 
 	src = srccg->sf;
 	i->sf = stretch(src, src->width, src->height, (wReverseX << 1) | wReverseY);
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumCG);
+	nt_scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
 	
@@ -145,7 +145,7 @@ int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) 
 }
 
 // 指定のCGを拡大/縮小したCGを作成
-int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
+int nt_scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	cginfo_t *i, *srccg;
 	surface_t *src;
 	
@@ -153,7 +153,7 @@ int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	spcg_assert_no(wNumSrcCG);
 
 	// 元にするCGを参照 (LINKCGなら読み込み)
-	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
+	if (NULL == (srccg = nt_scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
 	
@@ -166,7 +166,7 @@ int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	i->sf = stretch(src, wWidth, wHeight, 0);
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumCG);
+	nt_scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
 	
@@ -174,7 +174,7 @@ int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 }
 
 // ベースCGの上にブレンドCGを重ねた CG を作成
-int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode) {
+int nt_scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode) {
 	cginfo_t *i, *basecg, *blendcg;
 	
 	spcg_assert_no(wNumDstCG);
@@ -182,8 +182,8 @@ int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlen
 	spcg_assert_no(wNumBlendCG);
 	
 	// 元にするCGを参照 (LINKCGなら読み込み)
-	basecg  = scg_loadcg_no(wNumBaseCG, FALSE);
-	blendcg = scg_loadcg_no(wNumBlendCG, FALSE);
+	basecg  = nt_scg_loadcg_no(wNumBaseCG, FALSE);
+	blendcg = nt_scg_loadcg_no(wNumBlendCG, FALSE);
 	if (basecg == NULL || blendcg == NULL) return NG;
 	
 	i = malloc(sizeof(cginfo_t));
@@ -194,7 +194,7 @@ int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlen
 	i->sf = blend(basecg->sf, wX , wY, blendcg->sf, wAlphaMapMode);
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumDstCG);
+	nt_scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
 	
@@ -202,7 +202,7 @@ int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlen
 }
 
 // 指定の文字列のCGを作成
-int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) {
+int nt_scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) {
 	cginfo_t *i;
 	agsurface_t *glyph;
 	FONT *font;
@@ -232,7 +232,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) 
 	gr_draw_amap(i->sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumCG);
+	nt_scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
 	
@@ -240,7 +240,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) 
 }
 
 // 数字文字列のCGを作成
-int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue) {
+int nt_scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue) {
 	cginfo_t *i;
 	agsurface_t *glyph;
 	FONT *font;
@@ -270,7 +270,7 @@ int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs,
 	gr_draw_amap(i->sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumCG);
+	nt_scg_free(wNumCG);
 	
 	cgs[wNumCG] = i;
 	
@@ -278,14 +278,14 @@ int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs,
 }
 
 // CGを複製
-int scg_copy(int wNumDstCG, int wNumSrcCG) {
+int nt_scg_copy(int wNumDstCG, int wNumSrcCG) {
 	cginfo_t *i, *srccg;
 	
 	spcg_assert_no(wNumDstCG);
 	spcg_assert_no(wNumSrcCG);
 	
 	// 元にするCGを参照 (LINKCGなら読み込み)
-	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
+	if (NULL == (srccg = nt_scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
 	
@@ -296,7 +296,7 @@ int scg_copy(int wNumDstCG, int wNumSrcCG) {
 	i->sf = sf_dup(srccg->sf);
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumDstCG);
+	nt_scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
 	
@@ -304,7 +304,7 @@ int scg_copy(int wNumDstCG, int wNumSrcCG) {
 }
 
 // CGの一部を切りぬいたCGを作成
-int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
+int nt_scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
 	cginfo_t *i, *srccg;
 	surface_t *dst, *src;
 	
@@ -312,7 +312,7 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 	spcg_assert_no(wNumSrcCG);
 	
 	// 元にするCGを参照 (LINKCGなら読み込み)
-	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
+	if (NULL == (srccg = nt_scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
 	
@@ -337,7 +337,7 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 	i->sf = dst;
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumDstCG);
+	nt_scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
 	
@@ -345,7 +345,7 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 }
 
 // 元のCGの一部を切りぬいたCGを作成
-int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
+int nt_scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
 	cginfo_t *i, *srccg;
 	surface_t *dst, *src;
 	
@@ -353,7 +353,7 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 	spcg_assert_no(wNumSrcCG);
 	
 	// 元にするCGを参照 (LINKCGなら読み込み)
-	if (NULL == (srccg = scg_loadcg_no(wNumSrcCG, FALSE))) {
+	if (NULL == (srccg = nt_scg_loadcg_no(wNumSrcCG, FALSE))) {
 		return NG;
 	}
 	
@@ -380,7 +380,7 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 	i->sf = dst;
 	
 	// もし前に作成したものがあり、未開放の場合は開放
-	scg_free(wNumDstCG);
+	nt_scg_free(wNumDstCG);
 	
 	cgs[wNumDstCG] = i;
 	
@@ -388,11 +388,11 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 }
 
 // 全てのCGの開放
-int scg_freeall() {
+int nt_scg_freeall() {
 	int i;
 	
 	for (i = 1; i < CGMAX; i++) {
-		scg_free(i);
+		nt_scg_free(i);
 	}
 	return OK;
 }
@@ -401,7 +401,7 @@ int scg_freeall() {
  * 指定の番号の CG をオブジェクトリストから消し、オブジェクトがどこからも参照
  * されていない(参照数が0の)場合のみ、オブジェクトを削除
  */
-int scg_free(int no) {
+int nt_scg_free(int no) {
 	cginfo_t *cg;
 	
 	spcg_assert_no(no);
@@ -410,7 +410,7 @@ int scg_free(int no) {
 	
 	// 参照数が0の時のみオブジェクトを開放
 	if (cg->refcnt == 0) {
-		scg_free_cgobj(cg);
+		nt_scg_free_cgobj(cg);
 	}
 	
 	// 番号で消したときはオブジェクトが開放されなくても
@@ -423,7 +423,7 @@ int scg_free(int no) {
 /**
  * CG オブジェクトの開放
  */
-int scg_free_cgobj(cginfo_t *cg) {
+int nt_scg_free_cgobj(cginfo_t *cg) {
 	if (cg == NULL) return NG;
 	
 	(cg->refcnt)--;
@@ -448,7 +448,7 @@ int scg_free_cgobj(cginfo_t *cg) {
 }
 
 // CGの種類を取得
-int scg_querytype(int wNumCG, int *ret) {
+int nt_scg_querytype(int wNumCG, int *ret) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;
 
@@ -462,7 +462,7 @@ int scg_querytype(int wNumCG, int *ret) {
 }
 
 // CGの大きさを取得
-int scg_querysize(int wNumCG, int *w, int *h) {
+int nt_scg_querysize(int wNumCG, int *w, int *h) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;
 	if (cgs[wNumCG]->sf == NULL) goto errexit;
@@ -478,7 +478,7 @@ int scg_querysize(int wNumCG, int *w, int *h) {
 }
 
 // CGのBPPを取得
-int scg_querybpp(int wNumCG, int *ret) {
+int nt_scg_querybpp(int wNumCG, int *ret) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;
 	if (cgs[wNumCG]->sf == NULL) goto errexit;
@@ -493,7 +493,7 @@ int scg_querybpp(int wNumCG, int *ret) {
 }
 
 // CGの alphamap が存在するかを取得
-int scg_existalphamap(int wNumCG, int *ret) {
+int nt_scg_existalphamap(int wNumCG, int *ret) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (cgs[wNumCG] == NULL) goto errexit;
 	if (cgs[wNumCG]->sf == NULL) goto errexit;

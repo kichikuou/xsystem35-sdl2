@@ -38,10 +38,10 @@
  @param sp: 描画するスプライト
  @param r : 再描画する領域
 */
-int sp_draw(sprite_t *sp, MyRectangle *r) {
+int nt_sp_draw(sprite_t *sp, MyRectangle *r) {
 	if (sp == NULL) return NG;
 	
-	return sp_draw2(sp, sp->curcg, r);
+	return nt_sp_draw2(sp, sp->curcg, r);
 }
 
 /*
@@ -52,7 +52,7 @@ int sp_draw(sprite_t *sp, MyRectangle *r) {
   @param cg: 描画するCG
  @param r : 再描画する領域
 */
-int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
+int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	surface_t update;
 	int sx, sy, w, h, dx, dy;
 	
@@ -103,7 +103,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 }
 
 // BlendScreenによる描画
-int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
+int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	surface_t update;
 	cginfo_t *cg;
 	int sx, sy, w, h, dx, dy;
