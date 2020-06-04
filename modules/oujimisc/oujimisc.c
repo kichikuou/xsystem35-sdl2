@@ -5,9 +5,10 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 
-void MakeMapSetParam() {
+static void MakeMapSetParam() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -16,7 +17,7 @@ void MakeMapSetParam() {
 	DEBUG_COMMAND_YET("oujimisc.MakeMapSetParam %d,%d,%d,%d:\n", p1,p2,p3,p4);
 }
 
-void MakeMapSetChipParam() {
+static void MakeMapSetChipParam() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -27,7 +28,7 @@ void MakeMapSetChipParam() {
 	
 }
 
-void MakeMapDraw() {
+static void MakeMapDraw() {
 	int p1 = getCaliValue(); /* ISys3xDIB */
 	int p2 = getCaliValue(); 
 	int p3 = getCaliValue();
@@ -40,13 +41,13 @@ void MakeMapDraw() {
 	DEBUG_COMMAND_YET("oujimisc.MakeMapDraw %d,%d,%d,%d,%d,%p,%p,%p:\n", p1,p2,p3,p4,p5,p6,p7,p8);
 }
 
-void MakeMapInit() {
+static void MakeMapInit() {
 	int p1 = getCaliValue(); /* ISys3x */
 	
 	DEBUG_COMMAND_YET("oujimisc.MakeMapInit %d:\n", p1);
 }	
 
-void DrawNumber() {
+static void DrawNumber() {
 	int p1 = getCaliValue(); /* ISys3xDIB */
 	int p2 = getCaliValue(); 
 	int p3 = getCaliValue();
@@ -59,18 +60,18 @@ void DrawNumber() {
 	DEBUG_COMMAND_YET("oujimisc.DrawNumber %d,%d,%d,%d,%d,%d,%d,%d:\n", p1,p2,p3,p4,p5,p6,p7,p8);
 }
 
-void TempMapCreateShadow() {
+static void TempMapCreateShadow() {
 	DEBUG_COMMAND_YET("oujimisc.TempMapCreateShadow:\n");
 }
 
-void TempMapInit() {
+static void TempMapInit() {
 	int p1 = getCaliValue(); /* ISys3x */
 	int p2 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("oujimisc.TempMapInit %d,%d:\n", p1,p2);
 }
 
-void TempMapLoadToShadow() {
+static void TempMapLoadToShadow() {
 	int p1 = getCaliValue();
 	int *p2 = getCaliVariable();
 	int *p3 = getCaliVariable();
@@ -80,7 +81,7 @@ void TempMapLoadToShadow() {
 	DEBUG_COMMAND_YET("oujimisc.TempMapLoadToShadow %d,%p,%p,%p,%d:\n", p1,p2,p3,p4,p5);
 }
 
-void TempMapSaveToShadow() {
+static void TempMapSaveToShadow() {
 	int p1 = getCaliValue();
 	int *p2 = getCaliVariable();
 	int *p3 = getCaliVariable();
@@ -90,19 +91,19 @@ void TempMapSaveToShadow() {
 	DEBUG_COMMAND_YET("oujimisc.TempMapSaveToShadow %d,%p,%p,%p,%d:\n", p1,p2,p3,p4,p5);
 }
 
-void TempMapFileSave() {
+static void TempMapFileSave() {
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("oujimisc.TempMapFileSave %d:\n", p1);
 }
 
-void TempMapFileLoad() {
+static void TempMapFileLoad() {
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("oujimisc.TempMapFileLoad %d:\n", p1);
 }
 
-void CalcMoveDiffer() {
+static void CalcMoveDiffer() {
 	int *p1 = getCaliVariable();
 	int *p2 = getCaliVariable();
 	int p3 = getCaliValue();
@@ -114,3 +115,20 @@ void CalcMoveDiffer() {
 
 	DEBUG_COMMAND_YET("oujimisc.CalcMoveDiffer %p,%p,%d,%d,%d,%d,%p,%d:\n", p1,p2,p3,p4,p5,p6,p7,p8);
 }
+
+static const ModuleFunc functions[] = {
+	{"CalcMoveDiffer", CalcMoveDiffer},
+	{"DrawNumber", DrawNumber},
+	{"MakeMapDraw", MakeMapDraw},
+	{"MakeMapInit", MakeMapInit},
+	{"MakeMapSetChipParam", MakeMapSetChipParam},
+	{"MakeMapSetParam", MakeMapSetParam},
+	{"TempMapCreateShadow", TempMapCreateShadow},
+	{"TempMapFileLoad", TempMapFileLoad},
+	{"TempMapFileSave", TempMapFileSave},
+	{"TempMapInit", TempMapInit},
+	{"TempMapLoadToShadow", TempMapLoadToShadow},
+	{"TempMapSaveToShadow", TempMapSaveToShadow},
+};
+
+const Module module_oujimisc = {"oujimisc", functions, sizeof(functions) / sizeof(ModuleFunc)};

@@ -28,12 +28,8 @@
 #include "nact.h"
 #include "s39ain.h"
 #include "xsystem35.h"
-#ifdef ENABLE_MODULES
-#include <dlfcn.h>
-#endif
 
 #define dll  nact->ain.dll
-#define msgi nact->ain.msg
 
 typedef void *entrypoint (void);
 
@@ -46,21 +42,15 @@ void commands2F60() {
 	if (dll == NULL) {
 		SYSERROR("No DLL initilized\n");
 	}
-	
+
 	if (dll + type == NULL) goto eexit;
-	
-	if (dll[type].handle == NULL) goto eexit;
-	
+
 	if (dll[type].function_num < fnum) goto eexit;
-	
-	if (dll[type].function[fnum].name == NULL) goto eexit;
-	
-	function = dlsym(dll[type].handle, dll[type].function[fnum].name);
-	
-	if (function) {
-		(*function)();
-		return;
-	}
+
+	if (dll[type].function[fnum].entrypoint == NULL) goto eexit;
+
+	dll[type].function[fnum].entrypoint();
+	return;
 #endif
 	
  eexit:

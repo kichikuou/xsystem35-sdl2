@@ -34,6 +34,7 @@
 #include "nact.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "randMT.h"
 
 static int numbase;
@@ -51,7 +52,7 @@ static int64_t div64(int64_t a1, int64_t a2) {
 	return a1 / a2;
 }
 
-void SetIntNumBase(void) { /* 0 */
+static void SetIntNumBase(void) { /* 0 */
 	/*
 	  64 bit 演算のための倍数をセット
 	  
@@ -65,7 +66,7 @@ void SetIntNumBase(void) { /* 0 */
 	
 }
 
-void SetIntNum16(void) { /* 1 */
+static void SetIntNum16(void) { /* 1 */
 	/*
 	  64 bit 演算のための数値をセット
 
@@ -78,13 +79,13 @@ void SetIntNum16(void) { /* 1 */
 	DEBUG_COMMAND("ShCalc.SetIntNum16 %p:\n", var);
 }
 
-void SetIntNum32(void) { /* 2 */
+static void SetIntNum32(void) { /* 2 */
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShCalc.SetIntNum32: %d:\n", p1);
 }
 
-void GetIntNum16(void) { /* 3 */
+static void GetIntNum16(void) { /* 3 */
 	/*
 	  64 bit 演算した結果を得る
 
@@ -104,13 +105,13 @@ void GetIntNum16(void) { /* 3 */
 	DEBUG_COMMAND("ShCalc.GetIntNum16 %d:\n", var);
 }
 
-void GetIntNum32(void) { /* 4 */
+static void GetIntNum32(void) { /* 4 */
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShCalc.GetIntNum32: %d:\n", p1);
 }
 
-void AddIntNum16(void) { /* 5 */
+static void AddIntNum16(void) { /* 5 */
 	/*
 	  64 bit 加算
 
@@ -123,25 +124,25 @@ void AddIntNum16(void) { /* 5 */
 	DEBUG_COMMAND("ShCalc.AddIntNum16 %p:\n", var);
 }
 
-void AddIntNum32(void) { /* 6 */
+static void AddIntNum32(void) { /* 6 */
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShCalc.AddIntNum32: %d:\n", p1);
 }
 
-void SubIntNum16(void) { /* 7 */
+static void SubIntNum16(void) { /* 7 */
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShCalc.SubIntNum16: %d:\n", p1);
 }
 
-void SubIntNum32(void) { /* 8 */
+static void SubIntNum32(void) { /* 8 */
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShCalc.SubIntNum32: %d:\n", p1);
 }
 
-void MulIntNum16(void) {  /* 9 */
+static void MulIntNum16(void) {  /* 9 */
 	/*
 	  64 bit 乗算
 	  
@@ -154,13 +155,13 @@ void MulIntNum16(void) {  /* 9 */
 	DEBUG_COMMAND("ShCalc.MulIntNum16: %p:\n", var);
 }
 
-void MulIntNum32(void) {  /* 10 */
+static void MulIntNum32(void) {  /* 10 */
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShCalc.MulIntNum32: %d:\n", p1);
 }
 
-void DivIntNum16(void) { /* 11 */
+static void DivIntNum16(void) { /* 11 */
 	/*
 	  64 bit 除算
 
@@ -177,13 +178,13 @@ void DivIntNum16(void) { /* 11 */
 	DEBUG_COMMAND("ShCalc.DivIntNum16 %p:\n", var);
 }
 
-void DivIntNum32(void) { /* 12 */ 
+static void DivIntNum32(void) { /* 12 */
 	int p1 = getCaliValue();
 
 	DEBUG_COMMAND_YET("ShCalc.DivIntNum32: %d:\n", p1);
 }
 
-void CmpIntNum16(void) { /* 13 */
+static void CmpIntNum16(void) { /* 13 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -191,7 +192,7 @@ void CmpIntNum16(void) { /* 13 */
 	DEBUG_COMMAND_YET("ShCalc.CmpIntNum16: %d,%d,%d:\n", p1, p2, p3);
 }
 
-void CmpIntNum32(void) { /* 14 */
+static void CmpIntNum32(void) { /* 14 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -199,7 +200,7 @@ void CmpIntNum32(void) { /* 14 */
 	DEBUG_COMMAND_YET("ShCalc.CmpIntNum32: %d,%d,%d:\n", p1, p2, p3);
 }
 	
-void GetLengthNum16(void) { /* 15 */
+static void GetLengthNum16(void) { /* 15 */
 	/*
 	  数値の桁数を返す
 	   var: 数値
@@ -223,14 +224,14 @@ void GetLengthNum16(void) { /* 15 */
 	DEBUG_COMMAND("ShCalc.GetLengthNum16 %p,%p:\n", var, vResult);
 }
 
-void GetLengthNum32(void) { /* 16 */
+static void GetLengthNum32(void) { /* 16 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShCalc.GetLengthNum32: %d,%d:\n", p1, p2);
 }
 
-void NumToRate(void) { /* 17 */
+static void NumToRate(void) { /* 17 */
 	/*
 	  p1 * (p3/p2) の演算結果を返す。
 
@@ -262,7 +263,7 @@ void NumToRate(void) { /* 17 */
 	
 }
 
-void NumToRateNum(void) { /* 18 */
+static void NumToRateNum(void) { /* 18 */
 	/*
 	  p1 * (p2/p3) の演算結果を返す。
 
@@ -293,7 +294,7 @@ void NumToRateNum(void) { /* 18 */
 	DEBUG_COMMAND("ShCalc.NumToRateNum %d,%d,%d,%d,%p:\n", p1, p2, p3, flag, vResult);
 }
 
-void SetRandomSeed() {
+static void SetRandomSeed() {
 	/*
 	  乱数の種の設定
 	  
@@ -306,7 +307,7 @@ void SetRandomSeed() {
 	DEBUG_COMMAND("ShCalc.SetRandomSeed %d:\n", seed);
 }
 
-void GetRandomNumA() {
+static void GetRandomNumA() {
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 
@@ -319,7 +320,7 @@ void GetRandomNumA() {
 	DEBUG_COMMAND("ShCalc.GetRandomNumA %d,%p:\n", num, var);
 }
 
-void NumToBit() {
+static void NumToBit() {
 	/*
 	  2^(beki-1)
 	  
@@ -341,7 +342,7 @@ void NumToBit() {
 	DEBUG_COMMAND("ShCalc.NumToBit %d,%p:\n", beki, var);
 }
 
-void BitToNum() {
+static void BitToNum() {
 	/*
 	  val -> var
 	  1   -> 1
@@ -374,3 +375,31 @@ void BitToNum() {
 		(*var)++;
 	}
 }
+
+static const ModuleFunc functions[] = {
+	{"AddIntNum16", AddIntNum16},
+	{"AddIntNum32", AddIntNum32},
+	{"BitToNum", BitToNum},
+	{"CmpIntNum16", CmpIntNum16},
+	{"CmpIntNum32", CmpIntNum32},
+	{"DivIntNum16", DivIntNum16},
+	{"DivIntNum32", DivIntNum32},
+	{"GetIntNum16", GetIntNum16},
+	{"GetIntNum32", GetIntNum32},
+	{"GetLengthNum16", GetLengthNum16},
+	{"GetLengthNum32", GetLengthNum32},
+	{"GetRandomNumA", GetRandomNumA},
+	{"MulIntNum16", MulIntNum16},
+	{"MulIntNum32", MulIntNum32},
+	{"NumToBit", NumToBit},
+	{"NumToRate", NumToRate},
+	{"NumToRateNum", NumToRateNum},
+	{"SetIntNum16", SetIntNum16},
+	{"SetIntNum32", SetIntNum32},
+	{"SetIntNumBase", SetIntNumBase},
+	{"SetRandomSeed", SetRandomSeed},
+	{"SubIntNum16", SubIntNum16},
+	{"SubIntNum32", SubIntNum32},
+};
+
+const Module module_ShCalc = {"ShCalc", functions, sizeof(functions) / sizeof(ModuleFunc)};

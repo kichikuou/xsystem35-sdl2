@@ -34,10 +34,11 @@
 #include "nact.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "variable.h"
 #include "ags.h"
 
-void ExchangeString(void) {
+static void ExchangeString(void) {
 	/*
 	  文字列(target)中の一部(pat)を別の文字列(patr)で置き換える
 	*/
@@ -66,35 +67,35 @@ void ExchangeString(void) {
 	v_strcpy(target -1, dst);
 }
 
-void SetNum16String(void) { /* 1 */
+static void SetNum16String(void) { /* 1 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
 	DEBUG_COMMAND_YET("ShString.SetNum16String: %d,%d:\n", p1, p2);
 }
 
-void SetNum16HalfString(void) { /* 2 */
+static void SetNum16HalfString(void) { /* 2 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
 	DEBUG_COMMAND_YET("ShString.SetNum16HalfString: %d,%d:\n", p1, p2);
 }
 
-void SetNum32String(void) { /* 3 */
+static void SetNum32String(void) { /* 3 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
 	DEBUG_COMMAND_YET("ShString.SetNum32String: %d,%d:\n", p1, p2);
 }
 
-void SetNum32HalfString(void) { /* 4 */
+static void SetNum32HalfString(void) { /* 4 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
 	DEBUG_COMMAND_YET("ShString.SetNum32HalfString: %d,%d:\n", p1, p2);
 }
 
-void GetArrayString(void) { /* 5 */
+static void GetArrayString(void) { /* 5 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -102,7 +103,7 @@ void GetArrayString(void) { /* 5 */
 	DEBUG_COMMAND_YET("ShString.GetArrayString: %d,%d,%d:\n", p1, p2, p3);
 }
 
-void SetWindowTitle(void) { /* 6 */
+static void SetWindowTitle(void) { /* 6 */
 	int strno = getCaliValue();
 	int p2    = getCaliValue(); /* ISys3xSystem */ 
 	
@@ -111,7 +112,7 @@ void SetWindowTitle(void) { /* 6 */
 	DEBUG_COMMAND("ShString.SetWindowTitle: %d,%d:\n", strno, p2);
 }
 
-void FillString() {
+static void FillString() {
 	/*
 	  指定の番号の文字列を他の文字列にコピー
 	  
@@ -133,7 +134,7 @@ void FillString() {
 	DEBUG_COMMAND("ShString.FillString: %d,%d,%d,%d:\n", st, cnt, src, p4);
 }
 
-void SetStringNum16(void) {
+static void SetStringNum16(void) {
 	/*
 	  文字列を数値に変換
 	    大文字、小文字、混在可
@@ -173,9 +174,24 @@ void SetStringNum16(void) {
 	*var = atoi(_dst);
 }
 
-void SetStringNum32(void) {
+static void SetStringNum32(void) {
 	int p1 = getCaliValue();
 	int *p2 = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("ShString.SetStringNum32: %d,%p:\n", p1, p2);
 }
+
+static const ModuleFunc functions[] = {
+	{"ExchangeString", ExchangeString},
+	{"FillString", FillString},
+	{"GetArrayString", GetArrayString},
+	{"SetNum16HalfString", SetNum16HalfString},
+	{"SetNum16String", SetNum16String},
+	{"SetNum32HalfString", SetNum32HalfString},
+	{"SetNum32String", SetNum32String},
+	{"SetStringNum16", SetStringNum16},
+	{"SetStringNum32", SetStringNum32},
+	{"SetWindowTitle", SetWindowTitle},
+};
+
+const Module module_ShString = {"ShString", functions, sizeof(functions) / sizeof(ModuleFunc)};

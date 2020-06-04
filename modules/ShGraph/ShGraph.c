@@ -32,6 +32,7 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "ags.h"
 #include "counter.h"
@@ -89,7 +90,7 @@ static struct _s2 s2[SLOT];
 static int* add_p5[SLOT]; /* どこまでアニメーションのコマが進んだか */
 
 
-void Init() {
+static void Init() {
 	/*
 	  モジュール初期化
 	*/
@@ -98,13 +99,13 @@ void Init() {
 	DEBUG_COMMAND("ShGraph.Init %d:\n", p1);
 }
 
-void GetSurfaceData() {
+static void GetSurfaceData() {
 	int p1 = getCaliValue(); /* ISurface */
 	
 	DEBUG_COMMAND_YET("ShGraph.GetSurfaceData %d:\n", p1);
 }
 
-void ChangeEquColor() {
+static void ChangeEquColor() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -116,7 +117,7 @@ void ChangeEquColor() {
 	DEBUG_COMMAND_YET("ShGraph.ChangeEquColor %d,%d,%d,%d,%p,%p,%d:\n", p1, p2, p3, p4, p5, p6, p7);
 }
 
-void ChangeNotColor() {
+static void ChangeNotColor() {
 	/*
 	  指定の領域が src と等しくなければ dst に塗りつぶす
 	  
@@ -228,7 +229,7 @@ void ChangeNotColor() {
       lastslotが０の場合は 7 で指定したところまで。
 
 */
-void ResetAnimeData() {
+static void ResetAnimeData() {
 	/*
 	  アニメーション用の各種データをクリア
 	  
@@ -253,7 +254,7 @@ void ResetAnimeData() {
 	
 }
 
-void SetAnimeSrc() {
+static void SetAnimeSrc() {
 	/*
 	  アニメーションの各パターンのソース領域の設定
 
@@ -296,7 +297,7 @@ void SetAnimeSrc() {
 	src[no].b = b;
 }
 
-void SetAnimeDst() {
+static void SetAnimeDst() {
 	/*
 	  アニメーションの描画先設定
 	  
@@ -331,7 +332,7 @@ void SetAnimeDst() {
 	s2[no].w_1000A8A2 = 0;
 }
 
-void AddAnimeData() {
+static void AddAnimeData() {
 	/*
 	  アニメーション各種設定
 	  
@@ -375,7 +376,7 @@ void AddAnimeData() {
 	add_p5[i] = p5;
 }
 
-void AddAnimeRemain() {
+static void AddAnimeRemain() {
 	/*
 	  アニメーション各種設定
 	  
@@ -401,7 +402,7 @@ void AddAnimeRemain() {
 	}
 }
 
-void SetAnimeRect() {
+static void SetAnimeRect() {
 	/*
 	  アニメーション描画領域設定
 
@@ -423,7 +424,7 @@ void SetAnimeRect() {
 	maprect.height = h;
 }
 
-void SetAnimeBack() {
+static void SetAnimeBack() {
 	/*
 	  アニメーション背景領域設定
 	  
@@ -451,7 +452,7 @@ void SetAnimeBack() {
 	mapback_p6 = p6;
 }
 
-void PlayAnimeData() {
+static void PlayAnimeData() {
 	/*
 	  実際にアニメーションを実行
 	  
@@ -641,3 +642,20 @@ static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, i
 	}
 	}
 }
+
+static const ModuleFunc functions[] = {
+	{"AddAnimeData", AddAnimeData},
+	{"AddAnimeRemain", AddAnimeRemain},
+	{"ChangeEquColor", ChangeEquColor},
+	{"ChangeNotColor", ChangeNotColor},
+	{"GetSurfaceData", GetSurfaceData},
+	{"Init", Init},
+	{"PlayAnimeData", PlayAnimeData},
+	{"ResetAnimeData", ResetAnimeData},
+	{"SetAnimeBack", SetAnimeBack},
+	{"SetAnimeDst", SetAnimeDst},
+	{"SetAnimeRect", SetAnimeRect},
+	{"SetAnimeSrc", SetAnimeSrc},
+};
+
+const Module module_ShGraph = {"ShGraph", functions, sizeof(functions) / sizeof(ModuleFunc)};

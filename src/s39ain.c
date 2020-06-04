@@ -34,14 +34,13 @@
 #include "xsystem35.h"
 
 #ifdef ENABLE_MODULES
-#include <dlfcn.h>
+#include "modules.h"
 #endif
 
 /* short cut */
 #define dll  nact->ain.dll
 #define msg  nact->ain.msg
 #define fnc  nact->ain.fnc
-#define path_to_dll nact->ain.path_to_dll
 #define path_to_ain nact->ain.path_to_ain
 #define dllnum nact->ain.dllnum
 #define fncnum nact->ain.fncnum
@@ -60,13 +59,6 @@ int s39ain_init(void) {
 	
 	if (path_to_ain == NULL) {
 		return NG;
-	}
-	
-	if (path_to_dll == NULL) {
-		char path[512];
-		getcwd(path, 400);
-		strcat(path, "/modules");
-		path_to_dll = strdup(path);
 	}
 	
 	if (NULL == (fp =  fopen(path_to_ain, "rb"))) {
@@ -136,6 +128,7 @@ int s39ain_init(void) {
 				dll[i].function[j].argv[k] = LittleEndian_getDW(p, 0);
 				p += 4;
 			}
+			dll[i].function[j].entrypoint = NULL;
 		}
 	}
 	
@@ -176,30 +169,12 @@ int s39ain_init(void) {
 			p += strlen(p) + 1;
 		}
 	}
-	
-#ifndef ENABLE_MODULES
+
 	free(buf);
-	return dllnum == 0 ? OK : NG;
-#else
-	
-	/* open dll */
-	for (i = 0; i < dllnum; i++) {
-		char soname[64];
-		void *handle;
-		
-		if (dll[i].function_num == 0) continue;
-		
-		snprintf(soname, sizeof(soname), "lib%s.so", dll[i].name);
-		handle = dlopen(soname, RTLD_NOW);
-		
-		if (handle == NULL) {
-			SYSERROR("dlopen: %s(%s)\n", dlerror(), dll[i].name);
-		}
-		
-		dll[i].handle = handle;
-	}
-	
-	free(buf);
+
+#ifdef ENABLE_MODULES
+	for (i = 0; i < dllnum; i++)
+		resolve_module(&dll[i]);
+#endif
 	return OK;
-#endif // ENABLE_MODULES
 }

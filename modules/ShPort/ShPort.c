@@ -34,13 +34,14 @@
 #include "nact.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "graphicsdevice.h"
 
 // キー変換テーブル
 #define KEYMAP_MAX 8
 static BYTE *keymap[KEYMAP_MAX];
 
-void OutputMessageBox(void) { /* 0 */
+static void OutputMessageBox(void) { /* 0 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -51,7 +52,7 @@ void OutputMessageBox(void) { /* 0 */
 	DEBUG_COMMAND_YET("ShPort.OutputMessageBox: %d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6);
 }
 
-void InputListNum(void) { /* 1 */
+static void InputListNum(void) { /* 1 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -68,7 +69,7 @@ void InputListNum(void) { /* 1 */
  *   ShPortサブシステム全体の初期化
  *   @param p1: ISys3x
  */
-void Init(void) {
+static void Init(void) {
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("ShPort.Init: %d:\n", p1);
@@ -79,7 +80,7 @@ void Init(void) {
  *   指定のキーコードマップの初期化
  *   @param no: キーコードマップの番号(1~)
  */
-void InitKeyStatus(void) {
+static void InitKeyStatus(void) {
 	int no = getCaliValue();
 	
 	if (no >= KEYMAP_MAX) {
@@ -103,7 +104,7 @@ void InitKeyStatus(void) {
  *   @param key: キーコード
  *   @param func: 機能キーコード
  */
-void SetKeyStatus(void) {
+static void SetKeyStatus(void) {
 	int no   = getCaliValue();
 	int key  = getCaliValue();
 	int func = getCaliValue();
@@ -124,7 +125,7 @@ void SetKeyStatus(void) {
  *   @param no:  マップ番号
  *   @param var: 押下キーに対応する機能コードを返す変数
  */
-void GetKeyStatus(void) {
+static void GetKeyStatus(void) {
 	int no   = getCaliValue();
 	int *var = getCaliVariable();
 	int i;
@@ -142,7 +143,7 @@ void GetKeyStatus(void) {
 	DEBUG_COMMAND("ShPort.GetKeyStatus: %d,%p:\n", no, var);
 }
 
-void InputListString(void) {
+static void InputListString(void) {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -154,7 +155,7 @@ void InputListString(void) {
 	DEBUG_COMMAND_YET("ShPort.InputListString: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
-void InputOpenFile(void) {
+static void InputOpenFile(void) {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -166,7 +167,7 @@ void InputOpenFile(void) {
 	DEBUG_COMMAND_YET("ShPort.InputOpenFile: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
-void InputSaveFile(void) {
+static void InputSaveFile(void) {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -178,3 +179,16 @@ void InputSaveFile(void) {
 	DEBUG_COMMAND_YET("ShPort.InputSaveFile: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
+static const ModuleFunc functions[] = {
+	{"GetKeyStatus", GetKeyStatus},
+	{"Init", Init},
+	{"InitKeyStatus", InitKeyStatus},
+	{"InputListNum", InputListNum},
+	{"InputListString", InputListString},
+	{"InputOpenFile", InputOpenFile},
+	{"InputSaveFile", InputSaveFile},
+	{"OutputMessageBox", OutputMessageBox},
+	{"SetKeyStatus", SetKeyStatus},
+};
+
+const Module module_ShPort = {"ShPort", functions, sizeof(functions) / sizeof(ModuleFunc)};

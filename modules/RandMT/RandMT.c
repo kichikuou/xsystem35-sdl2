@@ -28,10 +28,11 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "randMT.h"
 
-void Init() {
+static void Init() {
 	/*
 	  乱数初期化
 
@@ -42,7 +43,7 @@ void Init() {
 	DEBUG_COMMAND_YET("RandMT.Init %p:\n", p1);
 }
 
-void Get() {
+static void Get() {
 	/*
 	  1 から num までの乱数を生成
 	  
@@ -61,10 +62,18 @@ void Get() {
 	DEBUG_COMMAND_YET("RandMT.Get %d,%p:\n", num, var);
 }
 
-void GetNoOverlap() { /* not used ? */
+static void GetNoOverlap() { /* not used ? */
 	int p1    = getCaliValue();
 	int p2    = getCaliValue();
 	int *var1 = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("RandMT.GetNoOverlap %p:\n", p1);
 }
+
+static const ModuleFunc functions[] = {
+	{"Get", Get},
+	{"GetNoOverlap", GetNoOverlap},
+	{"Init", Init},
+};
+
+const Module module_RandMT = {"RandMT", functions, sizeof(functions) / sizeof(ModuleFunc)};

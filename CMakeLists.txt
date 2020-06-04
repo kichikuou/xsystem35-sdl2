@@ -50,10 +50,7 @@ else()
   TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
 
   if (NOT DEFINED ENABLE_MODULES)
-    check_library_exists(dl dlopen "" ENABLE_MODULES)
-  endif()
-  if (ENABLE_MODULES)
-    link_libraries(dl)
+    set(ENABLE_MODULES 1)
   endif()
 
   find_package(ZLIB REQUIRED)
@@ -269,4 +266,5 @@ endif()
 
 if (ENABLE_MODULES)
   add_subdirectory(modules)
+  target_link_libraries(xsystem35 PRIVATE modules)
 endif()

@@ -1,12 +1,3 @@
-if (ENABLE_MODULES)
-  set(CMAKE_BUILD_RPATH ${CMAKE_CURRENT_BINARY_DIR}/../modules)
-  if (APPLE)
-    set(CMAKE_INSTALL_RPATH @loader_path/../lib/xsystem35)
-  else()
-    set(CMAKE_INSTALL_RPATH $ORIGIN/../lib/xsystem35)
-  endif()
-endif()
-
 if (ANDROID)
   add_library(xsystem35 SHARED)
 else()
@@ -59,10 +50,6 @@ target_sources(xsystem35 PRIVATE
 # Network
 target_sources(xsystem35 PRIVATE
   network.c)
-
-if (ENABLE_MODULES)
-  target_link_libraries(xsystem35 PRIVATE -rdynamic)
-endif()
 
 if (EMSCRIPTEN)
 

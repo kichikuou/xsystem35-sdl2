@@ -31,9 +31,10 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 
-void GetAtArray(void) { /* 0 */
+static void GetAtArray(void) { /* 0 */
 	/*
 	  配列から演算しながら値を取り出す
 	  
@@ -79,7 +80,7 @@ void GetAtArray(void) { /* 0 */
 	*vResult = j;
 }
 
-void AddAtArray(void) { /* 1 */
+static void AddAtArray(void) { /* 1 */
 	/*
 	  配列１に配列２を足す。65535 を超えたら 65535 に。
 	  
@@ -105,7 +106,7 @@ void AddAtArray(void) { /* 1 */
 	}
 }
 
-void SubAtArray(void) { /* 2 */
+static void SubAtArray(void) { /* 2 */
 	/*
 	  配列１から配列２を引く。負になったら０をかく
 	  
@@ -131,7 +132,7 @@ void SubAtArray(void) { /* 2 */
 	}
 }
 
-void MulAtArray(void) { /* 3 */
+static void MulAtArray(void) { /* 3 */
 	/*
 	  配列１に配列２をかけて、配列１に格納、65535まで。
 
@@ -157,7 +158,7 @@ void MulAtArray(void) { /* 3 */
 	}
 }
 
-void DivAtArray(void) { /* 4 */
+static void DivAtArray(void) { /* 4 */
 	/*
 	  配列１を配列２で割って、配列１に格納、65535まで。
 	  
@@ -187,7 +188,7 @@ void DivAtArray(void) { /* 4 */
 	}
 }
 
-void MinAtArray(void) { /* 5 */
+static void MinAtArray(void) { /* 5 */
 	/*
 	  配列 vAry1 の中身を配列 vAry2 で下限に設定する
 
@@ -210,7 +211,7 @@ void MinAtArray(void) { /* 5 */
 	}
 }
 
-void MaxAtArray(void) { /* 6 */
+static void MaxAtArray(void) { /* 6 */
 	/*
 	  配列 vAry1 の中身を配列 vAry2 で上限に設定する
 	  
@@ -233,7 +234,7 @@ void MaxAtArray(void) { /* 6 */
 	}
 }
 
-void AndNumArray(void) { /* 7 */
+static void AndNumArray(void) { /* 7 */
 	/*
 	  配列のデータと val で AND をとる
 
@@ -254,7 +255,7 @@ void AndNumArray(void) { /* 7 */
 	}
 }
 
-void OrNumArray(void) { /* 8 */
+static void OrNumArray(void) { /* 8 */
 	/*
 	  配列のデータと val で OR をとる
 
@@ -275,7 +276,7 @@ void OrNumArray(void) { /* 8 */
 	}
 }
 
-void XorNumArray(void) { /* 9 */
+static void XorNumArray(void) { /* 9 */
 	/*
 	  配列のデータと val で XOR をとる
 
@@ -296,7 +297,7 @@ void XorNumArray(void) { /* 9 */
 	}
 }
 
-void SetEquArray(void) { /* 10 */
+static void SetEquArray(void) { /* 10 */
 	/*
 	  配列が val と等しければ 配列 vResults に 1 を、そうでなければ
 	  0 を代入
@@ -320,7 +321,7 @@ void SetEquArray(void) { /* 10 */
 	}
 }
 
-void SetNotArray(void) { /* 11 */
+static void SetNotArray(void) { /* 11 */
 	/*
 	  配列が val と等しくなければ配列 vResults に 1 を、そうでなければ
 	  0 を代入
@@ -344,7 +345,7 @@ void SetNotArray(void) { /* 11 */
 	}
 }
 
-void SetLowArray(void) { /* 12 */
+static void SetLowArray(void) { /* 12 */
 	/*
 	  配列データが val よりも小さければ vResult に 1 をセット
 	  
@@ -367,7 +368,7 @@ void SetLowArray(void) { /* 12 */
 	}
 }
 
-void SetHighArray(void) { /* 13 */
+static void SetHighArray(void) { /* 13 */
 	/*
 	  配列データが val よりも大きければ vResult に 1 をセット
 	  
@@ -390,7 +391,7 @@ void SetHighArray(void) { /* 13 */
 	}
 }
 
-void SetRangeArray(void) { /* 14 */
+static void SetRangeArray(void) { /* 14 */
 	/* 
 	   配列データがある範囲(min〜max)にあるかチェック
 	   
@@ -417,7 +418,7 @@ void SetRangeArray(void) { /* 14 */
 	}
 }
 
-void SetAndEquArray(void) { /* 15 */
+static void SetAndEquArray(void) { /* 15 */
 	/*
 	  配列 vAry と mask との AND をとって val に等しければ
 	  配列 vResults に１を、等しくなければ 0 を書く
@@ -444,7 +445,7 @@ void SetAndEquArray(void) { /* 15 */
 	}
 }
 
-void AndEquArray(void) { /* 16 */
+static void AndEquArray(void) { /* 16 */
 	/*
 	  配列 vAry 中で val と同じならば、vResult と 1 の AND を
 	  違うならば 0 をかく。
@@ -468,7 +469,7 @@ void AndEquArray(void) { /* 16 */
 	}
 }
 
-void AndNotArray(void) { /* 17 */
+static void AndNotArray(void) { /* 17 */
 	/*
 	  配列 vAry 中で val と等しくないならば、vResult と 1 の AND を
 	  違う場合は 0 をかく。
@@ -492,7 +493,7 @@ void AndNotArray(void) { /* 17 */
 	}
 }
 
-void AndLowArray(void) { /* 18 */
+static void AndLowArray(void) { /* 18 */
 	/*
 	  配列 vAry が min よりも小さいならば、vResult と 1 の AND を
 	  そうでないならば 0 をかく。
@@ -516,7 +517,7 @@ void AndLowArray(void) { /* 18 */
 	}
 }
 
-void AndHighArray(void) { /* 19 */
+static void AndHighArray(void) { /* 19 */
 	/*
 	  配列 vAry が min よりも大きいならば、vResult と 1 の AND を
 	  そうでないならば 0 をかく。
@@ -540,7 +541,7 @@ void AndHighArray(void) { /* 19 */
 	}
 }
 
-void AndRangeArray(void) { /* 20 */
+static void AndRangeArray(void) { /* 20 */
 	/*
 	  vAry が min から max にある場合、vResults と 1 の AND を
 	  そうでなければ 0 をかく。
@@ -566,7 +567,7 @@ void AndRangeArray(void) { /* 20 */
 	}
 }
 
-void AndAndEquArray(void) { /* 21 */
+static void AndAndEquArray(void) { /* 21 */
 	/*
 	  配列 vAry と mask との AND をとって val に等しければ
 	  配列 vResults と１の AND、等しくなければ 0 を書く
@@ -593,7 +594,7 @@ void AndAndEquArray(void) { /* 21 */
 	}
 }
 
-void OrEquArray(void) { /* 22 */
+static void OrEquArray(void) { /* 22 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -602,7 +603,7 @@ void OrEquArray(void) { /* 22 */
 	DEBUG_COMMAND_YET("ShArray.OrEquArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void OrNotArray(void) { /* 23 */
+static void OrNotArray(void) { /* 23 */
 	/*
 	  配列の値が val と等しくなければ vResult に 1 を書き込む
 	  
@@ -626,7 +627,7 @@ void OrNotArray(void) { /* 23 */
 	}
 }
 
-void OrLowArray(void) { /* 24 */
+static void OrLowArray(void) { /* 24 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -635,7 +636,7 @@ void OrLowArray(void) { /* 24 */
 	DEBUG_COMMAND_YET("ShArray.OrLowArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void OrHighArray(void) { /* 25 */
+static void OrHighArray(void) { /* 25 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -644,7 +645,7 @@ void OrHighArray(void) { /* 25 */
 	DEBUG_COMMAND_YET("ShArray.OrHighArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void OrRangeArray(void) { /* 26 */
+static void OrRangeArray(void) { /* 26 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -654,7 +655,7 @@ void OrRangeArray(void) { /* 26 */
 	DEBUG_COMMAND_YET("ShArray.OrRangeArray: %d,%d,%d,%d,%d:\n", p1, p2, p3, p4,p5);
 }
 
-void OrAndEquArray(void) { /* 27 */
+static void OrAndEquArray(void) { /* 27 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -664,7 +665,7 @@ void OrAndEquArray(void) { /* 27 */
 	DEBUG_COMMAND_YET("ShArray.OrAndEquArray: %d,%d,%d,%d,%d:\n", p1, p2, p3, p4,p5);
 }
 
-void EnumEquArray(void) { /* 28 */
+static void EnumEquArray(void) { /* 28 */
 	/*
 	  配列のデータ中に val と同じデータを数を vResult に返す
 	  
@@ -689,7 +690,7 @@ void EnumEquArray(void) { /* 28 */
 	}
 }
 
-void EnumEquArray2(void) { /* 29 */
+static void EnumEquArray2(void) { /* 29 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -700,7 +701,7 @@ void EnumEquArray2(void) { /* 29 */
 	DEBUG_COMMAND_YET("ShArray.EnumEquArray2: %d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6);
 }
 
-void EnumEquNotArray2(void) { /* 30 */
+static void EnumEquNotArray2(void) { /* 30 */
 	/*
 	  配列１が val1 に等しく、配列２がval2 に等しくないものの数を
 	  vResult に返す。
@@ -732,7 +733,7 @@ void EnumEquNotArray2(void) { /* 30 */
 	}
 }
 
-void EnumNotArray(void) { /* 31 */
+static void EnumNotArray(void) { /* 31 */
 	/*
 	  配列のなかで val と等しくないものの個数を返す
 	  
@@ -759,7 +760,7 @@ void EnumNotArray(void) { /* 31 */
 	}
 }
 
-void EnumNotArray2(void) { /* 32 */
+static void EnumNotArray2(void) { /* 32 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -770,7 +771,7 @@ void EnumNotArray2(void) { /* 32 */
 	DEBUG_COMMAND_YET("ShArray.EnumNotArray2: %d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6);
 }
 
-void EnumLowArray(void) { /* 33 */
+static void EnumLowArray(void) { /* 33 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -779,7 +780,7 @@ void EnumLowArray(void) { /* 33 */
 	DEBUG_COMMAND_YET("ShArray.EnumLowArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void EnumHighArray(void) { /* 34 */
+static void EnumHighArray(void) { /* 34 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -788,7 +789,7 @@ void EnumHighArray(void) { /* 34 */
 	DEBUG_COMMAND_YET("ShArray.EnumHighArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void EnumRangeArray(void) { /* 35 */
+static void EnumRangeArray(void) { /* 35 */
 	/*
 	  配列の値のうちが min と max の間あるものの数を vResult に返す
 	  
@@ -818,7 +819,7 @@ void EnumRangeArray(void) { /* 35 */
 
 }
 
-void GrepEquArray(void) { /* 36 */
+static void GrepEquArray(void) { /* 36 */
 	/*
 	  配列の値が val と等しければ vLastMatch に一致した index を返し
 	  vResult に 1 を返す
@@ -850,7 +851,7 @@ void GrepEquArray(void) { /* 36 */
 	}
 }
 
-void GrepNotArray(void) { /* 37 */
+static void GrepNotArray(void) { /* 37 */
 	/*
 	  配列の値が val と等しくなければ vLastMatch にその index を返し
 	  vResult に 1 を返す
@@ -882,7 +883,7 @@ void GrepNotArray(void) { /* 37 */
 	}
 }
 
-void GrepEquArray2(void) { /* 38 */
+static void GrepEquArray2(void) { /* 38 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -894,7 +895,7 @@ void GrepEquArray2(void) { /* 38 */
 	DEBUG_COMMAND_YET("ShArray.GrepEquArray2: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7);
 }
 
-void GrepNotArray2(void) { /* 39 */
+static void GrepNotArray2(void) { /* 39 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -906,7 +907,7 @@ void GrepNotArray2(void) { /* 39 */
 	DEBUG_COMMAND_YET("ShArray.GrepNotArray2: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7);
 }
 
-void GrepEquNotArray2(void) { /* 40 */
+static void GrepEquNotArray2(void) { /* 40 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -918,7 +919,7 @@ void GrepEquNotArray2(void) { /* 40 */
 	DEBUG_COMMAND_YET("ShArray.GrepEquNotArray2: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7);
 }
 
-void GrepLowArray(void) { /* 41 */
+static void GrepLowArray(void) { /* 41 */
 	/*
 	  配列の値が min よりも小さければ vMatch に一致した index 
 	  を返し vResult に 1 を返す
@@ -950,7 +951,7 @@ void GrepLowArray(void) { /* 41 */
 	}
 }
 
-void GrepHighArray(void) { /* 42 */
+static void GrepHighArray(void) { /* 42 */
 	/*
 	  配列の値が min よりも大きければ vMatch に一致した index 
 	  を返し vResult に 1 を返す
@@ -982,7 +983,7 @@ void GrepHighArray(void) { /* 42 */
 	}
 }
 
-void GrepRangeArray(void) { /* 43 */
+static void GrepRangeArray(void) { /* 43 */
 	/*
 	  配列の値が max と min の間にあれば vMatch に一致した index 
 	  を返し vResult に 1 を返す
@@ -1016,7 +1017,7 @@ void GrepRangeArray(void) { /* 43 */
 	}
 }
 
-void GrepLowOrderArray(void) { /* 44 */
+static void GrepLowOrderArray(void) { /* 44 */
 	/*
 	  配列 vAry の中で minよりも大きく、 max よりも小さいもの
 	  のうち、最も小さいものの index を vLastMatch に返す。
@@ -1067,7 +1068,7 @@ void GrepLowOrderArray(void) { /* 44 */
 
 }
 
-void GrepHighOrderArray(void) { /* 45 */
+static void GrepHighOrderArray(void) { /* 45 */
 	/*
 	  配列 vAry の中で minよりも大きく、 max よりも小さいもの
 	  のうち、最も大きいものの index を vLastMatch に返す。
@@ -1117,7 +1118,7 @@ void GrepHighOrderArray(void) { /* 45 */
 	}
 }
 
-void ChangeEquArray(void) { /* 46 */
+static void ChangeEquArray(void) { /* 46 */
 	int *vAry = getCaliVariable();
 	int cnt = getCaliValue();
 	int src = getCaliValue();
@@ -1134,7 +1135,7 @@ void ChangeEquArray(void) { /* 46 */
 	}
 }
 
-void ChangeNotArray(void) { /* 47 */
+static void ChangeNotArray(void) { /* 47 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -1143,7 +1144,7 @@ void ChangeNotArray(void) { /* 47 */
 	DEBUG_COMMAND_YET("ShArray.ChangeNotArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void ChangeLowArray(void) { /* 48 */
+static void ChangeLowArray(void) { /* 48 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -1152,7 +1153,7 @@ void ChangeLowArray(void) { /* 48 */
 	DEBUG_COMMAND_YET("ShArray.ChangeLowArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void ChangeHighArray(void) { /* 49 */
+static void ChangeHighArray(void) { /* 49 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -1161,7 +1162,7 @@ void ChangeHighArray(void) { /* 49 */
 	DEBUG_COMMAND_YET("ShArray.ChangeHighArray: %d,%d,%d,%d:\n", p1, p2, p3, p4);
 }
 
-void ChangeRangeArray(void) { /* 50 */
+static void ChangeRangeArray(void) { /* 50 */
 	/*
 	  配列内データが min から max の間にあるときは val で置き換え
 	  
@@ -1188,7 +1189,7 @@ void ChangeRangeArray(void) { /* 50 */
 	}
 }
 
-void CopyArrayToRect(void) { /* 51 */
+static void CopyArrayToRect(void) { /* 51 */
 	/*
 	  vSrc の sw * sh の領域を vDst の dx,dy の位置にコピー 
 	  
@@ -1222,7 +1223,7 @@ void CopyArrayToRect(void) { /* 51 */
 	}
 }
 
-void CopyRectToArray(void) { /* 52 */
+static void CopyRectToArray(void) { /* 52 */
 	/*
 	  vSrc の sw * sh の領域を vDst の dx,dy の位置にコピー 
 	  
@@ -1256,7 +1257,7 @@ void CopyRectToArray(void) { /* 52 */
 	}
 }
 
-void ChangeSecretArray(void) { /* 53 */
+static void ChangeSecretArray(void) { /* 53 */
 	/*
 	  良く分からないが、データをコード化しているようだ
 	  
@@ -1340,3 +1341,62 @@ void ChangeSecretArray(void) { /* 53 */
 		break;
 	}
 }
+
+static const ModuleFunc functions[] = {
+	{"AddAtArray", AddAtArray},
+	{"AndAndEquArray", AndAndEquArray},
+	{"AndEquArray", AndEquArray},
+	{"AndHighArray", AndHighArray},
+	{"AndLowArray", AndLowArray},
+	{"AndNotArray", AndNotArray},
+	{"AndNumArray", AndNumArray},
+	{"AndRangeArray", AndRangeArray},
+	{"ChangeEquArray", ChangeEquArray},
+	{"ChangeHighArray", ChangeHighArray},
+	{"ChangeLowArray", ChangeLowArray},
+	{"ChangeNotArray", ChangeNotArray},
+	{"ChangeRangeArray", ChangeRangeArray},
+	{"ChangeSecretArray", ChangeSecretArray},
+	{"CopyArrayToRect", CopyArrayToRect},
+	{"CopyRectToArray", CopyRectToArray},
+	{"DivAtArray", DivAtArray},
+	{"EnumEquArray", EnumEquArray},
+	{"EnumEquArray2", EnumEquArray2},
+	{"EnumEquNotArray2", EnumEquNotArray2},
+	{"EnumHighArray", EnumHighArray},
+	{"EnumLowArray", EnumLowArray},
+	{"EnumNotArray", EnumNotArray},
+	{"EnumNotArray2", EnumNotArray2},
+	{"EnumRangeArray", EnumRangeArray},
+	{"GetAtArray", GetAtArray},
+	{"GrepEquArray", GrepEquArray},
+	{"GrepEquArray2", GrepEquArray2},
+	{"GrepEquNotArray2", GrepEquNotArray2},
+	{"GrepHighArray", GrepHighArray},
+	{"GrepHighOrderArray", GrepHighOrderArray},
+	{"GrepLowArray", GrepLowArray},
+	{"GrepLowOrderArray", GrepLowOrderArray},
+	{"GrepNotArray", GrepNotArray},
+	{"GrepNotArray2", GrepNotArray2},
+	{"GrepRangeArray", GrepRangeArray},
+	{"MaxAtArray", MaxAtArray},
+	{"MinAtArray", MinAtArray},
+	{"MulAtArray", MulAtArray},
+	{"OrAndEquArray", OrAndEquArray},
+	{"OrEquArray", OrEquArray},
+	{"OrHighArray", OrHighArray},
+	{"OrLowArray", OrLowArray},
+	{"OrNotArray", OrNotArray},
+	{"OrNumArray", OrNumArray},
+	{"OrRangeArray", OrRangeArray},
+	{"SetAndEquArray", SetAndEquArray},
+	{"SetEquArray", SetEquArray},
+	{"SetHighArray", SetHighArray},
+	{"SetLowArray", SetLowArray},
+	{"SetNotArray", SetNotArray},
+	{"SetRangeArray", SetRangeArray},
+	{"SubAtArray", SubAtArray},
+	{"XorNumArray", XorNumArray},
+};
+
+const Module module_ShArray = {"ShArray", functions, sizeof(functions) / sizeof(ModuleFunc)};

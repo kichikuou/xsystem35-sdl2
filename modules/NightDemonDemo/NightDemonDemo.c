@@ -28,28 +28,40 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 
 extern void ndd_init(char *files[], int n);
 extern void ndd_run(int demonum);
 
-void Init() {
+static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
 	int p2 = getCaliValue(); /* IWinMsg */
 	int p3 = getCaliValue(); /* ITimer */
 	int *var = getCaliVariable();
 	
+#ifdef HAVE_JPEG
 	ndd_init(nact->files.alk, 4);
+#endif
 	*var = 1;
 	
 	DEBUG_COMMAND("NightDemonDemo.Init %d,%d,%d,%p:\n", p1, p2, p3, var);
 }
 
-void Run() {
+static void Run() {
 	int p1 = getCaliValue(); // デモ番号 0,1,2
 	int p2 = getCaliValue();
 	
+#ifdef HAVE_JPEG
 	ndd_run(p1);
+#endif
 	
 	DEBUG_COMMAND("NightDemonDemo.Run %d,%d:\n", p1, p2);
 }
+
+static const ModuleFunc functions[] = {
+	{"Init", Init},
+	{"Run", Run},
+};
+
+const Module module_NightDemonDemo = {"NightDemonDemo", functions, sizeof(functions) / sizeof(ModuleFunc)};
