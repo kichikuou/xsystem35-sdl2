@@ -392,10 +392,10 @@ void smsg_clear(int wNum) {
 
 /*
   出力中の文字列があるかチェック
-  @return: なし(0) , あり(1)
+  @return: なし(1) , あり(0)
  */
 int smsg_is_empty() {
-	return (sact.msgbuf[0] != '\0');
+	return (sact.msgbuf[0] == '\0');
 }
 
 /*
