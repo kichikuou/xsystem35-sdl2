@@ -40,6 +40,7 @@ endif()
 FetchContent_GetProperties(SDL_mixer)
 if(NOT sdl_mixer_POPULATED)
   FetchContent_Populate(SDL_mixer)
+  SET(SUPPORT_OGG ON CACHE BOOL "Enable OGG support in SDL_mixer" FORCE)
   add_subdirectory(${sdl_mixer_SOURCE_DIR} ${sdl_mixer_BINARY_DIR})
   # Workaround for CMakeLists.txt bugs of SDL_mixer.
   # TODO: Fix these in upstream
