@@ -45,6 +45,7 @@ if(NOT sdl_mixer_POPULATED)
   # TODO: Fix these in upstream
   add_library(vorbisfile INTERFACE)
   target_include_directories(SDL2_mixer PUBLIC ${sdl_mixer_SOURCE_DIR}/include)
+  target_compile_definitions(SDL2_mixer PRIVATE MUSIC_WAV)
 endif()
 
 # The main CMakeLists.txt of xsystem35
