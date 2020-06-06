@@ -213,27 +213,37 @@ class Launcher private constructor(private val rootDir: File) {
     private class GameConfigWriter {
         private val grb = StringBuilder()
         private var basename: String? = null
-        private val aldRegex = """(.*?)([a-z])([a-z])\.ald""".toRegex(RegexOption.IGNORE_CASE)
-        private val resourceType = mapOf(
+        private val aldRegex = """(.*?)([a-z])([a-z])\.(ald|wai|bgi)""".toRegex(RegexOption.IGNORE_CASE)
+        private val aldType = mapOf(
+                "b" to "BGM",
                 "d" to "Data",
                 "g" to "Graphics",
                 "m" to "Midi",
                 "r" to "Resource",
                 "s" to "Scenario",
                 "w" to "Wave")
-
+        private val specialResources = mapOf(
+                "system39.ain" to "Ain",
+                "system39.ini" to "Init",
+                "sactefam.kld" to "SACT01"
+        )
         private val audioRegex = """.*?(\d+)\.(wav|mp3|ogg)""".toRegex(RegexOption.IGNORE_CASE)
         private val audioFiles: Array<String?> = arrayOfNulls(100)
 
         fun maybeAdd(path: String) {
             val name = File(path).name
 
-            if (name.toLowerCase(Locale.US) == "system39.ain") {
-                grb.appendln("Ain $path")
+            specialResources[name.toLowerCase(Locale.US)]?.let {
+                grb.appendln("$it $path")
                 return
             }
             aldRegex.matchEntire(name)?.let {
-                val type = resourceType[it.groupValues[2].toLowerCase(Locale.US)]
+                val ext = it.groupValues[4].toUpperCase(Locale.US)
+                val type = if (ext == "ALD") {
+                    aldType[it.groupValues[2].toLowerCase(Locale.US)]
+                } else {
+                    ext
+                }
                 val id = it.groupValues[3].toUpperCase(Locale.US)
                 if (type != null) {
                     grb.appendln("$type$id $path")
