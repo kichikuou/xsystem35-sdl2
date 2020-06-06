@@ -58,4 +58,3 @@ Note: This form of ZIP can be used in [Kichikuou on Web](http://kichikuou.github
 
 ## Known Issues
 - Android versions older than 7.0 cannot handle ZIPs containing Shift-JIS file names. This is the case with some ZIPs distributed on [retroc.net](http://retropc.net/alice/). If you get the error "This type of ZIP is not supported.", unzip the ZIP file on your PC and re-archive it with a modern ZIP creation software.
-- DLL modules used in System3.9 games (大悪司 and later) are not supported yet.

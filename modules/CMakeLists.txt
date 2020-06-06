@@ -1,4 +1,4 @@
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
 add_subdirectory(lib)
 
@@ -74,7 +74,11 @@ target_compile_options(modules PRIVATE -Wno-pointer-sign -Wno-invalid-source-enc
 target_link_libraries(modules PRIVATE graph alk drawtext list)
 
 if (SDL2MIXER_FOUND)
-  target_link_libraries(modules PRIVATE PkgConfig::SDL2MIXER)
+  if (ANDROID)
+    target_link_libraries(modules PRIVATE SDL2 SDL2_mixer)
+  else()
+    target_link_libraries(modules PRIVATE PkgConfig::SDL2MIXER)
+  endif()
 endif()
 
 include(FindJPEG)
