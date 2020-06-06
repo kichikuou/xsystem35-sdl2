@@ -44,7 +44,7 @@ cd xsystem35-sdl2/android
 4. The game starts. Two-finger touch is treated as a right click.
 
 ### Preparing a ZIP
-- Include all `.ALD` files and `.ain` files if any.
+- Include all files in the `GAMEDATA` folder (`.ALD` files and others). `.EXE` and `.DLL` are not really needed, but you can include them as well.
 - Music files (`.mp3`, `.ogg` or `.wav`) whose file names end with a number are recognized as BGM files. For example:
   - `Track2.mp3`
   - `15.ogg`
