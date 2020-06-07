@@ -116,6 +116,7 @@ static void window_init(void) {
 #endif
 
 #ifdef __ANDROID__
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 	Uint32 flags = SDL_WINDOW_FULLSCREEN;
 #else
