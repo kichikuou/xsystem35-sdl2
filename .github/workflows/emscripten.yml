@@ -1,5 +1,5 @@
 name: Emscripten Build
-on: [push]
+on: [push, pull_request]
 
 env:
   emscripten-version: 1.39.16

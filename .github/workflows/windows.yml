@@ -1,0 +1,48 @@
+name: Windows Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        mingw: ["MINGW32", "MINGW64"]
+        include:
+          - mingw: "MINGW32"
+            package: "mingw-w64-i686"
+          - mingw: "MINGW64"
+            package: "mingw-w64-x86_64"
+    defaults:
+      run:
+        shell: bash.exe --login -eo pipefail "{0}"
+    env:
+      MSYSTEM: ${{ matrix.mingw }}
+      CHERE_INVOKING: 1
+    name: MSYS2 ${{ matrix.mingw }}
+    steps:
+
+    - name: Set up shell
+      run: echo ::add-path::C:\msys64\usr\bin\
+      shell: pwsh
+
+    - name: Print system version
+      run: |
+        uname
+        echo PATH: $PATH
+
+    - name: Install Deps
+      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: |
+        mkdir -p out/debug
+        cd out/debug
+        cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../
+        make
+
+    - name: Test
+      run: ctest
+      working-directory: out/debug

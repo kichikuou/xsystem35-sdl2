@@ -1,10 +1,14 @@
 name: Linux Build
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build-type: ["Debug", "Release"]
 
+    name: Linux ${{ matrix.build-type }}
     steps:
     - uses: actions/checkout@v2
 
@@ -15,11 +19,11 @@ jobs:
 
     - name: Build
       run: |
-        mkdir -p out/debug
-        cd out/debug
-        cmake -DCMAKE_BUILD_TYPE=Debug ../../
+        mkdir -p out/${{ matrix.build-type }}
+        cd out/${{ matrix.build-type }}
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ../../
         make
 
     - name: Test
       run: ctest
-      working-directory: out/debug
+      working-directory: out/${{ matrix.build-type }}
