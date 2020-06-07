@@ -29,10 +29,12 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifdef HAVE_MMAP
+#include <sys/mman.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
@@ -56,23 +58,41 @@ alk_t *alk_new(char *path) {
 		return NULL;
 	}
 	
+#ifdef HAVE_MMAP
 	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
 		WARNING("mmap: %s\n", strerror(errno));
 		close(fd);
 		return NULL;
 	}
+#else
+	adr = malloc(sbuf.st_size);
+	size_t bytes = 0;
+	while (bytes < sbuf.st_size) {
+		ssize_t ret = read(fd, adr + bytes, sbuf.st_size - bytes);
+		if (ret <= 0) {
+			WARNING("read: %s\n", strerror(errno));
+			close(fd);
+			free(adr);
+			return NULL;
+		}
+		bytes += ret;
+	}
+#endif
+	close(fd);
 	
 	if (0 != strncmp(adr, "ALK0", 4)) {
-		WARNING("mmap: %s\n", strerror(errno));
+		WARNING("%s: not an ALK file\n", path);
+#ifdef HAVE_MMAP
 		munmap(adr, sbuf.st_size);
-		close(fd);
+#else
+		free(adr);
+#endif
 		return NULL;
 	}		
 
 	alk = calloc(1, sizeof(alk_t));
 	alk->mapadr = adr;
 	alk->size = sbuf.st_size;
-	alk->fd = fd;
 	
 	alk->datanum = LittleEndian_getDW(adr, 4);
 	alk->offset = malloc(sizeof(int) * alk->datanum);
@@ -87,8 +107,11 @@ alk_t *alk_new(char *path) {
 int alk_free(alk_t *alk) {
 	if (alk == NULL) return OK;
 
+#ifdef HAVE_MMAP
 	munmap(alk->mapadr, alk->size);
-	close(alk->fd);
+#else
+	free(alk->mapadr);
+#endif
 	free(alk->offset);
 	free(alk);
 

@@ -63,7 +63,6 @@ typedef struct {
 
 // SACTEFAM を使ったマスク
 typedef struct {
-	int fd;       // SACTEFAM.KLD のファイルディスクプリタ
 	char *mapadr; // mmap された最初のアドレス
 	off_t size;   // mmap した大きさ
 	int datanum;  // SACTEFAM.KLD 中のマスクファイルの数

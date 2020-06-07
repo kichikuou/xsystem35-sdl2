@@ -38,7 +38,6 @@
 */     
 
 typedef struct {
-	int   fd;      /* .alk ファイルの file discpriter   */
 	char *mapadr;  /* mmap したファイルの先頭アドレス   */
 	off_t size;    /* mmap したバイト数(ファイルサイズ) */
 	int   datanum; /* .alk ファイル中のファイル数       */

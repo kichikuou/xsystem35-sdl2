@@ -28,10 +28,12 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifdef HAVE_MMAP
+#include <sys/mman.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
@@ -76,16 +78,31 @@ int smask_init(char *path) {
 		return NG;
 	}
 
+#ifdef HAVE_MMAP
 	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
 		WARNING("mmap: %s\n", strerror(errno));
 		close(fd);
 		return NG;
 	}
+#else
+	adr = malloc(sbuf.st_size);
+	size_t bytes = 0;
+	while (bytes < sbuf.st_size) {
+		ssize_t ret = read(fd, adr + bytes, sbuf.st_size - bytes);
+		if (ret <= 0) {
+			WARNING("read: %s\n", strerror(errno));
+			close(fd);
+			free(adr);
+			return NG;
+		}
+		bytes += ret;
+	}
+#endif
+	close(fd);
 	
 	am = &sact.am;
 	am->mapadr = adr;
 	am->size = sbuf.st_size;
-	am->fd = fd;
 	
 	am->datanum = LittleEndian_getDW(adr, 0);
 	am->no = malloc(sizeof(int) * am->datanum);
