@@ -35,7 +35,7 @@ private var gLauncher: Launcher? = null
 interface LauncherObserver {
     fun onGameListChange()
     fun onInstallProgress(path: String)
-    fun onInstallSuccess(path: File)
+    fun onInstallSuccess(path: File, archiveName: String?)
     fun onInstallFailure(msgId: Int)
 }
 
@@ -73,7 +73,7 @@ class Launcher private constructor(private val rootDir: File) {
         updateGameList()
     }
 
-    fun install(input: InputStream) {
+    fun install(input: InputStream, archiveName: String?) {
         val dir = createDirForGame()
         @SuppressLint("HandlerLeak")
         val handler = object : Handler() {
@@ -84,7 +84,7 @@ class Launcher private constructor(private val rootDir: File) {
                     }
                     SUCCESS -> {
                         isInstalling = false
-                        observer?.onInstallSuccess(msg.obj as File)
+                        observer?.onInstallSuccess(msg.obj as File, archiveName)
                     }
                     FAILURE -> {
                         isInstalling = false

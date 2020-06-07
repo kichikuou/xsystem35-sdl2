@@ -29,6 +29,7 @@ import java.io.IOException
 class GameActivity : SDLActivity() {
     companion object {
         const val EXTRA_GAME_ROOT = "GAME_ROOT"
+        const val EXTRA_ARCHIVE_NAME = "ARCHIVE_NAME"
     }
 
     private lateinit var gameRoot: File
@@ -63,9 +64,12 @@ class GameActivity : SDLActivity() {
 
     override fun setTitle(title: CharSequence?) {
         super.setTitle(title)
-        val str = title?.toString()?.substringAfter(':', "")
-        if (str.isNullOrEmpty())
-            return
+        var str = title?.toString()?.substringAfter(':', "")
+        if (str.isNullOrEmpty()) {
+            str = intent.getStringExtra(EXTRA_ARCHIVE_NAME)
+            if (str == null)
+                return
+        }
         File(gameRoot, Launcher.TITLE_FILE).writeText(str)
         Launcher.updateGameList()
     }
