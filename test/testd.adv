@@ -1,0 +1,18 @@
+	MS FILE,"testd.adv":
+	!used:0!
+	!size:0!
+
+	DI 1,used,size:
+	~AssertEqual used,0,__LINE__:
+
+	DC 1,10,0:
+	DI 1,used,size:
+	~AssertEqual used,1,__LINE__:
+	~AssertEqual size,11,__LINE__:
+
+	DC 255,65535,0:
+	DI 255,used,size:
+	~AssertEqual used,1,__LINE__:
+	~AssertEqual size,0,__LINE__:
+
+	%0:

@@ -1,0 +1,11 @@
+	!RND:0!
+	!tests_passed:0!
+	!tests_failed:0!
+	ZH 2:
+
+	%#testd.adv:
+
+	HH0,tests_passed: ' tests passed' R
+	HH0,tests_failed: ' tests failed' R
+	{tests_failed: A}
+	ZZ0,0:

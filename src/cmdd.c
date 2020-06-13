@@ -41,13 +41,13 @@ void commandDC() {
 
 void commandDI() {
 	int page      = getCaliValue();
+	int *var_use  = getCaliVariable();
 	int *var_size = getCaliVariable();
-	int *var_save = getCaliVariable();
 	
-	*var_size = v_releaseArrayVar(page);
-	*var_save = v_getArrayBufferCnt(page) == true ? 1 : 0;
+	*var_use = v_getArrayBufferStatus(page);
+	*var_size = (v_getArrayBufferCnt(page) + 1) & 0xffff;
 
-	DEBUG_COMMAND("DI %d,%p,%p:\n", page, var_size, var_save);
+	DEBUG_COMMAND("DI %d,%p,%p:\n", page, var_use, var_size);
 }
 
 void commandDS() {
