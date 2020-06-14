@@ -81,9 +81,7 @@ if (SDL2MIXER_FOUND)
   endif()
 endif()
 
-include(FindJPEG)
-if (JPEG_FOUND)
-  target_compile_definitions(modules PRIVATE HAVE_JPEG)
+if (HAVE_JPEG)
   target_sources(modules PRIVATE
     NightDemonDemo/ndd.c
     NightDemonDemo/jpeg2surface.c

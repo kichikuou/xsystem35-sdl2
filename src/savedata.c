@@ -755,11 +755,10 @@ static int saveGameData(int no, char *buf, int size) {
 }
 
 /* 指定ファイルからの画像の読み込み thanx tajiru@wizard */
-BYTE* load_cg_with_file(char *filename, int *status){
+BYTE* load_cg_with_file(char *filename, int *status, long *filesize){
 	int size;
 	FILE *fp;
 	static BYTE *tmp;
-	long filesize;
 	
 	*status = 0;
 	
@@ -768,20 +767,20 @@ BYTE* load_cg_with_file(char *filename, int *status){
 	}
 	
 	fseek(fp, 0L, SEEK_END);
-	filesize = ftell(fp);
-	if (filesize == 0) {
+	*filesize = ftell(fp);
+	if (*filesize == 0) {
 		*status = SAVE_LOADERR; return NULL;
 	}
 	
-	tmp = (char *)malloc(filesize);
+	tmp = (char *)malloc(*filesize);
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
 		*status = SAVE_LOADERR; return NULL;
 	}
 	fseek(fp, 0L, SEEK_SET);
-	size = fread(tmp, 1, filesize,fp);
+	size = fread(tmp, 1, *filesize,fp);
 	
-	if (size != filesize) {
+	if (size != *filesize) {
 		*status = SAVE_LOADSHORTAGE;
 	} else {
 		*status = SAVE_LOADOK;

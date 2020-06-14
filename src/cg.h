@@ -37,7 +37,8 @@ typedef enum {
 	ALCG_PMS16   = 4,
 	ALCG_BMP8    = 5,
 	ALCG_BMP24   = 6,
-	ALCG_QNT     = 7
+	ALCG_QNT     = 7,
+	ALCG_JPEG    = 8,
 } CG_TYPE;
 
 /*

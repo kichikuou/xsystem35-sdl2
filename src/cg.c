@@ -33,6 +33,9 @@
 #include "pms.h"
 #include "bmp.h"
 #include "qnt.h"
+#ifdef HAVE_JPEG
+#include "jpeg.h"
+#endif
 #include "ald_manager.h"
 #include "savedata.h"
 #include "cache.h"
@@ -85,6 +88,10 @@ static CG_TYPE check_cgformat(BYTE *data) {
 		return ALCG_BMP8;
 	} else if (vsp_checkfmt(data)) {
 		return ALCG_VSP;
+#ifdef HAVE_JPEG
+	} else if (jpeg_checkfmt(data) && nact->sys_world_depth >= 15) {
+		return ALCG_JPEG;
+#endif
 	}
 	WARNING("Unknown Cg Type\n");
 	return ALCG_UNKNOWN;
@@ -182,6 +189,7 @@ static void display_cg(cgdata *cg, int x, int y) {
 		ags_drawCg8bit(cg, x, y); break;
 	case ALCG_PMS16:
 	case ALCG_BMP24:
+	case ALCG_JPEG:
 		ags_drawCg16bit(cg, x, y); break;
 	default:
 		break;
@@ -243,6 +251,12 @@ static cgdata *loader(int no) {
 			cg = qnt_extract(dfile->data);
 			size = (cg->width * cg->height) * 3;
 			break;
+#ifdef HAVE_JPEG
+		case ALCG_JPEG:
+			cg = jpeg_extract(dfile->data, dfile->size);
+			size = (cg->width * cg->height) * sizeof(WORD);
+			break;
+#endif
 		default:
 			break;
 		}
@@ -395,6 +409,7 @@ void cg_load(int no, int flg) {
 		break;
 	case ALCG_PMS16:
 	case ALCG_BMP24:
+	case ALCG_JPEG:
 		if (GCMD_EXTRACTCG(cg_fflg)) {
 			/* set display offset */
 			p = set_display_loc(cg);
@@ -463,11 +478,12 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 */
 int cg_load_with_filename(char *name, int x, int y) {
 	int status, type;
+	long filesize;
 	BYTE *data;
 	cgdata *cg = NULL;
 	MyPoint p;
 	
-	data = load_cg_with_file(name, &status);
+	data = load_cg_with_file(name, &status, &filesize);
 	if (data == NULL) return status;
 	
 	cg_set_display_location(x, y, OFFSET_ABSOLUTE_GC);
@@ -480,6 +496,11 @@ int cg_load_with_filename(char *name, int x, int y) {
 	case ALCG_BMP24:
 		cg = bmp16m_extract(data);
 		break;
+#ifdef HAVE_JPEG
+	case ALCG_JPEG:
+		cg = jpeg_extract(data, filesize);
+		break;
+#endif
 	default:
 		return status;
 	}

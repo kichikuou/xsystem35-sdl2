@@ -124,7 +124,7 @@ extern int save_save_var_with_file(char *filename, int *start, int cnt);
 extern int save_load_var_with_file(char *filename, int *start, int cnt);
 extern int save_save_str_with_file(char *filename, int start, int cnt);
 extern int save_load_str_with_file(char *filename, int start, int cnt);
-extern BYTE* load_cg_with_file(char *file,int *status);
+extern BYTE* load_cg_with_file(char *file, int *status, long *filesize);
 extern void save_set_path(char *path);
 extern void save_register_file(char *name, int index);
 extern char* save_get_file(int index);

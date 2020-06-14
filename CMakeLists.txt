@@ -78,6 +78,11 @@ else()
   optional_pkg_check_modules(SDL2MIXER IMPORTED_TARGET SDL2_mixer)
   optional_pkg_check_modules(SDL2TTF IMPORTED_TARGET SDL2_ttf)
 
+  include(FindJPEG)
+  if (JPEG_FOUND)
+    set(HAVE_JPEG 1)
+  endif()
+
   set(DEFAULT_FONT_PATH ${CMAKE_INSTALL_PREFIX}/share/xsystem35/fonts/)
 endif()
 

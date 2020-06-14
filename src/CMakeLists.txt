@@ -28,6 +28,10 @@ target_sources(xsystem35 PRIVATE
 # CG
 target_sources(xsystem35 PRIVATE
   pms.c vsp.c bmp.c qnt.c)
+if (HAVE_JPEG)
+  target_sources(xsystem35 PRIVATE jpeg.c)
+  target_link_libraries(xsystem35 PRIVATE JPEG::JPEG)
+endif()
 
 # Music
 target_sources(xsystem35 PRIVATE

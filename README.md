@@ -20,7 +20,7 @@ cmake の実行でエラーになる場合は必要なライブラリをイン�
 
 [Homebrew](https://brew.sh/index_ja) が必要です。
 
-    $ brew install cmake pkg-config sdl2 sdl2_mixer freetype
+    $ brew install cmake pkg-config sdl2 sdl2_mixer freetype libjpeg
     $ mkdir -p out/debug
     $ cd out/debug
     $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
@@ -30,7 +30,7 @@ cmake の実行でエラーになる場合は必要なライブラリをイン�
 
 [MSYS2](https://www.msys2.org) が必要です。
 
-    $ pacman -S cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer
+    $ pacman -S cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-libjpeg-turbo
     $ mkdir -p out/debug
     $ cd out/debug
     $ cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../

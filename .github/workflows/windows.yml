@@ -31,7 +31,7 @@ jobs:
         echo PATH: $PATH
 
     - name: Install Deps
-      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer
+      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer ${{ matrix.package }}-libjpeg-turbo
 
     - name: Checkout
       uses: actions/checkout@v2
