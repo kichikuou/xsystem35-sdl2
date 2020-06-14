@@ -69,14 +69,14 @@ static int *fixOffset(int base, int offset2) {
 	if (sysVarAttribute[base].page == 0) {
 		if (offset2 == -1) {
 			if (base >= SYSVAR_MAX) {
-				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d)\n", base, offset2);
+				WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d)\n", sl_getPage(), sl_getIndex(), base, offset2);
 				return NULL;
 			}
 			preVarIndex = base;
 			return sysVar + base;
 		} else {
 			if ((base + offset2) >= SYSVAR_MAX) {
-				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d)\n", base, offset2);
+				WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d)\n", sl_getPage(), sl_getIndex(), base, offset2);
 				return NULL;
 			}
 			preVarIndex = base + offset2;
@@ -88,7 +88,7 @@ static int *fixOffset(int base, int offset2) {
 			page   = sysVarAttribute[base].page;
 			offset = sysVarAttribute[base].offset;
 			if (*index + offset > arrayVarBuffer[page - 1].max) {
-				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d, %d, %d, %d)\n", base, offset2, *index, page, offset);
+				WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), base, offset2, *index, page, offset);
 				return NULL;
 			}
 			preVarIndex = offset + *index;
@@ -97,7 +97,7 @@ static int *fixOffset(int base, int offset2) {
 			page   = sysVarAttribute[base].page;
 			offset = sysVarAttribute[base].offset;
 			if (offset + offset2 > arrayVarBuffer[page - 1].max) {
-				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", base, offset2, page, offset);
+				WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), base, offset2, page, offset);
 				return NULL;
 			}
 			preVarIndex = offset + offset2;
@@ -195,8 +195,7 @@ int getCaliValue() {
 			}
 		l_var:
 			t = getVar(c0);
-			if (t == NULL) continue;
-			*cali = *t; cali++;
+			*cali++ = t ? *t : 0;
 		} else {
 			switch(c0) {
 			case 0x7e: /* != */
