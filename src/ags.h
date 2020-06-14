@@ -33,19 +33,19 @@
 
 
 /* マウスカーソルの種類 */
-#define IDC_ARROW     1
-#define IDC_CROSS     2
-#define IDC_IBEAM     3
-#define IDC_ICON      4
-#define IDC_NO        5
-#define IDC_SIZE      6
-#define IDC_SIZEALL   7
-#define IDC_SIZENESW  8
-#define IDC_SIZENS    9
-#define IDC_SIZENWSE 10
-#define IDC_SIZEWE   11
-#define IDC_UPARROW  12
-#define IDC_WAIT     13
+#define CURSOR_ARROW     1
+#define CURSOR_CROSS     2
+#define CURSOR_IBEAM     3
+#define CURSOR_ICON      4
+#define CURSOR_NO        5
+#define CURSOR_SIZE      6
+#define CURSOR_SIZEALL   7
+#define CURSOR_SIZENESW  8
+#define CURSOR_SIZENS    9
+#define CURSOR_SIZENWSE 10
+#define CURSOR_SIZEWE   11
+#define CURSOR_UPARROW  12
+#define CURSOR_WAIT     13
 
 /* RGB <-> alpha plane copy type */
 typedef enum {

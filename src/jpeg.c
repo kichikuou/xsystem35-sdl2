@@ -17,11 +17,14 @@
  *
 */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <jpeglib.h>
+#undef ERROR
+#undef max
+#undef min
+
+#include "config.h"
 
 #include "system.h"
 #include "ags.h"

@@ -97,25 +97,25 @@ void x11_init_cursor(void) {
 	maskPix[6] = XCreateBitmapFromData(x11_display, x11_window, maskbm6_bits,
 					   maskbm6_width, maskbm6_height);
 	
-	cursor[IDC_ARROW] = XCreatePixmapCursor(x11_display, curPix[0], maskPix[0],
+	cursor[CURSOR_ARROW] = XCreatePixmapCursor(x11_display, curPix[0], maskPix[0],
 						&black, &white, spot[0].x, spot[0].y);
-	cursor[IDC_CROSS] = XCreateFontCursor(x11_display, XC_tcross);
-	cursor[IDC_IBEAM] = cursor[IDC_ICON] = XCreateFontCursor(x11_display, XC_icon);
-	cursor[IDC_NO]    = XCreateFontCursor(x11_display, XC_X_cursor);
-	cursor[IDC_SIZE]  = XCreatePixmapCursor(x11_display, curPix[6], maskPix[6],
+	cursor[CURSOR_CROSS] = XCreateFontCursor(x11_display, XC_tcross);
+	cursor[CURSOR_IBEAM] = cursor[CURSOR_ICON] = XCreateFontCursor(x11_display, XC_icon);
+	cursor[CURSOR_NO]    = XCreateFontCursor(x11_display, XC_X_cursor);
+	cursor[CURSOR_SIZE]  = XCreatePixmapCursor(x11_display, curPix[6], maskPix[6],
 						&black, &white, spot[6].x, spot[6].y);
-	cursor[IDC_SIZEALL]  = cursor[IDC_SIZE];
-	cursor[IDC_SIZENESW] = XCreatePixmapCursor(x11_display, curPix[4], maskPix[4],
+	cursor[CURSOR_SIZEALL]  = cursor[CURSOR_SIZE];
+	cursor[CURSOR_SIZENESW] = XCreatePixmapCursor(x11_display, curPix[4], maskPix[4],
 						   &black, &white, spot[4].x, spot[4].y);
- 	cursor[IDC_SIZENS]   = XCreatePixmapCursor(x11_display, curPix[2], maskPix[2],
+	cursor[CURSOR_SIZENS]   = XCreatePixmapCursor(x11_display, curPix[2], maskPix[2],
 						   &black, &white, spot[2].x, spot[2].y);
-	cursor[IDC_SIZENWSE] = XCreatePixmapCursor(x11_display, curPix[3], maskPix[3],
+	cursor[CURSOR_SIZENWSE] = XCreatePixmapCursor(x11_display, curPix[3], maskPix[3],
 						   &black, &white, spot[3].x, spot[3].y);
-	cursor[IDC_SIZEWE]   = XCreatePixmapCursor(x11_display, curPix[1], maskPix[1],
+	cursor[CURSOR_SIZEWE]   = XCreatePixmapCursor(x11_display, curPix[1], maskPix[1],
 						   &black, &white, spot[1].x, spot[1].y);
-	cursor[IDC_UPARROW]  = XCreateFontCursor(x11_display, XC_sb_up_arrow);
-//	cursor[IDC_WAIT]     = XCreateFontCursor(x11_display, XC_watch);
-	cursor[IDC_WAIT]     = XCreatePixmapCursor(x11_display, curPix[5], maskPix[5],
+	cursor[CURSOR_UPARROW]  = XCreateFontCursor(x11_display, XC_sb_up_arrow);
+//	cursor[CURSOR_WAIT]     = XCreateFontCursor(x11_display, XC_watch);
+	cursor[CURSOR_WAIT]     = XCreatePixmapCursor(x11_display, curPix[5], maskPix[5],
 						   &black, &white, spot[5].x, spot[5].y);
 	
 	if ((tmpPixmap = XCreatePixmap(x11_display,x11_window, 1, 1, 1)))

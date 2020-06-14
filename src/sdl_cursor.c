@@ -82,18 +82,18 @@ static SDL_Cursor *init_system_cursor(const char *image[]) {
 
 /* mouse cursur の初期化 */
 void sdl_cursor_init(void) {
-	cursor[IDC_ARROW] = init_system_cursor(cursor_arrow);
-	cursor[IDC_CROSS] = init_system_cursor(cursor_cross);
-	cursor[IDC_IBEAM] = init_system_cursor(cursor_ibeam);
-	cursor[IDC_NO]    = init_system_cursor(cursor_no);
-	cursor[IDC_SIZE]  = init_system_cursor(cursor_move);
-	cursor[IDC_SIZEALL]  = init_system_cursor(cursor_move);
-	cursor[IDC_SIZENESW] = init_system_cursor(cursor_size_r);
-	cursor[IDC_SIZENS]   = init_system_cursor(cursor_size_v);
-	cursor[IDC_SIZENWSE] = init_system_cursor(cursor_size_l);
-	cursor[IDC_SIZEWE]   = init_system_cursor(cursor_size_h);
-	cursor[IDC_UPARROW]  = init_system_cursor(cursor_uparrow);
-	cursor[IDC_WAIT]     = init_system_cursor(cursor_busy);
+	cursor[CURSOR_ARROW] = init_system_cursor(cursor_arrow);
+	cursor[CURSOR_CROSS] = init_system_cursor(cursor_cross);
+	cursor[CURSOR_IBEAM] = init_system_cursor(cursor_ibeam);
+	cursor[CURSOR_NO]    = init_system_cursor(cursor_no);
+	cursor[CURSOR_SIZE]  = init_system_cursor(cursor_move);
+	cursor[CURSOR_SIZEALL]  = init_system_cursor(cursor_move);
+	cursor[CURSOR_SIZENESW] = init_system_cursor(cursor_size_r);
+	cursor[CURSOR_SIZENS]   = init_system_cursor(cursor_size_v);
+	cursor[CURSOR_SIZENWSE] = init_system_cursor(cursor_size_l);
+	cursor[CURSOR_SIZEWE]   = init_system_cursor(cursor_size_h);
+	cursor[CURSOR_UPARROW]  = init_system_cursor(cursor_uparrow);
+	cursor[CURSOR_WAIT]     = init_system_cursor(cursor_busy);
 }
 
 boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {

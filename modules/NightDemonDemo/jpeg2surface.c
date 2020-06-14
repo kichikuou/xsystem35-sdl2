@@ -21,10 +21,13 @@
 */
 /* $Id: jpeg2surface.c,v 1.2 2003/11/09 15:06:12 chikama Exp $ */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <jpeglib.h>
+#undef ERROR
+#undef max
+#undef min
+
+#include "config.h"
 
 #include "portab.h"
 #include "ags.h"
