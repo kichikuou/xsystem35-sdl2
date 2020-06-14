@@ -29,11 +29,11 @@
 #include "xsystem35.h"
 
 /* システム変数 */
-int *sysVar;
+int sysVar[SYSVAR_MAX];
 /* 配列変数の情報 */
-arrayVarStruct *sysVarAttribute;
+arrayVarStruct sysVarAttribute[SYSVAR_MAX];
 /* 配列本体 */
-arrayVarBufferStruct *arrayVarBuffer;
+arrayVarBufferStruct arrayVarBuffer[ARRAYVAR_PAGEMAX];
 /* 64bit変数 */
 double longVar[SYSVARLONG_MAX];
 /* 文字列変数 */
@@ -106,12 +106,9 @@ extern void v_initStringVars(int cnt,int len) {
 
 /* 変数の初期化 */
 extern boolean v_initVars() {
-	sysVar          = calloc(SYSVAR_MAX, sizeof(int));
-	sysVarAttribute	= calloc(SYSVAR_MAX, sizeof(arrayVarStruct));
-	arrayVarBuffer  = calloc(ARRAYVAR_PAGEMAX, sizeof(arrayVarBufferStruct));
 	strVar          = calloc(STRVAR_MAX, STRVAR_LEN);
 	
-	if (strVar == NULL || sysVar == NULL || sysVarAttribute == NULL || arrayVarBuffer == NULL) {
+	if (strVar == NULL) {
 		NOMEMERR();
 	}
 	

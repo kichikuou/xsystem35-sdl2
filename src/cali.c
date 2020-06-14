@@ -64,52 +64,44 @@ static int *fixOffset(int base, int offset2) {
 	int page, offset;
 	int *index;
 	
-	preVarPage = (sysVarAttribute + base) -> page;
+	preVarPage = sysVarAttribute[base].page;
 	preVarNo   = base;
-	if ((sysVarAttribute + base) -> page == 0) {
+	if (sysVarAttribute[base].page == 0) {
 		if (offset2 == -1) {
-#ifdef DEBUG_CHECKALING
 			if (base >= SYSVAR_MAX) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d)\n", base, offset2);
+				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d)\n", base, offset2);
 				return NULL;
 			}
-#endif
 			preVarIndex = base;
 			return sysVar + base;
 		} else {
-#ifdef DEBUG_CHECKALING
 			if ((base + offset2) >= SYSVAR_MAX) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d)\n", base, offset2);
+				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d)\n", base, offset2);
 				return NULL;
 			}
-#endif
 			preVarIndex = base + offset2;
 			return sysVar + base + offset2;
 		}
 	} else {
 		if (offset2 == -1) {
-			index  = (sysVarAttribute + base) -> pointvar;
-			page   = (sysVarAttribute + base) -> page;
-			offset = (sysVarAttribute + base) -> offset;
-#ifdef DEBUG_CHECKALING
-			if ((*index) + offset > (arrayVarBuffer + page - 1)->max) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d, %d, %d, %d)\n", base, offset2, *index, page, offset);
+			index  = sysVarAttribute[base].pointvar;
+			page   = sysVarAttribute[base].page;
+			offset = sysVarAttribute[base].offset;
+			if (*index + offset > arrayVarBuffer[page - 1].max) {
+				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d, %d, %d, %d)\n", base, offset2, *index, page, offset);
 				return NULL;
 			}
-#endif
-			preVarIndex = offset + (*index);
-			return ((arrayVarBuffer + page - 1) -> value) + offset + (*index);
+			preVarIndex = offset + *index;
+			return arrayVarBuffer[page - 1].value + offset + *index;
 		} else {
-			page   = (sysVarAttribute + base) -> page;
-			offset = (sysVarAttribute + base) -> offset;
-#ifdef DEBUG_CHECKALING
-			if (offset + offset2 > (arrayVarBuffer + page - 1)->max) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d, %d, %d)\n", base, offset2, page, offset);
+			page   = sysVarAttribute[base].page;
+			offset = sysVarAttribute[base].offset;
+			if (offset + offset2 > arrayVarBuffer[page - 1].max) {
+				WARNING("sysVar[no] ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", base, offset2, page, offset);
 				return NULL;
 			}
-#endif
 			preVarIndex = offset + offset2;
-			return ((arrayVarBuffer + page - 1) -> value) + offset + offset2;
+			return arrayVarBuffer[page - 1].value + offset + offset2;
 		}
 	}
 }
@@ -304,12 +296,12 @@ int getCaliValue() {
 		}
 	}
 	c0 = *--cali;
-#ifdef DEBUG_CHECKALING
+
 	if (cali != bufc) {
 		WARNING("Something is wrong @ %03d:%05x\n", sl_getPage(), sl_getIndex());
 		cali = bufc;
 		return 0;
 	}
-#endif
+
 	return c0;
 }

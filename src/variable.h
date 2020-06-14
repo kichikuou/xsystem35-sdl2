@@ -48,9 +48,9 @@ typedef struct {
 	int offset;
 } arrayVarStruct;
 
-extern int *sysVar;
-extern arrayVarStruct *sysVarAttribute;
-extern arrayVarBufferStruct *arrayVarBuffer;
+extern int sysVar[];
+extern arrayVarStruct sysVarAttribute[];
+extern arrayVarBufferStruct arrayVarBuffer[];
 extern double longVar[];
 extern boolean v_allocateArrayBuffer(int , int , boolean );
 extern boolean v_defineArrayVar(int , int *, int , int );
