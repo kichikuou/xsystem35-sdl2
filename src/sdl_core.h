@@ -102,7 +102,6 @@ extern void sdl_mainIteration();
 extern boolean RawKeyInfo[];
 extern void sdl_sleep(int msec);
 extern void sdl_wait_vsync();
-extern void sdl_sync();
 
 /* 初期化関係 */
 #define GraphicsInitilize() sdl_Initilize()
@@ -116,7 +115,7 @@ extern void sdl_sync();
 #define GetDIB() sdl_getDIB()
 
 /* 画面更新 */
-#define DspDeviceSync() sdl_sync()
+#define DspDeviceSync()
 #define UpdateArea(src,dst) sdl_updateArea((src),(dst))
 #define FullScreen(on) sdl_FullScreen(on)
 

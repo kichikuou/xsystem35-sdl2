@@ -428,13 +428,3 @@ void sdl_restoreRegion(void *psrc, int x, int y) {
 	sdl_putRegion(src, x ,y);
 	SDL_FreeSurface(src);
 }
-
-void sdl_sync() {
-	// imageXX等でsurface内を直接操作する際に、本当はlock/unlockで
-	// はさまないといけないんだけど、lockすればそれまでキューに入って
-	// いた SDL内部の処理がすべて終ると予想されるのでXsyncと同様の
-	// 効果があると思う。しかしUnlockしているので非同期でimageXXの処理中
-	// にSDLの描画命令が入る可能性もあるが、X11ではたぶん大丈夫？
-	SDL_LockSurface(sdl_dib);
-	SDL_UnlockSurface(sdl_dib);
-}
