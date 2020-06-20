@@ -135,8 +135,14 @@ void commandMA() {
 	/* num1 の文字列の後ろに num2 をつなげる */
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
-	
-	v_strcat(num1 - 1, v_str(num2 - 1));
+
+	if (num1 == num2) {
+		char *buf = strdup(v_str(num2 - 1));
+		v_strcat(num1 - 1, buf);
+		free(buf);
+	} else {
+		v_strcat(num1 - 1, v_str(num2 - 1));
+	}
 	
 	DEBUG_COMMAND("MA %d,%d:\n",num1,num2);
 }
@@ -176,7 +182,8 @@ void commandMM() {
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
-	v_strcpy(num1 - 1, v_str(num2 - 1));
+	if (num1 != num2)
+		v_strcpy(num1 - 1, v_str(num2 - 1));
 	
 	DEBUG_COMMAND("MM %d,%d:\n",num1, num2);
 }
@@ -236,8 +243,7 @@ void commandMD() {
 	int src_str_no = getCaliValue();
 	int len        = getCaliValue();
 	
-	strncpy(v_str(dst_str_no - 1), v_str(src_str_no - 1), len * 2);
-	*(v_str(dst_str_no - 1) + len*2) = '\0';
+	v_strncpy(dst_str_no - 1, 0, src_str_no - 1, 0, len);
 	
 	DEBUG_COMMAND("MD %d,%d,%d:\n",dst_str_no, src_str_no, len);
 }
@@ -250,8 +256,7 @@ void commandME() {
 	int src_pos    = getCaliValue();
 	int len        = getCaliValue();
 	
-	strncpy(v_str(dst_str_no - 1) + dst_pos * 2, v_str(src_str_no - 1) + src_pos * 2, len*2);
-	*(v_str(dst_str_no - 1) + dst_pos * 2 + len*2) = '\0';
+	v_strncpy(dst_str_no - 1, dst_pos, src_str_no - 1, src_pos, len);
 	
 	DEBUG_COMMAND("ME %d,%d,%d,%d,%d:\n",dst_str_no, dst_pos, src_str_no, src_pos, len);
 }
@@ -262,14 +267,13 @@ void commandMF() {
 	int dst_no    = getCaliValue();
 	int key_no    = getCaliValue();
 	int start_pos = getCaliValue();
-	char *start = v_str(dst_no - 1) + start_pos * 2;
 	
-	char *pos = strstr(start, v_str(key_no - 1));
+	int pos = v_strstr(dst_no - 1, start_pos, v_str(key_no - 1));
 	
-	if (pos == NULL) {
+	if (pos < 0) {
 		sysVar[0] = 255;
 	} else {
-		*var = (pos - start) / 2;
+		*var = pos;
 		sysVar[0] = 0;
 	}
 	
@@ -376,26 +380,16 @@ void commandMN() {
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 	int i, len;
-	char *b;
+	const char *b;
 	
 	switch(no) {
 	case 0:
 		/* 文字列を配列に変換する */
-		len = v_strlen(num -1);
-		b = v_str(num -1);
-		for (i = 0; i < len; i++) {
-			*var = *b;
-			var++; b++;
-		}
-		*var = 0;
+		sysVar[0] = v_strToVars(num - 1, var);
 		break;
 	case 1:
 		/* 配列を文字列に変換する */
-		b = v_str(num -1);
-		while(*var) {
-			*b = *var; b++; var++;
-		}
-		*b = '\0';
+		v_strFromVars(num - 1, var);
 		break;
 	default:
 		WARNING("UnKnown MN command(%d)\n", no);

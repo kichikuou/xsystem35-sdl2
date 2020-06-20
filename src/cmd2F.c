@@ -749,14 +749,12 @@ void commands2F44() {
 	char s[256];
 
 	if (fig) {
-		char *ss="%%%dd";
-		char sss[256];
-		sprintf(sss, ss, fig);
-		sprintf(s, sss, num2);
+		sprintf(s, "%*d", fig, num2);
+		v_strcpy(num1 - 1, s + strlen(s) - fig);
 	} else {
 		sprintf(s, "%d", num2);
+		v_strcpy(num1 - 1, s);
 	}
-	v_strcpy(num1 - 1, s);
 	
 	DEBUG_COMMAND("MHH %d, %d, %d:\n", num1, fig, num2);
 }
