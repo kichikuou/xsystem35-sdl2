@@ -21,9 +21,27 @@ jobs:
       run: |
         mkdir -p out/${{ matrix.build-type }}
         cd out/${{ matrix.build-type }}
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ../../
+        cmake -DENABLE_X11=NO -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ../../
         make
 
     - name: Test
       run: ctest
       working-directory: out/${{ matrix.build-type }}
+
+  build-x11:
+    runs-on: ubuntu-latest
+
+    name: Linux X11
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build
+      run: |
+        mkdir -p out
+        cd out
+        cmake ../
+        make
+
+    - name: Test
+      run: ctest
+      working-directory: out
