@@ -69,7 +69,7 @@ static void font_sdlttf_sel_font(int type, int size) {
 	}
 }
 
-static agsurface_t *font_sdlttf_get_glyph(unsigned char *msg) {
+static agsurface_t *font_sdlttf_get_glyph(const unsigned char *msg) {
 	static SDL_Surface *fs;
 	static agsurface_t result;
 
@@ -140,7 +140,7 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, unsigne
 	SDL_UnlockSurface(sdl_dib);
 }
 
-static int font_sdlttf_draw_glyph(int x, int y, unsigned char *str, int cl) {
+static int font_sdlttf_draw_glyph(int x, int y, const unsigned char *str, int cl) {
 	SDL_Surface *fs;
 	SDL_Rect r_src, r_dst;
 	int w, h, maxy;

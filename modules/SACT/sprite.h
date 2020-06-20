@@ -83,7 +83,7 @@ extern void sp_draw_dmap(void* data, void* userdata);
 
 
 // in sprite_msg.c
-extern void smsg_add(char *msg);
+extern void smsg_add(const char *msg);
 extern void smsg_newline(int wNum, int size);
 extern void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, int *wLength);
 extern void smsg_clear(int wNum);

@@ -151,7 +151,7 @@ extern void ags_remove();
 /* ウィンド関係 */
 extern void ags_setWorldSize(int width, int height, int depth);
 extern void ags_setViewArea(int x, int y, int width, int height);
-extern void ags_setWindowTitle(char *str);
+extern void ags_setWindowTitle(const char *str);
 extern void ags_getDIBInfo(DispInfo *info);
 extern void ags_getWindowInfo(DispInfo *info);
 extern void ags_getViewAreaInfo(DispInfo *info);
@@ -194,7 +194,7 @@ extern void ags_putRegion(void *region, int x, int y);
 extern void ags_copyRegion(void *region, int sx, int sy, int w,int h,int dx,int dy);
 extern void ags_delRegion(void *region);
 
-extern int  ags_drawString(int x, int y, char *src, int col);
+extern int  ags_drawString(int x, int y, const char *src, int col);
 extern void ags_drawCg8bit(cgdata *cg, int x, int y); 
 extern void ags_drawCg16bit(cgdata *cg, int x, int y); 
 

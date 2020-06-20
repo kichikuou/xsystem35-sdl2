@@ -58,7 +58,7 @@ static boolean nextLineIsAfterKaigyou = FALSE;
 
 /* Private Methods */
 static void drawLineFrame(Bcom_WindowInfo *info);
-static void copyMsgToStrVar(char *m);
+static void copyMsgToStrVar(const char *m);
 static void msgget_at_r();
 static void msgget_at_a();
 
@@ -108,7 +108,7 @@ void msg_setStringDecorationType(int type) {
 	msgDecorateType = type;
 }
 
-void msg_putMessage(char *m) {
+void msg_putMessage(const char *m) {
 	int         w;
 	MyRectangle adj;
 	
@@ -339,7 +339,7 @@ static void drawLineFrame(Bcom_WindowInfo *i) {
 	ags_updateArea(i->x -8, i->y -8, i->width +16, i->height +16);
 }
 
-static void copyMsgToStrVar(char *m) {
+static void copyMsgToStrVar(const char *m) {
 	if (v_strlen(msg.mg_curStrVarNo -1) == 0) {
 		v_strcpy(msg.mg_curStrVarNo -1, m);
 	} else {

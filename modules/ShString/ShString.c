@@ -45,8 +45,8 @@ static void ExchangeString(void) {
 	int target = getCaliValue();
 	int pat    = getCaliValue();
 	int patr   = getCaliValue();
-	char *start = v_str(target -1);
-	char *next;
+	const char *start = v_str(target -1);
+	const char *next;
 	char dst[STRVAR_LEN] = "";
 	
 	DEBUG_COMMAND("ShString.ExchangeString: %d,%d,%d:\n", target, pat, patr);
@@ -144,7 +144,7 @@ static void SetStringNum16(void) {
 	*/
 	int st = getCaliValue();
 	int *var = getCaliVariable();
-	char *str = v_str(st -1);
+	const char *str = v_str(st -1);
 	char _dst[100];
 	char *dst = _dst;
 	

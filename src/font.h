@@ -46,13 +46,13 @@ struct _FONT {
 	
 	void (*sel_font)(int type, int size);
 	
-	struct agsurface *(*get_glyph)(unsigned char *str);
+	struct agsurface *(*get_glyph)(const unsigned char *str);
 	
-	int (*draw_glyph)(int x, int y, unsigned char *str, int col);
+	int (*draw_glyph)(int x, int y, const unsigned char *str, int col);
 	
 	boolean (*self_drawable)();
 	
-	int (*codeconv[FONTTYPEMAX])(unsigned char **msg);
+	int (*codeconv[FONTTYPEMAX])(const unsigned char **msg);
 };
 
 typedef struct _FONT FONT;

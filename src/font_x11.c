@@ -151,7 +151,7 @@ static agsurface_t *get_drawn_glyph(const char *str, int w) {
 	return dst;
 }
 
-static agsurface_t *font_x11_get_glyph(unsigned char *str) {
+static agsurface_t *font_x11_get_glyph(const unsigned char *str) {
 	agsurface_t *dst;
 	int w;
 	BYTE *conv;
@@ -182,7 +182,7 @@ static agsurface_t *font_x11_get_glyph(unsigned char *str) {
 	return &img_glyph;
 }
 
-static int font_x11_draw_glyph(int x, int y, unsigned char *str, int col) {
+static int font_x11_draw_glyph(int x, int y, const unsigned char *str, int col) {
 	int w;
 	BYTE *conv;
 	

@@ -188,7 +188,7 @@ static int setupmark(int wNum1, int wNum2, struct markinfo *minfo) {
     
   @param msg: 追加する文字列
 */
-void smsg_add(char *msg) {
+void smsg_add(const char *msg) {
 	int len;
 	
 	if (msg[0] == '\0') return;

@@ -60,7 +60,7 @@ static FONT *this;
 static void pixmap2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl);
 static void pixmapmono2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl);
 
-static int toUnicode(unsigned char **msg) {
+static int toUnicode(const unsigned char **msg) {
 	int code;
 	
 	if (**msg >= 0xa0 && **msg <= 0xdf) {
@@ -74,7 +74,7 @@ static int toUnicode(unsigned char **msg) {
 	return code;
 }
 
-static int toSJIS(unsigned char **msg) {
+static int toSJIS(const unsigned char **msg) {
 	int code;
 
 	if (**msg >= 0xa0 && **msg <= 0xdf) {
@@ -88,7 +88,7 @@ static int toSJIS(unsigned char **msg) {
 	return code;
 }
 
-static int toSJIS0213(unsigned char **msg) {
+static int toSJIS0213(const unsigned char **msg) {
 	int code;
 	
 	if (**msg >= 0xa0 && **msg <= 0xdf) {
@@ -231,14 +231,14 @@ static void clear_canvas(void) {
 	memset(img_glyph.pixel, 0, GLYPH_PIXMAP_WIDTH * GLYPH_PIXMAP_HEIGHT);
 }
 
-static agsurface_t *font_ttf_get_glyph(unsigned char *_msg) {
+static agsurface_t *font_ttf_get_glyph(const unsigned char *_msg) {
 	FT_GlyphSlot   slot;
 	FT_UShort      code;
 	FT_Error       err;
 	FT_Pixel_Mode  pixelmode;
 	FT_Int         loadflag;
 	int x = 0;
-	unsigned char *msg = _msg;
+	const unsigned char *msg = _msg;
 	
 	if (fontset == NULL) return &img_glyph;
 	
@@ -300,7 +300,7 @@ static agsurface_t *font_ttf_get_glyph(unsigned char *_msg) {
 	return &img_glyph;
 }
 
-static int font_ttf_draw_glyph(int x, int y, unsigned char *str, int col) {
+static int font_ttf_draw_glyph(int x, int y, const unsigned char *str, int col) {
 	return 0;
 }
 

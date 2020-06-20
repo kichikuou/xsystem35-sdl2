@@ -52,8 +52,8 @@ MG コマンド: 表示時の ZH に依存
 */
 
 /* defined in hankaku.c */
-extern BYTE *zen2han(BYTE *src);
-extern BYTE *han2zen(BYTE *src);
+extern BYTE *zen2han(const BYTE *src);
+extern BYTE *han2zen(const BYTE *src);
 /* defined by hankan2sjis.c */
 extern char *hankana2sjis(int index);
 /* defined by cmd_check.c */
@@ -124,8 +124,8 @@ char* sys_getConvString(char term) {
 }
 
 /* 選択肢・通常メッセージ振り分け */
-void sys_addMsg(char *str) {
-	char *msg = NULL;
+void sys_addMsg(const char *str) {
+	const char *msg = NULL;
 
 	switch(msg_msgHankakuMode) {
 	case 0:
@@ -153,7 +153,7 @@ void sys_addMsg(char *str) {
 	}
 	
 	if (msg && msg_msgHankakuMode < 2) {
-		free(msg);
+		free((char *)msg);
 	}
 }
 

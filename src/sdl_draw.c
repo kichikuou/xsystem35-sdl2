@@ -412,7 +412,7 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, agsurface_t *src, unsigne
 	SDL_UnlockSurface(sdl_dib);
 }
 
-int sdl_drawString(int x, int y, char *msg, unsigned long col) {
+int sdl_drawString(int x, int y, const char *msg, unsigned long col) {
 	int w;
 
 	sdl_pal_check();

@@ -184,7 +184,7 @@ void ags_setViewArea(int x, int y, int width, int height) {
 	SetWindowSize(x, y, width, height);
 }
 
-void ags_setWindowTitle(char *src) {
+void ags_setWindowTitle(const char *src) {
 #define TITLEHEAD "XSystem35 Version "VERSION":"
 	BYTE *dst, *d;
 
@@ -396,7 +396,7 @@ void ags_delRegion(void *region) {
 	DelRegion(region);
 }
 
-int ags_drawString(int x, int y, char *src, int col) {
+int ags_drawString(int x, int y, const char *src, int col) {
 	int w;
 	
 	if (!check_param_xy(&x, &y)) return 0;

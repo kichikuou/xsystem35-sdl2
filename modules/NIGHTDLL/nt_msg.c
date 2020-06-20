@@ -179,7 +179,7 @@ void ntmsg_newline() {
 	ntmsg_add(buf);
 }
 
-void ntmsg_add(char *msg) {
+void ntmsg_add(const char *msg) {
 	int len;
 	
 	SACT_DEBUG("len = %d\n", strlen(msg));

@@ -612,7 +612,7 @@ static BYTE hankakutable[3][192][2] = {{
 	{0x83, 0xff}
 }};
 
-BYTE *zen2han(BYTE *src) {
+BYTE *zen2han(const BYTE *src) {
 	BYTE c0, c1;
 	char *dst, *_dst;
 	
@@ -644,7 +644,7 @@ BYTE *zen2han(BYTE *src) {
 	return _dst;
 }
 
-BYTE *han2zen(BYTE *src) {
+BYTE *han2zen(const BYTE *src) {
 	BYTE c0;
 	BYTE *dst, *_dst;
 	BYTE *kindex;

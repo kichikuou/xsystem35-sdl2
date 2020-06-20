@@ -172,7 +172,7 @@ void Xcore_drawLine(int x1, int y1, int x2, int y2, unsigned long col) {
 	}
 } 
 
-int Xcore_drawString(int x, int y, char *msg, unsigned long col) {
+int Xcore_drawString(int x, int y, const char *msg, unsigned long col) {
 	int w;
 	
 	if (x11_font->self_drawable()) {

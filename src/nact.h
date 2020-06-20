@@ -45,7 +45,7 @@ extern int *getCaliVariable();
 extern int *getVariable();
 extern char *sys_getString(char term);
 extern char *sys_getConvString(char term);
-extern void sys_addMsg(char *str);
+extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
 extern char *sys_getConstString();
 
@@ -110,7 +110,7 @@ typedef struct {
 	/* メッセージ関連 */
 	msg_t msg;
  	boolean   is_msg_out;          /* 通常メッセージを表示するか */
-	void (*msgout)(char *msg);     // 通常以外(DLL等)のメッセージ表示関数
+	void (*msgout)(const char *msg);     // 通常以外(DLL等)のメッセージ表示関数
 	
 	/* 選択肢関連 */
 	sel_t sel;
