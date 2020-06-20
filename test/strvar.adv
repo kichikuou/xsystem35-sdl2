@@ -1,0 +1,106 @@
+	MS FILE,"strvar.adv":
+	!len:0!
+	!src:0!
+	!dst:0!
+
+const word str1 = 10:
+const word str2 = 11:
+const word str3 = 12:
+
+	MS str1,"０１２３４５６７８９":
+	ML len,str1:
+	~AssertEquals len,10,__LINE__:
+	MD str2,str1,5:
+	MS str3,"０１２３４":
+	~AssertStrEquals str2,str3,__LINE__:
+	ME str2,2,str1,6,2:
+	MS str3,"０１６７":
+	~AssertStrEquals str2,str3,__LINE__:
+
+	MS str1,"0123456789":
+	ML len,str1:
+	~AssertEquals len,10,__LINE__:
+	MD str2,str1,5:
+	MS str3,"01234":
+	~AssertStrEquals str2,str3,__LINE__:
+	ME str2,2,str1,6,2:
+	MS str3,"0167":
+	~AssertStrEquals str2,str3,__LINE__:
+
+	MS str1,"<0x82a0>a":
+	MN 0,str1,D01:
+	~AssertEquals RND,3,__LINE__:
+	~AssertEquals D01,0xa082,__LINE__:
+	~AssertEquals D02,0x61,__LINE__:   ; 'a' == "\x61"
+	~AssertEquals D03,0,__LINE__:
+	!D01:0xa182!
+	inc D02:
+	MN 1,str1,D01:
+	MS str2,"<0x82a1>b":
+	~AssertStrEquals str1,str2,__LINE__:
+
+	MS str1,"あいうabc１２３":
+	MS str2,"c１":
+	MF D01,str1,str2,0:
+	~AssertEquals RND,0,__LINE__:
+	~AssertEquals D01,5,__LINE__:
+	MF RND,str1,str2,5:
+	~AssertEquals RND,0,__LINE__:
+	~AssertEquals D01,5,__LINE__:
+	MF RND,str1,str2,6:
+	~AssertEquals RND,255,__LINE__:
+
+	MH str1,0,0:
+	MS str2,"０":
+	~AssertStrEquals str1,str2,__LINE__:
+	MH str1,0,12345:
+	MS str2,"１２３４５":
+	~AssertStrEquals str1,str2,__LINE__:
+	MH str1,3,12345:
+	MS str2,"３４５":
+	~AssertStrEquals str1,str2,__LINE__:
+	MH str1,6,12345:
+	MS str2,"　１２３４５":
+	~AssertStrEquals str1,str2,__LINE__:
+
+	MHH str1,0,0:
+	MS str2,"0":
+	~AssertStrEquals str1,str2,__LINE__:
+	MHH str1,0,12345:
+	MS str2,"12345":
+	~AssertStrEquals str1,str2,__LINE__:
+	MHH str1,3,12345:
+	MS str2,"345":
+	~AssertStrEquals str1,str2,__LINE__:
+	MHH str1,6,12345:
+	MS str2," 12345":
+	~AssertStrEquals str1,str2,__LINE__:
+
+	MS str1,"123あいう":
+	~MPtoString str2,str1,5:
+	MS str3,"123あい":
+	~AssertStrEquals str2,str3,__LINE__:
+	~MPtoString str2,str1,8:
+	MS str3,"123あいう　　":
+	~AssertStrEquals str2,str3,__LINE__:
+
+	MS str2,"0123456789":
+	MM str1,str2:
+	~AssertStrEquals str1,str2,__LINE__:
+	<D01,20,500,1,10:
+		MA str1,str2:
+		ML len,str1:
+		~AssertEquals len,D01,__LINE__:
+	>
+
+	%0:
+
+**MPtoString dst,src,len:
+	MG 100,0:
+	MG 1,dst:
+	MG 4,0:
+	MG 0,1:
+	MP src,len:
+	MG 0,0:
+	MG 100,1:
+	%0:
