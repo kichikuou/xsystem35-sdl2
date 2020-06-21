@@ -45,7 +45,7 @@ int strvar_len = STRVAR_LEN;
 
 static char *advance(const char *s, int n) {
 	while (*s && n > 0) {
-		s += CHECKSJIS1BYTE(*s) ? 2 : 1;
+		s += (CHECKSJIS1BYTE(*s) && *(s + 1)) ? 2 : 1;
 		n--;
 	}
 	return (char *)s;
@@ -255,10 +255,10 @@ int v_strToVars(int no, int *vars) {
 	}
 
 	int count = 0;
-	for (const char *p = strVar[no]; *p; count++) {
-		vars[count] = *p++ & 0xff;
-		if (CHECKSJIS1BYTE(vars[count]))
-			vars[count] |= (*p++ & 0xff) << 8;
+	for (const char *p = strVar[no]; *p; p++, count++) {
+		vars[count] = *p & 0xff;
+		if (CHECKSJIS1BYTE(*p) && *(p + 1))
+			vars[count] |= (*++p & 0xff) << 8;
 	}
 	vars[count++] = 0;
 	return count;
