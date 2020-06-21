@@ -130,6 +130,7 @@ void msg_putMessage(const char *m) {
 	ags_setFont(msg.MsgFont, msg.MsgFontSize);
 	switch(msgDecorateType) {
 	case 0:
+	default:
 		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 0;
 		break;
 	case 1:
@@ -145,6 +146,12 @@ void msg_putMessage(const char *m) {
 		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
 		break;
 	case 4:
+		ags_drawString(msgcur.x -1, msgcur.y, m, msgDecorateColor);
+		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
+		ags_drawString(msgcur.x, msgcur.y -1, m, msgDecorateColor);
+		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
+		adj.x = -1; adj.y = -1; adj.width = 2; adj.height = 2;
+		break;
 	case 6:
 		ags_drawString(msgcur.x +1, msgcur.y, m, msg.MsgFontColor);
 		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 0;
@@ -157,11 +164,13 @@ void msg_putMessage(const char *m) {
 		ags_drawString(msgcur.x +1, msgcur.y +1, m, msg.MsgFontColor);
 		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
 		break;
-	case 9:
 	case 10:
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 0;
-		break;
-	default:
+		ags_drawString(msgcur.x -1, msgcur.y   , m, msgDecorateColor);
+		ags_drawString(msgcur.x +1, msgcur.y   , m, msgDecorateColor);
+		ags_drawString(msgcur.x   , msgcur.y -1, m, msgDecorateColor);
+		ags_drawString(msgcur.x   , msgcur.y +1, m, msgDecorateColor);
+		ags_drawString(msgcur.x +2, msgcur.y +2, m, msgDecorateColor);
+		adj.x = -1; adj.y = -1; adj.width = 3; adj.height = 3;
 		break;
 	}
 	
