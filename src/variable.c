@@ -52,33 +52,30 @@ static char *advance(const char *s, int n) {
 }
 
 /* 配列バッファの確保 DC ,page = 1~ */
-extern boolean v_allocateArrayBuffer(int page, int size, boolean flg) {
-	void *buf;
-	
+extern boolean v_allocateArrayBuffer(int page, int size, boolean saveflag) {
 	if (page <= 0 || page > 256)   { return false; }
 	if (size <= 0 || size > 65536) { return false; }
 	
-	if (NULL == (buf = malloc(size * sizeof(int) + 257))) {
+	void *buf = arrayVarBuffer[page - 1].value;
+	if (buf != NULL)
+		buf = realloc(buf, size * sizeof(int));
+	else
+		buf = calloc(size, sizeof(int));
+	if (!buf)
 		NOMEMERR();
-	}
-	memset(buf, 0, size * sizeof(int) + 257);
-	if (arrayVarBuffer[page - 1].value != NULL) {
-		int len = min(size, arrayVarBuffer[page - 1].max);
-		memcpy(buf, arrayVarBuffer[page - 1].value, len * sizeof(int));
-	}
-	
+
 	arrayVarBuffer[page - 1].value    = buf;
-	arrayVarBuffer[page - 1].max      = size;
-	arrayVarBuffer[page - 1].saveflag = flg;
+	arrayVarBuffer[page - 1].size     = size;
+	arrayVarBuffer[page - 1].saveflag = saveflag;
 	
 	return true;
 }
 
 /*　配列変数の割り当て DS */
 extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page) {
-	if (datavar < 0 || datavar > SYSVAR_MAX - 1)                   { return false; }
-	if (page    < 0 || page    > ARRAYVAR_PAGEMAX - 1)             { return false; }
-	if (offset  < 0 || offset  > arrayVarBuffer[page - 1].max - 1) { return false; }
+	if (datavar < 0 || datavar >  SYSVAR_MAX - 1)                { return false; }
+	if (page    < 0 || page    >  ARRAYVAR_PAGEMAX - 1)          { return false; }
+	if (offset  < 0 || offset  >= arrayVarBuffer[page - 1].size) { return false; }
 	
 	sysVarAttribute[datavar].pointvar = pointvar;
 	sysVarAttribute[datavar].page     = page;
@@ -90,11 +87,6 @@ extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page
 extern boolean v_releaseArrayVar(int datavar) {
 	sysVarAttribute[datavar].page = 0;
 	return true;
-}
-
-/* 指定ページの最大変数の取得 page = 1~ */
-extern int v_getArrayBufferCnt(int page) {
-	return arrayVarBuffer[page - 1].max;
 }
 
 /* 指定ページは使用中 page = 1~ */
@@ -285,9 +277,9 @@ void debug_showvariable() {
 
 	for (i = 0; i < ARRAYVAR_PAGEMAX; i++) {
 		if (arrayVarBuffer[i].value != NULL) {
-			fprintf(fp, "ArrayPage[%d],max=%d\n",i,arrayVarBuffer[i].max); 
+			fprintf(fp, "ArrayPage[%d],size=%d\n",i,arrayVarBuffer[i].size);
 			var = arrayVarBuffer[i].value;
-			for (j = 0; j < arrayVarBuffer[i].max; j+=10) {
+			for (j = 0; j < arrayVarBuffer[i].size; j+=10) {
 				for (k = 0; k < 10; k++) {
 					fprintf(fp, "%d,", *var); var++;
 				}

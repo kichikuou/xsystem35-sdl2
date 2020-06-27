@@ -291,7 +291,7 @@ int save_loadPartial(int no, int page, int offset, int cnt) {
 		cnt = min(cnt, SYSVAR_MAX - offset);
 		var = sysVar + offset;
 	} else {
-		cnt = min(cnt, arrayVarBuffer[page - 1].max - offset);
+		cnt = min(cnt, arrayVarBuffer[page - 1].size - offset);
 		var = arrayVarBuffer[page - 1].value + offset;
 	}
 	
@@ -349,7 +349,7 @@ int save_savePartial(int no, int page, int offset, int cnt) {
 	} else {
 		if (arrayVarBuffer[page - 1].saveflag == FALSE)
 			goto errexit;
-		cnt = min(cnt, arrayVarBuffer[page - 1].max - offset);
+		cnt = min(cnt, arrayVarBuffer[page - 1].size - offset);
 		var = arrayVarBuffer[page - 1].value + offset;
 	}
 	
@@ -636,7 +636,7 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	} else if (!arrayVarBuffer[page - 1].saveflag) {
 		return NULL;
 	} else {
-		cnt = arrayVarBuffer[page - 1].max;
+		cnt = arrayVarBuffer[page - 1].size;
 		var = arrayVarBuffer[page - 1].value;
 		if (var == NULL)
 			return NULL;
@@ -674,7 +674,7 @@ static int loadSysVar(char *buf) {
 		cnt = savefile_sysvar_cnt = head->size / sizeof(WORD);
 	} else {
 		cnt = head->size / sizeof(WORD);
-		if (arrayVarBuffer[page - 1].max != cnt || 
+		if (arrayVarBuffer[page - 1].size < cnt ||
 		    arrayVarBuffer[page - 1].value == NULL) {
 			/*
 			fprintf(stderr, "loadSysVar(): undef array\n");

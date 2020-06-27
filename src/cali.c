@@ -87,7 +87,7 @@ static int *fixOffset(int base, int offset2) {
 			index  = sysVarAttribute[base].pointvar;
 			page   = sysVarAttribute[base].page;
 			offset = sysVarAttribute[base].offset;
-			if (*index + offset > arrayVarBuffer[page - 1].max) {
+			if (*index + offset >= arrayVarBuffer[page - 1].size) {
 				WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), base, offset2, *index, page, offset);
 				return NULL;
 			}
@@ -96,7 +96,7 @@ static int *fixOffset(int base, int offset2) {
 		} else {
 			page   = sysVarAttribute[base].page;
 			offset = sysVarAttribute[base].offset;
-			if (offset + offset2 > arrayVarBuffer[page - 1].max) {
+			if (offset + offset2 >= arrayVarBuffer[page - 1].size) {
 				WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), base, offset2, page, offset);
 				return NULL;
 			}

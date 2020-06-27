@@ -37,7 +37,7 @@
 #define ARRAYVAR_PAGEMAX 256
 
 typedef struct {
-	int max;
+	int size;
 	boolean saveflag;
 	int *value;
 } arrayVarBufferStruct;
@@ -52,11 +52,9 @@ extern int sysVar[];
 extern arrayVarStruct sysVarAttribute[];
 extern arrayVarBufferStruct arrayVarBuffer[];
 extern double longVar[];
-extern boolean v_allocateArrayBuffer(int , int , boolean );
-extern boolean v_defineArrayVar(int , int *, int , int );
-extern boolean v_releaseArrayVar(int );
+extern boolean v_allocateArrayBuffer(int page, int size, boolean saveflag);
+extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page);
 extern boolean v_releaseArrayVar(int datavar);
-extern int v_getArrayBufferCnt(int page);
 extern boolean v_getArrayBufferStatus(int page);
 extern void v_initStringVars(int ,int );
 extern boolean v_initVars();
