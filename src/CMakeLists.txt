@@ -93,7 +93,7 @@ else()  # non-emscripten, non-android
   if (FREETYPE_FOUND)
     target_link_libraries(xsystem35 PRIVATE Freetype::Freetype)
   endif()
-  if (SDL2_FOUND)
+  if (ENABLE_SDL)
     target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2)
   endif()
   if (SDL2MIXER_FOUND)

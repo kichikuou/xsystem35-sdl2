@@ -71,10 +71,7 @@ else()
   optional_find_package(Freetype)
 
   include(FindPkgConfig)
-  if (NOT X11_FOUND)
-    optional_pkg_check_modules(SDL2 IMPORTED_TARGET sdl2)
-  endif()
-
+  optional_pkg_check_modules(SDL2 IMPORTED_TARGET sdl2)
   optional_pkg_check_modules(SDL2MIXER IMPORTED_TARGET SDL2_mixer)
   optional_pkg_check_modules(SDL2TTF IMPORTED_TARGET SDL2_ttf)
 
@@ -202,7 +199,7 @@ endif()
 
 if (EMSCRIPTEN OR ANDROID)
   set(SRC_JOYSTICK joystick_dmy.c)
-elseif (SDL2_FOUND)
+elseif (ENABLE_SDL)
   set(SRC_JOYSTICK joystick_sdl.c)
   set(SUMMARY_JOYSTICK "SDL")
   set(HAVE_SDLJOY 1)
