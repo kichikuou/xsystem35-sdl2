@@ -25,7 +25,7 @@ jobs:
         make
 
     - name: Test
-      run: ctest
+      run: ctest --output-on-failure
       working-directory: out/${{ matrix.build-type }}
 
   build-x11:
@@ -43,5 +43,5 @@ jobs:
         make
 
     - name: Test
-      run: ctest
+      run: ctest --output-on-failure
       working-directory: out

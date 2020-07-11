@@ -120,7 +120,7 @@ static void sys35_usage(boolean verbose) {
 	}
 	puts("Usage: xsystem35 [OPTIONS]\n");
 	puts("OPTIONS");
-	puts(" -gamefile file : set game resouce file to 'file'");
+	puts(" -gamefile file : set game resource file to 'file'");
 	puts(" -no-shm        : don't use MIT-SHM (use in another display)");
 	puts(" -devcd device  : set cdrom device name to 'device'");
 	puts(" -devmidi device: set midi device name to 'device'");
@@ -626,7 +626,7 @@ int main(int argc, char **argv) {
 	}
 #endif
 	GameResource gr;
-	if (!initGameResorce(&gr, gameResourceFile))
+	if (!initGameResource(&gr, gameResourceFile))
 		sys35_usage(TRUE);
 	registerGameFiles(&gr);
 	

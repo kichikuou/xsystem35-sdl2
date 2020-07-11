@@ -68,7 +68,7 @@ static boolean initFromDir(GameResource *gr) {
 	getcwd(cwd, 255);
 	DIR *dir = opendir(".");
 	if(!dir)
-		SYSERROR("Game Resouce File open failed\n");
+		SYSERROR("Game Resource File open failed\n");
 
 	struct dirent* d;
 	while ((d = readdir(dir))) {
@@ -128,6 +128,7 @@ static boolean initFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
 	while (fgets(line, 255, fp) != NULL) {
 		linecnt++;
 		if (line[0] == '#') continue;
+		path[0] = '\0';
 		sscanf(line, "%s %[^\n]", key, path);
 		if (path[0] == '\0') continue;
 		trimRight(path);
@@ -184,11 +185,11 @@ static boolean initFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
 	return TRUE;
 
  errexit:
-	SYSERROR("Illigal resouce at line(%d) file<%s>\n", linecnt, gr_fname);
+	SYSERROR("Illigal resource at line(%d) file<%s>\n", linecnt, gr_fname);
 	return FALSE;
 }
 
-boolean initGameResorce(GameResource *gr, const char *gr_fname) {
+boolean initGameResource(GameResource *gr, const char *gr_fname) {
 	memset(gr, 0, sizeof(GameResource));
 	FILE *fp = fopen(gr_fname, "r");
 	if (!fp)

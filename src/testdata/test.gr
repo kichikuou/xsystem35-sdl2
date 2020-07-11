@@ -1,0 +1,22 @@
+# This line is a comment.
+
+ScenarioA fooSA.ALD
+GraphicsA fooGA.ALD
+GraphicsB fooGB.ALD
+WaveA fooWA.ALD
+WaveZ fooWZ.ALD
+MidiC fooMC.ALD
+DataA file name with whitespaces
+  ResourceA	 this line has whitespaces at end of line  
+BGMA /path/to/fooBA.ALD
+
+Ain	System39.ain
+WAIA	foo_WA.WAI
+BGIA	foo_BA.BGI
+SACT01	SACTEFAM.KLD
+Init	System39.ini
+ALK00	0.alk
+ALK09	9.alk
+
+SaveA	~/save/foo_sa.asd
+SaveZ	/tmp/foo_sz.asd

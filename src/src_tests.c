@@ -1,8 +1,5 @@
 /*
- * gameresource.h  Game Resource (*.gr) file
- *
- * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
- *               1998-                           <masaki-c@is.aist-nara.ac.jp>
+ * Copyright (C) 2020 <KichikuouChrome@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,28 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
-*/
+ */
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#ifndef __GAMERESOURCE_H__
-#define __GAMERESOURCE_H__
+void gameresource_test(void);
 
-#include "portab.h"
-#include "ald_manager.h"
-#include "savedata.h"
+void sys_error(char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	vfprintf(stderr, format, args);
+	va_end(args);
+	exit(1);
+}
 
-typedef struct {
-	char *game_fname[DRIFILETYPEMAX][DRIFILEMAX];
-	int cnt[DRIFILETYPEMAX];
-	char *save_path;
-	char *save_fname[SAVE_MAXNUMBER];
-	char *ain;
-	char *wai;
-	char *bgi;
-	char *sact01;
-	char *init;
-	char *alk[10];
-} GameResource;
-
-boolean initGameResource(GameResource *gr, const char *gr_fname);
-
-#endif /* !__GAMERESOURCE_H__ */
+int main() {
+	gameresource_test();
+	return 0;
+}

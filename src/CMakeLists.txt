@@ -105,6 +105,10 @@ else()  # non-emscripten, non-android
   endif()
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)
+
+  add_executable(src_tests src_tests.c gameresource_test.c gameresource.c)
+  add_test(NAME src_tests COMMAND src_tests)
+  configure_file(testdata/test.gr ${CMAKE_CURRENT_BINARY_DIR}/testdata/test.gr COPYONLY)
 endif()
 
 # FIXME: set up dependency for xsystem35 on this

@@ -44,5 +44,5 @@ jobs:
         make
 
     - name: Test
-      run: ctest
+      run: ctest --output-on-failure
       working-directory: out/debug

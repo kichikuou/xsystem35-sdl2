@@ -27,7 +27,7 @@
     Midi     : MIDIデータ
     Data     : その他データ
     Save     : セーブデータ
-    Resouce  : リソースファイル(マウスカーソル形状)
+    Resource : リソースファイル(マウスカーソル形状)
     Ain      : DLL とその関数の情報のかかれた System39.ain
     BGM      : BGMデータ(エスカレイヤー以降のBGMデータファイル)
     WAI      : PCMデータの追加情報 (mixer channel 情報等)
