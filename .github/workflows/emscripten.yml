@@ -11,25 +11,17 @@ jobs:
 
     - uses: actions/checkout@v2
 
-    - name: Cache emsdk
-      uses: actions/cache@v1
-      id: cache
-      with:
-        path: emsdk-cache
-        key: ${{ runner.os }}-emsdk-${{ env.emscripten-version }}
-
     - name: Cache .emscripten_cache
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: emscripten-cache
         key: emscripten-cache-${{ env.emscripten-version }}
 
     - name: Setup Emscripten toolchain
-      uses: mymindstorm/setup-emsdk@v3
+      uses: mymindstorm/setup-emsdk@v6
       with:
         version: ${{ env.emscripten-version }}
         actions-cache-folder: emsdk-cache
-        no-cache: true
 
     - name: Build
       env:
@@ -45,7 +37,7 @@ jobs:
         mv src/xsystem35.* xsystem35/
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: xsystem35-wasm
         path: out/wasm/xsystem35
