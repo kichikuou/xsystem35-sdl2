@@ -144,7 +144,11 @@ static boolean sys35_initGameDataDir(int* cnt)
         return FALSE;
 }
 
-    
+static void trim_right(char *str) {
+	for (char *p = str + strlen(str) - 1; p >= str && isspace(*p); p--)
+		*p = '\0';
+}
+
 /* ゲームのデータファイルの情報を読み込む */
 boolean initGameDataResorce(const char *gameResourceFile) {
 	int cnt[] = {0, 0, 0, 0, 0, 0, 0};
@@ -163,8 +167,9 @@ boolean initGameDataResorce(const char *gameResourceFile) {
 		linecnt++;
 		if (s[0] == '#') continue;
 		s2[0] = '\0';
-		sscanf(s,"%s %s", s1, s2);
+		sscanf(s,"%s %[^\n]", s1, s2);
 		if (s2[0] == '\0') continue;
+		trim_right(s2);
 		if (0 == strncmp(s1, "Scenario", 8)) {
 			dno = s1[8] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
