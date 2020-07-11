@@ -24,7 +24,22 @@
 #define __GAMERESOURCE_H__
 
 #include "portab.h"
+#include "ald_manager.h"
+#include "savedata.h"
 
-boolean initGameDataResorce(const char *gameResourceFile);
+typedef struct {
+	char *game_fname[DRIFILETYPEMAX][DRIFILEMAX];
+	int cnt[DRIFILETYPEMAX];
+	char *save_path;
+	char *save_fname[SAVE_MAXNUMBER];
+	char *ain;
+	char *wai;
+	char *bgi;
+	char *sact01;
+	char *init;
+	char *alk[10];
+} GameResource;
+
+boolean initGameResorce(GameResource *gr, const char *gr_fname);
 
 #endif /* !__GAMERESOURCE_H__ */
