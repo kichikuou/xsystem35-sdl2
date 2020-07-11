@@ -33,14 +33,25 @@
 #include "savedata.h"
 #include "system.h"
 
-/* game data file name */
-static char *gamefname[DRIFILETYPEMAX][DRIFILEMAX];
+typedef struct {
+	char *game_fname[DRIFILETYPEMAX][DRIFILEMAX];
+	int cnt[DRIFILETYPEMAX];
+	char *save_path;
+	char *save_fname[SAVE_MAXNUMBER];
+	char *ain;
+	char *wai;
+	char *bgi;
+	char *sact01;
+	char *init;
+	char *alk[10];
+} GameResource;
 
-static void storeDataName(int type, int no, char *src) {
-	gamefname[type][no] = strdup(src);
+static void storeDataName(GameResource *gr, int type, int no, char *src) {
+	gr->game_fname[type][no] = strdup(src);
+	gr->cnt[type] = max(no + 1, gr->cnt[type]);
 }
 
-static void storeSaveName(int no, char *src) {
+static void storeSaveName(GameResource *gr, int no, char *src) {
 	char *home_dir = "";
 	char *path = NULL;
 	
@@ -50,10 +61,10 @@ static void storeSaveName(int no, char *src) {
 			NOMEMERR();
 		}
 		sprintf(path, "%s%s", home_dir, src+1);
-		save_register_file(path, no);
+		gr->save_fname[no] = strdup(path);
 		src = path;
 	} else {
-		save_register_file(src, no);
+		gr->save_fname[no] = strdup(src);
 	}
 	
 	if (no == 0) {
@@ -62,195 +73,184 @@ static void storeSaveName(int no, char *src) {
 			SYSERROR("Illigal save filename %s\n", src);
 		}
 		*b = '\0';
-		save_set_path(src);
+		gr->save_path = strdup(src);
 	}
 	if (path) free(path);
 }
 
-/* ゲームのデータファイルの情報をディレクトリから作成 thanx tajiri@wizard*/
-static boolean sys35_initGameDataDir(int* cnt)
-{
-    DIR* dir;
-    struct dirent* d;
-    char s1[256], s2[256];
-    int dno;
-    int i;
-    
-    getcwd(s1,255);
-    if(NULL == (dir= opendir(".")))
-    {
-        SYSERROR("Game Resouce File open failed\n");
-    }
-    while(NULL != (d = readdir(dir))){
-        char *filename = d->d_name;
-        int len = strlen(filename);
-        sprintf(s2,"%s%c%s",s1,'/',filename);
-        if(strcasecmp(filename,"adisk.ald")==0){
-            storeDataName(DRIFILE_SCO, 0, s2);
-            cnt[0] = max(1, cnt[0]);
-        } else if (strcasecmp(filename, "system39.ain") == 0) {
-		nact->ain.path_to_ain = strdup(filename);
-	}
-        else if(strcasecmp(filename+len-4,".ald")==0){
-            dno = toupper(*(filename+len-5)) - 'A';
-            if (dno < 0 || dno >= DRIFILEMAX) continue;
-            switch(*(filename+len-6)){
-                case 'S':
-                case 's':
-                    storeDataName(DRIFILE_SCO, dno, s2);
-                    cnt[0] = max(dno + 1, cnt[0]);
-                    break;
-                case 'g':
-                case 'G':
-                    storeDataName(DRIFILE_CG, dno, s2);
-                    cnt[1] = max(dno + 1, cnt[1]);
-                    break;
-                case 'W':
-                case 'w':
-                    storeDataName(DRIFILE_WAVE, dno, s2);
-                    cnt[2] = max(dno + 1, cnt[2]);
-                    break;
-                case 'M':
-                case 'm':
-                    storeDataName(DRIFILE_MIDI, dno, s2);
-                    cnt[3] = max(dno + 1, cnt[3]);
-                    break;
-                case 'D':
-                case 'd':
-                    storeDataName(DRIFILE_DATA, dno, s2);
-                    cnt[4] = max(dno + 1, cnt[4]);
-                    break;
-                case 'R':
-                case 'r':
-                    storeDataName(DRIFILE_RSC, dno, s2);
-                    cnt[5] = max(dno + 1, cnt[5]);
-                    break;
-                case 'B':
-                case 'b':
-                    storeDataName(DRIFILE_BGM, dno, s2);
-                    cnt[6] = max(dno + 1, cnt[6]);
-                    break;
-            }
-        }
-    }
-    for(i=0;i<SAVE_MAXNUMBER;i++){
-        sprintf(s2,"%s/%c%s",s1,'a'+i,"sleep.asd");
-        storeSaveName(i, s2);
-    }
+static boolean initFromDir(GameResource *gr) {
+	char cwd[256], path[256];
+	getcwd(cwd, 255);
+	DIR *dir = opendir(".");
+	if(!dir)
+		SYSERROR("Game Resouce File open failed\n");
 
-    if(cnt[0]>0)
-        return TRUE;
-    else
-        return FALSE;
+	struct dirent* d;
+	while ((d = readdir(dir))) {
+		char *filename = d->d_name;
+		int len = strlen(filename);
+		sprintf(path, "%s/%s", cwd, filename);
+		if (strcasecmp(filename, "adisk.ald") == 0) {
+			storeDataName(gr, DRIFILE_SCO, 0, path);
+		} else if (strcasecmp(filename, "system39.ain") == 0) {
+			gr->ain = strdup(filename);
+		} else if (strcasecmp(filename + len - 4, ".ald") == 0) {
+			int dno = toupper(filename[len - 5]) - 'A';
+			if (dno < 0 || dno >= DRIFILEMAX) continue;
+			switch (toupper(filename[len - 6])) {
+			case 'S':
+				storeDataName(gr, DRIFILE_SCO, dno, path);
+				break;
+			case 'G':
+				storeDataName(gr, DRIFILE_CG, dno, path);
+				break;
+			case 'W':
+				storeDataName(gr, DRIFILE_WAVE, dno, path);
+				break;
+			case 'M':
+				storeDataName(gr, DRIFILE_MIDI, dno, path);
+				break;
+			case 'D':
+				storeDataName(gr, DRIFILE_DATA, dno, path);
+				break;
+			case 'R':
+				storeDataName(gr, DRIFILE_RSC, dno, path);
+				break;
+			case 'B':
+				storeDataName(gr, DRIFILE_BGM, dno, path);
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < SAVE_MAXNUMBER; i++) {
+		sprintf(path, "%s/%c%s", cwd, 'a' + i, "sleep.asd");
+		storeSaveName(gr, i, path);
+	}
+
+	return (gr->cnt[DRIFILE_SCO] > 0) ? TRUE : FALSE;
 }
 
-static void trim_right(char *str) {
+static void trimRight(char *str) {
 	for (char *p = str + strlen(str) - 1; p >= str && isspace(*p); p--)
 		*p = '\0';
 }
 
-/* ゲームのデータファイルの情報を読み込む */
-boolean initGameDataResorce(const char *gameResourceFile) {
-	int cnt[] = {0, 0, 0, 0, 0, 0, 0};
+static boolean initFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
 	int linecnt = 0, dno;
-	FILE *fp;
-	char s[256];
-	char s1[256], s2[256];
-	
-	if (NULL == (fp = fopen(gameResourceFile, "r"))) {
-		if(sys35_initGameDataDir(cnt)==TRUE) {
-			goto initdata;
-		}
-		return FALSE;
-	}
-	while(fgets(s, 255, fp) != NULL ) {
+	char line[256];
+	char key[256], path[256];
+
+	while (fgets(line, 255, fp) != NULL) {
 		linecnt++;
-		if (s[0] == '#') continue;
-		s2[0] = '\0';
-		sscanf(s,"%s %[^\n]", s1, s2);
-		if (s2[0] == '\0') continue;
-		trim_right(s2);
-		if (0 == strncmp(s1, "Scenario", 8)) {
-			dno = s1[8] - 'A';
+		if (line[0] == '#') continue;
+		sscanf(line, "%s %[^\n]", key, path);
+		if (path[0] == '\0') continue;
+		trimRight(path);
+		if (0 == strncmp(key, "Scenario", 8)) {
+			dno = key[8] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_SCO, dno, s2);
-			cnt[0] = max(dno + 1, cnt[0]);
-		} else if (0 == strncmp(s1, "Graphics", 8)) {
-			dno = s1[8] - 'A';
+			storeDataName(gr, DRIFILE_SCO, dno, path);
+		} else if (0 == strncmp(key, "Graphics", 8)) {
+			dno = key[8] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_CG, dno, s2);
-			cnt[1] = max(dno + 1, cnt[1]);
-		} else if (0 == strncmp(s1, "Wave", 4)) {
-			dno = s1[4] - 'A';
+			storeDataName(gr, DRIFILE_CG, dno, path);
+		} else if (0 == strncmp(key, "Wave", 4)) {
+			dno = key[4] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_WAVE, dno, s2);
-			cnt[2] = max(dno + 1, cnt[2]);
-		} else if (0 == strncmp(s1, "Midi", 4)) {
-			dno = s1[4] - 'A';
+			storeDataName(gr, DRIFILE_WAVE, dno, path);
+		} else if (0 == strncmp(key, "Midi", 4)) {
+			dno = key[4] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_MIDI, dno, s2);
-			cnt[3] = max(dno + 1, cnt[3]);
-		} else if (0 == strncmp(s1, "Data", 4)) {
-			dno = s1[4] - 'A';
+			storeDataName(gr, DRIFILE_MIDI, dno, path);
+		} else if (0 == strncmp(key, "Data", 4)) {
+			dno = key[4] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_DATA, dno, s2);
-			cnt[4] = max(dno + 1, cnt[4]);
-		} else if (0 == strncmp(s1, "Resource", 8)) {
-			dno = s1[8] - 'A';
+			storeDataName(gr, DRIFILE_DATA, dno, path);
+		} else if (0 == strncmp(key, "Resource", 8)) {
+			dno = key[8] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_RSC, dno, s2);
-			cnt[5] = max(dno + 1, cnt[5]);
-		} else if (0 == strncmp(s1, "BGM", 3)) {
-			dno = s1[3] - 'A';
+			storeDataName(gr, DRIFILE_RSC, dno, path);
+		} else if (0 == strncmp(key, "BGM", 3)) {
+			dno = key[3] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_BGM, dno, s2);
-			cnt[6] = max(dno + 1, cnt[6]);
-		} else if (0 == strncmp(s1, "Save", 4)) {
-			dno = s1[4] - 'A';
+			storeDataName(gr, DRIFILE_BGM, dno, path);
+		} else if (0 == strncmp(key, "Save", 4)) {
+			dno = key[4] - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeSaveName(dno, s2);
-		} else if (0 == strncmp(s1, "Ain", 3)) {
-			nact->ain.path_to_ain = strdup(s2);
-		} else if (0 == strncmp(s1, "WAIA", 4)) {
-			nact->files.wai = strdup(s2);
-		} else if (0 == strncmp(s1, "BGIA", 4)) {
-			nact->files.bgi = strdup(s2);
-		} else if (0 == strncmp(s1, "SACT01", 6)) {
-			nact->files.sact01 = strdup(s2);
-		} else if (0 == strncmp(s1, "Init", 4)) {
-			nact->files.init = strdup(s2);
-		} else if (0 == strncmp(s1, "ALK", 3)) {
-			dno = s1[4] - '0';
+			storeSaveName(gr, dno, path);
+		} else if (0 == strncmp(key, "Ain", 3)) {
+			gr->ain = strdup(path);
+		} else if (0 == strncmp(key, "WAIA", 4)) {
+			gr->wai = strdup(path);
+		} else if (0 == strncmp(key, "BGIA", 4)) {
+			gr->bgi = strdup(path);
+		} else if (0 == strncmp(key, "SACT01", 6)) {
+			gr->sact01 = strdup(path);
+		} else if (0 == strncmp(key, "Init", 4)) {
+			gr->init = strdup(path);
+		} else if (0 == strncmp(key, "ALK", 3)) {
+			dno = key[4] - '0';
 			if (dno < 0 || dno >= 10) goto errexit;
-			nact->files.alk[dno] = strdup(s2);
+			gr->alk[dno] = strdup(path);
 		} else {
 			goto errexit;
 		}
 	}
-	fclose(fp);
-initdata:
-	if (cnt[0] == 0) {
-		SYSERROR("No Scenario data available\n");
-	}
-	
-	if (cnt[0] > 0)
-		ald_init(DRIFILE_SCO, gamefname[DRIFILE_SCO], cnt[0], TRUE);
-	if (cnt[1] > 0)
-		ald_init(DRIFILE_CG,  gamefname[DRIFILE_CG], cnt[1], TRUE);
-	if (cnt[2] > 0)
-		ald_init(DRIFILE_WAVE, gamefname[DRIFILE_WAVE], cnt[2], TRUE);
-	if (cnt[3] > 0)
-		ald_init(DRIFILE_MIDI, gamefname[DRIFILE_MIDI], cnt[3], TRUE);
-	if (cnt[4] > 0)
-		ald_init(DRIFILE_DATA, gamefname[DRIFILE_DATA], cnt[4], TRUE);
-	if (cnt[5] > 0)
-		ald_init(DRIFILE_RSC, gamefname[DRIFILE_RSC], cnt[5], TRUE);
-	if (cnt[6] > 0)
-		ald_init(DRIFILE_BGM, gamefname[DRIFILE_BGM], cnt[6], TRUE);
-
 	return TRUE;
 
  errexit:
-	SYSERROR("Illigal resouce at line(%d) file<%s>\n",linecnt, gameResourceFile);
+	SYSERROR("Illigal resouce at line(%d) file<%s>\n", linecnt, gr_fname);
 	return FALSE;
+}
+
+static void registerFiles(GameResource *gr) {
+	if (gr->cnt[DRIFILE_SCO] == 0) {
+		SYSERROR("No Scenario data available\n");
+	}
+	if (gr->cnt[DRIFILE_SCO] > 0)
+		ald_init(DRIFILE_SCO, gr->game_fname[DRIFILE_SCO], gr->cnt[DRIFILE_SCO], TRUE);
+	if (gr->cnt[DRIFILE_CG] > 0)
+		ald_init(DRIFILE_CG,  gr->game_fname[DRIFILE_CG], gr->cnt[DRIFILE_CG], TRUE);
+	if (gr->cnt[DRIFILE_WAVE] > 0)
+		ald_init(DRIFILE_WAVE, gr->game_fname[DRIFILE_WAVE], gr->cnt[DRIFILE_WAVE], TRUE);
+	if (gr->cnt[DRIFILE_MIDI] > 0)
+		ald_init(DRIFILE_MIDI, gr->game_fname[DRIFILE_MIDI], gr->cnt[DRIFILE_MIDI], TRUE);
+	if (gr->cnt[DRIFILE_DATA] > 0)
+		ald_init(DRIFILE_DATA, gr->game_fname[DRIFILE_DATA], gr->cnt[DRIFILE_DATA], TRUE);
+	if (gr->cnt[DRIFILE_RSC] > 0)
+		ald_init(DRIFILE_RSC, gr->game_fname[DRIFILE_RSC], gr->cnt[DRIFILE_RSC], TRUE);
+	if (gr->cnt[DRIFILE_BGM] > 0)
+		ald_init(DRIFILE_BGM, gr->game_fname[DRIFILE_BGM], gr->cnt[DRIFILE_BGM], TRUE);
+
+	if (gr->save_path)
+		save_set_path(gr->save_path);
+	for (int i = 0; i < SAVE_MAXNUMBER; i++) {
+		if (gr->save_fname[i])
+			save_register_file(gr->save_fname[i], i);
+	}
+
+	nact->ain.path_to_ain = gr->ain;
+	nact->files.wai = gr->wai;
+	nact->files.bgi = gr->bgi;
+	nact->files.sact01 = gr->sact01;
+	nact->files.init = gr->init;
+	for (int i = 0; i < 10; i++)
+		nact->files.alk[i] = gr->alk[i];
+}
+
+boolean initGameDataResorce(const char *gr_fname) {
+	GameResource gr;
+	memset(&gr, 0, sizeof(gr));
+
+	FILE *fp = fopen(gr_fname, "r");
+	boolean result;
+	if (fp) {
+		result = initFromFile(&gr, fp, gr_fname);
+		fclose(fp);
+	} else {
+		result = initFromDir(&gr);
+	}
+	if (result)
+		registerFiles(&gr);
+	return result;
 }
