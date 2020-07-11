@@ -73,6 +73,8 @@ static agsurface_t *font_sdlttf_get_glyph(const unsigned char *msg) {
 	static SDL_Surface *fs;
 	static agsurface_t result;
 
+	if (!fontset)
+		return NULL;
 	if (fs) {
 		SDL_FreeSurface(fs);
 		fs = NULL;
@@ -147,6 +149,8 @@ static int font_sdlttf_draw_glyph(int x, int y, const unsigned char *str, int cl
 	BYTE *conv;
 	
 	if (!*str)
+		return 0;
+	if (!fontset)
 		return 0;
 	
 	conv = sjis2lang(str);
