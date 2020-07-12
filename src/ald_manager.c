@@ -104,11 +104,10 @@ void ald_freedata(dridata *data) {
  *   mmap: mmap file or not
 */
 void ald_init(int type, const char **file, int cnt, boolean mmap) {
-	/* check wrong type */
-	if (type < DRIFILETYPEMAX) {
-		dri[type] = dri_init(file, cnt, mmap);
-		if (!dri[type]->mmapped) {
-			cacheid = cache_new(ald_free);
-		}
+	if (type >= DRIFILETYPEMAX || cnt <= 0)
+		return;
+	dri[type] = dri_init(file, cnt, mmap);
+	if (!dri[type]->mmapped) {
+		cacheid = cache_new(ald_free);
 	}
 }

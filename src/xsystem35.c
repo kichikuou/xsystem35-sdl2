@@ -565,27 +565,12 @@ static void init_signalhandler() {
 #endif
 
 static void registerGameFiles(void) {
-	GameResource *gr = &nact->files;
-	if (gr->cnt[DRIFILE_SCO] == 0) {
+	if (nact->files.cnt[DRIFILE_SCO] == 0)
 		SYSERROR("No Scenario data available\n");
-	}
-	if (gr->cnt[DRIFILE_SCO] > 0)
-		ald_init(DRIFILE_SCO, gr->game_fname[DRIFILE_SCO], gr->cnt[DRIFILE_SCO], TRUE);
-	if (gr->cnt[DRIFILE_CG] > 0)
-		ald_init(DRIFILE_CG,  gr->game_fname[DRIFILE_CG], gr->cnt[DRIFILE_CG], TRUE);
-	if (gr->cnt[DRIFILE_WAVE] > 0)
-		ald_init(DRIFILE_WAVE, gr->game_fname[DRIFILE_WAVE], gr->cnt[DRIFILE_WAVE], TRUE);
-	if (gr->cnt[DRIFILE_MIDI] > 0)
-		ald_init(DRIFILE_MIDI, gr->game_fname[DRIFILE_MIDI], gr->cnt[DRIFILE_MIDI], TRUE);
-	if (gr->cnt[DRIFILE_DATA] > 0)
-		ald_init(DRIFILE_DATA, gr->game_fname[DRIFILE_DATA], gr->cnt[DRIFILE_DATA], TRUE);
-	if (gr->cnt[DRIFILE_RSC] > 0)
-		ald_init(DRIFILE_RSC, gr->game_fname[DRIFILE_RSC], gr->cnt[DRIFILE_RSC], TRUE);
-	if (gr->cnt[DRIFILE_BGM] > 0)
-		ald_init(DRIFILE_BGM, gr->game_fname[DRIFILE_BGM], gr->cnt[DRIFILE_BGM], TRUE);
-
-	if (gr->save_path)
-		fc_init(gr->save_path);
+	for (int type = 0; type < DRIFILETYPEMAX; type++)
+		ald_init(type, nact->files.game_fname[type], nact->files.cnt[type], TRUE);
+	if (nact->files.save_path)
+		fc_init(nact->files.save_path);
 }
 
 int main(int argc, char **argv) {
