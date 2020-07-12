@@ -41,7 +41,7 @@
 #define dll  nact->ain.dll
 #define msg  nact->ain.msg
 #define fnc  nact->ain.fnc
-#define path_to_ain nact->ain.path_to_ain
+#define path_to_ain nact->files.ain
 #define dllnum nact->ain.dllnum
 #define fncnum nact->ain.fncnum
 #define varnum nact->ain.varnum

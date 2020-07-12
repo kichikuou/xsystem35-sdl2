@@ -43,7 +43,6 @@
 #include "message.h"
 
 /* セーブデータ */
-static char *saveDataFile[SAVE_MAXNUMBER];
 static int savefile_sysvar_cnt = SYSVAR_MAX;
 
 static void* saveStackInfo(Ald_stackHdr *head);
@@ -63,25 +62,14 @@ EM_JS(void, scheduleSync, (), {
 #define scheduleSync()
 #endif
 
-/* savefile がある directory を登録 */
-void save_set_path(const char *path) {
-	nact->files.savedir = strdup(path);
-	fc_init(path);
-}
-
-/* savefile を登録 */
-void save_register_file(const char *name, int index) {
-	saveDataFile[index] = strdup(name);
-}
-
 /* savefile を参照 */
-char *save_get_file(int index) {
-	return saveDataFile[index];
+const char *save_get_file(int index) {
+	return nact->files.save_fname[index];
 }
 
 /* savefile を削除 */
 int save_delete_file(int index) {
-	int ret = unlink(saveDataFile[index]);
+	int ret = unlink(nact->files.save_fname[index]);
 	
 	if (ret == 0) {
 		return 1;
@@ -465,8 +453,8 @@ int save_saveAll(int no) {
 	if (save_base == NULL)
 		return SAVE_SAVEERR;
 	
-	fc_backup_oldfile(saveDataFile[no]);
-	fp = fopen(saveDataFile[no],"wb");
+	fc_backup_oldfile(nact->files.save_fname[no]);
+	fp = fopen(nact->files.save_fname[no], "wb");
 	
 	if (fp == NULL)
 		return SAVE_SAVEERR;
@@ -712,7 +700,7 @@ static void* loadGameData(int no, int *status, int *size) {
 	long filesize;
 	char *buf;
 	
-	fp = fopen(saveDataFile[no], "rb");
+	fp = fopen(nact->files.save_fname[no], "rb");
 	if (fp == NULL)
 		goto errexit;
 	fseek(fp, 0L, SEEK_END);
@@ -743,8 +731,8 @@ static int saveGameData(int no, char *buf, int size) {
 	FILE *fp;
 	int status = SAVE_SAVEOK1;
 	
-	fc_backup_oldfile(saveDataFile[no]);
-	fp = fopen(saveDataFile[no],"wb");
+	fc_backup_oldfile(nact->files.save_fname[no]);
+	fp = fopen(nact->files.save_fname[no], "wb");
 	if (fp == NULL) {
 		return SAVE_SAVEERR;
 	}

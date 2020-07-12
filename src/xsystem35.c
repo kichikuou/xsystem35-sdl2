@@ -564,7 +564,8 @@ static void init_signalhandler() {
 }
 #endif
 
-static void registerGameFiles(GameResource *gr) {
+static void registerGameFiles(void) {
+	GameResource *gr = &nact->files;
 	if (gr->cnt[DRIFILE_SCO] == 0) {
 		SYSERROR("No Scenario data available\n");
 	}
@@ -584,19 +585,7 @@ static void registerGameFiles(GameResource *gr) {
 		ald_init(DRIFILE_BGM, gr->game_fname[DRIFILE_BGM], gr->cnt[DRIFILE_BGM], TRUE);
 
 	if (gr->save_path)
-		save_set_path(gr->save_path);
-	for (int i = 0; i < SAVE_MAXNUMBER; i++) {
-		if (gr->save_fname[i])
-			save_register_file(gr->save_fname[i], i);
-	}
-
-	nact->ain.path_to_ain = gr->ain;
-	nact->files.wai = gr->wai;
-	nact->files.bgi = gr->bgi;
-	nact->files.sact01 = gr->sact01;
-	nact->files.init = gr->init;
-	for (int i = 0; i < 10; i++)
-		nact->files.alk[i] = gr->alk[i];
+		fc_init(gr->save_path);
 }
 
 int main(int argc, char **argv) {
@@ -625,10 +614,9 @@ int main(int argc, char **argv) {
 		}
 	}
 #endif
-	GameResource gr;
-	if (!initGameResource(&gr, gameResourceFile))
+	if (!initGameResource(&nact->files, gameResourceFile))
 		sys35_usage(TRUE);
-	registerGameFiles(&gr);
+	registerGameFiles();
 	
 #ifdef HAVE_SIGACTION
 	init_signalhandler();
