@@ -82,13 +82,21 @@ static const char *joinPath(const char *dir, const char *fname) {
 static void initGameResourceFromDir_test(void) {
 	const char *files[] = {
 		"ADISK.ALD",
-		"SYSTEM39.AIN",
 		"FOOSB.ALD",
 		"foogz.ald",
 		"WA.ALD",
 		"unknownXA.ald",
 		"a.ald",
 		".ald",
+		"a",
+		"SYSTEM39.AIN",
+		"foo_WA.WAI",
+		"foo_BA.BGI",
+		"SACTEFAM.KLD",
+		"System39.ini",
+		"foo1.alk",
+		"0.alk",
+		".alk",
 		NULL
 	};
 	const char **dir = files;
@@ -109,7 +117,15 @@ static void initGameResourceFromDir_test(void) {
 		assert(strcmp(gr.save_fname[i], joinPath(cwd, buf)) == 0);
 	}
 	assert(strcmp(gr.save_path, cwd) == 0);
-	assert(strcmp(gr.ain, "SYSTEM39.AIN") == 0);
+	assert(strcmp(gr.ain, joinPath(cwd, "SYSTEM39.AIN")) == 0);
+	assert(strcmp(gr.wai, joinPath(cwd, "foo_WA.WAI")) == 0);
+	assert(strcmp(gr.bgi, joinPath(cwd, "foo_BA.BGI")) == 0);
+	assert(strcmp(gr.sact01, joinPath(cwd, "SACTEFAM.KLD")) == 0);
+	assert(strcmp(gr.init, joinPath(cwd, "System39.ini")) == 0);
+	assert(strcmp(gr.alk[0], joinPath(cwd, "0.alk")) == 0);
+	assert(strcmp(gr.alk[1], joinPath(cwd, "foo1.alk")) == 0);
+	for (int i = 2; i < 10; i++)
+		assert(gr.alk[i] == NULL);
 }
 
 void gameresource_test(void) {

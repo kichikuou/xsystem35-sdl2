@@ -75,8 +75,19 @@ boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_r
 		sprintf(path, "%s/%s", cwd, filename);
 		if (strcasecmp(filename, "adisk.ald") == 0) {
 			storeDataName(gr, DRIFILE_SCO, 0, path);
-		} else if (strcasecmp(filename, "system39.ain") == 0) {
-			gr->ain = strdup(filename);
+		} else if (strcasecmp(filename, "System39.ain") == 0) {
+			gr->ain = strdup(path);
+		} else if (strcasecmp(filename, "SACTEFAM.KLD") == 0) {
+			gr->sact01 = strdup(path);
+		} else if (strcasecmp(filename, "System39.ini") == 0) {
+			gr->init = strdup(path);
+		} else if (len >= 4 && strcasecmp(filename + len - 4, ".wai") == 0) {
+			gr->wai = strdup(path);
+		} else if (len >= 4 && strcasecmp(filename + len - 4, ".bgi") == 0) {
+			gr->bgi = strdup(path);
+		} else if (len >= 5 && strcasecmp(filename + len - 4, ".alk") == 0) {
+			if (!isdigit(filename[len - 5])) continue;
+			gr->alk[filename[len - 5] - '0'] = strdup(path);
 		} else if (len >= 6 && strcasecmp(filename + len - 4, ".ald") == 0) {
 			int dno = toupper(filename[len - 5]) - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) continue;
