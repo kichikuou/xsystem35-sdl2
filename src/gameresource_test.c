@@ -22,14 +22,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
-void gameresource_test(void) {
-#ifdef _WIN32
-	_putenv("HOME=/home/kichikuou");
-#else
-	setenv("HOME", "/home/kichikuou", 1);
-#endif
-
+static void initGameResource_test(void) {
 	GameResource gr;
 	assert(initGameResource(&gr, "testdata/test.gr"));
 
@@ -60,7 +55,70 @@ void gameresource_test(void) {
 	assert(strcmp(gr.alk[9], "9.alk") == 0);
 
 	assert(strcmp(gr.save_fname[0], "/home/kichikuou/save/foo_sa.asd") == 0);
+	for (int i = 1; i <= 24; i++)
+		assert(gr.save_fname[i] == NULL);
 	assert(strcmp(gr.save_fname[25], "/tmp/foo_sz.asd") == 0);
 	// save_path is determined based on save_fname[0].
 	assert(strcmp(gr.save_path, "/home/kichikuou/save") == 0);
+}
+
+static struct dirent *mockReaddir(DIR *dir) {
+	static struct dirent ent;
+	const char ***entries = (const char ***)dir;
+	if (**entries) {
+		strcpy(ent.d_name, **entries);
+		(*entries)++;
+		return &ent;
+	}
+	return NULL;
+}
+
+static const char *joinPath(const char *dir, const char *fname) {
+	static char buf[512];
+	sprintf(buf, "%s/%s", dir, fname);
+	return buf;
+}
+
+static void initGameResourceFromDir_test(void) {
+	const char *files[] = {
+		"ADISK.ALD",
+		"SYSTEM39.AIN",
+		"FOOSB.ALD",
+		"foogz.ald",
+		"WA.ALD",
+		"unknownXA.ald",
+		"a.ald",
+		".ald",
+		NULL
+	};
+	const char **dir = files;
+	static char cwd[256];
+	getcwd(cwd, sizeof(cwd));
+	GameResource gr;
+	assert(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
+	assert(gr.cnt[DRIFILE_SCO] == 2);
+	assert(strcmp(gr.game_fname[DRIFILE_SCO][0], joinPath(cwd, "ADISK.ALD")) == 0);
+	assert(strcmp(gr.game_fname[DRIFILE_SCO][1], joinPath(cwd, "FOOSB.ALD")) == 0);
+	assert(gr.cnt[DRIFILE_CG] == 26);
+	assert(strcmp(gr.game_fname[DRIFILE_CG][25], joinPath(cwd, "foogz.ald")) == 0);
+	assert(gr.cnt[DRIFILE_WAVE] == 1);
+	assert(strcmp(gr.game_fname[DRIFILE_WAVE][0], joinPath(cwd, "WA.ALD")) == 0);
+	for (int i = 0; i < 26; i++) {
+		char buf[16];
+		sprintf(buf, "%csleep.asd", 'a' + i);
+		assert(strcmp(gr.save_fname[i], joinPath(cwd, buf)) == 0);
+	}
+	assert(strcmp(gr.save_path, cwd) == 0);
+	assert(strcmp(gr.ain, "SYSTEM39.AIN") == 0);
+}
+
+void gameresource_test(void) {
+#ifdef _WIN32
+	_putenv("HOME=/home/kichikuou");
+#else
+	setenv("HOME", "/home/kichikuou", 1);
+#endif
+
+	initGameResource_test();
+	initGameResourceFromDir_test();
 }

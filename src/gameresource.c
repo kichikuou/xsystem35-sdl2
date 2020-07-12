@@ -21,7 +21,6 @@
 */
 
 #include <ctype.h>
-#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,15 +62,14 @@ static void storeSaveName(GameResource *gr, int no, char *src) {
 	if (path) free(path);
 }
 
-static boolean initFromDir(GameResource *gr) {
+boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_readdir)(DIR *)) {
 	char cwd[256], path[256];
 	getcwd(cwd, 255);
-	DIR *dir = opendir(".");
-	if(!dir)
-		SYSERROR("Game Resource File open failed\n");
+
+	memset(gr, 0, sizeof(GameResource));
 
 	struct dirent* d;
-	while ((d = readdir(dir))) {
+	while ((d = p_readdir(dir))) {
 		char *filename = d->d_name;
 		int len = strlen(filename);
 		sprintf(path, "%s/%s", cwd, filename);
@@ -79,7 +77,7 @@ static boolean initFromDir(GameResource *gr) {
 			storeDataName(gr, DRIFILE_SCO, 0, path);
 		} else if (strcasecmp(filename, "system39.ain") == 0) {
 			gr->ain = strdup(filename);
-		} else if (strcasecmp(filename + len - 4, ".ald") == 0) {
+		} else if (len >= 6 && strcasecmp(filename + len - 4, ".ald") == 0) {
 			int dno = toupper(filename[len - 5]) - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) continue;
 			switch (toupper(filename[len - 6])) {
@@ -120,10 +118,12 @@ static void trimRight(char *str) {
 		*p = '\0';
 }
 
-static boolean initFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
+static boolean initGameResourceFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
 	int linecnt = 0, dno;
 	char line[256];
 	char key[256], path[256];
+
+	memset(gr, 0, sizeof(GameResource));
 
 	while (fgets(line, 255, fp) != NULL) {
 		linecnt++;
@@ -190,11 +190,18 @@ static boolean initFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
 }
 
 boolean initGameResource(GameResource *gr, const char *gr_fname) {
-	memset(gr, 0, sizeof(GameResource));
 	FILE *fp = fopen(gr_fname, "r");
-	if (!fp)
-		return initFromDir(gr);
-	boolean result = initFromFile(gr, fp, gr_fname);
-	fclose(fp);
-	return result;
+	if (fp) {
+		boolean result = initGameResourceFromFile(gr, fp, gr_fname);
+		fclose(fp);
+		return result;
+	}
+	DIR *dir = opendir(".");
+	if (dir) {
+		boolean result = initGameResourceFromDir(gr, dir, readdir);
+		closedir(dir);
+		return result;
+	}
+	SYSERROR("Game Resource File open failed\n");
+	return FALSE;
 }

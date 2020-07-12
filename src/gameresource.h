@@ -23,6 +23,7 @@
 #ifndef __GAMERESOURCE_H__
 #define __GAMERESOURCE_H__
 
+#include <dirent.h>
 #include "portab.h"
 #include "ald_manager.h"
 #include "savedata.h"
@@ -41,5 +42,6 @@ typedef struct {
 } GameResource;
 
 boolean initGameResource(GameResource *gr, const char *gr_fname);
+boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_readdir)(DIR *));
 
 #endif /* !__GAMERESOURCE_H__ */
