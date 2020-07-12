@@ -1,3 +1,6 @@
+add_library(src_lib STATIC
+  gameresource.c)
+
 if (ANDROID)
   add_library(xsystem35 SHARED)
 else()
@@ -5,13 +8,13 @@ else()
 endif()
 
 target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign -Wno-invalid-source-encoding)
+target_link_libraries(xsystem35 PRIVATE src_lib)
 
 target_sources(xsystem35 PRIVATE
   xsystem35.c
   dri.c
   ald_manager.c
   cache.c
-  gameresource.c
   ${SRC_AUDIO}
   ${SRC_CDROM}
   ${SRC_MIDI}
@@ -106,7 +109,8 @@ else()  # non-emscripten, non-android
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)
 
-  add_executable(src_tests src_tests.c gameresource_test.c gameresource.c)
+  add_executable(src_tests src_tests.c gameresource_test.c)
+  target_link_libraries(src_tests PRIVATE src_lib)
   add_test(NAME src_tests COMMAND src_tests)
   configure_file(testdata/test.gr ${CMAKE_CURRENT_BINARY_DIR}/testdata/test.gr COPYONLY)
 endif()
