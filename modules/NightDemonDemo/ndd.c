@@ -39,7 +39,7 @@
 // 2: Meteo
 
 struct nddemo {
-	char **fn;
+	const char **fn;
 	alk_t *alk;
 	surface_t *sf[10];
 };
@@ -52,7 +52,7 @@ static int ndemo_nums[3] = {150, 603, 467};
 extern surface_t *jpeg2surface(FILE *fp, int offset);
 
 // ALKファイルの登録
-void ndd_init(char *files[], int n) {
+void ndd_init(const char *files[], int n) {
 	int i;
 	ndd.fn = malloc(sizeof(char *) * n);
 

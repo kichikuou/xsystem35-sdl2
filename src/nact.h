@@ -125,20 +125,20 @@ typedef struct {
 
 	/* データのファイル名 */
 	struct {
-		char *scenario[2];
-		char *graphics[2];
-		char *wav[2];
-		char *midi[2];
-		char *data[2];
-		char *resource[2];
-		char *bgm[2];
-		char *save[27];
-		char *savedir;
-		char *init;
-		char *bgi;
-		char *wai;
-		char *sact01;
-		char *alk[10];
+		const char *scenario[2];
+		const char *graphics[2];
+		const char *wav[2];
+		const char *midi[2];
+		const char *data[2];
+		const char *resource[2];
+		const char *bgm[2];
+		const char *save[27];
+		const char *savedir;
+		const char *init;
+		const char *bgi;
+		const char *wai;
+		const char *sact01;
+		const char *alk[10];
 	} files;
 	
 	int frame_count;

@@ -38,7 +38,7 @@ struct fnametable {
 static char *saveDataPath;
 static boolean newfile_kanjicode_utf8 = TRUE;
 
-static char *get_fullpath(const char* dir, char *filename) {
+static char *get_fullpath(const char* dir, const char *filename) {
 	char *fn = malloc(strlen(filename) + strlen(dir) + 3);
 	if (fn == NULL) {
 		return NULL;
@@ -51,7 +51,7 @@ static char *get_fullpath(const char* dir, char *filename) {
 
 /* list up file in current directory */
 /*   name : save/load directory      */
-void fc_init(char *name) {
+void fc_init(const char *name) {
 	saveDataPath = strdup(name);
 }
 
@@ -75,7 +75,7 @@ static char *fc_search(const char *fname_sjis, const char *dir) {
 	return found;
 }
 
-FILE *fc_open(char *filename, char type) {
+FILE *fc_open(const char *filename, char type) {
 	char *fullpath = fc_search(filename, saveDataPath);
 	if (fullpath == NULL) {
 		if (type == 'r') {
@@ -106,7 +106,7 @@ FILE *fc_open(char *filename, char type) {
 	return fp;
 }
 
-void fc_backup_oldfile(char *filename) {
+void fc_backup_oldfile(const char *filename) {
 #ifndef __EMSCRIPTEN__
 	char *newname;
 	

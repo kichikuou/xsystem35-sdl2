@@ -103,7 +103,7 @@ void ald_freedata(dridata *data) {
  *   cnt : number in file name array
  *   mmap: mmap file or not
 */
-void ald_init(int type, char **file, int cnt, boolean mmap) {
+void ald_init(int type, const char **file, int cnt, boolean mmap) {
 	/* check wrong type */
 	if (type < DRIFILETYPEMAX) {
 		dri[type] = dri_init(file, cnt, mmap);

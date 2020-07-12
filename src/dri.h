@@ -55,7 +55,7 @@ struct _dridata {
 };
 typedef struct _dridata dridata;
 
-extern drifiles *dri_init(char **file, int cnt, boolean mmapping);
+extern drifiles *dri_init(const char **file, int cnt, boolean mmapping);
 extern dridata  *dri_getdata(drifiles *d, int no);
 
 #endif /* !__DRI__ */

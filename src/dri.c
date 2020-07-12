@@ -175,13 +175,13 @@ static void get_fileptr(drifiles *d, FILE *fp, int disk) {
  *   mmapping: mmap file or not
  *   return: drifile object
 */
-drifiles *dri_init(char **file, int cnt, boolean mmapping) {
+drifiles *dri_init(const char **file, int cnt, boolean mmapping) {
 	drifiles *d = calloc(1, sizeof(drifiles));
 	FILE *fp;
 	int i;
 	boolean gotmap = FALSE;
 	long filesize;
-	char **filetop = file;
+	const char **filetop = file;
 	
 	for (i = 0; i < cnt; i++) {
 		if (*(file + i) == NULL) continue;

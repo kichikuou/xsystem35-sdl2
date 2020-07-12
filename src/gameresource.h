@@ -29,16 +29,16 @@
 #include "savedata.h"
 
 typedef struct {
-	char *game_fname[DRIFILETYPEMAX][DRIFILEMAX];
+	const char *game_fname[DRIFILETYPEMAX][DRIFILEMAX];
 	int cnt[DRIFILETYPEMAX];
-	char *save_path;
-	char *save_fname[SAVE_MAXNUMBER];
-	char *ain;
-	char *wai;
-	char *bgi;
-	char *sact01;
-	char *init;
-	char *alk[10];
+	const char *save_path;
+	const char *save_fname[SAVE_MAXNUMBER];
+	const char *ain;
+	const char *wai;
+	const char *bgi;
+	const char *sact01;
+	const char *init;
+	const char *alk[10];
 } GameResource;
 
 boolean initGameResource(GameResource *gr, const char *gr_fname);

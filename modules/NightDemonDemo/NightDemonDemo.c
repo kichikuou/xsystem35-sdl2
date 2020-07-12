@@ -31,7 +31,7 @@
 #include "modules.h"
 #include "nact.h"
 
-extern void ndd_init(char *files[], int n);
+extern void ndd_init(const char *files[], int n);
 extern void ndd_run(int demonum);
 
 static void Init() {

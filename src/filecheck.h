@@ -27,9 +27,9 @@
 #define FILENAME_KANJI_CODE_UTF8 0
 #define FILENAME_KANJI_CODE_SJIS 1
 
-extern void fc_init(char *name);
-extern FILE *fc_open(char *filename, char type);
-extern void fc_backup_oldfile(char *filename);
+extern void fc_init(const char *name);
+extern FILE *fc_open(const char *filename, char type);
+extern void fc_backup_oldfile(const char *filename);
 extern void fc_set_default_kanjicode(int c);
 
 #endif /* !__FILECHECK_H__ */

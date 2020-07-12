@@ -41,7 +41,7 @@
 #include "LittleEndian.h"
 #include "alk.h"
 
-alk_t *alk_new(char *path) {
+alk_t *alk_new(const char *path) {
 	alk_t *alk;
 	int i, fd;
 	char *adr;

@@ -64,13 +64,13 @@ EM_JS(void, scheduleSync, (), {
 #endif
 
 /* savefile がある directory を登録 */
-void save_set_path(char *path) {
+void save_set_path(const char *path) {
 	nact->files.savedir = strdup(path);
 	fc_init(path);
 }
 
 /* savefile を登録 */
-void save_register_file(char *name, int index) {
+void save_register_file(const char *name, int index) {
 	saveDataFile[index] = strdup(name);
 }
 

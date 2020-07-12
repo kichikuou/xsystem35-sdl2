@@ -50,7 +50,7 @@ typedef struct {
 
 /* System39.ain 全体の情報 */
 typedef struct {
-	char *path_to_ain; /* system39.ain へのパス  */
+	const char *path_to_ain; /* system39.ain へのパス  */
 	
 	int   dllnum; /* DLL  の数 */
 	int   fncnum; /* FUNC の数 */

@@ -44,7 +44,7 @@ typedef struct {
 	int  *offset;  /* 各ファイルへのオフセット          */
 } alk_t;
 
-extern alk_t *alk_new(char *path);
+extern alk_t *alk_new(const char *path);
 extern int    alk_free(alk_t *alk);
 extern char  *alk_get(alk_t *alk, int no);
 
