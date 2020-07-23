@@ -6,6 +6,7 @@
 const word str1 = 10:
 const word str2 = 11:
 const word str3 = 12:
+const word str4 = 13:
 
 	MS str1,"０１２３４５６７８９":
 	ML len,str1:
@@ -93,7 +94,64 @@ const word str3 = 12:
 		~AssertEquals len,D01,__LINE__:
 	>
 
+	\test_MG7:
+	\test_strFuncs:
+
 	%0:
+
+*test_MG7:
+	MG 100,0:
+	MG 1,str1:
+	MG 4,0:
+	MG 0,1:
+	'123あいう'
+	MG 0,0:
+	MG 100,1:
+	MG 7,len:
+	~AssertEquals len,6,__LINE__:
+	\0:
+
+*test_strFuncs:
+	MS str1,"":
+	MS str2,"あいう":
+	MS str3,"abc":
+	MS str4,"abcあいう":
+
+	strCheckASCII str1,RND:
+	~AssertEquals RND,0,__LINE__:
+	strCheckASCII str2,RND:
+	~AssertEquals RND,0,__LINE__:
+	strCheckASCII str3,RND:
+	~AssertEquals RND,1,__LINE__:
+	strCheckASCII str4,RND:
+	~AssertEquals RND,1,__LINE__:
+
+	strCheckSJIS str1,RND:
+	~AssertEquals RND,0,__LINE__:
+	strCheckSJIS str2,RND:
+	~AssertEquals RND,1,__LINE__:
+	strCheckSJIS str3,RND:
+	~AssertEquals RND,0,__LINE__:
+	strCheckSJIS str4,RND:
+	~AssertEquals RND,1,__LINE__:
+
+	strGetCharType str4,0,RND:
+	~AssertEquals RND,1,__LINE__:
+	strGetCharType str4,3,RND:
+	~AssertEquals RND,2,__LINE__:
+	strGetCharType str4,6,RND:
+	~AssertEquals RND,0,__LINE__:
+
+	strGetLengthASCII str1,RND:
+	~AssertEquals RND,0,__LINE__:
+	strGetLengthASCII str2,RND:
+	~AssertEquals RND,6,__LINE__:
+	strGetLengthASCII str3,RND:
+	~AssertEquals RND,3,__LINE__:
+	strGetLengthASCII str4,RND:
+	~AssertEquals RND,9,__LINE__:
+
+	\0:
 
 **MPtoString dst,src,len:
 	MG 100,0:
