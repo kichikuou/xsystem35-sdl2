@@ -330,7 +330,7 @@ void commandMG() {
 		break;
 	case 7:
 		var = getCaliVariable();
-		*var = v_strlen(nact->msg.mg_curStrVarNo -1) / 2;
+		*var = v_strlen(nact->msg.mg_curStrVarNo -1);
 		break;
 	case 100:
 		sw = getCaliValue();
