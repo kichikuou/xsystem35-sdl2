@@ -97,8 +97,8 @@ int nt_sstr_regist_replace(char *sstr, char *dstr) {
 	if (sstr == dstr) return NG;
 	
 	ex = malloc(sizeof(strexchange_t));
-	ex->src = strdup(sstr);
-	ex->dst = strdup(dstr);
+	ex->src = sstr;
+	ex->dst = dstr;
 	strreplace = slist_append(strreplace, ex);
 	return OK;
 }

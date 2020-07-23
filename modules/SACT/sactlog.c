@@ -40,7 +40,17 @@
 #include "ngraph.h"
 #include "drawtext.h"
 #include "utfsjis.h"
-#include "sactlog_sjismsg.c"
+
+#define LOGMSG_LINES 6
+
+static const char *logmsg[LOGMSG_LINES] = {
+	"\n",
+	"※バックログ操作方法※",
+	"[ESC]またはマウス右クリックでゲームに戻る",
+	"[PageUp][PageDown]でページスクロール",
+	"[↑][↓]またはマウスホイールで行スクロール",
+	"\n",
+};
 
 /*
   ホイールで上下スクロール
@@ -73,21 +83,18 @@ static void draw_log() {
 	// 表示始め位置
 	node = list_nth(sact.log, list_length(sact.log) - curline);
 	for (i = 0; i < LOGLINENUM; i++) {
-		char *str, *streuc;
 		if (cur <= 0) continue;
 		
-		str = (char *)(node->data);
+		char *str = (char *)(node->data);
 		if (0 == strcmp(str, "\n")) {
 			gr_fill(chr, 0, y + FONTSIZE/2, sf0->width, 3, 128, 0, 0);
 		} else {
-			streuc = sjis2utf(str);
 			if (cur < 6) {
 				dt_setfont(FONT_MINCHO, FONTSIZE);
 			} else {
 				dt_setfont(FONT_GOTHIC, FONTSIZE);
 			}
 			dt_drawtext(chr, 0, y, str);
-			free(streuc);
 		}
 		y += FONTSIZE;
 		cur--;
@@ -103,13 +110,15 @@ static void draw_log() {
 
 
 int sblog_start(void) {
+	static char *logmsg_sjis[6];
+	if (!logmsg_sjis[0]) {
+		for (int i = 0; i < LOGMSG_LINES; i++)
+			logmsg_sjis[i] = utf2sjis(logmsg[i]);
+	}
+
 	// 説明文章を追加
-	sact.log = list_append(sact.log, "\n");
-	sact.log = list_append(sact.log, LOGMSG1);
-	sact.log = list_append(sact.log, LOGMSG2);
-	sact.log = list_append(sact.log, LOGMSG3);
-	sact.log = list_append(sact.log, LOGMSG4);
-	sact.log = list_append(sact.log, "\n");
+	for (int i = 0; i < LOGMSG_LINES; i++)
+		sact.log = list_append(sact.log, logmsg_sjis[i]);
 	
 	back = sf_dup(sf0);
 	chr  = sf_create_surface(sf0->width, sf0->height, 8);
@@ -129,7 +138,7 @@ int sblog_end(void) {
 	sf_free(chr);
 	
 	// 説明文章を削除
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < LOGMSG_LINES; i++) {
 		node = list_last(sact.log);
 		sact.log = list_remove(sact.log, node->data);
 	}

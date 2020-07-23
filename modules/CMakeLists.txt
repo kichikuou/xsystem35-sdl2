@@ -70,7 +70,7 @@ add_library(modules STATIC
 
 target_include_directories(modules PUBLIC .)
 
-target_compile_options(modules PRIVATE -Wno-pointer-sign -Wno-invalid-source-encoding)
+target_compile_options(modules PRIVATE -Wno-pointer-sign)
 target_link_libraries(modules PRIVATE graph alk drawtext list)
 
 if (SDL2MIXER_FOUND)
