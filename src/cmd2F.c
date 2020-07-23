@@ -961,7 +961,7 @@ void commands2F58() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_hankaku(v_str(eNum) -1) ? 1 : 0;
+	*vResult = sjis_has_hankaku(v_str(eNum - 1)) ? 1 : 0;
 	
 	DEBUG_COMMAND("strCheckASCII %d, %d:\n", eNum, *vResult);
 }
@@ -970,7 +970,7 @@ void commands2F59() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_zenkaku(v_str(eNum) -1) ? 1 : 0;
+	*vResult = sjis_has_zenkaku(v_str(eNum - 1)) ? 1 : 0;
 	
 	DEBUG_COMMAND("strCheckSJIS %d, %d:\n", eNum, *vResult);
 }
