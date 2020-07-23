@@ -1,0 +1,7 @@
+void ExchangeString(IString arg1, IString arg2, IString arg3)
+void SetNum16String(pword arg1, IString arg2)
+void SetNum16HalfString(pword arg1, IString arg2)
+void SetNum32String(pword arg1, IString arg2)
+void SetNum32HalfString(pword arg1, IString arg2)
+void GetArrayString(pword arg1, int arg2, IString arg3)
+void SetWindowTitle(IString arg1, ISys3xSystem arg2)

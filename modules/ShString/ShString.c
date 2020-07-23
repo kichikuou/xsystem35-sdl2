@@ -45,26 +45,8 @@ static void ExchangeString(void) {
 	int target = getCaliValue();
 	int pat    = getCaliValue();
 	int patr   = getCaliValue();
-	const char *start = v_str(target -1);
-	const char *next;
-	char dst[STRVAR_LEN] = "";
-	
+	v_strReplaceAll(target - 1, pat - 1, patr - 1);
 	DEBUG_COMMAND("ShString.ExchangeString: %d,%d,%d:\n", target, pat, patr);
-	
-	if (v_strlen(target -1) == 0 || v_strlen(pat -1) == 0) {
-		return;
-	}
-	
-	while(TRUE) {
-		next = strstr(start, v_str(pat -1));
-		if (next == NULL) break;
-		strncat(dst, start, (size_t)(next - start));
-		strncat(dst, v_str(patr -1), sizeof(dst) - strlen(dst));
-		start = next + v_strlen(pat -1);
-	}
-	
-	strncat(dst, start, sizeof(dst) - strlen(dst));
-	v_strcpy(target -1, dst);
 }
 
 static void SetNum16String(void) { /* 1 */

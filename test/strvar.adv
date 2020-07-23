@@ -96,6 +96,7 @@ const word str4 = 13:
 
 	\test_MG7:
 	\test_strFuncs:
+	\test_ShString:
 
 	%0:
 
@@ -151,6 +152,15 @@ const word str4 = 13:
 	strGetLengthASCII str4,RND:
 	~AssertEquals RND,9,__LINE__:
 
+	\0:
+
+*test_ShString:
+	MS str1,"あああああ":
+	MS str2,"ああ":
+	MS str3,"いいい":
+	ShString.ExchangeString str1,str2,str3:
+	MS str4,"いいいいいいあ":
+	~AssertStrEquals str1,str4,__LINE__:
 	\0:
 
 **MPtoString dst,src,len:

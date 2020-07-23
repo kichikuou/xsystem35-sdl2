@@ -266,6 +266,34 @@ int v_strGetCharType(int no, int pos) {
 	return CHECKSJIS1BYTE(*p) ? 2 : 1;
 }
 
+void v_strReplaceAll(int no, int pattern, int replacement) {
+	const char *pat = v_str(pattern);
+	if (!*pat)
+		return;
+	const char *repl = v_str(replacement);
+
+	if (no < 0 || no >= strvar_cnt) {
+		WARNING("string index out of range: %d", no);
+		return;
+	}
+	if (!strVar[no])
+		return;
+	char *src = strVar[no];
+	strVar[no] = NULL;
+
+	char *start = src, *found;;
+	while ((found = strstr(start, pat))) {
+		char bak = *found;
+		*found = '\0';
+		v_strcat(no, start);
+		*found = bak;
+		v_strcat(no, repl);
+		start = found + strlen(pat);
+	}
+	v_strcat(no, start);
+	free(src);
+}
+
 #ifdef DEBUG
 
 void debug_showvariable() {

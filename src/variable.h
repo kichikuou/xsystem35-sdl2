@@ -68,5 +68,6 @@ extern void v_strFromVars(int no, const int *vars);
 extern int v_strToVars(int no, int *vars);
 extern const char *v_str(int no);
 extern int v_strGetCharType(int no, int pos);
+extern void v_strReplaceAll(int no, int pattern, int replacement);
 
 #endif /* !__VARIABLE__ */
