@@ -154,28 +154,3 @@ int sjis_count_char(const BYTE *src) {
 	}
 	return c;
 }
-
-/* SJIS(EUC) を含む文字列の ASCII を大文字化する */
-void sjis_toupper(BYTE *src) {
-	while(*src) {
-		if (CHECKSJIS1BYTE(*src)) {
-			src++;
-		} else {
-			if (*src >= 0x60 && *src <= 0x7a) {
-				*src &= 0xdf;
-			}
-		}
-		src++;
-	}
-}
-
-/* SJIS を含む文字列の ASCII を大文字化する2 */
-BYTE *sjis_toupper2(const BYTE *src) {
-	BYTE *dst;
-		
-	dst = malloc(strlen(src) +1);
-	if (dst == NULL) return NULL;
-	strcpy(dst, src);
-	sjis_toupper(dst);
-	return dst;
-}

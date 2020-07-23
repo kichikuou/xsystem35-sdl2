@@ -33,7 +33,5 @@ extern BYTE*   utf2sjis(const BYTE *src);
 extern boolean sjis_has_hankaku(const BYTE *src);
 extern boolean sjis_has_zenkaku(const BYTE *src);
 extern int     sjis_count_char(const BYTE *src);
-extern void    sjis_toupper(BYTE *src);
-extern BYTE*   sjis_toupper2(const BYTE *src);
 
 #endif /* __UTFSJIS__ */
