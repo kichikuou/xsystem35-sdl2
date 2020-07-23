@@ -35,7 +35,6 @@
 #include "font.h"
 #include "ags.h"
 
-extern int cp932tosjis0213(int code);
 extern const unsigned short *s2u[];
 
 typedef struct {
@@ -74,51 +73,18 @@ static int toUnicode(const unsigned char **msg) {
 	return code;
 }
 
-static int toSJIS(const unsigned char **msg) {
-	int code;
-
-	if (**msg >= 0xa0 && **msg <= 0xdf) {
-		code = **msg; (*msg)++;
-	} else if (**msg & 0x80) {
-		code = (**msg << 8) + *(*msg+1);
-		(*msg) += 2;
-	} else {
-		code = **msg; (*msg)++;
-	}
-	return code;
-}
-
-static int toSJIS0213(const unsigned char **msg) {
-	int code;
-	
-	if (**msg >= 0xa0 && **msg <= 0xdf) {
-		code = **msg; (*msg)++;
-	} else if (**msg & 0x80) {
-		code = (**msg << 8) + *(*msg+1);
-		(*msg) += 2;
-	} else {
-		code = **msg; (*msg)++;
-	}
-	return cp932tosjis0213(code);
-}
-
-static void select_charmap(FT_Face f, int type) {
+static boolean select_charmap(FT_Face f, int type) {
 	int i;
 	
 	for (i = 0; i < f->num_charmaps; i++) {
 		FT_CharMap map = f->charmaps[i];
-		if (map->encoding == ft_encoding_sjis) {
-			FT_Select_Charmap(f, ft_encoding_sjis);
-			this->codeconv[type] = (this->isJISX0213[type] ?
-						toSJIS0213 : toSJIS);
-			return;
-		} else if (map->encoding == ft_encoding_unicode) {
+		if (map->encoding == ft_encoding_unicode) {
 			FT_Select_Charmap(f, ft_encoding_unicode);
 			this->codeconv[type] = toUnicode;
-			return;
+			return TRUE;
 		}
 	}
-	SYSERROR("CharMap encoding is neither sjis nor unicode\n");
+	return FALSE;
 }
 
 static void font_insert(int size, int type, FT_Face face) {
@@ -172,11 +138,12 @@ static void font_ttf_sel_font(int type, int size) {
 			return;
 		}
 		
-		select_charmap(face, type);
+		if (!select_charmap(face, type))
+			SYSERROR("TTfont %s has no unicode charmap\n", name);
 		
 		err = FT_Set_Pixel_Sizes(face, 0, size);
 		if (err) {
-			WARNING("TTfont %s contains only fixed size(%d) font.\n",name, face->size);
+			WARNING("Font %s contains only fixed size(%d) font.\n",name, face->size);
 			return;
 		}
 		
