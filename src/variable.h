@@ -62,9 +62,11 @@ extern void v_strcpy(int no, const char *str);
 extern void v_strncpy(int dstno, int dstpos, int srcno, int srcpos, int len);
 extern void v_strcat(int no, const char *str);
 extern size_t v_strlen(int no);
+extern int v_strWidth(int no);
 extern int v_strstr(int no, int start, const char *str);
 extern void v_strFromVars(int no, const int *vars);
 extern int v_strToVars(int no, int *vars);
 extern const char *v_str(int no);
+extern int v_strGetCharType(int no, int pos);
 
 #endif /* !__VARIABLE__ */

@@ -639,22 +639,7 @@ void commands2F3C() {
 	int ePos = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	if (eNum <= 0 || v_strlen(eNum -1) < ePos) {
-		*vResult = 0;
-	} else {
-		BYTE b1, b2 = 0;
-		b1 = *(v_str(eNum - 1) + ePos);
-		if (ePos == 0) {
-			*vResult = CHECKSJIS1BYTE(b1) ? 2 : 1;
-		} else {
-			b2 = *(v_str(eNum - 1) + ePos -1);
-			if (CHECKSJIS1BYTE(b1)) {
-				*vResult = 2;
-			} else {
-				*vResult = CHECKSJIS1BYTE(b2) ? 2 : 1;
-			}
-		}
-	}
+	*vResult = v_strGetCharType(eNum - 1, ePos);
 	
 	DEBUG_COMMAND("strGetCharType %d, %d, %d:\n", eNum, ePos, *vResult);
 }
@@ -663,7 +648,7 @@ void commands2F3D() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = v_strlen(eNum -1);
+	*vResult = v_strWidth(eNum -1);
 
 	DEBUG_COMMAND("strGetLengthASCII %d, %d:\n", eNum, *vResult);
 }
