@@ -7,7 +7,7 @@ else()
   add_executable(xsystem35)
 endif()
 
-target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign -Wno-invalid-source-encoding)
+target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign)
 target_link_libraries(xsystem35 PRIVATE src_lib)
 
 target_sources(xsystem35 PRIVATE

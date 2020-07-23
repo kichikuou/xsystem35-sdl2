@@ -103,9 +103,9 @@ static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
 	
 	// ゲームタイトルによるバージョン設定
-	if (0 == strcmp(nact->game_title_name, GT_ESUKA)) {
+	if (0 == strcmp(nact->game_title_utf8, GT_ESUKA)) {
 		sact.version = 100;
-	} else if (0 == strcmp(nact->game_title_name, GT_RANCE5D)){
+	} else if (0 == strcmp(nact->game_title_utf8, GT_RANCE5D)){
 		sact.version = 110;
 	} else {
 		sact.version = 120;

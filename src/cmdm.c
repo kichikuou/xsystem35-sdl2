@@ -31,6 +31,7 @@
 #include "menu.h"
 #include "ags.h"
 #include "message.h"
+#include "gametitle.h"
 
 /* defined by cmds.c */
 extern boolean dummy_pcm_su_flag;
@@ -161,16 +162,18 @@ void commandMT() {
 	/* ウインドウのタイトル文字列を設定する */
 	char *str = sys_getString(':');
 	
-	strncpy(nact->game_title_name, str, sizeof(nact->game_title_name) -1);
+	if (nact->game_title_utf8)
+		free(nact->game_title_utf8);
+	nact->game_title_utf8 = sjis2utf(str);
 	ags_setWindowTitle(str);
 	
 	/* 闘神都市II 対策 */
-	if (0 == strcmp(str, GT_TOSHIN2)) {
+	if (0 == strcmp(nact->game_title_utf8, GT_TOSHIN2)) {
 		dummy_pcm_su_flag = TRUE;
 	}
 	
 	/* Rance4 対策？ */
-	if (0 == strcmp(str, GT_RANCE4)) {
+	if (0 == strcmp(nact->game_title_utf8, GT_RANCE4)) {
 		Y3waitCancel = FALSE;
 	}
 

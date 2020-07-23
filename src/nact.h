@@ -64,7 +64,7 @@ typedef struct {
 	boolean   popupmenu_opened;    /* popup menu が 開いているか */
 	boolean   mmx_is_ok;           /* MMX が有効かどうか */
 	
-	char       game_title_name[31];
+	char      *game_title_utf8;
 	int        scenario_version;
 
 	

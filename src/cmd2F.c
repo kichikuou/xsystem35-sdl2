@@ -37,6 +37,7 @@
 #include "graphicsdevice.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
+#include "gametitle.h"
 #if HAVE_UNAME
 #include <sys/utsname.h>
 #endif
@@ -449,10 +450,14 @@ void commands2F27() {
 void commands2F28() {
 	char *title = sys_getString(0);
 	
-	strncpy(nact->game_title_name, title, 30);
+	if (nact->game_title_utf8)
+		free(nact->game_title_utf8);
+	nact->game_title_utf8 = sjis2utf(title);
+
 	ags_setWindowTitle(title);
 
-	if (0 == strcmp(title, GT_RANCE3_ENG) || 0 == strcmp(title, GT_RANCE4_ENG)) {
+	if (0 == strcmp(nact->game_title_utf8, GT_RANCE3_ENG) ||
+		0 == strcmp(nact->game_title_utf8, GT_RANCE4_ENG)) {
 		have_eng_mp_patch = TRUE;
 	}
 

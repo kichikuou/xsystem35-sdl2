@@ -31,7 +31,6 @@
 #include "nact.h"
 #include "variable.h"
 #include "ald_manager.h"
-#include "gametitle.h"
 
 /* logfile when debug level >= 5 */
 #define DEBUGLOGFILE "./xsystem35.log"
