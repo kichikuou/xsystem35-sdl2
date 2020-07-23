@@ -80,7 +80,7 @@ static void draw_log() {
 		if (0 == strcmp(str, "\n")) {
 			gr_fill(chr, 0, y + FONTSIZE/2, sf0->width, 3, 128, 0, 0);
 		} else {
-			streuc = sjis2lang(str);
+			streuc = sjis2utf(str);
 			if (cur < 6) {
 				dt_setfont(FONT_MINCHO, FONTSIZE);
 			} else {

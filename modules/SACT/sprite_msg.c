@@ -194,7 +194,7 @@ void smsg_add(const char *msg) {
 	if (msg[0] == '\0') return;
 	
 	if (0) {
-		char *b = sjis2lang(msg);
+		char *b = sjis2utf(msg);
 		fprintf(stderr, "add msg '%s'\n", b);
 		free(b);
 	}
@@ -305,7 +305,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 		dt_setfont(wFont, wSize);
 
 		if (0) {
-			char *b = sjis2lang(mbuf);
+			char *b = sjis2utf(mbuf);
 			fprintf(stderr, "msg '%s'\n", b);
 			free(b);
 		}

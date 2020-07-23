@@ -26,10 +26,6 @@
 
 #include "portab.h"
 
-/* for future */
-#define sjis2lang sjis2utf
-#define lang2sjis utf2sjis
-
 #define CHECKSJIS1BYTE(b) ( ((b) & 0xe0) == 0x80 || ((b) & 0xe0) == 0xe0 )
 
 extern BYTE*   sjis2utf(const BYTE *src);

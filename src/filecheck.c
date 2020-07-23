@@ -60,7 +60,7 @@ static char *fc_search(const char *fname_sjis, const char *dir) {
 	if (d == NULL)
 		return NULL;
 
-	BYTE *fname_utf = sjis2lang(fname_sjis);
+	BYTE *fname_utf = sjis2utf(fname_sjis);
 	char *found = NULL;
 	struct dirent *entry;
 	while ((entry = readdir(d)) != NULL) {
@@ -86,7 +86,7 @@ FILE *fc_open(const char *filename, char type) {
 				return NULL;
 		} else {
 			if (newfile_kanjicode_utf8) {
-				char *fc = sjis2lang(filename);
+				char *fc = sjis2utf(filename);
 				fullpath = get_fullpath(saveDataPath, fc);
 				free(fc);
 			}

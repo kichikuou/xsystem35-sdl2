@@ -208,7 +208,7 @@ int nt_scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cTex
 	FONT *font;
 	
 	if (0) {
-		char *b = sjis2lang(cText);
+		char *b = sjis2utf(cText);
 		WARNING("str = '%s'\n", b);
 		free(b);
 	}

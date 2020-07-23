@@ -64,7 +64,7 @@ int s39ini_init(void) {
 		if (s1[0] == '\0') continue;
 		if (i >= MAXVOLCH || i < 0) continue;
 		s1[strlen(s1)-1] = '\0'; // remove last '"'
-		vval[i].label = sjis2lang(s1);
+		vval[i].label = sjis2utf(s1);
 		vval_max = max(vval_max, i);
 		//WARNING("VolumeValancer[%d] = %s\n", i, vval[i].label);
 	}

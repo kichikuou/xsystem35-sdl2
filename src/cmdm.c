@@ -105,8 +105,8 @@ void commandMI() { /* T2 */
 	char *title = sys_getString(':');
 	char *t1, *t2, *t3;
 	
-	t1 = sjis2lang(title);
-	t2 = sjis2lang(v_str(dst_no -1));
+	t1 = sjis2utf(title);
+	t2 = sjis2utf(v_str(dst_no -1));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -119,7 +119,7 @@ void commandMI() { /* T2 */
 		return;
 	}
 	
-	t3 = lang2sjis(mi_param.newstring);
+	t3 = utf2sjis(mi_param.newstring);
 	
 	/* 全角文字以外は不可 */
 	if (!sjis_has_hankaku(t3)) {
@@ -355,7 +355,7 @@ void commandMJ() {
 	INPUTSTRING_PARAM mj_param;
 	char *t1, *t2;
 	
-	t1 = sjis2lang(v_str(num -1));
+	t1 = sjis2utf(v_str(num -1));
 	mj_param.max = max_len;
 	mj_param.x = x;
 	mj_param.y = y;
@@ -366,7 +366,7 @@ void commandMJ() {
 	menu_inputstring2(&mj_param);
 	if (mj_param.newstring == NULL) return;
 	
-	t2 = lang2sjis(mj_param.newstring);
+	t2 = utf2sjis(mj_param.newstring);
 	if (!sjis_has_hankaku(t2)) {
 		v_strcpy(num -1, t2);
 	}

@@ -188,7 +188,7 @@ void ags_setWindowTitle(const char *src) {
 #define TITLEHEAD "XSystem35 Version "VERSION":"
 	BYTE *dst, *d;
 
-	dst = sjis2lang(src);
+	dst = sjis2utf(src);
 	if (NULL == (d = malloc(strlen(dst) + strlen(TITLEHEAD) + 1))) {
 		NOMEMERR();
 	}

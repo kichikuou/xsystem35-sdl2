@@ -406,8 +406,8 @@ void commands2F26() {
 	char *title  = sys_getString(0);
 	char *t1, *t2, *t3;
 	
-	t1 = sjis2lang(title);
-	t2 = sjis2lang(v_str(dst_no -1));
+	t1 = sjis2utf(title);
+	t2 = sjis2utf(v_str(dst_no -1));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -420,7 +420,7 @@ void commands2F26() {
 		return;
 	}
 	
-	t3 = lang2sjis(mi_param.newstring);
+	t3 = utf2sjis(mi_param.newstring);
 	
 	/* 全角文字以外は不可 */
 	if (!sjis_has_hankaku(t3)) {
@@ -468,7 +468,7 @@ void commands2F29() {
 	if (ni_param.title != NULL) {
 		free(ni_param.title);
 	}
-	t = sjis2lang(title);
+	t = sjis2utf(title);
 	ni_param.title = t;
 	
 	DEBUG_COMMAND("NT(new) %s:\n", title);
@@ -932,8 +932,8 @@ void commands2F57() {
 	char *t1, *t2, *t3;
 	INPUTSTRING_PARAM p;
 	
-	t1 = sjis2lang(sTitle);
-	t2 = sjis2lang(v_str(eStrVar -1));
+	t1 = sjis2utf(sTitle);
+	t2 = sjis2utf(v_str(eStrVar -1));
 	p.title = t1;
 	p.oldstring = t2;
 	p.max = eLength;
@@ -942,7 +942,7 @@ void commands2F57() {
 	if (p.newstring == NULL) {
 		*vResult = 65535;
 	} else {
-		t3 = lang2sjis(p.newstring);
+		t3 = utf2sjis(p.newstring);
 		if (!sjis_has_hankaku(t3)) {
 			v_strcpy(eStrVar -1, t3);
 			*vResult = sjis_count_char(t3);
@@ -979,7 +979,7 @@ void commands2F5A() {
 	char *sText = sys_getString(0);
 	char *t1;
 	
-	t1 = sjis2lang(sText);
+	t1 = sjis2utf(sText);
 	menu_msgbox_open(t1);
 	free(t1);
 	
@@ -990,7 +990,7 @@ void commands2F5B() {
 	int eNum = getCaliValue();
 	char *t1;
 	
-	t1 = sjis2lang(v_str(eNum) - 1);
+	t1 = sjis2utf(v_str(eNum) - 1);
 	menu_msgbox_open(t1);
 	free(t1);
 	

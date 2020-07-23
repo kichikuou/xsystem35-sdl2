@@ -27,7 +27,7 @@
 #include <emscripten.h>
 
 void texthook_message(const char *m) {
-	BYTE* s = sjis2lang((BYTE*)m);
+	BYTE* s = sjis2utf((BYTE*)m);
 	EM_ASM_({ xsystem35.texthook.message(UTF8ToString($0), $1); },
 			s, sl_getPage());
 	free(s);
@@ -53,7 +53,7 @@ static int newlines = 0;
 void texthook_message(const char *m) {
 	if (newlines)
 		printf("%d:", sl_getPage());
-	BYTE* s = sjis2lang((BYTE*)m);
+	BYTE* s = sjis2utf((BYTE*)m);
 	printf("%s", s);
 	free(s);
 	newlines = 0;

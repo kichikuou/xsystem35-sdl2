@@ -380,7 +380,7 @@ void commandNT() { /* From Panyo */
 	if (ni_param.title != NULL) {
 		free(ni_param.title);
 	}
-	t = sjis2lang(str);
+	t = sjis2utf(str);
 	ni_param.title = t;
 	
 	DEBUG_COMMAND("NT %p:\n", str);

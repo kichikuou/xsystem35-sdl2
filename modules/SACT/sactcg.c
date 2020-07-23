@@ -206,7 +206,7 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
 	FONT *font;
 	
 	if (0) {
-		char *b = sjis2lang(v_str(wText-1));
+		char *b = sjis2utf(v_str(wText-1));
 		WARNING("str = '%s'\n", b);
 		free(b);
 	}

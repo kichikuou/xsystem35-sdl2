@@ -80,7 +80,7 @@ static agsurface_t *font_sdlttf_get_glyph(const unsigned char *msg) {
 		fs = NULL;
 	}
 
-	BYTE* conv = sjis2lang(msg);
+	BYTE* conv = sjis2utf(msg);
 
 	SDL_Color color = {255, 255, 255, 0};
 	if (this->antialiase_on) {
@@ -153,7 +153,7 @@ static int font_sdlttf_draw_glyph(int x, int y, const unsigned char *str, int cl
 	if (!fontset)
 		return 0;
 	
-	conv = sjis2lang(str);
+	conv = sjis2utf(str);
 	if (this->antialiase_on) {
 		fs = TTF_RenderUTF8_Blended(fontset->id, conv, sdl_col[cl]);
 	} else {

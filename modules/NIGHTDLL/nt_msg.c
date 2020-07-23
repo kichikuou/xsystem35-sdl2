@@ -187,7 +187,7 @@ void ntmsg_add(const char *msg) {
 	if (msg[0] == '\0') return;
 	
 	if (0) {
-		char *b = sjis2lang(msg);
+		char *b = sjis2utf(msg);
 		fprintf(stderr, "add msg '%s'\n", b);
 		free(b);
 	}
@@ -259,7 +259,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 		dt_setfont(wFont, wSize);
 
 		if (1) {
-			char *b = sjis2lang(mbuf);
+			char *b = sjis2utf(mbuf);
 			fprintf(stderr, "msg '%s'\n", b);
 			free(b);
 		}

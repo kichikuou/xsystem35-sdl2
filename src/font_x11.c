@@ -157,7 +157,7 @@ static agsurface_t *font_x11_get_glyph(const unsigned char *str) {
 	BYTE *conv;
 	
 	/* convert string code from sjis to utf-8 */
-	conv = sjis2lang(str);
+	conv = sjis2utf(str);
 	
 	w = XmbTextEscapement(fontset, conv, strlen(conv)); 
 	
@@ -187,7 +187,7 @@ static int font_x11_draw_glyph(int x, int y, const unsigned char *str, int col) 
 	BYTE *conv;
 	
 	/* convert string code from sjis to utf-8 */
-	conv = sjis2lang(str);
+	conv = sjis2utf(str);
 	
 	w = XmbTextEscapement(fontset, conv, strlen(conv)); 
 	
