@@ -175,20 +175,12 @@ void v_strcat(int no, const char *str) {
 
 /* 文字変数の長さ */
 size_t v_strlen(int no) {
-	if (no < 0 || no >= strvar_cnt) {
-		WARNING("string index out of range: %d", no);
-		return 0;
-	}
-	return strVar[no] ? sjis_count_char(strVar[no]) : 0;
+	return sjis_count_char(v_str(no));
 }
 
 /* Width of a string (2 for full-width characters, 1 for half-width) */
 int v_strWidth(int no) {
-	if (no < 0 || no >= strvar_cnt) {
-		WARNING("string index out of range: %d", no);
-		return 0;
-	}
-	return strVar[no] ? strlen(strVar[no]) : 0;
+	return strlen(v_str(no));
 }
 
 /* 文字変数そのもの */
@@ -266,13 +258,7 @@ int v_strToVars(int no, int *vars) {
 }
 
 int v_strGetCharType(int no, int pos) {
-	if (no < 0 || no >= strvar_cnt) {
-		WARNING("string index out of range: %d", no);
-		return 0;
-	}
-	if (!strVar[no])
-		return 0;
-	const char *p = strVar[no];
+	const char *p = v_str(no);
 	for (; *p && pos > 0; pos--)
 		p += CHECKSJIS1BYTE(*p) ? 2 : 1;
 	if (!*p)
