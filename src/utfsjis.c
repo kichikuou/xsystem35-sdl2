@@ -68,6 +68,11 @@ BYTE *sjis2utf(const BYTE *src) {
 }
 
 static int unicode_to_sjis(int u) {
+	// U+30FB (KATAKANA MIDDLE DOT) is used as replacement character in
+	// s2utbl.h, so needs special treatment.
+	if (u == 0x30fb)
+		return 0x8145;
+
 	for (int b1 = 0x80; b1 <= 0xff; b1++) {
 		if (b1 >= 0xa0 && b1 <= 0xdf)
 			continue;
