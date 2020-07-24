@@ -16,13 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#undef NDEBUG
 #include "list.h"
-#include <assert.h>
+#include "unittest.h"
 #include <stdio.h>
 
 static void list_func(void *data, void *user_data) {
-	assert(*(int*)data == ++*(int*)user_data);
+	ASSERT_EQUAL(*(int*)data, ++*(int*)user_data);
 }
 
 static int compare_func(const void *a, const void *b) {
@@ -36,18 +35,18 @@ int main() {
 	// Basic
 	{
 		SList* l = NULL;
-		assert(slist_length(l) == 0);
+		ASSERT_EQUAL(slist_length(l), 0);
 
 		l = slist_append(l, &data1);
-		assert(slist_length(l) == 1);
-		assert(l->data == &data1);
-		assert(slist_next(l) == NULL);
+		ASSERT_EQUAL(slist_length(l), 1);
+		ASSERT_EQUAL_PTR(l->data, &data1);
+		ASSERT_NULL(slist_next(l));
 
 		l = slist_append(l, &data2);
-		assert(slist_length(l) == 2);
-		assert(l->data == &data1);
-		assert(slist_next(l)->data == &data2);
-		assert(slist_next(slist_next(l)) == NULL);
+		ASSERT_EQUAL(slist_length(l), 2);
+		ASSERT_EQUAL_PTR(l->data, &data1);
+		ASSERT_EQUAL_PTR(slist_next(l)->data, &data2);
+		ASSERT_NULL(slist_next(slist_next(l)));
 
 		slist_free(l);
 	}
@@ -55,20 +54,20 @@ int main() {
 	// slist_nth, slist_last
 	{
 		SList* l = NULL;
-		assert(slist_nth(l, 0) == NULL);
-		assert(slist_nth(l, 1) == NULL);
-		assert(slist_last(l) == NULL);
+		ASSERT_NULL(slist_nth(l, 0));
+		ASSERT_NULL(slist_nth(l, 1));
+		ASSERT_NULL(slist_last(l));
 
 		l = slist_append(l, &data1);
-		assert(slist_nth(l, 0)->data == &data1);
-		assert(slist_nth(l, 1) == NULL);
-		assert(slist_last(l) == slist_nth(l, 0));
+		ASSERT_EQUAL_PTR(slist_nth(l, 0)->data, &data1);
+		ASSERT_NULL(slist_nth(l, 1));
+		ASSERT_EQUAL_PTR(slist_last(l), slist_nth(l, 0));
 
 		l = slist_append(l, &data2);
-		assert(slist_nth(l, 0)->data == &data1);
-		assert(slist_nth(l, 1)->data == &data2);
-		assert(slist_nth(l, 2) == NULL);
-		assert(slist_last(l) == slist_nth(l, 1));
+		ASSERT_EQUAL_PTR(slist_nth(l, 0)->data, &data1);
+		ASSERT_EQUAL_PTR(slist_nth(l, 1)->data, &data2);
+		ASSERT_NULL(slist_nth(l, 2));
+		ASSERT_EQUAL_PTR(slist_last(l), slist_nth(l, 1));
 
 		slist_free(l);
 	}
@@ -76,28 +75,28 @@ int main() {
 	// slist_remove
 	{
 		SList* l = NULL;
-		assert(slist_remove(l, NULL) == NULL);
-		assert(slist_remove(l, &data1) == NULL);
+		ASSERT_NULL(slist_remove(l, NULL));
+		ASSERT_NULL(slist_remove(l, &data1));
 
 		l = slist_append(l, &data1);
-		assert(slist_remove(l, NULL) == l);
+		ASSERT_EQUAL_PTR(slist_remove(l, NULL), l);
 		l = slist_remove(l, &data1);
-		assert(l == NULL);
+		ASSERT_NULL(l);
 
 		l = slist_append(l, &data1);
 		l = slist_append(l, &data2);
 		l = slist_append(l, &data1);
 		l = slist_append(l, &data2);
-		assert(slist_length(l) == 4);
+		ASSERT_EQUAL(slist_length(l), 4);
 		l = slist_remove(l, &data2);
-		assert(slist_length(l) == 3);
-		assert(slist_nth(l, 0)->data == &data1);
-		assert(slist_nth(l, 1)->data == &data1);
-		assert(slist_nth(l, 2)->data == &data2);
+		ASSERT_EQUAL(slist_length(l), 3);
+		ASSERT_EQUAL_PTR(slist_nth(l, 0)->data, &data1);
+		ASSERT_EQUAL_PTR(slist_nth(l, 1)->data, &data1);
+		ASSERT_EQUAL_PTR(slist_nth(l, 2)->data, &data2);
 		l = slist_remove(l, &data2);
-		assert(slist_length(l) == 2);
-		assert(slist_nth(l, 0)->data == &data1);
-		assert(slist_nth(l, 1)->data == &data1);
+		ASSERT_EQUAL(slist_length(l), 2);
+		ASSERT_EQUAL_PTR(slist_nth(l, 0)->data, &data1);
+		ASSERT_EQUAL_PTR(slist_nth(l, 1)->data, &data1);
 
 		slist_free(l);
 	}
@@ -105,17 +104,17 @@ int main() {
 	// slist_index
 	{
 		SList* l = NULL;
-		assert(slist_index(l, NULL) == -1);
-		assert(slist_index(l, &data1) == -1);
+		ASSERT_EQUAL(slist_index(l, NULL), -1);
+		ASSERT_EQUAL(slist_index(l, &data1), -1);
 
 		l = slist_append(l, &data1);
-		assert(slist_index(l, NULL) == -1);
-		assert(slist_index(l, &data1) == 0);
+		ASSERT_EQUAL(slist_index(l, NULL), -1);
+		ASSERT_EQUAL(slist_index(l, &data1), 0);
 
 		l = slist_append(l, &data1);
 		l = slist_append(l, &data2);
-		assert(slist_index(l, &data1) == 0);
-		assert(slist_index(l, &data2) == 2);
+		ASSERT_EQUAL(slist_index(l, &data1), 0);
+		ASSERT_EQUAL(slist_index(l, &data2), 2);
 
 		slist_free(l);
 	}
@@ -127,7 +126,7 @@ int main() {
 		l = slist_append(l, &data2);
 		int count = 0;
 		slist_foreach(l, list_func, &count);
-		assert(count == 2);
+		ASSERT_EQUAL(count, 2);
 		slist_free(l);
 	}
 
@@ -140,11 +139,11 @@ int main() {
 		l = slist_insert_sorted(l, &data3, compare_func);
 		l = slist_insert_sorted(l, &data0, compare_func);
 		l = slist_insert_sorted(l, &data2, compare_func);
-		assert(slist_length(l) == 4);
-		assert(slist_nth(l, 0)->data == &data0);
-		assert(slist_nth(l, 1)->data == &data1);
-		assert(slist_nth(l, 2)->data == &data2);
-		assert(slist_nth(l, 3)->data == &data3);
+		ASSERT_EQUAL(slist_length(l), 4);
+		ASSERT_EQUAL_PTR(slist_nth(l, 0)->data, &data0);
+		ASSERT_EQUAL_PTR(slist_nth(l, 1)->data, &data1);
+		ASSERT_EQUAL_PTR(slist_nth(l, 2)->data, &data2);
+		ASSERT_EQUAL_PTR(slist_nth(l, 3)->data, &data3);
 
 		slist_free(l);
 	}

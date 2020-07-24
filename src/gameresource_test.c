@@ -16,9 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#undef NDEBUG
 #include "gameresource.h"
-#include <assert.h>
+#include "unittest.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,40 +25,40 @@
 
 static void initGameResource_test(void) {
 	GameResource gr;
-	assert(initGameResource(&gr, "testdata/test.gr"));
+	ASSERT_TRUE(initGameResource(&gr, "testdata/test.gr"));
 
-	assert(gr.cnt[DRIFILE_SCO] == 1);
-	assert(strcmp(gr.game_fname[DRIFILE_SCO][0], "fooSA.ALD") == 0);
-	assert(gr.cnt[DRIFILE_CG] == 2);
-	assert(strcmp(gr.game_fname[DRIFILE_CG][0], "fooGA.ALD") == 0);
-	assert(strcmp(gr.game_fname[DRIFILE_CG][1], "fooGB.ALD") == 0);
-	assert(gr.cnt[DRIFILE_WAVE] == 26);
-	assert(strcmp(gr.game_fname[DRIFILE_WAVE][0], "fooWA.ALD") == 0);
+	ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 1);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "fooSA.ALD");
+	ASSERT_EQUAL(gr.cnt[DRIFILE_CG], 2);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_CG][0], "fooGA.ALD");
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_CG][1], "fooGB.ALD");
+	ASSERT_EQUAL(gr.cnt[DRIFILE_WAVE], 26);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_WAVE][0], "fooWA.ALD");
 	for (int i = 1; i <= 24; i++)
-		assert(gr.game_fname[DRIFILE_WAVE][i] == NULL);
-	assert(strcmp(gr.game_fname[DRIFILE_WAVE][25], "fooWZ.ALD") == 0);
-	assert(gr.cnt[DRIFILE_MIDI] == 3);
-	assert(strcmp(gr.game_fname[DRIFILE_MIDI][2], "fooMC.ALD") == 0);
-	assert(strcmp(gr.game_fname[DRIFILE_DATA][0], "file name with whitespaces") == 0);
-	assert(strcmp(gr.game_fname[DRIFILE_RSC][0], "this line has whitespaces at end of line") == 0);
-	assert(strcmp(gr.game_fname[DRIFILE_BGM][0], "/path/to/fooBA.ALD") == 0);
+		ASSERT_NULL(gr.game_fname[DRIFILE_WAVE][i]);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_WAVE][25], "fooWZ.ALD");
+	ASSERT_EQUAL(gr.cnt[DRIFILE_MIDI], 3);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_MIDI][2], "fooMC.ALD");
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_DATA][0], "file name with whitespaces");
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_RSC][0], "this line has whitespaces at end of line");
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_BGM][0], "/path/to/fooBA.ALD");
 
-	assert(strcmp(gr.ain, "System39.ain") == 0);
-	assert(strcmp(gr.wai, "foo_WA.WAI") == 0);
-	assert(strcmp(gr.bgi, "foo_BA.BGI") == 0);
-	assert(strcmp(gr.sact01, "SACTEFAM.KLD") == 0);
-	assert(strcmp(gr.init, "System39.ini") == 0);
-	assert(strcmp(gr.alk[0], "0.alk") == 0);
+	ASSERT_STRCMP(gr.ain, "System39.ain");
+	ASSERT_STRCMP(gr.wai, "foo_WA.WAI");
+	ASSERT_STRCMP(gr.bgi, "foo_BA.BGI");
+	ASSERT_STRCMP(gr.sact01, "SACTEFAM.KLD");
+	ASSERT_STRCMP(gr.init, "System39.ini");
+	ASSERT_STRCMP(gr.alk[0], "0.alk");
 	for (int i = 1; i <= 8; i++)
-		assert(gr.alk[i] == NULL);
-	assert(strcmp(gr.alk[9], "9.alk") == 0);
+		ASSERT_NULL(gr.alk[i]);
+	ASSERT_STRCMP(gr.alk[9], "9.alk");
 
-	assert(strcmp(gr.save_fname[0], "/home/kichikuou/save/foo_sa.asd") == 0);
+	ASSERT_STRCMP(gr.save_fname[0], "/home/kichikuou/save/foo_sa.asd");
 	for (int i = 1; i <= 24; i++)
-		assert(gr.save_fname[i] == NULL);
-	assert(strcmp(gr.save_fname[25], "/tmp/foo_sz.asd") == 0);
+		ASSERT_NULL(gr.save_fname[i]);
+	ASSERT_STRCMP(gr.save_fname[25], "/tmp/foo_sz.asd");
 	// save_path is determined based on save_fname[0].
-	assert(strcmp(gr.save_path, "/home/kichikuou/save") == 0);
+	ASSERT_STRCMP(gr.save_path, "/home/kichikuou/save");
 }
 
 static struct dirent *mockReaddir(DIR *dir) {
@@ -103,29 +102,29 @@ static void initGameResourceFromDir_test(void) {
 	static char cwd[256];
 	getcwd(cwd, sizeof(cwd));
 	GameResource gr;
-	assert(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
-	assert(gr.cnt[DRIFILE_SCO] == 2);
-	assert(strcmp(gr.game_fname[DRIFILE_SCO][0], joinPath(cwd, "ADISK.ALD")) == 0);
-	assert(strcmp(gr.game_fname[DRIFILE_SCO][1], joinPath(cwd, "FOOSB.ALD")) == 0);
-	assert(gr.cnt[DRIFILE_CG] == 26);
-	assert(strcmp(gr.game_fname[DRIFILE_CG][25], joinPath(cwd, "foogz.ald")) == 0);
-	assert(gr.cnt[DRIFILE_WAVE] == 1);
-	assert(strcmp(gr.game_fname[DRIFILE_WAVE][0], joinPath(cwd, "WA.ALD")) == 0);
+	ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
+	ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 2);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], joinPath(cwd, "ADISK.ALD"));
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][1], joinPath(cwd, "FOOSB.ALD"));
+	ASSERT_EQUAL(gr.cnt[DRIFILE_CG], 26);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_CG][25], joinPath(cwd, "foogz.ald"));
+	ASSERT_EQUAL(gr.cnt[DRIFILE_WAVE], 1);
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_WAVE][0], joinPath(cwd, "WA.ALD"));
 	for (int i = 0; i < 26; i++) {
 		char buf[16];
 		sprintf(buf, "%csleep.asd", 'a' + i);
-		assert(strcmp(gr.save_fname[i], joinPath(cwd, buf)) == 0);
+		ASSERT_STRCMP(gr.save_fname[i], joinPath(cwd, buf));
 	}
-	assert(strcmp(gr.save_path, cwd) == 0);
-	assert(strcmp(gr.ain, joinPath(cwd, "SYSTEM39.AIN")) == 0);
-	assert(strcmp(gr.wai, joinPath(cwd, "foo_WA.WAI")) == 0);
-	assert(strcmp(gr.bgi, joinPath(cwd, "foo_BA.BGI")) == 0);
-	assert(strcmp(gr.sact01, joinPath(cwd, "SACTEFAM.KLD")) == 0);
-	assert(strcmp(gr.init, joinPath(cwd, "System39.ini")) == 0);
-	assert(strcmp(gr.alk[0], joinPath(cwd, "0.alk")) == 0);
-	assert(strcmp(gr.alk[1], joinPath(cwd, "foo1.alk")) == 0);
+	ASSERT_STRCMP(gr.save_path, cwd);
+	ASSERT_STRCMP(gr.ain, joinPath(cwd, "SYSTEM39.AIN"));
+	ASSERT_STRCMP(gr.wai, joinPath(cwd, "foo_WA.WAI"));
+	ASSERT_STRCMP(gr.bgi, joinPath(cwd, "foo_BA.BGI"));
+	ASSERT_STRCMP(gr.sact01, joinPath(cwd, "SACTEFAM.KLD"));
+	ASSERT_STRCMP(gr.init, joinPath(cwd, "System39.ini"));
+	ASSERT_STRCMP(gr.alk[0], joinPath(cwd, "0.alk"));
+	ASSERT_STRCMP(gr.alk[1], joinPath(cwd, "foo1.alk"));
 	for (int i = 2; i < 10; i++)
-		assert(gr.alk[i] == NULL);
+		ASSERT_NULL(gr.alk[i]);
 }
 
 void gameresource_test(void) {
