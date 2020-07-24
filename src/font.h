@@ -41,7 +41,6 @@ struct _FONT {
 	boolean antialiase_on;
 	
 	char *name[FONTTYPEMAX];
-	boolean isJISX0213[FONTTYPEMAX];
 	char face[FONTTYPEMAX];
 	
 	void (*sel_font)(int type, int size);
@@ -51,8 +50,6 @@ struct _FONT {
 	int (*draw_glyph)(int x, int y, const unsigned char *str, int col);
 	
 	boolean (*self_drawable)();
-	
-	int (*codeconv[FONTTYPEMAX])(const unsigned char **msg);
 };
 
 typedef struct _FONT FONT;

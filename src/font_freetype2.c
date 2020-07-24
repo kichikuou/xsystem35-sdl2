@@ -80,7 +80,6 @@ static boolean select_charmap(FT_Face f, int type) {
 		FT_CharMap map = f->charmaps[i];
 		if (map->encoding == ft_encoding_unicode) {
 			FT_Select_Charmap(f, ft_encoding_unicode);
-			this->codeconv[type] = toUnicode;
 			return TRUE;
 		}
 	}
@@ -212,7 +211,7 @@ static agsurface_t *font_ttf_get_glyph(const unsigned char *_msg) {
 	clear_canvas();
 	
 	while (*msg) {
-		code = this->codeconv[fontset->type](&msg);
+		code = toUnicode(&msg);
 		
 		if (this->antialiase_on) {
 			loadflag = FT_LOAD_RENDER;

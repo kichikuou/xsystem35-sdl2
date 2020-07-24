@@ -91,7 +91,6 @@ static int audio_buffer_size = 0;
 /* font name from rcfile */
 static char *fontname[FONTTYPEMAX];
 static char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF};
-static boolean isjix0213_tt[FONTTYPEMAX];
 static char fontface[FONTTYPEMAX];
 
 #ifdef ENABLE_SDLTTF
@@ -276,7 +275,6 @@ static void sys35_init() {
 		case FONT_FT2:
 		case FONT_SDLTTF:
 			nact->ags.font->name[i] = fontname_tt[i];
-			nact->ags.font->isJISX0213[i] = isjix0213_tt[i];
 			nact->ags.font->face[i] = fontface[i];
 			break;
 			
@@ -450,16 +448,6 @@ static void check_profile() {
 	param = get_profile("ttfont_mincho");
 	if (param) {
 		fontname_tt[FONT_MINCHO] = param;
-	}
-	/* ゴシックフォント(TT)のコード設定 */
-	param = get_profile("ttfont_gothic_code");
-	if (param) {
-		isjix0213_tt[FONT_GOTHIC] = (strcmp("jisx0213",param) == 0 ? TRUE : FALSE);
-	}
-	/* 明朝フォント(TT)のコード設定 */
-	param = get_profile("ttfont_mincho_code");
-	if (param) {
-		isjix0213_tt[FONT_MINCHO] = (strcmp("jisx0213",param) == 0 ? TRUE : FALSE);
 	}
 	/* ゴシックフォント(TT)のフェイス指定 */
 	param = get_profile("ttfont_gothic_face");

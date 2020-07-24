@@ -24,11 +24,6 @@ font_gothic: -*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-no
 #ttfont_mincho: /usr/local/share/xsystem35/fonts/mincho.otf
 #ttfont_gothic: /usr/local/share/xsystem35/fonts/MTLc3m.ttf
 
-# True Type フォントのエンコード方式を指定 
-# Shift JIS0213 の場合以下のように指定
-#ttfont_mincho_code: jisx0213
-#ttfont_gothic_code: jisx0213
-
 # True Type フォントのフェイス指定
 #ttfont_mincho_face: 0
 #ttfont_gothic_face: 0
