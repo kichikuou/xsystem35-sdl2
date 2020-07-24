@@ -45,7 +45,6 @@ extern int getCaliValue();
 extern int *getCaliVariable();
 extern int *getVariable();
 extern char *sys_getString(char term);
-extern char *sys_getConvString(char term);
 extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
 extern char *sys_getConstString();

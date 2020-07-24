@@ -97,28 +97,6 @@ char *sys_getConstString() {
 	return msgbuf;
 }
 
-/* 加工済み(半カナ->全カナ) 文字列抽出 */
-char* sys_getConvString(char term) {
-	int c0;
-	char *index = msgbuf;
-	char *kindex;
-	
-	while ((c0 = sl_getc()) != (int)term) {
-		if (c0 == 0x20) {
-			*index++ = 0x81; *index++ = 0x40;
-		} else if (c0 >= 0xe0) {
-			*index++ = (char)c0; *index++ = (char)sl_getc();
-		} else if (c0 >= 0xa0) {
-			kindex = hankana2sjis(c0);
-			*index++ = *kindex; *index++ = *(kindex+1);
-		} else {
-			*index++ = (char)c0; *index++ = (char)sl_getc();
-		}
-	}
-	*index = 0;
-	return msgbuf;
-}
-
 /* 選択肢・通常メッセージ振り分け */
 void sys_addMsg(const char *str) {
 	const char *msg = NULL;

@@ -27,7 +27,6 @@
 
 extern BYTE *zen2han(const BYTE *src);
 extern BYTE *han2zen(const BYTE *src);
-extern char *hankana2sjis(int index);
 extern char *num2sjis(int num);
 
 #endif /* __HANKAKU_H__ */
