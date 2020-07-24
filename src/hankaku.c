@@ -214,7 +214,7 @@ char *format_number_zenkaku(int n, int width, char *buf) {
 	char work[256];
 	char *dst = buf;
 	for (char *s = format_number(n, width, work); *s; s++) {
-		char *p = zenkaku_digits[*s == ' ' ? 10 : *s - '0'];
+		const char *p = zenkaku_digits[*s == ' ' ? 10 : *s - '0'];
 		while (*p)
 			*dst++ = *p++;
 	}
