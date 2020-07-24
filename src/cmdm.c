@@ -195,29 +195,10 @@ void commandMH() {
 	int num1 = getCaliValue();
 	int fig  = getCaliValue();
 	int num2 = getCaliValue();
-	char _work1[10],_work2[200];
-	char *work1 = _work1, *work2 = _work2;
-	int len;
-	
-	*work2 = 0;
-	sprintf(work1,"%d",num2);
-	if (fig != 0) {
-		len = strlen(work1);
-		if (fig > len) {
-			/* 空白でうめる */
-			len = fig - len;
-			while(len--) {
-				strcat(work2, num2sjis(10));
-			}
-		} else {
-			work1 += (len - fig);
-		}
-	}
-	while(*work1) {
-		strcat(work2, num2sjis((*work1) - '0')); work1++;
-	}
-	v_strcpy(num1 - 1, work2);
-	
+
+	char buf[512];
+	v_strcpy(num1 - 1, format_number_zenkaku(num2, fig, buf));
+
 	DEBUG_COMMAND("MH %d,%d,%d:\n",num1,fig,num2);
 }
 

@@ -33,6 +33,7 @@
 #include "message.h"
 #include "music.h"
 #include "utfsjis.h"
+#include "hankaku.h"
 #include "ags.h"
 #include "graphicsdevice.h"
 #include "ald_manager.h"
@@ -736,15 +737,9 @@ void commands2F44() {
 	int num1 = getCaliValue();
 	int fig  = getCaliValue();
 	int num2 = getCaliValue();
-	char s[256];
+	char buf[256];
 
-	if (fig) {
-		sprintf(s, "%*d", fig, num2);
-		v_strcpy(num1 - 1, s + strlen(s) - fig);
-	} else {
-		sprintf(s, "%d", num2);
-		v_strcpy(num1 - 1, s);
-	}
+	v_strcpy(num1 - 1, format_number(num2, fig, buf));
 	
 	DEBUG_COMMAND("MHH %d, %d, %d:\n", num1, fig, num2);
 }

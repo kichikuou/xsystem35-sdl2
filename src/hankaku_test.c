@@ -57,6 +57,26 @@ static void zen2han_test(void) {
 	ASSERT_STRCMP(sjis2utf(zen2han(utf2sjis(unconvertable))), unconvertable);
 }
 
+static void format_number_test(void) {
+	char buf[256];
+	ASSERT_STRCMP(format_number(0, 0, buf), "0");
+	ASSERT_STRCMP(format_number(42, 0, buf), "42");
+	ASSERT_STRCMP(format_number(0, 3, buf), "  0");
+	ASSERT_STRCMP(format_number(42, 3, buf), " 42");
+	ASSERT_STRCMP(format_number(65535, 3, buf), "535");
+}
+
+static void format_number_zenkaku_test(void) {
+	char buf[512];
+	ASSERT_STRCMP(sjis2utf(format_number_zenkaku(0, 0, buf)), "０");
+	ASSERT_STRCMP(sjis2utf(format_number_zenkaku(42, 0, buf)), "４２");
+	ASSERT_STRCMP(sjis2utf(format_number_zenkaku(0, 3, buf)), "　　０");
+	ASSERT_STRCMP(sjis2utf(format_number_zenkaku(42, 3, buf)), "　４２");
+	ASSERT_STRCMP(sjis2utf(format_number_zenkaku(65535, 3, buf)), "５３５");
+}
+
 void hankaku_test(void) {
 	zen2han_test();
+	format_number_test();
+	format_number_zenkaku_test();
 }

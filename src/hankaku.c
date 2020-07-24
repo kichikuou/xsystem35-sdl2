@@ -29,7 +29,7 @@
 #include "portab.h"
 #include "hankaku.h"
 
-static BYTE hankakutable[3][192] = {{
+static const BYTE hankakutable[3][192] = {{
 	// 0x8140 - 0x81ff
 	 ' ', 0xa4, 0xa1,  ',',  '.',  0xa5, ':',  ';',
 	 '?',  '!', 0xde, 0xdf,    0,  '`',    0,  '^',
@@ -126,6 +126,20 @@ static const BYTE kanatbl[][2] = {
 	0x82, 0xed, 0x82, 0xf1, 0x81, 0x4a, 0x81, 0x4b
 };
 
+static const char zenkaku_digits[][3] = {
+	0x82,0x4f,0x00, /* 0 */
+	0x82,0x50,0x00, /* 1 */
+	0x82,0x51,0x00, /* 2 */
+	0x82,0x52,0x00, /* 3 */
+	0x82,0x53,0x00, /* 4 */
+	0x82,0x54,0x00, /* 5 */
+	0x82,0x55,0x00, /* 6 */
+	0x82,0x56,0x00, /* 7 */
+	0x82,0x57,0x00, /* 8 */
+	0x82,0x58,0x00, /* 9 */
+	0x81,0x40,0x00, /* space */
+};
+
 BYTE *zen2han(const BYTE *src) {
 	BYTE c0, c1;
 	char *dst, *_dst;
@@ -187,19 +201,23 @@ BYTE *han2zen(const BYTE *src) {
 	return _dst;
 }
 
-char *num2sjis(int num) {
-	static char suji[][3] = {
-		0x82,0x4f,0x00, /* 0 */
-		0x82,0x50,0x00, /* 1 */
-		0x82,0x51,0x00, /* 2 */
-		0x82,0x52,0x00, /* 3 */
-		0x82,0x53,0x00, /* 4 */
-		0x82,0x54,0x00, /* 5 */
-		0x82,0x55,0x00, /* 6 */
-		0x82,0x56,0x00, /* 7 */
-		0x82,0x57,0x00, /* 8 */
-		0x82,0x58,0x00, /* 9 */
-		0x81,0x40,0x00, /* space */
-	};
-	return suji[num];
+char *format_number(int n, int width, char *buf) {
+	if (width) {
+		sprintf(buf, "%*d", width, n);
+		return buf + strlen(buf) - width;
+	}
+	sprintf(buf, "%d", n);
+	return buf;
+}
+
+char *format_number_zenkaku(int n, int width, char *buf) {
+	char work[256];
+	char *dst = buf;
+	for (char *s = format_number(n, width, work); *s; s++) {
+		char *p = zenkaku_digits[*s == ' ' ? 10 : *s - '0'];
+		while (*p)
+			*dst++ = *p++;
+	}
+	*dst = '\0';
+	return buf;
 }

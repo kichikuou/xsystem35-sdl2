@@ -27,6 +27,7 @@
 
 extern BYTE *zen2han(const BYTE *src);
 extern BYTE *han2zen(const BYTE *src);
-extern char *num2sjis(int num);
+extern char *format_number(int n, int width, char *buf);
+extern char *format_number_zenkaku(int n, int width, char *buf);
 
 #endif /* __HANKAKU_H__ */
