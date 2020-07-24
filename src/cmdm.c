@@ -32,11 +32,10 @@
 #include "ags.h"
 #include "message.h"
 #include "gametitle.h"
+#include "hankaku.h"
 
 /* defined by cmds.c */
 extern boolean dummy_pcm_su_flag;
-/* defined by hankan2sjis.c */
-extern char *num2sjis(int num);
 /* defined by cmds.c */
 extern boolean Y3waitCancel;
 

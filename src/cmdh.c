@@ -25,9 +25,7 @@
 #include <string.h>
 #include "portab.h"
 #include "xsystem35.h"
-
-/* defined by hankana2sjis.c */
-extern char *num2sjis(int num);
+#include "hankaku.h"
 
 void commandH() {
 	int fig = sys_getc();

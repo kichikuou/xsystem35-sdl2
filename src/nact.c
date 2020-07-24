@@ -38,6 +38,7 @@
 #include "message.h"
 #include "input.h"
 #include "menu.h"
+#include "hankaku.h"
 
 /*
 
@@ -51,11 +52,6 @@ MG コマンド: 表示時の ZH に依存
 
 */
 
-/* defined in hankaku.c */
-extern BYTE *zen2han(const BYTE *src);
-extern BYTE *han2zen(const BYTE *src);
-/* defined by hankan2sjis.c */
-extern char *hankana2sjis(int index);
 /* defined by cmd_check.c */
 extern void check_command(int c0);
 /* defined by cmdv.c */
