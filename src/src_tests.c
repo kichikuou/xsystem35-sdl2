@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 void gameresource_test(void);
+void hankaku_test(void);
 
 void sys_error(char *format, ...) {
 	va_list args;
@@ -32,5 +33,6 @@ void sys_error(char *format, ...) {
 
 int main() {
 	gameresource_test();
+	hankaku_test();
 	return 0;
 }

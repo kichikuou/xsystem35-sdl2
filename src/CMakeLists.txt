@@ -1,5 +1,9 @@
 add_library(src_lib STATIC
-  gameresource.c)
+  gameresource.c
+  hankaku.c
+  utfsjis.c
+  )
+target_compile_options(src_lib PRIVATE -Wno-pointer-sign)
 
 if (ANDROID)
   add_library(xsystem35 SHARED)
@@ -43,13 +47,12 @@ target_sources(xsystem35 PRIVATE
 
 # Misc
 target_sources(xsystem35 PRIVATE
-  LittleEndian.c counter.c input.c profile.c mt19937-1.c utfsjis.c
-  filecheck.c)
+  LittleEndian.c counter.c input.c profile.c mt19937-1.c filecheck.c)
 
 # Scenario
 target_sources(xsystem35 PRIVATE
   cali.c scenario.c variable.c cmd_check.c nact.c
-  selection.c message.c savedata.c hankaku.c s39ain.c texthook.c)
+  selection.c message.c savedata.c s39ain.c texthook.c)
 
 # Graphics
 target_sources(xsystem35 PRIVATE
@@ -109,7 +112,12 @@ else()  # non-emscripten, non-android
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)
 
-  add_executable(src_tests src_tests.c gameresource_test.c)
+  add_executable(src_tests
+    src_tests.c
+    gameresource_test.c
+    hankaku_test.c
+    )
+  target_compile_options(src_tests PRIVATE -Wno-pointer-sign)
   target_link_libraries(src_tests PRIVATE src_lib)
   add_test(NAME src_tests COMMAND src_tests)
   configure_file(testdata/test.gr ${CMAKE_CURRENT_BINARY_DIR}/testdata/test.gr COPYONLY)
