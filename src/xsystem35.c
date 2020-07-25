@@ -138,7 +138,6 @@ static void sys35_usage(boolean verbose) {
 	
 	puts(" -devjoy device : set joystic device name to 'device'");
 	puts("                    if 'device' is set to 'none', don't use the device");
-	puts(" -savekanji #   : kanji code of filename (0 or 1 ... 0:utf-8, 1:sjis)");
 
 	puts(" -devfont device: select font device");
 #ifdef ENABLE_SDLTTF
@@ -380,10 +379,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			if (argv[i + 1] != NULL) {
 				joy_set_devicename(argv[i + 1]);
 			}
-		} else if (0 == strcmp(argv[i], "-savekanji")) {
-			if (argv[i + 1] != NULL) {
-				fc_set_default_kanjicode(argv[i + 1][0] - '0');
-			}
 		} else if (0 == strcmp(argv[i], "-fullscreen")) {
 			fs_on = TRUE;
 		} else if (0 == strcmp(argv[i], "-noantialias")) {
@@ -502,11 +497,6 @@ static void check_profile() {
 		if (0 == strcmp(param, "Yes")) {
 			SetNoShmMode();
 		}
-	}
-	/* qe-kanjicode flag */
-	param = get_profile("qe-kanjicode");
-	if (param) {
-		fc_set_default_kanjicode(*param - '0');
 	}
 	/* disable image cursor */
 	param = get_profile("no_imagecursor");
