@@ -84,7 +84,6 @@ static void    check_profile();
 /* for debugging */
 static FILE *fpdebuglog;
 static int debuglv = DEBUGLEVEL;
-int sys_nextdebuglv;
 
 static int audio_buffer_size = 0;
 
@@ -182,8 +181,8 @@ static void sys35_usage(boolean verbose) {
 	exit(1);
 }
 
-void sys_message(char *format, ...) {
-	if (debuglv < sys_nextdebuglv)
+void sys_message(int lv, char *format, ...) {
+	if (debuglv < lv)
 		return;
 
 	va_list args;
@@ -198,10 +197,10 @@ void sys_message(char *format, ...) {
 		ANDROID_LOG_INFO,
 		ANDROID_LOG_VERBOSE,
 	};
-	int prio = prio_table[min(sys_nextdebuglv, 5)];
+	int prio = prio_table[min(lv, 5)];
 	__android_log_vprint(prio, "xsystem35", format, args);
 #elif defined (DEBUG)
-	if (sys_nextdebuglv >= 5) {
+	if (lv >= 5) {
 		vfprintf(fpdebuglog, format, args);
 		fflush(fpdebuglog);
 	} else {

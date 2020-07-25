@@ -44,11 +44,12 @@
   6: add message(output to terminal or FILE)
 */
 
-#define DEBUG_SHOWSCOADR  sys_message("%d,%x: ", sl_getPage(), sl_getIndex())
 #ifdef DEBUG
-#define DEBUG_COMMAND_YET sys_nextdebuglv = 2, DEBUG_SHOWSCOADR, sys_message
-#define DEBUG_COMMAND     sys_nextdebuglv = 5, DEBUG_SHOWSCOADR, sys_message
-#define DEBUG_MESSAGE     sys_nextdebuglv = 6, sys_message
+#define DEBUG_COMMAND_YET(fmt, ...) \
+	sys_message(2, fmt "%d,%x: ", sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
+#define DEBUG_COMMAND(fmt, ...) \
+	sys_message(5, fmt "%d,%x: ", sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
+#define DEBUG_MESSAGE(...)     sys_message(6, __VA_ARGS__)
 #else
 #define DEBUG_MESSAGE(...)
 #define DEBUG_COMMAND(...)

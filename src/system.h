@@ -26,20 +26,11 @@
 
 #include "config.h"
 
-#ifndef HAVE_FUNC
-#ifndef  __GNUC__
-#define __func__ ""
-#else 
-#define __func__ __FUNCTION__
-#endif
-#endif
-
 /* should define in somewhere */ 
 extern void sys_error(char *format, ...);    /* show nessafe and exit system */
 extern void sys_exit(int code);              /* exit system with code */
-extern void sys_message(char *format, ...);  /* show various message */
+extern void sys_message(int lv, char *format, ...);  /* show various message */
 extern void sys_reset();
-extern int  sys_nextdebuglv;                 /* message level */
 
 /*
  DEBUGLEVEL
@@ -56,14 +47,13 @@ extern int  sys_nextdebuglv;                 /* message level */
 #endif /* DEBUG */
 
 #define NOMEMERR()        sys_error("Out of memory at %s()\n", __func__)
-#define NOTICE            sys_nextdebuglv = 2, sys_message
+#define NOTICE(...)       sys_message(2, __VA_ARGS__)
 
-#define WARNING           sys_nextdebuglv = 1, \
-                          sys_message("*WARNING*(%s): ", __func__), sys_message
-
-#define SYSERROR          fprintf(stderr, "*ERROR*(%s): ", __func__), sys_error
-
-#define SACT_DEBUG        sys_nextdebuglv = 5, \
-                          sys_message("%s: ", __func__), sys_message
+#define SYSERROR(fmt, ...) \
+	sys_error("*ERROR*(%s): " fmt, __func__, ##__VA_ARGS__)
+#define WARNING(fmt, ...) \
+	sys_message(1, "*WARNING*(%s): " fmt, __func__, ##__VA_ARGS__)
+#define SACT_DEBUG(fmt, ...) \
+	sys_message(5, "%s: " fmt, __func__, ##__VA_ARGS__)
 
 #endif /* !__SYSTEM__ */
