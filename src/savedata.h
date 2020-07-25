@@ -120,11 +120,11 @@ extern int save_saveAll(int no);
 extern int save_loadPartial(int no, int page, int offset, int cnt);
 extern int save_savePartial(int no, int page, int offset, int cnt);
 extern int save_copyAll(int dstno, int srcno);
-extern int save_save_var_with_file(char *filename, int *start, int cnt);
-extern int save_load_var_with_file(char *filename, int *start, int cnt);
-extern int save_save_str_with_file(char *filename, int start, int cnt);
-extern int save_load_str_with_file(char *filename, int start, int cnt);
-extern BYTE* load_cg_with_file(char *file, int *status, long *filesize);
+extern int save_save_var_with_file(char *fname_utf8, int *start, int cnt);
+extern int save_load_var_with_file(char *fname_utf8, int *start, int cnt);
+extern int save_save_str_with_file(char *fname_utf8, int start, int cnt);
+extern int save_load_str_with_file(char *fname_utf8, int start, int cnt);
+extern BYTE* load_cg_with_file(char *fname_utf8, int *status, long *filesize);
 extern const char *save_get_file(int index);
 extern int save_delete_file(int index);
 

@@ -23,9 +23,11 @@
 /* $Id: cmdq.c,v 1.12 2003/01/25 01:34:50 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "xsystem35.h"
 #include "savedata.h"
+#include "utfsjis.h"
 
 #define WARN_SAVEERR(cmd, st) \
 if (st > 200) fprintf(stderr, "WARNING: Fail to save (cmd=%s, stat=%d)\n", cmd, st)
@@ -85,21 +87,23 @@ void commandQE() {
 	char *filename = sys_getString(':');
 	int *var, _var = 0, cnt;
 
+	char *fname_utf8 = sjis2utf(filename);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();
 		cnt = getCaliValue();
-		sysVar[0] = save_save_var_with_file(filename, var, cnt);
+		sysVar[0] = save_save_var_with_file(fname_utf8, var, cnt);
 		break;
 	case 1:
 		_var = getCaliValue();
 		cnt  = getCaliValue();
-		sysVar[0] = save_save_str_with_file(filename, _var, cnt);
+		sysVar[0] = save_save_str_with_file(fname_utf8, _var, cnt);
 		break;
 	default:
-		WARNING("Unknown QE command %d\n", type); return;
+		WARNING("Unknown QE command %d\n", type);
+		break;
 	}
-	
+	free(fname_utf8);
 	WARN_SAVEERR("QE", sysVar[0]);
 	
 	DEBUG_COMMAND("QE %d,%s,%d,%d:\n", type, filename, _var, cnt);

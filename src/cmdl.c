@@ -24,6 +24,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
@@ -32,6 +33,7 @@
 #include "xsystem35.h"
 #include "dri.h"
 #include "savedata.h"
+#include "utfsjis.h"
 #include "cg.h"
 
 void commandLD() {
@@ -109,21 +111,24 @@ void commandLE() {
 	char *filename = sys_getString(':');
 	int *var, _var = 0;
 	int num;
-	
+
+	char *fname_utf8 = sjis2utf(filename);
 	switch(type) {
 	case 0: /* T2 */
 		var = getCaliVariable();
 		num  = getCaliValue();
-		sysVar[0] = save_load_var_with_file(filename, var, num);		
+		sysVar[0] = save_load_var_with_file(fname_utf8, var, num);
 		break;
 	case 1: /* 456 */
 		_var = getCaliValue();
 		num  = getCaliValue();
-		sysVar[0] = save_load_str_with_file(filename, _var, num);
+		sysVar[0] = save_load_str_with_file(fname_utf8, _var, num);
 		break;
 	default:
-		WARNING("Unknown LE command %d\n", type); return;
+		WARNING("Unknown LE command %d\n", type);
+		break;
 	}
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LE %d,%s,%d,%d:\n",type, filename, _var, num);
 }
@@ -241,7 +246,9 @@ void commandLC() {
 	int y = getCaliValue();
 	char *filename = sys_getString(':'); 
 	
-	sysVar[0] = cg_load_with_filename(filename, x, y);
+	char *fname_utf8 = sjis2utf(filename);
+	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LC %d,%d,%s:\n", x, y, filename);
 }

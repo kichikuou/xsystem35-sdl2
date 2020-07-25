@@ -476,14 +476,14 @@ void cg_load_with_alpha(int cgno, int shadowno) {
  *   y   : display location y
  *   return: file read status
 */
-int cg_load_with_filename(char *name, int x, int y) {
+int cg_load_with_filename(char *fname_utf8, int x, int y) {
 	int status, type;
 	long filesize;
 	BYTE *data;
 	cgdata *cg = NULL;
 	MyPoint p;
 	
-	data = load_cg_with_file(name, &status, &filesize);
+	data = load_cg_with_file(fname_utf8, &status, &filesize);
 	if (data == NULL) return status;
 	
 	cg_set_display_location(x, y, OFFSET_ABSOLUTE_GC);

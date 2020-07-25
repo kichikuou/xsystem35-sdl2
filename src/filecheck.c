@@ -34,7 +34,6 @@
 #endif
 
 #include "filecheck.h"
-#include "utfsjis.h"
 
 static char *saveDataPath;
 
@@ -64,15 +63,13 @@ FILE *fopen_utf8(const char *path_utf8, char type) {
 	return _wfopen(wpath, type == 'r' ? L"rb" : L"wb");
 }
 
-FILE *fc_open(const char *fname_sjis, char type) {
-	char *fname_utf8 = sjis2utf(fname_sjis);
-	char *path_utf8 = get_fullpath(saveDataPath, fname_utf8);
-	FILE *fp = fopen_utf8(path_utf8, type);
+FILE *fc_open(const char *fname_utf8, char type) {
+	char *path = get_fullpath(saveDataPath, fname_utf8);
+	FILE *fp = fopen_utf8(path, type);
 	if (!fp && type == 'r') {
 		fp = fopen_utf8(fname_utf8, type);
 	}
-	free(path_utf8);
-	free(fname_utf8);
+	free(path);
 	return fp;
 }
 
@@ -95,16 +92,13 @@ static char *fc_search(const char *fname_utf8, const char *dir) {
 	return found;
 }
 
-FILE *fc_open(const char *fname_sjis, char type) {
-	BYTE *fname_utf8 = sjis2utf(fname_sjis);
+FILE *fc_open(const char *fname_utf8, char type) {
 	char *fullpath = fc_search(fname_utf8, saveDataPath);
 	if (!fullpath) {
 		if (type == 'r') {
 			fullpath = fc_search(fname_utf8, ".");
-			if (!fullpath) {
-				free(fname_utf8);
+			if (!fullpath)
 				return NULL;
-			}
 		} else {
 			fullpath = get_fullpath(saveDataPath, fname_utf8);
 		}
@@ -118,7 +112,6 @@ FILE *fc_open(const char *fname_sjis, char type) {
 		fp = fopen(fullpath, "rb");
 	}
 	free(fullpath);
-	free(fname_utf8);
 	return fp;
 }
 #endif // _WIN32

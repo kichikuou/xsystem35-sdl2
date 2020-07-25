@@ -367,7 +367,9 @@ void commands2F23() {
 	int y = getCaliValue();
 	char *vFileName = sys_getString(0);
 	
-	sysVar[0] = cg_load_with_filename(vFileName, x, y);
+	char *fname_utf8 = sjis2utf(vFileName);
+	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LC(new) %d, %d, %s:\n", x, y, vFileName);
 }
@@ -378,18 +380,20 @@ void commands2F24() {
 	int *var = NULL, _var = 0;
 	int num = 0;
 
+	char *fname_utf8 = sjis2utf(file_name);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();
 		num  = getCaliValue();
-		sysVar[0] = save_load_var_with_file(file_name, var, num);        
+		sysVar[0] = save_load_var_with_file(fname_utf8, var, num);
 		break;
 	case 1:
 		_var = getCaliValue();
 		num  = getCaliValue();
-		sysVar[0] = save_load_str_with_file(file_name, _var, num);
+		sysVar[0] = save_load_str_with_file(fname_utf8, _var, num);
 		break;
 	}
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LE(new) %d, %s, %d, %d:\n", type, file_name, var, num);
 }
@@ -485,20 +489,23 @@ void commands2F2A() {
 	char *file_name = sys_getString(0);
 	int *var, _var = 0, cnt;
 
+	char *fname_utf8 = sjis2utf(file_name);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();
 		cnt = getCaliValue();
-		sysVar[0] = save_save_var_with_file(file_name, var, cnt);
+		sysVar[0] = save_save_var_with_file(fname_utf8, var, cnt);
 		break;
 	case 1:
 		_var = getCaliValue();
 		cnt  = getCaliValue();
-		sysVar[0] = save_save_str_with_file(file_name, _var, cnt);
+		sysVar[0] = save_save_str_with_file(fname_utf8, _var, cnt);
 		break;
 	default:
-		WARNING("Unknown QE command\n"); return;
+		WARNING("Unknown QE command\n");
+		break;
 	}
+	free(fname_utf8);
 
 	DEBUG_COMMAND("QE(new) %d, %s, %d, %d:\n", type, file_name, _var, cnt);
 }

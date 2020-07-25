@@ -36,7 +36,6 @@
 #include "scenario.h"
 #include "xsystem35.h"
 #include "LittleEndian.h"
-#include "utfsjis.h"
 #include "filecheck.h"
 #include "windowframe.h"
 #include "selection.h"
@@ -78,7 +77,7 @@ int save_delete_file(int index) {
 }
 
 /* 指定ファイルへの変数の書き込み */
-int save_save_var_with_file(char *filename, int *start, int cnt) {
+int save_save_var_with_file(char *fname_utf8, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
 	WORD *tmp, *_tmp;
@@ -98,7 +97,7 @@ int save_save_var_with_file(char *filename, int *start, int cnt) {
 #endif
 	}
 	
-	if (NULL == (fp = fc_open(filename, 'w'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'w'))) {
 		status = SAVE_SAVEERR; goto errexit;
 	}
 	
@@ -119,7 +118,7 @@ int save_save_var_with_file(char *filename, int *start, int cnt) {
 }
 
 /* 指定ファイルからの変数の読み込み */
-int save_load_var_with_file(char *filename, int *start, int cnt) {
+int save_load_var_with_file(char *fname_utf8, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
 	WORD *tmp, *_tmp;
@@ -131,7 +130,7 @@ int save_load_var_with_file(char *filename, int *start, int cnt) {
 		return SAVE_LOADERR;
 	}
 	
-	if (NULL == (fp = fc_open(filename, 'r'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
 		status = SAVE_LOADERR; goto errexit;
 	}
 	
@@ -159,7 +158,7 @@ int save_load_var_with_file(char *filename, int *start, int cnt) {
 
 
 /* 指定ファイルへの文字列の書き込み, start = 1~ */
-int save_save_str_with_file(char *filename, int start, int cnt) {
+int save_save_str_with_file(char *fname_utf8, int start, int cnt) {
 	int status = 0, size, _size,i;
 	FILE *fp;
 	char *tmp, *_tmp;
@@ -177,8 +176,7 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 		tmp += strlen(tmp) + 1;
 	}
 	
-	
-	if (NULL == (fp = fc_open(filename, 'w'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'w'))) {
 		status = SAVE_SAVEERR; goto errexit;
 	}
 	size = tmp - _tmp;
@@ -199,13 +197,13 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 }
 
 /* 指定ファイルからの文字列の読み込み */
-int save_load_str_with_file(char *filename, int start, int cnt) {
+int save_load_str_with_file(char *fname_utf8, int start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
 	char *tmp, *_tmp=NULL;
 	long filesize;
 	
-	if (NULL == (fp = fc_open(filename, 'r'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
 		return SAVE_LOADERR;
 	}
 	
@@ -745,14 +743,14 @@ static int saveGameData(int no, char *buf, int size) {
 }
 
 /* 指定ファイルからの画像の読み込み thanx tajiru@wizard */
-BYTE* load_cg_with_file(char *filename, int *status, long *filesize){
+BYTE* load_cg_with_file(char *fname_utf8, int *status, long *filesize){
 	int size;
 	FILE *fp;
 	static BYTE *tmp;
 	
 	*status = 0;
 	
-	if (NULL == (fp = fc_open(filename, 'r'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
 		*status = SAVE_LOADERR; return NULL;
 	}
 	
