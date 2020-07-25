@@ -72,12 +72,6 @@ static struct dirent *mockReaddir(DIR *dir) {
 	return NULL;
 }
 
-static const char *joinPath(const char *dir, const char *fname) {
-	static char buf[512];
-	sprintf(buf, "%s/%s", dir, fname);
-	return buf;
-}
-
 static void initGameResourceFromDir_test(void) {
 	const char *files[] = {
 		"ADISK.ALD",
@@ -99,30 +93,28 @@ static void initGameResourceFromDir_test(void) {
 		NULL
 	};
 	const char **dir = files;
-	static char cwd[256];
-	getcwd(cwd, sizeof(cwd));
 	GameResource gr;
 	ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
 	ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 2);
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], joinPath(cwd, "ADISK.ALD"));
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][1], joinPath(cwd, "FOOSB.ALD"));
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "ADISK.ALD");
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][1], "FOOSB.ALD");
 	ASSERT_EQUAL(gr.cnt[DRIFILE_CG], 26);
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_CG][25], joinPath(cwd, "foogz.ald"));
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_CG][25], "foogz.ald");
 	ASSERT_EQUAL(gr.cnt[DRIFILE_WAVE], 1);
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_WAVE][0], joinPath(cwd, "WA.ALD"));
+	ASSERT_STRCMP(gr.game_fname[DRIFILE_WAVE][0], "WA.ALD");
 	for (int i = 0; i < 26; i++) {
 		char buf[16];
 		sprintf(buf, "%csleep.asd", 'a' + i);
-		ASSERT_STRCMP(gr.save_fname[i], joinPath(cwd, buf));
+		ASSERT_STRCMP(gr.save_fname[i], buf);
 	}
-	ASSERT_STRCMP(gr.save_path, cwd);
-	ASSERT_STRCMP(gr.ain, joinPath(cwd, "SYSTEM39.AIN"));
-	ASSERT_STRCMP(gr.wai, joinPath(cwd, "foo_WA.WAI"));
-	ASSERT_STRCMP(gr.bgi, joinPath(cwd, "foo_BA.BGI"));
-	ASSERT_STRCMP(gr.sact01, joinPath(cwd, "SACTEFAM.KLD"));
-	ASSERT_STRCMP(gr.init, joinPath(cwd, "System39.ini"));
-	ASSERT_STRCMP(gr.alk[0], joinPath(cwd, "0.alk"));
-	ASSERT_STRCMP(gr.alk[1], joinPath(cwd, "foo1.alk"));
+	ASSERT_STRCMP(gr.save_path, ".");
+	ASSERT_STRCMP(gr.ain, "SYSTEM39.AIN");
+	ASSERT_STRCMP(gr.wai, "foo_WA.WAI");
+	ASSERT_STRCMP(gr.bgi, "foo_BA.BGI");
+	ASSERT_STRCMP(gr.sact01, "SACTEFAM.KLD");
+	ASSERT_STRCMP(gr.init, "System39.ini");
+	ASSERT_STRCMP(gr.alk[0], "0.alk");
+	ASSERT_STRCMP(gr.alk[1], "foo1.alk");
 	for (int i = 2; i < 10; i++)
 		ASSERT_NULL(gr.alk[i]);
 }

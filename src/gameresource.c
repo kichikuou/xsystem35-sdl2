@@ -53,72 +53,70 @@ static void storeSaveName(GameResource *gr, int no, char *src) {
 	
 	if (no == 0) {
 		char *b = strrchr(src, '/');
-		if (b == NULL) {
-			SYSERROR("Illigal save filename %s\n", src);
+		if (b) {
+			*b = '\0';
+			gr->save_path = strdup(src);
+		} else {
+			gr->save_path = ".";
 		}
-		*b = '\0';
-		gr->save_path = strdup(src);
 	}
 	if (path) free(path);
 }
 
 boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_readdir)(DIR *)) {
-	char cwd[256], path[256];
-	getcwd(cwd, 255);
-
 	memset(gr, 0, sizeof(GameResource));
 
 	struct dirent* d;
 	while ((d = p_readdir(dir))) {
 		char *filename = d->d_name;
 		int len = strlen(filename);
-		sprintf(path, "%s/%s", cwd, filename);
 		if (strcasecmp(filename, "adisk.ald") == 0) {
-			storeDataName(gr, DRIFILE_SCO, 0, path);
+			storeDataName(gr, DRIFILE_SCO, 0, filename);
 		} else if (strcasecmp(filename, "System39.ain") == 0) {
-			gr->ain = strdup(path);
+			gr->ain = strdup(filename);
 		} else if (strcasecmp(filename, "SACTEFAM.KLD") == 0) {
-			gr->sact01 = strdup(path);
+			gr->sact01 = strdup(filename);
 		} else if (strcasecmp(filename, "System39.ini") == 0) {
-			gr->init = strdup(path);
+			gr->init = strdup(filename);
 		} else if (len >= 4 && strcasecmp(filename + len - 4, ".wai") == 0) {
-			gr->wai = strdup(path);
+			gr->wai = strdup(filename);
 		} else if (len >= 4 && strcasecmp(filename + len - 4, ".bgi") == 0) {
-			gr->bgi = strdup(path);
+			gr->bgi = strdup(filename);
 		} else if (len >= 5 && strcasecmp(filename + len - 4, ".alk") == 0) {
 			if (!isdigit(filename[len - 5])) continue;
-			gr->alk[filename[len - 5] - '0'] = strdup(path);
+			gr->alk[filename[len - 5] - '0'] = strdup(filename);
 		} else if (len >= 6 && strcasecmp(filename + len - 4, ".ald") == 0) {
 			int dno = toupper(filename[len - 5]) - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) continue;
 			switch (toupper(filename[len - 6])) {
 			case 'S':
-				storeDataName(gr, DRIFILE_SCO, dno, path);
+				storeDataName(gr, DRIFILE_SCO, dno, filename);
 				break;
 			case 'G':
-				storeDataName(gr, DRIFILE_CG, dno, path);
+				storeDataName(gr, DRIFILE_CG, dno, filename);
 				break;
 			case 'W':
-				storeDataName(gr, DRIFILE_WAVE, dno, path);
+				storeDataName(gr, DRIFILE_WAVE, dno, filename);
 				break;
 			case 'M':
-				storeDataName(gr, DRIFILE_MIDI, dno, path);
+				storeDataName(gr, DRIFILE_MIDI, dno, filename);
 				break;
 			case 'D':
-				storeDataName(gr, DRIFILE_DATA, dno, path);
+				storeDataName(gr, DRIFILE_DATA, dno, filename);
 				break;
 			case 'R':
-				storeDataName(gr, DRIFILE_RSC, dno, path);
+				storeDataName(gr, DRIFILE_RSC, dno, filename);
 				break;
 			case 'B':
-				storeDataName(gr, DRIFILE_BGM, dno, path);
+				storeDataName(gr, DRIFILE_BGM, dno, filename);
 				break;
 			}
 		}
 	}
 	for (int i = 0; i < SAVE_MAXNUMBER; i++) {
-		sprintf(path, "%s/%c%s", cwd, 'a' + i, "sleep.asd");
-		storeSaveName(gr, i, path);
+		char buf[] = "asleep.asd";
+		buf[0] = 'a' + i;
+		storeSaveName(gr, i, buf);
 	}
 
 	return (gr->cnt[DRIFILE_SCO] > 0) ? TRUE : FALSE;
