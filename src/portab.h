@@ -49,7 +49,11 @@
 
 typedef	unsigned char  ___BYTE;
 typedef	unsigned short ___WORD;
+#ifdef _WIN32
+typedef	unsigned long  ___DWORD;
+#else
 typedef	unsigned int   ___DWORD;
+#endif
 typedef char           ___boolean;
 
 #ifndef BYTE
