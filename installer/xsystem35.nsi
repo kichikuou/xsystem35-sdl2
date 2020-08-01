@@ -1,4 +1,3 @@
-Unicode true
 ManifestDPIAware true
 SetCompressor /SOLID lzma
 

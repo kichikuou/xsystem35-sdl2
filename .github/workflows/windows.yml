@@ -10,8 +10,10 @@ jobs:
         include:
           - mingw: "MINGW32"
             package: "mingw-w64-i686"
+            installer: "xsystem35-32bit"
           - mingw: "MINGW64"
             package: "mingw-w64-x86_64"
+            installer: "xsystem35-64bit"
     defaults:
       run:
         shell: bash.exe --login -eo pipefail "{0}"
@@ -31,18 +33,28 @@ jobs:
         echo PATH: $PATH
 
     - name: Install Deps
-      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer ${{ matrix.package }}-libjpeg-turbo
+      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer ${{ matrix.package }}-libjpeg-turbo ${{ matrix.package }}-nsis ${{ matrix.package }}-ntldd-git
 
     - name: Checkout
       uses: actions/checkout@v2
 
     - name: Build
       run: |
-        mkdir -p out/debug
-        cd out/debug
-        cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../
+        mkdir -p out/release
+        cd out/release
+        cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release ../../
         make
 
     - name: Test
       run: ctest --output-on-failure
-      working-directory: out/debug
+      working-directory: out/release
+
+    - name: Package
+      working-directory: installer
+      run: ./make-installer.sh ../out/release ${{ matrix.installer }}.nsi
+
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.installer }}
+        path: installer/${{ matrix.installer }}.exe
