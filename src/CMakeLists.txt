@@ -4,6 +4,7 @@ add_library(src_lib STATIC
   utfsjis.c
   )
 target_compile_options(src_lib PRIVATE -Wno-pointer-sign)
+target_include_directories(src_lib PRIVATE .)
 
 if (ANDROID)
   add_library(xsystem35 SHARED)
@@ -12,6 +13,7 @@ else()
 endif()
 
 target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign)
+target_include_directories(xsystem35 PRIVATE .)
 target_link_libraries(xsystem35 PRIVATE src_lib)
 
 target_sources(xsystem35 PRIVATE
@@ -61,6 +63,10 @@ target_sources(xsystem35 PRIVATE
 # Network
 target_sources(xsystem35 PRIVATE
   network.c)
+
+if (WIN32)
+  target_sources(xsystem35 PRIVATE win/dialog.c)
+endif()
 
 if (EMSCRIPTEN)
 

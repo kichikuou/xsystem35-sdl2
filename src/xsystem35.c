@@ -50,6 +50,10 @@
 #include <android/log.h>
 #endif
 
+#ifdef _WIN32
+#include "win/dialog.h"
+#endif
+
 #include "nact.h"
 #include "portab.h"
 #include "xsystem35.h"
@@ -564,6 +568,12 @@ int main(int argc, char **argv) {
 	if (strcmp(argv[1], "-gamedir") == 0)
 		chdir(argv[2]);
 #endif
+#ifdef _WIN32
+	if (argc == 1) {
+		if (!select_game_folder())
+			return 0;
+	}
+#endif
 	
 	load_profile();
 	check_profile();
@@ -576,8 +586,14 @@ int main(int argc, char **argv) {
 		}
 	}
 #endif
-	if (!initGameResource(&nact->files, gameResourceFile))
+	if (!initGameResource(&nact->files, gameResourceFile)) {
+#ifdef _WIN32
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)", NULL);
+		exit(1);
+#else
 		sys35_usage(TRUE);
+#endif
+	}
 	registerGameFiles();
 	
 #ifdef HAVE_SIGACTION
