@@ -29,6 +29,7 @@
 #include <limits.h>
 #ifdef _WIN32
 #include <windows.h>
+#include "win/resources.h"
 #undef ERROR
 #undef min
 #undef max
@@ -39,7 +40,7 @@
 
 #define RC_NAME ".xsys35rc"
 #define RC_LINE_CHARS_MAX 256
-#define REGKEY_PROFILE "Software\\Kichikuou\\xsystem35\\profile"
+#define REGKEY_PROFILE XSYSTEM35_REGKEY "\\profile"
 
 struct profile_kv {
 	char *name;

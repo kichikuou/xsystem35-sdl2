@@ -20,21 +20,38 @@
 #include <shlobj.h>
 #include "resources.h"
 
+#define REGVAL_RECENT_FOLDER "RecentFolder"
+
+static int CALLBACK select_game_callback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
+	if (uMsg == BFFM_INITIALIZED)
+		SendMessage(hwnd, BFFM_SETSELECTION, (WPARAM)TRUE, lpData);
+	return 0;
+}
+
 boolean select_game_folder(void) {
 	char title[256];
 	LoadString(GetModuleHandle(NULL), IDS_CHOOSE_GAME_FOLDER, title, sizeof(title));
 
+	char path[MAX_PATH] = "";
+	DWORD value_size = sizeof(path);
+	RegGetValue(HKEY_CURRENT_USER, XSYSTEM35_REGKEY, REGVAL_RECENT_FOLDER,
+				RRF_RT_REG_SZ, NULL, path, &value_size);
+
 	BROWSEINFO bi = {
 		.lpszTitle = title,
 		.ulFlags = BIF_RETURNONLYFSDIRS,
+		.lpfn = &select_game_callback,
+		.lParam = (LPARAM)path,
 	};
 	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	if (!pidl)
 		return FALSE;
-	char path[MAX_PATH];
 	SHGetPathFromIDList(pidl, path);
 	CoTaskMemFree(pidl);
 	if (!SetCurrentDirectory(path))
 		return FALSE;
+
+	RegSetKeyValue(HKEY_CURRENT_USER, XSYSTEM35_REGKEY, REGVAL_RECENT_FOLDER,
+				   REG_SZ, path, strlen(path) + 1);
 	return TRUE;
 }

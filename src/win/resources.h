@@ -19,6 +19,8 @@
 #ifndef __RESOURCES_H__
 #define __RESOURCES_H__
 
+#define XSYSTEM35_REGKEY "Software\\Kichikuou\\xsystem35"
+
 #define IDS_CHOOSE_GAME_FOLDER 1001
 
 #endif /* __RESOURCES_H__ */
