@@ -1,1 +1,17 @@
+#pragma code_page(65001)
+#include <afxres.h>
+#include "resources.h"
+
 100 ICON DISCARDABLE "xsystem35.ico"
+
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+STRINGTABLE
+{
+	IDS_CHOOSE_GAME_FOLDER "Choose a game folder:"
+}
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+STRINGTABLE
+{
+	IDS_CHOOSE_GAME_FOLDER "ゲームフォルダを選んでください:"
+}

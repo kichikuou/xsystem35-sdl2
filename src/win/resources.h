@@ -16,25 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#include <windows.h>
-#include <shlobj.h>
-#include "resources.h"
+#ifndef __RESOURCES_H__
+#define __RESOURCES_H__
 
-boolean select_game_folder(void) {
-	char title[256];
-	LoadString(GetModuleHandle(NULL), IDS_CHOOSE_GAME_FOLDER, title, sizeof(title));
+#define IDS_CHOOSE_GAME_FOLDER 1001
 
-	BROWSEINFO bi = {
-		.lpszTitle = title,
-		.ulFlags = BIF_RETURNONLYFSDIRS,
-	};
-	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
-	if (!pidl)
-		return FALSE;
-	char path[MAX_PATH];
-	SHGetPathFromIDList(pidl, path);
-	CoTaskMemFree(pidl);
-	if (!SetCurrentDirectory(path))
-		return FALSE;
-	return TRUE;
-}
+#endif /* __RESOURCES_H__ */
