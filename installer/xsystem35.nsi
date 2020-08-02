@@ -29,7 +29,7 @@ Section
 	WriteUninstaller $INSTDIR\uninstall.exe
 
 	WriteRegStr HKLM "Software\Kichikuou\xsystem35\profile" "ttfont_gothic" "$INSTDIR\fonts\MTLc3m.ttf"
-	WriteRegStr HKLM "Software\Kichikuou\xsystem35\profile" "ttfont_mincho" "$INSTDIR\fonts\mincho.ttf"
+	WriteRegStr HKLM "Software\Kichikuou\xsystem35\profile" "ttfont_mincho" "$INSTDIR\fonts\mincho.otf"
 
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xsystem35" "DisplayName" "xsystem35 (remove only)"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\xsystem35" "UninstallString" '"$INSTDIR\uninstall.exe"'
