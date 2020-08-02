@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 #include <jpeglib.h>
-#undef ERROR
 #undef max
 #undef min
 

@@ -33,7 +33,6 @@
 #define	YES		1
 #define	NO		0
 #define OK		0
-#define ERROR	      (-1)
 #define NG	      (-1)
 #define true            1
 #define false           0
