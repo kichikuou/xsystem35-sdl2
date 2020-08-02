@@ -65,7 +65,7 @@ target_sources(xsystem35 PRIVATE
   network.c)
 
 if (WIN32)
-  target_sources(xsystem35 PRIVATE win/dialog.c)
+  target_sources(xsystem35 PRIVATE win/dialog.c win/resources.rc)
 endif()
 
 if (EMSCRIPTEN)

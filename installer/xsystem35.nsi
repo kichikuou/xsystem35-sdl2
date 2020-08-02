@@ -13,6 +13,13 @@ UninstPage instfiles
 
 LicenseData ..\COPYING
 
+!define SHCNE_ASSOCCHANGED 0x08000000
+!define SHCNF_IDLIST 0
+Function RefreshShellIcons
+	System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v \
+		(${SHCNE_ASSOCCHANGED}, ${SHCNF_IDLIST}, 0, 0)'
+FunctionEnd
+
 Section
 	SetOutPath $INSTDIR
 	FILE ${BUILDDIR}\src\xsystem35.exe
@@ -33,8 +40,9 @@ LangString FileAssociation ${LANG_JAPANESE} ".ALD ファイルに関連付け"
 Section "$(FileAssociation)"
 	WriteRegStr HKCR ".ald" "" "System35Archive"
 	WriteRegStr HKCR "System35Archive" "" "AliceSoft System 3.x archive"
-	WriteRegStr HKCR "System35Archive\DefaultIcon" "" "$INSTDIR\xsystem35.exe,1"
+	WriteRegStr HKCR "System35Archive\DefaultIcon" "" "$INSTDIR\xsystem35.exe,0"
 	WriteRegStr HKCR "System35Archive\shell\open\command" "" '"$INSTDIR\xsystem35.exe" "%1"'
+	Call RefreshShellIcons
 SectionEnd
 
 LangString DesktopIcon ${LANG_ENGLISH} "Create Desktop icon"
