@@ -1340,9 +1340,7 @@ void commands2F7D() {
 	int index = sys_getdw();
 	
 	commandH();
-	sys_addMsg(nact->ain.msg[index]);
 	
-	// DEBUG_COMMAND_YET("2F7D %d, %d, %d:\n", index, page, p1);
 	DEBUG_COMMAND("2F7D %d:\n", index);
 }
 
@@ -1350,9 +1348,7 @@ void commands2F7E() {
 	int index = sys_getdw();
 	
 	commandHH();
-	sys_addMsg(nact->ain.msg[index]);
 	
-	//DEBUG_COMMAND_YET("2F7E %d, %d, %d:\n", index, p1, p2);
 	DEBUG_COMMAND("2F7E %d:\n", index);
 }
 
@@ -1361,7 +1357,6 @@ void commands2F7F() {
 	int p1    = sys_getCaliValue();
 	
 	sys_addMsg(v_str(p1 -1));
-	sys_addMsg(nact->ain.msg[index]);
 	
 	DEBUG_COMMAND("2F7F %d, %d(%s,%s):\n", index, p1, nact->ain.msg[index], v_str(p1 -1));
 }
