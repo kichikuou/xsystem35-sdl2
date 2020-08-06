@@ -1,24 +1,24 @@
 # xsytem35-sdl2
 
-アリスソフトのゲームエンジン System3.x のフリー実装である xsystem35 を SDL2 に対応して、emscripten でコンパイルできるようにしたものです。
+This is a multi-platform port of xsystem35, a free implementation of AriceSoft's System3.x game engine.
 
-## ビルド方法
-### Linux
+## Download
+Prebuilt binaries for Windows and Android can be downloaded from the [Releases](https://github.com/kichikuou/xsystem35-sdl2/releases) page.
 
-[cmake](https://cmake.org/) が必要です。
+## Build
+### Linux (Debian / Ubuntu)
 
+    $ sudo apt install build-essential cmake libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev
     $ mkdir -p out/debug
     $ cd out/debug
     $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
     $ make && make install
 
-cmake の実行でエラーになる場合は必要なライブラリをインストールしてください。
-
-グラフィックスシステムとして X11 と SDL2 が使用可能です。両方存在する場合は X11 が優先されますが、`cmake` のオプションに `-DENABLE_X11=NO` を指定すると SDL2 が使われます。
+You can choose between X11 and SDL2 as the graphics backend. If both libraries are found, X11 is used by default, but if `-DENABLE_X11=NO` flag is given to the `cmake` invocation, then SDL2 will be used.
 
 ### MacOS
 
-[Homebrew](https://brew.sh/index_ja) が必要です。
+[Homebrew](https://brew.sh/index_ja) is needed.
 
     $ brew install cmake pkg-config sdl2 sdl2_mixer freetype libjpeg
     $ mkdir -p out/debug
@@ -28,7 +28,7 @@ cmake の実行でエラーになる場合は必要なライブラリをイン�
 
 ### Windows
 
-[MSYS2](https://www.msys2.org) が必要です。
+[MSYS2](https://www.msys2.org) is needed.
 
     $ pacman -S cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-libjpeg-turbo
     $ mkdir -p out/debug
@@ -43,8 +43,8 @@ cmake の実行でエラーになる場合は必要なライブラリをイン�
     $ emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../../
     $ make
 
-実行するには、[鬼畜王 on Webのリポジトリ](https://github.com/kichikuou/web)をチェックアウトして、`docs`ディレクトリに `out/xsystem35.*` をすべてコピーしてください。
+To use the generated binary, checkout [Kichikuou on Web](https://github.com/kichikuou/web) and copy `out/xsystem35.*` into its `docs` directory.
 
 ### Android
 
-[android/README.md](android/) を参照してください。
+See [android/README.md](android/).
