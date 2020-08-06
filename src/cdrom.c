@@ -92,18 +92,16 @@ int cd_init(cdromdevice_t *cd) {
 		memcpy(cd, DEV_PLAY_MODE, sizeof(cdromdevice_t));
 		ret = cd->init(dev);
 	}
+	else {
 #ifdef ENABLE_CDROM_MP3
-	else if (S_ISREG(st.st_mode)) {
 		/* MP3 MODE */
 		memcpy(cd, &cdrom_mp3, sizeof(cdromdevice_t));
 		ret = cd->init(dev);
-		memcpy(cd, &cdrom_mp3, sizeof(cdromdevice_t));
-	}
-#endif
-	else {
+#else
 		/* error */
 		WARNING("no cdrom device available\n");
 		ret = NG;
+#endif
 	}
 	return ret;
 #endif  // ENABLE_CDROM_EMSCRIPTEN || ENABLE_CDROM_ANDROID

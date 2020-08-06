@@ -89,15 +89,20 @@ static int          trackno; // 現在演奏中のトラック
 static int          counter; // 演奏時間測定用カウンタ
 
 static int cdrom_init(char *config_file) {
-	FILE *fp;
 	char lbuf[256];
-	int lcnt = 0;
+	int lcnt = 1;
 	char *s;
 	
-	if (NULL == (fp = fopen(config_file, "rt"))) return NG;
-	// Skip the first line
-	fgets(lbuf, sizeof(lbuf), fp); lcnt++;
-	
+	FILE *fp = fopen(config_file, "rt");
+	if (fp) {
+		// Skip the first line
+		fgets(lbuf, sizeof(lbuf), fp);
+	} else {
+		fp = fopen("_inmm.ini", "rt");
+	}
+	if (!fp)
+		return NG;
+
 	while (TRUE) {
 		if (++lcnt >= (PLAYLIST_MAX +2)) {
 			break;
