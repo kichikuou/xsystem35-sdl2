@@ -549,7 +549,7 @@ static void registerGameFiles(void) {
 	if (nact->files.cnt[DRIFILE_SCO] == 0)
 		SYSERROR("No Scenario data available\n");
 	for (int type = 0; type < DRIFILETYPEMAX; type++)
-		ald_init(type, nact->files.game_fname[type], nact->files.cnt[type], TRUE);
+		ald_init(type, nact->files.game_fname[type], nact->files.cnt[type]);
 	if (nact->files.save_path)
 		fc_init(nact->files.save_path);
 }

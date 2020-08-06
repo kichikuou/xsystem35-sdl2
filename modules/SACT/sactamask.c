@@ -27,13 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#ifdef HAVE_MMAP
-#include <sys/mman.h>
-#endif
 
 #include "portab.h"
 #include "system.h"
@@ -62,55 +55,21 @@ static ecopyparam_t ecp;
 
 // SACTEFAM.KLD の読み込み
 int smask_init(char *path) {
-	struct stat sbuf;
-	int i, fd;
-	char *adr;
+	int i;
 	SACTEFAM_t *am;
 
-	if (0 > (fd = open(path, O_RDONLY))) {
-		WARNING("open: %s\n", strerror(errno));
+	mmap_t *m = map_file(path);
+	if (!m)
 		return NG;
-	}
-	
-	if (0 > fstat(fd, &sbuf)) {
-		WARNING("fstat: %s\n", strerror(errno));
-		close(fd);
-		return NG;
-	}
-
-#ifdef HAVE_MMAP
-	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
-		WARNING("mmap: %s\n", strerror(errno));
-		close(fd);
-		return NG;
-	}
-#else
-	adr = malloc(sbuf.st_size);
-	size_t bytes = 0;
-	while (bytes < sbuf.st_size) {
-		ssize_t ret = read(fd, adr + bytes, sbuf.st_size - bytes);
-		if (ret <= 0) {
-			WARNING("read: %s\n", strerror(errno));
-			close(fd);
-			free(adr);
-			return NG;
-		}
-		bytes += ret;
-	}
-#endif
-	close(fd);
-	
 	am = &sact.am;
-	am->mapadr = adr;
-	am->size = sbuf.st_size;
-	
-	am->datanum = LittleEndian_getDW(adr, 0);
+	am->mmap = m;
+	am->datanum = LittleEndian_getDW(m->addr, 0);
 	am->no = malloc(sizeof(int) * am->datanum);
 	am->offset = malloc(sizeof(int) * am->datanum);
 	
 	for (i = 0; i < am->datanum; i++) {
-		am->no[i] = LittleEndian_getDW(adr, 16 + i * 16);
-		am->offset[i] = LittleEndian_getDW(adr, 16 + i * 16 + 8);
+		am->no[i] = LittleEndian_getDW(m->addr, 16 + i * 16);
+		am->offset[i] = LittleEndian_getDW(m->addr, 16 + i * 16 + 8);
 	}
 	
 	return OK;
@@ -127,7 +86,7 @@ static surface_t *smask_get(int no) {
 
 	if (i == am->datanum) return NULL;
 	
-	return sf_getcg(am->mapadr + am->offset[i]);
+	return sf_getcg(am->mmap->addr + am->offset[i]);
 }
 
 // ベースになるマスクの alpha 値を拡大して取り出す

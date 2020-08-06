@@ -27,6 +27,7 @@
 
 #include <unistd.h>
 #include <sys/types.h>
+#include "mmap.h"
 
 /* 
    .ALK データ構造
@@ -38,8 +39,7 @@
 */     
 
 typedef struct {
-	char *mapadr;  /* mmap したファイルの先頭アドレス   */
-	off_t size;    /* mmap したバイト数(ファイルサイズ) */
+	mmap_t *mmap;  /* mmap したファイル   */
 	int   datanum; /* .alk ファイル中のファイル数       */
 	int  *offset;  /* 各ファイルへのオフセット          */
 } alk_t;

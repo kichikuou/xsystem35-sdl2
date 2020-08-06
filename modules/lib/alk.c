@@ -27,14 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#ifdef HAVE_MMAP
-#include <sys/mman.h>
-#endif
 
 #include "portab.h"
 #include "system.h"
@@ -43,62 +35,23 @@
 
 alk_t *alk_new(const char *path) {
 	alk_t *alk;
-	int i, fd;
-	char *adr;
-	struct stat sbuf;
+	int i;
 	
-	if (0 > (fd = open(path, O_RDONLY))) {
-		WARNING("open: %s\n", strerror(errno));
-		return NULL;
-	}
-
-	if (0 > fstat(fd, &sbuf)) {
-		WARNING("fstat: %s\n", strerror(errno));
-		close(fd);
-		return NULL;
-	}
+	mmap_t *m = map_file(path);
 	
-#ifdef HAVE_MMAP
-	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
-		WARNING("mmap: %s\n", strerror(errno));
-		close(fd);
-		return NULL;
-	}
-#else
-	adr = malloc(sbuf.st_size);
-	size_t bytes = 0;
-	while (bytes < sbuf.st_size) {
-		ssize_t ret = read(fd, adr + bytes, sbuf.st_size - bytes);
-		if (ret <= 0) {
-			WARNING("read: %s\n", strerror(errno));
-			close(fd);
-			free(adr);
-			return NULL;
-		}
-		bytes += ret;
-	}
-#endif
-	close(fd);
-	
-	if (0 != strncmp(adr, "ALK0", 4)) {
+	if (0 != strncmp(m->addr, "ALK0", 4)) {
 		WARNING("%s: not an ALK file\n", path);
-#ifdef HAVE_MMAP
-		munmap(adr, sbuf.st_size);
-#else
-		free(adr);
-#endif
+		unmap_file(m);
 		return NULL;
 	}		
 
 	alk = calloc(1, sizeof(alk_t));
-	alk->mapadr = adr;
-	alk->size = sbuf.st_size;
-	
-	alk->datanum = LittleEndian_getDW(adr, 4);
+	alk->mmap = m;
+	alk->datanum = LittleEndian_getDW(m->addr, 4);
 	alk->offset = malloc(sizeof(int) * alk->datanum);
 	
 	for (i = 0; i < alk->datanum; i++) {
-		alk->offset[i] = LittleEndian_getDW(adr, 8 + i * 8);
+		alk->offset[i] = LittleEndian_getDW(m->addr, 8 + i * 8);
 	}
 	
 	return alk;
@@ -107,11 +60,7 @@ alk_t *alk_new(const char *path) {
 int alk_free(alk_t *alk) {
 	if (alk == NULL) return OK;
 
-#ifdef HAVE_MMAP
-	munmap(alk->mapadr, alk->size);
-#else
-	free(alk->mapadr);
-#endif
+	unmap_file(alk->mmap);
 	free(alk->offset);
 	free(alk);
 
@@ -121,5 +70,5 @@ int alk_free(alk_t *alk) {
 char *alk_get(alk_t *alk, int no) {
 	if (no >= alk->datanum) return NULL;
 	
-	return alk->mapadr + alk->offset[no];
+	return (char *)alk->mmap->addr + alk->offset[no];
 }

@@ -32,7 +32,7 @@
 #include "surface.h"
 #include "sacttimer.h"
 #include "variable.h"
-
+#include "mmap.h"
 
 // スプライトの最大数
 #define SPRITEMAX 21845
@@ -63,8 +63,7 @@ typedef struct {
 
 // SACTEFAM を使ったマスク
 typedef struct {
-	char *mapadr; // mmap された最初のアドレス
-	off_t size;   // mmap した大きさ
+	mmap_t *mmap;
 	int datanum;  // SACTEFAM.KLD 中のマスクファイルの数
 	int *no;      // シナリオ側での番号
 	int *offset;  // データへのオフセット

@@ -25,17 +25,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "portab.h"
 #include "system.h"
 #include "LittleEndian.h"
 #include "dri.h"
-#ifdef HAVE_MMAP
-#include <sys/mman.h>
-#endif
 
 /*
  * static maethods
@@ -172,26 +165,28 @@ static void get_fileptr(drifiles *d, FILE *fp, int disk) {
  * Initilize drifile object and check file
  *   file    : file name array
  *   cnt     : number in file name array
- *   mmapping: mmap file or not
  *   return: drifile object
 */
-drifiles *dri_init(const char **file, int cnt, boolean mmapping) {
+drifiles *dri_init(const char **file, int cnt) {
 	drifiles *d = calloc(1, sizeof(drifiles));
 	FILE *fp;
 	int i;
 	boolean gotmap = FALSE;
-	long filesize;
-	const char **filetop = file;
-	
+#ifdef HAVE_MEMORY_MAPPED_FILE
+	boolean mmapping = TRUE;
+#else
+	boolean mmapping = FALSE;
+#endif
+
 	for (i = 0; i < cnt; i++) {
-		if (*(file + i) == NULL) continue;
+		if (file[i] == NULL) continue;
 		/* open check */
-		if (NULL == (fp = fopen(*(file + i), "rb"))) {
-			SYSERROR("File %s is not found\n", *(file + i));
+		if (NULL == (fp = fopen(file[i], "rb"))) {
+			SYSERROR("File %s is not found\n", file[i]);
 		}
 		/* check is drifile or noe */
 		if (!filecheck(fp)) {
-			SYSERROR("File %s is not dri file\n", *(file + i));
+			SYSERROR("File %s is not dri file\n", file[i]);
 		}
 		/* get file map */
 		if (!gotmap) {
@@ -200,29 +195,22 @@ drifiles *dri_init(const char **file, int cnt, boolean mmapping) {
 		}
 		/* get pointer */
 		get_fileptr(d, fp, i);
-		/* get file size for mmap */
-		filesize = getfilesize(fp);
 		/* copy filenme */
-		d->fnames[i] = strdup(*(file + i));
+		d->fnames[i] = strdup(file[i]);
 		/* close */
 		fclose(fp);
-#ifdef HAVE_MMAP
+
 		/* mmap */
 		if (mmapping) {
-			int fd;
-			if (0 > (fd = open(*(file + i),  O_RDONLY))) {
-				SYSERROR("open: %s\n", strerror(errno));
-			}
-			if (MAP_FAILED == (d->mmapadr[i] = mmap(0, filesize, PROT_READ, MAP_SHARED, fd, 0))) {
-				WARNING("mmap: %s\n", strerror(errno));
-				close(fd);
+			mmap_t *m = map_file(file[i]);
+			if (!m) {
 				mmapping = d->mmapped = FALSE;
-				i = 0; file = filetop; /* retry */
-				continue;
+				i = 0; /* retry */
+			} else {
+				d->mmap[i] = m;
+				d->mmapped = TRUE;
 			}
-			d->mmapped = TRUE;
 		}
-#endif
 	}
 	return d;
 }
@@ -256,7 +244,7 @@ dridata *dri_getdata(drifiles *d, int no) {
 	
 	/* get data top */
 	if (d->mmapped) {
-		data = d->mmapadr[disk] + dataptr;
+		data = d->mmap[disk]->addr + dataptr;
 	} else {
 		int readsize = dataptr2 - dataptr;
 		FILE *fp;

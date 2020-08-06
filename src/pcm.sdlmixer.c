@@ -22,15 +22,10 @@
 /* $Id: music_pcm.c,v 1.16 2003/11/09 15:06:13 chikama Exp $ */
 
 #include <assert.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <SDL_mixer.h>
 
 #include "portab.h"
@@ -43,9 +38,7 @@
 #include "counter.h"
 #include "nact.h"
 #include "LittleEndian.h"
-#ifdef HAVE_MMAP
-#include <sys/mman.h>
-#endif
+#include "mmap.h"
 
 #define DEFAULT_AUDIO_BUFFER_SIZE 2048
 
@@ -69,10 +62,10 @@ static pcmobj_t *pcmobj[128 + 1];
 
 static int unload(int slot);
 static int load_wai();
-static char *wai_mapadr;
+static mmap_t *wai_map;
 
 // Volume mixer channel
-#define WAIMIXCH(no) LittleEndian_getDW(wai_mapadr, 36 + (no -1) * 4 * 3 + 8)
+#define WAIMIXCH(no) LittleEndian_getDW(wai_map->addr, 36 + (no -1) * 4 * 3 + 8)
 
 /**
  * 指定の番号の .WAV|.OGG をロードする。
@@ -166,7 +159,7 @@ int muspcm_load_no(int slot, int no) {
 	}
 	
 	// if has .wai file
-	if (wai_mapadr) {
+	if (wai_map) {
 		int ch = WAIMIXCH(no);
 		prv.vol_pcm_sub[slot] = ch < 0 ? 0: ch;
 	} else {
@@ -345,63 +338,22 @@ int muspcm_waitend(int slot) {
 }
 
 static int load_wai() {
-	struct stat sbuf;
-	char *adr;
-	int fd;
+	if (wai_map) {
+		unmap_file(wai_map);
+		wai_map = NULL;
+	}
+	if (nact->files.wai == NULL)
+		return NG;
+	wai_map = map_file(nact->files.wai);
+	if (!wai_map)
+		return NG;
 
-	wai_mapadr = NULL;
-	if (nact->files.wai == NULL) goto endwai;
-	
-	if (0 > (fd = open(nact->files.wai, O_RDONLY))) {
-		WARNING("open: %s\n", strerror(errno));
-		goto endwai;
-	}
-	
-	if (0 > fstat(fd, &sbuf)) {
-		WARNING("fstat:%s\n", strerror(errno));
-		close(fd);
-		goto endwai;
-	}
-	
-#ifdef HAVE_MMAP
-	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
-		WARNING("mmap: %s\n", strerror(errno));
-		close(fd);
-		goto endwai;
-	}
-#else
-	adr = malloc(sbuf.st_size);
-	if (!adr) {
-		WARNING("load_wai: out of memory\n");
-		close(fd);
-		goto endwai;
-	}
-	size_t bytes = 0;
-	while (bytes < sbuf.st_size) {
-		ssize_t ret = read(fd, adr, sbuf.st_size);
-		if (ret <= 0) {
-			WARNING("load_wai: failed to read\n");
-			close(fd);
-			free(adr);
-			goto endwai;
-		}
-		bytes += ret;
-	}
-#endif
-	
+	char *adr = wai_map->addr;
 	if (*adr != 'X' || *(adr+1) != 'I' || *(adr+2) != '2') {
 		WARNING("not WAI file\n");
-#ifdef HAVE_MMAP
-		munmap(adr, sbuf.st_size);
-#else
-		free(adr);
-#endif
-		close(fd);
-		goto endwai;
+		unmap_file(wai_map);
+		wai_map = NULL;
+		return NG;
 	}
-	
-	wai_mapadr = adr;
-	
- endwai:
 	return OK;
 }
