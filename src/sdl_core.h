@@ -53,7 +53,7 @@ extern void sdl_setPallet(Pallet256 *pal, int src, int cnt);
 extern void sdl_drawRectangle(int x, int y, int w, int h, int cl);
 extern void sdl_fillRectangle(int x, int y, int w, int h, unsigned long c);
 extern void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long col);
-extern int  sdl_drawString(int x, int y, const char *msg, unsigned long col);
+extern int  sdl_drawString(int x, int y, const char *str_utf8, unsigned long col);
 extern void sdl_copyArea(int sx,int sy, int w, int h, int dx, int dy);
 extern void sdl_drawTT(int x,int y,int w,int h,const char *bitmap,int ww, boolean antialiased);
 extern void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int sp);
@@ -123,7 +123,7 @@ extern void sdl_wait_vsync();
 #define SetPallet(pal,src,cnt) sdl_setPallet((pal),(src),(cnt))
 
 /* 描画関係 */
-#define DrawString(x,y,str,col) sdl_drawString((x),(y),(str),(col))
+#define DrawString(x,y,str_utf8,col) sdl_drawString((x),(y),(str_utf8),(col))
 #define FillRectangle(x,y,w,h,col) sdl_fillRectangle((x),(y),(w),(h),(col))
 #define CopyArea(sx,sy,w,h,dx,dy) sdl_copyArea((sx),(sy),(w),(h),(dx),(dy))
 #define CopyAreaSP(sx,sy,w,h,dx,dy,col) sdl_copyAreaSP((sx),(sy),(w),(h),(dx),(dy),(col)) 

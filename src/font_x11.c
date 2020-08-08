@@ -36,7 +36,6 @@
 #include "ags.h"
 #include "xcore.h"
 #include "xcore_private.h"
-#include "utfsjis.h"
 #include "antialiase.h"
 
 /* fontset の為の情報 */
@@ -151,22 +150,13 @@ static agsurface_t *get_drawn_glyph(const char *str, int w) {
 	return dst;
 }
 
-static agsurface_t *font_x11_get_glyph(const unsigned char *str) {
-	agsurface_t *dst;
-	int w;
-	BYTE *conv;
+static agsurface_t *font_x11_get_glyph(const char *str_utf8) {
+	int w = XmbTextEscapement(fontset, str_utf8, strlen(str_utf8));
 	
-	/* convert string code from sjis to utf-8 */
-	conv = sjis2utf(str);
-	
-	w = XmbTextEscapement(fontset, conv, strlen(conv)); 
-	
-	if (w == 0) {
-		free(conv);
+	if (w == 0)
 		return NULL;
-	}
 	
-	dst = get_drawn_glyph(conv, w);
+	agsurface_t *dst = get_drawn_glyph(str_utf8, w);
 	image_get_glyph(dst, &img_glyph);
 
 	if (this->antialiase_on) {
@@ -178,27 +168,17 @@ static agsurface_t *font_x11_get_glyph(const unsigned char *str) {
 	
 	free(dst->pixel);
 	free(dst);
-	free(conv);
 	return &img_glyph;
 }
 
-static int font_x11_draw_glyph(int x, int y, const unsigned char *str, int col) {
-	int w;
-	BYTE *conv;
-	
-	/* convert string code from sjis to utf-8 */
-	conv = sjis2utf(str);
-	
-	w = XmbTextEscapement(fontset, conv, strlen(conv)); 
-	
-	if (w == 0) {
-		free(conv);
+static int font_x11_draw_glyph(int x, int y, const char *str_utf8, int col) {
+	int w = XmbTextEscapement(fontset, str_utf8, strlen(str_utf8));
+	if (w == 0)
 		return 0;
-	}
 	
 	if (!x11_dibinfo->shared) {
 		/* 一度 Pixmap に書いてからイメージを取得してDIBへ */
-		agsurface_t *dst = get_drawn_glyph(conv, w);
+		agsurface_t *dst = get_drawn_glyph(str_utf8, w);
 		
 		if (DIB_DEPTH == dib_depth_candidate) {
 			image_getGlyphImage(DIB, dst, x, y, PAL2PIC(col));
@@ -208,7 +188,7 @@ static int font_x11_draw_glyph(int x, int y, const unsigned char *str, int col) 
 		free(dst);
 	} else {
 		Xcore_setForeground(col);
-		XmbDrawString(x11_display, x11_pixmap, fontset, x11_gc_pix, x, y + font_ascent, conv, strlen(conv));
+		XmbDrawString(x11_display, x11_pixmap, fontset, x11_gc_pix, x, y + font_ascent, str_utf8, strlen(str_utf8));
 		x11_needSync = TRUE;
 	}
 	return w;

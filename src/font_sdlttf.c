@@ -9,7 +9,6 @@
 #include "system.h"
 #include "font.h"
 #include "sdl_private.h"
-#include "utfsjis.h"
 
 typedef struct {
 	int      size;
@@ -69,7 +68,7 @@ static void font_sdlttf_sel_font(int type, int size) {
 	}
 }
 
-static agsurface_t *font_sdlttf_get_glyph(const unsigned char *msg) {
+static agsurface_t *font_sdlttf_get_glyph(const char *str_utf8) {
 	static SDL_Surface *fs;
 	static agsurface_t result;
 
@@ -80,15 +79,12 @@ static agsurface_t *font_sdlttf_get_glyph(const unsigned char *msg) {
 		fs = NULL;
 	}
 
-	BYTE* conv = sjis2utf(msg);
-
 	SDL_Color color = {255, 255, 255, 0};
 	if (this->antialiase_on) {
-		fs = TTF_RenderUTF8_Shaded(fontset->id, conv, color, color);
+		fs = TTF_RenderUTF8_Shaded(fontset->id, str_utf8, color, color);
 	} else {
-		fs = TTF_RenderUTF8_Solid(fontset->id, conv, color);
+		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
 	}
-	free(conv);
 	if (!fs) {
 		WARNING("Text rendering failed: %s\n", TTF_GetError());
 		return NULL;
@@ -142,30 +138,27 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, unsigne
 	SDL_UnlockSurface(sdl_dib);
 }
 
-static int font_sdlttf_draw_glyph(int x, int y, const unsigned char *str, int cl) {
+static int font_sdlttf_draw_glyph(int x, int y, const char *str_utf8, int cl) {
 	SDL_Surface *fs;
 	SDL_Rect r_src, r_dst;
 	int w, h, maxy;
-	BYTE *conv;
 	
-	if (!*str)
+	if (!*str_utf8)
 		return 0;
 	if (!fontset)
 		return 0;
 	
-	conv = sjis2utf(str);
 	if (this->antialiase_on) {
-		fs = TTF_RenderUTF8_Blended(fontset->id, conv, sdl_col[cl]);
+		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, sdl_col[cl]);
 	} else {
-		fs = TTF_RenderUTF8_Solid(fontset->id, conv, sdl_col[cl]);
+		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, sdl_col[cl]);
 	}
 	if (!fs) {
 		WARNING("Text rendering failed: %s\n", TTF_GetError());
-		free(conv);
 		return 0;
 	}
 	
-	TTF_SizeUTF8(fontset->id, conv, &w, &h);
+	TTF_SizeUTF8(fontset->id, str_utf8, &w, &h);
 	y = max(0, y - (TTF_FontAscent(fontset->id) - fontset->size * 0.9));
 	
 	if (sdl_dib->format->BitsPerPixel == 8 && this->antialiase_on) {
@@ -177,8 +170,6 @@ static int font_sdlttf_draw_glyph(int x, int y, const unsigned char *str, int cl
 	}
 
 	SDL_FreeSurface(fs);
-	free(conv);
-	
 	return w;
 }
 

@@ -172,14 +172,14 @@ void Xcore_drawLine(int x1, int y1, int x2, int y2, unsigned long col) {
 	}
 } 
 
-int Xcore_drawString(int x, int y, const char *msg, unsigned long col) {
+int Xcore_drawString(int x, int y, const char *str_utf8, unsigned long col) {
 	int w;
 	
 	if (x11_font->self_drawable()) {
-		w = x11_font->draw_glyph(x, y, msg, col);
+		w = x11_font->draw_glyph(x, y, str_utf8, col);
 		x11_needSync = TRUE;
 	} else {
-		agsurface_t *glyph = x11_font->get_glyph(msg);
+		agsurface_t *glyph = x11_font->get_glyph(str_utf8);
 		
 		if (glyph == NULL) return 0;
 		

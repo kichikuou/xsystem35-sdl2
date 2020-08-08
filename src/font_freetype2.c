@@ -59,17 +59,32 @@ static FONT *this;
 static void pixmap2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl);
 static void pixmapmono2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl);
 
-static int toUnicode(const unsigned char **msg) {
+static int utf8_next_codepoint(const char **msg) {
 	int code;
-	
-	if (**msg >= 0xa0 && **msg <= 0xdf) {
-		code = 0xff60 + (**msg) - 0xa0; (*msg)++;
-	} else if (**msg&0x80) {
-		code = s2u[**msg - 0x80][*(*msg+1) - 0x40];
-		(*msg) += 2;
+	const unsigned char *s = (const unsigned char *)*msg;
+
+	if (*s <= 0x7f) {
+		code = *s++;
+	} else if (*s <= 0xbf) {
+		WARNING("Invalid UTF-8 sequence %02x\n", *s);
+		code = '?';
+		s++;
+	} else if (*s <= 0xdf) {
+		code = (s[0] & 0x1f) << 6 | (s[1] & 0x3f);
+		s += 2;
+	} else if (*s <= 0xef) {
+		code = (s[0] & 0xf) << 12 | (s[1] & 0x3f) << 6 | (s[2] & 0x3f);
+		s += 3;
+	} else if (*s <= 0xf7) {
+		code = (s[0] & 0x7) << 18 | (s[1] & 0x3f) << 12 | (s[2] & 0x3f) << 6 | (s[3] & 0x3f);
+		s += 4;
 	} else {
-		code = **msg; (*msg)++;
+		code = 0xfffd;  // REPLACEMENT CHARACTER
+		s++;
+		while (0x80 <= *s && *s <= 0xbf)
+			s++;
 	}
+	*msg = (const char *)s;
 	return code;
 }
 
@@ -197,21 +212,20 @@ static void clear_canvas(void) {
 	memset(img_glyph.pixel, 0, GLYPH_PIXMAP_WIDTH * GLYPH_PIXMAP_HEIGHT);
 }
 
-static agsurface_t *font_ttf_get_glyph(const unsigned char *_msg) {
+static agsurface_t *font_ttf_get_glyph(const char *str_utf8) {
 	FT_GlyphSlot   slot;
 	FT_UShort      code;
 	FT_Error       err;
 	FT_Pixel_Mode  pixelmode;
 	FT_Int         loadflag;
 	int x = 0;
-	const unsigned char *msg = _msg;
 	
 	if (fontset == NULL) return &img_glyph;
 	
 	clear_canvas();
 	
-	while (*msg) {
-		code = toUnicode(&msg);
+	while (*str_utf8) {
+		code = utf8_next_codepoint(&str_utf8);
 		
 		if (this->antialiase_on) {
 			loadflag = FT_LOAD_RENDER;
@@ -266,7 +280,7 @@ static agsurface_t *font_ttf_get_glyph(const unsigned char *_msg) {
 	return &img_glyph;
 }
 
-static int font_ttf_draw_glyph(int x, int y, const unsigned char *str, int col) {
+static int font_ttf_draw_glyph(int x, int y, const char *str_utf8, int col) {
 	return 0;
 }
 

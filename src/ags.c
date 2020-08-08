@@ -402,15 +402,20 @@ int ags_drawString(int x, int y, const char *src, int col) {
 	if (!check_param_xy(&x, &y)) return 0;
 	
 	DspDeviceSync();
-	w = DrawString(x, y, src, col);
-	
+	char *utf8 = sjis2utf(src);
+	w = DrawString(x, y, utf8, col);
+	free(utf8);
+
 	return w;
 }
 
 agsurface_t *ags_drawStringToSurface(int type, int size, const char *str) {
 	FONT *font = nact->ags.font;
 	font->sel_font(type, size);
-	return font->get_glyph(str);
+	char *utf8 = sjis2utf(str);
+	agsurface_t *sf = font->get_glyph(utf8);
+	free(utf8);
+	return sf;
 }
 
 void ags_drawCg8bit(cgdata *cg, int x, int y) {

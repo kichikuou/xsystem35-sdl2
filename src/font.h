@@ -45,9 +45,9 @@ struct _FONT {
 	
 	void (*sel_font)(int type, int size);
 	
-	struct agsurface *(*get_glyph)(const unsigned char *str);
+	struct agsurface *(*get_glyph)(const char *str_utf8);
 	
-	int (*draw_glyph)(int x, int y, const unsigned char *str, int col);
+	int (*draw_glyph)(int x, int y, const char *str_utf8, int col);
 	
 	boolean (*self_drawable)();
 };

@@ -412,15 +412,15 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, agsurface_t *src, unsigne
 	SDL_UnlockSurface(sdl_dib);
 }
 
-int sdl_drawString(int x, int y, const char *msg, unsigned long col) {
+int sdl_drawString(int x, int y, const char *str_utf8, unsigned long col) {
 	int w;
 
 	sdl_pal_check();
 	
 	if (sdl_font->self_drawable()) {
-		w = sdl_font->draw_glyph(x, y, msg, col);
+		w = sdl_font->draw_glyph(x, y, str_utf8, col);
 	} else {
-		agsurface_t *glyph = sdl_font->get_glyph(msg);
+		agsurface_t *glyph = sdl_font->get_glyph(str_utf8);
 		SDL_Rect r_src, r_dst;
 		
 		if (glyph == NULL) return 0;
