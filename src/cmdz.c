@@ -35,6 +35,7 @@
 #include "message.h"
 #include "input.h"
 #include "nact.h"
+#include "font.h"
 
 void commandZC() {
 	/* システムの使用環境を変更する */
