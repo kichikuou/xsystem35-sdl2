@@ -29,7 +29,6 @@
 #include "portab.h"
 #include "image.h"
 #include "xcore_image.h"
-#include "font.h"
 #include "cursor.h"
 #include "ags.h"
 
@@ -71,7 +70,7 @@ extern void Xcore_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int f
 
 /* フォント関連 */
 // extern FONT *Xcore_getFontDevice(void);
-extern void Xcore_setFontDevice(FONT *f);
+extern void Xcore_setFontDevice(struct _FONT *f);
 
 /* fader */
 extern void Xcore_fadeIn(int step);

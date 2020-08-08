@@ -31,9 +31,10 @@
 #include <X11/extensions/XShm.h>
 
 #include "portab.h"
-#include "font.h"
 #include "ags.h"
 #include "image.h"
+
+struct _FONT;
 
 /* dib/work image 情報 */
 typedef struct {
@@ -63,7 +64,7 @@ struct xcore_private_data {
 
 	int      dib_depth_candidate; /* DIB depth if required pixmap depth isnt 8 */ 
 	
-	FONT *fontinfo;           /* font object */
+	struct _FONT *fontinfo;       /* font object */
 	
 	boolean noSHM;        /* dont have X-SHM extension */
 

@@ -27,7 +27,6 @@
 #include "portab.h"
 #include "graphics.h"
 #include "scenario.h"
-#include "font.h"
 #include "s39ain.h"
 #include "gameresource.h"
 #include "selection.h"

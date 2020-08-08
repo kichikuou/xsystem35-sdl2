@@ -62,6 +62,7 @@
 #include "randMT.h"
 #include "counter.h"
 #include "ags.h"
+#include "font.h"
 #include "graphicsdevice.h"
 #include "menu.h"
 #include "music.h"

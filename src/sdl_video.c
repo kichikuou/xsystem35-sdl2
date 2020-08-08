@@ -173,8 +173,8 @@ static void makeDIB(int width, int height, int depth) {
 	image_setdepth(sdl_dibinfo->depth);
 }
 
-void sdl_setFontDevice(FONT *f) {
-        sdl_font = f;
+void sdl_setFontDevice(struct _FONT *f) {
+	sdl_font = f;
 }
 
 /* offscreen の設定 */

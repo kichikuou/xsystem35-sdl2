@@ -29,8 +29,8 @@
 #include "portab.h"
 #include "cg.h"
 #include "graphics.h"
-#include "font.h"
 
+struct _FONT;
 
 /* マウスカーソルの種類 */
 #define CURSOR_ARROW     1
@@ -136,7 +136,7 @@ struct _ags {
 	boolean fullscree_is_on;    /* if full-screen mode then true */
 	
 
-	FONT *font;                 /* font device */
+	struct _FONT *font;         /* font device */
 	agsurface_t *dib;           /* main surface */
 	void (*eventcb)(agsevent_t *e); /* deliver event */
 };
@@ -224,6 +224,17 @@ extern void ags_whiteOut(int rate, boolean flg);
 extern void ags_fader_callback();
 
 /* フォント関連 */
+
+typedef enum {
+	FONT_X11,
+	FONT_FT2,
+	FONT_SDLTTF
+} fontdev_t;
+
+enum FontType {
+	FONT_GOTHIC,
+	FONT_MINCHO,
+};
 extern void ags_setFont(int type, int size);
 
 /* カーソル関係 */

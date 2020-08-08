@@ -39,7 +39,7 @@ static void Init(void) { /* 0 */
 }
 
 static void InitGame() { /* 1 */
-	nact->ags.font->antialiase_on = TRUE;
+	ags_setAntialiasedStringMode(TRUE);
 	sys_setHankakuMode(2);
 	
 	nact->msgout = ntmsg_add;

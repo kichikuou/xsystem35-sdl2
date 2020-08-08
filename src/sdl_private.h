@@ -29,7 +29,8 @@
 
 #include "portab.h"
 #include "ags.h"
-#include "font.h"
+
+struct _FONT;
 
 struct sdl_private_data {
 	SDL_Window *window;
@@ -47,7 +48,7 @@ struct sdl_private_data {
 	
 	SDL_Rect       view;
 	
-	FONT *font;
+	struct _FONT *font;
 
 	boolean dirty;
 

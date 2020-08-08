@@ -486,7 +486,7 @@ void x11_makeWorkImage(int w, int h) {
 	alloced = TRUE;
 }
 
-void Xcore_setFontDevice(FONT *f) {
+void Xcore_setFontDevice(struct _FONT *f) {
 	x11_font = f;
 }
 

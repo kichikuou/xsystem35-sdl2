@@ -132,7 +132,7 @@ static void Init() {
 	sact.dmap = sf_create_pixel(sf0->width, sf0->height, 16);
 	
 	// その他 System35 のデフォルト動作の変更
-	nact->ags.font->antialiase_on = TRUE;
+	ags_setAntialiasedStringMode(TRUE);
 	sys_setHankakuMode(2); // 全角半角変換無し
 	ags_autorepeat(FALSE); // key auto repeat off
 	

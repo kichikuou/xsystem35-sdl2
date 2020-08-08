@@ -78,7 +78,7 @@ extern void sdl_delRegion(void *src);
 extern void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step);
 
 /* フォント関連 */
-extern void sdl_setFontDevice(FONT *f);
+extern void sdl_setFontDevice(struct _FONT *f);
 
 /* fader */
 extern void sdl_fadeIn(int step);
