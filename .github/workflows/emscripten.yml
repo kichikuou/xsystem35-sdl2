@@ -2,7 +2,7 @@ name: Emscripten Build
 on: [push, pull_request]
 
 env:
-  emscripten-version: 1.39.16
+  emscripten-version: 1.40.1
 
 jobs:
   build:
