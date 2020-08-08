@@ -204,24 +204,13 @@ int nt_scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumB
 // 指定の文字列のCGを作成
 int nt_scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText) {
 	cginfo_t *i;
-	agsurface_t *glyph;
-	FONT *font;
-	
-	if (0) {
-		char *b = sjis2utf(cText);
-		WARNING("str = '%s'\n", b);
-		free(b);
-	}
 	
 	spcg_assert_no(wNumCG);
 	
 	// 勝手に出ていいのかな？
 	if (strlen(cText) == 0) return OK;
 	
-	font = nact->ags.font;
-	font->sel_font(FONT_GOTHIC, wSize);
-	
-	glyph = font->get_glyph(cText);
+	agsurface_t *glyph = ags_drawStringToSurface(FONT_GOTHIC, wSize, cText);
 	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumCG;
@@ -242,8 +231,6 @@ int nt_scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cTex
 // 数字文字列のCGを作成
 int nt_scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue) {
 	cginfo_t *i;
-	agsurface_t *glyph;
-	FONT *font;
 	char s[256], ss[256];
 	
 	spcg_assert_no(wNumCG);
@@ -257,9 +244,7 @@ int nt_scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFi
 	}
 	sprintf(s, ss, wValue);
 	
-	font = nact->ags.font;
-	font->sel_font(FONT_GOTHIC, wSize);
-	glyph = font->get_glyph(s);
+	agsurface_t *glyph = ags_drawStringToSurface(FONT_GOTHIC, wSize, s);
 	
 	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;

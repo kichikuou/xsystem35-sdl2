@@ -407,6 +407,12 @@ int ags_drawString(int x, int y, const char *src, int col) {
 	return w;
 }
 
+agsurface_t *ags_drawStringToSurface(int type, int size, const char *str) {
+	FONT *font = nact->ags.font;
+	font->sel_font(type, size);
+	return font->get_glyph(str);
+}
+
 void ags_drawCg8bit(cgdata *cg, int x, int y) {
 	int sx, sy, w, h;
 	

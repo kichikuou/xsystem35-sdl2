@@ -29,7 +29,6 @@
 #include "system.h"
 #include "nact.h"
 #include "ags.h"
-#include "font.h"
 #include "surface.h"
 #include "ngraph.h"
 
@@ -59,13 +58,9 @@ int dt_setfont(int type, int size) {
  * @return: 実際に描画した幅
 */
 int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
-	agsurface_t *glyph;
 	int sx, sy, sw, sh;
-	FONT *font = nact->ags.font;
-	
-	font->sel_font(ftype, fsize);
-	
-	glyph = font->get_glyph(buf);
+
+	agsurface_t *glyph = ags_drawStringToSurface(ftype, fsize, buf);
 	if (glyph == NULL) return 0;
 	
 	sx = x;	sy = y;
@@ -92,13 +87,9 @@ int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
  * @return: 実際に描画した幅
  */ 
 int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b) {
-	agsurface_t *glyph;
 	int sx, sy, sw, sh;
-	FONT *font = nact->ags.font;
-	
-	font->sel_font(ftype, fsize);
-	
-	glyph = font->get_glyph(buf);
+
+	agsurface_t *glyph = ags_drawStringToSurface(ftype, fsize, buf);
 	if (glyph == NULL) return 0;
 
 	sx = x;	sy = y;

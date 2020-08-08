@@ -238,6 +238,7 @@ extern void    ags_setAntialiasedStringMode(boolean mode);
 extern boolean ags_getAntialiasedStringMode();
 extern void    ags_fader(ags_faderinfo_t *);
 extern void    ags_autorepeat(boolean bool);
+extern agsurface_t *ags_drawStringToSurface(int type, int size, const char *str);
 
 #define RGB_RMASK15 0x7c00
 #define RGB_GMASK15 0x03e0
