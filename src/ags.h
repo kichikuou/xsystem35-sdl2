@@ -224,7 +224,6 @@ extern void ags_whiteOut(int rate, boolean flg);
 extern void ags_fader_callback();
 
 /* フォント関連 */
-
 typedef enum {
 	FONT_X11,
 	FONT_FT2,
@@ -236,6 +235,7 @@ enum FontType {
 	FONT_MINCHO,
 };
 extern void ags_setFont(int type, int size);
+extern agsurface_t *ags_drawStringToSurface(const char *str);
 
 /* カーソル関係 */
 extern void ags_setCursorType(int type);
@@ -249,7 +249,6 @@ extern void    ags_setAntialiasedStringMode(boolean mode);
 extern boolean ags_getAntialiasedStringMode();
 extern void    ags_fader(ags_faderinfo_t *);
 extern void    ags_autorepeat(boolean bool);
-extern agsurface_t *ags_drawStringToSurface(int type, int size, const char *str);
 
 #define RGB_RMASK15 0x7c00
 #define RGB_GMASK15 0x03e0

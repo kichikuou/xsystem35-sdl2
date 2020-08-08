@@ -60,7 +60,8 @@ int dt_setfont(int type, int size) {
 int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
 	int sx, sy, sw, sh;
 
-	agsurface_t *glyph = ags_drawStringToSurface(ftype, fsize, buf);
+	ags_setFont(ftype, fsize);
+	agsurface_t *glyph = ags_drawStringToSurface(buf);
 	if (glyph == NULL) return 0;
 	
 	sx = x;	sy = y;
@@ -89,7 +90,8 @@ int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
 int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b) {
 	int sx, sy, sw, sh;
 
-	agsurface_t *glyph = ags_drawStringToSurface(ftype, fsize, buf);
+	ags_setFont(ftype, fsize);
+	agsurface_t *glyph = ags_drawStringToSurface(buf);
 	if (glyph == NULL) return 0;
 
 	sx = x;	sy = y;

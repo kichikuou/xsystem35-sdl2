@@ -409,11 +409,9 @@ int ags_drawString(int x, int y, const char *src, int col) {
 	return w;
 }
 
-agsurface_t *ags_drawStringToSurface(int type, int size, const char *str) {
-	FONT *font = nact->ags.font;
-	font->sel_font(type, size);
+agsurface_t *ags_drawStringToSurface(const char *str) {
 	char *utf8 = sjis2utf(str);
-	agsurface_t *sf = font->get_glyph(utf8);
+	agsurface_t *sf = nact->ags.font->get_glyph(utf8);
 	free(utf8);
 	return sf;
 }

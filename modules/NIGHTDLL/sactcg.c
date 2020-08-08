@@ -210,7 +210,8 @@ int nt_scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cTex
 	// 勝手に出ていいのかな？
 	if (strlen(cText) == 0) return OK;
 	
-	agsurface_t *glyph = ags_drawStringToSurface(FONT_GOTHIC, wSize, cText);
+	ags_setFont(FONT_GOTHIC, wSize);
+	agsurface_t *glyph = ags_drawStringToSurface(cText);
 	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumCG;
@@ -244,7 +245,8 @@ int nt_scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFi
 	}
 	sprintf(s, ss, wValue);
 	
-	agsurface_t *glyph = ags_drawStringToSurface(FONT_GOTHIC, wSize, s);
+	ags_setFont(FONT_GOTHIC, wSize);
+	agsurface_t *glyph = ags_drawStringToSurface(s);
 	
 	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
