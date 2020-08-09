@@ -188,12 +188,6 @@ void ntmsg_add(const char *msg) {
 	
 	if (msg[0] == '\0') return;
 	
-	if (0) {
-		char *b = sjis2utf(msg);
-		fprintf(stderr, "add msg '%s'\n", b);
-		free(b);
-	}
-
 	len = MSGBUFMAX - (int)strlen(night.msgbuf);
 	if (len < 0) {
 		WARNING("buf shortage (%d)\n", len);
@@ -260,12 +254,6 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 		
 		dt_setfont(wFont, wSize);
 
-		if (1) {
-			char *b = sjis2utf(mbuf);
-			fprintf(stderr, "msg '%s'\n", b);
-			free(b);
-		}
-		
 		cw = dt_drawtext_col(sp->u.msg.canvas,
 				     sp->u.msg.dspcur.x,
 				     sp->u.msg.dspcur.y,

@@ -38,7 +38,6 @@
 #include "ngraph.h"
 #include "drawtext.h"
 #include "sactlog.h"
-#include "utfsjis.h"
 
 // メッセージキー待ちの時、表示するアニメーションに関する情報
 struct markinfo {
@@ -193,12 +192,6 @@ void smsg_add(const char *msg) {
 	
 	if (msg[0] == '\0') return;
 	
-	if (0) {
-		char *b = sjis2utf(msg);
-		fprintf(stderr, "add msg '%s'\n", b);
-		free(b);
-	}
-	
 	len = MSGBUFMAX - (int)strlen(sact.msgbuf);
 	if (len < 0) {
 		WARNING("buf shortage (%d)\n", len);
@@ -304,12 +297,6 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 		}
 		dt_setfont(wFont, wSize);
 
-		if (0) {
-			char *b = sjis2utf(mbuf);
-			fprintf(stderr, "msg '%s'\n", b);
-			free(b);
-		}
-		
 		cw = dt_drawtext_col(sp->u.msg.canvas,
 				     sp->u.msg.dspcur.x,
 				     sp->u.msg.dspcur.y + wRSize + wRLineSpace,

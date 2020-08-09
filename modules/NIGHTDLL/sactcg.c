@@ -30,7 +30,6 @@
 #include "portab.h"
 #include "nact.h"
 #include "system.h"
-#include "utfsjis.h"
 #include "ags.h"
 #include "surface.h"
 #include "ngraph.h"

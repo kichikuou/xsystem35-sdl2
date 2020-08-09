@@ -35,7 +35,6 @@
 #include "sactcg.h"
 #include "surface.h"
 #include "ngraph.h"
-#include "utfsjis.h"
 
 #include "sactcg_stretch.c"
 #include "sactcg_blend.c"
