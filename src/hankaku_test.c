@@ -52,9 +52,11 @@ static void zen2han_test(void) {
 		"ベペボポヮヰヱヴヵヶΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩα"
 		"βγδεζηθικλμνξοπρστυφχψω";
 	for (const Zen2hanTestCase *tc = testcases; tc->zen; tc++) {
-		ASSERT_STRCMP(sjis2utf(zen2han(utf2sjis(tc->zen))), tc->han);
+		ASSERT_STRCMP(sjis2utf(zen2han(utf2sjis(tc->zen), SHIFT_JIS)), tc->han);
+		ASSERT_STRCMP(zen2han(tc->zen, UTF8), tc->han);
 	}
-	ASSERT_STRCMP(sjis2utf(zen2han(utf2sjis(unconvertable))), unconvertable);
+	ASSERT_STRCMP(sjis2utf(zen2han(utf2sjis(unconvertable), SHIFT_JIS)), unconvertable);
+	ASSERT_STRCMP(zen2han(unconvertable, UTF8), unconvertable);
 }
 
 static void format_number_test(void) {

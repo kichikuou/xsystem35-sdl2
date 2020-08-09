@@ -32,6 +32,12 @@
 #include "selection.h"
 #include "message.h"
 #include "ags.h"
+#include "utfsjis.h"
+
+#define toUTF8(s)   codeconv(UTF8, nact->encoding, s)
+#define toSJIS(s)   codeconv(SHIFT_JIS, nact->encoding, s)
+#define fromUTF8(s) codeconv(nact->encoding, UTF8, s)
+#define fromSJIS(s) codeconv(nact->encoding, SHIFT_JIS, s)
 
 /* コマンド解析時に参照する */
 #define sys_getc            sl_getc
@@ -46,6 +52,7 @@ extern int *getVariable();
 extern char *sys_getString(char term);
 extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
+extern void sys_setCharacterEncoding(CharacterEncoding encoding);
 extern char *sys_getConstString();
 
 // extern boolean sys_nact_engine();
@@ -61,6 +68,7 @@ typedef struct {
 	boolean   is_message_locked;   /* pointer 等の event handler を呼び出さない */
 	boolean   popupmenu_opened;    /* popup menu が 開いているか */
 	boolean   mmx_is_ok;           /* MMX が有効かどうか */
+	CharacterEncoding encoding;
 	
 	char      *game_title_utf8;
 	int        scenario_version;

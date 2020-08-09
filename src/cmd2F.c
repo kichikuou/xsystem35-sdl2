@@ -367,7 +367,7 @@ void commands2F23() {
 	int y = getCaliValue();
 	char *vFileName = sys_getString(0);
 	
-	char *fname_utf8 = sjis2utf(vFileName);
+	char *fname_utf8 = toUTF8(vFileName);
 	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
 	free(fname_utf8);
 	
@@ -380,7 +380,7 @@ void commands2F24() {
 	int *var = NULL, _var = 0;
 	int num = 0;
 
-	char *fname_utf8 = sjis2utf(file_name);
+	char *fname_utf8 = toUTF8(file_name);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();
@@ -412,8 +412,8 @@ void commands2F26() {
 	char *title  = sys_getString(0);
 	char *t1, *t2, *t3;
 	
-	t1 = sjis2utf(title);
-	t2 = sjis2utf(v_str(dst_no -1));
+	t1 = toUTF8(title);
+	t2 = toUTF8(v_str(dst_no -1));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -426,10 +426,10 @@ void commands2F26() {
 		return;
 	}
 	
-	t3 = utf2sjis(mi_param.newstring);
+	t3 = fromUTF8(mi_param.newstring);
 	
 	/* 全角文字以外は不可 */
-	if (!sjis_has_hankaku(t3)) {
+	if (nact->encoding != SHIFT_JIS || !sjis_has_hankaku(t3)) {
 		v_strcpy(dst_no -1, t3);
 	}
 	free(t1);
@@ -457,7 +457,7 @@ void commands2F28() {
 	
 	if (nact->game_title_utf8)
 		free(nact->game_title_utf8);
-	nact->game_title_utf8 = sjis2utf(title);
+	nact->game_title_utf8 = toUTF8(title);
 
 	ags_setWindowTitle(title);
 
@@ -478,7 +478,7 @@ void commands2F29() {
 	if (ni_param.title != NULL) {
 		free(ni_param.title);
 	}
-	t = sjis2utf(title);
+	t = toUTF8(title);
 	ni_param.title = t;
 	
 	DEBUG_COMMAND("NT(new) %s:\n", title);
@@ -489,7 +489,7 @@ void commands2F2A() {
 	char *file_name = sys_getString(0);
 	int *var, _var = 0, cnt;
 
-	char *fname_utf8 = sjis2utf(file_name);
+	char *fname_utf8 = toUTF8(file_name);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();
@@ -924,8 +924,8 @@ void commands2F57() {
 	char *t1, *t2, *t3;
 	INPUTSTRING_PARAM p;
 	
-	t1 = sjis2utf(sTitle);
-	t2 = sjis2utf(v_str(eStrVar -1));
+	t1 = toUTF8(sTitle);
+	t2 = toUTF8(v_str(eStrVar -1));
 	p.title = t1;
 	p.oldstring = t2;
 	p.max = eLength;
@@ -934,10 +934,10 @@ void commands2F57() {
 	if (p.newstring == NULL) {
 		*vResult = 65535;
 	} else {
-		t3 = utf2sjis(p.newstring);
-		if (!sjis_has_hankaku(t3)) {
+		t3 = fromUTF8(p.newstring);
+		if (nact->encoding != SHIFT_JIS || !sjis_has_hankaku(t3)) {
 			v_strcpy(eStrVar -1, t3);
-			*vResult = sjis_count_char(t3);
+			*vResult = v_strlen(eStrVar -1);
 		} else {
 			*vResult = 65535;
 		}
@@ -971,7 +971,7 @@ void commands2F5A() {
 	char *sText = sys_getString(0);
 	char *t1;
 	
-	t1 = sjis2utf(sText);
+	t1 = toUTF8(sText);
 	menu_msgbox_open(t1);
 	free(t1);
 	
@@ -982,7 +982,7 @@ void commands2F5B() {
 	int eNum = getCaliValue();
 	char *t1;
 	
-	t1 = sjis2utf(v_str(eNum) - 1);
+	t1 = toUTF8(v_str(eNum) - 1);
 	menu_msgbox_open(t1);
 	free(t1);
 	

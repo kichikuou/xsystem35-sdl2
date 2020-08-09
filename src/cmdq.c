@@ -87,7 +87,7 @@ void commandQE() {
 	char *filename = sys_getString(':');
 	int *var, _var = 0, cnt;
 
-	char *fname_utf8 = sjis2utf(filename);
+	char *fname_utf8 = toUTF8(filename);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();

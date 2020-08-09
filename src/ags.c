@@ -186,16 +186,16 @@ void ags_setViewArea(int x, int y, int width, int height) {
 
 void ags_setWindowTitle(const char *src) {
 #define TITLEHEAD "XSystem35 Version "VERSION":"
-	BYTE *dst, *d;
+	BYTE *utf, *d;
 
-	dst = sjis2utf(src);
-	if (NULL == (d = malloc(strlen(dst) + strlen(TITLEHEAD) + 1))) {
+	utf = toUTF8(src);
+	if (NULL == (d = malloc(strlen(utf) + strlen(TITLEHEAD) + 1))) {
 		NOMEMERR();
 	}
 	strcpy(d, TITLEHEAD);
-	strcat(d, dst);
+	strcat(d, utf);
 	SetWindowTitle(d);
-	free(dst);
+	free(utf);
 	free(d);
 }
 
@@ -402,7 +402,7 @@ int ags_drawString(int x, int y, const char *src, int col) {
 	if (!check_param_xy(&x, &y)) return 0;
 	
 	DspDeviceSync();
-	char *utf8 = sjis2utf(src);
+	char *utf8 = toUTF8(src);
 	w = DrawString(x, y, utf8, col);
 	free(utf8);
 
@@ -410,7 +410,7 @@ int ags_drawString(int x, int y, const char *src, int col) {
 }
 
 agsurface_t *ags_drawStringToSurface(const char *str) {
-	char *utf8 = sjis2utf(str);
+	char *utf8 = toUTF8(str);
 	agsurface_t *sf = nact->ags.font->get_glyph(utf8);
 	free(utf8);
 	return sf;

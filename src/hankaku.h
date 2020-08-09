@@ -24,9 +24,10 @@
 #define __HANKAKU_H__
 
 #include "portab.h"
+#include "utfsjis.h"
 
-extern BYTE *zen2han(const BYTE *src);
-extern BYTE *han2zen(const BYTE *src);
+extern BYTE *zen2han(const BYTE *src, CharacterEncoding enc);
+extern BYTE *han2zen(const BYTE *src, CharacterEncoding enc);
 extern char *format_number(int n, int width, char *buf);
 extern char *format_number_zenkaku(int n, int width, char *buf);
 

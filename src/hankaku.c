@@ -140,7 +140,7 @@ static const char zenkaku_digits[][3] = {
 	0x81,0x40,0x00, /* space */
 };
 
-BYTE *zen2han(const BYTE *src) {
+static BYTE *zen2han_sjis(const BYTE *src) {
 	BYTE c0, c1;
 	char *dst, *_dst;
 	
@@ -173,7 +173,201 @@ BYTE *zen2han(const BYTE *src) {
 	return _dst;
 }
 
-BYTE *han2zen(const BYTE *src) {
+static char *zen2han_utf8(const char *src) {
+	char *dst, *_dst;
+	dst = _dst = malloc(strlen(src) + 1);
+	if (dst == NULL) {
+		fprintf(stderr, "zen2han(): Out of Memory (size %zu)", strlen(src) + 1);
+		return NULL;
+	}
+
+	const char *p = src;
+	while (*p) {
+		const char *prev = p;
+		switch (utf8_next_codepoint(&p)) {
+		case L'’': *dst++ = '\''; break;
+		case L'”': *dst++ = '"'; break;
+		case L'　': *dst++ = ' '; break;
+		case L'、': strcpy(dst, "､"); dst += 3; break;
+		case L'。': strcpy(dst, "｡"); dst += 3; break;
+		case L'「': strcpy(dst, "｢"); dst += 3; break;
+		case L'」': strcpy(dst, "｣"); dst += 3; break;
+		case L'゛': strcpy(dst, "ﾞ"); dst += 3; break;
+		case L'゜': strcpy(dst, "ﾟ"); dst += 3; break;
+		case L'ァ': strcpy(dst, "ｧ"); dst += 3; break;
+		case L'ア': strcpy(dst, "ｱ"); dst += 3; break;
+		case L'ィ': strcpy(dst, "ｨ"); dst += 3; break;
+		case L'イ': strcpy(dst, "ｲ"); dst += 3; break;
+		case L'ゥ': strcpy(dst, "ｩ"); dst += 3; break;
+		case L'ウ': strcpy(dst, "ｳ"); dst += 3; break;
+		case L'ェ': strcpy(dst, "ｪ"); dst += 3; break;
+		case L'エ': strcpy(dst, "ｴ"); dst += 3; break;
+		case L'ォ': strcpy(dst, "ｫ"); dst += 3; break;
+		case L'オ': strcpy(dst, "ｵ"); dst += 3; break;
+		case L'カ': strcpy(dst, "ｶ"); dst += 3; break;
+		case L'キ': strcpy(dst, "ｷ"); dst += 3; break;
+		case L'ク': strcpy(dst, "ｸ"); dst += 3; break;
+		case L'ケ': strcpy(dst, "ｹ"); dst += 3; break;
+		case L'コ': strcpy(dst, "ｺ"); dst += 3; break;
+		case L'サ': strcpy(dst, "ｻ"); dst += 3; break;
+		case L'シ': strcpy(dst, "ｼ"); dst += 3; break;
+		case L'ス': strcpy(dst, "ｽ"); dst += 3; break;
+		case L'セ': strcpy(dst, "ｾ"); dst += 3; break;
+		case L'ソ': strcpy(dst, "ｿ"); dst += 3; break;
+		case L'タ': strcpy(dst, "ﾀ"); dst += 3; break;
+		case L'チ': strcpy(dst, "ﾁ"); dst += 3; break;
+		case L'ッ': strcpy(dst, "ｯ"); dst += 3; break;
+		case L'ツ': strcpy(dst, "ﾂ"); dst += 3; break;
+		case L'テ': strcpy(dst, "ﾃ"); dst += 3; break;
+		case L'ト': strcpy(dst, "ﾄ"); dst += 3; break;
+		case L'ナ': strcpy(dst, "ﾅ"); dst += 3; break;
+		case L'ニ': strcpy(dst, "ﾆ"); dst += 3; break;
+		case L'ヌ': strcpy(dst, "ﾇ"); dst += 3; break;
+		case L'ネ': strcpy(dst, "ﾈ"); dst += 3; break;
+		case L'ノ': strcpy(dst, "ﾉ"); dst += 3; break;
+		case L'ハ': strcpy(dst, "ﾊ"); dst += 3; break;
+		case L'ヒ': strcpy(dst, "ﾋ"); dst += 3; break;
+		case L'フ': strcpy(dst, "ﾌ"); dst += 3; break;
+		case L'ヘ': strcpy(dst, "ﾍ"); dst += 3; break;
+		case L'ホ': strcpy(dst, "ﾎ"); dst += 3; break;
+		case L'マ': strcpy(dst, "ﾏ"); dst += 3; break;
+		case L'ミ': strcpy(dst, "ﾐ"); dst += 3; break;
+		case L'ム': strcpy(dst, "ﾑ"); dst += 3; break;
+		case L'メ': strcpy(dst, "ﾒ"); dst += 3; break;
+		case L'モ': strcpy(dst, "ﾓ"); dst += 3; break;
+		case L'ャ': strcpy(dst, "ｬ"); dst += 3; break;
+		case L'ヤ': strcpy(dst, "ﾔ"); dst += 3; break;
+		case L'ュ': strcpy(dst, "ｭ"); dst += 3; break;
+		case L'ユ': strcpy(dst, "ﾕ"); dst += 3; break;
+		case L'ョ': strcpy(dst, "ｮ"); dst += 3; break;
+		case L'ヨ': strcpy(dst, "ﾖ"); dst += 3; break;
+		case L'ラ': strcpy(dst, "ﾗ"); dst += 3; break;
+		case L'リ': strcpy(dst, "ﾘ"); dst += 3; break;
+		case L'ル': strcpy(dst, "ﾙ"); dst += 3; break;
+		case L'レ': strcpy(dst, "ﾚ"); dst += 3; break;
+		case L'ロ': strcpy(dst, "ﾛ"); dst += 3; break;
+		case L'ワ': strcpy(dst, "ﾜ"); dst += 3; break;
+		case L'ヲ': strcpy(dst, "ｦ"); dst += 3; break;
+		case L'ン': strcpy(dst, "ﾝ"); dst += 3; break;
+		case L'・': strcpy(dst, "･"); dst += 3; break;
+		case L'ー': strcpy(dst, "ｰ"); dst += 3; break;
+		case L'！': *dst++ = '!'; break;
+		case L'＃': *dst++ = '#'; break;
+		case L'＄': *dst++ = '$'; break;
+		case L'％': *dst++ = '%'; break;
+		case L'＆': *dst++ = '&'; break;
+		case L'（': *dst++ = '('; break;
+		case L'）': *dst++ = ')'; break;
+		case L'＊': *dst++ = '*'; break;
+		case L'＋': *dst++ = '+'; break;
+		case L'，': *dst++ = ','; break;
+		case L'－': *dst++ = '-'; break;
+		case L'．': *dst++ = '.'; break;
+		case L'／': *dst++ = '/'; break;
+		case L'０': *dst++ = '0'; break;
+		case L'１': *dst++ = '1'; break;
+		case L'２': *dst++ = '2'; break;
+		case L'３': *dst++ = '3'; break;
+		case L'４': *dst++ = '4'; break;
+		case L'５': *dst++ = '5'; break;
+		case L'６': *dst++ = '6'; break;
+		case L'７': *dst++ = '7'; break;
+		case L'８': *dst++ = '8'; break;
+		case L'９': *dst++ = '9'; break;
+		case L'：': *dst++ = ':'; break;
+		case L'；': *dst++ = ';'; break;
+		case L'＜': *dst++ = '<'; break;
+		case L'＝': *dst++ = '='; break;
+		case L'＞': *dst++ = '>'; break;
+		case L'？': *dst++ = '?'; break;
+		case L'＠': *dst++ = '@'; break;
+		case L'Ａ': *dst++ = 'A'; break;
+		case L'Ｂ': *dst++ = 'B'; break;
+		case L'Ｃ': *dst++ = 'C'; break;
+		case L'Ｄ': *dst++ = 'D'; break;
+		case L'Ｅ': *dst++ = 'E'; break;
+		case L'Ｆ': *dst++ = 'F'; break;
+		case L'Ｇ': *dst++ = 'G'; break;
+		case L'Ｈ': *dst++ = 'H'; break;
+		case L'Ｉ': *dst++ = 'I'; break;
+		case L'Ｊ': *dst++ = 'J'; break;
+		case L'Ｋ': *dst++ = 'K'; break;
+		case L'Ｌ': *dst++ = 'L'; break;
+		case L'Ｍ': *dst++ = 'M'; break;
+		case L'Ｎ': *dst++ = 'N'; break;
+		case L'Ｏ': *dst++ = 'O'; break;
+		case L'Ｐ': *dst++ = 'P'; break;
+		case L'Ｑ': *dst++ = 'Q'; break;
+		case L'Ｒ': *dst++ = 'R'; break;
+		case L'Ｓ': *dst++ = 'S'; break;
+		case L'Ｔ': *dst++ = 'T'; break;
+		case L'Ｕ': *dst++ = 'U'; break;
+		case L'Ｖ': *dst++ = 'V'; break;
+		case L'Ｗ': *dst++ = 'W'; break;
+		case L'Ｘ': *dst++ = 'X'; break;
+		case L'Ｙ': *dst++ = 'Y'; break;
+		case L'Ｚ': *dst++ = 'Z'; break;
+		case L'［': *dst++ = '['; break;
+		case L'］': *dst++ = ']'; break;
+		case L'＾': *dst++ = '^'; break;
+		case L'＿': *dst++ = '_'; break;
+		case L'｀': *dst++ = '`'; break;
+		case L'ａ': *dst++ = 'a'; break;
+		case L'ｂ': *dst++ = 'b'; break;
+		case L'ｃ': *dst++ = 'c'; break;
+		case L'ｄ': *dst++ = 'd'; break;
+		case L'ｅ': *dst++ = 'e'; break;
+		case L'ｆ': *dst++ = 'f'; break;
+		case L'ｇ': *dst++ = 'g'; break;
+		case L'ｈ': *dst++ = 'h'; break;
+		case L'ｉ': *dst++ = 'i'; break;
+		case L'ｊ': *dst++ = 'j'; break;
+		case L'ｋ': *dst++ = 'k'; break;
+		case L'ｌ': *dst++ = 'l'; break;
+		case L'ｍ': *dst++ = 'm'; break;
+		case L'ｎ': *dst++ = 'n'; break;
+		case L'ｏ': *dst++ = 'o'; break;
+		case L'ｐ': *dst++ = 'p'; break;
+		case L'ｑ': *dst++ = 'q'; break;
+		case L'ｒ': *dst++ = 'r'; break;
+		case L'ｓ': *dst++ = 's'; break;
+		case L'ｔ': *dst++ = 't'; break;
+		case L'ｕ': *dst++ = 'u'; break;
+		case L'ｖ': *dst++ = 'v'; break;
+		case L'ｗ': *dst++ = 'w'; break;
+		case L'ｘ': *dst++ = 'x'; break;
+		case L'ｙ': *dst++ = 'y'; break;
+		case L'ｚ': *dst++ = 'z'; break;
+		case L'｛': *dst++ = '{'; break;
+		case L'｜': *dst++ = '|'; break;
+		case L'｝': *dst++ = '}'; break;
+		case L'￣': *dst++ = '~'; break;
+		case L'￥': *dst++ = '\\'; break;
+		default:
+			while (prev < p)
+				*dst++ = *prev++;
+			break;
+		}
+	}
+	*dst = 0;
+	return _dst;
+}
+
+BYTE *zen2han(const BYTE *src, CharacterEncoding enc) {
+	switch (enc) {
+	case SHIFT_JIS:
+		return zen2han_sjis(src);
+	case UTF8:
+		return zen2han_utf8(src);
+	default:
+		return (BYTE *)src;
+	}
+}
+
+BYTE *han2zen(const BYTE *src, CharacterEncoding enc) {
+	if (enc != SHIFT_JIS)
+		return (BYTE *)src; // Not implemented
+
 	BYTE c0;
 	BYTE *dst, *_dst;
 	dst = _dst = malloc(strlen(src) * 2 + 1);

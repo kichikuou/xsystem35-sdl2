@@ -104,7 +104,7 @@ void ntmsg_init() {
 
 
 	// 主人公名前
-	nt_sstr_regist_replace(utf2sjis(SNAME_RYO), utf2sjis(SNAME_RYO_DEF));
+	nt_sstr_regist_replace(fromUTF8(SNAME_RYO), fromUTF8(SNAME_RYO_DEF));
 	
 	night.msg.cbmove = cb_mousemove;
 	night.msg.cbrelease = cb_keyrelease;

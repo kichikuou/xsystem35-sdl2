@@ -34,6 +34,7 @@
 #include "system.h"
 #include "font.h"
 #include "ags.h"
+#include "utfsjis.h"
 
 extern const unsigned short *s2u[];
 
@@ -58,35 +59,6 @@ static FONT *this;
 
 static void pixmap2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl);
 static void pixmapmono2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl);
-
-static int utf8_next_codepoint(const char **msg) {
-	int code;
-	const unsigned char *s = (const unsigned char *)*msg;
-
-	if (*s <= 0x7f) {
-		code = *s++;
-	} else if (*s <= 0xbf) {
-		WARNING("Invalid UTF-8 sequence %02x\n", *s);
-		code = '?';
-		s++;
-	} else if (*s <= 0xdf) {
-		code = (s[0] & 0x1f) << 6 | (s[1] & 0x3f);
-		s += 2;
-	} else if (*s <= 0xef) {
-		code = (s[0] & 0xf) << 12 | (s[1] & 0x3f) << 6 | (s[2] & 0x3f);
-		s += 3;
-	} else if (*s <= 0xf7) {
-		code = (s[0] & 0x7) << 18 | (s[1] & 0x3f) << 12 | (s[2] & 0x3f) << 6 | (s[3] & 0x3f);
-		s += 4;
-	} else {
-		code = 0xfffd;  // REPLACEMENT CHARACTER
-		s++;
-		while (0x80 <= *s && *s <= 0xbf)
-			s++;
-	}
-	*msg = (const char *)s;
-	return code;
-}
 
 static boolean select_charmap(FT_Face f, int type) {
 	int i;

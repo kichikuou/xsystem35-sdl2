@@ -62,34 +62,37 @@ void commandMP() {
 	/* 指定の文字列を指定文字数だけ表示する（Ｘコマンドの桁数指定） */
 	int    num1 = getCaliValue();
 	int    num2 = getCaliValue();
-	const char bstr[3] = "\x81\x40"; // full-width whitespace
+	const char *fullwidth_blank[CHARACTER_ENCODING_MAX + 1] = {
+		[SHIFT_JIS] = "\x81\x40",
+		[UTF8] = "　",
+	};
 	const char *src = v_str(num1 - 1);
 	int chars = num2;
 	char *str;
 
 	/* Patched English executable appends num2 spaces instead of truncating */
 	if (have_eng_mp_patch) {
-		str = calloc(strlen(src) + num2 * 2 + 1, 1);
+		str = calloc(strlen(src) + num2 * strlen(fullwidth_blank[nact->encoding]) + 1, 1);
 		if (NULL == str) {
 			NOMEMERR();
 		}
 		strcpy(str, src);
 	}
 	else {
-		str = calloc(num2 * 2 + 1, 1);
+		str = calloc(num2 * MAX_BYTES_PAR_CHAR(nact->encoding) + 1, 1);
 		if (NULL == str) {
 			NOMEMERR();
 		}
 
 		const char *p = src;
 		while (*p && chars > 0) {
-			p += CHECKSJIS1BYTE(*p) ? 2 : 1;
+			p = advance_char(p, nact->encoding);
 			chars--;
 		}
 		strncpy(str, src, p - src);
 	}
 	while (chars-- > 0) {
-		strcat(str, bstr);
+		strcat(str, fullwidth_blank[nact->encoding]);
 	}
 
 	sys_addMsg(str);
@@ -105,8 +108,8 @@ void commandMI() { /* T2 */
 	char *title = sys_getString(':');
 	char *t1, *t2, *t3;
 	
-	t1 = sjis2utf(title);
-	t2 = sjis2utf(v_str(dst_no -1));
+	t1 = toUTF8(title);
+	t2 = toUTF8(v_str(dst_no -1));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -119,10 +122,10 @@ void commandMI() { /* T2 */
 		return;
 	}
 	
-	t3 = utf2sjis(mi_param.newstring);
+	t3 = fromUTF8(mi_param.newstring);
 	
 	/* 全角文字以外は不可 */
-	if (!sjis_has_hankaku(t3)) {
+	if (nact->encoding != SHIFT_JIS ||!sjis_has_hankaku(t3)) {
 		v_strcpy(dst_no -1, t3);
 	}
 	free(t1);
@@ -163,7 +166,7 @@ void commandMT() {
 	
 	if (nact->game_title_utf8)
 		free(nact->game_title_utf8);
-	nact->game_title_utf8 = sjis2utf(str);
+	nact->game_title_utf8 = toUTF8(str);
 	ags_setWindowTitle(str);
 	
 	/* 闘神都市II 対策 */
@@ -197,7 +200,9 @@ void commandMH() {
 	int num2 = getCaliValue();
 
 	char buf[512];
-	v_strcpy(num1 - 1, format_number_zenkaku(num2, fig, buf));
+	char *s = fromSJIS(format_number_zenkaku(num2, fig, buf));
+	v_strcpy(num1 - 1, s);
+	free(s);
 
 	DEBUG_COMMAND("MH %d,%d,%d:\n",num1,fig,num2);
 }
@@ -215,7 +220,7 @@ void commandML() {
 	int *var   = getCaliVariable();
 	int str_no = getCaliValue();
 	
-	*var = sjis_count_char(v_str(str_no -1));
+	*var = v_strlen(str_no -1);
 	
 	DEBUG_COMMAND("ML %p,%d:\n",var, str_no);
 }
@@ -338,7 +343,7 @@ void commandMJ() {
 	INPUTSTRING_PARAM mj_param;
 	char *t1, *t2;
 	
-	t1 = sjis2utf(v_str(num -1));
+	t1 = toUTF8(v_str(num -1));
 	mj_param.max = max_len;
 	mj_param.x = x;
 	mj_param.y = y;
@@ -349,8 +354,8 @@ void commandMJ() {
 	menu_inputstring2(&mj_param);
 	if (mj_param.newstring == NULL) return;
 	
-	t2 = utf2sjis(mj_param.newstring);
-	if (!sjis_has_hankaku(t2)) {
+	t2 = fromUTF8(mj_param.newstring);
+	if (nact->encoding != SHIFT_JIS || !sjis_has_hankaku(t2)) {
 		v_strcpy(num -1, t2);
 	}
 	free(t1);

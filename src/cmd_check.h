@@ -304,6 +304,7 @@ extern void commandZI();
 extern void commandZA();
 extern void commandZK();
 extern void commandZR();
+extern void commandZU();
 
 /* define in cmd2F.c */
 extern void commands2F00();

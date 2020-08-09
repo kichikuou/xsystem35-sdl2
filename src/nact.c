@@ -70,6 +70,10 @@ void sys_setHankakuMode(int mode) {
 	msg_msgHankakuMode = mode;
 }
 
+void sys_setCharacterEncoding(CharacterEncoding encoding) {
+	nact->encoding = encoding;
+}
+
 /* 文字列の取り出し */
 char *sys_getString(char term) {
 	int c0;
@@ -103,9 +107,9 @@ void sys_addMsg(const char *str) {
 
 	switch(msg_msgHankakuMode) {
 	case 0:
-		msg = han2zen(str); break;
+		msg = han2zen(str, nact->encoding); break;
 	case 1:
-		msg = zen2han(str); break;
+		msg = zen2han(str, nact->encoding); break;
 	case 2:
 		msg = str; break;
 	default:
@@ -126,7 +130,7 @@ void sys_addMsg(const char *str) {
 		}
 	}
 	
-	if (msg && msg_msgHankakuMode < 2) {
+	if (msg != str) {
 		free((char *)msg);
 	}
 }
@@ -136,8 +140,10 @@ static int checkMessage() {
 	char *index = msgbuf;
 	int c0 = sl_getc();
 	
-	while (c0 == 0x20 || c0 > 0x80) {
-		if (c0 == 0x20) {
+	while (c0 == 0x20 || c0 >= 0x80) {
+		if (nact->encoding == UTF8) {
+			*index++ = (char)c0;
+		} else if (c0 == 0x20) {
 			*index++ = (char)c0;
 		} else if (c0 >= 0xe0) {
 			*index++ = (char)c0; *index++ = (char)sl_getc();

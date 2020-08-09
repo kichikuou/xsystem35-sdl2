@@ -112,7 +112,7 @@ void commandLE() {
 	int *var, _var = 0;
 	int num;
 
-	char *fname_utf8 = sjis2utf(filename);
+	char *fname_utf8 = toUTF8(filename);
 	switch(type) {
 	case 0: /* T2 */
 		var = getCaliVariable();
@@ -246,7 +246,7 @@ void commandLC() {
 	int y = getCaliValue();
 	char *filename = sys_getString(':'); 
 	
-	char *fname_utf8 = sjis2utf(filename);
+	char *fname_utf8 = toUTF8(filename);
 	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
 	free(fname_utf8);
 	

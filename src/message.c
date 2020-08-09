@@ -326,11 +326,14 @@ void msg_getMessageLocation(MyPoint *loc) {
 
 void msg_hitAnyKey() {
 	int w;
-	static BYTE hak[] = {0x81, 0xa5, 0x00}; /* ▼ */
+	const char *prompt[CHARACTER_ENCODING_MAX + 1] = {
+		[SHIFT_JIS] = "\x81\xa5",
+		[UTF8] = "▼",
+	};
 	
 	w = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
 			   msg.win->y + msg.win->height - msg.MsgFontSize,
-			   hak, msg.HitAnyKeyMsgColor);
+			   prompt[nact->encoding], msg.HitAnyKeyMsgColor);
 	ags_updateArea(msg.win->x + msg.win->width  - msg.MsgFontSize,
 		       msg.win->y + msg.win->height - msg.MsgFontSize,
 		       w, msg.MsgFontSize);

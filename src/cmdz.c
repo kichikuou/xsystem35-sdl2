@@ -525,3 +525,13 @@ void commandZR() {
 	
 	DEBUG_COMMAND("ZR %d,%d:\n", num, *var);
 }
+
+void commandZU() {
+	/* xsystem35 extension: sets unicode mode */
+	int sw = getCaliValue();
+
+	if (sw <= CHARACTER_ENCODING_MAX)
+		sys_setCharacterEncoding(sw);
+
+	DEBUG_COMMAND("ZU %d:\n",sw);
+}

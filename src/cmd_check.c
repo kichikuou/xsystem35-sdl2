@@ -1098,6 +1098,8 @@ void check_command(int c0) {
 				undeferr();
 			}
 			 break;
+		case 'U':
+			commandZU(); break;
 		case 'Z':
 			switch(sl_getc()) {
 			case 0:

@@ -22,9 +22,11 @@
 /* $Id: cmdh.c,v 1.5 2000/09/10 10:39:48 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "utfsjis.h"
 #include "hankaku.h"
 
 void commandH() {
@@ -32,7 +34,9 @@ void commandH() {
 	int num = getCaliValue();
 	char buf[512];
 
-	sys_addMsg(format_number_zenkaku(num, fig, buf));
+	char *s = fromSJIS(format_number_zenkaku(num, fig, buf));
+	sys_addMsg(s);
+	free(s);
 
 	DEBUG_COMMAND("H %d,%d:\n",fig,num);
 }

@@ -43,7 +43,7 @@
 
 #define LOGMSG_LINES 6
 
-static const char *logmsg[LOGMSG_LINES] = {
+static const char *logmsg_utf8[LOGMSG_LINES] = {
 	"\n",
 	"※バックログ操作方法※",
 	"[ESC]またはマウス右クリックでゲームに戻る",
@@ -110,15 +110,15 @@ static void draw_log() {
 
 
 int sblog_start(void) {
-	static char *logmsg_sjis[6];
-	if (!logmsg_sjis[0]) {
+	static char *logmsg[LOGMSG_LINES];
+	if (!logmsg[0]) {
 		for (int i = 0; i < LOGMSG_LINES; i++)
-			logmsg_sjis[i] = utf2sjis(logmsg[i]);
+			logmsg[i] = fromUTF8(logmsg_utf8[i]);
 	}
 
 	// 説明文章を追加
 	for (int i = 0; i < LOGMSG_LINES; i++)
-		sact.log = list_append(sact.log, logmsg_sjis[i]);
+		sact.log = list_append(sact.log, logmsg[i]);
 	
 	back = sf_dup(sf0);
 	chr  = sf_create_surface(sf0->width, sf0->height, 8);

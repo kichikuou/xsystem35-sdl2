@@ -33,6 +33,18 @@
 #include "utfsjis.h"
 #include "s2utbl.h"
 
+char* codeconv(CharacterEncoding tocode,
+			   CharacterEncoding fromcode,
+			   const char *str) {
+	if (tocode == fromcode)
+		return strdup(str);
+	if (tocode == UTF8 && fromcode == SHIFT_JIS)
+		return (char *)sjis2utf((char *)str);
+	if (tocode == SHIFT_JIS && fromcode == UTF8)
+		return (char *)utf2sjis((char *)str);
+	return NULL;
+}
+
 BYTE *sjis2utf(const BYTE *src) {
 	BYTE* dst = malloc(strlen(src) * 3 + 1);
 	BYTE* dstp = dst;
@@ -147,15 +159,43 @@ boolean sjis_has_zenkaku(const BYTE *src) {
 	return FALSE;
 }
 
-/* src 中の文字数を数える 全角文字も１文字 */
-int sjis_count_char(const BYTE *src) {
-	int c = 0;
-	
-	while(*src) {
-		if (CHECKSJIS1BYTE(*src)) {
-			src++;
-		}
-		c++; src++;
+int utf8_next_codepoint(const char **msg) {
+	int code;
+	const unsigned char *s = (const unsigned char *)*msg;
+
+	if (*s <= 0x7f) {
+		code = *s++;
+	} else if (*s <= 0xbf) {
+		// Invalid UTF-8 sequence
+		code = '?';
+		s++;
+	} else if (*s <= 0xdf) {
+		code = (s[0] & 0x1f) << 6 | (s[1] & 0x3f);
+		s += 2;
+	} else if (*s <= 0xef) {
+		code = (s[0] & 0xf) << 12 | (s[1] & 0x3f) << 6 | (s[2] & 0x3f);
+		s += 3;
+	} else if (*s <= 0xf7) {
+		code = (s[0] & 0x7) << 18 | (s[1] & 0x3f) << 12 | (s[2] & 0x3f) << 6 | (s[3] & 0x3f);
+		s += 4;
+	} else {
+		code = 0xfffd;  // REPLACEMENT CHARACTER
+		s++;
+		while (0x80 <= *s && *s <= 0xbf)
+			s++;
 	}
-	return c;
+	*msg = (const char *)s;
+	return code;
+}
+
+char *advance_char(const char *s, CharacterEncoding e) {
+	switch (e) {
+	case SHIFT_JIS:
+		return (char *)s + ((CHECKSJIS1BYTE(*s) && *(s + 1)) ? 2 : 1);
+	case UTF8:
+		while (UTF8_TRAIL_BYTE(*++s))
+			;
+		return (char *)s;
+	}
+	return NULL;
 }

@@ -45,7 +45,7 @@ int strvar_len = STRVAR_LEN;
 
 static char *advance(const char *s, int n) {
 	while (*s && n > 0) {
-		s += (CHECKSJIS1BYTE(*s) && *(s + 1)) ? 2 : 1;
+		s = advance_char(s, nact->encoding);
 		n--;
 	}
 	return (char *)s;
@@ -175,7 +175,14 @@ void v_strcat(int no, const char *str) {
 
 /* 文字変数の長さ */
 size_t v_strlen(int no) {
-	return sjis_count_char(v_str(no));
+	const char *s = v_str(no);
+
+	int c = 0;
+	while (*s) {
+		s = advance_char(s, nact->encoding);
+		c++;
+	}
+	return c;
 }
 
 /* Width of a string (2 for full-width characters, 1 for half-width) */
@@ -207,7 +214,7 @@ int v_strstr(int no, int start, const char *str) {
 		return -1;
 	int n = start;
 	while (p < found) {
-		p += CHECKSJIS1BYTE(*p) ? 2 : 1;
+		p = advance_char(p, nact->encoding);
 		n++;
 	}
 	return n;
