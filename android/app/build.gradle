@@ -1,4 +1,4 @@
-def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY');
+def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY')
 def buildAsApplication = !buildAsLibrary
 if (buildAsApplication) {
     apply plugin: 'com.android.application'
@@ -9,13 +9,13 @@ else {
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
         if (buildAsApplication) {
             applicationId "io.github.kichikuou.xsystem35"
         }
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 4
         versionName "0.2.1"
         externalNativeBuild {

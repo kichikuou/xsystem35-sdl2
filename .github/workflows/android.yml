@@ -19,7 +19,7 @@ jobs:
     - name: Build
       run: |
         cd android
-        ./gradlew assembleRelease
+        ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle ./gradlew assembleRelease
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
