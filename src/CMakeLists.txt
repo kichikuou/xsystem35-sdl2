@@ -40,7 +40,9 @@ target_sources(xsystem35 PRIVATE
   pms.c vsp.c bmp.c qnt.c)
 if (HAVE_JPEG)
   target_sources(xsystem35 PRIVATE jpeg.c)
-  target_link_libraries(xsystem35 PRIVATE JPEG::JPEG)
+  if (NOT EMSCRIPTEN)
+    target_link_libraries(xsystem35 PRIVATE JPEG::JPEG)
+  endif()
 endif()
 
 # Music
@@ -70,7 +72,11 @@ endif()
 
 if (EMSCRIPTEN)
 
-  set(LIBS "SHELL:-s USE_ZLIB=1 -s USE_FREETYPE=1 -s USE_SDL=2")
+  set(LIBS
+    "SHELL:-s USE_ZLIB=1"
+    "SHELL:-s USE_LIBJPEG=1"
+    "SHELL:-s USE_FREETYPE=1"
+    "SHELL:-s USE_SDL=2")
   target_compile_options(xsystem35 PRIVATE ${LIBS})
   target_link_options(xsystem35 PRIVATE ${LIBS})
   target_link_libraries(xsystem35 PRIVATE idbfs.js)
