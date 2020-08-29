@@ -263,10 +263,10 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	case WINDOW_FRAME_EMPTY:
 		if (M == 0) {
 			/* show window */
+			if (msg.win->savedimg != NULL) {
+				ags_delRegion(msg.win->savedimg);
+			}
 			if (msg.win->save) {
-				if (msg.win->savedimg != NULL) {
-					ags_delRegion(msg.win->savedimg);
-				}
 				msg.win->savedimg = ags_saveRegion(msg.win->x, msg.win->y, msg.win->width, msg.win->height);
 			} else {
 				msg.win->savedimg = NULL;
@@ -283,10 +283,10 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	case WINDOW_FRAME_LINE:
 		if (M == 0) {
 			/* show window*/
+			if (msg.win->savedimg != NULL) {
+				ags_delRegion(msg.win->savedimg);
+			}
 			if (msg.win->save) {
-				if (msg.win->savedimg != NULL) {
-					ags_delRegion(msg.win->savedimg);
-				}
 				msg.win->savedimg = ags_saveRegion(msg.win->x -8, msg.win->y -8, msg.win->width +16, msg.win->height +16);
 			} else {
 				msg.win->savedimg = NULL;
