@@ -443,19 +443,19 @@ int save_saveAll(int no) {
 	char *sd_stack  = NULL;
 	char *sd_varSys = NULL;
 	int i, totalsize = sizeof(Ald_baseHdr);
-	FILE *fp;
+	FILE *fp = NULL;
 	
 	if (no >= SAVE_MAXNUMBER)
-		return SAVE_SAVEERR;
+		goto errexit;
 	
 	if (save_base == NULL)
-		return SAVE_SAVEERR;
+		goto errexit;
 	
 	fc_backup_oldfile(nact->files.save_fname[no]);
 	fp = fopen(nact->files.save_fname[no], "wb");
 	
 	if (fp == NULL)
-		return SAVE_SAVEERR;
+		goto errexit;
 	
 	memset(&save_stackHdr, 0, sizeof(Ald_stackHdr));
 	memset(&save_strHdr, 0, sizeof(Ald_strVarHdr));
