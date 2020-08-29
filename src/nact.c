@@ -179,10 +179,10 @@ void nact_main() {
 			nact->cmd_count++;
 		}
 		nact->callback();
-#ifndef __EMSCRIPTEN__
+
 		if (!nact->is_message_locked)
 			sys_getInputInfo();
-#endif
+
 		WaitVsync();
 		nact->frame_count++;
 		nact->wait_vsync = FALSE;
