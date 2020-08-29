@@ -148,7 +148,7 @@ static void sys35_usage(boolean verbose) {
 	puts(" -devfont sdl   : SDL_ttf");
 #endif
 #ifdef ENABLE_FT2
-	puts(" -devfont ttf   : FreeType");
+	puts(" -devfont ft2   : FreeType");
 #endif
 #ifdef ENABLE_X11FONT
 	puts(" -devfont x11   : x11");
