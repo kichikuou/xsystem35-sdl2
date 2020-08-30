@@ -63,7 +63,6 @@ mididevice_t midi = {
 };
 
 static Mix_Music *mix_music;
-static int midino;
 static int counter;
 static uint32_t fade_tick;
 
@@ -80,9 +79,6 @@ static int midi_exit() {
 }
 
 static int midi_start(int no, int loop, char *data, int datalen) {
-	if (midino == no)
-		return OK;
-
 	midi_stop();
 
 	SDL_RWops *rwops = SDL_RWFromConstMem(data, datalen);
@@ -96,7 +92,6 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 		return NG;
 	}
 
-	midino = no;
 	counter = get_high_counter(SYSTEMCOUNTER_MIDI);
 	return OK;
 }
@@ -106,7 +101,6 @@ static int midi_stop() {
 		return OK;
 	Mix_FreeMusic(mix_music);
 	mix_music = NULL;
-	midino = 0;
 	return OK;
 }
 
@@ -123,9 +117,8 @@ static int midi_unpause(void) {
 }
 
 static int midi_get_playing_info(midiplaystate *st) {
-	if (midino == 0) {
+	if (!mix_music) {
 		st->in_play = FALSE;
-		st->play_no = 0;
 		st->loc_ms  = 0;
 		return OK;
 	}
@@ -133,7 +126,6 @@ static int midi_get_playing_info(midiplaystate *st) {
 	int cnt = get_high_counter(SYSTEMCOUNTER_MIDI) - counter;
 
 	st->in_play = TRUE;
-	st->play_no = midino;
 	st->loc_ms = cnt * 10;
 	return OK;
 }

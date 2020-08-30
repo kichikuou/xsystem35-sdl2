@@ -54,8 +54,6 @@ mididevice_t midi = {
 	midi_fading
 };
 
-static int midino;
-
 static int midi_initilize(char *pname, int subdev) {
 	return OK;
 }
@@ -66,9 +64,6 @@ static int midi_exit() {
 }
 
 static int midi_start(int no, int loop, char *data, int datalen) {
-	if (midino == no)
-		return OK;
-
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
@@ -99,7 +94,6 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	(*env)->CallVoidMethod(env, context, mid, path_str, loop == 0);
 	(*env)->PopLocalFrame(env, NULL);
 
-	midino = no;
 	return OK;
 }
 
@@ -115,7 +109,6 @@ static int midi_stop() {
 	(*env)->CallVoidMethod(env, context, mid);
 	(*env)->PopLocalFrame(env, NULL);
 
-	midino = 0;
 	return OK;
 }
 
@@ -129,10 +122,7 @@ static int midi_unpause(void) {
 
 static int midi_get_playing_info(midiplaystate *st) {
 	st->in_play = FALSE;
-	st->play_no = 0;
 	st->loc_ms  = 0;
-	if (midino == 0)
-		return OK;
 
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
@@ -147,7 +137,6 @@ static int midi_get_playing_info(midiplaystate *st) {
 
 	if (pos >= 0) {
 		st->in_play = TRUE;
-		st->play_no = midino;
 		st->loc_ms = pos;
 	}
 	return OK;

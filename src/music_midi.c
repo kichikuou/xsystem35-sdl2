@@ -29,6 +29,8 @@
 #include "midi.h"
 #include "ald_manager.h"
 
+static int midino;
+
 int musmidi_init() {
 	int st = midi_init(&prv.mididev);
 
@@ -51,17 +53,19 @@ int musmidi_exit() {
 
 int musmidi_start(int no, int loop) {
 	if (!prv.midi_valid) return NG;
+	if (midino == no)
+		return OK;
 
-	dridata *dfile;
-	
-	dfile = ald_getdata(DRIFILE_MIDI, no -1);
-	if (dfile == NULL) {
-		prv.midi.dfile = NULL;
+	dridata *dfile = ald_getdata(DRIFILE_MIDI, no -1);
+	if (dfile == NULL)
 		return NG;
-	}
 	
+	prv.midi.dev->start(no, loop, dfile->data, dfile->size);
+
+	if (prv.midi.dfile)
+		ald_freedata(prv.midi.dfile);
 	prv.midi.dfile = dfile;
-	prv.midi.dev->start(no, loop, prv.midi.dfile->data, prv.midi.dfile->size);
+	midino = no;
 
 	return OK;
 }
@@ -75,6 +79,7 @@ int musmidi_stop() {
 		ald_freedata(prv.midi.dfile);
 		prv.midi.dfile = NULL;
 	}
+	midino = 0;
 	return OK;
 }
 
@@ -94,9 +99,13 @@ int musmidi_unpause() {
 
 midiplaystate musmidi_getpos() {
 	midiplaystate st = {FALSE, 0, 0};
-	if (!prv.midi_valid) return st;
+	if (!prv.midi_valid || !midino) return st;
 
 	prv.midi.dev->getpos(&st);
+	if (st.in_play)
+		st.play_no = midino;
+	else
+		midino = 0;
 	return st;
 }
 

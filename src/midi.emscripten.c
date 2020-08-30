@@ -55,8 +55,6 @@ mididevice_t midi = {
 	midi_fading
 };
 
-static int midino;
-
 static int midi_initilize(char *pname, int subdev) {
 	return OK;
 }
@@ -67,19 +65,12 @@ static int midi_exit() {
 }
 
 static int midi_start(int no, int loop, char *data, int datalen) {
-	if (midino == no)
-		return OK;
-
 	EM_ASM_ARGS({ xsystem35.midiPlayer.play($0, $1, $2); }, loop, data, datalen);
-
-	midino = no;
 	return OK;
 }
 
 static int midi_stop() {
 	EM_ASM( xsystem35.midiPlayer.stop(); );
-
-	midino = 0;
 	return OK;
 }
 
@@ -94,17 +85,13 @@ EM_JS(int, midi_unpause, (void), {
 });
 
 static int midi_get_playing_info(midiplaystate *st) {
-	if (midino != 0) {
-		int pos = EM_ASM_INT_V( return xsystem35.midiPlayer.getPosition(); );
-		if (pos >= 0) {
-			st->in_play = TRUE;
-			st->play_no = midino;
-			st->loc_ms = pos;
-			return OK;
-		}
+	int pos = EM_ASM_INT_V( return xsystem35.midiPlayer.getPosition(); );
+	if (pos >= 0) {
+		st->in_play = TRUE;
+		st->loc_ms = pos;
+		return OK;
 	}
 	st->in_play = FALSE;
-	st->play_no = 0;
 	st->loc_ms  = 0;
 	return OK;
 }

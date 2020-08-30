@@ -119,7 +119,6 @@ static boolean enabled = FALSE;
 static struct midiinfo *midi;
 static int midifd;
 static char *mididevname;
-static int midino;
 static pid_t midipid;
 static int counter;
 
@@ -536,7 +535,6 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 		_exit(0);
 	}
 	
-	midino  = no;
 	midipid = pid;
 	counter = get_high_counter(SYSTEMCOUNTER_MIDI);
 	
@@ -554,7 +552,6 @@ static int midi_stop() {
 	while(0 >= waitpid(midipid, &status, WNOHANG));
 	
 	midipid = 0;
-	midino  = 0;
 	
 	return OK;
 }
@@ -576,16 +573,14 @@ static int midi_unpause(void) {
 static int midi_get_playing_info(midiplaystate *st) {
 	int status, cnt, err;
 	
-	if (!enabled || midino == 0) {
+	if (!enabled || midipid == 0) {
 		st->in_play = FALSE;
-		st->play_no = 0;
 		st->loc_ms  = 0;
 		return OK;
 	}
 	
 	if (midipid == (err = waitpid(midipid, &status, WNOHANG))) {
 		st->in_play = FALSE;
-		st->play_no = 0;
 		st->loc_ms  = 0;
 		midipid = 0;
 		return OK;
@@ -594,7 +589,6 @@ static int midi_get_playing_info(midiplaystate *st) {
 	cnt = get_high_counter(SYSTEMCOUNTER_MIDI) - counter;
 	
 	st->in_play = TRUE;
-	st->play_no = midino;
 	st->loc_ms = cnt * 10;
 	
 	return OK;
