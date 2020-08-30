@@ -63,28 +63,23 @@ static void disjunction(void* region, void* data) {
 	MyRectangle *r2 = (MyRectangle *)data;
 	int x1, x2, y1, y2;
 	
-	//SACT_DEBUG("r1x=%d,r1y=%d,r1w=%d,r1h=%d\n", r1->x, r1->y, r1->width, r1->height);
-	//SACT_DEBUG("r2x=%d,r2y=%d,r2w=%d,r2h=%d\n", r2->x, r2->y, r2->width, r2->height);
-	
 	if (r2->width == 0) {
 		r2->x = r1->x;
 		r2->y = r1->y;
 		r2->width = r1->width;
 		r2->height = r1->height;
-		return;
+	} else {
+		x1 = min(r1->x, r2->x);
+		x2 = max(r1->x + r1->width,  r2->x + r2->width);
+		y1 = min(r1->y, r2->y);
+		y2 = max(r1->y + r1->height, r2->y + r2->height);
+
+		r2->x = x1;
+		r2->y = y1;
+		r2->width  = x2 - x1;
+		r2->height = y2 - y1;
 	}
-	
-	x1 = min(r1->x, r2->x);
-	x2 = max(r1->x + r1->width,  r2->x + r2->width);
-	y1 = min(r1->y, r2->y);
-	y2 = max(r1->y + r1->height, r2->y + r2->height);
-	
-	r2->x = x1;
-	r2->y = y1;
-	r2->width  = x2 - x1;
-	r2->height = y2 - y1;
-	
-	//SACT_DEBUG("res:r2x=%d,r2y=%d,r2w=%d,r2h=%d\n", r2->x, r2->y, r2->width, r2->height);
+	free(r1);
 }
 
 // 更新の必要なスプライトの領域の和をとってクリッピングする
