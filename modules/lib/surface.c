@@ -13,14 +13,12 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 	
 	s->width = width;
 	s->height = height;
-	s->has_alpha = has_alpha;
-	s->has_pixel = has_pixel;
 	
 	s->bytes_per_line = width;
 	s->bytes_per_pixel = 1;
 	s->depth = depth;
 	
-	if (s->has_pixel) {
+	if (has_pixel) {
 		switch (s->depth) {
 		case 8:
 			s->pixel = calloc(width * (height +1), sizeof(BYTE));
@@ -42,11 +40,9 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 		default:
 			WARNING("depth %d is not supported\n", s->depth);
 		}
-	} else {
-		s->pixel = NULL;
 	}
 	
-	if (s->has_alpha) {
+	if (has_alpha) {
 		s->alpha = calloc(width * (height +1), sizeof(BYTE));
 	}
 	
@@ -111,13 +107,13 @@ surface_t *sf_dup(surface_t *in) {
 	sf = malloc(sizeof(surface_t));
 	memcpy(sf, in, sizeof(surface_t));
 	
-	if (in->has_pixel) {
+	if (in->pixel) {
 		len = sf->bytes_per_line * sf->height;
 		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
 		memcpy(sf->pixel, in->pixel, len);
 	}
 	
-	if (in->has_alpha) {
+	if (in->alpha) {
 		len = sf->width * sf->height;
 		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
 		memcpy(sf->alpha, in->alpha, len);
@@ -143,12 +139,12 @@ void sf_copyall(surface_t *dst, surface_t *src) {
 	
 	if (src->bytes_per_pixel != dst->bytes_per_pixel) return;
 	
-	if (src->has_alpha && dst->has_alpha) {
+	if (src->alpha && dst->alpha) {
 		len = src->width * src->height;
 		memcpy(dst->alpha, src->alpha, len);
 	}
 	
-	if (src->has_pixel && dst->has_pixel) {
+	if (src->pixel && dst->pixel) {
 		len = src->bytes_per_line * src->height;
 		memcpy(dst->pixel, src->pixel, len);
 	}
@@ -170,7 +166,7 @@ surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 	sf = malloc(sizeof(surface_t));
 	memcpy(sf, in, sizeof(surface_t));
 	
-	if (in->has_pixel) {
+	if (in->pixel) {
 		len = sf->bytes_per_line * sf->height;
 		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
 		if (copypixel) {
@@ -178,7 +174,7 @@ surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 		}
 	}
 	
-	if (in->has_alpha) {
+	if (in->alpha) {
 		len = sf->width * sf->height;
 		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
 		if (copyalpha) {

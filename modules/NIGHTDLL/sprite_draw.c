@@ -76,7 +76,7 @@ int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	dx += r->x;
 	dy += r->y;
 	
-	if (cg->sf->has_alpha) {
+	if (cg->sf->alpha) {
 		// alpha map がある場合
 		gre_BlendUseAMap(sf0, dx, dy,
 				 sf0, dx, dy,

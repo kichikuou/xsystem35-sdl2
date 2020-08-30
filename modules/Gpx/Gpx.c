@@ -243,7 +243,7 @@ static void IsSurface() {
 	if (s == NULL) {
 		*var = 0;
 	} else {
-		*var = (s->has_alpha && s->has_pixel) ? 1 : 0;
+		*var = (s->alpha && s->pixel) ? 1 : 0;
 	}
 	
 	DEBUG_COMMAND("Gpx.IsSurface %d,%p:\n", p1, var);
@@ -265,7 +265,7 @@ static void IsPixel() {
 	if (s == NULL) {
 		*var = 0;
 	} else {
-		*var = s->has_pixel ? 1 : 0;
+		*var = s->pixel ? 1 : 0;
 	}
 	
 	DEBUG_COMMAND("Gpx.IsPixel %d,%p:\n", p1, var);
@@ -287,7 +287,7 @@ static void IsAlpha() {
 	if (s == NULL) {
 		*var = 0;
 	} else {
-		*var = s->has_alpha ? 1 : 0;
+		*var = s->alpha ? 1 : 0;
 	}
 	
 	DEBUG_COMMAND("Gpx.IsAlpha %d,%p:\n", p1, var);

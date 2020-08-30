@@ -71,12 +71,8 @@ struct agsurface {
 	int bytes_per_line;   /* bytes per line  */
 	int bytes_per_pixel;  /* bytes per pixel */
 	
-	BYTE *pixel; /* pointer to pixel data */
-	BYTE *alpha; /* pointer to alpha pixel data */
-
-	boolean has_alpha;
-	boolean has_pixel;
-
+	BYTE *pixel; /* pixel data (can be NULL) */
+	BYTE *alpha; /* alpha pixel data (can be NULL) */
 };
 typedef struct agsurface agsurface_t;
 

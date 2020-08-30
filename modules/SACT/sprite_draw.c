@@ -117,7 +117,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	dx += sact.updaterect.x;
 	dy += sact.updaterect.y;
 	
-	if (cg->sf->has_alpha) {
+	if (cg->sf->alpha) {
 		// alpha map がある場合
 		gre_BlendUseAMap(sf0, dx, dy,
 				 sf0, dx, dy,
@@ -175,7 +175,7 @@ void sp_draw_dmap(void* data, void* userdata) {
 		return;
 	}
 	
-	if (cg->sf->has_alpha) {
+	if (cg->sf->alpha) {
 		fill_dmap_mask(cg->sf, sx, sy, dx, dy, w, h, sp->no);
 	} else {
 		fill_dmap(dx, dy, w, h, sp->no);

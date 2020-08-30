@@ -308,15 +308,15 @@ int nt_scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHe
 	i->refcnt = 0;
 	
 	src = srccg->sf;
-	if (src->has_alpha) {
+	if (src->alpha) {
 		dst = sf_create_surface(wWidth, wHeight, src->depth);
 	} else {
 		dst = sf_create_pixel(wWidth, wHeight, src->depth);
 	}
-	if (src->has_pixel) {
+	if (src->pixel) {
 		gr_copy(dst, 0, 0, src, wX, wY, wWidth, wHeight);
 	}
-	if (src->has_alpha) {
+	if (src->alpha) {
 		gr_copy_alpha_map(dst, 0, 0, src, wX, wY, wWidth, wHeight);
 	}
 	
@@ -349,17 +349,17 @@ int nt_scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, in
 	i->refcnt = 0;
 
 	src = srccg->sf;
-	if (src->has_alpha) {
+	if (src->alpha) {
 		dst = sf_create_surface(src->width, src->height, src->depth);
 		gr_fill_alpha_map(dst, 0, 0, src->width, src->height, 255);
 	} else {
 		dst = sf_create_pixel(src->width, src->height, src->depth);
 	}
 	
-	if (src->has_pixel) {
+	if (src->pixel) {
 		gr_copy(dst, wX, wY, src, wX, wY, wWidth, wHeight);
 	}
-	if (src->has_alpha) {
+	if (src->alpha) {
 		gr_copy_alpha_map(dst, wX, wY, src, wX, wY, wWidth, wHeight);
 	}
 	
@@ -484,7 +484,7 @@ int nt_scg_existalphamap(int wNumCG, int *ret) {
 	if (cgs[wNumCG] == NULL) goto errexit;
 	if (cgs[wNumCG]->sf == NULL) goto errexit;
 	
-	*ret = cgs[wNumCG]->sf->has_alpha ? 1 : 0;
+	*ret = cgs[wNumCG]->sf->alpha ? 1 : 0;
 	
  errexit:
 	*ret = 0;

@@ -12,13 +12,11 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	dst->depth = src->depth;
 	dst->bytes_per_line = dw * src->bytes_per_pixel;
 	dst->bytes_per_pixel = src->bytes_per_pixel;
-	dst->has_pixel = src->has_pixel;
-	dst->has_alpha = src->has_alpha;
 	
-	if (src->has_pixel) {
+	if (src->pixel) {
 		dst->pixel = malloc(dh * dst->bytes_per_line);
 	}
-	if (src->has_alpha) {
+	if (src->alpha) {
 		dst->alpha = malloc(dw * dh);
 	}
 	
@@ -88,7 +86,7 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 		break;
 	}
 	
-	if (src->has_alpha) {
+	if (src->alpha) {
 		int x, y;
 		BYTE *sl, *dl;
 		BYTE *_sl, *_dl;

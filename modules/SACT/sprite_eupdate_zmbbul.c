@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "ngraph.h"
 #include "graph.h"
 
@@ -42,7 +43,10 @@ static void ec10_cb(surface_t *sfsrc, surface_t *sfdst) {
 	if (ec10_sf[0] == NULL) {
 		ec10_sf[0] = sf_dup2(sfsrc, FALSE, FALSE);
 		sf = ec10_sf[0];
-		sf->has_alpha = FALSE;
+		if (sf->alpha) {
+			free(sf->alpha);
+			sf->alpha = NULL;
+		}
 		gr_copy_stretch(sf, 0, 0, sf->width, sf->height, sfsrc, sx, sy, sw, sh);
 		gr_bright_dst_only(sf, 0, 0, sf->width, sf->height, 255/6);
 		return;

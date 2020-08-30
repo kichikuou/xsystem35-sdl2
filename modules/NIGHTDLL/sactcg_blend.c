@@ -4,7 +4,7 @@ static surface_t *blend(surface_t *base, int x, int y, surface_t *blend, int mod
 	
 	gr_copy(dst, 0, 0, base, 0, 0, base->width, base->height);
 	
-	if (base->has_alpha) {
+	if (base->alpha) {
 		// ベースに alpha map がある場合はそれをコピー
 		gr_copy_alpha_map(dst, 0, 0, base, 0, 0, base->width, base->height);
 	} else {
@@ -12,7 +12,7 @@ static surface_t *blend(surface_t *base, int x, int y, surface_t *blend, int mod
 		gr_fill_alpha_map(dst, 0, 0, base->width, base->height, 255);
 	}
 	
-	if (blend->has_alpha) {
+	if (blend->alpha) {
 		// 重ね合わせ先の alpha map があるときはそれを使う
 		gre_BlendUseAMap(dst, x, y, base, x, y, blend, 0, 0, blend->width, blend->height, blend, 0, 0, 255);
 	} else {
