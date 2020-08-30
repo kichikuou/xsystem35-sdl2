@@ -141,11 +141,15 @@ static void font_ttf_sel_font(int type, int size) {
 }
 
 static void pixmap2comimg(BYTE *src, int x, int y, int w, int h, int src_bpl) {
-	int yy;
+	if (x < 0) {
+		w += x;
+		src -= x;
+		x = 0;
+	}
 	BYTE *dst = GETOFFSET_PIXEL(&img_glyph, x, y);
 	if (w <= 0) return;
 	
-	for (yy = 0; yy < h; yy++) {
+	for (int yy = 0; yy < h; yy++) {
 		memcpy(dst, src, w);
 		src += src_bpl;
 		dst += img_glyph.bytes_per_line;
