@@ -232,24 +232,3 @@ cgdata *bmp16m_extract(BYTE *data) {
 	
 	return cg;
 }
-
-/*
- * Extract bmp pallet only
- *   data: raw data (pointer to data top)
- *   return: extracted pallet data
-*/
-cgdata *bmp_getpal(BYTE *data) {
-	cgdata *cg = calloc(1, sizeof(cgdata));
-	bmp_header *bmp = extract_header(data);
-	
-	cg->pal = malloc(sizeof(Pallet256));
-	getpal(cg->pal, data + bmp->bmpPp);
-	
-	cg->type  = ALCG_BMP8;
-	cg->pic   = NULL;
-	cg->alpha = NULL;
-	
-	free(bmp);
-	
-	return cg;
-}

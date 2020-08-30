@@ -63,7 +63,6 @@ extern boolean  pms256_checkfmt(BYTE *data);
 extern cgdata  *pms256_extract(BYTE *data);
 extern boolean  pms64k_checkfmt(BYTE *data);
 extern cgdata  *pms64k_extract(BYTE *data);
-extern cgdata  *pms_getpal(BYTE *data);
 
 #endif /* !__PMS__ */
 

@@ -81,7 +81,6 @@ extern void cg_load(int no, int flg);
 extern void cg_load_with_alpha(int cgno, int shadowno);
 extern int  cg_load_with_filename(char *fname_utf8, int x, int y);
 extern void cg_get_info(int no, MyRectangle *info);
-extern cgdata *cg_loadonly(int no);
 extern void cg_clear_display_loc();
 
 extern int cg_vspPB;

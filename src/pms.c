@@ -298,24 +298,3 @@ cgdata *pms64k_extract(BYTE *data) {
 	
 	return cg;
 }
-
-/*
- * Extract pms pallet only
- *   data: raw data (pointer to data top)
- *   return: extracted pallet data
-*/
-cgdata *pms_getpal(BYTE *data) {
-	cgdata *cg = calloc(1, sizeof(cgdata));
-	pms_header *pms = extract_header(data);
-	
-	cg->pal = malloc(sizeof(Pallet256));
-	getpal(cg->pal, data + pms->pmsPp);
-	
-	cg->type  = ALCG_PMS8;
-	cg->pic   = NULL;
-	cg->alpha = NULL;
-	
-	free(pms);
-	
-	return cg;
-}

@@ -50,6 +50,5 @@ extern boolean bmp256_checkfmt(BYTE *data);
 extern cgdata *bmp256_extract(BYTE *data);
 extern boolean bmp16m_checkfmt(BYTE *data);
 extern cgdata *bmp16m_extract(BYTE *data);
-extern cgdata *bmp_getpal(BYTE *data);
 
 #endif /* !__BMP__ */

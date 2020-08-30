@@ -223,24 +223,3 @@ cgdata *vsp_extract(BYTE *data) {
 	
 	return cg;
 }
-
-/*
- * Extract vsp pallet only
- *   data: raw data (pointer to data top)
- *   return: extracted pallet data
-*/
-cgdata *vsp_getpal(BYTE *data) {
-	cgdata *cg = calloc(1, sizeof(cgdata));
-	vsp_header *vsp = extract_header(data);
-	
-	cg->pal = malloc(sizeof(Pallet256));
-	getpal(cg->pal, data + vsp->vspPp);
-	
-	cg->type  = ALCG_VSP;
-	cg->pic   = NULL;
-	cg->alpha = NULL;
-	
-	free(vsp);
-	
-	return cg;
-}

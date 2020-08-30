@@ -225,63 +225,43 @@ static cgdata *loader(int no) {
 	
 	/* extract cg */
 	/*  size is only pixel data size */
-	if (GCMD_EXTRACTCG(cg_fflg)) {
-		switch(type) {
-		case ALCG_VSP:
-			cg = vsp_extract(dfile->data);
-			size = cg->width * cg->height;
-			break;
-		case ALCG_PMS8:
-			cg = pms256_extract(dfile->data);
-			size = cg->width * cg->height;
-			break;
-		case ALCG_PMS16:
-			cg = pms64k_extract(dfile->data);
-			size = (cg->width * cg->height) * sizeof(WORD);
-			break;
-		case ALCG_BMP8:
-			cg = bmp256_extract(dfile->data);
-			size = cg->width * cg->height;
-			break;
-		case ALCG_BMP24:
-			cg = bmp16m_extract(dfile->data);
-			size = (cg->width * cg->height) * sizeof(WORD);
-			break;
-		case ALCG_QNT:
-			cg = qnt_extract(dfile->data);
-			size = (cg->width * cg->height) * 3;
-			break;
+	switch(type) {
+	case ALCG_VSP:
+		cg = vsp_extract(dfile->data);
+		size = cg->width * cg->height;
+		break;
+	case ALCG_PMS8:
+		cg = pms256_extract(dfile->data);
+		size = cg->width * cg->height;
+		break;
+	case ALCG_PMS16:
+		cg = pms64k_extract(dfile->data);
+		size = (cg->width * cg->height) * sizeof(WORD);
+		break;
+	case ALCG_BMP8:
+		cg = bmp256_extract(dfile->data);
+		size = cg->width * cg->height;
+		break;
+	case ALCG_BMP24:
+		cg = bmp16m_extract(dfile->data);
+		size = (cg->width * cg->height) * sizeof(WORD);
+		break;
+	case ALCG_QNT:
+		cg = qnt_extract(dfile->data);
+		size = (cg->width * cg->height) * 3;
+		break;
 #ifdef HAVE_JPEG
-		case ALCG_JPEG:
-			cg = jpeg_extract(dfile->data, dfile->size);
-			size = (cg->width * cg->height) * sizeof(WORD);
-			break;
+	case ALCG_JPEG:
+		cg = jpeg_extract(dfile->data, dfile->size);
+		size = (cg->width * cg->height) * sizeof(WORD);
+		break;
 #endif
-		default:
-			break;
-		}
-		/* insert to cache */
-		if (cg)
-			cache_insert(cacheid, no, cg, size, NULL);
+	default:
+		break;
 	}
-	
-	/* load pallet if not extracted */
-	if (GCMD_LOAD_PALLET(cg_fflg) && cg == NULL) {
-		/* XXXX うむ、こいつらどこで解放するんだ */
-		switch(type) {
-		case ALCG_VSP:
-			cg = vsp_getpal(dfile->data);
-			break;
-		case ALCG_PMS8:
-			cg = pms_getpal(dfile->data);
-			break;
-		case ALCG_BMP8:
-			cg = bmp_getpal(dfile->data);
-			break;
-		default:
-			break;
-		}
-	}
+	/* insert to cache */
+	if (cg)
+		cache_insert(cacheid, no, cg, size, NULL);
 	
 	/* ok to free */
 	ald_freedata(dfile);
@@ -372,10 +352,6 @@ void cg_load(int no, int flg) {
 			break;
 		default:
 			break;
-		}
-		/* pallet load only */
-		if (cg->pic == NULL) {
-			cgdata_free(cg);
 		}
 	}
 	
@@ -549,10 +525,6 @@ void cg_get_info(int no, MyRectangle *info) {
 		info->width  = cg->width;
 		info->height = cg->height;
 	}
-}
-
-cgdata *cg_loadonly(int no) {
-	return loader(no);
 }
 
 void cg_clear_display_loc() {

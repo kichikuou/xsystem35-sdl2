@@ -47,6 +47,5 @@ typedef struct {
 	
 extern boolean vsp_checkfmt(BYTE *data);
 extern cgdata *vsp_extract(BYTE *data);
-extern cgdata *vsp_getpal(BYTE *data);
 
 #endif /* !__VSP__ */
