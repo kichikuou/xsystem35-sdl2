@@ -155,17 +155,19 @@ void ags_setWorldSize(int width, int height, int depth) {
 	nact->sys_world_size.width  = width;
 	nact->sys_world_size.height = height;
 	nact->sys_world_depth       = depth;
+
+	if (nact->ags.dib && nact->ags.dib->alpha) {
+		free(nact->ags.dib->alpha);
+		nact->ags.dib->alpha = NULL;
+	}
+
 	SetWorldSize(width, height, depth);
 	
 	nact->ags.dib = GetDIB();
 	
 	/* DIBが8以上の場合は、alpha plane を用意 */
-	if (depth > 8) {
-		if (nact->ags.dib->alpha != NULL) {
-			free(nact->ags.dib->alpha);
-		}
+	if (depth > 8)
 		nact->ags.dib->alpha = calloc(width * height, sizeof(BYTE));
-	}
 	
 	fade_outed = FALSE;  /* thanx tajiri@wizard */
 	
