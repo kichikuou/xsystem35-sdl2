@@ -208,7 +208,7 @@ int cdrom_getPlayingInfo (cd_time *info) {
 	struct cd_sub_channel_info data;
 	
 	if (!enabled)
-		goto errexit;
+		return NG;
 	memset(&s, 0, sizeof(s));
 
         s.data = &data;
@@ -217,17 +217,14 @@ int cdrom_getPlayingInfo (cd_time *info) {
         s.data_format = CD_CURRENT_POSITION;
 	if (do_ioctl(CDIOCREADSUBCHANNEL, &s) < 0) {
 		perror("CDIOCREADSUBCHANNEL");
-		goto errexit;
+		return NG;
 	}
 	if (s.data->header.audio_status != CD_AS_PLAY_IN_PROGRESS) {
-		goto errexit;
+		return NG;
 	}
 	info->t = s.data->what.position.track_number;
 	info->m = s.data->what.position.reladdr.msf.minute;
 	info->s = s.data->what.position.reladdr.msf.second;
 	info->f = s.data->what.position.reladdr.msf.frame;
 	return OK;
- errexit:
-	info->t = info->m = info->s = info->f = 999;
-	return NG;
 }

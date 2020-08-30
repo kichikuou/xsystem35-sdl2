@@ -66,6 +66,7 @@
 #include "graphicsdevice.h"
 #include "menu.h"
 #include "music.h"
+#include "cdrom.h"
 #include "savedata.h"
 #include "scenario.h"
 #include "variable.h"

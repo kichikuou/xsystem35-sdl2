@@ -59,6 +59,5 @@ int cdrom_stop() {
 }
 
 int cdrom_getPlayingInfo (cd_time *info) {
-	info->t = info->m = info->s = info->f = 999;
 	return NG;
 }

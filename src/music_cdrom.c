@@ -80,10 +80,8 @@ int muscd_stop() {
 	return OK;
 }
 
-cd_time muscd_getpos() {
-	cd_time tm;
-	prv.cddev.getpos(&tm);
-	return tm;
+int muscd_getpos(cd_time *tm) {
+	return prv.cddev.getpos(tm);
 }
 
 int muscd_cb() {

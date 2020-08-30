@@ -69,6 +69,8 @@ int cdrom_getPlayingInfo(cd_time *info) {
 	frame_of_getpos = nact->frame_count;
 
 	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
+	if (!t)
+		return NG;
 	info->t = t & 0xff;
 	FRAMES_TO_MSF(t >> 8, &info->m, &info->s, &info->f);
 	return OK;

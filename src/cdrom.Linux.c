@@ -241,22 +241,19 @@ static int cdrom_getPlayingInfo (cd_time *info) {
 	struct cdrom_subchnl sc;
 	
 	if (!enabled)
-		goto errexit;
+		return NG;
 	
 	sc.cdsc_format = CDROM_MSF;
 	if (do_ioctl(CDROMSUBCHNL, &sc) < 0) {
 		perror("CDROMSUBCHNL");
-		goto errexit;
+		return NG;
 	}
 	if (sc.cdsc_audiostatus != CDROM_AUDIO_PLAY) {
-		goto errexit;
+		return NG;
 	}
 	info->t = sc.cdsc_trk;
 	info->m = sc.cdsc_reladdr.msf.minute;
 	info->s = sc.cdsc_reladdr.msf.second;
 	info->f = sc.cdsc_reladdr.msf.frame;
 	return OK;
- errexit:
-	info->t = info->m = info->s = info->f = 999;
-	return NG;
 }

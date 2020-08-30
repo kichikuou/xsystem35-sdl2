@@ -46,7 +46,7 @@ extern int muscd_init();
 extern int muscd_exit();
 extern int muscd_start(int trk, int loop);
 extern int muscd_stop();
-extern cd_time muscd_getpos();
+extern int muscd_getpos(cd_time *tm);
 extern int muscd_cb();
 
 #endif /* __MUSIC_CDROM_H__ */

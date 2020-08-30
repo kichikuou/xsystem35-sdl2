@@ -56,17 +56,19 @@ void commandSS() {
 void commandSC() {
 	/* ＣＤのプレイ中のタイムを取得する */
 	int *var = getCaliVariable();
-	cd_time info;
+	int t, m, s, f;
 	
-	mus_cdrom_get_playposition(&info);
-	if (info.t == 999) {
-		*var++ = 999;
+	if (mus_cdrom_get_playposition(&t, &m, &s, &f) == OK) {
+		*var++ = t - 1;
+		*var++ = m;
+		*var++ = s;
+		*var++ = f;
 	} else {
-		*var++ = info.t - 1;
+		*var++ = 999;
+		*var++ = 999;
+		*var++ = 999;
+		*var++ = 999;
 	}
-	*var++ = info.m;
-	*var++ = info.s;
-	*var++ = info.f;
 	
 	DEBUG_COMMAND("SC %p:\n",var);
 }
@@ -98,12 +100,11 @@ void commandSR() {
 	var = getCaliVariable();
 	
 	if (num == 0) {
-		cd_time info;
-		mus_cdrom_get_playposition(&info);
-		if (info.t == 999) {
-			*var = 0;
+		int t, m, s, f;
+		if (mus_cdrom_get_playposition(&t, &m, &s, &f) == OK) {
+			*var = t - 1;
 		} else {
-			*var = info.t - 1;
+			*var = 0;
 		}
 	} else {
 		midiplaystate st;

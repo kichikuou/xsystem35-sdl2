@@ -198,18 +198,15 @@ static int cdrom_stop() {
 
 /* 現在演奏中のトラック情報の取得 */
 static int cdrom_getPlayingInfo (cd_time *inf) {
-	int cnt;
-	
-	if (!enabled || !mix_music) {
-		goto errout;
-	}
+	if (!enabled || !mix_music)
+		return NG;
 	
 	if (!Mix_PlayingMusic()) {
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
-		goto errout;
+		return NG;
 	}
-	cnt = get_high_counter(SYSTEMCOUNTER_MP3) - counter;
+	int cnt = get_high_counter(SYSTEMCOUNTER_MP3) - counter;
 	
 	inf->t = trackno;
 	inf->m = cnt / (60*100); cnt %= (60*100); 
@@ -217,8 +214,4 @@ static int cdrom_getPlayingInfo (cd_time *inf) {
 	inf->f = (cnt * CD_FPS) / 100;
 	
 	return OK;
-	
- errout:
-	inf->t = inf->m = inf->s = inf->f = 999;
-	return NG;
 }

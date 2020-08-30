@@ -67,13 +67,18 @@ int mus_cdrom_stop() {
 }
 
 /*
- * cdrom の演奏状態の取得
- *   info: 演奏時間(track/min/sec/frame)の状態を格納する場所
- *         停止している場合は 999/999/999/999 が返る
+ * cdrom の演奏時間(track/min/sec/frame)の取得
+ * 停止している場合は NG が返る
  */
-int mus_cdrom_get_playposition(cd_time *tm) {
+int mus_cdrom_get_playposition(int *t, int *m, int *s, int *f) {
 	if (!prv.cd_valid) return NG;
-	*tm = muscd_getpos();
+	cd_time info;
+	if (muscd_getpos(&info) != OK)
+		return NG;
+	*t = info.t;
+	*m = info.m;
+	*s = info.s;
+	*f = info.f;
 	return OK;
 }
 

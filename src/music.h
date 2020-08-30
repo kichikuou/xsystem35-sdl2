@@ -25,7 +25,6 @@
 #define __MUSIC_CLIENT_H__
 
 #include "portab.h"
-#include "cdrom.h"
 #include "midi.h"
 
 enum MixDevice {
@@ -42,7 +41,7 @@ extern int mus_exit();
 /* cdrom related function */
 extern int mus_cdrom_start(int track, int loop);
 extern int mus_cdrom_stop(void);
-extern int mus_cdrom_get_playposition(cd_time *tm);
+extern int mus_cdrom_get_playposition(int *t, int *m, int *s, int *f);
 extern int mus_cdrom_get_maxtrack(void);
 extern boolean mus_cdrom_get_state(void);
 
