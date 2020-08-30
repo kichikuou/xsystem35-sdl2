@@ -228,9 +228,10 @@ static int read_bitmapinfo(BYTE* data) {
 
 static int read_rgbquad(BYTE* data) {
 	int j;
-	int colors=2;
+	const int colors=2;
 	BYTE* p = data;
 	
+	free(cursorImage.icColors);
 	cursorImage.icColors = malloc(sizeof(TRGBQuad) * colors);
 	
 	if (cursorImage.icColors == NULL) {  /* shouldn't happen */
