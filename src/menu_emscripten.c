@@ -69,10 +69,6 @@ void menu_init(void) {
 	return;
 }
 
-void menu_widget_reinit(boolean reset_colortmap) {
-	return;
-}
-
 void menu_gtkmainiteration() {
 	return;
 }

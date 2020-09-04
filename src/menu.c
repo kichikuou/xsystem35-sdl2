@@ -168,32 +168,6 @@ void menu_init() {
 	menu_window_msgbox= create_window6();
 }
 
-void menu_widget_reinit(boolean reset_colortmap) {
-	static GdkColor     col[256];
-	static GdkVisual*   vis;
-	static GdkColormap* cm;
-	int i;
-	
-	if (reset_colortmap) {
-		vis = gdk_visual_get_system();
-		cm  = gdk_colormap_new(vis, TRUE);
-	}
-	if (vis == NULL) return;
-	if (vis->type != GDK_VISUAL_PSEUDO_COLOR) return;
-	
-	for (i = 0; i < 256; i++) {
-		col[i].pixel = i;
-		col[i].red   = nact->sys_pal->red[i]   * 257;
-		col[i].green = nact->sys_pal->green[i] * 257;
-		col[i].blue  = nact->sys_pal->blue[i]  * 257;
-	}
-	gdk_colors_store(cm, col, 256);
-	gtk_widget_set_default_colormap(cm);
-	
-	/* reconstruct widget */
-	menu_init();
-}
-
 void menu_gtkmainiteration() {
 	if (!menu_initilized) return;
 	
