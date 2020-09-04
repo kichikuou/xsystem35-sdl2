@@ -57,13 +57,15 @@ boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
 }
 
 boolean menu_inputnumber(INPUTNUM_PARAM *p) {
-	p->value = p->def;
+	p->value = EM_ASM_({
+			return xsystem35.shell.inputNumber(UTF8ToString($0), $1, $2, $3);
+		}, p->title, p->min, p->max, p->def);
 	return TRUE;
 }
 
-void menu_msgbox_open(char *msg) {
-	return;
-}
+EM_JS(void, menu_msgbox_open, (char *msg), {
+	window.alert(UTF8ToString(msg));
+});
 
 void menu_init(void) {
 	return;
