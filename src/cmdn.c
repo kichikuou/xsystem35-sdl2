@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "portab.h"
 #include "utfsjis.h"
@@ -359,6 +360,8 @@ void commandNI() { /* From Panyo */
 	ni_param.def = def;
 	ni_param.max = _max;
 	ni_param.min = _min;
+	if (!ni_param.title)
+		ni_param.title = strdup("");
 	
 	menu_inputnumber(&ni_param);
 	

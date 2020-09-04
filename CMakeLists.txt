@@ -89,6 +89,8 @@ endif()
 
 if (EMSCRIPTEN)
   set(SRC_MENU menu_emscripten.c)
+elseif (ANDROID)
+  set(SRC_MENU menu_android.c)
 elseif (GTK2_FOUND)
   set(SRC_MENU menu.c menu_callback.c menu_gui.c s39init.c)
 

@@ -17,9 +17,13 @@
 */
 package io.github.kichikuou.xsystem35
 
+import android.app.AlertDialog
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.widget.EditText
+import android.widget.NumberPicker
 import org.libsdl.app.SDLActivity
 import java.io.File
 import java.io.IOException
@@ -74,13 +78,81 @@ class GameActivity : SDLActivity() {
         Launcher.updateGameList()
     }
 
-    // These functions are called in the SDL thread by JNI.
+    private fun textInputDialog(msg: String, oldVal: String, result: Array<String?>) {
+        val input = EditText(this)
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        input.setText(oldVal)
+        AlertDialog.Builder(this)
+                .setMessage(msg)
+                .setView(input)
+                .setPositiveButton(R.string.ok) {_, _ ->
+                    result[0] = input.text.toString()
+                }
+                .setNegativeButton(R.string.cancel) {_, _ -> }
+                .setOnDismissListener {
+                    synchronized(result) {
+                        @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN") (result as Object).notify()
+                    }
+                }
+                .show()
+    }
+
+    private fun numberInputDialog(msg: String, min: Int, max: Int, initial: Int, result: IntArray) {
+        val input = NumberPicker(this)
+        input.minValue = min
+        input.maxValue = max
+        input.value = initial
+        AlertDialog.Builder(this)
+                .setMessage(msg)
+                .setView(input)
+                .setPositiveButton(R.string.ok) {_, _ ->
+                    input.clearFocus()
+                    result[0] = input.value
+                }
+                .setNegativeButton(R.string.cancel) {_, _ -> }
+                .setOnDismissListener {
+                    synchronized(result) {
+                        @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN") (result as Object).notify()
+                    }
+                }
+                .show()
+    }
+
+    // The functions below are called in the SDL thread by JNI.
     @Suppress("unused") fun cddaStart(track: Int, loop: Boolean) = cdda.start(track, loop)
     @Suppress("unused") fun cddaStop() = cdda.stop()
     @Suppress("unused") fun cddaCurrentPosition() = cdda.currentPosition()
     @Suppress("unused") fun midiStart(path: String, loop: Boolean) = midi.start(path, loop)
     @Suppress("unused") fun midiStop() = midi.stop()
     @Suppress("unused") fun midiCurrentPosition() = midi.currentPosition()
+
+    @Suppress("unused") fun inputString(msg: String, oldVal: String): String? {
+        val result = arrayOfNulls<String?>(1)
+        runOnUiThread { textInputDialog(msg, oldVal, result) }
+        // Block the calling thread.
+        synchronized(result) {
+            try {
+                @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN") (result as Object).wait()
+            } catch (ex: InterruptedException) {
+                ex.printStackTrace()
+            }
+        }
+        return result[0]
+    }
+
+    @Suppress("unused") fun inputNumber(msg: String, min: Int, max: Int, initial: Int): Int {
+        val result = intArrayOf(-1)
+        runOnUiThread { numberInputDialog(msg, min, max, initial, result) }
+        // Block the calling thread.
+        synchronized(result) {
+            try {
+                @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN") (result as Object).wait()
+            } catch (ex: InterruptedException) {
+                ex.printStackTrace()
+            }
+        }
+        return result[0]
+    }
 }
 
 private class CddaPlayer(private val playlistPath: File) {
