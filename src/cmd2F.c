@@ -428,10 +428,8 @@ void commands2F26() {
 	
 	t3 = fromUTF8(mi_param.newstring);
 	
-	/* 全角文字以外は不可 */
-	if (nact->encoding != SHIFT_JIS || !sjis_has_hankaku(t3)) {
-		v_strcpy(dst_no -1, t3);
-	}
+	v_strcpy(dst_no -1, t3);
+
 	free(t1);
 	free(t2);
 	free(t3);
@@ -935,12 +933,8 @@ void commands2F57() {
 		*vResult = 65535;
 	} else {
 		t3 = fromUTF8(p.newstring);
-		if (nact->encoding != SHIFT_JIS || !sjis_has_hankaku(t3)) {
-			v_strcpy(eStrVar -1, t3);
-			*vResult = v_strlen(eStrVar -1);
-		} else {
-			*vResult = 65535;
-		}
+		v_strcpy(eStrVar -1, t3);
+		*vResult = v_strlen(eStrVar -1);
 		free(t3);
 	}
 	free(t1);

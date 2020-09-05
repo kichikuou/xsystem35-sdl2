@@ -124,10 +124,8 @@ void commandMI() { /* T2 */
 	
 	t3 = fromUTF8(mi_param.newstring);
 	
-	/* 全角文字以外は不可 */
-	if (nact->encoding != SHIFT_JIS ||!sjis_has_hankaku(t3)) {
-		v_strcpy(dst_no -1, t3);
-	}
+	v_strcpy(dst_no -1, t3);
+
 	free(t1);
 	free(t2);
 	free(t3);
@@ -355,9 +353,8 @@ void commandMJ() {
 	if (mj_param.newstring == NULL) return;
 	
 	t2 = fromUTF8(mj_param.newstring);
-	if (nact->encoding != SHIFT_JIS || !sjis_has_hankaku(t2)) {
-		v_strcpy(num -1, t2);
-	}
+	v_strcpy(num -1, t2);
+
 	free(t1);
 	free(t2);
 	DEBUG_COMMAND("MJ %d,%d,%d,%d,%d:\n", num, x, y, h, max_len);
