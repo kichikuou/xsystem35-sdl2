@@ -137,7 +137,7 @@ endif()
 
 # FIXME: set up dependency for xsystem35 on this
 if (ENABLE_SDL AND NOT EMSCRIPTEN AND NOT ANDROID)
-  add_custom_target(sdl_input.c
-    COMMAND perl xsyskey.pl ${SDL2_INCLUDE_DIRS} > sdl_input.c
+  add_custom_target(sdl_keytable.h
+    COMMAND perl ../tools/xsyskey.pl ${SDL2_INCLUDE_DIRS} > sdl_keytable.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

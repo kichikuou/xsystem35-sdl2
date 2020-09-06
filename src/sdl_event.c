@@ -37,7 +37,7 @@
 #include "menu.h"
 #include "input.h"
 #include "joystick.h"
-#include "sdl_input.c"
+#include "sdl_keytable.h"
 #include "texthook.h"
 
 static void sdl_getEvent(void);
