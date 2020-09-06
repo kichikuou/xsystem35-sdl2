@@ -55,8 +55,8 @@ boolean menu_inputstring(INPUTSTRING_PARAM *p) {
 
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
-										"inputString", "(" STRING STRING ")" STRING);
-	jstring newstring = (jstring)(*env)->CallObjectMethod(env, context, mid, msg, oldstring);
+										"inputString", "(" STRING STRING "I)" STRING);
+	jstring newstring = (jstring)(*env)->CallObjectMethod(env, context, mid, msg, oldstring, p->max);
 	if (newstring) {
 		const char *newstr_utf8 = (*env)->GetStringUTFChars(env, newstring, NULL);
 		strcpy(buf, newstr_utf8);

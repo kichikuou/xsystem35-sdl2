@@ -78,7 +78,7 @@ class GameActivity : SDLActivity() {
         Launcher.updateGameList()
     }
 
-    private fun textInputDialog(msg: String, oldVal: String, result: Array<String?>) {
+    private fun textInputDialog(msg: String, oldVal: String, maxLen: Int, result: Array<String?>) {
         val input = EditText(this)
         input.inputType = InputType.TYPE_CLASS_TEXT
         input.setText(oldVal)
@@ -86,7 +86,7 @@ class GameActivity : SDLActivity() {
                 .setMessage(msg)
                 .setView(input)
                 .setPositiveButton(R.string.ok) {_, _ ->
-                    result[0] = input.text.toString()
+                    result[0] = input.text.toString().substring(0, maxLen)
                 }
                 .setNegativeButton(R.string.cancel) {_, _ -> }
                 .setOnDismissListener {
@@ -126,9 +126,9 @@ class GameActivity : SDLActivity() {
     @Suppress("unused") fun midiStop() = midi.stop()
     @Suppress("unused") fun midiCurrentPosition() = midi.currentPosition()
 
-    @Suppress("unused") fun inputString(msg: String, oldVal: String): String? {
+    @Suppress("unused") fun inputString(msg: String, oldVal: String, maxLen: Int): String? {
         val result = arrayOfNulls<String?>(1)
-        runOnUiThread { textInputDialog(msg, oldVal, result) }
+        runOnUiThread { textInputDialog(msg, oldVal, maxLen, result) }
         // Block the calling thread.
         synchronized(result) {
             try {
