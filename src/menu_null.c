@@ -26,6 +26,7 @@
 
 #include "portab.h"
 #include "menu.h"
+#include "sdl_core.h"
 
 void menu_open(void) {
 	return;
@@ -41,8 +42,7 @@ boolean menu_inputstring(INPUTSTRING_PARAM *p) {
 }
 
 boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
-	p->newstring = p->oldstring;
-	return TRUE;
+	return sdl_inputString(p);
 }
 
 boolean menu_inputnumber(INPUTNUM_PARAM *p) {

@@ -26,7 +26,7 @@
 #include "portab.h"
 
 /* 文字列入力のパラメータ */
-typedef struct {
+typedef struct inputstring_param {
 	char *title;
 	char *oldstring;
 	const char *newstring;

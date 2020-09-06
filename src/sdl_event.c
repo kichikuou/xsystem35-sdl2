@@ -96,6 +96,10 @@ static void sdl_getEvent(void) {
 
 	while (SDL_PollEvent(&e)) {
 		had_input = true;
+
+		if (sdl_custom_event_handler && sdl_custom_event_handler(&e))
+			continue;
+
 		switch (e.type) {
 #ifndef __EMSCRIPTEN__
 		case SDL_QUIT:
