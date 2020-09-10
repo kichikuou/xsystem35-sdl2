@@ -104,7 +104,7 @@ elseif (GTK2_FOUND)
     link_libraries(${Intl_LIBRARIES})
   endif()
 else()
-  set(SRC_MENU menu_null.c sdl_input.c)
+  set(SRC_MENU menu_sdl.c sdl_input.c)
 endif()
 
 # Graphics

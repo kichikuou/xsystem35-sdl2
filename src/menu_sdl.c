@@ -1,5 +1,5 @@
 /*
- * menu_null.c  popup menu for null
+ * menu_sdl.c  popup menu for SDL
  *
  * Copyright (C) 2000- Masaki Chikama (Wren) <masaki-c@is.aist-nara.ac.jp>
  *
@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: menu_null.c,v 1.2 2003/01/25 01:34:50 chikama Exp $ */
 
 #include "config.h"
 
