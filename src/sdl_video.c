@@ -206,6 +206,43 @@ void sdl_setAutoRepeat(boolean bool) {
 	}
 }
 
+void sdl_FullScreen(boolean on) {
+	if (on && !sdl_fs_on) {
+		sdl_fs_on = TRUE;
+		SDL_SetWindowFullscreen(sdl_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	} else if (!on && sdl_fs_on) {
+		sdl_fs_on = FALSE;
+		SDL_SetWindowFullscreen(sdl_window, 0);
+	}
+}
+
+void sdl_setWindowSize(int x, int y, int w, int h) {
+	view_x = x;
+	view_y = y;
+
+	if (w == view_w && h == view_h) return;
+
+	view_w = w;
+	view_h = h;
+
+#ifndef __ANDROID__
+	SDL_SetWindowSize(sdl_window, w, h);
+#endif
+	SDL_RenderSetLogicalSize(sdl_renderer, w, h);
+	if (sdl_display)
+		SDL_FreeSurface(sdl_display);
+	if (sdl_texture)
+		SDL_DestroyTexture(sdl_texture);
+	sdl_display = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+	sdl_texture = SDL_CreateTexture(sdl_renderer, sdl_display->format->format,
+									SDL_TEXTUREACCESS_STATIC, w, h);
+
+	//ms_active = (SDL_GetAppState() & SDL_APPMOUSEFOCUS) ? TRUE : FALSE;
+#ifdef __EMSCRIPTEN__
+	EM_ASM( xsystem35.shell.windowSizeChanged(); );
+#endif
+}
+
 #ifdef __EMSCRIPTEN__
 
 void* EMSCRIPTEN_KEEPALIVE sdl_getDisplaySurface() {
