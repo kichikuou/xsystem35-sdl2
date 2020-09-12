@@ -24,8 +24,10 @@
 #include <stdio.h>
 
 #include "portab.h"
+#include "nact.h"
 #include "menu.h"
 #include "sdl_core.h"
+#include "sdl_private.h"
 
 void menu_open(void) {
 	return;
@@ -50,7 +52,7 @@ boolean menu_inputnumber(INPUTNUM_PARAM *p) {
 }
 
 void menu_msgbox_open(char *msg) {
-	return;
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, nact->game_title_utf8, msg, sdl_window);
 }
 
 void menu_init(void) {
