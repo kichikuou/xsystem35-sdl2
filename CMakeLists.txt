@@ -85,6 +85,19 @@ else()
 endif()
 
 
+# Graphics
+
+if (X11_FOUND)
+  set(SRC_GRAPHDEV xcore_draw.c xcore_video.c xcore_mode.c xcore_event.c xcore_cursor.c xcore_maskupdate.c image.c xcore_image.c)
+  set(SUMMARY_GRAPHDEV "X11")
+elseif (SDL2_FOUND)
+  set(SRC_GRAPHDEV sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c)
+  set(SUMMARY_GRAPHDEV "SDL2")
+  set(ENABLE_SDL 1)
+else()
+  message(FATAL_ERROR "*** No graphic device available ***")
+endif()
+
 # Menu
 
 if (EMSCRIPTEN)
@@ -103,21 +116,10 @@ elseif (GTK2_FOUND)
     include_directories(${Intl_INCLUDE_DIRS})
     link_libraries(${Intl_LIBRARIES})
   endif()
-else()
+elseif (ENABLE_SDL)
   set(SRC_MENU menu_sdl.c sdl_input.c)
-endif()
-
-# Graphics
-
-if (X11_FOUND)
-  set(SRC_GRAPHDEV xcore_draw.c xcore_video.c xcore_mode.c xcore_event.c xcore_cursor.c xcore_maskupdate.c image.c xcore_image.c)
-  set(SUMMARY_GRAPHDEV "X11")
-elseif (SDL2_FOUND)
-  set(SRC_GRAPHDEV sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c)
-  set(SUMMARY_GRAPHDEV "SDL2")
-  set(ENABLE_SDL 1)
-else()
-  message(FATAL_ERROR "*** No graphic device available ***")
+else ()
+  set(SRC_MENU menu_null.c)
 endif()
 
 # PCM audio
