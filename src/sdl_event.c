@@ -101,12 +101,10 @@ static void sdl_getEvent(void) {
 			continue;
 
 		switch (e.type) {
-#ifndef __EMSCRIPTEN__
 		case SDL_QUIT:
-			nact->is_quit = TRUE;
-			nact->wait_vsync = TRUE;
+			menu_quitmenu_open();
 			break;
-#endif
+
 		case SDL_WINDOWEVENT:
 			switch (e.window.event) {
 			case SDL_WINDOWEVENT_ENTER:
