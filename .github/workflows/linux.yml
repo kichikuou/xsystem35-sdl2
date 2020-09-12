@@ -35,6 +35,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install Deps
+      run: |
+        sudo apt update
+        sudo apt install libgtk2.0-dev
+
     - name: Build
       run: |
         mkdir -p out
