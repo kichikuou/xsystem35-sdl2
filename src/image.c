@@ -906,7 +906,7 @@ void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx,
 }
 
 int image_index2pixel(int depth, int i) {
-	Pallet256 *pal = nact->sys_pal;
+	Palette256 *pal = nact->sys_pal;
 	
 	switch(depth) {
 	case 8:

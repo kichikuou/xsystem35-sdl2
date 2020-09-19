@@ -45,15 +45,15 @@
 #define check_param_xy ags_check_param_xy
 #define intersection   ags_intersection
 
-static void    initPal(Pallet256 *sys_pal);
+static void    initPal(Palette256 *sys_pal);
 static boolean intersects(MyRectangle *r1, MyRectangle *r2);
 
-static Pallet256 pal_256;
+static Palette256 pal_256;
 static boolean need_update = TRUE;
 static boolean fade_outed = FALSE;
 static int cursor_move_time = 50; /* カーソル移動にかかる時間(ms) */
 
-static void initPal(Pallet256 *pal) {
+static void initPal(Palette256 *pal) {
 	int i;
 	for (i = 0; i < 256; i++) {
 		pal->red[i]   =   0; pal->green[i]   =   0; pal->blue[i]   =   0;
@@ -62,7 +62,7 @@ static void initPal(Pallet256 *pal) {
 	pal->red[7]   = 255; pal->green[7]   = 255; pal->blue[7]   = 255;
 	pal->red[15]  = 255; pal->green[15]  = 255; pal->blue[15]  = 255;
 	pal->red[255] = 255; pal->green[255] = 255; pal->blue[255] = 255;
-	SetPallet(pal, 0, 256);
+	SetPalette(pal, 0, 256);
 	nact->sys_pal_changed = TRUE;
 }
 
@@ -250,7 +250,7 @@ void ags_updateFull() {
 	}
 }
 
-void ags_setPallets(Pallet256 *src_pal, int src, int dst, int cnt) {
+void ags_setPalettes(Palette256 *src_pal, int src, int dst, int cnt) {
 	int i;
 	for (i = 0; i < cnt; i++) {
 		nact->sys_pal->red  [dst + i] = src_pal->red  [src + i];
@@ -260,16 +260,16 @@ void ags_setPallets(Pallet256 *src_pal, int src, int dst, int cnt) {
 	nact->sys_pal_changed = TRUE;
 }
 
-void ags_setPallet(int no, int red, int green, int blue) {
+void ags_setPalette(int no, int red, int green, int blue) {
 	nact->sys_pal->red[no]   = red;
 	nact->sys_pal->green[no] = green;
 	nact->sys_pal->blue[no]  = blue;
 	nact->sys_pal_changed = TRUE;
 }
 
-void ags_setPalletToSystem(int src, int cnt) {
+void ags_setPaletteToSystem(int src, int cnt) {
 	if (!fade_outed) 
-		SetPallet(nact->sys_pal, src, cnt);
+		SetPalette(nact->sys_pal, src, cnt);
 }
 
 void ags_drawRectangle(int x, int y, int w, int h, int col) {
@@ -323,7 +323,7 @@ void ags_wrapColor(int x, int y, int w, int h, int p1, int p2) {
 	WrapColor(x, y, w, h, p1, p2);
 }
 
-void ags_getPixel(int x, int y, Pallet *cell) {
+void ags_getPixel(int x, int y, Palette *cell) {
 	if (!check_param_xy(&x, &y)) return;
 
 	DspDeviceSync();

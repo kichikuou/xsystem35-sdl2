@@ -30,12 +30,12 @@ typedef struct {
         BYTE red[256];
         BYTE green[256];
         BYTE blue[256];
-} Pallet256;
+} Palette256;
 
 typedef struct {
         BYTE r,g,b;
         DWORD pixel;
-} Pallet;
+} Palette;
 
 typedef struct {
         int x;

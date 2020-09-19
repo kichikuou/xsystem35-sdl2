@@ -40,7 +40,7 @@ struct sdl_private_data {
 
 	SDL_Surface     *dib; /* offscreen surface */
 	
-	SDL_Color       col[256]; /* color pallet */
+	SDL_Color       col[256]; /* color palette */
 	
 	unsigned long       white; /* white pixel */
 	

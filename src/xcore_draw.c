@@ -216,7 +216,7 @@ void Xcore_zoom(int x, int y, int w, int h) {
 }
 
 /* Color の複数個指定 */
-void Xcore_setPallet(Pallet256 *pal, int src, int cnt) {
+void Xcore_setPalette(Palette256 *pal, int src, int cnt) {
 	int i;
 	
 	if (x11_visual->class == PseudoColor) {
@@ -317,7 +317,7 @@ static void DIBToWorkImage(int sx, int sy, int w, int h, int dx, int dy) {
 /* (255-col)/255 * val + col */
 static void setWhiteness8(int val) {
 	int i;
-	Pallet256 *pal = nact->sys_pal;
+	Palette256 *pal = nact->sys_pal;
 
 	for (i = 0; i < 256; i++) {
 		x11_col[i].pixel = i;
@@ -332,7 +332,7 @@ static void setWhiteness8(int val) {
 /* 指定の明度以下に明るさを抑える */
 static void setBlightness8(int val) {
 	int i;
-	Pallet256 *pal = nact->sys_pal;
+	Palette256 *pal = nact->sys_pal;
 	
 	for (i =0; i < 256; i++) {
 		x11_col[i].pixel = i;

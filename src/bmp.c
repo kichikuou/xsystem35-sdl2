@@ -36,7 +36,7 @@
  * static methods
 */
 static bmp_header *extract_header(BYTE *b);
-static void getpal(Pallet256 *pal, BYTE *b);
+static void getpal(Palette256 *pal, BYTE *b);
 static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b);
 static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b);
 
@@ -64,11 +64,11 @@ static bmp_header *extract_header(BYTE *b) {
 }
 
 /*
- * Get pallet from raw data
- *   pal: pallet to be stored 
- *   b  : raw data (pointer to pallet)
+ * Get palette from raw data
+ *   pal: palette to be stored
+ *   b  : raw data (pointer to palette)
 */
-static void getpal(Pallet256 *pal, BYTE *b) {
+static void getpal(Palette256 *pal, BYTE *b) {
 	int i;
 	
 	for (i = 0; i < 256; i++) {
@@ -160,7 +160,7 @@ boolean bmp256_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract 8bit bmp, header, pallet and pixel
+ * Extract 8bit bmp, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
@@ -168,7 +168,7 @@ cgdata *bmp256_extract(BYTE *data) {
 	bmp_header *bmp = extract_header(data);
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	
-	cg->pal = malloc(sizeof(Pallet256));
+	cg->pal = malloc(sizeof(Palette256));
 	getpal(cg->pal, data + bmp->bmpPp);
 	
 	/* +10: margin for broken cg */
@@ -208,7 +208,7 @@ boolean bmp16m_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract 24bit bmp, header, pallet and pixel
+ * Extract 24bit bmp, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */

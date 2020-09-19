@@ -83,7 +83,7 @@ struct xcore_private_data {
 
 	IMAGEINFO *work;
 	
-	XColor    col[256];    /* pallet and color map */
+	XColor    col[256];    /* palette and color map */
 	Colormap  cm;
 };
 

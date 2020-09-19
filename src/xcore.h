@@ -49,7 +49,7 @@ extern void Xcore_updateArea(MyRectangle *src, MyPoint *dst);
 extern void Xcore_sync();
 
 /* パレット関係 */
-extern void Xcore_setPallet(Pallet256 *pal, int src, int cnt);
+extern void Xcore_setPalette(Palette256 *pal, int src, int cnt);
 extern void Xcore_setForeground(unsigned long col);
 
 /* 描画関係 */
@@ -111,7 +111,7 @@ extern boolean   RawKeyInfo[256];
 #define FullScreen(on) Xcore_fullScreen(on)
 
 /* パレット関係 */
-#define SetPallet(pal,src,cnt) Xcore_setPallet((pal),(src),(cnt))
+#define SetPalette(pal,src,cnt) Xcore_setPalette((pal),(src),(cnt))
 #define SetForeground(col) Xcore_setForeground((col))
 
 /* 描画関係 */

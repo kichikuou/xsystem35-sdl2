@@ -44,7 +44,7 @@
  * static methods
 */
 static pms_header *extract_header(BYTE *b);
-static void getpal(Pallet256 *pal, BYTE *b);
+static void getpal(Palette256 *pal, BYTE *b);
 static void extract_8bit(pms_header *pms, BYTE *pic, BYTE *b);
 static void extract_16bit(pms_header *pms, WORD *pic, BYTE *b);
 
@@ -74,11 +74,11 @@ static pms_header *extract_header(BYTE *b) {
 }
 
 /*
- * Get pallet from raw data
- *   pal: pallet to be stored 
- *   b  : raw data (pointer to pallet)
+ * Get palette from raw data
+ *   pal: palette to be stored
+ *   b  : raw data (pointer to palette)
 */
-static void getpal(Pallet256 *pal, BYTE *b) {
+static void getpal(Palette256 *pal, BYTE *b) {
 	int i;
 	
 	for (i = 0; i < 256; i++) {
@@ -219,7 +219,7 @@ boolean pms256_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract 8bit pms, header, pallet and pixel
+ * Extract 8bit pms, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
@@ -227,7 +227,7 @@ cgdata *pms256_extract(BYTE *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	pms_header *pms = extract_header(data);
 	
-	cg->pal = malloc(sizeof(Pallet256));
+	cg->pal = malloc(sizeof(Palette256));
 	getpal(cg->pal, data + pms->pmsPp);
 	
 	/* +10: margin for broken cg */
@@ -269,7 +269,7 @@ boolean pms64k_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract 16bit pms, header, pallet and pixel
+ * Extract 16bit pms, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */

@@ -98,8 +98,8 @@ void commandPS() {
 	Green = getCaliValue();
 	Blue  = getCaliValue();
 
-	ags_setPallet(Plane , Red, Green, Blue);
-	ags_setPalletToSystem(Plane, 1);
+	ags_setPalette(Plane, Red, Green, Blue);
+	ags_setPaletteToSystem(Plane, 1);
 	DEBUG_COMMAND("PS %d,%d,%d,%d:\n", Plane, Red, Green, Blue);
 }
 
@@ -126,9 +126,9 @@ void commandPP() { /* T2 */
 	int i;
 
 	for (i = 0; i < num2; i++) {
-		ags_setPallet(num1 + i, *var, *(var +1), *(var +2)); var+=3;
+		ags_setPalette(num1 + i, *var, *(var +1), *(var +2)); var+=3;
 	}
-	ags_setPalletToSystem(num1, num2);
+	ags_setPaletteToSystem(num1, num2);
 	DEBUG_COMMAND("PP %p,%d,%d:\n", var, num1, num2);
 }
 
@@ -155,7 +155,7 @@ void commandPT0() {
 	int *var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	Palette cell;
 	
 	ags_getPixel(x, y, &cell);
 	*var = cell.pixel;
@@ -170,7 +170,7 @@ void commandPT1() {
 	int *b_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	Palette cell;
 	
 	ags_getPixel(x, y, &cell);
 	*r_var = cell.r;
@@ -186,7 +186,7 @@ void commandPT2() {
 	int *low_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	Palette cell;
 	int r, g, b, pic;
 	
 	ags_getPixel(x, y, &cell);

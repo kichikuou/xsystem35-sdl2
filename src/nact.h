@@ -80,7 +80,7 @@ typedef struct {
 	
 #if 1
 	/* ags info */
-	Pallet256  *sys_pal;
+	Palette256 *sys_pal;
 	boolean     sys_pal_changed;
 	MyRectangle sys_view_area;
 	MyDimension sys_world_size;

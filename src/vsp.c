@@ -42,7 +42,7 @@
  * static methods
 */
 static vsp_header *extract_header(BYTE *b);
-static void getpal(Pallet256 *pal, BYTE *b);
+static void getpal(Palette256 *pal, BYTE *b);
 static void extract(vsp_header *vsp, BYTE *pic, BYTE *b);
 
 /*
@@ -73,11 +73,11 @@ static vsp_header *extract_header(BYTE *b) {
 }
 
 /*
- * Get pallet from raw data
- *   pal: pallet to be stored 
- *   b  : raw data (pointer to pallet)
+ * Get palette from raw data
+ *   pal: palette to be stored
+ *   b  : raw data (pointer to palette)
 */
-static void getpal(Pallet256 *pal, BYTE *b) {
+static void getpal(Palette256 *pal, BYTE *b) {
 	int red, green, blue, i;
 	
 	for (i = 0; i < 16; i++) {
@@ -196,7 +196,7 @@ boolean vsp_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract vsp, header, pallet and pixel
+ * Extract vsp, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
@@ -204,7 +204,7 @@ cgdata *vsp_extract(BYTE *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	vsp_header *vsp = extract_header(data);
 	
-	cg->pal = malloc(sizeof(Pallet256));
+	cg->pal = malloc(sizeof(Palette256));
 	getpal(cg->pal, data + vsp->vspPp);
 	
 	/* +10: margin for broken cg */

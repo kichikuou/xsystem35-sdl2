@@ -36,7 +36,7 @@
 #include "ags.h"
 
 /* private variables */
-static Pallet xpal[256];   /* pal & pixel 値 */
+static Palette xpal[256];   /* pal & pixel 値 */
 
 /* private methods */
 static void trans_index2pixels(int depth, int lv, cgdata *cg);
@@ -554,7 +554,7 @@ void image_draw_antialiased_pattern16(agsurface_t *dib, agsurface_t *pattern, in
 /******************************************************************************/
 
 static void expandPixel8to24p(agsurface_t *src, agsurface_t *dst) {
-	Pallet256 *pal = nact->sys_pal;
+	Palette256 *pal = nact->sys_pal;
 	int   x, y;
 	BYTE *yd;
 	BYTE *ys;
@@ -917,7 +917,7 @@ void xcore_image_setdepth(int depth) {
 
 
 static void trans_index2pixels(int depth, int lv, cgdata *cg) {
-	Pallet256 *pal;
+	Palette256 *pal;
 	int i, i_st = 0, i_ed = 256, r, g, b;
 	
 	if (cg == NULL) {
@@ -1312,7 +1312,7 @@ void image_wrapColor(agsurface_t *dib, int sx, int sy, int w, int h, int col, in
 /*
  * dib のピクセル情報を取得
  */
-void image_getPixel(agsurface_t *dib, int x, int y, Pallet *cell) {
+void image_getPixel(agsurface_t *dib, int x, int y, Palette *cell) {
 	BYTE *dst = GETOFFSET_PIXEL(dib, x, y);
 
 	switch(dib->depth) {

@@ -49,7 +49,7 @@ extern void sdl_fullScreen(boolean on);
 extern void sdl_updateScreen(void);
 
 /* パレット関係 */
-extern void sdl_setPallet(Pallet256 *pal, int src, int cnt);
+extern void sdl_setPalette(Palette256 *pal, int src, int cnt);
 
 /* 描画関係 */
 extern void sdl_drawRectangle(int x, int y, int w, int h, int cl);
@@ -71,7 +71,7 @@ extern void sdl_copyAreaSP16_alphaLevel(int sx, int sy, int w, int h, int dx, in
 extern void sdl_copyAreaSP16_whiteLevel(int sx, int sy, int w, int h, int dx, int dy, int lv);
 extern void sdl_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 extern void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
-extern void sdl_getPixel(int x, int y, Pallet *cell);
+extern void sdl_getPixel(int x, int y, Palette *cell);
 extern void sdl_putRegion(void *src, int x, int y);
 extern void sdl_CopyRegion(void *src, int sx, int sy, int w, int h, int dx, int dy);
 extern void sdl_restoreRegion(void *src, int x, int y);
@@ -123,7 +123,7 @@ extern boolean sdl_inputString(struct inputstring_param *);
 #define FullScreen(on) sdl_FullScreen(on)
 
 /* パレット関係 */
-#define SetPallet(pal,src,cnt) sdl_setPallet((pal),(src),(cnt))
+#define SetPalette(pal,src,cnt) sdl_setPalette((pal),(src),(cnt))
 
 /* 描画関係 */
 #define DrawString(x,y,str_utf8,col) sdl_drawString((x),(y),(str_utf8),(col))

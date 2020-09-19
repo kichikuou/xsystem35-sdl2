@@ -114,8 +114,8 @@ typedef struct ags_faderinfo ags_faderinfo_t;
 
 
 struct _ags {
-	Pallet256 pal;              /* system pallet */
-	boolean   pal_changed;      /* system pallet has changed */
+	Palette256 pal;             /* system palette */
+	boolean   pal_changed;      /* system palette has changed */
 	
 	MyDimension world_size;     /* size of off-screen */
 
@@ -165,9 +165,9 @@ extern void ags_updateFull(void);
 extern void ags_updateArea(int x, int y, int width, int height);
 
 /* パレット関係 */
-extern void ags_setPallets(Pallet256 *src_pal, int src, int dst, int cnt);
-extern void ags_setPallet(int no, int red, int green, int blue);
-extern void ags_setPalletToSystem(int src, int cnt);
+extern void ags_setPalettes(Palette256 *src_pal, int src, int dst, int cnt);
+extern void ags_setPalette(int no, int red, int green, int blue);
+extern void ags_setPaletteToSystem(int src, int cnt);
 
 /* 描画関係 */
 extern void ags_drawRectangle(int x, int y, int w, int h, int col);
@@ -181,7 +181,7 @@ extern void ags_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int col
 extern void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, int lv);
 
 extern void ags_wrapColor(int x, int y, int w, int h, int p1, int p2);
-extern void ags_getPixel(int x, int y, Pallet *cell);
+extern void ags_getPixel(int x, int y, Palette *cell);
 extern void ags_changeColorArea(int x, int y, int w, int h, int dst, int src, int cnt);
 
 extern void* ags_saveRegion(int x, int y, int w, int h);

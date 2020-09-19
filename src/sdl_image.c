@@ -331,7 +331,7 @@ void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 /*
  * dib のピクセル情報を取得
  */
-void sdl_getPixel(int x, int y, Pallet *cell) {
+void sdl_getPixel(int x, int y, Palette *cell) {
 	SDL_LockSurface(sdl_dib);
 
 	if (sdl_dib->format->BitsPerPixel == 8) {

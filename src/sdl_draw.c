@@ -60,7 +60,7 @@ static SDL_Surface *s_fader;  /* fade in /out 用 work surface */
 static void sdl_pal_check(void) {
 	if (nact->sys_pal_changed) {
 		nact->sys_pal_changed = FALSE;
-		sdl_setPallet(nact->sys_pal, 0, 256);
+		sdl_setPalette(nact->sys_pal, 0, 256);
 	}
 }
 
@@ -127,7 +127,7 @@ static void sdl_updateAll() {
 }
 
 /* Color の複数個指定 */
-void sdl_setPallet(Pallet256 *pal, int src, int cnt) {
+void sdl_setPalette(Palette256 *pal, int src, int cnt) {
 	int i;
 	
 	for (i = 0; i < cnt; i++) {
@@ -461,7 +461,7 @@ void sdl_Mosaic(int sx, int sy, int w, int h, int dx, int dy, int slice) {
 
 static void setBligtness(SDL_Surface *s, int val) {
 	int i;
-	Pallet256 *pal = nact->sys_pal;
+	Palette256 *pal = nact->sys_pal;
 	Uint8 *r = pal->red, *g = pal->green, *b = pal->blue;
 	SDL_Color *cl = sdl_col;
 	
@@ -476,7 +476,7 @@ static void setBligtness(SDL_Surface *s, int val) {
 
 static void setWhiteness(SDL_Surface *s, int val) {
 	int i;
-	Pallet256 *pal = nact->sys_pal;
+	Palette256 *pal = nact->sys_pal;
 	Uint8 *r = pal->red, *g = pal->green, *b = pal->blue;
 	SDL_Color *cl = sdl_col;
 	

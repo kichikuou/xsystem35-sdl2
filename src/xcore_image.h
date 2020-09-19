@@ -41,7 +41,7 @@ extern void image_copyAreaSP16_alphaBlend(agsurface_t *dib, int sx, int sy, int 
 extern void image_copyAreaSP16_alphaLevel(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int col);
 extern void image_copyAreaSP16_whiteLevel(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int col);
 extern void image_wrapColor(agsurface_t *dib, int sx, int sy, int w, int h, int col, int rate);
-extern void image_getPixel(agsurface_t *dib, int x, int y, Pallet *cell);
+extern void image_getPixel(agsurface_t *dib, int x, int y, Palette *cell);
 
 extern agsurface_t* image_saveRegion(agsurface_t *dib, int x, int y, int w, int h);
 extern void image_putRegion(agsurface_t *dib, agsurface_t *dst, int x, int y);
