@@ -109,8 +109,8 @@ static void FillString() {
 	int i;
 	
 	for (i = 0; i < cnt; i++) {
-		if (st != src)
-			svar_set(st, svar_get(src));
+		if (st + i != src)
+			svar_set(st + i, svar_get(src));
 	}
 	
 	DEBUG_COMMAND("ShString.FillString: %d,%d,%d,%d:\n", st, cnt, src, p4);

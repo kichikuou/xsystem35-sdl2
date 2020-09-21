@@ -7,6 +7,7 @@ const word str1 = 10:
 const word str2 = 11:
 const word str3 = 12:
 const word str4 = 13:
+const word str5 = 14:
 
 	MS str1,"０１２３４５６７８９":
 	ML len,str1:
@@ -161,6 +162,18 @@ const word str4 = 13:
 	ShString.ExchangeString str1,str2,str3:
 	MS str4,"いいいいいいあ":
 	~AssertStrEquals str1,str4,__LINE__:
+
+	MS str1,"a":
+	MS str2,"b":
+	MS str3,"c":
+	MS str4,"d":
+	ShString.FillString str1,3,str2:
+	MS str5,"b":
+	~AssertStrEquals str1,str5,__LINE__:
+	~AssertStrEquals str2,str5,__LINE__:
+	~AssertStrEquals str3,str5,__LINE__:
+	MS str5,"d":
+	~AssertStrEquals str4,str5,__LINE__:
 	\0:
 
 **MPtoString dst,src,len:
