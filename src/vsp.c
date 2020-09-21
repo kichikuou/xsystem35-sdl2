@@ -46,14 +46,6 @@ static void getpal(Palette256 *pal, BYTE *b);
 static void extract(vsp_header *vsp, BYTE *pic, BYTE *b);
 
 /*
- * extraction buffer
-*/
-static BYTE _bc[4][480];
-static BYTE _bp[4][480];
-static BYTE *bc[4];
-static BYTE *bp[4];
-
-/*
  * Get information from cg header
  *   b: raw data (pointer to header)
  *   return: acquired vsp information object
@@ -96,11 +88,14 @@ static void extract(vsp_header *vsp, BYTE *pic, BYTE *b) {
 	BYTE b0, b1, b2, b3, mask = 0;
 	BYTE *bt;
 	int i, l, x, y, pl, loc;
-	
-	bp[0] = _bp[0]; bc[0] = _bc[0];
-	bp[1] = _bp[1]; bc[1] = _bc[1];
-	bp[2] = _bp[2]; bc[2] = _bc[2];
-	bp[3] = _bp[3]; bc[3] = _bc[3];
+
+	// Extraction buffers.
+	BYTE *bc[4];
+	BYTE *bp[4];
+	for (int i = 0; i < 4; i++) {
+		bc[i] = alloca(vsp->vspYW);
+		bp[i] = alloca(vsp->vspYW);
+	}
 	
 	for (x = 0; x < vsp->vspXW; x++) {
 		for (pl = 0; pl < 4; pl++) {
