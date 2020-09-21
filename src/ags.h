@@ -62,8 +62,6 @@ typedef enum {
 } ALPHA_DIB_COPY_TYPE;
 
 struct agsurface {
-	int no;      /* surface number, primary DIB is 0 */
-	
 	int width;   /* width of surface  */
 	int height;  /* height of surface */
 	int depth;   /* depth of surface, 8/15/16/24/32 is available */

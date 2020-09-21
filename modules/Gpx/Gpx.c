@@ -120,10 +120,9 @@ static int load_cg_main(int no) {
 	
 	sno = find_null_surface();
 	
-	sf->no = sno;
 	suf[sno] = sf;
 	
-	return sf->no;
+	return sno;
 }
 
 static void Init() {
@@ -165,7 +164,7 @@ static void Create() {
 		*var = 0;
 	} else {
 		int no = find_null_surface();
-		*var = s->no = no;
+		*var = no;
 		suf[no] = s;
 	}
 	
@@ -193,7 +192,7 @@ static void CreatePixelOnly() {
 		*var = 0;
 	} else {
 		int no = find_null_surface();
-		*var = s->no = no;
+		*var = no;
 		suf[no] = s;
 	}
 	
@@ -219,7 +218,7 @@ static void CreateAMapOnly() {
 		*var = 0;
 	} else {
 		int no = find_null_surface();
-		*var = s->no = no;
+		*var = no;
 		suf[no] = s;
 	}
 	
