@@ -26,7 +26,7 @@ static void Start() {
         int *p1 = getCaliVariable();
         int p2 = getCaliValue();
 
-	msgskipfile = strdup(v_str(p2 -1));
+	msgskipfile = strdup(svar_get(p2));
 	
 	DEBUG_COMMAND_YET("MsgSkip.Start %p,%d:\n", p1, p2);
 }

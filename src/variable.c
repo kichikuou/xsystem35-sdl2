@@ -95,7 +95,7 @@ extern boolean v_getArrayBufferStatus(int page) {
 }
 
 /* 文字列変数の再初期化 */
-extern void v_initStringVars(int cnt,int len) {
+extern void svar_init(int cnt, int len) {
 	for (int i = cnt + 1; i < strvar_cnt; i++) {
 		if (strVar[i])
 			free(strVar[i]);
@@ -120,62 +120,62 @@ extern boolean v_initVars() {
 }
 
 /* 文字変数への代入 */
-void v_strcpy(int no, const char *str) {
-	if (no < 0 || no >= strvar_cnt) {
+void svar_set(int no, const char *str) {
+	if (no < 1 || no > strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return;
 	}
-	if (strVar[no])
-		free(strVar[no]);
-	strVar[no] = strdup(str);
+	if (strVar[no-1])
+		free(strVar[no-1]);
+	strVar[no-1] = strdup(str);
 }
 
-void v_strncpy(int dstno, int dstpos, int srcno, int srcpos, int len) {
-	if (dstno < 0 || dstno >= strvar_cnt) {
+void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len) {
+	if (dstno < 1 || dstno > strvar_cnt) {
 		WARNING("string index out of range: %d", dstno);
 		return;
 	}
-	if (!strVar[dstno])
-		strVar[dstno] = strdup("");
+	if (!strVar[dstno-1])
+		strVar[dstno-1] = strdup("");
 
 	char *buf = NULL;
 	const char *src;
 	if (srcno == dstno)
-		src = buf = strdup(strVar[srcno]);
+		src = buf = strdup(strVar[srcno-1]);
 	else
-		src = v_str(srcno);
+		src = svar_get(srcno);
 
-	dstpos = advance(strVar[dstno], dstpos) - strVar[dstno];  // #chars -> #bytes
+	dstpos = advance(strVar[dstno-1], dstpos) - strVar[dstno-1];  // #chars -> #bytes
 	src = advance(src, srcpos);
 	len = advance(src, len) - src;  // #chars -> #bytes
 
-	strVar[dstno] = realloc(strVar[dstno], dstpos + len + 1);
-	strncpy(strVar[dstno] + dstpos, src, len);
-	strVar[dstno][dstpos + len] = '\0';
+	strVar[dstno-1] = realloc(strVar[dstno-1], dstpos + len + 1);
+	strncpy(strVar[dstno-1] + dstpos, src, len);
+	strVar[dstno-1][dstpos + len] = '\0';
 
 	if (buf)
 		free(buf);
 }
 
 /* 文字変数への接続 */
-void v_strcat(int no, const char *str) {
-	if (no < 0 || no >= strvar_cnt) {
+void svar_append(int no, const char *str) {
+	if (no < 1 || no > strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return;
 	}
-	if (!strVar[no]) {
-		strVar[no] = strdup(str);
+	if (!strVar[no-1]) {
+		strVar[no-1] = strdup(str);
 		return;
 	}
-	int len1 = strlen(strVar[no]);
+	int len1 = strlen(strVar[no-1]);
 	int len2 = strlen(str);
-	strVar[no] = realloc(strVar[no], len1 + len2 + 1);
-	strcpy(strVar[no] + len1, str);
+	strVar[no-1] = realloc(strVar[no-1], len1 + len2 + 1);
+	strcpy(strVar[no-1] + len1, str);
 }
 
 /* 文字変数の長さ */
-size_t v_strlen(int no) {
-	const char *s = v_str(no);
+size_t svar_length(int no) {
+	const char *s = svar_get(no);
 
 	int c = 0;
 	while (*s) {
@@ -186,29 +186,29 @@ size_t v_strlen(int no) {
 }
 
 /* Width of a string (2 for full-width characters, 1 for half-width) */
-int v_strWidth(int no) {
-	return strlen(v_str(no));
+int svar_width(int no) {
+	return strlen(svar_get(no));
 }
 
 /* 文字変数そのもの */
-const char *v_str(int no) {
-	if (no < 0 || no >= strvar_cnt) {
+const char *svar_get(int no) {
+	if (no < 1 || no > strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return "";
 	}
-	return strVar[no] ? strVar[no] : "";
+	return strVar[no-1] ? strVar[no-1] : "";
 }
 
-int v_strstr(int no, int start, const char *str) {
-	if (no < 0 || no >= strvar_cnt) {
+int svar_find(int no, int start, const char *str) {
+	if (no < 1 || no > strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return -1;
 	}
 	if (!*str)
 		return 0;
-	if (!strVar[no])
+	if (!strVar[no-1])
 		return -1;
-	const char *p = advance(strVar[no], start);
+	const char *p = advance(strVar[no-1], start);
 	const char *found = strstr(p, str);
 	if (!found)
 		return -1;
@@ -220,8 +220,8 @@ int v_strstr(int no, int start, const char *str) {
 	return n;
 }
 
-void v_strFromVars(int no, const int *vars) {
-	if (no < 0 || no >= strvar_cnt) {
+void svar_fromVars(int no, const int *vars) {
+	if (no < 1 || no > strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return;
 	}
@@ -229,9 +229,9 @@ void v_strFromVars(int no, const int *vars) {
 	for (const int *c = vars; *c; c++)
 		len += (*c < 256) ? 1 : 2;
 
-	if (strVar[no])
-		free(strVar[no]);
-	char *p = strVar[no] = malloc(len + 1);
+	if (strVar[no-1])
+		free(strVar[no-1]);
+	char *p = strVar[no-1] = malloc(len + 1);
 
 	for (const int *v = vars; *v; v++) {
 		if (*v < 256) {
@@ -244,18 +244,18 @@ void v_strFromVars(int no, const int *vars) {
 	*p = '\0';
 }
 
-int v_strToVars(int no, int *vars) {
-	if (no < 0 || no >= strvar_cnt) {
+int svar_toVars(int no, int *vars) {
+	if (no < 1 || no > strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return 0;
 	}
-	if (!strVar[no]) {
+	if (!strVar[no-1]) {
 		*vars = 0;
 		return 1;
 	}
 
 	int count = 0;
-	for (const char *p = strVar[no]; *p; p++, count++) {
+	for (const char *p = strVar[no-1]; *p; p++, count++) {
 		vars[count] = *p & 0xff;
 		if (CHECKSJIS1BYTE(*p) && *(p + 1))
 			vars[count] |= (*++p & 0xff) << 8;
@@ -264,8 +264,8 @@ int v_strToVars(int no, int *vars) {
 	return count;
 }
 
-int v_strGetCharType(int no, int pos) {
-	const char *p = v_str(no);
+int svar_getCharType(int no, int pos) {
+	const char *p = svar_get(no);
 	for (; *p && pos > 0; pos--)
 		p += CHECKSJIS1BYTE(*p) ? 2 : 1;
 	if (!*p)
@@ -273,31 +273,31 @@ int v_strGetCharType(int no, int pos) {
 	return CHECKSJIS1BYTE(*p) ? 2 : 1;
 }
 
-void v_strReplaceAll(int no, int pattern, int replacement) {
-	const char *pat = v_str(pattern);
+void svar_replaceAll(int no, int pattern, int replacement) {
+	const char *pat = svar_get(pattern);
 	if (!*pat)
 		return;
-	const char *repl = v_str(replacement);
+	const char *repl = svar_get(replacement);
 
-	if (no < 0 || no >= strvar_cnt) {
+	if (no < 1 || no > strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return;
 	}
-	if (!strVar[no])
+	if (!strVar[no-1])
 		return;
-	char *src = strVar[no];
-	strVar[no] = NULL;
+	char *src = strVar[no-1];
+	strVar[no-1] = NULL;
 
 	char *start = src, *found;;
 	while ((found = strstr(start, pat))) {
 		char bak = *found;
 		*found = '\0';
-		v_strcat(no, start);
+		svar_append(no, start);
 		*found = bak;
-		v_strcat(no, repl);
+		svar_append(no, repl);
 		start = found + strlen(pat);
 	}
-	v_strcat(no, start);
+	svar_append(no, start);
 	free(src);
 }
 

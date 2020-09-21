@@ -171,7 +171,7 @@ int save_save_str_with_file(char *fname_utf8, int start, int cnt) {
 	
 	*tmp = 0;
 	for (i = 0; i < cnt; i++) {
-		strncpy(tmp, v_str(start + i - 1), strvar_len - 1);
+		strncpy(tmp, svar_get(start + i), strvar_len - 1);
 		tmp[strvar_len - 1] = '\0';
 		tmp += strlen(tmp) + 1;
 	}
@@ -228,7 +228,7 @@ int save_load_str_with_file(char *fname_utf8, int start, int cnt) {
 		status = SAVE_LOADOK;
 	}
 	for (i = 0; i < cnt; i++) {
-		v_strcpy(start + i - 1, tmp);
+		svar_set(start + i, tmp);
 		tmp += strlen(tmp) + 1;
 	}
 	fclose(fp);
@@ -584,8 +584,8 @@ static void *saveStrVar(Ald_strVarHdr *head) {
 		return NULL;
 	}
 	*tmp = 0;
-	for (i = 0; i < strvar_cnt; i++) {
-		strncpy(tmp, v_str(i), strvar_len - 1);
+	for (i = 1; i <= strvar_cnt; i++) {
+		strncpy(tmp, svar_get(i), strvar_len - 1);
 		tmp[strvar_len - 1] = '\0';
 		tmp += strlen(tmp) + 1;
 	}
@@ -603,10 +603,10 @@ static void loadStrVar(char *buf) {
 	cnt = head->count;
 	max = head->maxlen;
 	if (strvar_cnt != cnt || strvar_len != max)
-		v_initStringVars(cnt, max);
+		svar_init(cnt, max);
 	buf += sizeof(Ald_strVarHdr);
-	for (i = 0; i < cnt; i++) {
-		v_strcpy(i, buf);
+	for (i = 1; i <= cnt; i++) {
+		svar_set(i, buf);
 		buf += strlen(buf) + 1;
 	}
 }

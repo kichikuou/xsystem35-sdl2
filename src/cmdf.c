@@ -87,7 +87,7 @@ static void commandF1() {
 		p += (strlen(p) + 1);
 	}
 	
-	v_strcpy(str_number - 1 , p);
+	svar_set(str_number, p);
 	p += (strlen(p) + 1);
 	nact->datatbl_addr = (void *)p;
 }

@@ -413,7 +413,7 @@ void commands2F26() {
 	char *t1, *t2, *t3;
 	
 	t1 = toUTF8(title);
-	t2 = toUTF8(v_str(dst_no -1));
+	t2 = toUTF8(svar_get(dst_no));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -421,14 +421,14 @@ void commands2F26() {
 	
 	menu_inputstring(&mi_param);
 	if (mi_param.newstring == NULL) {
-		v_strcpy(dst_no -1, NULL);
+		svar_set(dst_no, NULL);
 		free(t1); free(t2);
 		return;
 	}
 	
 	t3 = fromUTF8(mi_param.newstring);
 	
-	v_strcpy(dst_no -1, t3);
+	svar_set(dst_no, t3);
 
 	free(t1);
 	free(t2);
@@ -442,7 +442,7 @@ void commands2F27() {
 	char *string = sys_getString(0);
 
 	if (num > 0) {
-	        v_strcpy(num - 1, string);
+		svar_set(num, string);
 	} else {
         	WARNING("MS: num <= 0\n");
 	}
@@ -650,7 +650,7 @@ void commands2F3C() {
 	int ePos = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = v_strGetCharType(eNum - 1, ePos);
+	*vResult = svar_getCharType(eNum, ePos);
 	
 	DEBUG_COMMAND("strGetCharType %d, %d, %d:\n", eNum, ePos, *vResult);
 }
@@ -659,7 +659,7 @@ void commands2F3D() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = v_strWidth(eNum -1);
+	*vResult = svar_width(eNum);
 
 	DEBUG_COMMAND("strGetLengthASCII %d, %d:\n", eNum, *vResult);
 }
@@ -744,7 +744,7 @@ void commands2F44() {
 	int num2 = getCaliValue();
 	char buf[256];
 
-	v_strcpy(num1 - 1, format_number(num2, fig, buf));
+	svar_set(num1, format_number(num2, fig, buf));
 	
 	DEBUG_COMMAND("MHH %d, %d, %d:\n", num1, fig, num2);
 }
@@ -872,7 +872,7 @@ void commands2F52() {
 	const char *s = CMAKE_SYSTEM_NAME;
 #endif
 
-	v_strcpy(eNum -1, s);
+	svar_set(eNum, s);
 	DEBUG_COMMAND("sysGetOsName %d: %s\n", eNum, s);
 }
 
@@ -923,7 +923,7 @@ void commands2F57() {
 	INPUTSTRING_PARAM p;
 	
 	t1 = toUTF8(sTitle);
-	t2 = toUTF8(v_str(eStrVar -1));
+	t2 = toUTF8(svar_get(eStrVar));
 	p.title = t1;
 	p.oldstring = t2;
 	p.max = eLength;
@@ -933,8 +933,8 @@ void commands2F57() {
 		*vResult = 65535;
 	} else {
 		t3 = fromUTF8(p.newstring);
-		v_strcpy(eStrVar -1, t3);
-		*vResult = v_strlen(eStrVar -1);
+		svar_set(eStrVar, t3);
+		*vResult = svar_length(eStrVar);
 		free(t3);
 	}
 	free(t1);
@@ -947,7 +947,7 @@ void commands2F58() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_hankaku(v_str(eNum - 1)) ? 1 : 0;
+	*vResult = sjis_has_hankaku(svar_get(eNum)) ? 1 : 0;
 	
 	DEBUG_COMMAND("strCheckASCII %d, %d:\n", eNum, *vResult);
 }
@@ -956,7 +956,7 @@ void commands2F59() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_zenkaku(v_str(eNum - 1)) ? 1 : 0;
+	*vResult = sjis_has_zenkaku(svar_get(eNum)) ? 1 : 0;
 	
 	DEBUG_COMMAND("strCheckSJIS %d, %d:\n", eNum, *vResult);
 }
@@ -976,7 +976,7 @@ void commands2F5B() {
 	int eNum = getCaliValue();
 	char *t1;
 	
-	t1 = toUTF8(v_str(eNum) - 1);
+	t1 = toUTF8(svar_get(eNum));
 	menu_msgbox_open(t1);
 	free(t1);
 	
@@ -1142,7 +1142,7 @@ void commands2F67() {
 	int i;
 
 	for (i = 0; i < nact->ain.fncnum; i++) {
-		if (0 == strcmp(nact->ain.fnc[i].name, v_str(eStrNum -1))) {
+		if (0 == strcmp(nact->ain.fnc[i].name, svar_get(eStrNum))) {
 			fnctbl[eNum].page  = nact->ain.fnc[i].page;
 			fnctbl[eNum].index = nact->ain.fnc[i].index;
 			break;
@@ -1291,7 +1291,7 @@ void commands2F77() {
 	int eStrNum    = getCaliValue();
 	int eSelectNum = getCaliValue();
 	
-	v_strcpy(eStrNum -1, sel_gettext(eSelectNum));
+	svar_set(eStrNum, sel_gettext(eSelectNum));
 	
 	DEBUG_COMMAND("menuGetText %d,%d:\n", eStrNum, eSelectNum);
 }
@@ -1350,9 +1350,9 @@ void commands2F7F() {
 	int index = sys_getdw();
 	int p1    = sys_getCaliValue();
 	
-	sys_addMsg(v_str(p1 -1));
+	sys_addMsg(svar_get(p1));
 	
-	DEBUG_COMMAND("2F7F %d, %d(%s,%s):\n", index, p1, nact->ain.msg[index], v_str(p1 -1));
+	DEBUG_COMMAND("2F7F %d, %d(%s,%s):\n", index, p1, nact->ain.msg[index], svar_get(p1));
 }
 
 void commands2F80() {
@@ -1392,7 +1392,7 @@ void commands2F82() {
 	DEBUG_COMMAND("dataGetString %d,%d:\n", eStrNum, eNumof);
 	
 	for (i = 0; i < eNumof; i++) {
-		v_strcpy(eStrNum + i -1, p);
+		svar_set(eStrNum + i, p);
 		p += (strlen(p) + 1);
 	}
 

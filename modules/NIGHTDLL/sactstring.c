@@ -118,7 +118,7 @@ int nt_sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	}
 	
 	sprintf(s, ss, num);
-	v_strcpy(strno -1, s);
+	svar_set(strno, s);
 	
 	return OK;
 }

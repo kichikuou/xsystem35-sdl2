@@ -45,7 +45,7 @@ static void ExchangeString(void) {
 	int target = getCaliValue();
 	int pat    = getCaliValue();
 	int patr   = getCaliValue();
-	v_strReplaceAll(target - 1, pat - 1, patr - 1);
+	svar_replaceAll(target, pat, patr);
 	DEBUG_COMMAND("ShString.ExchangeString: %d,%d,%d:\n", target, pat, patr);
 }
 
@@ -89,7 +89,7 @@ static void SetWindowTitle(void) { /* 6 */
 	int strno = getCaliValue();
 	int p2    = getCaliValue(); /* ISys3xSystem */ 
 	
-	ags_setWindowTitle(v_str(strno - 1));
+	ags_setWindowTitle(svar_get(strno));
 	
 	DEBUG_COMMAND("ShString.SetWindowTitle: %d,%d:\n", strno, p2);
 }
@@ -109,8 +109,8 @@ static void FillString() {
 	int i;
 	
 	for (i = 0; i < cnt; i++) {
-		if (st - 1 != src)
-			v_strcpy(st -1, v_str(src));
+		if (st != src)
+			svar_set(st, svar_get(src));
 	}
 	
 	DEBUG_COMMAND("ShString.FillString: %d,%d,%d,%d:\n", st, cnt, src, p4);
@@ -126,7 +126,7 @@ static void SetStringNum16(void) {
 	*/
 	int st = getCaliValue();
 	int *var = getCaliVariable();
-	const char *str = v_str(st -1);
+	const char *str = svar_get(st);
 	char _dst[100];
 	char *dst = _dst;
 	

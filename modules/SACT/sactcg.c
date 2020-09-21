@@ -205,10 +205,10 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
 	spcg_assert_no(wNumCG);
 	
 	// 勝手に出ていいのかな？
-	if (v_strlen(wText -1) == 0) return OK;
+	if (svar_length(wText) == 0) return OK;
 
 	ags_setFont(FONT_GOTHIC, wSize);
-	agsurface_t *glyph = ags_drawStringToSurface(v_str(wText -1));
+	agsurface_t *glyph = ags_drawStringToSurface(svar_get(wText));
 	i = malloc(sizeof(cginfo_t));
 	i->type = CG_SET;
 	i->no = wNumCG;

@@ -67,7 +67,7 @@ int spxm_getnum(int reginum) {
 
 int spxm_gettext(int reginum, int strno) {
 	if (reginum > SEL_ELEMENT_MAX) return NG;
-	v_strcpy(strno -1, xmenu.item[reginum]);
+	svar_set(strno, xmenu.item[reginum]);
 	return OK;
 }
 
@@ -78,6 +78,6 @@ int spxm_titlereg(void) {
 }
 
 int spxm_titleget(int strno) {
-	v_strcpy(strno -1, xmenu.title);
+	svar_set(strno, xmenu.title);
 	return OK;
 }

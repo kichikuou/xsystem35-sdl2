@@ -56,7 +56,7 @@ int sstr_push(int strno) {
 		idxmax = idx*2;
 	}
 	
-	stack[idx++] = strdup(v_str(strno -1));
+	stack[idx++] = strdup(svar_get(strno));
 	
 	return OK;
 }
@@ -68,7 +68,7 @@ int sstr_push(int strno) {
 int sstr_pop(int strno) {
 	if (idx == 0) return NG;
 	
-	v_strcpy(strno -1, stack[--idx]);
+	svar_set(strno, stack[--idx]);
 	free(stack[idx]);
 	
 	return OK;
@@ -85,8 +85,8 @@ int sstr_regist_replace(int sstrno, int dstrno) {
 	if (sstrno == dstrno) return NG;
 	
 	ex = malloc(sizeof(strexchange_t));
-	ex->src = strdup(v_str(sstrno -1));
-	ex->dst = strdup(v_str(dstrno -1));
+	ex->src = strdup(svar_get(sstrno));
+	ex->dst = strdup(svar_get(dstrno));
 	sact.strreplace = slist_append(sact.strreplace, ex);
 	return OK;
 }
@@ -106,7 +106,7 @@ int sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	}
 	
 	sprintf(s, ss, num);
-	v_strcpy(strno -1, s);
+	svar_set(strno, s);
 	
 	return OK;
 }

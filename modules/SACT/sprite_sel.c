@@ -284,7 +284,7 @@ void ssel_add(int nString, int wI) {
 		free(sact.sel.elem[wI]);
 	}
 	
-	sact.sel.elem[wI] = strdup(v_str(nString -1));
+	sact.sel.elem[wI] = strdup(svar_get(nString));
 }
 
 /*

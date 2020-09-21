@@ -352,17 +352,17 @@ static void drawLineFrame(Bcom_WindowInfo *i) {
 }
 
 static void copyMsgToStrVar(const char *m) {
-	if (v_strlen(msg.mg_curStrVarNo -1) == 0) {
-		v_strcpy(msg.mg_curStrVarNo -1, m);
+	if (svar_length(msg.mg_curStrVarNo) == 0) {
+		svar_set(msg.mg_curStrVarNo, m);
 	} else {
-		v_strcat(msg.mg_curStrVarNo -1, m);
+		svar_append(msg.mg_curStrVarNo, m);
 	}
 }
 
 static void msgget_at_r() {
 	if (msg.mg_policyR == 1) return;
 	msg.mg_curStrVarNo++;
-	// v_strcpy(msg.mg_curStrVarNo -1, NULL);
+	// svar_set(msg.mg_curStrVarNo, NULL);
 }
 
 static void msgget_at_a() {
@@ -372,10 +372,10 @@ static void msgget_at_a() {
 		break;
 	case 1:
 		msg.mg_curStrVarNo++;
-		v_strcpy(msg.mg_curStrVarNo -1, "");
+		svar_set(msg.mg_curStrVarNo, "");
 		break;
 	case 2:
-		v_strcpy(msg.mg_curStrVarNo -1, "");
+		svar_set(msg.mg_curStrVarNo, "");
 		msg.mg_curStrVarNo++;
 		break;
 	case 3:

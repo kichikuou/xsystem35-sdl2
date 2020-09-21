@@ -51,7 +51,7 @@ void commandMS() {
 	char *str = sys_getString(':');
 	
 	if (num > 0) { /* thanx tajiri@wizard */
-	        v_strcpy(num - 1, str);
+		svar_set(num, str);
 	} else {
         	WARNING("MS: num(%d) <= 0\n", num);
 	}
@@ -66,7 +66,7 @@ void commandMP() {
 		[SHIFT_JIS] = "\x81\x40",
 		[UTF8] = "　",
 	};
-	const char *src = v_str(num1 - 1);
+	const char *src = svar_get(num1);
 	int chars = num2;
 	char *str;
 
@@ -109,7 +109,7 @@ void commandMI() { /* T2 */
 	char *t1, *t2, *t3;
 	
 	t1 = toUTF8(title);
-	t2 = toUTF8(v_str(dst_no -1));
+	t2 = toUTF8(svar_get(dst_no));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -117,14 +117,14 @@ void commandMI() { /* T2 */
 	
 	menu_inputstring(&mi_param);
 	if (mi_param.newstring == NULL) {
-		v_strcpy(dst_no -1, NULL);
+		svar_set(dst_no, NULL);
 		free(t1); free(t2);
 		return;
 	}
 	
 	t3 = fromUTF8(mi_param.newstring);
 	
-	v_strcpy(dst_no -1, t3);
+	svar_set(dst_no, t3);
 
 	free(t1);
 	free(t2);
@@ -138,11 +138,11 @@ void commandMA() {
 	int num2 = getCaliValue();
 
 	if (num1 == num2) {
-		char *buf = strdup(v_str(num2 - 1));
-		v_strcat(num1 - 1, buf);
+		char *buf = strdup(svar_get(num2));
+		svar_append(num1, buf);
 		free(buf);
 	} else {
-		v_strcat(num1 - 1, v_str(num2 - 1));
+		svar_append(num1, svar_get(num2));
 	}
 	
 	DEBUG_COMMAND("MA %d,%d:\n",num1,num2);
@@ -153,7 +153,7 @@ void commandMC() {
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
-	sysVar[0] = strcmp(v_str(num1 - 1), v_str(num2 - 1)) == 0 ? 1 : 0;
+	sysVar[0] = strcmp(svar_get(num1), svar_get(num2)) == 0 ? 1 : 0;
 	
 	DEBUG_COMMAND("MC %d,%d:\n",num1,num2);
 }
@@ -186,7 +186,7 @@ void commandMM() {
 	int num2 = getCaliValue();
 	
 	if (num1 != num2)
-		v_strcpy(num1 - 1, v_str(num2 - 1));
+		svar_set(num1, svar_get(num2));
 	
 	DEBUG_COMMAND("MM %d,%d:\n",num1, num2);
 }
@@ -199,7 +199,7 @@ void commandMH() {
 
 	char buf[512];
 	char *s = fromSJIS(format_number_zenkaku(num2, fig, buf));
-	v_strcpy(num1 - 1, s);
+	svar_set(num1, s);
 	free(s);
 
 	DEBUG_COMMAND("MH %d,%d,%d:\n",num1,fig,num2);
@@ -218,7 +218,7 @@ void commandML() {
 	int *var   = getCaliVariable();
 	int str_no = getCaliValue();
 	
-	*var = v_strlen(str_no -1);
+	*var = svar_length(str_no);
 	
 	DEBUG_COMMAND("ML %p,%d:\n",var, str_no);
 }
@@ -229,7 +229,7 @@ void commandMD() {
 	int src_str_no = getCaliValue();
 	int len        = getCaliValue();
 	
-	v_strncpy(dst_str_no - 1, 0, src_str_no - 1, 0, len);
+	svar_copy(dst_str_no, 0, src_str_no, 0, len);
 	
 	DEBUG_COMMAND("MD %d,%d,%d:\n",dst_str_no, src_str_no, len);
 }
@@ -242,7 +242,7 @@ void commandME() {
 	int src_pos    = getCaliValue();
 	int len        = getCaliValue();
 	
-	v_strncpy(dst_str_no - 1, dst_pos, src_str_no - 1, src_pos, len);
+	svar_copy(dst_str_no, dst_pos, src_str_no, src_pos, len);
 	
 	DEBUG_COMMAND("ME %d,%d,%d,%d,%d:\n",dst_str_no, dst_pos, src_str_no, src_pos, len);
 }
@@ -254,7 +254,7 @@ void commandMF() {
 	int key_no    = getCaliValue();
 	int start_pos = getCaliValue();
 	
-	int pos = v_strstr(dst_no - 1, start_pos, v_str(key_no - 1));
+	int pos = svar_find(dst_no, start_pos, svar_get(key_no));
 	
 	if (pos < 0) {
 		sysVar[0] = 255;
@@ -277,7 +277,7 @@ void commandMZ0() {
 	/* いつからか、文字列変数の最大長さは∞になったようだ */
 	if (max_len == 0) max_len = STRVAR_LEN * 2;
 	
-	v_initStringVars(max_num,max_len * 2 + 1);
+	svar_init(max_num, max_len * 2 + 1);
 }
 
 void commandMG() {
@@ -304,7 +304,7 @@ void commandMG() {
 	case 4:
 		sw = getCaliValue();
 		nact->msg.mg_curStrVarNo = nact->msg.mg_startStrVarNo + sw;
-		v_strcpy(nact->msg.mg_curStrVarNo -1, "");
+		svar_set(nact->msg.mg_curStrVarNo, "");
 		break;
 	case 5:
 		var = getCaliVariable();
@@ -316,7 +316,7 @@ void commandMG() {
 		break;
 	case 7:
 		var = getCaliVariable();
-		*var = v_strlen(nact->msg.mg_curStrVarNo -1);
+		*var = svar_length(nact->msg.mg_curStrVarNo);
 		break;
 	case 100:
 		sw = getCaliValue();
@@ -341,7 +341,7 @@ void commandMJ() {
 	INPUTSTRING_PARAM mj_param;
 	char *t1, *t2;
 	
-	t1 = toUTF8(v_str(num -1));
+	t1 = toUTF8(svar_get(num));
 	mj_param.max = max_len;
 	mj_param.x = x;
 	mj_param.y = y;
@@ -353,7 +353,7 @@ void commandMJ() {
 	if (mj_param.newstring == NULL) return;
 	
 	t2 = fromUTF8(mj_param.newstring);
-	v_strcpy(num -1, t2);
+	svar_set(num, t2);
 
 	free(t1);
 	free(t2);
@@ -370,11 +370,11 @@ void commandMN() {
 	switch(no) {
 	case 0:
 		/* 文字列を配列に変換する */
-		sysVar[0] = v_strToVars(num - 1, var);
+		sysVar[0] = svar_toVars(num, var);
 		break;
 	case 1:
 		/* 配列を文字列に変換する */
-		v_strFromVars(num - 1, var);
+		svar_fromVars(num, var);
 		break;
 	default:
 		WARNING("UnKnown MN command(%d)\n", no);

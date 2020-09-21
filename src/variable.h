@@ -56,18 +56,19 @@ extern boolean v_allocateArrayBuffer(int page, int size, boolean saveflag);
 extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page);
 extern boolean v_releaseArrayVar(int datavar);
 extern boolean v_getArrayBufferStatus(int page);
-extern void v_initStringVars(int ,int );
 extern boolean v_initVars();
-extern void v_strcpy(int no, const char *str);
-extern void v_strncpy(int dstno, int dstpos, int srcno, int srcpos, int len);
-extern void v_strcat(int no, const char *str);
-extern size_t v_strlen(int no);
-extern int v_strWidth(int no);
-extern int v_strstr(int no, int start, const char *str);
-extern void v_strFromVars(int no, const int *vars);
-extern int v_strToVars(int no, int *vars);
-extern const char *v_str(int no);
-extern int v_strGetCharType(int no, int pos);
-extern void v_strReplaceAll(int no, int pattern, int replacement);
+
+extern void svar_init(int cnt, int len);
+extern const char *svar_get(int no);
+extern void svar_set(int no, const char *str);
+extern void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len);
+extern void svar_append(int no, const char *str);
+extern size_t svar_length(int no);
+extern int svar_width(int no);
+extern int svar_find(int no, int start, const char *str);
+extern void svar_fromVars(int no, const int *vars);
+extern int svar_toVars(int no, int *vars);
+extern int svar_getCharType(int no, int pos);
+extern void svar_replaceAll(int no, int pattern, int replacement);
 
 #endif /* !__VARIABLE__ */

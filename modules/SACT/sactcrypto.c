@@ -47,7 +47,7 @@ int scryp_encrypt_str(int strno, int key) {
 }
 
 int scryp_decrypt_str(int strno, int key) {
-	WARNING("str = '%s'\n", v_str(strno -1));
+	WARNING("str = '%s'\n", svar_get(strno));
 	WARNING("NOT IMPLEMENTED\n");
 	return OK;
 }

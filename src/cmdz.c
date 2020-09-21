@@ -167,7 +167,7 @@ void commandZD() {
 		break;
 	case 2:
 		sw = getCaliValue();
-		DEBUG_MESSAGE("(ZD2)%s\n", v_str(sw -1));
+		DEBUG_MESSAGE("(ZD2)%s\n", svar_get(sw));
 		break;
 	case 3:
 		sw = getCaliValue(); break;
@@ -352,7 +352,7 @@ void commandZZ2() {
 #else
 	static BYTE str[] = {0x82, 0x74, 0x82, 0x8e, 0x82, 0x8b, 0x82, 0x8e, 0x82, 0x8f, 0x82, 0x97, 0x82, 0x8e, 0};
 #endif
-	v_strcpy(num -1, str);
+	svar_set(num, str);
 
 	DEBUG_COMMAND("ZZ2 %d:\n",num);
 }
@@ -459,7 +459,7 @@ void commandZZ14() {
 #endif
 	
 	if (no <= 0) return;
-	v_strcpy(no -1, s);
+	svar_set(no, s);
 	
 	DEBUG_COMMAND("ZZ14 %d:\n", no);
 }

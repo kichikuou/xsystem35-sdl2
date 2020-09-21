@@ -1044,7 +1044,7 @@ void check_command(int c0) {
 	case 'X':
 	{
 		int num=getCaliValue();
-		sys_addMsg(v_str(num - 1));
+		sys_addMsg(svar_get(num));
 		DEBUG_COMMAND("X %d:\n", num);
 	}
 		break;
