@@ -78,15 +78,10 @@ static vsp_header *extract_header(BYTE *b) {
  *   b  : raw data (pointer to palette)
 */
 static void getpal(Palette256 *pal, BYTE *b) {
-	int red, green, blue, i;
-	
-	for (i = 0; i < 16; i++) {
-		blue  = b[i * 3 + 0];
-		red   = b[i * 3 + 1];
-		green = b[i * 3 + 2];
-		pal->red[i]   = (red   << 4);
-		pal->green[i] = (green << 4);
-		pal->blue[i]  = (blue  << 4);
+	for (int i = 0; i < 16; i++) {
+		pal->blue[i]  = b[i * 3 + 0] * 17;
+		pal->red[i]   = b[i * 3 + 1] * 17;
+		pal->green[i] = b[i * 3 + 2] * 17;
 	}
 }
 
