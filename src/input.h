@@ -50,6 +50,6 @@ extern boolean get_skipMode();
 extern boolean get_skipMode2();
 extern void set_hak_keymode(int key, int mode);
 
-#define sys_keywait(r,flg) Keywait(r,flg)
+#define sys_keywait(r,flg) sdl_keywait(r,flg)
 
 #endif /* __INPUT__ */

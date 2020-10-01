@@ -77,7 +77,7 @@ static void ntmain(struct _scoadr inadr) {
 		if (!nact->is_message_locked) {
 			sys_getInputInfo();
 		}
-		WaitVsync();
+		sdl_wait_vsync();
 		nact->frame_count++;
 		nact->wait_vsync = FALSE;
 	}

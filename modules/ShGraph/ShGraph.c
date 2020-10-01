@@ -566,7 +566,7 @@ static void PlayAnimeData() {
 		{
 			int now = get_high_counter(SYSTEMCOUNTER_MSEC);
 			if (now - cnt < interval) {
-				Sleep(interval - (now-cnt));
+				sdl_sleep(interval - (now-cnt));
 			}
 		}
 	}

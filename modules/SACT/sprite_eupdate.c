@@ -298,7 +298,7 @@ static void ec14_cb(surface_t *sfsrc, surface_t *sfdst) {
 	if (ecp.oldstep == 0) {
 		sf_copyall(sf0, sfdst);
 	}
-	Maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 44, curstep);
+	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 44, curstep);
 	ecp.oldstep = curstep;
 }
 
@@ -311,7 +311,7 @@ static void ec15_cb(surface_t *sfsrc, surface_t *sfdst) {
 	if (ecp.oldstep == 0) {
 		sf_copyall(sf0, sfdst);
 	}
-	Maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 45, curstep);
+	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 45, curstep);
 	ecp.oldstep = curstep;
 }
 
@@ -324,7 +324,7 @@ static void ec16_cb(surface_t *sfsrc, surface_t *sfdst) {
 	if (ecp.oldstep == 0) {
 		sf_copyall(sf0, sfdst);
 	}
-	Maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 46, curstep);
+	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 46, curstep);
 	ecp.oldstep = curstep;
 }
 
@@ -337,7 +337,7 @@ static void ec17_cb(surface_t *sfsrc, surface_t *sfdst) {
 	if (ecp.oldstep == 0) {
 		sf_copyall(sf0, sfdst);
 	}
-	Maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 47, curstep);
+	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 47, curstep);
 	ecp.oldstep = curstep;
 }
 

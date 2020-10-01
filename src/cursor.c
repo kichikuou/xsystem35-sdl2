@@ -293,7 +293,7 @@ static boolean cursor_load_mono(BYTE *d, int no) {
 	pos += p1;
 	
 	/* read pixedl data */
-	if (CursorNew(d + pos, no, &cursorImage, &cursordirentry) == FALSE) {
+	if (sdl_cursorNew(d + pos, no, &cursorImage, &cursordirentry) == FALSE) {
 		WARNING("unable to read pixel data\n");
 		return FALSE;
 	}

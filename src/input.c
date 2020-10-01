@@ -69,7 +69,7 @@ void set_hak_keymode(int key, int mode) {
 
 int sys_getMouseInfo(MyPoint *p, boolean is_dibgeo) {
 	MyPoint _p;
-	int key = GetMouseInfo(&_p);
+	int key = sdl_getMouseInfo(&_p);
 	
 	if (p) {
 		p->x = _p.x;
@@ -83,7 +83,7 @@ int sys_getMouseInfo(MyPoint *p, boolean is_dibgeo) {
 }
 
 int sys_getKeyInfo() {
-	return GetKeyInfo();
+	return sdl_getKeyInfo();
 }
 
 int sys_getJoyInfo() {
@@ -91,7 +91,7 @@ int sys_getJoyInfo() {
 }
 
 int sys_getInputInfo() {
- 	int key = GetMouseInfo(NULL) | GetKeyInfo() | joy_getinfo();
+	int key = sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | joy_getinfo();
 
 	if (key == SYS35KEY_SPC && skipModeInterruptable) {
 		skipToNextSel = FALSE;		

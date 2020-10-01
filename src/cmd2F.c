@@ -813,7 +813,7 @@ void commands2F4C() {
 	r.x = eSrcX; r.y = eSrcY; r.width = eWidth; r.height = eHeight;
 	p.x = eX, p.y = eY;
 	
-	UpdateArea(&r, &p);
+	sdl_updateArea(&r, &p);
 	
 	DEBUG_COMMAND("grBlt %d, %d, %d, %d, %d, %d:\n",
 		      eX, eY, eSrcX, eSrcY, eWidth, eHeight);

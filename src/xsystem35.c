@@ -221,7 +221,7 @@ void sys_exit(int code) {
 	sys35_remove();
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.quit(); );
-	Sleep(1000000000);
+	sdl_sleep(1000000000);
 #else
 	exit(code);
 #endif
@@ -571,7 +571,7 @@ int main(int argc, char **argv) {
 	
 	nact_main();
 #ifdef __EMSCRIPTEN__
-	Sleep(1000000000);
+	sdl_sleep(1000000000);
 #endif
 	sys35_remove();
 	

@@ -74,7 +74,7 @@ static void eCopyUpdateArea(int sx, int sy, int w, int h, int dx, int dy) {
 	dst.x = dx - nact->sys_view_area.x;
 	dst.y = dy - nact->sys_view_area.y;
 	
-	UpdateArea(&src, &dst);
+	sdl_updateArea(&src, &dst);
 }
 
 static int eCopyArea1(int dx, int dy, int w, int h, int opt) {
@@ -243,13 +243,13 @@ static int eCopyArea9(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 		cnt+=waitcnt;
 		for (y = 0; y < h -15; y+=16) {
 			for (x = 0; x < (w -7); x+=16) {
-				CopyArea(sx + x + hintX[i],sy + y + hintY[i], 8, 8, dx + x + hintX[i], dy + y + hintY[i]);
+				sdl_copyArea(sx + x + hintX[i],sy + y + hintY[i], 8, 8, dx + x + hintX[i], dy + y + hintY[i]);
 			}
 		}
 		ags_updateArea(dx, dy, w, h);
 		EC_WAIT;
 	}
-	CopyArea(sx, sy, w, h, dx, dy);
+	sdl_copyArea(sx, sy, w, h, dx, dy);
 	ags_updateArea(dx, dy, w, h);
 	return key;
 }
@@ -259,7 +259,7 @@ static void eCopyArea10(int step) {
 		return;
 	}
 	if (step == 64) {
-		CopyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
+		sdl_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
 		ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
 		return;
 	}
@@ -474,7 +474,7 @@ static int eCopyArea23(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -3); y+=4) {
 			for (x = 0; x < (w -3); x+=4) {
-				CopyArea(sx + x + hintX[i], sy + y + hintY[i], 2, 2,
+				sdl_copyArea(sx + x + hintX[i], sy + y + hintY[i], 2, 2,
 					 dx + x + hintX[i], dy + y + hintY[i]);
 			}
 		}
@@ -494,7 +494,7 @@ static int eCopyArea24(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	cnt = get_ecounter();
 	for (i = 0; i < 8; i++ ) {
 		cnt += waitcnt;
-		Mosaic(sx, sy, w, h, dx, dy, slices[i]);
+		sdl_Mosaic(sx, sy, w, h, dx, dy, slices[i]);
 		ags_updateArea(dx, dy, w, h);
 		EC_WAIT;
 	}
@@ -683,7 +683,7 @@ static void eCopyArea32(int step) {
 	}
 	ags_putRegion(save, ecp.dx, ecp.dy);
 	ags_copyArea_alphaBlend(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, step*4);
-	Mosaic(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, slices[step >> 1]);
+	sdl_Mosaic(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, slices[step >> 1]);
 	ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
 }
 
@@ -1085,19 +1085,19 @@ static void eCopyArea43(int step) {
 }
 
 static void eCopyArea44(int step) {
-	Maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 44, step); 
+	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 44, step); 
 }
 
 static void eCopyArea45(int step) {
-	Maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 45, step); 
+	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 45, step); 
 }
 
 static void eCopyArea46(int step) {
-	Maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 46, step); 
+	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 46, step); 
 }
 
 static void eCopyArea47(int step) {
-	Maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 47, step); 
+	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 47, step); 
 }
 
 static int eCopyArea48(int dx, int dy, int w, int h, int opt) {
@@ -1139,15 +1139,15 @@ static int eCopyArea49(int dx, int dy, int w, int h, int opt) {
 }
 
 static void eCopyArea50(int step) {
-	Maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 50, step); 
+	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 50, step); 
 }
 
 static void eCopyArea51(int step) {
-	Maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 51, step); 
+	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 51, step); 
 }
 
 static void eCopyArea52(int step) {
-	Maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 52, step); 
+	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 52, step); 
 }
 
 static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
@@ -1161,7 +1161,7 @@ static int eCopyArea1001(int sx, int sy, int w, int h, int dx, int dy, int opt, 
 }
 
 static int eCopyArea2000(int sx, int sy, int w, int h, int dx, int dy, int opt) {
-	FillRectangle(dx, dy, w, h, 0);
+	sdl_fillRectangle(dx, dy, w, h, 0);
 	ags_copyArea_alphaLevel(sx, sy, w, h, dx, dy, opt);
 	ags_updateArea(dx, dy, w, h);
 	return sys_getInputInfo();

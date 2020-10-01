@@ -62,7 +62,7 @@ static void initPal(Palette256 *pal) {
 	pal->red[7]   = 255; pal->green[7]   = 255; pal->blue[7]   = 255;
 	pal->red[15]  = 255; pal->green[15]  = 255; pal->blue[15]  = 255;
 	pal->red[255] = 255; pal->green[255] = 255; pal->blue[255] = 255;
-	SetPalette(pal, 0, 256);
+	sdl_setPalette(pal, 0, 256);
 	nact->sys_pal_changed = TRUE;
 }
 
@@ -137,10 +137,10 @@ void ags_init() {
 	nact->sys_view_area.width  = SYS35_DEFAULT_WIDTH;
 	nact->sys_view_area.height = SYS35_DEFAULT_HEIGHT;
 	
-	GraphicsInitilize();
+	sdl_Initilize();
 	
 	font_init(nact->fontdev);
-	SetFontDevice(nact->ags.font);
+	sdl_setFontDevice(nact->ags.font);
 	
 	initPal(&pal_256);
 	cg_init();
@@ -148,7 +148,7 @@ void ags_init() {
 
 void ags_remove() {
 	ags_autorepeat(TRUE);
-	GraphicsRemove();
+	sdl_Remove();
 }
 
 void ags_setWorldSize(int width, int height, int depth) {
@@ -161,9 +161,9 @@ void ags_setWorldSize(int width, int height, int depth) {
 		nact->ags.dib->alpha = NULL;
 	}
 
-	SetWorldSize(width, height, depth);
+	sdl_setWorldSize(width, height, depth);
 	
-	nact->ags.dib = GetDIB();
+	nact->ags.dib = sdl_getDIB();
 	
 	/* DIBが8以上の場合は、alpha plane を用意 */
 	if (depth > 8)
@@ -180,7 +180,7 @@ void ags_setViewArea(int x, int y, int width, int height) {
 	
 	nact->sys_view_area.width  = width;
 	nact->sys_view_area.height = height;
-	SetWindowSize(x, y, width, height);
+	sdl_setWindowSize(x, y, width, height);
 }
 
 void ags_setWindowTitle(const char *src) {
@@ -193,7 +193,7 @@ void ags_setWindowTitle(const char *src) {
 	}
 	strcpy(d, TITLEHEAD);
 	strcat(d, utf);
-	SetWindowTitle(d);
+	sdl_setWindowTitle(d);
 	free(utf);
 	free(d);
 }
@@ -205,13 +205,13 @@ void ags_getDIBInfo(DispInfo *info) {
 }
 
 void ags_getViewAreaInfo(DispInfo *info) {
-	GetWindowInfo(info);
+	sdl_getWindowInfo(info);
 	info->width  = nact->sys_view_area.width;
 	info->height = nact->sys_view_area.height;
 }
 
 void ags_getWindowInfo(DispInfo *info) {
-	GetWindowInfo(info);
+	sdl_getWindowInfo(info);
 }
 
 void ags_setExposeSwitch(boolean bool) {
@@ -230,7 +230,7 @@ void ags_updateArea(int x, int y, int w, int h) {
 			intersection(&nact->sys_view_area, &r, &update);
 			p.x = update.x - nact->sys_view_area.x;
 			p.y = update.y - nact->sys_view_area.y;
-			UpdateArea(&update, &p);
+			sdl_updateArea(&update, &p);
 		}
 	}
 }
@@ -246,7 +246,7 @@ void ags_updateFull() {
 		r.y = nact->sys_view_area.y;
 		r.width  = min(nact->sys_view_area.width,  nact->sys_world_size.width);
 		r.height = min(nact->sys_view_area.height, nact->sys_world_size.height);
-		UpdateArea(&r, &p);
+		sdl_updateArea(&r, &p);
 	}
 }
 
@@ -269,49 +269,47 @@ void ags_setPalette(int no, int red, int green, int blue) {
 
 void ags_setPaletteToSystem(int src, int cnt) {
 	if (!fade_outed) 
-		SetPalette(nact->sys_pal, src, cnt);
+		sdl_setPalette(nact->sys_pal, src, cnt);
 }
 
 void ags_drawRectangle(int x, int y, int w, int h, int col) {
 	if (!check_param(&x, &y, &w, &h)) return;
 	
-	DrawRectangle(x, y, w, h, col);
+	sdl_drawRectangle(x, y, w, h, col);
 }
 
 void ags_fillRectangle(int x, int y, int w, int h, int col) {
 	if (!check_param(&x, &y, &w, &h)) return;
 
-	FillRectangle(x, y, w, h, col);
+	sdl_fillRectangle(x, y, w, h, col);
 }
 
 void ags_drawLine(int x0, int y0, int x1, int y1, int col) {
 	if (!check_param_xy(&x0, &y0)) return;
 	if (!check_param_xy(&x1, &y1)) return;
 
-	DrawLine(x0, y0, x1, y1, col);
+	sdl_drawLine(x0, y0, x1, y1, col);
 }
 
 void ags_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	CopyArea(sx, sy, w, h, dx, dy);
+	sdl_copyArea(sx, sy, w, h, dx, dy);
 }
 
 void ags_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror_sw) {
 	if (!check_param(&sx, &sy, &sw, &sh)) return;
 	if (!check_param(&dx, &dy, &dw, &dh)) return;
 	
-	DspDeviceSync(); /* Device依存の sync (ex. XSync()) */
-	ScaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw);
+	sdl_scaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw);
 }
 
 void ags_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int col) {
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 
-	DspDeviceSync();
-	CopyAreaSP(sx, sy, w, h, dx, dy, col);
+	sdl_copyAreaSP(sx, sy, w, h, dx, dy, col);
 }
 
 void ags_wrapColor(int x, int y, int w, int h, int p1, int p2) {
@@ -319,15 +317,13 @@ void ags_wrapColor(int x, int y, int w, int h, int p1, int p2) {
 	
 	if (!check_param(&x, &y, &w, &h)) return;
 	
-	DspDeviceSync();
-	WrapColor(x, y, w, h, p1, p2);
+	sdl_wrapColor(x, y, w, h, p1, p2);
 }
 
 void ags_getPixel(int x, int y, Palette *cell) {
 	if (!check_param_xy(&x, &y)) return;
 
-	DspDeviceSync();
-	GetPixel(x, y, cell);
+	sdl_getPixel(x, y, cell);
 }
 
 void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt) {
@@ -335,7 +331,6 @@ void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt
 	
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	
-	DspDeviceSync();
 	{
 		agsurface_t *dib = nact->ags.dib;
 		int   x, y;
@@ -356,8 +351,7 @@ void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt
 void* ags_saveRegion(int x, int y, int w, int h) {
 	if (!check_param(&x, &y, &w, &h)) return NULL;
 
-	DspDeviceSync();
-	return (void *)SaveRegion(x, y, w, h);
+	return (void *)sdl_saveRegion(x, y, w, h);
 }
 
 void ags_restoreRegion(void *region, int x, int y) {
@@ -365,8 +359,7 @@ void ags_restoreRegion(void *region, int x, int y) {
 	
 	if (!check_param_xy(&x, &y)) return;
 	
-	DspDeviceSync();
-	RestoreRegion(region, x, y);
+	sdl_restoreRegion(region, x, y);
 }
 
 void ags_putRegion(void *region, int x, int y) {
@@ -374,8 +367,7 @@ void ags_putRegion(void *region, int x, int y) {
 	
 	if (!check_param_xy(&x, &y)) return;
 	
-	DspDeviceSync();
-	PutRegion(region, x, y);
+	sdl_putRegion(region, x, y);
 }
 
 void ags_copyRegion(void *region, int sx, int sy , int w, int h, int dx, int dy) {
@@ -384,15 +376,13 @@ void ags_copyRegion(void *region, int sx, int sy , int w, int h, int dx, int dy)
 	if (!check_param_xy(&dx, &dy)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	CopyRegion(region, sx, sy, w, h, dx, dy);
+	sdl_CopyRegion(region, sx, sy, w, h, dx, dy);
 }
 
 void ags_delRegion(void *region) {
 	if (region == NULL) return;
 	
-	DspDeviceSync();
-	DelRegion(region);
+	sdl_delRegion(region);
 }
 
 int ags_drawString(int x, int y, const char *src, int col) {
@@ -400,9 +390,8 @@ int ags_drawString(int x, int y, const char *src, int col) {
 	
 	if (!check_param_xy(&x, &y)) return 0;
 	
-	DspDeviceSync();
 	char *utf8 = toUTF8(src);
-	w = DrawString(x, y, utf8, col);
+	w = sdl_drawString(x, y, utf8, col);
 	free(utf8);
 
 	return w;
@@ -426,8 +415,7 @@ void ags_drawCg8bit(cgdata *cg, int x, int y) {
 	if (!check_param(&x, &y, &w, &h)) return;
 	
 	cg->data_offset = abs(sy - y) * cg->width + abs(sx - x);
-	DspDeviceSync();
-	DrawImage8_fromData(cg, x, y, w, h);
+	sdl_drawImage8_fromData(cg, x, y, w, h);
 }
 
 void ags_drawCg16bit(cgdata *cg, int x, int y) {
@@ -441,8 +429,7 @@ void ags_drawCg16bit(cgdata *cg, int x, int y) {
 	if (!check_param(&x, &y, &w, &h)) return;
 	
 	cg->data_offset = abs(sy - y) * cg->width + abs(sx - x);
-	DspDeviceSync();
-	DrawImage16_fromData(cg, x, y, w, h);
+	sdl_drawImage16_fromData(cg, x, y, w, h);
 }
 
 void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy) {
@@ -451,8 +438,7 @@ void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy) {
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	CopyAreaSP16_shadow(sx, sy, w, h, dx, dy);
+	sdl_copyAreaSP16_shadow(sx, sy, w, h, dx, dy, 255);
 }
 
 void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int col) {
@@ -461,8 +447,7 @@ void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int 
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	CopyAreaSP(sx, sy, w, h, dx, dy, col);
+	sdl_copyAreaSP(sx, sy, w, h, dx, dy, col);
 }
 
 void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
@@ -471,8 +456,7 @@ void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int l
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	CopyAreaSP16_alphaLevel(sx, sy, w, h, dx, dy, lv);
+	sdl_copyAreaSP16_alphaLevel(sx, sy, w, h, dx, dy, lv);
 }
 
 void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv) {
@@ -481,8 +465,7 @@ void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int l
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	CopyAreaSP16_alphaBlend(sx, sy, w, h, dx, dy, lv);
+	sdl_copyAreaSP16_alphaBlend(sx, sy, w, h, dx, dy, lv);
 }
 
 void ags_copyArea_whiteLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
@@ -491,8 +474,7 @@ void ags_copyArea_whiteLevel(int sx, int sy, int w, int h, int dx, int dy, int l
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	CopyAreaSP16_whiteLevel(sx, sy, w, h, dx, dy, lv);
+	sdl_copyAreaSP16_whiteLevel(sx, sy, w, h, dx, dy, lv);
 }
 
 
@@ -537,8 +519,6 @@ MyRectangle* ags_imageFlood(int x, int y, int c) {
 	
 	if (!check_param_xy(&x, &y)) return NULL;
 
-	DspDeviceSync();
-
 {
 	agsurface_t *dib = nact->ags.dib;
 	BYTE *dst = GETOFFSET_PIXEL(dib, x, y);
@@ -572,8 +552,7 @@ void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	Copy_from_alpha(sx, sy, w, h, dx, dy, flg);
+	sdl_copy_from_alpha(sx, sy, w, h, dx, dy, flg);
 }
 
 void ags_copyToAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg) {
@@ -582,8 +561,7 @@ void ags_copyToAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COP
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	Copy_to_alpha(sx, sy, w, h, dx, dy, flg);
+	sdl_copy_to_alpha(sx, sy, w, h, dx, dy, flg);
 }
 
 void ags_alpha_uppercut(int sx, int sy, int w, int h, int s, int d) {
@@ -663,7 +641,7 @@ void ags_fader(ags_faderinfo_t *i) {
 		i->callback(step);
 		key = sys_getInputInfo();
 		/* 実際の fade にかかった時間 */
-		Sleep(0); /* It's a magic !!! */
+		sdl_sleep(0); /* It's a magic !!! */
 		cnt2 = get_high_counter(SYSTEMCOUNTER_MSEC) - cnt1;
 		
 		lefttime = i->effect_time - (cnt1 + cnt2 - cnt_st); /* fade 残り時間 */
@@ -713,7 +691,7 @@ void ags_fadeIn(int rate, boolean flag) {
 
 	nact->waitcancel_key = 0;
 
-	i.callback = FadeIn;
+	i.callback = sdl_fadeIn;
 	i.step_max = 255;
 	ags_fader(&i);
 }
@@ -731,7 +709,7 @@ void ags_fadeOut(int rate, boolean flag) {
 
 	nact->waitcancel_key = 0;
 	
-	i.callback = FadeOut;
+	i.callback = sdl_fadeOut;
 	i.step_max = 255;
 	ags_fader(&i);
 }
@@ -748,7 +726,7 @@ void ags_whiteIn(int rate, boolean flag) {
 
 	nact->waitcancel_key = 0;
 
-	i.callback = WhiteIn;
+	i.callback = sdl_whiteIn;
 	i.step_max = 255;
 	ags_fader(&i);
 }
@@ -765,7 +743,7 @@ void ags_whiteOut(int rate, boolean flag) {
 	
 	nact->waitcancel_key = 0;
 	
-	i.callback = WhiteOut;
+	i.callback = sdl_whiteOut;
 	i.step_max = 255;
 	ags_fader(&i);
 }
@@ -776,7 +754,7 @@ void ags_setFont(int type, int size) {
 
 void ags_setCursorType(int type) {
 	if (nact->noimagecursor && type >= 100) return;
-	SetCursorType(type);
+	sdl_setCursorType(type);
 }
 
 void ags_loadCursor(int p1,int p2) {
@@ -801,7 +779,7 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 	case 0:
 		return;
 	case 1:
-		SetCursorLocation(x, y); break;
+		sdl_setCursorLocation(x, y); break;
 	case 2:
 		sys_getMouseInfo(&p, is_dibgeo);
 		delx = x - p.x;
@@ -814,7 +792,7 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 		dx[7] = x; dy[7] = y;
 		
 		for (i = 0; i < 8; i++) {
-			SetCursorLocation(dx[i], dy[i]);
+			sdl_setCursorLocation(dx[i], dy[i]);
 			usleep(cursor_move_time * 1000 / 8);
 		}
 		break;
@@ -835,7 +813,7 @@ boolean ags_getAntialiasedStringMode() {
 
 void ags_fullscreen(boolean on) {
 	nact->sys_fullscreen_on = on;
-	FullScreen(on);
+	sdl_FullScreen(on);
 }
 
 void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, int lv) {
@@ -846,8 +824,7 @@ void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, 
 	if (!check_param(&sx, &sy, &w, &h)) return;
 	if (!check_param(&dx, &dy, &w, &h)) return;
 	
-	DspDeviceSync();
-	CopyAreaSP16_shadow_withRate(sx, sy, w, h, dx, dy, lv);
+	sdl_copyAreaSP16_shadow(sx, sy, w, h, dx, dy, lv);
 } 
 
 void ags_setCursorMoveTime(int msec) {
@@ -865,8 +842,7 @@ int ags_getCursorMoveTime() {
 void ags_zoom(int x, int y, int w, int h) {
 	if (!check_param(&x, &y, &w, &h)) return;
 
-	DspDeviceSync();
-	Zoom(x, y, w, h);
+	sdl_zoom(x, y, w, h);
 }
 
 agsurface_t *ags_getDIB() {
@@ -874,16 +850,14 @@ agsurface_t *ags_getDIB() {
 }
 
 void ags_sync() {
-	DspDeviceSync();
 }
 
 void ags_fillRectangleNeg(int x, int y, int w, int h, int col) {
 	if (!check_param(&x, &y, &w, &h)) return;
 	
-	DspDeviceSync();
 	image_fillRectangleNeg(nact->ags.dib, x, y, w, h, col);
 }
 
 void ags_autorepeat(boolean bool) {
-	SetAutoRepeat(bool);
+	sdl_setAutoRepeat(bool);
 }

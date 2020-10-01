@@ -164,7 +164,7 @@ void spev_move_waitend(sprite_t *sp, int dx, int dy, int time) {
 	
 	while (sp->move.moving) {
 		nact->callback();
-		WaitVsync();
+		sdl_wait_vsync();
 	}
 }
 
@@ -183,7 +183,7 @@ void spev_wait4moving_sp() {
 		
 		while (sp->move.moving) {
 			nact->callback();
-			WaitVsync();
+			sdl_wait_vsync();
 		}
 	}
 }

@@ -794,7 +794,7 @@ void commandVA() { /* from Panyo */
 				/* キー抜け無し ,p3=0は指定不可 */
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
-					Sleep(10);
+					sdl_sleep(10);
 				}
 				va_drawUnit(p1);
 				va_updateUnit(p1);
@@ -804,7 +804,7 @@ void commandVA() { /* from Panyo */
 				VAcmd[p1].rewrite = TRUE;
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
-					Sleep(10);
+					sdl_sleep(10);
 					key = sys_getInputInfo();
 					if (key != 0) {
 						sysVar[0] = key;
