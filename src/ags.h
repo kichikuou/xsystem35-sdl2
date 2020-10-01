@@ -219,7 +219,6 @@ extern void ags_fader_callback();
 
 /* フォント関連 */
 typedef enum {
-	FONT_X11,
 	FONT_FT2,
 	FONT_SDLTTF
 } fontdev_t;

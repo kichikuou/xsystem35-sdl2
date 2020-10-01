@@ -173,7 +173,6 @@ extern boolean sdl_inputString(struct inputstring_param *);
 
 /* misc */
 #define ResourceInit(c,v) sdl_ResourceInit((c),(v))
-#define SetNoShmMode() /* NO */
 #define Sleep(ms) sdl_sleep(ms)
 #define WaitVsync() sdl_wait_vsync()
 

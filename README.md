@@ -8,13 +8,11 @@ Prebuilt binaries for Windows and Android can be downloaded from the [Releases](
 ## Build
 ### Linux (Debian / Ubuntu)
 
-    $ sudo apt install build-essential cmake libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev
+    $ sudo apt install build-essential cmake libgtk2.0-dev libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev
     $ mkdir -p out/debug
     $ cd out/debug
     $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
     $ make && make install
-
-You can choose between X11 and SDL2 as the graphics backend. If both libraries are found, X11 is used by default, but if `-DENABLE_X11=NO` flag is given to the `cmake` invocation, then SDL2 will be used.
 
 ### MacOS
 

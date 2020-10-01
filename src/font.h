@@ -60,13 +60,6 @@ extern FONT *font_ft2_new();
 extern FONT *font_sdlttf_new();
 #endif
 
-#ifdef ENABLE_X11FONT
-extern FONT *font_x11_new();
-#endif
-
-/* デフォルトのフォント名 */
-#define FONT_DEFAULTNAME_X "-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0201.1976-0,*"
-
 #ifdef __EMSCRIPTEN__
 int load_mincho_font(void);
 #endif

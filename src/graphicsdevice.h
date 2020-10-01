@@ -26,10 +26,6 @@
 
 #include "config.h"
 
-#if ENABLE_SDL
 #include "sdl_core.h"
-#else
-#include "xcore.h"
-#endif
 
 #endif /* !__GRAPHICDEVICE__ */

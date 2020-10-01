@@ -34,11 +34,6 @@
 
 void font_init(int dev) {
 	switch(dev) {
-#ifdef ENABLE_X11FONT
-	case FONT_X11:
-		nact->ags.font = font_x11_new();
-		break;
-#endif
 #ifdef ENABLE_FT2
 	case FONT_FT2:
 		nact->ags.font = font_ft2_new();
@@ -50,9 +45,6 @@ void font_init(int dev) {
 		break;
 #endif
 	default:
-#ifndef ENABLE_SDL
-		nact->ags.font = font_x11_new();
-#endif
 		break;
 	}
 }
