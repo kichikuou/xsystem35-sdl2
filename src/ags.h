@@ -155,7 +155,6 @@ extern boolean ags_check_param(int *x, int *y, int *w, int *h);
 extern boolean ags_check_param_xy(int *x, int *y);
 extern void    ags_intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst);
 extern agsurface_t *ags_getDIB();
-extern void ags_sync();
 
 /* 画面更新 */
 extern void ags_setExposeSwitch(boolean bool);

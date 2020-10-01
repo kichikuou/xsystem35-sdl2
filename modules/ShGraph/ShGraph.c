@@ -142,7 +142,6 @@ static void ChangeNotColor() {
 	DEBUG_COMMAND("ShGraph.ChangeNotColor %d,%d,%d,%d,%p,%p,%d:\n", x0, y0, width, height, src, dst, p7);
 	
 	ags_check_param(&x0, &y0, &width, &height);
-	ags_sync();
 	
 	dib = nact->ags.dib;
 	dp = GETOFFSET_PIXEL(dib, x0, y0);
@@ -508,7 +507,6 @@ static void PlayAnimeData() {
 					ags_copyArea(mapback.x, mapback.y,
 						     mapback.width, mapback.height,
 						     mapback_p5, mapback_p6);
-					ags_sync();
 				}
 				
 				if (wavno != 0) {

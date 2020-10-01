@@ -1209,7 +1209,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	int ret = 0;
 	ags_faderinfo_t i;
 
-	ags_sync();
 #if 0
 	NOTICE("ec_area sx %d sy %d w %d h %d dx %d dy %d sw %d opt %d spc %d cancel %s\n",
 	       sx, sy, w, h, dx, dy, sw, opt, spCol, cancel ? "True" : "False");

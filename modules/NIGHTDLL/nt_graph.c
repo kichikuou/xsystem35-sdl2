@@ -193,8 +193,6 @@ void nt_gr_draw(int effectno) {
 void nt_gr_screencg(int no, int x, int y) {
 	surface_t *sf;
 	
-	ags_sync();
-	
 	sf = sf_loadcg_no(no -1);
 	
 	gre_BlendScreen(sf0, x, y, sf0, x, y, sf, 0, 0, sf->width, sf->height);

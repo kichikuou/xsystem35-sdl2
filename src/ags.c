@@ -849,9 +849,6 @@ agsurface_t *ags_getDIB() {
 	return nact->ags.dib;
 }
 
-void ags_sync() {
-}
-
 void ags_fillRectangleNeg(int x, int y, int w, int h, int col) {
 	if (!check_param(&x, &y, &w, &h)) return;
 	

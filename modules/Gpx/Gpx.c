@@ -420,7 +420,6 @@ static void Copy() {
 	
 	DEBUG_COMMAND("Gpx.Copy %d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss, sx, sy, sw, sh);
 	
-	ags_sync();
 	src = sf_get(ss);
 	dst = sf_get(ds);
 	gr_copy(dst, dx, dy, src, sx, sy, sw, sh);
@@ -465,7 +464,6 @@ static void CopyAMap() {
 	
 	DEBUG_COMMAND("Gpx.CopyAMap %d,%d,%d,%d,%d,%d,%d,%d:\n", da, dx, dy, sa, sx, sy, sw, sh);
 	
-	ags_sync();
 	src = sf_get(sa);
 	dst = sf_get(da);
 	gr_copy_alpha_map(dst, dx, dy, src, sx, sy, sw, sh);
@@ -538,7 +536,6 @@ static void BlendAMap() {
 	
 	DEBUG_COMMAND("Gpx.BlendAMap %d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss, sx, sy, sw, sh);
 	
-	ags_sync();
 	src = sf_get(ss);
 	dst = sf_get(ds);
 	gr_blend_alpha_map(dst, dx, dy, src, sx, sy, sw, sh);
@@ -715,7 +712,6 @@ static void Fill() {
 	
 	DEBUG_COMMAND("Gpx.Fill %d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, r, g, b);
 	
-	ags_sync();
 	dst = sf_get(ds);
 	gr_fill(dst, dx, dy, dw, dh, r, g, b);
 }
@@ -734,7 +730,6 @@ static void FillAlphaColor() { /* not used ? */
 	
 	DEBUG_COMMAND_YET("Gpx.FillAlphaColor %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, r, g, b, lv);
 
-	ags_sync();
 	dst = sf_get(ds);
 	gr_fill_alpha_color(dst, dx, dy, dw, dh, r, g, b, lv);
 }
@@ -856,7 +851,6 @@ static void SpriteCopyAMap() {
 	
 	DEBUG_COMMAND("Gpx.SpriteCopyAMap %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", da, dx, dy, sa, sx, sy, sw, sh, cl);
 	
-	ags_sync();
 	src = sf_get(sa);
 	dst = sf_get(da);
 	gr_copy_alpha_map_sprite(dst, dx, dy, src, sx, sy, sw, sh, cl);
@@ -884,7 +878,6 @@ static void BrightDestOnly() {
 	
 	DEBUG_COMMAND("Gpx.BrightDestOnly %d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, r);
 	
-	ags_sync();
 	dst = sf_get(ds);
 	
 	gr_bright_dst_only(dst, dx, dy, dw, dh, r);
@@ -1004,7 +997,6 @@ static void CopyStretchBlendAMap() {
 	
 	DEBUG_COMMAND("Gpx.CopyStretchBlendAMap %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, ss, sx, sy, sw, sh);
 
-	ags_sync();
 	src = sf_get(ss);
 	dst = sf_get(ds);
 	gr_copy_stretch_blend_alpha_map(dst, dx, dy, dw, dh, src, sx, sy, sw, sh);
@@ -1056,7 +1048,6 @@ static void StretchBlendScreen2x2WDS() {
 	
 	DEBUG_COMMAND("Gpx.StretchBlendScreen2x2WDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
 	
-	ags_sync();
 	src1 = sf_get(ss1);
 	src2 = sf_get(ss2);
 	dst  = sf_get(ds);
@@ -1094,7 +1085,6 @@ static void BlendScreenWDS() {
 	
 	DEBUG_COMMAND("Gpx.BlendScreenWDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
 	
-	ags_sync();
 	src1 = sf_get(ss1);
 	src2 = sf_get(ss2);
 	dst  = sf_get(ds);
@@ -1161,7 +1151,6 @@ static void EffectCopy() {
 	default:
 		DEBUG_COMMAND_YET("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:\n", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
 	}
-	ags_sync();
 	dib = sf_get(0);
 	dst = sf_get(ss1);
 	src = sf_get(ss2);
