@@ -49,7 +49,7 @@ int joy_open(void) {
 			name=SDL_JoystickName(js);
 			joy_axes = SDL_JoystickNumAxes(js);
 			joy_buttons = SDL_JoystickNumButtons(js);
-			SDL_JoystickEventState(ENABLE_SDL);
+			SDL_JoystickEventState(SDL_ENABLE);
 			printf("SDL joystick '%s' axes %d buttons %d\n",name,joy_axes,joy_buttons);
 			return 1;
 		}
