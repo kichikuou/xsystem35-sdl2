@@ -35,7 +35,7 @@
 #include "system.h"
 #include "xsystem35.h"
 #include "modules.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 
 // キー変換テーブル
 #define KEYMAP_MAX 8

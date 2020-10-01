@@ -31,7 +31,7 @@
 #include "portab.h"
 #include "xsystem35.h"
 #include "ags.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 #include "alpha_plane.h"
 #include "counter.h"
 #include "utfsjis.h"

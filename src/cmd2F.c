@@ -35,7 +35,7 @@
 #include "utfsjis.h"
 #include "hankaku.h"
 #include "ags.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
 #include "gametitle.h"

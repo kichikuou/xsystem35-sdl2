@@ -27,7 +27,7 @@
 #include "portab.h"
 #include "xsystem35.h"
 #include "ags.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 #include "input.h"
 
 #define REPEAT_RATE_FAST 60 

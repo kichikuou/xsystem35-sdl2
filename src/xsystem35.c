@@ -61,7 +61,7 @@
 #include "counter.h"
 #include "ags.h"
 #include "font.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 #include "menu.h"
 #include "music.h"
 #include "cdrom.h"

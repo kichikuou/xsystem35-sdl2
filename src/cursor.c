@@ -29,7 +29,7 @@
 #include "cursor.h"
 #include "LittleEndian.h"
 #include "ald_manager.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 
 static CursorHeader    cursorHeader;
 static TCursorDirEntry cursordirentry;

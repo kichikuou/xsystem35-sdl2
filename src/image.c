@@ -29,7 +29,7 @@
 #include "cg.h"
 #include "config.h"
 #include "nact.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 #include "alpha_plane.h"
 #include "ags.h"
 

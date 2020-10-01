@@ -37,7 +37,7 @@
 #include "ags.h"
 #include "counter.h"
 #include "music.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 
 #define SLOT 40
 

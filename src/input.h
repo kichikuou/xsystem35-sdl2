@@ -26,7 +26,7 @@
 
 #include "portab.h"
 #include "graphics.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 
 #define SYS35KEY_NULL  0
 #define SYS35KEY_UP    1
