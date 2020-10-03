@@ -887,10 +887,6 @@ void image_fillRectangle(agsurface_t *dib, int x, int y, int w, int h, int col) 
 	fill_rectangle(dib, x, y, w, h, col);
 }
 
-void image_fillRectangleNeg(agsurface_t *dib, int x, int y, int w, int h, int col) {
-	fill_rectangle(dib, x, y, w, h, -1 ^ image_index2pixel(dib->depth, col));
-}
-
 void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	BYTE *sdata = GETOFFSET_ALPHA(dib, sx, sy);
 	BYTE *ddata = GETOFFSET_PIXEL(dib, dx, dy);
@@ -903,25 +899,6 @@ void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx,
 	BYTE *ddata = GETOFFSET_ALPHA(dib, dx, dy);
 	
 	copy_to_alpha(dib, sdata, ddata, w, h, flag);
-}
-
-int image_index2pixel(int depth, int i) {
-	Palette256 *pal = nact->sys_pal;
-	
-	switch(depth) {
-	case 8:
-		return i;
-	case 15:
-		return PIX15(pal->red[i], pal->green[i], pal->blue[i]);
-	case 16:
-		return PIX16(pal->red[i], pal->green[i], pal->blue[i]);
-	case 24:
-	case 32:
-		return PIX24(pal->red[i], pal->green[i], pal->blue[i]);
-	default:
-		WARNING("Unknown depth\n");
-		return i;
-	}
 }
 
 /* モザイク */

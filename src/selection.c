@@ -340,10 +340,11 @@ static int whereElement(void) {
 	return -1;
 }
 
-static void lineEncloseElement(MyRectangle *r, int col) {
-	ags_drawRectangle(r->x   , r->y  , r->width +2, r->height +2, col);
-	ags_drawRectangle(r->x +1, r->y+1, r->width   , r->height   , col);
-	ags_updateArea   (r->x   , r->y  , r->width +2, r->height +2);
+static void lineEncloseElement(MyRectangle *r, int col, boolean thick) {
+	ags_drawRectangle(r->x, r->y, r->width + 2, r->height + 2, col);
+	if (thick)
+		ags_drawRectangle(r->x + 1, r->y + 1, r->width, r->height, col);
+	ags_updateArea(r->x, r->y, r->width + 2, r->height + 2);
 }
 
 static void encloseElement(int sw, int no) {
@@ -357,8 +358,9 @@ static void encloseElement(int sw, int no) {
 		} else {
 			switch(sel.EncloseType) {
 			case 0:
-				lineEncloseElement(r, sel.WinBackgroundColor); break;
+				lineEncloseElement(r, sel.WinBackgroundColor, TRUE); break;
 			case 1:
+				lineEncloseElement(r, sel.WinBackgroundColor, FALSE); break;
 			case 2:
 				ags_fillRectangle(r->x, r->y, r->width +2, r->height +2, sel.WinBackgroundColor);
 				ags_drawString(r->x +2, r->y +2, elm[no], sel.MsgFontColor);
@@ -375,11 +377,12 @@ static void encloseElement(int sw, int no) {
 		}
 		switch(sel.EncloseType) {
 		case 0:
-			lineEncloseElement(r, sel.MsgFontColor); break;
+			lineEncloseElement(r, sel.WinFrameColor, TRUE); break;
 		case 1:
+			lineEncloseElement(r, 255, FALSE); break;
 		case 2:
-			ags_fillRectangleNeg(r->x, r->y, r->width +2, r->height +2, sel.SelectedElementColor);
-			ags_drawString(r->x +2, r->y +2, elm[no], sel.SelectedElementColor);
+			ags_fillRectangle(r->x, r->y, r->width +2, r->height +2, sel.MsgFontColor);
+			ags_drawString(r->x +2, r->y +2, elm[no], sel.WinBackgroundColor);
 			ags_updateArea(r->x, r->y, r->width +2, r->height +2);
 			break;
 		default:

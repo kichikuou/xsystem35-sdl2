@@ -847,12 +847,6 @@ agsurface_t *ags_getDIB() {
 	return nact->ags.dib;
 }
 
-void ags_fillRectangleNeg(int x, int y, int w, int h, int col) {
-	if (!check_param(&x, &y, &w, &h)) return;
-	
-	image_fillRectangleNeg(nact->ags.dib, x, y, w, h, col);
-}
-
 void ags_autorepeat(boolean bool) {
 	sdl_setAutoRepeat(bool);
 }
