@@ -36,11 +36,7 @@ target_sources(xsystem35 PRIVATE
 # Graphics
 
 target_sources(xsystem35 PRIVATE
-  sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c)
-
-# Font
-
-target_sources(xsystem35 PRIVATE font_sdlttf.c)
+  sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c font.c)
 
 # CG
 target_sources(xsystem35 PRIVATE
@@ -67,7 +63,7 @@ target_sources(xsystem35 PRIVATE
 
 # Graphics
 target_sources(xsystem35 PRIVATE
-  ags.c font.c flood.c cg.c ecopy.c antialiase.c alpha_plane.c cursor.c)
+  ags.c flood.c cg.c ecopy.c antialiase.c alpha_plane.c cursor.c)
 
 # Network
 target_sources(xsystem35 PRIVATE

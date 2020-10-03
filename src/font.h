@@ -32,30 +32,16 @@
 
 struct agsurface;
 
-struct _FONT {
-	
-	boolean antialiase_on;
-	
-	char *name[FONTTYPEMAX];
-	char face[FONTTYPEMAX];
-	
-	void (*sel_font)(int type, int size);
-	
-	struct agsurface *(*get_glyph)(const char *str_utf8);
-	
-	int (*draw_glyph)(int x, int y, const char *str_utf8, int col);
-	
-	boolean (*self_drawable)();
-};
-
-typedef struct _FONT FONT;
-
 extern void font_init(void);
-
-extern FONT *font_sdlttf_new();
+extern void font_set_name_and_index(int type, const char *name, int index);
+extern void font_set_antialias(boolean enable);
+extern boolean font_get_antialias(void);
+extern void font_select(int type, int size);
+extern struct agsurface *font_get_glyph(const char *str_utf8);
+extern int font_draw_glyph(int x, int y, const char *str_utf8, int col);
 
 #ifdef __EMSCRIPTEN__
-int load_mincho_font(void);
+extern int load_mincho_font(void);
 #endif
 
 #endif  /* __FONT_H__ */

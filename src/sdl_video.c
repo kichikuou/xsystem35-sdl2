@@ -34,7 +34,6 @@
 #include "sdl_core.h"
 #include "sdl_private.h"
 #include "xsystem35.h"
-#include "font.h"
 #include "joystick.h"
 #include "image.h"
 
@@ -171,10 +170,6 @@ static void makeDIB(int width, int height, int depth) {
 	sdl_dibinfo->alpha  = NULL;
 	
 	image_setdepth(sdl_dibinfo->depth);
-}
-
-void sdl_setFontDevice(struct _FONT *f) {
-	sdl_font = f;
 }
 
 /* offscreen の設定 */

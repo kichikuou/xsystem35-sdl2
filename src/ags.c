@@ -138,10 +138,8 @@ void ags_init() {
 	nact->sys_view_area.height = SYS35_DEFAULT_HEIGHT;
 	
 	sdl_Initilize();
-	
 	font_init();
-	sdl_setFontDevice(nact->ags.font);
-	
+
 	initPal(&pal_256);
 	cg_init();
 }
@@ -399,7 +397,7 @@ int ags_drawString(int x, int y, const char *src, int col) {
 
 agsurface_t *ags_drawStringToSurface(const char *str) {
 	char *utf8 = toUTF8(str);
-	agsurface_t *sf = nact->ags.font->get_glyph(utf8);
+	agsurface_t *sf = font_get_glyph(utf8);
 	free(utf8);
 	return sf;
 }
@@ -749,7 +747,7 @@ void ags_whiteOut(int rate, boolean flag) {
 }
 
 void ags_setFont(int type, int size) {
-	nact->ags.font->sel_font(type, size);
+	font_select(type, size);
 }
 
 void ags_setCursorType(int type) {
@@ -803,12 +801,12 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 
 void ags_setAntialiasedStringMode(boolean on) {
 	if (!nact->noantialias) {
-		nact->ags.font->antialiase_on = on;
+		font_set_antialias(on);
 	}
 }
 
 boolean ags_getAntialiasedStringMode() {
-	return nact->ags.font->antialiase_on;
+	return font_get_antialias();
 }
 
 void ags_fullscreen(boolean on) {

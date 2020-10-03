@@ -30,8 +30,6 @@
 #include "cg.h"
 #include "graphics.h"
 
-struct _FONT;
-
 /* マウスカーソルの種類 */
 #define CURSOR_ARROW     1
 #define CURSOR_CROSS     2
@@ -129,8 +127,6 @@ struct _ags {
 
 	boolean fullscree_is_on;    /* if full-screen mode then true */
 	
-
-	struct _FONT *font;         /* font device */
 	agsurface_t *dib;           /* main surface */
 	void (*eventcb)(agsevent_t *e); /* deliver event */
 };

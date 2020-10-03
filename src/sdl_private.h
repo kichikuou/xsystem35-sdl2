@@ -30,8 +30,6 @@
 #include "portab.h"
 #include "ags.h"
 
-struct _FONT;
-
 struct sdl_private_data {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
@@ -48,8 +46,6 @@ struct sdl_private_data {
 	
 	SDL_Rect       view;
 	
-	struct _FONT *font;
-
 	boolean dirty;
 
 	boolean ms_active;   /* mouse is active */
@@ -78,7 +74,6 @@ extern struct sdl_private_data *sdl_videodev;
 #define sdl_col (sdl_videodev->col)
 #define sdl_white (sdl_videodev->white)
 #define sdl_dibinfo (sdl_videodev->cimg)
-#define sdl_font (sdl_videodev->font)
 #define sdl_view (sdl_videodev->view)
 #define view_x (sdl_videodev->view.x)
 #define view_y (sdl_videodev->view.y)

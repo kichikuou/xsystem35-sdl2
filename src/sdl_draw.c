@@ -309,59 +309,6 @@ static agsurface_t* surface2com(SDL_Surface *src) {
 	return dst;
 }
 
-static SDL_Surface *com2surface(agsurface_t *src) {
-	SDL_Surface *s;
-	int y;
-	BYTE *sp, *dp;
-	
-	s = SDL_AllocSurface(SDL_SWSURFACE, src->width, src->height, src->depth, 0, 0, 0, 0);
-	
-	SDL_LockSurface(s);
-	
-	sp = s->pixels;
-	dp = src->pixel;
-	
-	for (y = 0; y < src->height; y++) {
-		memcpy(sp, dp, src->width);
-		sp += s->pitch;
-		dp += src->bytes_per_line;
-	}
-	
-	SDL_UnlockSurface(s);
-	return s;
-}
-
-static SDL_Surface *com2alphasurface(agsurface_t *src, int cl) {
-	SDL_Surface *s;
-	int x,y;
-	BYTE *sp, *dp;
-	SDL_Rect r_src;
-	
-	s = SDL_CreateRGBSurfaceWithFormat(0, src->width, src->height, 32, SDL_PIXELFORMAT_ARGB8888);
-	
-	setRect(r_src, 0, 0, src->width, src->height);
-	SDL_FillRect(s, &r_src, RGB_PIX24(sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b));
-
-	SDL_LockSurface(s);
-	
-	for (y = 0; y < src->height; y++) {
-		sp = src->pixel + y * src->bytes_per_line;
-		dp = s->pixels + y * s->pitch;
-#ifndef WORDS_BIGENDIAN
-		dp += s->format->BytesPerPixel -1;
-#endif
-		
-		for (x = 0; x < src->width; x++) {
-			*dp = *sp;
-			sp++;
-			dp += s->format->BytesPerPixel;
-		}
-	}
-	
-	SDL_UnlockSurface(s);
-	return s;
-}
-
 int sdl_nearest_color(int r, int g, int b) {
 	int i, col, mind = INT_MAX;
 	for (i = 0; i < 256; i++) {
@@ -377,77 +324,9 @@ int sdl_nearest_color(int r, int g, int b) {
 	return col;
 }
 
-static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, agsurface_t *src, unsigned long col) {
-	int x, y;
-	SDL_LockSurface(sdl_dib);
-
-	Uint8 cache[256*7];
-	memset(cache, 0, 256);
-
-	for (y = 0; y < src->height; y++) {
-		BYTE* sp = src->pixel + y * src->bytes_per_line;
-		BYTE* dp = sdl_dib->pixels + (dsty + y) * sdl_dib->pitch + dstx;
-		for (x = 0; x < src->width; x++) {
-			int alpha = *sp >> 5;
-			if (alpha == 0) {
-				// Transparent, do nothing
-			} else if (alpha == 7) {
-				*dp = col;
-			} else if (cache[*dp] & 1 << alpha) {
-				*dp = cache[alpha << 8 | *dp];
-			} else {
-				cache[*dp] |= 1 << alpha;
-				int c = sdl_nearest_color(
-					(sdl_col[col].r * alpha + sdl_col[*dp].r * (7 - alpha)) / 7,
-					(sdl_col[col].g * alpha + sdl_col[*dp].g * (7 - alpha)) / 7,
-					(sdl_col[col].b * alpha + sdl_col[*dp].b * (7 - alpha)) / 7);
-				cache[alpha << 8 | *dp] = c;
-				*dp = c;
-			}
-			sp++;
-			dp++;
-		}
-	}
-
-	SDL_UnlockSurface(sdl_dib);
-}
-
 int sdl_drawString(int x, int y, const char *str_utf8, unsigned long col) {
-	int w;
-
 	sdl_pal_check();
-	
-	if (sdl_font->self_drawable()) {
-		w = sdl_font->draw_glyph(x, y, str_utf8, col);
-	} else {
-		agsurface_t *glyph = sdl_font->get_glyph(str_utf8);
-		SDL_Rect r_src, r_dst;
-		
-		if (glyph == NULL) return 0;
-		setRect(r_src, 0, 0, glyph->width, glyph->height);
-		setRect(r_dst, x, y, glyph->width, glyph->height);
-		if (!sdl_font->antialiase_on) {
-			int i;
-			SDL_Surface *src = com2surface(glyph);
-			for (i = 1; i < 256; i++) { 
-				memcpy(src->format->palette->colors + i, &sdl_col[col],
-				       sizeof(SDL_Color));
-			}
-			SDL_SetColorKey(src, SDL_TRUE, 0);
-			SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
-			SDL_FreeSurface(src);
-		} else if (sdl_dib->format->BitsPerPixel == 8) {
-			sdl_drawAntiAlias_8bpp(x, y, glyph, col);
-		} else {
-			SDL_Surface *src = com2alphasurface(glyph, col);
-
-			SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
-			SDL_FreeSurface(src);
-		}
-		w = glyph->width;
-	}
-	
-	return w;
+	return font_draw_glyph(x, y, str_utf8, col);
 }
 
 void sdl_Mosaic(int sx, int sy, int w, int h, int dx, int dy, int slice) {

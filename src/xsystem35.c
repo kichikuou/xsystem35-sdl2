@@ -217,10 +217,8 @@ static void sys35_init() {
 	
 	ags_init();
 
-	for (i = 0; i < FONTTYPEMAX; i++) {
-		nact->ags.font->name[i] = fontname_tt[i];
-		nact->ags.font->face[i] = fontface[i];
-	}
+	for (i = 0; i < FONTTYPEMAX; i++)
+		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
 	
 	ags_fullscreen(fs_on);
 	nact->noantialias = font_noantialias;
