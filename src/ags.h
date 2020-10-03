@@ -72,8 +72,11 @@ struct agsurface {
 };
 typedef struct agsurface agsurface_t;
 
+// for agsurface_t
 #define GETOFFSET_PIXEL(suf, x, y) ((suf)->pixel + (y) * (suf)->bytes_per_line + (x) * (suf)->bytes_per_pixel)
 #define GETOFFSET_ALPHA(suf, x, y) ((suf)->alpha + (y) * (suf)->width + (x))
+// for SDL_surface
+#define PIXEL_AT(suf, x, y) ((suf)->pixels + (y) * (suf)->pitch + (x) * (suf)->format->BytesPerPixel)
 
 struct _agsevent {
 	int type;

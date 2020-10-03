@@ -24,12 +24,13 @@
 #ifndef __IMAGE__
 #define __IMAGE__
 
+#include <SDL_surface.h>
 #include "cg.h"
 #include "ags.h"
 
 extern void image_setdepth(int);
-extern void image_fadeOut(agsurface_t *img, int lv, int col);
-extern void image_fadeIn(agsurface_t *src, agsurface_t *dst, int lv);
+extern void image_fadeOut(SDL_Surface *img, int lv, int col);
+extern void image_fadeIn(SDL_Surface *src, SDL_Surface *dst, int lv);
 extern void image_drawLine(agsurface_t *dib, int x0, int y0, int x1, int y1, int col);
 extern void image_fillRectangle(agsurface_t *dib, int x, int y, int w, int h, int col);
 extern void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);

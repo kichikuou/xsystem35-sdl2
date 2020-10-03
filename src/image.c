@@ -138,29 +138,29 @@ static void image_fillRectangle8(agsurface_t *dib, int x, int y, int w, int h, i
 /* private methods  image操作 16bpp                                           */
 /******************************************************************************/
 
-static void fadeOut16(agsurface_t *dst, int lv, int col) {
+static void fadeOut16(SDL_Surface *dst, int lv, int col) {
 	WORD *yld;
 	int x, y;
 	
-	for (y = 0; y < dst->height; y+=4) {
-		yld = (WORD *)(dst->pixel + (y + fadeY[lv]) * dst->bytes_per_line);
-		for (x = 0; x < dst->width; x+=4) {
+	for (y = 0; y < dst->h; y += 4) {
+		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
+		for (x = 0; x < dst->w; x += 4) {
 			*(yld + fadeX[lv]) = col;
-			yld+=4;
+			yld += 4;
 		}
 	}
 }
 
-static void fadeIn16(agsurface_t *src, agsurface_t *dst, int lv) {
+static void fadeIn16(SDL_Surface *src, SDL_Surface *dst, int lv) {
 	WORD *yls, *yld;
 	int x, y;
 	
-	for (y = 0; y < src->height; y+=4) {
-		yls = (WORD *)(src->pixel + (y + fadeY[lv]) * src->bytes_per_line);
-		yld = (WORD *)(dst->pixel + (y + fadeY[lv]) * dst->bytes_per_line);
-		for (x = 0; x < src->width; x+=4) {
+	for (y = 0; y < src->h; y += 4) {
+		yls = PIXEL_AT(src, 0, y + fadeY[lv]);
+		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
+		for (x = 0; x < src->w; x += 4) {
 			*(yld + fadeX[lv]) = *(yls + fadeX[lv]);
-			yls+=4; yld+=4;
+			yls += 4; yld += 4;
 		}
 	}
 }
@@ -393,13 +393,13 @@ static void image_copy_to_alpha16(agsurface_t *dib, BYTE *sdata, BYTE *ddata, in
 /* private methods  image操作 packed 24bpp                                    */
 /******************************************************************************/
 
-static void fadeOut24p(agsurface_t *dst, int lv, int col) {
+static void fadeOut24p(SDL_Surface *dst, int lv, int col) {
 	BYTE *yld;
 	int x, y;
 	
-	for (y = 0; y < dst->height; y+=4) {
-		yld = (BYTE *)(dst->pixel + (y + fadeY[lv]) * dst->bytes_per_line);
-		for (x = 0; x < dst->width; x+=4) {
+	for (y = 0; y < dst->h; y += 4) {
+		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
+		for (x = 0; x < dst->w; x += 4) {
 			*(yld + fadeX[lv])    = 
 			*(yld + fadeX[lv] +1) =
 			*(yld + fadeX[lv] +2) = (BYTE)col;
@@ -408,19 +408,19 @@ static void fadeOut24p(agsurface_t *dst, int lv, int col) {
 	}
 }
 
-static void fadeIn24p(agsurface_t *src, agsurface_t *dst, int lv) {
+static void fadeIn24p(SDL_Surface *src, SDL_Surface *dst, int lv) {
 	DWORD *yls;
 	BYTE  *yld;
 	int x, y;
 	
-	for (y = 0; y < src->height; y+=4) {
-		yls = (DWORD *)(src->pixel + (y + fadeY[lv]) * src->bytes_per_line);
-		yld = (BYTE  *)(dst->pixel + (y + fadeY[lv]) * dst->bytes_per_line);
-		for (x = 0; x < src->width; x+=4) {
+	for (y = 0; y < src->h; y += 4) {
+		yls = PIXEL_AT(src, 0, y + fadeY[lv]);
+		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
+		for (x = 0; x < src->w; x += 4) {
 			*(yld + fadeX[lv]   ) = PIXB24(*(yls + fadeX[lv]));
 			*(yld + fadeX[lv] +1) = PIXG24(*(yls + fadeX[lv]));
 			*(yld + fadeX[lv] +2) = PIXR24(*(yls + fadeX[lv]));
-			yls+=4; yld+=(4*3);
+			yls += 4; yld += (4*3);
 		}
 	}
 }
@@ -429,29 +429,29 @@ static void fadeIn24p(agsurface_t *src, agsurface_t *dst, int lv) {
 /* private methods  image操作 24/32bpp                                        */
 /******************************************************************************/
 
-static void fadeOut24(agsurface_t *dst, int lv, int col) {
+static void fadeOut24(SDL_Surface *dst, int lv, int col) {
 	DWORD *yld;
 	int x, y;
 	
-	for (y = 0; y < dst->height; y+=4) {
-		yld = (DWORD *)(dst->pixel + (y + fadeY[lv]) * dst->bytes_per_line);
-		for (x = 0; x < dst->width; x+=4) {
+	for (y = 0; y < dst->h; y += 4) {
+		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
+		for (x = 0; x < dst->w; x += 4) {
 			*(yld + fadeX[lv]) = col;
-			yld+=4;
+			yld += 4;
 		}
 	}
 }
 
-static void fadeIn24(agsurface_t *src, agsurface_t *dst, int lv) {
+static void fadeIn24(SDL_Surface *src, SDL_Surface *dst, int lv) {
 	DWORD *yls, *yld;
 	int x, y;
 	
-	for (y = 0; y < src->height; y+=4) {
-		yls = (DWORD *)(src->pixel + (y + fadeY[lv]) * src->bytes_per_line);
-		yld = (DWORD *)(dst->pixel + (y + fadeY[lv]) * dst->bytes_per_line);
-		for (x = 0; x < src->width; x+=4) {
+	for (y = 0; y < src->h; y += 4) {
+		yls = PIXEL_AT(src, 0, y + fadeY[lv]);
+		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
+		for (x = 0; x < src->w; x += 4) {
 			*(yld + fadeX[lv]) = *(yls + fadeX[lv]);
-			yls+=4; yld+=4;
+			yls += 4; yld += 4;
 		}
 	}
 }
@@ -712,8 +712,8 @@ void image_setdepth(int depth) {
 /*
    fade out for 16/24/32
 */
-void image_fadeOut(agsurface_t *img, int lv, int col) {
-	switch(img->bytes_per_pixel) {
+void image_fadeOut(SDL_Surface *img, int lv, int col) {
+	switch(img->format->BytesPerPixel) {
 	case 2:
 		fadeOut16(img, lv, col); break;
 	case 3:
@@ -728,8 +728,8 @@ void image_fadeOut(agsurface_t *img, int lv, int col) {
 /*
    fade in for 16/24/32
 */
-void image_fadeIn(agsurface_t *src, agsurface_t *dst, int lv) {
-	switch(dst->bytes_per_pixel) {
+void image_fadeIn(SDL_Surface *src, SDL_Surface *dst, int lv) {
+	switch(dst->format->BytesPerPixel) {
 	case 2:
 		fadeIn16(src, dst, lv); break;
 	case 3:

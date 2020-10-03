@@ -55,8 +55,6 @@ static int fadestep[256] =
  251,251,252,252,252,252,253,253,253,253,254,254,254,254,254,254,255,255,255,
  255,255,255,255,255,255,255,255,255,255,255};
 
-static SDL_Surface *s_fader;  /* fade in /out 用 work surface */
-
 static void sdl_pal_check(void) {
 	if (nact->sys_pal_changed) {
 		nact->sys_pal_changed = FALSE;
@@ -296,19 +294,6 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long cl) {
 	
 }
 
-static agsurface_t* surface2com(SDL_Surface *src) {
-	agsurface_t *dst = malloc(sizeof(agsurface_t));
-	
-	dst->depth           = src->format->BitsPerPixel;
-	dst->bytes_per_pixel = src->format->BytesPerPixel;
-	dst->bytes_per_line  = src->pitch;
-	dst->pixel   = src->pixels;
-	dst->width  = src->w;
-	dst->height = src->h;
-	
-	return dst;
-}
-
 int sdl_nearest_color(int r, int g, int b) {
 	int i, col, mind = INT_MAX;
 	for (i = 0; i < 256; i++) {
@@ -369,8 +354,8 @@ static void setWhiteness(SDL_Surface *s, int val) {
 }
 
 static void fader_in(int n) {
-	static agsurface_t *work, *disp;
-	
+	static SDL_Surface *s_fader;
+
 	if (n == 0) {
 		SDL_Rect r_src, r_dst;
 		
@@ -385,23 +370,18 @@ static void fader_in(int n) {
 		setRect(r_src, view_x, view_y, view_w, view_h);
 		setRect(r_dst, winoffset_x, winoffset_y, view_w, view_h);
 		SDL_BlitSurface(sdl_dib, &r_src, s_fader, &r_dst);
-		
-		work = surface2com(s_fader);
-		disp = surface2com(sdl_display);
 	}
 	
 	if (n == 255) {
 		SDL_FreeSurface(s_fader);
 		sdl_updateAll();
-		free(work);
-		free(disp);
 		return;
 	}
 	
 	SDL_LockSurface(s_fader);
 	SDL_LockSurface(sdl_display);
 	
-	image_fadeIn(work, disp, n / 16);
+	image_fadeIn(s_fader, sdl_display, n / 16);
 	
 	SDL_UnlockSurface(sdl_display);
 	SDL_UnlockSurface(s_fader);
@@ -409,21 +389,14 @@ static void fader_in(int n) {
 }
 
 static void fader_out(int n,Uint32 c) {
-	static agsurface_t *disp;
-
-	if (n == 0) {
-		disp = surface2com(sdl_display);
-	}
-	
 	if (n == 255) {
 		SDL_FillRect(sdl_display, NULL, c);
-		free(disp);
 		return;
 	}
 	
 	SDL_LockSurface(sdl_display);
 	
-	image_fadeOut(disp, (255 - n) / 16, c);
+	image_fadeOut(sdl_display, (255 - n) / 16, c);
 	
 	SDL_UnlockSurface(sdl_display);
 	
