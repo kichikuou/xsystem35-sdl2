@@ -95,13 +95,6 @@ static int audio_buffer_size = 0;
 static char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF};
 static char fontface[FONTTYPEMAX];
 
-#ifdef ENABLE_SDLTTF
-#define DEFAULT_FONT_DEVICE FONT_SDLTTF
-#else
-#define DEFAULT_FONT_DEVICE FONT_FT2
-#endif
-
-static fontdev_t fontdev = DEFAULT_FONT_DEVICE;
 static boolean font_noantialias;
 
 /* fullscreen on from command line */
@@ -137,20 +130,6 @@ static void sys35_usage(boolean verbose) {
 	
 	puts(" -devjoy device : set joystic device name to 'device'");
 	puts("                    if 'device' is set to 'none', don't use the device");
-
-	puts(" -devfont device: select font device");
-#ifdef ENABLE_SDLTTF
-	puts(" -devfont sdl   : SDL_ttf");
-#endif
-#ifdef ENABLE_FT2
-	puts(" -devfont ft2   : FreeType");
-#endif
-
-#ifdef ENABLE_SDLTTF
-	puts("                : default is sdl");
-#else
-	puts("                : default is ft2");
-#endif
 
 	puts(" -ttfont_mincho: set TrueType font for mincho");
 	puts(" -ttfont_gothic: set TrueType font for mincho");
@@ -227,20 +206,6 @@ void sys_exit(int code) {
 #endif
 }
 
-static int check_fontdev(char *devname) {
-#ifdef ENABLE_SDLTTF
-	if (0 == strcmp(devname, "sdl")) {
-		return FONT_SDLTTF;
-	}
-#endif
-#ifdef ENABLE_FT2
-	if (0 == strcmp(devname, "ft2")) {
-		return FONT_FT2;
-	}
-#endif
-	return DEFAULT_FONT_DEVICE;
-}
-
 static void sys35_init() {
 	int i;
 	
@@ -249,8 +214,6 @@ static void sys35_init() {
 	sl_init();
 
 	v_initVars();
-	
-	nact->fontdev = fontdev;
 	
 	ags_init();
 
@@ -351,10 +314,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			fs_on = TRUE;
 		} else if (0 == strcmp(argv[i], "-noantialias")) {
 			font_noantialias = TRUE;
-		} else if (0 == strcmp(argv[i], "-devfont")) {
-			if (argv[i + 1] != NULL) {
-				fontdev = check_fontdev(argv[i + 1]);
-			}
 		} else if (0 == strcmp(argv[i], "-ttfont_gothic")) {
 			if (argv[i + 1] != NULL) {
 				fontname_tt[FONT_GOTHIC] = argv[i + 1];
@@ -379,11 +338,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 static void check_profile() {
 	char *param;
 	
-	/* フォントデバイスの選択 */
-	param = get_profile("font_device");
-	if (param) {
-		fontdev = check_fontdev(param);
-	}
 	/* ゴシックフォント(TT)の設定 */
 	param = get_profile("ttfont_gothic");
 	if (param) {

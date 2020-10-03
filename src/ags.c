@@ -139,7 +139,7 @@ void ags_init() {
 	
 	sdl_Initilize();
 	
-	font_init(nact->fontdev);
+	font_init();
 	sdl_setFontDevice(nact->ags.font);
 	
 	initPal(&pal_256);

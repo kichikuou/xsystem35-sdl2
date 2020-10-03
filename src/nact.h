@@ -112,7 +112,6 @@ typedef struct {
 	ags_t ags;
 	boolean noantialias; /* antialias を使用しない */
 	boolean noimagecursor; /* リソースファイルのカーソルを読みこまない */
-	fontdev_t fontdev; // 選択された fontdevice
 	
 	/* メッセージ関連 */
 	msg_t msg;

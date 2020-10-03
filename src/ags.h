@@ -217,11 +217,6 @@ extern void ags_whiteOut(int rate, boolean flg);
 extern void ags_fader_callback();
 
 /* フォント関連 */
-typedef enum {
-	FONT_FT2,
-	FONT_SDLTTF
-} fontdev_t;
-
 enum FontType {
 	FONT_GOTHIC,
 	FONT_MINCHO,

@@ -50,15 +50,9 @@ struct _FONT {
 
 typedef struct _FONT FONT;
 
-extern void font_init(int dev);
+extern void font_init(void);
 
-#ifdef ENABLE_FT2
-extern FONT *font_ft2_new();
-#endif
-
-#ifdef ENABLE_SDLTTF
 extern FONT *font_sdlttf_new();
-#endif
 
 #ifdef __EMSCRIPTEN__
 int load_mincho_font(void);

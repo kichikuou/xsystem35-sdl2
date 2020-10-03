@@ -32,21 +32,8 @@
 #include "ags.h"
 #include "font.h"
 
-void font_init(int dev) {
-	switch(dev) {
-#ifdef ENABLE_FT2
-	case FONT_FT2:
-		nact->ags.font = font_ft2_new();
-		break;
-#endif
-#ifdef ENABLE_SDLTTF
-	case FONT_SDLTTF:
-		nact->ags.font = font_sdlttf_new();
-		break;
-#endif
-	default:
-		break;
-	}
+void font_init() {
+	nact->ags.font = font_sdlttf_new();
 }
 
 #ifdef __EMSCRIPTEN__

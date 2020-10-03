@@ -24,7 +24,6 @@ target_sources(xsystem35 PRIVATE
   ${SRC_AUDIO}
   ${SRC_CDROM}
   ${SRC_MIDI}
-  ${SRC_FONT}
   ${SRC_MENU}
   ${SRC_JOYSTICK})
 
@@ -38,6 +37,10 @@ target_sources(xsystem35 PRIVATE
 
 target_sources(xsystem35 PRIVATE
   sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c image.c)
+
+# Font
+
+target_sources(xsystem35 PRIVATE font_sdlttf.c)
 
 # CG
 target_sources(xsystem35 PRIVATE
@@ -79,8 +82,8 @@ if (EMSCRIPTEN)
   set(LIBS
     "SHELL:-s USE_ZLIB=1"
     "SHELL:-s USE_LIBJPEG=1"
-    "SHELL:-s USE_FREETYPE=1"
-    "SHELL:-s USE_SDL=2")
+    "SHELL:-s USE_SDL=2"
+    "SHELL:-s USE_SDL_TTF=2")
   target_compile_options(xsystem35 PRIVATE ${LIBS})
   target_link_options(xsystem35 PRIVATE ${LIBS})
   target_link_libraries(xsystem35 PRIVATE idbfs.js)
@@ -104,17 +107,12 @@ elseif (ANDROID)
 else()  # non-emscripten, non-android
   target_link_libraries(xsystem35 PRIVATE m ZLIB::ZLIB)
   target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2)
+  target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2TTF)
   if (GTK2_FOUND)
     target_link_libraries(xsystem35 PRIVATE GTK2::gtk)
   endif()
-  if (FREETYPE_FOUND)
-    target_link_libraries(xsystem35 PRIVATE Freetype::Freetype)
-  endif()
   if (SDL2MIXER_FOUND)
     target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2MIXER)
-  endif()
-  if (SDL2TTF_FOUND)
-    target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2TTF)
   endif()
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)
