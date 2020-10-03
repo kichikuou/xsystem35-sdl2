@@ -24,20 +24,19 @@
 #ifndef __FONT_H__
 #define __FONT_H__
 
+#include <SDL_surface.h>
 #include "config.h"
 #include "portab.h"
 
 /* font の種類 */
 #define FONTTYPEMAX 2
 
-struct agsurface;
-
 extern void font_init(void);
 extern void font_set_name_and_index(int type, const char *name, int index);
 extern void font_set_antialias(boolean enable);
 extern boolean font_get_antialias(void);
 extern void font_select(int type, int size);
-extern struct agsurface *font_get_glyph(const char *str_utf8);
+extern struct SDL_Surface *font_get_glyph(const char *str_utf8);
 extern int font_draw_glyph(int x, int y, const char *str_utf8, int col);
 
 #ifdef __EMSCRIPTEN__

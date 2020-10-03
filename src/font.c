@@ -93,35 +93,21 @@ void font_select(int type, int size) {
 	}
 }
 
-agsurface_t *font_get_glyph(const char *str_utf8) {
-	static SDL_Surface *fs;
-	static agsurface_t result;
-
+SDL_Surface *font_get_glyph(const char *str_utf8) {
 	if (!fontset)
 		return NULL;
-	if (fs) {
-		SDL_FreeSurface(fs);
-		fs = NULL;
-	}
 
+	SDL_Surface *fs;
 	SDL_Color color = {255, 255, 255, 0};
 	if (this.antialiase_on) {
 		fs = TTF_RenderUTF8_Shaded(fontset->id, str_utf8, color, color);
 	} else {
 		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
 	}
-	if (!fs) {
+	if (!fs)
 		WARNING("Text rendering failed: %s\n", TTF_GetError());
-		return NULL;
-	}
 
-	result.depth = fs->format->BitsPerPixel;
-	result.bytes_per_pixel = fs->format->BytesPerPixel;
-	result.bytes_per_line = fs->pitch;
-	result.pixel = fs->pixels;
-	result.width = fs->w;
-	result.height = fs->h;
-	return &result;
+	return fs;
 }
 
 // SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.

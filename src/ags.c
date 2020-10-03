@@ -396,10 +396,24 @@ int ags_drawString(int x, int y, const char *src, int col) {
 }
 
 agsurface_t *ags_drawStringToSurface(const char *str) {
+	static SDL_Surface *fs;
+	static agsurface_t result;
+	if (fs) {
+		SDL_FreeSurface(fs);
+		fs = NULL;
+	}
+
 	char *utf8 = toUTF8(str);
-	agsurface_t *sf = font_get_glyph(utf8);
+	fs = font_get_glyph(utf8);
 	free(utf8);
-	return sf;
+
+	result.depth = fs->format->BitsPerPixel;
+	result.bytes_per_pixel = fs->format->BytesPerPixel;
+	result.bytes_per_line = fs->pitch;
+	result.pixel = fs->pixels;
+	result.width = fs->w;
+	result.height = fs->h;
+	return &result;
 }
 
 void ags_drawCg8bit(cgdata *cg, int x, int y) {
