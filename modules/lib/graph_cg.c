@@ -146,7 +146,7 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 			yl = (WORD *)(dp + y * ds->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				pic16 = *sp;
-				*yl = PIX15(RGB_PIXR16(pic16), RGB_PIXG16(pic16), RGB_PIXB16(pic16));
+				*yl = PIX15(PIXR16(pic16), PIXG16(pic16), PIXB16(pic16));
 				yl++; sp ++;
 			}
 			sp += (cg->width - dw);
@@ -172,7 +172,7 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 			yl = (DWORD *)(dp + y * ds->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				pic16 = *sp;
-				*yl = PIX24(RGB_PIXR16(pic16), RGB_PIXG16(pic16), RGB_PIXB16(pic16));
+				*yl = PIX24(PIXR16(pic16), PIXG16(pic16), PIXB16(pic16));
 				yl++; sp++;
 			}
 			sp += (cg->width - dw);

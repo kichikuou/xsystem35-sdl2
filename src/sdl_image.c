@@ -177,9 +177,7 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 			p_dst = p_ds;
 			memcpy(adata, a_src, w);
 			for (x = 0; x < w; x++) {
-				*p_dst++ = *a_src++ << 24 | RGB_PIX24(RGB_PIXR16(*p_src),
-													  RGB_PIXG16(*p_src),
-													  RGB_PIXB16(*p_src));
+				*p_dst++ = *a_src++ << 24 | PIX24(PIXR16(*p_src), PIXG16(*p_src), PIXB16(*p_src));
 				p_src++;
 			}
 			p_ds  += l;

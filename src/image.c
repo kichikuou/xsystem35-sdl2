@@ -953,7 +953,7 @@ BYTE *changeImage16AlphaLevel(cgdata *cg) {
 	new_pic_ = new_pic;
 
 	while (pixels--) {
-		*new_pic = RGB_ALPHALEVEL16(*pic, cg->alphalevel);
+		*new_pic = ALPHALEVEL16(*pic, cg->alphalevel);
 		new_pic++; pic++;
 	}
 	return (BYTE *)new_pic_;

@@ -232,80 +232,30 @@ extern boolean ags_getAntialiasedStringMode();
 extern void    ags_fader(ags_faderinfo_t *);
 extern void    ags_autorepeat(boolean bool);
 
-#define RGB_RMASK15 0x7c00
-#define RGB_GMASK15 0x03e0
-#define RGB_BMASK15 0x001f
-#define RGB_RMASK16 0xf800
-#define RGB_GMASK16 0x07e0
-#define RGB_BMASK16 0x001f
-#define RGB_RMASK24 0x00ff0000
-#define RGB_GMASK24 0x0000ff00
-#define RGB_BMASK24 0x000000ff
+#define RMASK15 0x7c00
+#define GMASK15 0x03e0
+#define BMASK15 0x001f
+#define RMASK16 0xf800
+#define GMASK16 0x07e0
+#define BMASK16 0x001f
+#define RMASK24 0x00ff0000
+#define GMASK24 0x0000ff00
+#define BMASK24 0x000000ff
 
-#define BGR_RMASK15 0x001f
-#define BGR_GMASK15 0x03e0
-#define BGR_BMASK15 0x7c00
-#define BGR_RMASK16 0x001f
-#define BGR_GMASK16 0x07e0
-#define BGR_BMASK16 0xf800
-#define BGR_RMASK24 0x000000ff
-#define BGR_GMASK24 0x0000ff00
-#define BGR_BMASK24 0x00ff0000
+#define PIXR15(pic) (BYTE)(((pic) & RMASK15) >> 7)
+#define PIXG15(pic) (BYTE)(((pic) & GMASK15) >> 2)
+#define PIXB15(pic) (BYTE)(((pic) & BMASK15) << 3)
+#define PIX15(r,g,b) (WORD)((((r) & 0xf8) << 7) | (((g) & 0xf8) << 2) | ((b       ) >> 3))
 
-#define RGB_PIXR15(pic) (BYTE)(((pic) & RGB_RMASK15) >> 7)
-#define RGB_PIXG15(pic) (BYTE)(((pic) & RGB_GMASK15) >> 2)
-#define RGB_PIXB15(pic) (BYTE)(((pic) & RGB_BMASK15) << 3)
-#define BGR_PIXR15(pic) (BYTE)(((pic) & BGR_RMASK15) << 3)
-#define BGR_PIXG15(pic) (BYTE)(((pic) & BGR_GMASK15) >> 2)
-#define BGR_PIXB15(pic) (BYTE)(((pic) & BGR_BMASK15) >> 7)
-#define RGB_PIX15(r,g,b) (WORD)((((r) & 0xf8) << 7) | (((g) & 0xf8) << 2) | ((b       ) >> 3))
-#define BGR_PIX15(r,g,b) (WORD)((((r)       ) >> 3) | (((g) & 0xf8) << 2) | ((b & 0xf8) << 7))
+#define PIXR16(pic) (BYTE)(((pic) & RMASK16) >> 8)
+#define PIXG16(pic) (BYTE)(((pic) & GMASK16) >> 3)
+#define PIXB16(pic) (BYTE)(((pic) & BMASK16) << 3)
+#define PIX16(r,g,b) (WORD)((((r) & 0xf8) << 8) | (((g) & 0xfc) << 3) | ((b       ) >> 3))
 
-#define RGB_PIXR16(pic) (BYTE)(((pic) & RGB_RMASK16) >> 8)
-#define RGB_PIXG16(pic) (BYTE)(((pic) & RGB_GMASK16) >> 3)
-#define RGB_PIXB16(pic) (BYTE)(((pic) & RGB_BMASK16) << 3)
-#define BGR_PIXR16(pic) (BYTE)(((pic) & BGR_RMASK16) << 3)
-#define BGR_PIXG16(pic) (BYTE)(((pic) & BGR_GMASK16) >> 3)
-#define BGR_PIXB16(pic) (BYTE)(((pic) & BGR_BMASK16) >> 8)
-#define RGB_PIX16(r,g,b) (WORD)((((r) & 0xf8) << 8) | (((g) & 0xfc) << 3) | ((b       ) >> 3))
-#define BGR_PIX16(r,g,b) (WORD)((((r)       ) >> 3) | (((g) & 0xfc) << 3) | ((b & 0xf8) << 8))
-
-#define RGB_PIXR24(pic) (BYTE)(((pic) & RGB_RMASK24) >> 16)
-#define RGB_PIXG24(pic) (BYTE)(((pic) & RGB_GMASK24) >>  8)
-#define RGB_PIXB24(pic) (BYTE)(((pic) & RGB_BMASK24)      )
-#define BGR_PIXR24(pic) (BYTE)(((pic) & BGR_RMASK24)      )
-#define BGR_PIXG24(pic) (BYTE)(((pic) & BGR_GMASK24) >>  8)
-#define BGR_PIXB24(pic) (BYTE)(((pic) & BGR_BMASK24) >> 16)
-#define RGB_PIX24(r,g,b) (DWORD)((((r) << 16) | ((g) << 8) | (b)      ))
-#define BGR_PIX24(r,g,b) (DWORD)((((r)      ) | ((g) << 8) | (b) << 16))
-
-#ifdef RGB_ORDER
-#define PIXR15 RGB_PIXR15
-#define PIXG15 RGB_PIXG15
-#define PIXB15 RGB_PIXB15
-#define PIXR16 RGB_PIXR16
-#define PIXG16 RGB_PIXG16
-#define PIXB16 RGB_PIXB16
-#define PIXR24 RGB_PIXR24
-#define PIXG24 RGB_PIXG24
-#define PIXB24 RGB_PIXB24
-#define PIX15  RGB_PIX15
-#define PIX16  RGB_PIX16
-#define PIX24  RGB_PIX24
-#else
-#define PIXR15 BGR_PIXR15
-#define PIXG15 BGR_PIXG15
-#define PIXB15 BGR_PIXB15
-#define PIXR16 BGR_PIXR16
-#define PIXG16 BGR_PIXG16
-#define PIXB16 BGR_PIXB16
-#define PIXR24 BGR_PIXR24
-#define PIXG24 BGR_PIXG24
-#define PIXB24 BGR_PIXB24
-#define PIX15  BGR_PIX15
-#define PIX16  BGR_PIX16
-#define PIX24  BGR_PIX24
-#endif
+#define PIXR24(pic) (BYTE)(((pic) & RMASK24) >> 16)
+#define PIXG24(pic) (BYTE)(((pic) & GMASK24) >>  8)
+#define PIXB24(pic) (BYTE)(((pic) & BMASK24)      )
+#define PIX24(r,g,b) (DWORD)((((r) << 16) | ((g) << 8) | (b)      ))
 
 #define ALPHABLEND15(f, b, a)  (PIX15((((PIXR15((f)) - PIXR15((b))) * (a)) >> 8) + PIXR15((b)),\
                                       (((PIXG15((f)) - PIXG15((b))) * (a)) >> 8) + PIXG15((b)),\
@@ -322,12 +272,8 @@ extern void    ags_autorepeat(boolean bool);
                                       (((PIXB16((f)) - PIXB16((b))) * (a)) >> 8)+ PIXB16((b))))
 
 #define ALPHALEVEL16(p, lv) PIX16(((PIXR16(p) * (lv)) >> 8),\
-                                  ((PIXG16(p) * (lv)) >> 8),\
-                                  ((PIXB16(p) * (lv)) >> 8))
-
-#define RGB_ALPHALEVEL16(p, lv) PIX16(((RGB_PIXR16(p) * (lv)) >> 8),\
-				      ((RGB_PIXG16(p) * (lv)) >> 8),\
-				      ((RGB_PIXB16(p) * (lv)) >> 8))
+								  ((PIXG16(p) * (lv)) >> 8),\
+								  ((PIXB16(p) * (lv)) >> 8))
 
 #define WHITELEVEL16(p, lv) ALPHABLEND16(0xffff,p,lv)
 
