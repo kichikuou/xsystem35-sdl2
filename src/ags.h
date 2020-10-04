@@ -62,7 +62,7 @@ typedef enum {
 struct agsurface {
 	int width;   /* width of surface  */
 	int height;  /* height of surface */
-	int depth;   /* depth of surface, 8/15/16/24/32 is available */
+	int depth;   /* depth of surface, 8/16/24/32 is available */
 	
 	int bytes_per_line;   /* bytes per line  */
 	int bytes_per_pixel;  /* bytes per pixel */
@@ -232,20 +232,12 @@ extern boolean ags_getAntialiasedStringMode();
 extern void    ags_fader(ags_faderinfo_t *);
 extern void    ags_autorepeat(boolean bool);
 
-#define RMASK15 0x7c00
-#define GMASK15 0x03e0
-#define BMASK15 0x001f
 #define RMASK16 0xf800
 #define GMASK16 0x07e0
 #define BMASK16 0x001f
 #define RMASK24 0x00ff0000
 #define GMASK24 0x0000ff00
 #define BMASK24 0x000000ff
-
-#define PIXR15(pic) (BYTE)(((pic) & RMASK15) >> 7)
-#define PIXG15(pic) (BYTE)(((pic) & GMASK15) >> 2)
-#define PIXB15(pic) (BYTE)(((pic) & BMASK15) << 3)
-#define PIX15(r,g,b) (WORD)((((r) & 0xf8) << 7) | (((g) & 0xf8) << 2) | ((b       ) >> 3))
 
 #define PIXR16(pic) (BYTE)(((pic) & RMASK16) >> 8)
 #define PIXG16(pic) (BYTE)(((pic) & GMASK16) >> 3)
@@ -256,16 +248,6 @@ extern void    ags_autorepeat(boolean bool);
 #define PIXG24(pic) (BYTE)(((pic) & GMASK24) >>  8)
 #define PIXB24(pic) (BYTE)(((pic) & BMASK24)      )
 #define PIX24(r,g,b) (DWORD)((((r) << 16) | ((g) << 8) | (b)      ))
-
-#define ALPHABLEND15(f, b, a)  (PIX15((((PIXR15((f)) - PIXR15((b))) * (a)) >> 8) + PIXR15((b)),\
-                                      (((PIXG15((f)) - PIXG15((b))) * (a)) >> 8) + PIXG15((b)),\
-                                      (((PIXB15((f)) - PIXB15((b))) * (a)) >> 8) + PIXB15((b))))
-
-#define ALPHALEVEL15(p, lv) (PIX15(((PIXR15(p) * (lv)) >> 8),\
-                                   ((PIXG15(p) * (lv)) >> 8),\
-                                   ((PIXB15(p) * (lv)) >> 8)))
-
-#define WHITELEVEL15(p, lv) ALPHABLEND15(0x7fff, p, lv)
 
 #define ALPHABLEND16(f, b, a)  (PIX16((((PIXR16((f)) - PIXR16((b))) * (a)) >> 8)+ PIXR16((b)),\
                                       (((PIXG16((f)) - PIXG16((b))) * (a)) >> 8)+ PIXG16((b)),\
@@ -287,7 +269,6 @@ extern void    ags_autorepeat(boolean bool);
 
 #define WHITELEVEL24(p, lv) ALPHABLEND24(0xffffffff, p, lv)
 
-#define SUTURADD15(pa, pb) PIX15(min(255,PIXR15(pa)+PIXR15(pb)), min(255, PIXG15(pa)+PIXG15(pb)), min(255, PIXB15(pa)+PIXB15(pb)));
 #define SUTURADD16(pa, pb) PIX16(min(255,PIXR16(pa)+PIXR16(pb)), min(255, PIXG16(pa)+PIXG16(pb)), min(255, PIXB16(pa)+PIXB16(pb)));
 //#define SUTURADD16(pa, pb) PIX16(min(255,(int)(PIXR16(pa))+(int)(PIXR16(pb))), min(255, (int)(PIXG16(pa))+(int)(PIXG16(pb))), min(255, (int)(PIXB16(pa))+(int)(PIXB16(pb))));
 #define SUTURADD24(pa, pb) PIX24(min(255,PIXR24(pa)+PIXR24(pb)), min(255, PIXG24(pa)+PIXG24(pb)), min(255, PIXB24(pa)+PIXB24(pb)));

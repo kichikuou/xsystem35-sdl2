@@ -4,7 +4,6 @@ static void uneune(surface_t *in, surface_t *out, int st) {
 	int x, y, m, n;
 	
 	switch(in->depth) {
-	case 15:
 	case 16: {
 		WORD *src, *dst;
 		for (y = 0; y < in->height; y++) {

@@ -37,16 +37,6 @@ static void ppm2surface(surface_t *sf, int curscanline, unsigned char *src, int 
 	BYTE *dp = GETOFFSET_PIXEL(sf, 0, curscanline);
 	
 	switch (sf->depth) {
-	case 15:
-	{
-		WORD *dst = (WORD *)dp;
-		while (width--) {
-			*dst = PIX15(*src, *(src +1), *(src +2));
-			dst++; src+= 3;
-		}
-		break;
-		
-	}
 	case 16:
 	{
 		WORD *dst = (WORD *)dp;

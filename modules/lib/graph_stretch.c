@@ -38,7 +38,6 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 	}
 	
 	switch(dst->depth) {
-	case 15:
 	case 16:
 	{
 		WORD *yls, *yld;

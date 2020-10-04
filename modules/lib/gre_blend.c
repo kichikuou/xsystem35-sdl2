@@ -16,22 +16,6 @@ int gre_Blend(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, 
 	dp = GETOFFSET_PIXEL(dst,   dx, dy);
 	
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD *yls, *yld, *ylw;
-		
-		for (y = 0; y < height; y++) {
-			yls = (WORD *)(sp + y * src->bytes_per_line);
-			yld = (WORD *)(dp + y * dst->bytes_per_line);
-			ylw = (WORD *)(wp + y * write->bytes_per_line);
-			
-			for (x = 0; x < width; x++) {
-				*ylw = ALPHABLEND15(*yls, *yld, lv);
-				yls++; yld++; ylw++;
-			}
-		}
-		break;
-	}
 	case 16:
 		if (nact->mmx_is_ok) {
 //		if (0) {

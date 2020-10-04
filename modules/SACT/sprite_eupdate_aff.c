@@ -10,7 +10,6 @@ static void do_aff(surface_t *in, surface_t *out, int deg, double zx, double zy)
 	int i, j, m, n;
 	
 	switch(in->depth) {
-	case 15:
 	case 16: {
 		WORD *src, *dst;
 		

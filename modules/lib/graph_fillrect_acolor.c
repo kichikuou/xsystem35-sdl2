@@ -18,20 +18,6 @@ int gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, i
 	dp = GETOFFSET_PIXEL(dst, dx, dy);
 	
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD pic15 = PIX15(r, g, b);
-		WORD *yls;
-		
-		for (y = 0; y < dh; y++) {
-			yls = (WORD *)(dp + y * dst->bytes_per_line);
-			for (x = 0; x < dw; x++) {
-				*yls = ALPHABLEND15(pic15, *yls, lv);
-				yls++;
-			}
-		}
-		break;
-	}
 	case 16:
 		if (nact->mmx_is_ok) {
 #ifdef ENABLE_MMX

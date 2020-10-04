@@ -272,28 +272,6 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 	}
 
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD *yls, *yld;
-		BYTE *yla;
-		
-		for (y = 0; y < dh; y++) {
-			yls = (WORD *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (WORD *)(dp +   y        * dst->bytes_per_line);
-			yla = (BYTE *)(sa + *(y + col) * src->width);
-			for (x = 0; x < dw; x++) {
-				*(yld + x) = ALPHABLEND15(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
-			}
-			while(*(col + y) == *(col + y + 1)) {
-				yld += dst->width;
-				for (x = 0; x < dw; x++) {
-					*(yld + x) = ALPHABLEND15(*(yls+ *(row+x)), *(yld+x), *(yla+*(row+x)));
-				}
-				y++;
-			}
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD *yls, *yld;

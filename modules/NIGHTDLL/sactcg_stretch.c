@@ -76,7 +76,6 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	switch(dst->depth) {
 	case 8:	
 		SCALEDCOPYAREA(BYTE); break;
-	case 15:
 	case 16:
 		SCALEDCOPYAREA(WORD); break;
 	case 24:

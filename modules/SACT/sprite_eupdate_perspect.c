@@ -44,7 +44,6 @@ static void do_per(surface_t *in, surface_t *out, float *k) {
 	int ys = in->height /2;
 	
 	switch(in->depth) {
-	case 15:
 	case 16: {
 		WORD *src, *dst;
 		

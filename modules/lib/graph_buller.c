@@ -19,39 +19,6 @@ int gr_buller(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 	sp = GETOFFSET_PIXEL(src, sx, sy);
 	dp = GETOFFSET_PIXEL(dst, dx, dy);
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD *yld, *yls;
-		
-		for (y = 0; y < height; y++) {
-			yls  = (WORD *)(sp + y * src->bytes_per_line);
-			yld  = (WORD *)(dp + y * dst->bytes_per_line);
-			for (x = 0; x < step; x++) {
-				*yld = *(yls+step);
-				yls++; yld++;
-			}
-			
-			for (; x < (width - step*2); x++) {
-				r1 = PIXR15((*(yls+step)));
-				g1 = PIXG15((*(yls+step)));
-				b1 = PIXB15((*(yls+step)));
-				r2 = PIXR15((*(yls-step)));
-				g2 = PIXG15((*(yls-step)));
-				b2 = PIXB15((*(yls-step)));
-				r3 = min(255, (r1+r2) >> 1);
-				g3 = min(255, (g1+g2) >> 1);
-				b3 = min(255, (b1+b2) >> 1);
-				
-				*yld = PIX15(r3, g3, b3);
-				yld++; yls++;
-			}
-			for (; x < width; x++) {
-				*yld = *(yls-step);
-				yls++; yld++;
-			}				
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD *yld, *yls;
@@ -137,36 +104,6 @@ int gr_buller_v(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, 
 	sp = GETOFFSET_PIXEL(src, sx, sy);
 	dp = GETOFFSET_PIXEL(dst, dx, dy);
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD *yld, *yls;
-		
-		for (x = 0; x < width; x++) {
-			yls  = (WORD *)(sp + x * src->bytes_per_pixel);
-			yld  = (WORD *)(dp + x * dst->bytes_per_pixel);
-			for (y = 0; y < step; y++) {
-				*(yld+y*dst->width) = *(yls+(y+step)*src->width);
-			}
-			
-			for (; y < (height - step*2); y++) {
-				r1 = PIXR15((*(yls+(y+step)*src->width)));
-				g1 = PIXG15((*(yls+(y+step)*src->width)));
-				b1 = PIXB15((*(yls+(y+step)*src->width)));
-				r2 = PIXR15((*(yls+(y-step)*src->width)));
-				g2 = PIXG15((*(yls+(y-step)*src->width)));
-				b2 = PIXB15((*(yls+(y-step)*src->width)));
-				r3 = min(255, (r1+r2) >> 1);
-				g3 = min(255, (g1+g2) >> 1);
-				b3 = min(255, (b1+b2) >> 1);
-				
-				*(yld+y*dst->width) = PIX15(r3, g3, b3);
-			}
-			for (; y < height; y++) {
-				*(yld+y*dst->width) = *(yls+(y-step)*src->width);
-			}				
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD *yld, *yls;

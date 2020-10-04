@@ -147,23 +147,6 @@ static void ChangeNotColor() {
 	dp = GETOFFSET_PIXEL(dib, x0, y0);
 	
 	switch(dib->depth) {
-	case 15:
-	{
-		WORD pic15s = PIX15(*src, *(src+1), *(src+2));
-		WORD pic15d = PIX15(*dst, *(dst+1), *(dst+2));
-		WORD *yl;
-		
-		for (y = 0; y < height; y++) {
-			yl = (WORD *)(dp + y * dib->bytes_per_line);
-			for (x = 0; x < width; x++) {
-				if (*yl != pic15s) {
-					*yl = pic15d;
-				}
-				yl++;
-			}
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD pic16s = PIX16(*src, *(src+1), *(src+2));
@@ -586,23 +569,6 @@ static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, i
 	dp = GETOFFSET_PIXEL(dib, dx, dy);
 	
 	switch(dib->depth) {
-	case 15:
-	{
-		WORD pic15 = PIX15(r, g, b);
-		WORD *yls, *yld;
-		
-		for (y = 0; y < height; y++) {
-			yls = (WORD *)(sp + y * dib->bytes_per_line);
-			yld = (WORD *)(dp + y * dib->bytes_per_line);
-			for (x = 0; x < width; x++) {
-				if (*yls != pic15) {
-					*yld = *yls;
-				}
-				yls++; yld++;
-			}
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD pic16 = PIX16(r, g, b);

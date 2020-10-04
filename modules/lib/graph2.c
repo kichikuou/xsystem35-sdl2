@@ -94,24 +94,6 @@ void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int 
 	dp   = GETOFFSET_PIXEL(dst, dx, dy);
 	
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD *yls1, *yls2, *yld;
-		BYTE *yla;
-		
-		for (y = 0; y < sh; y++) {
-			yls1 = (WORD *)(sp1  + y * src1->bytes_per_line);
-			yls2 = (WORD *)(sp2  + y * src2->bytes_per_line);
-			yld  = (WORD *)(dp   + y * dst->bytes_per_line);
-			yla  = (BYTE *)(sa   + y * src1->width);
-			
-			for (x = 0; x < sw; x++) {
-				*yld = SUTURADD15(*yls1, ALPHABLEND15(*yls1, *yls2, *yla));
-				yls1++; yls2++; yld++; yla++;
-			}
-		}
-		break;
-	}
 	case 16:
 //		if (nact->mmx_is_ok) {
 		if (0) {

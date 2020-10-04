@@ -57,23 +57,6 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
 	switch(ds->depth) {
-	case 15:
-	{
-		WORD *yl;
-		
-		for (y = 0; y < dh; y++) {
-			yl = (WORD *)(dp + y * ds->bytes_per_line);
-			for (x = 0; x < dw; x++) {
-				r = *sp;
-				g = *(sp +1);
-				b = *(sp +2);
-				*yl = PIX15(r, g, b);
-				yl++; sp += 3;
-			}
-			sp += ((cg->width - dw) * 3);
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD *yl;
@@ -138,21 +121,6 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
 	switch(ds->depth) {
-	case 15:
-	{
-		WORD *yl;
-		
-		for (y = 0; y < dh; y++) {
-			yl = (WORD *)(dp + y * ds->bytes_per_line);
-			for (x = 0; x < dw; x++) {
-				pic16 = *sp;
-				*yl = PIX15(PIXR16(pic16), PIXG16(pic16), PIXB16(pic16));
-				yl++; sp ++;
-			}
-			sp += (cg->width - dw);
-		}
-		break;
-	}
 	case 16:
 	{
 		for (y = 0; y < dh; y++) {

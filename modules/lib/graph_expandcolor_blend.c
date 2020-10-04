@@ -19,22 +19,6 @@ int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx,
 	dp = GETOFFSET_PIXEL(dst, dx, dy);
 	
 	switch(dst->depth) {
-	case 15: {
-		WORD *yd;
-		BYTE *ys;
-		col = PIX15(r, g, b);
-		for (y = 0; y < sh; y++) {
-			ys = (BYTE *)(sp + y * src->bytes_per_line);
-			yd = (WORD *)(dp + y * dst->bytes_per_line);
-			for (x = 0; x < sw; x++) {
-				if (*ys) {
-					*yd = ALPHABLEND15(col, *yd, (BYTE)*ys);
-				}
-				ys++; yd++;
-			}
-		}
-		break;
-	}
 	case 16:
 		col = PIX16(r, g, b);
 		//if (nact->mmx_is_ok) {

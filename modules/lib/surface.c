@@ -25,7 +25,6 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 			s->bytes_per_line = width;
 			s->bytes_per_pixel = 1;
 			break;
-		case 15:
 		case 16:
 			s->pixel = calloc(width * (height +1) * 2, sizeof(BYTE));
 			s->bytes_per_line = width * 2;
@@ -53,7 +52,7 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
  * surfaceの生成 (pixel + alpha)
  * @param width:  surfaceの幅
  * @param height: surfaceの高さ
- * @param depth:  surfaceのpixelのBPP (8|15|16|24|32), alphaは8固定
+ * @param depth:  surfaceのpixelのBPP (8|16|24|32), alphaは8固定
  * @return 生成した surface オブジェクト
  */
 surface_t *sf_create_surface(int width, int height, int depth) {
@@ -74,7 +73,7 @@ surface_t *sf_create_alpha(int width, int height) {
  * surfaceの生成 (pixelのみ)
  * @param width:  surfaceの幅
  * @param height: surfaceの高さ
- * @param depth:  surfaceのBPP(8|15|16|24|32)
+ * @param depth:  surfaceのBPP(8|16|24|32)
  * @return 生成した surface オブジェクト
  */
 surface_t *sf_create_pixel(int width, int height, int depth) {

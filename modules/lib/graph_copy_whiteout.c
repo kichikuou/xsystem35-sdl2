@@ -20,21 +20,6 @@ void gr_copy_whiteout(surface_t *dst, int dx, int dy, surface_t *src, int sx, in
 	if (sp == NULL || dp == NULL) return;
 	
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD *yls, *yld;
-		
-		for (y = 0; y < sh; y++) {
-			yls = (WORD *)(sp + y * src->bytes_per_line);
-			yld = (WORD *)(dp + y * dst->bytes_per_line);
-			
-			for (x = 0; x < sw; x++) {
-				*yld = WHITELEVEL15(*yls, lv);
-				yls++; yld++;
-			}
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD *yls, *yld;
