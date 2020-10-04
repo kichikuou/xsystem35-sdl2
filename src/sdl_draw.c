@@ -294,6 +294,11 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long cl) {
 	
 }
 
+SDL_Surface *com2surface(agsurface_t *s) {
+	return SDL_CreateRGBSurfaceFrom(
+		s->pixel, s->width, s->height, s->depth, s->bytes_per_line, 0, 0, 0, 0);
+}
+
 int sdl_nearest_color(int r, int g, int b) {
 	int i, col, mind = INT_MAX;
 	for (i = 0; i < 256; i++) {
@@ -318,7 +323,7 @@ void sdl_Mosaic(int sx, int sy, int w, int h, int dx, int dy, int slice) {
 	
 	SDL_LockSurface(sdl_dib);
 
-	image_Mosaic(sdl_dibinfo, sx, sy, w, h, dx, dy, slice); 
+	image_Mosaic(sdl_dib, sx, sy, w, h, dx, dy, slice);
 
 	SDL_UnlockSurface(sdl_dib);
 }

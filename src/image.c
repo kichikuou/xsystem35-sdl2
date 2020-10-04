@@ -38,7 +38,6 @@ static const int fadeX[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
 static const int fadeY[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
 
 static void (*draw_line)(agsurface_t*, int, int, int, int, int); 
-static void (*fill_rectangle)(agsurface_t*, int, int, int, int, int);
 static void (*copy_from_alpha)(agsurface_t *, BYTE *, BYTE *, int, int, ALPHA_DIB_COPY_TYPE);
 static void (*copy_to_alpha)(agsurface_t *, BYTE *, BYTE *, int, int, ALPHA_DIB_COPY_TYPE);
 
@@ -121,16 +120,6 @@ static void image_drawLine8(agsurface_t *dib, int x0, int y0, int x1, int y1, in
 				dd -= imax;
 			}
 		}
-	}
-}
-
-static void image_fillRectangle8(agsurface_t *dib, int x, int y, int w, int h, int col) {
-	BYTE *dst = GETOFFSET_PIXEL(dib, x, y);
-	int i;
-	
-	for (i = 0; i < h; i++) {
-		memset(dst, col, w);
-		dst += dib->bytes_per_line;
 	}
 }
 
@@ -248,22 +237,6 @@ static void image_drawLine16(agsurface_t *dib, int x0, int y0, int x1, int y1, i
 				dd -= imax;
 			}
 		}
-	}
-}
-
-static void image_fillRectangle16(agsurface_t *dib, int x, int y, int w, int h, int col) {
-	BYTE *_dst, *dst = GETOFFSET_PIXEL(dib, x, y);
-	int i;
-
-	_dst = dst;
-	
-	for (i = 0; i < w; i++) {
-		*((WORD *)dst + i) = col;
-	}
-	
-	for (i = 0; i < h -1; i++) {
-		dst += dib->bytes_per_line;
-		memcpy(dst, _dst, w * 2);
 	}
 }
 
@@ -542,22 +515,6 @@ static void image_drawLine24(agsurface_t *dib, int x0, int y0, int x1, int y1, i
 	}
 }
 
-static void image_fillRectangle24(agsurface_t *dib, int x, int y, int w, int h, int col) {
-	BYTE *_dst, *dst = GETOFFSET_PIXEL(dib, x, y);
-	int i;
-
-	_dst = dst;
-	
-	for (i = 0; i < w; i++) {
-		*((DWORD *)dst + i) = col;
-	}
-	
-	for (i = 0; i < h -1; i++) {
-		dst += dib->bytes_per_line;
-		memcpy(dst, _dst, w * 4);
-	}
-}
-
 static void image_copy_from_alpha24(agsurface_t *dib, BYTE *sdata, BYTE *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
 	BYTE *yls;
@@ -689,18 +646,15 @@ void image_setdepth(int depth) {
 	switch(depth) {
 	case 8:
 		draw_line = image_drawLine8;
-		fill_rectangle = image_fillRectangle8;
 		break;
 	case 16:
 		draw_line = image_drawLine16;
-		fill_rectangle = image_fillRectangle16;
 		copy_from_alpha = image_copy_from_alpha16;
 		copy_to_alpha = image_copy_to_alpha16;
 		break;
 	case 24:
 	case 32:
 		draw_line = image_drawLine24;
-		fill_rectangle = image_fillRectangle24;
 		copy_from_alpha = image_copy_from_alpha24;
 		copy_to_alpha = image_copy_to_alpha24;
 		break;
@@ -748,13 +702,6 @@ void image_drawLine(agsurface_t *dib, int x0, int y0, int x1, int y1, int col) {
 	draw_line(dib, x0, y0, x1, y1, col);
 }
 
-/*
- * dib に矩形塗りつぶしを描画
- */
-void image_fillRectangle(agsurface_t *dib, int x, int y, int w, int h, int col) {
-	fill_rectangle(dib, x, y, w, h, col);
-}
-
 void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	BYTE *sdata = GETOFFSET_ALPHA(dib, sx, sy);
 	BYTE *ddata = GETOFFSET_PIXEL(dib, dx, dy);
@@ -771,44 +718,26 @@ void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx,
 
 /* モザイク */
 
-void image_Mosaic(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, int slice) {
-#define m_mozaic(type) {                                                      \
-	type *p_ss = (type *)GETOFFSET_PIXEL(dib, sx, sy);                       \
-	type *p_src;                                                          \
-	int l = dib->bytes_per_line / dib->bytes_per_pixel * slice;           \
-	for (y = 0; y < h; y += slice) {                                      \
-		p_src = p_ss;                                                 \
-		if ((y + slice) > h ) r.height = h - y;                       \
-		r.width = slice;                                              \
-		for (x = 0; x < w; x += slice) {                              \
-			cl = *p_src;                                          \
-			r.x = dx + x;                                         \
-			r.y = dy + y;                                         \
-			if ((r.x + slice) > w) r.width = w - x;               \
-			fill_rectangle(dib, r.x, r.y, r.width, r.height, cl); \
-			p_src += slice;                                       \
-		}                                                             \
-		p_ss += l;                                                    \
-	}}
-	
-	int cl;
-	int x,y;
-	MyRectangle r;
-	
-	r.width=slice;
-	r.height=slice;
-	
-	switch(dib->depth) {
-	case 8:
-		m_mozaic(BYTE);
-		break;
-	case 16:
-		m_mozaic(WORD);
-		break;
-	case 24:
-	case 32:
-		m_mozaic(DWORD);
-		break;
+void image_Mosaic(SDL_Surface *dib, int sx, int sy, int w, int h, int dx, int dy, int slice) {
+	SDL_Rect r = {.h = slice};
+	for (int y = 0; y < h; y += slice) {
+		if (y + slice > h)
+			r.h = h - y;
+		r.w = slice;
+		for (int x = 0; x < w; x += slice) {
+			void *src = PIXEL_AT(dib, sx + x, sy + y);
+			Uint32 color;
+			switch (dib->format->BytesPerPixel) {
+			case 1: color = *(BYTE *)src; break;
+			case 2: color = *(WORD *)src; break;
+			default: color = *(DWORD *)src; break;
+			}
+			r.x = dx + x;
+			r.y = dy + y;
+			if (r.x + slice > w)
+				r.w = w - x;
+			SDL_FillRect(dib, &r, color);
+		}
 	}
 }
 

@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include <sys/types.h>
+#include <SDL_surface.h>
 #include "portab.h"
 #include "ags.h"
 #include "cursor.h"
@@ -78,6 +79,7 @@ extern void sdl_restoreRegion(void *src, int x, int y);
 extern void* sdl_saveRegion(int x, int y, int w, int h);
 extern void sdl_delRegion(void *src);
 extern void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step);
+extern SDL_Surface *com2surface(agsurface_t *s);
 
 /* fader */
 extern void sdl_fadeIn(int step);
