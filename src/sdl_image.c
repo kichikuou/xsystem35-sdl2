@@ -46,7 +46,7 @@ static void sdl_scaledCopyAreaInternal(SDL_Surface *src, SDL_Surface *dst, int s
 	SDL_Surface *ss;
 	SDL_Rect r_src, r_dst;
 	
-	ss = SDL_AllocSurface(SDL_ANYFORMAT, dw, dh, dst->format->BitsPerPixel, 0, 0, 0, 0);
+	ss = SDL_CreateRGBSurface(0, dw, dh, dst->format->BitsPerPixel, 0, 0, 0, 0);
 	
 	SDL_LockSurface(ss);
 
@@ -189,7 +189,7 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 		unsigned short *p_src = (WORD *)(cg->pic + cg->data_offset);
 		int i, l = w * 2;
 		
-		s = SDL_AllocSurface(SDL_ANYFORMAT, w, h, 16, 0, 0, 0, 0);
+		s = SDL_CreateRGBSurface(0, w, h, 16, 0, 0, 0, 0);
 		SDL_LockSurface(s);
 		p_dst = s->pixels;
 		for (i = 0; i < h; i++) {
@@ -373,7 +373,7 @@ void* sdl_saveRegion(int x, int y, int w, int h) {
 	SDL_Surface *s;
 	SDL_Rect r_src, r_dst;
 
-	s = SDL_AllocSurface(sdl_dib->flags, w, h, sdl_dib->format->BitsPerPixel,
+	s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel,
 			     sdl_dib->format->Rmask, sdl_dib->format->Gmask,
 			     sdl_dib->format->Bmask, sdl_dib->format->Amask);
 	if (sdl_dib->format->BitsPerPixel == 8)

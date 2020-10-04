@@ -221,7 +221,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	SDL_Surface *s;
 	SDL_Rect r_src, r_dst;
 	
-	s = SDL_AllocSurface(SDL_SWSURFACE, w, h, 8, 0, 0, 0, 0);
+	s = SDL_CreateRGBSurface(0, w, h, 8, 0, 0, 0, 0);
 
 	SDL_LockSurface(s);
 
@@ -360,7 +360,7 @@ static void fader_in(int n) {
 	if (n == 0) {
 		SDL_Rect r_src, r_dst;
 		
-		s_fader = SDL_AllocSurface(sdl_dib->flags, sdl_display->w, sdl_display->h,
+		s_fader = SDL_CreateRGBSurface(0, sdl_display->w, sdl_display->h,
 					   sdl_display->format->BitsPerPixel, 0, 0, 0, 0);
 		
 		if (sdl_display->format->BitsPerPixel == 8) {
@@ -455,8 +455,7 @@ void sdl_wrapColor(int sx, int sy, int w, int h, int cl, int rate) {
 	SDL_Surface *s;
 	SDL_Rect r_src,r_dst;
 
-	s = SDL_AllocSurface(SDL_SWSURFACE, w, h,
-			     sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
+	s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
 	
 	if (s->format->BitsPerPixel == 8) {
 		memcpy(s->format->palette->colors, sdl_dib->format->palette->colors,

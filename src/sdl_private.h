@@ -62,8 +62,6 @@ extern void sdl_cursor_init(void);
 extern void sdl_shadow_init(void);
 extern int sdl_nearest_color(int r, int g, int b);
 
-#define SDL_AllocSurface(flags,w,h,d,r,g,b,a) SDL_CreateRGBSurface(0,w,h,d,r,g,b,a)
-
 extern struct sdl_private_data *sdl_videodev;
 
 #define sdl_window (sdl_videodev->window)
