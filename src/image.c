@@ -37,91 +37,8 @@
 static const int fadeX[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
 static const int fadeY[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
 
-static void (*draw_line)(agsurface_t*, int, int, int, int, int); 
 static void (*copy_from_alpha)(agsurface_t *, BYTE *, BYTE *, int, int, ALPHA_DIB_COPY_TYPE);
 static void (*copy_to_alpha)(agsurface_t *, BYTE *, BYTE *, int, int, ALPHA_DIB_COPY_TYPE);
-
-/******************************************************************************/
-/* private methods  image操作 8bpp                                            */
-/******************************************************************************/
-
-static void image_drawLine8(agsurface_t *dib, int x0, int y0, int x1, int y1, int col) {
-	int dx = abs(x0 - x1), dy = abs(y0 - y1);
-	BYTE *p;
-	
-	if (dx == 0) {
-		int i = min(y0, y1);
-		p = GETOFFSET_PIXEL(dib, x0, i);
-		
-		for (i = 0; i < dy; i++) {
-			*p = col;
-			p += dib->bytes_per_line;
-		}
-		
-	} else if (dy == 0) {
-		int i = min(x0, x1);
-		p = GETOFFSET_PIXEL(dib, i, y0);
-		memset(p, col, dx);
-		
-	} else if (dx == dy) {
-		int i;
-		if (x0 < x1) {
-			p = GETOFFSET_PIXEL(dib, x0, y0);
-			if (y0 < y1) {
-				dy =  dib->bytes_per_line + dib->bytes_per_pixel;
-			} else {
-				dy = -dib->bytes_per_line + dib->bytes_per_pixel;
-			}
-		} else {
-			p = GETOFFSET_PIXEL(dib, x1, y1);
-			if (y0 < y1) {
-				dy = -dib->bytes_per_line + dib->bytes_per_pixel;
-			} else {
-				dy =  dib->bytes_per_line + dib->bytes_per_pixel;
-			}
-		}
-		for (i = 0; i < dx; i++) {
-			*p = col;
-			p += dy;
-		}
-	} else {
-		int i, d1, d2, ds, dd, imax;
-
-		if (dx < dy) {
-			d1 = dib->bytes_per_line;
-			if (y0 > y1) {
-				p  = GETOFFSET_PIXEL(dib, x1, y1);
-				d2 = dib->bytes_per_pixel * (x0 < x1 ? -1 : 1);
-			} else {
-				p  = GETOFFSET_PIXEL(dib, x0, y0);
-				d2 = dib->bytes_per_pixel * (x0 < x1 ? 1 : -1);
-			}
-			ds   = dx;
-			imax = dy;
-		} else {
-			d1 = dib->bytes_per_pixel;
-			if (x0 > x1) {
-				p  = GETOFFSET_PIXEL(dib, x1, y1);
-				d2 = dib->bytes_per_line * (y0 < y1 ? -1 : 1);
-			} else {
-				p  = GETOFFSET_PIXEL(dib, x0, y0);
-				d2 = dib->bytes_per_line * (y0 < y1 ? 1 : -1);
-			}
-			ds   = dy;
-			imax = dx;
-		}
-		dd = 0;
-		for (i = 0; i < imax; i++) {
-			*p  = col;
-			p  += d1;
-			dd += ds;
-			if (dd > imax) {
-				p += d2;
-				dd -= imax;
-			}
-		}
-	}
-}
 
 /******************************************************************************/
 /* private methods  image操作 16bpp                                           */
@@ -150,92 +67,6 @@ static void fadeIn16(SDL_Surface *src, SDL_Surface *dst, int lv) {
 		for (x = 0; x < src->w; x += 4) {
 			*(yld + fadeX[lv]) = *(yls + fadeX[lv]);
 			yls += 4; yld += 4;
-		}
-	}
-}
-
-static void image_drawLine16(agsurface_t *dib, int x0, int y0, int x1, int y1, int col) {
-	int dx = abs(x0 - x1), dy = abs(y0 - y1);
-	
-	if (dx == 0) {
-		int i = min(y0, y1), d = dib->bytes_per_line / 2;
-		WORD *p = (WORD *)GETOFFSET_PIXEL(dib, x0, i);
-
-		for (i = 0; i < dy; i++) {
-			*p = col;
-			p += d;
-		}
-		
-	} else if (dy == 0) {
-		int i = min(x0, x1), j;
-		WORD *p = (WORD *)GETOFFSET_PIXEL(dib, i, y0);
-		
-		for (j = 0; j < dx; j++) {
-			*(p++) = col;
-		}
-		
-	} else if (dx == dy) {
-		int i;
-		WORD *p;
-		
-		if (x0 < x1) {
-			p = (WORD *)GETOFFSET_PIXEL(dib, x0, y0);
-			if (y0 < y1) {
-				dy =  dib->bytes_per_line + dib->bytes_per_pixel;
-			} else {
-				dy = -dib->bytes_per_line + dib->bytes_per_pixel;
-			}
-		} else {
-			p = (WORD *)GETOFFSET_PIXEL(dib, x1, y1);
-			if (y0 < y1) {
-				dy = -dib->bytes_per_line + dib->bytes_per_pixel;
-			} else {
-				dy =  dib->bytes_per_line + dib->bytes_per_pixel;
-			}
-		}
-		dy /= 2;
-		for (i = 0; i < dx; i++) {
-			*p = col;
-			p += dy;
-		}
-	} else {
-		int i, d1, d2, ds, dd, imax;
-		WORD *p;
-
-		if (dx < dy) {
-			d1 = dib->bytes_per_line;
-			if (y0 > y1) {
-				p  = (WORD *)GETOFFSET_PIXEL(dib, x1, y1);
-				d2 = dib->bytes_per_pixel * (x0 < x1 ? -1 : 1);
-			} else {
-				p  = (WORD *)GETOFFSET_PIXEL(dib, x0, y0);
-				d2 = dib->bytes_per_pixel * (x0 < x1 ? 1 : -1);
-			}
-			ds   = dx;
-			imax = dy;
-		} else {
-			d1 = dib->bytes_per_pixel;
-			if (x0 > x1) {
-				p  = (WORD *)GETOFFSET_PIXEL(dib, x1, y1);
-				d2 = dib->bytes_per_line * (y0 < y1 ? -1 : 1);
-			} else {
-				p  = (WORD *)GETOFFSET_PIXEL(dib, x0, y0);
-				d2 = dib->bytes_per_line * (y0 < y1 ? 1 : -1);
-			}
-			ds   = dy;
-			imax = dx;
-		}
-		dd = 0;
-		d1 /= 2;
-		d2 /= 2;
-		for (i = 0; i < imax; i++) {
-			*p = col;
-			p  += d1;
-			dd += ds;
-			if (dd > imax) {
-				p  += d2;
-				dd -= imax;
-			}
 		}
 	}
 }
@@ -429,92 +260,6 @@ static void fadeIn24(SDL_Surface *src, SDL_Surface *dst, int lv) {
 	}
 }
 
-static void image_drawLine24(agsurface_t *dib, int x0, int y0, int x1, int y1, int col) {
-	int dx = abs(x0 - x1), dy = abs(y0 - y1);
-	
-	if (dx == 0) {
-		int i = min(y0, y1), d = dib->bytes_per_line / 4;
-		DWORD *p = (DWORD *)GETOFFSET_PIXEL(dib, x0, i);
-		
-		for (i = 0; i < dy; i++) {
-			*p = col;
-			p += d;
-		}
-		
-	} else if (dy == 0) {
-		int i = min(x0, x1), j;
-		DWORD *p = (DWORD *)GETOFFSET_PIXEL(dib, i, y0);
-		
-		for (j = 0; j < dx; j++) {
-			*(p++) = col;
-		}
-		
-	} else if (dx == dy) {
-		int i;
-		DWORD *p;
-		
-		if (x0 < x1) {
-			p = (DWORD *)GETOFFSET_PIXEL(dib, x0, y0);
-			if (y0 < y1) {
-				dy =  dib->bytes_per_line + dib->bytes_per_pixel;
-			} else {
-				dy = -dib->bytes_per_line + dib->bytes_per_pixel;
-			}
-		} else {
-			p = (DWORD *)GETOFFSET_PIXEL(dib, x1, y1);
-			if (y0 < y1) {
-				dy = -dib->bytes_per_line + dib->bytes_per_pixel;
-			} else {
-				dy =  dib->bytes_per_line + dib->bytes_per_pixel;
-			}
-		}
-		dy /= 4;
-		for (i = 0; i < dx; i++) {
-			*p = col;
-			p += dy;
-		}
-	} else {
-		int i, d1, d2, ds, dd, imax;
-		DWORD *p;
-
-		if (dx < dy) {
-			d1 = dib->bytes_per_line;
-			if (y0 > y1) {
-				p  = (DWORD *)GETOFFSET_PIXEL(dib, x1, y1);
-				d2 = dib->bytes_per_pixel * (x0 < x1 ? -1 : 1);
-			} else {
-				p  = (DWORD *)GETOFFSET_PIXEL(dib, x0, y0);
-				d2 = dib->bytes_per_pixel * (x0 < x1 ? 1 : -1);
-			}
-			ds   = dx;
-			imax = dy;
-		} else {
-			d1 = dib->bytes_per_pixel;
-			if (x0 > x1) {
-				p  = (DWORD *)GETOFFSET_PIXEL(dib, x1, y1);
-				d2 = dib->bytes_per_line * (y0 < y1 ? -1 : 1);
-			} else {
-				p  = (DWORD *)GETOFFSET_PIXEL(dib, x0, y0);
-				d2 = dib->bytes_per_line * (y0 < y1 ? 1 : -1);
-			}
-			ds   = dy;
-			imax = dx;
-		}
-		dd = 0;
-		d1 /= 4;
-		d2 /= 4;
-		for (i = 0; i < imax; i++) {
-			*p = col;
-			p += d1;
-			dd += ds;
-			if (dd > imax) {
-				p  += d2;
-				dd -= imax;
-			}
-		}
-	}
-}
-
 static void image_copy_from_alpha24(agsurface_t *dib, BYTE *sdata, BYTE *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
 	BYTE *yls;
@@ -645,16 +390,13 @@ static void image_copy_to_alpha24(agsurface_t *dib, BYTE *sdata, BYTE *ddata, in
 void image_setdepth(int depth) {
 	switch(depth) {
 	case 8:
-		draw_line = image_drawLine8;
 		break;
 	case 16:
-		draw_line = image_drawLine16;
 		copy_from_alpha = image_copy_from_alpha16;
 		copy_to_alpha = image_copy_to_alpha16;
 		break;
 	case 24:
 	case 32:
-		draw_line = image_drawLine24;
 		copy_from_alpha = image_copy_from_alpha24;
 		copy_to_alpha = image_copy_to_alpha24;
 		break;
@@ -693,13 +435,6 @@ void image_fadeIn(SDL_Surface *src, SDL_Surface *dst, int lv) {
 	default:
 		break;
 	}
-}
-
-/*
- * dib に線を描画
- */
-void image_drawLine(agsurface_t *dib, int x0, int y0, int x1, int y1, int col) {
-	draw_line(dib, x0, y0, x1, y1, col);
 }
 
 void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {

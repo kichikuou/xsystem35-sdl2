@@ -281,17 +281,13 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long cl) {
 
 	sdl_pal_check();
 	
-	if (sdl_dib->format->BitsPerPixel > 8 && cl < 256) {
-		cl = SDL_MapRGB(sdl_dib->format,
-				sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b);
-	}
+	if (cl >= 256)
+		cl = 0;
 	
-	SDL_LockSurface(sdl_dib);
-
-	image_drawLine(sdl_dibinfo, x1, y1, x2, y2, cl);
-	
-	SDL_UnlockSurface(sdl_dib);
-	
+	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(sdl_dib);
+	SDL_SetRenderDrawColor(renderer, sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b, SDL_ALPHA_OPAQUE);
+	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+	SDL_DestroyRenderer(renderer);
 }
 
 SDL_Surface *com2surface(agsurface_t *s) {
