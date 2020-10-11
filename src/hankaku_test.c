@@ -25,6 +25,11 @@ typedef struct {
 	const char *han;
 } Zen2hanTestCase;
 
+typedef struct {
+	const char *han;
+	const char *zen;
+} Han2ZenTestCase;
+
 static void zen2han_test(void) {
 	const Zen2hanTestCase testcases[] = {
 		{"", ""},
@@ -59,6 +64,21 @@ static void zen2han_test(void) {
 	ASSERT_STRCMP(zen2han(unconvertable, UTF8), unconvertable);
 }
 
+static void han2zen_test(void) {
+	const Han2ZenTestCase testcases[] = {
+		{"", ""},
+		{" ", "　"},
+		{"ｧｱｨｲｩｳｪｴｫｵｶｷｸｹｺｻｼｽｾｿﾀﾁｯﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓｬﾔｭﾕｮﾖﾗﾘﾙﾚﾛﾜｦﾝ", "ぁあぃいぅうぇえぉおかきくけこさしすせそたちっつてとなにぬねのはひふへほまみむめもゃやゅゆょよらりるれろわをん"},
+		{"､｡｢｣･ﾞﾟ", "、。「」・゛゜"},
+		{"0123456789", "0123456789"},
+		{"ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"},
+		{"abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz"},
+		{NULL, NULL},
+	};
+	for (const Han2ZenTestCase *tc = testcases; tc->han; tc++)
+		ASSERT_STRCMP(sjis2utf(han2zen(utf2sjis(tc->han), SHIFT_JIS)), tc->zen);
+}
+
 static void format_number_test(void) {
 	char buf[256];
 	ASSERT_STRCMP(format_number(0, 0, buf), "0");
@@ -79,6 +99,7 @@ static void format_number_zenkaku_test(void) {
 
 void hankaku_test(void) {
 	zen2han_test();
+	han2zen_test();
 	format_number_test();
 	format_number_zenkaku_test();
 }
