@@ -447,7 +447,6 @@ static void registerGameFiles(void) {
 }
 
 int main(int argc, char **argv) {
-	char *homedir = getenv("HOME"), *rc_name, *rc_path;
 #ifdef HAVE_SIGACTION
 	sys_set_signalhandler(SIGINT, SIG_IGN);
 #endif
@@ -507,11 +506,12 @@ int main(int argc, char **argv) {
 	sys35_init();	
 	
 #ifdef ENABLE_GTK
-	rc_name = get_profile("gtkrc_path");
+	char *homedir = getenv("HOME");
+	char *rc_name = get_profile("gtkrc_path");
 	if (!rc_name) {
 		rc_name = GTK_RC_NAME;
 	}
-	rc_path = (char *)malloc(sizeof(char) * (strlen(homedir) + strlen(rc_name)) + 2);
+	char *rc_path = (char *)malloc(sizeof(char) * (strlen(homedir) + strlen(rc_name)) + 2);
 	strcpy(rc_path, homedir);
 	strcat(rc_path, "/");
 	strcat(rc_path, rc_name);

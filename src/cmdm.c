@@ -364,8 +364,6 @@ void commandMN() {
 	int no   = sys_getc();
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
-	int i, len;
-	const char *b;
 	
 	switch(no) {
 	case 0:

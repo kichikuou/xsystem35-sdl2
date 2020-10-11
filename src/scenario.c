@@ -41,7 +41,6 @@
 /* static mathods */
 static void popVars(int *tmp);
 static void popDatas(int *tmp);
-static void showStackInfo();
 static void sl_push(int type, int *val, int cnt);
 static int* sl_pop();
 
@@ -62,6 +61,7 @@ static int dataPushCnt = 0;
 /* driobject */
 static dridata *dfile;
 
+#if 0
 /* debug: show stack information */
 static void showStackInfo() {
 	DEBUG_MESSAGE("stack top = %p, cur = %p, size=%d\n", sco_stackbuf, sco_stackindex, sco_stacksize);
@@ -72,7 +72,6 @@ static void showIndexInfo() {
 	DEBUG_MESSAGE("page = %d, index = %x\n", sl_page, sl_index);
 }
 
-#ifdef DEBUG
 static void showStackData() {
 	int i, j;
 	int *var;

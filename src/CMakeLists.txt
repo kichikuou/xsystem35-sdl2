@@ -3,7 +3,7 @@ add_library(src_lib STATIC
   hankaku.c
   utfsjis.c
   )
-target_compile_options(src_lib PRIVATE -Wno-pointer-sign)
+target_compile_options(src_lib PRIVATE -Wno-pointer-sign -Wall)
 target_include_directories(src_lib PRIVATE .)
 
 if (ANDROID)
@@ -12,7 +12,7 @@ else()
   add_executable(xsystem35)
 endif()
 
-target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign)
+target_compile_options(xsystem35 PRIVATE -Wno-pointer-sign $<$<CONFIG:Debug>:-Wall>)
 target_include_directories(xsystem35 PRIVATE .)
 target_link_libraries(xsystem35 PRIVATE src_lib)
 
@@ -118,7 +118,7 @@ else()  # non-emscripten, non-android
     gameresource_test.c
     hankaku_test.c
     )
-  target_compile_options(src_tests PRIVATE -Wno-pointer-sign)
+  target_compile_options(src_tests PRIVATE -Wno-pointer-sign -Wall)
   target_link_libraries(src_tests PRIVATE src_lib)
   add_test(NAME src_tests COMMAND src_tests)
   configure_file(testdata/test.gr ${CMAKE_CURRENT_BINARY_DIR}/testdata/test.gr COPYONLY)

@@ -213,7 +213,7 @@ static int cdrom_start(int trk, int loop) {
 		return OK;
 	} else {
 		ti.cdti_trk0 = ti.cdti_trk1 = trk;
-		ti.cdti_ind0 = ti.cdti_ind0 = 0;
+		ti.cdti_ind0 = ti.cdti_ind1 = 0;
 		if (do_ioctl(CDROMPLAYTRKIND, &ti) < 0) {
 			perror("CDROMPLAYTRKIND");
 			return NG;

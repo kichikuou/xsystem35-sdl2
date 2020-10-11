@@ -36,7 +36,6 @@ typedef void *entrypoint (void);
 void commands2F60() {
 	int type = sys_getdw();  /* DLL type */
 	int fnum = sys_getdw();  /* function number */
-	entrypoint *function = NULL;
 
 #ifdef ENABLE_MODULES
 	if (dll == NULL) {

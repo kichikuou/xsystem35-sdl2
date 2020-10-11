@@ -163,7 +163,6 @@ static int checkMessage() {
 
 void nact_main() {
 	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
-	int cnt = 0;
 
 	nact->frame_count = 0;
 	nact->cmd_count = 0;

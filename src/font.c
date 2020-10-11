@@ -152,7 +152,7 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, unsigne
 int font_draw_glyph(int x, int y, const char *str_utf8, int cl) {
 	SDL_Surface *fs;
 	SDL_Rect r_src, r_dst;
-	int w, h, maxy;
+	int w, h;
 	
 	if (!*str_utf8)
 		return 0;

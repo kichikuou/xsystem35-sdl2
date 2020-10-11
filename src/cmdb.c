@@ -30,7 +30,7 @@
 #include "selection.h"
 
 /* 選択肢Window情報 */
-Bcom_WindowInfo selWinInfo[SELWINMAX] = {{ 464, 80, 160, 160, TRUE}, 0};
+Bcom_WindowInfo selWinInfo[SELWINMAX] = {{ 464, 80, 160, 160, TRUE }};
 /* 現在の選択肢Window番号 */
 static int selWinNo;
 /* 現在のMessageWindow番号 */

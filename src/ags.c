@@ -620,12 +620,11 @@ void ags_alpha_getPixel(int x, int y, int *pic) {
 }
 
 void ags_alpha_setPixel(int x, int y, int w, int h, BYTE *b) {
-	int savex, savey, savew, saveh, offset;
+	int savex, savey, savew, offset;
 	
 	savex = x;
 	savey = y;
 	savew = w;
-	saveh = h;
 	
 	if (!check_param(&x, &y, &w, &h)) return;	
 	

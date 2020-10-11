@@ -500,6 +500,8 @@ void commands2F2A() {
 		sysVar[0] = save_save_str_with_file(fname_utf8, _var, cnt);
 		break;
 	default:
+		_var = getCaliValue();
+		cnt  = getCaliValue();
 		WARNING("Unknown QE command\n");
 		break;
 	}

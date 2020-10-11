@@ -125,6 +125,8 @@ void commandLE() {
 		sysVar[0] = save_load_str_with_file(fname_utf8, _var, num);
 		break;
 	default:
+		_var = getCaliValue();
+		num  = getCaliValue();
 		WARNING("Unknown LE command %d\n", type);
 		break;
 	}

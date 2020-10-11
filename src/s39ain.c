@@ -55,7 +55,7 @@ int s39ain_init(void) {
 	long len;
 	char *buf;
 	unsigned char *p;
-	int i, errors = 0;
+	int i;
 	
 	if (path_to_ain == NULL) {
 		return NG;
