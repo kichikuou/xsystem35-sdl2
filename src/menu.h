@@ -37,7 +37,7 @@ typedef struct inputstring_param {
 } INPUTSTRING_PARAM;
 
 /* 数値入力のパラメータ */
-typedef struct {
+typedef struct inputnum_param {
 	char *title;
 	int value;
 	int def;

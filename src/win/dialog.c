@@ -18,9 +18,21 @@
  */
 #include <windows.h>
 #include <shlobj.h>
+#undef min
+#undef max
+#include <SDL_syswm.h>
+#include "menu.h"
+#include "sdl_private.h"
 #include "resources.h"
 
 #define REGVAL_RECENT_FOLDER "RecentFolder"
+
+static HWND get_hwnd(SDL_Window *window) {
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+	SDL_GetWindowWMInfo(window, &info);
+	return info.info.win.window;
+}
 
 static int CALLBACK select_game_callback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
 	if (uMsg == BFFM_INITIALIZED)
@@ -53,5 +65,66 @@ boolean select_game_folder(void) {
 
 	RegSetKeyValue(HKEY_CURRENT_USER, XSYSTEM35_REGKEY, REGVAL_RECENT_FOLDER,
 				   REG_SZ, path, strlen(path) + 1);
+	return TRUE;
+}
+
+static INT_PTR CALLBACK text_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	static INPUTSTRING_PARAM *p;
+	static char utf8string[256];
+	wchar_t wstring[64];
+	int len;
+
+	switch (msg) {
+	case WM_CLOSE:
+		EndDialog(hDlg, IDCANCEL);
+		break;
+
+	case WM_INITDIALOG:
+		p = (INPUTSTRING_PARAM *)lParam;
+		if (MultiByteToWideChar(CP_UTF8, 0, p->title, -1, wstring, 64))
+			SetWindowTextW(GetDlgItem(hDlg, IDC_TEXT), wstring);
+		if (MultiByteToWideChar(CP_UTF8, 0, p->oldstring, -1, wstring, 64))
+			SetWindowTextW(GetDlgItem(hDlg, IDC_EDITBOX), wstring);
+		EnableWindow(GetDlgItem(hDlg, IDOK), p->oldstring[0] != '\0');
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDC_EDITBOX:
+			GetDlgItemTextW(hDlg, IDC_EDITBOX, wstring, 64);
+			len = wcslen(wstring);
+			EnableWindow(GetDlgItem(hDlg, IDOK), 0 < len && len <= p->max);
+			break;
+		case IDOK:
+			GetDlgItemTextW(hDlg, IDC_EDITBOX, wstring, 64);
+			WideCharToMultiByte(CP_UTF8, 0, wstring, -1, utf8string, sizeof(utf8string), NULL, NULL);
+			p->newstring = utf8string;
+			EndDialog(hDlg, IDOK);
+			break;
+		default:
+			return FALSE;
+		}
+		break;
+
+	default:
+		return FALSE;
+	}
+	return TRUE;
+}
+
+boolean input_string(INPUTSTRING_PARAM *p) {
+	p->newstring = p->oldstring;
+	DialogBoxParam(GetModuleHandle(NULL),
+				   MAKEINTRESOURCE(IDD_DIALOG1),
+				   get_hwnd(sdl_window),
+				   text_dialog_proc,
+				   (LPARAM)p);
+	return TRUE;
+}
+
+boolean input_number(INPUTNUM_PARAM *p) {
+	// TODO: Implement
+	p->value = p->def;
 	return TRUE;
 }

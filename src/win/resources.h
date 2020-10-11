@@ -21,6 +21,10 @@
 
 #define XSYSTEM35_REGKEY "Software\\Kichikuou\\xsystem35"
 
+#define IDD_DIALOG1            103
+#define IDC_TEXT               104
+#define IDC_EDITBOX            105
+
 #define IDS_CHOOSE_GAME_FOLDER 1001
 
 #endif /* __RESOURCES_H__ */

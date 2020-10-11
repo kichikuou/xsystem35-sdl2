@@ -21,6 +21,11 @@
 
 #include "portab.h"
 
+struct inputstring_param;
+struct inputnum_param;
+
 boolean select_game_folder(void);
+boolean input_string(struct inputstring_param *p);
+boolean input_number(struct inputnum_param *p);
 
 #endif  // __DIALOG_H__

@@ -29,6 +29,9 @@
 #include "menu.h"
 #include "sdl_core.h"
 #include "sdl_private.h"
+#ifdef _WIN32
+#include "win/dialog.h"
+#endif
 
 void menu_open(void) {
 	return;
@@ -59,8 +62,12 @@ void menu_quitmenu_open(void) {
 }
 
 boolean menu_inputstring(INPUTSTRING_PARAM *p) {
+#ifdef _WIN32
+	return input_string(p);
+#else
 	p->newstring = p->oldstring;
 	return TRUE;
+#endif
 }
 
 boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
@@ -68,8 +75,12 @@ boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
 }
 
 boolean menu_inputnumber(INPUTNUM_PARAM *p) {
+#ifdef _WIN32
+	return input_number(p);
+#else
 	p->value = p->def;
 	return TRUE;
+#endif
 }
 
 void menu_msgbox_open(char *msg) {
