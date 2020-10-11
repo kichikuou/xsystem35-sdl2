@@ -442,12 +442,6 @@ GtkWidget*
 create_menu1 (void)
 {
   GtkWidget *menu1;
-  GtkAccelGroup *menu1_accels;
-  GtkAccelGroup *item1_menu_accels;
-  GtkAccelGroup *item4_menu_accels;
-  GtkAccelGroup *item7_menu_accels;
-  GtkAccelGroup *item10_menu_accels;
-  GtkAccelGroup *item13_menu_accels;
   GtkWidget *item1;
   GtkWidget *item1_menu;
   GSList *msg_group = NULL;
@@ -461,21 +455,6 @@ create_menu1 (void)
   GtkWidget *item6;
   GtkWidget *__________2;
   GtkWidget *item7;
-  GtkWidget *item7_menu;
-  GSList *pcm_group = NULL;
-  GtkWidget *item8;
-  GtkWidget *item9;
-  GtkWidget *item10;
-  GtkWidget *item10_menu;
-  GSList *cdrom_group = NULL;
-  GtkWidget *item11;
-  GtkWidget *item12;
-  GtkWidget *item13;
-  GtkWidget *item13_menu;
-  GSList *midi_group = NULL;
-  GtkWidget *item14;
-  GtkWidget *item15;
-  GtkWidget *__________3;
   GtkWidget *item16;
   GtkWidget *__________4;
   GtkWidget *item17;
@@ -561,100 +540,6 @@ create_menu1 (void)
   gtk_widget_show (item7);
   gtk_container_add (GTK_CONTAINER (menu1), item7);
 
-#if 0
-  menu_item_pcm = item7 = gtk_menu_item_new_with_label (_("PCM-audio"));
-  gtk_widget_ref (item7);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item7", item7,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item7);
-  gtk_container_add (GTK_CONTAINER (menu1), item7);
-
-  item7_menu = gtk_menu_new ();
-  gtk_widget_ref (item7_menu);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item7_menu", item7_menu,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item7), item7_menu);
-  item8 = gtk_radio_menu_item_new_with_label (pcm_group, _("ON"));
-  pcm_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item8));
-  gtk_widget_ref (item8);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item8", item8,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item8);
-  gtk_container_add (GTK_CONTAINER (item7_menu), item8);
-
-  item9 = gtk_radio_menu_item_new_with_label (pcm_group, _("OFF"));
-  pcm_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item9));
-  gtk_widget_ref (item9);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item9", item9,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item9);
-  gtk_container_add (GTK_CONTAINER (item7_menu), item9);
-
-  menu_item_cdrom = item10 = gtk_menu_item_new_with_label (_("CDROM-audio"));
-  gtk_widget_ref (item10);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item10", item10,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item10);
-  gtk_container_add (GTK_CONTAINER (menu1), item10);
-
-  item10_menu = gtk_menu_new ();
-  gtk_widget_ref (item10_menu);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item10_menu", item10_menu,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item10), item10_menu);
-  item11 = gtk_radio_menu_item_new_with_label (cdrom_group, _("ON"));
-  cdrom_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item11));
-  gtk_widget_ref (item11);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item11", item11,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item11);
-  gtk_container_add (GTK_CONTAINER (item10_menu), item11);
-
-  item12 = gtk_radio_menu_item_new_with_label (cdrom_group, _("OFF"));
-  cdrom_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item12));
-  gtk_widget_ref (item12);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item12", item12,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item12);
-  gtk_container_add (GTK_CONTAINER (item10_menu), item12);
-
-  menu_item_midi = item13 = gtk_menu_item_new_with_label (_("MIDI-audio"));
-  gtk_widget_ref (item13);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item13", item13,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item13);
-  gtk_container_add (GTK_CONTAINER (menu1), item13);
-
-  item13_menu = gtk_menu_new ();
-  gtk_widget_ref (item13_menu);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item13_menu", item13_menu,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item13), item13_menu);
-  item14 = gtk_radio_menu_item_new_with_label (midi_group, _("ON"));
-  midi_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item14));
-  gtk_widget_ref (item14);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item14", item14,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item14);
-  gtk_container_add (GTK_CONTAINER (item13_menu), item14);
-
-  item15 = gtk_radio_menu_item_new_with_label (midi_group, _("OFF"));
-  midi_group = gtk_radio_menu_item_group (GTK_RADIO_MENU_ITEM (item15));
-  gtk_widget_ref (item15);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "item15", item15,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (item15);
-  gtk_container_add (GTK_CONTAINER (item13_menu), item15);
-
-  __________3 = gtk_menu_item_new ();
-  gtk_widget_ref (__________3);
-  gtk_object_set_data_full (GTK_OBJECT (menu1), "__________3", __________3,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (__________3);
-  gtk_container_add (GTK_CONTAINER (menu1), __________3);
-  gtk_widget_set_sensitive (__________3, FALSE);
-#endif
-
   item16 = gtk_menu_item_new_with_label (_("About"));
   gtk_widget_ref (item16);
   gtk_object_set_data_full (GTK_OBJECT (menu1), "item16", item16,
@@ -695,26 +580,6 @@ create_menu1 (void)
   gtk_signal_connect (GTK_OBJECT (item7), "activate",
                       GTK_SIGNAL_FUNC (on_item7_activate),
                       NULL);
-#if 0
-  gtk_signal_connect (GTK_OBJECT (item8), "activate",
-                      GTK_SIGNAL_FUNC (on_item8_activate),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (item9), "activate",
-                      GTK_SIGNAL_FUNC (on_item9_activate),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (item11), "activate",
-                      GTK_SIGNAL_FUNC (on_item11_activate),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (item12), "activate",
-                      GTK_SIGNAL_FUNC (on_item12_activate),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (item14), "activate",
-                      GTK_SIGNAL_FUNC (on_item14_activate),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (item15), "activate",
-                      GTK_SIGNAL_FUNC (on_item15_activate),
-                      NULL);
-#endif
   gtk_signal_connect (GTK_OBJECT (item16), "activate",
                       GTK_SIGNAL_FUNC (on_item16_activate),
                       NULL);

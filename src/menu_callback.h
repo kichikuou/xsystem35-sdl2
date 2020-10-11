@@ -28,15 +28,11 @@
 extern boolean menu_ok_exit;
 extern boolean menu_ok_input;
 
-extern GtkWidget *menu_item_pcm;
-extern GtkWidget *menu_item_cdrom;
-extern GtkWidget *menu_item_midi;
 extern GtkWidget *menu_item_msgskip_on;
 extern GtkWidget *menu_item_msgskip_off;
 
 extern GtkWidget *menu_label_inputstring_title;
 extern GtkWidget *menu_label_inputstring_maxchar;
-extern GtkWidget *menu_label_inputnum_title;
 extern GtkWidget *menu_label_inputnum_max;
 extern GtkWidget *menu_label_inputnum_min;
 extern GtkWidget *menu_label_inputnum_def;
@@ -68,10 +64,6 @@ on_item3_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_item4_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
 on_item5_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
@@ -81,34 +73,6 @@ on_item6_activate                      (GtkMenuItem     *menuitem,
 
 void
 on_item7_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item8_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item9_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item10_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item11_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item12_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item14_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item15_activate                     (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void

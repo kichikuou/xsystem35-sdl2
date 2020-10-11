@@ -35,9 +35,6 @@
 boolean menu_ok_exit;   /* exit window で OK が押されたかどうか */
 boolean menu_ok_input;  /* 文字列/数値入力 window で OK が... */
 
-GtkWidget *menu_item_pcm;
-GtkWidget *menu_item_cdrom;
-GtkWidget *menu_item_midi;
 GtkWidget *menu_item_msgskip_on;
 GtkWidget *menu_item_msgskip_off;
 
@@ -111,54 +108,6 @@ on_item7_activate                      (GtkMenuItem     *menuitem,
 {
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 	s39ini_winopen();
-}
-
-/* PCM off */
-void
-on_item9_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-	// mus_pcm_set_state(FALSE);
-	gtk_menu_popdown(GTK_MENU(menu_window_popup));
-}
-
-
-/* CD on */
-void
-on_item11_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-	// mus_cdrom_set_state(TRUE);
-	gtk_menu_popdown(GTK_MENU(menu_window_popup));
-}
-
-
-/* CD off */
-void
-on_item12_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-	// mus_cdrom_set_state(FALSE);
-	gtk_menu_popdown(GTK_MENU(menu_window_popup));
-}
-
-
-/* MIDI on */
-void
-on_item14_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-	// mus_midi_set_state(TRUE);
-	gtk_menu_popdown(GTK_MENU(menu_window_popup));
-}
-
-/* MIDI off */
-void
-on_item15_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
-{
-	// mus_midi_set_state(FALSE);
-	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 }
 
 /* PopupMenu about */
