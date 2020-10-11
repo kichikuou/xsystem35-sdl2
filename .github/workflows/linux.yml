@@ -21,7 +21,7 @@ jobs:
       run: |
         mkdir -p out/${{ matrix.build-type }}
         cd out/${{ matrix.build-type }}
-        cmake -DENABLE_X11=NO -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ../../
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ../../
         make
 
     - name: Test

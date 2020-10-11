@@ -18,7 +18,7 @@ jobs:
         key: emscripten-cache-${{ env.emscripten-version }}
 
     - name: Setup Emscripten toolchain
-      uses: mymindstorm/setup-emsdk@v6
+      uses: mymindstorm/setup-emsdk@v7
       with:
         version: ${{ env.emscripten-version }}
         actions-cache-folder: emsdk-cache
