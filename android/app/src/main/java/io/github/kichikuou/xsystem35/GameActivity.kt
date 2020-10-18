@@ -86,7 +86,8 @@ class GameActivity : SDLActivity() {
                 .setMessage(msg)
                 .setView(input)
                 .setPositiveButton(R.string.ok) {_, _ ->
-                    result[0] = input.text.toString().substring(0, maxLen)
+                    val s = input.text.toString()
+                    result[0] = if (s.length <= maxLen) s else s.substring(0, maxLen)
                 }
                 .setNegativeButton(R.string.cancel) {_, _ -> }
                 .setOnDismissListener {
