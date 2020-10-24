@@ -90,6 +90,7 @@ if (EMSCRIPTEN)
   target_link_options(xsystem35 PRIVATE
     "SHELL:-s ENVIRONMENT=web"
     "SHELL:-s ASYNCIFY=1 -s ASYNCIFY_IGNORE_INDIRECT=1"
+    "SHELL:-s ASYNCIFY_REMOVE=\"['SDL_Delay']\""
     "SHELL:-s ASYNCIFY_IMPORTS=\"['muspcm_load_no','muspcm_load_mixlr','muspcm_waitend','wait_vsync','load_mincho_font']\""
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
     "SHELL:-s NO_EXIT_RUNTIME=1"
