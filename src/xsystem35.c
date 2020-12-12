@@ -518,8 +518,8 @@ int main(int argc, char **argv) {
 	
 	gtk_rc_parse(rc_path);
 	free(rc_path);
-	menu_init();
 #endif
+	menu_init();
 	
 	nact_main();
 #ifdef __EMSCRIPTEN__

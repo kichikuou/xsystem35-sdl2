@@ -126,6 +126,11 @@ static void sdl_getEvent(void) {
 				break;
 			}
 			break;
+#ifdef _WIN32
+		case SDL_SYSWMEVENT:
+			win_menu_onsyswmevent(e.syswm.msg);
+			break;
+#endif
 		case SDL_APP_DIDENTERFOREGROUND:
 			sdl_dirty = TRUE;
 			break;

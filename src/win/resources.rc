@@ -4,7 +4,22 @@
 
 100 ICON DISCARDABLE "xsystem35.ico"
 
+////////////////////////////////////////////////////////////////////////
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+
+IDR_MENU1 MENU DISCARDABLE
+{
+    POPUP "File"
+    {
+        MENUITEM "Exit",                        ID_EXIT
+    }
+    POPUP "Screen"
+    {
+        MENUITEM "Window",                      ID_SCREEN_WINDOW
+        MENUITEM "Fullscreen",                  ID_SCREEN_FULL
+    }
+}
+
 STRINGTABLE
 {
 	IDS_CHOOSE_GAME_FOLDER "Choose a game folder:"
@@ -20,7 +35,22 @@ FONT 9, "MS Shell Dlg"
     DEFPUSHBUTTON   "OK",IDOK,35,36,50,14
 }
 
+////////////////////////////////////////////////////////////////////////
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+IDR_MENU1 MENU DISCARDABLE
+{
+    POPUP "ファイル"
+    {
+        MENUITEM "閉じる",                        ID_EXIT
+    }
+    POPUP "画面"
+    {
+        MENUITEM "ウィンドウ",                    ID_SCREEN_WINDOW
+        MENUITEM "フルスクリーン",                ID_SCREEN_FULL
+    }
+}
+
 STRINGTABLE
 {
 	IDS_CHOOSE_GAME_FOLDER "ゲームフォルダを選んでください:"

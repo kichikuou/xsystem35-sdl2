@@ -55,4 +55,10 @@ extern void menu_widgetinit(void);
 extern void menu_init();
 extern void menu_gtkmainiteration();
 
+#ifdef _WIN32
+struct SDL_SysWMmsg;
+extern void win_menu_init(void);
+extern void win_menu_onsyswmevent(struct SDL_SysWMmsg* msg);
+#endif
+
 #endif /* !__MENULL */

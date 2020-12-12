@@ -88,7 +88,9 @@ void menu_msgbox_open(char *msg) {
 }
 
 void menu_init(void) {
-	return;
+#ifdef _WIN32
+	win_menu_init();
+#endif
 }
 
 void menu_gtkmainiteration() {
