@@ -139,13 +139,14 @@ static void sdl_getEvent(void) {
 			break;
 		case SDL_KEYUP:
 			keyEventProsess(&e.key, FALSE);
-			if (e.key.keysym.sym == SDLK_F1) msg_skip = TRUE;
-#ifndef __EMSCRIPTEN__
-			if (e.key.keysym.sym == SDLK_F4) {
-				sdl_fs_on = !sdl_fs_on;
-				SDL_SetWindowFullscreen(sdl_window, sdl_fs_on ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+			switch (e.key.keysym.sym) {
+			case SDLK_F1:
+				msg_skip = TRUE;
+				break;
+			case SDLK_F4:
+				sdl_setFullscreen(!sdl_fs_on);
+				break;
 			}
-#endif
 			break;
 		case SDL_MOUSEMOTION:
 			mousex = e.motion.x;

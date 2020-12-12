@@ -22,9 +22,9 @@
 #include <SDL_syswm.h>
 #include "system.h"
 #include "menu.h"
+#include "sdl_core.h"
 #include "sdl_private.h"
 #include "resources.h"
-#include "ags.h"
 
 static HWND get_hwnd(SDL_Window *window) {
 	SDL_SysWMinfo info;
@@ -50,10 +50,10 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 			menu_quitmenu_open();
 			break;
 		case ID_SCREEN_WINDOW:
-			ags_fullscreen(FALSE);
+			sdl_setFullscreen(FALSE);
 			break;
 		case ID_SCREEN_FULL:
-			ags_fullscreen(TRUE);
+			sdl_setFullscreen(TRUE);
 			break;
 		}
 		break;

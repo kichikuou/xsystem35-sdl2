@@ -822,11 +822,6 @@ boolean ags_getAntialiasedStringMode() {
 	return font_get_antialias();
 }
 
-void ags_fullscreen(boolean on) {
-	nact->sys_fullscreen_on = on;
-	sdl_FullScreen(on);
-}
-
 void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, int lv) {
 	if (nact->sys_world_depth == 8) return;
 	

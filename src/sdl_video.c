@@ -201,14 +201,17 @@ void sdl_setAutoRepeat(boolean bool) {
 	}
 }
 
-void sdl_FullScreen(boolean on) {
-	if (on && !sdl_fs_on) {
-		sdl_fs_on = TRUE;
-		SDL_SetWindowFullscreen(sdl_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-	} else if (!on && sdl_fs_on) {
-		sdl_fs_on = FALSE;
-		SDL_SetWindowFullscreen(sdl_window, 0);
-	}
+void sdl_setFullscreen(boolean on) {
+#ifndef __EMSCRIPTEN__
+	if (on == sdl_fs_on)
+		return;
+	SDL_SetWindowFullscreen(sdl_window, on ? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+	sdl_fs_on = on;
+#endif
+}
+
+boolean sdl_isFullscreen(void) {
+	return sdl_fs_on;
 }
 
 void sdl_setWindowSize(int x, int y, int w, int h) {

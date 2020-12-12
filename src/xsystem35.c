@@ -220,7 +220,7 @@ static void sys35_init() {
 	for (i = 0; i < FONTTYPEMAX; i++)
 		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
 	
-	ags_fullscreen(fs_on);
+	sdl_setFullscreen(fs_on);
 	nact->noantialias = font_noantialias;
 	ags_setAntialiasedStringMode(!font_noantialias);
 	

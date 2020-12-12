@@ -429,7 +429,7 @@ void commandZZ10() {
 	/* スクリーンモードを取得する */
 	int *var = getCaliVariable();
 
-	*var = nact->sys_fullscreen_on ? 1 : 0;
+	*var = sdl_isFullscreen() ? 1 : 0;
 	
 	DEBUG_COMMAND("ZZ10 %d:\n",*var);
 }

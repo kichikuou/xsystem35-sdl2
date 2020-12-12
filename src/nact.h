@@ -78,7 +78,6 @@ typedef struct {
 	void *datatbl_addr; /* データテーブルのアドレス */
 	int fnc_return_value; /* 関数の戻り値として返す値 (~0,cali:で渡す値) */
 	
-#if 1
 	/* ags info */
 	Palette256 *sys_pal;
 	boolean     sys_pal_changed;
@@ -86,10 +85,6 @@ typedef struct {
 	MyDimension sys_world_size;
 	int         sys_world_depth;
 	int         sys_mouse_movesw; /* 0:IZを無視, 1: 直接指定場所へ, 2: スムーズに指定場所に */
-	boolean     sys_fullscreen_capable;
-	boolean     sys_fullscreen_on;
-	
-#endif
 
 	/* for fader/ecopy */
 	int     effect_rate;

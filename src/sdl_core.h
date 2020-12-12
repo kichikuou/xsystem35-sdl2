@@ -41,12 +41,12 @@ extern void sdl_setWorldSize(int width, int height, int depth);
 extern void sdl_setWindowSize(int x, int y, int w, int h);
 extern void sdl_setWindowTitle(char *name);
 extern void sdl_getWindowInfo(DispInfo *info);
-extern void sdl_FullScreen(boolean on);
+extern void sdl_setFullscreen(boolean on);
+extern boolean sdl_isFullscreen(void);
 extern agsurface_t *sdl_getDIB(void);
 
 /* 画面更新 */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);
-extern void sdl_fullScreen(boolean on);
 extern void sdl_updateScreen(void);
 
 /* パレット関係 */
