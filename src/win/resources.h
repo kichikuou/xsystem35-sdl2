@@ -31,5 +31,6 @@
 #define ID_EXIT                40001
 #define ID_SCREEN_WINDOW       40002
 #define ID_SCREEN_FULL         40003
+#define ID_MSGSKIP             40010
 
 #endif /* __RESOURCES_H__ */

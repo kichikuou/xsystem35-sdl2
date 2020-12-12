@@ -28,6 +28,7 @@
 #include "xsystem35.h"
 #include "message.h"
 #include "joystick.h"
+#include "menu.h"
 
 static boolean skipToNextSel = FALSE;
 static boolean skipModeInterruptable = TRUE;
@@ -36,8 +37,12 @@ static int hak_ignore_mask      = 0xffffffff;
 static int hak_releasewait_mask = (0 << 0) | (0 << 1) | (0 << 2) | (0 << 3) |
                                   (1 << 4) | (0 << 5) | (0 << 6) | (0 << 7) ;
 
-void set_skipMode(boolean bool) {
-	skipToNextSel = bool;
+void set_skipMode(boolean skip) {
+#ifdef _WIN32
+	if (skipToNextSel != skip)
+		win_menu_skipModeChanged(skip);
+#endif
+	skipToNextSel = skip;
 }
 
 boolean get_skipMode() {
@@ -94,7 +99,7 @@ int sys_getInputInfo() {
 	int key = sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | joy_getinfo();
 
 	if (key == SYS35KEY_SPC && skipModeInterruptable) {
-		skipToNextSel = FALSE;		
+		set_skipMode(FALSE);
 	}
 
 	/* 復活 !! */

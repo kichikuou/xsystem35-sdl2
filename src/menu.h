@@ -59,6 +59,7 @@ extern void menu_gtkmainiteration();
 struct SDL_SysWMmsg;
 extern void win_menu_init(void);
 extern void win_menu_onsyswmevent(struct SDL_SysWMmsg* msg);
+extern void win_menu_skipModeChanged(boolean skip);
 #endif
 
 #endif /* !__MENULL */

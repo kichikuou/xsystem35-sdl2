@@ -25,6 +25,7 @@
 #include "sdl_core.h"
 #include "sdl_private.h"
 #include "resources.h"
+#include "input.h"
 
 static HWND get_hwnd(SDL_Window *window) {
 	SDL_SysWMinfo info;
@@ -55,7 +56,30 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 		case ID_SCREEN_FULL:
 			sdl_setFullscreen(TRUE);
 			break;
+		case ID_MSGSKIP:
+			set_skipMode(!get_skipMode());
+			break;
 		}
 		break;
 	}
+}
+
+void win_menu_skipModeChanged(boolean skip) {
+	HWND hwnd = get_hwnd(sdl_window);
+	HMENU hmenu = GetMenu(hwnd);
+	wchar_t buf[20];
+	MENUITEMINFOW menuitem = {
+		.cbSize = sizeof(MENUITEMINFOW),
+		.fMask = MIIM_STRING,
+		.dwTypeData = buf,
+		.cch = sizeof(buf) / sizeof(wchar_t),
+	};
+	if (!GetMenuItemInfoW(hmenu, ID_MSGSKIP, false, &menuitem))
+		return;
+	wchar_t *p = wcsrchr(buf, L'[');
+	if (!p)
+		return;
+	wcscpy(p, skip ? L"[on]" : L"[off]");
+	SetMenuItemInfoW(hmenu, ID_MSGSKIP, false, &menuitem);
+	DrawMenuBar(hwnd);
 }

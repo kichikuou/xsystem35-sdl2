@@ -18,6 +18,7 @@ IDR_MENU1 MENU DISCARDABLE
         MENUITEM "Window",                      ID_SCREEN_WINDOW
         MENUITEM "Fullscreen",                  ID_SCREEN_FULL
     }
+    MENUITEM "MsgSkip[off]",                    ID_MSGSKIP
 }
 
 STRINGTABLE
@@ -49,6 +50,7 @@ IDR_MENU1 MENU DISCARDABLE
         MENUITEM "ウィンドウ",                    ID_SCREEN_WINDOW
         MENUITEM "フルスクリーン",                ID_SCREEN_FULL
     }
+    MENUITEM "文字送り[off]",                     ID_MSGSKIP
 }
 
 STRINGTABLE
