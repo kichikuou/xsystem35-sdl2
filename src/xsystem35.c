@@ -71,7 +71,6 @@
 #include "ald_manager.h"
 #include "gameresource.h"
 #include "filecheck.h"
-#include "joystick.h"
 #include "s39init.h"
 
 #ifdef ENABLE_MMX
@@ -247,7 +246,6 @@ static void sys35_remove() {
 #ifdef ENABLE_GTK
 	s39ini_remove();
 #endif
-	/* joy_close(); */
 #if DEBUG
 	if (debuglv >= 3) {
 		fclose(fpdebuglog);
@@ -305,7 +303,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			midi_set_output_device(argv[i][2] | subdev);
 		} else if (0 == strcmp(argv[i], "-devjoy")) {
 			if (argv[i + 1] != NULL) {
-				joy_set_deviceindex(atoi(argv[i + 1]));
+				sdl_setJoyDeviceIndex(atoi(argv[i + 1]));
 			}
 		} else if (0 == strcmp(argv[i], "-fullscreen")) {
 			fs_on = TRUE;
@@ -376,7 +374,7 @@ static void check_profile() {
 	/* joystick device name の設定 */
 	param = get_profile("joy_device");
 	if (param) {
-		joy_set_deviceindex(atoi(param));
+		sdl_setJoyDeviceIndex(atoi(param));
 	}
 	/* Raw MIDI device name の設定 */
 	param = get_profile("midi_device");

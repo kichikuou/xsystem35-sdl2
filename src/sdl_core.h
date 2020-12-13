@@ -88,6 +88,7 @@ extern void sdl_whiteIn(int step);
 extern void sdl_whiteOut(int step);
 
 /* key/pointer 関係 */
+extern void sdl_setJoyDeviceIndex(int index);
 extern int sdl_keywait(void);
 extern void sdl_keywait_post(void);
 extern void sdl_setCursorLocation(int x, int y);
@@ -95,7 +96,7 @@ extern void sdl_setCursorType(int type);
 extern boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCursorDirEntry *cursordirentry);
 extern int  sdl_getKeyInfo();
 extern int  sdl_getMouseInfo(MyPoint *p);
-extern int  sdl_getjoyinfo(void);
+extern int  sdl_getJoyInfo(void);
 extern void sdl_setAutoRepeat(boolean bool);
 
 /* misc */

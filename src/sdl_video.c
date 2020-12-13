@@ -34,14 +34,42 @@
 #include "sdl_core.h"
 #include "sdl_private.h"
 #include "xsystem35.h"
-#include "joystick.h"
 #include "image.h"
 
 static void window_init(void);
 static void makeDIB(int width, int height, int depth);
 
 struct sdl_private_data *sdl_videodev;
+static int joy_device_index = -1;
 
+#ifdef HAVE_SDLJOY
+static SDL_Joystick *js;
+
+static boolean joy_open_index(int index) {
+	js = SDL_JoystickOpen(index);
+	if (!js)
+		return FALSE;
+
+	const char *name = SDL_JoystickName(js);
+	int axes = SDL_JoystickNumAxes(js);
+	int buttons = SDL_JoystickNumButtons(js);
+	SDL_JoystickEventState(SDL_ENABLE);
+	printf("SDL joystick '%s' %d axes %d buttons\n", name, axes, buttons);
+	return TRUE;
+}
+
+static int joy_open(void) {
+	if (joy_device_index >= 0) {
+		return joy_open_index(joy_device_index) ? 1 : -1;
+	} else {
+		for (int i = 0; i < SDL_NumJoysticks(); i++) {
+			if (joy_open_index(i))
+				return 1;
+		}
+	}
+	return -1;
+}
+#endif // HAVE_SDLJOY
 
 /* SDL の初期化 */
 int sdl_Initilize(void) {
@@ -65,7 +93,9 @@ int sdl_Initilize(void) {
 	emscripten_set_visibilitychange_callback(NULL, 0, NULL);
 #endif
 
+#ifdef HAVE_SDLJOY
 	joy_open();
+#endif
 	return 0;
 }
 
@@ -79,7 +109,9 @@ void sdl_Remove(void) {
 
 		SDL_DestroyRenderer(sdl_renderer);
 		
-		joy_close();
+#ifdef HAVE_SDLJOY
+		SDL_JoystickClose(js);
+#endif
 		
 		SDL_Quit();
 		
@@ -239,6 +271,10 @@ void sdl_setWindowSize(int x, int y, int w, int h) {
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.windowSizeChanged(); );
 #endif
+}
+
+void sdl_setJoyDeviceIndex(int index) {
+	joy_device_index = index;
 }
 
 #ifdef __EMSCRIPTEN__

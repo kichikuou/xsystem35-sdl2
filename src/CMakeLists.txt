@@ -24,8 +24,7 @@ target_sources(xsystem35 PRIVATE
   ${SRC_AUDIO}
   ${SRC_CDROM}
   ${SRC_MIDI}
-  ${SRC_MENU}
-  ${SRC_JOYSTICK})
+  ${SRC_MENU})
 
 # System3.x commands
 target_sources(xsystem35 PRIVATE

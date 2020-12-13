@@ -29,7 +29,6 @@
 #include "counter.h"
 #include "xsystem35.h"
 #include "message.h"
-#include "joystick.h"
 #include "menu.h"
 #include "texthook.h"
 
@@ -95,11 +94,11 @@ int sys_getKeyInfo() {
 }
 
 int sys_getJoyInfo() {
-	return joy_getinfo();
+	return sdl_getJoyInfo();
 }
 
 int sys_getInputInfo() {
-	int key = sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | joy_getinfo();
+	int key = sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | sdl_getJoyInfo();
 
 	if (key == SYS35KEY_SPC && skipModeInterruptable) {
 		set_skipMode(FALSE);

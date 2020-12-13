@@ -36,7 +36,6 @@
 #include "key.h"
 #include "menu.h"
 #include "input.h"
-#include "joystick.h"
 #include "sdl_keytable.h"
 
 static void sdl_getEvent(void);
@@ -47,8 +46,11 @@ static int  check_button(void);
 /* pointer の状態 */
 static int mousex, mousey, mouseb;
 boolean RawKeyInfo[256];
+
+#if HAVE_SDLJOY
 /* SDL Joystick */
 static int joyinfo=0;
+#endif
 
 static int mouse_to_rawkey(int button) {
 	switch(button) {
@@ -90,7 +92,6 @@ static void sdl_getEvent(void) {
 	static int cmd_count_of_prev_input = -1;
 	SDL_Event e;
 	boolean m2b = FALSE, msg_skip = FALSE;
-	int i;
 	boolean had_input = false;
 
 	while (SDL_PollEvent(&e)) {
@@ -205,8 +206,8 @@ static void sdl_getEvent(void) {
 			if (abs(e.jaxis.value) < 0x4000) {
 				joyinfo &= e.jaxis.axis == 0 ? ~0xc : ~3;
 			} else {
-				i = (e.jaxis.axis == 0 ? 2 : 0) + 
-					(e.jaxis.value > 0 ? 1 : 0);
+				int i = (e.jaxis.axis == 0 ? 2 : 0) +
+						(e.jaxis.value > 0 ? 1 : 0);
 				joyinfo |= 1 << i;
 			}
 			break;
@@ -217,7 +218,7 @@ static void sdl_getEvent(void) {
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
 			if (e.jbutton.button < 4) {
-				i = 1 << (e.jbutton.button+4);
+				int i = 1 << (e.jbutton.button+4);
 				if (e.jbutton.state == SDL_PRESSED)
 					joyinfo |= i;
 				else
@@ -248,7 +249,7 @@ static void sdl_getEvent(void) {
 
 int sdl_keywait(void) {
 	sdl_getEvent();
-	return check_button() | sdl_getKeyInfo() | joy_getinfo();
+	return check_button() | sdl_getKeyInfo() | sdl_getJoyInfo();
 }
 
 /* キー情報の取得 */
@@ -301,9 +302,11 @@ int sdl_getMouseInfo(MyPoint *p) {
 	return check_button();
 }
 
+int sdl_getJoyInfo(void) {
 #ifdef HAVE_SDLJOY
-int sdl_getjoyinfo(void) {
 	sdl_getEvent();
 	return joyinfo;
-}
+#else
+	return 0;
 #endif
+}

@@ -176,11 +176,7 @@ endif()
 
 # Joystick
 
-if (EMSCRIPTEN OR ANDROID)
-  set(SRC_JOYSTICK joystick_dmy.c)
-else()
-  set(SRC_JOYSTICK joystick_sdl.c)
-  set(SUMMARY_JOYSTICK "SDL")
+if (NOT EMSCRIPTEN AND NOT ANDROID)
   set(HAVE_SDLJOY 1)
 endif()
 
