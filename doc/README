@@ -223,7 +223,7 @@
   -Ms?           : Sequencer device (?:device number)
   -M0            : disable midi
 
-  -devjoy name   : joystick のデバイス名を name にします
+  -devjoy n      : n 番目の joystick のデバイスを使用します。
 
   -version       : バージョン情報を表示します。
 

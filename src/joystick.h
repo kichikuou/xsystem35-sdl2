@@ -25,7 +25,7 @@
 
 #include "portab.h"
 
-extern void joy_set_devicename(char *);
+extern void joy_set_deviceindex(int);
 extern int  joy_open(void);
 extern void joy_close(void);
 extern int  joy_getinfo(void);

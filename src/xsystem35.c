@@ -128,8 +128,7 @@ static void sys35_usage(boolean verbose) {
 #endif
 	puts(" -M0            : Disable MIDI output");
 	
-	puts(" -devjoy device : set joystic device name to 'device'");
-	puts("                    if 'device' is set to 'none', don't use the device");
+	puts(" -devjoy device : joystick device index (0-)");
 
 	puts(" -ttfont_mincho: set TrueType font for mincho");
 	puts(" -ttfont_gothic: set TrueType font for mincho");
@@ -306,7 +305,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			midi_set_output_device(argv[i][2] | subdev);
 		} else if (0 == strcmp(argv[i], "-devjoy")) {
 			if (argv[i + 1] != NULL) {
-				joy_set_devicename(argv[i + 1]);
+				joy_set_deviceindex(atoi(argv[i + 1]));
 			}
 		} else if (0 == strcmp(argv[i], "-fullscreen")) {
 			fs_on = TRUE;
@@ -377,7 +376,7 @@ static void check_profile() {
 	/* joystick device name の設定 */
 	param = get_profile("joy_device");
 	if (param) {
-		joy_set_devicename(param);
+		joy_set_deviceindex(atoi(param));
 	}
 	/* Raw MIDI device name の設定 */
 	param = get_profile("midi_device");

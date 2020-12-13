@@ -23,7 +23,7 @@
 #include "joystick.h"
 #include "portab.h"
 
-void joy_set_devicename(char *name) {
+void joy_set_deviceindex(int index) {
 	return;
 }
 

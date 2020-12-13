@@ -31,30 +31,35 @@
 #include "joystick.h"
 #include "sdl_core.h"
 
-static int joy_axes, joy_buttons;
-static char *dev_joy = NULL;
-static boolean joy_enable=TRUE;
+static int device_index = -1;
 static SDL_Joystick *js;
 
-void joy_set_devicename(char *name) {
-	if( dev_joy ) free(dev_joy);
-	dev_joy=strdup(name);
+static boolean joy_open_index(int index) {
+	js = SDL_JoystickOpen(index);
+	if (!js)
+		return FALSE;
+
+	const char *name = SDL_JoystickName(js);
+	int axes = SDL_JoystickNumAxes(js);
+	int buttons = SDL_JoystickNumButtons(js);
+	SDL_JoystickEventState(SDL_ENABLE);
+	printf("SDL joystick '%s' %d axes %d buttons\n", name, axes, buttons);
+	return TRUE;
+}
+
+void joy_set_deviceindex(int index) {
+	device_index = index;
 }
 
 int joy_open(void) {
-	int i;
-	const char *name;
-	for( i=0 ; i<SDL_NumJoysticks() ; i++ ) {
-		if( (js=SDL_JoystickOpen(i)) ) {
-			name=SDL_JoystickName(js);
-			joy_axes = SDL_JoystickNumAxes(js);
-			joy_buttons = SDL_JoystickNumButtons(js);
-			SDL_JoystickEventState(SDL_ENABLE);
-			printf("SDL joystick '%s' axes %d buttons %d\n",name,joy_axes,joy_buttons);
-			return 1;
+	if (device_index >= 0) {
+		return joy_open_index(device_index) ? 1 : -1;
+	} else {
+		for (int i = 0; i < SDL_NumJoysticks(); i++) {
+			if (joy_open_index(i))
+				return 1;
 		}
 	}
-	joy_enable=FALSE;
 	return -1;
 }
 
@@ -62,19 +67,8 @@ void joy_close(void) {
 	SDL_JoystickClose(js);
 }
 
-#if 0
-boolean joy_getinfo(int *data) {
-	int rt = FALSE;
-	if( joy_enable ) {
-		*data=sdl_getjoyinfo();
-		rt=TRUE;
-	}
-	return rt;
-}
-#endif
-
 int joy_getinfo(void) {
-	if (joy_enable) {
+	if (js) {
 		return sdl_getjoyinfo();
 	}
 	return 0;
