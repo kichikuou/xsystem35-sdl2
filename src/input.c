@@ -122,7 +122,7 @@ int sys_keywait(int msec, unsigned flags) {
 		else
 			sdl_wait_vsync();
 		nact->callback();
-		key = sdl_keywait();
+		key = sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | sdl_getJoyInfo();
 		nact->wait_vsync = FALSE;  // We just waited!
 		if ((flags & KEYWAIT_CANCELABLE) && key) break;
 	}

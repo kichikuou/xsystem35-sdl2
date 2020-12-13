@@ -40,8 +40,6 @@
 
 static void sdl_getEvent(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool);
-static int  check_button(void);
-
 
 /* pointer の状態 */
 static int mousex, mousey, mouseb;
@@ -247,11 +245,6 @@ static void sdl_getEvent(void) {
 	if (msg_skip) set_skipMode(!get_skipMode());
 }
 
-int sdl_keywait(void) {
-	sdl_getEvent();
-	return check_button() | sdl_getKeyInfo() | sdl_getJoyInfo();
-}
-
 /* キー情報の取得 */
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool) {
 	int code = sdl_keytable[e->keysym.scancode];
@@ -276,15 +269,6 @@ int sdl_getKeyInfo() {
 	return rt;
 }
 
-static int check_button(void) {
-	int m1, m2;
-	
-	m1 = mouseb & (1 << 1) ? SYS35KEY_RET : 0;
-	m2 = mouseb & (1 << 3) ? SYS35KEY_SPC : 0;
-	
-	return m1 | m2;
-}
-
 int sdl_getMouseInfo(MyPoint *p) {
 	sdl_getEvent();
 	
@@ -299,7 +283,10 @@ int sdl_getMouseInfo(MyPoint *p) {
 		p->x = mousex - winoffset_x;
 		p->y = mousey - winoffset_y;
 	}
-	return check_button();
+
+	int m1 = mouseb & (1 << 1) ? SYS35KEY_RET : 0;
+	int m2 = mouseb & (1 << 3) ? SYS35KEY_SPC : 0;
+	return m1 | m2;
 }
 
 int sdl_getJoyInfo(void) {

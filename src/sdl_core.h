@@ -89,8 +89,6 @@ extern void sdl_whiteOut(int step);
 
 /* key/pointer 関係 */
 extern void sdl_setJoyDeviceIndex(int index);
-extern int sdl_keywait(void);
-extern void sdl_keywait_post(void);
 extern void sdl_setCursorLocation(int x, int y);
 extern void sdl_setCursorType(int type);
 extern boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCursorDirEntry *cursordirentry);
