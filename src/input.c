@@ -25,10 +25,13 @@
 #include <limits.h>
 #include "config.h"
 #include "input.h"
+#include "sdl_core.h"
+#include "counter.h"
 #include "xsystem35.h"
 #include "message.h"
 #include "joystick.h"
 #include "menu.h"
+#include "texthook.h"
 
 static boolean skipToNextSel = FALSE;
 static boolean skipModeInterruptable = TRUE;
@@ -108,6 +111,26 @@ int sys_getInputInfo() {
  	return key;
 }
 
+int sys_keywait(int msec, unsigned flags) {
+	int key=0, n;
+	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
+	texthook_keywait();
+
+	while (!((flags & KEYWAIT_SKIPPABLE) && skipToNextSel) &&
+		   (n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
+		if (n <= 16)
+			sdl_sleep(n);
+		else
+			sdl_wait_vsync();
+		nact->callback();
+		key = sdl_keywait();
+		nact->wait_vsync = FALSE;  // We just waited!
+		if ((flags & KEYWAIT_CANCELABLE) && key) break;
+	}
+
+	return key;
+}
+
 void sys_hit_any_key() {
 	int key=0;
 	if (skipToNextSel) return;
@@ -119,22 +142,20 @@ void sys_hit_any_key() {
 		nact->messagewait_cancelled = FALSE;
 		/* consume the input that cancelled message wait */
 		while(0 == (key & hak_ignore_mask)) {
-			key = sys_keywait(INT_MAX, TRUE);
+			key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE);
 		}
 		while(key & hak_releasewait_mask) {
-			key = sys_keywait(100, TRUE);
+			key = sys_keywait(100, KEYWAIT_CANCELABLE);
 		}
 	}
 
-	while(0 == (key & hak_ignore_mask)) {
-		key = sys_keywait(INT_MAX, TRUE);
+	while (!skipToNextSel && 0 == (key & hak_ignore_mask)) {
+		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 	}
 	
-	while(key & hak_releasewait_mask) {
-		key = sys_keywait(100, TRUE);
+	while (!skipToNextSel && (key & hak_releasewait_mask)) {
+		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 	}
-	
-	
 }
 
 void sys_key_releasewait(int key, boolean zi_mask_enabled) {
@@ -147,6 +168,6 @@ void sys_key_releasewait(int key, boolean zi_mask_enabled) {
 	}
 	
 	while(key & mask) {
-		key = sys_keywait(50, FALSE);
+		key = sys_keywait(50, KEYWAIT_NONCANCELABLE);
 	}
 }

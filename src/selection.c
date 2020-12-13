@@ -428,7 +428,7 @@ void sel_select() {
 	
 	sys_key_releasewait(SYS35KEY_RET, FALSE);
 	while (1) {
-		key = sys_keywait(25, TRUE);
+		key = sys_keywait(25, KEYWAIT_CANCELABLE);
 		if (!key && prevkey == SYS35KEY_SPC) break;
 		if (!key && prevkey == SYS35KEY_RET && curElement != -1) break;
 		prevkey = key;

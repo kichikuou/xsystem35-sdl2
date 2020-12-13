@@ -139,7 +139,7 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 		gre_BlendUseAMap(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, mask2, 0, 0, 255);
 		ags_updateFull();
 		
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
 		
 		// 一時マスクを削除

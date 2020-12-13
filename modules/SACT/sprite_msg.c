@@ -319,7 +319,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 			// keywait
 			delta = get_high_counter(SYSTEMCOUNTER_MSEC) - wcnt;
 			if (delta < wSpeed) {
-				if (sys_keywait(wSpeed - delta, FALSE)) {
+				if (sys_keywait(wSpeed - delta, KEYWAIT_NONCANCELABLE)) {
 					
 					wSpeed = 0;
 				}
@@ -418,7 +418,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 			update_mark(minfo[j].sp, minfo[j].cg);
 			i++;
 		} 
-		sys_keywait(interval - (get_high_counter(SYSTEMCOUNTER_MSEC) - st), FALSE);
+		sys_keywait(interval - (get_high_counter(SYSTEMCOUNTER_MSEC) - st), KEYWAIT_NONCANCELABLE);
 	}
 	
 	sact.waittype = KEYWAIT_NONE;

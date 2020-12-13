@@ -94,7 +94,7 @@ void ndd_run(int demonum) {
 		
 		cur1 = get_high_counter(SYSTEMCOUNTER_MSEC);
 		if (cur1 - cur < 33) {
-			if (sys_keywait(33 - (cur1 - cur), TRUE)) break;
+			if (sys_keywait(33 - (cur1 - cur), KEYWAIT_CANCELABLE)) break;
 		} else {
 			if (sys_getInputInfo()) break;
 		}

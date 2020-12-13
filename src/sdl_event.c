@@ -30,15 +30,14 @@
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
 #include "nact.h"
+#include "sdl_core.h"
 #include "sdl_private.h"
 #include "key.h"
 #include "menu.h"
 #include "input.h"
 #include "joystick.h"
 #include "sdl_keytable.h"
-#include "texthook.h"
 
 static void sdl_getEvent(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean bool);
@@ -247,24 +246,9 @@ static void sdl_getEvent(void) {
 	if (msg_skip) set_skipMode(!get_skipMode());
 }
 
-int sdl_keywait(int msec, boolean cancel) {
-	int key=0, n;
-	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
-	texthook_keywait();
-	
-	while ((n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
-		if (n <= 16)
-			sdl_sleep(n);
-		else
-			sdl_wait_vsync();
-		nact->callback();
-		sdl_getEvent();
-		key = check_button() | sdl_getKeyInfo() | joy_getinfo();
-		nact->wait_vsync = FALSE;  // We just waited!
-		if (cancel && key) break;
-	}
-	
-	return key;
+int sdl_keywait(void) {
+	sdl_getEvent();
+	return check_button() | sdl_getKeyInfo() | joy_getinfo();
 }
 
 /* キー情報の取得 */

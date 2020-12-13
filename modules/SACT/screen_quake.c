@@ -87,7 +87,7 @@ int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 		ags_setViewArea(adjx, adjy, sf0->width, sf0->height);
 		ags_updateFull();
 		
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
 	}
 	

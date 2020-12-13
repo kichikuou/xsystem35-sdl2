@@ -33,6 +33,7 @@
 #include "sact.h"
 #include "sprite.h"
 #include "counter.h"
+#include "sdl_core.h"
 
 /*
 

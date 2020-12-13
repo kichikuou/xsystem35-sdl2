@@ -27,6 +27,7 @@
 #include <math.h>
 
 #include "portab.h"
+#include "sdl_core.h"
 #include "input.h"
 #include "ags.h"
 #include "system.h"
@@ -55,7 +56,7 @@ static ecopyparam_t ecp;
 	do {												  \
 		int wait_ms = cnt - get_ecounter();				  \
 		if (wait_ms >= 16)								  \
-			key = sys_keywait(wait_ms, ecp.cancel);		  \
+			key = sys_keywait(wait_ms, ecp.cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE); \
 	} while (0)
 
 

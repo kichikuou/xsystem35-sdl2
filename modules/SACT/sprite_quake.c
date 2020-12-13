@@ -85,7 +85,7 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 		i++;
 		
 		// ウェイトとキャンセルチェック
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key != 0) break;
 	}
 	

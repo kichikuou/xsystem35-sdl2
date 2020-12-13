@@ -30,14 +30,15 @@
 #include "utfsjis.h"
 #include "menu.h"
 #include "ags.h"
+#include "input.h"
 #include "message.h"
 #include "gametitle.h"
 #include "hankaku.h"
 
 /* defined by cmds.c */
 extern boolean dummy_pcm_su_flag;
-/* defined by cmds.c */
-extern boolean Y3waitCancel;
+/* defined by cmdy.c */
+extern boolean Y3waitFlags;
 
 
 /* MI 用パラメータ */
@@ -174,7 +175,7 @@ void commandMT() {
 	
 	/* Rance4 対策？ */
 	if (0 == strcmp(nact->game_title_utf8, GT_RANCE4)) {
-		Y3waitCancel = FALSE;
+		Y3waitFlags = KEYWAIT_NONCANCELABLE;
 	}
 
 	DEBUG_COMMAND("MT %s:\n",str);

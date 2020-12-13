@@ -237,7 +237,7 @@ static int sel_main() {
 	selected_item = -1;
 	
 	while(selected_item == -1) {
-		sys_keywait(25, TRUE);
+		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	
 	sact.waittype = KEYWAIT_NONE;

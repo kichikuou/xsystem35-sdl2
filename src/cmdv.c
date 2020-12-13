@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include "portab.h"
+#include "sdl_core.h"
 #include "xsystem35.h"
 #include "ags.h"
 #include "counter.h"

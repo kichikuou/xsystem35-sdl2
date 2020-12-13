@@ -52,11 +52,11 @@ void commandIK() {
 		sysVar[0] = 0;
 		key = sys_getInputInfo();
 		if (ik_key != key) repeating = 0;
+		key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 		if (get_skipMode()) break;
-		key = sys_keywait(INT_MAX, TRUE);
 		
 		if (repeating == 1) {
-			sys_keywait(REPEAT_RATE_SLOW, FALSE);
+			sys_keywait(REPEAT_RATE_SLOW, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
 		sys_key_releasewait(key, TRUE);
@@ -66,11 +66,11 @@ void commandIK() {
 		sysVar[0] = 0;
 		key = sys_getInputInfo();
 		if (ik_key != key) repeating = 0;
+		key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 		if (get_skipMode()) break;
-		key = sys_keywait(INT_MAX, TRUE);
 		
 		if (repeating == 1) {
-			sys_keywait(REPEAT_RATE_FAST, FALSE);
+			sys_keywait(REPEAT_RATE_FAST, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
 		sys_key_releasewait(key, TRUE);

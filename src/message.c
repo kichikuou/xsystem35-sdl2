@@ -29,6 +29,7 @@
 
 #include "portab.h"
 #include "windowframe.h"
+#include "sdl_core.h"
 #include "xsystem35.h"
 #include "message.h"
 #include "variable.h"

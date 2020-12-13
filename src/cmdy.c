@@ -30,7 +30,7 @@
 #include "message.h"
 #include "input.h"
 
-boolean Y3waitCancel = TRUE;
+unsigned Y3waitFlags = KEYWAIT_CANCELABLE;
 
 void commandY() {
 	int i;
@@ -53,16 +53,15 @@ void commandY() {
 	} else if (p1 == 3) {
 		if (p2 == 10000) {
 			/* 以降のウェイトではキー入力を受けつけなくなる */
-			Y3waitCancel = FALSE;
+			Y3waitFlags = KEYWAIT_NONCANCELABLE;
 		} else if (p2 == 10001) {
 			/* 以降のウェイトではキー入力を受けつける（初期設定）*/
-			Y3waitCancel = TRUE;
+			Y3waitFlags = KEYWAIT_CANCELABLE;
 		} else if (p2 == 0) {
 			sysVar[0] = sys_getInputInfo(); /* thanx TOTOさん */
 		} else {
 			/* ＷＡＩＴ (1/60秒) × n だけウェイトをかける。*/
-			if (get_skipMode()) return;
-			sysVar[0] = sys_keywait(16 * p2, Y3waitCancel);
+			sysVar[0] = sys_keywait(16 * p2, Y3waitFlags | KEYWAIT_SKIPPABLE);
 		}
 	} else if (p1 == 4) {
 		/* 1 〜 n までの乱数を RND に返す。*/

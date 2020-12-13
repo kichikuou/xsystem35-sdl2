@@ -136,7 +136,7 @@ int ssnd_waitkey(int no, int *res) {
 	sact.waitkey = -1;
 	
 	while(sact.waitkey == -1 && mus_wav_get_playposition(slot)) {
-		sys_keywait(25, TRUE);
+		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	
 	if (sact.waitkey == -1) {

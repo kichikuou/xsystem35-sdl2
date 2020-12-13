@@ -664,7 +664,7 @@ void ags_fader(ags_faderinfo_t *i) {
 		mstime = lefttime / leftstep; /* 1stepに許される時間 */
 		if (mstime > cnt2) {
 			/* wait をいれる余裕がある場合 */
-			key = sys_keywait(mstime - cnt2, i->cancel);
+			key = sys_keywait(mstime - cnt2, i->cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 			step++;
 		} else if (mstime > 0) {
 			/* wait をいれる余裕が無い場合 */

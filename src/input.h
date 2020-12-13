@@ -26,7 +26,6 @@
 
 #include "portab.h"
 #include "graphics.h"
-#include "sdl_core.h"
 
 #define SYS35KEY_NULL  0
 #define SYS35KEY_UP    1
@@ -38,6 +37,11 @@
 #define SYS35KEY_ESC  64
 #define SYS35KEY_TAB 128
 
+#define KEYWAIT_NONCANCELABLE 0
+#define KEYWAIT_CANCELABLE    1
+#define KEYWAIT_SKIPPABLE     2
+
+extern int sys_keywait(int msec, unsigned flags);
 extern int sys_getMouseInfo(MyPoint *p, boolean is_dibgeo);
 extern int sys_getInputInfo(void);
 extern int sys_getKeyInfo(void);
@@ -49,7 +53,5 @@ extern void set_skipMode2(boolean bool);
 extern boolean get_skipMode();
 extern boolean get_skipMode2();
 extern void set_hak_keymode(int key, int mode);
-
-#define sys_keywait(r,flg) sdl_keywait(r,flg)
 
 #endif /* __INPUT__ */

@@ -9,6 +9,7 @@
 #include "system.h"
 #include "counter.h"
 #include "input.h"
+#include "sdl_core.h"
 #include "xsystem35.h"
 #include "nact.h"
 #include "scenario.h"
