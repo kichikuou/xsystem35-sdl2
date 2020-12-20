@@ -60,6 +60,7 @@ struct SDL_SysWMmsg;
 extern void win_menu_init(void);
 extern void win_menu_onsyswmevent(struct SDL_SysWMmsg* msg);
 extern void win_menu_skipModeChanged(boolean skip);
+extern void win_menu_enableMsgSkip(boolean enabled);
 #endif
 
 #endif /* !__MENULL */

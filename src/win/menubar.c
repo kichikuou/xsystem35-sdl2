@@ -83,3 +83,10 @@ void win_menu_skipModeChanged(boolean skip) {
 	SetMenuItemInfoW(hmenu, ID_MSGSKIP, false, &menuitem);
 	DrawMenuBar(hwnd);
 }
+
+void win_menu_enableMsgSkip(boolean enabled) {
+	HWND hwnd = get_hwnd(sdl_window);
+	HMENU hmenu = GetMenu(hwnd);
+	EnableMenuItem(hmenu, ID_MSGSKIP, enabled ? MF_ENABLED : MF_GRAYED);
+	DrawMenuBar(hwnd);
+}
