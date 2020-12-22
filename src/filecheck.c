@@ -62,8 +62,12 @@ FILE *fopen_utf8(const char *path_utf8, char type) {
 	return _wfopen(wpath, type == 'r' ? L"rb" : L"wb");
 }
 
+char *fc_get_path(const char *fname_utf8) {
+	return get_fullpath(saveDataPath, fname_utf8);
+}
+
 FILE *fc_open(const char *fname_utf8, char type) {
-	char *path = get_fullpath(saveDataPath, fname_utf8);
+	char *path = fc_get_path(fname_utf8);
 	FILE *fp = fopen_utf8(path, type);
 	if (!fp && type == 'r') {
 		fp = fopen_utf8(fname_utf8, type);
@@ -89,6 +93,13 @@ static char *fc_search(const char *fname_utf8, const char *dir) {
 	}
 	closedir(d);
 	return found;
+}
+
+char *fc_get_path(const char *fname_utf8) {
+	char *path = fc_search(fname_utf8, saveDataPath);
+	if (path)
+		return path;
+	return get_fullpath(saveDataPath, fname_utf8);
 }
 
 FILE *fc_open(const char *fname_utf8, char type) {

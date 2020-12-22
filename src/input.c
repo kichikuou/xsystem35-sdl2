@@ -32,12 +32,22 @@
 #include "menu.h"
 #include "texthook.h"
 
+static boolean msgskip_enabled = TRUE;
 static boolean skipToNextSel = FALSE;
 static boolean skipModeInterruptable = TRUE;
 
 static int hak_ignore_mask      = 0xffffffff;
 static int hak_releasewait_mask = (0 << 0) | (0 << 1) | (0 << 2) | (0 << 3) |
                                   (1 << 4) | (0 << 5) | (0 << 6) | (0 << 7) ;
+
+void enable_msgSkip(boolean enable) {
+	if (enable == msgskip_enabled)
+		return;
+	msgskip_enabled = enable;
+#ifdef _WIN32
+	win_menu_enableMsgSkip(enable);
+#endif
+}
 
 void set_skipMode(boolean skip) {
 #ifdef _WIN32

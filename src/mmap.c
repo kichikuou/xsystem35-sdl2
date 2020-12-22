@@ -45,13 +45,51 @@ mmap_t *map_file(const char *path) {
 	if (!hFile)
 		return NULL;
 	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-	if (!hMapping)
+	if (!hMapping) {
+		CloseHandle(hFile);
 		return NULL;
+	}
 	void *addr = MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
-	if (addr == NULL)
-		return NULL;
 	CloseHandle(hMapping);
 	CloseHandle(hFile);
+	if (addr == NULL)
+		return NULL;
+
+	mmap_t *m = malloc(sizeof(mmap_t));
+	m->addr = addr;
+	return m;
+}
+
+mmap_t *map_file_readwrite(const char *path, size_t size) {
+	HANDLE hFile = CreateFile(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS,
+							  FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+	if (!hFile)
+		return NULL;
+	LARGE_INTEGER filesize;
+	if (!GetFileSizeEx(hFile, &filesize)) {
+		CloseHandle(hFile);
+		return NULL;
+	}
+	if (filesize.QuadPart != size) {
+		if (SetFilePointer(hFile, size, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER ||
+			!SetEndOfFile(hFile)) {
+			CloseHandle(hFile);
+			return NULL;
+		}
+	}
+	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READWRITE, 0, size, NULL);
+	if (!hMapping) {
+		CloseHandle(hFile);
+		return NULL;
+	}
+	void *addr = MapViewOfFile(hMapping, FILE_MAP_WRITE, 0, 0, size);
+	CloseHandle(hMapping);
+	CloseHandle(hFile);
+	if (addr == NULL)
+		return NULL;
+
+	if (filesize.QuadPart < size)
+		memset(addr, 0, size);
 
 	mmap_t *m = malloc(sizeof(mmap_t));
 	m->addr = addr;
@@ -111,6 +149,36 @@ mmap_t *map_file(const char *path) {
 	m->addr = addr;
 	m->length = sbuf.st_size;
 	return m;
+}
+
+mmap_t *map_file_readwrite(const char *path, size_t size) {
+#ifndef HAVE_MMAP
+	return NULL;
+#else
+	int fd = open(path, O_RDWR | O_CREAT, 0644);
+	if (fd < 0) {
+		WARNING("open: %s\n", strerror(errno));
+		return NULL;
+	}
+
+	if (ftruncate(fd, size) < 0) {
+		WARNING("ftruncate: %s\n", strerror(errno));
+		close(fd);
+		return NULL;
+	}
+
+	void *addr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	close(fd);
+	if (addr == MAP_FAILED) {
+		WARNING("mmap: %s\n", strerror(errno));
+		return NULL;
+	}
+
+	mmap_t *m = malloc(sizeof(mmap_t));
+	m->addr = addr;
+	m->length = size;
+	return m;
+#endif
 }
 
 int unmap_file(mmap_t *m) {

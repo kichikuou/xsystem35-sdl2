@@ -112,7 +112,8 @@ typedef struct {
 	msg_t msg;
  	boolean   is_msg_out;          /* 通常メッセージを表示するか */
 	void (*msgout)(const char *msg);     // 通常以外(DLL等)のメッセージ表示関数
-	
+	void (*msgskip_callback)(int msgid);
+
 	/* 選択肢関連 */
 	sel_t sel;
 	

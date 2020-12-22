@@ -33,6 +33,7 @@ typedef struct {
 } mmap_t;
 
 mmap_t *map_file(const char *path);
+mmap_t *map_file_readwrite(const char *path, size_t size);
 int unmap_file(mmap_t *m);
 
 #endif /* __MMAP_H__ */
