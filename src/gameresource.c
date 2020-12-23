@@ -187,6 +187,8 @@ static boolean initGameResourceFromFile(GameResource *gr, FILE *fp, const char *
 			dno = key[4] - '0';
 			if (dno < 0 || dno >= 10) goto errexit;
 			gr->alk[dno] = strdup(path);
+		} else if (0 == strncmp(key, "MsgSkip", 7)) {
+			gr->msgskip = strdup(path);
 		} else {
 			goto errexit;
 		}

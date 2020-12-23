@@ -37,6 +37,7 @@
 #include "nact.h"
 #include "selection.h"
 #include "message.h"
+#include "msgskip.h"
 #include "input.h"
 #include "menu.h"
 #include "hankaku.h"
@@ -129,6 +130,7 @@ void sys_addMsg(const char *str) {
 		if (nact->msgout) {
 			nact->msgout(msg);
 		}
+		msgskip_onMessage();
 	}
 	
 	if (msg != str) {

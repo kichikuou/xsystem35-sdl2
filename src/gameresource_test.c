@@ -59,6 +59,7 @@ static void initGameResource_test(void) {
 	ASSERT_STRCMP(gr.save_fname[25], "/tmp/foo_sz.asd");
 	// save_path is determined based on save_fname[0].
 	ASSERT_STRCMP(gr.save_path, "/home/kichikuou/save");
+	ASSERT_STRCMP(gr.msgskip, "msgskip.asd");
 }
 
 static struct dirent *mockReaddir(DIR *dir) {

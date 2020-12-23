@@ -58,7 +58,7 @@ target_sources(xsystem35 PRIVATE
 # Scenario
 target_sources(xsystem35 PRIVATE
   cali.c scenario.c variable.c cmd_check.c nact.c
-  selection.c message.c savedata.c s39ain.c texthook.c)
+  selection.c message.c savedata.c s39ain.c texthook.c msgskip.c)
 
 # Graphics
 target_sources(xsystem35 PRIVATE

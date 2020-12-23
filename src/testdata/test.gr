@@ -20,3 +20,4 @@ ALK09	9.alk
 
 SaveA	~/save/foo_sa.asd
 SaveZ	/tmp/foo_sz.asd
+MsgSkip	msgskip.asd

@@ -39,6 +39,7 @@ typedef struct {
 	const char *sact01;
 	const char *init;
 	const char *alk[10];
+	const char *msgskip;
 } GameResource;
 
 boolean initGameResource(GameResource *gr, const char *gr_fname);

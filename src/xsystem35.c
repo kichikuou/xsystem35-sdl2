@@ -72,6 +72,7 @@
 #include "gameresource.h"
 #include "filecheck.h"
 #include "s39init.h"
+#include "msgskip.h"
 
 #ifdef ENABLE_MMX
 #include "haveunit.h"
@@ -233,6 +234,7 @@ static void sys35_init() {
 
 	msg_init();
 	sel_init();
+	msgskip_init(nact->files.msgskip);
 
 	s39ain_init();
 #ifdef ENABLE_GTK
