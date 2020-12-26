@@ -105,23 +105,21 @@ int sys_getJoyInfo() {
 }
 
 int sys_getInputInfo() {
-	int key = sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | sdl_getJoyInfo();
-
-	if (key == SYS35KEY_SPC && skipModeInterruptable) {
-		set_skipMode(FALSE);
-	}
-
-	/* 復活 !! */
-        if (key == (SYS35KEY_SPC | SYS35KEY_RET | SYS35KEY_ESC)) sys_exit(0);
-	
- 	return key;
+	return sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | sdl_getJoyInfo();
 }
 
 int sys_keywait(int msec, unsigned flags) {
-	int key=0, n;
-	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
 	texthook_keywait();
 
+	if ((flags & KEYWAIT_SKIPPABLE) && skipToNextSel) {
+		int key = sys_getInputInfo();
+		if (key)
+			set_skipMode(FALSE);
+		return key;
+	}
+
+	int key=0, n;
+	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
 	while (!((flags & KEYWAIT_SKIPPABLE) && skipToNextSel) &&
 		   (n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
 		if (n <= 16)
@@ -129,7 +127,7 @@ int sys_keywait(int msec, unsigned flags) {
 		else
 			sdl_wait_vsync();
 		nact->callback();
-		key = sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | sdl_getJoyInfo();
+		key = sys_getInputInfo();
 		nact->wait_vsync = FALSE;  // We just waited!
 		if ((flags & KEYWAIT_CANCELABLE) && key) break;
 	}
@@ -139,7 +137,12 @@ int sys_keywait(int msec, unsigned flags) {
 
 void sys_hit_any_key() {
 	int key=0;
-	if (skipToNextSel) return;
+	if (skipToNextSel) {
+		if (sys_getInputInfo())
+			set_skipMode(FALSE);
+		sdl_sleep(30);
+		return;
+	}
 
 	msg_hitAnyKey();
 	

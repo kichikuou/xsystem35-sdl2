@@ -408,6 +408,8 @@ void sel_select() {
 	int preElement = -1;
 	int key, prevkey = 0, i;
 	
+	if (get_skipMode2()) set_skipMode(FALSE);
+
 	saveimg2 = NULL;
 	keymode = 0;
 	
@@ -502,6 +504,4 @@ void sel_select() {
 		}
 		last_selected_element = 0;
 	}
-	
-	if (get_skipMode2()) set_skipMode(FALSE);
 }
