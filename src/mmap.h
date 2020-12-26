@@ -29,6 +29,7 @@ typedef struct {
 	void *addr;
 #ifndef _WIN32
 	size_t length;
+	int fd;	 // Emscripten needs fd for mmap kept open.
 #endif
 } mmap_t;
 

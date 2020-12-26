@@ -143,11 +143,11 @@ mmap_t *map_file(const char *path) {
 		bytes += ret;
 	}
 #endif
-	close(fd);
 
 	mmap_t *m = malloc(sizeof(mmap_t));
 	m->addr = addr;
 	m->length = sbuf.st_size;
+	m->fd = fd;
 	return m;
 }
 
@@ -168,15 +168,16 @@ mmap_t *map_file_readwrite(const char *path, size_t size) {
 	}
 
 	void *addr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	close(fd);
 	if (addr == MAP_FAILED) {
 		WARNING("mmap: %s\n", strerror(errno));
+		close(fd);
 		return NULL;
 	}
 
 	mmap_t *m = malloc(sizeof(mmap_t));
 	m->addr = addr;
 	m->length = size;
+	m->fd = fd;
 	return m;
 #endif
 }
@@ -184,6 +185,7 @@ mmap_t *map_file_readwrite(const char *path, size_t size) {
 int unmap_file(mmap_t *m) {
 #ifdef HAVE_MMAP
 	int rv = munmap(m->addr, m->length);
+	close(m->fd);
 	free(m);
 	return rv;
 #else
