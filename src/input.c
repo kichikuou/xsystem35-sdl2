@@ -44,17 +44,14 @@ void enable_msgSkip(boolean enable) {
 	if (enable == msgskip_enabled)
 		return;
 	msgskip_enabled = enable;
-#ifdef _WIN32
-	win_menu_enableMsgSkip(enable);
-#endif
+	menu_setSkipState(msgskip_enabled, skipToNextSel);
 }
 
 void set_skipMode(boolean skip) {
-#ifdef _WIN32
-	if (skipToNextSel != skip)
-		win_menu_skipModeChanged(skip);
-#endif
+	if (skipToNextSel == skip)
+		return;
 	skipToNextSel = skip;
+	menu_setSkipState(msgskip_enabled, skipToNextSel);
 }
 
 boolean get_skipMode() {

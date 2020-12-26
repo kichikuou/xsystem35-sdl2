@@ -111,3 +111,6 @@ void menu_init(void) {
 void menu_gtkmainiteration() {
 	return;
 }
+
+void menu_setSkipState(boolean enabled, boolean activated) {
+}

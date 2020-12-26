@@ -96,3 +96,8 @@ void menu_init(void) {
 void menu_gtkmainiteration() {
 	return;
 }
+
+#ifndef _WIN32
+void menu_setSkipState(boolean enabled, boolean activated) {
+}
+#endif

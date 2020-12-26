@@ -176,3 +176,6 @@ void menu_gtkmainiteration() {
 		menu_callback();
 	}
 }
+
+void menu_setSkipState(boolean enabled, boolean activated) {
+}

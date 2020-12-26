@@ -23,6 +23,10 @@
 #include "mmap.h"
 #include "input.h"
 #include "scenario.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <sys/mman.h>
+#endif
 
 // These parameters are chosen so that the false positive rate is less than 0.5%
 // in Kichikuou Rance (122,915 distinct messages).
@@ -37,6 +41,7 @@ typedef struct {
 static struct {
 	mmap_t *map;
 	MsgSkipData *data;
+	boolean dirty;
 } msgskip;
 
 // Knuth's multiplicative hash.
@@ -53,11 +58,16 @@ void msgskip_init(const char *msgskip_file) {
 		return;
 	msgskip.map = m;
 	msgskip.data = m->addr;
+	msgskip.dirty = false;
 
 	if (msgskip.data->size != BLOOM_FILTER_SIZE) {
 		msgskip.data->size = BLOOM_FILTER_SIZE;
 		memset(msgskip.data->bloom, 0, length - 4);
 	}
+
+#ifdef __EMSCRIPTEN__
+	EM_ASM({ setInterval(() => _msgskip_syncFile(), 5000); });
+#endif
 }
 
 void msgskip_onMessage(void) {
@@ -73,9 +83,23 @@ void msgskip_onMessage(void) {
 		msgskip.data->bloom[h >> 3] |= bit;
 	}
 	if (unseen) {
+		msgskip.dirty = true;
 		set_skipMode(FALSE);
 		enable_msgSkip(FALSE);
 	} else {
 		enable_msgSkip(TRUE);
 	}
 }
+
+#ifdef __EMSCRIPTEN__
+
+EMSCRIPTEN_KEEPALIVE
+void msgskip_syncFile() {
+	if (!msgskip.dirty)
+		return;
+	msync(msgskip.map->addr, msgskip.map->length, MS_ASYNC);
+	EM_ASM( xsystem35.shell.syncfs(); );
+	msgskip.dirty = false;
+}
+
+#endif // __EMSCRIPTEN__

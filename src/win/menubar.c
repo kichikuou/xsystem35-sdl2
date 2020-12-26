@@ -64,9 +64,12 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 	}
 }
 
-void win_menu_skipModeChanged(boolean skip) {
+void menu_setSkipState(boolean enabled, boolean activated) {
 	HWND hwnd = get_hwnd(sdl_window);
 	HMENU hmenu = GetMenu(hwnd);
+
+	EnableMenuItem(hmenu, ID_MSGSKIP, enabled ? MF_ENABLED : MF_GRAYED);
+
 	wchar_t buf[20];
 	MENUITEMINFOW menuitem = {
 		.cbSize = sizeof(MENUITEMINFOW),
@@ -74,19 +77,13 @@ void win_menu_skipModeChanged(boolean skip) {
 		.dwTypeData = buf,
 		.cch = sizeof(buf) / sizeof(wchar_t),
 	};
-	if (!GetMenuItemInfoW(hmenu, ID_MSGSKIP, false, &menuitem))
-		return;
-	wchar_t *p = wcsrchr(buf, L'[');
-	if (!p)
-		return;
-	wcscpy(p, skip ? L"[on]" : L"[off]");
-	SetMenuItemInfoW(hmenu, ID_MSGSKIP, false, &menuitem);
-	DrawMenuBar(hwnd);
-}
+	if (GetMenuItemInfoW(hmenu, ID_MSGSKIP, false, &menuitem)) {
+		wchar_t *p = wcsrchr(buf, L'[');
+		if (p) {
+			wcscpy(p, activated ? L"[on]" : L"[off]");
+			SetMenuItemInfoW(hmenu, ID_MSGSKIP, false, &menuitem);
+		}
+	}
 
-void win_menu_enableMsgSkip(boolean enabled) {
-	HWND hwnd = get_hwnd(sdl_window);
-	HMENU hmenu = GetMenu(hwnd);
-	EnableMenuItem(hmenu, ID_MSGSKIP, enabled ? MF_ENABLED : MF_GRAYED);
 	DrawMenuBar(hwnd);
 }
