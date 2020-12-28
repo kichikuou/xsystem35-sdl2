@@ -29,6 +29,7 @@
 #include "ags.h"
 #include "sdl_core.h"
 #include "input.h"
+#include "msgskip.h"
 
 #define REPEAT_RATE_FAST 60 
 #define REPEAT_RATE_SLOW 600
@@ -145,9 +146,9 @@ void commandIY() {
 	} else if (p1 == 1) {
 		set_skipMode(TRUE);
 	} else if (p1 == 2) {
-		set_skipMode2(TRUE);
+		msgskip_setFlags(MSGSKIP_STOP_ON_MENU, MSGSKIP_STOP_ON_MENU);
 	} else if (p1 == 3) {
-		set_skipMode2(FALSE);
+		msgskip_setFlags(0, MSGSKIP_STOP_ON_MENU);
 	}
 	
 	DEBUG_COMMAND("IY %d:\n",p1);

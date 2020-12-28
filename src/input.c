@@ -31,10 +31,11 @@
 #include "message.h"
 #include "menu.h"
 #include "texthook.h"
+#include "msgskip.h"
 
 static boolean msgskip_enabled = TRUE;
-static boolean skipToNextSel = FALSE;
-static boolean skipModeInterruptable = TRUE;
+static boolean msgskip_activated = FALSE;
+#define skipToNextSel (msgskip_enabled & msgskip_activated)
 
 static int hak_ignore_mask      = 0xffffffff;
 static int hak_releasewait_mask = (0 << 0) | (0 << 1) | (0 << 2) | (0 << 3) |
@@ -44,26 +45,18 @@ void enable_msgSkip(boolean enable) {
 	if (enable == msgskip_enabled)
 		return;
 	msgskip_enabled = enable;
-	menu_setSkipState(msgskip_enabled, skipToNextSel);
+	menu_setSkipState(msgskip_enabled, msgskip_activated);
 }
 
 void set_skipMode(boolean skip) {
-	if (skipToNextSel == skip)
+	if (msgskip_activated == skip)
 		return;
-	skipToNextSel = skip;
-	menu_setSkipState(msgskip_enabled, skipToNextSel);
+	msgskip_activated = skip;
+	menu_setSkipState(msgskip_enabled, msgskip_activated);
 }
 
 boolean get_skipMode() {
 	return skipToNextSel;
-}
-
-void set_skipMode2(boolean bool) {
-	skipModeInterruptable = bool;
-}
-
-boolean get_skipMode2() {
-	return skipModeInterruptable;
 }
 
 void set_hak_keymode(int key, int mode) {
@@ -112,10 +105,13 @@ int sys_keywait(int msec, unsigned flags) {
 	texthook_keywait();
 
 	if ((flags & KEYWAIT_SKIPPABLE) && skipToNextSel) {
-		int key = sys_getInputInfo();
-		if (key)
-			set_skipMode(FALSE);
-		return key;
+		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK) {
+			int key = sys_getInputInfo();
+			if (key)
+				set_skipMode(FALSE);
+			return key;
+		}
+		return 0;
 	}
 
 	int key=0, n;
@@ -138,7 +134,7 @@ int sys_keywait(int msec, unsigned flags) {
 void sys_hit_any_key() {
 	int key=0;
 	if (skipToNextSel) {
-		if (sys_getInputInfo())
+		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK && sys_getInputInfo())
 			set_skipMode(FALSE);
 		sdl_sleep(30);
 		return;

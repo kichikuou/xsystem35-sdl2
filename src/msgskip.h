@@ -20,7 +20,17 @@
 #ifndef __MSGSKIP_H__
 #define __MSGSKIP_H__
 
+#include "portab.h"
+
+#define MSGSKIP_SKIP_UNSEEN		1
+#define MSGSKIP_STOP_ON_UNSEEN	2
+#define MSGSKIP_STOP_ON_MENU	4
+#define MSGSKIP_STOP_ON_CLICK	8
+
 extern void msgskip_init(const char *msgskip_file);
 extern void msgskip_onMessage(void);
+extern unsigned msgskip_getFlags();
+extern void msgskip_setFlags(unsigned flags, unsigned mask);
+extern void msgskip_action(boolean unseen);
 
 #endif // __MSGSKIP_H__

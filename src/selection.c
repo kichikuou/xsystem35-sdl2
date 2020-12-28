@@ -31,6 +31,7 @@
 #include "scenario.h"
 #include "windowframe.h"
 #include "input.h"
+#include "msgskip.h"
 #include "message.h"
 #include "selection.h"
 
@@ -408,7 +409,8 @@ void sel_select() {
 	int preElement = -1;
 	int key, prevkey = 0, i;
 	
-	if (get_skipMode2()) set_skipMode(FALSE);
+	if (msgskip_getFlags() & MSGSKIP_STOP_ON_MENU)
+		set_skipMode(FALSE);
 
 	saveimg2 = NULL;
 	keymode = 0;

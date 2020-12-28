@@ -17,6 +17,7 @@
  *
  */
 
+#include "msgskip.h"
 #include <stdint.h>
 #include <string.h>
 #include "portab.h"
@@ -41,8 +42,11 @@ typedef struct {
 static struct {
 	mmap_t *map;
 	MsgSkipData *data;
+	unsigned flags;
 	boolean dirty;
-} msgskip;
+} msgskip = {
+	.flags = MSGSKIP_STOP_ON_UNSEEN | MSGSKIP_STOP_ON_MENU | MSGSKIP_STOP_ON_CLICK,
+};
 
 // Knuth's multiplicative hash.
 static uint32_t hash(uint32_t x, int s) {
@@ -82,13 +86,29 @@ void msgskip_onMessage(void) {
 		unseen |= (msgskip.data->bloom[h >> 3] & bit) ^ bit;
 		msgskip.data->bloom[h >> 3] |= bit;
 	}
-	if (unseen) {
+	if (unseen)
 		msgskip.dirty = true;
-		set_skipMode(FALSE);
+	msgskip_action(unseen);
+}
+
+void msgskip_action(boolean unseen) {
+	if (unseen && !(msgskip.flags & MSGSKIP_SKIP_UNSEEN)) {
+		if (msgskip.flags & MSGSKIP_STOP_ON_UNSEEN)
+			set_skipMode(FALSE);
 		enable_msgSkip(FALSE);
 	} else {
 		enable_msgSkip(TRUE);
 	}
+}
+
+unsigned msgskip_getFlags() {
+	return msgskip.flags;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void msgskip_setFlags(unsigned flags, unsigned mask) {
+	msgskip.flags &= ~mask;
+	msgskip.flags |= (flags & mask);
 }
 
 #ifdef __EMSCRIPTEN__

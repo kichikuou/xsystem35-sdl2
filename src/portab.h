@@ -93,5 +93,8 @@ typedef _Bool          ___boolean;
 		   (((a) >> 8) & 0x0000ff00) | \
 		   ((unsigned int)(a) >>24) )
 
+#ifndef __EMSCRIPTEN__
+#define EMSCRIPTEN_KEEPALIVE
+#endif
 
 #endif /* !__PORTAB__ */

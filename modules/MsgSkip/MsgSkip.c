@@ -13,7 +13,7 @@
 #include "modules.h"
 #include "nact.h"
 #include "message.h"
-#include "input.h"
+#include "msgskip.h"
 #include "utfsjis.h"
 
 typedef struct {
@@ -32,13 +32,9 @@ static void msg_callback(int msgid) {
 	if (!msgskip.valid || !msgskip.data || (unsigned)msgid >= nact->ain.msgnum)
 		return;
 	uint8_t bit = 1 << (msgid & 7);
-	if (msgskip.data->seen[msgid >> 3] & bit) {
-		enable_msgSkip(TRUE);
-	} else {
-		msgskip.data->seen[msgid >> 3] |= bit;
-		set_skipMode(FALSE);
-		enable_msgSkip(FALSE);
-	}
+	boolean unseen = !(msgskip.data->seen[msgid >> 3] & bit);
+	msgskip.data->seen[msgid >> 3] |= bit;
+	msgskip_action(unseen);
 }
 
 static int open_msgskip_file(const char *fname_utf8) {
