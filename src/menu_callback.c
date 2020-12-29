@@ -29,7 +29,7 @@
 #include "menu_callback.h"
 #include "menu_gui.h"
 #include "nact.h"
-#include "input.h"
+#include "msgskip.h"
 #include "s39init.h"
 
 boolean menu_ok_exit;   /* exit window で OK が押されたかどうか */
@@ -69,7 +69,7 @@ void
 on_item2_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	set_skipMode(TRUE);
+	msgskip_activate(TRUE);
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 }
 
@@ -78,7 +78,7 @@ void
 on_item3_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	set_skipMode(FALSE);
+	msgskip_activate(FALSE);
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 }
 

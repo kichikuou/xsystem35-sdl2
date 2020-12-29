@@ -36,6 +36,7 @@
 #include "key.h"
 #include "menu.h"
 #include "input.h"
+#include "msgskip.h"
 #include "sdl_keytable.h"
 
 static void sdl_getEvent(void);
@@ -242,7 +243,7 @@ static void sdl_getEvent(void) {
 		menu_open();
 	}
 	
-	if (msg_skip) set_skipMode(!get_skipMode());
+	if (msg_skip) msgskip_activate(!msgskip_isActivated());
 }
 
 /* キー情報の取得 */

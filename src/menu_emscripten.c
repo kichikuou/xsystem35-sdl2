@@ -25,7 +25,6 @@
 
 #include "portab.h"
 #include "menu.h"
-#include "input.h"
 
 void menu_open(void) {
 	return;
@@ -79,8 +78,3 @@ void menu_gtkmainiteration() {
 EM_JS(void, menu_setSkipState, (boolean enabled, boolean activated), {
 	xsystem35.shell.setSkipButtonState(enabled, activated);
 });
-
-EMSCRIPTEN_KEEPALIVE
-void msgskip_activate(int enable) {
-	set_skipMode(enable);
-}

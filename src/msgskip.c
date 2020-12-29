@@ -23,6 +23,7 @@
 #include "portab.h"
 #include "mmap.h"
 #include "nact.h"
+#include "menu.h"
 #include "input.h"
 #include "scenario.h"
 #ifdef __EMSCRIPTEN__
@@ -46,9 +47,12 @@ static struct {
 	unsigned flags;
 	boolean for_ain_message;
 	boolean dirty;
-	boolean paused;	 // used by MsgSkip module
+	boolean enabled;	// The menu item is enabled
+	boolean activated;	// Turned on by the user
+	boolean paused;		// Used by MsgSkip module
 } msgskip = {
 	.flags = MSGSKIP_STOP_ON_UNSEEN | MSGSKIP_STOP_ON_MENU | MSGSKIP_STOP_ON_CLICK,
+	.enabled = TRUE,
 };
 
 // Knuth's multiplicative hash.
@@ -59,10 +63,10 @@ static uint32_t hash(uint32_t x, int s) {
 static void msgskip_action(boolean unseen) {
 	if (unseen && !(msgskip.flags & MSGSKIP_SKIP_UNSEEN)) {
 		if (msgskip.flags & MSGSKIP_STOP_ON_UNSEEN)
-			set_skipMode(FALSE);
-		enable_msgSkip(FALSE);
+			msgskip_activate(FALSE);
+		msgskip_enableMenu(FALSE);
 	} else {
-		enable_msgSkip(TRUE);
+		msgskip_enableMenu(TRUE);
 	}
 }
 
@@ -91,8 +95,6 @@ void msgskip_init(const char *msgskip_file) {
 
 	msgskip.map = m;
 	msgskip.data = m->addr;
-	msgskip.dirty = false;
-	msgskip.paused = false;
 
 	if (msgskip.data->size != size) {
 		msgskip.data->size = size;
@@ -102,6 +104,29 @@ void msgskip_init(const char *msgskip_file) {
 #ifdef __EMSCRIPTEN__
 	EM_ASM({ setInterval(() => _msgskip_syncFile(), 5000); });
 #endif
+}
+
+boolean msgskip_isSkipping(void) {
+	return msgskip.enabled & msgskip.activated;
+}
+
+boolean msgskip_isActivated(void) {
+	return msgskip.activated;
+}
+
+void msgskip_enableMenu(boolean enable) {
+	if (enable == msgskip.enabled)
+		return;
+	msgskip.enabled = enable;
+	menu_setSkipState(msgskip.enabled, msgskip.activated);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void msgskip_activate(boolean activate) {
+	if (msgskip.activated == activate)
+		return;
+	msgskip.activated = activate;
+	menu_setSkipState(msgskip.enabled, msgskip.activated);
 }
 
 void msgskip_onMessage(void) {

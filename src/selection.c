@@ -410,7 +410,7 @@ void sel_select() {
 	int key, prevkey = 0, i;
 	
 	if (msgskip_getFlags() & MSGSKIP_STOP_ON_MENU)
-		set_skipMode(FALSE);
+		msgskip_activate(FALSE);
 
 	saveimg2 = NULL;
 	keymode = 0;

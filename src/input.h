@@ -48,9 +48,6 @@ extern int sys_getKeyInfo(void);
 extern int sys_getJoyInfo(void);
 extern void sys_key_releasewait(int key, boolean zi_mask_enabled);
 extern void sys_hit_any_key();
-extern void enable_msgSkip(boolean enable);
-extern void set_skipMode(boolean bool);
-extern boolean get_skipMode();
 extern void set_hak_keymode(int key, int mode);
 
 #endif /* __INPUT__ */

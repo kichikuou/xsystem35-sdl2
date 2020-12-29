@@ -25,7 +25,7 @@
 #include "sdl_core.h"
 #include "sdl_private.h"
 #include "resources.h"
-#include "input.h"
+#include "msgskip.h"
 
 static HWND get_hwnd(SDL_Window *window) {
 	SDL_SysWMinfo info;
@@ -57,7 +57,7 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 			sdl_setFullscreen(TRUE);
 			break;
 		case ID_MSGSKIP:
-			set_skipMode(!get_skipMode());
+			msgskip_activate(!msgskip_isActivated());
 			break;
 		}
 		break;

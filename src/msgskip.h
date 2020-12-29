@@ -28,6 +28,10 @@
 #define MSGSKIP_STOP_ON_CLICK	8
 
 extern void msgskip_init(const char *msgskip_file);
+extern boolean msgskip_isSkipping(void);
+extern boolean msgskip_isActivated(void);
+extern void msgskip_enableMenu(boolean enable);
+extern void msgskip_activate(boolean bool);
 extern void msgskip_onMessage(void);
 extern void msgskip_onAinMessage(int msgid);
 extern unsigned msgskip_getFlags();

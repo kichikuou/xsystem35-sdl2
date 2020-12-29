@@ -30,7 +30,7 @@
 #include "menu_callback.h"
 #include "nact.h"
 #include "input.h"
-
+#include "msgskip.h"
 
 static boolean menu_initilized = FALSE;
 
@@ -43,8 +43,8 @@ static int menu_callback() {
 void menu_open(void) {
 	if (!menu_initilized) return;
 	
-	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_on), get_skipMode());
-	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_off), !get_skipMode());
+	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_on), msgskip_isActivated());
+	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_off), !msgskip_isActivated());
 	gtk_menu_popup(GTK_MENU(menu_window_popup), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 	gtk_widget_show(menu_window_popup);
 	nact->popupmenu_opened = TRUE;

@@ -29,35 +29,12 @@
 #include "counter.h"
 #include "xsystem35.h"
 #include "message.h"
-#include "menu.h"
 #include "texthook.h"
 #include "msgskip.h"
-
-static boolean msgskip_enabled = TRUE;
-static boolean msgskip_activated = FALSE;
-#define skipToNextSel (msgskip_enabled & msgskip_activated)
 
 static int hak_ignore_mask      = 0xffffffff;
 static int hak_releasewait_mask = (0 << 0) | (0 << 1) | (0 << 2) | (0 << 3) |
                                   (1 << 4) | (0 << 5) | (0 << 6) | (0 << 7) ;
-
-void enable_msgSkip(boolean enable) {
-	if (enable == msgskip_enabled)
-		return;
-	msgskip_enabled = enable;
-	menu_setSkipState(msgskip_enabled, msgskip_activated);
-}
-
-void set_skipMode(boolean skip) {
-	if (msgskip_activated == skip)
-		return;
-	msgskip_activated = skip;
-	menu_setSkipState(msgskip_enabled, msgskip_activated);
-}
-
-boolean get_skipMode() {
-	return skipToNextSel;
-}
 
 void set_hak_keymode(int key, int mode) {
 	int flg = (1 << key);
@@ -104,11 +81,11 @@ int sys_getInputInfo() {
 int sys_keywait(int msec, unsigned flags) {
 	texthook_keywait();
 
-	if ((flags & KEYWAIT_SKIPPABLE) && skipToNextSel) {
+	if ((flags & KEYWAIT_SKIPPABLE) && msgskip_isSkipping()) {
 		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK) {
 			int key = sys_getInputInfo();
 			if (key)
-				set_skipMode(FALSE);
+				msgskip_activate(FALSE);
 			return key;
 		}
 		return 0;
@@ -116,7 +93,7 @@ int sys_keywait(int msec, unsigned flags) {
 
 	int key=0, n;
 	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
-	while (!((flags & KEYWAIT_SKIPPABLE) && skipToNextSel) &&
+	while (!((flags & KEYWAIT_SKIPPABLE) && msgskip_isSkipping()) &&
 		   (n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
 		if (n <= 16)
 			sdl_sleep(n);
@@ -133,9 +110,9 @@ int sys_keywait(int msec, unsigned flags) {
 
 void sys_hit_any_key() {
 	int key=0;
-	if (skipToNextSel) {
+	if (msgskip_isSkipping()) {
 		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK && sys_getInputInfo())
-			set_skipMode(FALSE);
+			msgskip_activate(FALSE);
 		sdl_sleep(30);
 		return;
 	}
@@ -154,11 +131,11 @@ void sys_hit_any_key() {
 		}
 	}
 
-	while (!skipToNextSel && 0 == (key & hak_ignore_mask)) {
+	while (!msgskip_isSkipping() && 0 == (key & hak_ignore_mask)) {
 		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 	}
 	
-	while (!skipToNextSel && (key & hak_releasewait_mask)) {
+	while (!msgskip_isSkipping() && (key & hak_releasewait_mask)) {
 		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 	}
 }

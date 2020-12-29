@@ -1250,7 +1250,7 @@ void commands2F70() {
 void commands2F71() {
 	int eFlag = getCaliValue();
 
-	enable_msgSkip(eFlag);
+	msgskip_enableMenu(eFlag);
 
 	DEBUG_COMMAND("wmenuEnableMsgSkip %d:\n", eFlag);
 }

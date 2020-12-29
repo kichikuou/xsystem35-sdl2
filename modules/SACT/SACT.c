@@ -29,6 +29,7 @@
 #include "portab.h"
 #include "system.h"
 #include "input.h"
+#include "msgskip.h"
 #include "xsystem35.h"
 #include "gametitle.h"
 #include "message.h"
@@ -1146,7 +1147,7 @@ static void WaitKeySpriteTimeOut() {
 static void QueryMessageSkip() {
 	int *vSkip = getCaliVariable();
 
-	*vSkip = get_skipMode() ? 1 : 0;
+	*vSkip = msgskip_isSkipping() ? 1 : 0;
 	
 	DEBUG_COMMAND_YET("SACT.QueryMessageSkip %p:\n", vSkip);
 }
