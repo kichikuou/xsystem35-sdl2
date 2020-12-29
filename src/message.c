@@ -34,6 +34,7 @@
 #include "message.h"
 #include "variable.h"
 #include "input.h"
+#include "msgskip.h"
 #include "ags.h"
 #include "nact.h"
 #include "texthook.h"
@@ -177,7 +178,7 @@ void msg_putMessage(const char *m) {
 	
 	w = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
 
-	if (nact->messagewait_enable && !nact->messagewait_cancelled) {
+	if (nact->messagewait_enable && !nact->messagewait_cancelled && !msgskip_isSkipping()) {
 		int x;
 		for (x = 0; x < w + adj.width; x+=16) {
 			ags_updateArea(msgcur.x + adj.x + x, msgcur.y + adj.y,
