@@ -29,8 +29,9 @@
 
 extern void msgskip_init(const char *msgskip_file);
 extern void msgskip_onMessage(void);
+extern void msgskip_onAinMessage(int msgid);
 extern unsigned msgskip_getFlags();
 extern void msgskip_setFlags(unsigned flags, unsigned mask);
-extern void msgskip_action(boolean unseen);
+extern void msgskip_pause(boolean pause);
 
 #endif // __MSGSKIP_H__

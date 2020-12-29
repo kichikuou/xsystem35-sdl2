@@ -234,12 +234,12 @@ static void sys35_init() {
 
 	msg_init();
 	sel_init();
-	msgskip_init(nact->files.msgskip);
 
 	s39ain_init();
 #ifdef ENABLE_GTK
 	s39ini_init();
 #endif
+	msgskip_init(nact->files.msgskip);
 }
 
 static void sys35_remove() {

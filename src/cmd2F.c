@@ -30,6 +30,7 @@
 #include "savedata.h"
 #include "menu.h"
 #include "input.h"
+#include "msgskip.h"
 #include "selection.h"
 #include "message.h"
 #include "music.h"
@@ -1331,8 +1332,7 @@ void commands2F7C() {
 	int index = sys_getdw();
 	
 	sys_addMsg(nact->ain.msg[index]);
-	if (nact->msgskip_callback)
-		nact->msgskip_callback(index);
+	msgskip_onAinMessage(index);
 
 	DEBUG_COMMAND("2F7C %d:\n", index);
 }
@@ -1341,8 +1341,7 @@ void commands2F7D() {
 	int index = sys_getdw();
 	
 	commandH();
-	if (nact->msgskip_callback)
-		nact->msgskip_callback(index);
+	msgskip_onAinMessage(index);
 
 	DEBUG_COMMAND("2F7D %d:\n", index);
 }
@@ -1351,8 +1350,7 @@ void commands2F7E() {
 	int index = sys_getdw();
 	
 	commandHH();
-	if (nact->msgskip_callback)
-		nact->msgskip_callback(index);
+	msgskip_onAinMessage(index);
 
 	DEBUG_COMMAND("2F7E %d:\n", index);
 }
@@ -1362,8 +1360,7 @@ void commands2F7F() {
 	int p1    = sys_getCaliValue();
 	
 	sys_addMsg(svar_get(p1));
-	if (nact->msgskip_callback)
-		nact->msgskip_callback(index);
+	msgskip_onAinMessage(index);
 
 	DEBUG_COMMAND("2F7F %d, %d(%s,%s):\n", index, p1, nact->ain.msg[index], svar_get(p1));
 }

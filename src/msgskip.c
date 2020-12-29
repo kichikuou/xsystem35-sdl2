@@ -22,6 +22,7 @@
 #include <string.h>
 #include "portab.h"
 #include "mmap.h"
+#include "nact.h"
 #include "input.h"
 #include "scenario.h"
 #ifdef __EMSCRIPTEN__
@@ -36,14 +37,16 @@
 
 typedef struct {
 	uint32_t size;
-	uint8_t bloom[];
+	uint8_t seen[];
 } MsgSkipData;
 
 static struct {
 	mmap_t *map;
 	MsgSkipData *data;
 	unsigned flags;
+	boolean for_ain_message;
 	boolean dirty;
+	boolean paused;	 // used by MsgSkip module
 } msgskip = {
 	.flags = MSGSKIP_STOP_ON_UNSEEN | MSGSKIP_STOP_ON_MENU | MSGSKIP_STOP_ON_CLICK,
 };
@@ -53,20 +56,47 @@ static uint32_t hash(uint32_t x, int s) {
 	return (x * 2654435761ULL) >> s;
 }
 
+static void msgskip_action(boolean unseen) {
+	if (unseen && !(msgskip.flags & MSGSKIP_SKIP_UNSEEN)) {
+		if (msgskip.flags & MSGSKIP_STOP_ON_UNSEEN)
+			set_skipMode(FALSE);
+		enable_msgSkip(FALSE);
+	} else {
+		enable_msgSkip(TRUE);
+	}
+}
+
 void msgskip_init(const char *msgskip_file) {
 	if (!msgskip_file)
 		return;
-	size_t length = ((BLOOM_FILTER_SIZE + 7) >> 3) + 4;
+	if (msgskip.data) {
+		// Called from MsgSkip.Start but we've already initialized with the
+		// MsgSkip file specified in the gameresource file. Do nothing.
+		return;
+	}
+
+	size_t size;
+	if (nact->ain.msg) {
+		msgskip.for_ain_message = true;
+		size = nact->ain.msgnum;
+	} else {
+		msgskip.for_ain_message = false;
+		size = BLOOM_FILTER_SIZE;
+	}
+
+	size_t length = ((size + 7) >> 3) + 4;
 	mmap_t *m = map_file_readwrite(msgskip_file, length);
 	if (!m)
 		return;
+
 	msgskip.map = m;
 	msgskip.data = m->addr;
 	msgskip.dirty = false;
+	msgskip.paused = false;
 
-	if (msgskip.data->size != BLOOM_FILTER_SIZE) {
-		msgskip.data->size = BLOOM_FILTER_SIZE;
-		memset(msgskip.data->bloom, 0, length - 4);
+	if (msgskip.data->size != size) {
+		msgskip.data->size = size;
+		memset(msgskip.data->seen, 0, length - 4);
 	}
 
 #ifdef __EMSCRIPTEN__
@@ -75,7 +105,7 @@ void msgskip_init(const char *msgskip_file) {
 }
 
 void msgskip_onMessage(void) {
-	if (!msgskip.data)
+	if (!msgskip.data || msgskip.for_ain_message)
 		return;
 	uint32_t h1 = hash(sl_getPage(), 7);
 	uint32_t h2 = hash(sl_getIndex(), 15);
@@ -83,22 +113,28 @@ void msgskip_onMessage(void) {
 	for (int i = 0; i < BLOOM_FILTER_HASHES; i++) {
 		uint32_t h = (h1 + i * h2) % BLOOM_FILTER_SIZE;
 		uint8_t bit = 1 << (h & 7);
-		unseen |= (msgskip.data->bloom[h >> 3] & bit) ^ bit;
-		msgskip.data->bloom[h >> 3] |= bit;
+		unseen |= (msgskip.data->seen[h >> 3] & bit) ^ bit;
+		msgskip.data->seen[h >> 3] |= bit;
 	}
 	if (unseen)
 		msgskip.dirty = true;
 	msgskip_action(unseen);
 }
 
-void msgskip_action(boolean unseen) {
-	if (unseen && !(msgskip.flags & MSGSKIP_SKIP_UNSEEN)) {
-		if (msgskip.flags & MSGSKIP_STOP_ON_UNSEEN)
-			set_skipMode(FALSE);
-		enable_msgSkip(FALSE);
-	} else {
-		enable_msgSkip(TRUE);
-	}
+void msgskip_onAinMessage(int msgid) {
+	if (msgskip.paused || !msgskip.data || !msgskip.for_ain_message
+		|| (unsigned)msgid >= msgskip.data->size)
+		return;
+	uint8_t bit = 1 << (msgid & 7);
+	boolean unseen = !(msgskip.data->seen[msgid >> 3] & bit);
+	msgskip.data->seen[msgid >> 3] |= bit;
+	if (unseen)
+		msgskip.dirty = true;
+	msgskip_action(unseen);
+}
+
+void msgskip_pause(boolean pause) {
+	msgskip.paused = pause;
 }
 
 unsigned msgskip_getFlags() {
