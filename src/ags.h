@@ -184,7 +184,7 @@ extern void ags_putRegion(void *region, int x, int y);
 extern void ags_copyRegion(void *region, int sx, int sy, int w,int h,int dx,int dy);
 extern void ags_delRegion(void *region);
 
-extern int  ags_drawString(int x, int y, const char *src, int col);
+extern MyRectangle ags_drawString(int x, int y, const char *src, int col);
 extern void ags_drawCg8bit(cgdata *cg, int x, int y); 
 extern void ags_drawCg16bit(cgdata *cg, int x, int y); 
 

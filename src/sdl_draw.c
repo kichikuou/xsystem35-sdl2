@@ -310,7 +310,7 @@ int sdl_nearest_color(int r, int g, int b) {
 	return col;
 }
 
-int sdl_drawString(int x, int y, const char *str_utf8, unsigned long col) {
+SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, unsigned long col) {
 	sdl_pal_check();
 	return font_draw_glyph(x, y, str_utf8, col);
 }

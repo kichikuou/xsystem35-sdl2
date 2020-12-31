@@ -383,16 +383,14 @@ void ags_delRegion(void *region) {
 	sdl_delRegion(region);
 }
 
-int ags_drawString(int x, int y, const char *src, int col) {
-	int w;
-	
-	if (!check_param_xy(&x, &y)) return 0;
+MyRectangle ags_drawString(int x, int y, const char *src, int col) {
+	if (!check_param_xy(&x, &y)) return (MyRectangle){};
 	
 	char *utf8 = toUTF8(src);
-	w = sdl_drawString(x, y, utf8, col);
+	SDL_Rect r = sdl_drawString(x, y, utf8, col);
 	free(utf8);
 
-	return w;
+	return (MyRectangle){r.x, r.y, r.w, r.h};
 }
 
 agsurface_t *ags_drawStringToSurface(const char *str) {

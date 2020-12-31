@@ -111,7 +111,6 @@ void msg_setStringDecorationType(int type) {
 }
 
 void msg_putMessage(const char *m) {
-	int         w;
 	MyRectangle adj;
 	
 	if (nextLineIsAfterKaigyou) {
@@ -176,18 +175,21 @@ void msg_putMessage(const char *m) {
 		break;
 	}
 	
-	w = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
+	MyRectangle drawn = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
+	msgcur.x += drawn.width;
+	drawn.x += adj.x;
+	drawn.y += adj.y;
+	drawn.width += adj.width;
+	drawn.height += adj.height;
 
 	if (nact->messagewait_enable && !nact->messagewait_cancelled && !msgskip_isSkipping()) {
 		int x;
-		for (x = 0; x < w + adj.width; x+=16) {
-			ags_updateArea(msgcur.x + adj.x + x, msgcur.y + adj.y,
-				       16, msg.MsgFontSize + adj.height);
+		for (x = 0; x < drawn.width; x+=16) {
+			ags_updateArea(drawn.x + x, drawn.y, 16, drawn.height);
 			if (nact->messagewait_cancel) {
 				if (sys_getInputInfo()) {
 					nact->messagewait_cancelled = TRUE;
-					ags_updateArea(msgcur.x + adj.x, msgcur.y + adj.y,
-						       w + adj.width, msg.MsgFontSize + adj.height);
+					ags_updateArea(drawn.x, drawn.y, drawn.width, drawn.height);
 					break;
 				}
 				sdl_sleep(nact->messagewait_time * 10);
@@ -195,10 +197,8 @@ void msg_putMessage(const char *m) {
 			nact->callback();
 		}
 	} else {
-		ags_updateArea(msgcur.x + adj.x, msgcur.y + adj.y,
-			       w + adj.width, msg.MsgFontSize + adj.height);
+		ags_updateArea(drawn.x, drawn.y, drawn.width, drawn.height);
 	}
-	msgcur.x += w;
 }
 
 void msg_nextLine() {
@@ -327,18 +327,15 @@ void msg_getMessageLocation(MyPoint *loc) {
 }
 
 void msg_hitAnyKey() {
-	int w;
 	const char *prompt[CHARACTER_ENCODING_MAX + 1] = {
 		[SHIFT_JIS] = "\x81\xa5",
 		[UTF8] = "▼",
 	};
 	
-	w = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
-			   msg.win->y + msg.win->height - msg.MsgFontSize,
-			   prompt[nact->encoding], msg.HitAnyKeyMsgColor);
-	ags_updateArea(msg.win->x + msg.win->width  - msg.MsgFontSize,
-		       msg.win->y + msg.win->height - msg.MsgFontSize,
-		       w, msg.MsgFontSize);
+	MyRectangle r = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
+								   msg.win->y + msg.win->height - msg.MsgFontSize,
+								   prompt[nact->encoding], msg.HitAnyKeyMsgColor);
+	ags_updateArea(r.x, r.y, r.width, r.height);
 }
 
 static void drawLineFrame(Bcom_WindowInfo *i) {

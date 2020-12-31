@@ -276,7 +276,7 @@ static void init_selwindow() {
 	ags_setFont(FONT_GOTHIC, sel.MsgFontSize);
 	for (i = 0; i < regnum; i++) {
 		DEBUG_MESSAGE("%d:%s\n", i +1, elm[i]);
-		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +2, elm[i], sel.MsgFontColor);
+		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +1, elm[i], sel.MsgFontColor);
 	}
 	ags_updateArea(saveArea.x, saveArea.y, saveArea.width, saveArea.height);
 	
@@ -364,7 +364,7 @@ static void encloseElement(int sw, int no) {
 				lineEncloseElement(r, sel.WinBackgroundColor, FALSE); break;
 			case 2:
 				ags_fillRectangle(r->x, r->y, r->width +2, r->height +2, sel.WinBackgroundColor);
-				ags_drawString(r->x +2, r->y +2, elm[no], sel.MsgFontColor);
+				ags_drawString(r->x +2, r->y +1, elm[no], sel.MsgFontColor);
 				ags_updateArea(r->x, r->y, r->width +2, r->height +2);
 				break;
 			default:
@@ -383,7 +383,7 @@ static void encloseElement(int sw, int no) {
 			lineEncloseElement(r, 255, FALSE); break;
 		case 2:
 			ags_fillRectangle(r->x, r->y, r->width +2, r->height +2, sel.MsgFontColor);
-			ags_drawString(r->x +2, r->y +2, elm[no], sel.WinBackgroundColor);
+			ags_drawString(r->x +2, r->y +1, elm[no], sel.WinBackgroundColor);
 			ags_updateArea(r->x, r->y, r->width +2, r->height +2);
 			break;
 		default:
