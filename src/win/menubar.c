@@ -47,7 +47,7 @@ static void saveScreenshot(void) {
 		.lpstrFilter = "Bitmap files (*.bmp)\0*.bmp\0All files (*.*)\0*.*\0",
 		.lpstrFile = pathbuf,
 		.nMaxFile = MAX_PATH,
-		.Flags = OFN_OVERWRITEPROMPT,
+		.Flags = OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR,
 	};
 	if (!GetSaveFileName(&ofn))
 		return;
