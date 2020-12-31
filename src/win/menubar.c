@@ -19,6 +19,7 @@
 #include <windows.h>
 #undef min
 #undef max
+#include <time.h>
 #include <SDL_syswm.h>
 #include "system.h"
 #include "menu.h"
@@ -34,6 +35,29 @@ static HWND get_hwnd(SDL_Window *window) {
 	return info.info.win.window;
 }
 
+static void saveScreenshot(void) {
+	char pathbuf[MAX_PATH];
+	time_t t = time(NULL);
+	struct tm *lt = localtime(&t);
+	strftime(pathbuf, sizeof(pathbuf), "xsystem35-%Y%m%d-%H%M%S.bmp", lt);
+
+	OPENFILENAME ofn = {
+		.lStructSize = sizeof(OPENFILENAME),
+		.hwndOwner = get_hwnd(sdl_window),
+		.lpstrFilter = "Bitmap files (*.bmp)\0*.bmp\0All files (*.*)\0*.*\0",
+		.lpstrFile = pathbuf,
+		.nMaxFile = MAX_PATH,
+		.Flags = OFN_OVERWRITEPROMPT,
+	};
+	if (!GetSaveFileName(&ofn))
+		return;
+	if (SDL_SaveBMP(sdl_display, pathbuf) != 0) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35",
+								 SDL_GetError(), sdl_window);
+		SDL_ClearError();
+	}
+}
+
 void win_menu_init(void) {
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	HMENU hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
@@ -47,6 +71,9 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 	switch (msg->msg.win.msg) {
 	case WM_COMMAND:
 		switch (msg->msg.win.wParam) {
+		case ID_SCREENSHOT:
+			saveScreenshot();
+			break;
 		case ID_EXIT:
 			menu_quitmenu_open();
 			break;
