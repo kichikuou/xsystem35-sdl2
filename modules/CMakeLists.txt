@@ -93,9 +93,11 @@ add_library(modules STATIC
 
 target_include_directories(modules PUBLIC . lib)
 
-add_executable(modules_tests lib/list_test.c)
-target_link_libraries(modules_tests PRIVATE modules)
-add_test(NAME modules_tests COMMAND modules_tests)
+if (NOT ANDROID)
+  add_executable(modules_tests lib/list_test.c)
+  target_link_libraries(modules_tests PRIVATE modules)
+  add_test(NAME modules_tests COMMAND modules_tests)
+endif()
 
 target_compile_options(modules PRIVATE -Wno-pointer-sign)
 

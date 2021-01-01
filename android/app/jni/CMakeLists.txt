@@ -9,8 +9,8 @@ project(GAME)
 include(FetchContent)
 FetchContent_Declare(
   SDL
-  URL http://libsdl.org/release/SDL2-2.0.12.tar.gz
-  URL_HASH SHA1=e8ba91bf5eb438dbcf1fedf0530a1bcbe30d3bb6
+  URL https://www.libsdl.org/release/SDL2-2.0.14.tar.gz
+  URL_HASH SHA1=212b17d988c417a1a905ab09c50d1845cc48ddb7
   PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SDL.patch
 )
 # TODO: Use SDL2_ttf 2.0.16 once released
