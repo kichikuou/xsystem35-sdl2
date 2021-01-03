@@ -61,6 +61,6 @@ typedef struct {
 	char **msg;           /* MSGI に関する情報 */
 } S39AIN;
 
-extern int s39ain_init(void);
+extern int s39ain_init(const char *path, S39AIN *ain);
 
 #endif /* __S39AIN_H__ */

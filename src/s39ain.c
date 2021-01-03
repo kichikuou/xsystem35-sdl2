@@ -29,7 +29,6 @@
 #include "portab.h"
 #include "system.h"
 #include "LittleEndian.h"
-#include "nact.h"
 #include "s39ain.h"
 #include "xsystem35.h"
 
@@ -37,29 +36,15 @@
 #include "modules.h"
 #endif
 
-/* short cut */
-#define dll  nact->ain.dll
-#define msg  nact->ain.msg
-#define fnc  nact->ain.fnc
-#define path_to_ain nact->files.ain
-#define dllnum nact->ain.dllnum
-#define fncnum nact->ain.fncnum
-#define varnum nact->ain.varnum
-#define msgnum nact->ain.msgnum
-
 /*
   system39.ain の読み込み
 */
-int s39ain_init(void) {
+int s39ain_init(const char *path_to_ain, S39AIN *ain) {
 	FILE *fp;
 	long len;
 	char *buf;
 	unsigned char *p;
 	int i;
-	
-	if (path_to_ain == NULL) {
-		return NG;
-	}
 	
 	if (NULL == (fp =  fopen(path_to_ain, "rb"))) {
 		WARNING("fail to open %s\n", path_to_ain);
@@ -75,7 +60,7 @@ int s39ain_init(void) {
 	
 	p = buf;
 	/* first check */
-	if (0 != strncmp(p, "AINI", 4)) {
+	if (0 != strncmp(p, "AIN", 3)) {
 		WARNING("%s is not ain file\n", path_to_ain);
 		free(buf);
 		return NG;
@@ -98,83 +83,81 @@ int s39ain_init(void) {
 		return NG;
 	}
 	p += 8;
-	dllnum = LittleEndian_getDW(p, 0);
-	dll = malloc(sizeof(S39AIN_DLLINF) * dllnum);
+	ain->dllnum = LittleEndian_getDW(p, 0);
+	ain->dll = malloc(sizeof(S39AIN_DLLINF) * ain->dllnum);
 	
 	p += 4;
-	for (i = 0; i < dllnum; i++) {
+	for (i = 0; i < ain->dllnum; i++) {
 		int fn, j;
 		
-		dll[i].name = strdup(p); /* DLL name */
+		ain->dll[i].name = p;
 		p += strlen(p) + 1;
 		
 		fn = LittleEndian_getDW(p, 0); /* number of function in DLL */
 		p += 4;
 		
-		dll[i].function_num = fn;
-		dll[i].function = malloc(sizeof(S39AIN_DLLFN) * fn);
+		ain->dll[i].function_num = fn;
+		ain->dll[i].function = malloc(sizeof(S39AIN_DLLFN) * fn);
 		for (j = 0; j < fn; j++) {
 			int argc, k;
 			
-			dll[i].function[j].name = strdup(p); /* function name */
+			ain->dll[i].function[j].name = p;
 			p += strlen(p) + 1;
 			
 			argc = LittleEndian_getDW(p, 0); /* number of argument */
 			p += 4;
 			
-			dll[i].function[j].argc = argc;
-			dll[i].function[j].argv = malloc(sizeof(int) * argc);
+			ain->dll[i].function[j].argc = argc;
+			ain->dll[i].function[j].argv = malloc(sizeof(int) * argc);
 			for (k = 0; k < argc; k++) {
-				dll[i].function[j].argv[k] = LittleEndian_getDW(p, 0);
+				ain->dll[i].function[j].argv[k] = LittleEndian_getDW(p, 0);
 				p += 4;
 			}
-			dll[i].function[j].entrypoint = NULL;
+			ain->dll[i].function[j].entrypoint = NULL;
 		}
 	}
 	
 	/* check FUNC */
 	if (0 == strncmp(p, "FUNC", 4)) {
-		fncnum = LittleEndian_getDW(p, 8);
+		ain->fncnum = LittleEndian_getDW(p, 8);
 		
-		fnc = malloc(sizeof(S39AIN_FUNCNAME) * fncnum);
+		ain->fnc = malloc(sizeof(S39AIN_FUNCNAME) * ain->fncnum);
 		p += 12;
 		
-		for (i = 0; i < fncnum; i++) {
-			fnc[i].name = strdup(p);
+		for (i = 0; i < ain->fncnum; i++) {
+			ain->fnc[i].name = p;
 			p += strlen(p) + 1;
-			fnc[i].page  = LittleEndian_getW(p, 0);
-			fnc[i].index = LittleEndian_getDW(p, 2);
+			ain->fnc[i].page  = LittleEndian_getW(p, 0);
+			ain->fnc[i].index = LittleEndian_getDW(p, 2);
 			p += 6;
 		}
 	}
 	
 	/* check VARI */
 	if (0 == strncmp(p, "VARI", 4)) {
-		varnum = LittleEndian_getDW(p, 8);
+		ain->varnum = LittleEndian_getDW(p, 8);
 		p += 12;
-		for (i = 0; i < varnum; i++) {
+		for (i = 0; i < ain->varnum; i++) {
 			p += strlen(p) + 1;
 		}
 	}
 	
 	/* check MSGI */
 	if (0 == strncmp(p, "MSGI", 4)) {
-		msgnum = LittleEndian_getDW(p, 8);
+		ain->msgnum = LittleEndian_getDW(p, 8);
 		
-		msg = malloc(sizeof(char *) * msgnum);
+		ain->msg = malloc(sizeof(char *) * ain->msgnum);
 		p += 12;
 		
-		for (i = 0; i < msgnum; i++) {
-			msg[i] = strdup(p);
+		for (i = 0; i < ain->msgnum; i++) {
+			ain->msg[i] = p;
 			p += strlen(p) + 1;
 		}
 	}
 
-	free(buf);
-
 #ifdef ENABLE_MODULES
-	for (i = 0; i < dllnum; i++)
-		resolve_module(&dll[i]);
+	for (i = 0; i < ain->dllnum; i++)
+		resolve_module(&ain->dll[i]);
 #endif
 	return OK;
 }

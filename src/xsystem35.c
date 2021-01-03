@@ -235,7 +235,8 @@ static void sys35_init() {
 	msg_init();
 	sel_init();
 
-	s39ain_init();
+	if (nact->files.ain)
+		s39ain_init(nact->files.ain, &nact->ain);
 #ifdef ENABLE_GTK
 	s39ini_init();
 #endif
