@@ -42,11 +42,11 @@ void commandES() {
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	
-	tbl[num - 1].r.x      = x;
-	tbl[num - 1].r.y      = y;
-	tbl[num - 1].r.width  = width;
-	tbl[num - 1].r.height = height;
-	tbl[num - 1].pal      = pal;
+	tbl[num - 1].r.x = x;
+	tbl[num - 1].r.y = y;
+	tbl[num - 1].r.w = width;
+	tbl[num - 1].r.h = height;
+	tbl[num - 1].pal = pal;
 	
 	DEBUG_COMMAND("ES %d,%d,%d,%d,%d,%d:\n", num, pal, x, y, width, height);
 }
@@ -58,13 +58,13 @@ void commandEC() {
 	
 	if (num == 0) {
 		r = &nact->sys_view_area;
-		ags_fillRectangle(r->x, r->y, r->width, r->height, 0);
-		ags_updateArea(r->x, r->y, r->width, r->height);
+		ags_fillRectangle(r->x, r->y, r->w, r->h, 0);
+		ags_updateArea(r->x, r->y, r->w, r->h);
 	} else {
 		int adj = (nact->patch_ec == 0) ? -1 : 0;
 		e = &tbl[num - 1];
-		ags_fillRectangle(e->r.x, e->r.y, e->r.width + adj, e->r.height + adj, e->pal);
-		ags_updateArea(e->r.x, e->r.y, e->r.width + adj, e->r.height + adj);
+		ags_fillRectangle(e->r.x, e->r.y, e->r.w + adj, e->r.h + adj, e->pal);
+		ags_updateArea(e->r.x, e->r.y, e->r.w + adj, e->r.h + adj);
 	}
 	DEBUG_COMMAND("EC %d:\n", num);
 }
@@ -78,8 +78,8 @@ void commandEG() {
 	
 	*x      = tbl[num -1].r.x;
 	*y      = tbl[num -1].r.y;
-	*width  = tbl[num -1].r.width;
-	*height = tbl[num -1].r.height;
+	*width  = tbl[num -1].r.w;
+	*height = tbl[num -1].r.h;
 
 	DEBUG_COMMAND("EG %d,%d,%d,%d,%d:\n", num, *x, *y, *width, *height);
 }
@@ -92,8 +92,8 @@ void commandEM() {
 	MyRectangle r = tbl[num - 1].r;
 	
 	if (nact->patch_emen == 0) {
-		r.width -= 1;
-		r.height -= 1;
+		r.w -= 1;
+		r.h -= 1;
 	}
 	*var = ags_regionContains(&r, x, y) ? 1 : 0;
 	DEBUG_COMMAND("EM %d,%d,%d,%d:\n", num, *var, x, y);
@@ -113,8 +113,8 @@ void commandEN() {
 	for (i = min; i <= max; i++) {
 		r = tbl[i - 1].r;
 		if (nact->patch_emen == 0) {
-			r.width -= 1;
-			r.height -= 1;
+			r.w -= 1;
+			r.h -= 1;
 		}
 		if (ags_regionContains(&r, x, y)) *var = i;
 	}

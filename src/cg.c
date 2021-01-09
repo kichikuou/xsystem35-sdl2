@@ -517,13 +517,13 @@ void cg_get_info(int no, MyRectangle *info) {
 	MyPoint p;
 	
 	if (cg == NULL) {
-		info->x = info->y = info->width = info->height = 0;
+		info->x = info->y = info->w = info->h = 0;
 	} else {
 		p = set_display_loc(cg);
 		info->x = p.x;
 		info->y = p.y;
-		info->width  = cg->width;
-		info->height = cg->height;
+		info->w = cg->width;
+		info->h = cg->height;
 	}
 }
 

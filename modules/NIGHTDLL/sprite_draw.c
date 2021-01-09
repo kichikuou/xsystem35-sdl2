@@ -60,8 +60,8 @@ int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	if (cg->sf == NULL) return NG;
 
 	// 更新領域の確定
-	update.width  = r->width;
-	update.height = r->height;
+	update.width  = r->w;
+	update.height = r->h;
 	sx = 0;
 	sy = 0;
 	dx = sp->cur.x - r->x;
@@ -116,8 +116,8 @@ int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	if (cg->sf == NULL) return NG;
 	
 	// 更新領域の確定
-	update.width  = r->width;
-	update.height = r->height;
+	update.width  = r->w;
+	update.height = r->h;
 	sx = 0;
 	sy = 0;
 	dx = sp->cur.x - r->x;

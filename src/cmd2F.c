@@ -811,11 +811,8 @@ void commands2F4C() {
 	int eWidth  = getCaliValue();
 	int eHeight = getCaliValue();
 
-	MyRectangle r;
-	MyPoint p;
-
-	r.x = eSrcX; r.y = eSrcY; r.width = eWidth; r.height = eHeight;
-	p.x = eX, p.y = eY;
+	MyRectangle r = {eSrcX, eSrcY, eWidth, eHeight};
+	MyPoint p = {eX, eY};
 	
 	sdl_updateArea(&r, &p);
 	

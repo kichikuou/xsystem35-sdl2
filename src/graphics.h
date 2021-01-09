@@ -25,6 +25,7 @@
 #define __GRAPHICS__
 
 #include "portab.h"
+#include <SDL_rect.h>
 
 typedef struct {
         BYTE red[256];
@@ -37,22 +38,14 @@ typedef struct {
         DWORD pixel;
 } Palette;
 
-typedef struct {
-        int x;
-        int y;
-} MyPoint;
+typedef SDL_Point MyPoint;
 
 typedef struct {
         int width;
         int height;
 } MyDimension;
 
-typedef struct {
-        int x;
-        int y;
-        int width;
-        int height;
-} MyRectangle;
+typedef SDL_Rect MyRectangle;
 
 typedef struct {
         int width;

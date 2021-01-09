@@ -336,9 +336,9 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	
 	// Waitなしの出力は最後にupdate
 	if (needupdate) {
-		uparea.width  = sp->cursize.width;
-		uparea.height = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
-		sp_updateme_part(sp, uparea.x, uparea.y, uparea.width, uparea.height);
+		uparea.w = sp->cursize.width;
+		uparea.h = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
+		sp_updateme_part(sp, uparea.x, uparea.y, uparea.w, uparea.h);
 	}
 	
 	// ????
@@ -438,8 +438,8 @@ int smsg_update(sprite_t *sp) {
 	//  -> 説明スプライトのように、SetShowされたときに対応できないからだめ 
 	//if (sact.msgbufempty) return OK;
 	
-	update.width  = sact.updaterect.width;
-	update.height = sact.updaterect.height;
+	update.width  = sact.updaterect.w;
+	update.height = sact.updaterect.h;
 	
 	dx = sp->cur.x - sact.updaterect.x;
 	dy = sp->cur.y - sact.updaterect.y;

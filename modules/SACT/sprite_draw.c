@@ -101,8 +101,8 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	if (cg->sf == NULL) return NG;
 
 	// 更新領域の確定
-	update.width  = sact.updaterect.width;
-	update.height = sact.updaterect.height;
+	update.width  = sact.updaterect.w;
+	update.height = sact.updaterect.h;
 	sx = 0;
 	sy = 0;
 	dx = sp->cur.x - sact.updaterect.x;

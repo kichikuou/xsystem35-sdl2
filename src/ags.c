@@ -43,10 +43,8 @@
 
 #define check_param    ags_check_param
 #define check_param_xy ags_check_param_xy
-#define intersection   ags_intersection
 
 static void    initPal(Palette256 *sys_pal);
-static boolean intersects(MyRectangle *r1, MyRectangle *r2);
 
 static Palette256 pal_256;
 static boolean need_update = TRUE;
@@ -67,25 +65,8 @@ static void initPal(Palette256 *pal) {
 }
 
 boolean ags_regionContains(MyRectangle *r, int x, int y) {
-	return x >= r->x && x < r->x + r->width && y >= r->y && y < r->y + r->height;
-}
-
-static boolean intersects(MyRectangle *r1, MyRectangle *r2) {
-        return !((r2->x + r2->width  <= r1->x) ||
-                 (r2->y + r2->height <= r1->y) ||
-                 (r2->x >= r1->x + r1->width)  ||
-                 (r2->y >= r1->y + r1->height));
-}
-
-void ags_intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst) {
-        int x1 = max(r1->x, r2->x);
-        int x2 = min(r1->x + r1->width, r2->x + r2->width);
-        int y1 = max(r1->y, r2->y);
-        int y2 = min(r1->y + r1->height, r2->y + r2->height);
-        rst->x = x1;
-	rst->y = y1;
-	rst->width  = x2 - x1;
-	rst->height = y2 - y1;
+	MyPoint p = {x, y};
+	return SDL_PointInRect(&p, r);
 }
 
 boolean ags_check_param(int *x, int *y, int *w, int *h) {
@@ -134,8 +115,8 @@ void ags_init() {
 	nact->sys_world_depth =  SYS35_DEFAULT_DEPTH;
 	nact->sys_view_area.x = 0;
 	nact->sys_view_area.y = 0;
-	nact->sys_view_area.width  = SYS35_DEFAULT_WIDTH;
-	nact->sys_view_area.height = SYS35_DEFAULT_HEIGHT;
+	nact->sys_view_area.w = SYS35_DEFAULT_WIDTH;
+	nact->sys_view_area.h = SYS35_DEFAULT_HEIGHT;
 	
 	sdl_Initilize();
 	font_init();
@@ -176,8 +157,8 @@ void ags_setViewArea(int x, int y, int width, int height) {
 	nact->sys_view_area.x = x;
 	nact->sys_view_area.y = y;
 	
-	nact->sys_view_area.width  = width;
-	nact->sys_view_area.height = height;
+	nact->sys_view_area.w = width;
+	nact->sys_view_area.h = height;
 	sdl_setWindowSize(x, y, width, height);
 }
 
@@ -204,8 +185,8 @@ void ags_getDIBInfo(DispInfo *info) {
 
 void ags_getViewAreaInfo(DispInfo *info) {
 	sdl_getWindowInfo(info);
-	info->width  = nact->sys_view_area.width;
-	info->height = nact->sys_view_area.height;
+	info->width  = nact->sys_view_area.w;
+	info->height = nact->sys_view_area.h;
 }
 
 void ags_getWindowInfo(DispInfo *info) {
@@ -217,35 +198,31 @@ void ags_setExposeSwitch(boolean bool) {
 }
 
 void ags_updateArea(int x, int y, int w, int h) {
-	MyRectangle r, update;
-	MyPoint p;
-	
-	if (fade_outed) return;
-	
-	if (need_update) {
-		r.x = x; r.y = y; r.width = w; r.height = h;
-		if (intersects(&nact->sys_view_area, &r)) {
-			intersection(&nact->sys_view_area, &r, &update);
-			p.x = update.x - nact->sys_view_area.x;
-			p.y = update.y - nact->sys_view_area.y;
-			sdl_updateArea(&update, &p);
-		}
+	if (fade_outed || !need_update)
+		return;
+
+	MyRectangle r = {x, y, w, h}, update;
+	if (SDL_IntersectRect(&nact->sys_view_area, &r, &update)) {
+		MyPoint p = {
+			update.x - nact->sys_view_area.x,
+			update.y - nact->sys_view_area.y
+		};
+		sdl_updateArea(&update, &p);
 	}
 }
 
 void ags_updateFull() {
+	if (fade_outed || !need_update)
+		return;
+
+	MyRectangle r = {
+		nact->sys_view_area.x,
+		nact->sys_view_area.y,
+		min(nact->sys_view_area.w, nact->sys_world_size.width),
+		min(nact->sys_view_area.h, nact->sys_world_size.height)
+	};
 	MyPoint p = {0, 0};
-	MyRectangle r;
-	
-	if (fade_outed) return;
-	
-	if (need_update) {
-		r.x = nact->sys_view_area.x;
-		r.y = nact->sys_view_area.y;
-		r.width  = min(nact->sys_view_area.width,  nact->sys_world_size.width);
-		r.height = min(nact->sys_view_area.height, nact->sys_world_size.height);
-		sdl_updateArea(&r, &p);
-	}
+	sdl_updateArea(&r, &p);
 }
 
 void ags_setPalettes(Palette256 *src_pal, int src, int dst, int cnt) {
@@ -550,8 +527,8 @@ MyRectangle* ags_imageFlood(int x, int y, int c) {
 	flood(x, y, pixcel);
 	rec.x = updatePointTop.x;
 	rec.y = updatePointTop.y;
-	rec.width =  updatePointEnd.x - updatePointTop.x + 1;
-	rec.height = updatePointEnd.y - updatePointTop.y + 1;
+	rec.w = updatePointEnd.x - updatePointTop.x + 1;
+	rec.h = updatePointEnd.y - updatePointTop.y + 1;
 	return &rec;
 }
 }

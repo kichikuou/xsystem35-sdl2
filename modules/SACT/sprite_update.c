@@ -39,46 +39,15 @@
 // スプライト再描画間の間に変更のあったスプライトの領域の和
 static SList *updatearea;
 
-static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst);
 static void disjunction(void* region, void* data);
 static void get_updatearea();
 static void do_update_each(void* data, void* userdata);
-
-// 領域１と領域２の積を計算
-static void intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst) {
-        int x1 = max(r1->x, r2->x);
-        int x2 = min(r1->x + r1->width, r2->x + r2->width);
-        int y1 = max(r1->y, r2->y);
-        int y2 = min(r1->y + r1->height, r2->y + r2->height);
-	
-        rst->x = x1;
-	rst->y = y1;
-	rst->width  = x2 - x1;
-	rst->height = y2 - y1;
-}
 
 // 領域１と領域２をすべて含む矩形領域を計算
 static void disjunction(void* region, void* data) {
 	MyRectangle *r1 = (MyRectangle *)region;
 	MyRectangle *r2 = (MyRectangle *)data;
-	int x1, x2, y1, y2;
-	
-	if (r2->width == 0) {
-		r2->x = r1->x;
-		r2->y = r1->y;
-		r2->width = r1->width;
-		r2->height = r1->height;
-	} else {
-		x1 = min(r1->x, r2->x);
-		x2 = max(r1->x + r1->width,  r2->x + r2->width);
-		y1 = min(r1->y, r2->y);
-		y2 = max(r1->y + r1->height, r2->y + r2->height);
-
-		r2->x = x1;
-		r2->y = y1;
-		r2->width  = x2 - x1;
-		r2->height = y2 - y1;
-	}
+	SDL_UnionRect(r1, r2, r2);
 	free(r1);
 }
 
@@ -93,11 +62,11 @@ static void get_updatearea() {
 	updatearea = NULL;
 	
 	// surface0との領域の積をとる
-	intersection(&rsf0, &clip, &sact.updaterect);
+	SDL_IntersectRect(&rsf0, &clip, &sact.updaterect);
 	
 	SACT_DEBUG("clipped area x=%d y=%d w=%d h=%d\n",
 		sact.updaterect.x, sact.updaterect.y,
-		sact.updaterect.width, sact.updaterect.height);
+		sact.updaterect.w, sact.updaterect.h);
 	
 	return;
 }
@@ -135,8 +104,8 @@ int sp_update_all(boolean syncscreen) {
 	// 画面全体を更新領域に
 	sact.updaterect.x = 0;
 	sact.updaterect.y = 0;
-	sact.updaterect.width  = sf0->width;
-	sact.updaterect.height = sf0->height;
+	sact.updaterect.w = sf0->width;
+	sact.updaterect.h = sf0->height;
 	
 	// updatelistに登録してあるスプライトを再描画
 	// updatelistはスプライトの番号順に並んでいる
@@ -164,10 +133,8 @@ int sp_update_clipped() {
 	// 更新領域の確定
 	get_updatearea();
 	
-	// 幅または高さが 0 の時はなにもしない
-	if (sact.updaterect.width == 0 || sact.updaterect.height == 0) {
+	if (SDL_RectEmpty(&sact.updaterect))
 		return OK;
-	}
 
 	// 更新領域に入っているスプライトの再描画
 	slist_foreach(sact.updatelist, do_update_each, NULL);
@@ -178,7 +145,7 @@ int sp_update_clipped() {
 	}
 	
 	// 更新領域を Window に転送
-	ags_updateArea(sact.updaterect.x, sact.updaterect.y, sact.updaterect.width, sact.updaterect.height);
+	ags_updateArea(sact.updaterect.x, sact.updaterect.y, sact.updaterect.w, sact.updaterect.h);
 	
 	return OK;
 }
@@ -196,13 +163,13 @@ int sp_updateme(sprite_t *sp) {
 	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x;
 	r->y = sp->cur.y;
-	r->width = sp->cursize.width;
-	r->height = sp->cursize.height;
+	r->w = sp->cursize.width;
+	r->h = sp->cursize.height;
 	
 	updatearea = slist_append(updatearea, r);
 	
 	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d\n",
-		r->x, r->y, sp->no, r->width, r->height);
+		r->x, r->y, sp->no, r->w, r->h);
 	
 	return OK;
 }
@@ -224,13 +191,13 @@ int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x + x;
 	r->y = sp->cur.y + y;
-	r->width = w;
-	r->height = h;
+	r->w = w;
+	r->h = h;
 	
 	updatearea = slist_append(updatearea, r);
 	
 	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d\n",
-		r->x, r->y, sp->no, r->width, r->height);
+		r->x, r->y, sp->no, r->w, r->h);
 	
 	return OK;
 }

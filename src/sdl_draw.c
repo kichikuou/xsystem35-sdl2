@@ -103,12 +103,9 @@ void sdl_wait_vsync() {
 
 /* off-screen の指定領域を Main Window へ転送 */
 void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
-	SDL_Rect rect_s, rect_d;
+	SDL_Rect rect_d = {winoffset_x + dst->x, winoffset_y + dst->y, src->w, src->h};
 	
-	setRect(rect_s, src->x, src->y, src->width, src->height);
-	setRect(rect_d, winoffset_x + dst->x, winoffset_y + dst->y, src->width, src->height);
-	
-	SDL_BlitSurface(sdl_dib, &rect_s, sdl_display, &rect_d);
+	SDL_BlitSurface(sdl_dib, src, sdl_display, &rect_d);
 	
 	sdl_dirty = TRUE;
 }

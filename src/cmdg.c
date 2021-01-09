@@ -68,8 +68,8 @@ void commandGS() {
 	cg_get_info(num - 1, &r);
 	var[0] = r.x;
 	var[1] = r.y;
-	var[2] = r.width;
-	var[3] = r.height;
+	var[2] = r.w;
+	var[3] = r.h;
 	
 	DEBUG_COMMAND("GS %d,%p:\n",num,var);
 }

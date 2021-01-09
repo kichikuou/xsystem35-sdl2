@@ -70,8 +70,8 @@ static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
 	
 	r.x = sp->cur.x + margin;
 	r.y = sp->cur.y + margin;
-	r.width = curcg->sf->width   - 2 * margin;
-	r.height = curcg->sf->height - 2 * margin;
+	r.w = curcg->sf->width - 2 * margin;
+	r.h = curcg->sf->height - 2 * margin;
 	return ags_regionContains(&r, x, y);
 }
 

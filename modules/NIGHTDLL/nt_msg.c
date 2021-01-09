@@ -289,9 +289,9 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 	
 	// Waitなしの出力は最後にupdate
 	if (needupdate) {
-		uparea.width  = sp->cursize.width;
-		uparea.height = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace);
-		nt_sp_updateme_part(sp, uparea.x, uparea.y, uparea.width, uparea.height);
+		uparea.w = sp->cursize.width;
+		uparea.h = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace);
+		nt_sp_updateme_part(sp, uparea.x, uparea.y, uparea.w, uparea.h);
 	}
 	
 }
@@ -459,8 +459,8 @@ int ntmsg_update(sprite_t *sp, MyRectangle *r) {
 	//  -> 説明スプライトのように、SetShowされたときに対応できないからだめ 
 	//if (sact.msgbufempty) return OK;
 	
-	update.width  = r->width;
-	update.height = r->height;
+	update.width  = r->w;
+	update.height = r->h;
 	
 	dx = sp->cur.x - r->x;
 	dy = sp->cur.y - r->y;

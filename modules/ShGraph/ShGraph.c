@@ -402,8 +402,8 @@ static void SetAnimeRect() {
 	
 	maprect.x = x;
 	maprect.y = y;
-	maprect.width  = w;
-	maprect.height = h;
+	maprect.w = w;
+	maprect.h = h;
 }
 
 static void SetAnimeBack() {
@@ -428,8 +428,8 @@ static void SetAnimeBack() {
 
 	mapback.x = sx;
 	mapback.y = sy;
-	mapback.width  = w;
-	mapback.height = h;
+	mapback.w = w;
+	mapback.h = h;
 	mapback_p5 = p5;
 	mapback_p6 = p6;
 }
@@ -487,9 +487,8 @@ static void PlayAnimeData() {
 				
 				if (!is_backcopied) {
 					is_backcopied = TRUE;
-					ags_copyArea(mapback.x, mapback.y,
-						     mapback.width, mapback.height,
-						     mapback_p5, mapback_p6);
+					ags_copyArea(mapback.x, mapback.y, mapback.w, mapback.h,
+								 mapback_p5, mapback_p6);
 				}
 				
 				if (wavno != 0) {
@@ -541,14 +540,12 @@ static void PlayAnimeData() {
 				// printf("wavPlay %d\n", wavno % 256);
 			}
 		}
-		if (is_backcopied && maprect.width != 0 && maprect.height != 0) {
-			ags_updateArea(maprect.x, maprect.y, maprect.width, maprect.height);
-		}
-		{
-			int now = get_high_counter(SYSTEMCOUNTER_MSEC);
-			if (now - cnt < interval) {
-				sdl_sleep(interval - (now-cnt));
-			}
+		if (is_backcopied && !SDL_RectEmpty(&maprect))
+			ags_updateArea(maprect.x, maprect.y, maprect.w, maprect.h);
+
+		int now = get_high_counter(SYSTEMCOUNTER_MSEC);
+		if (now - cnt < interval) {
+			sdl_sleep(interval - (now-cnt));
 		}
 	}
 }

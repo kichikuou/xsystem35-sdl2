@@ -132,38 +132,38 @@ void msg_putMessage(const char *m) {
 	switch(msgDecorateType) {
 	case 0:
 	default:
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 0;
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 0;
 		break;
 	case 1:
 		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case 2:
 		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 0;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case 3:
 		ags_drawString(msgcur.x +1, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
 	case 4:
 		ags_drawString(msgcur.x -1, msgcur.y, m, msgDecorateColor);
 		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
 		ags_drawString(msgcur.x, msgcur.y -1, m, msgDecorateColor);
 		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
-		adj.x = -1; adj.y = -1; adj.width = 2; adj.height = 2;
+		adj.x = -1; adj.y = -1; adj.w = 2; adj.h = 2;
 		break;
 	case 6:
 		ags_drawString(msgcur.x +1, msgcur.y, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 0;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case 7:
 		ags_drawString(msgcur.x, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case 8:
 		ags_drawString(msgcur.x +1, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
 	case 10:
 		ags_drawString(msgcur.x -1, msgcur.y   , m, msgDecorateColor);
@@ -171,25 +171,25 @@ void msg_putMessage(const char *m) {
 		ags_drawString(msgcur.x   , msgcur.y -1, m, msgDecorateColor);
 		ags_drawString(msgcur.x   , msgcur.y +1, m, msgDecorateColor);
 		ags_drawString(msgcur.x +2, msgcur.y +2, m, msgDecorateColor);
-		adj.x = -1; adj.y = -1; adj.width = 3; adj.height = 3;
+		adj.x = -1; adj.y = -1; adj.w = 3; adj.h = 3;
 		break;
 	}
 	
 	MyRectangle drawn = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
-	msgcur.x += drawn.width;
+	msgcur.x += drawn.w;
 	drawn.x += adj.x;
 	drawn.y += adj.y;
-	drawn.width += adj.width;
-	drawn.height += adj.height;
+	drawn.w += adj.w;
+	drawn.h += adj.h;
 
 	if (nact->messagewait_enable && !nact->messagewait_cancelled && !msgskip_isSkipping()) {
 		int x;
-		for (x = 0; x < drawn.width; x+=16) {
-			ags_updateArea(drawn.x + x, drawn.y, 16, drawn.height);
+		for (x = 0; x < drawn.w; x+=16) {
+			ags_updateArea(drawn.x + x, drawn.y, 16, drawn.h);
 			if (nact->messagewait_cancel) {
 				if (sys_getInputInfo()) {
 					nact->messagewait_cancelled = TRUE;
-					ags_updateArea(drawn.x, drawn.y, drawn.width, drawn.height);
+					ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
 					break;
 				}
 				sdl_sleep(nact->messagewait_time * 10);
@@ -197,7 +197,7 @@ void msg_putMessage(const char *m) {
 			nact->callback();
 		}
 	} else {
-		ags_updateArea(drawn.x, drawn.y, drawn.width, drawn.height);
+		ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
 	}
 }
 
@@ -335,7 +335,7 @@ void msg_hitAnyKey() {
 	MyRectangle r = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
 								   msg.win->y + msg.win->height - msg.MsgFontSize,
 								   prompt[nact->encoding], msg.HitAnyKeyMsgColor);
-	ags_updateArea(r.x, r.y, r.width, r.height);
+	ags_updateArea(r.x, r.y, r.w, r.h);
 }
 
 static void drawLineFrame(Bcom_WindowInfo *i) {

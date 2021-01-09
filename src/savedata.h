@@ -31,7 +31,6 @@ typedef int emscripten_align1_int;
 #endif
 
 #include "portab.h"
-#include "cg.h"
 #include "windowframe.h"
 
 #define SAVE_MAXNUMBER    (26)

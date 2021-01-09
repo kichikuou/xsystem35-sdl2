@@ -151,7 +151,6 @@ extern void ags_getViewAreaInfo(DispInfo *info);
 extern boolean ags_regionContains(MyRectangle *r, int x, int y);
 extern boolean ags_check_param(int *x, int *y, int *w, int *h);
 extern boolean ags_check_param_xy(int *x, int *y);
-extern void    ags_intersection(MyRectangle *r1, MyRectangle *r2, MyRectangle *rst);
 extern agsurface_t *ags_getDIB();
 
 /* 画面更新 */

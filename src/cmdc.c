@@ -256,7 +256,7 @@ void commandCP() {
 	MyRectangle* rec = ags_imageFlood(x, y, color);
 
 	if (rec != NULL) {
-		ags_updateArea(rec->x, rec->y, rec->width, rec->height);
+		ags_updateArea(rec->x, rec->y, rec->w, rec->h);
 	}
 
 	DEBUG_COMMAND("CP %d,%d,%d:\n", x, y, color);

@@ -65,16 +65,11 @@ static int get_ecounter(void) {
 }
 
 static void eCopyUpdateArea(int sx, int sy, int w, int h, int dx, int dy) {
-	MyRectangle src;
-	MyPoint dst;
-	
-	src.x = sx;
-	src.y = sy;
-	src.width  = w;
-	src.height = h;
-	dst.x = dx - nact->sys_view_area.x;
-	dst.y = dy - nact->sys_view_area.y;
-	
+	MyRectangle src = {sx, sy, w, h};
+	MyPoint dst = {
+		dx - nact->sys_view_area.x,
+		dy - nact->sys_view_area.y
+	};
 	sdl_updateArea(&src, &dst);
 }
 
@@ -1069,20 +1064,20 @@ static void eCopyArea43(int step) {
 	}
 	if (step == slice) {
 		ags_scaledCopyArea(ecp.sx, ecp.sy, ecp.w, ecp.h,
-				   nact->sys_view_area.x,     nact->sys_view_area.y,
-				   nact->sys_view_area.width, nact->sys_view_area.height, 0);
+				   nact->sys_view_area.x, nact->sys_view_area.y,
+				   nact->sys_view_area.w, nact->sys_view_area.h, 0);
 		ags_updateFull();
 		return;
 	}
 	
 	deltax = (ecp.sx - nact->sys_view_area.x) * step / slice;
 	deltay = (ecp.sy - nact->sys_view_area.y) * step / slice;
-	deltaw = (nact->sys_view_area.width  - ecp.w) * step / slice;
-	deltah = (nact->sys_view_area.height - ecp.h) * step / slice;
+	deltaw = (nact->sys_view_area.w - ecp.w) * step / slice;
+	deltah = (nact->sys_view_area.h - ecp.h) * step / slice;
 	ags_zoom(nact->sys_view_area.x + deltax,
 		 nact->sys_view_area.y + deltay,
-		 nact->sys_view_area.width  - deltaw,
-		 nact->sys_view_area.height - deltah);
+		 nact->sys_view_area.w - deltaw,
+		 nact->sys_view_area.h - deltah);
 }
 
 static void eCopyArea44(int step) {
@@ -1261,12 +1256,10 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 			ags_copyAreaSP(sx, sy, w, h, dx, dy, spCol);
 		}
 		{
-			MyRectangle r, update;
-			
-			r.x = dx; r.y = dy; r.width = w; r.height = h;
-			ags_intersection(&nact->sys_view_area, &r, &update);
-			w  = update.width;
-			h  = update.height;
+			MyRectangle r = {dx, dy, w, h}, update;
+			SDL_IntersectRect(&nact->sys_view_area, &r, &update);
+			w = update.w;
+			h = update.h;
 		}
 	}
 	
