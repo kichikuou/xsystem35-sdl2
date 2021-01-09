@@ -65,14 +65,14 @@ static int sel_main();
  *  マージン内はsprite内部とは判断しない
  */
 static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
-	MyRectangle r;
-	cginfo_t *curcg = sp->curcg;
-	
-	r.x = sp->cur.x + margin;
-	r.y = sp->cur.y + margin;
-	r.w = curcg->sf->width - 2 * margin;
-	r.h = curcg->sf->height - 2 * margin;
-	return ags_regionContains(&r, x, y);
+	MyPoint p = {x, y};
+	MyRectangle r = {
+		sp->cur.x + margin,
+		sp->cur.y + margin,
+		sp->curcg->sf->width - 2 * margin,
+		sp->curcg->sf->height - 2 * margin
+	};
+	return SDL_PointInRect(&p, &r);
 }
 
 // マウスが移動したときの callback

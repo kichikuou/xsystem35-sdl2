@@ -89,13 +89,14 @@ void commandEM() {
 	int *var = getCaliVariable();
 	int x    = getCaliValue();
 	int y    = getCaliValue();
+
+	MyPoint p = {x, y};
 	MyRectangle r = tbl[num - 1].r;
-	
 	if (nact->patch_emen == 0) {
 		r.w -= 1;
 		r.h -= 1;
 	}
-	*var = ags_regionContains(&r, x, y) ? 1 : 0;
+	*var = SDL_PointInRect(&p, &r) ? 1 : 0;
 	DEBUG_COMMAND("EM %d,%d,%d,%d:\n", num, *var, x, y);
 }
 
@@ -105,18 +106,18 @@ void commandEN() {
 	int max  = getCaliValue();
 	int x    = getCaliValue();
 	int y    = getCaliValue();
-	int i;
-	MyRectangle r;
 	
+	MyPoint p = {x, y};
 	*var = 0;
 	
-	for (i = min; i <= max; i++) {
-		r = tbl[i - 1].r;
+	for (int i = min; i <= max; i++) {
+		MyRectangle r = tbl[i - 1].r;
 		if (nact->patch_emen == 0) {
 			r.w -= 1;
 			r.h -= 1;
 		}
-		if (ags_regionContains(&r, x, y)) *var = i;
+		if (SDL_PointInRect(&p, &r))
+			*var = i;
 	}
 	
 	DEBUG_COMMAND("EN %d,%d,%d,%d,%d:\n", *var, min, max, x, y);

@@ -64,11 +64,6 @@ static void initPal(Palette256 *pal) {
 	nact->sys_pal_changed = TRUE;
 }
 
-boolean ags_regionContains(MyRectangle *r, int x, int y) {
-	MyPoint p = {x, y};
-	return SDL_PointInRect(&p, r);
-}
-
 boolean ags_check_param(int *x, int *y, int *w, int *h) {
 	if (*x >= nact->sys_world_size.width) {
 		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)\n", *x, nact->sys_world_size.width, sl_getPage(), sl_getIndex());
