@@ -80,9 +80,9 @@ int save_delete_file(int index) {
 int save_save_var_with_file(char *fname_utf8, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
-	WORD *tmp, *_tmp;
+	WORD *tmp;
 	
-	tmp = _tmp = (WORD *)malloc(cnt * sizeof(WORD));
+	tmp = (WORD *)malloc(cnt * sizeof(WORD));
 	
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
@@ -90,18 +90,14 @@ int save_save_var_with_file(char *fname_utf8, int *start, int cnt) {
 	}
 	
 	for (i = 0; i < cnt; i++) {
-#ifdef WORDS_BIGENDIAN
-		*tmp = swap16((WORD)*start); start++; tmp++;
-#else
-		*tmp = (WORD)*start; start++; tmp++;
-#endif
+		tmp[i] = SDL_SwapLE16((WORD)start[i]);
 	}
 	
 	if (NULL == (fp = fc_open(fname_utf8, 'w'))) {
 		status = SAVE_SAVEERR; goto errexit;
 	}
 	
-	size = fwrite(_tmp, sizeof(WORD), cnt, fp);
+	size = fwrite(tmp, sizeof(WORD), cnt, fp);
 	
 	if (size != cnt) {
 		status = SAVE_OTHERERR;
@@ -112,7 +108,7 @@ int save_save_var_with_file(char *fname_utf8, int *start, int cnt) {
 	fclose(fp);
 	scheduleSync();
  errexit:	
-	free(_tmp);
+	free(tmp);
 	
 	return status;
 }
@@ -121,9 +117,9 @@ int save_save_var_with_file(char *fname_utf8, int *start, int cnt) {
 int save_load_var_with_file(char *fname_utf8, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
-	WORD *tmp, *_tmp;
+	WORD *tmp;
 	
-	tmp = _tmp = (WORD *)malloc(cnt * sizeof(WORD));
+	tmp = (WORD *)malloc(cnt * sizeof(WORD));
 	
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
@@ -143,16 +139,12 @@ int save_load_var_with_file(char *fname_utf8, int *start, int cnt) {
 	}
 	
 	for (i = 0; i < cnt; i++) {
-#ifdef WORDS_BIGENDIAN
-		*start = swap16(*tmp); start++; tmp++;
-#else
-		*start = *tmp; start++; tmp++;
-#endif
+		start[i] = SDL_SwapLE16(tmp[i]);
 	}
 
 	fclose(fp);
  errexit:	
-	free(_tmp);
+	free(tmp);
 	return status;
 }
 

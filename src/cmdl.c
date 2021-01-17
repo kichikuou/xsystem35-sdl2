@@ -166,11 +166,7 @@ void commandLL() {
 			num = dfile->size / sizeof(WORD);
 		}
 		for (i = 0; i < num; i++) {
-#ifdef WORDS_BIGENDIAN
-			*var = swap16(*data); var++; data++;
-#else
-			*var = *data; var++; data++;
-#endif
+			var[i] = SDL_SwapLE16(data[i]);
 		}
 		break;
 		

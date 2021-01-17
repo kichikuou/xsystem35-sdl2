@@ -87,12 +87,6 @@ typedef _Bool          ___boolean;
 #  define N_(String) (String)
 #endif
 
-#define swap16(a) ( (((a) & 0xff) << 8) | ((unsigned short)(a) >> 8) )
-#define swap32(a) ( ((a) << 24) | \
-		   (((a) << 8) & 0x00ff0000) | \
-		   (((a) >> 8) & 0x0000ff00) | \
-		   ((unsigned int)(a) >>24) )
-
 #ifndef __EMSCRIPTEN__
 #define EMSCRIPTEN_KEEPALIVE
 #endif
