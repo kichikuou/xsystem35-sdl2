@@ -26,6 +26,9 @@
 #include "dri.h"
 #include "cache.h"
 #include "ald_manager.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 /* drifiles object */
 static drifiles *dri[DRIFILETYPEMAX];
@@ -53,6 +56,7 @@ static void ald_free(dridata *dfile) {
  *   no  : file no ( >= 0 )
  *   return: loaded dridata object
 */
+EMSCRIPTEN_KEEPALIVE
 dridata *ald_getdata(DRIFILETYPE type, int no) {
 	dridata *ddata;
 	
@@ -86,6 +90,7 @@ dridata *ald_getdata(DRIFILETYPE type, int no) {
  * free dri object
  *   data: object to be free
  */
+EMSCRIPTEN_KEEPALIVE
 void ald_freedata(dridata *data) {
 	if (data == NULL) return;
 	

@@ -27,6 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "xsystem35.h"
@@ -782,6 +785,7 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 	}
 }
 
+EMSCRIPTEN_KEEPALIVE
 void ags_setAntialiasedStringMode(boolean on) {
 	if (!nact->noantialias) {
 		font_set_antialias(on);
