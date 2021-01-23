@@ -39,7 +39,6 @@
 #include "counter.h"
 #include "utfsjis.h"
 #include "input.h"
-#include "flood.h"
 #include "font.h"
 #include "cursor.h"
 #include "image.h"
@@ -462,73 +461,11 @@ void ags_copyArea_whiteLevel(int sx, int sy, int w, int h, int dx, int dy, int l
 	sdl_copyAreaSP16_whiteLevel(sx, sy, w, h, dx, dy, lv);
 }
 
+MyRectangle ags_floodFill(int x, int y, int col) {
+	if (!check_param_xy(&x, &y))
+		return (MyRectangle){};
 
-/*******************************************************
- *
- * special thanks to tajiri@wizard.elec.waseda.ac.jpさん
- *
- *******************************************************/
-/* CP コマンドの実装用. 同じ色で出来た領域を指定された
-   色で塗り変える。
-*/
-static int floodColor;
-static int changeColor;
-static agsurface_t *__img;
-/*この操作のあとにアップデートする領域
-  (updatePointTop と updatePointEndで囲まれた長方形)
- */
-static MyPoint updatePointTop, updatePointEnd;
-
-static int pixcel(int x, int y) {
-	int pixval;
-	
-	if ((y >= 0) && (y <= __img->height) && (x >= 0) && (x <= __img->width)) {
-		BYTE *dst = (BYTE *)(__img->pixel + y * __img->bytes_per_line + x);
-		pixval = *dst;
-		
-		if (pixval == floodColor){
-		/* if(pixval <= floodColor+2 && pixval >= floodColor-2){ */
-			*dst = changeColor;
-			if (x < updatePointTop.x) updatePointTop.x = x;
-			if (x > updatePointEnd.x) updatePointEnd.x = x;
-			if (y < updatePointTop.y) updatePointTop.y = y;
-			if (y > updatePointEnd.y) updatePointEnd.y = y;
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-MyRectangle* ags_imageFlood(int x, int y, int c) {
-	if (nact->sys_world_depth != 8) return NULL;
-	
-	if (!check_param_xy(&x, &y)) return NULL;
-
-{
-	agsurface_t *dib = nact->ags.dib;
-	BYTE *dst = GETOFFSET_PIXEL(dib, x, y);
-	static MyRectangle rec;
-	__img = dib;
-	updatePointTop.x = x;
-	updatePointTop.y = y;
-	updatePointEnd.x = x;
-	updatePointEnd.y = y;
-	/*直線はぬりなおしたりしない！！*/
-	if ((x <= 0 || (*(dst - 1) != *(dst))) && ((x >= dib->width) || (*(dst + 1) != *dst)))
-		return NULL;
-	if ((y <= 0 || (*(dst - dib->bytes_per_line) != *(dst)))
-	    && ((y >= dib->height) || (*(dst + dib->bytes_per_line) != *dst)))
-		return NULL;
-	floodColor = *dst;
-	
-	changeColor = c;
-	flood(x, y, pixcel);
-	rec.x = updatePointTop.x;
-	rec.y = updatePointTop.y;
-	rec.w = updatePointEnd.x - updatePointTop.x + 1;
-	rec.h = updatePointEnd.y - updatePointTop.y + 1;
-	return &rec;
-}
+	return sdl_floodFill(x, y, col);
 }
 
 void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg) {

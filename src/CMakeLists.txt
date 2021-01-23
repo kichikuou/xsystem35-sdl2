@@ -62,7 +62,7 @@ target_sources(xsystem35 PRIVATE
 
 # Graphics
 target_sources(xsystem35 PRIVATE
-  ags.c flood.c cg.c ecopy.c alpha_plane.c cursor.c)
+  ags.c cg.c ecopy.c alpha_plane.c cursor.c)
 
 # Network
 target_sources(xsystem35 PRIVATE
