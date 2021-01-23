@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -137,39 +138,39 @@ void sdl_setPalette(Palette256 *pal, int src, int cnt) {
 }
 
 /* 矩形の描画 */
-void sdl_drawRectangle(int x, int y, int w, int h, int c) {
+void sdl_drawRectangle(int x, int y, int w, int h, BYTE c) {
 	SDL_Rect rect;
 	
 	sdl_pal_check();
-	
-	if (c < 256 && sdl_dib->format->BitsPerPixel > 8)
-		c = SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+
+	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
+		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
 
 	setRect(rect,x,y,w,1);
-	SDL_FillRect(sdl_dib, &rect, c);
+	SDL_FillRect(sdl_dib, &rect, col);
 	
 	setRect(rect,x,y,1,h);
-	SDL_FillRect(sdl_dib, &rect, c);
+	SDL_FillRect(sdl_dib, &rect, col);
 	
 	setRect(rect,x,y+h-1,w,1);
-	SDL_FillRect(sdl_dib, &rect, c);
+	SDL_FillRect(sdl_dib, &rect, col);
 	
 	setRect(rect,x+w-1,y,1,h);
-	SDL_FillRect(sdl_dib, &rect, c);
+	SDL_FillRect(sdl_dib, &rect, col);
 }
 
 /* 矩形塗りつぶし */
-void sdl_fillRectangle(int x, int y, int w, int h, unsigned long c) {
+void sdl_fillRectangle(int x, int y, int w, int h, BYTE c) {
 	SDL_Rect rect;
 	
 	sdl_pal_check();
 	
 	setRect(rect,x,y,w,h);
+
+	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
+		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
 	
-	if (c < 256 && sdl_dib->format->BitsPerPixel > 8)
-		c = SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
-	
-	SDL_FillRect(sdl_dib, &rect, c);
+	SDL_FillRect(sdl_dib, &rect, col);
 }
 
 /* 領域コピー */
@@ -193,19 +194,20 @@ void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 /*
  * dib に指定のパレット sp を抜いてコピー
  */
-void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int sp) {
+void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, BYTE sp) {
 	SDL_Rect r_src, r_dst;
 
 	sdl_pal_check();
-	
-	if (sdl_dib->format->BitsPerPixel > 8 && sp < 256) {
-		sp = SDL_MapRGB(sdl_dib->format,
+
+	Uint32 col = sp;
+	if (sdl_dib->format->BitsPerPixel > 8) {
+		col = SDL_MapRGB(sdl_dib->format,
 				sdl_col[sp].r & 0xf8,
 				sdl_col[sp].g & 0xfc,
 				sdl_col[sp].b & 0xf8);
 	}
 	
-	SDL_SetColorKey(sdl_dib, SDL_TRUE, sp);
+	SDL_SetColorKey(sdl_dib, SDL_TRUE, col);
 	
 	setRect(r_src, sx, sy, w, h);
 	setRect(r_dst, dx, dy, w, h);
@@ -274,15 +276,11 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 }
 
 /* 直線描画 */
-void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long cl) {
-
+void sdl_drawLine(int x1, int y1, int x2, int y2, BYTE c) {
 	sdl_pal_check();
 	
-	if (cl >= 256)
-		cl = 0;
-	
 	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(sdl_dib);
-	SDL_SetRenderDrawColor(renderer, sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b, SDL_ALPHA_OPAQUE);
+	SDL_SetRenderDrawColor(renderer, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b, SDL_ALPHA_OPAQUE);
 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 	SDL_DestroyRenderer(renderer);
 }
@@ -298,9 +296,8 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long cl) {
 #undef TYPE
 
 SDL_Rect sdl_floodFill(int x, int y, int c) {
-	Uint32 col = c;
-	if (c < 256 && sdl_dib->format->BitsPerPixel > 8)
-		col = SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
+		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
 
 	switch (sdl_dib->format->BytesPerPixel) {
 	case 1:
@@ -335,7 +332,7 @@ int sdl_nearest_color(int r, int g, int b) {
 	return col;
 }
 
-SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, unsigned long col) {
+SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, BYTE col) {
 	sdl_pal_check();
 	return font_draw_glyph(x, y, str_utf8, col);
 }
@@ -476,21 +473,17 @@ void sdl_whiteOut(int step) {
 /*
  * 指定範囲にパレット col を rate の割合で重ねる CK1
  */
-void sdl_wrapColor(int sx, int sy, int w, int h, int cl, int rate) {
+void sdl_wrapColor(int sx, int sy, int w, int h, BYTE c, int rate) {
 	SDL_Surface *s;
 	SDL_Rect r_src,r_dst;
 
 	s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
-	
-	if (s->format->BitsPerPixel == 8) {
-		memcpy(s->format->palette->colors, sdl_dib->format->palette->colors,
-		       sizeof(SDL_Color)*256);
-	} else {
-		cl = (cl < 256) ? SDL_MapRGB(sdl_dib->format, sdl_col[cl].r, sdl_col[cl].g, sdl_col[cl].b) : cl;
-	}
-	
+	assert(s->format->BitsPerPixel > 8);
+
+	Uint32 col = SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+
 	setRect(r_src, 0, 0, w, h);
-	SDL_FillRect(s, &r_src, cl);
+	SDL_FillRect(s, &r_src, col);
 	
 	SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(s, rate);
