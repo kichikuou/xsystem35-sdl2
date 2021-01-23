@@ -84,7 +84,4 @@ extern struct sdl_private_data *sdl_videodev;
 #define winoffset_y (sdl_videodev->winoffset_y)
 #define sdl_custom_event_handler (sdl_videodev->custom_event_handler)
 
-#define setRect(r,xx,yy,ww,hh) (r).x=(xx),(r).y=(yy),(r).w=(ww),(r).h=(hh)
-#define setOffset(s,x,y) (s->pixels) + (x) * (s->format->BytesPerPixel) + (y) * s->pitch
-
 #endif /* __SDL_PRIVATE_H__ */

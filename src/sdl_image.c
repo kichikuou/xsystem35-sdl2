@@ -44,7 +44,6 @@ static void sdl_scaledCopyAreaInternal(SDL_Surface *src, SDL_Surface *dst, int s
 	int      *row, *col;
 	int      x, y;
 	SDL_Surface *ss;
-	SDL_Rect r_src, r_dst;
 	
 	ss = SDL_CreateRGBSurface(0, dw, dh, dst->format->BitsPerPixel, 0, 0, 0, 0);
 	
@@ -127,8 +126,8 @@ static void sdl_scaledCopyAreaInternal(SDL_Surface *src, SDL_Surface *dst, int s
 	
 	SDL_UnlockSurface(ss);
 	
-	setRect(r_src,  0,  0, dw, dh);
-	setRect(r_dst, dx, dy, dw, dh);
+	SDL_Rect r_src = { 0,  0, dw, dh};
+	SDL_Rect r_dst = {dx, dy, dw, dh};
 	SDL_BlitSurface(ss, &r_src, dst, &r_dst);
 	
 	SDL_FreeSurface(ss);
@@ -153,7 +152,6 @@ void sdl_zoom(int x, int y, int w, int h) {
 void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	/* draw alpha pixel */
 	SDL_Surface *s;
-	SDL_Rect r_src,r_dst;
 	BYTE *pic_save = NULL;
 
 	/* set alpha Level */
@@ -209,8 +207,8 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 		}
 		SDL_UnlockSurface(s);
 	}
-	setRect(r_src,  0,  0, w, h);
-	setRect(r_dst, dx, dy, w, h);
+	SDL_Rect r_src = { 0,  0, w, h};
+	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 
@@ -239,12 +237,11 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 	BYTE *p_src, *p_dst, *p_ds;
 	
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
-	SDL_Rect r_src, r_dst;
 	int x, y;
 
-	setRect(r_dst, sx, sy, w, h);
-	setRect(r_src,  0,  0, w, h);
-	SDL_BlitSurface(sdl_dib, &r_dst, s, &r_src);
+	SDL_Rect r_src = {sx, sy, w, h};
+	SDL_Rect r_tmp = { 0,  0, w, h};
+	SDL_BlitSurface(sdl_dib, &r_src, s, &r_tmp);
 
 	SDL_LockSurface(s);
 
@@ -284,16 +281,14 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 	}
 	SDL_UnlockSurface(s);
 
-	setRect(r_dst, dx, dy, w, h);
-	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
+	SDL_Rect r_dst = {dx, dy, w, h};
+	SDL_BlitSurface(s, &r_tmp, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 }
 
 void sdl_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	SDL_Rect r_src, r_dst;
-
-	setRect(r_src, sx, sy, w, h);
-	setRect(r_dst, dx, dy, w, h);
+	SDL_Rect r_src = {sx, sy, w, h};
+	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(sdl_dib, lv);
 	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
@@ -301,9 +296,8 @@ void sdl_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, i
 }
 
 #define copyAreaSP_level(fn, cn, v) void sdl_copyAreaSP16_##fn(int sx, int sy, int w, int h, int dx, int dy, int lv) { \
-	SDL_Rect r_src,r_dst; \
-	setRect(r_src, sx, sy, w, h); \
-	setRect(r_dst, dx, dy, w, h); \
+	SDL_Rect r_src = {sx, sy, w, h};	   \
+	SDL_Rect r_dst = {dx, dy, w, h};					   \
 	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_BLEND); \
 	SDL_SetSurfaceAlphaMod(sdl_dib, v); \
 	SDL_FillRect(sdl_dib, &r_dst, cn); \
@@ -332,12 +326,11 @@ void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 void sdl_getPixel(int x, int y, Palette *cell) {
 	SDL_LockSurface(sdl_dib);
 
+	BYTE *p = PIXEL_AT(sdl_dib, x, y);
 	if (sdl_dib->format->BitsPerPixel == 8) {
-		BYTE *rt = setOffset(sdl_dib, x, y);
-		cell->pixel = *rt;
+		cell->pixel = *p;
 	} else {
 		Uint32 cl=0;
-		BYTE *p = setOffset(sdl_dib, x, y);
 		
 		switch (sdl_dib->format->BytesPerPixel) {
 		case 2:
@@ -370,17 +363,14 @@ void sdl_getPixel(int x, int y, Palette *cell) {
  * dib から領域の切り出し
  */
 void* sdl_saveRegion(int x, int y, int w, int h) {
-	SDL_Surface *s;
-	SDL_Rect r_src, r_dst;
-
-	s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel,
+	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel,
 			     sdl_dib->format->Rmask, sdl_dib->format->Gmask,
 			     sdl_dib->format->Bmask, sdl_dib->format->Amask);
 	if (sdl_dib->format->BitsPerPixel == 8)
 		memcpy(s->format->palette->colors, sdl_dib->format->palette->colors,
 		       sizeof(SDL_Color) * sdl_dib->format->palette->ncolors);
-	setRect(r_src, x, y, w, h);
-	setRect(r_dst, 0, 0, w, h);
+	SDL_Rect r_src = {x, y, w, h};
+	SDL_Rect r_dst = {0, 0, w, h};
 	SDL_BlitSurface(sdl_dib, &r_src, s, &r_dst);
 	return s;
 }
@@ -397,10 +387,9 @@ void sdl_delRegion(void *psrc) {
  */
 void sdl_putRegion(void *psrc, int x, int y) {
 	SDL_Surface *src = (SDL_Surface *)psrc;
-	SDL_Rect r_src,r_dst;
 	
-	setRect(r_src, 0, 0, src->w, src->h);
-	setRect(r_dst, x, y, src->w, src->h);
+	SDL_Rect r_src = {0, 0, src->w, src->h};
+	SDL_Rect r_dst = {x, y, src->w, src->h};
 
 	SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
 }
@@ -410,10 +399,9 @@ void sdl_putRegion(void *psrc, int x, int y) {
  */
 void sdl_CopyRegion(void *psrc, int sx, int sy, int w,int h, int dx, int dy) {
 	SDL_Surface *src = (SDL_Surface *)psrc;
-	SDL_Rect r_src,r_dst;
 
-	setRect(r_src, sx, sy, w, h);
-	setRect(r_dst, dx, dy, w, h);
+	SDL_Rect r_src = {sx, sy, w, h};
+	SDL_Rect r_dst = {dx, dy, w, h};
 
 	SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
 }

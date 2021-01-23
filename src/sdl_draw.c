@@ -113,9 +113,7 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 
 /* 全画面更新 */
 static void sdl_updateAll() {
-	SDL_Rect rect;
-
-	setRect(rect, winoffset_x, winoffset_y, view_w, view_h);
+	SDL_Rect rect = {winoffset_x, winoffset_y, view_w, view_h};
 	
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &rect);
 
@@ -139,33 +137,29 @@ void sdl_setPalette(Palette256 *pal, int src, int cnt) {
 
 /* 矩形の描画 */
 void sdl_drawRectangle(int x, int y, int w, int h, BYTE c) {
-	SDL_Rect rect;
-	
 	sdl_pal_check();
 
 	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
 		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
 
-	setRect(rect,x,y,w,1);
+	SDL_Rect rect = {x, y, w, 1};
 	SDL_FillRect(sdl_dib, &rect, col);
 	
-	setRect(rect,x,y,1,h);
+	rect = (SDL_Rect){x, y, 1, h};
 	SDL_FillRect(sdl_dib, &rect, col);
 	
-	setRect(rect,x,y+h-1,w,1);
+	rect = (SDL_Rect){x, y + h - 1, w, 1};
 	SDL_FillRect(sdl_dib, &rect, col);
 	
-	setRect(rect,x+w-1,y,1,h);
+	rect = (SDL_Rect){x + w - 1, y, 1, h};
 	SDL_FillRect(sdl_dib, &rect, col);
 }
 
 /* 矩形塗りつぶし */
 void sdl_fillRectangle(int x, int y, int w, int h, BYTE c) {
-	SDL_Rect rect;
-	
 	sdl_pal_check();
 	
-	setRect(rect,x,y,w,h);
+	SDL_Rect rect = {x, y, w, h};
 
 	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
 		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
@@ -178,9 +172,8 @@ void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	if (sx == dx && sy == dy)
 		return;
 
-	SDL_Rect r_src, r_dst;
-	setRect(r_src, sx, sy, w, h);
-	setRect(r_dst, dx, dy, w, h);
+	SDL_Rect r_src = {sx, sy, w, h};
+	SDL_Rect r_dst = {dx, dy, w, h};
 
 	SDL_Rect intersect;
 	if (SDL_IntersectRect(&r_src, &r_dst, &intersect)) {
@@ -195,8 +188,6 @@ void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
  * dib に指定のパレット sp を抜いてコピー
  */
 void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, BYTE sp) {
-	SDL_Rect r_src, r_dst;
-
 	sdl_pal_check();
 
 	Uint32 col = sp;
@@ -209,19 +200,15 @@ void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, BYTE sp) {
 	
 	SDL_SetColorKey(sdl_dib, SDL_TRUE, col);
 	
-	setRect(r_src, sx, sy, w, h);
-	setRect(r_dst, dx, dy, w, h);
+	SDL_Rect r_src = {sx, sy, w, h};
+	SDL_Rect r_dst = {dx, dy, w, h};
 	
 	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
 	SDL_SetColorKey(sdl_dib, SDL_FALSE, 0);
 }
 
 void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
-	SDL_Surface *s;
-	SDL_Rect r_src, r_dst;
-	
-	s = SDL_CreateRGBSurface(0, w, h, 8, 0, 0, 0, 0);
-
+	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, 8, 0, 0, 0, 0);
 	SDL_LockSurface(s);
 
 #if 0  /* for broken cg */
@@ -268,8 +255,8 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 		SDL_SetColorKey(s, SDL_TRUE, cg->spritecolor);
 	}
 	
-	setRect(r_src,  0,  0, w, h);
-	setRect(r_dst, dx, dy, w, h);
+	SDL_Rect r_src = { 0,  0, w, h};
+	SDL_Rect r_dst = {dx, dy, w, h};
 	
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
@@ -380,8 +367,6 @@ static void fader_in(int n) {
 	static SDL_Surface *s_fader;
 
 	if (n == 0) {
-		SDL_Rect r_src, r_dst;
-		
 		s_fader = SDL_CreateRGBSurface(0, sdl_display->w, sdl_display->h,
 					   sdl_display->format->BitsPerPixel, 0, 0, 0, 0);
 		
@@ -390,8 +375,8 @@ static void fader_in(int n) {
 			       sdl_display->format->palette->colors,
 			       sizeof(SDL_Color) * 256);
 		}
-		setRect(r_src, view_x, view_y, view_w, view_h);
-		setRect(r_dst, winoffset_x, winoffset_y, view_w, view_h);
+		SDL_Rect r_src = {view_x, view_y, view_w, view_h};
+		SDL_Rect r_dst = {winoffset_x, winoffset_y, view_w, view_h};
 		SDL_BlitSurface(sdl_dib, &r_src, s_fader, &r_dst);
 	}
 	
@@ -427,8 +412,7 @@ static void fader_out(int n,Uint32 c) {
 }
 
 static __inline void sdl_fade_blit(void) {
-	SDL_Rect r_dst;
-	setRect(r_dst, winoffset_x, winoffset_y, view_w, view_h);
+	SDL_Rect r_dst = {winoffset_x, winoffset_y, view_w, view_h};
 
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &r_dst);
 	sdl_dirty = TRUE;
@@ -474,20 +458,17 @@ void sdl_whiteOut(int step) {
  * 指定範囲にパレット col を rate の割合で重ねる CK1
  */
 void sdl_wrapColor(int sx, int sy, int w, int h, BYTE c, int rate) {
-	SDL_Surface *s;
-	SDL_Rect r_src,r_dst;
-
-	s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
+	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
 	assert(s->format->BitsPerPixel > 8);
 
 	Uint32 col = SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
 
-	setRect(r_src, 0, 0, w, h);
+	SDL_Rect r_src = {0, 0, w, h};
 	SDL_FillRect(s, &r_src, col);
 	
 	SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(s, rate);
-	setRect(r_dst, sx, sy, w, h);
+	SDL_Rect r_dst = {sx, sy, w, h};
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 }

@@ -174,12 +174,12 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, BYTE cl) {
 	TTF_SizeUTF8(fontset->id, str_utf8, &w, &h);
 	// Center vertically to the box.
 	y -= (TTF_FontHeight(fontset->id) - fontset->size) / 2;
-	setRect(r_dst, x, y, w, h);
+	r_dst = (SDL_Rect){x, y, w, h};
 	
 	if (sdl_dib->format->BitsPerPixel == 8 && this.antialiase_on) {
 		sdl_drawAntiAlias_8bpp(x, y, fs, cl);
 	} else {
-		setRect(r_src, 0, 0, w, h);
+		r_src = (SDL_Rect){0, 0, w, h};
 		SDL_BlitSurface(fs, &r_src, sdl_dib, &r_dst);
 	}
 
