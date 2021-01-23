@@ -248,7 +248,7 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 
 	SDL_LockSurface(s);
 
-#if SDL_BYTEORDER == SDL_LTL_ENDIAN
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	p_ds = s->pixels + 3;
 #else
 	p_ds = s->pixels;
@@ -347,7 +347,7 @@ void sdl_getPixel(int x, int y, Palette *cell) {
 			}
 			break;
 		case 3:
-#if SDL_BYTEORDER == SDL_LTL_ENDIAN
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 			cl = (p[2]<<16)+(p[1]<<8) + p[0];
 #else
 			cl = (p[0]<<16)+(p[1]<<8) + p[2];
