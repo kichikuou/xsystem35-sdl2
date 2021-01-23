@@ -287,68 +287,32 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, unsigned long cl) {
 	SDL_DestroyRenderer(renderer);
 }
 
-SDL_Rect sdl_floodFill(int x, int y, int col) {
-	// TODO: support non-8bit depths
-	if (sdl_dib->format->BitsPerPixel != 8)
+#define TYPE ___BYTE
+#include "flood.h"
+#undef TYPE
+#define TYPE ___WORD
+#include "flood.h"
+#undef TYPE
+#define TYPE ___DWORD
+#include "flood.h"
+#undef TYPE
+
+SDL_Rect sdl_floodFill(int x, int y, int c) {
+	Uint32 col = c;
+	if (c < 256 && sdl_dib->format->BitsPerPixel > 8)
+		col = SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+
+	switch (sdl_dib->format->BytesPerPixel) {
+	case 1:
+		return sdl_floodFill___BYTE(x, y, col);
+	case 2:
+		return sdl_floodFill___WORD(x, y, col);
+	case 4:
+		return sdl_floodFill___DWORD(x, y, col);
+	default:
+		WARNING("sdl_floodFill: unsupported DIB format\n");
 		return (SDL_Rect){};
-
-	int old_color = *(BYTE *)PIXEL_AT(sdl_dib, x, y);
-	if (old_color == col)
-		return (SDL_Rect){};
-
-	int minx = x, maxx = x, miny = y, maxy = y;
-
-	int stack_size = 64;
-	SDL_Point *stack = malloc(sizeof(SDL_Point) * stack_size);
-	int top = 0;
-	stack[top] = (SDL_Point){x, y};
-
-	while (top >= 0) {
-		x = stack[top].x;
-		y = stack[top].y;
-		top--;
-
-		BYTE *line = PIXEL_AT(sdl_dib, 0, y);
-		BYTE *prev_line = line - sdl_dib->pitch;
-		BYTE *next_line = line + sdl_dib->pitch;
-		while (x >= 0 && line[x] == old_color) x--;
-		x++;
-		minx = min(x, minx);
-
-		boolean span_above = FALSE, span_below = FALSE;
-		for (; x < sdl_dib->w && line[x] == old_color; x++) {
-			line[x] = col;
-			if (y > 0) {
-				if (!span_above && prev_line[x] == old_color) {
-					if (++top >= stack_size) {
-						stack_size *= 2;
-						stack = realloc(stack, sizeof(SDL_Point) * stack_size);
-					}
-					stack[top] = (SDL_Point){x, y - 1};
-					span_above = TRUE;
-				} else if (span_above && prev_line[x] != old_color) {
-					span_above = FALSE;
-				}
-			}
-			if (y < sdl_dib->h - 1) {
-				if (!span_below && next_line[x] == old_color) {
-					if (++top >= stack_size) {
-						stack_size *= 2;
-						stack = realloc(stack, sizeof(SDL_Point) * stack_size);
-					}
-					stack[top] = (SDL_Point){x, y + 1};
-					span_below = TRUE;
-				} else if (span_below && next_line[x] != old_color) {
-					span_below = FALSE;
-				}
-			}
-		}
-		maxx = max(x - 1, maxx);
-		miny = min(y, miny);
-		maxy = max(y, maxy);
 	}
-	free(stack);
-	return (SDL_Rect){minx, miny, maxx - minx + 1, maxy - miny + 1};
 }
 
 SDL_Surface *com2surface(agsurface_t *s) {
