@@ -31,10 +31,7 @@
 #include "LittleEndian.h"
 #include "s39ain.h"
 #include "xsystem35.h"
-
-#ifdef ENABLE_MODULES
 #include "modules.h"
-#endif
 
 /*
   system39.ain の読み込み
@@ -155,9 +152,8 @@ int s39ain_init(const char *path_to_ain, S39AIN *ain) {
 		}
 	}
 
-#ifdef ENABLE_MODULES
 	for (i = 0; i < ain->dllnum; i++)
 		resolve_module(&ain->dll[i]);
-#endif
+
 	return OK;
 }

@@ -93,13 +93,21 @@ add_library(modules STATIC
 
 target_include_directories(modules PUBLIC . lib)
 
-if (NOT ANDROID)
+if (NOT ANDROID AND NOT EMSCRIPTEN)
   add_executable(modules_tests lib/list_test.c)
   target_link_libraries(modules_tests PRIVATE modules)
   add_test(NAME modules_tests COMMAND modules_tests)
 endif()
 
 target_compile_options(modules PRIVATE -Wno-pointer-sign)
+
+if (EMSCRIPTEN)
+  set(LIBS
+    "SHELL:-s USE_LIBJPEG=1"
+    "SHELL:-s USE_SDL=2")
+  target_compile_options(modules PRIVATE ${LIBS})
+  target_link_options(modules PRIVATE ${LIBS})
+endif()
 
 if (SDL2MIXER_FOUND)
   if (ANDROID)
@@ -114,5 +122,7 @@ if (HAVE_JPEG)
     NightDemonDemo/ndd.c
     NightDemonDemo/jpeg2surface.c
     )
-  target_link_libraries(modules PRIVATE JPEG::JPEG)
+  if (NOT EMSCRIPTEN)
+    target_link_libraries(modules PRIVATE JPEG::JPEG)
+  endif()
 endif()

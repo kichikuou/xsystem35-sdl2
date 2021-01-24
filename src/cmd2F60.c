@@ -37,7 +37,6 @@ void commands2F60() {
 	int type = sys_getdw();  /* DLL type */
 	int fnum = sys_getdw();  /* function number */
 
-#ifdef ENABLE_MODULES
 	if (dll == NULL) {
 		SYSERROR("No DLL initilized\n");
 	}
@@ -50,7 +49,6 @@ void commands2F60() {
 
 	dll[type].function[fnum].entrypoint();
 	return;
-#endif
 	
  eexit:
 	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)\n", type, fnum, dll[type].name, dll[type].function[fnum].name);
