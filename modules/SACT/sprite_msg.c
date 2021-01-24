@@ -403,7 +403,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	sact.waittype = KEYWAIT_MESSAGE;
 	sact.waitkey = -1;
 	
-	while (sact.waitkey == -1) {
+	while (sact.waitkey == -1 && !nact->is_quit) {
 		int st = get_high_counter(SYSTEMCOUNTER_MSEC);
 		int interval = 25;
 		

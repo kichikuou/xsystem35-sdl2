@@ -150,7 +150,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	endtime = timeout < 0 ? INT_MAX : (curtime + timeout * 10);
 	
 	// スプライトキー待ちメイン
-	while (!waitcond(endtime)) {
+	while (!waitcond(endtime) && !nact->is_quit) {
 		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	

@@ -238,6 +238,8 @@ static int sel_main() {
 	
 	while(selected_item == -1) {
 		sys_keywait(25, KEYWAIT_CANCELABLE);
+		if (nact->is_quit)
+			selected_item = 0;
 	}
 	
 	sact.waittype = KEYWAIT_NONE;

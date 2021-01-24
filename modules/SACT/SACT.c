@@ -1012,7 +1012,7 @@ static void WaitKeySimple() {
 	sact.waittype = KEYWAIT_SIMPLE;
 	sact.waitkey = -1;
 	
-	while(sact.waitkey == -1) {
+	while (sact.waitkey == -1 && !nact->is_quit) {
 		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	
@@ -1587,7 +1587,7 @@ static void TimerWait() {
 	int wTimerID = getCaliValue();
 	int wCount = getCaliValue();
 
-	while(wCount > stimer_get(wTimerID)) {
+	while (wCount > stimer_get(wTimerID) && !nact->is_quit) {
 		sys_keywait(10, KEYWAIT_NONCANCELABLE);
 	}
 	

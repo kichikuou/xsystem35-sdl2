@@ -312,7 +312,7 @@ static int ntmsg_keywait() {
 	night.waittype = KEYWAIT_MESSAGE;
 	night.waitkey = -1;
 	
-	while (night.waitkey == -1) {
+	while (night.waitkey == -1 && !nact->is_quit) {
 		int st = get_high_counter(SYSTEMCOUNTER_MSEC);
 		int interval = 25;
 		
