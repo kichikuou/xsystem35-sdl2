@@ -41,7 +41,7 @@ create_window1 (void)
   GtkWidget *window1;
   GtkWidget *hbox1;
   GtkWidget *vbox1;
-  GtkObject *spinbutton1_adj;
+  GtkAdjustment *spinbutton1_adj;
   GtkWidget *spinbutton1;
   GtkWidget *table1;
   GtkWidget *label3;
@@ -182,13 +182,13 @@ create_window1 (void)
   gtk_widget_show (label4);
   gtk_box_pack_start (GTK_BOX (vbox2), label4, FALSE, FALSE, 0);
 
-  g_signal_connect(GTK_OBJECT (spinbutton1), "activate",
+  g_signal_connect(spinbutton1, "activate",
                       G_CALLBACK(on_spinbutton1_activate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (button1), "clicked",
+  g_signal_connect(button1, "clicked",
                       G_CALLBACK(on_button1_clicked),
                       NULL);
-  g_signal_connect(GTK_OBJECT (button2), "clicked",
+  g_signal_connect(button2, "clicked",
                       G_CALLBACK(on_button2_clicked),
                       NULL);
 
@@ -277,13 +277,13 @@ create_window2 (void)
   gtk_widget_show (button3);
   gtk_box_pack_end (GTK_BOX (hbox2), button3, FALSE, FALSE, 0);
 
-  g_signal_connect(GTK_OBJECT (button4), "clicked",
+  g_signal_connect(button4, "clicked",
                       G_CALLBACK(on_button4_clicked),
                       NULL);
-  g_signal_connect(GTK_OBJECT (button3), "clicked",
+  g_signal_connect(button3, "clicked",
                       G_CALLBACK(on_button3_clicked),
                       NULL);
-  g_signal_connect(GTK_OBJECT (entry1), "activate",
+  g_signal_connect(entry1, "activate",
                       G_CALLBACK(on_entry1_activate),
                       NULL);
 
@@ -342,13 +342,13 @@ create_window3 (void)
   gtk_widget_show (button6);
   gtk_box_pack_start (GTK_BOX (hbox3), button6, FALSE, TRUE, 0);
 
-  g_signal_connect(GTK_OBJECT (window3), "destroy",
+  g_signal_connect(window3, "destroy",
                       G_CALLBACK(on_window3_destroy),
                       NULL);
-  g_signal_connect(GTK_OBJECT (button5), "clicked",
+  g_signal_connect(button5, "clicked",
                       G_CALLBACK(on_button5_clicked),
                       NULL);
-  g_signal_connect(GTK_OBJECT (button6), "clicked",
+  g_signal_connect(button6, "clicked",
                       G_CALLBACK(on_button6_clicked),
                       NULL);
 
@@ -430,7 +430,7 @@ create_window4 (void)
   gtk_fixed_put (GTK_FIXED (fixed1), button11, 184, 104);
   gtk_widget_set_size_request(button11, 64, 24);
 
-  g_signal_connect(GTK_OBJECT (button11), "clicked",
+  g_signal_connect(button11, "clicked",
                       G_CALLBACK(on_button11_clicked),
                       NULL);
   return window4;
@@ -560,28 +560,28 @@ create_menu1 (void)
   gtk_widget_show (item17);
   gtk_container_add (GTK_CONTAINER (menu1), item17);
 
-  g_signal_connect(GTK_OBJECT (menu1), "deactivate",
+  g_signal_connect(menu1, "deactivate",
                       G_CALLBACK(on_menu1_deactivate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (item2), "toggled",
+  g_signal_connect(item2, "toggled",
                       G_CALLBACK(on_item2_activate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (item3), "toggled",
+  g_signal_connect(item3, "toggled",
                       G_CALLBACK(on_item3_activate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (item5), "activate",
+  g_signal_connect(item5, "activate",
                       G_CALLBACK(on_item5_activate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (item6), "activate",
+  g_signal_connect(item6, "activate",
                       G_CALLBACK(on_item6_activate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (item7), "activate",
+  g_signal_connect(item7, "activate",
                       G_CALLBACK(on_item7_activate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (item16), "activate",
+  g_signal_connect(item16, "activate",
                       G_CALLBACK(on_item16_activate),
                       NULL);
-  g_signal_connect(GTK_OBJECT (item17), "activate",
+  g_signal_connect(item17, "activate",
                       G_CALLBACK(on_item17_activate),
                       NULL);
 
@@ -608,7 +608,7 @@ create_window5 (void)
   gtk_widget_set_size_request(entry2, 100, 28);
   gtk_entry_set_text (GTK_ENTRY (entry2), _("default"));
 
-  g_signal_connect(GTK_OBJECT (entry2), "activate",
+  g_signal_connect(entry2, "activate",
                       G_CALLBACK(on_entry2_activate),
                       NULL);
 
@@ -649,7 +649,7 @@ create_window6 (void)
   gtk_widget_show (button16);
   gtk_box_pack_start (GTK_BOX (vbox5), button16, FALSE, FALSE, 0);
 
-  g_signal_connect(GTK_OBJECT (button16), "clicked",
+  g_signal_connect(button16, "clicked",
                       G_CALLBACK(on_button16_clicked),
                       NULL);
 

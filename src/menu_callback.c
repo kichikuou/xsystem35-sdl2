@@ -58,7 +58,7 @@ GtkWidget *menu_window_about; /* about xsystem35 window */
 GtkWidget *menu_window_msgbox;/* message box window */
 
 void
-on_window3_destroy                     (GtkObject       *object,
+on_window3_destroy                     (GObject       *object,
                                         gpointer         user_data)
 {
 

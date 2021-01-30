@@ -108,7 +108,7 @@ boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
 }
 
 boolean menu_inputnumber(INPUTNUM_PARAM *p) {
-	GtkObject *adj;
+	GtkAdjustment *adj;
 	char s[256];
 	
 	if (!menu_initilized) return FALSE;

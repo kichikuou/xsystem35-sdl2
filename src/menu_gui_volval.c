@@ -29,7 +29,7 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
   GtkWidget *label1;
   GtkWidget *hscale1;
   GtkWidget *checkbutton1;
-  GtkObject *adjustment1;
+  GtkAdjustment *adjustment1;
   GtkWidget *hbox1;
   GtkWidget *label6;
   GtkWidget *label7;
@@ -71,7 +71,7 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
 	  gtk_label_set_justify (GTK_LABEL (label1), GTK_JUSTIFY_LEFT);
 	  
 	  adjustment1 = gtk_adjustment_new (vval[i].vol, 0, 100, 0, 10, 0);
-	  g_signal_connect(GTK_OBJECT(adjustment1), "value-changed",
+	  g_signal_connect(adjustment1, "value-changed",
 			      G_CALLBACK(on_adjustment1_value_changed),
 			      &(vval[i].vol));
 	  
@@ -94,7 +94,7 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
 	  gtk_table_attach (GTK_TABLE (table2), checkbutton1, 2, 3, j+1, j+2,
 			    (GtkAttachOptions) (0),
 			    (GtkAttachOptions) (0), 0, 0);
-	  g_signal_connect(GTK_OBJECT (checkbutton1), "toggled",
+	  g_signal_connect(checkbutton1, "toggled",
 			      G_CALLBACK(on_checkbutton1_toggled),
 			      &(vval[i].mute));
 	  
@@ -127,7 +127,7 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
   gtk_box_pack_start (GTK_BOX (hbox1), label7, TRUE, FALSE, 3);
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_RIGHT);
 
-  g_signal_connect(GTK_OBJECT (window1), "delete_event",
+  g_signal_connect(window1, "delete_event",
 		      G_CALLBACK(on_window1_destroy),
 		      NULL);
 
