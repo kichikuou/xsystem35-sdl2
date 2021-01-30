@@ -499,7 +499,6 @@ int main(int argc, char **argv) {
 #endif
 
 #ifdef ENABLE_GTK
-	gtk_set_locale();
 	gtk_init(&argc, &argv);
 #endif
 

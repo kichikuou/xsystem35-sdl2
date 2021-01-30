@@ -105,6 +105,7 @@ else()  # non-emscripten, non-android
   target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2)
   target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2TTF)
   if (GTK2_FOUND)
+    target_compile_definitions(xsystem35 PRIVATE GDK_DISABLE_DEPRECATED GTK_DISABLE_DEPRECATED GSEAL_ENABLE)
     target_link_libraries(xsystem35 PRIVATE GTK2::gtk)
   endif()
   if (SDL2MIXER_FOUND)

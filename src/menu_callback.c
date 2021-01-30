@@ -229,7 +229,7 @@ on_spinbutton1_activate                (GtkEditable     *editable,
 {
 	GtkAdjustment *adj;
 	adj = gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(menu_spinbutton));
-	if (adj->value >= adj->lower && adj->value <= adj->upper) {
+	if (gtk_adjustment_get_value(adj) >= gtk_adjustment_get_lower(adj) && gtk_adjustment_get_value(adj) <= gtk_adjustment_get_upper(adj)) {
 		menu_ok_input = TRUE;
 		gtk_widget_hide(menu_window_in);
 		gtk_main_quit();
