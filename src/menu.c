@@ -45,6 +45,7 @@ void menu_open(void) {
 	
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_on), msgskip_isActivated());
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_off), !msgskip_isActivated());
+	// gtk_menu_popup_at_pointer() cannot be used because there's no GdkEvent here.
 	gtk_menu_popup(GTK_MENU(menu_window_popup), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 	gtk_widget_show(menu_window_popup);
 	nact->popupmenu_opened = TRUE;

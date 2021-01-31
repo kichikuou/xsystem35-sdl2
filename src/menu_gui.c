@@ -43,7 +43,7 @@ create_window1 (void)
   GtkWidget *vbox1;
   GtkAdjustment *spinbutton1_adj;
   GtkWidget *spinbutton1;
-  GtkWidget *table1;
+  GtkWidget *grid1;
   GtkWidget *label3;
   GtkWidget *label9;
   GtkWidget *label10;
@@ -61,14 +61,14 @@ create_window1 (void)
   gtk_window_set_resizable(GTK_WINDOW (window1), FALSE);
   gtk_window_set_position(GTK_WINDOW (window1), GTK_WIN_POS_MOUSE);
 
-  hbox1 = gtk_hbox_new (FALSE, 0);
+  hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   g_object_ref(hbox1);
   g_object_set_data_full(G_OBJECT(window1), "hbox1", hbox1,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (hbox1);
   gtk_container_add (GTK_CONTAINER (window1), hbox1);
 
-  vbox1 = gtk_vbox_new (FALSE, 10);
+  vbox1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
   g_object_ref(vbox1);
   g_object_set_data_full(G_OBJECT(window1), "vbox1", vbox1,
                             (GDestroyNotify)g_object_unref);
@@ -85,23 +85,21 @@ create_window1 (void)
   gtk_widget_show (spinbutton1);
   gtk_box_pack_start (GTK_BOX (vbox1), spinbutton1, FALSE, FALSE, 0);
 
-  table1 = gtk_table_new (3, 2, FALSE);
-  g_object_ref(table1);
-  g_object_set_data_full(G_OBJECT(window1), "table1", table1,
+  grid1 = gtk_grid_new();
+  g_object_ref(grid1);
+  g_object_set_data_full(G_OBJECT(window1), "grid1", grid1,
                             (GDestroyNotify)g_object_unref);
-  gtk_widget_show (table1);
-  gtk_box_pack_start (GTK_BOX (vbox1), table1, FALSE, FALSE, 0);
-  gtk_table_set_row_spacings (GTK_TABLE (table1), 5);
-  gtk_table_set_col_spacings (GTK_TABLE (table1), 3);
+  gtk_widget_show (grid1);
+  gtk_box_pack_start (GTK_BOX (vbox1), grid1, FALSE, FALSE, 0);
+  gtk_grid_set_row_spacing(GTK_GRID(grid1), 5);
+  gtk_grid_set_column_spacing(GTK_GRID(grid1), 3);
 
   label3 = gtk_label_new (_("default"));
   g_object_ref(label3);
   g_object_set_data_full(G_OBJECT(window1), "label3", label3,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label3);
-  gtk_table_attach (GTK_TABLE (table1), label3, 0, 1, 0, 1,
-                    (GtkAttachOptions) (0),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_grid_attach(GTK_GRID(grid1), label3, 0, 0, 1, 1);
   gtk_label_set_justify (GTK_LABEL (label3), GTK_JUSTIFY_LEFT);
 
   label9 = gtk_label_new (_("min"));
@@ -109,9 +107,7 @@ create_window1 (void)
   g_object_set_data_full(G_OBJECT(window1), "label9", label9,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label9);
-  gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 1, 2,
-                    (GtkAttachOptions) (0),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_grid_attach(GTK_GRID(grid1), label9, 0, 1, 1, 1);
   gtk_label_set_justify (GTK_LABEL (label9), GTK_JUSTIFY_LEFT);
 
   label10 = gtk_label_new (_("max"));
@@ -119,9 +115,7 @@ create_window1 (void)
   g_object_set_data_full(G_OBJECT(window1), "label10", label10,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label10);
-  gtk_table_attach (GTK_TABLE (table1), label10, 0, 1, 2, 3,
-                    (GtkAttachOptions) (0),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_grid_attach(GTK_GRID(grid1), label10, 0, 2, 1, 1);
   gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_LEFT);
 
   menu_label_inputnum_def = label11 = gtk_label_new (_("0"));
@@ -129,9 +123,7 @@ create_window1 (void)
   g_object_set_data_full(G_OBJECT(window1), "label11", label11,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label11);
-  gtk_table_attach (GTK_TABLE (table1), label11, 1, 2, 0, 1,
-                    (GtkAttachOptions) (0),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_grid_attach(GTK_GRID(grid1), label11, 1, 0, 1, 1);
   gtk_label_set_justify (GTK_LABEL (label11), GTK_JUSTIFY_LEFT);
 
   menu_label_inputnum_min = label12 = gtk_label_new (_("0"));
@@ -139,9 +131,7 @@ create_window1 (void)
   g_object_set_data_full(G_OBJECT(window1), "label12", label12,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label12);
-  gtk_table_attach (GTK_TABLE (table1), label12, 1, 2, 1, 2,
-                    (GtkAttachOptions) (0),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_grid_attach(GTK_GRID(grid1), label12, 1, 1, 1, 1);
   gtk_label_set_justify (GTK_LABEL (label12), GTK_JUSTIFY_LEFT);
 
   menu_label_inputnum_max = label13 = gtk_label_new (_("0"));
@@ -149,12 +139,11 @@ create_window1 (void)
   g_object_set_data_full(G_OBJECT(window1), "label13", label13,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label13);
-  gtk_table_attach (GTK_TABLE (table1), label13, 1, 2, 2, 3,
-                    (GtkAttachOptions) (0),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_grid_attach(GTK_GRID(grid1), label13, 1, 2, 1, 1);
   gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
 
-  vbox2 = gtk_vbox_new (TRUE, 0);
+  vbox2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_box_set_homogeneous(GTK_BOX(vbox2), TRUE);
   g_object_ref(vbox2);
   g_object_set_data_full(G_OBJECT(window1), "vbox2", vbox2,
                             (GDestroyNotify)g_object_unref);
@@ -215,7 +204,8 @@ create_window2 (void)
   gtk_window_set_resizable(GTK_WINDOW (window2), FALSE);
   gtk_window_set_position(GTK_WINDOW (window2), GTK_WIN_POS_MOUSE);
 
-  vbox3 = gtk_vbox_new (TRUE, 0);
+  vbox3 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_box_set_homogeneous(GTK_BOX(vbox3), TRUE);
   g_object_ref(vbox3);
   g_object_set_data_full(G_OBJECT(window2), "vbox3", vbox3,
                             (GDestroyNotify)g_object_unref);
@@ -229,7 +219,7 @@ create_window2 (void)
   gtk_widget_show (label5);
   gtk_box_pack_start (GTK_BOX (vbox3), label5, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label5), 0.00, 0.5);
+  gtk_label_set_xalign(GTK_LABEL(label5), 0.00);
 
   menu_textentry = entry1 = gtk_entry_new ();
   g_object_ref(entry1);
@@ -245,7 +235,7 @@ create_window2 (void)
   gtk_widget_show (label6);
   gtk_box_pack_start (GTK_BOX (vbox3), label6, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label6), 0.00, 0.5);
+  gtk_label_set_xalign(GTK_LABEL(label6), 0.00);
 
   label7 = gtk_label_new (_("Notice) HANKAKU is not available"));
   g_object_ref(label7);
@@ -254,9 +244,9 @@ create_window2 (void)
   gtk_widget_show (label7);
   gtk_box_pack_start (GTK_BOX (vbox3), label7, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
-  gtk_misc_set_alignment (GTK_MISC (label7), 0.00, 0.5);
+  gtk_label_set_xalign(GTK_LABEL(label7), 0.00);
 
-  hbox2 = gtk_hbox_new (FALSE, 5);
+  hbox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
   g_object_ref(hbox2);
   g_object_set_data_full(G_OBJECT(window2), "hbox2", hbox2,
                             (GDestroyNotify)g_object_unref);
@@ -307,7 +297,8 @@ create_window3 (void)
   gtk_window_set_resizable(GTK_WINDOW (window3), FALSE);
   gtk_window_set_position(GTK_WINDOW (window3), GTK_WIN_POS_MOUSE);
 
-  vbox4 = gtk_vbox_new (TRUE, 10);
+  vbox4 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_box_set_homogeneous(GTK_BOX(vbox4), TRUE);
   g_object_ref(vbox4);
   g_object_set_data_full(G_OBJECT(window3), "vbox4", vbox4,
                             (GDestroyNotify)g_object_unref);
@@ -321,7 +312,8 @@ create_window3 (void)
   gtk_widget_show (label8);
   gtk_box_pack_start (GTK_BOX (vbox4), label8, FALSE, FALSE, 0);
 
-  hbox3 = gtk_hbox_new (TRUE, 10);
+  hbox3 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+  gtk_box_set_homogeneous(GTK_BOX(hbox3), TRUE);
   g_object_ref(hbox3);
   g_object_set_data_full(G_OBJECT(window3), "hbox3", hbox3,
                             (GDestroyNotify)g_object_unref);
@@ -402,7 +394,7 @@ create_window4 (void)
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label23);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label23);
-  empty_notebook_page = gtk_vbox_new (FALSE, 0);
+  empty_notebook_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_widget_show (empty_notebook_page);
   gtk_container_add (GTK_CONTAINER (notebook1), empty_notebook_page);
 
@@ -412,7 +404,7 @@ create_window4 (void)
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label24);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label24);
-  empty_notebook_page = gtk_vbox_new (FALSE, 0);
+  empty_notebook_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_widget_show (empty_notebook_page);
   gtk_container_add (GTK_CONTAINER (notebook1), empty_notebook_page);
 
@@ -628,7 +620,7 @@ create_window6 (void)
   gtk_window_set_title (GTK_WINDOW (window6), _("MessageBox"));
   gtk_window_set_position(GTK_WINDOW (window6), GTK_WIN_POS_MOUSE);
 
-  vbox5 = gtk_vbox_new (FALSE, 0);
+  vbox5 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   g_object_ref(vbox5);
   g_object_set_data_full(G_OBJECT(window6), "vbox5", vbox5,
                             (GDestroyNotify)g_object_unref);
