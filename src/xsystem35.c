@@ -237,9 +237,6 @@ static void sys35_init() {
 
 	if (nact->files.ain)
 		s39ain_init(nact->files.ain, &nact->ain);
-#ifdef ENABLE_GTK
-	s39ini_init();
-#endif
 	msgskip_init(nact->files.msgskip);
 }
 
@@ -498,13 +495,11 @@ int main(int argc, char **argv) {
         textdomain(PACKAGE);
 #endif
 
+	sys35_init();
+
 #ifdef ENABLE_GTK
 	gtk_init(&argc, &argv);
-#endif
 
-	sys35_init();	
-	
-#ifdef ENABLE_GTK
 	char *homedir = getenv("HOME");
 	char *rc_name = get_profile("gtkrc_path");
 	if (!rc_name) {
@@ -517,6 +512,8 @@ int main(int argc, char **argv) {
 	
 	gtk_rc_parse(rc_path);
 	free(rc_path);
+
+	s39ini_init();
 #endif
 	menu_init();
 	
