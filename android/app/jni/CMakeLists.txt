@@ -16,14 +16,14 @@ FetchContent_Declare(
 # TODO: Use SDL2_ttf 2.0.16 once released
 FetchContent_Declare(
   SDL_ttf
-  URL https://hg.libsdl.org/SDL_ttf/archive/d56d67db41d8.tar.gz # rev 420
-  URL_HASH SHA1=143089a2b2973a5baeee0914af43608cfe8e1d87
+  GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+  GIT_TAG 11722a2bb4335d489d724c08cfdbb45f97d07aa7
 )
 # TODO: Use SDL2_mixer 2.0.5 once released
 FetchContent_Declare(
   SDL_mixer
-  URL https://hg.libsdl.org/SDL_mixer/archive/d2686bcfcba2.tar.gz # rev 1127
-  URL_HASH SHA1=4e62e29bd5628b262b3ffb6d5d29861c76a1500e
+  GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
+  GIT_TAG 20433729fb318f7b6f773a42ffa410114cb067f2
 )
 
 # Compilation of SDL and companion libraries
@@ -42,10 +42,6 @@ if(NOT sdl_mixer_POPULATED)
   FetchContent_Populate(SDL_mixer)
   SET(SUPPORT_OGG ON CACHE BOOL "Enable OGG support in SDL_mixer" FORCE)
   add_subdirectory(${sdl_mixer_SOURCE_DIR} ${sdl_mixer_BINARY_DIR})
-  # Workaround for CMakeLists.txt bugs of SDL_mixer.
-  # TODO: Fix these in upstream
-  add_library(vorbisfile INTERFACE)
-  target_include_directories(SDL2_mixer PUBLIC ${sdl_mixer_SOURCE_DIR}/include)
   target_compile_definitions(SDL2_mixer PRIVATE MUSIC_WAV)
 endif()
 
