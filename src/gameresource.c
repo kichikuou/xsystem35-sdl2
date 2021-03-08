@@ -193,6 +193,7 @@ static boolean initGameResourceFromFile(GameResource *gr, FILE *fp, const char *
 			goto errexit;
 		}
 	}
+	gr->gr_fname = strdup(gr_fname);
 	return TRUE;
 
  errexit:

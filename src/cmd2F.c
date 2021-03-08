@@ -1326,8 +1326,19 @@ void commands2F7B() {
 }
 
 void commands2F7C() {
+	if (!nact->files.ain) {
+		if (nact->files.gr_fname) {
+			SYSERROR("System39.ain is needed to run this game. Make sure you have an \"Ain\" line in %s.\n", nact->files.gr_fname);
+		} else {
+			SYSERROR("Ain file is needed to run this game. Make sure you have System39.ain file in the game directory.\n");
+		}
+	}
+
 	int index = sys_getdw();
-	
+	if (index >= nact->ain.msgnum) {
+		WARNING("message id out of bounds (%d)\n", index);
+		return;
+	}
 	sys_addMsg(nact->ain.msg[index]);
 	msgskip_onAinMessage(index);
 
@@ -1359,7 +1370,7 @@ void commands2F7F() {
 	sys_addMsg(svar_get(p1));
 	msgskip_onAinMessage(index);
 
-	DEBUG_COMMAND("2F7F %d, %d(%s,%s):\n", index, p1, nact->ain.msg[index], svar_get(p1));
+	DEBUG_COMMAND("2F7F %d, %d(%s):\n", index, p1, svar_get(p1));
 }
 
 void commands2F80() {

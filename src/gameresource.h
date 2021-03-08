@@ -29,6 +29,7 @@
 #include "savedata.h"
 
 typedef struct {
+	const char *gr_fname;
 	const char *game_fname[DRIFILETYPEMAX][DRIFILEMAX];
 	int cnt[DRIFILETYPEMAX];
 	const char *save_path;
