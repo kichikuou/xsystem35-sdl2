@@ -203,9 +203,23 @@ void commandLHG() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
 	int p1 = sys_getc();
 	int no = getCaliValue();
-	/* X版では全てをHDDに置くのでサポートしない */
-	
-	sysVar[0] = 255;
+
+	// HACK: Remember the last registered number so that LHG3 called immediately
+	// after LHG1 can return 1. This prevents "HDD is full or CD is not inserted"
+	// error message in Diabolique.
+	static int last_registered = -1;
+	switch (p1) {
+	case 1:  // register
+		last_registered = no;
+		break;
+	case 2:  // unregister
+		last_registered = -1;
+		break;
+	case 3:  // query
+		// Unconditionally returning 1 breaks Atlach-Nacha.
+		sysVar[0] = (no == last_registered) ? 1 : 0;
+		break;
+	}
 	DEBUG_COMMAND("LHG %d,%d:\n",p1,no);
 }
 
