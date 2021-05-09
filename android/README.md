@@ -23,8 +23,9 @@ sudo apt install git wget unzip default-jdk-headless cmake ninja-build
 # Install Android SDK / NDK
 export ANDROID_SDK_ROOT=$HOME/android-sdk
 mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip
-unzip commandlinetools-linux-6609375_latest.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
+unzip commandlinetools-linux-7302050_latest.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/tools
 yes |$ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
 $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager ndk-bundle
 export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle
