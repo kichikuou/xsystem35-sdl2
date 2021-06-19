@@ -77,23 +77,21 @@ void font_select(int type, int size) {
 	FontTable *tbl;
 
 	if (NULL == (tbl = font_lookup(size, type))) {
-		TTF_Font *fs;
-		
-		fs = TTF_OpenFontIndex(this.name[type], size, this.face[type]);
+		TTF_Font *fs = TTF_OpenFontIndex(this.name[type], size, this.face[type]);
 #ifdef __ANDROID__
 		// If `this.name[type]` is a custom font file specified in .xys35rc,
 		// SDL_RWFromFile used by TTF_OpenFontIndex does not work because it
 		// does not resolve relative path with the current directory. On the
 		// other hand, we can't just use fopen because SDL_RWFromFile can open
 		// apk assets and the default fonts are stored as assets.
-		FILE *fp = fopen(this.name[type], "r");
-		if (fp)
-			fs = TTF_OpenFontIndexRW(SDL_RWFromFP(fp, true), true, size, this.face[type]);
-#endif
-		if (fs == NULL) {
-			WARNING("%s is not found:\n", this.name[type]);
-			return;
+		if (!fs) {
+			FILE *fp = fopen(this.name[type], "r");
+			if (fp)
+				fs = TTF_OpenFontIndexRW(SDL_RWFromFP(fp, true), true, size, this.face[type]);
 		}
+#endif
+		if (!fs)
+			SYSERROR("Cannot open font %s\n", this.name[type]);
 		
 		font_insert(size, type, fs);
 		fontset = &fonttbl[fontcnt - 1];
