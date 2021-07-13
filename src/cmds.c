@@ -263,12 +263,14 @@ void commandSU() {
 		*var2 = 0;
 		if (dummy_pcm_in_play) dummy_pcm_in_play = FALSE;
 	} else {
-		*var1 = mus_pcm_get_playposition(var2);
+		*var2 = 0;
+		mus_pcm_get_playposition(var2);
+		*var1 = *var2 ? 1 : 0;
 		/* XXX for panyon_new */
-	        if (*var2 == 0){
+		if (*var2 == 0){
 			*var1 = dummy_pcm_in_play ? TRUE : FALSE;
-            		dummy_pcm_in_play = dummy_pcm_in_play ? FALSE : TRUE;
-        	}	
+			dummy_pcm_in_play = dummy_pcm_in_play ? FALSE : TRUE;
+		}
 	}
 	if (dummy_pcm_su_flag) {
 		*var1 = *var2 = 0;
