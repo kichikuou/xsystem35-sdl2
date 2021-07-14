@@ -2,7 +2,7 @@ name: Emscripten Build
 on: [push, pull_request]
 
 env:
-  emscripten-version: 2.0.15
+  emscripten-version: 2.0.25
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
         key: emscripten-cache-${{ env.emscripten-version }}
 
     - name: Setup Emscripten toolchain
-      uses: mymindstorm/setup-emsdk@v7
+      uses: mymindstorm/setup-emsdk@v10
       with:
         version: ${{ env.emscripten-version }}
         actions-cache-folder: emsdk-cache

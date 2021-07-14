@@ -28,11 +28,15 @@
 #include "nact.h"
 #include "s39ain.h"
 #include "xsystem35.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #define dll  nact->ain.dll
 
 typedef void *entrypoint (void);
 
+EMSCRIPTEN_KEEPALIVE  // Prevent inlining, because this function is listed in ASYNCIFY_ADD
 void commands2F60() {
 	int type = sys_getdw();  /* DLL type */
 	int fnum = sys_getdw();  /* function number */
