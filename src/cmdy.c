@@ -29,8 +29,53 @@
 #include "randMT.h"
 #include "message.h"
 #include "input.h"
+#include "scenario.h"
+#include "cmd_check.h"
+#include "sdl_core.h"
 
 unsigned Y3waitFlags = KEYWAIT_CANCELABLE;
+
+/*
+ * A hack to improve Rance4 map navigation.
+ *
+ * This fixes an issue where Rance4's map mode isn't responsive to mouse clicks.
+ * Here's a simplified code of Rance4's map UI loop:
+ *
+ *         !COUNT : 0!
+ *   *LOOP:
+ *         Y 3, 1:             ; wait 16ms
+ *         IM MX, MY:          ; get mouse position and button state
+ *         !COUNT : COUNT + 1!
+ *         { COUNT > 15 :
+ *            { RND = 16 :     ; if left button is pressed
+ *                ...          ; move to next map location
+ *            }
+ *            !COUNT : 0!
+ *         }
+ *         @LOOP:
+ *
+ * This means, a map move happens only if the button is pressed at the moment
+ * COUNT reaches 16. In the original System3.x, this is not a problem because
+ * `Y 3, 1:` returns immediately if a button is pressed, so COUNT quickly goes
+ * up to 16. However, xsystem35 throttles input commands (to prevent busy loops)
+ * so both Y and IM cause a 1-frame (16ms) delay. As a result, the user had to
+ * hold down the button for up to 512ms (16ms * 2 * 16) to navigate the map.
+ *
+ * To fix this, this hack processes `Y 3, 1:` followed by the IM command without
+ * delay, when a button is pressed.
+ */
+static void rance4_Y3_IM_hack() {
+	static int count;
+
+	int button_pressed = sys_getInputInfo();
+	if (!button_pressed) {
+		sdl_wait_vsync();
+		count = 0;
+	}
+	commandIM();
+	if (button_pressed && ++count & 15)
+		nact->wait_vsync = FALSE;
+}
 
 void commandY() {
 	int i;
@@ -51,17 +96,26 @@ void commandY() {
 			sysVar[i + 1] = 0;
 		}
 	} else if (p1 == 3) {
-		if (p2 == 10000) {
-			/* 以降のウェイトではキー入力を受けつけなくなる */
+		int orig_pc = sl_getIndex();
+		if (p2 == 1 && sl_getc() == 'I' && sl_getc() == 'M') {
+			rance4_Y3_IM_hack();
+			return;
+		}
+		sl_jmpNear(orig_pc);
+
+		switch (p2) {
+		case 10000:
 			Y3waitFlags = KEYWAIT_NONCANCELABLE;
-		} else if (p2 == 10001) {
-			/* 以降のウェイトではキー入力を受けつける（初期設定）*/
+			break;
+		case 10001:
 			Y3waitFlags = KEYWAIT_CANCELABLE;
-		} else if (p2 == 0) {
-			sysVar[0] = sys_getInputInfo(); /* thanx TOTOさん */
-		} else {
-			/* ＷＡＩＴ (1/60秒) × n だけウェイトをかける。*/
+			break;
+		case 0:
+			sysVar[0] = sys_getInputInfo();
+			break;
+		default:
 			sysVar[0] = sys_keywait(16 * p2, Y3waitFlags | KEYWAIT_SKIPPABLE);
+			break;
 		}
 	} else if (p1 == 4) {
 		/* 1 〜 n までの乱数を RND に返す。*/
