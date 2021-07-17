@@ -58,6 +58,10 @@ extern char *sys_getConstString();
 // extern boolean sys_nact_engine();
 extern void nact_main();
 extern void nact_init();
+extern void nact_endframe(void);
+
+// cmd_check.c
+extern void exec_command(void);
 
 typedef struct {
 	/* general */

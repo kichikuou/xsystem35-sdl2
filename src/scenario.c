@@ -200,6 +200,10 @@ int sl_getadr() {
 	return c0 + (c1 << 16);
 }
 
+void sl_ungetc(void) {
+	sl_index--;
+}
+
 /* @address */
 void sl_jmpNear(int address) {
 	sl_index = address;

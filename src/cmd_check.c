@@ -147,10 +147,43 @@ static void undeferr() {
 	SYSERROR("Undefined Command:@ %03d,%05x\n", sl_getPage(), sl_getIndex());
 }
 
-void check_command(int c0) {
+static void message(int c0) {
+	char buf[512];
+	char *p = buf;
+
+	while (c0 == 0x20 || c0 >= 0x80) {
+		if (nact->encoding == UTF8) {
+			*p++ = (char)c0;
+		} else if (c0 == 0x20) {
+			*p++ = (char)c0;
+		} else if (c0 >= 0xe0) {
+			*p++ = (char)c0; *p++ = (char)sl_getc();
+		} else if (c0 >= 0xa0) {
+			*p++ = (char)c0;
+		} else {
+			*p++ = (char)c0; *p++ = (char)sl_getc();
+		}
+		c0 = sl_getc();
+	}
+	sl_ungetc();
+	if (p != buf) {
+		*p = '\0';
+		sys_addMsg(buf);
+	}
+}
+
+void exec_command(void) {
+	DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
+
 	int page, index;
 	int bool;
-	
+	int c0 = sl_getc();
+
+	if (c0 == 0x20 || c0 >= 0x80) {
+		message(c0);
+		return;
+	}
+
 	switch(c0) {
 	case 0:
 		/* メッセージのゴミ？ */

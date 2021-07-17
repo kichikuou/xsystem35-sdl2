@@ -17,9 +17,6 @@
 #include "night.h"
 #include "nt_msg.h"
 
-/* defined by cmd_check.c */
-extern void check_command(int c0);
-
 #define MAINLOOP_EVENTCHECK_INTERVAL 16 /* 16 msec */
 
 
@@ -57,10 +54,9 @@ static void ntmain(struct _scoadr inadr) {
 
 	while (!nact->is_quit) {
 		for (int cnt = 0; !nact->wait_vsync && cnt < 10000; cnt++) {
-			DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
 			//SACT_DEBUG("%d:%x\n", sl_getPage(), sl_getIndex());
 			if (!nact->popupmenu_opened) {
-				check_command(sl_getc());
+				exec_command();
 				if (sl_getPage()  == inadr.page &&
 					sl_getIndex() == inadr.index) {
 					// ~E%05dからの戻り

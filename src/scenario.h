@@ -35,6 +35,7 @@ extern int sl_getdAt(int address);
 extern int sl_getwAt(int address);
 extern int sl_getcAt(int address);
 extern int sl_getadr();
+extern void sl_ungetc(void);
 extern void sl_jmpNear(int address);
 extern boolean sl_jmpFar(int page);
 extern boolean sl_jmpFar2(int page, int address);

@@ -54,8 +54,6 @@ MG コマンド: 表示時の ZH に依存
 
 */
 
-/* defined by cmd_check.c */
-extern void check_command(int c0);
 /* defined by cmdv.c */
 extern void va_animation();
 /* コマンド解析時の展開バッファ */
@@ -138,32 +136,6 @@ void sys_addMsg(const char *str) {
 	}
 }
 
-/* 文字列抽出 */
-static int checkMessage() {
-	char *index = msgbuf;
-	int c0 = sl_getc();
-	
-	while (c0 == 0x20 || c0 >= 0x80) {
-		if (nact->encoding == UTF8) {
-			*index++ = (char)c0;
-		} else if (c0 == 0x20) {
-			*index++ = (char)c0;
-		} else if (c0 >= 0xe0) {
-			*index++ = (char)c0; *index++ = (char)sl_getc();
-		} else if (c0 >= 0xa0) {
-			*index++ = (char)c0;
-		} else {
-			*index++ = (char)c0; *index++ = (char)sl_getc();
-		}
-		c0 = sl_getc();
-	}
-	if (index != msgbuf) {
-		*index = 0;
-		sys_addMsg(msgbuf);
-	}
-	return c0;
-}
-
 void nact_main() {
 	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
 
@@ -175,20 +147,22 @@ void nact_main() {
 		for (int cnt = 0; cnt < 10000; cnt++) {
 			if (nact->wait_vsync || nact->popupmenu_opened || nact->is_quit)
 				break;
-			DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
-			int c0 = checkMessage();
-			check_command(c0);
+			exec_command();
 			nact->cmd_count++;
 		}
-		nact->callback();
-
-		if (!nact->is_message_locked)
-			sys_getInputInfo();
-
-		sdl_wait_vsync();
-		nact->frame_count++;
-		nact->wait_vsync = FALSE;
+		nact_endframe();
 	}
+}
+
+void nact_endframe(void) {
+	nact->callback();
+
+	if (!nact->is_message_locked)
+		sys_getInputInfo();
+
+	sdl_wait_vsync();
+	nact->frame_count++;
+	nact->wait_vsync = FALSE;
 }
 
 static void nact_callback() {
