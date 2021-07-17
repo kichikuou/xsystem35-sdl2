@@ -48,6 +48,11 @@
 #define MIDI_PITCHB     0xe0    /* Pitch wheel change */
 #define MIDI_SYSEX      0xf0    /* System exclusive data */
 
+#define MIDI_EVENT_NORMAL   0
+#define MIDI_EVENT_TEXT     1
+#define MIDI_EVENT_TEMPO    2
+#define MIDI_EVENT_SYS35    3
+
 #define MAXMIDIEVENT 65536 /* maxium event sequence number */
 
 struct midievent {

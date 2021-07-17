@@ -49,6 +49,10 @@ extern mididevice_t midi_sdlmixer;
 extern mididevice_t midi_rawmidi;
 #endif
 
+#ifdef ENABLE_MIDI_PORTMIDI
+extern mididevice_t midi_portmidi;
+#endif
+
 int midi_init(mididevice_t *midi) {
 	int ret = NG;
 
@@ -74,6 +78,11 @@ int midi_init(mididevice_t *midi) {
 		memcpy(midi, &midi_sdlmixer, sizeof(mididevice_t));
 #endif
 		break;
+	case 'p':
+#ifdef ENABLE_MIDI_PORTMIDI
+		ret = midi_portmidi.init(NULL, subdev);
+		memcpy(midi, &midi_portmidi, sizeof(mididevice_t));
+#endif
 	case '0':
 		break;
 	}
@@ -100,6 +109,11 @@ void midi_set_output_device(int mode) {
 	case 's':
 		/* sequencer midi mode */
 		default_mode = 's';
+		subdev = mode >> 8;
+		break;
+	case 'p':
+		/* portmidi midi mode */
+		default_mode = 'p';
 		subdev = mode >> 8;
 		break;
 	case '0':

@@ -3,3 +3,7 @@ android/.gradle
 android/app/.externalNativeBuild
 android/app/build
 android/build
+.ccls-cache
+.dir-locals.el
+compile_commands.json
+build
