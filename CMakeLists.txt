@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 project(xsystem35 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 enable_testing()
 
 include(CheckIncludeFile)
@@ -52,9 +53,18 @@ else()
     set(HAVE_JPEG 1)
   endif()
 
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+  find_package(Threads)
+  if (CMAKE_USE_PTHREADS_INIT)
+    find_library(PORTMIDI portmidi)
+    if (PORTMIDI)
+      set(HAVE_PORTMIDI 1)
+      set(ENABLE_MIDI_PORTMIDI 1)
+    endif()
+  endif()
+
   set(DEFAULT_FONT_PATH ${CMAKE_INSTALL_PREFIX}/share/xsystem35/fonts/)
 endif()
-
 
 # Menu
 
@@ -144,6 +154,7 @@ else()
   else ()
     check_symbol_exists(SNDCTL_SEQ_NRSYNTHS "sys/soundcard.h" ENABLE_MIDI_SEQMIDI)
   endif()
+
   if (ENABLE_MIDI_SEQMIDI)
     list(APPEND SUMMARY_MIDI "OSS sequencer")
     set(SEQ_DEVICE "/dev/sequencer" CACHE STRING "sequencer device")
@@ -153,6 +164,12 @@ else()
     list(APPEND SRC_MIDI midi.sdlmixer.c)
     list(APPEND SUMMARY_MIDI "SDL_mixer")
     set(ENABLE_MIDI_SDLMIXER 1)
+  endif()
+
+  if (HAVE_PORTMIDI AND ENABLE_MIDI_PORTMIDI)
+    list(APPEND SRC_MIDI midi.portmidi.c)
+    list(APPEND SUMMARY_MIDI "PortMidi")
+    link_libraries(${PORTMIDI} Threads::Threads)
   endif()
 endif()
 

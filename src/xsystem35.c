@@ -127,6 +127,9 @@ static void sys35_usage(boolean verbose) {
 #ifdef ENABLE_MIDI_SEQMIDI
 	puts(" -Ms?           : Sequenceer device (?:devicenumber)");
 #endif
+#ifdef ENABLE_MIDI_PORTMIDI
+	puts(" -Mp?           : ALSA (via PortMidi) (?:devicenumber)");
+#endif
 	puts(" -M0            : Disable MIDI output");
 	
 	puts(" -devjoy device : joystick device index (0-)");

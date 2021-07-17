@@ -394,7 +394,7 @@ static void read_playevent() {
 	int c, c1, type;
 	int running = 0; /* 1 when running status used */
 	int status = 0; /* status value (e.g. 0x90==note-on) */
-	int delta, needed, lookfor;
+	int delta, needed, lookfor, len;
 	
 	/* This array is indexed by the high half of a status byte.  It's */
 	/* value is either the number of bytes needed (1 or 2) for a channel */
@@ -443,7 +443,8 @@ static void read_playevent() {
 		switch (c) {
 		case 0xFF: /* meta event */
 			type = midigetc();
-			lookfor = midi->length_left - readvarinum();
+			len = readvarinum();
+			lookfor = midi->length_left - len;
 			msginit();
 			
 			while(midi->length_left > lookfor) {
@@ -454,7 +455,8 @@ static void read_playevent() {
 			break;
 			
 		case 0xF0: /* system exclusive */
-			lookfor = midi->length_left - readvarinum();
+			len = readvarinum();
+			lookfor = midi->length_left - len;
 			msginit();
 			msgadd(0xF0);
 			while(midi->length_left > lookfor) {
@@ -464,7 +466,8 @@ static void read_playevent() {
 			break;
 			
 		case 0xF7: /* system exclusive continuation or arbitrary stuff */
-			lookfor = midi->length_left - readvarinum();
+			len = readvarinum();
+			lookfor = midi->length_left - len;
 			msginit();
 			while(midi->length_left > lookfor) {
 				msgadd(c = midigetc());
