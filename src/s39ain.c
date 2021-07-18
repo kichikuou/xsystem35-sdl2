@@ -133,8 +133,12 @@ int s39ain_init(const char *path_to_ain, S39AIN *ain) {
 	/* check VARI */
 	if (0 == strncmp(p, "VARI", 4)) {
 		ain->varnum = LittleEndian_getDW(p, 8);
+
+		ain->var = malloc(sizeof(char *) * ain->varnum);
 		p += 12;
+
 		for (i = 0; i < ain->varnum; i++) {
+			ain->var[i] = p;
 			p += strlen(p) + 1;
 		}
 	}

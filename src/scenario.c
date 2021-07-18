@@ -32,12 +32,6 @@
 #include "LittleEndian.h"
 #include "xsystem35.h"
 
-/* stack data type */
-#define STACK_NEARJMP 1
-#define STACK_FARJMP 2
-#define STACK_VARIABLE 3
-#define STACK_DATA 4
-
 /* static mathods */
 static void popVars(int *tmp);
 static void popDatas(int *tmp);

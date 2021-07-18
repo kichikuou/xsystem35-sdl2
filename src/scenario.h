@@ -26,6 +26,14 @@
 
 #include "portab.h"
 
+// Warning: changing these enum values will break savedata compatibility.
+enum stack_frame_type {
+	STACK_NEARJMP = 1,
+	STACK_FARJMP = 2,
+	STACK_VARIABLE = 3,
+	STACK_DATA = 4
+};
+
 extern boolean sl_init();
 extern boolean sl_reinit();
 extern int sl_getc();

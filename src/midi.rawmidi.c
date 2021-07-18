@@ -168,8 +168,6 @@ static char all_reset[] = { 0xb0, 0x78, 0x00, 0xb0, 0x79, 0x00,
 			    0xbf, 0x78, 0x00, 0xbf, 0x79, 0x00 };
 
 
-extern void sys_set_signalhandler(int SIG, void (*handler)(int));
-
 static void signal_pause(int sig_num) {
 	switch(sig_num) {
 	case SIGTERM:

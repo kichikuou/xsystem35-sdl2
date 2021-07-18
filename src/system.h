@@ -56,4 +56,8 @@ extern void sys_reset();
 #define SACT_DEBUG(fmt, ...) \
 	sys_message(5, "%s: " fmt, __func__, ##__VA_ARGS__)
 
+#ifdef HAVE_SIGACTION
+void sys_set_signalhandler(int SIG, void (*handler)(int));
+#endif
+
 #endif /* !__SYSTEM__ */

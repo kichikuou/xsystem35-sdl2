@@ -52,6 +52,7 @@
 #endif
 
 #include "nact.h"
+#include "debugger.h"
 #include "portab.h"
 #include "xsystem35.h"
 #include "nact.h"
@@ -87,6 +88,7 @@ static void    check_profile();
 /* for debugging */
 static FILE *fpdebuglog;
 static int debuglv = DEBUGLEVEL;
+static boolean debugger_enabled;
 
 static int audio_buffer_size = 0;
 
@@ -286,6 +288,8 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			}
 			fclose(fp);
 			gameResourceFile = argv[i + 1];
+		} else if (0 == strcmp(argv[i], "-debug")) {
+			debugger_enabled = true;
 		} else if (0 == strcmp(argv[i], "-devcd")) {
 			if (argv[i + 1] != NULL) {
 				cd_set_devicename(argv[i + 1]);
@@ -436,8 +440,14 @@ static void init_signalhandler() {
 static void registerGameFiles(void) {
 	if (nact->files.cnt[DRIFILE_SCO] == 0)
 		SYSERROR("No Scenario data available\n");
-	for (int type = 0; type < DRIFILETYPEMAX; type++)
-		ald_init(type, nact->files.game_fname[type], nact->files.cnt[type]);
+	for (int type = 0; type < DRIFILETYPEMAX; type++) {
+		boolean use_mmap = true;
+		if (debugger_enabled && type == DRIFILE_SCO) {
+			// Do not mmap scenario files so that BREAKPOINT instructions can be inserted.
+			use_mmap = false;
+		}
+		ald_init(type, nact->files.game_fname[type], nact->files.cnt[type], use_mmap);
+	}
 	if (nact->files.save_path)
 		fc_init(nact->files.save_path);
 }
@@ -486,6 +496,12 @@ int main(int argc, char **argv) {
 #ifdef HAVE_SIGACTION
 	init_signalhandler();
 #endif
+
+	if (debugger_enabled) {
+		char symbols_path[500];
+		snprintf(symbols_path, sizeof(symbols_path), "%s.symbols", nact->files.game_fname[DRIFILE_SCO][0]);
+		dbg_init(symbols_path);
+	}
 
 	mus_init(audio_buffer_size);
 

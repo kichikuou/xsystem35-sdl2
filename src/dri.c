@@ -161,21 +161,13 @@ static void get_fileptr(drifiles *d, FILE *fp, int disk) {
 	return;
 }
 
-/*
- * Initilize drifile object and check file
- *   file    : file name array
- *   cnt     : number in file name array
- *   return: drifile object
-*/
-drifiles *dri_init(const char **file, int cnt) {
+drifiles *dri_init(const char **file, int cnt, boolean use_mmap) {
 	drifiles *d = calloc(1, sizeof(drifiles));
 	FILE *fp;
 	int i;
 	boolean gotmap = FALSE;
-#ifdef HAVE_MEMORY_MAPPED_FILE
-	boolean mmapping = TRUE;
-#else
-	boolean mmapping = FALSE;
+#ifndef HAVE_MEMORY_MAPPED_FILE
+	use_mmap = FALSE;
 #endif
 
 	for (i = 0; i < cnt; i++) {
@@ -201,10 +193,10 @@ drifiles *dri_init(const char **file, int cnt) {
 		fclose(fp);
 
 		/* mmap */
-		if (mmapping) {
+		if (use_mmap) {
 			mmap_t *m = map_file(file[i]);
 			if (!m) {
-				mmapping = d->mmapped = FALSE;
+				use_mmap = d->mmapped = FALSE;
 				i = 0; /* retry */
 			} else {
 				d->mmap[i] = m;

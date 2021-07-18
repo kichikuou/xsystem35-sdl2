@@ -35,6 +35,7 @@
 #include "ags.h"
 #include "counter.h"
 #include "nact.h"
+#include "debugger.h"
 #include "selection.h"
 #include "message.h"
 #include "msgskip.h"
@@ -144,8 +145,11 @@ void nact_main() {
 	nact->wait_vsync = FALSE;
 	
 	while (!nact->is_quit) {
+		if (dbg_trapped)
+			dbg_repl();
+
 		for (int cnt = 0; cnt < 10000; cnt++) {
-			if (nact->wait_vsync || nact->popupmenu_opened || nact->is_quit)
+			if (nact->wait_vsync || nact->popupmenu_opened || nact->is_quit || dbg_trapped)
 				break;
 			exec_command();
 			nact->cmd_count++;

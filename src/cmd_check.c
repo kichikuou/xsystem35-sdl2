@@ -26,6 +26,7 @@
 
 #include "portab.h"
 #include "cmd_check.h"
+#include "debugger.h"
 #include "scenario.h"
 #include "xsystem35.h"
 #include "selection.h"
@@ -178,6 +179,14 @@ void exec_command(void) {
 	int page, index;
 	int bool;
 	int c0 = sl_getc();
+
+	if (c0 == BREAKPOINT) {
+		c0 = dbg_handle_breakpoint(sl_getPage(), sl_getIndex() - 1);
+		if (c0 < 0) {
+			sl_ungetc();
+			return;
+		}
+	}
 
 	if (c0 == 0x20 || c0 >= 0x80) {
 		message(c0);
