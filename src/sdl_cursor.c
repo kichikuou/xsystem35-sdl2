@@ -146,9 +146,41 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	return TRUE;
 }
 
+MyPoint sdl_translateMouseCoords(int x, int y) {
+	// scale mouse x and y
+	float scalex, scaley;
+	SDL_RenderGetScale(sdl_renderer, &scalex, &scaley);
+	x *= scalex;
+	y *= scaley;
+
+	// calculate window borders
+	int logw, logh;
+	SDL_RenderGetLogicalSize(sdl_renderer, &logw, &logh);
+
+	float scalew, scaleh;
+	scalew = logw * scalex;
+	scaleh = logh * scaley;
+
+	int winw, winh;
+	SDL_GetWindowSize(sdl_window, &winw, &winh);
+
+	float border_left = (winw - scalew) / 2;
+	float border_top  = (winh - scaleh) / 2;
+
+	// offset x and y by window borders
+	x += border_left;
+	y += border_top;
+
+	MyPoint p = { x, y };
+	return p;
+}
+
 /* マウスの位置の移動 */
 void sdl_setCursorLocation(int x, int y) {
-	if (ms_active) SDL_WarpMouseInWindow(sdl_window, x, y);
+	if (ms_active) {
+		MyPoint t = sdl_translateMouseCoords(x, y);
+		SDL_WarpMouseInWindow(sdl_window, t.x, t.y);
+	}
 }
 
 /* マウスカーソルの形状の設定 */
