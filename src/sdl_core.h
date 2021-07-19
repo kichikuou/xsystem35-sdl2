@@ -98,6 +98,7 @@ extern int  sdl_getKeyInfo();
 extern int  sdl_getMouseInfo(MyPoint *p);
 extern int  sdl_getJoyInfo(void);
 extern void sdl_setAutoRepeat(boolean bool);
+extern MyPoint sdl_translateMouseCoords(int x, int y);
 
 /* misc */
 extern void sdl_mainIteration();
