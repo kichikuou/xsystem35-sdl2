@@ -41,6 +41,7 @@ static void makeDIB(int width, int height, int depth);
 
 struct sdl_private_data *sdl_videodev;
 static int joy_device_index = -1;
+static boolean integer_scaling = FALSE;
 
 #ifdef HAVE_SDLJOY
 static SDL_Joystick *js;
@@ -158,6 +159,7 @@ static void window_init(void) {
 								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
 								  flags);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
+	SDL_RenderSetIntegerScale(sdl_renderer, integer_scaling);
 }
 
 static void makeDIB(int width, int height, int depth) {
@@ -273,6 +275,10 @@ void sdl_setWindowSize(int x, int y, int w, int h) {
 
 void sdl_setJoyDeviceIndex(int index) {
 	joy_device_index = index;
+}
+
+void sdl_setIntegerScaling(boolean bool) {
+	integer_scaling = bool;
 }
 
 #ifdef __EMSCRIPTEN__
