@@ -37,6 +37,7 @@ static pthread_t thread;
 static boolean thread_running = FALSE;
 static boolean should_stop    = FALSE;
 static boolean should_pause   = FALSE;
+static boolean should_unpause = FALSE;
 static boolean should_loop    = FALSE;
 
 static int midi_initialize(char *devnm, int subdev) {
@@ -78,7 +79,10 @@ static int midi_exit() {
 
 static int midi_start(int no, int loop, char *data, int datalen) {
 	NOTICE("midi_start: no = %i loop = %i datalen = %i\n", no, loop, datalen);
-	should_loop = loop;
+	should_stop    = FALSE;
+	should_pause   = FALSE;
+	should_unpause = FALSE;
+	should_loop    = loop;
 
 	if (thread_running) {
 		if (midi_stop() == NG) {
@@ -118,7 +122,7 @@ static int midi_pause() {
 
 static int midi_unpause() {
 	NOTICE("midi_unpause\n");
-	should_pause = FALSE;
+	should_unpause = TRUE;
 	return OK;
 }
 
@@ -287,6 +291,7 @@ static void *midi_thread(void *args) {
 	midi_allnotesoff();
 	midi_reset();
 
+	boolean pausing = FALSE;
 	int nevents = midi->eventsize;
 
 	pc = tick = ctick = 0;
@@ -306,6 +311,18 @@ static void *midi_thread(void *args) {
 
 		if (should_pause) {
 			NOTICE("midi_thread pausing\n");
+			midi_allnotesoff();
+			should_pause = FALSE;
+			pausing = TRUE;
+		}
+
+		if (should_unpause) {
+			NOTICE("midi_thread unpausing\n");
+			should_unpause = FALSE;
+			pausing = FALSE;
+		}
+
+		if (pausing) {
 			usleep(50*1000);
 			continue;
 		}
