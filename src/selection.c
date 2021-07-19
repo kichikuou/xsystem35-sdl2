@@ -433,19 +433,34 @@ void sel_select() {
 	sys_key_releasewait(SYS35KEY_RET, FALSE);
 	while (1) {
 		key = sys_keywait(25, KEYWAIT_CANCELABLE);
+
 		if (!key && prevkey == SYS35KEY_SPC) break;
 		if (!key && prevkey == SYS35KEY_RET && curElement != -1) break;
 		prevkey = key;
-		if (key & 3) {
+
+		if (key & 0xF) { /* arrow keys */
 			curElement = -1;
 			if ((key & 1)) {
+				/* up */
 				if (preElement > 0) curElement = preElement-1;
 				if (preElement < 0) curElement = 0;
 			}
 			
 			if ((key & 2) && preElement < (regnum-1)) {
+				/* down */
 				curElement = preElement+1;
 			}
+
+			if (key & 4) {
+				/* left */
+				curElement = 0;
+			}
+
+			if (key & 8) {
+				/* right */
+				curElement = regnum - 1;
+			}
+
 			if (curElement >= 0) {
 				if (preElement >= 0) {
 					encloseElement(0, preElement);
