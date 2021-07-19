@@ -147,6 +147,7 @@ static void sys35_usage(boolean verbose) {
 #endif  
 	puts(" -noantialias   : never use antialiased string");
 	puts(" -fullscreen    : start with fullscreen");
+	puts(" -integerscale  : use integer scaling when resizing");
 	puts(" -noimagecursor : disable image cursor");
 	puts(" -version       : show version");
 	puts(" -h             : show this message");
@@ -332,6 +333,8 @@ static void sys35_ParseOption(int *argc, char **argv) {
 		} else if (0 == strcmp(argv[i], "-version")) {
 			puts(VERSION);
 			exit(0);
+		}  else if (0 == strcmp(argv[i], "-integerscale")) {
+			sdl_setIntegerScaling(TRUE);
 		}
 	}
 }
@@ -401,6 +404,13 @@ static void check_profile() {
 	if (param) {
 		if (0 == strcmp(param, "Yes")) {
 			nact->noimagecursor = TRUE;
+		}
+	}
+	/* enable integer scaling */
+	param = get_profile("integerscale");
+	if (param) {
+		if (0 == strcmp(param, "Yes")) {
+			sdl_setIntegerScaling(TRUE);
 		}
 	}
 }
