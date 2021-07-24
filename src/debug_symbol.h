@@ -31,5 +31,6 @@ int dsym_line2addr(struct debug_symbols *dsym, int page, int line);
 int dsym_addr2line(struct debug_symbols *dsym, int page, int addr);
 const char *dsym_source_line(struct debug_symbols *dsym, int page, int line);
 int dsym_lookup_variable(struct debug_symbols *dsym, const char *name);
+const char *dsym_addr2func(struct debug_symbols *dsym, int page, int addr);
 
 #endif // __DEBUG_SYMBOL_H__

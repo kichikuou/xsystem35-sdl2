@@ -53,17 +53,22 @@ static Breakpoint *internal_breakpoint;
 static const char whitespaces[] = " \t\r\n";
 
 static const char *format_address(int page, int addr, boolean is_return_addr) {
-	static char buf[120];
+	static char buf[100];
 	const char *src = dsym_page2src(symbols, page);
 
 	// For return addresses, search with (addr - 1) so that the function call's
 	// line number will be printed.
 	int line = dsym_addr2line(symbols, page, is_return_addr ? addr - 1 : addr);
+	const char *func = dsym_addr2func(symbols, page, is_return_addr ? addr - 1 : addr);
 
-	if (src && line > 0)
-		sprintf(buf, "%.100s:%d", src, line);  // TODO: print function name
-	else
-		sprintf(buf, "%d:0x%x", page, addr);
+	if (src && line > 0) {
+		if (func)
+			snprintf(buf, sizeof(buf), "%s:%d in %s", src, line, func);
+		else
+			snprintf(buf, sizeof(buf), "%s:%d", src, line);
+	} else {
+		snprintf(buf, sizeof(buf), "%d:0x%x", page, addr);
+	}
 	return buf;
 }
 
@@ -364,7 +369,7 @@ void dbg_repl(void) {
 	}
 
 	char buf[256];
-	while (printf("dbg> "), fgets(buf, sizeof(buf), stdin)) {
+	while (printf("dbg> "), fflush(stdout), fgets(buf, sizeof(buf), stdin)) {
 		char *cmd = strtok(buf, whitespaces);
 		if (!cmd) {
 			// TODO: repeat last command

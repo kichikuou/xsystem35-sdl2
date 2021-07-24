@@ -41,12 +41,21 @@ typedef struct {
 	Mapping *mappings;
 } SrcInfo;
 
+typedef struct {
+	char *name;
+	int page;
+	int addr;
+	boolean is_local;
+} FuncInfo;
+
 struct debug_symbols {
 	int version;
 	int nr_srcs;
 	SrcInfo *srcs;
 	int nr_vars;
 	char **variables;
+	int nr_funcs;
+	FuncInfo *functions;
 };
 
 const char *fget4cc(FILE *fp) {
@@ -161,6 +170,21 @@ static boolean load_vari(struct debug_symbols *dsym, char *buf) {
 	return true;
 }
 
+static boolean load_func(struct debug_symbols *dsym, char *buf) {
+	dsym->nr_funcs = LittleEndian_getDW(buf, 0);
+	dsym->functions = calloc(dsym->nr_funcs, sizeof(FuncInfo));
+	char *p = buf + 4;
+	for (int i = 0; i < dsym->nr_funcs; i++) {
+		dsym->functions[i].name = p;
+		p += strlen(p) + 1;
+		dsym->functions[i].page = LittleEndian_getW(p, 0);
+		dsym->functions[i].addr = LittleEndian_getDW(p, 2);
+		dsym->functions[i].is_local = p[6];
+		p += 7;
+	}
+	return true;
+}
+
 struct debug_symbols *dsym_load(const char *path) {
 	FILE *fp = fopen(path, "rb");
 	if (!fp) {
@@ -206,6 +230,8 @@ struct debug_symbols *dsym_load(const char *path) {
 			ok = load_line(dsym, section_content);
 		} else if (!strcmp(tag, "VARI")) {
 			ok = load_vari(dsym, section_content);
+		} else if (!strcmp(tag, "FUNC")) {
+			ok = load_func(dsym, section_content);
 		} else {
 			WARNING("%s: unrecognized section %s\n", path, tag);
 		}
@@ -303,4 +329,27 @@ int dsym_lookup_variable(struct debug_symbols *dsym, const char *name) {
 			return i;
 	}
 	return -1;
+}
+
+const char *dsym_addr2func(struct debug_symbols *dsym, int page, int addr) {
+	if (!dsym)
+		return NULL;
+
+	// Binary search.
+	int left = 0, right = dsym->nr_funcs;
+	while (left < right) {
+		int mid = (left + right) / 2;
+		FuncInfo *f = &dsym->functions[mid];
+		if (f->page < page || (f->page == page && f->addr <= addr))
+			left = mid + 1;
+		else
+			right = mid;
+	}
+	if (left == 0)
+		return NULL;
+	FuncInfo *f = &dsym->functions[left - 1];
+	if (f->page != page)
+		return NULL;
+	assert(f->addr <= addr);
+	return f->name;
 }
