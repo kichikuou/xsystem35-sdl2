@@ -94,7 +94,24 @@ static boolean parse_address(const char *str, int *page, int *addr) {
 		return true;
 	}
 
-	// TODO: accept function names.
+	*page = sl_getPage();
+
+	// <linenum>
+	char *endptr;
+	line_no = strtol(str, &endptr, 0);
+	if (!*endptr) {
+		*addr = dsym_line2addr(symbols, sl_getPage(), line_no);
+		if (*addr < 0) {
+			printf("No line %d in current file.\n", line_no);
+			return false;
+		}
+		return true;
+	}
+
+	// <funcname>
+	if (dsym_func2addr(symbols, str, page, addr))
+		return true;
+
 	return false;
 }
 
@@ -210,7 +227,7 @@ int dbg_handle_breakpoint(int page, int addr) {
 
 	if (bp->no != INTERNAL_BREAKPOINT_NO) {
 		bp->ignore_next = true;
-		printf("Breakpoint %d, %d:0x%x\n", bp->no, page, addr);
+		printf("Breakpoint %d, %s\n", bp->no, format_address(page, addr, false));
 	}
 	dbg_trapped = true;
 	return -1;
@@ -251,7 +268,7 @@ static void cmd_break(void) {
 	}
 	Breakpoint *bp = set_breakpoint(page, addr, false);
 	if (bp)
-		printf("Breakpoint %d at %s\n", bp->no, arg);
+		printf("Breakpoint %d at %s\n", bp->no, format_address(bp->page, bp->addr, false));
 }
 
 static void cmd_delete(void) {

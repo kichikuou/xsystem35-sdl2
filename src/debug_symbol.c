@@ -353,3 +353,19 @@ const char *dsym_addr2func(struct debug_symbols *dsym, int page, int addr) {
 	assert(f->addr <= addr);
 	return f->name;
 }
+
+boolean dsym_func2addr(struct debug_symbols *dsym, const char *name, int *inout_page, int *out_addr) {
+	if (!dsym)
+		return false;
+
+	for (int i = 0; i < dsym->nr_funcs; i++) {
+		if (dsym->functions[i].is_local && dsym->functions[i].page != *inout_page)
+			continue;
+		if (!strcmp(dsym->functions[i].name, name)) {
+			*inout_page = dsym->functions[i].page;
+			*out_addr = dsym->functions[i].addr;
+			return true;
+		}
+	}
+	return false;
+}
