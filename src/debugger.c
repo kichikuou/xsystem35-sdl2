@@ -379,6 +379,26 @@ static void cmd_quit(void) {
 	sys_exit(0);
 }
 
+static void cmd_string(void) {
+	char *arg = strtok(NULL, whitespaces);
+	if (!arg) {
+		printf("Syntax: string <index>\n");
+		return;
+	}
+
+	while (arg) {
+		int no = atoi(arg);
+		if (no < 1) {
+			printf("Bad string index %s\n", arg);
+		} else {
+			char *utf = toUTF8(svar_get(no));
+			printf("string[%d] = \"%s\"\n", no, utf);  // TODO: escaping
+			free(utf);
+		}
+		arg = strtok(NULL, whitespaces);
+	}
+}
+
 void dbg_repl(void) {
 	dbg_trapped = false;
 	if (!print_source_line(sl_getPage(), sl_getIndex()))
@@ -413,6 +433,8 @@ void dbg_repl(void) {
 			cmd_print();
 		} else if (!strcmp(cmd, "q") || !strcmp(cmd, "quit")) {
 			cmd_quit();
+		} else if (!strcmp(cmd, "str") || !strcmp(cmd, "string")) {
+			cmd_string();
 		} else {
 			printf("Unknown command \"%s\".\n", cmd);
 		}
