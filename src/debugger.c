@@ -358,6 +358,10 @@ static void cmd_print(void) {
 	printf("%s = %d\n", arg, sysVar[var]);
 }
 
+static void cmd_quit(void) {
+	sys_exit(0);
+}
+
 void dbg_repl(void) {
 	dbg_trapped = false;
 	if (!print_source_line(sl_getPage(), sl_getIndex()))
@@ -390,6 +394,8 @@ void dbg_repl(void) {
 				return;
 		} else if (!strcmp(cmd, "p") || !strcmp(cmd, "print")) {
 			cmd_print();
+		} else if (!strcmp(cmd, "q") || !strcmp(cmd, "quit")) {
+			cmd_quit();
 		} else {
 			printf("Unknown command \"%s\".\n", cmd);
 		}
