@@ -22,10 +22,21 @@
 
 #include "portab.h"
 
-extern boolean dbg_trapped;
+typedef enum {
+	DBG_RUNNING,
+	DBG_STOPPED_ENTRY,
+	DBG_STOPPED_STEP,
+	DBG_STOPPED_NEXT,
+	DBG_STOPPED_BREAKPOINT,
+	DBG_STOPPED_INTERRUPT,
+} DebuggerState;
+
+extern DebuggerState dbg_state;
 
 #define BREAKPOINT 0x0f
 
+#define dbg_trapped() (dbg_state != DBG_RUNNING)
+#define dbg_interrupted() (dbg_state == DBG_STOPPED_INTERRUPT)
 void dbg_init(const char *symbols_path);
 void dbg_repl(void);
 int dbg_handle_breakpoint(int page, int addr);

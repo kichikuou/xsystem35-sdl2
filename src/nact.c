@@ -143,30 +143,29 @@ void nact_main() {
 	nact->frame_count = 0;
 	nact->cmd_count = 0;
 	nact->wait_vsync = FALSE;
-	
+
+	int cnt = 0;
 	while (!nact->is_quit) {
-		if (dbg_trapped)
+		nact->current_page = sl_getPage();
+		nact->current_addr = sl_getIndex();
+		if (dbg_trapped())
 			dbg_repl();
 
-		for (int cnt = 0; cnt < 10000; cnt++) {
-			if (nact->wait_vsync || nact->popupmenu_opened || nact->is_quit || dbg_trapped)
-				break;
-			exec_command();
-			nact->cmd_count++;
+		exec_command();
+		nact->cmd_count++;
+
+		if (++cnt >= 10000 || nact->wait_vsync || nact->popupmenu_opened || dbg_trapped()) {
+			nact->callback();
+
+			if (!nact->is_message_locked)
+				sys_getInputInfo();
+
+			sdl_wait_vsync();
+			nact->frame_count++;
+			nact->wait_vsync = FALSE;
+			cnt = 0;
 		}
-		nact_endframe();
 	}
-}
-
-void nact_endframe(void) {
-	nact->callback();
-
-	if (!nact->is_message_locked)
-		sys_getInputInfo();
-
-	sdl_wait_vsync();
-	nact->frame_count++;
-	nact->wait_vsync = FALSE;
 }
 
 static void nact_callback() {

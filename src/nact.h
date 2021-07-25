@@ -58,7 +58,6 @@ extern char *sys_getConstString();
 // extern boolean sys_nact_engine();
 extern void nact_main();
 extern void nact_init();
-extern void nact_endframe(void);
 
 // cmd_check.c
 extern void exec_command(void);
@@ -134,6 +133,10 @@ typedef struct {
 	int frame_count;
 	int cmd_count;
 	boolean wait_vsync;
+
+	/* start address of the command currently being executed */
+	int current_page;
+	int current_addr;
 
 } NACTINFO;
 
