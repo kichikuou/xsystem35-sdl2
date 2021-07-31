@@ -510,12 +510,6 @@ int main(int argc, char **argv) {
 	init_signalhandler();
 #endif
 
-	if (debugger_enabled) {
-		char symbols_path[500];
-		snprintf(symbols_path, sizeof(symbols_path), "%s.symbols", nact->files.game_fname[DRIFILE_SCO][0]);
-		dbg_init(symbols_path);
-	}
-
 	mus_init(audio_buffer_size);
 
 #ifdef ENABLE_NLS
@@ -531,6 +525,12 @@ int main(int argc, char **argv) {
 #endif
 	menu_init();
 	
+	if (debugger_enabled) {
+		char symbols_path[500];
+		snprintf(symbols_path, sizeof(symbols_path), "%s.symbols", nact->files.game_fname[DRIFILE_SCO][0]);
+		dbg_init(symbols_path);
+	}
+
 	nact_main();
 #ifdef __EMSCRIPTEN__
 	sdl_sleep(1000000000);

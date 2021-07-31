@@ -31,6 +31,9 @@
 #ifdef HAVE_SIGACTION
 #include <signal.h>
 #endif
+#ifdef _WIN32
+#include "win/console.h"
+#endif
 
 #define INTERNAL_BREAKPOINT_NO -1
 
@@ -207,16 +210,19 @@ static void delete_breakpoint(int no) {
 	printf("No breakpoint number %d.\n", no);
 }
 
-#ifdef HAVE_SIGACTION
 static void sigint_handler(int sig_num) {
 	dbg_state = DBG_STOPPED_INTERRUPT;
 }
-#endif
 
 void dbg_init(const char *symbols_path) {
 #ifdef HAVE_SIGACTION
 	sys_set_signalhandler(SIGINT, sigint_handler);
 #endif
+#ifdef _WIN32
+	win_alloc_console();
+	win_set_ctrl_c_handler(sigint_handler);
+#endif
+
 	dbg_state = DBG_STOPPED_ENTRY;
 	symbols = dsym_load(symbols_path);
 }
