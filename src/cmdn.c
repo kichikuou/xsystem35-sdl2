@@ -28,6 +28,7 @@
 #include "portab.h"
 #include "utfsjis.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "menu.h"
 
 /* NI/NT 用パラメータ */
@@ -234,7 +235,7 @@ void commandN_NOT() {
 }
 
 void commandNO() { /* T2 */
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int *dst_var = getCaliVariable();
 	int *src_var = getCaliVariable();
 	int cnt      = getCaliValue();
@@ -377,7 +378,7 @@ void commandNI() { /* From Panyo */
 
 void commandNT() { /* From Panyo */
 	/* NIコマンドで表示するタイトルを設定する。*/
-	char *str = sys_getString(':');
+	const char *str = sl_getString(':');
 
 	free(ni_param.title);
 	ni_param.title = toUTF8(str);

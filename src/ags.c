@@ -33,6 +33,7 @@
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 #include "sdl_core.h"
 #include "alpha_plane.h"

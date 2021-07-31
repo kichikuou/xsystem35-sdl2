@@ -335,14 +335,14 @@ static int get_retaddr_if_funcall(void) {
 			retaddr = sl_getIndex();
 		break;
 	case '\\':
-		if (sl_getadr() != 0)
+		if (sl_getaddr() != 0)
 			retaddr = sl_getIndex();
 		break;
 	case '~':
 		{
 			int page = sl_getw();
 			if (page != 0 && page != 0xffff) {
-				sl_getadr();
+				sl_getaddr();
 				retaddr = sl_getIndex();
 			}
 		}

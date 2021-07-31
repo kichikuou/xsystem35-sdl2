@@ -28,6 +28,7 @@
 #include "utfsjis.h"
 #include "variable.h"
 #include "xsystem35.h"
+#include "scenario.h"
 
 /* システム変数 */
 int sysVar[SYSVAR_MAX];

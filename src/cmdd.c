@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 
 void commandDC() {
 	int page = getCaliValue();

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 
 /* absolete */
@@ -35,7 +36,7 @@ void commandPN() {
 }
 
 void commandPF() {
-	int p1  = sys_getc();
+	int p1  = sl_getc();
 	int num = getCaliValue();
 	boolean cancel_enabled;
 
@@ -63,7 +64,7 @@ void commandPF() {
 }
 
 void commandPW() {
-	int p1  = sys_getc();
+	int p1  = sl_getc();
 	int num = getCaliValue();
 	boolean cancel_enabled;
 	

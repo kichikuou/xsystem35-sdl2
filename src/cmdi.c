@@ -26,6 +26,7 @@
 #include "config.h"
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 #include "sdl_core.h"
 #include "input.h"
@@ -39,7 +40,7 @@ static int ik_key = 0;
 
 void commandIK() {
 	/* キー入力関連のコマンド */
-	int num = sys_getc();
+	int num = sl_getc();
 	int key;
 
 	DEBUG_COMMAND("IK %d:\n",num);

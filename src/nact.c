@@ -57,8 +57,6 @@ MG コマンド: 表示時の ZH に依存
 
 /* defined by cmdv.c */
 extern void va_animation();
-/* コマンド解析時の展開バッファ */
-static char msgbuf[512];
 /* 半角モード */
 static int msg_msgHankakuMode = 0; /* 0:全角 1:半角, 2: 無変換 */
 
@@ -73,33 +71,6 @@ void sys_setHankakuMode(int mode) {
 
 void sys_setCharacterEncoding(CharacterEncoding encoding) {
 	nact->encoding = encoding;
-}
-
-/* 文字列の取り出し */
-char *sys_getString(char term) {
-	int c0;
-	char *index = msgbuf;
-	
-	while ((c0 = sl_getc()) != (int)term) {
-		*index++ = c0;
-	}
-	*index = 0;
-	return msgbuf;
-}
-
-/* 特殊 const string */
-char *sys_getConstString() {
-	int c0;
-	char *index = msgbuf;
-
-	c0 = sl_getc();
-	
-	while ((c0 = sl_getc()) != 0) {
-		*index++ = ((c0 & 0xf0) >> 4) + ((c0 & 0x0f) << 4);
-	}
-	
-	*index = 0;
-	return msgbuf;
 }
 
 /* 選択肢・通常メッセージ振り分け */

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "message.h"
 
 void commandT() {

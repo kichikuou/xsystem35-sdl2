@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "windowframe.h"
 #include "selection.h"
 #include "message.h"

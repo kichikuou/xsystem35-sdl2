@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "savedata.h"
 #include "utfsjis.h"
 
@@ -83,8 +84,8 @@ void commandQC() {
 }
 
 void commandQE() {
-	int type       = sys_getc();
-	char *filename = sys_getString(':');
+	int type       = sl_getc();
+	const char *filename = sl_getString(':');
 	int *var, _var = 0, cnt;
 
 	char *fname_utf8 = toUTF8(filename);

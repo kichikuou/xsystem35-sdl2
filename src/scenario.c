@@ -52,6 +52,8 @@ static int pageCallCnt  = 0;
 static int labelCallCnt_afterPageCall = 0;
 static int dataPushCnt = 0;
 
+static char strbuf[512];
+
 static dridata *dfile;   // dri object for current page
 static dridata *datatbl; // dri object for data table
 
@@ -140,7 +142,7 @@ int sl_getdAt(int adr) {
 	return c0 + (c1 << 16);
 }
 
-int sl_getadr(void) {
+int sl_getaddr(void) {
 	int c0 = sl_getw();
 	int c1 = sl_getw();
 	return c0 + (c1 << 16);
@@ -148,6 +150,28 @@ int sl_getadr(void) {
 
 void sl_ungetc(void) {
 	sl_index--;
+}
+
+const char *sl_getString(char term) {
+	int c0;
+	char *index = strbuf;
+
+	while ((c0 = sl_getc()) != (int)term) {
+		*index++ = c0;
+	}
+	*index = '\0';
+	return strbuf;
+}
+
+const char *sl_getConstString(void) {
+	char *index = strbuf;
+	int c0 = sl_getc();
+
+	while ((c0 = sl_getc()) != 0) {
+		*index++ = ((c0 & 0xf0) >> 4) + ((c0 & 0x0f) << 4);
+	}
+	*index = '\0';
+	return strbuf;
 }
 
 /* @address */

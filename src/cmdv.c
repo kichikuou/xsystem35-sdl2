@@ -29,6 +29,7 @@
 #include "portab.h"
 #include "sdl_core.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 #include "counter.h"
 #include "input.h"
@@ -563,7 +564,7 @@ void commandVE() { /* from T2 */
 }
 
 void commandVZ() { /* from T2 */
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	
@@ -729,7 +730,7 @@ static void throttle() {
 }
 
 void commandVA() { /* from Panyo */
-	int no = sys_getc();
+	int no = sl_getc();
 	int p1 = getCaliValue();
 	int p2, p3;
 	int *var1, *var2;

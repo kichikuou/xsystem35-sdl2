@@ -31,6 +31,7 @@
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "dri.h"
 #include "savedata.h"
 #include "utfsjis.h"
@@ -107,8 +108,8 @@ void commandLT() {
 }
 
 void commandLE() {
-	int type = sys_getc();
-	char *filename = sys_getString(':');
+	int type = sl_getc();
+	const char *filename = sl_getString(':');
 	int *var, _var = 0;
 	int num;
 
@@ -136,7 +137,7 @@ void commandLE() {
 }
 
 void commandLL() {
-	int type = sys_getc();
+	int type = sl_getc();
 	int link_no = getCaliValue();
 	int *var, _var = 0;
 	int num, i;
@@ -191,7 +192,7 @@ void commandLL() {
 
 void commandLHD() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -201,7 +202,7 @@ void commandLHD() {
 
 void commandLHG() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 
 	// HACK: Remember the last registered number so that LHG3 called immediately
@@ -225,7 +226,7 @@ void commandLHG() {
 
 void commandLHM() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -235,7 +236,7 @@ void commandLHM() {
 
 void commandLHS() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -245,7 +246,7 @@ void commandLHS() {
 
 void commandLHW() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -256,7 +257,7 @@ void commandLHW() {
 void commandLC() {
 	int x = getCaliValue();
 	int y = getCaliValue();
-	char *filename = sys_getString(':'); 
+	const char *filename = sl_getString(':');
 	
 	char *fname_utf8 = toUTF8(filename);
 	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
@@ -268,8 +269,8 @@ void commandLC() {
 void commandLXG() {
 	/* ファイルを選択する */
 	int file_name = getCaliValue();
-	char *title   = sys_getString(':');
-	char *filter  = sys_getString(':');
+	const char *title = sl_getString(':');
+	const char *filter = sl_getString(':');
 
 	DEBUG_COMMAND_YET("LXG %d,%s,%s:\n", file_name, title, filter);
 }

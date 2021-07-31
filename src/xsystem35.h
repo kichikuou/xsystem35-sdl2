@@ -26,7 +26,6 @@
 
 #include "config.h"
 #include "portab.h"
-#include "scenario.h"
 #include "system.h"
 #include "nact.h"
 #include "variable.h"
@@ -45,15 +44,9 @@
 */
 
 #ifdef DEBUG
-#define DEBUG_COMMAND_YET(fmt, ...) \
-	sys_message(2, "%d,%x: " fmt, sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
-#define DEBUG_COMMAND(fmt, ...) \
-	sys_message(5, "%d,%x: " fmt, sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
 #define DEBUG_MESSAGE(...)     sys_message(6, __VA_ARGS__)
 #else
 #define DEBUG_MESSAGE(...)
-#define DEBUG_COMMAND(...)
-#define DEBUG_COMMAND_YET(...)
 #endif
 
 /* defined in cali.c */

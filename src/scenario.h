@@ -25,6 +25,7 @@
 #define __SCENARIO__
 
 #include "portab.h"
+#include "system.h"
 
 // Warning: changing these enum values will break savedata compatibility.
 enum stack_frame_type {
@@ -48,12 +49,15 @@ extern int sl_index;       // cureent scenario address
 boolean sl_init(void);
 boolean sl_reinit(void);
 int sl_getw(void);
-#define sl_getdw sl_getadr
+#define sl_getdw sl_getaddr
 int sl_getdAt(int address);
 int sl_getwAt(int address);
 int sl_getcAt(int address);
-int sl_getadr(void);
+int sl_getaddr(void);
 void sl_ungetc(void);
+const char *sl_getString(char term);
+const char *sl_getConstString(void);
+
 void sl_jmpNear(int address);
 boolean sl_jmpFar(int page);
 boolean sl_jmpFar2(int page, int address);
@@ -78,5 +82,15 @@ void sl_returnGoto(int address);
 static inline int sl_getIndex(void) { return sl_index; }
 static inline int sl_getPage(void) { return sl_page; }
 static inline int sl_getc(void) { return sl_sco[sl_index++]; }
+
+#ifdef DEBUG
+#define DEBUG_COMMAND_YET(fmt, ...) \
+	sys_message(2, "%d,%x: " fmt, sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
+#define DEBUG_COMMAND(fmt, ...) \
+	sys_message(5, "%d,%x: " fmt, sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
+#else
+#define DEBUG_COMMAND(...)
+#define DEBUG_COMMAND_YET(...)
+#endif
 
 #endif /* !__SCENARIO_ */

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 
 void commandWW() {
@@ -51,7 +52,7 @@ void commandWV() {
 }
 
 void commandWZ() {
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int sw = getCaliValue();
 
 	switch(p1) {

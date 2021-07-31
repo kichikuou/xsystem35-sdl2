@@ -26,11 +26,12 @@
 #include <string.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "utfsjis.h"
 #include "hankaku.h"
 
 void commandH() {
-	int fig = sys_getc();
+	int fig = sl_getc();
 	int num = getCaliValue();
 	char buf[512];
 
@@ -42,7 +43,7 @@ void commandH() {
 }
 
 void commandHH(void) {
-	int fig = sys_getc();
+	int fig = sl_getc();
 	int num = getCaliValue();
 	char buf[256];
 

@@ -23,6 +23,7 @@
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "cg.h"
 
 void commandG0() {

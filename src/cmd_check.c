@@ -85,8 +85,8 @@ static void letVar(int type) {
 
 /* データテーブルの設定 */
 static void getDataTableAdr() {
-	int index  = sys_getaddress();
-	int offset = sys_getCaliValue();
+	int index  = sl_getaddr();
+	int offset = getCaliValue();
 	
 	if (offset) {
 		index = sl_getdAt(index + 4 * (offset - 1));
@@ -99,18 +99,18 @@ static void getDataTableAdr() {
 
 /* < ループ開始 */
 static void loopStart() {
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int exitadr, limit, direction, step;
 	int *var;
 	
 	if (p1 == 0) {
-		sys_getc();
-		sys_getc();
+		sl_getc();
+		sl_getc();
 	} else if (p1 != 1) {
 		undeferr();
 	}
 	
-	exitadr   = sys_getaddress();
+	exitadr   = sl_getaddr();
 	var       = getCaliVariable();
 	limit     = getCaliValue();
 	direction = getCaliValue();
@@ -214,7 +214,7 @@ void exec_command(void) {
 			sel_fixElement();
 			nact->sel.in_setting = FALSE;
 		} else {
-			sel_addRetValue(sys_getaddress());
+			sel_addRetValue(sl_getaddr());
 			nact->sel.in_setting = TRUE;
 		}
 		break;
@@ -233,7 +233,7 @@ void exec_command(void) {
 		break;
 	case '@':
 		/* puts("ラベルジャンプ") */
-		sl_jmpNear(sys_getaddress());
+		sl_jmpNear(sl_getaddr());
 		break;
 	case '<':
 		/* for loop */
@@ -241,7 +241,7 @@ void exec_command(void) {
 		break;
 	case '>':
 		/* loop end */
-		sl_jmpNear(sys_getaddress());
+		sl_jmpNear(sl_getaddr());
 		break;
 	case '/':
 		/* 小文字コマンド */
@@ -1183,7 +1183,7 @@ void exec_command(void) {
 		break;
 	case '\\':
 		/* label call */
-		index = sys_getaddress();
+		index = sl_getaddr();
 		if (index == 0) {
 			sl_retNear();
 		} else {
@@ -1197,14 +1197,14 @@ void exec_command(void) {
 	case '{':
 		/* puts("条件文"); */
 		bool = getCaliValue();
-		index = sys_getaddress();
+		index = sl_getaddr();
 		if (bool == 0) {
 			sl_jmpNear(index);
 		} 
 		break;
 	case '~':
 		/* label far call */
-		page = sys_getw();
+		page = sl_getw();
 		if (page == 0x0000) {
 			// puts("~ cali:");
 			nact->fnc_return_value = getCaliValue();
@@ -1213,7 +1213,7 @@ void exec_command(void) {
 			// puts("~~ cali:");
 			*getCaliVariable() = nact->fnc_return_value;
 		} else {
-			sl_callFar2(page - 1, sys_getaddress());
+			sl_callFar2(page - 1, sl_getaddr());
 		}
 		break;
 	default:

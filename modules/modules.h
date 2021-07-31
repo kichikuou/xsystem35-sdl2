@@ -20,6 +20,8 @@
 #ifndef __MODULES_H__
 #define __MODULES_H__
 
+#include "scenario.h"
+
 typedef struct {
 	const char *name;
 	void (*entrypoint)(void);

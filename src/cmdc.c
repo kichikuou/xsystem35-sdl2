@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 
 void commandCC() {
@@ -185,7 +186,7 @@ void commandCD() {
 }
 
 void commandCK() {
-	int no     = sys_getc();
+	int no     = sl_getc();
 	int x      = getCaliValue();
 	int y      = getCaliValue();
 	int width  = getCaliValue();

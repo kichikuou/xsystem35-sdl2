@@ -26,7 +26,6 @@
 
 #include "portab.h"
 #include "graphics.h"
-#include "scenario.h"
 #include "s39ain.h"
 #include "gameresource.h"
 #include "selection.h"
@@ -40,20 +39,12 @@
 #define fromSJIS(s) codeconv(nact->encoding, SHIFT_JIS, s)
 
 /* コマンド解析時に参照する */
-#define sys_getc            sl_getc
-#define sys_getw            sl_getw
-#define sys_getdw           sl_getdw
-#define sys_getaddress      sl_getadr
-#define sys_getCaliValue    getCaliValue
-#define sys_getCaliVariable getCaliVariable
 extern int getCaliValue();
 extern int *getCaliVariable();
 extern int *getVariable();
-extern char *sys_getString(char term);
 extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
 extern void sys_setCharacterEncoding(CharacterEncoding encoding);
-extern char *sys_getConstString();
 
 // extern boolean sys_nact_engine();
 extern void nact_main();

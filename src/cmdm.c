@@ -27,6 +27,7 @@
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "utfsjis.h"
 #include "menu.h"
 #include "ags.h"
@@ -49,7 +50,7 @@ boolean have_eng_mp_patch = FALSE;
 void commandMS() {
 	/* Xコマンドで表示される文字列領域に文字列を入れる */
 	int num = getCaliValue();
-	char *str = sys_getString(':');
+	const char *str = sl_getString(':');
 	
 	if (num > 0) { /* thanx tajiri@wizard */
 		svar_set(num, str);
@@ -106,7 +107,7 @@ void commandMI() { /* T2 */
 	/* ユーザーによる文字列の入力 */
 	int dst_no  = getCaliValue();
 	int max_len = getCaliValue();
-	char *title = sys_getString(':');
+	const char *title = sl_getString(':');
 	char *t1, *t2, *t3;
 	
 	t1 = toUTF8(title);
@@ -161,7 +162,7 @@ void commandMC() {
 
 void commandMT() {
 	/* ウインドウのタイトル文字列を設定する */
-	char *str = sys_getString(':');
+	const char *str = sl_getString(':');
 	
 	if (nact->game_title_utf8)
 		free(nact->game_title_utf8);
@@ -282,7 +283,7 @@ void commandMZ0() {
 }
 
 void commandMG() {
-	int no = sys_getc();
+	int no = sl_getc();
 	int sw = 0, *var;
 	
 	switch(no) {
@@ -362,7 +363,7 @@ void commandMJ() {
 }
 
 void commandMN() {
-	int no   = sys_getc();
+	int no   = sl_getc();
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 	

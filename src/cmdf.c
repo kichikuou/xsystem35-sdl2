@@ -46,7 +46,7 @@ static void commandF11();
 static int *F6Index[256];
 
 void commandF() {
-	switch (sys_getc()) {
+	switch (sl_getc()) {
 	case 1:
 		commandF1(); break;
 	case 2:
@@ -75,8 +75,8 @@ void commandF() {
 }
 
 static void commandF1() {
-	int str_number = sys_getCaliValue();
-	int skip       = sys_getCaliValue();
+	int str_number = getCaliValue();
+	int skip       = getCaliValue();
 	int i;
 	char *p;
 	
@@ -93,8 +93,8 @@ static void commandF1() {
 }
 
 static void commandF2() {
-	int *read_var = sys_getCaliVariable();
-	int skip      = sys_getCaliValue();
+	int *read_var = getCaliVariable();
+	int skip      = getCaliValue();
 	WORD *p = (WORD *)nact->datatbl_addr;
 	
 	p += skip;
@@ -108,8 +108,8 @@ static void commandF2() {
 }
 
 static void commandF3() {
-	int *read_var = sys_getCaliVariable();
-	int skip      = sys_getCaliValue();
+	int *read_var = getCaliVariable();
+	int skip      = getCaliValue();
 	
 	*read_var = LittleEndian_getW(nact->datatbl_addr, skip *2);
 	
@@ -117,8 +117,8 @@ static void commandF3() {
 }
 
 static void commandF4() {
-	int *read_var = sys_getCaliVariable();
-	int count     = sys_getCaliValue();
+	int *read_var = getCaliVariable();
+	int count     = getCaliValue();
 	int i;
 	WORD *p = (WORD *)nact->datatbl_addr;
 	
@@ -134,8 +134,8 @@ static void commandF4() {
 }
 
 static void commandF5() {
-	int *read_var = sys_getCaliVariable();
-	int count     = sys_getCaliValue();
+	int *read_var = getCaliVariable();
+	int count     = getCaliValue();
 	int i;
 	
 	for (i = 0; i < count; i++) {
@@ -147,8 +147,8 @@ static void commandF5() {
 }
 
 static void commandF6() {
-	int *var  = sys_getCaliVariable();
-	int index = sys_getCaliValue();
+	int *var  = getCaliVariable();
+	int index = getCaliValue();
 	
 	F6Index[index] = var;
 	
@@ -156,8 +156,8 @@ static void commandF6() {
 }
 
 static void commandF7() {
-	int data_width = sys_getCaliValue();
-	int count      = sys_getCaliValue();
+	int data_width = getCaliValue();
+	int count      = getCaliValue();
 	int i, j;
 	WORD *p = (WORD *)nact->datatbl_addr;
 	
@@ -174,25 +174,25 @@ static void commandF7() {
 }
 
 static void commandF8() {
-	int snum = sys_getCaliValue();
-	int scnt = sys_getCaliValue();
+	int snum = getCaliValue();
+	int scnt = getCaliValue();
 	DEBUG_COMMAND_YET("F8 %d,%d:\n", snum, scnt);
 }
 
 static void commandF9() {
-	int snum = sys_getCaliValue();
-	int scnt = sys_getCaliValue();
+	int snum = getCaliValue();
+	int scnt = getCaliValue();
 	DEBUG_COMMAND_YET("F9 %d,%d:\n", snum, scnt);
 }
 
 static void commandF10() {
-	int snum = sys_getCaliValue();
-	int scnt = sys_getCaliValue();
+	int snum = getCaliValue();
+	int scnt = getCaliValue();
 	DEBUG_COMMAND_YET("F10 %d,%d:\n", snum, scnt);
 }
 
 static void commandF11() {
-	int snum = sys_getCaliValue();
-	int ends = sys_getCaliValue();
+	int snum = getCaliValue();
+	int ends = getCaliValue();
 	DEBUG_COMMAND_YET("F11 %d,%d:\n", snum, ends);
 }

@@ -158,7 +158,7 @@ void commandZF() {
 
 void commandZD() {
 	/* デバッグモード時のデバッグメッセージの出力 ON/OFF/PAUSE */
-	int c0 = sys_getc();
+	int c0 = sl_getc();
 	int sw = 0, *var;
 	
 	switch(c0) {
@@ -486,7 +486,7 @@ void commandZI() { /* T2 */
 
 void commandZA() { /* T2 */
 	/* 文字飾りの種類を指定する */
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int p2 = getCaliValue();
 	
 	switch(p1) {
@@ -508,7 +508,7 @@ void commandZK() {
 	// ディスクの入れ替えを促す
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
-	char *str = sys_getString(':');
+	const char *str = sl_getString(':');
 	
 	DEBUG_COMMAND("ZK %d,%d,%s:\n", p1, p2, str);
 }
