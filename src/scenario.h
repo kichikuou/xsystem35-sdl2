@@ -34,41 +34,49 @@ enum stack_frame_type {
 	STACK_DATA = 4
 };
 
-extern boolean sl_init();
-extern boolean sl_reinit();
-extern int sl_getc();
-extern int sl_getw();
-#define sl_getdw sl_getadr
-extern int sl_getdAt(int address);
-extern int sl_getwAt(int address);
-extern int sl_getcAt(int address);
-extern int sl_getadr();
-extern void sl_ungetc(void);
-extern void sl_jmpNear(int address);
-extern boolean sl_jmpFar(int page);
-extern boolean sl_jmpFar2(int page, int address);
-extern void sl_callNear(int address);
-extern void sl_retNear();
-extern void sl_callFar(int page);
-extern void sl_callFar2(int page, int address);
-extern void sl_retFar();
-extern void sl_retFar2();
-extern void sl_stackClear_allCall();
-extern void sl_stackClear_labelCall(int cnt);
-extern void sl_stackClear_pageCall(int cnt);
-extern void sl_pushVar(int *topvar, int cnt);
-extern void sl_popVar(int *topvar, int cnt);
-extern int sl_getIndex();
-extern int sl_getPage();
-extern int *sl_getStackInfo(int *size);
-extern void sl_putStackInfo(int *data, int size);
-extern void sl_pushData(int *data, int cnt);
-extern void sl_popData(int *data, int cnt);
-extern void *sl_setDataTable(int page, int index);
-extern void sl_returnGoto(int address);
+enum txx_type {
+	TxxTEXTCOLOR = 1,
+	TxxTEXTSIZE = 2,
+	TxxTEXTLOC = 3
+};
 
-#define TxxTEXTCOLOR 1
-#define TxxTEXTSIZE  2
-#define TxxTEXTLOC   3
+// Use functions below instead of accessing these variables directly.
+extern const BYTE *sl_sco; // scenario page buffer
+extern int sl_page;        // current scenario page (0-based)
+extern int sl_index;       // cureent scenario address
+
+boolean sl_init(void);
+boolean sl_reinit(void);
+int sl_getw(void);
+#define sl_getdw sl_getadr
+int sl_getdAt(int address);
+int sl_getwAt(int address);
+int sl_getcAt(int address);
+int sl_getadr(void);
+void sl_ungetc(void);
+void sl_jmpNear(int address);
+boolean sl_jmpFar(int page);
+boolean sl_jmpFar2(int page, int address);
+void sl_callNear(int address);
+void sl_retNear(void);
+void sl_callFar(int page);
+void sl_callFar2(int page, int address);
+void sl_retFar(void);
+void sl_retFar2(void);
+void sl_stackClear_allCall(void);
+void sl_stackClear_labelCall(int cnt);
+void sl_stackClear_pageCall(int cnt);
+void sl_pushVar(int *topvar, int cnt);
+void sl_popVar(int *topvar, int cnt);
+int *sl_getStackInfo(int *size);
+void sl_putStackInfo(int *data, int size);
+void sl_pushData(int *data, int cnt);
+void sl_popData(int *data, int cnt);
+void *sl_setDataTable(int page, int index);
+void sl_returnGoto(int address);
+
+static inline int sl_getIndex(void) { return sl_index; }
+static inline int sl_getPage(void) { return sl_page; }
+static inline int sl_getc(void) { return sl_sco[sl_index++]; }
 
 #endif /* !__SCENARIO_ */

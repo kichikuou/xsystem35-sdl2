@@ -32,69 +32,36 @@
 #include "LittleEndian.h"
 #include "xsystem35.h"
 
+const BYTE *sl_sco;
+int sl_page;
+int sl_index;
+
 /* static mathods */
 static void popVars(int *tmp);
 static void popDatas(int *tmp);
 static void sl_push(int type, int *val, int cnt);
-static int* sl_pop();
+static int* sl_pop(void);
 
 /* static variables */
-static BYTE *sl_sco;              /* scenario data */ 
-static int  *sco_stackbuf;        /* stack data    */
-static int  *sco_stackindex;      /* stack index   */
-static int   sco_stacksize = 1024; /* default stack size */
-
-static int   sl_page;              /* current scenario page no */
-static int   sl_index;             /* cureent scenario address in page */
+static int *stack_buf;
+static int *stack_top;
+static int stack_size = 1024;
 
 static int labelCallCnt = 0;
 static int pageCallCnt  = 0;
 static int labelCallCnt_afterPageCall = 0;
 static int dataPushCnt = 0;
 
-/* driobject */
-static dridata *dfile;
-
-#if 0
-/* debug: show stack information */
-static void showStackInfo() {
-	DEBUG_MESSAGE("stack top = %p, cur = %p, size=%d\n", sco_stackbuf, sco_stackindex, sco_stacksize);
-}
-
-/* debbug: show current scenario pointer information */
-static void showIndexInfo() {
-	DEBUG_MESSAGE("page = %d, index = %x\n", sl_page, sl_index);
-}
-
-static void showStackData() {
-	int i, j;
-	int *var;
-	FILE *fp = fopen("STACKS.TXT","a");
-	if (fp == NULL) return;
-	
-	fprintf(fp, "Page = %d, index = %x\n", sl_getPage(), sl_getIndex());
-	fprintf(fp, "stack top = %p, cur = %p, size=%d, index=%td\n", sco_stackbuf, sco_stackindex, sco_stacksize, (sco_stackindex - sco_stackbuf));
-	
-	var = sco_stackbuf;
-	for (i = 0; i < sco_stacksize; i+=10) {
-		for (j = 0; j < 10; j++) {
-			fprintf(fp, "%d,", *var); var++;
-		}
-		fprintf(fp, "\n");
-	}
-	fprintf(fp, "\n");
-
-	fclose(fp);
-}
-#endif
+static dridata *dfile;   // dri object for current page
+static dridata *datatbl; // dri object for data table
 
 /* initilize stack and load first scenario data */
-boolean sl_init() {
-	sco_stackbuf = calloc(sco_stacksize, sizeof(int));
-	if (sco_stackbuf == NULL)
+boolean sl_init(void) {
+	stack_buf = calloc(stack_size, sizeof(int));
+	if (stack_buf == NULL)
 		NOMEMERR();
 	
-	sco_stackindex = sco_stackbuf;
+	stack_top = stack_buf;
 	sl_jmpFar(0);
 
 	labelCallCnt = 0;
@@ -104,38 +71,36 @@ boolean sl_init() {
 }
 
 /* UD 0 command, reinitilized scenario loader */
-boolean sl_reinit() {
-	free(sco_stackbuf);
+boolean sl_reinit(void) {
+	free(stack_buf);
 	return sl_init();
 }
 
 static void sl_push(int type, int *val, int cnt) {
 	int i;
 
-	if (sco_stackindex + cnt >= sco_stackbuf + sco_stacksize) {
-		i = sco_stackindex - sco_stackbuf;
-		sco_stacksize <<= 1;
-		sco_stackbuf    = realloc(sco_stackbuf, sco_stacksize * sizeof(int));
-		if (sco_stackbuf == NULL)
+	if (stack_top + cnt >= stack_buf + stack_size) {
+		i = stack_top - stack_buf;
+		stack_size <<= 1;
+		stack_buf = realloc(stack_buf, stack_size * sizeof(int));
+		if (stack_buf == NULL)
 			NOMEMERR();
-		sco_stackindex = sco_stackbuf + i;
+		stack_top = stack_buf + i;
 	}
 	val += (cnt - 1);
-	for (i = 0 ; i < cnt; i++) {
-		*sco_stackindex++ = *val--;
+	for (i = 0; i < cnt; i++) {
+		*stack_top++ = *val--;
 	}
-	*sco_stackindex++ = cnt;
-	*sco_stackindex++ = type;
-	// showStackInfo();
-	// showStackData();
+	*stack_top++ = cnt;
+	*stack_top++ = type;
 }
 
-static int* sl_pop() {
+static int* sl_pop(void) {
 	int i, type, cnt;
 	int *tmp, *_tmp;
 	
-	type = *--sco_stackindex;
-	cnt  = *--sco_stackindex;
+	type = *--stack_top;
+	cnt  = *--stack_top;
 	
 	tmp  = _tmp = malloc(sizeof(int) * (cnt + 2));
 	if (_tmp == NULL)
@@ -144,26 +109,18 @@ static int* sl_pop() {
 	*tmp++ = type;
 	*tmp++ = cnt;
 	for (i = 0; i < cnt; i++) {
-		*tmp++ = *--sco_stackindex;
+		*tmp++ = *--stack_top;
 	}
-	if (sco_stackindex < sco_stackbuf) {
+	if (stack_top < stack_buf) {
 		SYSERROR("Stack buffer is illegal\n");
 	}
 	
-	// showStackInfo();
-	// showStackData();
 	return _tmp;
 }
 
-int sl_getc() {
-	return sl_sco[sl_index++];
-}
-
-int sl_getw() {
-	int c0,c1;
-
-	c0 = sl_getc();
-	c1 = sl_getc();
+int sl_getw(void) {
+	int c0 = sl_getc();
+	int c1 = sl_getc();
 	return c0 + (c1 << 8);
 }
 
@@ -172,25 +129,20 @@ int sl_getcAt(int adr) {
 }
 
 int sl_getwAt(int adr) {
-	int c0,c1;
-	
-	c0 = sl_sco[adr];
-	c1 = sl_sco[adr + 1];
+	int c0 = sl_sco[adr];
+	int c1 = sl_sco[adr + 1];
 	return c0 + (c1 << 8);
 }
 
 int sl_getdAt(int adr) {
-	int c0, c1;
-	
-	c0 = sl_getwAt(adr);
-	c1 = sl_getwAt(adr + 2);
+	int c0 = sl_getwAt(adr);
+	int c1 = sl_getwAt(adr + 2);
 	return c0 + (c1 << 16);
 }
 
-int sl_getadr() {
-	int c0,c1;
-	c0 = sl_getw();
-	c1 = sl_getw();
+int sl_getadr(void) {
+	int c0 = sl_getw();
+	int c1 = sl_getw();
 	return c0 + (c1 << 16);
 }
 
@@ -201,7 +153,6 @@ void sl_ungetc(void) {
 /* @address */
 void sl_jmpNear(int address) {
 	sl_index = address;
-//	showIndexInfo();
 }
 
 /*
@@ -221,7 +172,6 @@ boolean sl_jmpFar(int page) {
 	sl_sco   = dfile->data;
 	sl_page  = page;
 	sl_index = LittleEndian_getDW(sl_sco, 4);
-//	showIndexInfo();
 	return TRUE;
 }
 
@@ -255,7 +205,7 @@ void sl_callNear(int address) {
 	labelCallCnt_afterPageCall++;
 }
 
-void sl_retNear() {
+void sl_retNear(void) {
 	int *tmp = sl_pop();
 	int index;
 	
@@ -308,7 +258,7 @@ void sl_callFar2(int page, int address) {
 	}
 }
 
-void sl_retFar() {
+void sl_retFar(void) {
 	int *tmp = sl_pop();
 	int page, index;
 
@@ -335,7 +285,7 @@ void sl_retFar() {
 }
 
 /* UD 1 */
-void sl_retFar2() {
+void sl_retFar2(void) {
 	int *tmp = sl_pop();
 	int page, index;
 
@@ -362,13 +312,13 @@ void sl_retFar2() {
 }
 
 /* UC0 */
-void sl_stackClear_allCall() {
-	free(sco_stackbuf);
-	sco_stackbuf = calloc(sco_stacksize, sizeof(int));
-	if (sco_stackbuf == NULL)
+void sl_stackClear_allCall(void) {
+	free(stack_buf);
+	stack_buf = calloc(stack_size, sizeof(int));
+	if (stack_buf == NULL)
 		NOMEMERR();
 
-	sco_stackindex = sco_stackbuf;
+	stack_top = stack_buf;
 }
 
 /* UC 2 */
@@ -470,29 +420,20 @@ static void popVars(int *tmp) {
 	memcpy(topVar, tmp + 4, sizeof(int) * cnt); 
 }
 
-int sl_getIndex() {
-	return sl_index;
-}
-
-int sl_getPage() {
-	return sl_page;
-}
-
 int *sl_getStackInfo(int *size) {
-	*size = sco_stackindex - sco_stackbuf;
-//	printf("get stack size = %d\n", *size);
-	return sco_stackbuf;
+	*size = stack_top - stack_buf;
+	return stack_buf;
 }
 
 void sl_putStackInfo(int *data, int size) {
-	if (size > sco_stacksize) {
-		sco_stacksize = size << 1;
-		sco_stackbuf  = calloc(sco_stacksize, sizeof(int));
+	if (size > stack_size) {
+		stack_size = size << 1;
+		stack_buf  = calloc(stack_size, sizeof(int));
 	}
-	if (sco_stackbuf == NULL)
+	if (stack_buf == NULL)
 		NOMEMERR();
-	memcpy(sco_stackbuf, data, size * sizeof(int));
-	sco_stackindex = sco_stackbuf + size;
+	memcpy(stack_buf, data, size * sizeof(int));
+	stack_top = stack_buf + size;
 }
 
 
@@ -548,8 +489,6 @@ static void popDatas(int *tmp) {
 	}
 	dataPushCnt--;
 }
-
-static dridata *datatbl;
 
 void *sl_setDataTable(int page, int index) {
 	if (datatbl) {
