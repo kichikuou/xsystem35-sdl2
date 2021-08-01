@@ -77,7 +77,7 @@ void sdl_updateScreen(void) {
 void sdl_sleep(int msec) {
 	sdl_updateScreen();
 	if (dbg_interrupted())
-		dbg_repl();
+		dbg_main();
 #ifdef __EMSCRIPTEN__
 	emscripten_sleep(msec);
 #else
@@ -98,7 +98,7 @@ EM_JS(void, wait_vsync, (void), {
 void sdl_wait_vsync() {
 	sdl_updateScreen();
 	if (dbg_interrupted())
-		dbg_repl();
+		dbg_main();
 #ifdef __EMSCRIPTEN__
 	wait_vsync();
 #else

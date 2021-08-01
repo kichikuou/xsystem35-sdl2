@@ -120,7 +120,7 @@ void nact_main() {
 		nact->current_page = sl_getPage();
 		nact->current_addr = sl_getIndex();
 		if (dbg_trapped())
-			dbg_repl();
+			dbg_main();
 
 		exec_command();
 		nact->cmd_count++;

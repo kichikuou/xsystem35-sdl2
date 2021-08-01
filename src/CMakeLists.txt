@@ -23,6 +23,7 @@ target_sources(xsystem35 PRIVATE
   cache.c
   debug_symbol.c
   debugger.c
+  debugger_cui.c
   ${SRC_AUDIO}
   ${SRC_CDROM}
   ${SRC_MIDI}
