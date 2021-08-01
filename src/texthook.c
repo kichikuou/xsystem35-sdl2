@@ -21,16 +21,16 @@
 #include <stdlib.h>
 #include "scenario.h"
 #include "texthook.h"
-#include "utfsjis.h"
+#include "nact.h"
 
 #ifdef __EMSCRIPTEN__  // ----------------------------------------------
 #include <emscripten.h>
 
 void texthook_message(const char *m) {
-	BYTE* s = sjis2utf((BYTE*)m);
+	char *utf = toUTF8(m);
 	EM_ASM_({ xsystem35.texthook.message(UTF8ToString($0), $1); },
-			s, sl_getPage());
-	free(s);
+			utf, sl_getPage());
+	free(utf);
 }
 
 EM_JS(void, texthook_newline, (void), {
@@ -53,9 +53,9 @@ static int newlines = 0;
 void texthook_message(const char *m) {
 	if (newlines)
 		printf("%d:", sl_getPage());
-	BYTE* s = sjis2utf((BYTE*)m);
-	printf("%s", s);
-	free(s);
+	char *utf = toUTF8(m);
+	printf("%s", utf);
+	free(utf);
 	newlines = 0;
 }
 
