@@ -46,11 +46,12 @@
 # ------------------------------------------------------------
 
 # ------------------------------------------------------------
-# MIDI出力のデフォルト出力方法
-# 'e'  : 外部プレーヤー
+# MIDI Output method
+# 'e'  : SDL_mixer (default)
+# 'pX' : via PortMidi (X is the device number, usually 0)
 # 'r'  : raw midi device
-# 'sX' : sequencer device (Xはポート番号、通常は0)
-# '0'  : (ゼロ) MIDI無効化
+# 'sX' : sequencer device (X is the port number, usually 0)
+# '0'  : disable MIDI
 #
 
 #midi_output_device: e
