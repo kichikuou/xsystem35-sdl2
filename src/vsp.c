@@ -90,11 +90,12 @@ static void extract(vsp_header *vsp, BYTE *pic, BYTE *b) {
 	int i, l, x, y, pl, loc;
 
 	// Extraction buffers.
+	BYTE *buf = malloc(vsp->vspYW * 8);
 	BYTE *bc[4];
 	BYTE *bp[4];
 	for (int i = 0; i < 4; i++) {
-		bc[i] = alloca(vsp->vspYW);
-		bp[i] = alloca(vsp->vspYW);
+		bc[i] = buf + vsp->vspYW * (i * 2);
+		bp[i] = buf + vsp->vspYW * (i * 2 + 1);
 	}
 	
 	for (x = 0; x < vsp->vspXW; x++) {
@@ -165,6 +166,7 @@ static void extract(vsp_header *vsp, BYTE *pic, BYTE *b) {
 		bt = bp[2]; bp[2] = bc[2]; bc[2] = bt;
 		bt = bp[3]; bp[3] = bc[3]; bc[3] = bt;
 	}
+	free(buf);
 }
 
 /*
