@@ -39,6 +39,6 @@ extern DebuggerState dbg_state;
 #define dbg_interrupted() (dbg_state == DBG_STOPPED_INTERRUPT)
 void dbg_init(const char *symbols_path);
 void dbg_main(void);
-int dbg_handle_breakpoint(int page, int addr);
+BYTE dbg_handle_breakpoint(int page, int addr);
 
 #endif // __DEBUGGER_H__

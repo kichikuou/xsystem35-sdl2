@@ -240,6 +240,9 @@ struct debug_symbols *dsym_load(const char *path) {
 			return NULL;
 		}
 	}
+	if (fgetc(fp) != EOF)
+		WARNING("%s: broken debug information structure\n", path);
+	fclose(fp);
 	return dsym;
 }
 

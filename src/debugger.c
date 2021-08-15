@@ -113,7 +113,7 @@ boolean dbg_delete_breakpoint(int no) {
 	return false;
 }
 
-int dbg_handle_breakpoint(int page, int addr) {
+BYTE dbg_handle_breakpoint(int page, int addr) {
 	Breakpoint *bp = dbg_find_breakpoint(page, addr);
 	if (!bp)
 		SYSERROR("Illegal BREAKPOINT instruction");
@@ -121,7 +121,7 @@ int dbg_handle_breakpoint(int page, int addr) {
 	dbg_state = bp->no == INTERNAL_BREAKPOINT_NO ?
 		DBG_STOPPED_NEXT : DBG_STOPPED_BREAKPOINT;
 
-	char restore_op = bp->restore_op;
+	BYTE restore_op = bp->restore_op;
 	dbg_main();  // this may destroy bp
 	return restore_op;
 }

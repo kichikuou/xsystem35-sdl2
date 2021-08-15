@@ -30,7 +30,7 @@ typedef struct breakpoint {
 	int no;
 	int page;
 	int addr;
-	char restore_op;
+	BYTE restore_op;
 	dridata *dfile;  // keeps modified scenario page alive in the cache
 } Breakpoint;
 
