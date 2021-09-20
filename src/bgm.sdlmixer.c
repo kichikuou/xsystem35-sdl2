@@ -22,7 +22,6 @@
 
 #include "config.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -33,75 +32,14 @@
 #include "system.h"
 #include "nact.h"
 #include "bgm.h"
+#include "bgi.h"
 #include "music_private.h"
 #include "ald_manager.h"
-
-#define BGI_MAX 100
-
-typedef struct {
-	int no;      // シナリオ上での曲番号
-	int loopno;  // ループ回数 (０の場合は無限)
-	int looptop; // ループ時先頭戻り位置 (サンプル数)
-	int len;     // 曲長さ (サンプル数)
-} bgi_t;
-
-static int bgi_nfile;
-static bgi_t bgi_data[BGI_MAX];
 
 static int current_no;
 static Mix_Music *mix_music;
 static dridata* dfile;
 static Uint32 start_time;
-
-static char *bgi_gets(char *buf, int n, FILE *fp) {
-	char *s = buf;
-	int c;
-	while (--n > 0 && (c = fgetc(fp)) != EOF) {
-		c = c >> 4 | (c & 0xf) << 4;  // decrypt
-		*s++ = c;
-		if (c == '\n')
-			break;
-	}
-	if (s == buf && c == EOF)
-		return NULL;
-	*s = '\0';
-	return buf;
-}
-
-static void bgi_read() {
-	if (nact->files.bgi == NULL)
-		return;
-
-	FILE *fp = fopen(nact->files.bgi, "rb");
-	if (!fp) {
-		WARNING("Could not open %s\n", nact->files.bgi);
-		return;
-	}
-
-	char buf[100];
-	while (bgi_nfile < BGI_MAX && bgi_gets(buf, sizeof(buf), fp)) {
-		int terminator;
-		if (sscanf(buf, " %d, %d, %d, %d, %d",
-				   &bgi_data[bgi_nfile].no,
-				   &bgi_data[bgi_nfile].loopno,
-				   &bgi_data[bgi_nfile].looptop,
-				   &bgi_data[bgi_nfile].len,
-				   &terminator) != 5
-			|| terminator != -1) {
-			continue;
-		}
-		bgi_nfile++;
-	}
-	return;
-}
-
-static bgi_t *bgi_find(int no) {
-	for (int i = 0; i < bgi_nfile; i++) {
-		if (bgi_data[i].no == no)
-			return &bgi_data[i];
-	}
-	return NULL;
-}
 
 static void free_music() {
 	current_no = 0;
@@ -138,9 +76,7 @@ static Mix_Music *bgm_load(int no) {
 }
 
 int musbgm_init() {
-	bgi_read();
-	if (!bgi_nfile) return NG;
-	return OK;
+	return bgi_read(nact->files.bgi);
 }
 
 int musbgm_exit() {
