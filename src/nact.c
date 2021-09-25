@@ -126,7 +126,7 @@ void nact_main() {
 		nact->cmd_count++;
 
 		if (++cnt >= 10000 || nact->wait_vsync || nact->popupmenu_opened || dbg_trapped()) {
-			nact->callback();
+			nact->callback();  // Async in emscripten
 
 			if (!nact->is_message_locked)
 				sys_getInputInfo();

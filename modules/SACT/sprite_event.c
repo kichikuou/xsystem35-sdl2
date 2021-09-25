@@ -270,7 +270,8 @@ static void cb_waitkey_simple(agsevent_t *e) {
 /*
   WaitKeySpriteのcallback
 */
-static void cb_waitkey_sprite(agsevent_t *e) {
+EMSCRIPTEN_KEEPALIVE
+void cb_waitkey_sprite(agsevent_t *e) {
 	SList *node;
 	sprite_t *focused_sp = NULL;   // focus を得ている sprite
 	sprite_t *defocused_sp = NULL; // focus を失った sprite
@@ -285,7 +286,7 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 	
 	if (sact.draggedsp) {
 		// 先に drag中のspriteにイベントを送る
-		update = sact.draggedsp->eventcb(sact.draggedsp, e);
+		update = sact.draggedsp->eventcb(sact.draggedsp, e);  // Async in emscripten
 	} else {
 		// 右クリックキャンセル
 		// drag中でない時のみ、キャンセルを受け付ける

@@ -142,7 +142,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 		agse.d1 = p.x;
 		agse.d2 = p.y;
 		agse.d3 = 0;
-		nact->ags.eventcb(&agse);
+		spev_callback(&agse);
 	}
 	
 	// 終了時間の計算
