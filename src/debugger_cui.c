@@ -132,7 +132,9 @@ static CommandResult cmd_backtrace(void) {
 static const char desc_break[] = "Set breakpoint at specified location.";
 static const char help_break[] =
 	"Syntax: break <filename>:<linenum>\n"
-	"        break <page>:<address>";
+	"        break <linenum>\n"
+	"        break <page>:<address>\n"
+	"        break <function>";
 
 static CommandResult cmd_break(void) {
 	char *arg = strtok(NULL, whitespaces);
@@ -190,6 +192,49 @@ static const char desc_help[] = "Print list of commands.";
 static const char * const help_help = NULL;
 
 static CommandResult cmd_help(void);
+
+static const char desc_list[] = "List specified function or line.";
+static const char help_list[] =
+	"Syntax: list\n"
+	"        list <linenum>\n"
+	"        list <filename>:<linenum>\n"
+	"        list <function>\n"
+	"\n"
+	"With no argument, lists ten lines around current location.";
+
+static CommandResult cmd_list(void) {
+	char *arg = strtok(NULL, whitespaces);
+	int page, addr;
+	if (arg) {
+		if (!parse_address(arg, &page, &addr)) {
+			puts(help_list);
+			return CONTINUE_REPL;
+		}
+	} else {
+		page = nact->current_page;
+		addr = nact->current_addr;
+	}
+
+	int line_no = dsym_addr2line(symbols, page, addr);
+	if (line_no <= 0) {
+		printf("Cannot determine source location for %x:%x\n", page, addr);
+		return CONTINUE_REPL;
+	}
+
+	if ((line_no -= 5) <= 0)
+		line_no = 1;
+
+	for (int i = 0; i < 10; i++) {
+		const char *line = dsym_source_line(symbols, page, line_no + i);
+		if (!line) {
+			if (i == 0)
+				printf("No source text for %s:%d\n", dsym_page2src(symbols, page), line_no);
+			break;
+		}
+		printf("%d\t%s\n", line_no + i, line);
+	}
+	return CONTINUE_REPL;
+}
 
 static const char desc_step[] = "Step program until it reaches a different source line.";
 static const char * const help_step = NULL;
@@ -287,6 +332,7 @@ const Command dbg_cui_commands[] = {
 	{"continue",  "c",   desc_continue,  help_continue,  cmd_continue},
 	{"delete",    "d",   desc_delete,    help_delete,    cmd_delete},
 	{"help",      "h",   desc_help,      help_help,      cmd_help},
+	{"list",      "l",   desc_list,      help_list,      cmd_list},
 	{"step",      "s",   desc_step,      help_step,      cmd_step},
 	{"next",      "n",   desc_next,      help_next,      cmd_next},
 	{"print",     "p",   desc_print,     help_print,     cmd_print},
