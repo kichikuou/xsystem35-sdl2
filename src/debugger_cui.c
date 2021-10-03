@@ -34,6 +34,8 @@
 
 static const char whitespaces[] = " \t\r\n";
 
+typedef enum { CONTINUE_REPL, EXIT_REPL } CommandResult;
+
 static const char *format_address(int page, int addr) {
 	static char buf[100];
 	const char *src = dsym_page2src(symbols, page);
@@ -105,7 +107,10 @@ static boolean print_source_line(int page, int addr) {
 	return true;
 }
 
-static void cmd_backtrace(void) {
+static const char desc_backtrace[] = "Print backtrace of stack frames.";
+static const char * const help_backtrace = NULL;
+
+static CommandResult cmd_backtrace(void) {
 	StackTrace *trace = dbg_stack_trace();
 
 	for (int i = 0; i < trace->nr_frame; i++) {
@@ -121,15 +126,20 @@ static void cmd_backtrace(void) {
 	}
 
 	free(trace);
+	return CONTINUE_REPL;
 }
 
-static void cmd_break(void) {
+static const char desc_break[] = "Set breakpoint at specified location.";
+static const char help_break[] =
+	"Syntax: break <filename>:<linenum>\n"
+	"        break <page>:<address>";
+
+static CommandResult cmd_break(void) {
 	char *arg = strtok(NULL, whitespaces);
 	int page, addr;
 	if (!arg || !parse_address(arg, &page, &addr)) {
-		printf("Syntax: break <filename>:<linenum>\n"
-			   "        break <page>:<address>\n");
-		return;
+		puts(help_break);
+		return CONTINUE_REPL;
 	}
 	Breakpoint *bp = dbg_set_breakpoint(page, addr, false);
 	if (bp) {
@@ -141,13 +151,25 @@ static void cmd_break(void) {
 		else
 			printf("Failed to set breakpoint at %d:0x%x: invalid address\n", page, addr);
 	}
+	return CONTINUE_REPL;
 }
 
-static void cmd_delete(void) {
+static const char desc_continue[] = "Continue program execution.";
+static const char * const help_continue = NULL;
+
+static CommandResult cmd_continue(void) {
+	return EXIT_REPL;
+}
+
+static const char desc_delete[] = "Delete breakpoints.";
+static const char help_delete[] =
+	"Syntax: delete <breakpoint_no>...";
+
+static CommandResult cmd_delete(void) {
 	char *arg = strtok(NULL, whitespaces);
 	if (!arg) {
-		printf("Syntax: delete <breakpoint_no>...\n");
-		return;
+		puts(help_delete);
+		return CONTINUE_REPL;
 	}
 
 	while (arg) {
@@ -161,39 +183,66 @@ static void cmd_delete(void) {
 		}
 		arg = strtok(NULL, whitespaces);
 	}
+	return CONTINUE_REPL;
 }
 
-static void cmd_step(void) {
+static const char desc_help[] = "Print list of commands.";
+static const char * const help_help = NULL;
+
+static CommandResult cmd_help(void);
+
+static const char desc_step[] = "Step program until it reaches a different source line.";
+static const char * const help_step = NULL;
+
+static CommandResult cmd_step(void) {
 	dbg_step();
+	return EXIT_REPL;
 }
 
-static void cmd_next(void) {
+static const char desc_next[] = "Step program, proceeding through subroutine calls.";
+static const char * const help_next = NULL;
+
+static CommandResult cmd_next(void) {
 	dbg_next();
+	return EXIT_REPL;
 }
 
-static void cmd_print(void) {
+static const char desc_print[] = "Print value of variable.";
+static const char help_print[] =
+	"Syntax: print <variable>";
+
+static CommandResult cmd_print(void) {
 	char *arg = strtok(NULL, whitespaces);
 	if (!arg) {
-		printf("Syntax: print <variable>\n");
-		return;
+		puts(help_print);
+		return CONTINUE_REPL;
 	}
 	int var = dbg_lookup_var(arg);
 	if (var < 0) {
 		printf("Unrecognized variable name \"%s\".\n", arg);
-		return;
+		return CONTINUE_REPL;
 	}
 	printf("%s = %d\n", arg, sysVar[var]);
+	return CONTINUE_REPL;
 }
 
-static void cmd_quit(void) {
+static const char desc_quit[] = "Exit " PACKAGE ".";
+static const char * const help_quit = NULL;
+
+static CommandResult cmd_quit(void) {
 	sys_exit(0);
+	return EXIT_REPL;
 }
 
-static void cmd_string(void) {
+static const char desc_string[] = "Print value of string variable.";
+static const char help_string[] =
+	"Syntax: string <index>";
+
+static CommandResult cmd_string(void) {
 	char *arg = strtok(NULL, whitespaces);
 	if (!arg) {
-		printf("Syntax: string <index>\n");
-		return;
+		puts(help_string);
+		return CONTINUE_REPL;
 	}
 
 	while (arg) {
@@ -207,6 +256,7 @@ static void cmd_string(void) {
 		}
 		arg = strtok(NULL, whitespaces);
 	}
+	return CONTINUE_REPL;
 }
 
 static void sigint_handler(int sig_num) {
@@ -223,6 +273,59 @@ void dbg_cui_init(void) {
 #endif
 }
 
+typedef struct {
+	const char *name;
+	const char *alias;
+	const char *description;
+	const char *help;
+	CommandResult (*func)(void);
+} Command;
+
+const Command dbg_cui_commands[] = {
+	{"backtrace", "bt",  desc_backtrace, help_backtrace, cmd_backtrace},
+	{"break",     "b",   desc_break,     help_break,     cmd_break},
+	{"continue",  "c",   desc_continue,  help_continue,  cmd_continue},
+	{"delete",    "d",   desc_delete,    help_delete,    cmd_delete},
+	{"help",      "h",   desc_help,      help_help,      cmd_help},
+	{"step",      "s",   desc_step,      help_step,      cmd_step},
+	{"next",      "n",   desc_next,      help_next,      cmd_next},
+	{"print",     "p",   desc_print,     help_print,     cmd_print},
+	{"quit",      "q",   desc_quit,      help_quit,      cmd_quit},
+	{"string",    "str", desc_string,    help_string,    cmd_string},
+	{NULL}  // terminator
+};
+
+const Command *find_command(const char *str) {
+	for (const Command *cmd = dbg_cui_commands; cmd->name; cmd++) {
+		if (!strcmp(str, cmd->name) || !strcmp(str, cmd->alias))
+			return cmd;
+	}
+	printf("Unknown command \"%s\". Try \"help\".\n", str);
+	return NULL;
+}
+
+static CommandResult cmd_help(void) {
+	char *token = strtok(NULL, whitespaces);
+	if (!token) {
+		puts("List of commands:");
+		puts("");
+		for (const Command *cmd = dbg_cui_commands; cmd->name; cmd++)
+			printf("%s, %s -- %s\n", cmd->name, cmd->alias, cmd->description);
+		puts("");
+		puts("Type \"help\" followed by command name for full documentation.");
+		return CONTINUE_REPL;
+	}
+	const Command *cmd = find_command(token);
+	if (cmd) {
+		printf("%s, %s -- %s\n", cmd->name, cmd->alias, cmd->description);
+		if (cmd->help) {
+			puts("");
+			puts(cmd->help);
+		}
+	}
+	return CONTINUE_REPL;
+}
+
 void dbg_cui_repl(void) {
 	if (dbg_state == DBG_STOPPED_BREAKPOINT) {
 		Breakpoint *bp = dbg_find_breakpoint(nact->current_page, nact->current_addr);
@@ -235,33 +338,15 @@ void dbg_cui_repl(void) {
 
 	char buf[256];
 	while (printf("dbg> "), fflush(stdout), fgets(buf, sizeof(buf), stdin)) {
-		char *cmd = strtok(buf, whitespaces);
-		if (!cmd) {
+		char *token = strtok(buf, whitespaces);
+		if (!token) {
 			// TODO: repeat last command
 			continue;
 		}
-		if (!strcmp(cmd, "c") || !strcmp(cmd, "continue")) {
-			break;
-		} else if (!strcmp(cmd, "bt") || !strcmp(cmd, "backtrace")) {
-			cmd_backtrace();
-		} else if (!strcmp(cmd, "b") || !strcmp(cmd, "break")) {
-			cmd_break();
-		} else if (!strcmp(cmd, "d") || !strcmp(cmd, "delete")) {
-			cmd_delete();
-		} else if (!strcmp(cmd, "s") || !strcmp(cmd, "step")) {
-			cmd_step();
-			return;
-		} else if (!strcmp(cmd, "n") || !strcmp(cmd, "next")) {
-			cmd_next();
-			return;
-		} else if (!strcmp(cmd, "p") || !strcmp(cmd, "print")) {
-			cmd_print();
-		} else if (!strcmp(cmd, "q") || !strcmp(cmd, "quit")) {
-			cmd_quit();
-		} else if (!strcmp(cmd, "str") || !strcmp(cmd, "string")) {
-			cmd_string();
-		} else {
-			printf("Unknown command \"%s\".\n", cmd);
+		const Command *cmd = find_command(token);
+		if (cmd) {
+			if (cmd->func() == EXIT_REPL)
+				return;
 		}
 	}
 }
