@@ -32,7 +32,10 @@
 #include "win/console.h"
 #endif
 
+#define CMD_BUFFER_SIZE 256
+
 static const char whitespaces[] = " \t\r\n";
+static char default_command[CMD_BUFFER_SIZE];
 
 typedef enum { CONTINUE_REPL, EXIT_REPL } CommandResult;
 
@@ -233,6 +236,10 @@ static CommandResult cmd_list(void) {
 		}
 		printf("%d\t%s\n", line_no + i, line);
 	}
+
+	// Empty REPL input will print the next 10 lines.
+	sprintf(default_command, "l %s:%d", dsym_page2src(symbols, page), line_no + 15);
+
 	return CONTINUE_REPL;
 }
 
@@ -382,13 +389,18 @@ void dbg_cui_repl(void) {
 		printf("Stopped at %s\n", format_address(nact->current_page, nact->current_addr));
 	dbg_state = DBG_RUNNING;
 
-	char buf[256];
-	while (printf("dbg> "), fflush(stdout), fgets(buf, sizeof(buf), stdin)) {
+	char buf[CMD_BUFFER_SIZE];
+	while (printf("dbg> "), fflush(stdout), fgets(buf, CMD_BUFFER_SIZE, stdin)) {
+		// If input line is empty, repeat the last command.
+		if (buf[0] == '\n')
+			strcpy(buf, default_command);
+		else
+			strcpy(default_command, buf);
+
 		char *token = strtok(buf, whitespaces);
-		if (!token) {
-			// TODO: repeat last command
+		if (!token)
 			continue;
-		}
+
 		const Command *cmd = find_command(token);
 		if (cmd) {
 			if (cmd->func() == EXIT_REPL)
