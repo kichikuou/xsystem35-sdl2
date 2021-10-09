@@ -21,9 +21,6 @@ target_sources(xsystem35 PRIVATE
   dri.c
   ald_manager.c
   cache.c
-  debug_symbol.c
-  debugger.c
-  debugger_cui.c
   ${SRC_AUDIO}
   ${SRC_CDROM}
   ${SRC_MIDI}
@@ -70,6 +67,12 @@ target_sources(xsystem35 PRIVATE
 # Network
 target_sources(xsystem35 PRIVATE
   network.c)
+
+# Debugger
+if (ENABLE_DEBUGGER)
+  target_sources(xsystem35 PRIVATE
+    debug_symbol.c debugger.c debugger_cui.c)
+endif()
 
 if (WIN32)
   target_sources(xsystem35 PRIVATE win/dialog.c win/resources.rc win/menubar.c win/console.c)

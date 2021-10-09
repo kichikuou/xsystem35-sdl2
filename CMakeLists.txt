@@ -48,6 +48,8 @@ else()
   pkg_check_modules(SDL2TTF IMPORTED_TARGET SDL2_ttf)
   optional_pkg_check_modules(SDL2MIXER IMPORTED_TARGET SDL2_mixer)
 
+  option(ENABLE_DEBUGGER "Enable built-in debugger" ON)
+
   include(FindJPEG)
   if (JPEG_FOUND)
     set(HAVE_JPEG 1)

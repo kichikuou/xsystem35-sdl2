@@ -35,10 +35,23 @@ extern DebuggerState dbg_state;
 
 #define BREAKPOINT 0x0f
 
+
+#ifdef ENABLE_DEBUGGER
+
 #define dbg_trapped() (dbg_state != DBG_RUNNING)
 #define dbg_interrupted() (dbg_state == DBG_STOPPED_INTERRUPT)
 void dbg_init(const char *symbols_path);
 void dbg_main(void);
 BYTE dbg_handle_breakpoint(int page, int addr);
+
+#else // ENABLE_DEBUGGER
+
+#define dbg_trapped() false
+#define dbg_interrupted() false
+#define dbg_init(symbols_path)
+#define dbg_main()
+#define dbg_handle_breakpoint(page, addr) BREAKPOINT
+
+#endif // ENABLE_DEBUGGER
 
 #endif // __DEBUGGER_H__
