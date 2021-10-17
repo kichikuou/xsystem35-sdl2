@@ -47,14 +47,24 @@ typedef struct {
 	StackFrame frames[];
 } StackTrace;
 
+typedef struct {
+	void (*init)(void);
+	void (*quit)(void);
+	void (*repl)(void);
+	void (*onsleep)(void);
+} DebuggerImpl;
+
+extern DebuggerImpl dbg_cui_impl;
+extern DebuggerImpl dbg_dap_impl;
+extern DebuggerImpl *dbg_impl;
+
 Breakpoint *dbg_find_breakpoint(int page, int addr);
 Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal);
 boolean dbg_delete_breakpoint(int no);
+void dbg_delete_breakpoints_in_page(int page);
 void dbg_step(void);
 void dbg_next(void);
 int dbg_lookup_var(const char *name);
 StackTrace *dbg_stack_trace(void);
-void dbg_cui_init(void);
-void dbg_cui_repl(void);
 
 #endif // __DEBUGGER_PRIVATE_H__

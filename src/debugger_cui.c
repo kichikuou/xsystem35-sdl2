@@ -315,7 +315,7 @@ static void sigint_handler(int sig_num) {
 	dbg_state = DBG_STOPPED_INTERRUPT;
 }
 
-void dbg_cui_init(void) {
+static void dbg_cui_init(void) {
 #ifdef HAVE_SIGACTION
 	sys_set_signalhandler(SIGINT, sigint_handler);
 #endif
@@ -323,6 +323,9 @@ void dbg_cui_init(void) {
 	win_alloc_console();
 	win_set_ctrl_c_handler(sigint_handler);
 #endif
+}
+
+static void dbg_cui_quit(void) {
 }
 
 typedef struct {
@@ -379,7 +382,7 @@ static CommandResult cmd_help(void) {
 	return CONTINUE_REPL;
 }
 
-void dbg_cui_repl(void) {
+static void dbg_cui_repl(void) {
 	if (dbg_state == DBG_STOPPED_BREAKPOINT) {
 		Breakpoint *bp = dbg_find_breakpoint(nact->current_page, nact->current_addr);
 		if (bp)
@@ -408,3 +411,15 @@ void dbg_cui_repl(void) {
 		}
 	}
 }
+
+static void dbg_cui_onsleep(void) {
+	if (dbg_state == DBG_STOPPED_INTERRUPT)
+		dbg_main();
+}
+
+DebuggerImpl dbg_cui_impl = {
+	.init = dbg_cui_init,
+	.quit = dbg_cui_quit,
+	.repl = dbg_cui_repl,
+	.onsleep = dbg_cui_onsleep,
+};

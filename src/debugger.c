@@ -31,6 +31,7 @@
 #define INTERNAL_BREAKPOINT_NO -1
 
 DebuggerState dbg_state = DBG_RUNNING;
+DebuggerImpl *dbg_impl;
 
 struct debug_symbols *symbols;
 static Breakpoint *breakpoints = NULL;
@@ -43,10 +44,15 @@ static struct {
 	int line;
 } step_exec_state;
 
-void dbg_init(const char *symbols_path) {
-	dbg_cui_init();
+void dbg_init(const char *symbols_path, boolean use_dap) {
+	dbg_impl = use_dap ? &dbg_dap_impl : &dbg_cui_impl;
+	dbg_impl->init();
 	dbg_state = DBG_STOPPED_ENTRY;
 	symbols = dsym_load(symbols_path);
+}
+
+void dbg_quit() {
+	dbg_impl->quit();
 }
 
 int dbg_lookup_var(const char *name) {
@@ -111,6 +117,26 @@ boolean dbg_delete_breakpoint(int no) {
 		prev = bp;
 	}
 	return false;
+}
+
+void dbg_delete_breakpoints_in_page(int page) {
+	Breakpoint *prev = NULL;
+	for (Breakpoint *bp = breakpoints; bp;) {
+		if (bp->page == page) {
+			assert(bp->dfile->data[bp->addr] == BREAKPOINT);
+			bp->dfile->data[bp->addr] = bp->restore_op;
+			ald_freedata(bp->dfile);
+			if (prev)
+				prev->next = bp->next;
+			else
+				breakpoints = bp->next;
+			bp = bp->next;
+			free(bp);
+		} else {
+			prev = bp;
+			bp = bp->next;
+		}
+	}
 }
 
 BYTE dbg_handle_breakpoint(int page, int addr) {
@@ -265,5 +291,10 @@ void dbg_main(void) {
 	default:
 		break;
 	}
-	dbg_cui_repl();
+	dbg_impl->repl();
+}
+
+void dbg_onsleep(void) {
+	if (dbg_impl)
+		dbg_impl->onsleep();
 }

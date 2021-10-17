@@ -71,7 +71,7 @@ target_sources(xsystem35 PRIVATE
 # Debugger
 if (ENABLE_DEBUGGER)
   target_sources(xsystem35 PRIVATE
-    debug_symbol.c debugger.c debugger_cui.c)
+    debug_symbol.c debugger.c debugger_cui.c debugger_dap.c)
 endif()
 
 if (WIN32)
@@ -115,6 +115,13 @@ else()  # non-emscripten, non-android
   endif()
   if (SDL2MIXER_FOUND)
     target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2MIXER)
+  endif()
+  if (ENABLE_DEBUGGER)
+    if (cJSON_FOUND)
+      target_link_libraries(xsystem35 PRIVATE PkgConfig::cJSON)
+    else()
+      target_link_libraries(xsystem35 PRIVATE ${cJSON})
+    endif()
   endif()
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)

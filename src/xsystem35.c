@@ -88,7 +88,11 @@ static void    check_profile();
 /* for debugging */
 static FILE *fpdebuglog;
 static int debuglv = DEBUGLEVEL;
-static boolean debugger_enabled;
+enum {
+	DEBUGGER_DISABLED,
+	DEBUGGER_CUI,
+	DEBUGGER_DAP,
+} debugger_mode = DEBUGGER_DISABLED;
 
 static int audio_buffer_size = 0;
 
@@ -246,6 +250,7 @@ static void sys35_init() {
 }
 
 static void sys35_remove() {
+	dbg_quit();
 	mus_exit(); 
 	ags_remove();
 #ifdef ENABLE_GTK
@@ -293,7 +298,9 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			fclose(fp);
 			gameResourceFile = argv[i + 1];
 		} else if (0 == strcmp(argv[i], "-debug")) {
-			debugger_enabled = true;
+			debugger_mode = DEBUGGER_CUI;
+		} else if (0 == strcmp(argv[i], "-debug_dap")) {
+			debugger_mode = DEBUGGER_DAP;
 		} else if (0 == strcmp(argv[i], "-devcd")) {
 			if (argv[i + 1] != NULL) {
 				cd_set_devicename(argv[i + 1]);
@@ -455,7 +462,7 @@ static void registerGameFiles(void) {
 		SYSERROR("No Scenario data available\n");
 	for (int type = 0; type < DRIFILETYPEMAX; type++) {
 		boolean use_mmap = true;
-		if (debugger_enabled && type == DRIFILE_SCO) {
+		if (debugger_mode != DEBUGGER_DISABLED && type == DRIFILE_SCO) {
 			// Do not mmap scenario files so that BREAKPOINT instructions can be inserted.
 			use_mmap = false;
 		}
@@ -525,10 +532,10 @@ int main(int argc, char **argv) {
 #endif
 	menu_init();
 	
-	if (debugger_enabled) {
+	if (debugger_mode != DEBUGGER_DISABLED) {
 		char symbols_path[500];
 		snprintf(symbols_path, sizeof(symbols_path), "%s.symbols", nact->files.game_fname[DRIFILE_SCO][0]);
-		dbg_init(symbols_path);
+		dbg_init(symbols_path, debugger_mode == DEBUGGER_DAP);
 	}
 
 	nact_main();

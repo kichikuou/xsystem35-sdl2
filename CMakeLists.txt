@@ -49,6 +49,16 @@ else()
   optional_pkg_check_modules(SDL2MIXER IMPORTED_TARGET SDL2_mixer)
 
   option(ENABLE_DEBUGGER "Enable built-in debugger" ON)
+  if (ENABLE_DEBUGGER)
+    pkg_check_modules(cJSON IMPORTED_TARGET libcjson)
+    if (NOT cJSON_FOUND)
+      # libcjson-dev of Debian buster / Ubuntu 20.04 does not install pkgconfig files.
+      find_library(cJSON cjson)
+      if (NOT cJSON)
+        message(FATAL_ERROR "libcjson is required but not found.")
+      endif()
+    endif()
+  endif()
 
   include(FindJPEG)
   if (JPEG_FOUND)
