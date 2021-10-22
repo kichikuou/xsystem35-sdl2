@@ -32,9 +32,15 @@
 #include "debugger_private.h"
 #include "debug_symbol.h"
 #include "system.h"
+#include "nact.h"
 #include "variable.h"
 
 #define THREAD_ID 1
+
+enum VariablesReference {
+	VREF_GLOBALS = 1,
+	VREF_STRINGS,
+};
 
 static boolean initialized = false;
 static char *src_dir;
@@ -102,6 +108,7 @@ static void cmd_initialize(cJSON *args, cJSON *resp) {
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
 	cJSON_AddBoolToObject(body, "supportsConfigurationDoneRequest", true);
 	cJSON_AddBoolToObject(body, "supportsEvaluateForHovers", true);
+	cJSON_AddBoolToObject(body, "supportsSetVariable", true);
 }
 
 static void cmd_launch(cJSON *args, cJSON *resp) {
@@ -251,10 +258,142 @@ static void cmd_threads(cJSON *args, cJSON *resp) {
 }
 
 static void cmd_scopes(cJSON *args, cJSON *resp) {
-	cJSON *body;
+	cJSON *body, *scopes, *globals, *strings;
 	cJSON_AddBoolToObject(resp, "success", true);
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
-	cJSON_AddItemToObjectCS(body, "scopes", cJSON_CreateArray());
+	cJSON_AddItemToObjectCS(body, "scopes", scopes = cJSON_CreateArray());
+	cJSON_AddItemToArray(scopes, globals = cJSON_CreateObject());
+	cJSON_AddStringToObject(globals, "name", "All Variables");
+	cJSON_AddNumberToObject(globals, "variablesReference", VREF_GLOBALS);
+	cJSON_AddNumberToObject(globals, "namedVariables", dsym_num_variables(symbols));
+	cJSON_AddBoolToObject(globals, "expensive", false);
+	cJSON_AddItemToArray(scopes, strings = cJSON_CreateObject());
+	cJSON_AddStringToObject(strings, "name", "Strings");
+	cJSON_AddNumberToObject(strings, "variablesReference", VREF_STRINGS);
+	cJSON_AddNumberToObject(strings, "indexedVariables", svar_count() + 1);
+	cJSON_AddBoolToObject(strings, "expensive", false);
+}
+
+char *format_string_value(const char *str) {
+	char *utf = toUTF8(str);
+	char *new_value = malloc(strlen(utf) + 3);
+	sprintf(new_value, "\"%s\"", utf);
+	free(utf);
+	return new_value;
+}
+
+static void cmd_variables(cJSON *args, cJSON *resp) {
+	cJSON *start_ = cJSON_GetObjectItemCaseSensitive(args, "start");
+	cJSON *count_ = cJSON_GetObjectItemCaseSensitive(args, "count");
+	int start = cJSON_IsNumber(start_) ? start_->valueint : 0;
+	int count = cJSON_IsNumber(count_) ? count_->valueint : 65536;
+
+	cJSON *vref = cJSON_GetObjectItemCaseSensitive(args, "variablesReference");
+	if (cJSON_IsNumber(vref) && vref->valueint == VREF_GLOBALS) {
+		cJSON *body, *variables;
+		cJSON_AddBoolToObject(resp, "success", true);
+		cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
+		cJSON_AddItemToObjectCS(body, "variables", variables = cJSON_CreateArray());
+		int end = dsym_num_variables(symbols);
+		if (end > start + count)
+			end = start + count;
+		for (int i = start; i < end; i++) {
+			cJSON *var = cJSON_CreateObject();
+			cJSON_AddItemToArray(variables, var);
+			cJSON_AddStringToObject(var, "name", dsym_variable_name(symbols, i));
+			char value[20];
+			sprintf(value, "%d", sysVar[i]);
+			cJSON_AddStringToObject(var, "value", value);
+			cJSON_AddNumberToObject(var, "variablesReference", 0);
+		}
+	} else if (cJSON_IsNumber(vref) && vref->valueint == VREF_STRINGS) {
+		cJSON *body, *variables;
+		cJSON_AddBoolToObject(resp, "success", true);
+		cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
+		cJSON_AddItemToObjectCS(body, "variables", variables = cJSON_CreateArray());
+		if (start == 0) {
+			start++;
+			count--;
+		}
+		int end = svar_count() + 1;
+		if (end > start + count)
+			end = start + count;
+		for (int i = start; i < end; i++) {
+			char name[20];
+			cJSON *var = cJSON_CreateObject();
+			cJSON_AddItemToArray(variables, var);
+			sprintf(name, "[%d]", i);
+			cJSON_AddStringToObject(var, "name", name);
+			char *value = format_string_value(svar_get(i));
+			cJSON_AddStringToObject(var, "value", value);
+			free(value);
+			cJSON_AddNumberToObject(var, "variablesReference", 0);
+		}
+	} else {
+		cJSON_AddBoolToObject(resp, "success", false);
+		cJSON_AddStringToObject(resp, "message", "invalid variablesReference");
+	}
+}
+
+static void cmd_setVariable(cJSON *args, cJSON *resp) {
+	cJSON *name = cJSON_GetObjectItemCaseSensitive(args, "name");
+	cJSON *value = cJSON_GetObjectItemCaseSensitive(args, "value");
+	if (!cJSON_IsString(name) || !cJSON_IsString(value)) {
+		cJSON_AddBoolToObject(resp, "success", false);
+		cJSON_AddStringToObject(resp, "message", "invalid arguments");
+		return;
+	}
+
+	cJSON *vref = cJSON_GetObjectItemCaseSensitive(args, "variablesReference");
+	if (cJSON_IsNumber(vref) && vref->valueint == VREF_GLOBALS) {
+		int var = dbg_lookup_var(name->valuestring);
+		if (var < 0) {
+			cJSON_AddBoolToObject(resp, "success", false);
+			cJSON_AddStringToObject(resp, "message", "invalid variable name");
+			return;
+		}
+		int parsed_value;
+		if (sscanf(value->valuestring, "%i", &parsed_value) != 1) {
+			cJSON_AddBoolToObject(resp, "success", false);
+			cJSON_AddStringToObject(resp, "message", "syntax error");
+			return;
+		}
+		sysVar[var] = parsed_value & 0xffff;
+
+		cJSON *body;
+		cJSON_AddBoolToObject(resp, "success", true);
+		cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
+		char new_value[20];
+		sprintf(new_value, "%d", sysVar[var]);
+		cJSON_AddStringToObject(body, "value", new_value);
+	} else if (cJSON_IsNumber(vref) && vref->valueint == VREF_STRINGS) {
+		int idx;
+		if (sscanf(name->valuestring, "[%d]", &idx) != 1 || idx < 1 || idx > svar_count()) {
+			cJSON_AddBoolToObject(resp, "success", false);
+			cJSON_AddStringToObject(resp, "message", "invalid string index");
+			return;
+		}
+		int len = strlen(value->valuestring);
+		if (len < 2 || value->valuestring[0] != '"' || value->valuestring[len-1] != '"') {
+			cJSON_AddBoolToObject(resp, "success", false);
+			cJSON_AddStringToObject(resp, "message", "syntax error");
+			return;
+		}
+		value->valuestring[len-1] = '\0';
+		char *str = fromUTF8(value->valuestring + 1);
+		svar_set(idx, str);
+		free(str);
+
+		cJSON *body;
+		cJSON_AddBoolToObject(resp, "success", true);
+		cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
+		char *new_value = format_string_value(svar_get(idx));
+		cJSON_AddStringToObject(body, "value", new_value);
+		free(new_value);
+	} else {
+		cJSON_AddBoolToObject(resp, "success", false);
+		cJSON_AddStringToObject(resp, "message", "invalid variablesReference");
+	}
 }
 
 static void cmd_disconnect(cJSON *args, cJSON *resp) {
@@ -311,6 +450,10 @@ static boolean handle_request(cJSON *request) {
 		cmd_threads(args, resp);
 	} else if (!strcmp(command->valuestring, "scopes")) {
 		cmd_scopes(args, resp);
+	} else if (!strcmp(command->valuestring, "variables")) {
+		cmd_variables(args, resp);
+	} else if (!strcmp(command->valuestring, "setVariable")) {
+		cmd_setVariable(args, resp);
 	} else if (!strcmp(command->valuestring, "disconnect")) {
 		cmd_disconnect(args, resp);
 	} else {

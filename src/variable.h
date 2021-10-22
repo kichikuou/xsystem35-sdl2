@@ -59,6 +59,7 @@ extern boolean v_getArrayBufferStatus(int page);
 extern boolean v_initVars();
 
 extern void svar_init(int cnt, int len);
+extern int svar_count(void);
 extern const char *svar_get(int no);
 extern void svar_set(int no, const char *str);
 extern void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len);

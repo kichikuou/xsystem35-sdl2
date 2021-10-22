@@ -111,6 +111,10 @@ extern void svar_init(int cnt, int len) {
 	strvar_len = len;
 }
 
+extern int svar_count(void) {
+	return strvar_cnt;
+}
+
 /* 変数の初期化 */
 extern boolean v_initVars() {
 	strVar = calloc(STRVAR_MAX, sizeof(char *));

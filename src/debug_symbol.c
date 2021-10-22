@@ -323,6 +323,18 @@ const char *dsym_source_line(struct debug_symbols *dsym, int page, int line) {
 	return info->lines[line];
 }
 
+int dsym_num_variables(struct debug_symbols *dsym) {
+	if (!dsym)
+		return 0;
+	return dsym->nr_vars;
+}
+
+const char *dsym_variable_name(struct debug_symbols *dsym, int i) {
+	if (!dsym || (unsigned)i >= dsym->nr_vars)
+		return NULL;
+	return dsym->variables[i];
+}
+
 int dsym_lookup_variable(struct debug_symbols *dsym, const char *name) {
 	if (!dsym || !dsym->variables)
 		return -1;
