@@ -226,7 +226,12 @@ static void cmd_pause(cJSON *args, cJSON *resp) {
 }
 
 static void cmd_stepIn(cJSON *args, cJSON *resp) {
-	dbg_step();
+	dbg_stepin();
+	cJSON_AddBoolToObject(resp, "success", true);
+}
+
+static void cmd_stepOut(cJSON *args, cJSON *resp) {
+	dbg_stepout();
 	cJSON_AddBoolToObject(resp, "success", true);
 }
 
@@ -289,6 +294,9 @@ static boolean handle_request(cJSON *request) {
 		cmd_stackTrace(args, resp);
 	} else if (!strcmp(command->valuestring, "stepIn")) {
 		cmd_stepIn(args, resp);
+		continue_repl = false;
+	} else if (!strcmp(command->valuestring, "stepOut")) {
+		cmd_stepOut(args, resp);
 		continue_repl = false;
 	} else if (!strcmp(command->valuestring, "next")) {
 		cmd_next(args, resp);

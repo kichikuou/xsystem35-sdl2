@@ -247,7 +247,15 @@ static const char desc_step[] = "Step program until it reaches a different sourc
 static const char * const help_step = NULL;
 
 static CommandResult cmd_step(void) {
-	dbg_step();
+	dbg_stepin();
+	return EXIT_REPL;
+}
+
+static const char desc_finish[] = "Execute until current function returns.";
+static const char * const help_finish = NULL;
+
+static CommandResult cmd_finish(void) {
+	dbg_stepout();
 	return EXIT_REPL;
 }
 
@@ -344,6 +352,7 @@ const Command dbg_cui_commands[] = {
 	{"help",      "h",   desc_help,      help_help,      cmd_help},
 	{"list",      "l",   desc_list,      help_list,      cmd_list},
 	{"step",      "s",   desc_step,      help_step,      cmd_step},
+	{"finish",    NULL,  desc_finish,    help_finish,    cmd_finish},
 	{"next",      "n",   desc_next,      help_next,      cmd_next},
 	{"print",     "p",   desc_print,     help_print,     cmd_print},
 	{"quit",      "q",   desc_quit,      help_quit,      cmd_quit},
@@ -353,11 +362,18 @@ const Command dbg_cui_commands[] = {
 
 const Command *find_command(const char *str) {
 	for (const Command *cmd = dbg_cui_commands; cmd->name; cmd++) {
-		if (!strcmp(str, cmd->name) || !strcmp(str, cmd->alias))
+		if (!strcmp(str, cmd->name) || (cmd->alias && !strcmp(str, cmd->alias)))
 			return cmd;
 	}
 	printf("Unknown command \"%s\". Try \"help\".\n", str);
 	return NULL;
+}
+
+static void cmd_print_help(const Command *cmd) {
+	if (cmd->alias)
+		printf("%s, %s -- %s\n", cmd->name, cmd->alias, cmd->description);
+	else
+		printf("%s -- %s\n", cmd->name, cmd->description);
 }
 
 static CommandResult cmd_help(void) {
@@ -366,14 +382,14 @@ static CommandResult cmd_help(void) {
 		puts("List of commands:");
 		puts("");
 		for (const Command *cmd = dbg_cui_commands; cmd->name; cmd++)
-			printf("%s, %s -- %s\n", cmd->name, cmd->alias, cmd->description);
+			cmd_print_help(cmd);
 		puts("");
 		puts("Type \"help\" followed by command name for full documentation.");
 		return CONTINUE_REPL;
 	}
 	const Command *cmd = find_command(token);
 	if (cmd) {
-		printf("%s, %s -- %s\n", cmd->name, cmd->alias, cmd->description);
+		cmd_print_help(cmd);
 		if (cmd->help) {
 			puts("");
 			puts(cmd->help);

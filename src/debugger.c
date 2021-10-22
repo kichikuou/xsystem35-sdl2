@@ -199,7 +199,7 @@ StackTrace *dbg_stack_trace(void) {
 	return trace;
 }
 
-void dbg_step(void) {
+void dbg_stepin(void) {
 	step_exec_state.page = nact->current_page;
 	step_exec_state.line = dsym_addr2line(symbols, step_exec_state.page, nact->current_addr);
 	dbg_state = DBG_STOPPED_STEP;
@@ -210,6 +210,32 @@ static boolean should_continue_step(void) {
 		return false;  // line info was not available
 	return step_exec_state.page == nact->current_page
 		&& step_exec_state.line == dsym_addr2line(symbols, step_exec_state.page, nact->current_addr);
+}
+
+void dbg_stepout(void) {
+	// Set an internal breakpoint at the return address of current frame.
+	int stack_size;
+	const int *stack_base = sl_getStackInfo(&stack_size);
+	const int *p = stack_base + stack_size - 1;
+	while (p >= stack_base) {
+		int page, addr = -1;
+		switch (*p) {
+		case STACK_NEARJMP:
+			page = nact->current_page;
+			addr = p[-2];
+			break;
+		case STACK_FARJMP:
+			page = p[-2];
+			addr = p[-3];
+			break;
+		}
+		if (addr >= 0) {
+			internal_breakpoint = dbg_set_breakpoint(page, addr, true);
+			return;
+		}
+		p -= p[-1] + 2;
+	}
+	// No parent frame found, continue execution.
 }
 
 static int get_retaddr_if_funcall(void) {
