@@ -50,11 +50,11 @@ jobs:
       working-directory: out/release
 
     - name: Package
-      working-directory: installer
-      run: ./make-installer.sh ../out/release ${{ matrix.installer }}.nsi
+      working-directory: tools/installer
+      run: ./make-installer.sh ../../out/release ${{ matrix.installer }}.nsi
 
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.installer }}
-        path: installer/${{ matrix.installer }}.exe
+        path: tools/installer/${{ matrix.installer }}.exe

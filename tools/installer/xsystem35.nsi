@@ -11,7 +11,7 @@ Page instfiles
 UninstPage uninstConfirm
 UninstPage instfiles
 
-LicenseData ..\COPYING
+LicenseData ..\..\COPYING
 
 !define SHCNE_ASSOCCHANGED 0x08000000
 !define SHCNF_IDLIST 0
@@ -25,9 +25,10 @@ Section
 	FILE ${BUILDDIR}\src\xsystem35.exe
 	!include ${BUILDDIR}\dlls.nsi
 	SetOutPath $INSTDIR\fonts
-	FILE /x CMakeLists.txt ..\fonts\*.*
+	FILE /x CMakeLists.txt ..\..\fonts\*.*
 	WriteUninstaller $INSTDIR\uninstall.exe
 
+	WriteRegStr HKLM "Software\Kichikuou\xsystem35" "InstallDir" "$INSTDIR"
 	WriteRegStr HKLM "Software\Kichikuou\xsystem35\profile" "ttfont_gothic" "$INSTDIR\fonts\MTLc3m.ttf"
 	WriteRegStr HKLM "Software\Kichikuou\xsystem35\profile" "ttfont_mincho" "$INSTDIR\fonts\mincho.otf"
 
