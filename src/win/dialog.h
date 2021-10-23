@@ -24,6 +24,7 @@
 struct inputstring_param;
 struct inputnum_param;
 
+boolean current_folder_has_ald(void);
 boolean select_game_folder(void);
 boolean input_string(struct inputstring_param *p);
 boolean input_number(struct inputnum_param *p);

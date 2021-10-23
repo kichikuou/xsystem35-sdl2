@@ -40,6 +40,15 @@ static int CALLBACK select_game_callback(HWND hwnd, UINT uMsg, LPARAM lParam, LP
 	return 0;
 }
 
+boolean current_folder_has_ald(void) {
+	WIN32_FIND_DATA find_data;
+	HANDLE hFind = FindFirstFile("*.ALD", &find_data);
+	if (hFind == INVALID_HANDLE_VALUE)
+		return FALSE;
+	FindClose(hFind);
+	return TRUE;
+}
+
 boolean select_game_folder(void) {
 	char title[256];
 	LoadString(GetModuleHandle(NULL), IDS_CHOOSE_GAME_FOLDER, title, sizeof(title));
