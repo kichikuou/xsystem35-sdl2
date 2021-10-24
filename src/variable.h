@@ -39,14 +39,7 @@ typedef struct {
 	int *value;
 } arrayVarBufferStruct;
 
-typedef struct {
-	int *pointvar;
-	int page;
-	int offset;
-} arrayVarStruct;
-
 extern int sysVar[];
-extern arrayVarStruct sysVarAttribute[];
 extern arrayVarBufferStruct arrayVarBuffer[];
 extern double longVar[];
 

@@ -30,10 +30,16 @@
 #include "xsystem35.h"
 #include "scenario.h"
 
+typedef struct {
+	int *pointvar;
+	int page;
+	int offset;
+} VariableAttributes;
+
 /* システム変数 */
 int sysVar[SYSVAR_MAX];
 /* 配列変数の情報 */
-arrayVarStruct sysVarAttribute[SYSVAR_MAX];
+static VariableAttributes attributes[SYSVAR_MAX];
 /* 配列本体 */
 arrayVarBufferStruct arrayVarBuffer[ARRAYVAR_PAGEMAX];
 /* 64bit変数 */
@@ -57,7 +63,7 @@ static char *advance(const char *s, int n) {
 }
 
 int *v_ref(int var) {
-	arrayVarStruct *attr = &sysVarAttribute[var];
+	VariableAttributes *attr = &attributes[var];
 	preVarPage = attr->page;
 	preVarNo   = var;
 
@@ -80,7 +86,7 @@ int *v_ref(int var) {
 }
 
 int *v_ref_indexed(int var, int index) {
-	arrayVarStruct *attr = &sysVarAttribute[var];
+	VariableAttributes *attr = &attributes[var];
 	preVarPage = attr->page;
 	preVarNo   = var;
 
@@ -131,15 +137,15 @@ extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page
 	if (page    < 0 || page    >  ARRAYVAR_PAGEMAX - 1)          { return false; }
 	if (offset  < 0 || offset  >= arrayVarBuffer[page - 1].size) { return false; }
 	
-	sysVarAttribute[datavar].pointvar = pointvar;
-	sysVarAttribute[datavar].page     = page;
-	sysVarAttribute[datavar].offset   = offset;
+	attributes[datavar].pointvar = pointvar;
+	attributes[datavar].page     = page;
+	attributes[datavar].offset   = offset;
 	return true;
 }
 
 /* 配列変数の割り当て解除 DR */
 extern boolean v_releaseArrayVar(int datavar) {
-	sysVarAttribute[datavar].page = 0;
+	attributes[datavar].page = 0;
 	return true;
 }
 

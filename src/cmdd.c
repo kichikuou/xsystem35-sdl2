@@ -77,15 +77,15 @@ void commandDR() {
 
 void commandDF() {
 	int *data_var = getCaliVariable();
-	int varno     = preVarNo;
+	int page      = preVarPage;
+	int offset    = preVarIndex;
 	int cnt       = getCaliValue();
 	int data      = getCaliValue();
 	
 	DEBUG_COMMAND("DF %p,%d,%d:\n", data_var, cnt, data);
 
-	const arrayVarStruct* array = &sysVarAttribute[varno];
-	if (array->page) {
-		int maxlen = arrayVarBuffer[array->page - 1].size - array->offset - *array->pointvar;
+	if (page) {
+		int maxlen = arrayVarBuffer[page - 1].size - offset;
 		if (cnt > maxlen) {
 			WARNING("%03d:%05x: count exceeds array boundary (%d > %d)\n", sl_getPage(), sl_getIndex(), cnt, maxlen);
 			cnt = maxlen;
