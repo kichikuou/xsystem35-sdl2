@@ -1446,7 +1446,7 @@ void commands2F84() {
 void commands2F85() {
 	int *vResult = getCaliVariable();
 	
-	*vResult = SYSVAR_MAX;
+	*vResult = nact->ain.varnum;
 	
 	DEBUG_COMMAND("varGetNumof %p:\n", vResult);
 }
