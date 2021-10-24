@@ -282,7 +282,7 @@ static CommandResult cmd_print(void) {
 		printf("Unrecognized variable name \"%s\".\n", arg);
 		return CONTINUE_REPL;
 	}
-	printf("%s = %d\n", arg, sysVar[var]);
+	printf("%s = %d\n", arg, *v_ref(var));
 	return CONTINUE_REPL;
 }
 

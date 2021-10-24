@@ -214,7 +214,7 @@ static void cmd_evaluate(cJSON *args, cJSON *resp) {
 	}
 
 	char result[20];
-	sprintf(result, "%d", sysVar[var]);
+	sprintf(result, "%d", *v_ref(var));
 
 	cJSON *body;
 	cJSON_AddBoolToObject(resp, "success", true);
@@ -302,7 +302,7 @@ static void cmd_variables(cJSON *args, cJSON *resp) {
 			cJSON_AddItemToArray(variables, var);
 			cJSON_AddStringToObject(var, "name", dsym_variable_name(symbols, i));
 			char value[20];
-			sprintf(value, "%d", sysVar[i]);
+			sprintf(value, "%d", *v_ref(i));
 			cJSON_AddStringToObject(var, "value", value);
 			cJSON_AddNumberToObject(var, "variablesReference", 0);
 		}
@@ -358,13 +358,13 @@ static void cmd_setVariable(cJSON *args, cJSON *resp) {
 			cJSON_AddStringToObject(resp, "message", "syntax error");
 			return;
 		}
-		sysVar[var] = parsed_value & 0xffff;
+		*v_ref(var) = parsed_value & 0xffff;
 
 		cJSON *body;
 		cJSON_AddBoolToObject(resp, "success", true);
 		cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
 		char new_value[20];
-		sprintf(new_value, "%d", sysVar[var]);
+		sprintf(new_value, "%d", *v_ref(var));
 		cJSON_AddStringToObject(body, "value", new_value);
 	} else if (cJSON_IsNumber(vref) && vref->valueint == VREF_STRINGS) {
 		int idx;

@@ -27,9 +27,6 @@
 #include <sys/types.h>
 #include "portab.h"
 
-
-// #define SYSVAR_MAX       1024
-//#define SYSVAR_MAX       8192#
 #define SYSVAR_MAX       65536
 #define SYSVARLONG_MAX   128
 #define STRVAR_MAX       5000
@@ -52,24 +49,31 @@ extern int sysVar[];
 extern arrayVarStruct sysVarAttribute[];
 extern arrayVarBufferStruct arrayVarBuffer[];
 extern double longVar[];
-extern boolean v_allocateArrayBuffer(int page, int size, boolean saveflag);
-extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page);
-extern boolean v_releaseArrayVar(int datavar);
-extern boolean v_getArrayBufferStatus(int page);
-extern boolean v_initVars();
 
-extern void svar_init(int cnt, int len);
-extern int svar_count(void);
-extern const char *svar_get(int no);
-extern void svar_set(int no, const char *str);
-extern void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len);
-extern void svar_append(int no, const char *str);
-extern size_t svar_length(int no);
-extern int svar_width(int no);
-extern int svar_find(int no, int start, const char *str);
-extern void svar_fromVars(int no, const int *vars);
-extern int svar_toVars(int no, int *vars);
-extern int svar_getCharType(int no, int pos);
-extern void svar_replaceAll(int no, int pattern, int replacement);
+extern int preVarPage;
+extern int preVarIndex;
+extern int preVarNo;
+
+int *v_ref(int var);
+int *v_ref_indexed(int var, int index);
+boolean v_allocateArrayBuffer(int page, int size, boolean saveflag);
+boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page);
+boolean v_releaseArrayVar(int datavar);
+boolean v_getArrayBufferStatus(int page);
+boolean v_initVars();
+
+void svar_init(int cnt, int len);
+int svar_count(void);
+const char *svar_get(int no);
+void svar_set(int no, const char *str);
+void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len);
+void svar_append(int no, const char *str);
+size_t svar_length(int no);
+int svar_width(int no);
+int svar_find(int no, int start, const char *str);
+void svar_fromVars(int no, const int *vars);
+int svar_toVars(int no, int *vars);
+int svar_getCharType(int no, int pos);
+void svar_replaceAll(int no, int pattern, int replacement);
 
 #endif /* !__VARIABLE__ */

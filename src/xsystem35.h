@@ -49,11 +49,6 @@
 #define DEBUG_MESSAGE(...)
 #endif
 
-/* defined in cali.c */
-extern int preVarPage;      /* 直前にアクセスした変数のページ */
-extern int preVarIndex;     /* 直前にアクセスした変数のINDEX */
-extern int preVarNo;        /* 直前にアクセスした変数の番号 */
-
 #define System_idle(msec) usleep(1000l * (msec));
 // extern void System_idle(int msec);
 

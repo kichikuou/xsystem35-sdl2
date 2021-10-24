@@ -44,12 +44,65 @@ static char **strVar;
 int strvar_cnt = STRVAR_MAX;
 int strvar_len = STRVAR_LEN;
 
+int preVarPage;      /* 直前にアクセスした変数のページ */
+int preVarIndex;     /* 直前にアクセスした変数のINDEX */
+int preVarNo;        /* 直前にアクセスした変数の番号 */
+
 static char *advance(const char *s, int n) {
 	while (*s && n > 0) {
 		s = advance_char(s, nact->encoding);
 		n--;
 	}
 	return (char *)s;
+}
+
+int *v_ref(int var) {
+	arrayVarStruct *attr = &sysVarAttribute[var];
+	preVarPage = attr->page;
+	preVarNo   = var;
+
+	if (attr->page == 0) {
+		// Normal variable access
+		preVarIndex = var;
+		return sysVar + var;
+	}
+
+	// Implicit array access
+	int *index = attr->pointvar;
+	int page   = attr->page;
+	int offset = attr->offset;
+	if (*index + offset >= arrayVarBuffer[page - 1].size) {
+		WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), var, *index, page, offset);
+		return NULL;
+	}
+	preVarIndex = offset + *index;
+	return arrayVarBuffer[page - 1].value + offset + *index;
+}
+
+int *v_ref_indexed(int var, int index) {
+	arrayVarStruct *attr = &sysVarAttribute[var];
+	preVarPage = attr->page;
+	preVarNo   = var;
+
+	if (attr->page == 0) {
+		// If VAR_n is not an array variable, VAR_n[i] points to VAR_(n+i).
+		if ((var + index) >= SYSVAR_MAX) {
+			WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d)\n", sl_getPage(), sl_getIndex(), var, index);
+			return NULL;
+		}
+		preVarIndex = var + index;
+		return sysVar + var + index;
+	}
+
+	// Indexed array access
+	int page   = attr->page;
+	int offset = attr->offset;
+	if (offset + index >= arrayVarBuffer[page - 1].size) {
+		WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), var, index, page, offset);
+		return NULL;
+	}
+	preVarIndex = offset + index;
+	return arrayVarBuffer[page - 1].value + offset + index;
 }
 
 /* 配列バッファの確保 DC ,page = 1~ */
@@ -305,40 +358,3 @@ void svar_replaceAll(int no, int pattern, int replacement) {
 	svar_append(no, start);
 	free(src);
 }
-
-#ifdef DEBUG
-
-void debug_showvariable() {
-	int i,j,k;
-	int *var;
-	FILE *fp = fopen("VARIABLES.TXT","a");
-	if (fp == NULL) return;
-
-	fprintf(fp, "Page = %d, index = %x\n", sl_getPage(), sl_getIndex());
-
-	var = &sysVar[0];
-	fprintf(fp, "sysVar\n");
-	for (i = 0; i < SYSVAR_MAX; i+=10) {
-		for (j = 0; j < 10; j++) {
-			fprintf(fp, "%d,", *var); var++;
-		}
-		fprintf(fp, "\n");
-	}
-
-	for (i = 0; i < ARRAYVAR_PAGEMAX; i++) {
-		if (arrayVarBuffer[i].value != NULL) {
-			fprintf(fp, "ArrayPage[%d],size=%d\n",i,arrayVarBuffer[i].size);
-			var = arrayVarBuffer[i].value;
-			for (j = 0; j < arrayVarBuffer[i].size; j+=10) {
-				for (k = 0; k < 10; k++) {
-					fprintf(fp, "%d,", *var); var++;
-				}
-				fprintf(fp, "\n");
-			}
-		}
-	}
-
-	fclose(fp);
-}
-
-#endif
