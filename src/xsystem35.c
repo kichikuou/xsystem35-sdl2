@@ -191,15 +191,14 @@ void sys_message(int lv, char *format, ...) {
 }
 
 void sys_error(char *format, ...) {
+	char buf[512];
 	va_list args;
 	
 	va_start(args, format);
-#ifdef __ANDROID__
-	__android_log_vprint(ANDROID_LOG_FATAL, "xsystem35", format, args);
-#else
-	vfprintf(stderr, format, args);
-#endif
+	vsnprintf(buf, sizeof buf, format, args);
 	va_end(args);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35", buf, NULL);
+
 	sys35_remove();
 	exit(1);
 }
@@ -459,7 +458,7 @@ static void init_signalhandler() {
 
 static void registerGameFiles(void) {
 	if (nact->files.cnt[DRIFILE_SCO] == 0)
-		SYSERROR("No Scenario data available\n");
+		SYSERROR("No Scenario data available");
 	for (int type = 0; type < DRIFILETYPEMAX; type++) {
 		boolean use_mmap = true;
 		if (debugger_mode != DEBUGGER_DISABLED && type == DRIFILE_SCO) {

@@ -218,7 +218,7 @@ void commandSG() {
 		break;
 	}
 	default:
-		SYSERROR("Unknown SG command %d\n", sw);
+		SYSERROR("Unknown SG command %d", sw);
 		break;
 	}
 }
@@ -377,6 +377,6 @@ void commandSX() {
 		break;
 	}
 	default:
-		SYSERROR("Unknown SX command\n");
+		SYSERROR("Unknown SX command");
 	}
 }

@@ -68,7 +68,7 @@ static int *getVar(int c0) {
 	} else if (c1 >= 0x40) {
 		return v_ref(c1);  // 0x40 - 0xff
 	}
-	SYSERROR("Invalid variable reference at %d:0x%x\n", sl_getPage(), sl_getIndex() - 2);
+	SYSERROR("Invalid variable reference at %d:0x%x", sl_getPage(), sl_getIndex() - 2);
 	return NULL;
 }
 
@@ -76,7 +76,7 @@ static int *getVar(int c0) {
 int *getCaliVariable() {
 	int *c0 = getVar(sl_getc());
 	if (sl_getc() != 0x7f) {
-		SYSERROR("Something is Wrong @ %03d:%05x\n", sl_getPage(), sl_getIndex());
+		SYSERROR("Something is Wrong @ %03d:%05x", sl_getPage(), sl_getIndex());
 	}
 	return c0;
 }
@@ -125,7 +125,7 @@ int getCaliValue() {
 					cali++;
 					continue;
 				} else if (c1 < 0x34) {
-					SYSERROR("Unknow Parameter @ %03d:%05x\n", sl_getPage(), sl_getIndex());
+					SYSERROR("Unknow Parameter @ %03d:%05x", sl_getPage(), sl_getIndex());
 				}
 			}
 		l_var:
@@ -216,7 +216,7 @@ int getCaliValue() {
 					c1 = sl_getc();
 					if (c0 == 0) { /* 34h-ffh */
 						if (c1 <= 0x33) {
-							SYSERROR("Unknown Parameter @ %03d:%05x\n", sl_getPage(), sl_getIndex());
+							SYSERROR("Unknown Parameter @ %03d:%05x", sl_getPage(), sl_getIndex());
 						}
 					} else { /* 100h- 3fff */
 						c1 += ((c0 & 0x3f) * 256);

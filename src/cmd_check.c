@@ -145,7 +145,7 @@ static void loopStart() {
 }
 
 static void undeferr() {
-	SYSERROR("Undefined Command:@ %03d,%05x\n", sl_getPage(), sl_getIndex());
+	SYSERROR("Undefined Command:@ %03d,%05x", sl_getPage(), sl_getIndex());
 }
 
 static void message(int c0) {

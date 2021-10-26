@@ -174,11 +174,11 @@ drifiles *dri_init(const char **file, int cnt, boolean use_mmap) {
 		if (file[i] == NULL) continue;
 		/* open check */
 		if (NULL == (fp = fopen(file[i], "rb"))) {
-			SYSERROR("File %s is not found\n", file[i]);
+			SYSERROR("File %s is not found", file[i]);
 		}
 		/* check is drifile or noe */
 		if (!filecheck(fp)) {
-			SYSERROR("File %s is not dri file\n", file[i]);
+			SYSERROR("File %s is not dri file", file[i]);
 		}
 		/* get file map */
 		if (!gotmap) {

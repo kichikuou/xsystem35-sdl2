@@ -65,7 +65,7 @@ static int find_null_surface() {
 		if (suf[i] == NULL) return i;
 	}
 	
-	SYSERROR("no free surface\n");
+	SYSERROR("no free surface");
 	return 0;
 }
 

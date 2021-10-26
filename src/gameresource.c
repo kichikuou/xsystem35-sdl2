@@ -197,7 +197,7 @@ static boolean initGameResourceFromFile(GameResource *gr, FILE *fp, const char *
 	return TRUE;
 
  errexit:
-	SYSERROR("Illigal resource at line(%d) file<%s>\n", linecnt, gr_fname);
+	SYSERROR("Illigal resource at line(%d) file<%s>", linecnt, gr_fname);
 	return FALSE;
 }
 
@@ -214,6 +214,6 @@ boolean initGameResource(GameResource *gr, const char *gr_fname) {
 		closedir(dir);
 		return result;
 	}
-	SYSERROR("Game Resource File open failed\n");
+	SYSERROR("Game Resource File open failed");
 	return FALSE;
 }

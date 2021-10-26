@@ -43,7 +43,7 @@ void commands2F60() {
 	int fnum = sl_getdw();  /* function number */
 
 	if (dll == NULL) {
-		SYSERROR("No DLL initilized\n");
+		SYSERROR("No DLL initilized");
 	}
 
 	if (dll + type == NULL) goto eexit;
@@ -56,5 +56,5 @@ void commands2F60() {
 	return;
 	
  eexit:
-	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)\n", type, fnum, dll[type].name, dll[type].function[fnum].name);
+	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)", type, fnum, dll[type].name, dll[type].function[fnum].name);
 }

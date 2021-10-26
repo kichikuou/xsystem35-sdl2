@@ -91,7 +91,7 @@ void font_select(int type, int size) {
 		}
 #endif
 		if (!fs)
-			SYSERROR("Cannot open font %s\n", this.name[type]);
+			SYSERROR("Cannot open font %s", this.name[type]);
 		
 		font_insert(size, type, fs);
 		fontset = &fonttbl[fontcnt - 1];
@@ -202,7 +202,7 @@ void font_init(void) {
 	this.antialiase_on = FALSE;
 	
 	if (TTF_Init() == -1)
-		SYSERROR("Failed to intialize SDL_ttf: %s\n", TTF_GetError());
+		SYSERROR("Failed to intialize SDL_ttf: %s", TTF_GetError());
 }
 
 void font_set_name_and_index(int type, const char *name, int index) {

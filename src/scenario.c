@@ -114,7 +114,7 @@ static int* sl_pop(void) {
 		*tmp++ = *--stack_top;
 	}
 	if (stack_top < stack_buf) {
-		SYSERROR("Stack buffer is illegal\n");
+		SYSERROR("Stack buffer is illegal");
 	}
 	
 	return _tmp;
@@ -235,11 +235,11 @@ void sl_retNear(void) {
 	
 	while (*tmp != STACK_NEARJMP) {
 		if (*tmp == STACK_FARJMP) {
-			SYSERROR("Stack buffer is illegal\n");
+			SYSERROR("Stack buffer is illegal");
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
-			SYSERROR("Stack buffer is illegal\n");
+			SYSERROR("Stack buffer is illegal");
 		}
 		free(tmp);
 		tmp = sl_pop();
@@ -294,7 +294,7 @@ void sl_retFar(void) {
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
-			SYSERROR("Stack buffer is illegal\n");
+			SYSERROR("Stack buffer is illegal");
 		}
 		free(tmp);
 		tmp = sl_pop();
@@ -321,7 +321,7 @@ void sl_retFar2(void) {
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
-			SYSERROR("Stack buffer is illegal\n");
+			SYSERROR("Stack buffer is illegal");
 		}
 		free(tmp);
 		tmp = sl_pop();
@@ -358,7 +358,7 @@ void sl_stackClear_pageCall(int cnt) {
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
-			SYSERROR("Stack buffer is illegal\n");
+			SYSERROR("Stack buffer is illegal");
 		}
 		free(tmp);
 	}
@@ -379,7 +379,7 @@ void sl_stackClear_labelCall(int cnt) {
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
-			SYSERROR("Stack buffer is illegal\n");
+			SYSERROR("Stack buffer is illegal");
 		}
 		free(tmp);
 		if (labelCallCnt_afterPageCall == 0) break;
@@ -408,7 +408,7 @@ void sl_popVar(int *topvar, int cnt) {
 	int *tmp = sl_pop();
 
 	if (*tmp != STACK_VARIABLE) {
-		SYSERROR("Stack buffer is illegal\n");
+		SYSERROR("Stack buffer is illegal");
 	}
 	if (*(tmp + 2) != preVarPage){
 		WARNING("Variable is not match with stacked variable\n");
@@ -476,7 +476,7 @@ void sl_popData(int *data, int cnt) {
 	dataPushCnt--;
 	
 	if (*tmp != STACK_DATA)
-		SYSERROR("Stack buffer is illegal\n");
+		SYSERROR("Stack buffer is illegal");
 	if (*(tmp + 1) != cnt)
 		WARNING("Variable count is not match with stacked variable\n");
 	
@@ -534,7 +534,7 @@ void sl_returnGoto(int address) {
 			popVars(tmp);
 		} else {
 			fprintf(stderr, "%d \n", *tmp);
-			SYSERROR("Stack buffer is illegal\n");
+			SYSERROR("Stack buffer is illegal");
 		}
 		free(tmp);
 		tmp = sl_pop();
