@@ -31,27 +31,6 @@
 #include "variable.h"
 #include "ald_manager.h"
 
-/* logfile when debug level >= 5 */
-#define DEBUGLOGFILE "./xsystem35.log"
-
-/* 
- debug level in xsystem35
-  0: critical error message only (output to terminal or message box)
-  1: warning only(output to terminal) [stable release default]
-  2: add not inplement message (output to terminal) [devel relase default]
-  5: add command message (output to terminal or FILE)
-  6: add message(output to terminal or FILE)
-*/
-
-#ifdef DEBUG
-#define DEBUG_MESSAGE(...)     sys_message(6, __VA_ARGS__)
-#else
-#define DEBUG_MESSAGE(...)
-#endif
-
-#define System_idle(msec) usleep(1000l * (msec));
-// extern void System_idle(int msec);
-
 /* system35 画面デフォルト */
 #define SYS35_DEFAULT_WIDTH 640
 #define SYS35_DEFAULT_HEIGHT 480

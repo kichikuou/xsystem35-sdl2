@@ -86,7 +86,6 @@ static void    sys35_ParseOption(int *argc, char **argv);
 static void    check_profile();
 
 /* for debugging */
-static FILE *fpdebuglog;
 static int debuglv = DEBUGLEVEL;
 enum {
 	DEBUGGER_DISABLED,
@@ -143,11 +142,10 @@ static void sys35_usage(boolean verbose) {
 	
 #ifdef DEBUG
 	puts(" -debuglv #     : debug level");
-	puts("                :  0: critical error message only ");
-	puts("                :  1: + waring message");
-	puts("                :  2: + not implemented command message");
-	puts("                :  5: + implemented command (write to logfile)");
-	puts("                :  6: + message (write to logfile)");
+	puts("                :  1: warings");
+	puts("                :  2: unimplemented commands");
+	puts("                :  5: command trace");
+	puts("                :  6: message trace");
 #endif  
 	puts(" -noantialias   : never use antialiased string");
 	puts(" -fullscreen    : start with fullscreen");
@@ -177,13 +175,6 @@ void sys_message(int lv, char *format, ...) {
 	};
 	int prio = prio_table[min(lv, 5)];
 	__android_log_vprint(prio, "xsystem35", format, args);
-#elif defined (DEBUG)
-	if (lv >= 5) {
-		vfprintf(fpdebuglog, format, args);
-		fflush(fpdebuglog);
-	} else {
-		vfprintf(stderr, format, args);
-	}
 #else
 	vfprintf(stderr, format, args);
 #endif
@@ -254,11 +245,6 @@ static void sys35_remove() {
 	ags_remove();
 #ifdef ENABLE_GTK
 	s39ini_remove();
-#endif
-#if DEBUG
-	if (debuglv >= 3) {
-		fclose(fpdebuglog);
-	}
 #endif
 }
 
@@ -495,13 +481,6 @@ int main(int argc, char **argv) {
 	check_profile();
 	sys35_ParseOption(&argc, argv);
 	
-#if DEBUG
-	if (debuglv >= 5) {
-		if (NULL == (fpdebuglog = fopen(DEBUGLOGFILE, "w"))) {
-			fpdebuglog = stderr;
-		}
-	}
-#endif
 	if (!initGameResource(&nact->files, gameResourceFile)) {
 #ifdef _WIN32
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)", NULL);

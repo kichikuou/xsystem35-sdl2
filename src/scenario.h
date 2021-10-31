@@ -88,9 +88,11 @@ static inline int sl_getc(void) { return sl_sco[sl_index++]; }
 	sys_message(2, "%d,%x: " fmt, sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
 #define DEBUG_COMMAND(fmt, ...) \
 	sys_message(5, "%d,%x: " fmt, sl_getPage(), sl_getIndex(), ##__VA_ARGS__)
+#define DEBUG_MESSAGE(...) sys_message(6, __VA_ARGS__)
 #else
 #define DEBUG_COMMAND(...)
 #define DEBUG_COMMAND_YET(...)
+#define DEBUG_MESSAGE(...)
 #endif
 
 #endif /* !__SCENARIO_ */
