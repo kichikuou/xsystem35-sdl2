@@ -103,10 +103,10 @@ extern char *xsys35_sact01;
 static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
 	
-	// ゲームタイトルによるバージョン設定
-	if (0 == strcmp(nact->game_title_utf8, GT_ESUKA)) {
+	if (!strcmp(nact->game_title_utf8, GT_ESUKA)) {
 		sact.version = 100;
-	} else if (0 == strcmp(nact->game_title_utf8, GT_RANCE5D)){
+	} else if (!strcmp(nact->game_title_utf8, GT_RANCE5D) ||
+			   !strcmp(nact->game_title_utf8, GT_RANCE5D_ENG)) {
 		sact.version = 110;
 	} else {
 		sact.version = 120;
