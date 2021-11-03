@@ -33,7 +33,7 @@ jobs:
         echo PATH: $PATH
 
     - name: Install Deps
-      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer ${{ matrix.package }}-libjpeg-turbo ${{ matrix.package }}-cjson ${{ matrix.package }}-nsis ${{ matrix.package }}-ntldd-git
+      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer ${{ matrix.package }}-libjpeg-turbo ${{ matrix.package }}-libwebp ${{ matrix.package }}-cjson ${{ matrix.package }}-nsis ${{ matrix.package }}-ntldd-git
 
     - name: Checkout
       uses: actions/checkout@v2

@@ -65,6 +65,11 @@ else()
     set(HAVE_JPEG 1)
   endif()
 
+  optional_pkg_check_modules(WEBP IMPORTED_TARGET libwebp)
+  if (WEBP_FOUND)
+    set(HAVE_WEBP 1)
+  endif()
+
   set(THREADS_PREFER_PTHREAD_FLAG ON)
   find_package(Threads)
   if (CMAKE_USE_PTHREADS_INIT)

@@ -86,7 +86,7 @@ static surface_t *smask_get(int no) {
 
 	if (i == am->datanum) return NULL;
 	
-	return sf_getcg(am->mmap->addr + am->offset[i]);
+	return sf_getcg(am->mmap->addr + am->offset[i], 0 /*FIXME*/);
 }
 
 // ベースになるマスクの alpha 値を拡大して取り出す

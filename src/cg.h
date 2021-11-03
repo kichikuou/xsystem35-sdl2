@@ -32,13 +32,14 @@
 */
 typedef enum {
 	ALCG_UNKNOWN = 1,
-	ALCG_VSP     = 2,
-	ALCG_PMS8    = 3,
-	ALCG_PMS16   = 4,
-	ALCG_BMP8    = 5,
-	ALCG_BMP24   = 6,
-	ALCG_QNT     = 7,
-	ALCG_JPEG    = 8,
+	ALCG_VSP,
+	ALCG_PMS8,
+	ALCG_PMS16,
+	ALCG_BMP8,
+	ALCG_BMP24,
+	ALCG_QNT,
+	ALCG_JPEG,
+	ALCG_WEBP,
 } CG_TYPE;
 
 /*

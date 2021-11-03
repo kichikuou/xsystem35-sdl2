@@ -33,6 +33,9 @@
 #include "ags.h"
 #include "pms.h"
 #include "qnt.h"
+#ifdef HAVE_WEBP
+#include "webp.h"
+#endif
 #include "ngraph.h"
 #include "dri.h"
 #include "ald_manager.h"
@@ -50,6 +53,10 @@ static CG_TYPE check_cgformat(BYTE *data) {
 		return ALCG_PMS8;
 	} else if (pms64k_checkfmt(data)) {
 		return ALCG_PMS16;
+#ifdef HAVE_WEBP
+	} else if (webp_checkfmt(data)) {
+		return ALCG_WEBP;
+#endif
 	}
 	return ALCG_UNKNOWN;
 }
@@ -61,7 +68,7 @@ static CG_TYPE check_cgformat(BYTE *data) {
  * @return CG が展開された surface
  *         未知の形式のときは NULL が返る
  */
-surface_t *sf_getcg(void *b) {
+surface_t *sf_getcg(void *b, size_t size) {
 	surface_t *sf = NULL;
 	int type;
 	cgdata *cg = NULL;
@@ -77,6 +84,11 @@ surface_t *sf_getcg(void *b) {
 	case ALCG_QNT:
 		cg = qnt_extract(b);
 		break;
+#ifdef HAVE_WEBP
+	case ALCG_WEBP:
+		cg = webp_extract(b, size);
+		break;
+#endif
 	default:
 		break;
 	}
@@ -93,7 +105,7 @@ surface_t *sf_getcg(void *b) {
 		break;
 		
 	case ALCG_PMS16:
-                if (cg->alpha) {
+		if (cg->alpha) {
 			sf = sf_create_surface(cg->width, cg->height, sf0->depth);
 			gr_drawimage16(sf, cg, cg->x, cg->y);
 			gr_draw_amap(sf, cg->x, cg->y, cg->alpha, cg->width, cg->height, cg->width);
@@ -103,7 +115,8 @@ surface_t *sf_getcg(void *b) {
 		}
 		break;
                 
-        case ALCG_QNT:
+	case ALCG_QNT:
+	case ALCG_WEBP:
 		if (cg->alpha) {
 			sf = sf_create_surface(cg->width, cg->height, sf0->depth);
 			gr_drawimage24(sf, cg, cg->x, cg->y);
@@ -112,7 +125,7 @@ surface_t *sf_getcg(void *b) {
 			sf = sf_create_pixel(cg->width, cg->height, sf0->depth);
 			gr_drawimage24(sf, cg, cg->x, cg->y);
 		}
-                break;
+		break;
 	}
 	
 	if (cg->pic)   free(cg->pic);
@@ -137,7 +150,7 @@ surface_t *sf_loadcg_no(int no) {
 		return NULL;
 	}
 	
-	sf = sf_getcg(dfile->data);
+	sf = sf_getcg(dfile->data, dfile->size);
 	
 	ald_freedata(dfile);
 

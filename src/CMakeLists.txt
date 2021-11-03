@@ -46,6 +46,10 @@ if (HAVE_JPEG)
     target_link_libraries(xsystem35 PRIVATE JPEG::JPEG)
   endif()
 endif()
+if (HAVE_WEBP)
+  target_sources(xsystem35 PRIVATE webp.c)
+  target_link_libraries(xsystem35 PRIVATE PkgConfig::WEBP)
+endif()
 
 # Music
 target_sources(xsystem35 PRIVATE

@@ -83,7 +83,7 @@ extern void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y);
 
 
 /* defined in cg.c */
-extern surface_t *sf_getcg(void *buf);
+extern surface_t *sf_getcg(void *buf, size_t size);
 extern surface_t *sf_loadcg_no(int no);
 
 
