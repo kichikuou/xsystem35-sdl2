@@ -64,9 +64,9 @@ static Mix_Music *bgm_load(int no) {
 
 	SDL_RWops *rwops = SDL_RWFromConstMem(dfile->data, dfile->size);
 
-	mix_music = Mix_LoadMUSType_RW(rwops, MUS_WAV, SDL_TRUE /* freesrc */);
+	mix_music = Mix_LoadMUS_RW(rwops, SDL_TRUE /* freesrc */);
 	if (mix_music == NULL) {
-		WARNING("not .wav file\n");
+		WARNING("Failed to load BGM %d: %s\n", no, SDL_GetError());
 		free_music();
 		return NULL;
 	}
