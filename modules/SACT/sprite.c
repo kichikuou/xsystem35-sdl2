@@ -242,13 +242,13 @@ int sp_set_wall_paper(int no) {
 		scg_free_cgobj(sp->curcg);
 	}
 	
-	if (no) { // 指定のCGを表示
-		sp->curcg = scg_loadcg_no(no, TRUE);
+	sp->curcg = no ? scg_loadcg_no(no, TRUE) : NULL;
+
+	if (sp->curcg) { // display specified CG
 		sp->update = DEFAULT_UPDATE;
 		sp->cursize.width  = sp->curcg->sf->width;
 		sp->cursize.height = sp->curcg->sf->height;
-	} else { // 真黒
-		sp->cursize.width  = sf0->width;
+	} else { // Black
 		sp->cursize.height = sf0->height;
 		sp->curcg = NULL;
 		sp->update = sp_draw_wall;
