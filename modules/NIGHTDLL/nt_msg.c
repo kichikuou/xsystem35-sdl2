@@ -369,22 +369,15 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 }
 
 static BYTE *get_char(BYTE *msg, char *mbuf, int bufmax) {
-	int c1;
-	
-	//  改行
 	if (msg[0] == '\n') {
 		mbuf[0] = '\n';
 		mbuf[1] = '\0';
 		return msg +1;
 	}
 	
-	c1 = *msg++;
-	
-	*mbuf++ = c1;
-	
-	if ((c1 >= 0x81 && c1 < 0xa0) || (c1 >= 0xe0 && c1 <= 0xee)) {
+	BYTE *p = advance_char(msg, nact->encoding);
+	while (msg < p)
 		*mbuf++ = *msg++;
-	}
 	*mbuf = '\0';
 	
 	return msg;

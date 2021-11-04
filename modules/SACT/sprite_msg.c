@@ -492,9 +492,6 @@ static int get_linelen(BYTE *msg) {
 //   ルビつき文字の場合: メッセージ本体と対応するルビ文字列
 //   それ以外          : 全角|半角文字１文字
 static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
-	int c1, i;
-
-	//  改行
 	if (msg[0] == '\n') {
 		mbuf[0] = '\n';
 		mbuf[1] = msg[1];
@@ -504,6 +501,7 @@ static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 	
 	// ルビつき文字
 	if (0 == strncmp("|RB|", msg, 4)) {
+		int i;
 		msg += 4;
 		for (i = 0; *msg != '|' && i < bufmax; i++) {
 			mbuf[i] = *msg++;
@@ -514,13 +512,9 @@ static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 		}
 		msg++; rbuf[i] = '\0';
 	} else {
-		c1 = *msg++;
-		
-		*mbuf++ = c1;
-		
-		if ((c1 >= 0x81 && c1 < 0xa0) || (c1 >= 0xe0 && c1 <= 0xee)) {
+		BYTE *p = advance_char(msg, nact->encoding);
+		while (msg < p)
 			*mbuf++ = *msg++;
-		}
 		*mbuf = '\0';
 	}
 	return msg;
