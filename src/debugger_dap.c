@@ -112,6 +112,11 @@ static void emit_output_event(const char *output) {
 }
 
 static void cmd_initialize(cJSON *args, cJSON *resp) {
+	if (!symbols) {
+		cJSON_AddBoolToObject(resp, "success", false);
+		cJSON_AddStringToObject(resp, "message", "xsystem35: Cannot load debug symbols");
+		return;
+	}
 	cJSON *body;
 	cJSON_AddBoolToObject(resp, "success", true);
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
@@ -555,7 +560,7 @@ static int read_command_thread(void *data) {
 	return 0;
 }
 
-static void dbg_dap_init(void) {
+static void dbg_dap_init(const char *symbols_path) {
 	cmd_queue.mutex = SDL_CreateMutex();
 	cmd_queue.cond_nonempty = SDL_CreateCond();
 
@@ -565,6 +570,8 @@ static void dbg_dap_init(void) {
 #endif
 
 	SDL_CreateThread(read_command_thread, "Debugger", NULL);
+
+	symbols = dsym_load(symbols_path);
 
 	while (!initialized) {
 		char *msg = cmdq_dequeue();

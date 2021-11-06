@@ -323,7 +323,8 @@ static void sigint_handler(int sig_num) {
 	dbg_state = DBG_STOPPED_INTERRUPT;
 }
 
-static void dbg_cui_init(void) {
+static void dbg_cui_init(const char *symbols_path) {
+	symbols = dsym_load(symbols_path);
 #ifdef HAVE_SIGACTION
 	sys_set_signalhandler(SIGINT, sigint_handler);
 #endif

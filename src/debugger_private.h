@@ -48,7 +48,7 @@ typedef struct {
 } StackTrace;
 
 typedef struct {
-	void (*init)(void);
+	void (*init)(const char *symbols_path);
 	void (*quit)(void);
 	void (*repl)(void);
 	void (*onsleep)(void);
