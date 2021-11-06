@@ -108,6 +108,14 @@ static void emit_output_event(const char *output) {
 	cJSON_AddStringToObject(event, "event", "output");
 	cJSON_AddItemToObjectCS(event, "body", body = cJSON_CreateObject());
 	cJSON_AddStringToObject(body, "output", output);
+
+	const char *src = dsym_page2src(symbols, nact->current_page);
+	if (src)
+		cJSON_AddItemToObjectCS(body, "source", create_source(src));
+	int line = dsym_addr2line(symbols, nact->current_page, nact->current_addr);
+	if (line >= 0)
+		cJSON_AddNumberToObject(body, "line", line);
+
 	send_json(event);
 }
 
