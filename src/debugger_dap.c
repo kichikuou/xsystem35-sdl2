@@ -68,21 +68,21 @@ static void send_json(cJSON *json) {
 	cJSON_free(json);
 }
 
-static void emit_initialized_event() {
+static void emit_initialized_event(void) {
 	cJSON *event = cJSON_CreateObject();
 	cJSON_AddStringToObject(event, "type", "event");
 	cJSON_AddStringToObject(event, "event", "initialized");
 	send_json(event);
 }
 
-static void emit_terminated_event() {
+static void emit_terminated_event(void) {
 	cJSON *event = cJSON_CreateObject();
 	cJSON_AddStringToObject(event, "type", "event");
 	cJSON_AddStringToObject(event, "event", "terminated");
 	send_json(event);
 }
 
-static void emit_stop_event() {
+static void emit_stop_event(void) {
 	const char *reason;
 	switch (dbg_state) {
 	case DBG_STOPPED_ENTRY: reason = "entry"; break;
@@ -99,6 +99,15 @@ static void emit_stop_event() {
 	cJSON_AddItemToObjectCS(event, "body", body = cJSON_CreateObject());
 	cJSON_AddStringToObject(body, "reason", reason);
 	cJSON_AddNumberToObject(body, "threadId", THREAD_ID);  // needed?
+	send_json(event);
+}
+
+static void emit_output_event(const char *output) {
+	cJSON *event = cJSON_CreateObject(), *body;
+	cJSON_AddStringToObject(event, "type", "event");
+	cJSON_AddStringToObject(event, "event", "output");
+	cJSON_AddItemToObjectCS(event, "body", body = cJSON_CreateObject());
+	cJSON_AddStringToObject(body, "output", output);
 	send_json(event);
 }
 
@@ -598,4 +607,5 @@ DebuggerImpl dbg_dap_impl = {
 	.quit = dbg_dap_quit,
 	.repl = dbg_dap_repl,
 	.onsleep = dbg_dap_onsleep,
+	.console_output = emit_output_event,
 };

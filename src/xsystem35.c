@@ -176,7 +176,8 @@ void sys_message(int lv, char *format, ...) {
 	int prio = prio_table[min(lv, 5)];
 	__android_log_vprint(prio, "xsystem35", format, args);
 #else
-	vfprintf(stderr, format, args);
+	if (!dbg_console_vprintf(format, args))
+		vfprintf(stderr, format, args);
 #endif
 	va_end(args);
 }

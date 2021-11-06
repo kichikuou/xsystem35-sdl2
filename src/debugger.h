@@ -20,6 +20,7 @@
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
 
+#include <stdarg.h>
 #include "portab.h"
 
 typedef enum {
@@ -44,6 +45,7 @@ void dbg_quit();
 void dbg_main(void);
 void dbg_onsleep(void);
 BYTE dbg_handle_breakpoint(int page, int addr);
+boolean dbg_console_vprintf(const char *format, va_list ap);
 
 #else // ENABLE_DEBUGGER
 
@@ -53,6 +55,7 @@ BYTE dbg_handle_breakpoint(int page, int addr);
 #define dbg_main()
 #define dbg_onsleep()
 #define dbg_handle_breakpoint(page, addr) BREAKPOINT
+#define dbg_console_vprintf(format, ap) false
 
 #endif // ENABLE_DEBUGGER
 
