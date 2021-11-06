@@ -67,6 +67,7 @@ void dbg_stepin(void);
 void dbg_stepout(void);
 void dbg_next(void);
 int dbg_lookup_var(const char *name);
+boolean dbg_evaluate(const char *expr, char *result, size_t result_size);
 StackTrace *dbg_stack_trace(void);
 
 #endif // __DEBUGGER_PRIVATE_H__

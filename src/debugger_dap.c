@@ -223,25 +223,20 @@ static void cmd_evaluate(cJSON *args, cJSON *resp) {
 	cJSON *expression = cJSON_GetObjectItemCaseSensitive(args, "expression");
 	if (!cJSON_IsString(expression)) {
 		cJSON_AddBoolToObject(resp, "success", false);
-		// TODO: add message
+		cJSON_AddStringToObject(resp, "message", "invalid arguments");
 		return;
 	}
-	const char *varname = expression->valuestring;
-	int var = dbg_lookup_var(varname);
-	if (var < 0) {
-		fprintf(stderr, "Unrecognized variable name \"%s\".\n", varname);
-		// TODO: add message
+	char buf[256];
+	if (!dbg_evaluate(expression->valuestring, buf, sizeof(buf))) {
 		cJSON_AddBoolToObject(resp, "success", false);
+		cJSON_AddStringToObject(resp, "message", buf);
 		return;
 	}
-
-	char result[20];
-	sprintf(result, "%d", *v_ref(var));
 
 	cJSON *body;
 	cJSON_AddBoolToObject(resp, "success", true);
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
-	cJSON_AddStringToObject(body, "result", result);
+	cJSON_AddStringToObject(body, "result", buf);
 	cJSON_AddNumberToObject(body, "variablesReference", 0);
 }
 

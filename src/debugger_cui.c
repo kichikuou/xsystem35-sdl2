@@ -267,22 +267,20 @@ static CommandResult cmd_next(void) {
 	return EXIT_REPL;
 }
 
-static const char desc_print[] = "Print value of variable.";
+static const char desc_print[] = "Print value of expression.";
 static const char help_print[] =
-	"Syntax: print <variable>";
+	"Syntax: print <expr>";
 
 static CommandResult cmd_print(void) {
-	char *arg = strtok(NULL, whitespaces);
-	if (!arg) {
+	char *expr = strtok(NULL, "");
+	if (!expr) {
 		puts(help_print);
 		return CONTINUE_REPL;
 	}
-	int var = dbg_lookup_var(arg);
-	if (var < 0) {
-		printf("Unrecognized variable name \"%s\".\n", arg);
-		return CONTINUE_REPL;
-	}
-	printf("%s = %d\n", arg, *v_ref(var));
+
+	char buf[256];
+	dbg_evaluate(expr, buf, sizeof(buf));
+	puts(buf);
 	return CONTINUE_REPL;
 }
 
