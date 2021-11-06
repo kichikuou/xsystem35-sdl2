@@ -34,14 +34,25 @@ boolean webp_checkfmt(BYTE *data) {
 }
 
 static int get_base_cg(uint8_t *data, size_t size) {
-	if (size < 12)
-		return 0;
-	if (data[size-12] != 'O' || data[size-11] != 'V' || data[size-10] != 'E' || data[size-9] != 'R')
-		return 0;
-	int uk = LittleEndian_getDW(data, size-8); // size?
-	if (uk != 4)
-		WARNING("WEBP: expected 0x4 preceding base CG number, got %d\n", uk);
-	return LittleEndian_getDW(data, size-4);
+	// Skip 'NULL' chunk if any.
+	if (size >= 12 &&
+		data[size-12] == 'N' &&
+		data[size-11] == 'U' &&
+		data[size-10] == 'L' &&
+		data[size-9] == 'L' &&
+		LittleEndian_getDW(data, size - 8) == 4) {
+		size -= 12;
+	}
+
+	if (size >= 12 &&
+		data[size-12] == 'O' &&
+		data[size-11] == 'V' &&
+		data[size-10] == 'E' &&
+		data[size-9] == 'R' &&
+		LittleEndian_getDW(data, size - 8) == 4) {
+		return LittleEndian_getDW(data, size - 4);
+	}
+	return 0;
 }
 
 static uint8_t *webp_load(uint8_t *data, size_t size, int *width, int *height, int *has_alpha) {
