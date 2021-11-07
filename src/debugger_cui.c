@@ -134,28 +134,43 @@ static CommandResult cmd_backtrace(void) {
 
 static const char desc_break[] = "Set breakpoint at specified location.";
 static const char help_break[] =
-	"Syntax: break <filename>:<linenum>\n"
-	"        break <linenum>\n"
-	"        break <page>:<address>\n"
-	"        break <function>";
+	"Syntax: break <filename>:<linenum> [if <condition>]\n"
+	"        break <linenum> [if <condition>]\n"
+	"        break <page>:<address> [if <condition>]\n"
+	"        break <function> [if <condition>]";
 
 static CommandResult cmd_break(void) {
-	char *arg = strtok(NULL, whitespaces);
+	char *token = strtok(NULL, whitespaces);
 	int page, addr;
-	if (!arg || !parse_address(arg, &page, &addr)) {
+	if (!token || !parse_address(token, &page, &addr)) {
 		puts(help_break);
 		return CONTINUE_REPL;
 	}
 	Breakpoint *bp = dbg_set_breakpoint(page, addr, false);
-	if (bp) {
-		printf("Breakpoint %d at %s\n", bp->no, format_address(bp->page, bp->addr));
-	} else {
+	if (!bp) {
 		Breakpoint *bp = dbg_find_breakpoint(page, addr);
 		if (bp)
 			printf("Breakpoint %d is already set at %d:0x%x.\n", bp->no, page, addr);
 		else
 			printf("Failed to set breakpoint at %d:0x%x: invalid address\n", page, addr);
+		return CONTINUE_REPL;
 	}
+
+	token = strtok(NULL, whitespaces);
+	if (token && !strcmp(token, "if")) {
+		char *condition = strtok(NULL, "");
+		if (!condition)
+			condition = "";
+
+		char errmsg[256];
+		if (!dbg_set_breakpoint_condition(bp, condition, errmsg, sizeof(errmsg))) {
+			puts(errmsg);
+			dbg_delete_breakpoint(bp->no);
+			return CONTINUE_REPL;
+		}
+	}
+
+	printf("Breakpoint %d at %s\n", bp->no, format_address(bp->page, bp->addr));
 	return CONTINUE_REPL;
 }
 

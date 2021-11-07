@@ -244,6 +244,17 @@ static int eval_expr(void) {
 	return val;
 }
 
+static int eval_condition(const char *expr) {
+	eval_input = expr;
+	eval_result = NULL;
+	eval_result_size = 0;
+	if (!setjmp(eval_jmp_buf)) {
+		return eval_expr();
+	} else {
+		return 0;
+	}
+}
+
 boolean dbg_evaluate(const char *expr, char *result, size_t result_size) {
 	eval_input = expr;
 	eval_result = result;
@@ -289,12 +300,23 @@ Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal) {
 	return bp;
 }
 
+boolean dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char *err, size_t errsize) {
+	if (!dbg_evaluate(condition, err, errsize))
+		return false;
+	if (bp->condition)
+		free(bp->condition);
+	bp->condition = strdup(condition);
+	return true;
+}
+
 boolean dbg_delete_breakpoint(int no) {
 	Breakpoint *prev = NULL;
 	for (Breakpoint *bp = breakpoints; bp; bp = bp->next) {
 		if (bp->no == no) {
 			assert(bp->dfile->data[bp->addr] == BREAKPOINT);
 			bp->dfile->data[bp->addr] = bp->restore_op;
+			if (bp->condition)
+				free(bp->condition);
 			ald_freedata(bp->dfile);
 			if (prev)
 				prev->next = bp->next;
@@ -332,6 +354,9 @@ BYTE dbg_handle_breakpoint(int page, int addr) {
 	Breakpoint *bp = dbg_find_breakpoint(page, addr);
 	if (!bp)
 		SYSERROR("Illegal BREAKPOINT instruction");
+
+	if (bp->condition && !eval_condition(bp->condition))
+		return bp->restore_op;
 
 	dbg_state = bp->no == INTERNAL_BREAKPOINT_NO ?
 		DBG_STOPPED_NEXT : DBG_STOPPED_BREAKPOINT;

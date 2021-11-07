@@ -31,6 +31,7 @@ typedef struct breakpoint {
 	int page;
 	int addr;
 	BYTE restore_op;
+	char *condition;
 	dridata *dfile;  // keeps modified scenario page alive in the cache
 } Breakpoint;
 
@@ -63,6 +64,7 @@ Breakpoint *dbg_find_breakpoint(int page, int addr);
 Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal);
 boolean dbg_delete_breakpoint(int no);
 void dbg_delete_breakpoints_in_page(int page);
+boolean dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char *err, size_t errsize);
 void dbg_stepin(void);
 void dbg_stepout(void);
 void dbg_next(void);

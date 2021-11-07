@@ -128,6 +128,7 @@ static void cmd_initialize(cJSON *args, cJSON *resp) {
 	cJSON *body;
 	cJSON_AddBoolToObject(resp, "success", true);
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
+	cJSON_AddBoolToObject(body, "supportsConditionalBreakpoints", true);
 	cJSON_AddBoolToObject(body, "supportsConfigurationDoneRequest", true);
 	cJSON_AddBoolToObject(body, "supportsEvaluateForHovers", true);
 	cJSON_AddBoolToObject(body, "supportsSetVariable", true);
@@ -172,10 +173,10 @@ static void cmd_stackTrace(cJSON *args, cJSON *resp) {
 static void cmd_setBreakpoints(cJSON *args, cJSON *resp) {
 	cJSON *source = cJSON_GetObjectItemCaseSensitive(args, "source");
 	cJSON *source_name = cJSON_GetObjectItemCaseSensitive(source, "name");
-	cJSON *lines = cJSON_GetObjectItemCaseSensitive(args, "lines");
-	if (!cJSON_IsString(source_name) || !cJSON_IsArray(lines)) {
+	cJSON *in_bps = cJSON_GetObjectItemCaseSensitive(args, "breakpoints");
+	if (!cJSON_IsString(source_name) || !cJSON_IsArray(in_bps)) {
 		cJSON_AddBoolToObject(resp, "success", false);
-		// TODO: add message
+		cJSON_AddStringToObject(resp, "message", "invalid arguments");
 		return;
 	}
 	const char *filename = source_name->valuestring;
@@ -183,34 +184,50 @@ static void cmd_setBreakpoints(cJSON *args, cJSON *resp) {
 
 	dbg_delete_breakpoints_in_page(page);
 
-	cJSON *body, *breakpoints;
+	cJSON *body, *out_bps;
 	cJSON_AddBoolToObject(resp, "success", true);
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
-	cJSON_AddItemToObjectCS(body, "breakpoints", breakpoints = cJSON_CreateArray());
+	cJSON_AddItemToObjectCS(body, "breakpoints", out_bps = cJSON_CreateArray());
 
-	cJSON *line;
-	cJSON_ArrayForEach(line, lines) {
+	char message[256];
+	cJSON *srcbp;
+	cJSON_ArrayForEach(srcbp, in_bps) {
 		cJSON *item = cJSON_CreateObject();
-		cJSON_AddItemToArray(breakpoints, item);
+		cJSON_AddItemToArray(out_bps, item);
 
+		cJSON *line = cJSON_GetObjectItemCaseSensitive(srcbp, "line");
 		int line_no = line->valueint;
 		int addr = dsym_line2addr(symbols, page, line_no);
 		if (page < 0) {
-			fprintf(stderr, "No source file named %s.\n", filename);
+			snprintf(message, sizeof(message), "no source file named %s", filename);
 			cJSON_AddBoolToObject(item, "verified", false);
+			cJSON_AddStringToObject(item, "message", message);
 			continue;
 		}
 		if (addr < 0) {
-			fprintf(stderr, "No line %d in file %s.\n", line_no, filename);
+			snprintf(message, sizeof(message), "no line %d in file %s", line_no, filename);
 			cJSON_AddBoolToObject(item, "verified", false);
+			cJSON_AddStringToObject(item, "message", message);
 			continue;
 		}
 		Breakpoint *bp = dbg_set_breakpoint(page, addr, false);
 		if (!bp) {
-			fprintf(stderr, "Failed to set breakpoint at %d:0x%x\n", page, addr);
+			snprintf(message, sizeof(message), "failed to set breakpoint at %d:0x%x", page, addr);
 			cJSON_AddBoolToObject(item, "verified", false);
+			cJSON_AddStringToObject(item, "message", message);
 			continue;
 		}
+
+		cJSON *condition = cJSON_GetObjectItemCaseSensitive(srcbp, "condition");
+		if (condition && cJSON_IsString(condition)) {
+			if (!dbg_set_breakpoint_condition(bp, condition->valuestring, message, sizeof(message))) {
+				dbg_delete_breakpoint(bp->no);
+				cJSON_AddBoolToObject(item, "verified", false);
+				cJSON_AddStringToObject(item, "message", message);
+				continue;
+			}
+		}
+
 		line_no = dsym_addr2line(symbols, page, addr);
 		cJSON_AddNumberToObject(item, "id", bp->no);
 		cJSON_AddBoolToObject(item, "verified", true);
