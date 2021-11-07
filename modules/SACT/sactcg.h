@@ -27,7 +27,8 @@
 #include "portab.h"
 #include "sact.h"
 
-extern cginfo_t *scg_loadcg_no(int no, boolean refinc);
+extern cginfo_t *scg_addref(int no);
+extern void scg_deref(cginfo_t *cg);
 extern int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate);
 extern int scg_create_reverse(int NumCG, int wNumSrcCG, int wReverseX, int wReverseY);
 extern int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG);
@@ -39,7 +40,6 @@ extern int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int
 extern int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
 extern int scg_freeall();
 extern int scg_free(int cg);
-extern int scg_free_cgobj(cginfo_t *cg);
 extern int scg_querytype(int wNumCG, int *ret);
 extern int scg_querysize(int wNumCG, int *w, int *h);
 extern int scg_querybpp(int wNumCG, int *ret);

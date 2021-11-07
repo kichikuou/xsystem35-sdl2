@@ -147,9 +147,9 @@ int sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	sp->no   = no;
 	
 	// set時点でのcgが使用される(draw時ではない)
-	if (cg1) sp->cg1 = scg_loadcg_no(cg1, TRUE); else sp->cg1 = NULL;
-	if (cg2) sp->cg2 = scg_loadcg_no(cg2, TRUE); else sp->cg2 = NULL;
-	if (cg3) sp->cg3 = scg_loadcg_no(cg3, TRUE); else sp->cg3 = NULL;
+	sp->cg1 = cg1 ? scg_addref(cg1) : NULL;
+	sp->cg2 = cg2 ? scg_addref(cg2) : NULL;
+	sp->cg3 = cg3 ? scg_addref(cg3) : NULL;
 	
 	//初期のcurcgはcg1
 	sp->curcg = sp->cg1;
@@ -238,11 +238,10 @@ int sp_new_msg(int no, int x, int y, int width, int height) {
 int sp_set_wall_paper(int no) {
 	sprite_t *sp = sact.sp[0];
 	
-	if (sp->curcg) {
-		scg_free_cgobj(sp->curcg);
-	}
+	if (sp->curcg)
+		scg_deref(sp->curcg);
 	
-	sp->curcg = no ? scg_loadcg_no(no, TRUE) : NULL;
+	sp->curcg = no ? scg_addref(no) : NULL;
 
 	if (sp->curcg) { // display specified CG
 		sp->update = DEFAULT_UPDATE;
@@ -287,9 +286,10 @@ int sp_free(int no) {
 	}
 	
 	// CGオブジェクトの削除
-	if (sp->cg1) scg_free_cgobj(sp->cg1);
-	if (sp->cg2) scg_free_cgobj(sp->cg2);
-	if (sp->cg3) scg_free_cgobj(sp->cg3);
+	if (sp->cg1) scg_deref(sp->cg1);
+	if (sp->cg2) scg_deref(sp->cg2);
+	if (sp->cg3) scg_deref(sp->cg3);
+	sp->cg1 = sp->cg2 = sp->cg3 = NULL;
 	
 	// remove時の処理があれば実行
 	if (sp->remove) {

@@ -27,7 +27,8 @@
 #include "portab.h"
 #include "night.h"
 
-extern cginfo_t *nt_scg_loadcg_no(int no, boolean refinc);
+extern cginfo_t *nt_scg_addref(int no);
+extern void nt_scg_deref(cginfo_t *cg);
 extern int nt_scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate);
 extern int nt_scg_create_reverse(int NumCG, int wNumSrcCG, int wReverseX, int wReverseY);
 extern int nt_scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG);
@@ -39,7 +40,6 @@ extern int nt_scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, 
 extern int nt_scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
 extern int nt_scg_freeall();
 extern int nt_scg_free(int cg);
-extern int nt_scg_free_cgobj(cginfo_t *cg);
 extern int nt_scg_querytype(int wNumCG, int *ret);
 extern int nt_scg_querysize(int wNumCG, int *w, int *h);
 extern int nt_scg_querybpp(int wNumCG, int *ret);
