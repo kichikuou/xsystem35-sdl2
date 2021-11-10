@@ -49,7 +49,6 @@ static struct {
 void dbg_init(const char *symbols_path, boolean use_dap) {
 	dbg_impl = use_dap ? &dbg_dap_impl : &dbg_cui_impl;
 	dbg_impl->init(symbols_path);
-	dbg_state = DBG_STOPPED_ENTRY;
 }
 
 void dbg_quit() {

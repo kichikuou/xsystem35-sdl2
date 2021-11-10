@@ -42,7 +42,12 @@ enum VariablesReference {
 	VREF_STRINGS,
 };
 
-static boolean initialized = false;
+static enum {
+	WAITING_LAUNCH,
+	WAITING_CONFIGURATIONDONE,
+	INITIALIZED
+} init_state = WAITING_LAUNCH;
+
 static char *src_dir;
 
 cJSON *create_source(const char *name) {
@@ -138,13 +143,16 @@ static void cmd_launch(cJSON *args, cJSON *resp) {
 	cJSON *srcDir = cJSON_GetObjectItemCaseSensitive(args, "srcDir");
 	if (cJSON_IsString(srcDir))
 		src_dir = strdup(srcDir->valuestring);
+	if (cJSON_IsTrue(cJSON_GetObjectItemCaseSensitive(args, "stopOnEntry")))
+		dbg_state = DBG_STOPPED_ENTRY;
 	cJSON_AddBoolToObject(resp, "success", true);
 
 	emit_initialized_event();
-	initialized = true;
+	init_state = WAITING_CONFIGURATIONDONE;
 }
 
 static void cmd_configurationDone(cJSON *args, cJSON *resp) {
+	init_state = INITIALIZED;
 	cJSON_AddBoolToObject(resp, "success", true);
 }
 
@@ -593,7 +601,7 @@ static void dbg_dap_init(const char *symbols_path) {
 
 	symbols = dsym_load(symbols_path);
 
-	while (!initialized) {
+	while (init_state != INITIALIZED) {
 		char *msg = cmdq_dequeue();
 		if (!msg)
 			break;

@@ -345,6 +345,7 @@ static void dbg_cui_init(const char *symbols_path) {
 	win_alloc_console();
 	win_set_ctrl_c_handler(sigint_handler);
 #endif
+	dbg_state = DBG_STOPPED_ENTRY;
 }
 
 static void dbg_cui_quit(void) {
