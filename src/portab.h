@@ -24,30 +24,26 @@
 #ifndef __PORTAB__
 #define __PORTAB__
 
+#include <stdbool.h>
+#include <stdint.h>
 #include "config.h"
 
 #define OK		0
 #define NG	      (-1)
-#define true            1
-#define false           0
 
 #ifndef FALSE
-#define FALSE           0
+#define FALSE false
 #undef  TRUE
-#define TRUE            1
+#define TRUE  true
 #endif
 
 #define min(x,y) ((x) < (y) ? (x) : (y))
 #define max(x,y) ((x) > (y) ? (x) : (y))
 
-typedef	unsigned char  ___BYTE;
-typedef	unsigned short ___WORD;
-#ifdef _WIN32
-typedef	unsigned long  ___DWORD;
-#else
-typedef	unsigned int   ___DWORD;
-#endif
-typedef _Bool          ___boolean;
+typedef uint8_t  ___BYTE;
+typedef uint16_t ___WORD;
+typedef uint32_t ___DWORD;
+typedef bool     ___boolean;
 
 #ifndef BYTE
 #define BYTE ___BYTE
