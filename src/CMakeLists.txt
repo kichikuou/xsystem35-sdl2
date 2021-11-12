@@ -1,6 +1,7 @@
 add_library(src_lib STATIC
   gameresource.c
   hankaku.c
+  msgqueue.c
   utfsjis.c
   )
 target_compile_options(src_lib PRIVATE -Wno-pointer-sign -Wall)
@@ -108,9 +109,11 @@ if (EMSCRIPTEN)
 
 elseif (ANDROID)
 
+  target_link_libraries(src_lib PRIVATE SDL2)
   target_link_libraries(xsystem35 PRIVATE SDL2 SDL2_ttf SDL2_mixer ${ndk_zlib} ${ndk_log})
 
 else()  # non-emscripten, non-android
+  target_link_libraries(src_lib PRIVATE PkgConfig::SDL2)
   target_link_libraries(xsystem35 PRIVATE m ZLIB::ZLIB)
   target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2)
   target_link_libraries(xsystem35 PRIVATE PkgConfig::SDL2TTF)

@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL_mutex.h>
 #include <SDL_thread.h>
 #ifdef _WIN32
 #include <fcntl.h>
@@ -31,6 +30,7 @@
 #include "debugger.h"
 #include "debugger_private.h"
 #include "debug_symbol.h"
+#include "msgqueue.h"
 #include "system.h"
 #include "nact.h"
 #include "variable.h"
@@ -49,6 +49,7 @@ static enum {
 } init_state = WAITING_LAUNCH;
 
 static char *src_dir;
+static struct msgq *queue;
 
 cJSON *create_source(const char *name) {
 	cJSON *source = cJSON_CreateObject();
@@ -516,55 +517,6 @@ static boolean handle_message(char *msg) {
 	return continue_repl;
 }
 
-struct cmdq_elem {
-	char *cmd;
-	struct cmdq_elem *next;
-};
-
-struct {
-	SDL_mutex *mutex;
-	SDL_cond *cond_nonempty;
-	struct cmdq_elem *head;
-	struct cmdq_elem *last;
-} cmd_queue;
-
-static boolean cmdq_isempty(void) {
-	return !cmd_queue.head;
-}
-
-static void cmdq_enqueue(char *cmd) {
-	struct cmdq_elem *e = malloc(sizeof(struct cmdq_elem));
-	e->cmd = cmd;
-	e->next = NULL;
-
-	SDL_LockMutex(cmd_queue.mutex);
-	if (!cmd_queue.head) {
-		cmd_queue.head = cmd_queue.last = e;
-	} else {
-		cmd_queue.last->next = e;
-		cmd_queue.last = e;
-	}
-	SDL_UnlockMutex(cmd_queue.mutex);
-	SDL_CondSignal(cmd_queue.cond_nonempty);
-}
-
-static char *cmdq_dequeue(void) {
-	SDL_LockMutex(cmd_queue.mutex);
-	while (!cmd_queue.head)
-		SDL_CondWait(cmd_queue.cond_nonempty, cmd_queue.mutex);
-
-	struct cmdq_elem *e = cmd_queue.head;
-	cmd_queue.head = e->next;
-	if (!e->next)
-		cmd_queue.last = NULL;
-
-	SDL_UnlockMutex(cmd_queue.mutex);
-
-	char *cmd = e->cmd;
-	free(e);
-	return cmd;
-}
-
 static int read_command_thread(void *data) {
 	int content_length = -1;
 	char header[512];
@@ -578,19 +530,18 @@ static int read_command_thread(void *data) {
 			}
 			char *buf = malloc(content_length);
 			fread(buf, content_length, 1, stdin);
-			cmdq_enqueue(buf);
+			msgq_enqueue(queue, buf);
 			content_length = -1;
 		} else {
 			fprintf(stderr, "Unknown Debug Adapter Protocol header: %s", header);
 		}
 	}
-	cmdq_enqueue(NULL);  // EOF
+	msgq_enqueue(queue, NULL);  // EOF
 	return 0;
 }
 
 static void dbg_dap_init(const char *symbols_path) {
-	cmd_queue.mutex = SDL_CreateMutex();
-	cmd_queue.cond_nonempty = SDL_CreateCond();
+	queue = msgq_new();
 
 #ifdef _WIN32
 	_setmode(_fileno(stdin), _O_BINARY);
@@ -602,7 +553,7 @@ static void dbg_dap_init(const char *symbols_path) {
 	symbols = dsym_load(symbols_path);
 
 	while (init_state != INITIALIZED) {
-		char *msg = cmdq_dequeue();
+		char *msg = msgq_dequeue(queue);
 		if (!msg)
 			break;
 		handle_message(msg);
@@ -619,7 +570,7 @@ static void dbg_dap_repl(void) {
 
 	boolean continue_repl = true;
 	while (continue_repl) {
-		char *msg = cmdq_dequeue();
+		char *msg = msgq_dequeue(queue);
 		if (!msg)
 			break;
 		continue_repl = handle_message(msg);
@@ -627,8 +578,8 @@ static void dbg_dap_repl(void) {
 }
 
 static void dbg_dap_onsleep(void) {
-	while (!cmdq_isempty()) {
-		char *msg = cmdq_dequeue();
+	while (!msgq_isempty(queue)) {
+		char *msg = msgq_dequeue(queue);
 		if (!msg)
 			break;
 		handle_message(msg);
