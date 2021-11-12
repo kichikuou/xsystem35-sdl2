@@ -44,7 +44,7 @@ extern void sdl_getWindowInfo(DispInfo *info);
 extern void sdl_setFullscreen(boolean on);
 extern boolean sdl_isFullscreen(void);
 extern agsurface_t *sdl_getDIB(void);
-extern void sdl_setIntegerScaling(boolean bool);
+extern void sdl_setIntegerScaling(boolean enable);
 
 /* 画面更新 */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);
@@ -97,7 +97,7 @@ extern boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage,  TCur
 extern int  sdl_getKeyInfo();
 extern int  sdl_getMouseInfo(MyPoint *p);
 extern int  sdl_getJoyInfo(void);
-extern void sdl_setAutoRepeat(boolean bool);
+extern void sdl_setAutoRepeat(boolean enable);
 extern MyPoint sdl_translateMouseCoords(int x, int y);
 
 /* misc */

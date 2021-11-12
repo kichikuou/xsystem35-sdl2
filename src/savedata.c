@@ -636,7 +636,6 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 static int loadSysVar(char *buf) {
 	int i, cnt;
 	int  *var;
-	int bool;
 	WORD *data;
 	Ald_sysVarHdr *head = (Ald_sysVarHdr *)buf;
 	int page = head->pageNo;
@@ -659,8 +658,7 @@ static int loadSysVar(char *buf) {
 			return SAVE_LOADERR;
 			*/
 			
-			bool = v_allocateArrayBuffer(page, cnt, TRUE);
-			if (!bool) {
+			if (!v_allocateArrayBuffer(page, cnt, TRUE)) {
 				fprintf(stderr, "v_allocateArrayBuffer fail\n");
 				return SAVE_LOADERR;
 			}

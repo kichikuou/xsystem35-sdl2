@@ -153,7 +153,7 @@ extern boolean ags_check_param_xy(int *x, int *y);
 extern agsurface_t *ags_getDIB();
 
 /* 画面更新 */
-extern void ags_setExposeSwitch(boolean bool);
+extern void ags_setExposeSwitch(boolean expose);
 extern void ags_updateFull(void);
 extern void ags_updateArea(int x, int y, int width, int height);
 
@@ -230,7 +230,7 @@ extern int  ags_getCursorMoveTime();
 extern void    ags_setAntialiasedStringMode(boolean mode);
 extern boolean ags_getAntialiasedStringMode();
 extern void    ags_fader(ags_faderinfo_t *);
-extern void    ags_autorepeat(boolean bool);
+extern void    ags_autorepeat(boolean enable);
 
 #define RMASK16 0xf800
 #define GMASK16 0x07e0

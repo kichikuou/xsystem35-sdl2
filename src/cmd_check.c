@@ -177,7 +177,6 @@ void exec_command(void) {
 	DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
 
 	int page, index;
-	int bool;
 	int c0 = sl_getc();
 
 	if (c0 == BREAKPOINT)
@@ -1194,13 +1193,13 @@ void exec_command(void) {
 		/* puts("選択"); */
 		sel_select();
 		break;
-	case '{':
-		/* puts("条件文"); */
-		bool = getCaliValue();
-		index = sl_getaddr();
-		if (bool == 0) {
-			sl_jmpNear(index);
-		} 
+	case '{':  // conditional statement
+		{
+			int cond = getCaliValue();
+			index = sl_getaddr();
+			if (!cond)
+				sl_jmpNear(index);
+		}
 		break;
 	case '~':
 		/* label far call */

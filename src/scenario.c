@@ -253,33 +253,23 @@ void sl_retNear(void) {
 }
 
 void sl_callFar(int page) {
-	int val[2];
-	boolean bool;
-
-	val[0] = sl_page;
-	val[1] = sl_index;
+	int val[2] = { sl_page, sl_index };
 	sl_push(STACK_FARJMP, val, 2);
-	bool = sl_jmpFar(page);
+	boolean ok = sl_jmpFar(page);
 	pageCallCnt++;
 	labelCallCnt_afterPageCall = 0;
-	if (!bool) {
+	if (!ok)
 		sl_retFar();
-	}
 }
 
 void sl_callFar2(int page, int address) {
-	int val[2];
-	boolean bool;
-	
-	val[0] = sl_page;
-	val[1] = sl_index;
+	int val[2] = { sl_page, sl_index };
 	sl_push(STACK_FARJMP, val, 2);
-	bool = sl_jmpFar2(page, address);
+	boolean ok = sl_jmpFar2(page, address);
 	labelCallCnt_afterPageCall = 0;
 	pageCallCnt++;
-	if (!bool) {
+	if (!ok)
 		sl_retFar();
-	}
 }
 
 void sl_retFar(void) {

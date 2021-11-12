@@ -191,8 +191,8 @@ void ags_getWindowInfo(DispInfo *info) {
 	sdl_getWindowInfo(info);
 }
 
-void ags_setExposeSwitch(boolean bool) {
-	need_update = bool;
+void ags_setExposeSwitch(boolean expose) {
+	need_update = expose;
 }
 
 void ags_updateArea(int x, int y, int w, int h) {
@@ -767,6 +767,6 @@ agsurface_t *ags_getDIB() {
 	return nact->ags.dib;
 }
 
-void ags_autorepeat(boolean bool) {
-	sdl_setAutoRepeat(bool);
+void ags_autorepeat(boolean enable) {
+	sdl_setAutoRepeat(enable);
 }

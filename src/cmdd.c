@@ -31,12 +31,9 @@ void commandDC() {
 	int page = getCaliValue();
 	int maxindex = getCaliValue();
 	int save = getCaliValue();
-	boolean bool;
 	
-	bool = v_allocateArrayBuffer(page, maxindex + 1, save == 0 ? false : true);
-	if(!bool) {
+	if (!v_allocateArrayBuffer(page, maxindex + 1, save == 0 ? false : true))
 		WARNING("commandDC(): Array allocate failed\n");
-	}
 	DEBUG_COMMAND("DC %d,%d,%d:\n", page, maxindex, save);
 }
 
@@ -57,11 +54,9 @@ void commandDS() {
 	int varno      = preVarNo;
 	int offset     = getCaliValue();
 	int page       = getCaliValue();
-	boolean bool;
 	
 	DEBUG_COMMAND("DS %p,%p,%d,%d:\n",point_var, data_var, offset, page);
-	bool = v_defineArrayVar(varno, point_var, offset, page);
-	if (!bool) {
+	if (!v_defineArrayVar(varno, point_var, offset, page)) {
 		WARNING("commandDS(): Array allocate failed\n");
 		WARNING("if you are playing 'Pastel Chime', please patch to scenario(see patch/README.TXT for detail)\n");
 	}

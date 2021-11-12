@@ -225,8 +225,8 @@ agsurface_t *sdl_getDIB(void) {
 }
 
 /* AutoRepeat の設定 */
-void sdl_setAutoRepeat(boolean bool) {
-	if (bool) {
+void sdl_setAutoRepeat(boolean enable) {
+	if (enable) {
 		// SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	} else {
 		// SDL_EnableKeyRepeat(0, 0);
@@ -277,8 +277,8 @@ void sdl_setJoyDeviceIndex(int index) {
 	joy_device_index = index;
 }
 
-void sdl_setIntegerScaling(boolean bool) {
-	integer_scaling = bool;
+void sdl_setIntegerScaling(boolean enable) {
+	integer_scaling = enable;
 }
 
 #ifdef __EMSCRIPTEN__
