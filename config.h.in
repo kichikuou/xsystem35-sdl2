@@ -24,8 +24,6 @@
 #cmakedefine MIDI_DEVICE "@MIDI_DEVICE@"
 #cmakedefine SEQ_DEVICE "@SEQ_DEVICE@"
 
-#cmakedefine QUIET_MIDI @QUIET_MIDI@
-
 #cmakedefine HAVE_GETLOGIN @HAVE_GETLOGIN@
 #cmakedefine HAVE_JPEG @HAVE_JPEG@
 #cmakedefine HAVE_MMAP @HAVE_MMAP@

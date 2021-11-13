@@ -161,7 +161,6 @@ else()
     list(APPEND SUMMARY_MIDI "raw")
     set(MIDI_DEVICE "/dev/midi" CACHE STRING "midi device")
     set(ENABLE_MIDI_RAWMIDI 1)
-    option(QUIET_MIDI "No display midi stdout" OFF)
   endif()
 
   if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")

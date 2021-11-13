@@ -40,5 +40,6 @@ struct msgq *msgq_new(void);
 void msgq_free(struct msgq *q);
 void msgq_enqueue(struct msgq *q, void *msg);
 void *msgq_dequeue(struct msgq *q);
+void *msgq_dequeue_timeout(struct msgq *q, uint32_t timeout_ms);
 
 #endif // __MSGQUEUE_H__

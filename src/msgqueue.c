@@ -70,3 +70,26 @@ void *msgq_dequeue(struct msgq *q) {
 	free(e);
 	return msg;
 }
+
+void *msgq_dequeue_timeout(struct msgq *q, uint32_t timeout_ms) {
+	SDL_LockMutex(q->mutex);
+
+	while (!q->head && SDL_CondWaitTimeout(q->cond_nonempty, q->mutex, timeout_ms) == 0)
+		;
+
+	if (!q->head) {  // timed out
+		SDL_UnlockMutex(q->mutex);
+		return NULL;
+	}
+
+	struct msgq_elem *e = q->head;
+	q->head = e->next;
+	if (!e->next)
+		q->last = NULL;
+
+	SDL_UnlockMutex(q->mutex);
+
+	void *msg = e->msg;
+	free(e);
+	return msg;
+}
