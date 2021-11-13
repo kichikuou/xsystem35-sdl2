@@ -20,20 +20,63 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <time.h>
 #include <sys/time.h>
-#include <pthread.h>
+#include <SDL_thread.h>
+#include <portmidi.h>
 
 #include "system.h"
 #include "counter.h"
+#include "midi.h"
+#include "midifile.h"
 
-#include "midi.portmidi.h"
+struct _midiflag {
+	char midi_variable[128];
+	char midi_flag[128];
+};
+
+typedef struct _midiflag midiflag_t;
+typedef struct midievent midievent_t;
+
+static int midi_thread(void *);
+
+static int midi_initialize(char *devnm, int subdev);
+static int midi_exit();
+static int midi_start(int no, int loop, char *data, int datalen);
+static int midi_stop();
+static int midi_pause();
+static int midi_unpause();
+static int midi_getpos(midiplaystate *st);
+static int midi_getflag(int mode, int idx);
+static int midi_setflag(int mode, int idx, int val);
+
+static void midi_allnotesoff();
+static void midi_reset();
+static void midi_settempo(midievent_t event);
+static void midi_sync(midievent_t event);
+
+mididevice_t midi_portmidi = {
+	midi_initialize,
+	midi_exit,
+	midi_start,
+	midi_stop,
+	midi_pause,
+	midi_unpause,
+	midi_getpos,
+	midi_getflag,
+	midi_setflag,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
 
 static PortMidiStream *stream;
 static struct midiinfo *midi;
 static midiflag_t *flags;
 static int counter;
 
-static pthread_t thread;
+static SDL_Thread *thread;
 static boolean thread_running = FALSE;
 static boolean should_stop    = FALSE;
 static boolean should_pause   = FALSE;
@@ -97,8 +140,8 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 		return NG;
 	}
 
-	int err = pthread_create(&thread, NULL, midi_thread, NULL);
-	if (err) {
+	thread = SDL_CreateThread(midi_thread, "PortMIDI", NULL);
+	if (!thread) {
 		WARNING("could not create midi thread\n");
 		return NG;
 	}
@@ -110,7 +153,8 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 static int midi_stop() {
 	NOTICE("midi_stop\n");
 	should_stop = TRUE;
-	pthread_join(thread, NULL);
+	SDL_WaitThread(thread, NULL);
+	thread = NULL;
 	return OK;
 }
 
@@ -283,7 +327,7 @@ static void midi_handlesys35(midievent_t event) {
 	}
 }
 
-static void *midi_thread(void *args) {
+static int midi_thread(void *args) {
 	thread_running = TRUE;
 	NOTICE("midi_thread started\n");
 
@@ -366,5 +410,5 @@ static void *midi_thread(void *args) {
 	should_stop = FALSE;
 	thread_running = FALSE;
 	NOTICE("midi_thread done.\n");
-	pthread_exit(NULL);
+	return 0;
 }

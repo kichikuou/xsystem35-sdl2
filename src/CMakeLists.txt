@@ -130,6 +130,9 @@ else()  # non-emscripten, non-android
       target_link_libraries(xsystem35 PRIVATE ${cJSON})
     endif()
   endif()
+  if (ENABLE_MIDI_PORTMIDI)
+    target_link_libraries(xsystem35 PRIVATE ${PORTMIDI})
+  endif()
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)
 
