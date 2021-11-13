@@ -64,7 +64,8 @@ static void move_drain(sprite_t *sp) {
 	sact.teventremovelist = slist_append(sact.teventremovelist, sp);
 	
 	sp->move.moving = FALSE;
-	sp->move.time = 0; // 移動時間の初期化
+	if (sp->move.speed > 0)
+		sp->move.time = 0;
 }
 
 // SP_MOVE の timer event callback
@@ -114,15 +115,18 @@ static int move_cb(sprite_t *sp, agsevent_t *e) {
 void spev_move_setup(void* data, void* userdata) {
 	sprite_t *sp = (sprite_t *)data;
 	
-	// 非表示のものは移動しない(いいのかな)
-	if (!sp->show) return;
+	// Hidden sprite just moves to its final location.
+	if (!sp->show) {
+		sp->cur = sp->loc = sp->move.to;
+		return;
+	}
 	
 	// move 開始時刻の記録
 	sp->move.starttime = sact.movestarttime;
 	sp->move.moving = TRUE;
 	
 	// MOVE_SPEED で設定した場合は、移動量を考慮して移動時間を決定
-	if (sp->move.time == -1) {
+	if (sp->move.speed > 0) {
 		// speed から timeへ
 		int dx = sp->move.to.x - sp->loc.x;
 		int dy = sp->move.to.y - sp->loc.y;
@@ -155,7 +159,7 @@ void spev_move_waitend(sprite_t *sp, int dx, int dy, int time) {
 	sp->move.to.x = dx;
 	sp->move.to.y = dy;
 	sp->move.speed = time;
-	sp->move.time = -1;
+	sp->move.time = 0;
 	
 	sact.movelist = slist_append(sact.movelist, sp);
 	sact.movestarttime = get_high_counter(SYSTEMCOUNTER_MSEC);

@@ -363,10 +363,8 @@ int sp_set_move(int wNum, int wX, int wY) {
 	sp->move.to.x = wX - sact.origin.x;
 	sp->move.to.y = wY - sact.origin.y;
 	
-	if (sp->move.time == 0) {
-		sp->move.time = -1;
+	if (!sp->move.time && !sp->move.speed)
 		sp->move.speed = 100;
-	}
 	
 	sp->cur = sp->loc;
 	
@@ -382,17 +380,18 @@ int sp_set_movetime(int wNum, int wTime) {
 	sp_assert_no(wNum);
 	
 	sact.sp[wNum]->move.time = wTime * 10;
+	sact.sp[wNum]->move.speed = 0;
 	return OK;
 }
 
 // スプライト移動速度の設定
-int sp_set_movespeed(int wNum, int wTime) {
+int sp_set_movespeed(int wNum, int wSpeed) {
 	sp_assert_no(wNum);
 	
-	if (wTime == 0) wTime = 1;
+	if (wSpeed == 0) wSpeed = 1;
 	
-	sact.sp[wNum]->move.speed = wTime ;
-	sact.sp[wNum]->move.time = -1;
+	sact.sp[wNum]->move.speed = wSpeed;
+	sact.sp[wNum]->move.time = 0;
 	
 	return OK;
 }
