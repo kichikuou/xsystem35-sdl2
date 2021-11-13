@@ -30,12 +30,11 @@
 #include "midi.h"
 #include "midifile.h"
 
-struct _midiflag {
+static struct {
 	char midi_variable[128];
 	char midi_flag[128];
-};
+} flags;
 
-typedef struct _midiflag midiflag_t;
 typedef struct midievent midievent_t;
 
 static int midi_thread(void *);
@@ -73,7 +72,6 @@ mididevice_t midi_portmidi = {
 
 static PortMidiStream *stream;
 static struct midiinfo *midi;
-static midiflag_t *flags;
 static int counter;
 
 static SDL_Thread *thread;
@@ -189,11 +187,11 @@ static int midi_getflag(int mode, int idx) {
 	NOTICE("midi_getflag: %i = %i\n", mode, idx);
 	if (mode == 0) {
 		/* flag */
-		return flags->midi_flag[idx];
+		return flags.midi_flag[idx];
 	}
 	else {
 		/* variable */
-		return flags->midi_variable[idx];
+		return flags.midi_variable[idx];
 	}
 }
 
@@ -201,11 +199,11 @@ static int midi_setflag(int mode, int idx, int val) {
 	NOTICE("midi_setflag: %i %i = %i\n", mode, idx, val);
 	if (mode == 0) {
 		/* flag */
-		return flags->midi_flag[idx] = val;
+		return flags.midi_flag[idx] = val;
 	}
 	else {
 		/* variable */
-		flags->midi_variable[idx] = val;
+		flags.midi_variable[idx] = val;
 	}
 
 	return OK;
@@ -288,12 +286,12 @@ static void midi_handlesys35(midievent_t event) {
 	case 2:
 		/* set flag */
 		NOTICE("set flag %i = %i\n", vn2, vn3);
-		flags->midi_flag[vn2] = vn3;
+		flags.midi_flag[vn2] = vn3;
 		pc += 6;
 		break;
 	case 3:
 		/* flag jump */
-		if (flags->midi_flag[vn2] == 1) {
+		if (flags.midi_flag[vn2] == 1) {
 			pc = midi->sys35_label[vn3];
 			tick = ctick = event.ctime;
 			midi_allnotesoff();
@@ -306,12 +304,12 @@ static void midi_handlesys35(midievent_t event) {
 	case 4:
 		/* set variable */
 		NOTICE("set var %i = %i\n", vn2, vn3);
-		flags->midi_variable[vn2] = vn3;
+		flags.midi_variable[vn2] = vn3;
 		pc += 6;
 		break;
 	case 5:
 		/* variable jump */
-		if (--(flags->midi_variable[vn2]) == 0) {
+		if (--(flags.midi_variable[vn2]) == 0) {
 			pc = midi->sys35_label[vn3];
 			tick = ctick = event.ctime;
 			midi_allnotesoff();
