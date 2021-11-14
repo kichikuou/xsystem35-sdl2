@@ -80,7 +80,6 @@ static void cb_defocused_swsp(void* s, void* data);
 static int  cb_focused(sprite_t *sp);
 static int  cb_defocused(sprite_t *sp);
 static void cb_waitkey_simple(agsevent_t *e);
-static void cb_waitkey_sprite(agsevent_t *e);
 static void cb_waitkey_selection(agsevent_t *e);
 
 /*

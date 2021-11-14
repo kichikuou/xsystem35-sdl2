@@ -108,6 +108,7 @@ void sys_addMsg(const char *str) {
 	}
 }
 
+EMSCRIPTEN_KEEPALIVE
 void nact_main() {
 	reset_counter_high(SYSTEMCOUNTER_MSEC, 1, 0);
 
