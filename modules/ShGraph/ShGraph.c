@@ -35,7 +35,6 @@
 #include "modules.h"
 #include "nact.h"
 #include "ags.h"
-#include "counter.h"
 #include "music.h"
 #include "sdl_core.h"
 
@@ -466,7 +465,7 @@ static void PlayAnimeData() {
 	dib = ags_getDIB();
 	
 	for (loop = 0; loop < p1; loop++) {
-		int cnt = get_high_counter(SYSTEMCOUNTER_MSEC);
+		int cnt = sdl_getTicks();
 		is_backcopied = FALSE;
 		
 		for (i = 0; i < SLOT; i++) {
@@ -543,7 +542,7 @@ static void PlayAnimeData() {
 		if (is_backcopied && !SDL_RectEmpty(&maprect))
 			ags_updateArea(maprect.x, maprect.y, maprect.w, maprect.h);
 
-		int now = get_high_counter(SYSTEMCOUNTER_MSEC);
+		int now = sdl_getTicks();
 		if (now - cnt < interval) {
 			sdl_sleep(interval - (now-cnt));
 		}

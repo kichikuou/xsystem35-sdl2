@@ -37,7 +37,6 @@
 #include "sprite.h"
 #include "surface.h"
 #include "sactcg.h"
-#include "counter.h"
 #include "sdl_core.h"
 
 
@@ -422,15 +421,15 @@ int sp_eupdate(int type, int time, int cancel) {
 		ec19_prepare(sfsrc, sfdst);
 	}
 	
-	ecp.sttime = ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time*10;
 	ecp.oldstep = 0;
 	
-	while ((ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < ecp.edtime) {
+	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
 		int rest;
 		
 		(*cb[type-1])(sfsrc, sfdst);
-		rest = 15 - (get_high_counter(SYSTEMCOUNTER_MSEC) - ecp.curtime);
+		rest = 15 - (sdl_getTicks() - ecp.curtime);
 		key = sys_keywait(rest, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		
 		if (cancel && key) break;

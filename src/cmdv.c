@@ -31,7 +31,6 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "ags.h"
-#include "counter.h"
 #include "input.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -772,7 +771,7 @@ void commandVA() { /* from Panyo */
 			/* 開始 (p3=コマ数,0:無限(開始位置==終了位置のとき))*/
 			inAnimation = TRUE;
 			VAcmd[p1].elaspCut  = 0;
-			VAcmd[p1].startTime = get_high_counter(SYSTEMCOUNTER_MSEC);
+			VAcmd[p1].startTime = sdl_getTicks();
 			VAcmd[p1].totalCut  = p3;
 			
 			if (p3 == 0) {
@@ -1015,7 +1014,7 @@ static void va_animationAlone(int i) {
 static void va_update() {
 	boolean proceeding = FALSE;
 	int i;
-	int curTime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	int curTime = sdl_getTicks();
 	
 	for (i = 0; i < VACMD_MAX; i++) {
 		if (VAcmd[i].state == VA_RUNNING) {

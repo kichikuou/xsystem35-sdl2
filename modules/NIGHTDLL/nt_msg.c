@@ -6,7 +6,7 @@
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "utfsjis.h"
 #include "ags.h"
 #include "nact.h"
@@ -241,7 +241,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 		char mbuf[20];
 		int cw, delta, wcnt;
 		
-		wcnt = get_high_counter(SYSTEMCOUNTER_MSEC);
+		wcnt = sdl_getTicks();
 		
 		mbuf[0] = '\0';
 		msg = get_char(msg, mbuf, sizeof(mbuf) -1); 
@@ -272,7 +272,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 			needupdate = FALSE;
 			
 			// keywait
-			delta = get_high_counter(SYSTEMCOUNTER_MSEC) - wcnt;
+			delta = sdl_getTicks() - wcnt;
 			if (delta < wSpeed) {
 				if (sys_keywait(wSpeed - delta, KEYWAIT_NONCANCELABLE)) {
 					
@@ -313,14 +313,14 @@ static int ntmsg_keywait() {
 	night.waitkey = -1;
 	
 	while (night.waitkey == -1 && !nact->is_quit) {
-		int st = get_high_counter(SYSTEMCOUNTER_MSEC);
+		int st = sdl_getTicks();
 		int interval = 25;
 		
 		if (!night.zhiding) {
 			interval = night.sp[SPNO_MSG_KEYANIM]->u.anime.interval;
 			hakanim(i++);
 		} 
-		sys_keywait(interval - (get_high_counter(SYSTEMCOUNTER_MSEC) - st), KEYWAIT_NONCANCELABLE);
+		sys_keywait(interval - (sdl_getTicks() - st), KEYWAIT_NONCANCELABLE);
 	}
 	
 	night.waittype = KEYWAIT_NONE;

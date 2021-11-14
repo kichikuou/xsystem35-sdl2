@@ -35,7 +35,7 @@
 #include "music_pcm.h"
 #include "music_private.h"
 #include "pcm.sdlmixer.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "nact.h"
 #include "LittleEndian.h"
 #include "mmap.h"
@@ -211,7 +211,7 @@ int muspcm_start(int slot, int loop) {
 		return NG;
 	
 	obj->playing = TRUE;
-	obj->start_time = get_high_counter(SYSTEMCOUNTER_MSEC);
+	obj->start_time = sdl_getTicks();
 	return OK;
 }
 
@@ -289,7 +289,7 @@ int muspcm_getpos(int slot) {
 	if (!obj->playing) return 0;
 	
 	long len = obj->chunk->alen * 1000 / (44100 * 4);
-	int pos = get_high_counter(SYSTEMCOUNTER_MSEC) - obj->start_time;
+	int pos = sdl_getTicks() - obj->start_time;
 	if (pos == 0)
 		pos = 1;  // because 0 means "not playing"
 	if (pos > len)

@@ -26,11 +26,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL_timer.h>
 #include <SDL_mixer.h>
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
 #include "cdrom.h"
 #include "music_private.h"
 
@@ -86,7 +86,7 @@ static char         *playlist[PLAYLIST_MAX];
 static int          lastindex; // 最終トラック番号
 static Mix_Music    *mix_music;
 static int          trackno; // 現在演奏中のトラック
-static int          counter; // 演奏時間測定用カウンタ
+static int          start_time;
 
 static int cdrom_init(char *config_file) {
 	char lbuf[256];
@@ -131,7 +131,6 @@ static int cdrom_init(char *config_file) {
 	trackno = 0;
 	prv.cd_maxtrk = lastindex;
 	
-	reset_counter_high(SYSTEMCOUNTER_MP3, 10, 0);
 	enabled = TRUE;
 
 	NOTICE("cdrom mp3 external player mode\n");
@@ -179,7 +178,7 @@ static int cdrom_start(int trk, int loop) {
 	}
 
 	trackno = trk;
-	counter = get_high_counter(SYSTEMCOUNTER_MP3);
+	start_time = SDL_GetTicks();
 	
 	return OK;
 }
@@ -206,12 +205,12 @@ static int cdrom_getPlayingInfo (cd_time *inf) {
 		mix_music = NULL;
 		return NG;
 	}
-	int cnt = get_high_counter(SYSTEMCOUNTER_MP3) - counter;
+	int ms = SDL_GetTicks() - start_time;
 	
 	inf->t = trackno;
-	inf->m = cnt / (60*100); cnt %= (60*100); 
-	inf->s = cnt / 100;      cnt %= 100;
-	inf->f = (cnt * CD_FPS) / 100;
+	inf->m = ms / (60*1000); ms %= (60*1000);
+	inf->s = ms / 1000;      ms %= 1000;
+	inf->f = (ms * CD_FPS) / 1000;
 	
 	return OK;
 }

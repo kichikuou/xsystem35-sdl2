@@ -23,10 +23,10 @@
 #include <time.h>
 #include <sys/time.h>
 #include <SDL_thread.h>
+#include <SDL_timer.h>
 #include <portmidi.h>
 
 #include "system.h"
-#include "counter.h"
 #include "midi.h"
 #include "midifile.h"
 
@@ -72,7 +72,7 @@ mididevice_t midi_portmidi = {
 
 static PortMidiStream *stream;
 static struct midiinfo *midi;
-static int counter;
+static int start_time;
 
 static SDL_Thread *thread;
 static boolean thread_running = FALSE;
@@ -83,7 +83,6 @@ static boolean should_loop    = FALSE;
 
 static int midi_initialize(char *devnm, int subdev) {
 	NOTICE("midi_initialize: devnm = [%s] subdev = [%i]\n", devnm, subdev);
-	reset_counter_high(SYSTEMCOUNTER_MIDI, 10, 0);
 	PmError err;
 
 	if ((err = Pm_Initialize()) != pmNoError) {
@@ -144,7 +143,7 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 		return NG;
 	}
 
-	counter = get_high_counter(SYSTEMCOUNTER_MIDI);
+	start_time = SDL_GetTicks();
 	return OK;
 }
 
@@ -176,9 +175,8 @@ static int midi_getpos(midiplaystate *st) {
 		return OK;
 	}
 
-	int cnt = get_high_counter(SYSTEMCOUNTER_MIDI) - counter;
 	st->in_play = TRUE;
-	st->loc_ms = cnt * 10;
+	st->loc_ms = SDL_GetTicks() - start_time;
 
 	return OK;
 }

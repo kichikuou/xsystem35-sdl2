@@ -29,7 +29,7 @@
 #include "counter.h"
 #include "nact.h"
 
-#define HICOUNTER_MAX (256 + EXTER_HIGHTCOUNTER_NUM)
+#define HICOUNTER_MAX 256
 static struct timeval tv_base;
 static int counter_init = 0;
 

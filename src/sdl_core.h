@@ -103,6 +103,7 @@ extern MyPoint sdl_translateMouseCoords(int x, int y);
 /* misc */
 extern void sdl_mainIteration();
 extern boolean RawKeyInfo[];
+extern uint32_t sdl_getTicks(void);
 extern void sdl_sleep(int msec);
 extern void sdl_wait_vsync();
 extern boolean sdl_inputString(struct inputstring_param *);

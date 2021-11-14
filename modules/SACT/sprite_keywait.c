@@ -29,7 +29,7 @@
 #include "portab.h"
 #include "system.h"
 #include "list.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "ags.h"
 #include "nact.h"
 #include "input.h"
@@ -69,7 +69,7 @@ static void hidesprite(sprite_t *sp) {
    スプライトがドロップされた時の各種処理を含む
 */
 static boolean waitcond(int endtime) {
-	int curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	int curtime = sdl_getTicks();
 	if (curtime >= endtime) return TRUE;
 	
 	if (sact.dropped) {
@@ -146,7 +146,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	}
 	
 	// 終了時間の計算
-	curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	curtime = sdl_getTicks();
 	endtime = timeout < 0 ? INT_MAX : (curtime + timeout * 10);
 	
 	// スプライトキー待ちメイン

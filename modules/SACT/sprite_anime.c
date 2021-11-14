@@ -28,7 +28,7 @@
 #include "portab.h"
 #include "system.h"
 #include "ags.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "sact.h"
 #include "sprite.h"
 
@@ -44,7 +44,7 @@ static int eventCB_ANIM(sprite_t *sp, agsevent_t *e) {
 	if (e->type != AGSEVENT_TIMER) return 0;
 	
 	// 現在時刻の取得
-	now = get_high_counter(SYSTEMCOUNTER_MSEC);
+	now = sdl_getTicks();
 	
 	// 指定時間までスキップ
 	if ((now - sp->u.anime.starttime) < sp->u.anime.interval) return 0;
@@ -85,7 +85,7 @@ int sp_anime_setup(sprite_t *sp) {
 	int n = 0;
 	
 	sp->u.anime.interval = 500; // デフォルトの間隔 0.5秒
-	sp->u.anime.starttime = get_high_counter(SYSTEMCOUNTER_MSEC); // 開始時刻
+	sp->u.anime.starttime = sdl_getTicks(); // 開始時刻
 	sp->u.anime.tick = 0;      // カウンタ初期化
 	
 	// アニメパターンはいくつあるか

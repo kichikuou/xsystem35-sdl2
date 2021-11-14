@@ -6,7 +6,7 @@
 #include "system.h"
 #include "surface.h"
 // #include "gleffectcopy.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "ags.h"
 #include "input.h"
 #include "graph.h"
@@ -52,10 +52,6 @@ static void ec11_cb(int step);
 static void ec11_prepare(void);
 static void ec12_cb(int step);
 static void ec13_cb(int step);
-
-static int get_ecounter(void) {
-	return get_high_counter(SYSTEMCOUNTER_MSEC);
-}
 
 #if 0
 void gle_set_check_clik() {
@@ -255,13 +251,13 @@ static void ec5_cb(int step) {
 
 #define EC_WAIT                                               \
 	if ((key |= sys_getInputInfo()) && ecp.cancel) break; \
-	key = sys_keywait(cnt - get_ecounter(), ecp.cancel);
+	key = sys_keywait(cnt - sdl_getTicks(), ecp.cancel);
 
 static void ec7_cb() {
 	int i, j, y, key = 0, cnt;
 	int waitcnt = ecp.time == 0 ? 40 : (ecp.time/60);
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < ECA7_D + ecp.h / ECA7_D -1; i++) {
 		cnt += waitcnt;
 		for (j = 0; j < min(i + 1, ECA7_D); j++) {

@@ -28,7 +28,7 @@
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "ags.h"
 #include "graphics.h"
 #include "sact.h"
@@ -95,7 +95,7 @@ int sp_update_all(boolean syncscreen) {
 	// スプライト移動がある場合は移動開始
 	if (sact.movelist) {
 		// 移動開始時間を合わせる
-		sact.movestarttime = get_high_counter(SYSTEMCOUNTER_MSEC);
+		sact.movestarttime = sdl_getTicks();
 		slist_foreach(sact.movelist, spev_move_setup, NULL);
 		slist_free(sact.movelist);
 		sact.movelist = NULL;

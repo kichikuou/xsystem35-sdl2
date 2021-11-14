@@ -30,7 +30,7 @@
 #include "system.h"
 #include "surface.h"
 #include "music.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "ngraph.h"
 #include "input.h"
 
@@ -81,18 +81,18 @@ void ndd_run(int demonum) {
 	while (sys_getInputInfo());
 	
 	mus_bgm_play(ndemo_mus[demonum], 0, 100);
-	start = get_high_counter(SYSTEMCOUNTER_MSEC);
+	start = sdl_getTicks();
 	ct = 0;
 	for (i = 0; i <= ndemo_nums[demonum];) {
 		int offset;
-		int cur1, cur = get_high_counter(SYSTEMCOUNTER_MSEC);
+		int cur1, cur = sdl_getTicks();
 		
 		offset = alk->offset[i];
 		
 		jpeg2surface(fp, offset); ct++;
 		ags_updateFull();
 		
-		cur1 = get_high_counter(SYSTEMCOUNTER_MSEC);
+		cur1 = sdl_getTicks();
 		if (cur1 - cur < 33) {
 			if (sys_keywait(33 - (cur1 - cur), KEYWAIT_CANCELABLE)) break;
 		} else {

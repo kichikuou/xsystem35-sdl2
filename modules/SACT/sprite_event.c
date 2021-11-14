@@ -27,7 +27,7 @@
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "menu.h"
 #include "input.h"
 #include "nact.h"
@@ -211,7 +211,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	switch (e->type) {
 	case AGSEVENT_KEY_PRESS:
 		if (e->d3 == KEY_Z) {
-			cur = get_high_counter(SYSTEMCOUNTER_MSEC);
+			cur = sdl_getTicks();
 			if (!sact.zhiding) {
 				slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
 				sact.zhiding = TRUE;
@@ -242,7 +242,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	case AGSEVENT_KEY_RELEASE:
 		switch(e->d3) {
 		case KEY_Z:
-			cur = get_high_counter(SYSTEMCOUNTER_MSEC);
+			cur = sdl_getTicks();
 			if (500 < (cur - sact.zofftime) || !sact.zdooff) {
 				slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
 				sact.zhiding = FALSE;

@@ -50,7 +50,6 @@
 #include "midi.h"
 #include "music_private.h"
 #include "midifile.h"
-#include "counter.h"
 #include "msgqueue.h"
 
 static struct {
@@ -110,7 +109,7 @@ static int midifd = -1;
 static char *mididevname;
 static SDL_Thread *thread;
 static struct msgq *queue;
-static int counter;
+static int start_time;
 
 static char cmd_pause[] = "pause";
 static char cmd_unpause[] = "unpause";
@@ -326,8 +325,6 @@ static void *midi_mainloop(struct midiinfo *midi) {
 static int midi_initilize(char *devnm, int subdev) {
 	enabled = FALSE;
 	
-	reset_counter_high(SYSTEMCOUNTER_MIDI, 10, 0);
-	
 	if (devnm == NULL) {
 		if (subdev == -1) {
 			mididevname = MIDI_DEVICE;
@@ -412,7 +409,7 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	queue = msgq_new();
 	thread = SDL_CreateThread(midi_thread, "MIDI", midi);
 
-	counter = get_high_counter(SYSTEMCOUNTER_MIDI);
+	start_time = SDL_GetTicks();
 	
 	return OK;
 }
@@ -459,10 +456,8 @@ static int midi_get_playing_info(midiplaystate *st) {
 		return OK;
 	}
 	
-	int cnt = get_high_counter(SYSTEMCOUNTER_MIDI) - counter;
-	
 	st->in_play = TRUE;
-	st->loc_ms = cnt * 10;
+	st->loc_ms = SDL_GetTicks() - start_time;
 	
 	return OK;
 }

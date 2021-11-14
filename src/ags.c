@@ -37,7 +37,6 @@
 #include "ags.h"
 #include "sdl_core.h"
 #include "alpha_plane.h"
-#include "counter.h"
 #include "utfsjis.h"
 #include "input.h"
 #include "font.h"
@@ -549,7 +548,7 @@ void ags_alpha_setPixel(int x, int y, int w, int h, BYTE *b) {
  */
 void ags_fader(ags_faderinfo_t *i) {
 	int cnt_st, step, key = 0, canceled_key = 0;
-	cnt_st = get_high_counter(SYSTEMCOUNTER_MSEC);
+	cnt_st = sdl_getTicks();
 	
 	i->callback(0);
 	
@@ -559,12 +558,12 @@ void ags_fader(ags_faderinfo_t *i) {
 	while(step < i->step_max) {
 		int lefttime, leftstep, mstime, cnt1, cnt2;
 		
-		cnt1 = get_high_counter(SYSTEMCOUNTER_MSEC);
+		cnt1 = sdl_getTicks();
 		i->callback(step);
 		key = sys_getInputInfo();
 		/* 実際の fade にかかった時間 */
 		sdl_sleep(0); /* It's a magic !!! */
-		cnt2 = get_high_counter(SYSTEMCOUNTER_MSEC) - cnt1;
+		cnt2 = sdl_getTicks() - cnt1;
 		
 		lefttime = i->effect_time - (cnt1 + cnt2 - cnt_st); /* fade 残り時間 */
 		leftstep = i->step_max - step;  /* fade 残りステップ数 */

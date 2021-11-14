@@ -32,7 +32,6 @@
 #include "ags.h"
 #include "system.h"
 #include "nact.h"
-#include "counter.h"
 
 /* saved parameter */
 struct ecopyparam {
@@ -54,15 +53,11 @@ static ecopyparam_t ecp;
 #define EC_WAIT \
 	if ((key |= sys_getInputInfo()) && ecp.cancel) break; \
 	do {												  \
-		int wait_ms = cnt - get_ecounter();				  \
+		int wait_ms = cnt - sdl_getTicks();				  \
 		if (wait_ms >= 16)								  \
 			key = sys_keywait(wait_ms, ecp.cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE); \
 	} while (0)
 
-
-static int get_ecounter(void) {
-	return get_high_counter(SYSTEMCOUNTER_MSEC);
-}
 
 static void eCopyUpdateArea(int sx, int sy, int w, int h, int dx, int dy) {
 	MyRectangle src = {sx, sy, w, h};
@@ -77,7 +72,7 @@ static int eCopyArea1(int dx, int dy, int w, int h, int opt) {
 	int y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (y = 0; y < h - 24; y += 24) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, dy + h - y, w, y, dx, dy);
@@ -92,7 +87,7 @@ static int eCopyArea2(int dx, int dy, int w, int h, int opt) {
 	int y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (y = 0; y < h - 24; y += 24) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, dy , w, y, dx, dy + h - y);
@@ -113,7 +108,7 @@ static int eCopyArea3(int dx, int dy, int w, int h, int opt) {
 	}
 	y1 = dy;
 	y2 = dy + h - 1;
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	while (h > 0) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, y1, w, 1, dx, y1);
@@ -137,7 +132,7 @@ static int eCopyArea4(int dx, int dy, int w, int h, int opt) {
 	}
 	x1 = dx;
 	x2 = dx + w - 1;
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	while (w > 0) {
 		cnt += waitcnt;
 		eCopyUpdateArea(x1, dy, 1, h, x1, dy);
@@ -157,7 +152,7 @@ static int eCopyArea5(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	static int hx[16]={ 0,32,16,48, 0,32,16,48,16,48, 0,32,16,48, 0,32};
 	static int hy[16]={ 0, 0,16,16,32,32,48,48, 0, 0,16,16,32,32,48,48};
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < 16; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -63); y += 64) {
@@ -178,7 +173,7 @@ static int eCopyArea6(int dx, int dy, int w, int h, int opt) {
 	int i, x, y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < 7; i++) {
 		cnt += waitcnt;
 		for (x = 0; x < (w -63); x += 64) {
@@ -200,7 +195,7 @@ static int eCopyArea7(int dx, int dy, int w, int h, int opt) {
 	int i, key = 0, cnt;
 	int waitcnt = opt == 0 ? 40 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < (w/2 - E7_8X+1); i+=E7_8X) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, dy+i*h/w, w, E7_8X*h/w, dx, dy+i*h/w);
@@ -217,7 +212,7 @@ static int eCopyArea8(int dx, int dy, int w, int h, int opt) {
 	int i, key = 0, cnt;
 	int waitcnt = opt == 0 ? 40 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = E7_8X; i < (w/2 -E7_8X+1); i+=E7_8X) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx+ w/2 - i , dy + h/2 - i*h/w, 2*i, 2*i*h/w ,dx+ w/2-i, dy + h/2 - i*h/w);
@@ -234,7 +229,7 @@ static int eCopyArea9(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	static int hintY[4] = {0,8,8,0};
 
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < 4; i++) {
 		cnt+=waitcnt;
 		for (y = 0; y < h -15; y+=16) {
@@ -271,7 +266,7 @@ static int eCopyArea11(int dx, int dy, int w, int h, int opt) {
 	int waitcnt = opt == 0 ? 40 : opt;
 
 #define ECA11_SLICE 16
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < ECA11_SLICE + h / ECA11_SLICE -1; i++) {
 		cnt += waitcnt;
 		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
@@ -290,7 +285,7 @@ static int eCopyArea12(int dx, int dy, int w, int h, int opt) {
 	int x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (x = 0; x < (w -7); x += 8) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx + x, dy, 8, h, dx + x, dy);
@@ -304,7 +299,7 @@ static int eCopyArea13(int dx, int dy, int w, int h, int opt) {
 	int x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (x = (w -8); x > 8; x -= 8) {
 		cnt +=waitcnt;
 		eCopyUpdateArea(dx + x, dy, 8, h, dx + x, dy);
@@ -318,7 +313,7 @@ static int eCopyArea14(int dx, int dy, int w, int h, int opt) {
 	int y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (y = 0; y < (h -7); y += 8) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, dy + y, w, 8, dx, dy + y);
@@ -332,7 +327,7 @@ static int eCopyArea15(int dx, int dy, int w, int h, int opt) {
 	int y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (y = (h -8); y > 8; y -= 8) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, dy + y, w, 8, dx, dy + y);
@@ -346,7 +341,7 @@ static int eCopyArea16(int dx, int dy, int w, int h, int opt) {
 	int i, x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < 8; i++) {
 		cnt += waitcnt;
 		for (x = 0; x < (w -15); x += 16) {
@@ -364,7 +359,7 @@ static int eCopyArea17(int dx, int dy, int w, int h, int opt) {
 	int waitcnt = opt == 0 ? 30 : opt;
 
 #define E17X 18
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < E17X; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h - E17X + 1); y += E17X) {
@@ -380,7 +375,7 @@ static int eCopyArea18(int dx, int dy, int w, int h, int opt) {
 	int x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (x = 0; x < (w/2 -7); x += 8) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx + w/2 - x - 8, dy, 8, h, dx + w/2 - x - 8, dy);
@@ -395,7 +390,7 @@ static int eCopyArea19(int dx, int dy, int w, int h, int opt) {
 	int x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (x = 0; x < (w/2 -7); x += 8) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx + x,         dy, 8, h, dx + x,         dy);
@@ -410,7 +405,7 @@ static int eCopyArea20(int dx, int dy, int w, int h, int opt) {
 	int y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (y = 0; y < (h/2 -7); y += 8) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, dy + h/2 - y - 8, w, 8, dx, dy + h/2 - y - 8);
@@ -425,7 +420,7 @@ static int eCopyArea21(int dx, int dy, int w, int h, int opt) {
 	int y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (y = 0; y < (h/2 -7); y += 8) {
 		cnt += waitcnt;
 		eCopyUpdateArea(dx, dy + y        , w, 8, dx, dy + y);
@@ -440,7 +435,7 @@ static int eCopyArea22(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int i, x, y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 80 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < 2; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -3); y+=4) {
@@ -465,7 +460,7 @@ static int eCopyArea23(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	static int hintX[4] = {0,2,2,0};
 	static int hintY[4] = {0,2,0,2};
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < 4; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -3); y+=4) {
@@ -487,7 +482,7 @@ static int eCopyArea24(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int waitcnt = opt == 0 ? 100 : opt;
 	static int slices[8]={80,70,60,48,32,16,8,4};
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < 8; i++ ) {
 		cnt += waitcnt;
 		sdl_Mosaic(sx, sy, w, h, dx, dy, slices[i]);
@@ -506,7 +501,7 @@ static int eCopyArea25(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int w2=w/2,h2=h/2,h1=h-1,mr=(int)(sqrt(w2*w2+h2*h2));
 	int ux=0,uy=0,ux_y=h2-1,uw,uh;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (r = SCA25_6_SLICE; r < mr; r += SCA25_6_SLICE ) {
 		cnt += waitcnt;
 		rr=r*r;
@@ -549,7 +544,7 @@ static int eCopyArea26(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int w2=w/2,w1=w-1,h2=h/2,h1=h-1,mr=(int)(sqrt(w2*w2+h2*h2));
 	int ux=0,uy=0,ux_y=0,uw,uh;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (r = mr - SCA25_6_SLICE; r > 0; r -= SCA25_6_SLICE) {
 		cnt += waitcnt;
 		rr=r*r;
@@ -687,7 +682,7 @@ static int eCopyArea33(int dx, int dy, int w, int h, int opt) {
 	int i, j, y, key = 0, cnt,dyy=dy+h-1;
 	int waitcnt = opt == 0 ? 40 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < ECA11_SLICE + h / ECA11_SLICE -1; i++) {
 		cnt += waitcnt;
 		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
@@ -706,7 +701,7 @@ static int eCopyArea34(int dx, int dy, int w, int h, int opt) {
 	int i, j, y, key = 0, cnt,dyy=dy+h-1,h2=h/2;
 	int waitcnt = opt == 0 ? 40 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < ECA11_SLICE + h / ECA11_SLICE/2 -1; i++) {
 		cnt += waitcnt;
 		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
@@ -880,7 +875,7 @@ static int eCopyArea39(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	dy2 = dy+h-1;
 	sy1 = sy;
 	sy2 = sy+h-1;
-	cnt=get_ecounter();
+	cnt=sdl_getTicks();
 	for (i = 0; i < h2; i++) {
 		cnt+=waitcnt;
 		ags_copyArea_alphaBlend(sx, sy1, w, 1, dx, dy1, 128);
@@ -924,7 +919,7 @@ static int eCopyArea40(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	dx2 = dx+w-1;
 	sx1 = sx;
 	sx2 = sx+w-1;
-	cnt=get_ecounter();
+	cnt=sdl_getTicks();
 	for (i = 0; i < w2; i++) {
 		cnt+=waitcnt;
 		ags_copyArea_alphaBlend(sx1, sy, 1, h, dx1, dy, 128);
@@ -1100,7 +1095,7 @@ static int eCopyArea48(int dx, int dy, int w, int h, int opt) {
 	int i, j, x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 40 : opt;
 
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < ECA11_SLICE + w / ECA11_SLICE -1; i++) {
 		cnt += waitcnt;
 		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
@@ -1119,7 +1114,7 @@ static int eCopyArea49(int dx, int dy, int w, int h, int opt) {
 	int i, j, x, key = 0, cnt, dxx = dx + w - 1;
 	int waitcnt = opt == 0 ? 40 : opt;
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	for (i = 0; i < ECA11_SLICE + w / ECA11_SLICE -1; i++) {
 		cnt += waitcnt;
 		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
@@ -1180,7 +1175,7 @@ static int eCopyArea5sp(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 		step[i] = 50 * sin((2 * M_PI * i) / 50);
 	}
 	
-	cnt = get_ecounter();
+	cnt = sdl_getTicks();
 	
 	for (i = 150; i < h + 200; i++) {
 		cnt += waitcnt;

@@ -74,6 +74,10 @@ void sdl_updateScreen(void) {
 	sdl_dirty = false;
 }
 
+uint32_t sdl_getTicks(void) {
+	return SDL_GetTicks();
+}
+
 void sdl_sleep(int msec) {
 	sdl_updateScreen();
 	dbg_onsleep();

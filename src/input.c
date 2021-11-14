@@ -26,7 +26,6 @@
 #include "config.h"
 #include "input.h"
 #include "sdl_core.h"
-#include "counter.h"
 #include "xsystem35.h"
 #include "message.h"
 #include "texthook.h"
@@ -92,9 +91,9 @@ int sys_keywait(int msec, unsigned flags) {
 	}
 
 	int key=0, n;
-	int end = msec == INT_MAX ? INT_MAX : get_high_counter(SYSTEMCOUNTER_MSEC) + msec;
+	int end = msec == INT_MAX ? INT_MAX : sdl_getTicks() + msec;
 	while (!((flags & KEYWAIT_SKIPPABLE) && msgskip_isSkipping()) &&
-		   (n = end - get_high_counter(SYSTEMCOUNTER_MSEC)) > 0) {
+		   (n = end - sdl_getTicks()) > 0) {
 		if (n <= 16)
 			sdl_sleep(n);
 		else

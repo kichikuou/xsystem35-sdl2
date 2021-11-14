@@ -36,7 +36,7 @@
 #include "surface.h"
 #include "ngraph.h"
 #include "sprite.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "randMT.h"
 
 typedef void entrypoint (double step, int p1, int p2, int *retx, int *rety);
@@ -78,9 +78,9 @@ int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	
 	if (type > 1) return OK;
 	
-	sttime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	sttime = sdl_getTicks();
 	edtime = time * 10 + sttime;
-	while ((curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < edtime) {
+	while ((curtime = sdl_getTicks()) < edtime) {
 		int adjx, adjy;
 		
 		cb[type]((double)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);

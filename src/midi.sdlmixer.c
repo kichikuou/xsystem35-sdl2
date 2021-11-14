@@ -23,7 +23,6 @@
 #include <SDL_mixer.h>
 
 #include "portab.h"
-#include "counter.h"
 #include "midi.h"
 
 // MIX_INIT_FLUIDSYNTH was renamed to MIX_INIT_MID in SDL_mixer 2.0.2
@@ -63,13 +62,12 @@ mididevice_t midi = {
 };
 
 static Mix_Music *mix_music;
-static int counter;
+static int start_time;
 static uint32_t fade_tick;
 
 static int midi_initilize(char *pname, int subdev) {
 	if (Mix_Init(MIX_INIT_MID) != MIX_INIT_MID)
 		return NG;
-	reset_counter_high(SYSTEMCOUNTER_MIDI, 10, 0);
 	return OK;
 }
 
@@ -92,7 +90,7 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 		return NG;
 	}
 
-	counter = get_high_counter(SYSTEMCOUNTER_MIDI);
+	start_time = SDL_GetTicks();
 	return OK;
 }
 
@@ -105,13 +103,13 @@ static int midi_stop() {
 }
 
 static int midi_pause(void) {
-	// FIXME: adjust counter
+	// FIXME: adjust start_time
 	Mix_PauseMusic();
 	return OK;
 }
 
 static int midi_unpause(void) {
-	// FIXME: adjust counter
+	// FIXME: adjust start_time
 	Mix_ResumeMusic();
 	return OK;
 }
@@ -123,10 +121,8 @@ static int midi_get_playing_info(midiplaystate *st) {
 		return OK;
 	}
 
-	int cnt = get_high_counter(SYSTEMCOUNTER_MIDI) - counter;
-
 	st->in_play = TRUE;
-	st->loc_ms = cnt * 10;
+	st->loc_ms = SDL_GetTicks() - start_time;
 	return OK;
 }
 

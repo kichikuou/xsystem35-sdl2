@@ -36,7 +36,6 @@
 #include "sprite.h"
 #include "surface.h"
 #include "sactcg.h"
-#include "counter.h"
 #include "sdl_core.h"
 
 
@@ -378,7 +377,7 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	
 	sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
 
-	ecp.sttime = ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time;
 	ecp.oldstep = 0;
 	
@@ -423,11 +422,11 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 		break;
 	}
 	
-	while ((ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < ecp.edtime) {
+	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
 		int rest;
 		
 		cb(sfsrc, sfdst);
-		rest = 15 - (get_high_counter(SYSTEMCOUNTER_MSEC) - ecp.curtime);
+		rest = 15 - (sdl_getTicks() - ecp.curtime);
 		key = sys_keywait(rest, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		
 		if (cancel && key) break;

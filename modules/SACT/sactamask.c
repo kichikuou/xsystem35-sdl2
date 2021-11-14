@@ -36,7 +36,7 @@
 #include "surface.h"
 #include "ngraph.h"
 #include "sprite.h"
-#include "counter.h"
+#include "sdl_core.h"
 
 static surface_t *smask_get(int no);
 static surface_t *smask_mul(surface_t *sf, int val);
@@ -127,11 +127,11 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 	sfdst = sf_dup(sf0);
 	sf_copyall(sf0, sfsrc);
 	
-	ecp.sttime = ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time*10;
 	ecp.oldstep = 0;
 	
-	while ((ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < ecp.edtime) {
+	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
 		int curstep = 255 * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
 		// 元になるマスクのalpha値を16倍して欲しいところだけ取り出す
 		mask2 = smask_mul(mask, curstep);
