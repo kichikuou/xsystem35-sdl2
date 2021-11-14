@@ -1,11 +1,75 @@
 # xsytem35-sdl2
 
-This is a multi-platform port of xsystem35, a free implementation of AriceSoft's System3.x game engine.
+This is a multi-platform port of `xsystem35`, a free implementation of
+AliceSoft's System 3.x game engine.
 
-## Download
-Prebuilt binaries for Windows and Android can be downloaded from the [Releases](https://github.com/kichikuou/xsystem35-sdl2/releases) page.
+## Unique Features
 
-## Build
+In addition to the original System 3.x's functionalities, xsystem35-sdl2 has
+the following features.
+
+### Playing audio files as fake CD music
+
+Many System 3.x games had music as audio tracks on the CD-ROM. Xsystem35 can
+play music from audio files instead, to avoid the hassle of inserting CDs. To
+use ripped audio files, create a file named `playlist.txt` in the game
+directory, and enter the paths to your tracks, one per line. For example:
+
+```
+# The first line is not used
+BGM/track02.mp3
+BGM/track03.mp3
+...
+```
+
+The first line is not used, because track 1 of game CD is usually a data track.
+
+### Unicode translation support
+
+The original System 3.x only supported Shift_JIS (a Japanese character
+encoding), but xsystem35 supports Unicode and is able to run games translated
+into languages other than Japanese and English.
+
+See [xsys35c](https://github.com/kichikuou/xsys35c)'s document for how to
+build a game with Unicode mode.
+
+### Debugging
+
+Xsystem35 has a built-in debugger that allows you to step through the game and
+examine / modify variables in the game. There are two ways to use the debugger:
+
+- Through [Visual Studio Code](https://code.visualstudio.com/) (recommended):
+  The [vscode-system3x](https://github.com/kichikuou/vscode-system3x) extension
+  provides graphical debugging interface for System 3.x.
+- Using CUI debugger: Running xsystem35 with `-debugger` option will start the
+  debugger with console interface. Type `help` to see a list of available
+  commands.
+
+## Installing
+
+Prebuilt packages for Windows and Android can be downloaded from the
+[Releases](https://github.com/kichikuou/xsystem35-sdl2/releases) page. For
+other platforms, see the [Building](#building) section.
+
+## Running
+### Windows
+
+Execute `xsytem35`, and it will show a dialog to select a folder. Select the
+game folder (where the ALD files are located).
+
+### Android
+
+Make a Zip file containing all the game files, copy it to your device, and load
+it.
+
+### Other Platforms
+
+Run xsystem35 from within the game directory.
+
+    cd /path/to/game_directory
+    xsystem35
+
+## Building
 ### Linux (Debian / Ubuntu)
 
     $ sudo apt install build-essential cmake libgtk-3-dev libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libwebp-dev libcjson-dev
@@ -41,7 +105,9 @@ Prebuilt binaries for Windows and Android can be downloaded from the [Releases](
     $ emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../../
     $ make
 
-To use the generated binary, checkout [Kichikuou on Web](https://github.com/kichikuou/web) and copy `out/xsystem35.*` into its `docs` directory.
+To use the generated binary, checkout
+[Kichikuou on Web](https://github.com/kichikuou/web) and copy `out/xsystem35.*`
+into its `docs` directory.
 
 ### Android
 
