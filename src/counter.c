@@ -22,26 +22,26 @@
 */
 /* $Id: counter.c,v 1.10 2000/11/25 13:09:03 chikama Exp $ */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <unistd.h>
 #include "counter.h"
+#include "sdl_core.h"
 #include "nact.h"
 
-#define HICOUNTER_MAX 256
-static struct timeval tv_base;
-static int counter_init = 0;
+#define NUM_COUNTER 257
 
-static int counter_init_high[HICOUNTER_MAX];
-static struct timeval tv_high[HICOUNTER_MAX];
-static int division_high[HICOUNTER_MAX] = { [0 ...( HICOUNTER_MAX-1 )]=1};
+static uint32_t base_ticks[NUM_COUNTER];
+static int offsets[NUM_COUNTER];
+static int divisions[NUM_COUNTER] = { [0 ...( NUM_COUNTER-1 )]=1};
 
-// Allow up to 10 get_counter() calls in single animation frame
-void counter_throttle(void) {
+static void counter_init(int num, int offset, int division) {
+	base_ticks[num] = sdl_getTicks();
+	offsets[num] = offset;
+	divisions[num] = division;
+}
+
+static int get_counter_internal(int num, int division) {
+	// Allow up to 10 get_counter() calls in single animation frame.
 	static int frame = -1;
 	static int count = 0;
-
 	if (nact->frame_count == frame) {
 		if (++count >= 10)
 			nact->wait_vsync = TRUE;
@@ -49,57 +49,35 @@ void counter_throttle(void) {
 		frame = nact->frame_count;
 		count = 0;
 	}
+
+	uint32_t ms = sdl_getTicks() - base_ticks[num] + offsets[num];
+	return ms / division;
 }
 
 int get_counter(int division) {
-	long sec, usec, usec2;
-	struct timeval tv;
-
-	counter_throttle();
-	gettimeofday(&tv, NULL);
-	sec  = tv.tv_sec - tv_base.tv_sec;
-	usec = tv.tv_usec - tv_base.tv_usec;
-	usec2 = sec * 1000l + usec / 1000l;
-	return counter_init + (int)(usec2 / division);
+	return get_counter_internal(0, division);
 }
 
 /* カウンタ〜を valでリセット */
 /* 初期化時に一度呼んでおく */
 void reset_counter(int val) {
-	counter_init = val;
-	gettimeofday(&tv_base, NULL);
+	counter_init(0, val, 1);
 }
 
 
 int get_high_counter(int num) {
-	long sec, usec, usec2;
-	struct timeval tv;
-	struct timeval tv_base = tv_high[num -1];
-	int division = division_high[num -1];
-	
-	counter_throttle();
-	gettimeofday(&tv, NULL);
-	sec  = tv.tv_sec - tv_base.tv_sec;
-	usec = tv.tv_usec - tv_base.tv_usec;
-	usec2 = sec * (1000l/division)+ usec / 1000l /division;
-	return counter_init_high[num -1] + usec2;
+	return get_counter_internal(num, divisions[num]);
 }
 
 /* 高精度カウンタ〜 thanx tajiri@wizard */
 /* カウンタ〜を valでリセット */
 /* 初期化時に一度呼んでおく */
-void reset_counter_high(int num,int division,int val) {
-	if (num == 0) {
-		int i;
-		for (i = 0; i < 256; i++) {
-			counter_init_high[i] = val;
-			gettimeofday(&tv_high[i], NULL);
-			division_high[i]=division;
-		}
+void reset_counter_high(int num, int division, int val) {
+	if (num) {
+		counter_init(num, val, division);
 	} else {
-		counter_init_high[num -1] = val;
-		gettimeofday(&tv_high[num -1], NULL);
-		division_high[num -1]=division;
+		for (int i = 1; i <= 256; i++)
+			counter_init(i, val, division);
 	}
 }
 
