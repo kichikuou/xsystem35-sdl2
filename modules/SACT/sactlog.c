@@ -30,7 +30,6 @@
 #include "portab.h"
 #include "system.h"
 #include "list.h"
-#include "counter.h"
 #include "menu.h"
 #include "input.h"
 #include "nact.h"

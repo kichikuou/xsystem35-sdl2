@@ -58,7 +58,7 @@ target_sources(xsystem35 PRIVATE
 
 # Misc
 target_sources(xsystem35 PRIVATE
-  LittleEndian.c counter.c input.c profile.c mt19937-1.c filecheck.c mmap.c)
+  LittleEndian.c input.c profile.c mt19937-1.c filecheck.c mmap.c)
 
 # Scenario
 target_sources(xsystem35 PRIVATE

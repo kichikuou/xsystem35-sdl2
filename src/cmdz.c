@@ -30,13 +30,37 @@
 #include "sdl_core.h"
 #include "ags.h"
 #include "scenario.h"
-#include "counter.h"
 #include "randMT.h"
 #include "selection.h"
 #include "message.h"
 #include "input.h"
 #include "nact.h"
 #include "font.h"
+
+static struct {
+	uint32_t base;
+	int divisor;
+} counters[257];  // [0] for ZT 1-5, [1..256] for ZT 10-11
+
+static void reset_counter(int num, int divisor, int offset) {
+	counters[num].base = sdl_getTicks() - offset;
+	counters[num].divisor = divisor;
+}
+
+static uint32_t get_counter(int num) {
+	// Allow up to 10 get_counter() calls in single animation frame.
+	static int frame = -1;
+	static int count = 0;
+	if (nact->frame_count == frame) {
+		if (++count >= 10)
+			nact->wait_vsync = TRUE;
+	} else {
+		frame = nact->frame_count;
+		count = 0;
+	}
+
+	return sdl_getTicks() - counters[num].base;
+}
 
 void commandZC() {
 	/* システムの使用環境を変更する */
@@ -191,7 +215,7 @@ void commandZT0() {
 	c1 = sl_getc();
 	c2 = sl_getc();
 	if (c1 == 0x41 && c2 == 0x7f) {
-		reset_counter(0);
+		reset_counter(0, 1, 0);
 		return;
 	} else {
 		sl_jmpNear(sv);
@@ -214,7 +238,7 @@ void commandZT1() {
 	/* タイマーを n の数値でクリアする */
 	int n = getCaliValue();
 	
-	reset_counter(n);
+	reset_counter(0, 1, n);
 	
 	DEBUG_COMMAND("ZT1 %d:\n", n);
 }
@@ -222,7 +246,7 @@ void commandZT1() {
 void commandZT2() {
 	/* タイマーを var に取得する 1/10 sec */
 	int *var = getCaliVariable();
-	int val = get_counter(100);
+	int val = get_counter(0) / 100;
 	
 	if (val > 65535) val = 65535;
 	*var = val;
@@ -233,7 +257,7 @@ void commandZT2() {
 void commandZT3() {
 	/* タイマーを var に取得する 1/30 sec */
 	int *var = getCaliVariable();
-	int val = get_counter(33);
+	int val = get_counter(0) * 3 / 100;
 	
 	if (val > 65535) val = 65535;
 	*var = val;
@@ -244,7 +268,7 @@ void commandZT3() {
 void commandZT4() {
 	/* タイマーを var に取得する 1/60 sec */
 	int *var = getCaliVariable();
-	int val = get_counter(17);
+	int val = get_counter(0) * 3 / 50;
 	
 	if (val > 65535) val = 65535;
 	*var = val;
@@ -255,7 +279,7 @@ void commandZT4() {
 void commandZT5() {
 	/* タイマーを var に取得する */
 	int *var = getCaliVariable();
-	int val = get_counter(10);
+	int val = get_counter(0) / 10;
 	
 	if (val > 65535) val = 65535;
 	*var = val;
@@ -269,7 +293,14 @@ void commandZT10() {
 	int base  = getCaliValue();
 	int count = getCaliValue();
 	
-	reset_counter_high(num, base ? base : 1, count);
+	if (num > 256) {
+		WARNING("invalid timer id %d\n", num);
+	} else if (num == 0) {
+		for (int i = 1; i <= 256; i++)
+			reset_counter(i, base, count);
+	} else {
+		reset_counter(num, base, count);
+	}
 	
 	DEBUG_COMMAND("ZT10 %d,%d,%d:\n", num, base, count);
 }
@@ -278,11 +309,14 @@ void commandZT11() {
 	/* 高精度タイマー取得 */
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
-	int val  = get_high_counter(num);
-	
-	*var = val;
-	
-	DEBUG_COMMAND("ZT11 %d,%d,%d:\n", num, val, *var);
+
+	int divisor = counters[num].divisor ? counters[num].divisor : 1;
+	if (num > 256)
+		WARNING("invalid timer id %d\n", num);
+	else
+		*var = get_counter(num) / divisor;
+
+	DEBUG_COMMAND("ZT11 %d,%d:\n", num, *var);
 }
 
 void commandZT20() {

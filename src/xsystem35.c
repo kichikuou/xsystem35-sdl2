@@ -58,7 +58,6 @@
 #include "nact.h"
 #include "profile.h"
 #include "randMT.h"
-#include "counter.h"
 #include "ags.h"
 #include "font.h"
 #include "sdl_core.h"
@@ -222,9 +221,6 @@ static void sys35_init() {
 	sdl_setFullscreen(fs_on);
 	nact->noantialias = font_noantialias;
 	ags_setAntialiasedStringMode(!font_noantialias);
-	
-	
-	reset_counter(0);
 
 	sgenrand(getpid());
 

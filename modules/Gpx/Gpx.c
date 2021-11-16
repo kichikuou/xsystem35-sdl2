@@ -38,7 +38,6 @@
 #include "ags.h"
 #include "cg.h"
 #include "image.h"
-#include "counter.h"
 #include "input.h"
 // #include "alpha_plane.h"
 #include "surface.h"

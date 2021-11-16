@@ -29,7 +29,6 @@
 #include "portab.h"
 #include "system.h"
 #include "list.h"
-#include "counter.h"
 #include "ags.h"
 #include "graphics.h"
 // #include "sact.h"

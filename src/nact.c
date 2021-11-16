@@ -33,7 +33,6 @@
 #include "xsystem35.h"
 #include "sdl_core.h"
 #include "ags.h"
-#include "counter.h"
 #include "nact.h"
 #include "debugger.h"
 #include "selection.h"
