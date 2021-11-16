@@ -248,8 +248,7 @@ void commandZT2() {
 	int *var = getCaliVariable();
 	int val = get_counter(0) / 100;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
 	DEBUG_COMMAND("ZT2 %p:\n", var);
 }
@@ -259,8 +258,7 @@ void commandZT3() {
 	int *var = getCaliVariable();
 	int val = get_counter(0) * 3 / 100;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
 	DEBUG_COMMAND("ZT3 %p:\n", var);
 }
@@ -270,8 +268,7 @@ void commandZT4() {
 	int *var = getCaliVariable();
 	int val = get_counter(0) * 3 / 50;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
 	DEBUG_COMMAND("ZT4 %p:\n", var);
 }
@@ -281,8 +278,7 @@ void commandZT5() {
 	int *var = getCaliVariable();
 	int val = get_counter(0) / 10;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
 	DEBUG_COMMAND("ZT5 %d:\n", val);
 }
@@ -314,7 +310,7 @@ void commandZT11() {
 	if (num > 256)
 		WARNING("invalid timer id %d\n", num);
 	else
-		*var = get_counter(num) / divisor;
+		*var = (get_counter(num) / divisor) & 0xffff;
 
 	DEBUG_COMMAND("ZT11 %d,%d:\n", num, *var);
 }
