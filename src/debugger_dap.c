@@ -42,12 +42,8 @@ enum VariablesReference {
 	VREF_STRINGS,
 };
 
-static enum {
-	WAITING_LAUNCH,
-	WAITING_CONFIGURATIONDONE,
-	INITIALIZED
-} init_state = WAITING_LAUNCH;
-
+static bool initialized;
+static char *symbols_path;
 static char *src_dir;
 static struct msgq *queue;
 
@@ -126,11 +122,6 @@ static void emit_output_event(const char *output) {
 }
 
 static void cmd_initialize(cJSON *args, cJSON *resp) {
-	if (!symbols) {
-		cJSON_AddBoolToObject(resp, "success", false);
-		cJSON_AddStringToObject(resp, "message", "xsystem35: Cannot load debug symbols");
-		return;
-	}
 	cJSON *body;
 	cJSON_AddBoolToObject(resp, "success", true);
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
@@ -141,6 +132,20 @@ static void cmd_initialize(cJSON *args, cJSON *resp) {
 }
 
 static void cmd_launch(cJSON *args, cJSON *resp) {
+	cJSON *noDebug = cJSON_GetObjectItemCaseSensitive(args, "noDebug");
+	if (cJSON_IsTrue(noDebug)) {
+		cJSON_AddBoolToObject(resp, "success", true);
+		initialized = true;
+		return;
+	}
+
+	symbols = dsym_load(symbols_path);
+	if (!symbols) {
+		cJSON_AddBoolToObject(resp, "success", false);
+		cJSON_AddStringToObject(resp, "message", "xsystem35: Cannot load debug symbols");
+		return;
+	}
+
 	cJSON *srcDir = cJSON_GetObjectItemCaseSensitive(args, "srcDir");
 	if (cJSON_IsString(srcDir))
 		src_dir = strdup(srcDir->valuestring);
@@ -149,11 +154,10 @@ static void cmd_launch(cJSON *args, cJSON *resp) {
 	cJSON_AddBoolToObject(resp, "success", true);
 
 	emit_initialized_event();
-	init_state = WAITING_CONFIGURATIONDONE;
 }
 
 static void cmd_configurationDone(cJSON *args, cJSON *resp) {
-	init_state = INITIALIZED;
+	initialized = true;
 	cJSON_AddBoolToObject(resp, "success", true);
 }
 
@@ -540,7 +544,8 @@ static int read_command_thread(void *data) {
 	return 0;
 }
 
-static void dbg_dap_init(const char *symbols_path) {
+static void dbg_dap_init(const char *path) {
+	symbols_path = strdup(path);
 	queue = msgq_new();
 
 #ifdef _WIN32
@@ -550,9 +555,7 @@ static void dbg_dap_init(const char *symbols_path) {
 
 	SDL_CreateThread(read_command_thread, "Debugger", NULL);
 
-	symbols = dsym_load(symbols_path);
-
-	while (init_state != INITIALIZED) {
+	while (!initialized) {
 		char *msg = msgq_dequeue(queue);
 		if (!msg)
 			break;
