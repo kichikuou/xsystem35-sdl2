@@ -33,43 +33,12 @@
 #include "alpha_plane.h"
 #include "ags.h"
 
-/* fader */
-static const int fadeX[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
-static const int fadeY[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
-
 static void (*copy_from_alpha)(agsurface_t *, BYTE *, BYTE *, int, int, ALPHA_DIB_COPY_TYPE);
 static void (*copy_to_alpha)(agsurface_t *, BYTE *, BYTE *, int, int, ALPHA_DIB_COPY_TYPE);
 
 /******************************************************************************/
 /* private methods  image操作 16bpp                                           */
 /******************************************************************************/
-
-static void fadeOut16(SDL_Surface *dst, int lv, int col) {
-	WORD *yld;
-	int x, y;
-	
-	for (y = 0; y < dst->h; y += 4) {
-		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
-		for (x = 0; x < dst->w; x += 4) {
-			*(yld + fadeX[lv]) = col;
-			yld += 4;
-		}
-	}
-}
-
-static void fadeIn16(SDL_Surface *src, SDL_Surface *dst, int lv) {
-	WORD *yls, *yld;
-	int x, y;
-	
-	for (y = 0; y < src->h; y += 4) {
-		yls = PIXEL_AT(src, 0, y + fadeY[lv]);
-		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
-		for (x = 0; x < src->w; x += 4) {
-			*(yld + fadeX[lv]) = *(yls + fadeX[lv]);
-			yls += 4; yld += 4;
-		}
-	}
-}
 
 static void image_copy_from_alpha16(agsurface_t *dib, BYTE *sdata, BYTE *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
@@ -194,71 +163,8 @@ static void image_copy_to_alpha16(agsurface_t *dib, BYTE *sdata, BYTE *ddata, in
 }
 
 /******************************************************************************/
-/* private methods  image操作 packed 24bpp                                    */
-/******************************************************************************/
-
-static void fadeOut24p(SDL_Surface *dst, int lv, int col) {
-	BYTE *yld;
-	int x, y;
-	
-	for (y = 0; y < dst->h; y += 4) {
-		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
-		for (x = 0; x < dst->w; x += 4) {
-			*(yld + fadeX[lv])    = 
-			*(yld + fadeX[lv] +1) =
-			*(yld + fadeX[lv] +2) = (BYTE)col;
-			yld += (4*3);
-		}
-	}
-}
-
-static void fadeIn24p(SDL_Surface *src, SDL_Surface *dst, int lv) {
-	DWORD *yls;
-	BYTE  *yld;
-	int x, y;
-	
-	for (y = 0; y < src->h; y += 4) {
-		yls = PIXEL_AT(src, 0, y + fadeY[lv]);
-		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
-		for (x = 0; x < src->w; x += 4) {
-			*(yld + fadeX[lv]   ) = PIXB24(*(yls + fadeX[lv]));
-			*(yld + fadeX[lv] +1) = PIXG24(*(yls + fadeX[lv]));
-			*(yld + fadeX[lv] +2) = PIXR24(*(yls + fadeX[lv]));
-			yls += 4; yld += (4*3);
-		}
-	}
-}
-
-/******************************************************************************/
 /* private methods  image操作 24/32bpp                                        */
 /******************************************************************************/
-
-static void fadeOut24(SDL_Surface *dst, int lv, int col) {
-	DWORD *yld;
-	int x, y;
-	
-	for (y = 0; y < dst->h; y += 4) {
-		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
-		for (x = 0; x < dst->w; x += 4) {
-			*(yld + fadeX[lv]) = col;
-			yld += 4;
-		}
-	}
-}
-
-static void fadeIn24(SDL_Surface *src, SDL_Surface *dst, int lv) {
-	DWORD *yls, *yld;
-	int x, y;
-	
-	for (y = 0; y < src->h; y += 4) {
-		yls = PIXEL_AT(src, 0, y + fadeY[lv]);
-		yld = PIXEL_AT(dst, 0, y + fadeY[lv]);
-		for (x = 0; x < src->w; x += 4) {
-			*(yld + fadeX[lv]) = *(yls + fadeX[lv]);
-			yls += 4; yld += 4;
-		}
-	}
-}
 
 static void image_copy_from_alpha24(agsurface_t *dib, BYTE *sdata, BYTE *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
@@ -400,38 +306,6 @@ void image_setdepth(int depth) {
 		copy_from_alpha = image_copy_from_alpha24;
 		copy_to_alpha = image_copy_to_alpha24;
 		break;
-	default:
-		break;
-	}
-}
-
-/*
-   fade out for 16/24/32
-*/
-void image_fadeOut(SDL_Surface *img, int lv, int col) {
-	switch(img->format->BytesPerPixel) {
-	case 2:
-		fadeOut16(img, lv, col); break;
-	case 3:
-		fadeOut24p(img, lv, col); break;
-	case 4:
-		fadeOut24(img, lv, col); break;
-	default:
-		break;
-	}
-}
-
-/*
-   fade in for 16/24/32
-*/
-void image_fadeIn(SDL_Surface *src, SDL_Surface *dst, int lv) {
-	switch(dst->format->BytesPerPixel) {
-	case 2:
-		fadeIn16(src, dst, lv); break;
-	case 3:
-		fadeIn24p(src, dst, lv); break;
-	case 4:
-		fadeIn24(src, dst, lv); break;
 	default:
 		break;
 	}

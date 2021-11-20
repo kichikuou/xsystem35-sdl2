@@ -42,6 +42,9 @@
 #include "nact.h"
 #include "debugger.h"
 
+static const int fadeX[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
+static const int fadeY[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
+
 static int fadestep[256] =
 {0,1,3,4,6,7,9,10,12,14,15,17,18,20,21,23,25,26,28,29,31,32,34,36,37,39,40,
  42,43,45,46,48,49,51,53,54,56,57,59,60,62,63,65,66,68,69,71,72,74,75,77,78,
@@ -370,50 +373,51 @@ static void setWhiteness(SDL_Surface *s, int val) {
 }
 
 static void fader_in(int n) {
-	static SDL_Surface *s_fader;
+	static SDL_Surface *src;
 
 	if (n == 0) {
-		s_fader = SDL_CreateRGBSurface(0, sdl_display->w, sdl_display->h,
+		src = SDL_CreateRGBSurface(0, sdl_display->w, sdl_display->h,
 					   sdl_display->format->BitsPerPixel, 0, 0, 0, 0);
 		
-		if (sdl_display->format->BitsPerPixel == 8) {
-			memcpy(s_fader->format->palette->colors,
-			       sdl_display->format->palette->colors,
-			       sizeof(SDL_Color) * 256);
-		}
 		SDL_Rect r_src = {view_x, view_y, view_w, view_h};
 		SDL_Rect r_dst = {winoffset_x, winoffset_y, view_w, view_h};
-		SDL_BlitSurface(sdl_dib, &r_src, s_fader, &r_dst);
+		SDL_BlitSurface(sdl_dib, &r_src, src, &r_dst);
 	}
 	
 	if (n == 255) {
-		SDL_FreeSurface(s_fader);
+		SDL_FreeSurface(src);
 		sdl_updateAll();
 		return;
 	}
-	
-	SDL_LockSurface(s_fader);
-	SDL_LockSurface(sdl_display);
-	
-	image_fadeIn(s_fader, sdl_display, n / 16);
-	
-	SDL_UnlockSurface(sdl_display);
-	SDL_UnlockSurface(s_fader);
+
+	int lv = n / 16;
+	for (int y = 0; y < src->h; y += 4) {
+		DWORD *yls = PIXEL_AT(src, 0, y + fadeY[lv]);
+		DWORD *yld = PIXEL_AT(sdl_display, 0, y + fadeY[lv]);
+		for (int x = 0; x < src->w; x += 4) {
+			*(yld + fadeX[lv]) = *(yls + fadeX[lv]);
+			yls += 4; yld += 4;
+		}
+	}
+
 	sdl_dirty = TRUE;
 }
 
-static void fader_out(int n,Uint32 c) {
+static void fader_out(int n, Uint32 c) {
 	if (n == 255) {
 		SDL_FillRect(sdl_display, NULL, c);
 		return;
 	}
-	
-	SDL_LockSurface(sdl_display);
-	
-	image_fadeOut(sdl_display, (255 - n) / 16, c);
-	
-	SDL_UnlockSurface(sdl_display);
-	
+
+	int lv = (255 - n) / 16;
+	for (int y = 0; y < sdl_display->h; y += 4) {
+		DWORD *yld = PIXEL_AT(sdl_display, 0, y + fadeY[lv]);
+		for (int x = 0; x < sdl_display->w; x += 4) {
+			*(yld + fadeX[lv]) = c;
+			yld += 4;
+		}
+	}
+
 	sdl_dirty = TRUE;
 }
 
@@ -481,8 +485,8 @@ void sdl_wrapColor(int sx, int sy, int w, int h, BYTE c, int rate) {
 
 /* mask update まだ */
 void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step) {
-
 	if (step == 256) {
+		WARNING("Unimplemented effect %d\n", func);
 		ags_copyArea(sx, sy, w, h, dx, dy);
 		ags_updateArea(dx, dy, w, h);
 	}

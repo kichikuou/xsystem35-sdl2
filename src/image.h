@@ -29,8 +29,6 @@
 #include "ags.h"
 
 extern void image_setdepth(int);
-extern void image_fadeOut(SDL_Surface *img, int lv, int col);
-extern void image_fadeIn(SDL_Surface *src, SDL_Surface *dst, int lv);
 extern void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 extern void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 extern void image_Mosaic(SDL_Surface *dib, int sx, int sy, int w, int h, int dx, int dy, int slice);
