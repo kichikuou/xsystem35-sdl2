@@ -53,7 +53,7 @@ typedef struct {
 	void (*quit)(void);
 	void (*repl)(void);
 	void (*onsleep)(void);
-	void (*console_output)(const char *output);
+	void (*console_output)(int lv, const char *output);
 } DebuggerImpl;
 
 extern DebuggerImpl dbg_cui_impl;

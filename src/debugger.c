@@ -538,11 +538,11 @@ void dbg_onsleep(void) {
 		dbg_impl->onsleep();
 }
 
-boolean dbg_console_vprintf(const char *format, va_list ap) {
+boolean dbg_console_vprintf(int lv, const char *format, va_list ap) {
 	if (!dbg_impl || !dbg_impl->console_output)
 		return false;
 	char buf[1024];
 	vsnprintf(buf, sizeof(buf), format, ap);
-	dbg_impl->console_output(buf);
+	dbg_impl->console_output(lv, buf);
 	return true;
 }

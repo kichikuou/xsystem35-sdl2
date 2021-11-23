@@ -42,10 +42,14 @@ enum VariablesReference {
 	VREF_STRINGS,
 };
 
+// Exception Breakpoint Filters.
+static const char ebf_warnings[] = "warnings";
+
 static bool initialized;
 static char *symbols_path;
 static char *src_dir;
 static struct msgq *queue;
+static bool break_on_warnings;
 
 cJSON *create_source(const char *name) {
 	cJSON *source = cJSON_CreateObject();
@@ -84,7 +88,7 @@ static void emit_terminated_event(void) {
 	send_json(event);
 }
 
-static void emit_stop_event(void) {
+static void emit_stopped_event(void) {
 	const char *reason;
 	switch (dbg_state) {
 	case DBG_STOPPED_ENTRY: reason = "entry"; break;
@@ -92,6 +96,7 @@ static void emit_stop_event(void) {
 	case DBG_STOPPED_NEXT: reason = "step"; break;
 	case DBG_STOPPED_BREAKPOINT: reason = "breakpoint"; break;
 	case DBG_STOPPED_INTERRUPT: reason = "pause"; break;
+	case DBG_STOPPED_EXCEPTION: reason = "exception"; break;
 	default: reason = "unknown"; break;
 	}
 
@@ -104,7 +109,7 @@ static void emit_stop_event(void) {
 	send_json(event);
 }
 
-static void emit_output_event(const char *output) {
+static void emit_output_event(int lv, const char *output) {
 	cJSON *event = cJSON_CreateObject(), *body;
 	cJSON_AddStringToObject(event, "type", "event");
 	cJSON_AddStringToObject(event, "event", "output");
@@ -119,16 +124,23 @@ static void emit_output_event(const char *output) {
 		cJSON_AddNumberToObject(body, "line", line);
 
 	send_json(event);
+
+	if (break_on_warnings && lv <= 1)
+		dbg_state = DBG_STOPPED_EXCEPTION;
 }
 
 static void cmd_initialize(cJSON *args, cJSON *resp) {
-	cJSON *body;
+	cJSON *body, *filters, *filter;
 	cJSON_AddBoolToObject(resp, "success", true);
 	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
 	cJSON_AddBoolToObject(body, "supportsConditionalBreakpoints", true);
 	cJSON_AddBoolToObject(body, "supportsConfigurationDoneRequest", true);
 	cJSON_AddBoolToObject(body, "supportsEvaluateForHovers", true);
 	cJSON_AddBoolToObject(body, "supportsSetVariable", true);
+	cJSON_AddItemToObjectCS(body, "exceptionBreakpointFilters", filters = cJSON_CreateArray());
+	cJSON_AddItemToArray(filters, filter = cJSON_CreateObject());
+	cJSON_AddStringToObject(filter, "filter", ebf_warnings);
+	cJSON_AddStringToObject(filter, "label", "Stop on warnings");
 }
 
 static void cmd_launch(cJSON *args, cJSON *resp) {
@@ -247,6 +259,17 @@ static void cmd_setBreakpoints(cJSON *args, cJSON *resp) {
 		cJSON_AddItemToObjectCS(item, "source", create_source(filename));
 		cJSON_AddNumberToObject(item, "line", line_no);
 	}
+}
+
+static void cmd_setExceptionBreakpoints(cJSON *args, cJSON *resp) {
+	cJSON *filters = cJSON_GetObjectItemCaseSensitive(args, "filters");
+	break_on_warnings = false;
+	cJSON *filter;
+	cJSON_ArrayForEach(filter, filters) {
+		if (cJSON_IsString(filter) && !strcmp(filter->valuestring, ebf_warnings))
+			break_on_warnings = true;
+	}
+	cJSON_AddBoolToObject(resp, "success", true);
 }
 
 static void cmd_evaluate(cJSON *args, cJSON *resp) {
@@ -493,6 +516,8 @@ static boolean handle_request(cJSON *request) {
 		cmd_evaluate(args, resp);
 	} else if (!strcmp(command->valuestring, "setBreakpoints")) {
 		cmd_setBreakpoints(args, resp);
+	} else if (!strcmp(command->valuestring, "setExceptionBreakpoints")) {
+		cmd_setExceptionBreakpoints(args, resp);
 	} else if (!strcmp(command->valuestring, "threads")) {
 		cmd_threads(args, resp);
 	} else if (!strcmp(command->valuestring, "scopes")) {
@@ -568,7 +593,7 @@ static void dbg_dap_quit(void) {
 }
 
 static void dbg_dap_repl(void) {
-	emit_stop_event();
+	emit_stopped_event();
 	dbg_state = DBG_RUNNING;
 
 	boolean continue_repl = true;
@@ -587,7 +612,7 @@ static void dbg_dap_onsleep(void) {
 			break;
 		handle_message(msg);
 	}
-	if (dbg_state == DBG_STOPPED_INTERRUPT)
+	if (dbg_state == DBG_STOPPED_INTERRUPT || dbg_state == DBG_STOPPED_EXCEPTION)
 		dbg_main();
 }
 
