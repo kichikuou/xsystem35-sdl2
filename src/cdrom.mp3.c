@@ -34,34 +34,6 @@
 #include "cdrom.h"
 #include "music_private.h"
 
-/*
-   CPUパワーがあまってあまってどうしようもない人へ :-)
-
-  使い方
-
-   1. とりあえず mpg123 などの プレイヤーを用意する。
-      esd を使いたい場合は Ver 0.59q 以降を入れよう。
-      プレーヤーにはあらかじめパスを通しておく。
-
-   2. % cat ~/game/kichiku.playlist
-       mpg123 -quite
-       $(HOME)/game/kichiku/mp3/trk02.mp3
-       $(HOME)/game/kichiku/mp3/trk03.mp3
-       $(HOME)/game/kichiku/mp3/trk04.mp3
-       $(HOME)/game/kichiku/mp3/trk05.mp3
-       $(HOME)/game/kichiku/mp3/trk06.mp3
-
-       ってなファイルを用意する。( $(HOME)は適当にかえてね )
-       １行目はプレーヤーとそのオプション
-       ２行目以降はトラック２から順にファイルをならべる
-       
-
-   3 configure で --enable-cdrom=mp3 を追加する
-
-   4 実行時オプションに -devcd ~/game/kichiku.playlist のように上で作成したファイルを指定
-
-*/
-
 static int cdrom_init(char *);
 static int cdrom_exit();
 static int cdrom_start(int, int);
@@ -83,58 +55,46 @@ cdromdevice_t cdrom = {
 
 static boolean      enabled = FALSE;
 static char         *playlist[PLAYLIST_MAX];
-static int          lastindex; // 最終トラック番号
 static Mix_Music    *mix_music;
 static int          trackno; // 現在演奏中のトラック
 static int          start_time;
 
-static int cdrom_init(char *config_file) {
-	char lbuf[256];
-	int lcnt = 1;
-	char *s;
-	
-	FILE *fp = fopen(config_file, "rt");
+static int cdrom_init(char *playlist_path) {
+	char buf[256];
+
+	FILE *fp = fopen(playlist_path, "r");
 	if (fp) {
 		// Skip the first line
-		fgets(lbuf, sizeof(lbuf), fp);
+		fgets(buf, sizeof(buf), fp);
 	} else {
-		fp = fopen("_inmm.ini", "rt");
+		fp = fopen("_inmm.ini", "r");
 	}
-	if (!fp)
+	if (!fp) {
+		NOTICE("cdrom: Cannot open playlist %s\n", playlist_path);
 		return NG;
+	}
 
-	while (TRUE) {
-		if (++lcnt >= (PLAYLIST_MAX +2)) {
+	for (int track = 2; track < PLAYLIST_MAX; track++) {
+		if (!fgets(buf, sizeof(buf), fp))
 			break;
-		}
-		if (!fgets(lbuf, sizeof(lbuf) -1, fp)) {
-			if (feof(fp)) {
+		for (char *s = buf; *s; s++) {
+			if (*s == '\\')
+				*s = '/';
+			else if (*s == '\r' || *s == '\n') {
+				*s = '\0';
 				break;
-			} else {
-				perror("fgets()");
-				fclose(fp);
-				return NG;
 			}
 		}
-		if (NULL == (playlist[lcnt -2] = malloc(strlen(lbuf) + 1))) {
-			fclose(fp);
-			return NG;
+		if (*buf) {
+			playlist[track] = strdup(buf);
+			prv.cd_maxtrk = track;
 		}
-		s = lbuf;
-		while (*s != '\n' && *s != 0) s++;
-		if (*s == '\n') *s=0;
-		strcpy(playlist[lcnt - 2], lbuf);
 	}
-	lastindex = lcnt -1;
 	fclose(fp);
+	NOTICE("cdrom: Loaded playlist from %s\n", playlist_path);
 	
 	trackno = 0;
-	prv.cd_maxtrk = lastindex;
-	
 	enabled = TRUE;
-
-	NOTICE("cdrom mp3 external player mode\n");
-	
 	return OK;
 }
 
@@ -149,10 +109,8 @@ static int cdrom_exit() {
 static int cdrom_start(int trk, int loop) {
 	if (!enabled) return 0;
 	
-	/* 曲数よりも多い指定は不可*/
-	if (trk > lastindex) {
+	if (trk >= PLAYLIST_MAX || !playlist[trk])
 		return NG;
-	}
 	
 	if (mix_music)
 		Mix_FreeMusic(mix_music);
@@ -160,15 +118,15 @@ static int cdrom_start(int trk, int loop) {
 #ifdef __ANDROID__
 	// Mix_LoadMUS uses SDL_RWFromFile which requires absolute path on Android
 	char path[PATH_MAX];
-	if (!realpath(playlist[trk -2], path))
+	if (!realpath(playlist[trk], path))
 		return NG;
 	mix_music = Mix_LoadMUS(path);
 #else
-	mix_music = Mix_LoadMUS(playlist[trk -2]);
+	mix_music = Mix_LoadMUS(playlist[trk]);
 #endif
 
 	if (!mix_music) {
-		WARNING("Cannot load %s: %s\n", playlist[trk -2], Mix_GetError());
+		WARNING("Cannot load %s: %s\n", playlist[trk], Mix_GetError());
 		return NG;
 	}
 	if (Mix_PlayMusic(mix_music, loop == 0 ? -1 : loop) != 0) {
