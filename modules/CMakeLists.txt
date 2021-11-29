@@ -103,16 +103,19 @@ target_compile_options(modules PRIVATE -Wno-pointer-sign)
 
 if (EMSCRIPTEN)
   set(LIBS
+    "SHELL:-s USE_ZLIB=1"
     "SHELL:-s USE_LIBJPEG=1"
     "SHELL:-s USE_SDL=2")
   target_compile_options(modules PRIVATE ${LIBS})
   target_link_options(modules PRIVATE ${LIBS})
-endif()
-
-if (SDL2MIXER_FOUND)
-  if (ANDROID)
+elseif (ANDROID)
+  target_link_libraries(modules PRIVATE ${ndk_zlib})
+  if (SDL2MIXER_FOUND)
     target_link_libraries(modules PRIVATE SDL2 SDL2_mixer)
-  else()
+  endif()
+else()
+  target_link_libraries(modules PRIVATE ZLIB::ZLIB)
+  if (SDL2MIXER_FOUND)
     target_link_libraries(modules PRIVATE PkgConfig::SDL2MIXER)
   endif()
 endif()
