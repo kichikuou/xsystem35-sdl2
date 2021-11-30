@@ -137,8 +137,10 @@ void ags_setWorldSize(int width, int height, int depth) {
 	nact->ags.dib = sdl_getDIB();
 	
 	/* DIBが8以上の場合は、alpha plane を用意 */
-	if (depth > 8)
-		nact->ags.dib->alpha = calloc(width * height, sizeof(BYTE));
+	if (depth > 8) {
+		nact->ags.dib->alpha = malloc(width * height);
+		memset(nact->ags.dib->alpha, 255, width * height);
+	}
 	
 	fade_outed = FALSE;  /* thanx tajiri@wizard */
 	
