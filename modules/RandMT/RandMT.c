@@ -59,15 +59,17 @@ static void Get() {
 		*var = (int)(genrand() * num) + 1;
 	}
 	
-	DEBUG_COMMAND_YET("RandMT.Get %d,%p:\n", num, var);
+	DEBUG_COMMAND("RandMT.Get %d,%p:\n", num, var);
 }
 
-static void GetNoOverlap() { /* not used ? */
-	int p1    = getCaliValue();
-	int p2    = getCaliValue();
-	int *var1 = getCaliVariable();
-	
-	DEBUG_COMMAND_YET("RandMT.GetNoOverlap %p:\n", p1);
+static void GetNoOverlap() {
+	int min  = getCaliValue();
+	int n    = getCaliValue();
+	int *var = getCaliVariable();
+
+	*var = (int)(genrand() * n) + min;
+
+	DEBUG_COMMAND("RandMT.GetNoOverlap %d,%d,%p:\n", min, n, var);
 }
 
 static const ModuleFunc functions[] = {
