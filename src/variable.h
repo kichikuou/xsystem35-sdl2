@@ -55,8 +55,8 @@ boolean v_releaseArrayVar(int datavar);
 boolean v_getArrayBufferStatus(int page);
 boolean v_initVars();
 
-void svar_init(int cnt, int len);
-int svar_count(void);
+void svar_init(int max_index, int len);
+int svar_maxindex(void);
 const char *svar_get(int no);
 void svar_set(int no, const char *str);
 void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len);

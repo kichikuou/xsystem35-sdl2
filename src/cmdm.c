@@ -52,11 +52,7 @@ void commandMS() {
 	int num = getCaliValue();
 	const char *str = sl_getString(':');
 	
-	if (num > 0) { /* thanx tajiri@wizard */
-		svar_set(num, str);
-	} else {
-        	WARNING("MS: num(%d) <= 0\n", num);
-	}
+	svar_set(num, str);
 	DEBUG_COMMAND("MS %d,%s:\n",num,str);
 }
 

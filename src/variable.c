@@ -155,23 +155,23 @@ extern boolean v_getArrayBufferStatus(int page) {
 }
 
 /* 文字列変数の再初期化 */
-extern void svar_init(int cnt, int len) {
-	for (int i = cnt + 1; i < strvar_cnt; i++) {
+extern void svar_init(int max_index, int len) {
+	for (int i = max_index + 1; i < strvar_cnt; i++) {
 		if (strVar[i])
 			free(strVar[i]);
 	}
-	strVar = realloc(strVar, cnt * sizeof(char *));
+	strVar = realloc(strVar, (max_index + 1) * sizeof(char *));
 	if (strVar == NULL) {
 		NOMEMERR();
 	}
-	for (int i = strvar_cnt + 1; i < cnt; i++)
+	for (int i = strvar_cnt; i <= max_index; i++)
 		strVar[i] = NULL;
-	strvar_cnt = cnt;
+	strvar_cnt = max_index + 1;
 	strvar_len = len;
 }
 
-extern int svar_count(void) {
-	return strvar_cnt;
+extern int svar_maxindex(void) {
+	return strvar_cnt - 1;
 }
 
 /* 変数の初期化 */
@@ -185,37 +185,37 @@ extern boolean v_initVars() {
 
 /* 文字変数への代入 */
 void svar_set(int no, const char *str) {
-	if (no < 1 || no > strvar_cnt) {
-		WARNING("string index out of range: %d", no);
+	if ((unsigned)no >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", no);
 		return;
 	}
-	if (strVar[no-1])
-		free(strVar[no-1]);
-	strVar[no-1] = strdup(str);
+	if (strVar[no])
+		free(strVar[no]);
+	strVar[no] = strdup(str);
 }
 
 void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len) {
-	if (dstno < 1 || dstno > strvar_cnt) {
-		WARNING("string index out of range: %d", dstno);
+	if ((unsigned)dstno >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", dstno);
 		return;
 	}
-	if (!strVar[dstno-1])
-		strVar[dstno-1] = strdup("");
+	if (!strVar[dstno])
+		strVar[dstno] = strdup("");
 
 	char *buf = NULL;
 	const char *src;
 	if (srcno == dstno)
-		src = buf = strdup(strVar[srcno-1]);
+		src = buf = strdup(strVar[srcno]);
 	else
 		src = svar_get(srcno);
 
-	dstpos = advance(strVar[dstno-1], dstpos) - strVar[dstno-1];  // #chars -> #bytes
+	dstpos = advance(strVar[dstno], dstpos) - strVar[dstno];  // #chars -> #bytes
 	src = advance(src, srcpos);
 	len = advance(src, len) - src;  // #chars -> #bytes
 
-	strVar[dstno-1] = realloc(strVar[dstno-1], dstpos + len + 1);
-	strncpy(strVar[dstno-1] + dstpos, src, len);
-	strVar[dstno-1][dstpos + len] = '\0';
+	strVar[dstno] = realloc(strVar[dstno], dstpos + len + 1);
+	strncpy(strVar[dstno] + dstpos, src, len);
+	strVar[dstno][dstpos + len] = '\0';
 
 	if (buf)
 		free(buf);
@@ -223,18 +223,18 @@ void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len) {
 
 /* 文字変数への接続 */
 void svar_append(int no, const char *str) {
-	if (no < 1 || no > strvar_cnt) {
-		WARNING("string index out of range: %d", no);
+	if ((unsigned)no >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", no);
 		return;
 	}
-	if (!strVar[no-1]) {
-		strVar[no-1] = strdup(str);
+	if (!strVar[no]) {
+		strVar[no] = strdup(str);
 		return;
 	}
-	int len1 = strlen(strVar[no-1]);
+	int len1 = strlen(strVar[no]);
 	int len2 = strlen(str);
-	strVar[no-1] = realloc(strVar[no-1], len1 + len2 + 1);
-	strcpy(strVar[no-1] + len1, str);
+	strVar[no] = realloc(strVar[no], len1 + len2 + 1);
+	strcpy(strVar[no] + len1, str);
 }
 
 /* 文字変数の長さ */
@@ -256,23 +256,23 @@ int svar_width(int no) {
 
 /* 文字変数そのもの */
 const char *svar_get(int no) {
-	if (no < 1 || no > strvar_cnt) {
-		WARNING("string index out of range: %d", no);
+	if ((unsigned)no >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", no);
 		return "";
 	}
-	return strVar[no-1] ? strVar[no-1] : "";
+	return strVar[no] ? strVar[no] : "";
 }
 
 int svar_find(int no, int start, const char *str) {
-	if (no < 1 || no > strvar_cnt) {
-		WARNING("string index out of range: %d", no);
+	if ((unsigned)no >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", no);
 		return -1;
 	}
 	if (!*str)
 		return 0;
-	if (!strVar[no-1])
+	if (!strVar[no])
 		return -1;
-	const char *p = advance(strVar[no-1], start);
+	const char *p = advance(strVar[no], start);
 	const char *found = strstr(p, str);
 	if (!found)
 		return -1;
@@ -285,17 +285,17 @@ int svar_find(int no, int start, const char *str) {
 }
 
 void svar_fromVars(int no, const int *vars) {
-	if (no < 1 || no > strvar_cnt) {
-		WARNING("string index out of range: %d", no);
+	if ((unsigned)no >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", no);
 		return;
 	}
 	int len = 0;
 	for (const int *c = vars; *c; c++)
 		len += (*c < 256) ? 1 : 2;
 
-	if (strVar[no-1])
-		free(strVar[no-1]);
-	char *p = strVar[no-1] = malloc(len + 1);
+	if (strVar[no])
+		free(strVar[no]);
+	char *p = strVar[no] = malloc(len + 1);
 
 	for (const int *v = vars; *v; v++) {
 		if (*v < 256) {
@@ -309,17 +309,17 @@ void svar_fromVars(int no, const int *vars) {
 }
 
 int svar_toVars(int no, int *vars) {
-	if (no < 1 || no > strvar_cnt) {
-		WARNING("string index out of range: %d", no);
+	if ((unsigned)no >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", no);
 		return 0;
 	}
-	if (!strVar[no-1]) {
+	if (!strVar[no]) {
 		*vars = 0;
 		return 1;
 	}
 
 	int count = 0;
-	for (const char *p = strVar[no-1]; *p; p++, count++) {
+	for (const char *p = strVar[no]; *p; p++, count++) {
 		vars[count] = *p & 0xff;
 		if (CHECKSJIS1BYTE(*p) && *(p + 1))
 			vars[count] |= (*++p & 0xff) << 8;
@@ -343,14 +343,14 @@ void svar_replaceAll(int no, int pattern, int replacement) {
 		return;
 	const char *repl = svar_get(replacement);
 
-	if (no < 1 || no > strvar_cnt) {
-		WARNING("string index out of range: %d", no);
+	if ((unsigned)no >= strvar_cnt) {
+		WARNING("string index out of range: %d\n", no);
 		return;
 	}
-	if (!strVar[no-1])
+	if (!strVar[no])
 		return;
-	char *src = strVar[no-1];
-	strVar[no-1] = NULL;
+	char *src = strVar[no];
+	strVar[no] = NULL;
 
 	char *start = src, *found;;
 	while ((found = strstr(start, pat))) {

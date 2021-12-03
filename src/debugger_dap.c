@@ -340,7 +340,7 @@ static void cmd_scopes(cJSON *args, cJSON *resp) {
 	cJSON_AddItemToArray(scopes, strings = cJSON_CreateObject());
 	cJSON_AddStringToObject(strings, "name", "Strings");
 	cJSON_AddNumberToObject(strings, "variablesReference", VREF_STRINGS);
-	cJSON_AddNumberToObject(strings, "indexedVariables", svar_count() + 1);
+	cJSON_AddNumberToObject(strings, "indexedVariables", svar_maxindex() + 1);
 	cJSON_AddBoolToObject(strings, "expensive", false);
 }
 
@@ -381,11 +381,7 @@ static void cmd_variables(cJSON *args, cJSON *resp) {
 		cJSON_AddBoolToObject(resp, "success", true);
 		cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
 		cJSON_AddItemToObjectCS(body, "variables", variables = cJSON_CreateArray());
-		if (start == 0) {
-			start++;
-			count--;
-		}
-		int end = svar_count() + 1;
+		int end = svar_maxindex() + 1;
 		if (end > start + count)
 			end = start + count;
 		for (int i = start; i < end; i++) {
@@ -438,7 +434,7 @@ static void cmd_setVariable(cJSON *args, cJSON *resp) {
 		cJSON_AddStringToObject(body, "value", new_value);
 	} else if (cJSON_IsNumber(vref) && vref->valueint == VREF_STRINGS) {
 		int idx;
-		if (sscanf(name->valuestring, "[%d]", &idx) != 1 || idx < 1 || idx > svar_count()) {
+		if (sscanf(name->valuestring, "[%d]", &idx) != 1 || (unsigned)idx > svar_maxindex()) {
 			cJSON_AddBoolToObject(resp, "success", false);
 			cJSON_AddStringToObject(resp, "message", "invalid string index");
 			return;

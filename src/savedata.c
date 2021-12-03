@@ -155,7 +155,7 @@ int save_save_str_with_file(char *fname_utf8, int start, int cnt) {
 	FILE *fp;
 	char *tmp, *_tmp;
 	
-	_tmp = tmp = malloc(strvar_cnt * strvar_len);
+	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
 		return SAVE_LOADSHORTAGE;
@@ -570,19 +570,20 @@ static void loadStackInfo(char *buf) {
 static void *saveStrVar(Ald_strVarHdr *head) {
 	int i;
 	char *tmp, *_tmp;
-	_tmp = tmp = malloc(strvar_cnt * strvar_len);
+	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
 		return NULL;
 	}
 	*tmp = 0;
-	for (i = 1; i <= strvar_cnt; i++) {
+	// Do not save svar[0], for backward compatibility.
+	for (i = 1; i <= svar_maxindex(); i++) {
 		strncpy(tmp, svar_get(i), strvar_len - 1);
 		tmp[strvar_len - 1] = '\0';
 		tmp += strlen(tmp) + 1;
 	}
 	head->size   = tmp - _tmp;
-	head->count  = strvar_cnt;
+	head->count  = svar_maxindex();
 	head->maxlen = strvar_len;
 	return _tmp;
 }
@@ -594,8 +595,10 @@ static void loadStrVar(char *buf) {
 	
 	cnt = head->count;
 	max = head->maxlen;
-	if (strvar_cnt != cnt || strvar_len != max)
+	if (svar_maxindex() != cnt || strvar_len != max) {
+		WARNING("Unexpected number of strings in savedata (%d, expected %d)\n", cnt, svar_maxindex());
 		svar_init(cnt, max);
+	}
 	buf += sizeof(Ald_strVarHdr);
 	for (i = 1; i <= cnt; i++) {
 		svar_set(i, buf);

@@ -111,7 +111,6 @@ typedef struct {
 /* defined by cmdb.c */
 extern Bcom_WindowInfo selWinInfo[];
 /* defined by variable.c */
-extern int  strvar_cnt;
 extern int  strvar_len;
 
 extern int save_loadAll(int no);

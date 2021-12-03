@@ -441,15 +441,10 @@ void commands2F26() {
 }
 
 void commands2F27() {
-	int   num    = getCaliValue();
+	int num = getCaliValue();
 	const char *string = sl_getString(0);
 
-	if (num > 0) {
-		svar_set(num, string);
-	} else {
-        	WARNING("MS: num <= 0\n");
-	}
-	
+	svar_set(num, string);
 	DEBUG_COMMAND("MS(new) %d, %s:\n", num, string);
 }
 
