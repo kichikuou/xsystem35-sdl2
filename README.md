@@ -59,8 +59,7 @@ game folder (where the ALD files are located).
 
 ### Android
 
-Make a Zip file containing all the game files, copy it to your device, and load
-it.
+See [android/README.md](https://github.com/kichikuou/xsystem35-sdl2/blob/master/android/README.md#use).
 
 ### Other Platforms
 
