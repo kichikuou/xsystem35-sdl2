@@ -32,6 +32,7 @@
 #include "ags.h"
 #include "system.h"
 #include "nact.h"
+#include "effect.h"
 
 /* saved parameter */
 struct ecopyparam {
@@ -1075,22 +1076,6 @@ static void eCopyArea43(int step) {
 		 nact->sys_view_area.h - deltah);
 }
 
-static void eCopyArea44(int step) {
-	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 44, step); 
-}
-
-static void eCopyArea45(int step) {
-	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 45, step); 
-}
-
-static void eCopyArea46(int step) {
-	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 46, step); 
-}
-
-static void eCopyArea47(int step) {
-	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 47, step); 
-}
-
 static int eCopyArea48(int dx, int dy, int w, int h, int opt) {
 	int i, j, x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 40 : opt;
@@ -1127,18 +1112,6 @@ static int eCopyArea49(int dx, int dy, int w, int h, int opt) {
 	
 	eCopyUpdateArea(dx, dy, w, h, dx, dy);
 	return key;
-}
-
-static void eCopyArea50(int step) {
-	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 50, step); 
-}
-
-static void eCopyArea51(int step) {
-	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 51, step); 
-}
-
-static void eCopyArea52(int step) {
-	sdl_maskupdate(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, 52, step); 
 }
 
 static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
@@ -1194,6 +1167,12 @@ static int eCopyArea5sp(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	ags_delRegion(save);
 	
 	return key;
+}
+
+struct sdl_fader *sdlfader;
+
+static void sdlfader_step(int step) {
+	sdl_fader_step(sdlfader, step);
 }
 
 void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, boolean cancel, int spCol) {
@@ -1449,36 +1428,21 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		ags_fader(&i);
 		return;
 		
-	case 44:
-		i.step_max = 256;
+	case EFFECT_PENTAGRAM_IN_OUT:
+	case EFFECT_PENTAGRAM_OUT_IN:
+	case EFFECT_HEXAGRAM_IN_OUT:
+	case EFFECT_HEXAGRAM_OUT_IN:
+	case EFFECT_WINDMILL:
+	case EFFECT_WINDMILL_180:
+	case EFFECT_WINDMILL_360:
+		i.step_max = SDL_FADER_MAXSTEP;
 		i.effect_time = opt == 0 ? 1000 : opt;
 		i.cancel = cancel;
-		i.callback = eCopyArea44;
+		sdlfader = sdl_fader_init(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, sw);
+		i.callback = sdlfader_step;
 		ags_fader(&i);
-		return;
-
-	case 45:
-		i.step_max = 256;
-		i.effect_time = opt == 0 ? 1000 : opt;
-		i.cancel = cancel;
-		i.callback = eCopyArea45;
-		ags_fader(&i);
-		return;
-		
-	case 46:
-		i.step_max = 256;
-		i.effect_time = opt == 0 ? 1000 : opt;
-		i.cancel = cancel;
-		i.callback = eCopyArea46;
-		ags_fader(&i);
-		return;
-		
-	case 47:
-		i.step_max = 256;
-		i.effect_time = opt == 0 ? 1000 : opt;
-		i.cancel = cancel;
-		i.callback = eCopyArea47;
-		ags_fader(&i);
+		sdl_fader_finish(sdlfader);
+		sdlfader = NULL;
 		return;
 		
 	case 48:
@@ -1487,30 +1451,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 49:
 	        ret = eCopyArea49(dx, dy, w, h, opt);
 		break;
-		
-	case 50:
-		i.step_max = 256;
-		i.effect_time = opt == 0 ? 1000 : opt;
-		i.cancel = cancel;
-		i.callback = eCopyArea50;
-		ags_fader(&i);
-		return;
-		
-	case 51:
-		i.step_max = 256;
-		i.effect_time = opt == 0 ? 1000 : opt;
-		i.cancel = cancel;
-		i.callback = eCopyArea51;
-		ags_fader(&i);
-		return;
-		
-	case 52:
-		i.step_max = 256;
-		i.effect_time = opt == 0 ? 1000 : opt;
-		i.cancel = cancel;
-		i.callback = eCopyArea52;
-		ags_fader(&i);
-		return;
 		
 	case 1000:
 		if (nact->sys_world_depth != 8) return;
