@@ -287,8 +287,8 @@ int sdl_getMouseInfo(MyPoint *p) {
 	}
 	
 	if (p) {
-		p->x = mousex - winoffset_x;
-		p->y = mousey - winoffset_y;
+		p->x = mousex;
+		p->y = mousey;
 	}
 
 	int m1 = mouseb & (1 << 1) ? SYS35KEY_RET : 0;

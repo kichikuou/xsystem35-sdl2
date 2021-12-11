@@ -113,7 +113,7 @@ void sdl_wait_vsync() {
 
 /* off-screen の指定領域を Main Window へ転送 */
 void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
-	SDL_Rect rect_d = {winoffset_x + dst->x, winoffset_y + dst->y, src->w, src->h};
+	SDL_Rect rect_d = {dst->x, dst->y, src->w, src->h};
 	
 	SDL_BlitSurface(sdl_dib, src, sdl_display, &rect_d);
 	
@@ -122,7 +122,7 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 
 /* 全画面更新 */
 static void sdl_updateAll() {
-	SDL_Rect rect = {winoffset_x, winoffset_y, view_w, view_h};
+	SDL_Rect rect = {0, 0, view_w, view_h};
 	
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &rect);
 
@@ -380,7 +380,7 @@ static void fader_in(int n) {
 					   sdl_display->format->BitsPerPixel, 0, 0, 0, 0);
 		
 		SDL_Rect r_src = {view_x, view_y, view_w, view_h};
-		SDL_Rect r_dst = {winoffset_x, winoffset_y, view_w, view_h};
+		SDL_Rect r_dst = {0, 0, view_w, view_h};
 		SDL_BlitSurface(sdl_dib, &r_src, src, &r_dst);
 	}
 	
@@ -422,7 +422,7 @@ static void fader_out(int n, Uint32 c) {
 }
 
 static __inline void sdl_fade_blit(void) {
-	SDL_Rect r_dst = {winoffset_x, winoffset_y, view_w, view_h};
+	SDL_Rect r_dst = {0, 0, view_w, view_h};
 
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &r_dst);
 	sdl_dirty = TRUE;

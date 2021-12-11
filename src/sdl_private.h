@@ -52,9 +52,6 @@ struct sdl_private_data {
 
 	boolean fs_on;
 
-	int      winoffset_x; /* draw offset in Window x */
-	int      winoffset_y; /*                       y */
-
 	boolean (*custom_event_handler)(const SDL_Event *);
 };
 
@@ -80,8 +77,6 @@ extern struct sdl_private_data *sdl_videodev;
 #define sdl_dirty (sdl_videodev->dirty)
 #define ms_active (sdl_videodev->ms_active)
 #define sdl_fs_on (sdl_videodev->fs_on)
-#define winoffset_x (sdl_videodev->winoffset_x)
-#define winoffset_y (sdl_videodev->winoffset_y)
 #define sdl_custom_event_handler (sdl_videodev->custom_event_handler)
 
 #endif /* __SDL_PRIVATE_H__ */
