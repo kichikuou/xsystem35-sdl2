@@ -48,10 +48,7 @@ static void ec9_cb(surface_t *, surface_t *);
 static void ec11_cb(surface_t *, surface_t *);
 static void ec12_cb(surface_t *, surface_t *);
 static void ec13_cb(surface_t *, surface_t *);
-static void ec14_cb(surface_t *, surface_t *);
-static void ec15_cb(surface_t *, surface_t *);
-static void ec16_cb(surface_t *, surface_t *);
-static void ec17_cb(surface_t *, surface_t *);
+static void sdlfader_cb(surface_t *, surface_t *);
 static void ec_dummy_cb(surface_t *, surface_t *);
 
 struct ecopyparam {
@@ -60,6 +57,7 @@ struct ecopyparam {
 	int edtime;
 	int curstep;
 	int oldstep;
+	struct sdl_fader *fader;
 };
 typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
@@ -87,10 +85,10 @@ static entrypoint *cb[39] = {
 	ec11_cb,
 	ec12_cb,
 	ec13_cb,
-	ec14_cb,
-	ec15_cb,
-	ec16_cb,
-	ec17_cb,
+	sdlfader_cb,
+	sdlfader_cb,
+	sdlfader_cb,
+	sdlfader_cb,
 	ec_dummy_cb,  // 欠番
 	ec19_cb,
 	ec20_cb,
@@ -288,55 +286,13 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 	ecp.oldstep = st_i;
 }
 
-// 五芒星 (内->外)
-static void ec14_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
+static void sdlfader_cb(surface_t *sfsrc, surface_t *sfdst) {
+	int curstep = SDL_FADER_MAXSTEP * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
 	
 	if (ecp.oldstep == 0) {
 		sf_copyall(sf0, sfdst);
 	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 44, curstep);
-	ecp.oldstep = curstep;
-}
-
-// 五芒星 (外->内)
-static void ec15_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 45, curstep);
-	ecp.oldstep = curstep;
-}
-
-// 六芒星 (内->外)
-static void ec16_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 46, curstep);
-	ecp.oldstep = curstep;
-}
-
-// 六芒星 (外->内)
-static void ec17_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 47, curstep);
+	sdl_fader_step(ecp.fader, curstep);
 	ecp.oldstep = curstep;
 }
 
@@ -386,6 +342,15 @@ static void ec38_cb(surface_t *sfsrc, surface_t *sfdst) {
 static void ec39_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
+static enum effect sact_effect_to_effect(enum sact_effect effect) {
+	switch (effect) {
+	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
+	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
+	case SACT_EFFECT_HEXAGRAM_IN_OUT: return EFFECT_HEXAGRAM_IN_OUT;
+	case SACT_EFFECT_HEXAGRAM_OUT_IN: return EFFECT_HEXAGRAM_OUT_IN;
+	default: return 0;
+	}
+}
 
 /*
   効果つき画面更新
@@ -409,7 +374,11 @@ int sp_eupdate(int type, int time, int cancel) {
 	
 	sfdst = sf_dup(sf0);
 	
-	sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
+	if (SACT_EFFECT_PENTAGRAM_IN_OUT <= type && type <= SACT_EFFECT_HEXAGRAM_OUT_IN)
+		ecp.fader = sdl_fader_init(0, 0, sfsrc->width, sfsrc->height, 0, 0, sact_effect_to_effect(type));
+	else
+		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
+
 	// 5つを越えたら別の方法を考えよう
 	if (type == 10) {
 		ec10_prepare(sfsrc, sfdst);
@@ -448,6 +417,10 @@ int sp_eupdate(int type, int time, int cancel) {
 	}
 	if (type == 19) {
 		ec19_drain(sfsrc, sfdst);
+	}
+	if (ecp.fader) {
+		sdl_fader_finish(ecp.fader);
+		ecp.fader = NULL;
 	}
 	
 	return OK;

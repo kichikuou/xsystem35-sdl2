@@ -81,7 +81,6 @@ extern void sdl_CopyRegion(void *src, int sx, int sy, int w, int h, int dx, int 
 extern void sdl_restoreRegion(void *src, int x, int y);
 extern void* sdl_saveRegion(int x, int y, int w, int h);
 extern void sdl_delRegion(void *src);
-extern void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step);
 extern SDL_Surface *com2surface(agsurface_t *s);
 
 /* fader */

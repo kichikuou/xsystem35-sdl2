@@ -47,10 +47,6 @@ static void ec9_cb(surface_t *, surface_t *);
 static void ec11_cb(surface_t *, surface_t *);
 static void ec12_cb(surface_t *, surface_t *);
 static void ec13_cb(surface_t *, surface_t *);
-static void ec14_cb(surface_t *, surface_t *);
-static void ec15_cb(surface_t *, surface_t *);
-static void ec16_cb(surface_t *, surface_t *);
-static void ec17_cb(surface_t *, surface_t *);
 static void ec_dummy_cb(surface_t *, surface_t *);
 
 struct ecopyparam {
@@ -243,58 +239,6 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 	
 	ags_updateArea(0, dyy-ed_i, src->width, l);
 	ecp.oldstep = st_i;
-}
-
-// 五芒星 (内->外)
-static void ec14_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 44, curstep);
-	ecp.oldstep = curstep;
-}
-
-// 五芒星 (外->内)
-static void ec15_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 45, curstep);
-	ecp.oldstep = curstep;
-}
-
-// 六芒星 (内->外)
-static void ec16_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 46, curstep);
-	ecp.oldstep = curstep;
-}
-
-// 六芒星 (外->内)
-static void ec17_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep, maxstep;
-	maxstep = 256;
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_maskupdate(0, 0, sfsrc->width, sfsrc->height, 0, 0, 47, curstep);
-	ecp.oldstep = curstep;
 }
 
 // フェードイン

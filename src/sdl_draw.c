@@ -480,12 +480,3 @@ void sdl_wrapColor(int sx, int sy, int w, int h, BYTE c, int rate) {
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 }
-
-/* mask update まだ */
-void sdl_maskupdate(int sx, int sy, int w, int h, int dx, int dy, int func, int step) {
-	if (step == 256) {
-		WARNING("Unimplemented effect %d\n", func);
-		ags_copyArea(sx, sy, w, h, dx, dy);
-		ags_updateArea(dx, dy, w, h);
-	}
-}
