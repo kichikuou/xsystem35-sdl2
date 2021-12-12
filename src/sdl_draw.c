@@ -376,9 +376,7 @@ static void fader_in(int n) {
 	static SDL_Surface *src;
 
 	if (n == 0) {
-		src = SDL_CreateRGBSurface(0, sdl_display->w, sdl_display->h,
-					   sdl_display->format->BitsPerPixel, 0, 0, 0, 0);
-		
+		src = SDL_CreateRGBSurfaceWithFormat(0, sdl_display->w, sdl_display->h, 32, SDL_PIXELFORMAT_RGB888);
 		SDL_Rect r_src = {view_x, view_y, view_w, view_h};
 		SDL_Rect r_dst = {0, 0, view_w, view_h};
 		SDL_BlitSurface(sdl_dib, &r_src, src, &r_dst);

@@ -263,7 +263,7 @@ void sdl_setWindowSize(int x, int y, int w, int h) {
 		SDL_FreeSurface(sdl_display);
 	if (sdl_texture)
 		SDL_DestroyTexture(sdl_texture);
-	sdl_display = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+	sdl_display = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
 	sdl_texture = SDL_CreateTexture(sdl_renderer, sdl_display->format->format,
 									SDL_TEXTUREACCESS_STATIC, w, h);
 
