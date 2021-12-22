@@ -109,7 +109,7 @@ class Launcher private constructor(private val rootDir: File) {
     private fun updateGameList() {
         var saveDirFound = false
         games.clear()
-        for (path in rootDir.listFiles()) {
+        for (path in rootDir.listFiles() ?: emptyArray()) {
             if (!path.isDirectory)
                 continue
             if (path.name == SAVE_DIR) {
@@ -144,7 +144,7 @@ class Launcher private constructor(private val rootDir: File) {
     // Throws IOException
     fun exportSaveData(output: OutputStream) {
         ZipOutputStream(output.buffered()).use { zip ->
-            for (path in File(rootDir, SAVE_DIR).listFiles()) {
+            for (path in File(rootDir, SAVE_DIR).listFiles() ?: emptyArray()) {
                 if (path.isDirectory || path.name.endsWith(".asd."))
                     continue
                 val pathInZip = "${SAVE_DIR}/${path.name}"
@@ -189,7 +189,7 @@ class Launcher private constructor(private val rootDir: File) {
                 val path = File(outDir, zipEntry.name)
                 if (zipEntry.isDirectory)
                     return@forEachZipEntry
-                path.parentFile.mkdirs()
+                path.parentFile?.mkdirs()
                 handler.sendMessage(handler.obtainMessage(PROGRESS, zipEntry.name))
                 FileOutputStream(path).buffered().use {
                     zip.copyTo(it)
@@ -234,7 +234,7 @@ class Launcher private constructor(private val rootDir: File) {
             val name = File(path).name
 
             specialResources[name.toLowerCase(Locale.US)]?.let {
-                grb.appendln("$it $path")
+                grb.appendLine("$it $path")
                 return
             }
             aldRegex.matchEntire(name)?.let {
@@ -246,7 +246,7 @@ class Launcher private constructor(private val rootDir: File) {
                 }
                 val id = it.groupValues[3].toUpperCase(Locale.US)
                 if (type != null) {
-                    grb.appendln("$type$id $path")
+                    grb.appendLine("$type$id $path")
                     basename = it.groupValues[1]
                 }
             }
@@ -261,7 +261,7 @@ class Launcher private constructor(private val rootDir: File) {
 
         fun write(outDir: File) {
             for (id in 'A' .. 'Z') {
-                grb.appendln("Save$id ../save/${basename}s${id.toLowerCase()}.asd")
+                grb.appendLine("Save$id ../save/${basename}s${id.toLowerCase()}.asd")
             }
             val gr = grb.toString()
             Log.i("xsystem35.gr", gr)

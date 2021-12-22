@@ -189,8 +189,11 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
         val cursor = contentResolver.query(uri, null, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
-                val fname = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                return if (fname.endsWith(".zip", true)) fname.dropLast(4) else fname
+                val column = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (column >= 0) {
+                    val fname = it.getString(column)
+                    return if (fname.endsWith(".zip", true)) fname.dropLast(4) else fname
+                }
             }
         }
         return null

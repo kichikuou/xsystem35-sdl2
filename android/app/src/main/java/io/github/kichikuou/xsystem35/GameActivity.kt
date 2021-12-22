@@ -162,7 +162,7 @@ private class CddaPlayer(private val playlistPath: File) {
             playlistPath.readLines()
         } catch (e: IOException) {
             Log.e("loadPlaylist", "Cannot load $playlistPath", e)
-            emptyList<String>()
+            emptyList()
         }
     private var currentTrack = 0
     private val player = MediaPlayer()
