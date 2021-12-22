@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 
 project(GAME)
 
-# armeabi-v7a requires cpufeatures library
-# include(AndroidNdkModules)
-# android_ndk_import_module_cpufeatures()
-
 include(FetchContent)
 FetchContent_Declare(
   SDL
