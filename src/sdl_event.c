@@ -219,6 +219,17 @@ static void sdl_getEvent(void) {
 		case SDL_JOYBALLMOTION:
 			break;
 		case SDL_JOYHATMOTION:
+			joyinfo &= ~(SYS35KEY_UP | SYS35KEY_DOWN | SYS35KEY_LEFT | SYS35KEY_RIGHT);
+			switch (e.jhat.value) {
+			case SDL_HAT_UP:        joyinfo |= SYS35KEY_UP;    break;
+			case SDL_HAT_DOWN:      joyinfo |= SYS35KEY_DOWN;  break;
+			case SDL_HAT_LEFT:      joyinfo |= SYS35KEY_LEFT;  break;
+			case SDL_HAT_RIGHT:     joyinfo |= SYS35KEY_RIGHT; break;
+			case SDL_HAT_LEFTUP:    joyinfo |= SYS35KEY_LEFT  | SYS35KEY_UP;   break;
+			case SDL_HAT_RIGHTUP:   joyinfo |= SYS35KEY_RIGHT | SYS35KEY_UP;   break;
+			case SDL_HAT_LEFTDOWN:  joyinfo |= SYS35KEY_LEFT  | SYS35KEY_DOWN; break;
+			case SDL_HAT_RIGHTDOWN: joyinfo |= SYS35KEY_RIGHT | SYS35KEY_DOWN; break;
+			}
 			break;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
