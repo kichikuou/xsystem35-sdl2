@@ -308,44 +308,34 @@ boolean dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char
 	return true;
 }
 
+static Breakpoint *breakpoint_free(Breakpoint *bp) {
+	assert(bp->dfile->data[bp->addr] == BREAKPOINT);
+	bp->dfile->data[bp->addr] = bp->restore_op;
+	if (bp->condition)
+		free(bp->condition);
+	ald_freedata(bp->dfile);
+	Breakpoint *next = bp->next;
+	free(bp);
+	return next;
+}
+
 boolean dbg_delete_breakpoint(int no) {
-	Breakpoint *prev = NULL;
-	for (Breakpoint *bp = breakpoints; bp; bp = bp->next) {
-		if (bp->no == no) {
-			assert(bp->dfile->data[bp->addr] == BREAKPOINT);
-			bp->dfile->data[bp->addr] = bp->restore_op;
-			if (bp->condition)
-				free(bp->condition);
-			ald_freedata(bp->dfile);
-			if (prev)
-				prev->next = bp->next;
-			else
-				breakpoints = bp->next;
-			free(bp);
+	for (Breakpoint **p = &breakpoints; *p; p = &(*p)->next) {
+		if ((*p)->no == no) {
+			*p = breakpoint_free(*p);
 			return true;
 		}
-		prev = bp;
 	}
 	return false;
 }
 
 void dbg_delete_breakpoints_in_page(int page) {
-	Breakpoint *prev = NULL;
-	for (Breakpoint *bp = breakpoints; bp;) {
-		if (bp->page == page) {
-			assert(bp->dfile->data[bp->addr] == BREAKPOINT);
-			bp->dfile->data[bp->addr] = bp->restore_op;
-			ald_freedata(bp->dfile);
-			if (prev)
-				prev->next = bp->next;
-			else
-				breakpoints = bp->next;
-			bp = bp->next;
-			free(bp);
-		} else {
-			prev = bp;
-			bp = bp->next;
-		}
+	Breakpoint **p = &breakpoints;
+	while (*p) {
+		if ((*p)->page == page)
+			*p = breakpoint_free(*p);
+		else
+			p = &(*p)->next;
 	}
 }
 
