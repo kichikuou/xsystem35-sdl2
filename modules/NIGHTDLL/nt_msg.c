@@ -304,7 +304,10 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 static int ntmsg_keywait() {
 	int i = 0;
 	
-	if (night.waitskiplv > 0) return 0;
+	if (night.waitskiplv > 0) {
+		sys_getInputInfo();
+		return 0;
+	}
 	
 	// アニメパターンの初期化
 	setup_hakanim();

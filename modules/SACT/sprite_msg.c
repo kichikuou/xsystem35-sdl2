@@ -395,7 +395,10 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	struct markinfo minfo[6];
 	int i = 0, j, maxstep;
 	
-	if (sact.waitskiplv > 0) return 0;
+	if (sact.waitskiplv > 0) {
+		sys_getInputInfo();
+		return 0;
+	}
 	
 	// アニメパターンの初期化
 	maxstep = setupmark(wNum1, wNum2, minfo);
