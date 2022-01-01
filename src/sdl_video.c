@@ -246,6 +246,10 @@ boolean sdl_isFullscreen(void) {
 	return sdl_fs_on;
 }
 
+void sdl_raiseWindow(void) {
+	SDL_RaiseWindow(sdl_window);
+}
+
 void sdl_setWindowSize(int x, int y, int w, int h) {
 	view_x = x;
 	view_y = y;

@@ -44,6 +44,7 @@ extern void sdl_setWindowTitle(char *name);
 extern void sdl_getWindowInfo(DispInfo *info);
 extern void sdl_setFullscreen(boolean on);
 extern boolean sdl_isFullscreen(void);
+extern void sdl_raiseWindow(void);
 extern agsurface_t *sdl_getDIB(void);
 extern void sdl_setIntegerScaling(boolean enable);
 

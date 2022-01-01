@@ -31,6 +31,7 @@
 #include "debugger_private.h"
 #include "debug_symbol.h"
 #include "msgqueue.h"
+#include "sdl_core.h"
 #include "system.h"
 #include "nact.h"
 #include "variable.h"
@@ -298,6 +299,7 @@ static void cmd_evaluate(cJSON *args, cJSON *resp) {
 }
 
 static void cmd_continue(cJSON *args, cJSON *resp) {
+	sdl_raiseWindow();
 	cJSON_AddBoolToObject(resp, "success", true);
 }
 
