@@ -348,7 +348,7 @@ static void dbg_cui_init(const char *symbols_path) {
 	dbg_state = DBG_STOPPED_ENTRY;
 }
 
-static void dbg_cui_quit(void) {
+static void dbg_cui_quit(bool restart) {
 }
 
 typedef struct {

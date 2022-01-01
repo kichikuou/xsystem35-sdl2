@@ -50,7 +50,7 @@ typedef struct {
 
 typedef struct {
 	void (*init)(const char *symbols_path);
-	void (*quit)(void);
+	void (*quit)(bool restart);
 	void (*repl)(void);
 	void (*onsleep)(void);
 	void (*console_output)(int lv, const char *output);

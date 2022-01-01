@@ -237,7 +237,7 @@ static void sys35_init() {
 }
 
 static void sys35_remove() {
-	dbg_quit();
+	dbg_quit(false);
 	mus_exit(); 
 	ags_remove();
 #ifdef ENABLE_GTK
@@ -251,7 +251,7 @@ void sys_reset() {
 #ifdef ENABLE_GTK
 	s39ini_remove();
 #endif
-	
+	dbg_quit(true);  // This may exit().
 	execvp(saved_argv[0], saved_argv);
 	sys_error("exec fail");
 }
