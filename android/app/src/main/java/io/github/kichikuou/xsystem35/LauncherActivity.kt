@@ -25,8 +25,6 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
@@ -37,12 +35,13 @@ private const val INSTALL_REQUEST = 1
 private const val SAVEDATA_EXPORT_REQUEST = 2
 private const val SAVEDATA_IMPORT_REQUEST = 3
 
-class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, LauncherObserver {
+class LauncherActivity : Activity(), LauncherObserver {
     private lateinit var launcher: Launcher
     private var progressDialog: ProgressDialogFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.launcher)
 
         launcher = Launcher.getInstance(filesDir)
         launcher.observer = this
@@ -51,7 +50,13 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
         }
 
         onGameListChange()
-        listView.onItemLongClickListener = this
+        val listView = findViewById<ListView>(R.id.list)
+        listView.setOnItemClickListener { _, _, position, _ ->
+            onListItemClick(position)
+        }
+        listView.setOnItemLongClickListener { _, _, position, _ ->
+            onItemLongClick(position)
+        }
     }
 
     override fun onDestroy() {
@@ -59,8 +64,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
         super.onDestroy()
     }
 
-    override fun onListItemClick(l: ListView?, v: View?, position: Int, id: Long) {
-        super.onListItemClick(l, v, position, id)
+    private fun onListItemClick(position: Int) {
         if (position < launcher.games.size) {
             startGame(launcher.games[position].path, null)
         } else {
@@ -70,7 +74,7 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
         }
     }
 
-    override fun onItemLongClick(a: AdapterView<*>?, v: View?, position: Int, id: Long): Boolean {
+    private fun onItemLongClick(position: Int): Boolean {
         if (position < launcher.games.size) {
             AlertDialog.Builder(this).setTitle(R.string.uninstall_dialog_title)
                     .setMessage(getString(R.string.uninstall_dialog_message, launcher.games[position].title))
@@ -139,7 +143,8 @@ class LauncherActivity : ListActivity(), AdapterView.OnItemLongClickListener, La
     override fun onGameListChange() {
         val items = launcher.titles.toMutableList()
         items.add(getString(R.string.install_from_zip))
-        listAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        val listView = findViewById<ListView>(R.id.list)
+        listView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
     }
 
     override fun onInstallProgress(path: String) {
