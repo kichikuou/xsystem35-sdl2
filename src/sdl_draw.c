@@ -341,15 +341,6 @@ SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, BYTE col) {
 	return font_draw_glyph(x, y, str_utf8, col);
 }
 
-void sdl_Mosaic(int sx, int sy, int w, int h, int dx, int dy, int slice) {
-	
-	SDL_LockSurface(sdl_dib);
-
-	image_Mosaic(sdl_dib, sx, sy, w, h, dx, dy, slice);
-
-	SDL_UnlockSurface(sdl_dib);
-}
-
 static void setBligtness(SDL_Surface *s, int val) {
 	int i;
 	Palette256 *pal = nact->sys_pal;

@@ -325,31 +325,6 @@ void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx,
 	copy_to_alpha(dib, sdata, ddata, w, h, flag);
 }
 
-/* モザイク */
-
-void image_Mosaic(SDL_Surface *dib, int sx, int sy, int w, int h, int dx, int dy, int slice) {
-	SDL_Rect r = {.h = slice};
-	for (int y = 0; y < h; y += slice) {
-		if (y + slice > h)
-			r.h = h - y;
-		r.w = slice;
-		for (int x = 0; x < w; x += slice) {
-			void *src = PIXEL_AT(dib, sx + x, sy + y);
-			Uint32 color;
-			switch (dib->format->BytesPerPixel) {
-			case 1: color = *(BYTE *)src; break;
-			case 2: color = *(WORD *)src; break;
-			default: color = *(DWORD *)src; break;
-			}
-			r.x = dx + x;
-			r.y = dy + y;
-			if (r.x + slice > w)
-				r.w = w - x;
-			SDL_FillRect(dib, &r, color);
-		}
-	}
-}
-
 /* 16bitCGの ALPHALEVELを指定 */
 BYTE *changeImage16AlphaLevel(cgdata *cg) {
 	WORD *new_pic = malloc(sizeof(WORD) * cg->width * cg->height), *new_pic_;

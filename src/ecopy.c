@@ -458,23 +458,6 @@ static int eCopyArea23(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	return key;
 }
 
-static int eCopyArea24(int sx, int sy, int w, int h, int dx, int dy, int opt) {
-	int i, key = 0, cnt;
-	int waitcnt = opt == 0 ? 100 : opt;
-	static int slices[8]={80,70,60,48,32,16,8,4};
-
-	cnt = sdl_getTicks();
-	for (i = 0; i < 8; i++ ) {
-		cnt += waitcnt;
-		sdl_Mosaic(sx, sy, w, h, dx, dy, slices[i]);
-		ags_updateArea(dx, dy, w, h);
-		EC_WAIT;
-	}
-	ags_copyArea(sx, sy, w, h, dx, dy);
-	ags_updateArea(dx, dy, w, h);
-	return key;
-}
-
 #define SCA25_6_SLICE 10
 static int eCopyArea25(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int r, rr, x, xx, y, yy, key = 0, cnt;
@@ -567,27 +550,6 @@ static int eCopyArea26(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	ags_copyArea(sx,sy,w,h,dx,dy);
 	ags_updateArea(dx, dy, w, h);
 	return key;
-}
-
-static void eCopyArea32(int step) {
-	static void *save;
-	static int slices[32]={4,8,12,16,20,28,36,40,44,48,56,64,72,80,88,96,
-			       88,80,72,64,56,48,44,40,36,28,24,20,16,12,8,4};
-	
-	if (step == 0) {
-		save = ags_saveRegion(ecp.dx, ecp.dy, ecp.w, ecp.h);
-		return;
-	}
-	if (step == 64) {
-		ags_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
-		ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
-		ags_delRegion(save);
-		return;
-	}
-	ags_putRegion(save, ecp.dx, ecp.dy);
-	ags_copyArea_alphaBlend(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, step*4);
-	sdl_Mosaic(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, slices[step >> 1]);
-	ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
 }
 
 static int eCopyArea39(int sx, int sy, int w, int h, int dx, int dy, int opt) {
@@ -864,6 +826,8 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	case NACT_EFFECT_BLIND_LR:
 	case NACT_EFFECT_BLIND_RL:
 		return (opt ? opt : 40) * (rect->w / 16 + 16);
+	case NACT_EFFECT_MOSAIC:
+		return (opt ? opt : 100) * 8;
 	case NACT_EFFECT_FADEIN:
 	case NACT_EFFECT_WHITEIN:
 	case NACT_EFFECT_FADEOUT:
@@ -871,6 +835,8 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 		return opt ? opt * 32 : 1700;
 	case NACT_EFFECT_CROSSFADE:
 		return opt ? opt * 256 : 2700;
+	case NACT_EFFECT_CROSSFADE_MOSAIC:
+		return opt ? opt * 256 : 1400;
 	case NACT_EFFECT_CROSSFADE_DOWN:
 	case NACT_EFFECT_CROSSFADE_UP:
 		return opt ? opt * (rect->h + 256) : 1150;
@@ -1045,22 +1011,12 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 23:
 		ret = eCopyArea23(sx, sy, w, h, dx, dy, opt);
 		break;
-	case 24:
-		ret = eCopyArea24(sx, sy, w, h, dx, dy, opt);
-		break;
 	case 25:
 		ret = eCopyArea25(sx, sy, w, h, dx, dy, opt);
 		break;
 	case 26:
 		ret = eCopyArea26(sx, sy, w, h, dx, dy, opt);
 		break;
-	case 32:
-		i.step_max = 64;
-		i.effect_time = opt == 0 ? 1400 : opt * 256;
-		i.cancel = cancel;
-		i.callback = eCopyArea32;
-		ags_fader(&i);
-		return;
 	case 39:
 		ret = eCopyArea39(sx, sy, w, h, dx, dy, opt);
 		break;

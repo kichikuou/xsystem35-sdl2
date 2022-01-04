@@ -32,11 +32,13 @@
 enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
 	case NACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
+	case NACT_EFFECT_MOSAIC:           return EFFECT_MOSAIC;
 	case NACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
 	case NACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
 	case NACT_EFFECT_FADEOUT:          return EFFECT_FADEOUT_FROM_NEW;
 	case NACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT_FROM_NEW;
 	case NACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
+	case NACT_EFFECT_CROSSFADE_MOSAIC: return EFFECT_CROSSFADE_MOSAIC;
 	case NACT_EFFECT_BLIND_UP:         return EFFECT_BLIND_UP;
 	case NACT_EFFECT_BLIND_UP_DOWN:    return EFFECT_BLIND_UP_DOWN;
 	case NACT_EFFECT_CROSSFADE_DOWN:   return EFFECT_CROSSFADE_DOWN;
@@ -64,6 +66,7 @@ enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 	case SACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
 	case SACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT;
 	case SACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
+	case SACT_EFFECT_CROSSFADE_MOSAIC: return EFFECT_CROSSFADE_MOSAIC;
 	case SACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
 	case SACT_EFFECT_BLIND_LR:         return EFFECT_BLIND_LR;
 	case SACT_EFFECT_BLIND_DOWN_LR:    return EFFECT_BLIND_DOWN_LR;
@@ -136,6 +139,11 @@ static void crossfade_step(struct sdl_effect *eff, double progress) {
 static void crossfade_free(struct sdl_effect *eff) {
 	effect_finish(eff, true);
 	free(eff);
+}
+
+static struct sdl_effect *fallback_effect_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", type);
+	return crossfade_new(rect, old, new);
 }
 
 // EFFECT_CROSSFADE_{UP,DOWN}
@@ -289,6 +297,95 @@ static void crossfade_rl_step(struct sdl_effect *eff, double progress) {
 static void crossfade_animation_free(struct sdl_effect *eff) {
 	effect_finish(eff, false);
 	free(eff);
+}
+
+// EFFECT_MOSAIC, EFFECT_CROSSFADE_MOSAIC
+
+struct mosaic_effect {
+	struct sdl_effect eff;
+	SDL_Texture *tmp_old, *tmp_new, *tx_mosaic;
+};
+
+static void mosaic_step(struct sdl_effect *eff, double progress);
+static void mosaic_free(struct sdl_effect *eff);
+
+static struct sdl_effect *mosaic_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	if (!SDL_RenderTargetSupported(sdl_renderer))
+		return fallback_effect_new(rect, old, new, type);
+
+	struct mosaic_effect *eff = calloc(1, sizeof(struct mosaic_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(&eff->eff, rect, old, new, type);
+	eff->tmp_old = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
+	eff->tmp_new = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
+	eff->tx_mosaic = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
+	eff->eff.step = mosaic_step;
+	eff->eff.finish = mosaic_free;
+	return &eff->eff;
+}
+
+static void mosaic(SDL_Texture *src, SDL_Texture *tmp, SDL_Texture *dst, int w, int h, double scale) {
+	int cx = w / 2;
+	int cy = h / 2;
+	SDL_FRect fr = {
+		.x = cx - cx / scale,
+		.y = cy - cy / scale,
+		.w = w / scale,
+		.h = h / scale,
+	};
+	SDL_SetRenderTarget(sdl_renderer, tmp);
+	SDL_RenderCopyF(sdl_renderer, src, NULL, &fr);
+
+	SDL_Rect dstr = {
+		.x = w * (1 - scale) / 2,
+		.y = h * (1 - scale) / 2,
+		.w = w * scale,
+		.h = h * scale,
+	};
+	SDL_SetRenderTarget(sdl_renderer, dst);
+
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+	SDL_SetTextureScaleMode(tmp, SDL_ScaleModeNearest);
+#else
+	// Should be okay because nearest is the default scaling mode.
+#endif
+	SDL_RenderCopy(sdl_renderer, tmp, NULL, &dstr);
+	SDL_SetRenderTarget(sdl_renderer, NULL);
+}
+
+static void mosaic_step(struct sdl_effect *eff, double progress) {
+	struct mosaic_effect *this = (struct mosaic_effect *)eff;
+
+	if (eff->type == EFFECT_MOSAIC) {
+		const int max_scale = 80;
+		int scale = (1.0 - progress) * (max_scale - 1) + 1;
+		mosaic(eff->tx_new, this->tmp_new, this->tx_mosaic, eff->dst_rect.w, eff->dst_rect.h, scale);
+		SDL_RenderCopy(sdl_renderer, this->tx_mosaic, NULL, &eff->dst_rect);
+	} else if (eff->type == EFFECT_CROSSFADE_MOSAIC) {
+		const int max_scale = 96;
+		double scale = (progress < 0.5 ? progress : 1.0 - progress) * 2 * (max_scale - 1) + 1;
+		mosaic(eff->tx_old, this->tmp_old, this->tx_mosaic, eff->dst_rect.w, eff->dst_rect.h, scale);
+		SDL_RenderCopy(sdl_renderer, this->tx_mosaic, NULL, &eff->dst_rect);
+		mosaic(eff->tx_new, this->tmp_new, this->tx_mosaic, eff->dst_rect.w, eff->dst_rect.h, scale);
+		SDL_SetTextureBlendMode(this->tx_mosaic, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(this->tx_mosaic, progress * 255);
+		SDL_RenderCopy(sdl_renderer, this->tx_mosaic, NULL, &eff->dst_rect);
+		SDL_SetTextureBlendMode(this->tx_mosaic, SDL_BLENDMODE_NONE);
+	} else {
+		assert(!"Cannot happen");
+	}
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void mosaic_free(struct sdl_effect *eff) {
+	struct mosaic_effect *this = (struct mosaic_effect *)eff;
+	SDL_DestroyTexture(this->tmp_old);
+	SDL_DestroyTexture(this->tmp_new);
+	SDL_DestroyTexture(this->tx_mosaic);
+	effect_finish(&this->eff, true);
+	free(this);
 }
 
 // EFFECT_{FADE,WHITE}{OUT,IN}
@@ -491,10 +588,8 @@ static void linear_blur_step(struct sdl_effect *eff, double progress);
 static void linear_blur_free(struct sdl_effect *eff);
 
 static struct sdl_effect *linear_blur_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
-	if (!SDL_RenderTargetSupported(sdl_renderer)) {
-		WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", type);
-		return crossfade_new(rect, old, new);
-	}
+	if (!SDL_RenderTargetSupported(sdl_renderer))
+		return fallback_effect_new(rect, old, new, type);
 
 	struct linear_blur_effect *lbe = calloc(1, sizeof(struct linear_blur_effect));
 	if (!lbe)
@@ -609,8 +704,7 @@ static struct sdl_effect *polygon_mask_new(SDL_Rect *rect, SDL_Surface *old, SDL
 	}
 #endif // HAS_SDL_RenderGeometry
 
-	WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", type);
-	return crossfade_new(rect, old, new);
+	return fallback_effect_new(rect, old, new, type);
 }
 
 #if HAS_SDL_RenderGeometry
@@ -932,6 +1026,9 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_CROSSFADE_LR:
 	case EFFECT_CROSSFADE_RL:
 		return crossfade_animation_new(rect, sf_old, sf_new, type);
+	case EFFECT_MOSAIC:
+	case EFFECT_CROSSFADE_MOSAIC:
+		return mosaic_new(rect, sf_old, sf_new, type);
 	case EFFECT_FADEOUT:
 	case EFFECT_FADEOUT_FROM_NEW:
 	case EFFECT_FADEIN:

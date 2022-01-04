@@ -40,7 +40,6 @@
 #include "sdl_core.h"
 
 
-static void ec6_cb(surface_t *, surface_t *);
 static void sdl_effect_cb(surface_t *, surface_t *);
 static void ec_dummy_cb(surface_t *, surface_t *);
 
@@ -56,7 +55,6 @@ typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
 
 #include "sprite_eupdate_perspect.c"
-#include "sprite_eupdate_mosaic.c"
 #include "sprite_eupdate_uneune.c"
 #include "sprite_eupdate_zmbbul.c"
 
@@ -68,7 +66,7 @@ static entrypoint *cb[39] = {
 	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
-	ec6_cb,
+	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
