@@ -183,12 +183,6 @@ else()
   endif()
 endif()
 
-# Joystick
-
-if (NOT EMSCRIPTEN AND NOT ANDROID)
-  set(HAVE_SDLJOY 1)
-endif()
-
 # TODO: MMX
 
 function (print_summary name)
@@ -205,7 +199,6 @@ message("------------------")
 print_summary(audio ${SUMMARY_AUDIO})
 print_summary(cdrom ${SUMMARY_CDROM})
 print_summary(midi ${SUMMARY_MIDI})
-print_summary(joystick ${SUMMARY_JOYSTICK})
 message("------------------")
 
 set(PACKAGE ${PROJECT_NAME})

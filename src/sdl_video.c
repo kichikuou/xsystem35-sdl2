@@ -43,7 +43,6 @@ struct sdl_private_data *sdl_videodev;
 static int joy_device_index = -1;
 static boolean integer_scaling = FALSE;
 
-#ifdef HAVE_SDLJOY
 static SDL_Joystick *js;
 
 static boolean joy_open_index(int index) {
@@ -55,7 +54,7 @@ static boolean joy_open_index(int index) {
 	int axes = SDL_JoystickNumAxes(js);
 	int buttons = SDL_JoystickNumButtons(js);
 	SDL_JoystickEventState(SDL_ENABLE);
-	printf("SDL joystick '%s' %d axes %d buttons\n", name, axes, buttons);
+	NOTICE("SDL joystick '%s' %d axes %d buttons\n", name, axes, buttons);
 	return TRUE;
 }
 
@@ -70,7 +69,6 @@ static int joy_open(void) {
 	}
 	return -1;
 }
-#endif // HAVE_SDLJOY
 
 /* SDL の初期化 */
 int sdl_Initilize(void) {
@@ -94,9 +92,7 @@ int sdl_Initilize(void) {
 	emscripten_set_visibilitychange_callback(NULL, 0, NULL);
 #endif
 
-#ifdef HAVE_SDLJOY
 	joy_open();
-#endif
 	return 0;
 }
 
@@ -110,9 +106,7 @@ void sdl_Remove(void) {
 
 		SDL_DestroyRenderer(sdl_renderer);
 		
-#ifdef HAVE_SDLJOY
 		SDL_JoystickClose(js);
-#endif
 		
 		SDL_Quit();
 		
@@ -134,11 +128,7 @@ void sdl_setWindowTitle(char *name) {
 /* Visual に応じて Window を生成する */
 static void window_init(void) {
 	
-	SDL_Init(SDL_INIT_VIDEO
-#ifdef HAVE_SDLJOY
-		 |SDL_INIT_JOYSTICK
-#endif
-		);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	
 #ifdef __EMSCRIPTEN__
 	// Stop SDL from calling emscripten_sleep() in functions that are called

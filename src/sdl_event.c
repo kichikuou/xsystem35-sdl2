@@ -46,10 +46,8 @@ static void keyEventProsess(SDL_KeyboardEvent *e, boolean pressed);
 static int mousex, mousey, mouseb;
 boolean RawKeyInfo[256];
 
-#if HAVE_SDLJOY
 /* SDL Joystick */
 static int joyinfo=0;
-#endif
 
 static int mouse_to_rawkey(int button) {
 	switch(button) {
@@ -206,7 +204,7 @@ static void sdl_getEvent(void) {
 			mousey = e.tfinger.y * view_h;
 			break;
 
-#if HAVE_SDLJOY
+
 		case SDL_JOYAXISMOTION:
 			if (abs(e.jaxis.value) < 0x4000) {
 				joyinfo &= e.jaxis.axis == 0 ? ~0xc : ~3;
@@ -216,8 +214,10 @@ static void sdl_getEvent(void) {
 				joyinfo |= 1 << i;
 			}
 			break;
+
 		case SDL_JOYBALLMOTION:
 			break;
+
 		case SDL_JOYHATMOTION:
 			joyinfo &= ~(SYS35KEY_UP | SYS35KEY_DOWN | SYS35KEY_LEFT | SYS35KEY_RIGHT);
 			switch (e.jhat.value) {
@@ -231,6 +231,7 @@ static void sdl_getEvent(void) {
 			case SDL_HAT_RIGHTDOWN: joyinfo |= SYS35KEY_RIGHT | SYS35KEY_DOWN; break;
 			}
 			break;
+
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
 			if (e.jbutton.button < 4) {
@@ -244,7 +245,7 @@ static void sdl_getEvent(void) {
 				}
 			}
 			break;
-#endif
+
 		default:
 			NOTICE("ev %x\n", e.type);
 			break;
@@ -308,10 +309,6 @@ int sdl_getMouseInfo(MyPoint *p) {
 }
 
 int sdl_getJoyInfo(void) {
-#ifdef HAVE_SDLJOY
 	sdl_getEvent();
 	return joyinfo;
-#else
-	return 0;
-#endif
 }
