@@ -45,7 +45,10 @@ static boolean integer_scaling = FALSE;
 
 static SDL_Joystick *js;
 
-static boolean joy_open_index(int index) {
+boolean sdl_joy_open(int index) {
+	if (js)
+		return FALSE;
+
 	js = SDL_JoystickOpen(index);
 	if (!js)
 		return FALSE;
@@ -58,16 +61,15 @@ static boolean joy_open_index(int index) {
 	return TRUE;
 }
 
-static int joy_open(void) {
-	if (joy_device_index >= 0) {
-		return joy_open_index(joy_device_index) ? 1 : -1;
-	} else {
-		for (int i = 0; i < SDL_NumJoysticks(); i++) {
-			if (joy_open_index(i))
-				return 1;
-		}
+static boolean joy_open(void) {
+	if (joy_device_index >= 0)
+		return sdl_joy_open(joy_device_index);
+
+	for (int i = 0; i < SDL_NumJoysticks(); i++) {
+		if (sdl_joy_open(i))
+			return TRUE;
 	}
-	return -1;
+	return FALSE;
 }
 
 /* SDL の初期化 */

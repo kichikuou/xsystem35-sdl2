@@ -204,6 +204,9 @@ static void sdl_getEvent(void) {
 			mousey = e.tfinger.y * view_h;
 			break;
 
+		case SDL_JOYDEVICEADDED:
+			sdl_joy_open(e.jdevice.which);
+			break;
 
 		case SDL_JOYAXISMOTION:
 			if (abs(e.jaxis.value) < 0x4000) {
