@@ -30,8 +30,32 @@
 struct sdl_fader {
 	SDL_Texture *tx_old, *tx_new, *tx_tmp;
 	SDL_Rect dst_rect;
-	enum effect effect;
+	enum sdl_effect effect;
 };
+
+enum sdl_effect from_nact_effect(enum nact_effect effect) {
+	switch (effect) {
+	case NACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
+	case NACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
+	case NACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
+	case NACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
+	case NACT_EFFECT_HEXAGRAM_OUT_IN:  return EFFECT_HEXAGRAM_OUT_IN;
+	case NACT_EFFECT_WINDMILL:         return EFFECT_WINDMILL;
+	case NACT_EFFECT_WINDMILL_180:     return EFFECT_WINDMILL_180;
+	case NACT_EFFECT_WINDMILL_360:     return EFFECT_WINDMILL_360;
+	default:                           return EFFECT_INVALID;
+	}
+}
+
+enum sdl_effect from_sact_effect(enum sact_effect effect) {
+	switch (effect) {
+	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
+	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
+	case SACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
+	case SACT_EFFECT_HEXAGRAM_OUT_IN:  return EFFECT_HEXAGRAM_OUT_IN;
+	default:                           return EFFECT_INVALID;
+	}
+}
 
 #define HAS_SDL_RenderGeometry SDL_VERSION_ATLEAST(2, 0, 18)
 #if HAS_SDL_RenderGeometry
@@ -269,7 +293,7 @@ static void step_crossfade(struct sdl_fader *fader, int step) {
 	SDL_RenderPresent(sdl_renderer);
 }
 
-struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, enum effect effect) {
+struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
 	if (!SDL_RenderTargetSupported(sdl_renderer) || !HAS_SDL_RenderGeometry) {
 		WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", effect);
 		effect = EFFECT_CROSSFADE;

@@ -1428,17 +1428,17 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		ags_fader(&i);
 		return;
 		
-	case EFFECT_PENTAGRAM_IN_OUT:
-	case EFFECT_PENTAGRAM_OUT_IN:
-	case EFFECT_HEXAGRAM_IN_OUT:
-	case EFFECT_HEXAGRAM_OUT_IN:
-	case EFFECT_WINDMILL:
-	case EFFECT_WINDMILL_180:
-	case EFFECT_WINDMILL_360:
+	case NACT_EFFECT_PENTAGRAM_IN_OUT:
+	case NACT_EFFECT_PENTAGRAM_OUT_IN:
+	case NACT_EFFECT_HEXAGRAM_IN_OUT:
+	case NACT_EFFECT_HEXAGRAM_OUT_IN:
+	case NACT_EFFECT_WINDMILL:
+	case NACT_EFFECT_WINDMILL_180:
+	case NACT_EFFECT_WINDMILL_360:
 		i.step_max = SDL_FADER_MAXSTEP;
 		i.effect_time = opt == 0 ? 1000 : opt;
 		i.cancel = cancel;
-		sdlfader = sdl_fader_init(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, sw);
+		sdlfader = sdl_fader_init(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, from_nact_effect(sw));
 		i.callback = sdlfader_step;
 		ags_fader(&i);
 		sdl_fader_finish(sdlfader);

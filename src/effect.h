@@ -20,23 +20,40 @@
 #ifndef __EFFECT_H__
 #define __EFFECT_H__
 
-// Effect numbers for the CE command.
-enum effect {
-	EFFECT_CROSSFADE = 31,
-	EFFECT_PENTAGRAM_IN_OUT = 44,
-	EFFECT_PENTAGRAM_OUT_IN = 45,
-	EFFECT_HEXAGRAM_IN_OUT = 46,
-	EFFECT_HEXAGRAM_OUT_IN = 47,
-	EFFECT_WINDMILL = 50,
-	EFFECT_WINDMILL_180 = 51,
-	EFFECT_WINDMILL_360 = 52,
+// Effect types of the CE command.
+enum nact_effect {
+	NACT_EFFECT_CROSSFADE        = 31,
+	NACT_EFFECT_PENTAGRAM_IN_OUT = 44,
+	NACT_EFFECT_PENTAGRAM_OUT_IN = 45,
+	NACT_EFFECT_HEXAGRAM_IN_OUT  = 46,
+	NACT_EFFECT_HEXAGRAM_OUT_IN  = 47,
+	NACT_EFFECT_WINDMILL         = 50,
+	NACT_EFFECT_WINDMILL_180     = 51,
+	NACT_EFFECT_WINDMILL_360     = 52,
 };
 
+// Effect types of SCAT.DrawEffect.
 enum sact_effect {
 	SACT_EFFECT_PENTAGRAM_IN_OUT = 14,
 	SACT_EFFECT_PENTAGRAM_OUT_IN = 15,
-	SACT_EFFECT_HEXAGRAM_IN_OUT = 16,
-	SACT_EFFECT_HEXAGRAM_OUT_IN = 17,
+	SACT_EFFECT_HEXAGRAM_IN_OUT  = 16,
+	SACT_EFFECT_HEXAGRAM_OUT_IN  = 17,
 };
+
+// Internal effect numbers.
+enum sdl_effect {
+	EFFECT_INVALID,
+	EFFECT_CROSSFADE,
+	EFFECT_PENTAGRAM_IN_OUT,
+	EFFECT_PENTAGRAM_OUT_IN,
+	EFFECT_HEXAGRAM_IN_OUT,
+	EFFECT_HEXAGRAM_OUT_IN,
+	EFFECT_WINDMILL,
+	EFFECT_WINDMILL_180,
+	EFFECT_WINDMILL_360,
+};
+
+enum sdl_effect from_nact_effect(enum nact_effect effect);
+enum sdl_effect from_sact_effect(enum sact_effect effect);
 
 #endif /* __EFFECT_H__ */

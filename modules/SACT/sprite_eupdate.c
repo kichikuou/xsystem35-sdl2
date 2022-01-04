@@ -342,16 +342,6 @@ static void ec38_cb(surface_t *sfsrc, surface_t *sfdst) {
 static void ec39_cb(surface_t *sfsrc, surface_t *sfdst) {
 }
 
-static enum effect sact_effect_to_effect(enum sact_effect effect) {
-	switch (effect) {
-	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
-	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
-	case SACT_EFFECT_HEXAGRAM_IN_OUT: return EFFECT_HEXAGRAM_IN_OUT;
-	case SACT_EFFECT_HEXAGRAM_OUT_IN: return EFFECT_HEXAGRAM_OUT_IN;
-	default: return 0;
-	}
-}
-
 /*
   効果つき画面更新
   @param type: 効果の種類
@@ -375,7 +365,7 @@ int sp_eupdate(int type, int time, int cancel) {
 	sfdst = sf_dup(sf0);
 	
 	if (SACT_EFFECT_PENTAGRAM_IN_OUT <= type && type <= SACT_EFFECT_HEXAGRAM_OUT_IN)
-		ecp.fader = sdl_fader_init(0, 0, sfsrc->width, sfsrc->height, 0, 0, sact_effect_to_effect(type));
+		ecp.fader = sdl_fader_init(0, 0, sfsrc->width, sfsrc->height, 0, 0, from_sact_effect(type));
 	else
 		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
 
