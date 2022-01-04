@@ -38,6 +38,10 @@ enum sact_effect {
 	SACT_EFFECT_PENTAGRAM_OUT_IN = 15,
 	SACT_EFFECT_HEXAGRAM_IN_OUT  = 16,
 	SACT_EFFECT_HEXAGRAM_OUT_IN  = 17,
+	SACT_EFFECT_ROTATE_OUT       = 20,
+	SACT_EFFECT_ROTATE_IN        = 21,
+	SACT_EFFECT_ROTATE_OUT_CW    = 22,
+	SACT_EFFECT_ROTATE_IN_CW     = 23,
 };
 
 // Internal effect numbers.
@@ -51,6 +55,10 @@ enum sdl_effect {
 	EFFECT_WINDMILL,
 	EFFECT_WINDMILL_180,
 	EFFECT_WINDMILL_360,
+	EFFECT_ROTATE_OUT,
+	EFFECT_ROTATE_IN,
+	EFFECT_ROTATE_OUT_CW,
+	EFFECT_ROTATE_IN_CW,
 };
 
 enum sdl_effect from_nact_effect(enum nact_effect effect);

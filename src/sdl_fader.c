@@ -53,6 +53,10 @@ enum sdl_effect from_sact_effect(enum sact_effect effect) {
 	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
 	case SACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
 	case SACT_EFFECT_HEXAGRAM_OUT_IN:  return EFFECT_HEXAGRAM_OUT_IN;
+	case SACT_EFFECT_ROTATE_OUT:       return EFFECT_ROTATE_OUT;
+	case SACT_EFFECT_ROTATE_IN:        return EFFECT_ROTATE_IN;
+	case SACT_EFFECT_ROTATE_OUT_CW:    return EFFECT_ROTATE_OUT_CW;
+	case SACT_EFFECT_ROTATE_IN_CW:     return EFFECT_ROTATE_IN_CW;
 	default:                           return EFFECT_INVALID;
 	}
 }
@@ -293,8 +297,47 @@ static void step_crossfade(struct sdl_fader *fader, int step) {
 	SDL_RenderPresent(sdl_renderer);
 }
 
+static void step_rotate(struct sdl_fader *fader, int step) {
+	SDL_Texture *bg_texture, *fg_texture;
+	double angle = step * 360.0 / SDL_FADER_MAXSTEP;
+	double scale = step / (double)SDL_FADER_MAXSTEP;
+	switch (fader->effect) {
+	case EFFECT_ROTATE_OUT:
+		scale = 1.0 - scale;
+		bg_texture = fader->tx_new;
+		fg_texture = fader->tx_old;
+		angle *= -1.0;
+		break;
+	case EFFECT_ROTATE_IN:
+		bg_texture = fader->tx_old;
+		fg_texture = fader->tx_new;
+		angle *= -1.0;
+		break;
+	case EFFECT_ROTATE_OUT_CW:
+		scale = 1.0 - scale;
+		bg_texture = fader->tx_new;
+		fg_texture = fader->tx_old;
+		break;
+	case EFFECT_ROTATE_IN_CW:
+		bg_texture = fader->tx_old;
+		fg_texture = fader->tx_new;
+		break;
+	default:
+		assert(!"Cannot happen");
+	}
+	SDL_Rect r = fader->dst_rect;
+	r.x += (1.0 - scale) * r.w / 2;
+	r.y += (1.0 - scale) * r.h / 2;
+	r.w *= scale;
+	r.h *= scale;
+	SDL_RenderCopy(sdl_renderer, bg_texture, NULL, &fader->dst_rect);
+	SDL_RenderCopyEx(sdl_renderer, fg_texture, NULL, &r, angle, NULL, SDL_FLIP_NONE);
+	SDL_RenderPresent(sdl_renderer);
+}
+
 struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
-	if (!SDL_RenderTargetSupported(sdl_renderer) || !HAS_SDL_RenderGeometry) {
+	if (EFFECT_PENTAGRAM_IN_OUT <= effect && effect <= EFFECT_WINDMILL_360 &&
+		(!SDL_RenderTargetSupported(sdl_renderer) || !HAS_SDL_RenderGeometry)) {
 		WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", effect);
 		effect = EFFECT_CROSSFADE;
 	}
@@ -345,6 +388,12 @@ void sdl_fader_step(struct sdl_fader *fader, int step) {
 		step_polygon_mask(fader, step);
 		break;
 #endif
+	case EFFECT_ROTATE_OUT:
+	case EFFECT_ROTATE_IN:
+	case EFFECT_ROTATE_OUT_CW:
+	case EFFECT_ROTATE_IN_CW:
+		step_rotate(fader, step);
+		break;
 	default:
 		if (step == 0)
 			WARNING("Unknown effect %d\n", fader->effect);

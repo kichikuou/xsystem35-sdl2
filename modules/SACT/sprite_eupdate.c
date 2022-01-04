@@ -64,7 +64,6 @@ static ecopyparam_t ecp;
 
 #include "sprite_eupdate_perspect.c"
 #include "sprite_eupdate_mosaic.c"
-#include "sprite_eupdate_aff.c"
 #include "sprite_eupdate_uneune.c"
 #include "sprite_eupdate_buller.c"
 #include "sprite_eupdate_zmbbul.c"
@@ -91,10 +90,10 @@ static entrypoint *cb[39] = {
 	sdlfader_cb,
 	ec_dummy_cb,  // 欠番
 	ec19_cb,
-	ec20_cb,
-	ec21_cb,
-	ec22_cb,
-	ec23_cb,
+	sdlfader_cb,
+	sdlfader_cb,
+	sdlfader_cb,
+	sdlfader_cb,
 	ec_dummy_cb,
 	ec25_cb,
 	ec26_cb,
@@ -364,8 +363,9 @@ int sp_eupdate(int type, int time, int cancel) {
 	
 	sfdst = sf_dup(sf0);
 	
-	if (SACT_EFFECT_PENTAGRAM_IN_OUT <= type && type <= SACT_EFFECT_HEXAGRAM_OUT_IN)
-		ecp.fader = sdl_fader_init(0, 0, sfsrc->width, sfsrc->height, 0, 0, from_sact_effect(type));
+	enum sdl_effect sdl_effect = from_sact_effect(type);
+	if (sdl_effect != EFFECT_INVALID)
+		ecp.fader = sdl_fader_init(0, 0, sfsrc->width, sfsrc->height, 0, 0, sdl_effect);
 	else
 		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
 

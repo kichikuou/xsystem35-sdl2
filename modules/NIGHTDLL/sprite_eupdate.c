@@ -61,7 +61,6 @@ static ecopyparam_t ecp;
 
 // #include "sprite_eupdate_perspect.c"
 // #include "sprite_eupdate_mosaic.c"
-// #include "sprite_eupdate_aff.c"
 // #include "sprite_eupdate_uneune.c"
 #include "sprite_eupdate_buller.c"
 // #include "sprite_eupdate_zmbbul.c"
