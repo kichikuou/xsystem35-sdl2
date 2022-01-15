@@ -596,6 +596,20 @@ void ags_fader(ags_faderinfo_t *i) {
 	nact->waitcancel_key = canceled_key;
 }
 
+void ags_fade2(int duration_ms, boolean cancelable, ags_fade2_callback callback, void *callback_arg) {
+	unsigned wflags = cancelable ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE;
+	int start = sdl_getTicks();
+	for (int t = 0; t < duration_ms; t = sdl_getTicks() - start) {
+		callback(callback_arg, (double)t / duration_ms);
+		int key = sys_keywait(start + t + 16 - sdl_getTicks(), wflags);
+		if (cancelable && key) {
+			nact->waitcancel_key = key;
+			break;
+		}
+	}
+	callback(callback_arg, 1.0);
+}
+
 void ags_fadeIn(int rate, boolean flag) {
 	ags_faderinfo_t i;
 

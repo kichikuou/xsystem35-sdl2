@@ -286,13 +286,7 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 }
 
 static void sdlfader_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep = SDL_FADER_MAXSTEP * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	
-	if (ecp.oldstep == 0) {
-		sf_copyall(sf0, sfdst);
-	}
-	sdl_fader_step(ecp.fader, curstep);
-	ecp.oldstep = curstep;
+	sdl_fader_step(ecp.fader, (double)(ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime));
 }
 
 

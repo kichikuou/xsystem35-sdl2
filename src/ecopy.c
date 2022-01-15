@@ -1169,12 +1169,6 @@ static int eCopyArea5sp(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	return key;
 }
 
-struct sdl_fader *sdlfader;
-
-static void sdlfader_step(int step) {
-	sdl_fader_step(sdlfader, step);
-}
-
 void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, boolean cancel, int spCol) {
 	int ret = 0;
 	ags_faderinfo_t i;
@@ -1435,14 +1429,11 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case NACT_EFFECT_WINDMILL:
 	case NACT_EFFECT_WINDMILL_180:
 	case NACT_EFFECT_WINDMILL_360:
-		i.step_max = SDL_FADER_MAXSTEP;
-		i.effect_time = opt == 0 ? 1000 : opt;
-		i.cancel = cancel;
-		sdlfader = sdl_fader_init(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, from_nact_effect(sw));
-		i.callback = sdlfader_step;
-		ags_fader(&i);
-		sdl_fader_finish(sdlfader);
-		sdlfader = NULL;
+		{
+			struct sdl_fader *fader = sdl_fader_init(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, from_nact_effect(sw));
+			ags_fade2(opt ? opt : 1000, cancel, (ags_fade2_callback)sdl_fader_step, fader);
+			sdl_fader_finish(fader);
+		}
 		return;
 		
 	case 48:

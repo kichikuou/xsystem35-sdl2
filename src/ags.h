@@ -232,6 +232,9 @@ extern boolean ags_getAntialiasedStringMode();
 extern void    ags_fader(ags_faderinfo_t *);
 extern void    ags_autorepeat(boolean enable);
 
+typedef void (*ags_fade2_callback)(void *, double);
+void ags_fade2(int duration_ms, boolean cancelable, ags_fade2_callback callback, void *callback_arg);
+
 #define RMASK16 0xf800
 #define GMASK16 0x07e0
 #define BMASK16 0x001f

@@ -58,7 +58,7 @@ enum sdl_effect from_sact_effect(enum sact_effect effect) {
 }
 
 struct sdl_fader {
-	void (*step)(struct sdl_fader *this, int step);
+	void (*step)(struct sdl_fader *this, double progress);
 	void (*finish)(struct sdl_fader *this);
 	enum sdl_effect effect;
 	SDL_Rect dst_rect;
@@ -98,7 +98,7 @@ static void fader_finish(struct sdl_fader *fader) {
 
 // EFFECT_CROSSFADE
 
-static void crossfade_step(struct sdl_fader *fader, int step);
+static void crossfade_step(struct sdl_fader *fader, double progress);
 static void crossfade_free(struct sdl_fader *fader);
 
 static struct sdl_fader *crossfade_new(int sx, int sy, int w, int h, int dx, int dy) {
@@ -111,10 +111,10 @@ static struct sdl_fader *crossfade_new(int sx, int sy, int w, int h, int dx, int
 	return fader;
 }
 
-static void crossfade_step(struct sdl_fader *fader, int step) {
+static void crossfade_step(struct sdl_fader *fader, double progress) {
 	SDL_RenderCopy(sdl_renderer, fader->tx_old, NULL, &fader->dst_rect);
 	SDL_SetTextureBlendMode(fader->tx_new, SDL_BLENDMODE_BLEND);
-	SDL_SetTextureAlphaMod(fader->tx_new, step * 255 / SDL_FADER_MAXSTEP);
+	SDL_SetTextureAlphaMod(fader->tx_new, progress * 255);
 	SDL_RenderCopy(sdl_renderer, fader->tx_new, NULL, &fader->dst_rect);
 	SDL_SetTextureBlendMode(fader->tx_new, SDL_BLENDMODE_NONE);
 	SDL_RenderPresent(sdl_renderer);
@@ -132,7 +132,7 @@ struct polygon_mask_fader {
 	SDL_Texture *tx_tmp;
 };
 
-static void polygon_mask_step(struct sdl_fader *fader, int step);
+static void polygon_mask_step(struct sdl_fader *fader, double progress);
 static void polygon_mask_free(struct sdl_fader *fader);
 
 static struct sdl_fader *polygon_mask_new(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
@@ -339,34 +339,33 @@ static void draw_windmill_360(int w, int h, double theta) {
 	SDL_RenderGeometry(sdl_renderer, NULL, v, 10, indices, i);
 }
 
-static void polygon_mask_step(struct sdl_fader *fader, int step) {
+static void polygon_mask_step(struct sdl_fader *fader, double progress) {
 	struct polygon_mask_fader *this = (struct polygon_mask_fader *)fader;
 	int w = fader->dst_rect.w;
 	int h = fader->dst_rect.h;
-	double t = (double)step / SDL_FADER_MAXSTEP;
 	SDL_SetRenderTarget(sdl_renderer, this->tx_tmp);
 	SDL_RenderCopy(sdl_renderer, fader->tx_old, NULL, NULL);
 	switch (fader->effect) {
 	case EFFECT_PENTAGRAM_IN_OUT:
-		draw_pentagram(w / 2, h / 2, max(w, h) * t, M_PI * t);
+		draw_pentagram(w / 2, h / 2, max(w, h) * progress, M_PI * progress);
 		break;
 	case EFFECT_PENTAGRAM_OUT_IN:
-		draw_pentagram(w / 2, h / 2, max(w, h) * (1 - t), M_PI * t);
+		draw_pentagram(w / 2, h / 2, max(w, h) * (1 - progress), M_PI * progress);
 		break;
 	case EFFECT_HEXAGRAM_IN_OUT:
-		draw_hexagram(w / 2, h / 2, max(w, h) * t, M_PI * t);
+		draw_hexagram(w / 2, h / 2, max(w, h) * progress, M_PI * progress);
 		break;
 	case EFFECT_HEXAGRAM_OUT_IN:
-		draw_hexagram(w / 2, h / 2, max(w, h) * (1 - t), M_PI * t);
+		draw_hexagram(w / 2, h / 2, max(w, h) * (1 - progress), M_PI * progress);
 		break;
 	case EFFECT_WINDMILL:
-		draw_windmill_90(w, h, M_PI / 2 * t);
+		draw_windmill_90(w, h, M_PI / 2 * progress);
 		break;
 	case EFFECT_WINDMILL_180:
-		draw_windmill_180(w, h, M_PI * t);
+		draw_windmill_180(w, h, M_PI * progress);
 		break;
 	case EFFECT_WINDMILL_360:
-		draw_windmill_360(w, h, M_PI * 2 * t);
+		draw_windmill_360(w, h, M_PI * 2 * progress);
 		break;
 	default:
 		assert(!"Cannot happen");
@@ -389,7 +388,7 @@ static void polygon_mask_free(struct sdl_fader *fader) {
 
 // EFFECT_ROTATE_*
 
-static void rotate_step(struct sdl_fader *fader, int step);
+static void rotate_step(struct sdl_fader *fader, double progress);
 static void rotate_free(struct sdl_fader *fader);
 
 static struct sdl_fader *rotate_new(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
@@ -402,10 +401,10 @@ static struct sdl_fader *rotate_new(int sx, int sy, int w, int h, int dx, int dy
 	return fader;
 }
 
-static void rotate_step(struct sdl_fader *fader, int step) {
+static void rotate_step(struct sdl_fader *fader, double progress) {
 	SDL_Texture *bg_texture, *fg_texture;
-	double angle = step * 360.0 / SDL_FADER_MAXSTEP;
-	double scale = step / (double)SDL_FADER_MAXSTEP;
+	double angle = progress * 360;
+	double scale = progress;
 	switch (fader->effect) {
 	case EFFECT_ROTATE_OUT:
 		scale = 1.0 - scale;
@@ -469,8 +468,8 @@ struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, e
 	}
 }
 
-void sdl_fader_step(struct sdl_fader *fader, int step) {
-	fader->step(fader, step);
+void sdl_fader_step(struct sdl_fader *fader, double progress) {
+	fader->step(fader, progress);
 }
 
 void sdl_fader_finish(struct sdl_fader *fader) {

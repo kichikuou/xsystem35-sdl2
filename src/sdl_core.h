@@ -85,11 +85,10 @@ extern void sdl_delRegion(void *src);
 extern SDL_Surface *com2surface(agsurface_t *s);
 
 /* fader */
-#define SDL_FADER_MAXSTEP 256
 struct sdl_fader;
 
 struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect type);
-void sdl_fader_step(struct sdl_fader *fader, int step);
+void sdl_fader_step(struct sdl_fader *fader, double progress);
 void sdl_fader_finish(struct sdl_fader *fader);
 extern void sdl_fadeIn(int step);
 extern void sdl_fadeOut(int step);
