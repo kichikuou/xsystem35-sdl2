@@ -39,7 +39,6 @@
 #include "sdl_core.h"
 
 
-static void ec1_cb(surface_t *, surface_t *);
 static void ec6_cb(surface_t *, surface_t *);
 static void ec7_cb(surface_t *, surface_t *);
 static void ec8_cb(surface_t *, surface_t *);
@@ -69,23 +68,6 @@ typedef void entrypoint (surface_t *, surface_t *);
 
 static void ec_dummy_cb(surface_t *sfsrc, surface_t *sfdst) {
 	WARNING("NOT IMPLEMENTED\n");
-}
-
-// クロスフェード
-static void ec1_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep;
-	
-	curstep = 255 * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	gre_Blend(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, curstep);
-
-	// SACT_DEBUG("step = %d\n", curstep);
-	ags_updateFull();
-	
-	ecp.oldstep = curstep;
 }
 
 // すだれ落ち
@@ -240,65 +222,6 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 	ecp.oldstep = st_i;
 }
 
-// フェードイン
-static void ec_fadein_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep;
-	
-	curstep = 255 * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	
-	gr_copy_bright(sf0, 0, 0, sfsrc, 0, 0, sfsrc->width, sfsrc->height, curstep);
-	ags_updateFull();
-	ecp.oldstep = curstep;
-}
-
-static void ec_fadeout_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep;
-	
-	curstep = 255 * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	
-	gr_copy_bright(sf0, 0, 0, sfsrc, 0, 0, sfsrc->width, sfsrc->height, 255-curstep);
-	ags_updateFull();
-	ecp.oldstep = curstep;
-}
-
-// ホワイトイン
-static void ec_whitein_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep;
-	
-	curstep = 255 * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	
-	gr_copy_whiteout(sf0, 0, 0, sfsrc, 0, 0, sfsrc->width, sfsrc->height, 255 - curstep);
-	ags_updateFull();
-	ecp.oldstep = curstep;
-}
-
-static void ec_whiteout_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep;
-	
-	curstep = 255 * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	
-	gr_copy_whiteout(sf0, 0, 0, sfsrc, 0, 0, sfsrc->width, sfsrc->height, curstep);
-	ags_updateFull();
-	ecp.oldstep = curstep;
-}
-
-
 
 /*
   効果つき画面更新
@@ -318,7 +241,14 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	
 	sfdst = sf_dup(sf0);
 	
-	sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
+	enum sdl_effect sdl_effect = from_sact_effect(type - 100);
+	struct sdl_fader *fader = NULL;
+	if (sdl_effect != EFFECT_INVALID) {
+		SDL_Rect rect = { 0, 0, sfsrc->width, sfsrc->height };
+		fader = sdl_fader_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
+	} else {
+		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
+	}
 
 	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time;
@@ -327,21 +257,6 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	switch(type) {
 	case 10:
 		cb = ec_dummy_cb;
-		break;
-	case 101: // クロスフェード
-		cb = ec1_cb;
-		break;
-	case 102: // フェードアウト
-		cb = ec_fadeout_cb;
-		break;
-	case 103: // フェードイン
-		cb = ec_fadein_cb;
-		break;
-	case 104: // ホワイトアウト
-		cb = ec_whiteout_cb;
-		break;
-	case 105: // ホワイトイン
-		cb = ec_whitein_cb;
 		break;
 	case 107: // 簾落ち
 		cb = ec7_cb;
@@ -366,10 +281,12 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	}
 	
 	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
-		int rest;
-		
-		cb(sfsrc, sfdst);
-		rest = 15 - (sdl_getTicks() - ecp.curtime);
+		if (fader) {
+			sdl_fader_step(fader, (double)(ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime));
+		} else {
+			cb(sfsrc, sfdst);
+		}
+		int rest = 15 - (sdl_getTicks() - ecp.curtime);
 		key = sys_keywait(rest, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		
 		if (cancel && key) break;
@@ -383,6 +300,8 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	if (type == 111) {
 		ec11_drain(sfsrc, sfdst);
 	}
+	if (fader)
+		sdl_fader_finish(fader);
 	
 	return OK;
 }

@@ -71,9 +71,6 @@ extern int gr_buller_v(surface_t *dst, int dx, int dy, surface_t *src, int sx, i
 /* in graph_stretch.c */
 extern void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh);
 
-/* in graph_copy_whiteout.c */
-extern void gr_copy_whiteout(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int lv);
-
 
 /* in graph_cg.c */
 extern void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y);

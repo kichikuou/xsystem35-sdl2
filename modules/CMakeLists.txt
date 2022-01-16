@@ -73,7 +73,6 @@ add_library(modules STATIC
   lib/graph_copy.c
   lib/graph_copy_amap.c
   lib/graph_copy_bright.c
-  lib/graph_copy_whiteout.c
   lib/graph_blend_amap.c
   lib/graph_blend_screen.c
   lib/graph_saturadd_amap.c

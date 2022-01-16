@@ -71,10 +71,10 @@ typedef void entrypoint (surface_t *, surface_t *);
 
 static entrypoint *cb[39] = {
 	sdlfader_cb,
-	ec_dummy_cb, // 欠番
-	ec_dummy_cb, // 欠番
-	ec_dummy_cb, // 欠番
-	ec_dummy_cb, // 欠番
+	sdlfader_cb,
+	sdlfader_cb,
+	sdlfader_cb,
+	sdlfader_cb,
 	ec6_cb,
 	ec7_cb,
 	ec8_cb,

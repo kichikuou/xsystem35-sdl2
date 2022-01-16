@@ -42,10 +42,6 @@ static ecopyparam_t ecp;
 #define ECA7_D  16
 #define ECA12_D 256
 
-static void ec2_cb(int step);
-static void ec3_cb(int step);
-static void ec4_cb(int step);
-static void ec5_cb(int step);
 static void ec7_cb();
 static void ec11_cb(int step);
 static void ec11_prepare(void);
@@ -72,7 +68,17 @@ void gpx_effect(int no,
 		ags_fade2(time ? time : 2700, FALSE, (ags_fade2_callback)sdl_fader_step, fader);
 		sdl_fader_finish(fader);
 
-		gr_copy(write, wx, wy, src, sx, sy, width, height);
+		switch (no) {
+		case SACT_EFFECT_FADEOUT:
+			gr_fill(write, wx, wy, width, height, 0, 0, 0);
+			break;
+		case SACT_EFFECT_WHITEOUT:
+			gr_fill(write, wx, wy, width, height, 255, 255, 255);
+			break;
+		default:
+			gr_copy(write, wx, wy, src, sx, sy, width, height);
+			break;
+		}
 		ags_updateArea(wx, wy, width, height);
 		return;
 	}
@@ -93,34 +99,6 @@ void gpx_effect(int no,
 	ags_faderinfo_t i;
 
 	switch(no) {
-	case 2:
-		i.step_max = 64;
-		i.effect_time = time == 0 ? 2700 : time;
-		i.cancel = FALSE;
-		i.callback = ec2_cb;
-		ags_fader(&i);
-		break;
-	case 3:
-		i.step_max = 64;
-		i.effect_time = time == 0 ? 2700 : time;
-		i.cancel = FALSE;
-		i.callback = ec3_cb;
-		ags_fader(&i);
-		break;
-	case 4:
-		i.step_max = 64;
-		i.effect_time = time == 0 ? 2700 : time;
-		i.cancel = FALSE;
-		i.callback = ec4_cb;
-		ags_fader(&i);
-		break;
-	case 5:
-		i.step_max = 64;
-		i.effect_time = time == 0 ? 2700 : time;
-		i.cancel = FALSE;
-		i.callback = ec5_cb;
-		ags_fader(&i);
-		break;
 	case 7:
 		ec7_cb();
 		break;
@@ -152,89 +130,6 @@ void gpx_effect(int no,
 	}
 }
 
-void sf_blend_white_level(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int lv) {
-
-	int x, y;
-	BYTE *sp, *dp;
-	
-	sp = GETOFFSET_PIXEL(src, sx, sy);
-	dp = GETOFFSET_PIXEL(dst, dx, dy);
-	
-	switch(dst->depth) {
-	case 16:
-	{
-		WORD *yls, *yld;
-		
-		for (y = 0; y < sh; y++) {
-			yls = (WORD *)(sp + y * src->bytes_per_line);
-			yld = (WORD *)(dp + y * dst->bytes_per_line);
-			
-			for (x = 0; x < sw; x++) {
-				*yld = WHITELEVEL16(*yls, lv);
-				yls++; yld++;
-			}
-		}
-		break;
-	}
-	case 24:
-	case 32:
-	{
-		DWORD *yls, *yld;
-		
-		for (y = 0; y < sh; y++) {
-			yls = (DWORD *)(sp + y * src->bytes_per_line);
-			yld = (DWORD *)(dp + y * dst->bytes_per_line);
-			
-			for (x = 0; x < sw; x++) {
-				*yld = WHITELEVEL24(*yls, lv);
-				yls++; yld++;
-			}
-		}
-		break;
-	}
-	}
-}
-
-
-static void ec2_cb(int step) {
-	if (step == 0) {
-		gr_copy_bright(ecp.write, ecp.wx, ecp.wy, ecp.dst, ecp.dx, ecp.dy, ecp.w, ecp.h, 255);
-	} else if (step == 64) {
-		gr_copy_bright(ecp.write, ecp.wx, ecp.wy, ecp.dst, ecp.dx, ecp.dy, ecp.w, ecp.h, 0);
-	} else {
-		gr_copy_bright(ecp.write, ecp.wx, ecp.wy, ecp.dst, ecp.dx, ecp.dy, ecp.w, ecp.h, 255 - step * 4);
-	}
-	ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-}
-
-static void ec3_cb(int step) {
-	if (step != 64) {
-		gr_copy_bright(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h, step * 4);
-	} else {
-		gr_copy_bright(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h, 255);
-	}
-	ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-}
-
-static void ec4_cb(int step) {
-	if (step != 64) {
-		sf_blend_white_level(ecp.write, ecp.wx, ecp.wy, ecp.dst, ecp.dx, ecp.dy, ecp.w, ecp.h, step * 4);
-	} else {
-		sf_blend_white_level(ecp.write, ecp.wx, ecp.wy, ecp.dst, ecp.dx, ecp.dy, ecp.w, ecp.h, 255);
-	}
-	ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-}
-
-static void ec5_cb(int step) {
-	if (step == 0) {
-		sf_blend_white_level(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h, 255);
-	} else if (step == 64) {
-		sf_blend_white_level(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h, 0);
-	} else {
-		sf_blend_white_level(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h, 255 - step * 4);
-	}
-	ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-}
 
 #define EC_WAIT                                               \
 	if ((key |= sys_getInputInfo()) && ecp.cancel) break; \

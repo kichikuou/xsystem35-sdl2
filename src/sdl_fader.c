@@ -31,6 +31,10 @@
 
 enum sdl_effect from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
+	case NACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
+	case NACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
+	case NACT_EFFECT_FADEOUT:          return EFFECT_FADEOUT_FROM_NEW;
+	case NACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT_FROM_NEW;
 	case NACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
 	case NACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
 	case NACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
@@ -46,6 +50,10 @@ enum sdl_effect from_nact_effect(enum nact_effect effect) {
 enum sdl_effect from_sact_effect(enum sact_effect effect) {
 	switch (effect) {
 	case SACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
+	case SACT_EFFECT_FADEOUT:          return EFFECT_FADEOUT;
+	case SACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
+	case SACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT;
+	case SACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
 	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
 	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
 	case SACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
@@ -75,10 +83,11 @@ static void fader_init(struct sdl_fader *fader, SDL_Rect *rect, SDL_Surface *old
 	SDL_FreeSurface(new);
 }
 
-static void fader_finish(struct sdl_fader *fader) {
-	SDL_RenderCopy(sdl_renderer, fader->tx_new, NULL, &fader->dst_rect);
-	SDL_RenderPresent(sdl_renderer);
-
+static void fader_finish(struct sdl_fader *fader, bool present) {
+	if (present) {
+		SDL_RenderCopy(sdl_renderer, fader->tx_new, NULL, &fader->dst_rect);
+		SDL_RenderPresent(sdl_renderer);
+	}
 	SDL_DestroyTexture(fader->tx_old);
 	SDL_DestroyTexture(fader->tx_new);
 }
@@ -108,7 +117,74 @@ static void crossfade_step(struct sdl_fader *fader, double progress) {
 }
 
 static void crossfade_free(struct sdl_fader *fader) {
-	fader_finish(fader);
+	fader_finish(fader, true);
+	free(fader);
+}
+
+// EFFECT_{FADE,WHITE}{OUT,IN}
+
+static void brightness_step(struct sdl_fader *fader, double progress);
+static void brightness_free(struct sdl_fader *fader);
+
+static struct sdl_fader *brightness_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect effect) {
+	struct sdl_fader *fader = calloc(1, sizeof(struct sdl_fader));
+	if (!fader)
+		NOMEMERR();
+	fader_init(fader, rect, old, new, effect);
+	fader->step = brightness_step;
+	fader->finish = brightness_free;
+	return fader;
+}
+
+static void brightness_step(struct sdl_fader *fader, double progress) {
+	SDL_Texture *texture;
+	int color;
+	int alpha;
+	switch (fader->effect) {
+	case EFFECT_FADEOUT:
+		texture = fader->tx_old;
+		color = 0;
+		alpha = progress * 255;
+		break;
+	case EFFECT_FADEOUT_FROM_NEW:
+		texture = fader->tx_new;
+		color = 0;
+		alpha = progress * 255;
+		break;
+	case EFFECT_FADEIN:
+		texture = fader->tx_new;
+		color = 0;
+		alpha = (1.0 - progress) * 255;
+		break;
+	case EFFECT_WHITEOUT:
+		texture = fader->tx_old;
+		color = 255;
+		alpha = progress * 255;
+		break;
+	case EFFECT_WHITEOUT_FROM_NEW:
+		texture = fader->tx_new;
+		color = 255;
+		alpha = progress * 255;
+		break;
+	case EFFECT_WHITEIN:
+		texture = fader->tx_new;
+		color = 255;
+		alpha = (1.0 - progress) * 255;
+		break;
+	default:
+		assert(!"Cannot happen");
+	}
+	SDL_RenderCopy(sdl_renderer, texture, NULL, &fader->dst_rect);
+	SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(sdl_renderer, color, color, color, alpha);
+	SDL_RenderFillRect(sdl_renderer, &fader->dst_rect);
+	SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_NONE);
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void brightness_free(struct sdl_fader *fader) {
+	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+	fader_finish(fader, false);
 	free(fader);
 }
 
@@ -367,7 +443,7 @@ static void polygon_mask_step(struct sdl_fader *fader, double progress) {
 static void polygon_mask_free(struct sdl_fader *fader) {
 	struct polygon_mask_fader *this = (struct polygon_mask_fader *)fader;
 	SDL_DestroyTexture(this->tx_tmp);
-	fader_finish(&this->f);
+	fader_finish(&this->f, true);
 	free(this);
 }
 
@@ -427,7 +503,7 @@ static void rotate_step(struct sdl_fader *fader, double progress) {
 }
 
 static void rotate_free(struct sdl_fader *fader) {
-	fader_finish(fader);
+	fader_finish(fader, true);
 	free(fader);
 }
 
@@ -454,6 +530,13 @@ struct sdl_fader *sdl_fader_init(SDL_Rect *rect, agsurface_t *old, int ox, int o
 	switch (effect) {
 	case EFFECT_CROSSFADE:
 		return crossfade_new(rect, sf_old, sf_new);
+	case EFFECT_FADEOUT:
+	case EFFECT_FADEOUT_FROM_NEW:
+	case EFFECT_FADEIN:
+	case EFFECT_WHITEOUT:
+	case EFFECT_WHITEOUT_FROM_NEW:
+	case EFFECT_WHITEIN:
+		return brightness_new(rect, sf_old, sf_new, effect);
 	case EFFECT_PENTAGRAM_IN_OUT:
 	case EFFECT_PENTAGRAM_OUT_IN:
 	case EFFECT_HEXAGRAM_IN_OUT:
