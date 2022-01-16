@@ -176,6 +176,14 @@ void sdl_fillRectangle(int x, int y, int w, int h, BYTE c) {
 	SDL_FillRect(sdl_dib, &rect, col);
 }
 
+void sdl_fillRectangleRGB(int x, int y, int w, int h, BYTE r, BYTE g, BYTE b) {
+	if (sdl_dib->format->BitsPerPixel == 8)
+		return;
+
+	SDL_Rect rect = {x, y, w, h};
+	SDL_FillRect(sdl_dib, &rect, SDL_MapRGB(sdl_dib->format, r, g, b));
+}
+
 /* 領域コピー */
 void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	if (sx == dx && sy == dy)

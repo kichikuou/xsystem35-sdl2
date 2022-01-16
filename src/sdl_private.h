@@ -40,8 +40,6 @@ struct sdl_private_data {
 	
 	SDL_Color       col[256]; /* color palette */
 	
-	unsigned long       white; /* white pixel */
-	
 	agsurface_t *cimg;
 	
 	SDL_Rect       view;
@@ -68,7 +66,6 @@ extern struct sdl_private_data *sdl_videodev;
 #define sdl_display (sdl_videodev->dsp)
 #define sdl_dib (sdl_videodev->dib)
 #define sdl_col (sdl_videodev->col)
-#define sdl_white (sdl_videodev->white)
 #define sdl_dibinfo (sdl_videodev->cimg)
 #define sdl_view (sdl_videodev->view)
 #define view_x (sdl_videodev->view.x)

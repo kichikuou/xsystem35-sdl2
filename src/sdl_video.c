@@ -176,9 +176,6 @@ static void makeDIB(int width, int height, int depth) {
 	       sdl_dib->format->Rmask, sdl_dib->format->Gmask,
 	       sdl_dib->format->Bmask, sdl_dib->format->Amask);
 #endif
-	if (depth > 8) {
-		sdl_white = (sdl_dib->format->Rmask | sdl_dib->format->Gmask | sdl_dib->format->Bmask);
-	}
 	
 	if (sdl_dibinfo) {
 		free(sdl_dibinfo);

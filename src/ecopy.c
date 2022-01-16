@@ -959,7 +959,7 @@ static int eCopyArea1001(int sx, int sy, int w, int h, int dx, int dy, int opt, 
 }
 
 static int eCopyArea2000(int sx, int sy, int w, int h, int dx, int dy, int opt) {
-	sdl_fillRectangle(dx, dy, w, h, 0);
+	sdl_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
 	ags_copyArea_alphaLevel(sx, sy, w, h, dx, dy, opt);
 	ags_updateArea(dx, dy, w, h);
 	return sys_getInputInfo();
@@ -1055,10 +1055,10 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		// Actual copy.
 		switch (sw) {
 		case NACT_EFFECT_FADEOUT:
-			ags_copyArea_alphaLevel(sx, sy, w, h, dx, dy, 0);
+			sdl_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
 			break;
 		case NACT_EFFECT_WHITEOUT:
-			ags_copyArea_whiteLevel(sx, sy, w, h, dx, dy, 255);
+			sdl_fillRectangleRGB(dx, dy, w, h, 255, 255, 255);
 			break;
 		default:
 			ags_copyArea(sx, sy, w, h, dx, dy);

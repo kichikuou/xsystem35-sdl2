@@ -449,15 +449,6 @@ void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int l
 	sdl_copyAreaSP16_alphaBlend(sx, sy, w, h, dx, dy, lv);
 }
 
-void ags_copyArea_whiteLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	if (nact->sys_world_depth == 8) return;
-
-	if (!ags_check_param(&sx, &sy, &w, &h)) return;
-	if (!ags_check_param(&dx, &dy, &w, &h)) return;
-	
-	sdl_copyAreaSP16_whiteLevel(sx, sy, w, h, dx, dy, lv);
-}
-
 MyRectangle ags_floodFill(int x, int y, int col) {
 	if (!ags_check_param_xy(&x, &y))
 		return (MyRectangle){};

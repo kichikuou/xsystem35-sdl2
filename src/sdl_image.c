@@ -295,18 +295,15 @@ void sdl_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, i
 	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_NONE);
 }
 
-#define copyAreaSP_level(fn, cn, v) void sdl_copyAreaSP16_##fn(int sx, int sy, int w, int h, int dx, int dy, int lv) { \
-	SDL_Rect r_src = {sx, sy, w, h};	   \
-	SDL_Rect r_dst = {dx, dy, w, h};					   \
-	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_BLEND); \
-	SDL_SetSurfaceAlphaMod(sdl_dib, v); \
-	SDL_FillRect(sdl_dib, &r_dst, cn); \
-	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst); \
-	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_NONE); \
+void sdl_copyAreaSP16_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
+	SDL_Rect r_src = {sx, sy, w, h};
+	SDL_Rect r_dst = {dx, dy, w, h};
+	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceAlphaMod(sdl_dib, lv);
+	SDL_FillRect(sdl_dib, &r_dst, 0);
+	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
+	SDL_SetSurfaceBlendMode(sdl_dib, SDL_BLENDMODE_NONE);
 }
-
-copyAreaSP_level(alphaLevel, 0, lv);
-copyAreaSP_level(whiteLevel, sdl_white, 255 - lv);
 
 void sdl_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	SDL_LockSurface(sdl_dib);
