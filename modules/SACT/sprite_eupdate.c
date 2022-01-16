@@ -41,9 +41,6 @@
 
 
 static void ec6_cb(surface_t *, surface_t *);
-static void ec7_cb(surface_t *, surface_t *);
-static void ec8_cb(surface_t *, surface_t *);
-static void ec9_cb(surface_t *, surface_t *);
 static void ec11_cb(surface_t *, surface_t *);
 static void ec12_cb(surface_t *, surface_t *);
 static void ec13_cb(surface_t *, surface_t *);
@@ -76,9 +73,9 @@ static entrypoint *cb[39] = {
 	sdlfader_cb,
 	sdlfader_cb,
 	ec6_cb,
-	ec7_cb,
-	ec8_cb,
-	ec9_cb,
+	sdlfader_cb,
+	sdlfader_cb,
+	sdlfader_cb,
 	ec10_cb,
 	ec11_cb,
 	ec12_cb,
@@ -113,99 +110,6 @@ static entrypoint *cb[39] = {
 
 static void ec_dummy_cb(surface_t *sfsrc, surface_t *sfdst) {
 	WARNING("NOT IMPLEMENTED\n");
-}
-
-// すだれ落ち
-static void ec7_cb(surface_t *sfsrc, surface_t *sfdst) {
-#define EC7DELTA 16
-	int curstep, maxstep = sfsrc->height / EC7DELTA + EC7DELTA;
-	int i, t, y;
-	
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	SACT_DEBUG("step = %d\n", curstep);
-	
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	t = ecp.oldstep;
-	while(t < curstep) {
-		for (i = 0; i < min(t + 1, EC7DELTA); i++) {
-			y = i + EC7DELTA * (t - i);
-			if (y < 0 || y >= sfsrc->height) continue;
-			gr_copy(sf0, 0, y,
-				sfdst, 0, y, sfsrc->width, 1);
-		}
-		t++;
-	}
-	
-	ecp.oldstep = curstep;
-	ags_updateFull();
-}
-
-// すだれ左->右
-static void ec8_cb(surface_t *sfsrc, surface_t *sfdst) {
-#define EC8DELTA 16
-	int curstep, maxstep = sfsrc->width / EC8DELTA + EC8DELTA;
-	int i, t, x;
-	
-	curstep = maxstep * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	SACT_DEBUG("step = %d\n", curstep);
-	
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	t = ecp.oldstep;
-	while(t < curstep) {
-		for (i = 0; i < min(t + 1, EC8DELTA); i++) {
-			x = i + EC8DELTA * (t - i);
-			if (x < 0 || x >= sfsrc->width) continue;
-			gr_copy(sf0,   x, 0,
-				sfdst, x, 0, 1, sfsrc->height);
-		}
-		t++;
-	}
-	
-	ecp.oldstep = curstep;
-	ags_updateFull();
-}
-
-// すだれ落ち＆左->右
-static void ec9_cb(surface_t *sfsrc, surface_t *sfdst) {
-#define EC9DELTA 16
-	int curstep, maxstep; 
-	int i, t, x, y;
-
-	maxstep = max(sfsrc->height / EC9DELTA + EC9DELTA,
-		      sfsrc->width  / EC9DELTA + EC9DELTA);
-	
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	SACT_DEBUG("step = %d\n", curstep);
-	
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	t = ecp.oldstep;
-	while(t < curstep) {
-		for (i = 0; i < min(t + 1, EC9DELTA); i++) {
-			y = i + EC9DELTA * (t - i);
-			if (y < 0 || y >= sfsrc->height) continue;
-			gr_copy(sf0, 0, y,
-				sfdst, 0, y, sfsrc->width, 1);
-		}
-		for (i = 0; i < min(t + 1, EC9DELTA); i++) {
-			x = i + EC9DELTA * (t - i);
-			if (x < 0 || x >= sfsrc->width) continue;
-			gr_copy(sf0,   x, 0,
-				sfdst, x, 0, 1, sfsrc->height);
-		}
-		t++;
-	}
-	
-	ecp.oldstep = curstep;
-	ags_updateFull();
 }
 
 // 上->下クロスフェード

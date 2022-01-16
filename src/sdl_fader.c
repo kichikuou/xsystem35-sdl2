@@ -31,15 +31,20 @@
 
 enum sdl_effect from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
+	case NACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
 	case NACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
 	case NACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
 	case NACT_EFFECT_FADEOUT:          return EFFECT_FADEOUT_FROM_NEW;
 	case NACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT_FROM_NEW;
 	case NACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
+	case NACT_EFFECT_BLIND_UP:         return EFFECT_BLIND_UP;
+	case NACT_EFFECT_BLIND_UP_DOWN:    return EFFECT_BLIND_UP_DOWN;
 	case NACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
 	case NACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
 	case NACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
 	case NACT_EFFECT_HEXAGRAM_OUT_IN:  return EFFECT_HEXAGRAM_OUT_IN;
+	case NACT_EFFECT_BLIND_LR:         return EFFECT_BLIND_LR;
+	case NACT_EFFECT_BLIND_RL:         return EFFECT_BLIND_RL;
 	case NACT_EFFECT_WINDMILL:         return EFFECT_WINDMILL;
 	case NACT_EFFECT_WINDMILL_180:     return EFFECT_WINDMILL_180;
 	case NACT_EFFECT_WINDMILL_360:     return EFFECT_WINDMILL_360;
@@ -54,6 +59,9 @@ enum sdl_effect from_sact_effect(enum sact_effect effect) {
 	case SACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
 	case SACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT;
 	case SACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
+	case SACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
+	case SACT_EFFECT_BLIND_LR:         return EFFECT_BLIND_LR;
+	case SACT_EFFECT_BLIND_DOWN_LR:    return EFFECT_BLIND_DOWN_LR;
 	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
 	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
 	case SACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
@@ -184,6 +192,125 @@ static void brightness_step(struct sdl_fader *fader, double progress) {
 
 static void brightness_free(struct sdl_fader *fader) {
 	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+	fader_finish(fader, false);
+	free(fader);
+}
+
+// EFFECT_BLIND_*
+
+static void blind_step(struct sdl_fader *fader, double progress);
+static void blind_free(struct sdl_fader *fader);
+
+static struct sdl_fader *blind_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect effect) {
+	struct sdl_fader *fader = calloc(1, sizeof(struct sdl_fader));
+	if (!fader)
+		NOMEMERR();
+	fader_init(fader, rect, old, new, effect);
+	fader->step = blind_step;
+	fader->finish = blind_free;
+	return fader;
+}
+
+static void blind_step(struct sdl_fader *fader, double progress) {
+	const int N = 16;
+
+	SDL_RenderCopy(sdl_renderer, fader->tx_old, NULL, &fader->dst_rect);
+
+	if (fader->effect == EFFECT_BLIND_DOWN || fader->effect == EFFECT_BLIND_UP_DOWN || fader->effect == EFFECT_BLIND_DOWN_LR) {
+		SDL_Rect rect = fader->dst_rect;
+		if (fader->effect == EFFECT_BLIND_UP_DOWN)
+			rect.h = rect.h / (N * 2) * N;
+
+		int maxstep = rect.h / N + N;
+		int step = maxstep * progress;
+
+		int top = (step - N + 1) * N;
+		if (top > 0) {
+			SDL_Rect sr = {0, 0, rect.w, top};
+			SDL_Rect dr = {rect.x, rect.y, rect.w, top};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+		for (int i = 1; i < N; i++) {
+			int y = (step - N + i) * N;
+			if (y < 0 || y >= rect.h)
+				continue;
+			SDL_Rect sr = {0, y, rect.w, N - i};
+			SDL_Rect dr = {rect.x, rect.y + y, rect.w, N - i};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+	}
+
+	if (fader->effect == EFFECT_BLIND_UP || fader->effect == EFFECT_BLIND_UP_DOWN) {
+		SDL_Rect rect = fader->dst_rect;
+		int offset = 0;
+		if (fader->effect == EFFECT_BLIND_UP_DOWN) {
+			offset = rect.h / (N * 2) * N;
+			rect.y += offset;
+			rect.h -= offset;
+		}
+		int maxstep = rect.h / N + N;
+		int step = maxstep - maxstep * progress;
+
+		for (int i = 1; i < N; i++) {
+			int y = (step - N + i) * N;
+			if (y < 0 || y >= rect.h)
+				continue;
+			SDL_Rect sr = {0, offset + y + N - i, rect.w, i};
+			SDL_Rect dr = {rect.x, rect.y + y + N - i, rect.w, i};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+		int top = step * N;
+		if (top < rect.h) {
+			SDL_Rect sr = {0, offset + top, rect.w, rect.h - top};
+			SDL_Rect dr = {rect.x, rect.y + top, rect.w, rect.h - top};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+	}
+
+	if (fader->effect == EFFECT_BLIND_LR || fader->effect == EFFECT_BLIND_DOWN_LR) {
+		int maxstep = fader->dst_rect.w / N + N;
+		int step = maxstep * progress;
+
+		int lhs = (step - N + 1) * N;
+		if (lhs > 0) {
+			SDL_Rect sr = {0, 0, lhs, fader->dst_rect.h};
+			SDL_Rect dr = {fader->dst_rect.x, fader->dst_rect.y, lhs, fader->dst_rect.h};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+		for (int i = 1; i < N; i++) {
+			int x = (step - N + i) * N;
+			if (x < 0 || x >= fader->dst_rect.w)
+				continue;
+			SDL_Rect sr = {x, 0, N - i, fader->dst_rect.h};
+			SDL_Rect dr = {fader->dst_rect.x + x, fader->dst_rect.y, N - i, fader->dst_rect.h};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+	}
+
+	if (fader->effect == EFFECT_BLIND_RL) {
+		int maxstep = fader->dst_rect.w / N + N;
+		int step = maxstep - maxstep * progress;
+
+		for (int i = 1; i < N; i++) {
+			int x = (step - N + i) * N;
+			if (x < 0 || x >= fader->dst_rect.w)
+				continue;
+			SDL_Rect sr = {x + N - i, 0, i, fader->dst_rect.h};
+			SDL_Rect dr = {fader->dst_rect.x + x + N - i, fader->dst_rect.y, i, fader->dst_rect.h};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+		int lhs = step * N;
+		if (lhs < fader->dst_rect.w) {
+			SDL_Rect sr = {lhs, 0, fader->dst_rect.w - lhs, fader->dst_rect.h};
+			SDL_Rect dr = {fader->dst_rect.x + lhs, fader->dst_rect.y, fader->dst_rect.w - lhs, fader->dst_rect.h};
+			SDL_RenderCopy(sdl_renderer, fader->tx_new, &sr, &dr);
+		}
+	}
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void blind_free(struct sdl_fader *fader) {
 	fader_finish(fader, false);
 	free(fader);
 }
@@ -537,6 +664,13 @@ struct sdl_fader *sdl_fader_init(SDL_Rect *rect, agsurface_t *old, int ox, int o
 	case EFFECT_WHITEOUT_FROM_NEW:
 	case EFFECT_WHITEIN:
 		return brightness_new(rect, sf_old, sf_new, effect);
+	case EFFECT_BLIND_DOWN:
+	case EFFECT_BLIND_UP:
+	case EFFECT_BLIND_LR:
+	case EFFECT_BLIND_RL:
+	case EFFECT_BLIND_UP_DOWN:
+	case EFFECT_BLIND_DOWN_LR:
+		return blind_new(rect, sf_old, sf_new, effect);
 	case EFFECT_PENTAGRAM_IN_OUT:
 	case EFFECT_PENTAGRAM_OUT_IN:
 	case EFFECT_HEXAGRAM_IN_OUT:

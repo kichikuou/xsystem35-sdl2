@@ -262,26 +262,6 @@ static void eCopyArea10(int step) {
 		       ecp.w * step / 64, ecp.h * step / 64);
 }
 
-static int eCopyArea11(int dx, int dy, int w, int h, int opt) {
-	int i, j, y, key = 0, cnt;
-	int waitcnt = opt == 0 ? 40 : opt;
-
-#define ECA11_SLICE 16
-	cnt = sdl_getTicks();
-	for (i = 0; i < ECA11_SLICE + h / ECA11_SLICE -1; i++) {
-		cnt += waitcnt;
-		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
-			y = j + ECA11_SLICE*(i-j);
-			if (y < 0 || y >= h) continue;
-			eCopyUpdateArea(dx, dy + y, w, 1, dx, dy + y);
-		}
-		EC_WAIT;
-	}
-	
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
 static int eCopyArea12(int dx, int dy, int w, int h, int opt) {
 	int x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
@@ -608,45 +588,6 @@ static void eCopyArea32(int step) {
 	ags_copyArea_alphaBlend(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, step*4);
 	sdl_Mosaic(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, slices[step >> 1]);
 	ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
-}
-
-static int eCopyArea33(int dx, int dy, int w, int h, int opt) {
-	int i, j, y, key = 0, cnt,dyy=dy+h-1;
-	int waitcnt = opt == 0 ? 40 : opt;
-
-	cnt = sdl_getTicks();
-	for (i = 0; i < ECA11_SLICE + h / ECA11_SLICE -1; i++) {
-		cnt += waitcnt;
-		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
-			y = j + ECA11_SLICE*(i-j);
-			if (y < 0 || y >= h) continue;
-			eCopyUpdateArea(dx, dyy - y, w, 1, dx, dyy - y);
-		}
-		EC_WAIT;
-	}
-	
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea34(int dx, int dy, int w, int h, int opt) {
-	int i, j, y, key = 0, cnt,dyy=dy+h-1,h2=h/2;
-	int waitcnt = opt == 0 ? 40 : opt;
-
-	cnt = sdl_getTicks();
-	for (i = 0; i < ECA11_SLICE + h / ECA11_SLICE/2 -1; i++) {
-		cnt += waitcnt;
-		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
-			y = j + ECA11_SLICE*(i-j);
-			if (y < 0 || y >= h2 ) continue;
-			eCopyUpdateArea(dx, dy + y, w, 1, dx, dy + y);
-			eCopyUpdateArea(dx, dyy - y, w, 1, dx, dyy - y);
-		}
-		EC_WAIT;
-	}
-	
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
 }
 
 #define ECA35_D 256
@@ -1007,44 +948,6 @@ static void eCopyArea43(int step) {
 		 nact->sys_view_area.h - deltah);
 }
 
-static int eCopyArea48(int dx, int dy, int w, int h, int opt) {
-	int i, j, x, key = 0, cnt;
-	int waitcnt = opt == 0 ? 40 : opt;
-
-	cnt = sdl_getTicks();
-	for (i = 0; i < ECA11_SLICE + w / ECA11_SLICE -1; i++) {
-		cnt += waitcnt;
-		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
-			x = j + ECA11_SLICE*(i-j);
-			if (x < 0 || x >= w) continue;
-			eCopyUpdateArea( dx+x, dy, 1, h, dx+x, dy);
-		}
-		EC_WAIT;
-	}
-	
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea49(int dx, int dy, int w, int h, int opt) {
-	int i, j, x, key = 0, cnt, dxx = dx + w - 1;
-	int waitcnt = opt == 0 ? 40 : opt;
-	
-	cnt = sdl_getTicks();
-	for (i = 0; i < ECA11_SLICE + w / ECA11_SLICE -1; i++) {
-		cnt += waitcnt;
-		for (j = 0; j < min(i+1, ECA11_SLICE); j++) {
-			x = j + ECA11_SLICE*(i-j);
-			if (x < 0 || x >= w) continue;
-			eCopyUpdateArea(dxx - x, dy, 1, h, dxx - x, dy);
-		}
-		EC_WAIT;
-	}
-	
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
 static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
 	/* XOR */
 	return sys_getInputInfo();
@@ -1100,8 +1003,16 @@ static int eCopyArea5sp(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	return key;
 }
 
-static int duration(enum nact_effect effect, int opt) {
+static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	switch (effect) {
+	case NACT_EFFECT_BLIND_DOWN:
+	case NACT_EFFECT_BLIND_UP:
+		return (opt ? opt : 40) * (rect->h / 16 + 16);
+	case NACT_EFFECT_BLIND_UP_DOWN:
+		return (opt ? opt : 40) * (rect->h / 16 + 16) / 2;
+	case NACT_EFFECT_BLIND_LR:
+	case NACT_EFFECT_BLIND_RL:
+		return (opt ? opt : 40) * (rect->w / 16 + 16);
 	case NACT_EFFECT_FADEIN:
 	case NACT_EFFECT_WHITEIN:
 	case NACT_EFFECT_FADEOUT:
@@ -1138,7 +1049,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { dx, dy, w, h };
 		struct sdl_fader *fader = sdl_fader_init(&rect, sdl_getDIB(), dx, dy, sdl_getDIB(), sx, sy, from_nact_effect(sw));
-		ags_fade2(duration(sw, opt), cancel, (ags_fade2_callback)sdl_fader_step, fader);
+		ags_fade2(duration(sw, opt, &rect), cancel, (ags_fade2_callback)sdl_fader_step, fader);
 		sdl_fader_finish(fader);
 
 		// Actual copy.
@@ -1176,7 +1087,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 6:
 	case 7:
 	case 8:
-	case 11:
 	case 12:
 	case 13:
 	case 14:
@@ -1187,10 +1097,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 19:
 	case 20:
 	case 21:
-	case 33:
-	case 34:
-	case 48:
-	case 49:
 	case 53:
 	case 54:
 		if (spCol == -1) {
@@ -1245,9 +1151,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		i.callback = eCopyArea10;
 		ags_fader(&i);
 		return;
-	case 11:
-		ret = eCopyArea11(dx, dy, w, h, opt);
-		break;
 	case 12:
 		ret = eCopyArea12(dx, dy, w, h, opt);
 		break;
@@ -1300,12 +1203,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		i.callback = eCopyArea32;
 		ags_fader(&i);
 		return;
-	case 33:
-		ret = eCopyArea33(dx, dy, w, h, opt);
-		break;
-	case 34:
-		ret = eCopyArea34(dx, dy, w, h, opt);
-		break;
 	case 35:
 		i.step_max = ECA35_D + h;
 		i.effect_time = opt == 0 ? 1150 : opt * i.step_max;
@@ -1361,13 +1258,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		i.callback = eCopyArea43;
 		ags_fader(&i);
 		return;
-		
-	case 48:
-		ret = eCopyArea48(dx, dy, w, h, opt);
-		break;
-	case 49:
-	        ret = eCopyArea49(dx, dy, w, h, opt);
-		break;
 		
 	case 1000:
 		if (nact->sys_world_depth != 8) return;

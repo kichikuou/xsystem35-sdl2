@@ -39,10 +39,8 @@ static ecopyparam_t ecp;
 
 
 
-#define ECA7_D  16
 #define ECA12_D 256
 
-static void ec7_cb();
 static void ec11_cb(int step);
 static void ec11_prepare(void);
 static void ec12_cb(int step);
@@ -99,9 +97,6 @@ void gpx_effect(int no,
 	ags_faderinfo_t i;
 
 	switch(no) {
-	case 7:
-		ec7_cb();
-		break;
 	case 11:
 		ec11_prepare();
 		i.step_max = 6;
@@ -130,29 +125,6 @@ void gpx_effect(int no,
 	}
 }
 
-
-#define EC_WAIT                                               \
-	if ((key |= sys_getInputInfo()) && ecp.cancel) break; \
-	key = sys_keywait(cnt - sdl_getTicks(), ecp.cancel);
-
-static void ec7_cb() {
-	int i, j, y, key = 0, cnt;
-	int waitcnt = ecp.time == 0 ? 40 : (ecp.time/60);
-	
-	cnt = sdl_getTicks();
-	for (i = 0; i < ECA7_D + ecp.h / ECA7_D -1; i++) {
-		cnt += waitcnt;
-		for (j = 0; j < min(i + 1, ECA7_D); j++) {
-			y = j + ECA7_D * (i-j);
-			if (y < 0 || y >= ecp.h) continue;
-			gr_copy(ecp.write, ecp.wx, ecp.wy + y, ecp.src, ecp.sx, ecp.sy + y, ecp.w, 1);
-		}
-		ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-		EC_WAIT;
-	}
-	
-	ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-}
 
 static void ec11_prepare() {
 	int i;
