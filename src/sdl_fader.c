@@ -45,6 +45,7 @@ enum sdl_effect from_nact_effect(enum nact_effect effect) {
 
 enum sdl_effect from_sact_effect(enum sact_effect effect) {
 	switch (effect) {
+	case SACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
 	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
 	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
 	case SACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
@@ -65,27 +66,13 @@ struct sdl_fader {
 	SDL_Texture *tx_old, *tx_new;
 };
 
-static void fader_init(struct sdl_fader *fader, int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
+static void fader_init(struct sdl_fader *fader, SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect effect) {
 	fader->effect = effect;
-	fader->dst_rect.x = dx;
-	fader->dst_rect.y = dy;
-	fader->dst_rect.w = w;
-	fader->dst_rect.h = h;
-
-	SDL_Surface *sf_old = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
-	SDL_Surface *sf_new = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
-
-	SDL_Rect src_rect = { sx, sy, w, h };
-	SDL_BlitSurface(sdl_display, &fader->dst_rect, sf_old, NULL);
-	SDL_BlitSurface(sdl_dib, &src_rect, sf_new, NULL);
-
-	fader->tx_old = SDL_CreateTextureFromSurface(sdl_renderer, sf_old);
-	fader->tx_new = SDL_CreateTextureFromSurface(sdl_renderer, sf_new);
-
-	SDL_FreeSurface(sf_old);
-	SDL_FreeSurface(sf_new);
-
-	sdl_copyArea(sx, sy, w, h, dx, dy);
+	fader->dst_rect = *rect;
+	fader->tx_old = SDL_CreateTextureFromSurface(sdl_renderer, old);
+	fader->tx_new = SDL_CreateTextureFromSurface(sdl_renderer, new);
+	SDL_FreeSurface(old);
+	SDL_FreeSurface(new);
 }
 
 static void fader_finish(struct sdl_fader *fader) {
@@ -101,11 +88,11 @@ static void fader_finish(struct sdl_fader *fader) {
 static void crossfade_step(struct sdl_fader *fader, double progress);
 static void crossfade_free(struct sdl_fader *fader);
 
-static struct sdl_fader *crossfade_new(int sx, int sy, int w, int h, int dx, int dy) {
+static struct sdl_fader *crossfade_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new) {
 	struct sdl_fader *fader = calloc(1, sizeof(struct sdl_fader));
 	if (!fader)
 		NOMEMERR();
-	fader_init(fader, sx, sy, w, h, dx, dy, EFFECT_CROSSFADE);
+	fader_init(fader, rect, old, new, EFFECT_CROSSFADE);
 	fader->step = crossfade_step;
 	fader->finish = crossfade_free;
 	return fader;
@@ -135,14 +122,14 @@ struct polygon_mask_fader {
 static void polygon_mask_step(struct sdl_fader *fader, double progress);
 static void polygon_mask_free(struct sdl_fader *fader);
 
-static struct sdl_fader *polygon_mask_new(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
+static struct sdl_fader *polygon_mask_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect effect) {
 #if HAS_SDL_RenderGeometry
 	if (SDL_RenderTargetSupported(sdl_renderer)) {
 		struct polygon_mask_fader *pmf = calloc(1, sizeof(struct polygon_mask_fader));
 		if (!pmf)
 			NOMEMERR();
-		fader_init(&pmf->f, sx, sy, w, h, dx, dy, effect);
-		pmf->tx_tmp = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, w, h);
+		fader_init(&pmf->f, rect, old, new, effect);
+		pmf->tx_tmp = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
 		pmf->f.step = polygon_mask_step;
 		pmf->f.finish = polygon_mask_free;
 		return &pmf->f;
@@ -150,7 +137,7 @@ static struct sdl_fader *polygon_mask_new(int sx, int sy, int w, int h, int dx, 
 #endif // HAS_SDL_RenderGeometry
 
 	WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", effect);
-	return crossfade_new(sx, sy, w, h, dx, dy);
+	return crossfade_new(rect, old, new);
 }
 
 #if HAS_SDL_RenderGeometry
@@ -391,11 +378,11 @@ static void polygon_mask_free(struct sdl_fader *fader) {
 static void rotate_step(struct sdl_fader *fader, double progress);
 static void rotate_free(struct sdl_fader *fader);
 
-static struct sdl_fader *rotate_new(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
+static struct sdl_fader *rotate_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect effect) {
 	struct sdl_fader *fader = calloc(1, sizeof(struct sdl_fader));
 	if (!fader)
 		NOMEMERR();
-	fader_init(fader, sx, sy, w, h, dx, dy, effect);
+	fader_init(fader, rect, old, new, effect);
 	fader->step = rotate_step;
 	fader->finish = rotate_free;
 	return fader;
@@ -445,10 +432,28 @@ static void rotate_free(struct sdl_fader *fader) {
 }
 
 
-struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect effect) {
+static SDL_Surface *create_surface(agsurface_t *as, int x, int y, int w, int h) {
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
+	SDL_Rect rect = { x, y, w, h };
+	if (!as) {
+		SDL_BlitSurface(sdl_display, &rect, sf, NULL);
+	} else if (as == sdl_dibinfo) {
+		SDL_BlitSurface(sdl_dib, &rect, sf, NULL);
+	} else {
+		SDL_Surface *s = com2surface(as);
+		SDL_BlitSurface(s, &rect, sf, NULL);
+		SDL_FreeSurface(s);
+	}
+	return sf;
+}
+
+struct sdl_fader *sdl_fader_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect effect) {
+	SDL_Surface *sf_old = create_surface(old, ox, oy, rect->w, rect->h);
+	SDL_Surface *sf_new = create_surface(new, nx, ny, rect->w, rect->h);
+
 	switch (effect) {
 	case EFFECT_CROSSFADE:
-		return crossfade_new(sx, sy, w, h, dx, dy);
+		return crossfade_new(rect, sf_old, sf_new);
 	case EFFECT_PENTAGRAM_IN_OUT:
 	case EFFECT_PENTAGRAM_OUT_IN:
 	case EFFECT_HEXAGRAM_IN_OUT:
@@ -456,15 +461,15 @@ struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, e
 	case EFFECT_WINDMILL:
 	case EFFECT_WINDMILL_180:
 	case EFFECT_WINDMILL_360:
-		return polygon_mask_new(sx, sy, w, h, dx, dy, effect);
+		return polygon_mask_new(rect, sf_old, sf_new, effect);
 	case EFFECT_ROTATE_OUT:
 	case EFFECT_ROTATE_IN:
 	case EFFECT_ROTATE_OUT_CW:
 	case EFFECT_ROTATE_IN_CW:
-		return rotate_new(sx, sy, w, h, dx, dy, effect);
+		return rotate_new(rect, sf_old, sf_new, effect);
 	default:
 		WARNING("Unknown effect %d\n", effect);
-		return crossfade_new(sx, sy, w, h, dx, dy);
+		return crossfade_new(rect, sf_old, sf_new);
 	}
 }
 

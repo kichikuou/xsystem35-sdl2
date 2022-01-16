@@ -40,7 +40,6 @@
 #include "sdl_core.h"
 
 
-static void ec1_cb(surface_t *, surface_t *);
 static void ec6_cb(surface_t *, surface_t *);
 static void ec7_cb(surface_t *, surface_t *);
 static void ec8_cb(surface_t *, surface_t *);
@@ -71,7 +70,7 @@ static ecopyparam_t ecp;
 typedef void entrypoint (surface_t *, surface_t *);
 
 static entrypoint *cb[39] = {
-	ec1_cb,
+	sdlfader_cb,
 	ec_dummy_cb, // 欠番
 	ec_dummy_cb, // 欠番
 	ec_dummy_cb, // 欠番
@@ -114,23 +113,6 @@ static entrypoint *cb[39] = {
 
 static void ec_dummy_cb(surface_t *sfsrc, surface_t *sfdst) {
 	WARNING("NOT IMPLEMENTED\n");
-}
-
-// クロスフェード
-static void ec1_cb(surface_t *sfsrc, surface_t *sfdst) {
-	int curstep;
-	
-	curstep = 255 * (ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime);
-	if (ecp.oldstep == curstep) {
-		usleep(0);
-		return;
-	}
-	gre_Blend(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, curstep);
-
-	SACT_DEBUG("step = %d\n", curstep);
-	ags_updateFull();
-	
-	ecp.oldstep = curstep;
 }
 
 // すだれ落ち
@@ -358,10 +340,12 @@ int sp_eupdate(int type, int time, int cancel) {
 	sfdst = sf_dup(sf0);
 	
 	enum sdl_effect sdl_effect = from_sact_effect(type);
-	if (sdl_effect != EFFECT_INVALID)
-		ecp.fader = sdl_fader_init(0, 0, sfsrc->width, sfsrc->height, 0, 0, sdl_effect);
-	else
+	if (sdl_effect != EFFECT_INVALID) {
+		SDL_Rect rect = { 0, 0, sfsrc->width, sfsrc->height };
+		ecp.fader = sdl_fader_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
+	} else {
 		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
+	}
 
 	// 5つを越えたら別の方法を考えよう
 	if (type == 10) {

@@ -1150,10 +1150,9 @@ static void EffectCopy() {
 	default:
 		DEBUG_COMMAND_YET("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:\n", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
 	}
-	dib = sf_get(0);
 	dst = sf_get(ss1);
 	src = sf_get(ss2);
-	gpx_effect(no, dib, dx, dy, dst, sx1, sy1, src, sx2, sy2, sw, sh, time, var);
+	gpx_effect(no, dx, dy, dst, sx1, sy1, src, sx2, sy2, sw, sh, time, var);
 	
 }
 

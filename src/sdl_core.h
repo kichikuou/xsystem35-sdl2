@@ -87,7 +87,7 @@ extern SDL_Surface *com2surface(agsurface_t *s);
 /* fader */
 struct sdl_fader;
 
-struct sdl_fader *sdl_fader_init(int sx, int sy, int w, int h, int dx, int dy, enum sdl_effect type);
+struct sdl_fader *sdl_fader_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect effect);
 void sdl_fader_step(struct sdl_fader *fader, double progress);
 void sdl_fader_finish(struct sdl_fader *fader);
 extern void sdl_fadeIn(int step);

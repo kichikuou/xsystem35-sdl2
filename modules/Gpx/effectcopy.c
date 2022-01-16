@@ -42,7 +42,6 @@ static ecopyparam_t ecp;
 #define ECA7_D  16
 #define ECA12_D 256
 
-static void ec1_cb(int step);
 static void ec2_cb(int step);
 static void ec3_cb(int step);
 static void ec4_cb(int step);
@@ -53,26 +52,31 @@ static void ec11_prepare(void);
 static void ec12_cb(int step);
 static void ec13_cb(int step);
 
-#if 0
-void gle_set_check_clik() {
-}
-void gle_set_itimer() {
-}
-#endif
-
 void gpx_effect(int no,
-		surface_t *write, int wx, int wy,
+		int wx, int wy,
 		surface_t *dst, int dx, int dy,
 		surface_t *src, int sx, int sy,
 		int width, int height,
 		int time,
 		int *endtype) {
-	
-	ags_faderinfo_t i;
-	
+	surface_t *write = nact->ags.dib;
 	if (!gr_clip(dst, &dx, &dy, &width, &height, write, &wx, &wy)) return;
 	if (!gr_clip(src, &sx, &sy, &width, &height, write, &wx, &wy)) return;
-	
+
+	*endtype = 0;
+
+	enum sdl_effect sdl_effect = from_sact_effect(no);
+	if (sdl_effect != EFFECT_INVALID) {
+		SDL_Rect rect = { wx, wy, width, height };
+		struct sdl_fader *fader = sdl_fader_init(&rect, dst, dx, dy, src, sx, sy, sdl_effect);
+		ags_fade2(time ? time : 2700, FALSE, (ags_fade2_callback)sdl_fader_step, fader);
+		sdl_fader_finish(fader);
+
+		gr_copy(write, wx, wy, src, sx, sy, width, height);
+		ags_updateArea(wx, wy, width, height);
+		return;
+	}
+
 	ecp.write = write;
 	ecp.wx  = wx;
 	ecp.wy  = wy;
@@ -85,15 +89,10 @@ void gpx_effect(int no,
 	ecp.w = width;
 	ecp.h = height;
 	ecp.time = time;
-	
+
+	ags_faderinfo_t i;
+
 	switch(no) {
-	case 1:
-		i.step_max = 64;
-		i.effect_time = time == 0 ? 2700 : time;
-		i.cancel = FALSE;
-		i.callback = ec1_cb;
-		ags_fader(&i);
-		break;
 	case 2:
 		i.step_max = 64;
 		i.effect_time = time == 0 ? 2700 : time;
@@ -151,9 +150,6 @@ void gpx_effect(int no,
 		gr_copy(write, wx, wy, src, sx, sy, width, height);
 		ags_updateArea(wx, wy, width, height);
 	}
-	
-	*endtype = 0;
-
 }
 
 void sf_blend_white_level(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int lv) {
@@ -199,15 +195,6 @@ void sf_blend_white_level(surface_t *dst, int dx, int dy, surface_t *src, int sx
 	}
 }
 
-
-static void ec1_cb(int step) {
-	if (step == 64) {
-		gr_copy(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h);
-	} else {
-		gre_Blend(ecp.write, ecp.wx, ecp.wy, ecp.dst, ecp.dx, ecp.dy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h, step * 4);
-	}
-	ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-}
 
 static void ec2_cb(int step) {
 	if (step == 0) {

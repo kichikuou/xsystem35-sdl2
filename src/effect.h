@@ -32,8 +32,9 @@ enum nact_effect {
 	NACT_EFFECT_WINDMILL_360     = 52,
 };
 
-// Effect types of SCAT.DrawEffect.
+// Effect types of SCAT.DrawEffect and Gpx.EffectCopy.
 enum sact_effect {
+	SACT_EFFECT_CROSSFADE        = 1,
 	SACT_EFFECT_PENTAGRAM_IN_OUT = 14,
 	SACT_EFFECT_PENTAGRAM_OUT_IN = 15,
 	SACT_EFFECT_HEXAGRAM_IN_OUT  = 16,

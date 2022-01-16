@@ -1430,9 +1430,12 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case NACT_EFFECT_WINDMILL_180:
 	case NACT_EFFECT_WINDMILL_360:
 		{
-			struct sdl_fader *fader = sdl_fader_init(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy, from_nact_effect(sw));
+			SDL_Rect rect = { ecp.dx, ecp.dy, ecp.w, ecp.h };
+			struct sdl_fader *fader = sdl_fader_init(&rect, sdl_getDIB(), ecp.dx, ecp.dy, sdl_getDIB(), ecp.sx, ecp.sy, from_nact_effect(sw));
 			ags_fade2(opt ? opt : 1000, cancel, (ags_fade2_callback)sdl_fader_step, fader);
 			sdl_fader_finish(fader);
+			// Actual copy.
+			sdl_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
 		}
 		return;
 		
