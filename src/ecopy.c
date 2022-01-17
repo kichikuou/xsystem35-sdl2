@@ -885,6 +885,8 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	case NACT_EFFECT_WINDMILL_180:
 	case NACT_EFFECT_WINDMILL_360:
 		 return opt ? opt : 1000;
+	case NACT_EFFECT_LINEAR_BLUR:
+		return opt ? opt : 1700;
 	}
 	return 1000;
 }
@@ -954,7 +956,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 19:
 	case 20:
 	case 21:
-	case 53:
 	case 54:
 		if (spCol == -1) {
 			ags_copyArea(sx, sy, w, h, dx, dy);

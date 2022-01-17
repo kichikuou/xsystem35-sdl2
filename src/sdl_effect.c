@@ -52,6 +52,7 @@ enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	case NACT_EFFECT_WINDMILL:         return EFFECT_WINDMILL;
 	case NACT_EFFECT_WINDMILL_180:     return EFFECT_WINDMILL_180;
 	case NACT_EFFECT_WINDMILL_360:     return EFFECT_WINDMILL_360;
+	case NACT_EFFECT_LINEAR_BLUR:      return EFFECT_LINEAR_BLUR;
 	default:                           return EFFECT_INVALID;
 	}
 }
@@ -66,12 +67,14 @@ enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 	case SACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
 	case SACT_EFFECT_BLIND_LR:         return EFFECT_BLIND_LR;
 	case SACT_EFFECT_BLIND_DOWN_LR:    return EFFECT_BLIND_DOWN_LR;
+	case SACT_EFFECT_LINEAR_BLUR:      return EFFECT_LINEAR_BLUR;
 	case SACT_EFFECT_CROSSFADE_DOWN:   return EFFECT_CROSSFADE_DOWN;
 	case SACT_EFFECT_CROSSFADE_UP:     return EFFECT_CROSSFADE_UP;
 	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
 	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
 	case SACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
 	case SACT_EFFECT_HEXAGRAM_OUT_IN:  return EFFECT_HEXAGRAM_OUT_IN;
+	case SACT_EFFECT_LINEAR_BLUR_VERT: return EFFECT_LINEAR_BLUR_VERT;
 	case SACT_EFFECT_ROTATE_OUT:       return EFFECT_ROTATE_OUT;
 	case SACT_EFFECT_ROTATE_IN:        return EFFECT_ROTATE_IN;
 	case SACT_EFFECT_ROTATE_OUT_CW:    return EFFECT_ROTATE_OUT_CW;
@@ -474,6 +477,114 @@ static void blind_free(struct sdl_effect *eff) {
 	free(eff);
 }
 
+// EFFECT_LINEAR_BLUR, EFFECT_LINEAR_BLUR_VERT
+
+#define LINEAR_BLUR_STEPS 10
+
+struct linear_blur_effect {
+	struct sdl_effect eff;
+	SDL_Texture *blurred_old[LINEAR_BLUR_STEPS];
+	SDL_Texture *blurred_new[LINEAR_BLUR_STEPS];
+};
+
+static void linear_blur_step(struct sdl_effect *eff, double progress);
+static void linear_blur_free(struct sdl_effect *eff);
+
+static struct sdl_effect *linear_blur_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	if (!SDL_RenderTargetSupported(sdl_renderer)) {
+		WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", type);
+		return crossfade_new(rect, old, new);
+	}
+
+	struct linear_blur_effect *lbe = calloc(1, sizeof(struct linear_blur_effect));
+	if (!lbe)
+		NOMEMERR();
+	effect_init(&lbe->eff, rect, old, new, type);
+	lbe->eff.step = linear_blur_step;
+	lbe->eff.finish = linear_blur_free;
+	return &lbe->eff;
+}
+
+static SDL_Texture *blur(struct linear_blur_effect *this, SDL_Texture *src, int stride) {
+	bool vertical = this->eff.type == EFFECT_LINEAR_BLUR_VERT;
+	int w = this->eff.dst_rect.w;
+	int h = this->eff.dst_rect.h;
+	SDL_Texture *dst = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, w, h);
+
+	SDL_SetRenderTarget(sdl_renderer, dst);
+	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+	SDL_RenderClear(sdl_renderer);
+	SDL_SetTextureBlendMode(src, SDL_BLENDMODE_ADD);
+	SDL_SetTextureAlphaMod(src, 127);
+
+	SDL_Rect dr = {0, 0, w, h};
+	*(vertical ? &dr. y : &dr.x) = -stride / 2;
+	SDL_RenderCopy(sdl_renderer, src, NULL, &dr);
+	*(vertical ? &dr. y : &dr.x) = max(1, stride / 2);
+	SDL_RenderCopy(sdl_renderer, src, NULL, &dr);
+
+	// Copy the edge pixels to emulate texture clamping.
+	SDL_Rect sr = {0, 0, vertical ? w : 1, vertical ? 1 : h};
+	*(vertical ? &dr.h : &dr.w) = max(1, stride / 2);
+	*(vertical ? &dr.y : &dr.x) = 0;
+	SDL_RenderCopy(sdl_renderer, src, &sr, &dr);
+	if (stride > 1) {
+		if (vertical) {
+			sr.y = h - 1;
+			dr.y = h - stride / 2;
+		} else {
+			sr.x = w - 1;
+			dr.x = w - stride / 2;
+		}
+		SDL_RenderCopy(sdl_renderer, src, &sr, &dr);
+	}
+
+	SDL_SetTextureAlphaMod(src, 255);
+	SDL_SetTextureBlendMode(src, SDL_BLENDMODE_NONE);
+	SDL_SetRenderTarget(sdl_renderer, NULL);
+
+	return dst;
+}
+
+static void linear_blur_step(struct sdl_effect *eff, double progress) {
+	struct linear_blur_effect *this = (struct linear_blur_effect *)eff;
+
+	int step = progress * LINEAR_BLUR_STEPS * 2;
+	if (step == LINEAR_BLUR_STEPS * 2) {
+		SDL_RenderCopy(sdl_renderer, eff->tx_new, NULL, NULL);
+		SDL_RenderPresent(sdl_renderer);
+		return;
+	}
+
+	for (int i = 0; i <= step && i < LINEAR_BLUR_STEPS; i++) {
+		if (this->blurred_old[i])
+			continue;
+		this->blurred_old[i] = blur(this, i ? this->blurred_old[i - 1] : eff->tx_old, 1 << i);
+		this->blurred_new[i] = blur(this, i ? this->blurred_new[i - 1] : eff->tx_new, 1 << i);
+	}
+
+	int i = step < LINEAR_BLUR_STEPS ? step : LINEAR_BLUR_STEPS * 2 - 1 - step;
+	SDL_Texture *old = this->blurred_old[i];
+	SDL_Texture *new = this->blurred_new[i];
+	SDL_RenderCopy(sdl_renderer, old, NULL, &eff->dst_rect);
+	SDL_SetTextureBlendMode(new, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(new, 255 * progress);
+	SDL_RenderCopy(sdl_renderer, new, NULL, &eff->dst_rect);
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void linear_blur_free(struct sdl_effect *eff) {
+	struct linear_blur_effect *this = (struct linear_blur_effect *)eff;
+	for (int i = 0; i < LINEAR_BLUR_STEPS; i++) {
+		if (this->blurred_old[i])
+			SDL_DestroyTexture(this->blurred_old[i]);
+		if (this->blurred_new[i])
+			SDL_DestroyTexture(this->blurred_new[i]);
+	}
+	effect_finish(&this->eff, true);
+	free(this);
+}
+
 // EFFECT_PENTAGRAM_*, EFFECT_HEXAGRAM_*, EFFECT_WINDMILL*
 
 struct polygon_mask_effect {
@@ -835,6 +946,9 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_BLIND_UP_DOWN:
 	case EFFECT_BLIND_DOWN_LR:
 		return blind_new(rect, sf_old, sf_new, type);
+	case EFFECT_LINEAR_BLUR:
+	case EFFECT_LINEAR_BLUR_VERT:
+		return linear_blur_new(rect, sf_old, sf_new, type);
 	case EFFECT_PENTAGRAM_IN_OUT:
 	case EFFECT_PENTAGRAM_OUT_IN:
 	case EFFECT_HEXAGRAM_IN_OUT:

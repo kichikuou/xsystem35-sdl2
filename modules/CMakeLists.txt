@@ -79,7 +79,6 @@ add_library(modules STATIC
   lib/graph_draw_amap.c
   lib/graph_stretch.c
   lib/graph_cg.c
-  lib/graph_buller.c
   lib/gre_blend_useamap.c
   lib/gre_blend.c
   lib/gre_blend_screen.c

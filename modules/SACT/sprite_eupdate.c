@@ -41,7 +41,6 @@
 
 
 static void ec6_cb(surface_t *, surface_t *);
-static void ec11_cb(surface_t *, surface_t *);
 static void sdl_effect_cb(surface_t *, surface_t *);
 static void ec_dummy_cb(surface_t *, surface_t *);
 
@@ -59,7 +58,6 @@ static ecopyparam_t ecp;
 #include "sprite_eupdate_perspect.c"
 #include "sprite_eupdate_mosaic.c"
 #include "sprite_eupdate_uneune.c"
-#include "sprite_eupdate_buller.c"
 #include "sprite_eupdate_zmbbul.c"
 
 typedef void entrypoint (surface_t *, surface_t *);
@@ -75,7 +73,7 @@ static entrypoint *cb[39] = {
 	sdl_effect_cb,
 	sdl_effect_cb,
 	ec10_cb,
-	ec11_cb,
+	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
@@ -83,7 +81,7 @@ static entrypoint *cb[39] = {
 	sdl_effect_cb,
 	sdl_effect_cb,
 	ec_dummy_cb,  // 欠番
-	ec19_cb,
+	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
@@ -192,12 +190,6 @@ int sp_eupdate(int type, int time, int cancel) {
 	if (type == 10) {
 		ec10_prepare(sfsrc, sfdst);
 	}
-	if (type == 11) {
-		ec11_prepare(sfsrc, sfdst);
-	}
-	if (type == 19) {
-		ec19_prepare(sfsrc, sfdst);
-	}
 	
 	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time*10;
@@ -220,12 +212,6 @@ int sp_eupdate(int type, int time, int cancel) {
 
 	if (type == 10) {
 		ec10_drain(sfsrc, sfdst);
-	}
-	if (type == 11) {
-		ec11_drain(sfsrc, sfdst);
-	}
-	if (type == 19) {
-		ec19_drain(sfsrc, sfdst);
 	}
 	if (ecp.eff) {
 		sdl_effect_finish(ecp.eff);

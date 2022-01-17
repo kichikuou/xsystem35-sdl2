@@ -64,10 +64,6 @@ extern int gre_Blend(surface_t *write, int wx, int wy, surface_t *dst, int dx, i
 /* in gre_blend_screen.c */
 extern int gre_BlendScreen(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height);
 
-/* in graph_buller */
-extern int gr_buller(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int step);
-extern int gr_buller_v(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int step);
-
 /* in graph_stretch.c */
 extern void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh);
 
