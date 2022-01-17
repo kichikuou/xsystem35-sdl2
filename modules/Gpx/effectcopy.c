@@ -39,12 +39,8 @@ static ecopyparam_t ecp;
 
 
 
-#define ECA12_D 256
-
 static void ec11_cb(int step);
 static void ec11_prepare(void);
-static void ec12_cb(int step);
-static void ec13_cb(int step);
 
 void gpx_effect(int no,
 		int wx, int wy,
@@ -63,7 +59,9 @@ void gpx_effect(int no,
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { wx, wy, width, height };
 		struct sdl_effect *eff = sdl_effect_init(&rect, dst, dx, dy, src, sx, sy, sdl_effect);
-		ags_fade2(time ? time : 2700, FALSE, (ags_fade2_callback)sdl_effect_step, eff);
+		if (!time)
+			time = (no == SACT_EFFECT_CROSSFADE_DOWN || SACT_EFFECT_CROSSFADE_UP) ? 1150 : 2700;
+		ags_fade2(time, FALSE, (ags_fade2_callback)sdl_effect_step, eff);
 		sdl_effect_finish(eff);
 
 		switch (no) {
@@ -103,20 +101,6 @@ void gpx_effect(int no,
 		i.effect_time = time == 0 ? 2700 : time;
 		i.cancel = FALSE;
 		i.callback = ec11_cb;
-		ags_fader(&i);
-		break;
-	case 12:
-		i.step_max = ECA12_D + ecp.h;
-		i.effect_time = time == 0 ? 1150 : time;
-		i.cancel = FALSE;
-		i.callback = ec12_cb;
-		ags_fader(&i);
-		break;
-	case 13:
-		i.step_max = ECA12_D + ecp.h;
-		i.effect_time = time == 0 ? 1150 : time;
-		i.cancel = FALSE;
-		i.callback = ec13_cb;
 		ags_fader(&i);
 		break;
 	default:
@@ -186,72 +170,3 @@ static void ec11_cb(int step) {
 	ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
 }
 #endif
-
-static void ec12_cb(int step) {
-	int j, l;
-	int st_i, ed_i;
-	static int last_i = 0;
-	
-	if (step == 0) {
-		return;
-	}
-	
-	if (step == ECA12_D + ecp.h) {
-		gr_copy(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h);
-		ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-		return;
-	}
-	
-	st_i = max(0, step - ECA12_D + 1);
-	ed_i = min(ecp.h - 1, step);
-	l = ed_i - st_i + 1;
-	
-	for (j = st_i; j < ed_i; j++) {
-		gre_Blend(ecp.write, ecp.wx, ecp.wy + j, ecp.dst, ecp.dx, ecp.dy + j, ecp.src, ecp.sx, ecp.sy + j, ecp.w, 1, step - j);
-	}
-
-	if ((st_i - last_i) > 1) {
-		gr_copy(ecp.write, ecp.wx, ecp.wy + last_i, ecp.src, ecp.sx, ecp.sy+last_i, ecp.w, st_i - last_i);
-		ags_updateArea(ecp.wx, ecp.wy + last_i, ecp.w, st_i - last_i);
-	}
-	
-	ags_updateArea(ecp.wx, ecp.wy + st_i, ecp.w, l);
-	
-	last_i = st_i;
-}
-
-static void ec13_cb(int step) {
-	int j, l;
-	int st_i,ed_i;
-	static int last_i = 0;
-	int syy1 = ecp.dy + ecp.h -1;
-	int syy2 = ecp.sy + ecp.h -1;
-	int dyy  = ecp.wy + ecp.h -1;
-	
-	if (step == 0) {
-		return;
-	}
-	
-	if (step == ECA12_D + ecp.h) {
-		gr_copy(ecp.write, ecp.wx, ecp.wy, ecp.src, ecp.sx, ecp.sy, ecp.w, ecp.h);
-		ags_updateArea(ecp.wx, ecp.wy, ecp.w, ecp.h);
-		return;
-	}
-	
-	st_i = max(0, step - ECA12_D + 1);
-	ed_i = min(ecp.h -1, step);
-	l = ed_i - st_i+1;
-	
-	for (j = st_i; j <= ed_i; j++) {
-		gre_Blend(ecp.write, ecp.wx, dyy - j, ecp.dst, ecp.dx, syy1 - j, ecp.src, ecp.sx, syy2 - j, ecp.w, 1, step - j);
-	}
-	
-	if ((st_i - last_i) > 1) {
-		gr_copy(ecp.write, ecp.wx, dyy - st_i + 1, ecp.src, ecp.sx, syy2 - st_i + 1, ecp.w, st_i - last_i);
-		ags_updateArea(ecp.wx, dyy - st_i + 1, ecp.w, st_i - last_i);
-	}
-	
-	ags_updateArea(ecp.wx, dyy-ed_i, ecp.w, l);
-	
-	last_i = st_i;
-}

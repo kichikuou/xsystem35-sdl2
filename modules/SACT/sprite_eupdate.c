@@ -42,8 +42,6 @@
 
 static void ec6_cb(surface_t *, surface_t *);
 static void ec11_cb(surface_t *, surface_t *);
-static void ec12_cb(surface_t *, surface_t *);
-static void ec13_cb(surface_t *, surface_t *);
 static void sdl_effect_cb(surface_t *, surface_t *);
 static void ec_dummy_cb(surface_t *, surface_t *);
 
@@ -78,8 +76,8 @@ static entrypoint *cb[39] = {
 	sdl_effect_cb,
 	ec10_cb,
 	ec11_cb,
-	ec12_cb,
-	ec13_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
@@ -112,70 +110,9 @@ static void ec_dummy_cb(surface_t *sfsrc, surface_t *sfdst) {
 	WARNING("NOT IMPLEMENTED\n");
 }
 
-// 上->下クロスフェード
-static void ec12_cb(surface_t *src, surface_t *dst) {
-#define EC12DELTA 256
-	int curstep, maxstep = src->height + EC12DELTA;
-	int j, st_i, ed_i, l;
-	
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	SACT_DEBUG("step = %d\n", curstep);
-	
-	if (ecp.oldstep == curstep) {
-		usleep(0); return;
-	}
-	
-	st_i = max(0, curstep - EC12DELTA + 1);
-	ed_i = min(src->height -1, curstep);
-	l = ed_i - st_i + 1;
-	for (j = st_i; j < ed_i; j++) {
-		gre_Blend(sf0, 0, j, src, 0, j, dst, 0, j, src->width, 1, curstep - j);
-	}
-	if ((st_i - ecp.oldstep) > 1) {
-		gr_copy(sf0, 0, ecp.oldstep, dst, 0, ecp.oldstep, src->width, st_i - ecp.oldstep);
-		ags_updateArea(0, ecp.oldstep, src->width, st_i - ecp.oldstep);
-	}
-	
-	ags_updateArea(0, st_i, src->width, l);
-	ecp.oldstep = st_i;
-}
-
-// 下->上クロスフェード
-static void ec13_cb(surface_t *src, surface_t *dst) {
-#define EC13DELTA 256
-	int curstep, maxstep = src->height + EC12DELTA;
-	int j, st_i, ed_i, l;
-	int syy1 = 0 + dst->height -1;
-	int syy2 = 0 + src->height -1;
-	int dyy  = 0 + sf0->height -1;
-	
-	curstep = maxstep * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-	SACT_DEBUG("step = %d\n", curstep);
-	
-	if (ecp.oldstep == curstep) {
-		usleep(0); return;
-	}
-	
-	st_i = max(0, curstep - EC13DELTA + 1);
-	ed_i = min(src->height -1, curstep);
-	l = ed_i - st_i + 1;
-	for (j = st_i; j < ed_i; j++) {
-		gre_Blend(sf0, 0, dyy - j, src, 0, syy1-j, dst, 0, syy2-j, src->width, 1, curstep - j);
-	}
-	if ((st_i - ecp.oldstep) > 1) {
-		gr_copy(sf0, 0, dyy-ecp.oldstep, dst, 0, syy2-ecp.oldstep, src->width, st_i - ecp.oldstep);
-		ags_updateArea(0, dyy-ecp.oldstep, src->width, st_i - ecp.oldstep);
-	}
-	
-	ags_updateArea(0, dyy-ed_i, src->width, l);
-	ecp.oldstep = st_i;
-}
-
 static void sdl_effect_cb(surface_t *sfsrc, surface_t *sfdst) {
 	sdl_effect_step(ecp.eff, (double)(ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime));
 }
-
-
 
 //ブロックディゾルブ
 static void ec24_cb(surface_t *sfsrc, surface_t *sfdst) {

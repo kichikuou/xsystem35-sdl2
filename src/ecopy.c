@@ -590,155 +590,6 @@ static void eCopyArea32(int step) {
 	ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
 }
 
-#define ECA35_D 256
-static void eCopyArea35(int step) {
-	int j, l;
-	int st_i, ed_i;
-	static int last_i = 0;
-	static void *save = NULL;
-	
-	if (step == 0) {
-		save = ags_saveRegion(ecp.dx, ecp.dy, ecp.w,ecp.h);
-		return;
-	}
-	
-	if (step == ECA35_D + ecp.h) {
-		ags_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
-		ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
-		ags_delRegion(save);
-		return;
-	}
-	
-	st_i = max(0, step - ECA35_D + 1);
-	ed_i = min(ecp.h - 1, step);
-	l = ed_i - st_i + 1;
-	
-	ags_copyRegion(save, 0, st_i, ecp.w, l, ecp.dx, ecp.dy+st_i);
-	ags_copyArea(ecp.sx, ecp.sy + st_i, ecp.w, 1, ecp.dx, ecp.dy + st_i);
-	for (j = st_i; j < ed_i; j++) {
-		ags_copyArea_alphaBlend(ecp.sx, ecp.sy + j, ecp.w, 1, ecp.dx, ecp.dy + j, step - j);
-	}
-	
-	if ((st_i - last_i) > 1) {
-		ags_copyArea(ecp.sx, ecp.sy + last_i, ecp.w, st_i - last_i, ecp.dx, ecp.dy + last_i);
-		ags_updateArea(ecp.dx, ecp.dy + last_i, ecp.w, st_i - last_i);
-	}
-	ags_updateArea(ecp.dx, ecp.dy+st_i, ecp.w, l);
-	
-	// if (st_i > 0) last_i = st_i;
-	last_i = st_i;
-}
-
-static void eCopyArea36(int step) {
-	int j, l;
-	int st_i,ed_i;
-	static int last_i=0;
-	static void *save;
-	
-	int syy=ecp.sy+ecp.h-1,dyy=ecp.dy+ecp.h-1;
-
-	if (step == 0) {
-		save = ags_saveRegion(ecp.dx, ecp.dy, ecp.w,ecp.h);
-		return;
-	}
-	if (step == ECA35_D + ecp.h) {
-		ags_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
-		ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
-		ags_delRegion(save);
-		return;
-	}
-	
-	st_i = max(0, step-ECA35_D+1);
-	ed_i = min(ecp.h -1, step);
-	l = ed_i - st_i+1;
-	ags_copyRegion(save,0,ecp.h -1 -ed_i,ecp.w,l,ecp.dx,dyy-ed_i);
-	
-	for (j = st_i; j <= ed_i; j++) {
-		ags_copyArea_alphaBlend(ecp.sx, syy-j, ecp.w, 1, ecp.dx, dyy-j, step-j);
-	}
-	
-	if ((st_i - last_i) > 1) {
-		ags_copyArea(ecp.sx,syy-st_i+1,ecp.w,st_i-last_i,ecp.dx,dyy-st_i+1);
-		ags_updateArea(ecp.dx, dyy-st_i+1, ecp.w, st_i-last_i);
-	}
-	ags_updateArea(ecp.dx, dyy-ed_i, ecp.w, l);
-
-	// if (st_i > 0) last_i = st_i;
-	last_i = st_i;
-}
-
-static void eCopyArea37(int step) {
-	int j, l;
-	int st_i,ed_i;
-	static int last_i=0;
-	static void *save = NULL;
-	
-	if (step == 0) {
-		save = ags_saveRegion(ecp.dx,ecp.dy,ecp.w,ecp.h);
-		return;
-	}
-	if (step == ECA35_D + ecp.w) {
-		ags_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
-		ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
-		ags_delRegion(save);
-		return;
-	}
-	
-	st_i=max(0,step-ECA35_D+1);
-	ed_i=min(ecp.w -1,step);
-	l=ed_i-st_i+1;
-	ags_copyRegion(save,st_i,0,l,ecp.h,ecp.dx+st_i,ecp.dy);
-	
-	for (j = st_i; j <= ed_i; j++) {
-		ags_copyArea_alphaBlend(ecp.sx+j, ecp.sy, 1, ecp.h, ecp.dx+j, ecp.dy, step-j);
-	}
-	
-	if ((st_i - last_i) > 1) {
-		ags_copyArea(ecp.sx+last_i, ecp.sy, st_i-last_i, ecp.h,ecp.dx+last_i, ecp.dy);
-		ags_updateArea(ecp.dx+last_i, ecp.dy, st_i-last_i, ecp.h);
-	}
-	ags_updateArea(ecp.dx+st_i, ecp.dy, l, ecp.h);
-
-	//if (st_i > 0) last_i = st_i;
-	last_i = st_i;
-}
-
-static void eCopyArea38(int step) {
-	int j, l;
-	int st_i, ed_i;
-	static int last_i=0;
-	static void *save;
-	int sxx=ecp.sx+ecp.w - 1,dxx=ecp.dx+ecp.w-1;
-	
-	if (step == 0) {
-		save = ags_saveRegion(ecp.dx, ecp.dy, ecp.w,ecp.h);
-		return;
-	}
-	if (step == ECA35_D + ecp.w) {
-		ags_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
-		ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
-		ags_delRegion(save);
-		return;
-	}
-	
-	st_i=max(0,step-ECA35_D+1);
-	ed_i=min(ecp.w - 1,step);
-	l=ed_i-st_i+1;
-	ags_copyRegion(save,ecp.w-1-ed_i,0,l,ecp.h,dxx-ed_i,ecp.dy);
-	
-	for (j = st_i; j<=ed_i; j++) {
-		ags_copyArea_alphaBlend(sxx-j, ecp.sy, 1, ecp.h, dxx-j, ecp.dy, step-j);
-	}
-	
-	if ((st_i - last_i) > 1) {
-		ags_copyArea(sxx-st_i+1, ecp.sy,st_i-last_i, ecp.h, dxx-st_i+1, ecp.dy);
-		ags_updateArea(dxx-st_i+1,ecp.dy, st_i-last_i, ecp.h);
-	}
-	ags_updateArea(dxx-ed_i, ecp.dy, l, ecp.h);
-	// if (st_i > 0) last_i=st_i;
-	last_i=st_i;
-}
-
 static int eCopyArea39(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int i,dy1,dy2,sy1,sy2, key = 0, cnt;
 	int waitcnt = opt == 0 ? 3 : opt;
@@ -1020,6 +871,12 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 		return opt ? opt * 32 : 1700;
 	case NACT_EFFECT_CROSSFADE:
 		return opt ? opt * 256 : 2700;
+	case NACT_EFFECT_CROSSFADE_DOWN:
+	case NACT_EFFECT_CROSSFADE_UP:
+		return opt ? opt * (rect->h + 256) : 1150;
+	case NACT_EFFECT_CROSSFADE_LR:
+	case NACT_EFFECT_CROSSFADE_RL:
+		return opt ? opt * (rect->w + 256) : 1150;
 	case NACT_EFFECT_PENTAGRAM_IN_OUT:
 	case NACT_EFFECT_PENTAGRAM_OUT_IN:
 	case NACT_EFFECT_HEXAGRAM_IN_OUT:
@@ -1201,34 +1058,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		i.effect_time = opt == 0 ? 1400 : opt * 256;
 		i.cancel = cancel;
 		i.callback = eCopyArea32;
-		ags_fader(&i);
-		return;
-	case 35:
-		i.step_max = ECA35_D + h;
-		i.effect_time = opt == 0 ? 1150 : opt * i.step_max;
-		i.cancel = cancel;
-		i.callback = eCopyArea35;
-		ags_fader(&i);
-		return;
-	case 36:
-		i.step_max = ECA35_D + h;
-		i.effect_time = opt == 0 ? 1150 : opt * i.step_max;
-		i.cancel = cancel;
-		i.callback = eCopyArea36;
-		ags_fader(&i);
-		return;
-	case 37:
-		i.step_max = ECA35_D + w;
-		i.effect_time = opt == 0 ? 1150 : opt * i.step_max;
-		i.cancel = cancel;
-		i.callback = eCopyArea37;
-		ags_fader(&i);
-		return;
-	case 38:
-		i.step_max = ECA35_D + w;
-		i.effect_time = opt == 0 ? 1150 : opt * i.step_max;
-		i.cancel = cancel;
-		i.callback = eCopyArea38;
 		ags_fader(&i);
 		return;
 	case 39:
