@@ -1045,12 +1045,12 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	
 	nact->waitcancel_key = 0;
 
-	enum sdl_effect sdl_effect = from_nact_effect(sw);
+	enum sdl_effect_type sdl_effect = from_nact_effect(sw);
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { dx, dy, w, h };
-		struct sdl_fader *fader = sdl_fader_init(&rect, sdl_getDIB(), dx, dy, sdl_getDIB(), sx, sy, from_nact_effect(sw));
-		ags_fade2(duration(sw, opt, &rect), cancel, (ags_fade2_callback)sdl_fader_step, fader);
-		sdl_fader_finish(fader);
+		struct sdl_effect *eff = sdl_effect_init(&rect, sdl_getDIB(), dx, dy, sdl_getDIB(), sx, sy, from_nact_effect(sw));
+		ags_fade2(duration(sw, opt, &rect), cancel, (ags_fade2_callback)sdl_effect_step, eff);
+		sdl_effect_finish(eff);
 
 		// Actual copy.
 		switch (sw) {

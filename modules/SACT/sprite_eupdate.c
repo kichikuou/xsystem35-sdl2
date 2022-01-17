@@ -44,7 +44,7 @@ static void ec6_cb(surface_t *, surface_t *);
 static void ec11_cb(surface_t *, surface_t *);
 static void ec12_cb(surface_t *, surface_t *);
 static void ec13_cb(surface_t *, surface_t *);
-static void sdlfader_cb(surface_t *, surface_t *);
+static void sdl_effect_cb(surface_t *, surface_t *);
 static void ec_dummy_cb(surface_t *, surface_t *);
 
 struct ecopyparam {
@@ -53,7 +53,7 @@ struct ecopyparam {
 	int edtime;
 	int curstep;
 	int oldstep;
-	struct sdl_fader *fader;
+	struct sdl_effect *eff;
 };
 typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
@@ -67,29 +67,29 @@ static ecopyparam_t ecp;
 typedef void entrypoint (surface_t *, surface_t *);
 
 static entrypoint *cb[39] = {
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
 	ec6_cb,
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
 	ec10_cb,
 	ec11_cb,
 	ec12_cb,
 	ec13_cb,
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
 	ec_dummy_cb,  // 欠番
 	ec19_cb,
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
-	sdlfader_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
+	sdl_effect_cb,
 	ec_dummy_cb,
 	ec25_cb,
 	ec26_cb,
@@ -171,8 +171,8 @@ static void ec13_cb(surface_t *src, surface_t *dst) {
 	ecp.oldstep = st_i;
 }
 
-static void sdlfader_cb(surface_t *sfsrc, surface_t *sfdst) {
-	sdl_fader_step(ecp.fader, (double)(ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime));
+static void sdl_effect_cb(surface_t *sfsrc, surface_t *sfdst) {
+	sdl_effect_step(ecp.eff, (double)(ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime));
 }
 
 
@@ -243,10 +243,10 @@ int sp_eupdate(int type, int time, int cancel) {
 	
 	sfdst = sf_dup(sf0);
 	
-	enum sdl_effect sdl_effect = from_sact_effect(type);
+	enum sdl_effect_type sdl_effect = from_sact_effect(type);
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { 0, 0, sfsrc->width, sfsrc->height };
-		ecp.fader = sdl_fader_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
+		ecp.eff = sdl_effect_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
 	} else {
 		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
 	}
@@ -290,9 +290,9 @@ int sp_eupdate(int type, int time, int cancel) {
 	if (type == 19) {
 		ec19_drain(sfsrc, sfdst);
 	}
-	if (ecp.fader) {
-		sdl_fader_finish(ecp.fader);
-		ecp.fader = NULL;
+	if (ecp.eff) {
+		sdl_effect_finish(ecp.eff);
+		ecp.eff = NULL;
 	}
 	
 	return OK;

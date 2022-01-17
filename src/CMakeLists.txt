@@ -36,7 +36,7 @@ target_sources(xsystem35 PRIVATE
 # Graphics
 
 target_sources(xsystem35 PRIVATE
-  sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c sdl_fader.c
+  sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c sdl_effect.c
   image.c font.c)
 
 # CG

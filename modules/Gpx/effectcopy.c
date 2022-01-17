@@ -59,12 +59,12 @@ void gpx_effect(int no,
 
 	*endtype = 0;
 
-	enum sdl_effect sdl_effect = from_sact_effect(no);
+	enum sdl_effect_type sdl_effect = from_sact_effect(no);
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { wx, wy, width, height };
-		struct sdl_fader *fader = sdl_fader_init(&rect, dst, dx, dy, src, sx, sy, sdl_effect);
-		ags_fade2(time ? time : 2700, FALSE, (ags_fade2_callback)sdl_fader_step, fader);
-		sdl_fader_finish(fader);
+		struct sdl_effect *eff = sdl_effect_init(&rect, dst, dx, dy, src, sx, sy, sdl_effect);
+		ags_fade2(time ? time : 2700, FALSE, (ags_fade2_callback)sdl_effect_step, eff);
+		sdl_effect_finish(eff);
 
 		switch (no) {
 		case SACT_EFFECT_FADEOUT:

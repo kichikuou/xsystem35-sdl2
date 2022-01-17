@@ -145,11 +145,11 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	
 	sfdst = sf_dup(sf0);
 	
-	enum sdl_effect sdl_effect = from_sact_effect(type - 100);
-	struct sdl_fader *fader = NULL;
+	enum sdl_effect_type sdl_effect = from_sact_effect(type - 100);
+	struct sdl_effect *eff = NULL;
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { 0, 0, sfsrc->width, sfsrc->height };
-		fader = sdl_fader_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
+		eff = sdl_effect_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
 	} else {
 		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
 	}
@@ -179,8 +179,8 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	}
 	
 	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
-		if (fader) {
-			sdl_fader_step(fader, (double)(ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime));
+		if (eff) {
+			sdl_effect_step(eff, (double)(ecp.curtime - ecp.sttime) / (ecp.edtime - ecp.sttime));
 		} else {
 			cb(sfsrc, sfdst);
 		}
@@ -198,8 +198,8 @@ int nt_sp_eupdate(int type, int time, int cancel) {
 	if (type == 111) {
 		ec11_drain(sfsrc, sfdst);
 	}
-	if (fader)
-		sdl_fader_finish(fader);
+	if (eff)
+		sdl_effect_finish(eff);
 	
 	return OK;
 }

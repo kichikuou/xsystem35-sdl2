@@ -62,7 +62,7 @@ enum sact_effect {
 };
 
 // Internal effect numbers.
-enum sdl_effect {
+enum sdl_effect_type {
 	EFFECT_INVALID,
 	EFFECT_CROSSFADE,
 	EFFECT_FADEOUT,
@@ -90,7 +90,7 @@ enum sdl_effect {
 	EFFECT_ROTATE_IN_CW,
 };
 
-enum sdl_effect from_nact_effect(enum nact_effect effect);
-enum sdl_effect from_sact_effect(enum sact_effect effect);
+enum sdl_effect_type from_nact_effect(enum nact_effect effect);
+enum sdl_effect_type from_sact_effect(enum sact_effect effect);
 
 #endif /* __EFFECT_H__ */
