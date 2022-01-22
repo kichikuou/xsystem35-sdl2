@@ -32,7 +32,7 @@ void gpx_effect(int no,
 	SDL_Rect rect = { wx, wy, width, height };
 	struct sdl_effect *eff = sdl_effect_init(&rect, dst, dx, dy, src, sx, sy, type);
 	if (!time)
-		time = (no == SACT_EFFECT_CROSSFADE_DOWN || SACT_EFFECT_CROSSFADE_UP) ? 1150 : 2700;
+		time = (no == SACT_EFFECT_CROSSFADE_DOWN || no == SACT_EFFECT_CROSSFADE_UP) ? 1150 : 2700;
 	ags_fade2(time, FALSE, (ags_fade2_callback)sdl_effect_step, eff);
 	sdl_effect_finish(eff);
 
