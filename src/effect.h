@@ -72,6 +72,7 @@ enum sact_effect {
 	SACT_EFFECT_ROTATE_IN        = 21,
 	SACT_EFFECT_ROTATE_OUT_CW    = 22,
 	SACT_EFFECT_ROTATE_IN_CW     = 23,
+	SACT_EFFECT_ZIGZAG_CROSSFADE = 31,
 };
 
 // Internal effect numbers.
@@ -110,6 +111,7 @@ enum sdl_effect_type {
 	EFFECT_ROTATE_IN,
 	EFFECT_ROTATE_OUT_CW,
 	EFFECT_ROTATE_IN_CW,
+	EFFECT_ZIGZAG_CROSSFADE,
 };
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect);

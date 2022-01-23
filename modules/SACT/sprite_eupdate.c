@@ -55,7 +55,6 @@ typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
 
 #include "sprite_eupdate_perspect.c"
-#include "sprite_eupdate_uneune.c"
 #include "sprite_eupdate_zmbbul.c"
 
 typedef void entrypoint (surface_t *, surface_t *);
@@ -91,7 +90,7 @@ static entrypoint *cb[39] = {
 	ec28_cb,
 	ec29_cb,
 	ec_dummy_cb,
-	ec31_cb,
+	sdl_effect_cb,
 	ec_dummy_cb,
 	ec_dummy_cb,
 	ec_dummy_cb,

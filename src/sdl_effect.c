@@ -83,6 +83,7 @@ enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 	case SACT_EFFECT_ROTATE_IN:        return EFFECT_ROTATE_IN;
 	case SACT_EFFECT_ROTATE_OUT_CW:    return EFFECT_ROTATE_OUT_CW;
 	case SACT_EFFECT_ROTATE_IN_CW:     return EFFECT_ROTATE_IN_CW;
+	case SACT_EFFECT_ZIGZAG_CROSSFADE: return EFFECT_ZIGZAG_CROSSFADE;
 	default:                           return EFFECT_INVALID;
 	}
 }
@@ -1004,6 +1005,88 @@ static void rotate_free(struct sdl_effect *eff) {
 	free(eff);
 }
 
+// EFFECT_ZIGZAG_CROSSFADE
+
+struct zigzag_crossfade_effect {
+	struct sdl_effect eff;
+	SDL_Texture *tmp1, *tmp2;
+};
+
+static void zigzag_crossfade_step(struct sdl_effect *eff, double progress);
+static void zigzag_crossfade_free(struct sdl_effect *eff);
+
+static struct sdl_effect *zigzag_crossfade_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new) {
+	if (!SDL_RenderTargetSupported(sdl_renderer))
+		return fallback_effect_new(rect, old, new, EFFECT_ZIGZAG_CROSSFADE);
+
+	struct zigzag_crossfade_effect *eff = calloc(1, sizeof(struct zigzag_crossfade_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(&eff->eff, rect, old, new, EFFECT_ZIGZAG_CROSSFADE);
+	eff->tmp1 = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
+	eff->tmp2 = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
+	eff->eff.step = zigzag_crossfade_step;
+	eff->eff.finish = zigzag_crossfade_free;
+	return &eff->eff;
+}
+
+static void wave_warp_h(SDL_Texture *src, SDL_Texture *dst, int w, int h, double amplitude, double length, double phase) {
+	SDL_SetRenderTarget(sdl_renderer, dst);
+	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+	SDL_RenderClear(sdl_renderer);
+	SDL_Rect sr = {0, 0, w, 1};
+	SDL_Rect dr = {0, 0, w, 1};
+	for (int y = 0; y < h; y++) {
+		sr.y = dr.y = y;
+		dr.x = sin(phase + y * (2 * M_PI / 360 * length)) * amplitude;
+		SDL_RenderCopy(sdl_renderer, src, &sr, &dr);
+	}
+	SDL_SetRenderTarget(sdl_renderer, NULL);
+}
+
+static void wave_warp_v(SDL_Texture *src, SDL_Texture *dst, int w, int h, double amplitude, double length, double phase) {
+	SDL_SetRenderTarget(sdl_renderer, dst);
+	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+	SDL_RenderClear(sdl_renderer);
+	SDL_Rect sr = {0, 0, 1, h};
+	SDL_Rect dr = {0, 0, 1, h};
+	for (int x = 0; x < w; x++) {
+		sr.x = dr.x = x;
+		dr.y = sin(phase + x * (2 * M_PI / 360 * length)) * amplitude;
+		SDL_RenderCopy(sdl_renderer, src, &sr, &dr);
+	}
+	SDL_SetRenderTarget(sdl_renderer, NULL);
+}
+
+static void zigzag_crossfade_step(struct sdl_effect *eff, double progress) {
+	struct zigzag_crossfade_effect *this = (struct zigzag_crossfade_effect *)eff;
+
+	double amp = (progress < 0.5 ? progress : 1.0 - progress) * 80;
+	double len = (progress < 0.5 ? progress : 1.0 - progress) * 20;
+	double phase = progress * 10;
+
+	wave_warp_h(eff->tx_old, this->tmp1, eff->dst_rect.w, eff->dst_rect.h, amp, len, phase);
+	wave_warp_v(this->tmp1, this->tmp2, eff->dst_rect.w, eff->dst_rect.h, amp, len, phase);
+	SDL_RenderCopy(sdl_renderer, this->tmp2, NULL, &eff->dst_rect);
+
+	wave_warp_h(eff->tx_new, this->tmp1, eff->dst_rect.w, eff->dst_rect.h, amp, len, phase);
+	wave_warp_v(this->tmp1, this->tmp2, eff->dst_rect.w, eff->dst_rect.h, amp, len, phase);
+	SDL_SetTextureBlendMode(this->tmp2, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(this->tmp2, progress * 255);
+	SDL_RenderCopy(sdl_renderer, this->tmp2, NULL, &eff->dst_rect);
+	SDL_SetTextureBlendMode(this->tmp2, SDL_BLENDMODE_NONE);
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void zigzag_crossfade_free(struct sdl_effect *eff) {
+	struct zigzag_crossfade_effect *this = (struct zigzag_crossfade_effect *)eff;
+	SDL_DestroyTexture(this->tmp1);
+	SDL_DestroyTexture(this->tmp2);
+	effect_finish(&this->eff, true);
+	free(this);
+}
+
 
 static SDL_Surface *create_surface(agsurface_t *as, int x, int y, int w, int h) {
 	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
@@ -1066,6 +1149,8 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_ROTATE_IN_CW:
 	case EFFECT_ZOOM_IN:
 		return rotate_new(rect, sf_old, sf_new, type);
+	case EFFECT_ZIGZAG_CROSSFADE:
+		return zigzag_crossfade_new(rect, sf_old, sf_new);
 	default:
 		WARNING("Unknown effect %d\n", type);
 		return crossfade_new(rect, sf_old, sf_new);
