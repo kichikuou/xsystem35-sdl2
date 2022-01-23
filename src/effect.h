@@ -22,6 +22,7 @@
 
 // Effect types of the CE command.
 enum nact_effect {
+	NACT_EFFECT_ZOOM_IN          = 10,
 	NACT_EFFECT_BLIND_DOWN       = 11,
 	NACT_EFFECT_MOSAIC           = 24,
 	NACT_EFFECT_FADEIN           = 27,
@@ -104,6 +105,7 @@ enum sdl_effect_type {
 	EFFECT_WINDMILL,
 	EFFECT_WINDMILL_180,
 	EFFECT_WINDMILL_360,
+	EFFECT_ZOOM_IN,
 	EFFECT_ROTATE_OUT,
 	EFFECT_ROTATE_IN,
 	EFFECT_ROTATE_OUT_CW,

@@ -31,6 +31,7 @@
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
+	case NACT_EFFECT_ZOOM_IN:          return EFFECT_ZOOM_IN;
 	case NACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
 	case NACT_EFFECT_MOSAIC:           return EFFECT_MOSAIC;
 	case NACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
@@ -980,6 +981,11 @@ static void rotate_step(struct sdl_effect *eff, double progress) {
 		bg_texture = eff->tx_old;
 		fg_texture = eff->tx_new;
 		break;
+	case EFFECT_ZOOM_IN:
+		bg_texture = eff->tx_old;
+		fg_texture = eff->tx_new;
+		angle = 0;
+		break;
 	default:
 		assert(!"Cannot happen");
 	}
@@ -1058,6 +1064,7 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_ROTATE_IN:
 	case EFFECT_ROTATE_OUT_CW:
 	case EFFECT_ROTATE_IN_CW:
+	case EFFECT_ZOOM_IN:
 		return rotate_new(rect, sf_old, sf_new, type);
 	default:
 		WARNING("Unknown effect %d\n", type);

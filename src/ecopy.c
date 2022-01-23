@@ -246,22 +246,6 @@ static int eCopyArea9(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	return key;
 }
 
-static void eCopyArea10(int step) {
-	if (step == 0) {
-		return;
-	}
-	if (step == 64) {
-		sdl_copyArea(ecp.sx, ecp.sy, ecp.w, ecp.h, ecp.dx, ecp.dy);
-		ags_updateArea(ecp.dx, ecp.dy, ecp.w, ecp.h);
-		return;
-	}
-	ags_scaledCopyArea(ecp.sx, ecp.sy, ecp.w, ecp.h,
-			   ecp.dx + ecp.w * (64 - step) / 128, ecp.dy + ecp.h * (64 - step) / 128,
-			   ecp.w * step / 64, ecp.h * step / 64, 0);
-	ags_updateArea(ecp.dx + ecp.w * (64 - step) / 128, ecp.dy + ecp.h * (64 - step) / 128,
-		       ecp.w * step / 64, ecp.h * step / 64);
-}
-
 static int eCopyArea12(int dx, int dy, int w, int h, int opt) {
 	int x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
@@ -818,6 +802,8 @@ static int eCopyArea5sp(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 
 static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	switch (effect) {
+	case NACT_EFFECT_ZOOM_IN:
+		return opt ? opt * 64 : 500;
 	case NACT_EFFECT_BLIND_DOWN:
 	case NACT_EFFECT_BLIND_UP:
 		return (opt ? opt : 40) * (rect->h / 16 + 16);
@@ -968,13 +954,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 9:
 		ret = eCopyArea9(sx, sy, w, h, dx, dy, opt);
 		break;
-	case 10:
-		i.step_max = 64;
-		i.effect_time = opt == 0 ? 500 : opt * 64;
-		i.cancel = cancel;
-		i.callback = eCopyArea10;
-		ags_fader(&i);
-		return;
 	case 12:
 		ret = eCopyArea12(dx, dy, w, h, opt);
 		break;
