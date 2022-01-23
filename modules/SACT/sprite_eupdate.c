@@ -55,7 +55,6 @@ typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
 
 #include "sprite_eupdate_perspect.c"
-#include "sprite_eupdate_zmbbul.c"
 
 typedef void entrypoint (surface_t *, surface_t *);
 
@@ -69,7 +68,7 @@ static entrypoint *cb[39] = {
 	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
-	ec10_cb,
+	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
 	sdl_effect_cb,
@@ -183,11 +182,6 @@ int sp_eupdate(int type, int time, int cancel) {
 		sf_copyall(sf0, sfsrc); // 全部の効果タイプにこの処理は要らないんだけど
 	}
 
-	// 5つを越えたら別の方法を考えよう
-	if (type == 10) {
-		ec10_prepare(sfsrc, sfdst);
-	}
-	
 	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time*10;
 	ecp.oldstep = 0;
@@ -207,9 +201,6 @@ int sp_eupdate(int type, int time, int cancel) {
 	sf_free(sfsrc);
 	sf_free(sfdst);
 
-	if (type == 10) {
-		ec10_drain(sfsrc, sfdst);
-	}
 	if (ecp.eff) {
 		sdl_effect_finish(ecp.eff);
 		ecp.eff = NULL;

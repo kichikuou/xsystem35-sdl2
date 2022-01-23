@@ -71,6 +71,7 @@ enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 	case SACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
 	case SACT_EFFECT_BLIND_LR:         return EFFECT_BLIND_LR;
 	case SACT_EFFECT_BLIND_DOWN_LR:    return EFFECT_BLIND_DOWN_LR;
+	case SACT_EFFECT_ZOOM_BLEND_BLUR:  return EFFECT_ZOOM_BLEND_BLUR;
 	case SACT_EFFECT_LINEAR_BLUR:      return EFFECT_LINEAR_BLUR;
 	case SACT_EFFECT_CROSSFADE_DOWN:   return EFFECT_CROSSFADE_DOWN;
 	case SACT_EFFECT_CROSSFADE_UP:     return EFFECT_CROSSFADE_UP;
@@ -574,6 +575,77 @@ static void blind_step(struct sdl_effect *eff, double progress) {
 static void blind_free(struct sdl_effect *eff) {
 	effect_finish(eff, false);
 	free(eff);
+}
+
+// EFFECT_ZOOM_BLEND_BLUR
+
+#define ZOOM_BLEND_BLUR_STEPS 6
+
+struct zoom_blend_blur_effect {
+	struct sdl_effect eff;
+	SDL_Texture *tx[ZOOM_BLEND_BLUR_STEPS];
+	int index;
+};
+
+static void zoom_blend_blur_step(struct sdl_effect *eff, double progress);
+static void zoom_blend_blur_free(struct sdl_effect *eff);
+
+static struct sdl_effect *zoom_blend_blur_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new) {
+	if (!SDL_RenderTargetSupported(sdl_renderer))
+		return fallback_effect_new(rect, old, new, EFFECT_ZOOM_BLEND_BLUR);
+
+	struct zoom_blend_blur_effect *eff = calloc(1, sizeof(struct zoom_blend_blur_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(&eff->eff, rect, old, new, EFFECT_ZOOM_BLEND_BLUR);
+	eff->eff.step = zoom_blend_blur_step;
+	eff->eff.finish = zoom_blend_blur_free;
+	return &eff->eff;
+}
+
+static void zoom_blend_blur_step(struct sdl_effect *eff, double progress) {
+	struct zoom_blend_blur_effect *this = (struct zoom_blend_blur_effect *)eff;
+
+	if (!this->tx[this->index]) {
+		this->tx[this->index] = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, eff->dst_rect.w, eff->dst_rect.h);
+	}
+
+	double scale = (progress < 0.5 ? 1 - progress * 2 : (progress - 0.5) * 2) * 0.9 + 0.1;  // 0.1 - 1.0
+	int w = eff->dst_rect.w * scale;
+	int h = eff->dst_rect.h * scale;
+	SDL_Rect r = {
+		.x = (eff->dst_rect.w - w) / 2,
+		.y = (eff->dst_rect.h - h) / 2,
+		.w = w,
+		.h = h
+	};
+	SDL_SetRenderTarget(sdl_renderer, this->tx[this->index]);
+	SDL_RenderCopy(sdl_renderer, eff->tx_new, &r, NULL);
+	SDL_SetRenderTarget(sdl_renderer, NULL);
+
+	this->index = (this->index + 1) % ZOOM_BLEND_BLUR_STEPS;
+
+	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(sdl_renderer, &eff->dst_rect);
+	for (int i = 0; i < ZOOM_BLEND_BLUR_STEPS; i++) {
+		SDL_Texture *tx = this->tx[i] ? this->tx[i] : eff->tx_new;
+		SDL_SetTextureBlendMode(tx, SDL_BLENDMODE_ADD);
+		SDL_SetTextureAlphaMod(tx, 255 / ZOOM_BLEND_BLUR_STEPS);
+		SDL_RenderCopy(sdl_renderer, tx, NULL, &eff->dst_rect);
+		SDL_SetTextureBlendMode(tx, SDL_BLENDMODE_NONE);
+		SDL_SetTextureAlphaMod(tx, 255);
+	}
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void zoom_blend_blur_free(struct sdl_effect *eff) {
+	struct zoom_blend_blur_effect *this = (struct zoom_blend_blur_effect *)eff;
+	for (int i = 0; i < ZOOM_BLEND_BLUR_STEPS; i++) {
+		if (this->tx[i])
+			SDL_DestroyTexture(this->tx[i]);
+	}
+	effect_finish(&this->eff, true);
+	free(this);
 }
 
 // EFFECT_LINEAR_BLUR, EFFECT_LINEAR_BLUR_VERT
@@ -1132,6 +1204,8 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_BLIND_UP_DOWN:
 	case EFFECT_BLIND_DOWN_LR:
 		return blind_new(rect, sf_old, sf_new, type);
+	case EFFECT_ZOOM_BLEND_BLUR:
+		return zoom_blend_blur_new(rect, sf_old, sf_new);
 	case EFFECT_LINEAR_BLUR:
 	case EFFECT_LINEAR_BLUR_VERT:
 		return linear_blur_new(rect, sf_old, sf_new, type);
