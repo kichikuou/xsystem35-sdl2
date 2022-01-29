@@ -121,6 +121,19 @@ static void effect_finish(struct sdl_effect *eff, bool present) {
 	SDL_DestroyTexture(eff->tx_new);
 }
 
+static inline void flip_rect_h(SDL_Rect *r, int w) {
+	r->x = w - r->x - r->w;
+}
+
+static inline void flip_rect_v(SDL_Rect *r, int h) {
+	r->y = h - r->y - r->h;
+}
+
+static inline void move_rect(SDL_Rect *r, int off_x, int off_y) {
+	r->x += off_x;
+	r->y += off_y;
+}
+
 // EFFECT_CROSSFADE
 
 static void crossfade_step(struct sdl_effect *eff, double progress);
@@ -155,12 +168,10 @@ static struct sdl_effect *fallback_effect_new(SDL_Rect *rect, SDL_Surface *old, 
 	return crossfade_new(rect, old, new);
 }
 
-// EFFECT_CROSSFADE_{UP,DOWN}
+// EFFECT_CROSSFADE_{UP,DOWN,LR,RL}
 
-static void crossfade_down_step(struct sdl_effect *eff, double progress);
-static void crossfade_up_step(struct sdl_effect *eff, double progress);
-static void crossfade_lr_step(struct sdl_effect *eff, double progress);
-static void crossfade_rl_step(struct sdl_effect *eff, double progress);
+static void crossfade_vstep(struct sdl_effect *eff, double progress);
+static void crossfade_hstep(struct sdl_effect *eff, double progress);
 static void crossfade_animation_free(struct sdl_effect *eff);
 
 static struct sdl_effect *crossfade_animation_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -169,17 +180,21 @@ static struct sdl_effect *crossfade_animation_new(SDL_Rect *rect, SDL_Surface *o
 		NOMEMERR();
 	effect_init(eff, rect, old, new, type);
 	switch (type) {
-	case EFFECT_CROSSFADE_DOWN: eff->step = crossfade_down_step; break;
-	case EFFECT_CROSSFADE_UP:   eff->step = crossfade_up_step;   break;
-	case EFFECT_CROSSFADE_LR:   eff->step = crossfade_lr_step;   break;
-	case EFFECT_CROSSFADE_RL:   eff->step = crossfade_rl_step;   break;
+	case EFFECT_CROSSFADE_DOWN:
+	case EFFECT_CROSSFADE_UP:
+		eff->step = crossfade_vstep;
+		break;
+	case EFFECT_CROSSFADE_LR:
+	case EFFECT_CROSSFADE_RL:
+		eff->step = crossfade_hstep;
+		break;
 	default: assert(!"Cannot happen");
 	}
 	eff->finish = crossfade_animation_free;
 	return eff;
 }
 
-static void crossfade_down_step(struct sdl_effect *eff, double progress) {
+static void crossfade_vstep(struct sdl_effect *eff, double progress) {
 	const int BAND_WIDTH = 254;
 
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
@@ -188,19 +203,23 @@ static void crossfade_down_step(struct sdl_effect *eff, double progress) {
 	int band_top = maxstep * progress - BAND_WIDTH;
 	if (band_top > 0) {
 		SDL_Rect sr = {0, 0, eff->dst_rect.w, band_top};
-		SDL_Rect dr = {eff->dst_rect.x, eff->dst_rect.y, eff->dst_rect.w, band_top};
+		if (eff->type == EFFECT_CROSSFADE_UP)
+			flip_rect_v(&sr, eff->dst_rect.h);
+		SDL_Rect dr = sr;
+		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
 		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
 	}
 
 	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_BLEND);
-	SDL_Rect sr = {0, 0, eff->dst_rect.w, 1};
-	SDL_Rect dr = {eff->dst_rect.x, 0, eff->dst_rect.w, 1};
 	for (int i = 0; i < BAND_WIDTH; i++) {
 		int y = band_top + i;
 		if (y < 0 || y >= eff->dst_rect.h)
 			continue;
-		sr.y = y;
-		dr.y = eff->dst_rect.y + y;
+		SDL_Rect sr = {0, y, eff->dst_rect.w, 1};
+		if (eff->type == EFFECT_CROSSFADE_UP)
+			flip_rect_v(&sr, eff->dst_rect.h);
+		SDL_Rect dr = sr;
+		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
 		SDL_SetTextureAlphaMod(eff->tx_new, BAND_WIDTH - i);
 		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
 	}
@@ -209,39 +228,7 @@ static void crossfade_down_step(struct sdl_effect *eff, double progress) {
 	SDL_RenderPresent(sdl_renderer);
 }
 
-static void crossfade_up_step(struct sdl_effect *eff, double progress) {
-	const int BAND_WIDTH = 254;
-
-	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
-
-	int maxstep = eff->dst_rect.h + BAND_WIDTH;
-	int band_top = maxstep - maxstep * progress - BAND_WIDTH;
-
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_BLEND);
-	SDL_Rect sr = {0, 0, eff->dst_rect.w, 1};
-	SDL_Rect dr = {eff->dst_rect.x, 0, eff->dst_rect.w, 1};
-	for (int i = 0; i < BAND_WIDTH; i++) {
-		int y = band_top + i;
-		if (y < 0 || y >= eff->dst_rect.h)
-			continue;
-		sr.y = y;
-		dr.y = eff->dst_rect.y + y;
-		SDL_SetTextureAlphaMod(eff->tx_new, i + 1);
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-	}
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_NONE);
-
-	int top = band_top + BAND_WIDTH;
-	if (top < eff->dst_rect.h) {
-		SDL_Rect sr = {0, top, eff->dst_rect.w, eff->dst_rect.h - top};
-		SDL_Rect dr = {eff->dst_rect.x, eff->dst_rect.y + top, eff->dst_rect.w, eff->dst_rect.h - top};
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-	}
-
-	SDL_RenderPresent(sdl_renderer);
-}
-
-static void crossfade_lr_step(struct sdl_effect *eff, double progress) {
+static void crossfade_hstep(struct sdl_effect *eff, double progress) {
 	const int BAND_WIDTH = 254;
 
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
@@ -250,55 +237,27 @@ static void crossfade_lr_step(struct sdl_effect *eff, double progress) {
 	int band_lhs = maxstep * progress - BAND_WIDTH;
 	if (band_lhs > 0) {
 		SDL_Rect sr = {0, 0, band_lhs, eff->dst_rect.h};
-		SDL_Rect dr = {eff->dst_rect.x, eff->dst_rect.y, band_lhs, eff->dst_rect.h};
+		if (eff->type == EFFECT_CROSSFADE_RL)
+			flip_rect_h(&sr, eff->dst_rect.w);
+		SDL_Rect dr = sr;
+		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
 		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
 	}
 
 	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_BLEND);
-	SDL_Rect sr = {0, 0, 1, eff->dst_rect.h};
-	SDL_Rect dr = {0, eff->dst_rect.y, 1, eff->dst_rect.h};
 	for (int i = 0; i < BAND_WIDTH; i++) {
 		int x = band_lhs + i;
 		if (x < 0 || x >= eff->dst_rect.w)
 			continue;
-		sr.x = x;
-		dr.x = eff->dst_rect.x + x;
+		SDL_Rect sr = {x, 0, 1, eff->dst_rect.h};
+		if (eff->type == EFFECT_CROSSFADE_RL)
+			flip_rect_h(&sr, eff->dst_rect.w);
+		SDL_Rect dr = sr;
+		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
 		SDL_SetTextureAlphaMod(eff->tx_new, BAND_WIDTH - i);
 		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
 	}
 	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_NONE);
-
-	SDL_RenderPresent(sdl_renderer);
-}
-
-static void crossfade_rl_step(struct sdl_effect *eff, double progress) {
-	const int BAND_WIDTH = 254;
-
-	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
-
-	int maxstep = eff->dst_rect.w + BAND_WIDTH;
-	int band_lhs = maxstep - maxstep * progress - BAND_WIDTH;
-
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_BLEND);
-	SDL_Rect sr = {0, 0, 1, eff->dst_rect.h};
-	SDL_Rect dr = {0, eff->dst_rect.y, 1, eff->dst_rect.h};
-	for (int i = 0; i < BAND_WIDTH; i++) {
-		int x = band_lhs + i;
-		if (x < 0 || x >= eff->dst_rect.w)
-			continue;
-		sr.x = x;
-		dr.x = eff->dst_rect.x + x;
-		SDL_SetTextureAlphaMod(eff->tx_new, i + 1);
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-	}
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_NONE);
-
-	int lhs = band_lhs + BAND_WIDTH;
-	if (lhs < eff->dst_rect.w) {
-		SDL_Rect sr = {lhs, 0, eff->dst_rect.w - lhs, eff->dst_rect.h};
-		SDL_Rect dr = {eff->dst_rect.x + lhs, eff->dst_rect.y, eff->dst_rect.w - lhs, eff->dst_rect.h};
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-	}
 
 	SDL_RenderPresent(sdl_renderer);
 }
@@ -479,98 +438,81 @@ static struct sdl_effect *blind_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surfac
 	return eff;
 }
 
+static void blind_vstep(double progress, SDL_Rect *rect, SDL_Texture *tx_new, int offset_y, bool flip) {
+	const int N = 16;
+
+	int nr_bands = rect->h / N + N - 1;
+	int step = nr_bands * progress;
+
+	int top = (step - (N - 1)) * N;
+	if (top > 0) {
+		if (top > rect->w)
+			top = rect->w;
+		SDL_Rect sr = {0, 0, rect->w, top};
+		if (flip)
+			flip_rect_v(&sr, rect->h);
+		SDL_Rect dr = sr;
+		move_rect(&dr, rect->x, rect->y);
+		sr.y += offset_y;
+		SDL_RenderCopy(sdl_renderer, tx_new, &sr, &dr);
+	}
+	for (int i = 1; i < N; i++) {
+		int y = (step - i) * N;
+		if (y < 0 || y >= rect->h)
+			continue;
+		SDL_Rect sr = {0, y, rect->w, i};
+		if (flip)
+			flip_rect_v(&sr, rect->h);
+		SDL_Rect dr = sr;
+		move_rect(&dr, rect->x, rect->y);
+		sr.y += offset_y;
+		SDL_RenderCopy(sdl_renderer, tx_new, &sr, &dr);
+	}
+}
+
 static void blind_step(struct sdl_effect *eff, double progress) {
 	const int N = 16;
 
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
 
-	if (eff->type == EFFECT_BLIND_DOWN || eff->type == EFFECT_BLIND_UP_DOWN || eff->type == EFFECT_BLIND_DOWN_LR) {
-		SDL_Rect rect = eff->dst_rect;
-		if (eff->type == EFFECT_BLIND_UP_DOWN)
-			rect.h = rect.h / (N * 2) * N;
+	if (eff->type == EFFECT_BLIND_DOWN || eff->type == EFFECT_BLIND_UP || eff->type == EFFECT_BLIND_DOWN_LR) {
+		blind_vstep(progress, &eff->dst_rect, eff->tx_new, 0, eff->type == EFFECT_BLIND_UP);
+	}
+	if (eff->type == EFFECT_BLIND_UP_DOWN) {
+		SDL_Rect top_rect = eff->dst_rect;
+		top_rect.h = top_rect.h / (N * 2) * N;
+		blind_vstep(progress, &top_rect, eff->tx_new, 0, false);
 
-		int maxstep = rect.h / N + N;
-		int step = maxstep * progress;
-
-		int top = (step - N + 1) * N;
-		if (top > 0) {
-			SDL_Rect sr = {0, 0, rect.w, top};
-			SDL_Rect dr = {rect.x, rect.y, rect.w, top};
-			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-		}
-		for (int i = 1; i < N; i++) {
-			int y = (step - N + i) * N;
-			if (y < 0 || y >= rect.h)
-				continue;
-			SDL_Rect sr = {0, y, rect.w, N - i};
-			SDL_Rect dr = {rect.x, rect.y + y, rect.w, N - i};
-			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-		}
+		SDL_Rect bottom_rect = eff->dst_rect;
+		bottom_rect.y += top_rect.h;
+		bottom_rect.h -= top_rect.h;
+		blind_vstep(progress, &bottom_rect, eff->tx_new, top_rect.h, true);
 	}
 
-	if (eff->type == EFFECT_BLIND_UP || eff->type == EFFECT_BLIND_UP_DOWN) {
-		SDL_Rect rect = eff->dst_rect;
-		int offset = 0;
-		if (eff->type == EFFECT_BLIND_UP_DOWN) {
-			offset = rect.h / (N * 2) * N;
-			rect.y += offset;
-			rect.h -= offset;
-		}
-		int maxstep = rect.h / N + N;
-		int step = maxstep - maxstep * progress;
+	if (eff->type == EFFECT_BLIND_LR || eff->type == EFFECT_BLIND_RL || eff->type == EFFECT_BLIND_DOWN_LR) {
+		int nr_bands = eff->dst_rect.w / N + N - 1;
+		int step = nr_bands * progress;
 
-		for (int i = 1; i < N; i++) {
-			int y = (step - N + i) * N;
-			if (y < 0 || y >= rect.h)
-				continue;
-			SDL_Rect sr = {0, offset + y + N - i, rect.w, i};
-			SDL_Rect dr = {rect.x, rect.y + y + N - i, rect.w, i};
-			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-		}
-		int top = step * N;
-		if (top < rect.h) {
-			SDL_Rect sr = {0, offset + top, rect.w, rect.h - top};
-			SDL_Rect dr = {rect.x, rect.y + top, rect.w, rect.h - top};
-			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-		}
-	}
-
-	if (eff->type == EFFECT_BLIND_LR || eff->type == EFFECT_BLIND_DOWN_LR) {
-		int maxstep = eff->dst_rect.w / N + N;
-		int step = maxstep * progress;
-
-		int lhs = (step - N + 1) * N;
+		int lhs = (step - (N - 1)) * N;
 		if (lhs > 0) {
+			if (lhs > eff->dst_rect.w)
+				lhs = eff->dst_rect.w;
 			SDL_Rect sr = {0, 0, lhs, eff->dst_rect.h};
-			SDL_Rect dr = {eff->dst_rect.x, eff->dst_rect.y, lhs, eff->dst_rect.h};
+			if (eff->type == EFFECT_BLIND_RL)
+				flip_rect_h(&sr, eff->dst_rect.w);
+			SDL_Rect dr = sr;
+			move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
 			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
 		}
 		for (int i = 1; i < N; i++) {
-			int x = (step - N + i) * N;
+			int x = (step - i) * N;
 			if (x < 0 || x >= eff->dst_rect.w)
 				continue;
-			SDL_Rect sr = {x, 0, N - i, eff->dst_rect.h};
-			SDL_Rect dr = {eff->dst_rect.x + x, eff->dst_rect.y, N - i, eff->dst_rect.h};
-			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-		}
-	}
-
-	if (eff->type == EFFECT_BLIND_RL) {
-		int maxstep = eff->dst_rect.w / N + N;
-		int step = maxstep - maxstep * progress;
-
-		for (int i = 1; i < N; i++) {
-			int x = (step - N + i) * N;
-			if (x < 0 || x >= eff->dst_rect.w)
-				continue;
-			SDL_Rect sr = {x + N - i, 0, i, eff->dst_rect.h};
-			SDL_Rect dr = {eff->dst_rect.x + x + N - i, eff->dst_rect.y, i, eff->dst_rect.h};
-			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-		}
-		int lhs = step * N;
-		if (lhs < eff->dst_rect.w) {
-			SDL_Rect sr = {lhs, 0, eff->dst_rect.w - lhs, eff->dst_rect.h};
-			SDL_Rect dr = {eff->dst_rect.x + lhs, eff->dst_rect.y, eff->dst_rect.w - lhs, eff->dst_rect.h};
+			SDL_Rect sr = {x, 0, i, eff->dst_rect.h};
+			if (eff->type == EFFECT_BLIND_RL)
+				flip_rect_h(&sr, eff->dst_rect.w);
+			SDL_Rect dr = sr;
+			move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
 			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
 		}
 	}
