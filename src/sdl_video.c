@@ -129,7 +129,8 @@ void sdl_setWindowTitle(char *name) {
 
 /* Visual に応じて Window を生成する */
 static void window_init(void) {
-	
+	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	
 #ifdef __EMSCRIPTEN__
