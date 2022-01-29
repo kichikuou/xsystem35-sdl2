@@ -94,12 +94,15 @@ struct sdl_effect {
 	void (*finish)(struct sdl_effect *this);
 	enum sdl_effect_type type;
 	SDL_Rect dst_rect;
+	bool is_fullscreen;
 	SDL_Texture *tx_old, *tx_new;
 };
 
 static void effect_init(struct sdl_effect *eff, SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
 	eff->type = type;
 	eff->dst_rect = *rect;
+	eff->is_fullscreen = rect->x == 0 && rect->y == 0
+		&& rect->w == sdl_display->w && rect->h == sdl_display->h;
 	eff->tx_old = SDL_CreateTextureFromSurface(sdl_renderer, old);
 	eff->tx_new = SDL_CreateTextureFromSurface(sdl_renderer, new);
 	SDL_FreeSurface(old);
@@ -108,6 +111,9 @@ static void effect_init(struct sdl_effect *eff, SDL_Rect *rect, SDL_Surface *old
 
 static void effect_finish(struct sdl_effect *eff, bool present) {
 	if (present) {
+		SDL_RenderClear(sdl_renderer);
+		if (!eff->is_fullscreen)
+			SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 		SDL_RenderCopy(sdl_renderer, eff->tx_new, NULL, &eff->dst_rect);
 		SDL_RenderPresent(sdl_renderer);
 	}
@@ -449,11 +455,11 @@ static void brightness_step(struct sdl_effect *eff, double progress) {
 	SDL_SetRenderDrawColor(sdl_renderer, color, color, color, alpha);
 	SDL_RenderFillRect(sdl_renderer, &eff->dst_rect);
 	SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_NONE);
+	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderPresent(sdl_renderer);
 }
 
 static void brightness_free(struct sdl_effect *eff) {
-	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
 	effect_finish(eff, false);
 	free(eff);
 }
@@ -625,7 +631,6 @@ static void zoom_blend_blur_step(struct sdl_effect *eff, double progress) {
 
 	this->index = (this->index + 1) % ZOOM_BLEND_BLUR_STEPS;
 
-	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
 	SDL_RenderFillRect(sdl_renderer, &eff->dst_rect);
 	for (int i = 0; i < ZOOM_BLEND_BLUR_STEPS; i++) {
 		SDL_Texture *tx = this->tx[i] ? this->tx[i] : eff->tx_new;
@@ -681,7 +686,6 @@ static SDL_Texture *blur(struct linear_blur_effect *this, SDL_Texture *src, int 
 	SDL_Texture *dst = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, w, h);
 
 	SDL_SetRenderTarget(sdl_renderer, dst);
-	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_renderer);
 	SDL_SetTextureBlendMode(src, SDL_BLENDMODE_ADD);
 	SDL_SetTextureAlphaMod(src, 127);
@@ -1104,7 +1108,6 @@ static struct sdl_effect *zigzag_crossfade_new(SDL_Rect *rect, SDL_Surface *old,
 
 static void wave_warp_h(SDL_Texture *src, SDL_Texture *dst, int w, int h, double amplitude, double length, double phase) {
 	SDL_SetRenderTarget(sdl_renderer, dst);
-	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_renderer);
 	SDL_Rect sr = {0, 0, w, 1};
 	SDL_Rect dr = {0, 0, w, 1};
@@ -1118,7 +1121,6 @@ static void wave_warp_h(SDL_Texture *src, SDL_Texture *dst, int w, int h, double
 
 static void wave_warp_v(SDL_Texture *src, SDL_Texture *dst, int w, int h, double amplitude, double length, double phase) {
 	SDL_SetRenderTarget(sdl_renderer, dst);
-	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_renderer);
 	SDL_Rect sr = {0, 0, 1, h};
 	SDL_Rect dr = {0, 0, 1, h};
@@ -1232,6 +1234,9 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 }
 
 void sdl_effect_step(struct sdl_effect *eff, double progress) {
+	SDL_RenderClear(sdl_renderer);
+	if (!eff->is_fullscreen)
+		SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 	eff->step(eff, progress);
 }
 

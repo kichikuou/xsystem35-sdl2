@@ -151,6 +151,7 @@ static void window_init(void) {
 								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
 								  flags);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
+	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderSetIntegerScale(sdl_renderer, integer_scaling);
 }
 
