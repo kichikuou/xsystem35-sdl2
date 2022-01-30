@@ -23,19 +23,12 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "portab.h"
 #include "system.h"
 #include "ngraph.h"
 #include "ags.h"
-#include "nact.h"
 #include "input.h"
 #include "sprite.h"
-#include "surface.h"
-#include "sactcg.h"
 #include "sdl_core.h"
 
 /*
