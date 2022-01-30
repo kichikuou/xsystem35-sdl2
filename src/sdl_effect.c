@@ -62,30 +62,34 @@ enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 
 enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 	switch (effect) {
-	case SACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
-	case SACT_EFFECT_FADEOUT:          return EFFECT_FADEOUT;
-	case SACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
-	case SACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT;
-	case SACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
-	case SACT_EFFECT_CROSSFADE_MOSAIC: return EFFECT_CROSSFADE_MOSAIC;
-	case SACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
-	case SACT_EFFECT_BLIND_LR:         return EFFECT_BLIND_LR;
-	case SACT_EFFECT_BLIND_DOWN_LR:    return EFFECT_BLIND_DOWN_LR;
-	case SACT_EFFECT_ZOOM_BLEND_BLUR:  return EFFECT_ZOOM_BLEND_BLUR;
-	case SACT_EFFECT_LINEAR_BLUR:      return EFFECT_LINEAR_BLUR;
-	case SACT_EFFECT_CROSSFADE_DOWN:   return EFFECT_CROSSFADE_DOWN;
-	case SACT_EFFECT_CROSSFADE_UP:     return EFFECT_CROSSFADE_UP;
-	case SACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
-	case SACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
-	case SACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
-	case SACT_EFFECT_HEXAGRAM_OUT_IN:  return EFFECT_HEXAGRAM_OUT_IN;
-	case SACT_EFFECT_LINEAR_BLUR_VERT: return EFFECT_LINEAR_BLUR_VERT;
-	case SACT_EFFECT_ROTATE_OUT:       return EFFECT_ROTATE_OUT;
-	case SACT_EFFECT_ROTATE_IN:        return EFFECT_ROTATE_IN;
-	case SACT_EFFECT_ROTATE_OUT_CW:    return EFFECT_ROTATE_OUT_CW;
-	case SACT_EFFECT_ROTATE_IN_CW:     return EFFECT_ROTATE_IN_CW;
-	case SACT_EFFECT_ZIGZAG_CROSSFADE: return EFFECT_ZIGZAG_CROSSFADE;
-	default:                           return EFFECT_INVALID;
+	case SACT_EFFECT_CROSSFADE:           return EFFECT_CROSSFADE;
+	case SACT_EFFECT_FADEOUT:             return EFFECT_FADEOUT;
+	case SACT_EFFECT_FADEIN:              return EFFECT_FADEIN;
+	case SACT_EFFECT_WHITEOUT:            return EFFECT_WHITEOUT;
+	case SACT_EFFECT_WHITEIN:             return EFFECT_WHITEIN;
+	case SACT_EFFECT_CROSSFADE_MOSAIC:    return EFFECT_CROSSFADE_MOSAIC;
+	case SACT_EFFECT_BLIND_DOWN:          return EFFECT_BLIND_DOWN;
+	case SACT_EFFECT_BLIND_LR:            return EFFECT_BLIND_LR;
+	case SACT_EFFECT_BLIND_DOWN_LR:       return EFFECT_BLIND_DOWN_LR;
+	case SACT_EFFECT_ZOOM_BLEND_BLUR:     return EFFECT_ZOOM_BLEND_BLUR;
+	case SACT_EFFECT_LINEAR_BLUR:         return EFFECT_LINEAR_BLUR;
+	case SACT_EFFECT_CROSSFADE_DOWN:      return EFFECT_CROSSFADE_DOWN;
+	case SACT_EFFECT_CROSSFADE_UP:        return EFFECT_CROSSFADE_UP;
+	case SACT_EFFECT_PENTAGRAM_IN_OUT:    return EFFECT_PENTAGRAM_IN_OUT;
+	case SACT_EFFECT_PENTAGRAM_OUT_IN:    return EFFECT_PENTAGRAM_OUT_IN;
+	case SACT_EFFECT_HEXAGRAM_IN_OUT:     return EFFECT_HEXAGRAM_IN_OUT;
+	case SACT_EFFECT_HEXAGRAM_OUT_IN:     return EFFECT_HEXAGRAM_OUT_IN;
+	case SACT_EFFECT_LINEAR_BLUR_VERT:    return EFFECT_LINEAR_BLUR_VERT;
+	case SACT_EFFECT_ROTATE_OUT:          return EFFECT_ROTATE_OUT;
+	case SACT_EFFECT_ROTATE_IN:           return EFFECT_ROTATE_IN;
+	case SACT_EFFECT_ROTATE_OUT_CW:       return EFFECT_ROTATE_OUT_CW;
+	case SACT_EFFECT_ROTATE_IN_CW:        return EFFECT_ROTATE_IN_CW;
+	case SACT_EFFECT_POLYGON_ROTATE_Y:    return EFFECT_POLYGON_ROTATE_Y;
+	case SACT_EFFECT_POLYGON_ROTATE_Y_CW: return EFFECT_POLYGON_ROTATE_Y_CW;
+	case SACT_EFFECT_POLYGON_ROTATE_X:    return EFFECT_POLYGON_ROTATE_X;
+	case SACT_EFFECT_POLYGON_ROTATE_X_CW: return EFFECT_POLYGON_ROTATE_X_CW;
+	case SACT_EFFECT_ZIGZAG_CROSSFADE:    return EFFECT_ZIGZAG_CROSSFADE;
+	default:                              return EFFECT_INVALID;
 	}
 }
 
@@ -127,6 +131,15 @@ static inline void flip_rect_h(SDL_Rect *r, int w) {
 
 static inline void flip_rect_v(SDL_Rect *r, int h) {
 	r->y = h - r->y - r->h;
+}
+
+static void transpose_rect(SDL_Rect *r) {
+	int tx = r->x;
+	r->x = r->y;
+	r->y = tx;
+	int tw = r->w;
+	r->w = r->h;
+	r->h = tw;
 }
 
 static inline void move_rect(SDL_Rect *r, int off_x, int off_y) {
@@ -1023,6 +1036,66 @@ static void rotate_free(struct sdl_effect *eff) {
 	free(eff);
 }
 
+// EFFECT_POLYGON_ROTATE_*
+
+static void polygon_rotate_step(struct sdl_effect *eff, double progress);
+static void polygon_rotate_free(struct sdl_effect *eff);
+
+static struct sdl_effect *polygon_rotate_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(eff, rect, old, new, type);
+	eff->step = polygon_rotate_step;
+	eff->finish = polygon_rotate_free;
+	return eff;
+}
+
+static void polygon_rotate_step(struct sdl_effect *eff, double progress) {
+	bool vertical = eff->type == EFFECT_POLYGON_ROTATE_Y || eff->type == EFFECT_POLYGON_ROTATE_Y_CW;
+	SDL_Texture *texture = progress < 0.5 ? eff->tx_old : eff->tx_new;
+	double angle = progress < 0.5 ? progress * M_PI : (progress - 1.0) * M_PI;
+	if (eff->type == EFFECT_POLYGON_ROTATE_Y_CW || eff->type == EFFECT_POLYGON_ROTATE_X_CW)
+		angle *= -1;
+
+	const double distance = 2.0;
+	double cos_a = cos(angle);
+	double sin_a = sin(angle);
+	double lz = -0.5 * sin_a + distance;
+	double rz = 0.5 * sin_a + distance;
+	double lx = -0.5 * cos_a / lz;
+	double rx = 0.5 * cos_a / rz;
+
+	int w = vertical ? eff->dst_rect.w : eff->dst_rect.h;
+	int h = vertical ? eff->dst_rect.h : eff->dst_rect.w;
+	double dlx = w * (lx * distance + 0.5);
+	double drx = w * (rx * distance + 0.5);
+
+	// Perspective-correct interpolation.
+	for (int x = dlx; x <= drx; x++) {
+		if (x < 0 || x >= w)
+			continue;
+		double t = (x - dlx) / (drx - dlx);
+		double recip_z = (1 - t) * (1 / lz) + t * (1 / rz);
+		double tx = t * (w / rz) / recip_z;
+		SDL_Rect sr = {tx, 0, 1, h};
+		double dh = h * recip_z * distance;
+		SDL_Rect dr = {x, (h - dh) / 2, 1, dh};
+		if (!vertical) {
+			transpose_rect(&sr);
+			transpose_rect(&dr);
+		}
+		SDL_RenderCopy(sdl_renderer, texture, &sr, &dr);
+	}
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void polygon_rotate_free(struct sdl_effect *eff) {
+	effect_finish(eff, true);
+	free(eff);
+}
+
 // EFFECT_ZIGZAG_CROSSFADE
 
 struct zigzag_crossfade_effect {
@@ -1161,12 +1234,17 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_WINDMILL_180:
 	case EFFECT_WINDMILL_360:
 		return polygon_mask_new(rect, sf_old, sf_new, type);
+	case EFFECT_ZOOM_IN:
 	case EFFECT_ROTATE_OUT:
 	case EFFECT_ROTATE_IN:
 	case EFFECT_ROTATE_OUT_CW:
 	case EFFECT_ROTATE_IN_CW:
-	case EFFECT_ZOOM_IN:
 		return rotate_new(rect, sf_old, sf_new, type);
+	case EFFECT_POLYGON_ROTATE_Y:
+	case EFFECT_POLYGON_ROTATE_Y_CW:
+	case EFFECT_POLYGON_ROTATE_X:
+	case EFFECT_POLYGON_ROTATE_X_CW:
+		return polygon_rotate_new(rect, sf_old, sf_new, type);
 	case EFFECT_ZIGZAG_CROSSFADE:
 		return zigzag_crossfade_new(rect, sf_old, sf_new);
 	default:
