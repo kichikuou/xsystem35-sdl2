@@ -31,32 +31,36 @@
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
-	case NACT_EFFECT_ZOOM_IN:          return EFFECT_ZOOM_IN;
-	case NACT_EFFECT_BLIND_DOWN:       return EFFECT_BLIND_DOWN;
-	case NACT_EFFECT_MOSAIC:           return EFFECT_MOSAIC;
-	case NACT_EFFECT_FADEIN:           return EFFECT_FADEIN;
-	case NACT_EFFECT_WHITEIN:          return EFFECT_WHITEIN;
-	case NACT_EFFECT_FADEOUT:          return EFFECT_FADEOUT_FROM_NEW;
-	case NACT_EFFECT_WHITEOUT:         return EFFECT_WHITEOUT_FROM_NEW;
-	case NACT_EFFECT_CROSSFADE:        return EFFECT_CROSSFADE;
-	case NACT_EFFECT_CROSSFADE_MOSAIC: return EFFECT_CROSSFADE_MOSAIC;
-	case NACT_EFFECT_BLIND_UP:         return EFFECT_BLIND_UP;
-	case NACT_EFFECT_BLIND_UP_DOWN:    return EFFECT_BLIND_UP_DOWN;
-	case NACT_EFFECT_CROSSFADE_DOWN:   return EFFECT_CROSSFADE_DOWN;
-	case NACT_EFFECT_CROSSFADE_UP:     return EFFECT_CROSSFADE_UP;
-	case NACT_EFFECT_CROSSFADE_LR:     return EFFECT_CROSSFADE_LR;
-	case NACT_EFFECT_CROSSFADE_RL:     return EFFECT_CROSSFADE_RL;
-	case NACT_EFFECT_PENTAGRAM_IN_OUT: return EFFECT_PENTAGRAM_IN_OUT;
-	case NACT_EFFECT_PENTAGRAM_OUT_IN: return EFFECT_PENTAGRAM_OUT_IN;
-	case NACT_EFFECT_HEXAGRAM_IN_OUT:  return EFFECT_HEXAGRAM_IN_OUT;
-	case NACT_EFFECT_HEXAGRAM_OUT_IN:  return EFFECT_HEXAGRAM_OUT_IN;
-	case NACT_EFFECT_BLIND_LR:         return EFFECT_BLIND_LR;
-	case NACT_EFFECT_BLIND_RL:         return EFFECT_BLIND_RL;
-	case NACT_EFFECT_WINDMILL:         return EFFECT_WINDMILL;
-	case NACT_EFFECT_WINDMILL_180:     return EFFECT_WINDMILL_180;
-	case NACT_EFFECT_WINDMILL_360:     return EFFECT_WINDMILL_360;
-	case NACT_EFFECT_LINEAR_BLUR:      return EFFECT_LINEAR_BLUR;
-	default:                           return EFFECT_INVALID;
+	case NACT_EFFECT_ZOOM_IN:           return EFFECT_ZOOM_IN;
+	case NACT_EFFECT_BLIND_DOWN:        return EFFECT_BLIND_DOWN;
+	case NACT_EFFECT_MOSAIC:            return EFFECT_MOSAIC;
+	case NACT_EFFECT_FADEIN:            return EFFECT_FADEIN;
+	case NACT_EFFECT_WHITEIN:           return EFFECT_WHITEIN;
+	case NACT_EFFECT_FADEOUT:           return EFFECT_FADEOUT_FROM_NEW;
+	case NACT_EFFECT_WHITEOUT:          return EFFECT_WHITEOUT_FROM_NEW;
+	case NACT_EFFECT_CROSSFADE:         return EFFECT_CROSSFADE;
+	case NACT_EFFECT_CROSSFADE_MOSAIC:  return EFFECT_CROSSFADE_MOSAIC;
+	case NACT_EFFECT_BLIND_UP:          return EFFECT_BLIND_UP;
+	case NACT_EFFECT_BLIND_UP_DOWN:     return EFFECT_BLIND_UP_DOWN;
+	case NACT_EFFECT_CROSSFADE_DOWN:    return EFFECT_CROSSFADE_DOWN;
+	case NACT_EFFECT_CROSSFADE_UP:      return EFFECT_CROSSFADE_UP;
+	case NACT_EFFECT_CROSSFADE_LR:      return EFFECT_CROSSFADE_LR;
+	case NACT_EFFECT_CROSSFADE_RL:      return EFFECT_CROSSFADE_RL;
+	case NACT_EFFECT_BLEND_UP_DOWN:     return EFFECT_BLEND_UP_DOWN;
+	case NACT_EFFECT_BLEND_LR_RL:       return EFFECT_BLEND_LR_RL;
+	case NACT_EFFECT_CROSSFADE_LR_RL:   return EFFECT_CROSSFADE_LR_RL;
+	case NACT_EFFECT_CROSSFADE_UP_DOWN: return EFFECT_CROSSFADE_UP_DOWN;
+	case NACT_EFFECT_PENTAGRAM_IN_OUT:  return EFFECT_PENTAGRAM_IN_OUT;
+	case NACT_EFFECT_PENTAGRAM_OUT_IN:  return EFFECT_PENTAGRAM_OUT_IN;
+	case NACT_EFFECT_HEXAGRAM_IN_OUT:   return EFFECT_HEXAGRAM_IN_OUT;
+	case NACT_EFFECT_HEXAGRAM_OUT_IN:   return EFFECT_HEXAGRAM_OUT_IN;
+	case NACT_EFFECT_BLIND_LR:          return EFFECT_BLIND_LR;
+	case NACT_EFFECT_BLIND_RL:          return EFFECT_BLIND_RL;
+	case NACT_EFFECT_WINDMILL:          return EFFECT_WINDMILL;
+	case NACT_EFFECT_WINDMILL_180:      return EFFECT_WINDMILL_180;
+	case NACT_EFFECT_WINDMILL_360:      return EFFECT_WINDMILL_360;
+	case NACT_EFFECT_LINEAR_BLUR:       return EFFECT_LINEAR_BLUR;
+	default:                            return EFFECT_INVALID;
 	}
 }
 
@@ -183,8 +187,7 @@ static struct sdl_effect *fallback_effect_new(SDL_Rect *rect, SDL_Surface *old, 
 
 // EFFECT_CROSSFADE_{UP,DOWN,LR,RL}
 
-static void crossfade_vstep(struct sdl_effect *eff, double progress);
-static void crossfade_hstep(struct sdl_effect *eff, double progress);
+static void crossfade_animation_step(struct sdl_effect *eff, double progress);
 static void crossfade_animation_free(struct sdl_effect *eff);
 
 static struct sdl_effect *crossfade_animation_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -192,85 +195,97 @@ static struct sdl_effect *crossfade_animation_new(SDL_Rect *rect, SDL_Surface *o
 	if (!eff)
 		NOMEMERR();
 	effect_init(eff, rect, old, new, type);
-	switch (type) {
-	case EFFECT_CROSSFADE_DOWN:
-	case EFFECT_CROSSFADE_UP:
-		eff->step = crossfade_vstep;
-		break;
-	case EFFECT_CROSSFADE_LR:
-	case EFFECT_CROSSFADE_RL:
-		eff->step = crossfade_hstep;
-		break;
-	default: assert(!"Cannot happen");
-	}
+	eff->step = crossfade_animation_step;
 	eff->finish = crossfade_animation_free;
 	return eff;
 }
 
-static void crossfade_vstep(struct sdl_effect *eff, double progress) {
-	const int BAND_WIDTH = 254;
-
-	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
-
-	int maxstep = eff->dst_rect.h + BAND_WIDTH;
-	int band_top = maxstep * progress - BAND_WIDTH;
+static void crossfade_animation_step_sub(SDL_Rect *rect, SDL_Texture *tx, int tx_x, int tx_y, double progress, int band_width, bool lr, bool flip) {
+	int maxstep = (lr ? rect->w : rect->h) + band_width;
+	int band_top = maxstep * progress - band_width;
 	if (band_top > 0) {
-		SDL_Rect sr = {0, 0, eff->dst_rect.w, band_top};
-		if (eff->type == EFFECT_CROSSFADE_UP)
-			flip_rect_v(&sr, eff->dst_rect.h);
+		SDL_Rect sr = {0, 0, rect->w, rect->h};
+		*(lr ? &sr.w : &sr.h) = band_top;
+		if (flip) {
+			if (lr)
+				flip_rect_h(&sr, rect->w);
+			else
+				flip_rect_v(&sr, rect->h);
+		}
 		SDL_Rect dr = sr;
-		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+		move_rect(&sr, tx_x, tx_y);
+		move_rect(&dr, rect->x, rect->y);
+		SDL_RenderCopy(sdl_renderer, tx, &sr, &dr);
 	}
 
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_BLEND);
-	for (int i = 0; i < BAND_WIDTH; i++) {
-		int y = band_top + i;
-		if (y < 0 || y >= eff->dst_rect.h)
-			continue;
-		SDL_Rect sr = {0, y, eff->dst_rect.w, 1};
-		if (eff->type == EFFECT_CROSSFADE_UP)
-			flip_rect_v(&sr, eff->dst_rect.h);
+	SDL_SetTextureBlendMode(tx, SDL_BLENDMODE_BLEND);
+	for (int i = 0; i < band_width; i++) {
+		SDL_Rect sr;
+		if (lr) {
+			int x = band_top + i;
+			if (x < 0 || x >= rect->w)
+				continue;
+			sr = (SDL_Rect){x, 0, 1, rect->h};
+			if (flip)
+				flip_rect_h(&sr, rect->w);
+		} else {
+			int y = band_top + i;
+			if (y < 0 || y >= rect->h)
+				continue;
+			sr = (SDL_Rect){0, y, rect->w, 1};
+			if (flip)
+				flip_rect_v(&sr, rect->h);
+		}
 		SDL_Rect dr = sr;
-		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
-		SDL_SetTextureAlphaMod(eff->tx_new, BAND_WIDTH - i);
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+		move_rect(&sr, tx_x, tx_y);
+		move_rect(&dr, rect->x, rect->y);
+		SDL_SetTextureAlphaMod(tx, 255 - (i + 1) * (256 / band_width));
+		SDL_RenderCopy(sdl_renderer, tx, &sr, &dr);
 	}
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_NONE);
-
-	SDL_RenderPresent(sdl_renderer);
+	SDL_SetTextureBlendMode(tx, SDL_BLENDMODE_NONE);
 }
 
-static void crossfade_hstep(struct sdl_effect *eff, double progress) {
-	const int BAND_WIDTH = 254;
-
+static void crossfade_animation_step(struct sdl_effect *eff, double progress) {
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
 
-	int maxstep = eff->dst_rect.w + BAND_WIDTH;
-	int band_lhs = maxstep * progress - BAND_WIDTH;
-	if (band_lhs > 0) {
-		SDL_Rect sr = {0, 0, band_lhs, eff->dst_rect.h};
-		if (eff->type == EFFECT_CROSSFADE_RL)
-			flip_rect_h(&sr, eff->dst_rect.w);
-		SDL_Rect dr = sr;
-		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+	switch (eff->type) {
+	case EFFECT_CROSSFADE_DOWN:
+		crossfade_animation_step_sub(&eff->dst_rect, eff->tx_new, 0, 0, progress, 254, false, false);
+		break;
+	case EFFECT_CROSSFADE_UP:
+		crossfade_animation_step_sub(&eff->dst_rect, eff->tx_new, 0, 0, progress, 254, false, true);
+		break;
+	case EFFECT_CROSSFADE_LR:
+		crossfade_animation_step_sub(&eff->dst_rect, eff->tx_new, 0, 0, progress, 254, true, false);
+		break;
+	case EFFECT_CROSSFADE_RL:
+		crossfade_animation_step_sub(&eff->dst_rect, eff->tx_new, 0, 0, progress, 254, true, true);
+		break;
+	case EFFECT_CROSSFADE_UP_DOWN:
+		{
+			SDL_Rect dr = eff->dst_rect;
+			int th = dr.h /= 2;
+			dr.h = th;
+			crossfade_animation_step_sub(&dr, eff->tx_new, 0, 0, progress, 127, false, true);
+			dr.y += th;
+			dr.h = eff->dst_rect.h - th;
+			crossfade_animation_step_sub(&dr, eff->tx_new, 0, th, progress, 127, false, false);
+		}
+		break;
+	case EFFECT_CROSSFADE_LR_RL:
+		{
+			SDL_Rect dr = eff->dst_rect;
+			int lw = dr.w /= 2;
+			dr.w = lw;
+			crossfade_animation_step_sub(&dr, eff->tx_new, 0, 0, progress, 127, true, true);
+			dr.x += lw;
+			dr.w = eff->dst_rect.w - lw;
+			crossfade_animation_step_sub(&dr, eff->tx_new, lw, 0, progress, 127, true, false);
+		}
+		break;
+	default:
+		assert(!"Cannot happen");
 	}
-
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_BLEND);
-	for (int i = 0; i < BAND_WIDTH; i++) {
-		int x = band_lhs + i;
-		if (x < 0 || x >= eff->dst_rect.w)
-			continue;
-		SDL_Rect sr = {x, 0, 1, eff->dst_rect.h};
-		if (eff->type == EFFECT_CROSSFADE_RL)
-			flip_rect_h(&sr, eff->dst_rect.w);
-		SDL_Rect dr = sr;
-		move_rect(&dr, eff->dst_rect.x, eff->dst_rect.y);
-		SDL_SetTextureAlphaMod(eff->tx_new, BAND_WIDTH - i);
-		SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
-	}
-	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_NONE);
 
 	SDL_RenderPresent(sdl_renderer);
 }
@@ -534,6 +549,65 @@ static void blind_step(struct sdl_effect *eff, double progress) {
 }
 
 static void blind_free(struct sdl_effect *eff) {
+	effect_finish(eff, false);
+	free(eff);
+}
+
+// EFFECT_BLEND_*
+
+static void blend_animation_step(struct sdl_effect *eff, double progress);
+static void blend_animation_free(struct sdl_effect *eff);
+
+static struct sdl_effect *blend_animation_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(eff, rect, old, new, type);
+	eff->step = blend_animation_step;
+	eff->finish = blend_animation_free;
+	return eff;
+}
+
+static void blend_animation_step(struct sdl_effect *eff, double progress) {
+	const bool lr = eff->type == EFFECT_BLEND_LR_RL;
+
+	SDL_Texture *bg, *fg;
+	if (progress < 0.5) {
+		bg = eff->tx_old;
+		fg = eff->tx_new;
+	} else {
+		bg = eff->tx_new;
+		fg = eff->tx_old;
+		progress = 1.0 - progress;
+	}
+
+	SDL_RenderCopy(sdl_renderer, bg, NULL, &eff->dst_rect);
+	int k = (lr ? eff->dst_rect.w : eff->dst_rect.h) * progress;
+	SDL_SetTextureBlendMode(fg, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(fg, 127);
+
+	SDL_Rect sr = {0, 0, eff->dst_rect.w, eff->dst_rect.h};
+	SDL_Rect dr = eff->dst_rect;
+	if (lr)
+		sr.w = dr.w = k;
+	else
+		sr.h = dr.h = k;
+	SDL_RenderCopy(sdl_renderer, fg, &sr, &dr);
+
+	if (lr) {
+		sr.x = eff->dst_rect.w - k;
+		dr.x += sr.x;
+	} else {
+		sr.y = eff->dst_rect.h - k;
+		dr.y += sr.y;
+	}
+	SDL_RenderCopy(sdl_renderer, fg, &sr, &dr);
+
+	SDL_SetTextureBlendMode(fg, SDL_BLENDMODE_NONE);
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void blend_animation_free(struct sdl_effect *eff) {
 	effect_finish(eff, false);
 	free(eff);
 }
@@ -1203,6 +1277,8 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_CROSSFADE_UP:
 	case EFFECT_CROSSFADE_LR:
 	case EFFECT_CROSSFADE_RL:
+	case EFFECT_CROSSFADE_LR_RL:
+	case EFFECT_CROSSFADE_UP_DOWN:
 		return crossfade_animation_new(rect, sf_old, sf_new, type);
 	case EFFECT_MOSAIC:
 	case EFFECT_CROSSFADE_MOSAIC:
@@ -1221,6 +1297,9 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_BLIND_UP_DOWN:
 	case EFFECT_BLIND_DOWN_LR:
 		return blind_new(rect, sf_old, sf_new, type);
+	case EFFECT_BLEND_UP_DOWN:
+	case EFFECT_BLEND_LR_RL:
+		return blend_animation_new(rect, sf_old, sf_new, type);
 	case EFFECT_ZOOM_BLEND_BLUR:
 		return zoom_blend_blur_new(rect, sf_old, sf_new);
 	case EFFECT_LINEAR_BLUR:
