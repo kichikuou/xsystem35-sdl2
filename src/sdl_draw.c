@@ -425,7 +425,8 @@ static __inline void sdl_fade_blit(void) {
 	sdl_dirty = TRUE;
 }
 
-void sdl_fadeIn(int step) {
+void sdl_fadeIn(void *arg, double progress) {
+	int step = progress * 255;
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		setBligtness(sdl_dib, fadestep[step]);
 		sdl_fade_blit();
@@ -434,7 +435,8 @@ void sdl_fadeIn(int step) {
 	}
 }
 
-void sdl_fadeOut(int step) {
+void sdl_fadeOut(void *arg, double progress) {
+	int step = progress * 255;
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		setBligtness(sdl_dib, fadestep[255 - step]);
 		sdl_fade_blit();
@@ -443,7 +445,8 @@ void sdl_fadeOut(int step) {
 	}
 }
 
-void sdl_whiteIn(int step) {
+void sdl_whiteIn(void *arg, double progress) {
+	int step = progress * 255;
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		setWhiteness(sdl_dib, fadestep[255 - step]); /* ??? */
 		sdl_fade_blit();
@@ -452,7 +455,8 @@ void sdl_whiteIn(int step) {
 	}
 }
 
-void sdl_whiteOut(int step) {
+void sdl_whiteOut(void *arg, double progress) {
+	int step = progress * 255;
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		setWhiteness(sdl_dib, fadestep[step]); /* ??? */
 		sdl_fade_blit();

@@ -99,19 +99,6 @@ typedef struct _agsevent agsevent_t;
 #define AGSEVENT_WHEEL_DN 5
 
 
-/*
- * fader 管理情報
- */
-struct ags_faderinfo {
-	int step_max;    /* 最大 step 数 */
-	int effect_time; /* 全体の処理にかける時間 */
-	
-	boolean cancel;  /* 途中で key 抜けをうけつけるか */
-	void (*callback)(int); /* callback 関数 */
-};
-typedef struct ags_faderinfo ags_faderinfo_t;
-
-
 struct _ags {
 	Palette256 pal;             /* system palette */
 	boolean   pal_changed;      /* system palette has changed */
@@ -207,7 +194,6 @@ extern void ags_fadeIn(int rate, boolean flg);
 extern void ags_fadeOut(int rate, boolean flg);
 extern void ags_whiteIn(int rate, boolean flg);
 extern void ags_whiteOut(int rate, boolean flg);
-extern void ags_fader_callback();
 
 /* フォント関連 */
 enum FontType {
@@ -227,11 +213,10 @@ extern int  ags_getCursorMoveTime();
 /* misc */
 extern void    ags_setAntialiasedStringMode(boolean mode);
 extern boolean ags_getAntialiasedStringMode();
-extern void    ags_fader(ags_faderinfo_t *);
 extern void    ags_autorepeat(boolean enable);
 
-typedef void (*ags_fade2_callback)(void *, double);
-void ags_fade2(int duration_ms, boolean cancelable, ags_fade2_callback callback, void *callback_arg);
+typedef void (*ags_EffectStepFunc)(void *, double);
+void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step, void *arg);
 
 #define RMASK16 0xf800
 #define GMASK16 0x07e0

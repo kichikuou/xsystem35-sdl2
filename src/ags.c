@@ -531,144 +531,50 @@ void ags_alpha_setPixel(int x, int y, int w, int h, BYTE *b) {
 	alpha_set_pixels(nact->ags.dib, x, y, w, h, b + offset, savew);
 }
 
-/*
- * fade in/out の wait 制御
- */
-void ags_fader(ags_faderinfo_t *i) {
-	int cnt_st, step, key = 0, canceled_key = 0;
-	cnt_st = sdl_getTicks();
-	
-	i->callback(0);
-	
-	if (i->effect_time == 0) goto out;
-	
-	step = 1;
-	while(step < i->step_max) {
-		int lefttime, leftstep, mstime, cnt1, cnt2;
-		
-		cnt1 = sdl_getTicks();
-		i->callback(step);
-		key = sys_getInputInfo();
-		/* 実際の fade にかかった時間 */
-		sdl_sleep(0); /* It's a magic !!! */
-		cnt2 = sdl_getTicks() - cnt1;
-		
-		lefttime = i->effect_time - (cnt1 + cnt2 - cnt_st); /* fade 残り時間 */
-		leftstep = i->step_max - step;  /* fade 残りステップ数 */
-		
-		if (lefttime <= 0) break;  /* 時間切れ */
-		if (leftstep <= 0) break;
-		
-		mstime = lefttime / leftstep; /* 1stepに許される時間 */
-		if (mstime > cnt2) {
-			/* wait をいれる余裕がある場合 */
-			key = sys_keywait(mstime - cnt2, i->cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
-			step++;
-		} else if (mstime > 0) {
-			/* wait をいれる余裕が無い場合 */
-			step += ((cnt2+1) * leftstep / lefttime);
-			nact->callback();
-		} else {
-			break;
-		}
-		/* wait cancel が有効の場合 */
-		if (i->cancel) {
-			if (key != 0) {
-				canceled_key = key;
-				break;
-			}
-		}
-	}
- out:
-	/* fader last step */
-	i->callback(i->step_max);
-	
-	/* store canceled key */
-	nact->waitcancel_key = canceled_key;
-}
-
-void ags_fade2(int duration_ms, boolean cancelable, ags_fade2_callback callback, void *callback_arg) {
+void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step, void *arg) {
 	unsigned wflags = cancelable ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE;
 	int start = sdl_getTicks();
 	for (int t = 0; t < duration_ms; t = sdl_getTicks() - start) {
-		callback(callback_arg, (double)t / duration_ms);
+		step(arg, (double)t / duration_ms);
 		int key = sys_keywait(start + t + 16 - sdl_getTicks(), wflags);
 		if (cancelable && key) {
 			nact->waitcancel_key = key;
 			break;
 		}
 	}
-	callback(callback_arg, 1.0);
+	step(arg, 1.0);
 }
 
 void ags_fadeIn(int rate, boolean flag) {
-	ags_faderinfo_t i;
-
-	if (need_update) {
-		i.effect_time = (rate * 16 * 1000) / 60;
-		i.cancel = flag;
-	} else {
-		i.effect_time = 0;
-	}
+	if (!need_update)
+		rate = 0;
 	fade_outed = FALSE;
-
 	nact->waitcancel_key = 0;
-
-	i.callback = sdl_fadeIn;
-	i.step_max = 255;
-	ags_fader(&i);
+	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_fadeIn, NULL);
 }
 
 void ags_fadeOut(int rate, boolean flag) {
-	ags_faderinfo_t i;
-	
-	if (need_update && !fade_outed) {
-		i.effect_time = (rate * 16 * 1000) / 60;
-		i.cancel = flag;
-	} else {
-		i.effect_time = 0;
-	}
+	if (!need_update || fade_outed)
+		rate = 0;
 	fade_outed = TRUE;
-
 	nact->waitcancel_key = 0;
-	
-	i.callback = sdl_fadeOut;
-	i.step_max = 255;
-	ags_fader(&i);
+	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_fadeOut, NULL);
 }
 
 void ags_whiteIn(int rate, boolean flag) {	
-	ags_faderinfo_t i;
-	if (need_update) {
-		i.effect_time = (rate * 16 * 1000) / 60;
-		i.cancel = flag;
-	} else {
-		i.effect_time = 0;
-	}
+	if (!need_update)
+		rate = 0;
 	fade_outed = FALSE;
-
 	nact->waitcancel_key = 0;
-
-	i.callback = sdl_whiteIn;
-	i.step_max = 255;
-	ags_fader(&i);
+	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_whiteIn, NULL);
 }
 
 void ags_whiteOut(int rate, boolean flag) {
-	ags_faderinfo_t i;
-	if (need_update && !fade_outed) {
-		i.effect_time = (rate * 16 * 1000) / 60;
-		i.cancel = flag;
-	} else {
-		i.effect_time = 0;
-	}		
+	if (!need_update || fade_outed)
+		rate = 0;
 	fade_outed = TRUE;
-	
 	nact->waitcancel_key = 0;
-	
-	i.callback = sdl_whiteOut;
-	i.step_max = 255;
-	ags_fader(&i);
+	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_whiteOut, NULL);
 }
 
 void ags_setFont(int type, int size) {
