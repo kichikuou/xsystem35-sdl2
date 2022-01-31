@@ -168,7 +168,6 @@ extern void ags_fillRectangle(int x, int y, int w, int h, int col);
 extern void ags_drawLine(int x0, int y0, int x1, int y1, int col);
 extern void ags_copyArea(int sx, int sy, int w, int h, int dx, int dy);
 extern void ags_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror_sw);
-extern void ags_zoom(int x, int y, int w, int h);
 extern void ags_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int col);
 extern void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, int lv);
 

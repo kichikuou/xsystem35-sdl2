@@ -41,6 +41,7 @@ enum nact_effect {
 	NACT_EFFECT_BLEND_LR_RL       = 40,
 	NACT_EFFECT_CROSSFADE_LR_RL   = 41,
 	NACT_EFFECT_CROSSFADE_UP_DOWN = 42,
+	NACT_EFFECT_MAGNIFY           = 43,
 	NACT_EFFECT_PENTAGRAM_IN_OUT  = 44,
 	NACT_EFFECT_PENTAGRAM_OUT_IN  = 45,
 	NACT_EFFECT_HEXAGRAM_IN_OUT   = 46,
@@ -142,6 +143,7 @@ enum sdl_effect_type {
 	EFFECT_POLYGON_ROTATE_X,
 	EFFECT_POLYGON_ROTATE_X_CW,
 	EFFECT_ZIGZAG_CROSSFADE,
+	EFFECT_MAGNIFY,
 };
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect);

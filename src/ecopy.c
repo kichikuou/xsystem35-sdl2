@@ -34,29 +34,14 @@
 #include "nact.h"
 #include "effect.h"
 
-/* saved parameter */
-struct ecopyparam {
-	int sx;
-	int sy;
-	int w;
-	int h;
-	int dx;
-	int dy;
-	int sw;
-	int opt;
-	boolean cancel;
-	int spCol;
-	int extp[10];
-};
-typedef struct ecopyparam ecopyparam_t;
-static ecopyparam_t ecp;
+static boolean ecp_cancel;
 
 #define EC_WAIT \
-	if ((key |= sys_getInputInfo()) && ecp.cancel) break; \
+	if ((key |= sys_getInputInfo()) && ecp_cancel) break; \
 	do {												  \
 		int wait_ms = cnt - sdl_getTicks();				  \
 		if (wait_ms >= 16)								  \
-			key = sys_keywait(wait_ms, ecp.cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE); \
+			key = sys_keywait(wait_ms, ecp_cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE); \
 	} while (0)
 
 
@@ -536,31 +521,6 @@ static int eCopyArea26(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	return key;
 }
 
-static void eCopyArea43(int step) {
-	int deltax, deltay, deltaw, deltah;
-	int slice = max(ecp.w, ecp.h);
-	
-	if (step == 0) {
-		return;
-	}
-	if (step == slice) {
-		ags_scaledCopyArea(ecp.sx, ecp.sy, ecp.w, ecp.h,
-				   nact->sys_view_area.x, nact->sys_view_area.y,
-				   nact->sys_view_area.w, nact->sys_view_area.h, 0);
-		ags_updateFull();
-		return;
-	}
-	
-	deltax = (ecp.sx - nact->sys_view_area.x) * step / slice;
-	deltay = (ecp.sy - nact->sys_view_area.y) * step / slice;
-	deltaw = (nact->sys_view_area.w - ecp.w) * step / slice;
-	deltah = (nact->sys_view_area.h - ecp.h) * step / slice;
-	ags_zoom(nact->sys_view_area.x + deltax,
-		 nact->sys_view_area.y + deltay,
-		 nact->sys_view_area.w - deltaw,
-		 nact->sys_view_area.h - deltah);
-}
-
 static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
 	/* XOR */
 	return sys_getInputInfo();
@@ -653,6 +613,8 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 		return opt ? opt * (127 + rect->w / 2) : 1300;
 	case NACT_EFFECT_CROSSFADE_UP_DOWN:
 		return opt ? opt * (127 + rect->h / 2) : 1300;
+	case NACT_EFFECT_MAGNIFY:
+		return opt ? opt + 300 : 2000;
 	case NACT_EFFECT_PENTAGRAM_IN_OUT:
 	case NACT_EFFECT_PENTAGRAM_OUT_IN:
 	case NACT_EFFECT_HEXAGRAM_IN_OUT:
@@ -669,7 +631,6 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 
 void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, boolean cancel, int spCol) {
 	int ret = 0;
-	ags_faderinfo_t i;
 
 #if 0
 	NOTICE("ec_area sx %d sy %d w %d h %d dx %d dy %d sw %d opt %d spc %d cancel %s\n",
@@ -691,28 +652,27 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		switch (sw) {
 		case NACT_EFFECT_FADEOUT:
 			sdl_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
+			ags_updateArea(dx, dy, w, h);
 			break;
 		case NACT_EFFECT_WHITEOUT:
 			sdl_fillRectangleRGB(dx, dy, w, h, 255, 255, 255);
+			ags_updateArea(dx, dy, w, h);
+			break;
+		case NACT_EFFECT_MAGNIFY:
+			ags_scaledCopyArea(sx, sy, w, h,
+							   nact->sys_view_area.x, nact->sys_view_area.y,
+							   nact->sys_view_area.w, nact->sys_view_area.h, 0);
+			ags_updateFull();
 			break;
 		default:
 			ags_copyArea(sx, sy, w, h, dx, dy);
+			ags_updateArea(dx, dy, w, h);
 			break;
 		}
-		ags_updateArea(dx, dy, w, h);
 		return;
 	}
 
-	ecp.sx = sx;
-	ecp.sy = sy;
-	ecp.w  = w;
-	ecp.h  = h;
-	ecp.dx = dx;
-	ecp.dy = dy;
-	ecp.sw = sw;
-	ecp.opt    = opt;
-	ecp.cancel = cancel;
-	ecp.spCol  = spCol;
+	ecp_cancel = cancel;
 	
 	switch(sw) {
 	case 1:
@@ -820,13 +780,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 26:
 		ret = eCopyArea26(sx, sy, w, h, dx, dy, opt);
 		break;
-	case 43:
-		i.step_max = max(w, h);
-		i.effect_time = opt == 0 ? 2000 : opt + 300;
-		i.cancel = cancel;
-		i.callback = eCopyArea43;
-		ags_fader(&i);
-		return;
 		
 	case 1000:
 		if (nact->sys_world_depth != 8) return;

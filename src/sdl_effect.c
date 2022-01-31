@@ -50,6 +50,7 @@ enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	case NACT_EFFECT_BLEND_LR_RL:       return EFFECT_BLEND_LR_RL;
 	case NACT_EFFECT_CROSSFADE_LR_RL:   return EFFECT_CROSSFADE_LR_RL;
 	case NACT_EFFECT_CROSSFADE_UP_DOWN: return EFFECT_CROSSFADE_UP_DOWN;
+	case NACT_EFFECT_MAGNIFY:           return EFFECT_MAGNIFY;
 	case NACT_EFFECT_PENTAGRAM_IN_OUT:  return EFFECT_PENTAGRAM_IN_OUT;
 	case NACT_EFFECT_PENTAGRAM_OUT_IN:  return EFFECT_PENTAGRAM_OUT_IN;
 	case NACT_EFFECT_HEXAGRAM_IN_OUT:   return EFFECT_HEXAGRAM_IN_OUT;
@@ -111,10 +112,14 @@ static void effect_init(struct sdl_effect *eff, SDL_Rect *rect, SDL_Surface *old
 	eff->dst_rect = *rect;
 	eff->is_fullscreen = rect->x == 0 && rect->y == 0
 		&& rect->w == sdl_display->w && rect->h == sdl_display->h;
-	eff->tx_old = SDL_CreateTextureFromSurface(sdl_renderer, old);
-	eff->tx_new = SDL_CreateTextureFromSurface(sdl_renderer, new);
-	SDL_FreeSurface(old);
-	SDL_FreeSurface(new);
+	if (old) {
+		eff->tx_old = SDL_CreateTextureFromSurface(sdl_renderer, old);
+		SDL_FreeSurface(old);
+	}
+	if (new) {
+		eff->tx_new = SDL_CreateTextureFromSurface(sdl_renderer, new);
+		SDL_FreeSurface(new);
+	}
 }
 
 static void effect_finish(struct sdl_effect *eff, bool present) {
@@ -125,8 +130,10 @@ static void effect_finish(struct sdl_effect *eff, bool present) {
 		SDL_RenderCopy(sdl_renderer, eff->tx_new, NULL, &eff->dst_rect);
 		SDL_RenderPresent(sdl_renderer);
 	}
-	SDL_DestroyTexture(eff->tx_old);
-	SDL_DestroyTexture(eff->tx_new);
+	if (eff->tx_old)
+		SDL_DestroyTexture(eff->tx_old);
+	if (eff->tx_new)
+		SDL_DestroyTexture(eff->tx_new);
 }
 
 static inline void flip_rect_h(SDL_Rect *r, int w) {
@@ -1250,6 +1257,47 @@ static void zigzag_crossfade_free(struct sdl_effect *eff) {
 	free(this);
 }
 
+// EFFECT_MAGNIFY
+
+struct magnify_effect {
+	struct sdl_effect eff;
+	SDL_Rect new_rect;
+};
+
+static void magnify_step(struct sdl_effect *eff, double progress);
+static void magnify_free(struct sdl_effect *eff);
+
+static struct sdl_effect *magnify_new(SDL_Surface *sf, SDL_Rect *old_rect, SDL_Rect *new_rect) {
+	struct magnify_effect *eff = calloc(1, sizeof(struct magnify_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(&eff->eff, old_rect, sf, NULL, EFFECT_MAGNIFY);
+	eff->new_rect = *new_rect;
+	eff->eff.step = magnify_step;
+	eff->eff.finish = magnify_free;
+	return &eff->eff;
+}
+
+static void magnify_step(struct sdl_effect *eff, double progress) {
+	struct magnify_effect *this = (struct magnify_effect *)eff;
+	SDL_Rect *or = &eff->dst_rect;
+	SDL_Rect *nr = &this->new_rect;
+	SDL_Rect r = {
+		.x = or->x + (nr->x - or->x) * progress,
+		.y = or->y + (nr->y - or->y) * progress,
+		.w = or->w + (nr->w - or->w) * progress,
+		.h = or->h + (nr->h - or->h) * progress,
+	};
+	SDL_RenderCopy(sdl_renderer, eff->tx_old, &r, NULL);
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void magnify_free(struct sdl_effect *eff) {
+	effect_finish(eff, false);
+	free(eff);
+}
+
+// -----------------
 
 static SDL_Surface *create_surface(agsurface_t *as, int x, int y, int w, int h) {
 	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
@@ -1267,6 +1315,13 @@ static SDL_Surface *create_surface(agsurface_t *as, int x, int y, int w, int h) 
 }
 
 struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type type) {
+	if (type == EFFECT_MAGNIFY) {
+		SDL_Rect old_rect = { view_x, view_y, view_w, view_h };
+		SDL_Rect new_rect = { nx, ny, rect->w, rect->h };
+		SDL_Surface *sf = create_surface(old, view_x, view_y, view_w, view_h);
+		return magnify_new(sf, &old_rect, &new_rect);
+	}
+
 	SDL_Surface *sf_old = create_surface(old, ox, oy, rect->w, rect->h);
 	SDL_Surface *sf_new = create_surface(new, nx, ny, rect->w, rect->h);
 

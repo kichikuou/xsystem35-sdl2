@@ -754,16 +754,6 @@ int ags_getCursorMoveTime() {
 	 return cursor_move_time;
 }
 
-/*
- * 指定の領域に全画面をZoom
- * 
- */
-void ags_zoom(int x, int y, int w, int h) {
-	if (!ags_check_param(&x, &y, &w, &h)) return;
-
-	sdl_zoom(x, y, w, h);
-}
-
 agsurface_t *ags_getDIB() {
 	return nact->ags.dib;
 }
