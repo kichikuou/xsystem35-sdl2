@@ -42,24 +42,6 @@
 #include "nact.h"
 #include "debugger.h"
 
-static const int fadeX[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
-static const int fadeY[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
-
-static int fadestep[256] =
-{0,1,3,4,6,7,9,10,12,14,15,17,18,20,21,23,25,26,28,29,31,32,34,36,37,39,40,
- 42,43,45,46,48,49,51,53,54,56,57,59,60,62,63,65,66,68,69,71,72,74,75,77,78,
- 80,81,83,84,86,87,89,90,92,93,95,96,97,99,100,102,103,105,106,108,109,110,
- 112,113,115,116,117,119,120,122,123,124,126,127,128,130,131,132,134,135,136,
- 138,139,140,142,143,144,146,147,148,149,151,152,153,155,156,157,158,159,161,
- 162,163,164,166,167,168,169,170,171,173,174,175,176,177,178,179,181,182,183,
- 184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,
- 203,204,205,206,207,208,209,210,211,211,212,213,214,215,216,217,217,218,219,
- 220,221,221,222,223,224,225,225,226,227,227,228,229,230,230,231,232,232,233,
- 234,234,235,235,236,237,237,238,238,239,239,240,241,241,242,242,243,243,244,
- 244,244,245,245,246,246,247,247,247,248,248,249,249,249,250,250,250,251,251,
- 251,251,252,252,252,252,253,253,253,253,254,254,254,254,254,254,255,255,255,
- 255,255,255,255,255,255,255,255,255,255,255};
-
 static void sdl_pal_check(void) {
 	if (nact->sys_pal_changed) {
 		nact->sys_pal_changed = FALSE;
@@ -121,7 +103,7 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 }
 
 /* 全画面更新 */
-static void sdl_updateAll() {
+void sdl_updateAll(void) {
 	SDL_Rect rect = {0, 0, view_w, view_h};
 	
 	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &rect);
@@ -339,130 +321,6 @@ int sdl_nearest_color(int r, int g, int b) {
 SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, BYTE col) {
 	sdl_pal_check();
 	return font_draw_glyph(x, y, str_utf8, col);
-}
-
-static void setBligtness(SDL_Surface *s, int val) {
-	int i;
-	Palette256 *pal = nact->sys_pal;
-	Uint8 *r = pal->red, *g = pal->green, *b = pal->blue;
-	SDL_Color *cl = sdl_col;
-	
-	for (i = 0; i < 256; i++) {
-		cl->r = (val * (*(r++))) / 255;
-		cl->g = (val * (*(g++))) / 255;
-		cl->b = (val * (*(b++))) / 255;
-		cl++;
-	}
-	SDL_SetPaletteColors(s->format->palette, sdl_col, 0, 256);
-}
-
-static void setWhiteness(SDL_Surface *s, int val) {
-	int i;
-	Palette256 *pal = nact->sys_pal;
-	Uint8 *r = pal->red, *g = pal->green, *b = pal->blue;
-	SDL_Color *cl = sdl_col;
-	
-	for (i = 0; i < 256; i++) {
-		cl->r = (((255- *r) * val) / 256) + *r; r++;
-		cl->g = (((255- *g) * val) / 256) + *g; g++;
-		cl->b = (((255- *b) * val) / 256) + *b; b++;
-		cl++;
-	}
-	SDL_SetPaletteColors(s->format->palette, sdl_col, 0, 256);
-}
-
-static void fader_in(int n) {
-	static SDL_Surface *src;
-
-	if (n == 0) {
-		src = SDL_CreateRGBSurfaceWithFormat(0, sdl_display->w, sdl_display->h, 32, SDL_PIXELFORMAT_RGB888);
-		SDL_Rect r_src = {view_x, view_y, view_w, view_h};
-		SDL_Rect r_dst = {0, 0, view_w, view_h};
-		SDL_BlitSurface(sdl_dib, &r_src, src, &r_dst);
-	}
-	
-	if (n == 255) {
-		SDL_FreeSurface(src);
-		sdl_updateAll();
-		return;
-	}
-
-	int lv = n / 16;
-	for (int y = 0; y < src->h; y += 4) {
-		DWORD *yls = PIXEL_AT(src, 0, y + fadeY[lv]);
-		DWORD *yld = PIXEL_AT(sdl_display, 0, y + fadeY[lv]);
-		for (int x = 0; x < src->w; x += 4) {
-			*(yld + fadeX[lv]) = *(yls + fadeX[lv]);
-			yls += 4; yld += 4;
-		}
-	}
-
-	sdl_dirty = TRUE;
-}
-
-static void fader_out(int n, Uint32 c) {
-	if (n == 255) {
-		SDL_FillRect(sdl_display, NULL, c);
-		return;
-	}
-
-	int lv = (255 - n) / 16;
-	for (int y = 0; y < sdl_display->h; y += 4) {
-		DWORD *yld = PIXEL_AT(sdl_display, 0, y + fadeY[lv]);
-		for (int x = 0; x < sdl_display->w; x += 4) {
-			*(yld + fadeX[lv]) = c;
-			yld += 4;
-		}
-	}
-
-	sdl_dirty = TRUE;
-}
-
-static __inline void sdl_fade_blit(void) {
-	SDL_Rect r_dst = {0, 0, view_w, view_h};
-
-	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &r_dst);
-	sdl_dirty = TRUE;
-}
-
-void sdl_fadeIn(void *arg, double progress) {
-	int step = progress * 255;
-	if (sdl_dib->format->BitsPerPixel == 8) {
-		setBligtness(sdl_dib, fadestep[step]);
-		sdl_fade_blit();
-	} else {
-		fader_in(step);
-	}
-}
-
-void sdl_fadeOut(void *arg, double progress) {
-	int step = progress * 255;
-	if (sdl_dib->format->BitsPerPixel == 8) {
-		setBligtness(sdl_dib, fadestep[255 - step]);
-		sdl_fade_blit();
-	} else {
-		fader_out(step, SDL_MapRGB(sdl_display->format, 0, 0, 0));
-	}
-}
-
-void sdl_whiteIn(void *arg, double progress) {
-	int step = progress * 255;
-	if (sdl_dib->format->BitsPerPixel == 8) {
-		setWhiteness(sdl_dib, fadestep[255 - step]); /* ??? */
-		sdl_fade_blit();
-	} else {
-		fader_in(step);
-	}
-}
-
-void sdl_whiteOut(void *arg, double progress) {
-	int step = progress * 255;
-	if (sdl_dib->format->BitsPerPixel == 8) {
-		setWhiteness(sdl_dib, fadestep[step]); /* ??? */
-		sdl_fade_blit();
-	} else {
-		fader_out(step, SDL_MapRGB(sdl_display->format, 255, 255, 255));
-	}
 }
 
 /*

@@ -461,6 +461,95 @@ static void brightness_free(struct sdl_effect *eff) {
 	free(eff);
 }
 
+// EFFECT_DITHERING_{FADE,WHITE}{OUT,IN}
+
+static void dithering_fade_step(struct sdl_effect *eff, double progress);
+static void dithering_fade_free(struct sdl_effect *eff);
+
+static SDL_Texture *create_dither_pattern_texture(int w, int h, int val) {
+	SDL_PixelFormat *fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
+	Uint32 col = SDL_MapRGBA(fmt, val, val, val, SDL_ALPHA_OPAQUE);
+	SDL_FreeFormat(fmt);
+
+	Uint32 *pixels = calloc(w * h, sizeof(Uint32));
+	if (!pixels)
+		NOMEMERR();
+	for (int y = 0; y < h; y += 4) {
+		Uint32 *row = pixels + y * w;
+		for (int x = 0; x < w; x += 4)
+			row[x] = col;
+	}
+
+	SDL_Texture *tx = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, w, h);
+	SDL_UpdateTexture(tx, NULL, pixels, w * 4);
+	free(pixels);
+	SDL_SetTextureBlendMode(tx, SDL_BLENDMODE_BLEND);
+	return tx;
+}
+
+static struct sdl_effect *dithering_fade_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	switch (type) {
+	case EFFECT_DITHERING_FADEOUT:
+		SDL_FreeSurface(new);
+		effect_init(eff, rect, old, NULL, type);
+		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 0);
+		break;
+	case EFFECT_DITHERING_FADEIN:
+		SDL_FreeSurface(old);
+		effect_init(eff, rect, new, NULL, type);
+		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 0);
+		break;
+	case EFFECT_DITHERING_WHITEOUT:
+		SDL_FreeSurface(new);
+		effect_init(eff, rect, old, NULL, type);
+		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 255);
+		break;
+	case EFFECT_DITHERING_WHITEIN:
+		SDL_FreeSurface(old);
+		effect_init(eff, rect, new, NULL, type);
+		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 255);
+		break;
+	default:
+		assert(!"Cannot happen");
+	}
+	eff->step = dithering_fade_step;
+	eff->finish = dithering_fade_free;
+	return eff;
+}
+
+static void dithering_fade_step(struct sdl_effect *eff, double progress) {
+	static const int dither_x[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
+	static const int dither_y[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
+
+	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
+
+	if (eff->type == EFFECT_DITHERING_FADEIN || eff->type == EFFECT_DITHERING_WHITEIN)
+		progress = 1 - progress;
+	int level = round(progress * 16);
+
+	assert(eff->is_fullscreen);
+	SDL_Rect dr = eff->dst_rect;
+	for (int i = 0; i < level; i++) {
+		dr.x = eff->dst_rect.x + dither_x[i];
+		dr.y = eff->dst_rect.y + dither_y[i];
+		SDL_RenderCopy(sdl_renderer, eff->tx_new, NULL, &dr);
+	}
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void dithering_fade_free(struct sdl_effect *eff) {
+	if (eff->type == EFFECT_DITHERING_FADEOUT)
+		SDL_FillRect(sdl_display, &eff->dst_rect, SDL_MapRGB(sdl_display->format, 0, 0, 0));
+	else if (eff->type == EFFECT_DITHERING_WHITEOUT)
+		SDL_FillRect(sdl_display, &eff->dst_rect, SDL_MapRGB(sdl_display->format, 255, 255, 255));
+	effect_finish(eff, false);
+	free(eff);
+}
+
 // EFFECT_BLIND_*
 
 static void blind_step(struct sdl_effect *eff, double progress);
@@ -1348,6 +1437,11 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_WHITEOUT_FROM_NEW:
 	case EFFECT_WHITEIN:
 		return brightness_new(rect, sf_old, sf_new, type);
+	case EFFECT_DITHERING_FADEOUT:
+	case EFFECT_DITHERING_FADEIN:
+	case EFFECT_DITHERING_WHITEOUT:
+	case EFFECT_DITHERING_WHITEIN:
+		return dithering_fade_new(rect, sf_old, sf_new, type);
 	case EFFECT_BLIND_DOWN:
 	case EFFECT_BLIND_UP:
 	case EFFECT_BLIND_LR:

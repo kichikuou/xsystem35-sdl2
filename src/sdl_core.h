@@ -50,6 +50,7 @@ extern void sdl_setIntegerScaling(boolean enable);
 
 /* 画面更新 */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);
+extern void sdl_updateAll(void);
 extern void sdl_updateScreen(void);
 
 /* パレット関係 */
@@ -83,14 +84,9 @@ extern SDL_Surface *com2surface(agsurface_t *s);
 
 /* Effects */
 struct sdl_effect;
-
 struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type effect);
-void sdl_effect_step(struct sdl_effect *fader, double progress);
-void sdl_effect_finish(struct sdl_effect *fader);
-extern void sdl_fadeIn(void *arg, double progress);
-extern void sdl_fadeOut(void *arg, double progress);
-extern void sdl_whiteIn(void *arg, double progress);
-extern void sdl_whiteOut(void *arg, double progress);
+void sdl_effect_step(struct sdl_effect *eff, double progress);
+void sdl_effect_finish(struct sdl_effect *eff);
 
 /* key/pointer 関係 */
 extern void sdl_setJoyDeviceIndex(int index);

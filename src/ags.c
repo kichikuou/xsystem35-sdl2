@@ -545,36 +545,74 @@ void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step,
 	step(arg, 1.0);
 }
 
-void ags_fadeIn(int rate, boolean flag) {
-	if (!need_update)
-		rate = 0;
-	fade_outed = FALSE;
+static void fade(int duration, boolean cancelable, enum sdl_effect_type type) {
 	nact->waitcancel_key = 0;
-	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_fadeIn, NULL);
+
+	SDL_Rect rect = {0, 0, nact->sys_view_area.w, nact->sys_view_area.h};
+	struct sdl_effect *eff = sdl_effect_init(
+		&rect, NULL, 0, 0,
+		sdl_getDIB(), nact->sys_view_area.x, nact->sys_view_area.y,
+		type);
+	ags_runEffect(duration, cancelable, (ags_EffectStepFunc)sdl_effect_step, eff);
+	sdl_effect_finish(eff);
+}
+
+void ags_fadeIn(int rate, boolean flag) {
+	int duration = rate * 16 * 1000 / 60;
+	if (!need_update)
+		duration = 0;
+	fade_outed = FALSE;
+
+	if (nact->sys_world_depth == 8)
+		sdl_setPalette(nact->sys_pal, 0, 256);
+
+	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_FADEIN : EFFECT_DITHERING_FADEIN);
+
+	sdl_updateAll();
 }
 
 void ags_fadeOut(int rate, boolean flag) {
+	int duration = rate * 16 * 1000 / 60;
 	if (!need_update || fade_outed)
-		rate = 0;
+		duration = 0;
 	fade_outed = TRUE;
-	nact->waitcancel_key = 0;
-	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_fadeOut, NULL);
+
+	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_FADEOUT : EFFECT_DITHERING_FADEOUT);
+
+	if (nact->sys_world_depth == 8) {
+		Palette256 pal;
+		memset(&pal, 0, sizeof(pal));
+		sdl_setPalette(&pal, 0, 256);
+	}
 }
 
 void ags_whiteIn(int rate, boolean flag) {	
+	int duration = rate * 16 * 1000 / 60;
 	if (!need_update)
-		rate = 0;
+		duration = 0;
 	fade_outed = FALSE;
-	nact->waitcancel_key = 0;
-	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_whiteIn, NULL);
+
+	if (nact->sys_world_depth == 8)
+		sdl_setPalette(nact->sys_pal, 0, 256);
+
+	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEIN);
+
+	sdl_updateAll();
 }
 
 void ags_whiteOut(int rate, boolean flag) {
+	int duration = rate * 16 * 1000 / 60;
 	if (!need_update || fade_outed)
-		rate = 0;
+		duration = 0;
 	fade_outed = TRUE;
-	nact->waitcancel_key = 0;
-	ags_runEffect(rate * 16 * 1000 / 60, flag, sdl_whiteOut, NULL);
+
+	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEOUT);
+
+	if (nact->sys_world_depth == 8) {
+		Palette256 pal;
+		memset(&pal, 255, sizeof(pal));
+		sdl_setPalette(&pal, 0, 256);
+	}
 }
 
 void ags_setFont(int type, int size) {
