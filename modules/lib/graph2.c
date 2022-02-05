@@ -95,16 +95,7 @@ void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int 
 	
 	switch(dst->depth) {
 	case 16:
-//		if (nact->mmx_is_ok) {
-		if (0) {
-#ifdef ENABLE_MMX
-			ablend16_wds_pppp(dp, sp1, sp2, sa, sw, sh,
-					  dst->bytes_per_line,
-					  src1->bytes_per_line,
-					  src2->bytes_per_line,
-					  src1->width);
-#endif
-		} else {
+		{
 			WORD *yls1, *yls2, *yld;
 			BYTE *yla;
 			

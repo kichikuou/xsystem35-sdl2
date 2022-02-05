@@ -21,11 +21,7 @@ int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx,
 	switch(dst->depth) {
 	case 16:
 		col = PIX16(r, g, b);
-		//if (nact->mmx_is_ok) {
-		if (0) {
-			//ablend16_dpp(col, dp, sp, sw, sh,
-			//	     dst->bytes_per_line, src->bytes_per_line);
-		} else {
+		{
 			WORD *yd;
 			BYTE *ys;
 			for (y = 0; y < sh; y++) {

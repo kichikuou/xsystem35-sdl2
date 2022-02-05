@@ -20,15 +20,7 @@ void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int 
 	
 	switch(dst->depth) {
 	case 16:
-		if (nact->mmx_is_ok) {
-//		if (0) {
-#ifdef ENABLE_MMX
-			int alpha;
-			lv = 255 - lv;
-			alpha = lv | lv << 8 | lv << 16 | lv << 24;
-			ablend16_dpd(dp, 0, sp, alpha, width, height, dst->bytes_per_line, src->bytes_per_line);
-#endif
-		} else {
+		{
 			WORD *yls, *yld;
 			
 			for (y = 0; y < height; y++) {

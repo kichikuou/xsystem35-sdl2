@@ -20,17 +20,7 @@ int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, i
 	if (lv == 255) {
 		switch(dst->depth) {
 		case 16:
-			if (nact->mmx_is_ok) {
-//			if (0) {
-#ifdef ENABLE_MMX
-				ablend16_ppp(wp, sp, dp, ap,
-					     width, height,
-					     write->bytes_per_line,
-					     src->bytes_per_line,
-					     dst->bytes_per_line,
-					     alpha->width, 255);
-#endif
-			} else {
+			{
 				WORD *yls, *yld, *ylw;
 				BYTE *yla;
 				
@@ -71,17 +61,7 @@ int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, i
 	} else {
 		switch(dst->depth) {
 		case 16:
-			if (nact->mmx_is_ok) {
-//			if (0) {
-#ifdef ENABLE_MMX
-				ablend16_ppp(wp, sp, dp, ap,
-					     width, height,
-					     write->bytes_per_line,
-					     src->bytes_per_line,
-					     dst->bytes_per_line,
-					     alpha->width, lv);
-#endif
-			} else {
+			{
 				WORD *yls, *yld, *ylw;
 				BYTE *yla;
 				

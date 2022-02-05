@@ -183,8 +183,6 @@ else()
   endif()
 endif()
 
-# TODO: MMX
-
 function (print_summary name)
   if (ARGN)
     list(JOIN ARGN ", " MSG)

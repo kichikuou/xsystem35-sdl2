@@ -73,10 +73,6 @@
 #include "s39init.h"
 #include "msgskip.h"
 
-#ifdef ENABLE_MMX
-#include "haveunit.h"
-#endif
-
 static char *gameResourceFile = "xsystem35.gr";
 static void    sys35_usage(boolean verbose);
 static void    sys35_init();
@@ -223,10 +219,6 @@ static void sys35_init() {
 	ags_setAntialiasedStringMode(!font_noantialias);
 
 	sgenrand(getpid());
-
-#ifdef ENABLE_MMX
-	nact->mmx_is_ok = ((haveUNIT() & tMMX) ? TRUE : FALSE);
-#endif
 
 	msg_init();
 	sel_init();

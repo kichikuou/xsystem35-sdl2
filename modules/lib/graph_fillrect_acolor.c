@@ -19,13 +19,7 @@ int gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, i
 	
 	switch(dst->depth) {
 	case 16:
-		if (nact->mmx_is_ok) {
-#ifdef ENABLE_MMX
-			int alpha = lv | lv << 8 | lv << 16 | lv << 24;
-			WORD pic16 = PIX16(r, g, b);
-			ablend16_dpd(dp, pic16, dp, alpha, dw, dh, dst->bytes_per_line, dst->bytes_per_line);
-#endif
-		} else {
+		{
 			WORD pic16 = PIX16(r, g, b);
 			WORD *yls;
 			

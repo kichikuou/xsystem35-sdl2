@@ -260,10 +260,4 @@ void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step,
 //#define SUTURADD16(pa, pb) PIX16(min(255,(int)(PIXR16(pa))+(int)(PIXR16(pb))), min(255, (int)(PIXG16(pa))+(int)(PIXG16(pb))), min(255, (int)(PIXB16(pa))+(int)(PIXB16(pb))));
 #define SUTURADD24(pa, pb) PIX24(min(255,PIXR24(pa)+PIXR24(pb)), min(255, PIXG24(pa)+PIXG24(pb)), min(255, PIXB24(pa)+PIXB24(pb)));
 
-
-/* exter methods */
-extern void ablend16_dpd(BYTE *, int, BYTE *, int, int, int, int, int);
-extern void ablend16_ppd(BYTE *, BYTE *, BYTE *, int, int, int, int, int, int);
-extern void ablend16_ppp(BYTE *, BYTE *, BYTE *, BYTE *, int, int, int, int, int, int, int);
-
 #endif /* !__AGS_H__ */
