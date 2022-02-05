@@ -112,9 +112,9 @@ void commandPG() { /* T2 */
 	int i;
 	
 	for (i = 0; i < num2; i++) {
-		*var = nact->sys_pal->red[num1 + i];   var++;
-		*var = nact->sys_pal->green[num1 + i]; var++;
-		*var = nact->sys_pal->blue[num1 + i];  var++;
+		*var = nact->ags.pal->red[num1 + i];   var++;
+		*var = nact->ags.pal->green[num1 + i]; var++;
+		*var = nact->ags.pal->blue[num1 + i];  var++;
 	}
 	DEBUG_COMMAND("PG %p,%d,%d:\n", var, num1, num2);
 }

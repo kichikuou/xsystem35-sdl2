@@ -80,16 +80,16 @@ static CG_TYPE check_cgformat(BYTE *data) {
 		return ALCG_QNT;
 	} else if (pms256_checkfmt(data)) {
 		return ALCG_PMS8;
-	} else if (pms64k_checkfmt(data) && nact->sys_world_depth >= 15) {
+	} else if (pms64k_checkfmt(data) && nact->ags.world_depth >= 15) {
 		return ALCG_PMS16;
-	} else if (bmp16m_checkfmt(data) && nact->sys_world_depth >= 15) {
+	} else if (bmp16m_checkfmt(data) && nact->ags.world_depth >= 15) {
 		return ALCG_BMP24;
 	} else if (bmp256_checkfmt(data)) {
 		return ALCG_BMP8;
 	} else if (vsp_checkfmt(data)) {
 		return ALCG_VSP;
 #ifdef HAVE_JPEG
-	} else if (jpeg_checkfmt(data) && nact->sys_world_depth >= 15) {
+	} else if (jpeg_checkfmt(data) && nact->ags.world_depth >= 15) {
 		return ALCG_JPEG;
 #endif
 	}

@@ -219,7 +219,7 @@ static void sys35_init() {
 		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
 	
 	sdl_setFullscreen(fs_on);
-	nact->noantialias = font_noantialias;
+	nact->ags.noantialias = font_noantialias;
 	ags_setAntialiasedStringMode(!font_noantialias);
 
 	sgenrand(getpid());
@@ -314,7 +314,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				fontname_tt[FONT_MINCHO] = argv[i + 1];
 			}
 		} else if (0 == strcmp(argv[i], "-noimagecursor")) {
-			nact->noimagecursor = TRUE;
+			nact->ags.noimagecursor = TRUE;
 		} else if (0 == strcmp(argv[i], "-debuglv")) {
 			if (argv[i + 1] != NULL) {
 				debuglv = argv[i + 1][0] - '0';
@@ -392,7 +392,7 @@ static void check_profile() {
 	param = get_profile("no_imagecursor");
 	if (param) {
 		if (0 == strcmp(param, "Yes")) {
-			nact->noimagecursor = TRUE;
+			nact->ags.noimagecursor = TRUE;
 		}
 	}
 	/* enable integer scaling */

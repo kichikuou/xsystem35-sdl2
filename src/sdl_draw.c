@@ -43,9 +43,9 @@
 #include "debugger.h"
 
 static void sdl_pal_check(void) {
-	if (nact->sys_pal_changed) {
-		nact->sys_pal_changed = FALSE;
-		sdl_setPalette(nact->sys_pal, 0, 256);
+	if (nact->ags.pal_changed) {
+		nact->ags.pal_changed = FALSE;
+		sdl_setPalette(nact->ags.pal, 0, 256);
 	}
 }
 

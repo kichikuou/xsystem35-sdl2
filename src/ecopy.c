@@ -48,8 +48,8 @@ static boolean ecp_cancel;
 static void eCopyUpdateArea(int sx, int sy, int w, int h, int dx, int dy) {
 	MyRectangle src = {sx, sy, w, h};
 	MyPoint dst = {
-		dx - nact->sys_view_area.x,
-		dy - nact->sys_view_area.y
+		dx - nact->ags.view_area.x,
+		dy - nact->ags.view_area.y
 	};
 	sdl_updateArea(&src, &dst);
 }
@@ -643,7 +643,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 
 	enum sdl_effect_type sdl_effect = from_nact_effect(sw);
 	if (sdl_effect != EFFECT_INVALID) {
-		SDL_Rect rect = { dx - nact->sys_view_area.x, dy - nact->sys_view_area.y, w, h };
+		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
 		struct sdl_effect *eff = sdl_effect_init(&rect, sdl_getDIB(), dx, dy, sdl_getDIB(), sx, sy, from_nact_effect(sw));
 		ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
 		sdl_effect_finish(eff);
@@ -660,8 +660,8 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 			break;
 		case NACT_EFFECT_MAGNIFY:
 			ags_scaledCopyArea(sx, sy, w, h,
-							   nact->sys_view_area.x, nact->sys_view_area.y,
-							   nact->sys_view_area.w, nact->sys_view_area.h, 0);
+							   nact->ags.view_area.x, nact->ags.view_area.y,
+							   nact->ags.view_area.w, nact->ags.view_area.h, 0);
 			ags_updateFull();
 			break;
 		default:
@@ -700,7 +700,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		}
 		{
 			MyRectangle r = {dx, dy, w, h}, update;
-			SDL_IntersectRect(&nact->sys_view_area, &r, &update);
+			SDL_IntersectRect(&nact->ags.view_area, &r, &update);
 			w = update.w;
 			h = update.h;
 		}
@@ -782,19 +782,19 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		break;
 		
 	case 1000:
-		if (nact->sys_world_depth != 8) return;
+		if (nact->ags.world_depth != 8) return;
 		ret = eCopyArea1000(sx, sy, w, h, dx, dy, opt, spCol);
 		break;
 	case 1001:
-		if (nact->sys_world_depth != 8) return;
+		if (nact->ags.world_depth != 8) return;
 		ret = eCopyArea1001(sx, sy, w, h, dx, dy, opt, spCol);
 		break;
 	case 2000:
-		if (nact->sys_world_depth == 8) return;
+		if (nact->ags.world_depth == 8) return;
 		ret = eCopyArea2000(sx, sy, w, h, dx, dy, opt);
 		break;
 	case 2001:
-		if (nact->sys_world_depth == 8) return;
+		if (nact->ags.world_depth == 8) return;
 		ret = eCopyArea2001(sx, sy, w, h, dx, dy, opt);
 		break;
 	default:

@@ -58,8 +58,8 @@ int sys_getMouseInfo(MyPoint *p, boolean is_dibgeo) {
 		p->x = _p.x;
 		p->y = _p.y;
 		if (is_dibgeo) {
-			p->x += nact->sys_view_area.x;
-			p->y += nact->sys_view_area.y;
+			p->x += nact->ags.view_area.x;
+			p->y += nact->ags.view_area.y;
 		}
 	}
 	return key;

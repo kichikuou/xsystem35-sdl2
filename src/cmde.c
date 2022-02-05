@@ -58,7 +58,7 @@ void commandEC() {
 	MyRectangle *r;
 	
 	if (num == 0) {
-		r = &nact->sys_view_area;
+		r = &nact->ags.view_area;
 		ags_fillRectangle(r->x, r->y, r->w, r->h, 0);
 		ags_updateArea(r->x, r->y, r->w, r->h);
 	} else {

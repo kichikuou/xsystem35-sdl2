@@ -100,7 +100,7 @@ typedef struct _agsevent agsevent_t;
 
 
 struct _ags {
-	Palette256 pal;             /* system palette */
+	Palette256 *pal;             /* system palette */
 	boolean   pal_changed;      /* system palette has changed */
 	
 	MyDimension world_size;     /* size of off-screen */
@@ -115,10 +115,11 @@ struct _ags {
 				       2: move to the geometory smoothly
 				    */
 
-	boolean fullscree_is_on;    /* if full-screen mode then true */
-	
 	agsurface_t *dib;           /* main surface */
 	void (*eventcb)(agsevent_t *e); /* deliver event */
+
+	boolean noantialias; /* antialias を使用しない */
+	boolean noimagecursor; /* リソースファイルのカーソルを読みこまない */
 };
 typedef struct _ags ags_t;
 

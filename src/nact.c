@@ -153,7 +153,7 @@ static void nact_callback() {
 }
 
 void nact_init() {
-	nact->sys_mouse_movesw = 2;
+	nact->ags.mouse_movesw = 2;
 	nact->is_quit = FALSE;
 	nact->is_va_animation = FALSE;
 	nact->is_cursor_animation = FALSE;

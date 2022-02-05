@@ -68,8 +68,8 @@ static void redraw() {
 	ags_fillRectangle(cursor_x, r.y, 2, r.h, fgcolor);  // cursor
 
 	// Dib geometry -> window geometry
-	r.x -= nact->sys_view_area.x;
-	r.y -= nact->sys_view_area.y;
+	r.x -= nact->ags.view_area.x;
+	r.y -= nact->ags.view_area.y;
 	SDL_SetTextInputRect(&r);
 
 	ags_updateArea(input->rect.x, input->rect.y, input->rect.w, input->rect.h);
@@ -137,8 +137,8 @@ boolean sdl_inputString(INPUTSTRING_PARAM *p) {
 	struct EditorState s = {
 		.params = p,
 		.rect = {
-			.x = p->x + nact->sys_view_area.x,  // window geometry -> dib geometry
-			.y = p->y + nact->sys_view_area.y,
+			.x = p->x + nact->ags.view_area.x,  // window geometry -> dib geometry
+			.y = p->y + nact->ags.view_area.y,
 			.w = p->h * p->max + XMARGIN * 2,
 			.h = p->h + YMARGIN * 2
 		},

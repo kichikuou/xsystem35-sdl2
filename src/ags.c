@@ -58,24 +58,24 @@ static void initPal(Palette256 *pal) {
 	pal->red[15]  = 255; pal->green[15]  = 255; pal->blue[15]  = 255;
 	pal->red[255] = 255; pal->green[255] = 255; pal->blue[255] = 255;
 	sdl_setPalette(pal, 0, 256);
-	nact->sys_pal_changed = TRUE;
+	nact->ags.pal_changed = TRUE;
 }
 
 boolean ags_check_param(int *x, int *y, int *w, int *h) {
-	if (*x >= nact->sys_world_size.width) {
-		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)\n", *x, nact->sys_world_size.width, sl_getPage(), sl_getIndex());
+	if (*x >= nact->ags.world_size.width) {
+		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)\n", *x, nact->ags.world_size.width, sl_getPage(), sl_getIndex());
 		return FALSE;
 	}
-	if (*y >= nact->sys_world_size.height) {
-		WARNING("Illegal Param y = %d (max=%d)\n", *y, nact->sys_world_size.height);
+	if (*y >= nact->ags.world_size.height) {
+		WARNING("Illegal Param y = %d (max=%d)\n", *y, nact->ags.world_size.height);
 		return FALSE;
 	}
 	
 	if (*x < 0) { *w += *x; *x = 0; }
 	if (*y < 0) { *h += *y; *y = 0; }
 	
-	if ((*x + *w) > nact->sys_world_size.width)  { *w = nact->sys_world_size.width  - *x;}
-	if ((*y + *h) > nact->sys_world_size.height) { *h = nact->sys_world_size.height - *y;}
+	if ((*x + *w) > nact->ags.world_size.width)  { *w = nact->ags.world_size.width  - *x;}
+	if ((*y + *h) > nact->ags.world_size.height) { *h = nact->ags.world_size.height - *y;}
 	
 	if (*w <= 0) return FALSE;
 	if (*h <= 0) return FALSE;
@@ -84,11 +84,11 @@ boolean ags_check_param(int *x, int *y, int *w, int *h) {
 }
 
 boolean ags_check_param_xy(int *x, int *y) {
-	if (*x >= nact->sys_world_size.width) {
+	if (*x >= nact->ags.world_size.width) {
 		WARNING("Illegal Param x = %d\n", *x);
 		return FALSE;
 	}
-	if (*y >= nact->sys_world_size.height) {
+	if (*y >= nact->ags.world_size.height) {
 		WARNING("Illegal Param y = %d\n", *y);
 		return FALSE;
 	}
@@ -100,15 +100,15 @@ boolean ags_check_param_xy(int *x, int *y) {
 }
 
 void ags_init() {
-	nact->sys_mouse_movesw = 2; /* 0:IZを無視, 1: 直接指定場所へ, 2: スムーズに指定場所に */
-	nact->sys_pal = &pal_256;
-	nact->sys_world_size.width  =  SYS35_DEFAULT_WIDTH;
-	nact->sys_world_size.height =  SYS35_DEFAULT_HEIGHT;
-	nact->sys_world_depth =  SYS35_DEFAULT_DEPTH;
-	nact->sys_view_area.x = 0;
-	nact->sys_view_area.y = 0;
-	nact->sys_view_area.w = SYS35_DEFAULT_WIDTH;
-	nact->sys_view_area.h = SYS35_DEFAULT_HEIGHT;
+	nact->ags.mouse_movesw = 2; /* 0:IZを無視, 1: 直接指定場所へ, 2: スムーズに指定場所に */
+	nact->ags.pal = &pal_256;
+	nact->ags.world_size.width  =  SYS35_DEFAULT_WIDTH;
+	nact->ags.world_size.height =  SYS35_DEFAULT_HEIGHT;
+	nact->ags.world_depth =  SYS35_DEFAULT_DEPTH;
+	nact->ags.view_area.x = 0;
+	nact->ags.view_area.y = 0;
+	nact->ags.view_area.w = SYS35_DEFAULT_WIDTH;
+	nact->ags.view_area.h = SYS35_DEFAULT_HEIGHT;
 	
 	sdl_Initilize();
 	font_init();
@@ -123,9 +123,9 @@ void ags_remove() {
 }
 
 void ags_setWorldSize(int width, int height, int depth) {
-	nact->sys_world_size.width  = width;
-	nact->sys_world_size.height = height;
-	nact->sys_world_depth       = depth;
+	nact->ags.world_size.width  = width;
+	nact->ags.world_size.height = height;
+	nact->ags.world_depth       = depth;
 
 	if (nact->ags.dib && nact->ags.dib->alpha) {
 		free(nact->ags.dib->alpha);
@@ -144,15 +144,15 @@ void ags_setWorldSize(int width, int height, int depth) {
 	
 	fade_outed = FALSE;  /* thanx tajiri@wizard */
 	
-	nact->sys_pal_changed = TRUE;
+	nact->ags.pal_changed = TRUE;
 }
 
 void ags_setViewArea(int x, int y, int width, int height) {
-	nact->sys_view_area.x = x;
-	nact->sys_view_area.y = y;
+	nact->ags.view_area.x = x;
+	nact->ags.view_area.y = y;
 	
-	nact->sys_view_area.w = width;
-	nact->sys_view_area.h = height;
+	nact->ags.view_area.w = width;
+	nact->ags.view_area.h = height;
 	sdl_setWindowSize(x, y, width, height);
 }
 
@@ -172,15 +172,15 @@ void ags_setWindowTitle(const char *src) {
 }
 
 void ags_getDIBInfo(DispInfo *info) {
-	info->width  = nact->sys_world_size.width;
-	info->height = nact->sys_world_size.height;
-	info->depth  = nact->sys_world_depth;
+	info->width  = nact->ags.world_size.width;
+	info->height = nact->ags.world_size.height;
+	info->depth  = nact->ags.world_depth;
 }
 
 void ags_getViewAreaInfo(DispInfo *info) {
 	sdl_getWindowInfo(info);
-	info->width  = nact->sys_view_area.w;
-	info->height = nact->sys_view_area.h;
+	info->width  = nact->ags.view_area.w;
+	info->height = nact->ags.view_area.h;
 }
 
 void ags_getWindowInfo(DispInfo *info) {
@@ -196,10 +196,10 @@ void ags_updateArea(int x, int y, int w, int h) {
 		return;
 
 	MyRectangle r = {x, y, w, h}, update;
-	if (SDL_IntersectRect(&nact->sys_view_area, &r, &update)) {
+	if (SDL_IntersectRect(&nact->ags.view_area, &r, &update)) {
 		MyPoint p = {
-			update.x - nact->sys_view_area.x,
-			update.y - nact->sys_view_area.y
+			update.x - nact->ags.view_area.x,
+			update.y - nact->ags.view_area.y
 		};
 		sdl_updateArea(&update, &p);
 	}
@@ -210,10 +210,10 @@ void ags_updateFull() {
 		return;
 
 	MyRectangle r = {
-		nact->sys_view_area.x,
-		nact->sys_view_area.y,
-		min(nact->sys_view_area.w, nact->sys_world_size.width),
-		min(nact->sys_view_area.h, nact->sys_world_size.height)
+		nact->ags.view_area.x,
+		nact->ags.view_area.y,
+		min(nact->ags.view_area.w, nact->ags.world_size.width),
+		min(nact->ags.view_area.h, nact->ags.world_size.height)
 	};
 	MyPoint p = {0, 0};
 	sdl_updateArea(&r, &p);
@@ -222,23 +222,23 @@ void ags_updateFull() {
 void ags_setPalettes(Palette256 *src_pal, int src, int dst, int cnt) {
 	int i;
 	for (i = 0; i < cnt; i++) {
-		nact->sys_pal->red  [dst + i] = src_pal->red  [src + i];
-		nact->sys_pal->green[dst + i] = src_pal->green[src + i];
-		nact->sys_pal->blue [dst + i] = src_pal->blue [src + i];
+		nact->ags.pal->red  [dst + i] = src_pal->red  [src + i];
+		nact->ags.pal->green[dst + i] = src_pal->green[src + i];
+		nact->ags.pal->blue [dst + i] = src_pal->blue [src + i];
 	}
-	nact->sys_pal_changed = TRUE;
+	nact->ags.pal_changed = TRUE;
 }
 
 void ags_setPalette(int no, int red, int green, int blue) {
-	nact->sys_pal->red[no]   = red;
-	nact->sys_pal->green[no] = green;
-	nact->sys_pal->blue[no]  = blue;
-	nact->sys_pal_changed = TRUE;
+	nact->ags.pal->red[no]   = red;
+	nact->ags.pal->green[no] = green;
+	nact->ags.pal->blue[no]  = blue;
+	nact->ags.pal_changed = TRUE;
 }
 
 void ags_setPaletteToSystem(int src, int cnt) {
 	if (!fade_outed) 
-		sdl_setPalette(nact->sys_pal, src, cnt);
+		sdl_setPalette(nact->ags.pal, src, cnt);
 }
 
 void ags_drawRectangle(int x, int y, int w, int h, int col) {
@@ -282,7 +282,7 @@ void ags_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int col) {
 }
 
 void ags_wrapColor(int x, int y, int w, int h, int p1, int p2) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param(&x, &y, &w, &h)) return;
 	
@@ -296,7 +296,7 @@ void ags_getPixel(int x, int y, Palette *cell) {
 }
 
 void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt) {
-	if (nact->sys_world_depth != 8) return;
+	if (nact->ags.world_depth != 8) return;
 	
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	
@@ -414,7 +414,7 @@ void ags_drawCg16bit(cgdata *cg, int x, int y) {
 }
 
 void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -423,7 +423,7 @@ void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy) {
 }
 
 void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int col) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -432,7 +432,7 @@ void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int 
 }
 
 void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -441,7 +441,7 @@ void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int l
 }
 
 void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -457,7 +457,7 @@ MyRectangle ags_floodFill(int x, int y, int col) {
 }
 
 void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -466,7 +466,7 @@ void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 }
 
 void ags_copyToAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -475,7 +475,7 @@ void ags_copyToAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COP
 }
 
 void ags_alpha_uppercut(int sx, int sy, int w, int h, int s, int d) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	
@@ -483,7 +483,7 @@ void ags_alpha_uppercut(int sx, int sy, int w, int h, int s, int d) {
 }
 
 void ags_alpha_lowercut(int sx, int sy, int w, int h, int s, int d) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 
@@ -491,7 +491,7 @@ void ags_alpha_lowercut(int sx, int sy, int w, int h, int s, int d) {
 }
 
 void ags_alpha_setLevel(int x, int y, int w, int h, int lv) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param(&x, &y, &w, &h)) return;
 
@@ -499,7 +499,7 @@ void ags_alpha_setLevel(int x, int y, int w, int h, int lv) {
 }
 
 void ags_alpha_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -508,7 +508,7 @@ void ags_alpha_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 }
 
 void ags_alpha_getPixel(int x, int y, int *pic) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param_xy(&x, &y)) {
 		*pic = 0;
@@ -548,10 +548,10 @@ void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step,
 static void fade(int duration, boolean cancelable, enum sdl_effect_type type) {
 	nact->waitcancel_key = 0;
 
-	SDL_Rect rect = {0, 0, nact->sys_view_area.w, nact->sys_view_area.h};
+	SDL_Rect rect = {0, 0, nact->ags.view_area.w, nact->ags.view_area.h};
 	struct sdl_effect *eff = sdl_effect_init(
 		&rect, NULL, 0, 0,
-		sdl_getDIB(), nact->sys_view_area.x, nact->sys_view_area.y,
+		sdl_getDIB(), nact->ags.view_area.x, nact->ags.view_area.y,
 		type);
 	ags_runEffect(duration, cancelable, (ags_EffectStepFunc)sdl_effect_step, eff);
 	sdl_effect_finish(eff);
@@ -563,10 +563,10 @@ void ags_fadeIn(int rate, boolean flag) {
 		duration = 0;
 	fade_outed = FALSE;
 
-	if (nact->sys_world_depth == 8)
-		sdl_setPalette(nact->sys_pal, 0, 256);
+	if (nact->ags.world_depth == 8)
+		sdl_setPalette(nact->ags.pal, 0, 256);
 
-	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_FADEIN : EFFECT_DITHERING_FADEIN);
+	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEIN : EFFECT_DITHERING_FADEIN);
 
 	sdl_updateAll();
 }
@@ -577,9 +577,9 @@ void ags_fadeOut(int rate, boolean flag) {
 		duration = 0;
 	fade_outed = TRUE;
 
-	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_FADEOUT : EFFECT_DITHERING_FADEOUT);
+	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEOUT : EFFECT_DITHERING_FADEOUT);
 
-	if (nact->sys_world_depth == 8) {
+	if (nact->ags.world_depth == 8) {
 		Palette256 pal;
 		memset(&pal, 0, sizeof(pal));
 		sdl_setPalette(&pal, 0, 256);
@@ -592,10 +592,10 @@ void ags_whiteIn(int rate, boolean flag) {
 		duration = 0;
 	fade_outed = FALSE;
 
-	if (nact->sys_world_depth == 8)
-		sdl_setPalette(nact->sys_pal, 0, 256);
+	if (nact->ags.world_depth == 8)
+		sdl_setPalette(nact->ags.pal, 0, 256);
 
-	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEIN);
+	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEIN);
 
 	sdl_updateAll();
 }
@@ -606,9 +606,9 @@ void ags_whiteOut(int rate, boolean flag) {
 		duration = 0;
 	fade_outed = TRUE;
 
-	fade(duration, flag, nact->sys_world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEOUT);
+	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEOUT);
 
-	if (nact->sys_world_depth == 8) {
+	if (nact->ags.world_depth == 8) {
 		Palette256 pal;
 		memset(&pal, 255, sizeof(pal));
 		sdl_setPalette(&pal, 0, 256);
@@ -620,12 +620,12 @@ void ags_setFont(int type, int size) {
 }
 
 void ags_setCursorType(int type) {
-	if (nact->noimagecursor && type >= 100) return;
+	if (nact->ags.noimagecursor && type >= 100) return;
 	sdl_setCursorType(type);
 }
 
 void ags_loadCursor(int p1,int p2) {
-	if (!nact->noimagecursor) {
+	if (!nact->ags.noimagecursor) {
 		cursor_load(p1, p2);
 	}
 }
@@ -638,11 +638,11 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 
 	/* DIB 座表系か Window 座表系か */
 	if (is_dibgeo) {
-		x -= nact->sys_view_area.x;
-		y -= nact->sys_view_area.y;
+		x -= nact->ags.view_area.x;
+		y -= nact->ags.view_area.y;
 	}
 	
-	switch(nact->sys_mouse_movesw) {
+	switch(nact->ags.mouse_movesw) {
 	case 0:
 		return;
 	case 1:
@@ -670,7 +670,7 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 
 EMSCRIPTEN_KEEPALIVE
 void ags_setAntialiasedStringMode(boolean on) {
-	if (!nact->noantialias) {
+	if (!nact->ags.noantialias) {
 		font_set_antialias(on);
 	}
 }
@@ -680,7 +680,7 @@ boolean ags_getAntialiasedStringMode() {
 }
 
 void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	if (nact->sys_world_depth == 8) return;
+	if (nact->ags.world_depth == 8) return;
 	
 	if (lv == 0) return;
 	
