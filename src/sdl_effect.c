@@ -120,6 +120,9 @@ static void effect_init(struct sdl_effect *eff, SDL_Rect *rect, SDL_Surface *old
 		eff->tx_new = SDL_CreateTextureFromSurface(sdl_renderer, new);
 		SDL_FreeSurface(new);
 	}
+
+	if (!eff->is_fullscreen)
+		sdl_updateScreen();  // Flush pending display changes.
 }
 
 static void effect_finish(struct sdl_effect *eff, bool present) {
