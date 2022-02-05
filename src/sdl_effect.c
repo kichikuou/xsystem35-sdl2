@@ -1407,13 +1407,6 @@ static SDL_Surface *create_surface(agsurface_t *as, int x, int y, int w, int h) 
 }
 
 struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type type) {
-	if (type == EFFECT_MAGNIFY) {
-		SDL_Rect old_rect = { view_x, view_y, view_w, view_h };
-		SDL_Rect new_rect = { nx, ny, rect->w, rect->h };
-		SDL_Surface *sf = create_surface(old, view_x, view_y, view_w, view_h);
-		return magnify_new(sf, &old_rect, &new_rect);
-	}
-
 	SDL_Surface *sf_old = create_surface(old, ox, oy, rect->w, rect->h);
 	SDL_Surface *sf_new = create_surface(new, nx, ny, rect->w, rect->h);
 
@@ -1482,6 +1475,11 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 		WARNING("Unknown effect %d\n", type);
 		return crossfade_new(rect, sf_old, sf_new);
 	}
+}
+
+struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
+	SDL_Surface *sf = create_surface(surface, view_rect->x, view_rect->y, view_rect->w, view_rect->h);
+	return magnify_new(sf, view_rect, target_rect);
 }
 
 void sdl_effect_step(struct sdl_effect *eff, double progress) {

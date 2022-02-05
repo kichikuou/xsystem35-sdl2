@@ -103,10 +103,10 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 }
 
 /* 全画面更新 */
-void sdl_updateAll(void) {
+void sdl_updateAll(MyRectangle *view_rect) {
 	SDL_Rect rect = {0, 0, view_w, view_h};
 	
-	SDL_BlitSurface(sdl_dib, &sdl_view, sdl_display, &rect);
+	SDL_BlitSurface(sdl_dib, view_rect, sdl_display, &rect);
 
 	sdl_dirty = TRUE;
 }

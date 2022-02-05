@@ -39,7 +39,7 @@ extern void sdl_Remove(void);
 
 /* ウィンド関係 */
 extern void sdl_setWorldSize(int width, int height, int depth);
-extern void sdl_setWindowSize(int x, int y, int w, int h);
+extern void sdl_setWindowSize(int w, int h);
 extern void sdl_setWindowTitle(char *name);
 extern void sdl_getWindowInfo(DispInfo *info);
 extern void sdl_setFullscreen(boolean on);
@@ -50,7 +50,7 @@ extern void sdl_setIntegerScaling(boolean enable);
 
 /* 画面更新 */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);
-extern void sdl_updateAll(void);
+extern void sdl_updateAll(MyRectangle *view_rect);
 extern void sdl_updateScreen(void);
 
 /* パレット関係 */
@@ -85,6 +85,7 @@ extern SDL_Surface *com2surface(agsurface_t *s);
 /* Effects */
 struct sdl_effect;
 struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type effect);
+struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect);
 void sdl_effect_step(struct sdl_effect *eff, double progress);
 void sdl_effect_finish(struct sdl_effect *eff);
 

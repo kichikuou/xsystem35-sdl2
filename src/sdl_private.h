@@ -42,7 +42,8 @@ struct sdl_private_data {
 	
 	agsurface_t *cimg;
 	
-	SDL_Rect       view;
+	int     view_w;
+	int     view_h;
 	
 	boolean dirty;
 
@@ -67,11 +68,8 @@ extern struct sdl_private_data *sdl_videodev;
 #define sdl_dib (sdl_videodev->dib)
 #define sdl_col (sdl_videodev->col)
 #define sdl_dibinfo (sdl_videodev->cimg)
-#define sdl_view (sdl_videodev->view)
-#define view_x (sdl_videodev->view.x)
-#define view_y (sdl_videodev->view.y)
-#define view_w (sdl_videodev->view.w)
-#define view_h (sdl_videodev->view.h)
+#define view_w (sdl_videodev->view_w)
+#define view_h (sdl_videodev->view_h)
 #define sdl_dirty (sdl_videodev->dirty)
 #define ms_active (sdl_videodev->ms_active)
 #define sdl_fs_on (sdl_videodev->fs_on)

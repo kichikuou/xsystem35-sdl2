@@ -150,10 +150,9 @@ void ags_setWorldSize(int width, int height, int depth) {
 void ags_setViewArea(int x, int y, int width, int height) {
 	nact->ags.view_area.x = x;
 	nact->ags.view_area.y = y;
-	
 	nact->ags.view_area.w = width;
 	nact->ags.view_area.h = height;
-	sdl_setWindowSize(x, y, width, height);
+	sdl_setWindowSize(width, height);
 }
 
 void ags_setWindowTitle(const char *src) {
@@ -568,7 +567,7 @@ void ags_fadeIn(int rate, boolean flag) {
 
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEIN : EFFECT_DITHERING_FADEIN);
 
-	sdl_updateAll();
+	sdl_updateAll(&nact->ags.view_area);
 }
 
 void ags_fadeOut(int rate, boolean flag) {
@@ -597,7 +596,7 @@ void ags_whiteIn(int rate, boolean flag) {
 
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEIN);
 
-	sdl_updateAll();
+	sdl_updateAll(&nact->ags.view_area);
 }
 
 void ags_whiteOut(int rate, boolean flag) {

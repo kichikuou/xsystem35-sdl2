@@ -641,6 +641,19 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	
 	nact->waitcancel_key = 0;
 
+	if (sw == NACT_EFFECT_MAGNIFY) {
+		SDL_Rect target_rect = { sx, sy, w, h };
+		struct sdl_effect *eff = sdl_effect_magnify_init(sdl_getDIB(), &nact->ags.view_area, &target_rect);
+		ags_runEffect(duration(sw, opt, NULL), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
+		sdl_effect_finish(eff);
+		// Actual copy.
+		ags_scaledCopyArea(
+			sx, sy, w, h,
+			nact->ags.view_area.x, nact->ags.view_area.y, nact->ags.view_area.w, nact->ags.view_area.h, 0);
+		ags_updateFull();
+		return;
+	}
+
 	enum sdl_effect_type sdl_effect = from_nact_effect(sw);
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
@@ -657,12 +670,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		case NACT_EFFECT_WHITEOUT:
 			sdl_fillRectangleRGB(dx, dy, w, h, 255, 255, 255);
 			ags_updateArea(dx, dy, w, h);
-			break;
-		case NACT_EFFECT_MAGNIFY:
-			ags_scaledCopyArea(sx, sy, w, h,
-							   nact->ags.view_area.x, nact->ags.view_area.y,
-							   nact->ags.view_area.w, nact->ags.view_area.h, 0);
-			ags_updateFull();
 			break;
 		default:
 			ags_copyArea(sx, sy, w, h, dx, dy);

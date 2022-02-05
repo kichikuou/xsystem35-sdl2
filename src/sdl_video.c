@@ -85,7 +85,7 @@ int sdl_Initilize(void) {
 	/* init cursor */
 	sdl_cursor_init();
 	
-	sdl_setWindowSize(0, 0, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
+	sdl_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 
 	sdl_shadow_init();
 	
@@ -241,10 +241,7 @@ void sdl_raiseWindow(void) {
 	SDL_RaiseWindow(sdl_window);
 }
 
-void sdl_setWindowSize(int x, int y, int w, int h) {
-	view_x = x;
-	view_y = y;
-
+void sdl_setWindowSize(int w, int h) {
 	if (w == view_w && h == view_h) return;
 
 	view_w = w;
