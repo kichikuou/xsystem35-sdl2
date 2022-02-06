@@ -31,8 +31,18 @@
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
+	case NACT_EFFECT_WIPE_IN:           return EFFECT_WIPE_IN;
+	case NACT_EFFECT_WIPE_OUT:          return EFFECT_WIPE_OUT;
 	case NACT_EFFECT_ZOOM_IN:           return EFFECT_ZOOM_IN;
 	case NACT_EFFECT_BLIND_DOWN:        return EFFECT_BLIND_DOWN;
+	case NACT_EFFECT_WIPE_LR:           return EFFECT_WIPE_LR;
+	case NACT_EFFECT_WIPE_RL:           return EFFECT_WIPE_RL;
+	case NACT_EFFECT_WIPE_DOWN:         return EFFECT_WIPE_DOWN;
+	case NACT_EFFECT_WIPE_UP:           return EFFECT_WIPE_UP;
+	case NACT_EFFECT_WIPE_OUT_V:        return EFFECT_WIPE_OUT_V;
+	case NACT_EFFECT_WIPE_IN_V:         return EFFECT_WIPE_IN_V;
+	case NACT_EFFECT_WIPE_OUT_H:        return EFFECT_WIPE_OUT_H;
+	case NACT_EFFECT_WIPE_IN_H:         return EFFECT_WIPE_IN_H;
 	case NACT_EFFECT_MOSAIC:            return EFFECT_MOSAIC;
 	case NACT_EFFECT_FADEIN:            return EFFECT_FADEIN;
 	case NACT_EFFECT_WHITEIN:           return EFFECT_WHITEIN;
@@ -547,6 +557,80 @@ static void dithering_fade_free(struct sdl_effect *eff) {
 	else if (eff->type == EFFECT_DITHERING_WHITEOUT)
 		SDL_FillRect(sdl_display, &eff->dst_rect, SDL_MapRGB(sdl_display->format, 255, 255, 255));
 	effect_finish(eff, false);
+	free(eff);
+}
+
+// EFFECT_WIPE_*
+
+static void wipe_step(struct sdl_effect *eff, double progress);
+static void wipe_free(struct sdl_effect *eff);
+
+static struct sdl_effect *wipe_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(eff, rect, old, new, type);
+	eff->step = wipe_step;
+	eff->finish = wipe_free;
+	return eff;
+}
+
+static void wipe_step(struct sdl_effect *eff, double progress) {
+	SDL_Texture *bg = eff->tx_old;
+	SDL_Texture *fg = eff->tx_new;
+	if (eff->type == EFFECT_WIPE_RL ||
+		eff->type == EFFECT_WIPE_UP ||
+		eff->type == EFFECT_WIPE_IN ||
+		eff->type == EFFECT_WIPE_IN_V ||
+		eff->type == EFFECT_WIPE_IN_H) {
+		bg = eff->tx_new;
+		fg = eff->tx_old;
+		progress = 1 - progress;
+	}
+
+	SDL_RenderCopy(sdl_renderer, bg, NULL, &eff->dst_rect);
+
+	SDL_Rect sr = { 0, 0, eff->dst_rect.w, eff->dst_rect.h };
+	SDL_Rect dr = eff->dst_rect;
+	switch (eff->type) {
+	case EFFECT_WIPE_LR:
+	case EFFECT_WIPE_RL:
+		sr.w *= progress;
+		dr.w = sr.w;
+		break;
+	case EFFECT_WIPE_DOWN:
+	case EFFECT_WIPE_UP:
+		sr.h *= progress;
+		dr.h = sr.h;
+		break;
+	case EFFECT_WIPE_OUT:
+	case EFFECT_WIPE_IN:
+	case EFFECT_WIPE_OUT_V:
+	case EFFECT_WIPE_IN_V:
+		sr.w *= progress;
+		sr.x = (dr.w - sr.w) / 2;
+		dr.w = sr.w;
+		dr.x += sr.x;
+		if (eff->type == EFFECT_WIPE_OUT_V || eff->type == EFFECT_WIPE_IN_V)
+			break;
+		// fallthrough
+	case EFFECT_WIPE_OUT_H:
+	case EFFECT_WIPE_IN_H:
+		sr.h *= progress;
+		sr.y = (dr.h - sr.h) / 2;
+		dr.h = sr.h;
+		dr.y += sr.y;
+		break;
+	default:
+		assert(!"Cannot happen");
+	}
+	SDL_RenderCopy(sdl_renderer, fg, &sr, &dr);
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void wipe_free(struct sdl_effect *eff) {
+	effect_finish(eff, true);
 	free(eff);
 }
 
@@ -1435,6 +1519,17 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_DITHERING_WHITEOUT:
 	case EFFECT_DITHERING_WHITEIN:
 		return dithering_fade_new(rect, sf_old, sf_new, type);
+	case EFFECT_WIPE_IN:
+	case EFFECT_WIPE_OUT:
+	case EFFECT_WIPE_LR:
+	case EFFECT_WIPE_RL:
+	case EFFECT_WIPE_DOWN:
+	case EFFECT_WIPE_UP:
+	case EFFECT_WIPE_OUT_V:
+	case EFFECT_WIPE_IN_V:
+	case EFFECT_WIPE_OUT_H:
+	case EFFECT_WIPE_IN_H:
+		return wipe_new(rect, sf_old, sf_new, type);
 	case EFFECT_BLIND_DOWN:
 	case EFFECT_BLIND_UP:
 	case EFFECT_BLIND_LR:

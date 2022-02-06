@@ -176,38 +176,6 @@ static int eCopyArea6(int dx, int dy, int w, int h, int opt) {
 	return key;
 }
 
-#define E7_8X 24
-static int eCopyArea7(int dx, int dy, int w, int h, int opt) {
-	int i, key = 0, cnt;
-	int waitcnt = opt == 0 ? 40 : opt;
-
-	cnt = sdl_getTicks();
-	for (i = 0; i < (w/2 - E7_8X+1); i+=E7_8X) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, dy+i*h/w, w, E7_8X*h/w, dx, dy+i*h/w);
-		eCopyUpdateArea(dx, dy+(h-(i+E7_8X)*h/w), w, E7_8X*h/w, dx, dy+(h-(i+E7_8X)*h/w));
-		eCopyUpdateArea(dx+i, dy, E7_8X, h, dx+i, dy);
-		eCopyUpdateArea(dx+(w-i-E7_8X), dy, E7_8X, h, dx+(w-i-E7_8X), dy);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea8(int dx, int dy, int w, int h, int opt) {
-	int i, key = 0, cnt;
-	int waitcnt = opt == 0 ? 40 : opt;
-
-	cnt = sdl_getTicks();
-	for (i = E7_8X; i < (w/2 -E7_8X+1); i+=E7_8X) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx+ w/2 - i , dy + h/2 - i*h/w, 2*i, 2*i*h/w ,dx+ w/2-i, dy + h/2 - i*h/w);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
 static int eCopyArea9(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int i, x, y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 80 : opt;
@@ -228,62 +196,6 @@ static int eCopyArea9(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	}
 	sdl_copyArea(sx, sy, w, h, dx, dy);
 	ags_updateArea(dx, dy, w, h);
-	return key;
-}
-
-static int eCopyArea12(int dx, int dy, int w, int h, int opt) {
-	int x, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	
-	cnt = sdl_getTicks();
-	for (x = 0; x < (w -7); x += 8) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx + x, dy, 8, h, dx + x, dy);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea13(int dx, int dy, int w, int h, int opt) {
-	int x, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	
-	cnt = sdl_getTicks();
-	for (x = (w -8); x > 8; x -= 8) {
-		cnt +=waitcnt;
-		eCopyUpdateArea(dx + x, dy, 8, h, dx + x, dy);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea14(int dx, int dy, int w, int h, int opt) {
-	int y, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	
-	cnt = sdl_getTicks();
-	for (y = 0; y < (h -7); y += 8) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, dy + y, w, 8, dx, dy + y);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea15(int dx, int dy, int w, int h, int opt) {
-	int y, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	
-	cnt = sdl_getTicks();
-	for (y = (h -8); y > 8; y -= 8) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, dy + y, w, 8, dx, dy + y);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
 	return key;
 }
 
@@ -315,66 +227,6 @@ static int eCopyArea17(int dx, int dy, int w, int h, int opt) {
 		for (y = 0; y < (h - E17X + 1); y += E17X) {
 			eCopyUpdateArea(dx, dy + y + i, w, 1, dx, dy + y + i);
 		}
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea18(int dx, int dy, int w, int h, int opt) {
-	int x, key = 0, cnt;
-	int waitcnt = opt == 0 ? 30 : opt;
-
-	cnt = sdl_getTicks();
-	for (x = 0; x < (w/2 -7); x += 8) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx + w/2 - x - 8, dy, 8, h, dx + w/2 - x - 8, dy);
-		eCopyUpdateArea(dx + w/2 + x    , dy, 8, h, dx + w/2 + x    , dy);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea19(int dx, int dy, int w, int h, int opt) {
-	int x, key = 0, cnt;
-	int waitcnt = opt == 0 ? 30 : opt;
-
-	cnt = sdl_getTicks();
-	for (x = 0; x < (w/2 -7); x += 8) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx + x,         dy, 8, h, dx + x,         dy);
-		eCopyUpdateArea(dx + w - x - 8, dy, 8, h, dx + w - x - 8, dy);
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea20(int dx, int dy, int w, int h, int opt) {
-	int y, key = 0, cnt;
-	int waitcnt = opt == 0 ? 30 : opt;
-
-	cnt = sdl_getTicks();
-	for (y = 0; y < (h/2 -7); y += 8) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, dy + h/2 - y - 8, w, 8, dx, dy + h/2 - y - 8);
-		eCopyUpdateArea(dx, dy + h/2 + y    , w, 8, dx, dy + h/2 + y    );
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea21(int dx, int dy, int w, int h, int opt) {
-	int y, key = 0, cnt;
-	int waitcnt = opt == 0 ? 30 : opt;
-
-	cnt = sdl_getTicks();
-	for (y = 0; y < (h/2 -7); y += 8) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, dy + y        , w, 8, dx, dy + y);
-		eCopyUpdateArea(dx, dy + h - y - 8, w, 8, dx, dy + h - y - 8);
 		EC_WAIT;
 	}
 	eCopyUpdateArea(dx, dy, w, h, dx, dy);
@@ -588,6 +440,21 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	case NACT_EFFECT_BLIND_LR:
 	case NACT_EFFECT_BLIND_RL:
 		return (opt ? opt : 40) * (rect->w / 16 + 16);
+	case NACT_EFFECT_WIPE_IN:
+	case NACT_EFFECT_WIPE_OUT:
+		return (opt ? opt : 40) * (rect->w / 48);
+	case NACT_EFFECT_WIPE_LR:
+	case NACT_EFFECT_WIPE_RL:
+		return (opt ? opt : 20) * rect->w / 8;
+	case NACT_EFFECT_WIPE_DOWN:
+	case NACT_EFFECT_WIPE_UP:
+		return (opt ? opt : 20) * rect->h / 8;
+	case NACT_EFFECT_WIPE_OUT_V:
+	case NACT_EFFECT_WIPE_IN_V:
+		return (opt ? opt : 30) * rect->w / 16;
+	case NACT_EFFECT_WIPE_OUT_H:
+	case NACT_EFFECT_WIPE_IN_H:
+		return (opt ? opt : 30) * rect->h / 16;
 	case NACT_EFFECT_MOSAIC:
 		return (opt ? opt : 100) * 8;
 	case NACT_EFFECT_FADEIN:
@@ -687,18 +554,8 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 3:
 	case 4:
 	case 6:
-	case 7:
-	case 8:
-	case 12:
-	case 13:
-	case 14:
-	case 15:
 	case 16:
 	case 17:
-	case 18:
-	case 19:
-	case 20:
-	case 21:
 	case 54:
 		if (spCol == -1) {
 			ags_copyArea(sx, sy, w, h, dx, dy);
@@ -736,44 +593,14 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 6:
 		ret = eCopyArea6(dx, dy, w, h, opt);
 		break;
-	case 7:
-		ret = eCopyArea7(dx, dy, w, h, opt);
-		break;
-	case 8:
-		ret = eCopyArea8(dx, dy, w, h, opt);
-		break;
 	case 9:
 		ret = eCopyArea9(sx, sy, w, h, dx, dy, opt);
-		break;
-	case 12:
-		ret = eCopyArea12(dx, dy, w, h, opt);
-		break;
-	case 13:
-		ret = eCopyArea13(dx, dy, w, h, opt);
-		break;
-	case 14:
-		ret = eCopyArea14(dx, dy, w, h, opt);
-		break;
-	case 15:
-		ret = eCopyArea15(dx, dy, w, h, opt);
 		break;
 	case 16:
 		ret = eCopyArea16(dx, dy, w, h, opt);
 		break;
 	case 17:
 		ret = eCopyArea17(dx, dy, w, h, opt);
-		break;
-	case 18:
-		ret = eCopyArea18(dx, dy, w, h, opt);
-		break;
- 	case 19:
-		ret = eCopyArea19(dx, dy, w, h, opt);
-		break;
- 	case 20:
-		ret = eCopyArea20(dx, dy, w, h, opt);
-		break;
- 	case 21:
-		ret = eCopyArea21(dx, dy, w, h, opt);
 		break;
 	case 22:
 		ret = eCopyArea22(sx, sy, w, h, dx, dy, opt);
