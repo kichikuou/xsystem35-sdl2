@@ -99,7 +99,7 @@ boolean ags_check_param_xy(int *x, int *y) {
 	return TRUE;
 }
 
-void ags_init() {
+void ags_init(const char *videodev) {
 	nact->ags.mouse_movesw = 2; /* 0:IZを無視, 1: 直接指定場所へ, 2: スムーズに指定場所に */
 	nact->ags.pal = &pal_256;
 	nact->ags.world_size.width  =  SYS35_DEFAULT_WIDTH;
@@ -110,7 +110,7 @@ void ags_init() {
 	nact->ags.view_area.w = SYS35_DEFAULT_WIDTH;
 	nact->ags.view_area.h = SYS35_DEFAULT_HEIGHT;
 	
-	sdl_Initilize();
+	sdl_Initialize(videodev);
 	font_init();
 
 	initPal(&pal_256);
