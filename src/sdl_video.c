@@ -36,7 +36,7 @@
 #include "xsystem35.h"
 #include "image.h"
 
-static void window_init(const char *driver_name);
+static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
 
 struct sdl_private_data *sdl_videodev;
@@ -73,10 +73,10 @@ static boolean joy_open(void) {
 }
 
 /* SDL の初期化 */
-int sdl_Initialize(const char *videodev) {
+int sdl_Initialize(const char *render_driver) {
 	sdl_videodev = calloc(1, sizeof(struct sdl_private_data));
 
-	window_init(videodev);
+	window_init(render_driver);
 	
 	/* offscreen Pixmap */
 	makeDIB(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SYS35_DEFAULT_DEPTH);
@@ -126,26 +126,9 @@ void sdl_setWindowTitle(char *name) {
 }
 #endif
 
-static int rendering_driver_index(const char *driver_name) {
-	if (!driver_name)
-		return -1;
-
-	SDL_RendererInfo info;
-	int nr_devs = SDL_GetNumRenderDrivers();
-	for (int i = 0; i < nr_devs; i++) {
-		if (!SDL_GetRenderDriverInfo(i, &info) && !strcmp(info.name, driver_name))
-			return i;
-	}
-
-	fprintf(stderr, "Unknown video driver \"%s\". Valid names are:\n", driver_name);
-	for (int i = 0; i < nr_devs; i++) {
-		if (SDL_GetRenderDriverInfo(i, &info) == 0)
-			fprintf(stderr, "  %s\n", info.name);
-	}
-	exit(1);
-}
-
-static void window_init(const char *driver_name) {
+static void window_init(const char *render_driver) {
+	if (render_driver)
+		SDL_SetHint(SDL_HINT_RENDER_DRIVER, render_driver);
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
@@ -168,7 +151,7 @@ static void window_init(const char *driver_name) {
 								  SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
 								  flags);
-	sdl_renderer = SDL_CreateRenderer(sdl_window, rendering_driver_index(driver_name), 0);
+	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderSetIntegerScale(sdl_renderer, integer_scaling);
 }

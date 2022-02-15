@@ -126,7 +126,7 @@ typedef struct _ags ags_t;
 
 
 /* 初期化関係 */
-extern void ags_init(const char *videodev);
+extern void ags_init(const char *render_driver);
 extern void ags_remove();
 
 /* ウィンド関係 */

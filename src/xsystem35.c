@@ -80,7 +80,7 @@ static void    sys35_remove();
 static void    sys35_ParseOption(int *argc, char **argv);
 static void    check_profile();
 
-static char *videodev = NULL;
+static char *render_driver = NULL;
 
 /* for debugging */
 static int debuglv = DEBUGLEVEL;
@@ -114,7 +114,7 @@ static void sys35_usage(boolean verbose) {
 	puts("Usage: xsystem35 [OPTIONS]\n");
 	puts("OPTIONS");
 	puts(" -gamefile file : set game resource file to 'file'");
-	puts(" -devvideo device : set video device name to 'device'");
+	puts(" -renderer name : set rendering driver name to 'name'");
 	puts(" -devcd device  : set cdrom device name to 'device'");
 	puts(" -devmidi device: set midi device name to 'device'");
 	
@@ -212,7 +212,7 @@ static void sys35_init() {
 
 	v_initVars();
 	
-	ags_init(videodev);
+	ags_init(render_driver);
 
 	for (i = 0; i < FONTTYPEMAX; i++)
 		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
@@ -278,8 +278,8 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			debugger_mode = DEBUGGER_CUI;
 		} else if (0 == strcmp(argv[i], "-debug_dap")) {
 			debugger_mode = DEBUGGER_DAP;
-		} else if (0 == strcmp(argv[i], "-devvideo")) {
-			videodev = argv[i + 1];
+		} else if (0 == strcmp(argv[i], "-renderer")) {
+			render_driver = argv[i + 1];
 		} else if (0 == strcmp(argv[i], "-devcd")) {
 			if (argv[i + 1] != NULL) {
 				cd_set_devicename(argv[i + 1]);
@@ -361,10 +361,10 @@ static void check_profile() {
 		audio_buffer_size = atoi(param);
 	}
 
-	/* Video device */
-	param = get_profile("video_device");
+	/* Rendering driver */
+	param = get_profile("render_driver");
 	if (param) {
-		videodev = param;
+		render_driver = param;
 	}
 
 	/* CD-ROM device name の設定 */

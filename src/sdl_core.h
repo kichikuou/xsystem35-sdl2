@@ -34,7 +34,7 @@
 struct inputstring_param;
 
 /* 初期化関係 */
-extern int sdl_Initialize(const char *videodev);
+extern int sdl_Initialize(const char *render_driver);
 extern void sdl_Remove(void);
 
 /* ウィンド関係 */
