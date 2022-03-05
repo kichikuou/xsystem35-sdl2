@@ -29,6 +29,7 @@
 #include "system.h"
 #include "nact.h"
 #include "ags.h"
+#include "font.h"
 #include "surface.h"
 #include "ngraph.h"
 
@@ -42,6 +43,13 @@ static int fsize;  // フォントの大きさ
  * @param size: フォントサイズ
  */
 int dt_setfont(int type, int size) {
+#ifdef __EMSCRIPTEN__
+	if (type == FONT_MINCHO) {
+		if (load_mincho_font() != OK)
+			type = FONT_GOTHIC;
+	}
+#endif
+
 	ftype = type;
 	fsize = size;
 	return OK;
