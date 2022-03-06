@@ -3,37 +3,34 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       matrix:
-        mingw: ["MINGW32", "MINGW64"]
         include:
-          - mingw: "MINGW32"
-            package: "mingw-w64-i686"
-            installer: "xsystem35-32bit"
-          - mingw: "MINGW64"
-            package: "mingw-w64-x86_64"
-            installer: "xsystem35-64bit"
+          - { sys: MINGW32, installer: "xsystem35-32bit" }
+          - { sys: MINGW64, installer: "xsystem35-64bit" }
     defaults:
       run:
-        shell: bash.exe --login -eo pipefail "{0}"
-    env:
-      MSYSTEM: ${{ matrix.mingw }}
-      CHERE_INVOKING: 1
-    name: MSYS2 ${{ matrix.mingw }}
+        shell: msys2 {0}
+    name: MSYS2 ${{ matrix.sys }}
     steps:
 
-    - name: Set up shell
-      run: echo "C:\msys64\usr\bin\" >> $env:GITHUB_PATH
-      shell: pwsh
-
-    - name: Print system version
-      run: |
-        uname
-        echo PATH: $PATH
-
-    - name: Install Deps
-      run: pacman -S --noconfirm ${{ matrix.package }}-SDL2 ${{ matrix.package }}-SDL2_ttf ${{ matrix.package }}-SDL2_mixer ${{ matrix.package }}-libjpeg-turbo ${{ matrix.package }}-libwebp ${{ matrix.package }}-cjson ${{ matrix.package }}-nsis ${{ matrix.package }}-ntldd-git
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.sys }}
+        pacboy: >-
+          gcc:p
+          cmake:p
+          ninja:p
+          SDL2:p
+          SDL2_ttf:p
+          SDL2_mixer:p
+          libjpeg-turbo:p
+          libwebp:p
+          cjson:p
+          nsis:p
+          ntldd-git:p
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -42,8 +39,8 @@ jobs:
       run: |
         mkdir -p out/release
         cd out/release
-        cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release ../../
-        make
+        cmake -G"Ninja" -DCMAKE_BUILD_TYPE=Release ../../
+        ninja
 
     - name: Test
       run: ctest --output-on-failure
