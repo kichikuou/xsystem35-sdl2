@@ -17,7 +17,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   SDL_mixer
   GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-  GIT_TAG 20433729fb318f7b6f773a42ffa410114cb067f2
+  GIT_TAG 6845d9f3cb3f35542f1ec7e74dba6b30bf968959
 )
 
 # Compilation of SDL and companion libraries
