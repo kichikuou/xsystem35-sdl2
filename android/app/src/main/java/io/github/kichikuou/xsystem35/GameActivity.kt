@@ -169,7 +169,7 @@ private class CddaPlayer(private val playlistPath: File) {
     private var playerPaused = false
 
     fun start(track: Int, loop: Boolean) {
-        val f = playlist.elementAtOrNull(track)
+        val f = playlist.elementAtOrNull(track - 1)
         if (f.isNullOrEmpty()) {
             Log.w("cddaStart", "No playlist entry for track $track")
             return

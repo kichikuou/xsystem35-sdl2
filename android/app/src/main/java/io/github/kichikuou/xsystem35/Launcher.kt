@@ -47,7 +47,8 @@ private const val FAILURE = 2
 class Launcher private constructor(private val rootDir: File) {
     companion object {
         const val TITLE_FILE = "title.txt"
-        const val PLAYLIST_FILE = "playlist.txt"
+        const val PLAYLIST_FILE = "playlist2.txt"
+        const val OLD_PLAYLIST_FILE = "playlist.txt"
 
         fun getInstance(rootDir: File): Launcher {
             if (gLauncher == null) {
@@ -120,6 +121,7 @@ class Launcher private constructor(private val rootDir: File) {
                 val titleFile = File(path, TITLE_FILE)
                 val title = titleFile.readText()
                 games.add(Entry(path, title, titleFile.lastModified()))
+                migratePlaylist(path)
             } catch (e: IOException) {
                 // Incomplete game installation. Delete it.
                 path.deleteRecursively()
@@ -209,6 +211,20 @@ class Launcher private constructor(private val rootDir: File) {
         }
     }
 
+    // Xsystem35-sdl2 <=2.2.0 had a bug where playlist had an extra empty line at
+    // the beginning of the file. This migrates playlist.txt created by an old
+    // version of xsystem35-sdl2 to playlist2.txt.
+    private fun migratePlaylist(dir: File) {
+        val oldPlaylist = File(dir, OLD_PLAYLIST_FILE)
+        if (!oldPlaylist.exists())
+            return
+        var tracks = oldPlaylist.readLines()
+        if (!tracks.isEmpty())
+            tracks = tracks.subList(1, tracks.size)
+        File(dir, PLAYLIST_FILE).writeText(tracks.joinToString("\n"))
+        oldPlaylist.delete()
+    }
+
     // A helper class which generates xsystem35.gr and playlist.txt in the game root directory.
     private class GameConfigWriter {
         private val grb = StringBuilder()
@@ -252,8 +268,8 @@ class Launcher private constructor(private val rootDir: File) {
             }
             audioRegex.matchEntire(name)?.let {
                 val track = it.groupValues[1].toInt()
-                if (track < audioFiles.size)
-                    audioFiles[track] = path
+                if (0 < track && track <= audioFiles.size)
+                    audioFiles[track - 1] = path
             }
         }
 
