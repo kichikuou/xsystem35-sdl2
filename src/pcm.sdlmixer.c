@@ -40,6 +40,8 @@
 #include "LittleEndian.h"
 #include "mmap.h"
 
+#define SAMPLE_RATE 44100
+#define BYTES_PER_SAMPLE 4
 #define DEFAULT_AUDIO_BUFFER_SIZE 2048
 
 struct _pcmobj {
@@ -137,7 +139,7 @@ int muspcm_init(int audio_buffer_size) {
 		audio_buffer_size = DEFAULT_AUDIO_BUFFER_SIZE;
 
 	Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
-	if (Mix_OpenAudio(44100, AUDIO_S16LSB, 2, audio_buffer_size) < 0)
+	if (Mix_OpenAudio(SAMPLE_RATE, AUDIO_S16LSB, 2, audio_buffer_size) < 0)
 		return NG;
 	load_wai();
 	return OK;
@@ -288,7 +290,7 @@ int muspcm_getpos(int slot) {
 	
 	if (!obj->playing) return 0;
 	
-	long len = obj->chunk->alen * 1000 / (44100 * 4);
+	long len = obj->chunk->alen * 1000LL / (SAMPLE_RATE * BYTES_PER_SAMPLE);
 	int pos = sdl_getTicks() - obj->start_time;
 	if (pos == 0)
 		pos = 1;  // because 0 means "not playing"
@@ -316,7 +318,7 @@ int muspcm_getwavelen(int slot) {
 	obj = pcmobj[slot];
 	if (obj == NULL) return 0;
 	
-	long len = obj->chunk->alen * 1000 / (44100 * 4);
+	long len = obj->chunk->alen * 1000LL / (SAMPLE_RATE * BYTES_PER_SAMPLE);
 
 	return len > 65535 ? 65535 : len;
 }
