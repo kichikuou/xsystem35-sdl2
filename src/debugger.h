@@ -43,7 +43,7 @@ extern DebuggerState dbg_state;
 #define dbg_trapped() (dbg_state != DBG_RUNNING)
 void dbg_init(const char *symbols_path, boolean use_dap);
 void dbg_quit(bool restart);
-void dbg_main(void);
+void dbg_main(int bp_no);
 void dbg_onsleep(void);
 BYTE dbg_handle_breakpoint(int page, int addr);
 boolean dbg_console_vprintf(int lv, const char *format, va_list ap);
@@ -53,7 +53,7 @@ boolean dbg_console_vprintf(int lv, const char *format, va_list ap);
 #define dbg_trapped() false
 #define dbg_init(symbols_path, use_dap)
 #define dbg_quit(restart)
-#define dbg_main()
+#define dbg_main(bp_no)
 #define dbg_onsleep()
 #define dbg_handle_breakpoint(page, addr) BREAKPOINT
 #define dbg_console_vprintf(lv, format, ap) false

@@ -25,12 +25,17 @@
 
 extern struct debug_symbols *symbols;
 
-typedef struct breakpoint {
-	struct breakpoint *next;
-	int no;
+typedef struct {
 	int page;
 	int addr;
+	int refcnt;
 	BYTE restore_op;
+} PhysicalBreakpoint;
+
+typedef struct breakpoint {
+	struct breakpoint *next;
+	PhysicalBreakpoint *phys;
+	int no;
 	char *condition;
 	dridata *dfile;  // keeps modified scenario page alive in the cache
 } Breakpoint;
@@ -51,7 +56,7 @@ typedef struct {
 typedef struct {
 	void (*init)(const char *symbols_path);
 	void (*quit)(bool restart);
-	void (*repl)(void);
+	void (*repl)(int bp_no);
 	void (*onsleep)(void);
 	void (*console_output)(int lv, const char *output);
 } DebuggerImpl;
@@ -60,7 +65,6 @@ extern DebuggerImpl dbg_cui_impl;
 extern DebuggerImpl dbg_dap_impl;
 extern DebuggerImpl *dbg_impl;
 
-Breakpoint *dbg_find_breakpoint(int page, int addr);
 Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal);
 boolean dbg_delete_breakpoint(int no);
 void dbg_delete_breakpoints_in_page(int page);

@@ -148,11 +148,7 @@ static CommandResult cmd_break(void) {
 	}
 	Breakpoint *bp = dbg_set_breakpoint(page, addr, false);
 	if (!bp) {
-		Breakpoint *bp = dbg_find_breakpoint(page, addr);
-		if (bp)
-			printf("Breakpoint %d is already set at %d:0x%x.\n", bp->no, page, addr);
-		else
-			printf("Failed to set breakpoint at %d:0x%x: invalid address\n", page, addr);
+		printf("Failed to set breakpoint at %d:0x%x: invalid address\n", page, addr);
 		return CONTINUE_REPL;
 	}
 
@@ -170,7 +166,7 @@ static CommandResult cmd_break(void) {
 		}
 	}
 
-	printf("Breakpoint %d at %s\n", bp->no, format_address(bp->page, bp->addr));
+	printf("Breakpoint %d at %s\n", bp->no, format_address(bp->phys->page, bp->phys->addr));
 	return CONTINUE_REPL;
 }
 
@@ -413,12 +409,9 @@ static CommandResult cmd_help(void) {
 	return CONTINUE_REPL;
 }
 
-static void dbg_cui_repl(void) {
-	if (dbg_state == DBG_STOPPED_BREAKPOINT) {
-		Breakpoint *bp = dbg_find_breakpoint(nact->current_page, nact->current_addr);
-		if (bp)
-			printf("Breakpoint %d\n", bp->no);
-	}
+static void dbg_cui_repl(int bp_no) {
+	if (dbg_state == DBG_STOPPED_BREAKPOINT && bp_no)
+		printf("Breakpoint %d\n", bp_no);
 	if (!print_source_line(nact->current_page, nact->current_addr))
 		printf("Stopped at %s\n", format_address(nact->current_page, nact->current_addr));
 	dbg_state = DBG_RUNNING;
@@ -445,7 +438,7 @@ static void dbg_cui_repl(void) {
 
 static void dbg_cui_onsleep(void) {
 	if (dbg_state == DBG_STOPPED_INTERRUPT)
-		dbg_main();
+		dbg_main(0);
 }
 
 DebuggerImpl dbg_cui_impl = {

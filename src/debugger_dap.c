@@ -596,7 +596,7 @@ static void dbg_dap_quit(bool restart) {
 		exit(0); // The front end will restart xsystem35, so we can just exit.
 }
 
-static void dbg_dap_repl(void) {
+static void dbg_dap_repl(int bp_no) {
 	emit_stopped_event();
 	dbg_state = DBG_RUNNING;
 
@@ -617,7 +617,7 @@ static void dbg_dap_onsleep(void) {
 		handle_message(msg);
 	}
 	if (dbg_state == DBG_STOPPED_INTERRUPT || dbg_state == DBG_STOPPED_EXCEPTION)
-		dbg_main();
+		dbg_main(0);
 }
 
 DebuggerImpl dbg_dap_impl = {

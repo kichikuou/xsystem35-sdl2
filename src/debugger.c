@@ -268,10 +268,10 @@ boolean dbg_evaluate(const char *expr, char *result, size_t result_size) {
 	}
 }
 
-Breakpoint *dbg_find_breakpoint(int page, int addr) {
+static PhysicalBreakpoint *find_physical_breakpoint(int page, int addr) {
 	for (Breakpoint *bp = breakpoints; bp; bp = bp->next) {
-		if (bp->page == page && bp->addr == addr)
-			return bp;
+		if (bp->phys->page == page && bp->phys->addr == addr)
+			return bp->phys;
 	}
 	return NULL;
 }
@@ -280,17 +280,29 @@ Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal) {
 	dridata *dfile = ald_getdata(DRIFILE_SCO, page);
 	if (!dfile)
 		return NULL;
-	if (addr < 0 || addr >= dfile->size || dfile->data[addr] == BREAKPOINT) {
+	if (addr < 0 || addr >= dfile->size) {
 		ald_freedata(dfile);
 		return NULL;
 	}
 
+	PhysicalBreakpoint *phys;
+	if (dfile->data[addr] == BREAKPOINT) {
+		phys = find_physical_breakpoint(page, addr);
+		if (!phys)
+			SYSERROR("Illegal BREAKPOINT instruction");
+		phys->refcnt++;
+	} else {
+		phys = calloc(1, sizeof(PhysicalBreakpoint));
+		phys->page = page;
+		phys->addr = addr;
+		phys->refcnt = 1;
+		phys->restore_op = dfile->data[addr];
+	}
+
 	Breakpoint *bp = calloc(1, sizeof(Breakpoint));
 	bp->no = is_internal ? INTERNAL_BREAKPOINT_NO : next_breakpoint_no++;
-	bp->page = page;
-	bp->addr = addr;
+	bp->phys = phys;
 	bp->dfile = dfile;
-	bp->restore_op = dfile->data[addr];
 	bp->next = breakpoints;
 	breakpoints = bp;
 
@@ -309,8 +321,12 @@ boolean dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char
 }
 
 static Breakpoint *breakpoint_free(Breakpoint *bp) {
-	assert(bp->dfile->data[bp->addr] == BREAKPOINT);
-	bp->dfile->data[bp->addr] = bp->restore_op;
+	assert(bp->dfile->data[bp->phys->addr] == BREAKPOINT);
+	assert(bp->phys->refcnt > 0);
+	if (--bp->phys->refcnt == 0) {
+		bp->dfile->data[bp->phys->addr] = bp->phys->restore_op;
+		free(bp->phys);
+	}
 	if (bp->condition)
 		free(bp->condition);
 	ald_freedata(bp->dfile);
@@ -332,7 +348,7 @@ boolean dbg_delete_breakpoint(int no) {
 void dbg_delete_breakpoints_in_page(int page) {
 	Breakpoint **p = &breakpoints;
 	while (*p) {
-		if ((*p)->page == page)
+		if ((*p)->phys->page == page)
 			*p = breakpoint_free(*p);
 		else
 			p = &(*p)->next;
@@ -340,19 +356,21 @@ void dbg_delete_breakpoints_in_page(int page) {
 }
 
 BYTE dbg_handle_breakpoint(int page, int addr) {
-	Breakpoint *bp = dbg_find_breakpoint(page, addr);
-	if (!bp)
-		SYSERROR("Illegal BREAKPOINT instruction");
+	for (Breakpoint *bp = breakpoints; bp; bp = bp->next) {
+		if (bp->phys->page != page || bp->phys->addr != addr)
+			continue;
+		if (bp->condition && !eval_condition(bp->condition))
+			continue;
 
-	if (bp->condition && !eval_condition(bp->condition))
-		return bp->restore_op;
+		dbg_state = bp->no == INTERNAL_BREAKPOINT_NO ?
+			DBG_STOPPED_NEXT : DBG_STOPPED_BREAKPOINT;
 
-	dbg_state = bp->no == INTERNAL_BREAKPOINT_NO ?
-		DBG_STOPPED_NEXT : DBG_STOPPED_BREAKPOINT;
-
-	BYTE restore_op = bp->restore_op;
-	dbg_main();  // this may destroy bp
-	return restore_op;
+		BYTE restore_op = bp->phys->restore_op;
+		dbg_main(bp->no);  // this may destroy bp
+		return restore_op;
+	}
+	SYSERROR("Illegal BREAKPOINT instruction");
+	return BREAKPOINT;
 }
 
 static void set_stack_frame(StackFrame *frame, int page, int addr, boolean is_return_addr) {
@@ -449,7 +467,7 @@ static int get_retaddr_if_funcall(void) {
 	sl_jmpNear(nact->current_addr);
 	int c0 = sl_getc();
 	if (c0 == BREAKPOINT) {
-		Breakpoint *bp = dbg_find_breakpoint(nact->current_page, nact->current_addr);
+		PhysicalBreakpoint *bp = find_physical_breakpoint(nact->current_page, nact->current_addr);
 		if (bp)
 			c0 = bp->restore_op;
 		else
@@ -502,7 +520,7 @@ static boolean should_continue_next(void) {
 	return true;
 }
 
-void dbg_main(void) {
+void dbg_main(int bp_no) {
 	if (internal_breakpoint) {
 		dbg_delete_breakpoint(INTERNAL_BREAKPOINT_NO);
 		internal_breakpoint = NULL;
@@ -520,7 +538,7 @@ void dbg_main(void) {
 	default:
 		break;
 	}
-	dbg_impl->repl();
+	dbg_impl->repl(bp_no);
 }
 
 void dbg_onsleep(void) {
