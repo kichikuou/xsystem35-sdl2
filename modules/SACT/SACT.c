@@ -48,15 +48,6 @@
 #include "sactamask.h"
 
 /*
-  MTコマンドで設定された文字列によって、バージョン間の違いを吸収
-
-  Version 1.0 : エスカレイヤー
-          1.1 : Rance5D
-          1.2(前期): 妻みぐい２
-          1.2(後期): SACT開発キット, シェル・クレイル, NightDemon
-*/ 
-
-/*
   妻みぐい２キー説明
 
   メッセージスキップ(既読、未読関係なくスキップ) -> Ctrl
@@ -96,22 +87,45 @@
 sact_t sactprv;
 extern char *xsys35_sact01;
 
+/*
+  Version 1.0 : エスカレイヤー
+          1.1 : Rance5D
+          1.2(前期): 妻みぐい２
+          1.2(後期): SACT開発キット, シェル・クレイル, NightDemon
+*/
+static int detect_sact_version(void) {
+	S39AIN_DLLINF *dll = NULL;
+	for (int i = 0; i < nact->ain.dllnum; i++) {
+		if (!strcasecmp(nact->ain.dll[i].name, "SACT")) {
+			dll = &nact->ain.dll[i];
+			break;
+		}
+	}
+	if (!dll)
+		return 0;
+	for (int i = 0; i < dll->function_num; i++) {
+		if (!strcmp(dll->function[i].name, "MessageOutput")) {
+			switch (dll->function[i].argc) {
+			case 8: return 100;
+			case 9: return 110;
+			case 10: return 120;
+			}
+			break;
+		}
+	}
+	return 0;
+}
+
 /**
  * SACT.Init (1.0~)
  *   SACT全体の初期化
  */
 static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
-	
-	if (!strcmp(nact->game_title_utf8, GT_ESUKA)) {
-		sact.version = 100;
-	} else if (!strcmp(nact->game_title_utf8, GT_RANCE5D) ||
-			   !strcmp(nact->game_title_utf8, GT_RANCE5D_ENG)) {
-		sact.version = 110;
-	} else {
-		sact.version = 120;
-	}
-	
+
+	sact.version = detect_sact_version();
+	if (!sact.version)
+		SYSERROR("Cannot determine SACT version");
 	NOTICE("SACT version = %d\n", sact.version);
 	
 	// 初期座標原点
