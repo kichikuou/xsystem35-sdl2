@@ -63,7 +63,6 @@ static cacher *cacheid;
 /* static methods */
 static CG_TYPE check_cgformat(BYTE *data);
 static void set_vspbank(BYTE *pic, int bank, int width, int height);
-static void cgdata_free(cgdata *cg);
 static MyPoint set_display_loc(cgdata *cg);
 static void clear_display_loc();
 static void display_cg(cgdata *cg, int x, int y);
@@ -116,7 +115,7 @@ static void set_vspbank(BYTE *pic, int bank, int width, int height) {
  * Free data 
  *  cg: freeing data object
 */
-static void cgdata_free(cgdata *cg) {
+void cgdata_free(cgdata *cg) {
 	if (cg->pic) free(cg->pic);
 	if (cg->pal) free(cg->pal);
 	if (cg->alpha) free(cg->alpha);

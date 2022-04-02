@@ -34,9 +34,6 @@
 #include "alk.h"
 
 alk_t *alk_new(const char *path) {
-	alk_t *alk;
-	int i;
-	
 	mmap_t *m = map_file(path);
 	
 	if (0 != strncmp(m->addr, "ALK0", 4)) {
@@ -45,30 +42,20 @@ alk_t *alk_new(const char *path) {
 		return NULL;
 	}		
 
-	alk = calloc(1, sizeof(alk_t));
+	int nr_entries = LittleEndian_getDW(m->addr, 4);
+
+	alk_t *alk = malloc(sizeof(alk_t) + sizeof(struct alk_entry) * nr_entries);
 	alk->mmap = m;
-	alk->datanum = LittleEndian_getDW(m->addr, 4);
-	alk->offset = malloc(sizeof(int) * alk->datanum);
-	
-	for (i = 0; i < alk->datanum; i++) {
-		alk->offset[i] = LittleEndian_getDW(m->addr, 8 + i * 8);
+	alk->datanum = nr_entries;
+
+	for (int i = 0; i < nr_entries; i++) {
+		alk->entries[i].data = (uint8_t *)m->addr + LittleEndian_getDW(m->addr, 8 + i * 8);
+		alk->entries[i].size = LittleEndian_getDW(m->addr, 8 + i * 8 + 4);
 	}
-	
 	return alk;
 }
 
-int alk_free(alk_t *alk) {
-	if (alk == NULL) return OK;
-
+void alk_free(alk_t *alk) {
 	unmap_file(alk->mmap);
-	free(alk->offset);
 	free(alk);
-
-	return OK;
-}
-
-char *alk_get(alk_t *alk, int no) {
-	if (no >= alk->datanum) return NULL;
-	
-	return (char *)alk->mmap->addr + alk->offset[no];
 }

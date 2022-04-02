@@ -127,12 +127,7 @@ surface_t *sf_getcg(void *b, size_t size) {
 		}
 		break;
 	}
-	
-	if (cg->pic)   free(cg->pic);
-	if (cg->pal)   free(cg->pal);
-	if (cg->alpha) free(cg->alpha);
-	free(cg);
-	
+	cgdata_free(cg);
 	return sf;
 }
 

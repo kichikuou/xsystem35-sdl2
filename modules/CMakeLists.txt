@@ -118,12 +118,6 @@ else()
   endif()
 endif()
 
-if (HAVE_JPEG)
-  target_sources(modules PRIVATE
-    NightDemonDemo/ndd.c
-    NightDemonDemo/jpeg2surface.c
-    )
-  if (NOT EMSCRIPTEN)
-    target_link_libraries(modules PRIVATE JPEG::JPEG)
-  endif()
+if (HAVE_JPEG AND NOT EMSCRIPTEN)
+  target_link_libraries(modules PRIVATE JPEG::JPEG)
 endif()
