@@ -61,8 +61,6 @@ typedef struct {
 	int pms_bank;    // palette bank for pms
 	
 	int spritecolor; // sprite color for vsp and pms8
-	
-	int data_offset; // pic offset for clipping
 } cgdata;
 
 /*

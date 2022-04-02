@@ -142,11 +142,13 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 /*
  * dibに16bitCGの描画
  */
-void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h, int brightness) {
-	SDL_Surface *s;
+void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness) {
+	int w = cg->width;
+	int h = cg->height;
 
+	SDL_Surface *s;
 	if (cg->alpha != NULL && cg->spritecolor != -1) {
-		unsigned short *p_src = (WORD *)(cg->pic + cg->data_offset);
+		unsigned short *p_src = (WORD *)cg->pic;
 		DWORD *p_ds, *p_dst;
 		BYTE *a_src = cg->alpha;
 		BYTE *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
@@ -168,41 +170,29 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h, int brig
 		}
 		SDL_UnlockSurface(s);
 	} else {
-		BYTE *p_dst;
-		unsigned short *p_src = (WORD *)(cg->pic + cg->data_offset);
-		int i, l = w * 2;
-		
-		s = SDL_CreateRGBSurface(0, w, h, 16, 0, 0, 0, 0);
-		SDL_LockSurface(s);
-		p_dst = s->pixels;
-		for (i = 0; i < h; i++) {
-			memcpy(p_dst, p_src, l);
-			p_dst += s->pitch;
-			p_src += cg->width;
-		}
+		s = SDL_CreateRGBSurfaceWithFormatFrom(
+			cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
 		if (cg->alpha) {
 			BYTE *a_src = cg->alpha;
 			BYTE *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
 			
-			for (i = 0; i < h; i++) {
+			for (int i = 0; i < h; i++) {
 				memcpy(adata, a_src, w);
 				adata += sdl_dibinfo->width;
 				a_src += cg->width;
 			}
 		}
-		SDL_UnlockSurface(s);
 	}
 
 	if (brightness != 255)
 		SDL_SetSurfaceColorMod(s, brightness, brightness, brightness);
 
-	SDL_Rect r_src = { 0,  0, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
-	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
+	SDL_BlitSurface(s, NULL, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 }
 
-void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int w, int h, int brightness) {
+void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int brightness) {
 	if (cg->alpha) {
 		// This function is called only for JPEG images, so this shouldn't happen.
 		WARNING("sdl_drawImage24_fromData: unsupported format");
@@ -210,13 +200,12 @@ void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int w, int h, int bright
 	}
 
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
-		cg->pic + cg->data_offset, w, h, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+		cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
 	if (brightness != 255)
 		SDL_SetSurfaceColorMod(s, brightness, brightness, brightness);
 
-	SDL_Rect r_src = {0, 0, w, h};
-	SDL_Rect r_dst = {x, y, w, h};
-	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
+	SDL_Rect r_dst = {x, y, cg->width, cg->height};
+	SDL_BlitSurface(s, NULL, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 }
 

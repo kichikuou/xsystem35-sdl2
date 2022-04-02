@@ -51,9 +51,9 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 
 	if (!gr_clip_xywh(ds, &dx, &dy, &dw, &dh)) return;
 	
-	cg->data_offset = (abs(dy - y) * cg->width + abs(dx - x)) * 3;
+	int data_offset = (abs(dy - y) * cg->width + abs(dx - x)) * 3;
 	
-	sp = (BYTE *)(cg->pic + cg->data_offset);
+	sp = (BYTE *)(cg->pic + data_offset);
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
 	switch(ds->depth) {
@@ -115,9 +115,9 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 	
 	if (!gr_clip_xywh(ds, &dx, &dy, &dw, &dh)) return;
 	
-	cg->data_offset = (abs(dy - y) * cg->width + abs(dx - x)) * 2;
+	int data_offset = (abs(dy - y) * cg->width + abs(dx - x)) * 2;
 	
-	sp = (WORD *)(cg->pic + cg->data_offset);
+	sp = (WORD *)(cg->pic + data_offset);
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
 	switch(ds->depth) {

@@ -206,27 +206,11 @@ void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, BYTE sp) {
 	SDL_SetColorKey(sdl_dib, SDL_FALSE, 0);
 }
 
-void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
-	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, 8, 0, 0, 0, 0);
-	SDL_LockSurface(s);
-
-#if 0  /* for broken cg */
-	if (s->pitch == s->w) {
-		memcpy(s->pixels, cg->pic, w * h);
-	} else 
-#endif
-	{
-		int i = h;
-		BYTE *p_src = (cg->pic + cg->data_offset), *p_dst = s->pixels;
-		
-		while (i--) {
-			memcpy(p_dst, p_src, w);
-			p_dst += s->pitch;
-			p_src += cg->width;
-		}
-	}
-	
-	SDL_UnlockSurface(s);
+void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy) {
+	int w = cg->width;
+	int h = cg->height;
+	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
+		cg->pic, w, h, 8, w, SDL_PIXELFORMAT_INDEX8);
 	
 	sdl_pal_check();
 	
@@ -254,10 +238,9 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 		SDL_SetColorKey(s, SDL_TRUE, cg->spritecolor);
 	}
 	
-	SDL_Rect r_src = { 0,  0, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
-	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
+	SDL_BlitSurface(s, NULL, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 }
 
