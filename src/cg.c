@@ -46,8 +46,8 @@ int cg_vspPB = -1;
 int cg_fflg = 7;
 /* CGをロードした回数を書き込む変数 */
 int *cg_loadCountVar = NULL;
-/* CGの明度指定 */
-int cg_alphaLevel = 255;
+/* Brightness (PD command) */
+int cg_brightness = 255;
 
 #define GCMD_EXTRACTCG(c)    ((c) & 0x01)
 #define GCMD_SET_PALETTE(c)  ((c) & 0x02)
@@ -177,12 +177,7 @@ static void clear_display_loc() {
  *  y : display location y
 */ 
 static void display_cg(cgdata *cg, int x, int y) {
-	/* always set cg's alpha level */
-	cg->alphalevel = cg_alphaLevel;
-	
-	ags_drawCg(cg, x, y);
-	
-	/* update drawn area */
+	ags_drawCg(cg, x, y, cg_brightness);
 	ags_updateArea(x, y, cg->width, cg->height);
 }
 

@@ -61,7 +61,6 @@ typedef struct {
 	int pms_bank;    // palette bank for pms
 	
 	int spritecolor; // sprite color for vsp and pms8
-	int alphalevel;  // alpha level of image
 	
 	int data_offset; // pic offset for clipping
 } cgdata;
@@ -89,6 +88,6 @@ extern void cgdata_free(cgdata *cg);
 extern int cg_vspPB;
 extern int cg_fflg;
 extern int *cg_loadCountVar;
-extern int cg_alphaLevel;
+extern int cg_brightness;
 
 #endif /* !__CG__ */

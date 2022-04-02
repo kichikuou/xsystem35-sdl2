@@ -324,18 +324,3 @@ void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx,
 	
 	copy_to_alpha(dib, sdata, ddata, w, h, flag);
 }
-
-/* 16bitCGの ALPHALEVELを指定 */
-BYTE *changeImage16AlphaLevel(cgdata *cg) {
-	WORD *new_pic = malloc(sizeof(WORD) * cg->width * cg->height), *new_pic_;
-	WORD *pic = (WORD *)cg->pic;
-	int   pixels = cg->width * cg->height;
-	
-	new_pic_ = new_pic;
-
-	while (pixels--) {
-		*new_pic = ALPHALEVEL16(*pic, cg->alphalevel);
-		new_pic++; pic++;
-	}
-	return (BYTE *)new_pic_;
-}

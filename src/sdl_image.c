@@ -142,16 +142,8 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 /*
  * dibに16bitCGの描画
  */
-void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
-	/* draw alpha pixel */
+void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h, int brightness) {
 	SDL_Surface *s;
-	BYTE *pic_save = NULL;
-
-	/* set alpha Level */
-	if (cg->alphalevel != 255) {
-		pic_save = cg->pic;
-		cg->pic = changeImage16AlphaLevel(cg);
-	}
 
 	if (cg->alpha != NULL && cg->spritecolor != -1) {
 		unsigned short *p_src = (WORD *)(cg->pic + cg->data_offset);
@@ -200,18 +192,17 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 		}
 		SDL_UnlockSurface(s);
 	}
+
+	if (brightness != 255)
+		SDL_SetSurfaceColorMod(s, brightness, brightness, brightness);
+
 	SDL_Rect r_src = { 0,  0, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
-
-	if (cg->alphalevel != 255) {
-		free(cg->pic);
-		cg->pic = pic_save;
-	}
 }
 
-void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int w, int h) {
+void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int w, int h, int brightness) {
 	if (cg->alpha) {
 		// This function is called only for JPEG images, so this shouldn't happen.
 		WARNING("sdl_drawImage24_fromData: unsupported format");
@@ -220,8 +211,8 @@ void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int w, int h) {
 
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
 		cg->pic + cg->data_offset, w, h, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
-	if (cg->alphalevel != 255)
-		SDL_SetSurfaceColorMod(s, cg->alphalevel, cg->alphalevel, cg->alphalevel);
+	if (brightness != 255)
+		SDL_SetSurfaceColorMod(s, brightness, brightness, brightness);
 
 	SDL_Rect r_src = {0, 0, w, h};
 	SDL_Rect r_dst = {x, y, w, h};

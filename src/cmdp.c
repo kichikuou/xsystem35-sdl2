@@ -146,7 +146,7 @@ void commandPD() {
 	/* ＣＧ展開の明度を指定する */
 	int num = getCaliValue();
 	
-	cg_alphaLevel = num;
+	cg_brightness = num;
 	
 	DEBUG_COMMAND("PD %d:\n",num);
 }

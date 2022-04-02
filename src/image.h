@@ -32,6 +32,4 @@ extern void image_setdepth(int);
 extern void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 extern void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 
-extern BYTE *changeImage16AlphaLevel(cgdata *cg);
-
 #endif  /* __IMAGE__ */
