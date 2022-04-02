@@ -384,7 +384,7 @@ agsurface_t *ags_drawStringToSurface(const char *str) {
 	return &result;
 }
 
-void ags_drawCg(cgdata *cg, int depth, int x, int y) {
+void ags_drawCg(cgdata *cg, int x, int y) {
 	int sx, sy, w, h;
 	
 	sx = x;
@@ -395,7 +395,7 @@ void ags_drawCg(cgdata *cg, int depth, int x, int y) {
 	if (!ags_check_param(&x, &y, &w, &h)) return;
 	
 	cg->data_offset = abs(sy - y) * cg->width + abs(sx - x);
-	switch (depth) {
+	switch (cg->depth) {
 	case 8:  sdl_drawImage8_fromData(cg, x, y, w, h); break;
 	case 16: sdl_drawImage16_fromData(cg, x, y, w, h); break;
 	case 24: sdl_drawImage24_fromData(cg, x, y, w, h); break;

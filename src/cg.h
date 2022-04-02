@@ -51,6 +51,7 @@ typedef struct {
 	int y;           // default display location y
 	int width;       // image width
 	int height;      // image height
+	int depth;       // pixel depth (8, 16 or 24)
 	
 	BYTE *pic;       // extracted pixel data
 	BYTE *alpha;     // extracted alpha data if exists

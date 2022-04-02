@@ -127,6 +127,7 @@ cgdata *webp_extract(BYTE *data, size_t size) {
 	cg->type = ALCG_WEBP;
 	cg->width = width;
 	cg->height = height;
+	cg->depth = 24;
 	cg->pic = malloc(cg->width * cg->height * 3);
 	cg->alpha = malloc(cg->width * cg->height);
 	rgba_to_rgb_and_alpha(rgba, cg->pic, cg->alpha, cg->width * cg->height);

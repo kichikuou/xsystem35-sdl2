@@ -206,8 +206,9 @@ cgdata *vsp_extract(BYTE *data) {
 	cg->type = ALCG_VSP;
 	cg->x = vsp->vspX0 * 8;
 	cg->y = vsp->vspY0;
-	cg->width    = vsp->vspXW * 8;
-	cg->height   = vsp->vspYW;
+	cg->width  = vsp->vspXW * 8;
+	cg->height = vsp->vspYW;
+	cg->depth = 8;
 	cg->vsp_bank = vsp->vspPb;
 	cg->alpha = NULL;
 	

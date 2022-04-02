@@ -180,20 +180,7 @@ static void display_cg(cgdata *cg, int x, int y) {
 	/* always set cg's alpha level */
 	cg->alphalevel = cg_alphaLevel;
 	
-	/* draw cg */
-	switch(cg->type) {
-	case ALCG_VSP:
-	case ALCG_PMS8:
-	case ALCG_BMP8:
-		ags_drawCg(cg, 8, x, y); break;
-	case ALCG_PMS16:
-	case ALCG_BMP24:
-		ags_drawCg(cg, 16, x, y); break;
-	case ALCG_JPEG:
-		ags_drawCg(cg, 24, x, y); break;
-	default:
-		break;
-	}
+	ags_drawCg(cg, x, y);
 	
 	/* update drawn area */
 	ags_updateArea(x, y, cg->width, cg->height);
@@ -207,7 +194,6 @@ static void display_cg(cgdata *cg, int x, int y) {
 static cgdata *loader(int no) {
 	dridata *dfile;
 	cgdata *cg = NULL;
-	int type, size = 0;
 
 	/* search in cache */
 	if (NULL != (cg = (cgdata *)cache_foreach(cacheid, no))) return cg;
@@ -220,48 +206,39 @@ static cgdata *loader(int no) {
 		(*(cg_loadCountVar + no + 1))++;
 	}
 	
-	/* check loaded cg format */
-	type = check_cgformat(dfile->data);
-	
 	/* extract cg */
-	/*  size is only pixel data size */
-	switch(type) {
+	switch (check_cgformat(dfile->data)) {
 	case ALCG_VSP:
 		cg = vsp_extract(dfile->data);
-		size = cg->width * cg->height;
 		break;
 	case ALCG_PMS8:
 		cg = pms256_extract(dfile->data);
-		size = cg->width * cg->height;
 		break;
 	case ALCG_PMS16:
 		cg = pms64k_extract(dfile->data);
-		size = (cg->width * cg->height) * sizeof(WORD);
 		break;
 	case ALCG_BMP8:
 		cg = bmp256_extract(dfile->data);
-		size = cg->width * cg->height;
 		break;
 	case ALCG_BMP24:
 		cg = bmp16m_extract(dfile->data);
-		size = (cg->width * cg->height) * sizeof(WORD);
 		break;
 	case ALCG_QNT:
 		cg = qnt_extract(dfile->data);
-		size = (cg->width * cg->height) * 3;
 		break;
 #ifdef HAVE_JPEG
 	case ALCG_JPEG:
 		cg = jpeg_extract(dfile->data, dfile->size);
-		size = (cg->width * cg->height) * 3;
 		break;
 #endif
 	default:
 		break;
 	}
 	/* insert to cache */
-	if (cg)
+	if (cg) {
+		int size = cg->width * cg->height * (cg->depth / 8);
 		cache_insert(cacheid, no, cg, size, NULL);
+	}
 	
 	/* ok to free */
 	ald_freedata(dfile);
@@ -356,53 +333,23 @@ void cg_load(int no, int flg) {
 	}
 	
 	/* refrect palette change */
-	if (GCMD_SET_PALETTE(cg_fflg)) {
-		switch(cg->type) {
-		case ALCG_VSP:
-		case ALCG_PMS8:
-		case ALCG_BMP8:
-			ags_setPaletteToSystem(0, 256);
-			break;
-		default:
-			break;
-		}
-	}
+	if (GCMD_SET_PALETTE(cg_fflg) && cg->depth == 8)
+		ags_setPaletteToSystem(0, 256);
 	
 	/* draw cg */
-	switch(cg->type) {
-	case ALCG_VSP:
-	case ALCG_PMS8:
-	case ALCG_BMP8:
-		if (GCMD_EXTRACTCG(cg_fflg)) {
-			/* set display offset */
-			p = set_display_loc(cg);
-			/* draw cg pixel */
-			cg->spritecolor = flg;
-			display_cg(cg, p.x, p.y);
-			/* clear display offset */
-			clear_display_loc();
+	if (GCMD_EXTRACTCG(cg_fflg)) {
+		/* set display offset */
+		p = set_display_loc(cg);
+		/* draw alpha pixel */
+		if (cg->alpha) {
+			ags_alpha_setPixel(p.x, p.y, cg->width, cg->height, cg->alpha);
 		}
-		break;
-	case ALCG_PMS16:
-	case ALCG_BMP24:
-	case ALCG_JPEG:
-		if (GCMD_EXTRACTCG(cg_fflg)) {
-			/* set display offset */
-			p = set_display_loc(cg);
-			/* draw alpha pixel */
-			if (cg->alpha) {
-				ags_alpha_setPixel(p.x, p.y, cg->width, cg->height, cg->alpha);
-			}
-			/* draw cg pixel */
-			cg->spritecolor = flg;
-			display_cg(cg, p.x, p.y);
-			/* clear display offset */
-			clear_display_loc();
-		}
-		break;
-	default:
-		break;
-	} 
+		/* draw cg pixel */
+		cg->spritecolor = flg;
+		display_cg(cg, p.x, p.y);
+		/* clear display offset */
+		clear_display_loc();
+	}
 }
 
 /*
@@ -482,13 +429,10 @@ int cg_load_with_filename(char *fname_utf8, int x, int y) {
 	}
 	
 	/* load palette if not extracted */
-	if (GCMD_LOAD_PALETTE(cg_fflg)) {
-		if (cg->type == ALCG_BMP8)
+	if (cg->depth == 8) {
+		if (GCMD_LOAD_PALETTE(cg_fflg))
 			ags_setPalettes(cg->pal, 10, 10, 236);
-	}
-	
-	if (GCMD_SET_PALETTE(cg_fflg)) {
-		if (cg->type == ALCG_BMP8)
+		if (GCMD_SET_PALETTE(cg_fflg))
 			ags_setPaletteToSystem(0, 256);
 	}
 

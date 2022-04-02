@@ -54,6 +54,7 @@ cgdata *jpeg_extract(BYTE *data, size_t size) {
 	cg->type = ALCG_JPEG;
 	cg->width  = cinfo.output_width;
 	cg->height = cinfo.output_height;
+	cg->depth  = 24;
 	cg->pic = malloc(3 * cg->width * cg->height);
 
 	int row_stride = cinfo.output_width * cinfo.output_components;

@@ -170,7 +170,7 @@ extern void ags_copyRegion(void *region, int sx, int sy, int w,int h,int dx,int 
 extern void ags_delRegion(void *region);
 
 extern MyRectangle ags_drawString(int x, int y, const char *src, int col);
-extern void ags_drawCg(cgdata *cg, int depth, int x, int y);
+extern void ags_drawCg(cgdata *cg, int x, int y);
 
 extern void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy);
 extern void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int col);

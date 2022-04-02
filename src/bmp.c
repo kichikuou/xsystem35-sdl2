@@ -180,6 +180,7 @@ cgdata *bmp256_extract(BYTE *data) {
 	cg->y = 0;
 	cg->width  = bmp->bmpXW;
 	cg->height = bmp->bmpYW;
+	cg->depth = 8;
 	cg->alpha  = NULL;
 	
 	free(bmp);
@@ -225,6 +226,7 @@ cgdata *bmp16m_extract(BYTE *data) {
 	cg->y = 0;
 	cg->width  = bmp->bmpXW;
 	cg->height = bmp->bmpYW;
+	cg->depth = 16;
 	cg->alpha = NULL;
 	cg->pal   = NULL;
 	

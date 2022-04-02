@@ -244,6 +244,7 @@ cgdata *qnt_extract(BYTE *data) {
 	cg->y      = qnt.y0;
 	cg->width  = qnt.width;
 	cg->height = qnt.height;
+	cg->depth  = 24;
 	cg->pal    = NULL;
 	
 	return cg;

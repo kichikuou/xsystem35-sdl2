@@ -237,8 +237,9 @@ cgdata *pms256_extract(BYTE *data) {
 	cg->type = ALCG_PMS8;
 	cg->x = pms->pmsX0;
 	cg->y = pms->pmsY0;
-	cg->width    = pms->pmsXW;
-	cg->height   = pms->pmsYW;
+	cg->width  = pms->pmsXW;
+	cg->height = pms->pmsYW;
+	cg->depth = 8;
 	cg->pms_bank = pms->pmsBf;
 	cg->alpha = NULL;
 	
@@ -292,6 +293,7 @@ cgdata *pms64k_extract(BYTE *data) {
 	cg->y = pms->pmsY0;
 	cg->width  = pms->pmsXW;
 	cg->height = pms->pmsYW;
+	cg->depth = 16;
 	cg->pal = NULL;
 	
 	free(pms);
