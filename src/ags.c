@@ -384,11 +384,17 @@ agsurface_t *ags_drawStringToSurface(const char *str) {
 	return &result;
 }
 
-void ags_drawCg(cgdata *cg, int x, int y, int brightness) {
+void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend) {
 	switch (cg->depth) {
-	case 8:  sdl_drawImage8_fromData(cg, x, y); break;
-	case 16: sdl_drawImage16_fromData(cg, x, y, brightness); break;
-	case 24: sdl_drawImage24_fromData(cg, x, y, brightness); break;
+	case 8:
+		sdl_drawImage8_fromData(cg, x, y, sprite_color);
+		break;
+	case 16:
+		sdl_drawImage16_fromData(cg, x, y, brightness, alpha_blend);
+		break;
+	case 24:
+		sdl_drawImage24_fromData(cg, x, y, brightness);
+		break;
 	}
 }
 

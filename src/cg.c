@@ -65,7 +65,7 @@ static CG_TYPE check_cgformat(BYTE *data);
 static void set_vspbank(BYTE *pic, int bank, int width, int height);
 static MyPoint set_display_loc(cgdata *cg);
 static void clear_display_loc();
-static void display_cg(cgdata *cg, int x, int y);
+static void display_cg(cgdata *cg, int x, int y, int sprite_color, bool alpha_blend);
 static cgdata *loader(int no);
 
 
@@ -176,8 +176,8 @@ static void clear_display_loc() {
  *  x : display location x
  *  y : display location y
 */ 
-static void display_cg(cgdata *cg, int x, int y) {
-	ags_drawCg(cg, x, y, cg_brightness);
+static void display_cg(cgdata *cg, int x, int y, int sprite_color, bool alpha_blend) {
+	ags_drawCg(cg, x, y, cg_brightness, sprite_color, alpha_blend);
 	ags_updateArea(x, y, cg->width, cg->height);
 }
 
@@ -340,8 +340,7 @@ void cg_load(int no, int flg) {
 			ags_alpha_setPixel(p.x, p.y, cg->width, cg->height, cg->alpha);
 		}
 		/* draw cg pixel */
-		cg->spritecolor = flg;
-		display_cg(cg, p.x, p.y);
+		display_cg(cg, p.x, p.y, flg, flg != -1);
 		/* clear display offset */
 		clear_display_loc();
 	}
@@ -380,7 +379,7 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 	/* draw pixel */
 	if (cg) {
 		p = set_display_loc(cg);
-		display_cg(cg, p.x, p.y);
+		display_cg(cg, p.x, p.y, -1, true);
 	}
 	
 	/* clear display offset */
@@ -436,8 +435,7 @@ int cg_load_with_filename(char *fname_utf8, int x, int y) {
 		/* set display offset */
 		p = set_display_loc(cg);
 		/* draw cg pixel */
-		cg->spritecolor = -1;
-		display_cg(cg, p.x, p.y);
+		display_cg(cg, p.x, p.y, -1, false);
 		/* clear display offset */
 		clear_display_loc();
 	}

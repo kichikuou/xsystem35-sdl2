@@ -142,12 +142,12 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 /*
  * dibに16bitCGの描画
  */
-void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness) {
+void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool alpha_blend) {
 	int w = cg->width;
 	int h = cg->height;
 
 	SDL_Surface *s;
-	if (cg->alpha != NULL && cg->spritecolor != -1) {
+	if (cg->alpha && alpha_blend) {
 		unsigned short *p_src = (WORD *)cg->pic;
 		DWORD *p_ds, *p_dst;
 		BYTE *a_src = cg->alpha;

@@ -59,8 +59,6 @@ typedef struct {
 	
 	int vsp_bank;    // palette bank for vsp
 	int pms_bank;    // palette bank for pms
-	
-	int spritecolor; // sprite color for vsp and pms8
 } cgdata;
 
 /*

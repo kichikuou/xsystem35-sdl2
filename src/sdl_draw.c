@@ -206,7 +206,7 @@ void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, BYTE sp) {
 	SDL_SetColorKey(sdl_dib, SDL_FALSE, 0);
 }
 
-void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy) {
+void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 	int w = cg->width;
 	int h = cg->height;
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
@@ -234,9 +234,8 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy) {
 		memcpy(s->format->palette->colors, sdl_col, sizeof(SDL_Color) * 256);
 	}
 	
-	if (cg->spritecolor != -1) {
-		SDL_SetColorKey(s, SDL_TRUE, cg->spritecolor);
-	}
+	if (sprite_color != -1)
+		SDL_SetColorKey(s, SDL_TRUE, sprite_color);
 	
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
