@@ -185,11 +185,12 @@ static void display_cg(cgdata *cg, int x, int y) {
 	case ALCG_VSP:
 	case ALCG_PMS8:
 	case ALCG_BMP8:
-		ags_drawCg8bit(cg, x, y); break;
+		ags_drawCg(cg, 8, x, y); break;
 	case ALCG_PMS16:
 	case ALCG_BMP24:
+		ags_drawCg(cg, 16, x, y); break;
 	case ALCG_JPEG:
-		ags_drawCg16bit(cg, x, y); break;
+		ags_drawCg(cg, 24, x, y); break;
 	default:
 		break;
 	}
@@ -252,7 +253,7 @@ static cgdata *loader(int no) {
 #ifdef HAVE_JPEG
 	case ALCG_JPEG:
 		cg = jpeg_extract(dfile->data, dfile->size);
-		size = (cg->width * cg->height) * sizeof(WORD);
+		size = (cg->width * cg->height) * 3;
 		break;
 #endif
 	default:

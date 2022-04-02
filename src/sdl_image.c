@@ -211,6 +211,24 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int w, int h) {
 	}
 }
 
+void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int w, int h) {
+	if (cg->alpha) {
+		// This function is called only for JPEG images, so this shouldn't happen.
+		WARNING("sdl_drawImage24_fromData: unsupported format");
+		return;
+	}
+
+	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
+		cg->pic + cg->data_offset, w, h, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+	if (cg->alphalevel != 255)
+		SDL_SetSurfaceColorMod(s, cg->alphalevel, cg->alphalevel, cg->alphalevel);
+
+	SDL_Rect r_src = {0, 0, w, h};
+	SDL_Rect r_dst = {x, y, w, h};
+	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
+	SDL_FreeSurface(s);
+}
+
 /*
  * 16bit専用の dib の指定領域コピー alphaつき
  */

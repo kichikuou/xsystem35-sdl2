@@ -384,7 +384,7 @@ agsurface_t *ags_drawStringToSurface(const char *str) {
 	return &result;
 }
 
-void ags_drawCg8bit(cgdata *cg, int x, int y) {
+void ags_drawCg(cgdata *cg, int depth, int x, int y) {
 	int sx, sy, w, h;
 	
 	sx = x;
@@ -395,21 +395,11 @@ void ags_drawCg8bit(cgdata *cg, int x, int y) {
 	if (!ags_check_param(&x, &y, &w, &h)) return;
 	
 	cg->data_offset = abs(sy - y) * cg->width + abs(sx - x);
-	sdl_drawImage8_fromData(cg, x, y, w, h);
-}
-
-void ags_drawCg16bit(cgdata *cg, int x, int y) {
-	int sx, sy, w, h;
-	
-	sx = x;
-	sy = y;
-	w = cg->width;
-	h = cg->height;
-
-	if (!ags_check_param(&x, &y, &w, &h)) return;
-	
-	cg->data_offset = abs(sy - y) * cg->width + abs(sx - x);
-	sdl_drawImage16_fromData(cg, x, y, w, h);
+	switch (depth) {
+	case 8:  sdl_drawImage8_fromData(cg, x, y, w, h); break;
+	case 16: sdl_drawImage16_fromData(cg, x, y, w, h); break;
+	case 24: sdl_drawImage24_fromData(cg, x, y, w, h); break;
+	}
 }
 
 void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy) {

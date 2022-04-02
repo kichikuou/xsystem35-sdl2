@@ -69,6 +69,7 @@ extern void sdl_drawImage8_fromData(cgdata *cg, int x, int y, int w, int h);
 extern void sdl_wrapColor(int sx, int sy, int w, int h, BYTE cl, int rate);
 extern void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror);
 extern void sdl_drawImage16_fromData(cgdata *cg, int x, int y, int w, int h);
+extern void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int w, int h);
 extern void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv);
 extern void sdl_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv);
 extern void sdl_copyAreaSP16_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv);

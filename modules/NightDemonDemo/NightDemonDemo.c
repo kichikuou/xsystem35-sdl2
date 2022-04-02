@@ -65,7 +65,7 @@ static void ndd_run(int demonum) {
 
 		cgdata *cg = jpeg_extract(alk->entries[i].data, alk->entries[i].size);
 		if (cg) {
-			gr_drawimage16(sf0, cg, 0, 0);
+			gr_drawimage24(sf0, cg, 0, 0);
 			ags_updateFull();
 			cgdata_free(cg);
 		} else {
