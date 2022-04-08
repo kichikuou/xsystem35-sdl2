@@ -249,18 +249,18 @@ class Launcher private constructor(private val rootDir: File) {
         fun maybeAdd(path: String) {
             val name = File(path).name
 
-            specialResources[name.toLowerCase(Locale.US)]?.let {
+            specialResources[name.lowercase(Locale.US)]?.let {
                 grb.appendLine("$it $path")
                 return
             }
             aldRegex.matchEntire(name)?.let {
-                val ext = it.groupValues[4].toUpperCase(Locale.US)
+                val ext = it.groupValues[4].uppercase(Locale.US)
                 val type = if (ext == "ALD") {
-                    aldType[it.groupValues[2].toLowerCase(Locale.US)]
+                    aldType[it.groupValues[2].lowercase(Locale.US)]
                 } else {
                     ext
                 }
-                val id = it.groupValues[3].toUpperCase(Locale.US)
+                val id = it.groupValues[3].uppercase(Locale.US)
                 if (type != null) {
                     grb.appendLine("$type$id $path")
                     basename = it.groupValues[1]
@@ -277,7 +277,7 @@ class Launcher private constructor(private val rootDir: File) {
 
         fun write(outDir: File) {
             for (id in 'A' .. 'Z') {
-                grb.appendLine("Save$id ../save/${basename}s${id.toLowerCase()}.asd")
+                grb.appendLine("Save$id ../save/${basename}s${id.lowercase(Locale.US)}.asd")
             }
             val gr = grb.toString()
             Log.i("xsystem35.gr", gr)
