@@ -23,10 +23,11 @@
 
 #include "config.h"
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "variable.h"
 #include "sact.h"
 
@@ -39,7 +40,7 @@ static int idxmax;     // stack pointerの最大
  * 文字列変数スタックの初期化
  */
 int sstr_init() {
-	stack = g_new(char *, DEFSTACKSIZE);
+	stack = malloc(sizeof(char *) * DEFSTACKSIZE);
 	idx = 0;
 	idxmax = DEFSTACKSIZE;
 	return OK;
@@ -51,11 +52,11 @@ int sstr_init() {
  */
 int sstr_push(int strno) {
 	if (idx >= idxmax) {
-		stack = g_renew(char *, stack, idx*2);
+		stack = realloc(stack, sizeof(char *) * idx*2);
 		idxmax = idx*2;
 	}
 	
-	stack[idx++] = g_strdup(v_str(strno -1));
+	stack[idx++] = strdup(svar_get(strno));
 	
 	return OK;
 }
@@ -67,8 +68,8 @@ int sstr_push(int strno) {
 int sstr_pop(int strno) {
 	if (idx == 0) return NG;
 	
-	v_strcpy(strno -1, stack[--idx]);
-	g_free(stack[idx]);
+	svar_set(strno, stack[--idx]);
+	free(stack[idx]);
 	
 	return OK;
 }
@@ -83,10 +84,10 @@ int sstr_regist_replace(int sstrno, int dstrno) {
 	
 	if (sstrno == dstrno) return NG;
 	
-	ex = g_new(strexchange_t, 1);
-	ex->src = strdup(v_str(sstrno -1));
-	ex->dst = strdup(v_str(dstrno -1));
-	sact.strreplace = g_slist_append(sact.strreplace, ex);
+	ex = malloc(sizeof(strexchange_t));
+	ex->src = strdup(svar_get(sstrno));
+	ex->dst = strdup(svar_get(dstrno));
+	sact.strreplace = slist_append(sact.strreplace, ex);
 	return OK;
 }
 
@@ -105,7 +106,7 @@ int sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	}
 	
 	sprintf(s, ss, num);
-	v_strcpy(strno -1, s);
+	svar_set(strno, s);
 	
 	return OK;
 }

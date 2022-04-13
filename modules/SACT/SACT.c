@@ -25,14 +25,15 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
-#include "imput.h"
+#include "input.h"
+#include "msgskip.h"
 #include "xsystem35.h"
 #include "gametitle.h"
 #include "message.h"
+#include "modules.h"
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
@@ -45,15 +46,6 @@
 #include "ngraph.h"
 #include "surface.h"
 #include "sactamask.h"
-
-/*
-  MTコマンドで設定された文字列によって、バージョン間の違いを吸収
-
-  Version 1.0 : エスカレイヤー
-          1.1 : Rance5D
-          1.2(前期): 妻みぐい２
-          1.2(後期): SACT開発キット, シェル・クレイル, NightDemon
-*/ 
 
 /*
   妻みぐい２キー説明
@@ -95,22 +87,45 @@
 sact_t sactprv;
 extern char *xsys35_sact01;
 
+/*
+  Version 1.0 : エスカレイヤー
+          1.1 : Rance5D
+          1.2(前期): 妻みぐい２
+          1.2(後期): SACT開発キット, シェル・クレイル, NightDemon
+*/
+static int detect_sact_version(void) {
+	S39AIN_DLLINF *dll = NULL;
+	for (int i = 0; i < nact->ain.dllnum; i++) {
+		if (!strcasecmp(nact->ain.dll[i].name, "SACT")) {
+			dll = &nact->ain.dll[i];
+			break;
+		}
+	}
+	if (!dll)
+		return 0;
+	for (int i = 0; i < dll->function_num; i++) {
+		if (!strcmp(dll->function[i].name, "MessageOutput")) {
+			switch (dll->function[i].argc) {
+			case 8: return 100;
+			case 9: return 110;
+			case 10: return 120;
+			}
+			break;
+		}
+	}
+	return 0;
+}
+
 /**
  * SACT.Init (1.0~)
  *   SACT全体の初期化
  */
-void Init() {
+static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
-	
-	// ゲームタイトルによるバージョン設定
-	if (0 == strcmp(nact->game_title_name, GT_ESUKA)) {
-		sact.version = 100;
-	} else if (0 == strcmp(nact->game_title_name, GT_RANCE5D)){
-		sact.version = 110;
-	} else {
-		sact.version = 120;
-	}
-	
+
+	sact.version = detect_sact_version();
+	if (!sact.version)
+		SYSERROR("Cannot determine SACT version");
 	NOTICE("SACT version = %d\n", sact.version);
 	
 	// 初期座標原点
@@ -132,7 +147,7 @@ void Init() {
 	sact.dmap = sf_create_pixel(sf0->width, sf0->height, 16);
 	
 	// その他 System35 のデフォルト動作の変更
-	nact->ags.font->antialiase_on = TRUE;
+	ags_setAntialiasedStringMode(TRUE);
 	sys_setHankakuMode(2); // 全角半角変換無し
 	ags_autorepeat(FALSE); // key auto repeat off
 	
@@ -154,7 +169,7 @@ void Init() {
  *   @param wNumCG3: クリックしたときのＣＧ番号
  *   @param wType: スプライトのタイプ
  */
-void CreateSprite() {
+static void CreateSprite() {
 	int wNum    = getCaliValue();
 	int wNumCG1 = getCaliValue();
 	int wNumCG2 = getCaliValue();
@@ -175,7 +190,7 @@ void CreateSprite() {
  *   @param wWidth: スプライトの幅
  *   @param wHeight: スプライトの高さ
  */
-void CreateTextSprite() {
+static void CreateTextSprite() {
 	int wNum = getCaliValue();
 	int wX   = getCaliValue();
 	int wY   = getCaliValue();
@@ -192,7 +207,7 @@ void CreateTextSprite() {
  *   壁紙(画面背景)として表示するＣＧの設定
  *   @param wNum: 壁紙(背景)として表示するＣＧの番号
  */
-void SetWallPaper() {
+static void SetWallPaper() {
 	int wNum = getCaliValue();
 	
 	sp_set_wall_paper(wNum);
@@ -204,7 +219,7 @@ void SetWallPaper() {
  * SACT.Clear (1.0~)
  *   全スプライト削除(~SP_CLR)
  */
-void Clear() {
+static void Clear() {
 	sp_free_all();
 	
 	DEBUG_COMMAND_YET("SACT.Clear:\n");
@@ -215,7 +230,7 @@ void Clear() {
  *   スプライトの削除
  *   @param wNum: 削除するスプライト番号
  */
-void Delete() {
+static void Delete() {
 	int wNum = getCaliValue();
 	
 	sp_free(wNum);
@@ -229,7 +244,7 @@ void Delete() {
  *   @param wNum: 先頭スプライト番号
  *   @param wCount: 範囲
  */
-void SpriteDeleteCount() {
+static void SpriteDeleteCount() {
 	int wNum   = getCaliValue();
 	int wCount = getCaliValue();
 	int i;
@@ -245,7 +260,7 @@ void SpriteDeleteCount() {
  * SACT.Draw (1.0~)
  *   現在設定されているスプライト状態を画面に反映(~SP_UPDATE)
  */
-void Draw() {
+static void Draw() {
 	sp_update_all(TRUE);
 
 	DEBUG_COMMAND_YET("SACT.Draw:\n");
@@ -258,7 +273,7 @@ void Draw() {
  *   @param wEffectTime: エフェクトの時間(1/100秒単位)
  *   @param wEffectKey: キー抜け設定 (1.1~) (1で有効)
  */
-void DrawEffect() {
+static void DrawEffect() {
 	int wType       = getCaliValue();
 	int wEffectTime = getCaliValue();
 	int wEffectkey = 1;
@@ -279,7 +294,7 @@ void DrawEffect() {
  *   @param wEffectTime: エフェクトの時間(1/100秒単位)
  *   @param wEffectKey: キー抜け設定
  */
-void DrawEffectAlphaMap() {
+static void DrawEffectAlphaMap() {
 	int nIndexAlphaMap = getCaliValue();
 	int wEffectTime = getCaliValue();
 	int wEffectKey  = getCaliValue();
@@ -300,7 +315,7 @@ void DrawEffectAlphaMap() {
  *   @param wCount: 時間(1/100秒)
  *   @param nfKeyEnable: キー抜け (1で有効) (1.1~) 
  */
-void QuakeScreen() {
+static void QuakeScreen() {
 	int wType   = getCaliValue();
 	int wParam1 = getCaliValue();
 	int wParam2 = getCaliValue();
@@ -322,7 +337,7 @@ void QuakeScreen() {
  *   @param wX: 原点にするＸ座標の位置
  *   @param wY: 原点にするＹ座標の位置
  */
-void SetOrigin() {
+static void SetOrigin() {
 	int wX = getCaliValue();
 	int wY = getCaliValue();
 	
@@ -339,7 +354,7 @@ void SetOrigin() {
  *   @param wCount: 表示する個数
  *   @param wShow: 0:非表示, 1:表示
  */
-void SetShow() {
+static void SetShow() {
 	int wNum   = getCaliValue();
 	int wCount = getCaliValue();
 	int wShow  = getCaliValue();
@@ -356,7 +371,7 @@ void SetShow() {
  *   @param wCount: 表示する個数
  *   @param nBlendRate: ブレンド率
  */
-void SetBlendRate() {
+static void SetBlendRate() {
 	int wNum   = getCaliValue();
 	int wCount = getCaliValue();
 	int nBlendRate  = getCaliValue();
@@ -373,7 +388,7 @@ void SetBlendRate() {
  *   @param wX: 表示Ｘ座標
  *   @param wY: 表示Ｙ座標
  */
-void SetPos() {
+static void SetPos() {
 	int wNum = getCaliValue();
 	int wX  = getCaliValue();
 	int wY  = getCaliValue();
@@ -390,7 +405,7 @@ void SetPos() {
  *   @param wX: 表示Ｘ座標
  *   @param wY: 表示Ｙ座標
  */
-void SetMove() {
+static void SetMove() {
 	int wNum = getCaliValue();
 	int wX   = getCaliValue();
 	int wY   = getCaliValue();
@@ -406,7 +421,7 @@ void SetMove() {
  *   @param wNum: スプライト番号
  *   @param wTime: 移動を完了するまでの時間(1/100秒単位)
  */
-void SetMoveTime() {
+static void SetMoveTime() {
 	int wNum  = getCaliValue();
 	int wTime = getCaliValue();
 	
@@ -421,7 +436,7 @@ void SetMoveTime() {
  *   @param wNum: スプライト番号
  *   @param wSpeed: 移動速度(デフォルトを100%とした%指定)
  */
-void SetMoveSpeed() {
+static void SetMoveSpeed() {
 	int wNum   = getCaliValue();
 	int wSpeed = getCaliValue();
 	
@@ -437,7 +452,7 @@ void SetMoveSpeed() {
  *   @param wCount: 範囲
  *   @param wSpeed: 移動速度(デフォルトを100%とした%指定)
  */
-void SetMoveSpeedCount() {
+static void SetMoveSpeedCount() {
 	int wNum   = getCaliValue();
 	int wCount = getCaliValue();
 	int wSpeed = getCaliValue();
@@ -457,7 +472,7 @@ void SetMoveSpeedCount() {
  *   @param wCount: 範囲
  *   @param nTime: 間隔 
  */
-void SetSpriteAnimeTimeInterval() {
+static void SetSpriteAnimeTimeInterval() {
 	int wNum   = getCaliValue();
 	int wCount = getCaliValue();
 	int nTime  = getCaliValue();
@@ -475,7 +490,7 @@ void SetSpriteAnimeTimeInterval() {
  *   キー入力待ちでZキーが押されたときに表示OFFになるスプライトの登録
  *   @param wNum: スプライト番号
  */
-void AddZKeyHideSprite() {
+static void AddZKeyHideSprite() {
 	int wNum = getCaliValue();
 	
 	sp_add_zkey_hidesprite(wNum);
@@ -487,7 +502,7 @@ void AddZKeyHideSprite() {
  * SACT.ClearZKeyHideSprite (1.0~)
  *   AddZKeyHideSpriteで登録したスプライト番号を全てクリア
  */
-void ClearZKeyHideSprite() {
+static void ClearZKeyHideSprite() {
 	sp_clear_zkey_hidesprite_all();
 	
 	DEBUG_COMMAND_YET("SACT.ClearZKeyHideSprite:\n");
@@ -500,7 +515,7 @@ void ClearZKeyHideSprite() {
  *   @param wNum: スプライト番号
  *   @param wIndex: 固定する状態番号(1-3)
  */
-void SpriteFreeze() {
+static void SpriteFreeze() {
 	int wNum   = getCaliValue();
 	int wIndex = getCaliValue();
 	
@@ -514,7 +529,7 @@ void SpriteFreeze() {
  *   Freezeしたスプライト状態を解除
  *   @param wNum: スプライト番号
  */
-void SpriteThaw() {
+static void SpriteThaw() {
 	int wNum = getCaliValue();
 	
 	sp_thaw_sprite(wNum);
@@ -529,7 +544,7 @@ void SpriteThaw() {
  *   @param wCount: 範囲
  *   @param wIndex: 固定する状態番号
  */
-void SpriteFreezeCount() {
+static void SpriteFreezeCount() {
 	int wNum   = getCaliValue();
 	int wCount = getCaliValue();
 	int wIndex = getCaliValue();
@@ -548,7 +563,7 @@ void SpriteFreezeCount() {
  *    @param wNum: 先頭スプライト番号
  *    @param wCount: 範囲
  */
-void SpriteThawCount() {
+static void SpriteThawCount() {
 	int wNum   = getCaliValue();
 	int wCount = getCaliValue();
 	int i;
@@ -565,7 +580,7 @@ void SpriteThawCount() {
  *   QuakeSpriteで揺らすスプライトを追加
  *   @param wNum: スプライト番号
  */
-void QuakeSpriteAdd() {
+static void QuakeSpriteAdd() {
 	int wNum = getCaliValue();
 	
 	sp_add_quakesprite(wNum);
@@ -577,7 +592,7 @@ void QuakeSpriteAdd() {
  * SACT.QuakeSpriteReset (1.0~)
  *   QuakeSpriteAddの設定を全て解除
  */
-void QuakeSpriteReset() {
+static void QuakeSpriteReset() {
 	sp_clear_quakesprite_all();
 	DEBUG_COMMAND_YET("SACT.QuakeSpriteReset:\n");
 }
@@ -592,7 +607,7 @@ void QuakeSpriteReset() {
  *   @param wCount: 時間(1/100秒)
  *   @param nfKeyEnable: (1.1~): キーキャンセルあり(=1)
  */
-void QuakeSprite() {
+static void QuakeSprite() {
 	int wType       = getCaliValue();
 	int wAmplitudeX = getCaliValue();
 	int wAmplitudeY = getCaliValue();
@@ -614,7 +629,7 @@ void QuakeSprite() {
  *  @param wNum: スプライト番号
  *  @param var: 登録状態を返す変数 0: 未登録, 1:既登録
  */
-void QuerySpriteIsExist() {
+static void QuerySpriteIsExist() {
 	int wNum = getCaliValue();
 	int *var = getCaliVariable();
 
@@ -632,7 +647,7 @@ void QuerySpriteIsExist() {
  *   @param vCG2: ＣＧ２(ない場合は０)
  *   @param vCG3: ＣＧ３(ない場合は０)
  */
-void QuerySpriteInfo() {
+static void QuerySpriteInfo() {
 	int wNum   = getCaliValue();
 	int *vType = getCaliVariable();
 	int *vCG1  = getCaliVariable();
@@ -650,7 +665,7 @@ void QuerySpriteInfo() {
  *   @param wNum: スプライト番号
  *   @param vShow: 0:非表示, 1:表示
  */
-void QuerySpriteShow() {
+static void QuerySpriteShow() {
 	int wNum = getCaliValue();
 	int *vShow = getCaliVariable();
 
@@ -666,7 +681,7 @@ void QuerySpriteShow() {
  *   @param vX: Ｘ座標
  *   @param vY: Ｙ座標
  */
-void QuerySpritePos() {
+static void QuerySpritePos() {
 	int wNum = getCaliValue();
 	int *vX  = getCaliVariable();
 	int *vY  = getCaliVariable();
@@ -683,7 +698,7 @@ void QuerySpritePos() {
  *   @param vWidth: スプライトの幅
  *   @param vHeight: スプライトの高さ
  */
-void QuerySpriteSize() {
+static void QuerySpriteSize() {
 	int wNum     = getCaliValue();
 	int *vWidth  = getCaliVariable();
 	int *vHeight = getCaliVariable();
@@ -700,7 +715,7 @@ void QuerySpriteSize() {
  *   @param pwX:
  *   @param pwY:
  */
-void QueryTextPos() {
+static void QueryTextPos() {
 	int wNum = getCaliValue();
 	int *vX  = getCaliVariable();
 	int *vY  = getCaliVariable();
@@ -714,7 +729,7 @@ void QueryTextPos() {
  * SCAT.CG_Clear (1.0~)
  *   CG_Createで作成したCGを全て削除
  */
-void CG_Clear() {
+static void CG_Clear() {
 	scg_freeall();
 	
 	DEBUG_COMMAND_YET("SACT.CG_Clear:\n");
@@ -725,7 +740,7 @@ void CG_Clear() {
  *   CG_Createで作成したCGを削除
  *   @param wNumCG: 削除するCG番号
  */
-void CG_Reset() {
+static void CG_Reset() {
 	int wNumCG = getCaliValue();
 	
 	scg_free(wNumCG);
@@ -740,7 +755,7 @@ void CG_Reset() {
  *   @param vType: CGの種類, 0: 未使用, 1:リンクされている, 2: CG_SETで作成
  *                 3: CG_REVERSEで作成, 4: CG_STRETCHで作成
  */
-void CG_QueryType() {
+static void CG_QueryType() {
 	int wNumCG = getCaliValue();
 	int *vType = getCaliVariable();
 	
@@ -756,7 +771,7 @@ void CG_QueryType() {
  *   @param vWidth: 幅
  *   @param vHeight: 高さ
  */
-void CG_QuerySize() {
+static void CG_QuerySize() {
 	int wNumCG   = getCaliValue();
 	int *vWidth  = getCaliVariable();
 	int *vHeight = getCaliVariable();
@@ -772,7 +787,7 @@ void CG_QuerySize() {
  *   @param wNumCG: CG番号
  *   @param vBpp: CGのbpp
  */
-void CG_QueryBpp() {
+static void CG_QueryBpp() {
 	int wNumCG = getCaliValue();
 	int *vBpp  = getCaliVariable();
 	
@@ -787,7 +802,7 @@ void CG_QueryBpp() {
  *   @param wNumCG: CG番号
  *   @param vMask: 0/1
  */
-void CG_ExistAlphaMap() {
+static void CG_ExistAlphaMap() {
 	int wNumCG = getCaliValue();
 	int *vMask = getCaliVariable();
 	
@@ -807,7 +822,7 @@ void CG_ExistAlphaMap() {
  *   @param wB: RGB値の青(0-255)
  *   @param wBlendRate: ブレンド率(0-255)
  */
-void CG_Create() {
+static void CG_Create() {
 	int wNumCG     = getCaliValue();
 	int wWidth     = getCaliValue();
 	int wHeight    = getCaliValue();
@@ -829,7 +844,7 @@ void CG_Create() {
  *   @param wReverseX: X方向の反転スイッチ(0:反転しない、1:反転する)
  *   @param wReverseY: Y方向の反転スイッチ(0:反転しない、1:反転する)
  */
-void CG_CreateReverse() {
+static void CG_CreateReverse() {
 	int wNumCG = getCaliValue();
 	int wNumSrcCG = getCaliValue();
 	int wReverseX = getCaliValue();
@@ -848,7 +863,7 @@ void CG_CreateReverse() {
  *   @param wHeight: 作成するCGの高さ
  *   @param wNumSrcCG: 元になるCGの番号
  */
-void CG_CreateStretch() {
+static void CG_CreateStretch() {
 	int wNumCG    = getCaliValue();
 	int wWidth    = getCaliValue();
 	int wHeight   = getCaliValue();
@@ -869,7 +884,7 @@ void CG_CreateStretch() {
  *   @param wNumBlendCG: 上に重ね合わせるCG
  *   @param wAlphaMapMode: αマップの作成モード
  */
-void CG_CreateBlend() {
+static void CG_CreateBlend() {
 	int wNumDstCG  = getCaliValue();
 	int wNumBaseCG = getCaliValue();
 	int wX = getCaliValue();
@@ -892,7 +907,7 @@ void CG_CreateBlend() {
  *   @param wB: 文字のB値(0-255)
  *   @param wText: 描画する文字列変数の番号
  */
-void CG_CreateText() {
+static void CG_CreateText() {
 	int wNumCG = getCaliValue();
 	int wSize  = getCaliValue();
 	int wR     = getCaliValue();
@@ -918,7 +933,7 @@ void CG_CreateText() {
  *                        0:ゼロ埋めしない 1:ゼロ埋めする
  *   @param wValue: 描画する値
  */
-void CG_CreateTextNum() {
+static void CG_CreateTextNum() {
 	int wNumCG       = getCaliValue();
 	int wSize        = getCaliValue();
 	int wR           = getCaliValue();
@@ -939,7 +954,7 @@ void CG_CreateTextNum() {
  *   @param wNumDst: 複写先のCG番号
  *   @param wNumSrc: 複写元のCG番号
  */
-void CG_Copy() {
+static void CG_Copy() {
 	int wNumDst = getCaliValue();
 	int wNumSrc = getCaliValue();
 	
@@ -958,7 +973,7 @@ void CG_Copy() {
  *   @param wWidth: カット幅
  *   @param wHeight: カット高さ
  */
-void CG_Cut() {
+static void CG_Cut() {
 	int wNumDstCG = getCaliValue();
 	int wNumSrcCG = getCaliValue();
 	int wX = getCaliValue();
@@ -982,7 +997,7 @@ void CG_Cut() {
  *   @param wWidth: カット幅
  *   @param wHeight: カット高さ
  */
-void CG_PartCopy() {
+static void CG_PartCopy() {
 	int wNumDstCG = getCaliValue();
 	int wNumSrcCG = getCaliValue();
 	int wX = getCaliValue();
@@ -1000,7 +1015,7 @@ void CG_PartCopy() {
  *   通常キー入力待ち
  *   @param vKey: 入力されたキー
  */
-void WaitKeySimple() {
+static void WaitKeySimple() {
 	int *vKey = getCaliVariable();
 
 	DEBUG_COMMAND_YET("SACT.WaitKeySimple %d:\n", vKey);
@@ -1011,8 +1026,8 @@ void WaitKeySimple() {
 	sact.waittype = KEYWAIT_SIMPLE;
 	sact.waitkey = -1;
 	
-	while(sact.waitkey == -1) {
-		sys_keywait(25, TRUE);
+	while (sact.waitkey == -1 && !nact->is_quit) {
+		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	
 	sact.waittype = KEYWAIT_NONE;
@@ -1028,7 +1043,7 @@ void WaitKeySimple() {
  *   @param wMessageMark2: スプライト番号2(アニメーションスプライト)
  *   @param wMessageLength: (1.2~)
  */
-void WaitKeyMessage() {
+static void WaitKeyMessage() {
 	int wMessageMark1 = getCaliValue();
 	int wMessageMark2 = getCaliValue();
 	int wMessageLength = 0;
@@ -1050,7 +1065,7 @@ void WaitKeyMessage() {
  *   @param vRsv1: 予約
  *   @param vRsv2: 予約
  */
-void WaitKeySprite() {
+static void WaitKeySprite() {
 	int *vOK = getCaliVariable();
 	int *vRND = getCaliVariable();
 	int *vRsv1 = getCaliVariable();
@@ -1069,7 +1084,7 @@ void WaitKeySprite() {
  *   @param nKeyCode:
  *   @param vResult:
  */
-void PeekKey() {
+static void PeekKey() {
 	int nKeyCode = getCaliValue();
 	int *vResult = getCaliVariable();
 	
@@ -1081,7 +1096,7 @@ void PeekKey() {
  * SACT.WaitKeySKipKeyUp (1.0~)
  *   文字送りキーが押されっぱなしの時、離されるまで待つ
  */
-void WaitMsgSkipKeyUp() {
+static void WaitMsgSkipKeyUp() {
 	WARNING("NOT IMPLEMENTED\n");
 	DEBUG_COMMAND_YET("SACT.WaitMsgSkipKeyUp:\n");
 }
@@ -1093,7 +1108,7 @@ void WaitMsgSkipKeyUp() {
  *   @param vD03: タイムアウトした場合=1, しない場合=0
  *   @param wTime: タイムアウト時間 (1/100sec)
  */
-void WaitKeySimpleTimeOut() {
+static void WaitKeySimpleTimeOut() {
 	int *vRND = getCaliVariable();
 	int *vD03 = getCaliVariable();
 	int wTime = getCaliValue();
@@ -1101,7 +1116,7 @@ void WaitKeySimpleTimeOut() {
 	sact.waittype = KEYWAIT_SIMPLE;
 	sact.waitkey = -1;
 	
-	sys_keywait(wTime * 10, TRUE);
+	sys_keywait(wTime * 10, KEYWAIT_CANCELABLE);
 	if (sact.waitkey == -1) {
 		*vD03 = 1;
 		*vRND = 0;
@@ -1125,7 +1140,7 @@ void WaitKeySimpleTimeOut() {
  *   @param vD03: タイムアウトした場合=1, しない場合=0
  *   @param wTime: タイムアウト時間 (1/100sec)
  */
-void WaitKeySpriteTimeOut() {
+static void WaitKeySpriteTimeOut() {
 	int *vOK = getCaliVariable();
 	int *vRND = getCaliVariable();
 	int *vD01 = getCaliVariable();
@@ -1143,10 +1158,10 @@ void WaitKeySpriteTimeOut() {
  *   ??????
  *   @param vSkip:
  */
-void QueryMessageSkip() {
+static void QueryMessageSkip() {
 	int *vSkip = getCaliVariable();
 
-	*vSkip = get_skipMode() ? 1 : 0;
+	*vSkip = msgskip_isSkipping() ? 1 : 0;
 	
 	DEBUG_COMMAND_YET("SACT.QueryMessageSkip %p:\n", vSkip);
 }
@@ -1157,7 +1172,7 @@ void QueryMessageSkip() {
  *   @param sstr: 変換元文字列番号
  *   @param dstr: 変換先文字列番号
  */
-void RegistReplaceString() {
+static void RegistReplaceString() {
 	int sstr = getCaliValue();
 	int dstr = getCaliValue();
 	
@@ -1182,7 +1197,7 @@ void RegistReplaceString() {
  *   @param wMessageAlign: 行そろえ (1.1~)
  *   @param vMessageLength: ???     (1.2~)
  */
-void MessageOutput() {
+static void MessageOutput() {
 	int wMessageSpriteNumber = getCaliValue();
 	int wMessageSize   = getCaliValue();
 	int wMessageColorR = getCaliValue();
@@ -1226,7 +1241,7 @@ void MessageOutput() {
  *   @param wRubyLineSpace: ルビ文字とメッセージの行間スペース
  *   @param vLength: ???    (1.2~)
  */
-void MessageOutputEx() {
+static void MessageOutputEx() {
 	int wMessageSpriteNumber = getCaliValue();
 	int wMessageSize   = getCaliValue();
 	int wMessageColorR = getCaliValue();
@@ -1256,7 +1271,7 @@ void MessageOutputEx() {
  *   @param wMessageSpriteNumber: メッセージスプライト番号
  *   @param wMessageSize: フォントの大きさ (~MES_SIZE|~MES_SET)
  */
-void MessageNewLine() {
+static void MessageNewLine() {
 	int wMessageSpriteNumber = getCaliValue();
 	int wMessageSize = getCaliValue();
 	
@@ -1270,7 +1285,7 @@ void MessageNewLine() {
  *   メッセージ領域の消去(Aコマンド相当)
  *   @param wMessageSpriteNumber: メッセージスプライト番号
  */ 
-void MessageClear() {
+static void MessageClear() {
 	int wMessageSpriteNumber = getCaliValue();
 	
 	smsg_clear(wMessageSpriteNumber);
@@ -1283,7 +1298,7 @@ void MessageClear() {
  *   メッセージが残っている場合 wResult に 0 を返す?
  *   @param wResult: 結果を返す変数
  */
-void MessageIsEmpty() {
+static void MessageIsEmpty() {
 	int *wResult = getCaliVariable();
 
 	*wResult = smsg_is_empty();
@@ -1297,7 +1312,7 @@ void MessageIsEmpty() {
  *   @param vCount: 取得した行数
  *   @param nTopStringNum: バッファを取得する文字列変数の最初
  */
-void MessagePeek() {
+static void MessagePeek() {
 	int *vCount = getCaliVariable();
 	int nTopStringNum = getCaliValue();
 
@@ -1310,7 +1325,7 @@ void MessagePeek() {
  * SACT.Log_Stop (1.2~)
  *   ログ採取停止
  */
-void Log_Stop() {
+static void Log_Stop() {
 	sact.logging = FALSE;
 	DEBUG_COMMAND_YET("SACT.Log_Stop:\n");
 }
@@ -1319,7 +1334,7 @@ void Log_Stop() {
  * SACT.Log_Start (1.2~)
  *   ログ採取開始
  */
-void Log_Start() {
+static void Log_Start() {
 	sact.logging = TRUE;
 	DEBUG_COMMAND_YET("SACT.Log_Start:\n");
 }
@@ -1328,7 +1343,7 @@ void Log_Start() {
  * SACT.MenuClear (1.0~)
  *   SACT内部の選択肢情報をクリア
  */
-void MenuClear() {
+static void MenuClear() {
 	ssel_clear();
 	
 	DEBUG_COMMAND_YET("SACT.MenuClear:\n");
@@ -1340,7 +1355,7 @@ void MenuClear() {
  *   @param nString: 登録する文字列変数番号
  *   @param wI: 登録する位置 (1-)
  */
-void MenuAdd() {
+static void MenuAdd() {
 	int nString = getCaliValue();
 	int wI = getCaliValue();
 
@@ -1360,7 +1375,7 @@ void MenuAdd() {
  *   @param wChoiceAutoMoveCursor: オープン時に自動的に移動する選択肢の番号
  *   @param nAlign: 行そろえ (0:左, 1:中央, 2: 右) (1.1~)
  */
-void MenuOpen() {
+static void MenuOpen() {
 	int *wMenuResult = getCaliVariable();
 	int wNum         = getCaliValue();
 	int wChoiceSize  = getCaliValue();
@@ -1383,7 +1398,7 @@ void MenuOpen() {
  *   SACT内部に文字列変数をプッシュ
  *   @param nString: 文字列変数番号
  */
-void PushString() {
+static void PushString() {
 	int nString = getCaliValue();
 	
 	sstr_push(nString);
@@ -1396,7 +1411,7 @@ void PushString() {
  *   SACT内部にプッシュした文字列変数をポップ
  *   @param nString: 文字列変数番号
  */
-void PopString() {
+static void PopString() {
 	int nString = getCaliValue();
 
 	sstr_pop(nString);
@@ -1417,7 +1432,7 @@ void PopString() {
  *   @param nIndex: 数字(0-9)
  *   @param nCG: 数字に対応するCG番号
  */
-void Numeral_SetCG() {
+static void Numeral_SetCG() {
 	int nNum = getCaliValue();
 	int nIndex = getCaliValue();
 	int nCG = getCaliValue();
@@ -1434,7 +1449,7 @@ void Numeral_SetCG() {
  *   @param nIndex: 数字(0-9)
  *   @param vCG: 設定されているCG番号を返す変数
  */
-void Numeral_GetCG() {
+static void Numeral_GetCG() {
 	int nNum = getCaliValue();
 	int nIndex = getCaliValue();
 	int *vCG = getCaliVariable();
@@ -1451,7 +1466,7 @@ void Numeral_GetCG() {
  *   @param nX: 表示Ｘ座標
  *   @param ny: 表示Ｙ座標
  */
-void Numeral_SetPos() {
+static void Numeral_SetPos() {
 	int nNum = getCaliValue();
 	int nX = getCaliValue();
 	int nY = getCaliValue();
@@ -1468,7 +1483,7 @@ void Numeral_SetPos() {
  *   @param vX: Ｘ座標を格納する変数
  *   @param vY: Ｙ座標を格納する変数
  */
-void Numeral_GetPos() {
+static void Numeral_GetPos() {
 	int nNum = getCaliValue();
 	int *vX = getCaliVariable();
 	int *vY = getCaliVariable();
@@ -1484,7 +1499,7 @@ void Numeral_GetPos() {
  *   @param nNum: スプライト番号
  *   @param nSpan: 間隔
  */
-void Numeral_SetSpan() {
+static void Numeral_SetSpan() {
 	int nNum = getCaliValue();
 	int nSpan = getCaliValue();
 	
@@ -1499,7 +1514,7 @@ void Numeral_SetSpan() {
  *   @param nNum: スプライト番号
  *   @param vSpan: 値を格納する変数
  */
-void Numeral_GetSpan() {
+static void Numeral_GetSpan() {
 	int nNum = getCaliValue();
 	int *vSpan = getCaliVariable();
 
@@ -1512,7 +1527,7 @@ void Numeral_GetSpan() {
  * SACT.ExpSp_Clear (1.0~)
  *   説明スプライト設定クリア
  */
-void ExpSp_Clear() {
+static void ExpSp_Clear() {
 	DEBUG_COMMAND_YET("SACT.ExpSp_Clear:\n");
 
 	sp_exp_clear();
@@ -1524,7 +1539,7 @@ void ExpSp_Clear() {
  *   @param wNumSP1: スイッチスプライト
  *   @param wNumSP2: 説明スプライト
  */
-void ExpSp_Add() {
+static void ExpSp_Add() {
 	int wNumSP1 = getCaliValue();
 	int wNumSP2 = getCaliValue();
 	
@@ -1538,7 +1553,7 @@ void ExpSp_Add() {
  *   説明スプライト削除
  *   @param wNum: スプライト番号
  */
-void ExpSp_Del() {
+static void ExpSp_Del() {
 	int wNum = getCaliValue();
 	
 	sp_exp_del(wNum);
@@ -1552,7 +1567,7 @@ void ExpSp_Del() {
  *   @param wTimerID: タイマーID
  *   @param wCount: リセットする値
  */
-void TimerSet() {
+static void TimerSet() {
 	int wTimerID = getCaliValue();
 	int wCount = getCaliValue();
 	
@@ -1567,7 +1582,7 @@ void TimerSet() {
  *   @param wTimerID: タイマーID
  *   @param vRND: 取得する変数
  */
-void TimerGet() {
+static void TimerGet() {
 	int wTimerID = getCaliValue();
 	int *vRND = getCaliVariable();
 
@@ -1582,12 +1597,12 @@ void TimerGet() {
  *   @param wTimerID: タイマーID
  *   @param wCount: 指定カウント
  */
-void TimerWait() {
+static void TimerWait() {
 	int wTimerID = getCaliValue();
 	int wCount = getCaliValue();
 
-	while(wCount > stimer_get(wTimerID)) {
-		sys_keywait(10, FALSE);
+	while (wCount > stimer_get(wTimerID) && !nact->is_quit) {
+		sys_keywait(10, KEYWAIT_NONCANCELABLE);
 	}
 	
 	DEBUG_COMMAND("SACT.TimerWait %d,%d:\n", wTimerID, wCount);
@@ -1598,10 +1613,10 @@ void TimerWait() {
  *   指定時間、すべての動作を停止
  *   @param nCount: 時間(1/100秒単位)
  */
-void Wait() {
+static void Wait() {
 	int wCount = getCaliValue();
 	
-	sys_keywait(wCount*10, FALSE);
+	sys_keywait(wCount*10, KEYWAIT_NONCANCELABLE);
 	
 	DEBUG_COMMAND_YET("SACT.Wait %d:\n", wCount);
 }
@@ -1611,7 +1626,7 @@ void Wait() {
  *   サウンド直接再生  (~SOUND_PLAY)
  *   @param wNum: 再生する番号
  */
-void SoundPlay() {
+static void SoundPlay() {
 	int wNum = getCaliValue();
 	
 	ssnd_play(wNum);
@@ -1625,7 +1640,7 @@ void SoundPlay() {
  *   @param wNum: 停止する番号
  *   @param wFadeTime: 停止するまでの時間 (1/100sec)
  */
-void SoundStop() {
+static void SoundStop() {
 	int wNum = getCaliValue();
 	int wFadeTime = getCaliValue();
 	
@@ -1640,7 +1655,7 @@ void SoundStop() {
  *   @param wNum: 停止する番号
  *   @param wFadeTime: 停止するまでの時間 (1/100sec)
  */
-void SoundStopAll() {
+static void SoundStopAll() {
 	int wFadeTime = getCaliValue();
 	
 	ssnd_stopall(wFadeTime);
@@ -1653,7 +1668,7 @@ void SoundStopAll() {
  *   ヘッダで指定された時間or再生終了まで待つ  (~SOUND_WAIT)
  *   @param wNum: 指定番号
  */
-void SoundWait() {
+static void SoundWait() {
 	int wNum = getCaliValue();
 	
 	ssnd_wait(wNum);
@@ -1667,7 +1682,7 @@ void SoundWait() {
  *   @param wNum: 指定番号
  *   @param vKey: キャンセルキー
  */
-void SoundWaitKey() {
+static void SoundWaitKey() {
 	int wNum = getCaliValue();
 	int *vKey = getCaliVariable();
 	
@@ -1681,7 +1696,7 @@ void SoundWaitKey() {
  *   再生の準備をする(~SOUND_PREPARE)
  *   @param wNum: 再生する番号
  */
-void SoundPrepare() {
+static void SoundPrepare() {
 	int wNum = getCaliValue();
 	
 	ssnd_prepare(wNum);
@@ -1694,7 +1709,7 @@ void SoundPrepare() {
  *   再生の準備をする(左右反転) (~SOUND_PREPARE_LR)
  *   @param wNum: 再生する番号
  */
-void SoundPrepareLR() {
+static void SoundPrepareLR() {
 	int wNum = getCaliValue();
 
 	ssnd_prepareLRrev(wNum);
@@ -1707,7 +1722,7 @@ void SoundPrepareLR() {
  *   左右反転して再生 (~SOUND_PLAY_LR)
  *   @param wNum: 再生する番号
  */
-void SoundPlayLR() {
+static void SoundPlayLR() {
 	int wNum = getCaliValue();
 	
 	ssnd_playLRrev(wNum);
@@ -1724,7 +1739,7 @@ void SoundPlayLR() {
  *   @param wNumWave2: Sound2
  *   @param wNumWave3: Sound3
  */
-void SpriteSound() {
+static void SpriteSound() {
 	int wNumSP = getCaliValue();
 	int nCount = getCaliValue();
 	int wNumWave1 = getCaliValue();
@@ -1743,7 +1758,7 @@ void SpriteSound() {
  * SACT.SpriteSoundWait (1.0~)
  *   SpriteSoundで設定したすべての音の再生終了まで待つ (~SP_SOUND_WAIT)
  */
-void SpriteSoundWait() {
+static void SpriteSoundWait() {
 	DEBUG_COMMAND_YET("SACT.SpriteSoundWait:\n");
 
 	sp_sound_wait();
@@ -1754,7 +1769,7 @@ void SpriteSoundWait() {
  *   範囲外をクリックしたときの音  (~SPRITE_SOUND_OB)
  *   @param wNumWave: 再生する番号、０でクリア
  */
-void SpriteSoundOB() {
+static void SpriteSoundOB() {
 	int wNumWave = getCaliValue();
 	
 	sp_sound_ob(wNumWave);
@@ -1768,7 +1783,7 @@ void SpriteSoundOB() {
  *   @param wNum: 番号
  *   @param vRND: 0:ない、1:ある
  */
-void MusicCheck() {
+static void MusicCheck() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 	
@@ -1783,7 +1798,7 @@ void MusicCheck() {
  *   @param wNum: 音楽番号
  *   @param vRND: 取得した長さを格納する変数
  */
-void MusicGetLength() {
+static void MusicGetLength() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 	
@@ -1798,7 +1813,7 @@ void MusicGetLength() {
  *   @param wNum: 音楽番号
  *   @param vRND: 取得した位置を格納する変数
  */
-void MusicGetPos() {
+static void MusicGetPos() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 	
@@ -1814,7 +1829,7 @@ void MusicGetPos() {
  *   @param wFadeTime: フェードイン時間(1/100秒)
  *   @param wVolume: 音量(0-100)
  */
-void MusicPlay() {
+static void MusicPlay() {
 	int wNum = getCaliValue();
 	int wFadeTime = getCaliValue();
 	int wVolume = getCaliValue();
@@ -1830,7 +1845,7 @@ void MusicPlay() {
  *   @param wNum: 音楽番号
  *   @param wFadeTime: 終了するまでの時間(1/100秒)
  */
-void MusicStop() {
+static void MusicStop() {
 	int wNum = getCaliValue();
 	int wFadeTime = getCaliValue();
 	
@@ -1844,7 +1859,7 @@ void MusicStop() {
  *   すべての音楽を停止
  *   @param wFadeTime: 終了するまでの時間(1/100秒)
  */
-void MusicStopAll() {
+static void MusicStopAll() {
 	int wFadeTime = getCaliValue();
 	
 	smus_stopall(wFadeTime);
@@ -1859,7 +1874,7 @@ void MusicStopAll() {
  *   @param wFadeTime: フェード時間(1/100秒)
  *   @param wVolume: 音量 (1-100)
  */
-void MusicFade() {
+static void MusicFade() {
 	int wNum = getCaliValue();
 	int wFadeTime = getCaliValue();
 	int wVolume = getCaliValue();
@@ -1875,7 +1890,7 @@ void MusicFade() {
  *   @param wNum: 音楽番号
  *   @param nTimeOut: (1.1~)
  */
-void MusicWait() {
+static void MusicWait() {
 	int wNum = getCaliValue();
 	int nTimeOut = 0;
 	
@@ -1895,7 +1910,7 @@ void MusicWait() {
  *   @param wNum: 音楽番号
  *   @param wIndex: 位置マーク番号
  */
-void MusicWaitPos() {
+static void MusicWaitPos() {
 	int wNum = getCaliValue();
 	int wIndex = getCaliValue();
 	
@@ -1910,7 +1925,7 @@ void MusicWaitPos() {
  *   @param wNum: チャンネル番号
  *   @param vRND: リンク番号(未使用＝０)
  */
-void SoundGetLinkNum() {
+static void SoundGetLinkNum() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 
@@ -1931,7 +1946,7 @@ void SoundGetLinkNum() {
  *
  *     pos = ((pos2-pos1) / (val2-val1)) * (val-val1) + pos1
  */
-void ChartPos() {
+static void ChartPos() {
 	int *pos = getCaliVariable();
 	int pos1 = getCaliValue();
 	int pos2 = getCaliValue();
@@ -1952,7 +1967,7 @@ void ChartPos() {
  *   @param zeropad: 0: ゼロ埋めしない, 1: ゼロ埋めする
  *   @param num: 変換する数値
  */
-void NumToStr() {
+static void NumToStr() {
 	int strno   = getCaliValue();
 	int fig     = getCaliValue();
 	int zeropad = getCaliValue();
@@ -1966,7 +1981,7 @@ void NumToStr() {
 /**
  * SACT.Maze_Create (1.0~)
  */
-void Maze_Create() {
+static void Maze_Create() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
@@ -1978,7 +1993,7 @@ void Maze_Create() {
 /**
  * SACT.Maze_Get (1.0~)
  */
-void Maze_Get() {
+static void Maze_Get() {
 	int *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -1991,7 +2006,7 @@ void Maze_Get() {
 /**
  * SACT.EncryptWORD (1.0~)
  */
-void EncryptWORD() {
+static void EncryptWORD() {
 	int *array = getCaliVariable();
 	int num = getCaliValue();
 	int key = getCaliValue();
@@ -2004,7 +2019,7 @@ void EncryptWORD() {
 /**
  * SACT.DecryptWORD (1.0~)
  */
-void DecryptWORD() {
+static void DecryptWORD() {
 	int *array = getCaliVariable();
 	int num = getCaliValue();
 	int key = getCaliValue();
@@ -2017,7 +2032,7 @@ void DecryptWORD() {
 /**
  * SACT.EncryptString (1.0~)
  */
-void EncryptString() {
+static void EncryptString() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
@@ -2029,7 +2044,7 @@ void EncryptString() {
 /**
  * SACT.DecryptString (1.0~)
  */
-void DecryptString() {
+static void DecryptString() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
@@ -2042,7 +2057,7 @@ void DecryptString() {
  * SACT.XMenuClear (1.0~)
  *   拡張メニュー初期化
  */
-void XMenuClear() {
+static void XMenuClear() {
 	spxm_clear();
 	
 	DEBUG_COMMAND_YET("SACT.XMenuClear:\n");
@@ -2054,7 +2069,7 @@ void XMenuClear() {
  *   @param nRegiNum: 拡張メニューの内部インデックス番号
  *   @param nMenuID: 選択されたときに返す番号(ID)
  */
-void XMenuRegister() {
+static void XMenuRegister() {
 	int nRegiNum = getCaliValue();
 	int nMenuID  = getCaliValue();
 	
@@ -2069,7 +2084,7 @@ void XMenuRegister() {
  *   @param nRegiNum: 内部インデックス番号
  *   @param vMenuID: 登録されているIDを格納する変数
  */
-void XMenuGetNum() {
+static void XMenuGetNum() {
 	int nRegiNum = getCaliValue();
 	int *vMenuID = getCaliVariable();
 	
@@ -2084,7 +2099,7 @@ void XMenuGetNum() {
  *   @param nRegiNum: 内部インデックス番号
  *   @param strno: コピー先文字列変数番号
  */
-void XMenuGetText() {
+static void XMenuGetText() {
 	int nRegiNum = getCaliValue();
 	int strno    = getCaliValue();
 	
@@ -2097,7 +2112,7 @@ void XMenuGetText() {
  * SACT.XMenuTitleRegister (1.0~)
  *   現在バッファにある文字列を拡張メニューのタイトルとして登録
  */
-void XMenuTitleRegister() {
+static void XMenuTitleRegister() {
 	spxm_titlereg();
 	
 	DEBUG_COMMAND_YET("SACT.XMenuTitleRegister:\n");
@@ -2108,10 +2123,135 @@ void XMenuTitleRegister() {
  *   拡張メニューのタイトルを指定の文字列変数にコピー
  *   @param strno: コピー先文字列変数番号
  */
-void XMenuTitleGet() {
+static void XMenuTitleGet() {
 	int strno = getCaliValue();
 	
 	spxm_titleget(strno);
 	
 	DEBUG_COMMAND_YET("SACT.XMenuTitleGet %d:\n", strno);
 }
+
+static const ModuleFunc functions[] = {
+	{"AddZKeyHideSprite", AddZKeyHideSprite},
+	{"CG_Clear", CG_Clear},
+	{"CG_Copy", CG_Copy},
+	{"CG_Create", CG_Create},
+	{"CG_CreateBlend", CG_CreateBlend},
+	{"CG_CreateReverse", CG_CreateReverse},
+	{"CG_CreateStretch", CG_CreateStretch},
+	{"CG_CreateText", CG_CreateText},
+	{"CG_CreateTextNum", CG_CreateTextNum},
+	{"CG_Cut", CG_Cut},
+	{"CG_ExistAlphaMap", CG_ExistAlphaMap},
+	{"CG_PartCopy", CG_PartCopy},
+	{"CG_QueryBpp", CG_QueryBpp},
+	{"CG_QuerySize", CG_QuerySize},
+	{"CG_QueryType", CG_QueryType},
+	{"CG_Reset", CG_Reset},
+	{"ChartPos", ChartPos},
+	{"Clear", Clear},
+	{"ClearZKeyHideSprite", ClearZKeyHideSprite},
+	{"CreateSprite", CreateSprite},
+	{"CreateTextSprite", CreateTextSprite},
+	{"DecryptString", DecryptString},
+	{"DecryptWORD", DecryptWORD},
+	{"Delete", Delete},
+	{"Draw", Draw},
+	{"DrawEffect", DrawEffect},
+	{"DrawEffectAlphaMap", DrawEffectAlphaMap},
+	{"EncryptString", EncryptString},
+	{"EncryptWORD", EncryptWORD},
+	{"ExpSp_Add", ExpSp_Add},
+	{"ExpSp_Clear", ExpSp_Clear},
+	{"ExpSp_Del", ExpSp_Del},
+	{"Init", Init},
+	{"Log_Start", Log_Start},
+	{"Log_Stop", Log_Stop},
+	{"Maze_Create", Maze_Create},
+	{"Maze_Get", Maze_Get},
+	{"MenuAdd", MenuAdd},
+	{"MenuClear", MenuClear},
+	{"MenuOpen", MenuOpen},
+	{"MessageClear", MessageClear},
+	{"MessageIsEmpty", MessageIsEmpty},
+	{"MessageNewLine", MessageNewLine},
+	{"MessageOutput", MessageOutput},
+	{"MessageOutputEx", MessageOutputEx},
+	{"MessagePeek", MessagePeek},
+	{"MusicCheck", MusicCheck},
+	{"MusicFade", MusicFade},
+	{"MusicGetLength", MusicGetLength},
+	{"MusicGetPos", MusicGetPos},
+	{"MusicPlay", MusicPlay},
+	{"MusicStop", MusicStop},
+	{"MusicStopAll", MusicStopAll},
+	{"MusicWait", MusicWait},
+	{"MusicWaitPos", MusicWaitPos},
+	{"NumToStr", NumToStr},
+	{"Numeral_GetCG", Numeral_GetCG},
+	{"Numeral_GetPos", Numeral_GetPos},
+	{"Numeral_GetSpan", Numeral_GetSpan},
+	{"Numeral_SetCG", Numeral_SetCG},
+	{"Numeral_SetPos", Numeral_SetPos},
+	{"Numeral_SetSpan", Numeral_SetSpan},
+	{"PeekKey", PeekKey},
+	{"PopString", PopString},
+	{"PushString", PushString},
+	{"QuakeScreen", QuakeScreen},
+	{"QuakeSprite", QuakeSprite},
+	{"QuakeSpriteAdd", QuakeSpriteAdd},
+	{"QuakeSpriteReset", QuakeSpriteReset},
+	{"QueryMessageSkip", QueryMessageSkip},
+	{"QuerySpriteInfo", QuerySpriteInfo},
+	{"QuerySpriteIsExist", QuerySpriteIsExist},
+	{"QuerySpritePos", QuerySpritePos},
+	{"QuerySpriteShow", QuerySpriteShow},
+	{"QuerySpriteSize", QuerySpriteSize},
+	{"QueryTextPos", QueryTextPos},
+	{"RegistReplaceString", RegistReplaceString},
+	{"SetBlendRate", SetBlendRate},
+	{"SetMove", SetMove},
+	{"SetMoveSpeed", SetMoveSpeed},
+	{"SetMoveSpeedCount", SetMoveSpeedCount},
+	{"SetMoveTime", SetMoveTime},
+	{"SetOrigin", SetOrigin},
+	{"SetPos", SetPos},
+	{"SetShow", SetShow},
+	{"SetSpriteAnimeTimeInterval", SetSpriteAnimeTimeInterval},
+	{"SetWallPaper", SetWallPaper},
+	{"SoundGetLinkNum", SoundGetLinkNum},
+	{"SoundPlay", SoundPlay},
+	{"SoundPlayLR", SoundPlayLR},
+	{"SoundPrepare", SoundPrepare},
+	{"SoundPrepareLR", SoundPrepareLR},
+	{"SoundStop", SoundStop},
+	{"SoundStopAll", SoundStopAll},
+	{"SoundWait", SoundWait},
+	{"SoundWaitKey", SoundWaitKey},
+	{"SpriteDeleteCount", SpriteDeleteCount},
+	{"SpriteFreeze", SpriteFreeze},
+	{"SpriteFreezeCount", SpriteFreezeCount},
+	{"SpriteSound", SpriteSound},
+	{"SpriteSoundOB", SpriteSoundOB},
+	{"SpriteSoundWait", SpriteSoundWait},
+	{"SpriteThaw", SpriteThaw},
+	{"SpriteThawCount", SpriteThawCount},
+	{"TimerGet", TimerGet},
+	{"TimerSet", TimerSet},
+	{"TimerWait", TimerWait},
+	{"Wait", Wait},
+	{"WaitKeyMessage", WaitKeyMessage},
+	{"WaitKeySimple", WaitKeySimple},
+	{"WaitKeySimpleTimeOut", WaitKeySimpleTimeOut},
+	{"WaitKeySprite", WaitKeySprite},
+	{"WaitKeySpriteTimeOut", WaitKeySpriteTimeOut},
+	{"WaitMsgSkipKeyUp", WaitMsgSkipKeyUp},
+	{"XMenuClear", XMenuClear},
+	{"XMenuGetNum", XMenuGetNum},
+	{"XMenuGetText", XMenuGetText},
+	{"XMenuRegister", XMenuRegister},
+	{"XMenuTitleGet", XMenuTitleGet},
+	{"XMenuTitleRegister", XMenuTitleRegister},
+};
+
+const Module module_SACT = {"SACT", functions, sizeof(functions) / sizeof(ModuleFunc)};

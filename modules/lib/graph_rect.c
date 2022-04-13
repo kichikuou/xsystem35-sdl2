@@ -19,8 +19,6 @@ int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b)
 	switch(dst->depth) {
 	case 8:
 		col = r; break;
-	case 15:
-		col = PIX15(r, g, b); break;
 	case 16:
 		col = PIX16(r, g, b); break;
 	case 24:
@@ -49,7 +47,6 @@ int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b)
 			*((BYTE *)dp + i) = col;
 		}
 		break;
-	case 15:
 	case 16:
 		/* top */
 		for (i = 0; i < w; i++) {

@@ -1,7 +1,7 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"
@@ -9,45 +9,40 @@
 #include "system.h"
 
 static surface_t *create(int width, int height, int depth, boolean has_pixel, boolean has_alpha) {
-	surface_t *s = g_new0(surface_t, 1);
+	surface_t *s = calloc(1, sizeof(surface_t));
 	
 	s->width = width;
 	s->height = height;
-	s->has_alpha = has_alpha;
-	s->has_pixel = has_pixel;
 	
 	s->bytes_per_line = width;
 	s->bytes_per_pixel = 1;
 	s->depth = depth;
 	
-	if (s->has_pixel) {
+	if (has_pixel) {
 		switch (s->depth) {
 		case 8:
-			s->pixel = g_new0(BYTE, width * (height +1));
+			s->pixel = calloc(width * (height +1), sizeof(BYTE));
 			s->bytes_per_line = width;
 			s->bytes_per_pixel = 1;
 			break;
-		case 15:
 		case 16:
-			s->pixel = g_new0(BYTE, width * (height +1) * 2);
+			s->pixel = calloc(width * (height +1) * 2, sizeof(BYTE));
 			s->bytes_per_line = width * 2;
 			s->bytes_per_pixel = 2;
 			break;
 		case 24:
 		case 32:
-			s->pixel = g_new0(BYTE, width * (height +1) * 4);
+			s->pixel = calloc(width * (height +1) * 4, sizeof(BYTE));
 			s->bytes_per_line = width * 4;
 			s->bytes_per_pixel = 4;
 			break;
 		default:
 			WARNING("depth %d is not supported\n", s->depth);
 		}
-	} else {
-		s->pixel = NULL;
 	}
 	
-	if (s->has_alpha) {
-		s->alpha = g_new0(BYTE, width * (height +1));
+	if (has_alpha) {
+		s->alpha = calloc(width * (height +1), sizeof(BYTE));
 	}
 	
 	return s;
@@ -57,7 +52,7 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
  * surfaceの生成 (pixel + alpha)
  * @param width:  surfaceの幅
  * @param height: surfaceの高さ
- * @param depth:  surfaceのpixelのBPP (8|15|16|24|32), alphaは8固定
+ * @param depth:  surfaceのpixelのBPP (8|16|24|32), alphaは8固定
  * @return 生成した surface オブジェクト
  */
 surface_t *sf_create_surface(int width, int height, int depth) {
@@ -78,7 +73,7 @@ surface_t *sf_create_alpha(int width, int height) {
  * surfaceの生成 (pixelのみ)
  * @param width:  surfaceの幅
  * @param height: surfaceの高さ
- * @param depth:  surfaceのBPP(8|15|16|24|32)
+ * @param depth:  surfaceのBPP(8|16|24|32)
  * @return 生成した surface オブジェクト
  */
 surface_t *sf_create_pixel(int width, int height, int depth) {
@@ -92,9 +87,9 @@ surface_t *sf_create_pixel(int width, int height, int depth) {
  */
 void sf_free(surface_t *s) {
 	if (s == NULL) return;
-	if (s->pixel) g_free(s->pixel);
-	if (s->alpha) g_free(s->alpha);
-	g_free(s);
+	if (s->pixel) free(s->pixel);
+	if (s->alpha) free(s->alpha);
+	free(s);
 }
 
 /**
@@ -108,18 +103,18 @@ surface_t *sf_dup(surface_t *in) {
 	
 	if (in == NULL) return NULL;
 	
-	sf = g_new(surface_t, 1);
+	sf = malloc(sizeof(surface_t));
 	memcpy(sf, in, sizeof(surface_t));
 	
-	if (in->has_pixel) {
+	if (in->pixel) {
 		len = sf->bytes_per_line * sf->height;
-		sf->pixel = g_new(BYTE, len + sf->bytes_per_line);
+		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
 		memcpy(sf->pixel, in->pixel, len);
 	}
 	
-	if (in->has_alpha) {
+	if (in->alpha) {
 		len = sf->width * sf->height;
-		sf->alpha = g_new(BYTE, len + sf->width);
+		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
 		memcpy(sf->alpha, in->alpha, len);
 	}
 	
@@ -143,12 +138,12 @@ void sf_copyall(surface_t *dst, surface_t *src) {
 	
 	if (src->bytes_per_pixel != dst->bytes_per_pixel) return;
 	
-	if (src->has_alpha && dst->has_alpha) {
+	if (src->alpha && dst->alpha) {
 		len = src->width * src->height;
 		memcpy(dst->alpha, src->alpha, len);
 	}
 	
-	if (src->has_pixel && dst->has_pixel) {
+	if (src->pixel && dst->pixel) {
 		len = src->bytes_per_line * src->height;
 		memcpy(dst->pixel, src->pixel, len);
 	}
@@ -167,20 +162,20 @@ surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 	
 	if (in == NULL) return NULL;
 	
-	sf = g_new(surface_t, 1);
+	sf = malloc(sizeof(surface_t));
 	memcpy(sf, in, sizeof(surface_t));
 	
-	if (in->has_pixel) {
+	if (in->pixel) {
 		len = sf->bytes_per_line * sf->height;
-		sf->pixel = g_new(BYTE, len + sf->bytes_per_line);
+		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
 		if (copypixel) {
 			memcpy(sf->pixel, in->pixel, len);
 		}
 	}
 	
-	if (in->has_alpha) {
+	if (in->alpha) {
 		len = sf->width * sf->height;
-		sf->alpha = g_new(BYTE, len + sf->width);
+		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
 		if (copyalpha) {
 			memcpy(sf->alpha, in->alpha, len);
 		}

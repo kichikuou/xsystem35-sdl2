@@ -26,18 +26,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
 // #include "LittleEndian.h"
 #include "ags.h"
-#include "imput.h"
+#include "input.h"
 #include "sact.h"
 #include "surface.h"
 #include "ngraph.h"
 #include "sprite.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "randMT.h"
 
 typedef void entrypoint (double step, int p1, int p2, int *retx, int *rety);
@@ -79,16 +78,16 @@ int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	
 	if (type > 1) return OK;
 	
-	sttime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	sttime = sdl_getTicks();
 	edtime = time * 10 + sttime;
-	while ((curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < edtime) {
+	while ((curtime = sdl_getTicks()) < edtime) {
 		int adjx, adjy;
 		
 		cb[type]((double)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);
 		ags_setViewArea(adjx, adjy, sf0->width, sf0->height);
 		ags_updateFull();
 		
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
 	}
 	

@@ -28,7 +28,7 @@
 
 void commandUC() { /* 王道勇者 */
 	/* ラベル・シナリオコールのスタックフレームを削除する。*/
-	int mode = sys_getc();
+	int mode = sl_getc();
 	int num  = getCaliValue();
 	
 	switch(mode) {
@@ -94,7 +94,7 @@ void commandUP0() {
 
 void commandUP1() {
 	/* 子プロセスを起動する */
-	char *str = sys_getString(':');
+	const char *str = sl_getString(':');
 	int mode = getCaliValue();
 	
 	DEBUG_COMMAND_YET("UP1 %s,%d:\n",str,mode);
@@ -102,8 +102,8 @@ void commandUP1() {
 
 void commandUP3() {
 	/* 外部プログラム起動後SYSTEM3.6終了*/
-	char *str1 = sys_getString(':');
-	char *str2 = sys_getString(':');
+	const char *str1 = sl_getString(':');
+	const char *str2 = sl_getString(':');
 	
 	DEBUG_COMMAND_YET("UP3 %s,%s:\n",str1,str2);
 }

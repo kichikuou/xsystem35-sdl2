@@ -24,16 +24,16 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
-#include "imput.h"
+#include "list.h"
+#include "input.h"
 #include "sact.h"
 #include "surface.h"
 #include "ngraph.h"
 #include "sprite.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "randMT.h"
 
 /*
@@ -49,11 +49,11 @@
 int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int cancel) {
 	int edtime, curtime;
 	int i = 0, key;
-	GSList *node;
+	SList *node;
 	
-	edtime = wCount * 10 + get_high_counter(SYSTEMCOUNTER_MSEC);
+	edtime = wCount * 10 + sdl_getTicks();
 	
-	while ((curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < edtime) {
+	while ((curtime = sdl_getTicks()) < edtime) {
 		if (wType == 0) { // 全てのスプライトを同じように動かす
 			int adjx = (int)(genrand() * wAmplitudeX/2);
 			int adjy = (int)(genrand() * wAmplitudeY/2);
@@ -85,7 +85,7 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 		i++;
 		
 		// ウェイトとキャンセルチェック
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key != 0) break;
 	}
 	

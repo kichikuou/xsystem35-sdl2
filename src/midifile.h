@@ -48,6 +48,11 @@
 #define MIDI_PITCHB     0xe0    /* Pitch wheel change */
 #define MIDI_SYSEX      0xf0    /* System exclusive data */
 
+#define MIDI_EVENT_NORMAL   0
+#define MIDI_EVENT_TEXT     1
+#define MIDI_EVENT_TEMPO    2
+#define MIDI_EVENT_SYS35    3
+
 #define MAXMIDIEVENT 65536 /* maxium event sequence number */
 
 struct midievent {
@@ -78,9 +83,9 @@ struct midiinfo {
 	int ceptr; /* current event pointer */
 	
 	/* work info */
-	long curtime;   /* current time */
-	int msgindex;   /* midi message buffer index */
-	int msgsize;    /* size of current allocaed msg */
+	long curtime;    /* current time */
+	size_t msgindex; /* midi message buffer index */
+	size_t msgsize;  /* size of current allocaed msg */
 	unsigned char *msgbuffer; /* message buffer */
 	
 	/* system35 jump info */

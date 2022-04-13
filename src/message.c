@@ -29,12 +29,15 @@
 
 #include "portab.h"
 #include "windowframe.h"
+#include "sdl_core.h"
 #include "xsystem35.h"
 #include "message.h"
 #include "variable.h"
-#include "imput.h"
+#include "input.h"
+#include "msgskip.h"
 #include "ags.h"
 #include "nact.h"
+#include "texthook.h"
 
 /* ショートカット */
 #define msg nact->msg
@@ -57,7 +60,7 @@ static boolean nextLineIsAfterKaigyou = FALSE;
 
 /* Private Methods */
 static void drawLineFrame(Bcom_WindowInfo *info);
-static void copyMsgToStrVar(char *m);
+static void copyMsgToStrVar(const char *m);
 static void msgget_at_r();
 static void msgget_at_a();
 
@@ -86,6 +89,13 @@ void msg_init() {
 	msg.mg_curStrVarNo   = 1;
 	msg.mg_policyR       = 0;
 	msg.mg_policyA       = 0;
+
+	msg.win = &msg.wininfo[0];
+	msg.wininfo[0].x = 8;
+	msg.wininfo[0].y = 311;
+	msg.wininfo[0].width = 616;
+	msg.wininfo[0].height = 80;
+	msg.wininfo[0].save = TRUE;
 }
 
 void msg_setFontSize(int size) {
@@ -100,8 +110,7 @@ void msg_setStringDecorationType(int type) {
 	msgDecorateType = type;
 }
 
-void msg_putMessage(char *m) {
-	int         w;
+void msg_putMessage(const char *m) {
 	MyRectangle adj;
 	
 	if (nextLineIsAfterKaigyou) {
@@ -109,6 +118,8 @@ void msg_putMessage(char *m) {
 		msg_nextPage(TRUE);
 	}
 	
+	texthook_message(m);
+
 	/* 表示文字列を文字列変数にコピーする */
 	if (msg.mg_getString) {
 		copyMsgToStrVar(m);
@@ -120,68 +131,79 @@ void msg_putMessage(char *m) {
 	ags_setFont(msg.MsgFont, msg.MsgFontSize);
 	switch(msgDecorateType) {
 	case 0:
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 0;
+	default:
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 0;
 		break;
 	case 1:
 		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case 2:
 		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 0;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case 3:
 		ags_drawString(msgcur.x +1, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
 	case 4:
+		ags_drawString(msgcur.x -1, msgcur.y, m, msgDecorateColor);
+		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
+		ags_drawString(msgcur.x, msgcur.y -1, m, msgDecorateColor);
+		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
+		adj.x = -1; adj.y = -1; adj.w = 2; adj.h = 2;
+		break;
 	case 6:
 		ags_drawString(msgcur.x +1, msgcur.y, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 0;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case 7:
 		ags_drawString(msgcur.x, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case 8:
 		ags_drawString(msgcur.x +1, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
-	case 9:
 	case 10:
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 0;
-		break;
-	default:
+		ags_drawString(msgcur.x -1, msgcur.y   , m, msgDecorateColor);
+		ags_drawString(msgcur.x +1, msgcur.y   , m, msgDecorateColor);
+		ags_drawString(msgcur.x   , msgcur.y -1, m, msgDecorateColor);
+		ags_drawString(msgcur.x   , msgcur.y +1, m, msgDecorateColor);
+		ags_drawString(msgcur.x +2, msgcur.y +2, m, msgDecorateColor);
+		adj.x = -1; adj.y = -1; adj.w = 3; adj.h = 3;
 		break;
 	}
 	
-	w = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
+	MyRectangle drawn = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
+	msgcur.x += drawn.w;
+	drawn.x += adj.x;
+	drawn.y += adj.y;
+	drawn.w += adj.w;
+	drawn.h += adj.h;
 
-	if (nact->messagewait_enable) {
+	if (nact->messagewait_enable && !nact->messagewait_cancelled && !msgskip_isSkipping()) {
 		int x;
-		for (x = 0; x < w + adj.width; x+=16) {
-			ags_updateArea(msgcur.x + adj.x + x, msgcur.y + adj.y,
-				       16, msg.MsgFontSize + adj.height);
+		for (x = 0; x < drawn.w; x+=16) {
+			ags_updateArea(drawn.x + x, drawn.y, 16, drawn.h);
 			if (nact->messagewait_cancel) {
 				if (sys_getInputInfo()) {
-					nact->messagewait_enable_save = nact->messagewait_enable ;
-					nact->messagewait_enable = FALSE;
-					ags_updateArea(msgcur.x + adj.x, msgcur.y + adj.y,
-						       w + adj.width, msg.MsgFontSize + adj.height);
+					nact->messagewait_cancelled = TRUE;
+					ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
 					break;
 				}
-				usleep(nact->messagewait_time * 10000);
+				sdl_sleep(nact->messagewait_time * 10);
 			}
 			nact->callback();
 		}
 	} else {
-		ags_updateArea(msgcur.x + adj.x, msgcur.y + adj.y,
-			       w + adj.width, msg.MsgFontSize + adj.height);
+		ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
 	}
-	msgcur.x += w;
 }
 
 void msg_nextLine() {
+	texthook_newline();
+
 	// puts("next Line");
 	if (msg.mg_getString) {
 		msgget_at_r();
@@ -197,6 +219,8 @@ void msg_nextLine() {
 }
 
 void msg_nextPage(boolean innerclear) {
+	texthook_nextpage();
+
 	// puts("next Page");
 	if (innerclear) {
 		if (msg.WinBackgroundTransparent == 255) {
@@ -241,10 +265,10 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	case WINDOW_FRAME_EMPTY:
 		if (M == 0) {
 			/* show window */
+			if (msg.win->savedimg != NULL) {
+				ags_delRegion(msg.win->savedimg);
+			}
 			if (msg.win->save) {
-				if (msg.win->savedimg != NULL) {
-					ags_delRegion(msg.win->savedimg);
-				}
 				msg.win->savedimg = ags_saveRegion(msg.win->x, msg.win->y, msg.win->width, msg.win->height);
 			} else {
 				msg.win->savedimg = NULL;
@@ -261,10 +285,10 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	case WINDOW_FRAME_LINE:
 		if (M == 0) {
 			/* show window*/
+			if (msg.win->savedimg != NULL) {
+				ags_delRegion(msg.win->savedimg);
+			}
 			if (msg.win->save) {
-				if (msg.win->savedimg != NULL) {
-					ags_delRegion(msg.win->savedimg);
-				}
 				msg.win->savedimg = ags_saveRegion(msg.win->x -8, msg.win->y -8, msg.win->width +16, msg.win->height +16);
 			} else {
 				msg.win->savedimg = NULL;
@@ -291,8 +315,10 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 }
 
 void msg_setMessageLocation(int x, int y) {
+	texthook_newline();
 	msgcur.x = x;
 	msgcur.y = y;
+	nextLineIsAfterKaigyou = FALSE;
 }
 
 void msg_getMessageLocation(MyPoint *loc) {
@@ -301,15 +327,15 @@ void msg_getMessageLocation(MyPoint *loc) {
 }
 
 void msg_hitAnyKey() {
-	int w;
-	static BYTE hak[] = {0x81, 0xa5, 0x00}; /* ▼ */
+	const char *prompt[CHARACTER_ENCODING_MAX + 1] = {
+		[SHIFT_JIS] = "\x81\xa5",
+		[UTF8] = "▼",
+	};
 	
-	w = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
-			   msg.win->y + msg.win->height - msg.MsgFontSize,
-			   hak, msg.HitAnyKeyMsgColor);
-	ags_updateArea(msg.win->x + msg.win->width  - msg.MsgFontSize,
-		       msg.win->y + msg.win->height - msg.MsgFontSize,
-		       w, msg.MsgFontSize);
+	MyRectangle r = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
+								   msg.win->y + msg.win->height - msg.MsgFontSize,
+								   prompt[nact->encoding], msg.HitAnyKeyMsgColor);
+	ags_updateArea(r.x, r.y, r.w, r.h);
 }
 
 static void drawLineFrame(Bcom_WindowInfo *i) {
@@ -324,18 +350,18 @@ static void drawLineFrame(Bcom_WindowInfo *i) {
 	ags_updateArea(i->x -8, i->y -8, i->width +16, i->height +16);
 }
 
-static void copyMsgToStrVar(char *m) {
-	if (v_strlen(msg.mg_curStrVarNo -1) == 0) {
-		v_strcpy(msg.mg_curStrVarNo -1, m);
+static void copyMsgToStrVar(const char *m) {
+	if (svar_length(msg.mg_curStrVarNo) == 0) {
+		svar_set(msg.mg_curStrVarNo, m);
 	} else {
-		v_strcat(msg.mg_curStrVarNo -1, m);
+		svar_append(msg.mg_curStrVarNo, m);
 	}
 }
 
 static void msgget_at_r() {
 	if (msg.mg_policyR == 1) return;
 	msg.mg_curStrVarNo++;
-	// v_strcpy(msg.mg_curStrVarNo -1, NULL);
+	// svar_set(msg.mg_curStrVarNo, NULL);
 }
 
 static void msgget_at_a() {
@@ -345,10 +371,10 @@ static void msgget_at_a() {
 		break;
 	case 1:
 		msg.mg_curStrVarNo++;
-		v_strcpy(msg.mg_curStrVarNo -1, "");
+		svar_set(msg.mg_curStrVarNo, "");
 		break;
 	case 2:
-		v_strcpy(msg.mg_curStrVarNo -1, "");
+		svar_set(msg.mg_curStrVarNo, "");
 		msg.mg_curStrVarNo++;
 		break;
 	case 3:

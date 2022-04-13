@@ -31,7 +31,7 @@
 */
 /* $Id: qnt.c,v 1.4 2003/04/22 16:34:28 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include <zlib.h>
 
 #include "portab.h"
@@ -47,25 +47,13 @@
 #define ZLIBBUF_MARGIN 5*1024
 
 /*
-  static methods
-*/
-static qnt_header *extract_header(BYTE *b);
-static void extract_pixel(qnt_header *qnt, BYTE *pic, BYTE *b);
-static void extract_alpha(qnt_header *qnt, BYTE *pic, BYTE *b);
-
-
-/*
   Get information from header
 
     b: raw data 
-
-    return: acquired qnt information object
+    qnt: acquired qnt information object
 */
-static qnt_header *extract_header(BYTE *b) {
-	qnt_header *qnt = g_new(qnt_header, 1);
-	int rsv0;
-	
-	rsv0 = LittleEndian_getDW(b, 4);
+static void extract_header(BYTE *b, qnt_header *qnt) {
+	int rsv0 = LittleEndian_getDW(b, 4);
 	if (rsv0 == 0) {
 		qnt->hdr_size = 48;
 		qnt->x0  = LittleEndian_getDW(b, 8);
@@ -87,8 +75,6 @@ static qnt_header *extract_header(BYTE *b) {
 		qnt->pixel_size = LittleEndian_getDW(b, 36);
 		qnt->alpha_size = LittleEndian_getDW(b, 40);
 	}
-	
-	return qnt;
 }
 
 /*
@@ -101,11 +87,11 @@ static qnt_header *extract_header(BYTE *b) {
 static void extract_pixel(qnt_header *qnt, BYTE *pic, BYTE *b) {
 	int i, j, x, y, w, h;
 	long ucbuf = (qnt->width+1) * (qnt->height+1) * 3 + ZLIBBUF_MARGIN;
-	BYTE *raw = g_new(BYTE, ucbuf);
+	BYTE *raw = malloc(sizeof(BYTE) * ucbuf);
 	
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->pixel_size)) {
 		WARNING("uncompress failed\n");
-		g_free(raw);
+		free(raw);
 		return;
 	}
 	
@@ -170,7 +156,7 @@ static void extract_pixel(qnt_header *qnt, BYTE *pic, BYTE *b) {
 		}
 	}
 	
-	g_free(raw);
+	free(raw);
 }
 
 /*
@@ -183,11 +169,11 @@ static void extract_pixel(qnt_header *qnt, BYTE *pic, BYTE *b) {
 static void extract_alpha(qnt_header *qnt, BYTE *pic, BYTE *b) {
 	int i, x, y, w, h;
 	long ucbuf = (qnt->width+1) * (qnt->height+1) + ZLIBBUF_MARGIN;
-	BYTE *raw = g_new(BYTE, ucbuf);
+	BYTE *raw = malloc(sizeof(BYTE) * ucbuf);
 
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->alpha_size)) {
 		WARNING("uncompress failed\n");
-		g_free(raw);
+		free(raw);
 		return;
 	}
 	
@@ -218,7 +204,7 @@ static void extract_alpha(qnt_header *qnt, BYTE *pic, BYTE *b) {
 		}
 	}
 	
-	g_free(raw);
+	free(raw);
 }
 
 /*
@@ -241,22 +227,24 @@ boolean qnt_checkfmt(BYTE *data) {
      return: extracted image data and information
 */
 cgdata *qnt_extract(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
-	qnt_header *qnt = extract_header(data);
+	cgdata *cg = calloc(1, sizeof(cgdata));
+	qnt_header qnt;
+	extract_header(data, &qnt);
 	
-	cg->pic = g_new(BYTE, (qnt->width+10) * (qnt->height+10) * 3);
-	extract_pixel(qnt, cg->pic, data + qnt->hdr_size);
+	cg->pic = malloc(sizeof(BYTE) * ((qnt.width+10) * (qnt.height+10) * 3));
+	extract_pixel(&qnt, cg->pic, data + qnt.hdr_size);
 	
-	if (qnt->alpha_size != 0) {
-		cg->alpha = g_new(BYTE, (qnt->width+10) * (qnt->height+10));
-		extract_alpha(qnt, (BYTE *)cg->alpha, data + qnt->hdr_size + qnt->pixel_size);
+	if (qnt.alpha_size != 0) {
+		cg->alpha = malloc(sizeof(BYTE) * ((qnt.width+10) * (qnt.height+10)));
+		extract_alpha(&qnt, (BYTE *)cg->alpha, data + qnt.hdr_size + qnt.pixel_size);
 	}
 	
 	cg->type   = ALCG_QNT;
-	cg->x      = qnt->x0;
-	cg->y      = qnt->y0;
-	cg->width  = qnt->width;
-	cg->height = qnt->height;
+	cg->x      = qnt.x0;
+	cg->y      = qnt.y0;
+	cg->width  = qnt.width;
+	cg->height = qnt.height;
+	cg->depth  = 24;
 	cg->pal    = NULL;
 	
 	return cg;

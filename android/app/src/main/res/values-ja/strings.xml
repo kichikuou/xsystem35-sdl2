@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">xsystem35</string>
+    <string name="action_export_save_data">セーブデータをエクスポート</string>
+    <string name="action_import_save_data">セーブデータをインポート</string>
+    <string name="cancel">キャンセル</string>
+    <string name="cannot_find_ald">System 3.x のファイル (*.ald) が見つかりません。</string>
+    <string name="choose_a_file">ファイルを選択</string>
+    <string name="error_dialog_title">エラー</string>
+    <string name="install_dialog_title">インストール中…</string>
+    <string name="install_from_zip">ZIP からインストール</string>
+    <string name="install_progress">%s を展開中</string>
+    <string name="no_data_to_import">ZIP アーカイブ中に save/ フォルダが見つかりません。</string>
+    <string name="save_data_export_error">セーブデータのエクスポートに失敗しました。</string>
+    <string name="save_data_export_success">エクスポートに成功しました。</string>
+    <string name="save_data_import_success">インポートに成功しました。</string>
+    <string name="uninstall_dialog_message">「%s」をアンインストールしますか？</string>
+    <string name="uninstall_dialog_title">確認</string>
+    <string name="unsupported_zip">この形式の ZIP はサポートしていません。</string>
+    <string name="zip_extraction_error">ZIP の展開に失敗しました。</string>
+</resources>

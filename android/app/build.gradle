@@ -1,0 +1,79 @@
+def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY')
+def buildAsApplication = !buildAsLibrary
+if (buildAsApplication) {
+    apply plugin: 'com.android.application'
+}
+else {
+    apply plugin: 'com.android.library'
+}
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 31
+    defaultConfig {
+        if (buildAsApplication) {
+            applicationId "io.github.kichikuou.xsystem35"
+        }
+        minSdkVersion 19
+        targetSdkVersion 31
+        versionCode 7
+        versionName "2.3.0"
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_APP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
+                // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                abiFilters 'armeabi-v7a', 'arm64-v8a'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    if (!project.hasProperty('EXCLUDE_NATIVE_LIBS')) {
+        sourceSets.main {
+            jniLibs.srcDir 'libs'
+            assets.srcDir '../../fonts'
+        }
+        aaptOptions {
+            // Disable asset compression for fonts.
+            // Without this, text rendering will be very slow.
+            noCompress 'ttf', 'otf'
+        }
+        externalNativeBuild {
+            cmake {
+                // xsystem35 requires CMake >=3.13, so SDK-bundled CMake
+                // (3.6 or 3.10.2) cannot be used.
+                version getInstalledCmakeVersion()
+                path 'jni/CMakeLists.txt'
+            }
+        }
+       
+    }
+    lintOptions {
+        abortOnError false
+    }
+    
+    if (buildAsLibrary) {
+        libraryVariants.all { variant ->
+            variant.outputs.each { output ->
+                def outputFile = output.outputFile
+                if (outputFile != null && outputFile.name.endsWith(".aar")) {
+                    def fileName = "org.libsdl.app.aar"
+                    output.outputFile = new File(outputFile.parent, fileName)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+
+static String getInstalledCmakeVersion() {
+    ('cmake --version'.execute().text =~ /cmake version ([0-9.]+)/)[0][1]
+}

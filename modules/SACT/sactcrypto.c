@@ -22,7 +22,6 @@
 /* $Id: sactcrypto.c,v 1.1 2003/04/22 16:29:52 chikama Exp $ */
 
 #include <stdio.h>
-#include <glib.h>
 #include "portab.h"
 #include "system.h"
 #include "variable.h"
@@ -48,7 +47,7 @@ int scryp_encrypt_str(int strno, int key) {
 }
 
 int scryp_decrypt_str(int strno, int key) {
-	WARNING("str = '%s'\n", v_str(strno -1));
+	WARNING("str = '%s'\n", svar_get(strno));
 	WARNING("NOT IMPLEMENTED\n");
 	return OK;
 }

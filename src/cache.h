@@ -29,24 +29,22 @@
 /* cache controlr infomartion */
 struct _cacheinfo {
 	int key;            /* key of data */
-	int refcnt;         /* reference count */
 	int size;           /* data size */
 	struct _cacheinfo *next; /* next data */
-	boolean *in_use;    /* if *in_use is TRUE, dont remove from cache */
+	int *in_use;    /* if *in_use is nonzero, dont remove from cache */
 	void *data;         /* real data */
 };
 typedef struct _cacheinfo cacheinfo;
 
 /* cache handler */
 struct _cacher {
-	int id;                 /* id of cache object */
 	void (*free_)(void *);   /* free data callback */
 	struct _cacheinfo *top; /* pointer to data */
 };
 typedef struct _cacher cacher;
 
 extern cacher *cache_new(void *delcallback);
-extern void    cache_insert(cacher *id, int key, void *data, int size, boolean *in_use);
+extern void    cache_insert(cacher *id, int key, void *data, int size, int *in_use);
 extern void   *cache_foreach(cacher *id, int key);
 
 #endif /* !__CASHE__ */

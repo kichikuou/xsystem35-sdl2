@@ -29,16 +29,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
 #include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
 
 #ifdef ENABLE_MIDI_SEQMIDI
 #if defined(__FreeBSD__)
@@ -51,27 +43,24 @@
 #include <sys/ioctl.h>
 #endif
 
+#include <SDL_thread.h>
+#include <SDL_timer.h>
 #include "portab.h"
 #include "system.h"
 #include "midi.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "midifile.h"
-#include "counter.h"
+#include "msgqueue.h"
 
-struct _midiflag {
+static struct {
 	char midi_variable[128];
 	char midi_flag[128];
-};
-typedef struct _midiflag midiflag_t;
+} flags;
 
-
-static void signal_pause(int sig_num);
 static void send_reset();
-static unsigned long ticks2usec(unsigned long ticks, int division, unsigned int tempo);
-static void parse_event();
 static int midi_initilize(char *devnm, int subdev);
 static int midi_exit();
-static int midi_start(int no, char *data, int datalen);
+static int midi_start(int no, int loop, char *data, int datalen);
 static int midi_stop();
 static int midi_pause(void);
 static int midi_unpause(void);
@@ -79,15 +68,15 @@ static int midi_get_playing_info(midiplaystate *st);
 static int midi_getflag(int mode, int index);
 static int midi_setflag(int mode, int index, int val);
 
-static long(* myflush)(void);
-static void(* mywrite)(unsigned char *d, int n, int p);
+static void (*myflush)(void);
+static void (*mywrite)(unsigned char *d, int n, int p);
 
 #ifdef ENABLE_MIDI_RAWMIDI
-static long raw_myflush();
+static void raw_myflush();
 static void raw_mywrite(unsigned char *d, int n, int p);
 #endif
 #ifdef ENABLE_MIDI_SEQMIDI
-static long seq_myflush();
+static void seq_myflush();
 static void seq_mywrite(unsigned char *d, int n, int p);
 #endif
 
@@ -102,6 +91,8 @@ mididevice_t midi_rawmidi = {
 	midi_getflag,
 	midi_setflag,
 	NULL,
+	NULL,
+	NULL,
 	NULL
 };
 
@@ -114,21 +105,15 @@ mididevice_t midi_rawmidi = {
 #endif
 
 static boolean enabled = FALSE;
-static struct midiinfo *midi;
-static int midifd;
+static int midifd = -1;
 static char *mididevname;
-static int midino;
-static pid_t midipid;
-static int counter;
+static SDL_Thread *thread;
+static struct msgq *queue;
+static int start_time;
 
-static int shmkey;
-static midiflag_t *flags;
-
-
-static boolean cmd_pause;
-static boolean cmd_stop;
-
-static long extratime;
+static char cmd_pause[] = "pause";
+static char cmd_unpause[] = "unpause";
+static char cmd_stop[] = "stop";
 
 #define ALL_NOTEOFF_SZ 48
 static char all_noteoff[] = { 0xb0, 0x7b, 0x00,
@@ -167,29 +152,6 @@ static char all_reset[] = { 0xb0, 0x78, 0x00, 0xb0, 0x79, 0x00,
 			    0xbf, 0x78, 0x00, 0xbf, 0x79, 0x00 };
 
 
-extern void sys_set_signalhandler(int SIG, void (*handler)(int));
-
-static void signal_pause(int sig_num) {
-	switch(sig_num) {
-	case SIGTERM:
-		cmd_stop = TRUE;
-		break;
-	case SIGUSR1:
-		/* pause */
-		if (!cmd_pause) {
-			cmd_pause = TRUE;
-		}
-		break;
-		
-	case SIGUSR2:
-		/* unpause */
-		if (cmd_pause) {
-			cmd_pause = FALSE;
-		}
-		break;
-	}
-}
-
 static void send_reset() {
 	mywrite(all_reset, ALL_RESET_SZ, 0);
 	usleep(60000);
@@ -204,32 +166,11 @@ static void send_reset() {
 static unsigned char wrbuff[WRBFSIZE];
 static int nwr = 0; /* wrbuff の index */
 
-static long raw_myflush() {
-	struct timeval st, et;
-	static long ret;
-	static long t1, t2;
-	int i;
-	
-	gettimeofday(&st, NULL);
-	
-	for (i = 0 ;i < nwr ; i++) {
-		while(write(midifd, wrbuff+i, 1) != 1);
+static void raw_myflush() {
+	for (int i = 0; i < nwr; i++) {
+		while (write(midifd, wrbuff+i, 1) != 1);
 	}
-	
 	nwr = 0;
-	gettimeofday(&et, NULL);
-	
-	t1 = et.tv_usec - st.tv_usec;
-	t2 = et.tv_sec  - st.tv_sec;
-	while (t1 < 0) {
-		t2--;
-		t1 += 1000000;
-	}
-	
-	ret = t2 * 1000000 + t1 + extratime;
-	
-	extratime = 0;
-	return ret;
 }
 
 /*
@@ -238,7 +179,7 @@ static long raw_myflush() {
 static void raw_mywrite(unsigned char *d, int n, int p) {
 	
 	if ((nwr + n + 2) >= WRBFSIZE) {
-		extratime = myflush();
+		myflush();
 	}
 	
 	while (n--) {
@@ -253,38 +194,16 @@ SEQ_DEFINEBUF(2048);
 SEQ_USE_EXTBUF();
 static int midi_subdev;
 
-void seqbuf_dump() {
+void seqbuf_dump(void) {
 	if (_seqbufptr) {
-		if (write(midifd, _seqbuf, _seqbufptr) == -1) {
-			perror("write");
-			exit(-1);
-		}
+		if (write(midifd, _seqbuf, _seqbufptr) == -1)
+			WARNING("write: %s\n", strerror(errno));
 	}
 	_seqbufptr = 0;
 }
 
-static long seq_myflush() {
-	struct timeval st, et;
-	static long ret;
-	static long t1, t2;
-	
-	gettimeofday(&st, NULL);
-	
+static void seq_myflush() {
 	seqbuf_dump();
-	
-	gettimeofday(&et, NULL);
-	
-	t1 = et.tv_usec - st.tv_usec;
-	t2 = et.tv_sec  - st.tv_sec;
-	while (t1 < 0) {
-		t2--;
-		t1 += 1000000;
-	}
-	
-	ret = t2 * 1000000 + t1 + extratime;
-	
-	extratime = 0;
-	return ret;
 }
 
 /*
@@ -301,143 +220,110 @@ static void seq_mywrite(unsigned char *d, int n, int p) {
 
 
 
-/*
- * tick count to micro second for (usleep)
- * 
- */
-static unsigned long ticks2usec(unsigned long ticks, int division, unsigned int tempo) {
-	
-	return (unsigned long) ((ticks) * (tempo) / (division));
+static uint32_t ticks2ms(int ticks, int division, unsigned int tempo) {
+	return ticks * tempo / (division * 1000);
 }
 
-static void parse_event() {
+static void *midi_mainloop(struct midiinfo *midi) {
 	int i = 0;
-	int tick = 0;
 	int ctick = 0;
 	int tempo = 500000;
-	unsigned long ts, tu;
-	struct timeval tp;
-	
-	gettimeofday(&tp, NULL);
-	ts = tp.tv_sec;
-	tu = tp.tv_usec;
-	
-	while(TRUE) {
-		/* pause / stop check */
-		if (cmd_stop) {
-			break;
-		}
-		
-		if (cmd_pause) {
-			gettimeofday(&tp, NULL);
-			ts = tp.tv_sec;
-			tu = tp.tv_usec;
-			usleep(50*1000);
-			continue;
-		}
-		
-		while(tick == midi->event[i].ctime) {
-			/* delta wait */
-			if (ctick != midi->event[i].ctime) {
-				int delta, stime;
-				
-				delta = midi->event[i].ctime - ctick;
-				stime = ticks2usec(delta, midi->division, tempo) - myflush();
-				if (stime > 0) {
-					long j;
-					struct timespec ttmp, *req;
-					
-					req = &ttmp;
-					req->tv_sec = (time_t)stime / 1000000;
-					req->tv_nsec = (long)(stime % 1000000) * 1000;
-					nanosleep(req, NULL);
-					
-					gettimeofday(&tp, NULL);
-					j = (tp.tv_sec * 1000000 + tp.tv_usec) - (ts * 1000000 + tu);
-					if (j != stime) {
-						extratime += (j - stime);
+	uint32_t last_time = SDL_GetTicks();
+
+	void *cmd;
+	while (i < midi->eventsize) {
+		if (ctick < midi->event[i].ctime) {
+			myflush();
+			int delta = midi->event[i].ctime - ctick;
+			uint32_t target_time = last_time + ticks2ms(delta, midi->division, tempo);
+			uint32_t current_time = SDL_GetTicks();
+			while (current_time < target_time) {
+				cmd = msgq_dequeue_timeout(queue, target_time - current_time);
+				if (cmd == cmd_stop)
+					return cmd;
+
+				if (cmd == cmd_pause) {
+					while (TRUE) {
+						cmd = msgq_dequeue(queue);
+						if (cmd == cmd_stop)
+							return cmd;
+						if (cmd == cmd_unpause)
+							break;
 					}
-				} else {
-					gettimeofday(&tp, NULL);
-					extratime +=  -stime;
+					target_time += SDL_GetTicks() - current_time;
 				}
-				ts = tp.tv_sec;
-				tu = tp.tv_usec;
+				current_time = SDL_GetTicks();
+			}
+			last_time = target_time;
+			ctick = midi->event[i].ctime;
+		}
+
+		if (midi->event[i].type == 0) {
+			/* ordinary data */
+			mywrite(midi->event[i].data, midi->event[i].n, midi->event[i].port);
+			i++;
+		} else if (midi->event[i].type == 2) {
+			/* tempo change */
+			int *p = (int*)midi->event[i].data;
+			tempo = (unsigned int)*p;
+			i++;
+		} else if (midi->event[i].type == 3) {
+			/* system35 maker */
+			int vn1 = midi->event[i+1].data[2];
+			int vn2 = midi->event[i+2].data[2];
+			int vn3 = midi->event[i+3].data[2];
+				
+			switch (vn1) {
+			case 0:
+				/* set label */
+				i += 6;
+				break;
+			case 1:
+				/* jump */
+				mywrite(all_noteoff, ALL_NOTEOFF_SZ, 0);
+				i = midi->sys35_label[vn2];
 				ctick = midi->event[i].ctime;
-			}
-			if (midi->event[i].type == 0) {
-				/* ordinary data */
-				mywrite(midi->event[i].data, midi->event[i].n, midi->event[i].port);
-				i++;
-			} else if (midi->event[i].type == 2) {
-				/* tempo change */
-				int *p;
-				p = (int*)midi->event[i].data;
-				tempo = (unsigned int)*p;
-				i++;
-			} else if (midi->event[i].type == 3) {
-				/* system35 maker */
-				int vn1 = midi->event[i+1].data[2];
-				int vn2 = midi->event[i+2].data[2];
-				int vn3 = midi->event[i+3].data[2];
-				
-				switch(vn1) {
-				case 0:
-					/* set label */
-					i += 6;
-					break;
-				case 1:
-					/* jump */
+				break;
+			case 2:
+				/* set flag */
+				flags.midi_flag[vn2] = vn3;
+				i += 6;
+				break;
+			case 3:
+				/* flag jump */
+				if (flags.midi_flag[vn2] == 1) {
+					i = midi->sys35_label[vn3];
+					ctick = midi->event[i].ctime;
 					mywrite(all_noteoff, ALL_NOTEOFF_SZ, 0);
-					i = midi->sys35_label[vn2];
-					ctick = tick = midi->event[i].ctime;
-					break;
-				case 2:
-					/* set flag */
-					flags->midi_flag[vn2] = vn3;
+				} else {
 					i += 6;
-					break;
-				case 3:
-					/* flag jump */
-					if (flags->midi_flag[vn2] == 1) {
-						i = midi->sys35_label[vn3];
-						ctick = 
-						tick = midi->event[i].ctime;
-						mywrite(all_noteoff, ALL_NOTEOFF_SZ, 0);
-					} else {
-						i += 6;
-					}
-					break;
-				case 4:
-					/* set variable */
-					flags->midi_variable[vn2] = vn3;
-					i += 6;
-					break;
-				case 5:
-					/* variable jump */
-					if (--(flags->midi_variable[vn2]) == 0) {
-						i = midi->sys35_label[vn3];
-						ctick =
-						tick  = midi->event[i].ctime;
-						mywrite(all_noteoff, ALL_NOTEOFF_SZ, 0);
-					} else {
-						i += 6;
-					}
-					break;
 				}
-			} else {
-				WARNING("Unknown type of event %x (NEVER!).\n", midi->event[i].type);
+				break;
+			case 4:
+				/* set variable */
+				flags.midi_variable[vn2] = vn3;
+				i += 6;
+				break;
+			case 5:
+				/* variable jump */
+				if (--(flags.midi_variable[vn2]) == 0) {
+					i = midi->sys35_label[vn3];
+					ctick = midi->event[i].ctime;
+					mywrite(all_noteoff, ALL_NOTEOFF_SZ, 0);
+				} else {
+					i += 6;
+				}
+				break;
 			}
-			if (i >= midi->eventsize) return;
+		} else {
+			WARNING("Unknown type of event %x (NEVER!).\n", midi->event[i].type);
 		}
-		tick++;
 	}
+	return NULL;
 }
 
 static int midi_initilize(char *devnm, int subdev) {
 	enabled = FALSE;
-	
-	reset_counter_high(SYSTEMCOUNTER_MIDI, 10, 0);
 	
 	if (devnm == NULL) {
 		if (subdev == -1) {
@@ -449,16 +335,6 @@ static int midi_initilize(char *devnm, int subdev) {
 		mididevname = devnm;
 	}
 
-	if (0 > (shmkey = shmget(IPC_PRIVATE, sizeof(midiflag_t),  IPC_CREAT | 0600))) {
-		perror("shmget");
-		return NG;
-	}
-	if ((void *)-1 == (flags = (midiflag_t *)shmat(shmkey, 0, 0))) {
-		perror("shmat");
-		return NG;
-	}
-	memset(flags, 0, sizeof(midiflag_t));
-	
 	if (subdev == -1) {
 #ifdef ENABLE_MIDI_RAWMIDI
 		myflush = raw_myflush;
@@ -481,119 +357,107 @@ static int midi_initilize(char *devnm, int subdev) {
 static int midi_exit() {
 	if (enabled) {
 		midi_stop();
-		if (0 > shmdt((char *)flags)) {
-			perror("shmdt");
-		}
-		if (0 > shmctl(shmkey, IPC_RMID, 0)) {
-			perror("shmctl");
-		}
 	}
 	return OK;
 }
 
+static int midi_thread(void *data) {
+	send_reset();
+
+	void *cmd = midi_mainloop(data);
+
+	send_reset();
+	mf_remove_midifile(data);
+	close(midifd);
+	midifd = -1;
+
+	while (cmd != cmd_stop)
+		cmd = msgq_dequeue(queue);
+	return 0;
+}
 
 /* no = 0~ */
-static int midi_start(int no, char *data, int datalen) {
-	pid_t pid;
-	
-	pid = fork();
-	if (pid == 0) {
-#ifdef QUITE_MIDI
-		close(1);
-#endif
-		sys_set_signalhandler(SIGTERM, SIG_DFL);
-		
-		if (NULL == (midi = mf_read_midifile(data, datalen))) {
-			_exit(-1);
-		}
-		
-		
-		if (0 > (midifd = open(mididevname, O_RDWR))) {
-			perror("open");
-			_exit(-1);
-		}
+static int midi_start(int no, int loop, char *data, int datalen) {
+	if (queue)
+		midi_stop();
+
+	struct midiinfo *midi = mf_read_midifile(data, datalen);
+	if (!midi) {
+		WARNING("error reading midi file\n");
+		return NG;
+	}
+
+	if (0 > (midifd = open(mididevname, O_RDWR))) {
+		WARNING("error opening %s: %s\n", mididevname, strerror(errno));
+		mf_remove_midifile(midi);
+		return NG;
+	}
+
 #ifdef ENABLE_SEQMIDI
-		{ int nrsynths; 
+	{
+		int nrsynths;
 		if (-1 == ioctl(mididev,  SNDCTL_SEQ_NRSYNTHS, &nrsynths)) {
-			perror("SNDCTL_SEQ_NRSYNTHS");
-			_exit(-1);
-		}}
+			WARNING("SNDCTL_SEQ_NRSYNTHS: %s\n", strerror(errno));
+			mf_remove_midifile(midi);
+			close(midifd);
+			midifid = -1;
+			return NG;
+		}
+	}
 #endif
 
-		send_reset();
-		
-		sys_set_signalhandler(SIGUSR1, signal_pause); /* pause   */
-		sys_set_signalhandler(SIGUSR2, signal_pause); /* unpause */
-		sys_set_signalhandler(SIGTERM, signal_pause); /* stop    */
-		
-		/* parse */
-		parse_event();
-		
-		send_reset();
-		mf_remove_midifile(midi);
-		_exit(0);
-	}
-	
-	midino  = no;
-	midipid = pid;
-	counter = get_high_counter(SYSTEMCOUNTER_MIDI);
+	queue = msgq_new();
+	thread = SDL_CreateThread(midi_thread, "MIDI", midi);
+
+	start_time = SDL_GetTicks();
 	
 	return OK;
 }
 
 static int midi_stop() {
-	int status=0;
-	
-	if (!enabled || midipid == 0) {
+	if (!enabled || !queue) {
 		return OK;
 	}
 	
-	kill(midipid, SIGTERM);
-	while(0 >= waitpid(midipid, &status, WNOHANG));
-	
-	midipid = 0;
-	midino  = 0;
+	msgq_enqueue(queue, cmd_stop);
+	SDL_WaitThread(thread, NULL);
+	thread = NULL;
+	msgq_free(queue);
+	queue = NULL;
 	
 	return OK;
 }
 
 static int midi_pause(void) {
-	if (!enabled) return OK;
+	if (!enabled || !queue) return OK;
 	
-	kill(midipid, SIGUSR1);
+	msgq_enqueue(queue, cmd_pause);
 	return OK;
 }
 
 static int midi_unpause(void) {
-	if (!enabled) return OK;
+	if (!enabled || !queue) return OK;
 	
-	kill(midipid, SIGUSR2);
+	msgq_enqueue(queue, cmd_unpause);
 	return OK;
 }
 
 static int midi_get_playing_info(midiplaystate *st) {
-	int status, cnt, err;
-	
-	if (!enabled || midino == 0) {
+	if (!enabled || !queue) {
 		st->in_play = FALSE;
-		st->play_no = 0;
 		st->loc_ms  = 0;
 		return OK;
 	}
 	
-	if (midipid == (err = waitpid(midipid, &status, WNOHANG))) {
+	if (midifd < 0) {
+		midi_stop();
 		st->in_play = FALSE;
-		st->play_no = 0;
 		st->loc_ms  = 0;
-		midipid = 0;
 		return OK;
 	}
-	
-	cnt = get_high_counter(SYSTEMCOUNTER_MIDI) - counter;
 	
 	st->in_play = TRUE;
-	st->play_no = midino;
-	st->loc_ms = cnt * 10;
+	st->loc_ms = SDL_GetTicks() - start_time;
 	
 	return OK;
 }
@@ -601,20 +465,20 @@ static int midi_get_playing_info(midiplaystate *st) {
 static int midi_getflag(int mode, int index) {
 	if (mode == 0) {
 		/* flag */
-		return flags->midi_flag[index];
+		return flags.midi_flag[index];
 	} else {
 		/* variable */
-		return flags->midi_variable[index];
+		return flags.midi_variable[index];
 	}
 }
 
 static int midi_setflag(int mode, int index, int val) {
 	if (mode == 0) {
 		/* flag */
-		flags->midi_flag[index] = val;
+		flags.midi_flag[index] = val;
 	} else {
 		/* variable */
-		flags->midi_variable[index] = val;
+		flags.midi_variable[index] = val;
 	}
 	return OK;
 }

@@ -24,7 +24,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <limits.h>
-#include <glib.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "cache.h"
 
@@ -34,9 +34,8 @@
 #endif
 
 static int     totalsize;     /* total size in cache */
-static int     id = 0;        /* Id of cache object  */ 
-static boolean dummyfalse = FALSE; /* dummy in_use flag */
-static boolean dummytrue  = TRUE;  /* dummy in_use flag */
+static int dummyfalse = 0; /* dummy in_use flag */
+static int dummytrue  = 1;  /* dummy in_use flag */
 
 /*
  * static methods
@@ -50,22 +49,18 @@ static void remove_in_cache(cacher *id);
 static void remove_in_cache(cacher *id) {
 	cacheinfo *ip = id->top;
 	cacheinfo *ic = ip->next;
+	if (!ic)
+		return;
 	
 	while(ic->next != NULL) {
-		if (!(boolean)*(ic->in_use)) {
-			if (ic->refcnt-- == 0) {
-				totalsize -= ic->size;
-				if (ic->next != NULL) {
-					ip->next = ic->next;
-				} else {
-					ip->next = NULL;
-				}
-				id->free_(ic->data);
-			}
+		if (!*ic->in_use) {
+			totalsize -= ic->size;
+			ip->next = ic->next;
+			id->free_(ic->data);
+			free(ic);
 		} else {
 			ip = ic;
 		}
-		g_free(ic);
 		ic = ip->next;
 	}
 	return;
@@ -77,14 +72,12 @@ static void remove_in_cache(cacher *id) {
  *   return: new cache handler
 */
 cacher *cache_new(void *delcallback) {
-	cacher *c = g_new0(cacher, 1);
+	cacher *c = calloc(1, sizeof(cacher));
 	
-	c->id = id;
-	c->top = g_new0(cacheinfo, 1);
+	c->top = calloc(1, sizeof(cacheinfo));
 	c->top->next = NULL;
 	c->top->in_use = &dummytrue;
 	c->free_ = delcallback;
-	id++;
 	return c;
 }
 
@@ -94,9 +87,9 @@ cacher *cache_new(void *delcallback) {
  *   key   : data key
  *   data  : data to be cached
  *   size  : data size
- *   in_use: in_use mark pointer, if in_use is TRUE, dont remove from cache
+ *   in_use: in_use mark pointer, if in_use is nonzero, dont remove from cache
 */
-void cache_insert(cacher *id, int key, void *data, int size, boolean *in_use) {
+void cache_insert(cacher *id, int key, void *data, int size, int *in_use) {
 	cacheinfo *i = id->top;
 	
 	if (CACHE_TOTALSIZE <= (totalsize >> 20)) {
@@ -110,7 +103,7 @@ void cache_insert(cacher *id, int key, void *data, int size, boolean *in_use) {
 	i->key = key;
 	i->data = data;
 	i->size = size;
-	i->next = g_new0(cacheinfo, 1);
+	i->next = calloc(1, sizeof(cacheinfo));
 	i->next->next = NULL;
 	if (in_use) {
 		i->in_use = in_use;
@@ -131,9 +124,6 @@ void *cache_foreach(cacher *id, int key) {
 	
 	while(i != NULL) {
 		if (i->key == key) {
-			if (INT_MAX < i->refcnt) {
-				i->refcnt++;
-			}
 			return i->data;
 		}
 		i = i->next;

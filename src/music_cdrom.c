@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include "portab.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "music_cdrom.h"
 #include "cdrom.h"
 
@@ -80,10 +80,8 @@ int muscd_stop() {
 	return OK;
 }
 
-cd_time muscd_getpos() {
-	cd_time tm;
-	prv.cddev.getpos(&tm);
-	return tm;
+int muscd_getpos(cd_time *tm) {
+	return prv.cddev.getpos(tm);
 }
 
 int muscd_cb() {
@@ -92,7 +90,7 @@ int muscd_cb() {
 	switch(obj->st) {
 	case CDROM_START:
 		obj->in_play = TRUE;
-		obj->dev->start(obj->track);
+		obj->dev->start(obj->track, obj->loop);
 		obj->st = CDROM_STOPCHECK;
 		break;
 	case CDROM_STOPCHECK:

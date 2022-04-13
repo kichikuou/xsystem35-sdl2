@@ -27,21 +27,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "savedata.h"
 #include "scenario.h"
 #include "xsystem35.h"
 #include "LittleEndian.h"
-#include "utfsjis.h"
 #include "filecheck.h"
 #include "windowframe.h"
 #include "selection.h"
 #include "message.h"
 
 /* セーブデータ */
-static char *saveDataFile[SAVE_MAXNUMBER];
-static char *saveDataPath;
 static int savefile_sysvar_cnt = SYSVAR_MAX;
 
 static void* saveStackInfo(Ald_stackHdr *head);
@@ -53,28 +53,22 @@ static int   loadSysVar(char *buf);
 static void* loadGameData(int no, int *status, int *size);
 static int   saveGameData(int no, char *buf, int size);
 
-
-
-/* savefile がある directory を登録 */
-void save_set_path(char *path) {
-	nact->files.savedir = strdup(path);
-	saveDataPath = strdup(path);
-	fc_init(path);
-}
-
-/* savefile を登録 */
-void save_register_file(char *name, int index) {
-	saveDataFile[index] = strdup(name);
-}
+#ifdef __EMSCRIPTEN__
+EM_JS(void, scheduleSync, (), {
+	xsystem35.shell.syncfs();
+});
+#else
+#define scheduleSync()
+#endif
 
 /* savefile を参照 */
-char *save_get_file(int index) {
-	return saveDataFile[index];
+const char *save_get_file(int index) {
+	return nact->files.save_fname[index];
 }
 
 /* savefile を削除 */
 int save_delete_file(int index) {
-	int ret = unlink(saveDataFile[index]);
+	int ret = unlink(nact->files.save_fname[index]);
 	
 	if (ret == 0) {
 		return 1;
@@ -82,58 +76,13 @@ int save_delete_file(int index) {
 	return 1; /* とりあえず */
 }
 
-static char *get_fullpath(char *filename) {
-	char *fn = malloc(strlen(filename) + strlen(saveDataPath) + 3);
-	if (fn == NULL) {
-		return NULL;
-	}
-	strcpy(fn, saveDataPath);
-	strcat(fn, "/");
-	strcat(fn, filename);
-	return fn;
-}
-
-static void backup_oldfile(char *filename) {
-	char *newname;
-	
-	if (!filename) return;
-	newname = malloc(strlen(filename) + 3);
-	
-	strcpy(newname, filename);
-	strcat(newname, ".");
-	rename(filename, newname);
-	
-	free(newname);
-}
-
-static FILE *fileopen(char *filename, char type) {
-	char *fc = fc_search(filename);
-	char *fullpath;
-	FILE *fp;
-	
-	if (fc == NULL) { /* if file does not exist */
-		if (type == 'r') return NULL;
-		fc = fc_add(filename);
-	}
-	fullpath = get_fullpath(fc);
-	
-	if (type == 'w') {
-		backup_oldfile(fullpath);
-		fp = fopen(fullpath, "w");
-	} else {
-		fp = fopen(fullpath, "r");
-	}
-	free(fullpath);
-	return fp;
-}
-
 /* 指定ファイルへの変数の書き込み */
-int save_save_var_with_file(char *filename, int *start, int cnt) {
+int save_save_var_with_file(char *fname_utf8, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
-	WORD *tmp, *_tmp;
+	WORD *tmp;
 	
-	tmp = _tmp = (WORD *)malloc(cnt * sizeof(WORD));
+	tmp = (WORD *)malloc(cnt * sizeof(WORD));
 	
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
@@ -141,18 +90,14 @@ int save_save_var_with_file(char *filename, int *start, int cnt) {
 	}
 	
 	for (i = 0; i < cnt; i++) {
-#ifdef WORDS_BIGENDIAN
-		*tmp = swap16((WORD)*start); start++; tmp++;
-#else
-		*tmp = (WORD)*start; start++; tmp++;
-#endif
+		tmp[i] = SDL_SwapLE16((WORD)start[i]);
 	}
 	
-	if (NULL == (fp = fileopen(filename, 'w'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'w'))) {
 		status = SAVE_SAVEERR; goto errexit;
 	}
 	
-	size = fwrite(_tmp, sizeof(WORD), cnt, fp);
+	size = fwrite(tmp, sizeof(WORD), cnt, fp);
 	
 	if (size != cnt) {
 		status = SAVE_OTHERERR;
@@ -161,26 +106,27 @@ int save_save_var_with_file(char *filename, int *start, int cnt) {
 	}
 	
 	fclose(fp);
+	scheduleSync();
  errexit:	
-	free(_tmp);
+	free(tmp);
 	
 	return status;
 }
 
 /* 指定ファイルからの変数の読み込み */
-int save_load_var_with_file(char *filename, int *start, int cnt) {
+int save_load_var_with_file(char *fname_utf8, int *start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
-	WORD *tmp, *_tmp;
+	WORD *tmp;
 	
-	tmp = _tmp = (WORD *)malloc(cnt * sizeof(WORD));
+	tmp = (WORD *)malloc(cnt * sizeof(WORD));
 	
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
 		return SAVE_LOADERR;
 	}
 	
-	if (NULL == (fp = fileopen(filename, 'r'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
 		status = SAVE_LOADERR; goto errexit;
 	}
 	
@@ -193,27 +139,23 @@ int save_load_var_with_file(char *filename, int *start, int cnt) {
 	}
 	
 	for (i = 0; i < cnt; i++) {
-#ifdef WORDS_BIGENDIAN
-		*start = swap16(*tmp); start++; tmp++;
-#else
-		*start = *tmp; start++; tmp++;
-#endif
+		start[i] = SDL_SwapLE16(tmp[i]);
 	}
 
 	fclose(fp);
  errexit:	
-	free(_tmp);
+	free(tmp);
 	return status;
 }
 
 
 /* 指定ファイルへの文字列の書き込み, start = 1~ */
-int save_save_str_with_file(char *filename, int start, int cnt) {
+int save_save_str_with_file(char *fname_utf8, int start, int cnt) {
 	int status = 0, size, _size,i;
 	FILE *fp;
 	char *tmp, *_tmp;
 	
-	_tmp = tmp = malloc(strvar_cnt * strvar_len);
+	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
 		return SAVE_LOADSHORTAGE;
@@ -221,12 +163,12 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 	
 	*tmp = 0;
 	for (i = 0; i < cnt; i++) {
-		strncpy(tmp, v_str(start + i - 1), strvar_len - 1);
-		tmp += v_strlen(start + i - 1) + 1;
+		strncpy(tmp, svar_get(start + i), strvar_len - 1);
+		tmp[strvar_len - 1] = '\0';
+		tmp += strlen(tmp) + 1;
 	}
 	
-	
-	if (NULL == (fp = fileopen(filename, 'w'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'w'))) {
 		status = SAVE_SAVEERR; goto errexit;
 	}
 	size = tmp - _tmp;
@@ -239,6 +181,7 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 	}
 	
 	fclose(fp);
+	scheduleSync();
  errexit:      
 	free(_tmp);
 	
@@ -246,13 +189,13 @@ int save_save_str_with_file(char *filename, int start, int cnt) {
 }
 
 /* 指定ファイルからの文字列の読み込み */
-int save_load_str_with_file(char *filename, int start, int cnt) {
+int save_load_str_with_file(char *fname_utf8, int start, int cnt) {
 	int status = 0, size, i;
 	FILE *fp;
 	char *tmp, *_tmp=NULL;
 	long filesize;
 	
-	if (NULL == (fp = fileopen(filename, 'r'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
 		return SAVE_LOADERR;
 	}
 	
@@ -277,8 +220,8 @@ int save_load_str_with_file(char *filename, int start, int cnt) {
 		status = SAVE_LOADOK;
 	}
 	for (i = 0; i < cnt; i++) {
-		strncpy(v_str(start + i - 1), tmp, strvar_len);
-		tmp += v_strlen(start + i - 1) + 1;
+		svar_set(start + i, tmp);
+		tmp += strlen(tmp) + 1;
 	}
 	fclose(fp);
 	free(_tmp);
@@ -326,7 +269,7 @@ int save_loadPartial(int no, int page, int offset, int cnt) {
 		cnt = min(cnt, SYSVAR_MAX - offset);
 		var = sysVar + offset;
 	} else {
-		cnt = min(cnt, arrayVarBuffer[page - 1].max - offset);
+		cnt = min(cnt, arrayVarBuffer[page - 1].size - offset);
 		var = arrayVarBuffer[page - 1].value + offset;
 	}
 	
@@ -384,7 +327,7 @@ int save_savePartial(int no, int page, int offset, int cnt) {
 	} else {
 		if (arrayVarBuffer[page - 1].saveflag == FALSE)
 			goto errexit;
-		cnt = min(cnt, arrayVarBuffer[page - 1].max - offset);
+		cnt = min(cnt, arrayVarBuffer[page - 1].size - offset);
 		var = arrayVarBuffer[page - 1].value + offset;
 	}
 	
@@ -456,12 +399,12 @@ int save_loadAll(int no) {
 		// selWinInfo[i].save   = TRUE;
 	}
 	for (i = 0; i < MSGWINMAX; i++) {
-		msgWinInfo[i].x      = save_base->msgWinInfo[i].x;
-		msgWinInfo[i].y      = save_base->msgWinInfo[i].y;
-		msgWinInfo[i].width  = save_base->msgWinInfo[i].width;
-		msgWinInfo[i].height = save_base->msgWinInfo[i].height;
-		// msgWinInfo[i].savedImage = NULL;
-		// msgWinInfo[i].save   = FALSE;
+		nact->msg.wininfo[i].x      = save_base->msgWinInfo[i].x;
+		nact->msg.wininfo[i].y      = save_base->msgWinInfo[i].y;
+		nact->msg.wininfo[i].width  = save_base->msgWinInfo[i].width;
+		nact->msg.wininfo[i].height = save_base->msgWinInfo[i].height;
+		// nact->msg.wininfo[i].savedImage = NULL;
+		// nact->msg.wininfo[i].save   = FALSE;
 	}
 	/* スタックのロード */
 	loadStackInfo(saveTop + save_base->stackinfo);
@@ -492,19 +435,19 @@ int save_saveAll(int no) {
 	char *sd_stack  = NULL;
 	char *sd_varSys = NULL;
 	int i, totalsize = sizeof(Ald_baseHdr);
-	FILE *fp;
+	FILE *fp = NULL;
 	
 	if (no >= SAVE_MAXNUMBER)
-		return SAVE_SAVEERR;
+		goto errexit;
 	
 	if (save_base == NULL)
-		return SAVE_SAVEERR;
+		goto errexit;
 	
-	backup_oldfile(saveDataFile[no]);
-	fp = fopen(saveDataFile[no],"wb");
+	fc_backup_oldfile(nact->files.save_fname[no]);
+	fp = fopen(nact->files.save_fname[no], "wb");
 	
 	if (fp == NULL)
-		return SAVE_SAVEERR;
+		goto errexit;
 	
 	memset(&save_stackHdr, 0, sizeof(Ald_stackHdr));
 	memset(&save_strHdr, 0, sizeof(Ald_strVarHdr));
@@ -532,10 +475,10 @@ int save_saveAll(int no) {
 	}
 	
 	for (i = 0; i < MSGWINMAX; i++) {
-		save_base->msgWinInfo[i].x      = (WORD)msgWinInfo[i].x;
-		save_base->msgWinInfo[i].y      = (WORD)msgWinInfo[i].y;
-		save_base->msgWinInfo[i].width  = (WORD)msgWinInfo[i].width;
-		save_base->msgWinInfo[i].height = (WORD)msgWinInfo[i].height;
+		save_base->msgWinInfo[i].x      = (WORD)nact->msg.wininfo[i].x;
+		save_base->msgWinInfo[i].y      = (WORD)nact->msg.wininfo[i].y;
+		save_base->msgWinInfo[i].width  = (WORD)nact->msg.wininfo[i].width;
+		save_base->msgWinInfo[i].height = (WORD)nact->msg.wininfo[i].height;
 	}
 
 	fseek(fp, sizeof(Ald_baseHdr), SEEK_SET);
@@ -589,6 +532,7 @@ int save_saveAll(int no) {
 		goto errexit;
 	
 	fclose(fp);
+	scheduleSync();
 	free(save_base);
 
 	return SAVE_SAVEOK1;
@@ -626,18 +570,20 @@ static void loadStackInfo(char *buf) {
 static void *saveStrVar(Ald_strVarHdr *head) {
 	int i;
 	char *tmp, *_tmp;
-	_tmp = tmp = malloc(strvar_cnt * strvar_len);
+	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
 		return NULL;
 	}
 	*tmp = 0;
-	for (i = 0; i < strvar_cnt; i++) {
-		strncpy(tmp, v_str(i), strvar_len - 1);
-		tmp += v_strlen(i) + 1;
+	// Do not save svar[0], for backward compatibility.
+	for (i = 1; i <= svar_maxindex(); i++) {
+		strncpy(tmp, svar_get(i), strvar_len - 1);
+		tmp[strvar_len - 1] = '\0';
+		tmp += strlen(tmp) + 1;
 	}
 	head->size   = tmp - _tmp;
-	head->count  = strvar_cnt;
+	head->count  = svar_maxindex();
 	head->maxlen = strvar_len;
 	return _tmp;
 }
@@ -649,12 +595,14 @@ static void loadStrVar(char *buf) {
 	
 	cnt = head->count;
 	max = head->maxlen;
-	if (strvar_cnt != cnt || strvar_len != max)
-		v_initStringVars(cnt, max);
+	if (svar_maxindex() != cnt || strvar_len != max) {
+		WARNING("Unexpected number of strings in savedata (%d, expected %d)\n", cnt, svar_maxindex());
+		svar_init(cnt, max);
+	}
 	buf += sizeof(Ald_strVarHdr);
-	for (i = 0; i < cnt; i++) {
-		strncpy(v_str(i), buf, max - 1);
-		buf += v_strlen(i) + 1;
+	for (i = 1; i <= cnt; i++) {
+		svar_set(i, buf);
+		buf += strlen(buf) + 1;
 	}
 }
 
@@ -669,7 +617,7 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	} else if (!arrayVarBuffer[page - 1].saveflag) {
 		return NULL;
 	} else {
-		cnt = arrayVarBuffer[page - 1].max;
+		cnt = arrayVarBuffer[page - 1].size;
 		var = arrayVarBuffer[page - 1].value;
 		if (var == NULL)
 			return NULL;
@@ -691,7 +639,6 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 static int loadSysVar(char *buf) {
 	int i, cnt;
 	int  *var;
-	int bool;
 	WORD *data;
 	Ald_sysVarHdr *head = (Ald_sysVarHdr *)buf;
 	int page = head->pageNo;
@@ -707,15 +654,14 @@ static int loadSysVar(char *buf) {
 		cnt = savefile_sysvar_cnt = head->size / sizeof(WORD);
 	} else {
 		cnt = head->size / sizeof(WORD);
-		if (arrayVarBuffer[page - 1].max != cnt || 
+		if (arrayVarBuffer[page - 1].size < cnt ||
 		    arrayVarBuffer[page - 1].value == NULL) {
 			/*
 			fprintf(stderr, "loadSysVar(): undef array\n");
 			return SAVE_LOADERR;
 			*/
 			
-			bool = v_allocateArrayBuffer(page, cnt, TRUE);
-			if (!bool) {
+			if (!v_allocateArrayBuffer(page, cnt, TRUE)) {
 				fprintf(stderr, "v_allocateArrayBuffer fail\n");
 				return SAVE_LOADERR;
 			}
@@ -745,7 +691,7 @@ static void* loadGameData(int no, int *status, int *size) {
 	long filesize;
 	char *buf;
 	
-	fp = fopen(saveDataFile[no], "rb");
+	fp = fopen(nact->files.save_fname[no], "rb");
 	if (fp == NULL)
 		goto errexit;
 	fseek(fp, 0L, SEEK_END);
@@ -776,8 +722,8 @@ static int saveGameData(int no, char *buf, int size) {
 	FILE *fp;
 	int status = SAVE_SAVEOK1;
 	
-	backup_oldfile(saveDataFile[no]);
-	fp = fopen(saveDataFile[no],"wb");
+	fc_backup_oldfile(nact->files.save_fname[no]);
+	fp = fopen(nact->files.save_fname[no], "wb");
 	if (fp == NULL) {
 		return SAVE_SAVEERR;
 	}
@@ -785,37 +731,37 @@ static int saveGameData(int no, char *buf, int size) {
 		status = SAVE_SAVEERR;
 	}
 	fclose(fp);
+	scheduleSync();
 	return status;
 }
 
 /* 指定ファイルからの画像の読み込み thanx tajiru@wizard */
-BYTE* load_cg_with_file(char *filename, int *status){
+BYTE* load_cg_with_file(char *fname_utf8, int *status, long *filesize){
 	int size;
 	FILE *fp;
 	static BYTE *tmp;
-	long filesize;
 	
 	*status = 0;
 	
-	if (NULL == (fp = fileopen(filename, 'r'))) {
+	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
 		*status = SAVE_LOADERR; return NULL;
 	}
 	
 	fseek(fp, 0L, SEEK_END);
-	filesize = ftell(fp);
-	if (filesize == 0) {
+	*filesize = ftell(fp);
+	if (*filesize == 0) {
 		*status = SAVE_LOADERR; return NULL;
 	}
 	
-	tmp = (char *)malloc(filesize);
+	tmp = (char *)malloc(*filesize);
 	if (tmp == NULL) {
 		WARNING("Out of memory\n");
 		*status = SAVE_LOADERR; return NULL;
 	}
 	fseek(fp, 0L, SEEK_SET);
-	size = fread(tmp, 1, filesize,fp);
+	size = fread(tmp, 1, *filesize,fp);
 	
-	if (size != filesize) {
+	if (size != *filesize) {
 		*status = SAVE_LOADSHORTAGE;
 	} else {
 		*status = SAVE_LOADOK;

@@ -26,77 +26,36 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <glib.h>
+#include <stdlib.h>
 
 #include "portab.h"
 #include "system.h"
 #include "LittleEndian.h"
 #include "alk.h"
 
-alk_t *alk_new(char *path) {
-	alk_t *alk;
-	int i, fd;
-	char *adr;
-	struct stat sbuf;
+alk_t *alk_new(const char *path) {
+	mmap_t *m = map_file(path);
 	
-	if (0 > (fd = open(path, O_RDONLY))) {
-		WARNING("open: %s\n", strerror(errno));
-		return NULL;
-	}
-
-	if (0 > fstat(fd, &sbuf)) {
-		WARNING("fstat: %s\n", strerror(errno));
-		close(fd);
-		return NULL;
-	}
-	
-	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
-		WARNING("mmap: %s\n", strerror(errno));
-		close(fd);
-		return NULL;
-	}
-	
-	if (0 != strncmp(adr, "ALK0", 4)) {
-		WARNING("mmap: %s\n", strerror(errno));
-		munmap(adr, sbuf.st_size);
-		close(fd);
+	if (0 != strncmp(m->addr, "ALK0", 4)) {
+		WARNING("%s: not an ALK file\n", path);
+		unmap_file(m);
 		return NULL;
 	}		
 
-	alk = g_new0(alk_t, 1);
-	alk->mapadr = adr;
-	alk->size = sbuf.st_size;
-	alk->fd = fd;
-	
-	alk->datanum = LittleEndian_getDW(adr, 4);
-	alk->offset = g_new(int, alk->datanum);
-	
-	for (i = 0; i < alk->datanum; i++) {
-		alk->offset[i] = LittleEndian_getDW(adr, 8 + i * 8);
+	int nr_entries = LittleEndian_getDW(m->addr, 4);
+
+	alk_t *alk = malloc(sizeof(alk_t) + sizeof(struct alk_entry) * nr_entries);
+	alk->mmap = m;
+	alk->datanum = nr_entries;
+
+	for (int i = 0; i < nr_entries; i++) {
+		alk->entries[i].data = (uint8_t *)m->addr + LittleEndian_getDW(m->addr, 8 + i * 8);
+		alk->entries[i].size = LittleEndian_getDW(m->addr, 8 + i * 8 + 4);
 	}
-	
 	return alk;
 }
 
-int alk_free(alk_t *alk) {
-	if (alk == NULL) return OK;
-
-	munmap(alk->mapadr, alk->size);
-	close(alk->fd);
-	g_free(alk->offset);
-	g_free(alk);
-
-	return OK;
-}
-
-char *alk_get(alk_t *alk, int no) {
-	if (no >= alk->datanum) return NULL;
-	
-	return alk->mapadr + alk->offset[no];
+void alk_free(alk_t *alk) {
+	unmap_file(alk->mmap);
+	free(alk);
 }

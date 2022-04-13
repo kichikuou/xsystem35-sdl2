@@ -24,33 +24,26 @@
 #ifndef __PORTAB__
 #define __PORTAB__
 
+#include <stdbool.h>
+#include <stdint.h>
 #include "config.h"
 
-#ifdef DMALLOC
-#include <dmalloc.h>
-#endif
-
-#define	YES		1
-#define	NO		0
 #define OK		0
-#define ERROR	      (-1)
 #define NG	      (-1)
-#define true            1
-#define false           0
 
 #ifndef FALSE
-#define FALSE           0
+#define FALSE false
 #undef  TRUE
-#define TRUE            (!FALSE)
+#define TRUE  true
 #endif
 
 #define min(x,y) ((x) < (y) ? (x) : (y))
 #define max(x,y) ((x) > (y) ? (x) : (y))
 
-typedef	unsigned char  ___BYTE;
-typedef	unsigned short ___WORD;
-typedef	unsigned int   ___DWORD;
-typedef char           ___boolean;
+typedef uint8_t  ___BYTE;
+typedef uint16_t ___WORD;
+typedef uint32_t ___DWORD;
+typedef bool     ___boolean;
 
 #ifndef BYTE
 #define BYTE ___BYTE
@@ -90,11 +83,8 @@ typedef char           ___boolean;
 #  define N_(String) (String)
 #endif
 
-#define swap16(a) ( (((a) & 0xff) << 8) | ((unsigned short)(a) >> 8) )
-#define swap32(a) ( ((a) << 24) | \
-		   (((a) << 8) & 0x00ff0000) | \
-		   (((a) >> 8) & 0x0000ff00) | \
-		   ((unsigned int)(a) >>24) )
-
+#ifndef __EMSCRIPTEN__
+#define EMSCRIPTEN_KEEPALIVE
+#endif
 
 #endif /* !__PORTAB__ */

@@ -19,36 +19,8 @@ int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, i
 	
 	if (lv == 255) {
 		switch(dst->depth) {
-		case 15:
-		{
-			WORD *yls, *yld, *ylw;
-			BYTE *yla;
-			
-			for (y = 0; y < height; y++) {
-				yls = (WORD *)(sp + y * src->bytes_per_line);
-				yld = (WORD *)(dp + y * dst->bytes_per_line);
-				ylw = (WORD *)(wp + y * write->bytes_per_line);
-				yla = (BYTE *)(ap + y * alpha->width);
-				
-				for (x = 0; x < width; x++) {
-					*ylw = ALPHABLEND15(*yls, *yld, *yla);
-					yls++; yld++; ylw++; yla++;
-				}
-			}
-			break;
-		}
 		case 16:
-			if (nact->mmx_is_ok) {
-//			if (0) {
-#ifdef ENABLE_MMX
-				ablend16_ppp(wp, sp, dp, ap,
-					     width, height,
-					     write->bytes_per_line,
-					     src->bytes_per_line,
-					     dst->bytes_per_line,
-					     alpha->width, 255);
-#endif
-			} else {
+			{
 				WORD *yls, *yld, *ylw;
 				BYTE *yla;
 				
@@ -88,36 +60,8 @@ int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, i
 		
 	} else {
 		switch(dst->depth) {
-		case 15:
-		{
-			WORD *yls, *yld, *ylw;
-			BYTE *yla;
-			
-			for (y = 0; y < height; y++) {
-				yls = (WORD *)(sp + y * src->bytes_per_line);
-				yld = (WORD *)(dp + y * dst->bytes_per_line);
-				ylw = (WORD *)(wp + y * write->bytes_per_line);
-				yla = (BYTE *)(ap + y * alpha->width);
-				
-				for (x = 0; x < width; x++) {
-					*ylw = ALPHABLEND15(*yls, *yld, (*yla * lv) / 255);
-					yls++; yld++; ylw++; yla++;
-				}
-			}
-			break;
-	}
 		case 16:
-			if (nact->mmx_is_ok) {
-//			if (0) {
-#ifdef ENABLE_MMX
-				ablend16_ppp(wp, sp, dp, ap,
-					     width, height,
-					     write->bytes_per_line,
-					     src->bytes_per_line,
-					     dst->bytes_per_line,
-					     alpha->width, lv);
-#endif
-			} else {
+			{
 				WORD *yls, *yld, *ylw;
 				BYTE *yla;
 				

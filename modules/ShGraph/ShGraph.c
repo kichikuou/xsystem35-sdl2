@@ -32,10 +32,11 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "ags.h"
-#include "counter.h"
-#include "music_client.h"
+#include "music.h"
+#include "sdl_core.h"
 
 #define SLOT 40
 
@@ -88,7 +89,7 @@ static struct _s2 s2[SLOT];
 static int* add_p5[SLOT]; /* どこまでアニメーションのコマが進んだか */
 
 
-void Init() {
+static void Init() {
 	/*
 	  モジュール初期化
 	*/
@@ -97,13 +98,13 @@ void Init() {
 	DEBUG_COMMAND("ShGraph.Init %d:\n", p1);
 }
 
-void GetSurfaceData() {
+static void GetSurfaceData() {
 	int p1 = getCaliValue(); /* ISurface */
 	
 	DEBUG_COMMAND_YET("ShGraph.GetSurfaceData %d:\n", p1);
 }
 
-void ChangeEquColor() {
+static void ChangeEquColor() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -115,7 +116,7 @@ void ChangeEquColor() {
 	DEBUG_COMMAND_YET("ShGraph.ChangeEquColor %d,%d,%d,%d,%p,%p,%d:\n", p1, p2, p3, p4, p5, p6, p7);
 }
 
-void ChangeNotColor() {
+static void ChangeNotColor() {
 	/*
 	  指定の領域が src と等しくなければ dst に塗りつぶす
 	  
@@ -140,29 +141,11 @@ void ChangeNotColor() {
 	DEBUG_COMMAND("ShGraph.ChangeNotColor %d,%d,%d,%d,%p,%p,%d:\n", x0, y0, width, height, src, dst, p7);
 	
 	ags_check_param(&x0, &y0, &width, &height);
-	ags_sync();
 	
 	dib = nact->ags.dib;
 	dp = GETOFFSET_PIXEL(dib, x0, y0);
 	
 	switch(dib->depth) {
-	case 15:
-	{
-		WORD pic15s = PIX15(*src, *(src+1), *(src+2));
-		WORD pic15d = PIX15(*dst, *(dst+1), *(dst+2));
-		WORD *yl;
-		
-		for (y = 0; y < height; y++) {
-			yl = (WORD *)(dp + y * dib->bytes_per_line);
-			for (x = 0; x < width; x++) {
-				if (*yl != pic15s) {
-					*yl = pic15d;
-				}
-				yl++;
-			}
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD pic16s = PIX16(*src, *(src+1), *(src+2));
@@ -227,7 +210,7 @@ void ChangeNotColor() {
       lastslotが０の場合は 7 で指定したところまで。
 
 */
-void ResetAnimeData() {
+static void ResetAnimeData() {
 	/*
 	  アニメーション用の各種データをクリア
 	  
@@ -252,7 +235,7 @@ void ResetAnimeData() {
 	
 }
 
-void SetAnimeSrc() {
+static void SetAnimeSrc() {
 	/*
 	  アニメーションの各パターンのソース領域の設定
 
@@ -295,7 +278,7 @@ void SetAnimeSrc() {
 	src[no].b = b;
 }
 
-void SetAnimeDst() {
+static void SetAnimeDst() {
 	/*
 	  アニメーションの描画先設定
 	  
@@ -330,7 +313,7 @@ void SetAnimeDst() {
 	s2[no].w_1000A8A2 = 0;
 }
 
-void AddAnimeData() {
+static void AddAnimeData() {
 	/*
 	  アニメーション各種設定
 	  
@@ -374,7 +357,7 @@ void AddAnimeData() {
 	add_p5[i] = p5;
 }
 
-void AddAnimeRemain() {
+static void AddAnimeRemain() {
 	/*
 	  アニメーション各種設定
 	  
@@ -400,7 +383,7 @@ void AddAnimeRemain() {
 	}
 }
 
-void SetAnimeRect() {
+static void SetAnimeRect() {
 	/*
 	  アニメーション描画領域設定
 
@@ -418,11 +401,11 @@ void SetAnimeRect() {
 	
 	maprect.x = x;
 	maprect.y = y;
-	maprect.width  = w;
-	maprect.height = h;
+	maprect.w = w;
+	maprect.h = h;
 }
 
-void SetAnimeBack() {
+static void SetAnimeBack() {
 	/*
 	  アニメーション背景領域設定
 	  
@@ -444,13 +427,13 @@ void SetAnimeBack() {
 
 	mapback.x = sx;
 	mapback.y = sy;
-	mapback.width  = w;
-	mapback.height = h;
+	mapback.w = w;
+	mapback.h = h;
 	mapback_p5 = p5;
 	mapback_p6 = p6;
 }
 
-void PlayAnimeData() {
+static void PlayAnimeData() {
 	/*
 	  実際にアニメーションを実行
 	  
@@ -482,7 +465,7 @@ void PlayAnimeData() {
 	dib = ags_getDIB();
 	
 	for (loop = 0; loop < p1; loop++) {
-		int cnt = get_high_counter(SYSTEMCOUNTER_MSEC);
+		int cnt = sdl_getTicks();
 		is_backcopied = FALSE;
 		
 		for (i = 0; i < SLOT; i++) {
@@ -503,10 +486,8 @@ void PlayAnimeData() {
 				
 				if (!is_backcopied) {
 					is_backcopied = TRUE;
-					ags_copyArea(mapback.x, mapback.y,
-						     mapback.width, mapback.height,
-						     mapback_p5, mapback_p6);
-					ags_sync();
+					ags_copyArea(mapback.x, mapback.y, mapback.w, mapback.h,
+								 mapback_p5, mapback_p6);
 				}
 				
 				if (wavno != 0) {
@@ -558,14 +539,12 @@ void PlayAnimeData() {
 				// printf("wavPlay %d\n", wavno % 256);
 			}
 		}
-		if (is_backcopied && maprect.width != 0 && maprect.height != 0) {
-			ags_updateArea(maprect.x, maprect.y, maprect.width, maprect.height);
-		}
-		{
-			int now = get_high_counter(SYSTEMCOUNTER_MSEC);
-			if (now - cnt < interval) {
-				usleep((interval - (now-cnt)) * 1000);
-			}
+		if (is_backcopied && !SDL_RectEmpty(&maprect))
+			ags_updateArea(maprect.x, maprect.y, maprect.w, maprect.h);
+
+		int now = sdl_getTicks();
+		if (now - cnt < interval) {
+			sdl_sleep(interval - (now-cnt));
 		}
 	}
 }
@@ -586,23 +565,6 @@ static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, i
 	dp = GETOFFSET_PIXEL(dib, dx, dy);
 	
 	switch(dib->depth) {
-	case 15:
-	{
-		WORD pic15 = PIX15(r, g, b);
-		WORD *yls, *yld;
-		
-		for (y = 0; y < height; y++) {
-			yls = (WORD *)(sp + y * dib->bytes_per_line);
-			yld = (WORD *)(dp + y * dib->bytes_per_line);
-			for (x = 0; x < width; x++) {
-				if (*yls != pic15) {
-					*yld = *yls;
-				}
-				yls++; yld++;
-			}
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD pic16 = PIX16(r, g, b);
@@ -640,3 +602,20 @@ static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, i
 	}
 	}
 }
+
+static const ModuleFunc functions[] = {
+	{"AddAnimeData", AddAnimeData},
+	{"AddAnimeRemain", AddAnimeRemain},
+	{"ChangeEquColor", ChangeEquColor},
+	{"ChangeNotColor", ChangeNotColor},
+	{"GetSurfaceData", GetSurfaceData},
+	{"Init", Init},
+	{"PlayAnimeData", PlayAnimeData},
+	{"ResetAnimeData", ResetAnimeData},
+	{"SetAnimeBack", SetAnimeBack},
+	{"SetAnimeDst", SetAnimeDst},
+	{"SetAnimeRect", SetAnimeRect},
+	{"SetAnimeSrc", SetAnimeSrc},
+};
+
+const Module module_ShGraph = {"ShGraph", functions, sizeof(functions) / sizeof(ModuleFunc)};

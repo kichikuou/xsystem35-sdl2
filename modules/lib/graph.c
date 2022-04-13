@@ -1,7 +1,7 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"
@@ -17,10 +17,10 @@
 */
 
 #undef WARNING
-#define WARNING //
+#define WARNING(...)
 
 #undef NOTICE
-#define NOTICE //
+#define NOTICE(...)
 
 
 /**
@@ -90,8 +90,8 @@ boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds
 		*sy -= *dy; *sh += *dy; *dy = 0;
 	}
 	
-	*sw = MIN(ss->width  - *sx, MIN(ds->width  - *dx, *sw));
-	*sh = MIN(ss->height - *sy, MIN(ds->height - *dy, *sh));
+	*sw = min(ss->width  - *sx, min(ds->width  - *dx, *sw));
+	*sh = min(ss->height - *sy, min(ds->height - *dy, *sh));
 
 	if (*sw <= 0) {
 		WARNING("sw become <=0\n");
@@ -152,8 +152,8 @@ boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
 		*sh += *sy; *sy = 0;
 	}
 	
-	*sw = MIN(ss->width  - *sx, *sw);
-	*sh = MIN(ss->height - *sy, *sh);
+	*sw = min(ss->width  - *sx, *sw);
+	*sh = min(ss->height - *sy, *sh);
 	
 	if (*sw <= 0) {
 		WARNING("sw become <=0\n");
@@ -258,10 +258,10 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 	a1  = (float)sw / (float)dw;
 	a2  = (float)sh / (float)dh;
 	// src width と dst width が同じときに問題があるので+1
-	row = g_new0(int, dw+1);
+	row = calloc(dw+1, sizeof(int));
 	// 1おおきくして初期化しないと col[dw-1]とcol[dw]が同じになる
 	// 可能性がある。
-	col = g_new0(int, dh+1);
+	col = calloc(dh+1, sizeof(int));
 	
 	for (yd = 0.0, y = 0; y < dh; y++) {
 		col[y] = yd; yd += a2;
@@ -272,28 +272,6 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 	}
 
 	switch(dst->depth) {
-	case 15:
-	{
-		WORD *yls, *yld;
-		BYTE *yla;
-		
-		for (y = 0; y < dh; y++) {
-			yls = (WORD *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (WORD *)(dp +   y        * dst->bytes_per_line);
-			yla = (BYTE *)(sa + *(y + col) * src->width);
-			for (x = 0; x < dw; x++) {
-				*(yld + x) = ALPHABLEND15(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
-			}
-			while(*(col + y) == *(col + y + 1)) {
-				yld += dst->width;
-				for (x = 0; x < dw; x++) {
-					*(yld + x) = ALPHABLEND15(*(yls+ *(row+x)), *(yld+x), *(yla+*(row+x)));
-				}
-				y++;
-			}
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD *yls, *yld;
@@ -341,8 +319,8 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 	}
 	}
 	
-	g_free(row);
-	g_free(col);
+	free(row);
+	free(col);
 }
 
 #include "graph2.c"

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 
 void commandWW() {
@@ -51,7 +52,7 @@ void commandWV() {
 }
 
 void commandWZ() {
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int sw = getCaliValue();
 
 	switch(p1) {
@@ -59,7 +60,7 @@ void commandWZ() {
 		ags_setExposeSwitch(sw == 0 ? FALSE : TRUE);
 		if (sw == 1) {
 			/* う〜ん こんな処理いれなあかんのかぁ〜 (T_T) */
-			if (nact->sys_world_depth == 8) nact->sys_pal_changed = TRUE;
+			if (nact->ags.world_depth == 8) nact->ags.pal_changed = TRUE;
 			ags_updateFull();
 		}
 		break;

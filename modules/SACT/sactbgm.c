@@ -24,12 +24,11 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
 #include "ald_manager.h"
-#include "music_client.h"
+#include "music.h"
 
 // 指定の番号の音楽が存在するかチェック
 int smus_check(int no) {

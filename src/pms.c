@@ -32,7 +32,7 @@
 */
 /* $Id: pms.c,v 1.2 2000/11/25 18:31:49 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 #include "portab.h"
 #include "LittleEndian.h"
@@ -44,7 +44,7 @@
  * static methods
 */
 static pms_header *extract_header(BYTE *b);
-static void getpal(Pallet256 *pal, BYTE *b);
+static void getpal(Palette256 *pal, BYTE *b);
 static void extract_8bit(pms_header *pms, BYTE *pic, BYTE *b);
 static void extract_16bit(pms_header *pms, WORD *pic, BYTE *b);
 
@@ -54,7 +54,7 @@ static void extract_16bit(pms_header *pms, WORD *pic, BYTE *b);
  *   return: acquired pms information object
 */
 static pms_header *extract_header(BYTE *b) {
-	pms_header *pms = g_new(pms_header, 1);
+	pms_header *pms = malloc(sizeof(pms_header));
 	
 	pms->pmsVer = LittleEndian_getW(b, 2);
 	pms->pmsHdrSize = LittleEndian_getW(b, 4);
@@ -74,11 +74,11 @@ static pms_header *extract_header(BYTE *b) {
 }
 
 /*
- * Get pallet from raw data
- *   pal: pallet to be stored 
- *   b  : raw data (pointer to pallet)
+ * Get palette from raw data
+ *   pal: palette to be stored
+ *   b  : raw data (pointer to palette)
 */
-static void getpal(Pallet256 *pal, BYTE *b) {
+static void getpal(Palette256 *pal, BYTE *b) {
 	int i;
 	
 	for (i = 0; i < 256; i++) {
@@ -219,30 +219,31 @@ boolean pms256_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract 8bit pms, header, pallet and pixel
+ * Extract 8bit pms, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
 cgdata *pms256_extract(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	pms_header *pms = extract_header(data);
 	
-	cg->pal = g_new(Pallet256, 1);
+	cg->pal = malloc(sizeof(Palette256));
 	getpal(cg->pal, data + pms->pmsPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = g_new(BYTE, (pms->pmsXW + 10) * (pms->pmsYW + 10));
+	cg->pic = malloc(sizeof(BYTE) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
 	extract_8bit(pms, cg->pic, data + pms->pmsDp);
 	
 	cg->type = ALCG_PMS8;
 	cg->x = pms->pmsX0;
 	cg->y = pms->pmsY0;
-	cg->width    = pms->pmsXW;
-	cg->height   = pms->pmsYW;
+	cg->width  = pms->pmsXW;
+	cg->height = pms->pmsYW;
+	cg->depth = 8;
 	cg->pms_bank = pms->pmsBf;
 	cg->alpha = NULL;
 	
-	g_free(pms);
+	free(pms);
 	
 	return cg;
 }
@@ -269,21 +270,21 @@ boolean pms64k_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract 16bit pms, header, pallet and pixel
+ * Extract 16bit pms, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
 cgdata *pms64k_extract(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	pms_header *pms = extract_header(data);
 	
 	/* +10: margin for broken cg */
-	cg->pic = (BYTE *)g_new(WORD, (pms->pmsXW + 10) * (pms->pmsYW + 10));
+	cg->pic = (BYTE *)malloc(sizeof(WORD) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
 	extract_16bit(pms, (WORD *)cg->pic, data + pms->pmsDp);
 	
 	cg->alpha = NULL;
 	if (pms->pmsPp != 0) {
-		cg->alpha = g_new(BYTE, (pms->pmsXW + 10) * (pms->pmsYW + 10));
+		cg->alpha = malloc(sizeof(BYTE) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
 		extract_8bit(pms, cg->alpha, data + pms->pmsPp);
 	}
 	
@@ -292,30 +293,10 @@ cgdata *pms64k_extract(BYTE *data) {
 	cg->y = pms->pmsY0;
 	cg->width  = pms->pmsXW;
 	cg->height = pms->pmsYW;
+	cg->depth = 16;
 	cg->pal = NULL;
 	
-	g_free(pms);
-	
-	return cg;
-}
-
-/*
- * Extract pms pallet only
- *   data: raw data (pointer to data top)
- *   return: extracted pallet data
-*/
-cgdata *pms_getpal(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
-	pms_header *pms = extract_header(data);
-	
-	cg->pal = g_new(Pallet256, 1);
-	getpal(cg->pal, data + pms->pmsPp);
-	
-	cg->type  = ALCG_PMS8;
-	cg->pic   = NULL;
-	cg->alpha = NULL;
-	
-	g_free(pms);
+	free(pms);
 	
 	return cg;
 }

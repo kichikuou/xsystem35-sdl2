@@ -48,100 +48,27 @@ int getCaliValue();
 int *getCaliVariable();
 int *getVariable();
 
-int preVarPage;      /* 直前にアクセスした変数のページ */
-int preVarIndex;     /* 直前にアクセスした変数のINDEX */
-int preVarNo;        /* 直前にアクセスした変数の番号 */
-
 static int buf[CALI_DEPTH_MAX]; /* 計算式バッファ */
 static int *cali = buf;         /* インデックス */
 
-static void undeferr() {
-	SYSERROR("Undefined Command:@ %03d,%05x\n", sl_getPage(), sl_getIndex());
-}
-
-/* 配列のオフセットを確定する */
-static int *fixOffset(int base, int offset2) {
-	int page, offset;
-	int *index;
-	
-	preVarPage = (sysVarAttribute + base) -> page;
-	preVarNo   = base;
-	if ((sysVarAttribute + base) -> page == 0) {
-		if (offset2 == -1) {
-#ifdef DEBUG_CHECKALING
-			if (base >= SYSVAR_MAX) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d)\n", base, offset2);
-				return NULL;
-			}
-#endif
-			preVarIndex = base;
-			return sysVar + base;
-		} else {
-#ifdef DEBUG_CHECKALING
-			if ((base + offset2) >= SYSVAR_MAX) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d)\n", base, offset2);
-				return NULL;
-			}
-#endif
-			preVarIndex = base + offset2;
-			return sysVar + base + offset2;
-		}
-	} else {
-		if (offset2 == -1) {
-			index  = (sysVarAttribute + base) -> pointvar;
-			page   = (sysVarAttribute + base) -> page;
-			offset = (sysVarAttribute + base) -> offset;
-#ifdef DEBUG_CHECKALING
-			if ((*index) + offset > (arrayVarBuffer + page - 1)->max) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d, %d, %d, %d)\n", base, offset2, *index, page, offset);
-				return NULL;
-			}
-#endif
-			preVarIndex = offset + (*index);
-			return ((arrayVarBuffer + page - 1) -> value) + offset + (*index);
-		} else {
-			page   = (sysVarAttribute + base) -> page;
-			offset = (sysVarAttribute + base) -> offset;
-#ifdef DEBUG_CHECKALING
-			if (offset + offset2 > (arrayVarBuffer + page - 1)->max) {
-				WARNING("sysVar[no] ArrayIndexOutofException (%d, %d, %d, %d)\n", base, offset2, page, offset);
-				return NULL;
-			}
-#endif
-			preVarIndex = offset + offset2;
-			return ((arrayVarBuffer + page - 1) -> value) + offset + offset2;
-		}
-	}
-}
-
 /* 変数番号を返す */
 static int *getVar(int c0) {
-	int c1;
-	
-	if ((c0 & 0x40) != 0) { /* 2byte系 */
+	if ((c0 & 0x40) == 0)
+		return v_ref(c0 & 0x3f);  // 0 - 0x3f
+
+	int c1 = sl_getc();
+	if (c0 != 0xc0)
+		return v_ref(((c0 & 0x3f) * 256) + c1);  // 0x100 - 0x3fff
+
+	if (c1 == 1) {
+		c0 = sl_getc();
 		c1 = sl_getc();
-		if (c0 == 0xc0) {
-			if (c1 == 0) {
-				SYSERROR("Unknown Parameter\n");
-			} else if (c1 == 1) {
-				/* SYSTEM35拡張 */
-				c0 = (sl_getc() << 8) + sl_getc();  /* varbase */
-				c1 = getCaliValue();                /* offset */
-				return fixOffset(c0, c1);
-			} else if (c1 < 0x40) {
-				WARNING("Unknown Parameter\n");
-				undeferr();
-			} else { /* 2byte系 40h - ffh */
-				return fixOffset(c1, -1);
-			}
-		} else { /* 2byte系 100h - 3fffh */
-			return fixOffset(((c0 & 0x3f) * 256) + c1, -1);
-		}
-	} else { /* 1byte系 */
-		return fixOffset(c0 & 0x3f, -1);
+		int index = getCaliValue();
+		return v_ref_indexed(c0 << 8 | c1, index);
+	} else if (c1 >= 0x40) {
+		return v_ref(c1);  // 0x40 - 0xff
 	}
-	/* 来ないはず */
-	SYSERROR("Something was wrong\n");
+	SYSERROR("Invalid variable reference at %d:0x%x", sl_getPage(), sl_getIndex() - 2);
 	return NULL;
 }
 
@@ -149,7 +76,7 @@ static int *getVar(int c0) {
 int *getCaliVariable() {
 	int *c0 = getVar(sl_getc());
 	if (sl_getc() != 0x7f) {
-		SYSERROR("Something is Wrong @ %03d:%05x\n", sl_getPage(), sl_getIndex());
+		SYSERROR("Something is Wrong @ %03d:%05x", sl_getPage(), sl_getIndex());
 	}
 	return c0;
 }
@@ -198,13 +125,12 @@ int getCaliValue() {
 					cali++;
 					continue;
 				} else if (c1 < 0x34) {
-					SYSERROR("Unknow Parameter @ %03d:%05x\n", sl_getPage(), sl_getIndex());
+					SYSERROR("Unknow Parameter @ %03d:%05x", sl_getPage(), sl_getIndex());
 				}
 			}
 		l_var:
 			t = getVar(c0);
-			if (t == NULL) continue;
-			*cali = *t; cali++;
+			*cali++ = t ? *t : 0;
 		} else {
 			switch(c0) {
 			case 0x7e: /* != */
@@ -290,7 +216,7 @@ int getCaliValue() {
 					c1 = sl_getc();
 					if (c0 == 0) { /* 34h-ffh */
 						if (c1 <= 0x33) {
-							SYSERROR("Unknown Parameter @ %03d:%05x\n", sl_getPage(), sl_getIndex());
+							SYSERROR("Unknown Parameter @ %03d:%05x", sl_getPage(), sl_getIndex());
 						}
 					} else { /* 100h- 3fff */
 						c1 += ((c0 & 0x3f) * 256);
@@ -304,12 +230,12 @@ int getCaliValue() {
 		}
 	}
 	c0 = *--cali;
-#ifdef DEBUG_CHECKALING
+
 	if (cali != bufc) {
 		WARNING("Something is wrong @ %03d:%05x\n", sl_getPage(), sl_getIndex());
 		cali = bufc;
 		return 0;
 	}
-#endif
+
 	return c0;
 }

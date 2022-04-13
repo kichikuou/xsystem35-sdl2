@@ -26,20 +26,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
+#include "sdl_core.h"
 #include "ags.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 #include "sact.h"
 #include "sprite.h"
 #include "ngraph.h"
 #include "drawtext.h"
 #include "sactlog.h"
-#include "utfsjis.h"
 
 // メッセージキー待ちの時、表示するアニメーションに関する情報
 struct markinfo {
@@ -49,7 +47,7 @@ struct markinfo {
 };
 
 static boolean is_messagesprite(int wNum);
-static void replacestr_cb(gpointer data, gpointer userdata);
+static void replacestr_cb(void* data, void* userdata);
 static char *replacestr(char *msg);
 static void update_mark(sprite_t *sp, cginfo_t *cg);
 static int  setupmark(int wNum1, int wNum2, struct markinfo *minfo);
@@ -81,7 +79,7 @@ static boolean is_messagesprite(int wNum) {
 }
 
 // 文字列の置き換え処理
-static void replacestr_cb(gpointer data, gpointer userdata) {
+static void replacestr_cb(void* data, void* userdata) {
 	strexchange_t *ex = (strexchange_t *)data;
 	char *start, *next, *out;
 	
@@ -113,7 +111,7 @@ static char *replacestr(char *msg) {
 	strncpy(repbuf[0], msg, REPLACEBUFSIZE);
 	replacesrc = repbuf[0];
 	replacedst = repbuf[1];
-	g_slist_foreach(sact.strreplace, replacestr_cb, NULL);
+	slist_foreach(sact.strreplace, replacestr_cb, NULL);
 
 	return (repbuf[0][0] == '\0') ? repbuf[1] : repbuf[0];
 }
@@ -189,16 +187,10 @@ static int setupmark(int wNum1, int wNum2, struct markinfo *minfo) {
     
   @param msg: 追加する文字列
 */
-void smsg_add(char *msg) {
+void smsg_add(const char *msg) {
 	int len;
 	
 	if (msg[0] == '\0') return;
-	
-	if (0) {
-		char *b = sjis2lang(msg);
-		fprintf(stderr, "add msg '%s'\n", b);
-		free(b);
-	}
 	
 	len = MSGBUFMAX - (int)strlen(sact.msgbuf);
 	if (len < 0) {
@@ -277,7 +269,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 		char mbuf[20], rbuf[20];
 		int cw, delta, wcnt;
 		
-		wcnt = get_high_counter(SYSTEMCOUNTER_MSEC);
+		wcnt = sdl_getTicks();
 		
 		mbuf[0] = rbuf[0] = '\0';
 		msg = get_char(msg, mbuf, rbuf, sizeof(mbuf) -1); 
@@ -305,12 +297,6 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 		}
 		dt_setfont(wFont, wSize);
 
-		if (0) {
-			char *b = sjis2lang(mbuf);
-			fprintf(stderr, "msg '%s'\n", b);
-			free(b);
-		}
-		
 		cw = dt_drawtext_col(sp->u.msg.canvas,
 				     sp->u.msg.dspcur.x,
 				     sp->u.msg.dspcur.y + wRSize + wRLineSpace,
@@ -331,9 +317,9 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 			needupdate = FALSE;
 			
 			// keywait
-			delta = get_high_counter(SYSTEMCOUNTER_MSEC) - wcnt;
+			delta = sdl_getTicks() - wcnt;
 			if (delta < wSpeed) {
-				if (sys_keywait(wSpeed - delta, FALSE)) {
+				if (sys_keywait(wSpeed - delta, KEYWAIT_NONCANCELABLE)) {
 					
 					wSpeed = 0;
 				}
@@ -350,9 +336,9 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	
 	// Waitなしの出力は最後にupdate
 	if (needupdate) {
-		uparea.width  = sp->cursize.width;
-		uparea.height = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
-		sp_updateme_part(sp, uparea.x, uparea.y, uparea.width, uparea.height);
+		uparea.w = sp->cursize.width;
+		uparea.h = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
+		sp_updateme_part(sp, uparea.x, uparea.y, uparea.w, uparea.h);
 	}
 	
 	// ????
@@ -387,16 +373,16 @@ void smsg_clear(int wNum) {
 	sp_updateme(sp);
 	
 	if (sact.logging) {
-		sact.log = g_list_append(sact.log, g_strdup("\n"));
+		sact.log = list_append(sact.log, strdup("\n"));
 	}
 }
 
 /*
   出力中の文字列があるかチェック
-  @return: なし(0) , あり(1)
+  @return: なし(1) , あり(0)
  */
 int smsg_is_empty() {
-	return (sact.msgbuf[0] != '\0');
+	return (sact.msgbuf[0] == '\0');
 }
 
 /*
@@ -409,7 +395,10 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	struct markinfo minfo[6];
 	int i = 0, j, maxstep;
 	
-	if (sact.waitskiplv > 0) return 0;
+	if (sact.waitskiplv > 0) {
+		sys_getInputInfo();
+		return 0;
+	}
 	
 	// アニメパターンの初期化
 	maxstep = setupmark(wNum1, wNum2, minfo);
@@ -417,8 +406,8 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	sact.waittype = KEYWAIT_MESSAGE;
 	sact.waitkey = -1;
 	
-	while (sact.waitkey == -1) {
-		int st = get_high_counter(SYSTEMCOUNTER_MSEC);
+	while (sact.waitkey == -1 && !nact->is_quit) {
+		int st = sdl_getTicks();
 		int interval = 25;
 		
 		// アニメパターンがある場合、その更新
@@ -432,7 +421,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 			update_mark(minfo[j].sp, minfo[j].cg);
 			i++;
 		} 
-		sys_keywait(interval - (get_high_counter(SYSTEMCOUNTER_MSEC) - st), FALSE);
+		sys_keywait(interval - (sdl_getTicks() - st), KEYWAIT_NONCANCELABLE);
 	}
 	
 	sact.waittype = KEYWAIT_NONE;
@@ -452,8 +441,8 @@ int smsg_update(sprite_t *sp) {
 	//  -> 説明スプライトのように、SetShowされたときに対応できないからだめ 
 	//if (sact.msgbufempty) return OK;
 	
-	update.width  = sact.updaterect.width;
-	update.height = sact.updaterect.height;
+	update.width  = sact.updaterect.w;
+	update.height = sact.updaterect.h;
 	
 	dx = sp->cur.x - sact.updaterect.x;
 	dy = sp->cur.y - sact.updaterect.y;
@@ -472,7 +461,7 @@ int smsg_update(sprite_t *sp) {
 	
 	gre_BlendUseAMap(sf0, dx, dy, sf0, dx, dy, sp->u.msg.canvas, sx, sy, w, h, sp->u.msg.canvas, sx, sy, sp->blendrate);
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
 		sp->no, sx, sy, w, h, dx, dy);
 	
 	return OK;
@@ -506,9 +495,6 @@ static int get_linelen(BYTE *msg) {
 //   ルビつき文字の場合: メッセージ本体と対応するルビ文字列
 //   それ以外          : 全角|半角文字１文字
 static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
-	int c1, i;
-
-	//  改行
 	if (msg[0] == '\n') {
 		mbuf[0] = '\n';
 		mbuf[1] = msg[1];
@@ -518,6 +504,7 @@ static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 	
 	// ルビつき文字
 	if (0 == strncmp("|RB|", msg, 4)) {
+		int i;
 		msg += 4;
 		for (i = 0; *msg != '|' && i < bufmax; i++) {
 			mbuf[i] = *msg++;
@@ -528,13 +515,9 @@ static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 		}
 		msg++; rbuf[i] = '\0';
 	} else {
-		c1 = *msg++;
-		
-		*mbuf++ = c1;
-		
-		if ((c1 >= 0x81 && c1 < 0xa0) || (c1 >= 0xe0 && c1 <= 0xee)) {
+		BYTE *p = advance_char(msg, nact->encoding);
+		while (msg < p)
 			*mbuf++ = *msg++;
-		}
 		*mbuf = '\0';
 	}
 	return msg;
@@ -553,7 +536,7 @@ static void append_to_log(char *msg) {
 static void sactlog_newline() {
 	if (sact.logging) {
 		if (sact.msgbuf2[0] == '\0') return;
-		sact.log = g_list_append(sact.log, g_strdup(sact.msgbuf2));
+		sact.log = list_append(sact.log, strdup(sact.msgbuf2));
 		sact.msgbuf2[0] = '\0';
 	}
 }

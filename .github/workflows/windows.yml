@@ -1,0 +1,57 @@
+name: Windows Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - { sys: MINGW32, installer: "xsystem35-32bit" }
+          - { sys: MINGW64, installer: "xsystem35-64bit" }
+    defaults:
+      run:
+        shell: msys2 {0}
+    name: MSYS2 ${{ matrix.sys }}
+    steps:
+
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.sys }}
+        pacboy: >-
+          gcc:p
+          cmake:p
+          ninja:p
+          SDL2:p
+          SDL2_ttf:p
+          SDL2_mixer:p
+          libjpeg-turbo:p
+          libwebp:p
+          cjson:p
+          nsis:p
+          ntldd-git:p
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: |
+        mkdir -p out/release
+        cd out/release
+        cmake -G"Ninja" -DCMAKE_BUILD_TYPE=Release ../../
+        ninja
+
+    - name: Test
+      run: ctest --output-on-failure
+      working-directory: out/release
+
+    - name: Package
+      working-directory: tools/installer
+      run: ./make-installer.sh ../../out/release ${{ matrix.installer }}.nsi
+
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.installer }}
+        path: tools/installer/${{ matrix.installer }}.exe

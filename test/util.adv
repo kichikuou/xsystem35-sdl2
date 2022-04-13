@@ -1,0 +1,29 @@
+const word FILE = 1:
+	!actual:0!
+	!expected:0!
+	!line:0!
+
+**AssertEquals actual,expected,line:
+	{expected = actual:
+		inc tests_passed:
+		%0:
+	}
+	inc tests_failed:
+	'[FAIL] ' X FILE: ':' HH0,line:
+	' expected: ' HH0,expected:
+	' actual: ' HH0,actual:
+	R
+	%0:
+
+**AssertStrEquals actual,expected,line:
+	MC actual,expected:
+	{RND = 1:
+		inc tests_passed:
+		%0:
+	}
+	inc tests_failed:
+	'[FAIL] ' X FILE: ':' HH0,line:
+	' expected: "' X expected: '"'
+	' actual: "' X actual: '"'
+	R
+	%0:

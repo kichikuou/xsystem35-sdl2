@@ -26,11 +26,12 @@
 
 #include "portab.h"
 #include "cmd_check.h"
+#include "debugger.h"
 #include "scenario.h"
 #include "xsystem35.h"
 #include "selection.h"
 #include "message.h"
-#include "imput.h"
+#include "input.h"
 
 static void undeferr();
 
@@ -84,8 +85,8 @@ static void letVar(int type) {
 
 /* データテーブルの設定 */
 static void getDataTableAdr() {
-	int index  = sys_getaddress();
-	int offset = sys_getCaliValue();
+	int index  = sl_getaddr();
+	int offset = getCaliValue();
 	
 	if (offset) {
 		index = sl_getdAt(index + 4 * (offset - 1));
@@ -98,18 +99,18 @@ static void getDataTableAdr() {
 
 /* < ループ開始 */
 static void loopStart() {
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int exitadr, limit, direction, step;
 	int *var;
 	
 	if (p1 == 0) {
-		sys_getc();
-		sys_getc();
+		sl_getc();
+		sl_getc();
 	} else if (p1 != 1) {
 		undeferr();
 	}
 	
-	exitadr   = sys_getaddress();
+	exitadr   = sl_getaddr();
 	var       = getCaliVariable();
 	limit     = getCaliValue();
 	direction = getCaliValue();
@@ -144,13 +145,48 @@ static void loopStart() {
 }
 
 static void undeferr() {
-	SYSERROR("Undefined Command:@ %03d,%05x\n", sl_getPage(), sl_getIndex());
+	SYSERROR("Undefined Command:@ %03d,%05x", sl_getPage(), sl_getIndex());
 }
 
-void check_command(int c0) {
+static void message(int c0) {
+	char buf[512];
+	char *p = buf;
+
+	while (c0 == 0x20 || c0 >= 0x80) {
+		if (nact->encoding == UTF8) {
+			*p++ = (char)c0;
+		} else if (c0 == 0x20) {
+			*p++ = (char)c0;
+		} else if (c0 >= 0xe0) {
+			*p++ = (char)c0; *p++ = (char)sl_getc();
+		} else if (c0 >= 0xa0) {
+			*p++ = (char)c0;
+		} else {
+			*p++ = (char)c0; *p++ = (char)sl_getc();
+		}
+		c0 = sl_getc();
+	}
+	sl_ungetc();
+	if (p != buf) {
+		*p = '\0';
+		sys_addMsg(buf);
+	}
+}
+
+void exec_command(void) {
+	DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
+
 	int page, index;
-	int bool;
-	
+	int c0 = sl_getc();
+
+	if (c0 == BREAKPOINT)
+		c0 = dbg_handle_breakpoint(sl_getPage(), sl_getIndex() - 1);
+
+	if (c0 == 0x20 || c0 >= 0x80) {
+		message(c0);
+		return;
+	}
+
 	switch(c0) {
 	case 0:
 		/* メッセージのゴミ？ */
@@ -177,7 +213,7 @@ void check_command(int c0) {
 			sel_fixElement();
 			nact->sel.in_setting = FALSE;
 		} else {
-			sel_addRetValue(sys_getaddress());
+			sel_addRetValue(sl_getaddr());
 			nact->sel.in_setting = TRUE;
 		}
 		break;
@@ -196,7 +232,7 @@ void check_command(int c0) {
 		break;
 	case '@':
 		/* puts("ラベルジャンプ") */
-		sl_jmpNear(sys_getaddress());
+		sl_jmpNear(sl_getaddr());
 		break;
 	case '<':
 		/* for loop */
@@ -204,7 +240,7 @@ void check_command(int c0) {
 		break;
 	case '>':
 		/* loop end */
-		sl_jmpNear(sys_getaddress());
+		sl_jmpNear(sl_getaddr());
 		break;
 	case '/':
 		/* 小文字コマンド */
@@ -1044,7 +1080,7 @@ void check_command(int c0) {
 	case 'X':
 	{
 		int num=getCaliValue();
-		sys_addMsg(v_str(num - 1));
+		sys_addMsg(svar_get(num));
 		DEBUG_COMMAND("X %d:\n", num);
 	}
 		break;
@@ -1098,6 +1134,8 @@ void check_command(int c0) {
 				undeferr();
 			}
 			 break;
+		case 'U':
+			commandZU(); break;
 		case 'Z':
 			switch(sl_getc()) {
 			case 0:
@@ -1144,7 +1182,7 @@ void check_command(int c0) {
 		break;
 	case '\\':
 		/* label call */
-		index = sys_getaddress();
+		index = sl_getaddr();
 		if (index == 0) {
 			sl_retNear();
 		} else {
@@ -1155,17 +1193,17 @@ void check_command(int c0) {
 		/* puts("選択"); */
 		sel_select();
 		break;
-	case '{':
-		/* puts("条件文"); */
-		bool = getCaliValue();
-		index = sys_getaddress();
-		if (bool == 0) {
-			sl_jmpNear(index);
-		} 
+	case '{':  // conditional statement
+		{
+			int cond = getCaliValue();
+			index = sl_getaddr();
+			if (!cond)
+				sl_jmpNear(index);
+		}
 		break;
 	case '~':
 		/* label far call */
-		page = sys_getw();
+		page = sl_getw();
 		if (page == 0x0000) {
 			// puts("~ cali:");
 			nact->fnc_return_value = getCaliValue();
@@ -1174,7 +1212,7 @@ void check_command(int c0) {
 			// puts("~~ cali:");
 			*getCaliVariable() = nact->fnc_return_value;
 		} else {
-			sl_callFar2(page - 1, sys_getaddress());
+			sl_callFar2(page - 1, sl_getaddr());
 		}
 		break;
 	default:

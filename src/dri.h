@@ -25,6 +25,7 @@
 #define __DRI__
 
 #include "portab.h"
+#include "mmap.h"
 
 #define DRIFILEMAX 255     /* maximum file number for one data type */
 #define DRIDATAMAX 65535   /* maximum file number in one file */
@@ -32,7 +33,7 @@
 struct _drifiles {
 	/* for mmap */
 	boolean     mmapped;
-	void        *mmapadr[DRIFILEMAX];
+	mmap_t      *mmap[DRIFILEMAX];
 	/* for file access */
 	char        *fnames[DRIFILEMAX];
 	/* max file number in files */
@@ -50,12 +51,12 @@ struct _dridata {
 	char    *data_raw; /* dri header pointer */
 	char    *data;     /* real data */
 	char    *name;     /* not used */
-	boolean in_use;    /* dont remove from cache if TRUE */
+	int     refcnt;    /* reference count */
 	drifiles *a;       /* archive file obj */
 };
 typedef struct _dridata dridata;
 
-extern drifiles *dri_init(char **file, int cnt, boolean mmapping);
+extern drifiles *dri_init(const char **file, int cnt, boolean use_mmap);
 extern dridata  *dri_getdata(drifiles *d, int no);
 
 #endif /* !__DRI__ */

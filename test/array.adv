@@ -1,0 +1,61 @@
+	MS FILE,"array.adv":
+	!used:0!
+	!size:0!
+	!array:0!
+	!array2:0!
+	!index:0!
+
+	; DI should return (0, _) for an unallocated array
+	DI 1,used,size:
+	~AssertEquals used,0,__LINE__:
+
+	DC 1,10,1:		; page1 = allocate_array(11)
+	DC 2,0,1:		; page2 = allocate_array(1)
+	DC 255,65535,1:		; page255 = allocate_array(65536)
+
+	DI 1,used,size:
+	~AssertEquals used,1,__LINE__:
+	~AssertEquals size,11,__LINE__:
+	DI 2,used,size:
+	~AssertEquals used,1,__LINE__:
+	~AssertEquals size,1,__LINE__:
+	DI 255,used,size:
+	~AssertEquals used,1,__LINE__:
+	~AssertEquals size,0,__LINE__:
+
+	DS index,array,0,1:	; array maps page1[0..]
+
+	; Must be zero-initialized
+	~AssertEquals array[3],0,__LINE__:
+
+	!index:3!
+	!array:30!		; page1[3] = 30
+
+	; var[...] style access ignores the index variable
+	~AssertEquals array[3],30,__LINE__:
+
+	DS index,array2,1,1:	; array2 maps page1[1..]
+	~AssertEquals array2[2],30,__LINE__:
+	!index:2!
+	~AssertEquals array2,30,__LINE__:
+
+	DF array2,6,42:		; memset(page1+1+index, 42, 6)
+	~AssertEquals array[2],0,__LINE__:
+	~AssertEquals array[3],42,__LINE__:
+	~AssertEquals array[8],42,__LINE__:
+	~AssertEquals array[9],0,__LINE__:
+
+	!index:0!
+	DS index,array,0,2:    ; array maps page2[0..]
+        !array:33!
+	~AssertEquals array[0],33,__LINE__:
+	DF array,1,66:
+	~AssertEquals array[0],66,__LINE__:
+
+	; Array access without DS
+	!D05:5!
+	~AssertEquals D01[4],5,__LINE__:
+	DF D01,5,0:
+	~AssertEquals D01[4],0,__LINE__:
+
+	%0:

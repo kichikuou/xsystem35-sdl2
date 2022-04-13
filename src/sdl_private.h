@@ -25,78 +25,54 @@
 
 #include "config.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "ags.h"
-#include "font.h"
 
 struct sdl_private_data {
-	const SDL_VideoInfo   *vf; /* sdl video information */
-
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+	SDL_Texture *texture;
 	SDL_Surface     *dsp; /* toplevel surface */
-
-	Uint32 vflag; /* video mode flag */
 
 	SDL_Surface     *dib; /* offscreen surface */
 	
-	SDL_Color       col[256]; /* color pallet */
-	
-	unsigned long       white; /* white pixel */
+	SDL_Color       col[256]; /* color palette */
 	
 	agsurface_t *cimg;
 	
-	SDL_Rect       view;
+	int     view_w;
+	int     view_h;
 	
-	FONT *font;
+	boolean dirty;
 
 	boolean ms_active;   /* mouse is active */
 
 	boolean fs_on;
 
-	int      winoffset_x; /* draw offset in Window x */
-	int      winoffset_y; /*                       y */
-
+	boolean (*custom_event_handler)(const SDL_Event *);
 };
 
-extern void sdl_cursor_init(void);
-extern void sdl_shadow_init(void);
-extern void sdl_vm_init(void);
-
+void sdl_cursor_init(void);
+void sdl_shadow_init(void);
+int sdl_nearest_color(int r, int g, int b);
+boolean sdl_joy_open(int index);
 
 extern struct sdl_private_data *sdl_videodev;
 
-#define sdl_vinfo (sdl_videodev->vf)
+#define sdl_window (sdl_videodev->window)
+#define sdl_renderer (sdl_videodev->renderer)
+#define sdl_texture (sdl_videodev->texture)
 #define sdl_display (sdl_videodev->dsp)
-#define sdl_vflag (sdl_videodev->vflag)
 #define sdl_dib (sdl_videodev->dib)
 #define sdl_col (sdl_videodev->col)
-#define sdl_white (sdl_videodev->white)
 #define sdl_dibinfo (sdl_videodev->cimg)
-#define sdl_font (sdl_videodev->font)
-#define sdl_view (sdl_videodev->view)
-#define view_x (sdl_videodev->view.x)
-#define view_y (sdl_videodev->view.y)
-#define view_w (sdl_videodev->view.w)
-#define view_h (sdl_videodev->view.h)
+#define view_w (sdl_videodev->view_w)
+#define view_h (sdl_videodev->view_h)
+#define sdl_dirty (sdl_videodev->dirty)
 #define ms_active (sdl_videodev->ms_active)
 #define sdl_fs_on (sdl_videodev->fs_on)
-#define winoffset_x (sdl_videodev->winoffset_x)
-#define winoffset_y (sdl_videodev->winoffset_y)
-
-#define setRect(r,xx,yy,ww,hh) (r).x=(xx),(r).y=(yy),(r).w=(ww),(r).h=(hh)
-#define setOffset(s,x,y) (s->pixels) + (x) * (s->format->BytesPerPixel) + (y) * s->pitch
-
-#ifdef HAVE_SDLRLE
-#define RLEFLAG(v) ((v)|SDL_RLEACCEL)
-#ifdef HAVE_SDLRALPHA
-#define R_ALPHA(v) (v)
-#else
-#define R_ALPHA(v) (255-(v))
-#endif
-#else
-#define RLEFLAG(v) (v)
-#define R_ALPHA(v) (v)
-#endif
+#define sdl_custom_event_handler (sdl_videodev->custom_event_handler)
 
 #endif /* __SDL_PRIVATE_H__ */

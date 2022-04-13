@@ -24,12 +24,9 @@
 #ifndef __FILECHECK_H__
 #define __FILECHECK_H__
 
-#define FILENAME_KANJI_CODE_UTF8 0
-#define FILENAME_KANJI_CODE_SJIS 1
-
-extern void fc_init(char *name);
-extern char *fc_search(char *req);
-extern char *fc_add(char *req);
-extern void fc_set_default_kanjicode(int c);
+extern void fc_init(const char *name);
+extern char *fc_get_path(const char *fname_utf8);
+extern FILE *fc_open(const char *fname_utf8, char type);
+extern void fc_backup_oldfile(const char *filename);
 
 #endif /* !__FILECHECK_H__ */

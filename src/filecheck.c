@@ -26,108 +26,117 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#ifdef _WIN32
+#include <windows.h>
+#undef min
+#undef max
+#endif
 
-#include "utfsjis.h"
+#include "filecheck.h"
 
-struct fnametable {
-	char *realname;
-	char *transname;
-};
+static char *saveDataPath;
 
-#define FILEMAX 100 /* ???? */
-static struct fnametable tbl[FILEMAX];
-static int fnametable_cnt;
-static boolean initilized = FALSE;
-static boolean newfile_kanjicode_utf8 = TRUE;
+static char *get_fullpath(const char* dir, const char *filename) {
+	char *fn = malloc(strlen(filename) + strlen(dir) + 3);
+	if (fn == NULL) {
+		return NULL;
+	}
+	strcpy(fn, dir);
+	strcat(fn, "/");
+	strcat(fn, filename);
+	return fn;
+}
 
 /* list up file in current directory */
 /*   name : save/load directory      */
-void fc_init(char *name) {
-	DIR *dir;
-	struct dirent *entry;
-	int c = 0;
-	
-	initilized = FALSE;
-	
-	if (NULL == (dir = opendir(name))) {
-		return;
+void fc_init(const char *name) {
+	saveDataPath = strdup(name);
+}
+
+#ifdef _WIN32
+
+FILE *fopen_utf8(const char *path_utf8, char type) {
+	wchar_t wpath[PATH_MAX + 1];
+	if (!MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path_utf8, -1, wpath, PATH_MAX + 1))
+		return NULL;
+	return _wfopen(wpath, type == 'r' ? L"rb" : L"wb");
+}
+
+char *fc_get_path(const char *fname_utf8) {
+	return get_fullpath(saveDataPath, fname_utf8);
+}
+
+FILE *fc_open(const char *fname_utf8, char type) {
+	char *path = fc_get_path(fname_utf8);
+	FILE *fp = fopen_utf8(path, type);
+	if (!fp && type == 'r') {
+		fp = fopen_utf8(fname_utf8, type);
 	}
-	
-	while(0 < (entry = readdir(dir))) {
-		if (c >= FILEMAX) {
-			fprintf(stderr, "Over " "FILEMAX" "files in savefile directry\n");
+	free(path);
+	return fp;
+}
+
+#else // !_WIN32
+
+static char *fc_search(const char *fname_utf8, const char *dir) {
+	DIR *d = opendir(dir);
+	if (d == NULL)
+		return NULL;
+
+	char *found = NULL;
+	struct dirent *entry;
+	while ((entry = readdir(d)) != NULL) {
+		if (strcasecmp(fname_utf8, entry->d_name) == 0) {
+			found = get_fullpath(dir, entry->d_name);
 			break;
 		}
-		tbl[c].realname = strdup(entry->d_name);
-		tbl[c].transname = strdup(entry->d_name);
-		sjis_toupper(tbl[c].transname);
-		c++;
 	}
-	fnametable_cnt = c;
-	closedir(dir);
-	initilized = TRUE;
+	closedir(d);
+	return found;
 }
 
-/* req must sjis */
-char *fc_search(char *req) {
-	int i;
-	BYTE *b;
-	
-	if (!initilized) return req;
-	
-	for (i = 0; i < fnametable_cnt; i++) {
-		/* match exeactly */
-		if (0 == strcmp(req, tbl[i].realname)) return req;
+char *fc_get_path(const char *fname_utf8) {
+	char *path = fc_search(fname_utf8, saveDataPath);
+	if (path)
+		return path;
+	return get_fullpath(saveDataPath, fname_utf8);
+}
 
-		/* capital match */
-		b = sjis_toupper2(req);
-		if (0 == strcmp(b, tbl[i].transname)) {
-			free(b);
-			return tbl[i].realname;
+FILE *fc_open(const char *fname_utf8, char type) {
+	char *fullpath = fc_search(fname_utf8, saveDataPath);
+	if (!fullpath) {
+		if (type == 'r') {
+			fullpath = fc_search(fname_utf8, ".");
+			if (!fullpath)
+				return NULL;
+		} else {
+			fullpath = get_fullpath(saveDataPath, fname_utf8);
 		}
-		
-		/* utf-8 match */
-		b = sjis2lang(req);
-		sjis_toupper(b);
-		if (0 == strcmp(b, tbl[i].transname)) {
-			free(b);
-			return tbl[i].realname;
-		} 
-		free(b);
-	}
-	return NULL;
-}
-
-/* add new file to entry */
-char *fc_add(char *req) {
-	BYTE *b;
-	
-	if (!initilized) return req;
-	
-	if (fnametable_cnt >= FILEMAX) {
-		fprintf(stderr, "Over " "FILEMAX" "files in savefile directry\n");
-		return req;
 	}
 
-	if (newfile_kanjicode_utf8) {
-		tbl[fnametable_cnt].realname = sjis2lang(req);
+	FILE *fp;
+	if (type == 'w') {
+		fc_backup_oldfile(fullpath);
+		fp = fopen(fullpath, "wb");
 	} else {
-		tbl[fnametable_cnt].realname = strdup(req);
+		fp = fopen(fullpath, "rb");
 	}
-
-	b = sjis_toupper2(req);
-	tbl[fnametable_cnt].transname = b;
-	
-	b = tbl[fnametable_cnt].realname;
-	fnametable_cnt++;
-	return b;
+	free(fullpath);
+	return fp;
 }
+#endif // _WIN32
 
-/* QE で新規ファイルをセーブする時のファイル名の漢字コード */
-void fc_set_default_kanjicode(int c) {
-	if (c == 0) {
-		newfile_kanjicode_utf8 = TRUE;
-	} else {
-		newfile_kanjicode_utf8 = FALSE;
-	}
-}		
+void fc_backup_oldfile(const char *filename) {
+#ifndef __EMSCRIPTEN__
+	char *newname;
+	
+	if (!filename) return;
+	newname = malloc(strlen(filename) + 3);
+	
+	strcpy(newname, filename);
+	strcat(newname, ".");
+	rename(filename, newname);
+	
+	free(newname);
+#endif
+}

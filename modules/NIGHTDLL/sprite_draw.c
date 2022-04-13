@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -39,10 +38,10 @@
  @param sp: 描画するスプライト
  @param r : 再描画する領域
 */
-int sp_draw(sprite_t *sp, MyRectangle *r) {
+int nt_sp_draw(sprite_t *sp, MyRectangle *r) {
 	if (sp == NULL) return NG;
 	
-	return sp_draw2(sp, sp->curcg, r);
+	return nt_sp_draw2(sp, sp->curcg, r);
 }
 
 /*
@@ -53,7 +52,7 @@ int sp_draw(sprite_t *sp, MyRectangle *r) {
   @param cg: 描画するCG
  @param r : 再描画する領域
 */
-int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
+int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	surface_t update;
 	int sx, sy, w, h, dx, dy;
 	
@@ -61,8 +60,8 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	if (cg->sf == NULL) return NG;
 
 	// 更新領域の確定
-	update.width  = r->width;
-	update.height = r->height;
+	update.width  = r->w;
+	update.height = r->h;
 	sx = 0;
 	sy = 0;
 	dx = sp->cur.x - r->x;
@@ -77,7 +76,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	dx += r->x;
 	dy += r->y;
 	
-	if (cg->sf->has_alpha) {
+	if (cg->sf->alpha) {
 		// alpha map がある場合
 		gre_BlendUseAMap(sf0, dx, dy,
 				 sf0, dx, dy,
@@ -97,14 +96,14 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 		}
 	}
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
 		sp->no, sx, sy, w, h, dx, dy);
 	
 	return OK;
 }
 
 // BlendScreenによる描画
-int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
+int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	surface_t update;
 	cginfo_t *cg;
 	int sx, sy, w, h, dx, dy;
@@ -117,8 +116,8 @@ int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	if (cg->sf == NULL) return NG;
 	
 	// 更新領域の確定
-	update.width  = r->width;
-	update.height = r->height;
+	update.width  = r->w;
+	update.height = r->h;
 	sx = 0;
 	sy = 0;
 	dx = sp->cur.x - r->x;
@@ -137,7 +136,8 @@ int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 			sf0, dx, dy,
 			cg->sf, sx, sy, w, h);
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
 		sp->no, sx, sy, w, h, dx, dy);
 	
+	return OK;
 }

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "portab.h"
 
-#include "music_client.h"
+#include "music.h"
 #include "night.h"
 
 struct _ntsnd {

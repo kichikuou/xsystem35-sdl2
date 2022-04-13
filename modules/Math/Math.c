@@ -28,12 +28,13 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "randMT.h"
 
 static int numtblmax;
 
-void RandMTInit() {
+static void RandMTInit() {
 	/*
 	  (おそらく Mersenne Twister使用の) 乱数初期化
 
@@ -44,7 +45,7 @@ void RandMTInit() {
 	DEBUG_COMMAND("Math.RandMTInit %d:\n", p1);
 }
 
-void RandMTGet() {
+static void RandMTGet() {
 	/*
 	  1 から num までの乱数を生成
 	  
@@ -63,7 +64,7 @@ void RandMTGet() {
 	DEBUG_COMMAND("Math.RandMTGet %d,%p:\n", num, var);
 }
 
-void RandMTMakeNumTable() {
+static void RandMTMakeNumTable() {
 	/*
 	  乱数テーブルの最大値を設定
 
@@ -76,7 +77,7 @@ void RandMTMakeNumTable() {
 	DEBUG_COMMAND("Math.RandMTMakeNumTable %d:\n", p1);
 }
 
-void RandMTGetNumTable() {
+static void RandMTGetNumTable() {
 	/*
 	  乱数テーブルから値を取得
 
@@ -88,3 +89,12 @@ void RandMTGetNumTable() {
 	
 	DEBUG_COMMAND("Math.RandMTGetNumTable %d:\n", *var);
 }
+
+static const ModuleFunc functions[] = {
+	{"RandMTGet", RandMTGet},
+	{"RandMTGetNumTable", RandMTGetNumTable},
+	{"RandMTInit", RandMTInit},
+	{"RandMTMakeNumTable", RandMTMakeNumTable},
+};
+
+const Module module_Math = {"Math", functions, sizeof(functions) / sizeof(ModuleFunc)};

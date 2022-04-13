@@ -25,28 +25,20 @@
 #ifndef __ALK_H__
 #define __ALK_H__
 
-#include <unistd.h>
-#include <sys/types.h>
+#include "mmap.h"
 
-/* 
-   .ALK データ構造
-   
-   char[4] sig = "ALK0"; シグネチャ
-   int32   num = ファイル数
-     int32 offset; 個々のファイルのファイルの先頭からのオフセット
-     int32 size;   個々のファイルの大きさ(in bytes)
-*/     
+struct alk_entry {
+	void *data;
+	uint32_t size;
+};
 
 typedef struct {
-	int   fd;      /* .alk ファイルの file discpriter   */
-	char *mapadr;  /* mmap したファイルの先頭アドレス   */
-	off_t size;    /* mmap したバイト数(ファイルサイズ) */
-	int   datanum; /* .alk ファイル中のファイル数       */
-	int  *offset;  /* 各ファイルへのオフセット          */
+	mmap_t *mmap;
+	int datanum;
+	struct alk_entry entries[];
 } alk_t;
 
-extern alk_t *alk_new(char *path);
-extern int    alk_free(alk_t *alk);
-extern char  *alk_get(alk_t *alk, int no);
+alk_t *alk_new(const char *path);
+void alk_free(alk_t *alk);
 
 #endif /* __ALK_H__ */

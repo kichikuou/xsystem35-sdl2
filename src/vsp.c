@@ -30,7 +30,7 @@
 */
 /* $Id: vsp.c,v 1.6 2000/11/25 18:31:49 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 #include "portab.h"
 #include "LittleEndian.h"
@@ -42,16 +42,8 @@
  * static methods
 */
 static vsp_header *extract_header(BYTE *b);
-static void getpal(Pallet256 *pal, BYTE *b);
+static void getpal(Palette256 *pal, BYTE *b);
 static void extract(vsp_header *vsp, BYTE *pic, BYTE *b);
-
-/*
- * extraction buffer
-*/
-static BYTE _bc[4][480];
-static BYTE _bp[4][480];
-static BYTE *bc[4];
-static BYTE *bp[4];
 
 /*
  * Get information from cg header
@@ -59,7 +51,7 @@ static BYTE *bp[4];
  *   return: acquired vsp information object
 */
 static vsp_header *extract_header(BYTE *b) {
-	vsp_header *vsp = g_new(vsp_header, 1);
+	vsp_header *vsp = malloc(sizeof(vsp_header));
 	
 	vsp->vspX0 = LittleEndian_getW(b, 0);
 	vsp->vspY0 = LittleEndian_getW(b, 2);
@@ -73,20 +65,15 @@ static vsp_header *extract_header(BYTE *b) {
 }
 
 /*
- * Get pallet from raw data
- *   pal: pallet to be stored 
- *   b  : raw data (pointer to pallet)
+ * Get palette from raw data
+ *   pal: palette to be stored
+ *   b  : raw data (pointer to palette)
 */
-static void getpal(Pallet256 *pal, BYTE *b) {
-	int red, green, blue, i;
-	
-	for (i = 0; i < 16; i++) {
-		blue  = b[i * 3 + 0];
-		red   = b[i * 3 + 1];
-		green = b[i * 3 + 2];
-		pal->red[i]   = (red   << 4);
-		pal->green[i] = (green << 4);
-		pal->blue[i]  = (blue  << 4);
+static void getpal(Palette256 *pal, BYTE *b) {
+	for (int i = 0; i < 16; i++) {
+		pal->blue[i]  = b[i * 3 + 0] * 17;
+		pal->red[i]   = b[i * 3 + 1] * 17;
+		pal->green[i] = b[i * 3 + 2] * 17;
 	}
 }
 
@@ -101,11 +88,15 @@ static void extract(vsp_header *vsp, BYTE *pic, BYTE *b) {
 	BYTE b0, b1, b2, b3, mask = 0;
 	BYTE *bt;
 	int i, l, x, y, pl, loc;
-	
-	bp[0] = _bp[0]; bc[0] = _bc[0];
-	bp[1] = _bp[1]; bc[1] = _bc[1];
-	bp[2] = _bp[2]; bc[2] = _bc[2];
-	bp[3] = _bp[3]; bc[3] = _bc[3];
+
+	// Extraction buffers.
+	BYTE *buf = malloc(vsp->vspYW * 8);
+	BYTE *bc[4];
+	BYTE *bp[4];
+	for (int i = 0; i < 4; i++) {
+		bc[i] = buf + vsp->vspYW * (i * 2);
+		bp[i] = buf + vsp->vspYW * (i * 2 + 1);
+	}
 	
 	for (x = 0; x < vsp->vspXW; x++) {
 		for (pl = 0; pl < 4; pl++) {
@@ -175,6 +166,7 @@ static void extract(vsp_header *vsp, BYTE *pic, BYTE *b) {
 		bt = bp[2]; bp[2] = bc[2]; bc[2] = bt;
 		bt = bp[3]; bp[3] = bc[3]; bc[3] = bt;
 	}
+	free(buf);
 }
 
 /*
@@ -196,51 +188,31 @@ boolean vsp_checkfmt(BYTE *data) {
 }
 
 /*
- * Extract vsp, header, pallet and pixel
+ * Extract vsp, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
 cgdata *vsp_extract(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	vsp_header *vsp = extract_header(data);
 	
-	cg->pal = g_new(Pallet256, 1);
+	cg->pal = malloc(sizeof(Palette256));
 	getpal(cg->pal, data + vsp->vspPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = g_new(BYTE, (vsp->vspXW * 8 + 10) * (vsp->vspYW + 10));
+	cg->pic = malloc(sizeof(BYTE) * ((vsp->vspXW * 8 + 10) * (vsp->vspYW + 10)));
 	extract(vsp, cg->pic, data + vsp->vspDp);
 	
 	cg->type = ALCG_VSP;
 	cg->x = vsp->vspX0 * 8;
 	cg->y = vsp->vspY0;
-	cg->width    = vsp->vspXW * 8;
-	cg->height   = vsp->vspYW;
+	cg->width  = vsp->vspXW * 8;
+	cg->height = vsp->vspYW;
+	cg->depth = 8;
 	cg->vsp_bank = vsp->vspPb;
 	cg->alpha = NULL;
 	
-	g_free(vsp);
-	
-	return cg;
-}
-
-/*
- * Extract vsp pallet only
- *   data: raw data (pointer to data top)
- *   return: extracted pallet data
-*/
-cgdata *vsp_getpal(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
-	vsp_header *vsp = extract_header(data);
-	
-	cg->pal = g_new(Pallet256, 1);
-	getpal(cg->pal, data + vsp->vspPp);
-	
-	cg->type  = ALCG_VSP;
-	cg->pic   = NULL;
-	cg->alpha = NULL;
-	
-	g_free(vsp);
+	free(vsp);
 	
 	return cg;
 }

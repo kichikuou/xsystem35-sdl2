@@ -21,15 +21,6 @@ int gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b)
 		memset(dp, r, dw);
 		break;
 		
-	case 15:
-	{
-		WORD pic15 = PIX15(r, g, b);
-		
-		for (x = 0; x < dw; x++) {
-			*((WORD *)dp + x) = pic15;
-		}
-		break;
-	}
 	case 16:
 	{
 		WORD pic16 = PIX16(r, g, b);

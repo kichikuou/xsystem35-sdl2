@@ -24,12 +24,13 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "portab.h"
 #include "nact.h"
 #include "ags.h"
-#include "imput.h"
+#include "input.h"
 #include "key.h"
 #include "sact.h"
 #include "sprite.h"
@@ -64,14 +65,14 @@ static int sel_main();
  *  マージン内はsprite内部とは判断しない
  */
 static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
-	MyRectangle r;
-	cginfo_t *curcg = sp->curcg;
-	
-	r.x = sp->cur.x + margin;
-	r.y = sp->cur.y + margin;
-	r.width = curcg->sf->width   - 2 * margin;
-	r.height = curcg->sf->height - 2 * margin;
-	return ags_regionContains(&r, x, y);
+	MyPoint p = {x, y};
+	MyRectangle r = {
+		sp->cur.x + margin,
+		sp->cur.y + margin,
+		sp->curcg->sf->width - 2 * margin,
+		sp->curcg->sf->height - 2 * margin
+	};
+	return SDL_PointInRect(&p, &r);
 }
 
 // マウスが移動したときの callback
@@ -236,7 +237,9 @@ static int sel_main() {
 	selected_item = -1;
 	
 	while(selected_item == -1) {
-		sys_keywait(25, TRUE);
+		sys_keywait(25, KEYWAIT_CANCELABLE);
+		if (nact->is_quit)
+			selected_item = 0;
 	}
 	
 	sact.waittype = KEYWAIT_NONE;
@@ -264,7 +267,7 @@ void ssel_clear() {
 	int i;
 	
 	for (i = 0; i < SEL_ELEMENT_MAX; i++) {
-		g_free(sact.sel.elem[i]);
+		free(sact.sel.elem[i]);
 		sact.sel.elem[i] = NULL;
 	}
 }
@@ -280,10 +283,10 @@ void ssel_add(int nString, int wI) {
 		return;
 	}
 	if (sact.sel.elem[wI] != NULL) {
-		g_free(sact.sel.elem[wI]);
+		free(sact.sel.elem[wI]);
 	}
 	
-	sact.sel.elem[wI] = g_strdup(v_str(nString -1));
+	sact.sel.elem[wI] = strdup(svar_get(nString));
 }
 
 /*

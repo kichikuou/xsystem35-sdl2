@@ -28,17 +28,17 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "ags.h"
 #include "cg.h"
 #include "image.h"
-#include "counter.h"
-#include "imput.h"
+#include "input.h"
 // #include "alpha_plane.h"
 #include "surface.h"
 #include "graph.h"
@@ -64,7 +64,7 @@ static int find_null_surface() {
 		if (suf[i] == NULL) return i;
 	}
 	
-	SYSERROR("no free surface\n");
+	SYSERROR("no free surface");
 	return 0;
 }
 
@@ -75,9 +75,9 @@ static int sf_free_one(int no) {
 	s = suf[no];
 	if (s == NULL) return NG;
 	
-	if (s->pixel) g_free(s->pixel);
-	if (s->alpha) g_free(s->alpha);
-	g_free(s);
+	if (s->pixel) free(s->pixel);
+	if (s->alpha) free(s->alpha);
+	free(s);
 	
 	suf[no] = NULL;
 	pre_freesurfno = no;
@@ -91,9 +91,9 @@ static int sf_free_all() {
 	for (i = 1; i < MAX_SURFACE; i++) {
 		if (suf[i] == NULL) continue;
 		s = suf[i];
-		if (s->pixel) g_free(s->pixel);
-		if (s->alpha) g_free(s->alpha);
-		g_free(s);
+		if (s->pixel) free(s->pixel);
+		if (s->alpha) free(s->alpha);
+		free(s);
 		suf[i] = NULL;
 	}
 	
@@ -119,13 +119,12 @@ static int load_cg_main(int no) {
 	
 	sno = find_null_surface();
 	
-	sf->no = sno;
 	suf[sno] = sf;
 	
-	return sf->no;
+	return sno;
 }
 
-void Init() {
+static void Init() {
 	/*
 	  Gpx.Init(): Gpx モジュールの初期化
 	*/
@@ -140,7 +139,7 @@ void Init() {
 	DEBUG_COMMAND("Gpx.Init %d:\n", p1);
 }
 
-void Create() {
+static void Create() {
 	/*
 	  Gpx.Create(): 新規 surface の作成(PixelとAlphaマップの両方)
 	  
@@ -164,14 +163,14 @@ void Create() {
 		*var = 0;
 	} else {
 		int no = find_null_surface();
-		*var = s->no = no;
+		*var = no;
 		suf[no] = s;
 	}
 	
 	DEBUG_COMMAND("Gpx.Create %p,%d,%d,%d:\n", var, width, height, bpp);
 }
 
-void CreatePixelOnly() {
+static void CreatePixelOnly() {
 	/*
 	  Gpx.CreatePixelOnly(): 新規 surface の作成(Pixelのみ)
 	  
@@ -192,14 +191,14 @@ void CreatePixelOnly() {
 		*var = 0;
 	} else {
 		int no = find_null_surface();
-		*var = s->no = no;
+		*var = no;
 		suf[no] = s;
 	}
 	
 	DEBUG_COMMAND("Gpx.CreatePixelOnly %d,%d,%d,%d:\n", *var, width, height, bpp);
 }
 
-void CreateAMapOnly() {
+static void CreateAMapOnly() {
 	/*
 	  Gpx.CreateAMapOnly(): 新規 surface の作成(AlphaMapのみ)
 	  
@@ -218,14 +217,14 @@ void CreateAMapOnly() {
 		*var = 0;
 	} else {
 		int no = find_null_surface();
-		*var = s->no = no;
+		*var = no;
 		suf[no] = s;
 	}
 	
 	DEBUG_COMMAND("Gpx.CreateAMapOnly %p,%d,%d:\n", var, width, height);
 }
 
-void IsSurface() {
+static void IsSurface() {
 	/*
 	  Gpx.IsSurface(): 指定の番号の surface が surface かどうか
 	                   (pixel と alpha の両方のデータを持つ)を調べる
@@ -242,13 +241,13 @@ void IsSurface() {
 	if (s == NULL) {
 		*var = 0;
 	} else {
-		*var = (s->has_alpha && s->has_pixel) ? 1 : 0;
+		*var = (s->alpha && s->pixel) ? 1 : 0;
 	}
 	
 	DEBUG_COMMAND("Gpx.IsSurface %d,%p:\n", p1, var);
 }
 
-void IsPixel() {
+static void IsPixel() {
 	/*
 	  Gpx.IsPixel(): 指定の番号の surface が pixelデータかどうかを調べる
 	  
@@ -264,13 +263,13 @@ void IsPixel() {
 	if (s == NULL) {
 		*var = 0;
 	} else {
-		*var = s->has_pixel ? 1 : 0;
+		*var = s->pixel ? 1 : 0;
 	}
 	
 	DEBUG_COMMAND("Gpx.IsPixel %d,%p:\n", p1, var);
 }
 
-void IsAlpha() {
+static void IsAlpha() {
 	/*
 	  Gpx.IsAlpha(): 指定の番号の surface が alpha mapかどうかを調べる
 	  
@@ -286,13 +285,13 @@ void IsAlpha() {
 	if (s == NULL) {
 		*var = 0;
 	} else {
-		*var = s->has_alpha ? 1 : 0;
+		*var = s->alpha ? 1 : 0;
 	}
 	
 	DEBUG_COMMAND("Gpx.IsAlpha %d,%p:\n", p1, var);
 }
 
-void GetWidth() {
+static void GetWidth() {
 	/*
 	  Gpx.GetWidth(): 指定の番号の surface の幅を取得する
 	  
@@ -314,7 +313,7 @@ void GetWidth() {
 	DEBUG_COMMAND("Gpx.GetWidth %d,%d:\n", p1, *var);
 }
 
-void GetHeight() {
+static void GetHeight() {
 	/*
 	  Gpx.GetWidth(): 指定の番号の surface の高さを取得する
 	  
@@ -336,13 +335,13 @@ void GetHeight() {
 	DEBUG_COMMAND("Gpx.GetHeight %d,%d:\n", p1, *var);
 }
 
-void GetCreatedSurface() { /* not used ? */
+static void GetCreatedSurface() { /* not used ? */
 	int *var = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("Gpx.GetCreatedSurface %p:\n", var);
 }
 
-void LoadCG() {
+static void LoadCG() {
 	/*
 	  Gpx.LoadCG(): 新規 surface を作成してその上に CG を load
 	  
@@ -357,21 +356,21 @@ void LoadCG() {
 	DEBUG_COMMAND("Gpx.LoadCG %p,%d (%d):\n", var, p1, *var);
 }
 
-void GetCGPosX() { /* not useed ? */
+static void GetCGPosX() { /* not useed ? */
 	int *var = getCaliVariable();
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("Gpx.GetCgPosX %p,%d:\n", var, p1);
 }
 
-void GetCGPosY() { /* not useed ? */
+static void GetCGPosY() { /* not useed ? */
 	int *var = getCaliVariable();
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("Gpx.GetCgPosY %p,%d:\n", var, p1);
 }
 
-void Free() {
+static void Free() {
 	/*
 	  Gpx.Free(): 指定の surface を開放する
 	  
@@ -386,7 +385,7 @@ void Free() {
 	}
 }
 
-void FreeAll() {
+static void FreeAll() {
 	/*
 	  Gpx.FreeAll(): 全ての surface を開放する
 	*/
@@ -395,7 +394,7 @@ void FreeAll() {
 	DEBUG_COMMAND("Gpx.FreeAll:\n");
 }
 
-void Copy() {
+static void Copy() {
 	/*
 	  Gpx.Copy(): 指定 surface 領域のコピー
 	  
@@ -420,13 +419,12 @@ void Copy() {
 	
 	DEBUG_COMMAND("Gpx.Copy %d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss, sx, sy, sw, sh);
 	
-	ags_sync();
 	src = sf_get(ss);
 	dst = sf_get(ds);
 	gr_copy(dst, dx, dy, src, sx, sy, sw, sh);
 }
 
-void CopyBright() { /* not used ? */
+static void CopyBright() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -440,7 +438,7 @@ void CopyBright() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.CopyBright %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
-void CopyAMap() {
+static void CopyAMap() {
 	/*
 	  Gpx.CopyAMap(): 指定 surface の alpha map 領域のコピー
 	  
@@ -465,13 +463,12 @@ void CopyAMap() {
 	
 	DEBUG_COMMAND("Gpx.CopyAMap %d,%d,%d,%d,%d,%d,%d,%d:\n", da, dx, dy, sa, sx, sy, sw, sh);
 	
-	ags_sync();
 	src = sf_get(sa);
 	dst = sf_get(da);
 	gr_copy_alpha_map(dst, dx, dy, src, sx, sy, sw, sh);
 }
 
-void Blend() { /* not used ? */
+static void Blend() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -485,7 +482,7 @@ void Blend() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.Blend %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
-void BlendSrcBright() { /* not used ? */
+static void BlendSrcBright() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -500,7 +497,7 @@ void BlendSrcBright() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendSrcBright %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 }
 
-void BlendAddSatur() { /* not used ? */
+static void BlendAddSatur() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -513,7 +510,7 @@ void BlendAddSatur() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendAddStatur %d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-void BlendAMap() {
+static void BlendAMap() {
 	/*
 	  Gpx.BlendAMap(): 転送元の alpha map を参照して 指定領域を alpha blend
 	  
@@ -538,13 +535,12 @@ void BlendAMap() {
 	
 	DEBUG_COMMAND("Gpx.BlendAMap %d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss, sx, sy, sw, sh);
 	
-	ags_sync();
 	src = sf_get(ss);
 	dst = sf_get(ds);
 	gr_blend_alpha_map(dst, dx, dy, src, sx, sy, sw, sh);
 }
 
-void BlendAMapSrcOnly() { /* not used ? */
+static void BlendAMapSrcOnly() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -557,7 +553,7 @@ void BlendAMapSrcOnly() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendAMapSrcOnly %d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-void BlendAMapColor() { /* not used ? */
+static void BlendAMapColor() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -573,7 +569,7 @@ void BlendAMapColor() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendAMapColor %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 }
 
-void BlendAMapColorAlpha() { /* not used ? */
+static void BlendAMapColorAlpha() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -590,7 +586,7 @@ void BlendAMapColorAlpha() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendAMapColorAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 }
 
-void BlendAMapAlpha() { /* not used ? */
+static void BlendAMapAlpha() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -604,7 +600,7 @@ void BlendAMapAlpha() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendAMapAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
-void BlendAMapBright() { /* not used ? */
+static void BlendAMapBright() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -618,7 +614,7 @@ void BlendAMapBright() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendAMapBright %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
-void BlendAMapAlphaSrcBright() { /* not used ? */
+static void BlendAMapAlphaSrcBright() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -633,7 +629,7 @@ void BlendAMapAlphaSrcBright() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendAMapBright %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 }
 
-void BlendUseAMapColor() { /* not used ? */
+static void BlendUseAMapColor() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -650,7 +646,7 @@ void BlendUseAMapColor() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendUseAMapColor %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 }
 
-void BlendScreen() { /* not used ? */
+static void BlendScreen() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -663,7 +659,7 @@ void BlendScreen() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendScreen %d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-void BlendMultiply() { /* not used ? */
+static void BlendMultiply() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -676,7 +672,7 @@ void BlendMultiply() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendMultiply %d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-void BlendScreenAlpha() { /* not used ? */
+static void BlendScreenAlpha() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -690,7 +686,7 @@ void BlendScreenAlpha() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.BlendScreenAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
-void Fill() {
+static void Fill() {
 	/*
 	  Gpx.Fill(): 指定領域の塗りつぶし
 	  
@@ -715,12 +711,11 @@ void Fill() {
 	
 	DEBUG_COMMAND("Gpx.Fill %d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, r, g, b);
 	
-	ags_sync();
 	dst = sf_get(ds);
 	gr_fill(dst, dx, dy, dw, dh, r, g, b);
 }
 
-void FillAlphaColor() { /* not used ? */
+static void FillAlphaColor() { /* not used ? */
 	int ds = getCaliValue();
 	int dx = getCaliValue();
 	int dy = getCaliValue();
@@ -734,12 +729,11 @@ void FillAlphaColor() { /* not used ? */
 	
 	DEBUG_COMMAND_YET("Gpx.FillAlphaColor %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, r, g, b, lv);
 
-	ags_sync();
 	dst = sf_get(ds);
 	gr_fill_alpha_color(dst, dx, dy, dw, dh, r, g, b, lv);
 }
 
-void FillAMap() { /* not used ? */
+static void FillAMap() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -750,7 +744,7 @@ void FillAMap() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.FillAMap %d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6);
 }
 
-void FillAMapOverBorder() {
+static void FillAMapOverBorder() {
 	/*
 	  Gpx.FillAMapOverBorder(): 矩形領域中の 閾値以上の alpha 値を持つ
 	                            ものを指定の alpha 値に置き換え。
@@ -772,13 +766,13 @@ void FillAMapOverBorder() {
 	int d = getCaliValue();
 	surface_t *dst;
 	
-	DEBUG_COMMAND("Gpx.BlendAMapOverBorder %d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, s, d);
+	DEBUG_COMMAND("Gpx.FillAMapOverBorder %d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, s, d);
 
 	dst = sf_get(ds);
 	gr_fill_alpha_overborder(dst, dx, dy, dw, dh, s, d);
 }
 
-void FillAMapUnderBorder() { /* not used ? */
+static void FillAMapUnderBorder() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -787,10 +781,10 @@ void FillAMapUnderBorder() { /* not used ? */
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAMapUnderBorder %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7);
+	DEBUG_COMMAND_YET("Gpx.FillAMapUnderBorder %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7);
 }
 
-void SaturDP_DPxSA() { /* not used ? */
+static void SaturDP_DPxSA() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -803,7 +797,7 @@ void SaturDP_DPxSA() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.SaturDP_DPxSA %d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-void ScreenDA_DAxSA() { /* not used ? */
+static void ScreenDA_DAxSA() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -816,7 +810,7 @@ void ScreenDA_DAxSA() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.ScreenDA_DAxSA %d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-void AddDA_DAxSA() { /* not used ? */
+static void AddDA_DAxSA() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -829,7 +823,7 @@ void AddDA_DAxSA() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.AddDA_DAxSA %d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-void SpriteCopyAMap() {
+static void SpriteCopyAMap() {
 	/*
 	  Gpx.SpriteCopyAMap(): 指定の alpha 値以外の領域の alpha map コピー
 	  
@@ -856,14 +850,13 @@ void SpriteCopyAMap() {
 	
 	DEBUG_COMMAND("Gpx.SpriteCopyAMap %d,%d,%d,%d,%d,%d,%d,%d,%d:\n", da, dx, dy, sa, sx, sy, sw, sh, cl);
 	
-	ags_sync();
 	src = sf_get(sa);
 	dst = sf_get(da);
 	gr_copy_alpha_map_sprite(dst, dx, dy, src, sx, sy, sw, sh, cl);
 	
 }
 
-void BrightDestOnly() {
+static void BrightDestOnly() {
 	/*
 	  Gpx.BrightDestOnly(): 指定領域の明るさを設定
 	  
@@ -884,13 +877,12 @@ void BrightDestOnly() {
 	
 	DEBUG_COMMAND("Gpx.BrightDestOnly %d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, r);
 	
-	ags_sync();
 	dst = sf_get(ds);
 	
 	gr_bright_dst_only(dst, dx, dy, dw, dh, r);
 }
 
-void CopyTextureWrap() { /* not used ? */
+static void CopyTextureWrap() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -907,7 +899,7 @@ void CopyTextureWrap() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.CopyTextureWrap %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 }
 
-void CopyTextureWrapAlpha() { /* not used ? */
+static void CopyTextureWrapAlpha() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -925,7 +917,7 @@ void CopyTextureWrapAlpha() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.CopyTextureWrapAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
 }
 
-void CopyStretch() {
+static void CopyStretch() {
 	/*
 	  Gpx.CopyStretch(): 拡大・縮小
 	  
@@ -959,7 +951,7 @@ void CopyStretch() {
 	gr_copy_stretch(dst, dx, dy, dw, dh, src, sx, sy, sw, sh);
 }
 
-void CopyStretchBlend() { /* not used ? */
+static void CopyStretchBlend() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -975,7 +967,7 @@ void CopyStretchBlend() { /* not used ? */
 	DEBUG_COMMAND_YET("Gpx.CopyStretchBlend %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 }
 
-void CopyStretchBlendAMap() {
+static void CopyStretchBlendAMap() {
 	/*
 	  Gpx.CopyStretchBlendAMap(): 拡大・縮小しながら alpha blend
 	  
@@ -1004,13 +996,12 @@ void CopyStretchBlendAMap() {
 	
 	DEBUG_COMMAND("Gpx.CopyStretchBlendAMap %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, dw, dh, ss, sx, sy, sw, sh);
 
-	ags_sync();
 	src = sf_get(ss);
 	dst = sf_get(ds);
 	gr_copy_stretch_blend_alpha_map(dst, dx, dy, dw, dh, src, sx, sy, sw, sh);
 }
 
-void StretchBlendScreen2x2() { /* not used ? */
+static void StretchBlendScreen2x2() { /* not used ? */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -1024,7 +1015,7 @@ void StretchBlendScreen2x2() { /* not used ? */
 }
 
 
-void StretchBlendScreen2x2WDS() {
+static void StretchBlendScreen2x2WDS() {
 	/*
 	  Gpx.StretchBlenfScreen2x2WDS(): ２枚の surface を縦横２倍に拡大しつつ
                                          alpha blend (飽和加算)する
@@ -1056,14 +1047,13 @@ void StretchBlendScreen2x2WDS() {
 	
 	DEBUG_COMMAND("Gpx.StretchBlendScreen2x2WDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
 	
-	ags_sync();
 	src1 = sf_get(ss1);
 	src2 = sf_get(ss2);
 	dst  = sf_get(ds);
 	gr_blend_alpha_wds_stretch2x2(src1, sx1, sy1, src2, sx2, sy2, sw, sh, dst, dx, dy);
 }
 
-void BlendScreenWDS() {
+static void BlendScreenWDS() {
 	/*
 	  Gpx.BlendScreenWDS(): 飽和加算 alpha blend
 	  
@@ -1094,14 +1084,13 @@ void BlendScreenWDS() {
 	
 	DEBUG_COMMAND("Gpx.BlendScreenWDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
 	
-	ags_sync();
 	src1 = sf_get(ss1);
 	src2 = sf_get(ss2);
 	dst  = sf_get(ds);
 	gr_blend_alpha_wds(src1, sx1, sy1, src2, sx2, sy2, sw, sh, dst, dx, dy);
 }
 
-void EffectCopy() {
+static void EffectCopy() {
 	/*
 	  Gpx.EffectCopy(): 効果つき領域コピー
 	  
@@ -1161,16 +1150,71 @@ void EffectCopy() {
 	default:
 		DEBUG_COMMAND_YET("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:\n", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
 	}
-	ags_sync();
-	dib = sf_get(0);
 	dst = sf_get(ss1);
 	src = sf_get(ss2);
-	gpx_effect(no, dib, dx, dy, dst, sx1, sy1, src, sx2, sy2, sw, sh, time, var);
+	gpx_effect(no, dx, dy, dst, sx1, sy1, src, sx2, sy2, sw, sh, time, var);
 	
 }
 
-void SetClickCancelFlag() { /* not used ? */
+static void SetClickCancelFlag() { /* not used ? */
 	int p1 = getCaliValue();
 	
 	DEBUG_COMMAND_YET("Gpx.SetClikCancelFlag %d:\n", p1);
 }
+
+static const ModuleFunc functions[] = {
+	{"AddDA_DAxSA", AddDA_DAxSA},
+	{"Blend", Blend},
+	{"BlendAMap", BlendAMap},
+	{"BlendAMapAlpha", BlendAMapAlpha},
+	{"BlendAMapAlphaSrcBright", BlendAMapAlphaSrcBright},
+	{"BlendAMapBright", BlendAMapBright},
+	{"BlendAMapColor", BlendAMapColor},
+	{"BlendAMapColorAlpha", BlendAMapColorAlpha},
+	{"BlendAMapSrcOnly", BlendAMapSrcOnly},
+	{"BlendAddSatur", BlendAddSatur},
+	{"BlendMultiply", BlendMultiply},
+	{"BlendScreen", BlendScreen},
+	{"BlendScreenAlpha", BlendScreenAlpha},
+	{"BlendScreenWDS", BlendScreenWDS},
+	{"BlendSrcBright", BlendSrcBright},
+	{"BlendUseAMapColor", BlendUseAMapColor},
+	{"BrightDestOnly", BrightDestOnly},
+	{"Copy", Copy},
+	{"CopyAMap", CopyAMap},
+	{"CopyBright", CopyBright},
+	{"CopyStretch", CopyStretch},
+	{"CopyStretchBlend", CopyStretchBlend},
+	{"CopyStretchBlendAMap", CopyStretchBlendAMap},
+	{"CopyTextureWrap", CopyTextureWrap},
+	{"CopyTextureWrapAlpha", CopyTextureWrapAlpha},
+	{"Create", Create},
+	{"CreateAMapOnly", CreateAMapOnly},
+	{"CreatePixelOnly", CreatePixelOnly},
+	{"EffectCopy", EffectCopy},
+	{"Fill", Fill},
+	{"FillAMap", FillAMap},
+	{"FillAMapOverBorder", FillAMapOverBorder},
+	{"FillAMapUnderBorder", FillAMapUnderBorder},
+	{"FillAlphaColor", FillAlphaColor},
+	{"Free", Free},
+	{"FreeAll", FreeAll},
+	{"GetCGPosX", GetCGPosX},
+	{"GetCGPosY", GetCGPosY},
+	{"GetCreatedSurface", GetCreatedSurface},
+	{"GetHeight", GetHeight},
+	{"GetWidth", GetWidth},
+	{"Init", Init},
+	{"IsAlpha", IsAlpha},
+	{"IsPixel", IsPixel},
+	{"IsSurface", IsSurface},
+	{"LoadCG", LoadCG},
+	{"SaturDP_DPxSA", SaturDP_DPxSA},
+	{"ScreenDA_DAxSA", ScreenDA_DAxSA},
+	{"SetClickCancelFlag", SetClickCancelFlag},
+	{"SpriteCopyAMap", SpriteCopyAMap},
+	{"StretchBlendScreen2x2", StretchBlendScreen2x2},
+	{"StretchBlendScreen2x2WDS", StretchBlendScreen2x2WDS},
+};
+
+const Module module_Gpx = {"Gpx", functions, sizeof(functions) / sizeof(ModuleFunc)};

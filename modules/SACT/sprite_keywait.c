@@ -24,14 +24,15 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <limits.h>
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
+#include "list.h"
+#include "sdl_core.h"
 #include "ags.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 #include "ngraph.h"
 #include "surface.h"
 #include "sact.h"
@@ -52,7 +53,7 @@ static void hidesprite(sprite_t *sp) {
 		sp->blendrate = i;
 		sp_updateme(sp);
 		sp_update_clipped();
-		sys_keywait(10, FALSE);
+		sys_keywait(10, KEYWAIT_NONCANCELABLE);
 	}
 	
 	sp_updateme(sp);
@@ -68,7 +69,7 @@ static void hidesprite(sprite_t *sp) {
    スプライトがドロップされた時の各種処理を含む
 */
 static boolean waitcond(int endtime) {
-	int curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	int curtime = sdl_getTicks();
 	if (curtime >= endtime) return TRUE;
 	
 	if (sact.dropped) {
@@ -122,7 +123,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	sp_update_all(TRUE);
 	
 	// depthmap を準備
-	g_slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
+	slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
 	
 	sact.waittype = KEYWAIT_SPRITE;
 	sact.waitkey = -1;
@@ -141,16 +142,16 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 		agse.d1 = p.x;
 		agse.d2 = p.y;
 		agse.d3 = 0;
-		nact->ags.eventcb(&agse);
+		spev_callback(&agse);
 	}
 	
 	// 終了時間の計算
-	curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
-	endtime = timeout < 0 ? G_MAXINT: (curtime + timeout * 10);
+	curtime = sdl_getTicks();
+	endtime = timeout < 0 ? INT_MAX : (curtime + timeout * 10);
 	
 	// スプライトキー待ちメイン
-	while (!waitcond(endtime)) {
-		sys_keywait(25, TRUE);
+	while (!waitcond(endtime) && !nact->is_quit) {
+		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	
 	if (sact.waitkey == 0) {

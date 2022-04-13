@@ -24,7 +24,6 @@
 #ifndef __S39AIN_H__
 #define __S39AIN_H__
 
-#include <ltdl.h>
 #include "portab.h"
 
 /* DLL 内関数情報 */
@@ -32,11 +31,11 @@ typedef struct {
 	char *name; /* 関数名 */
 	int   argc; /* 関数の引数の数 */
 	int  *argv; /* 関数の引数のそれぞれの種類 */
+	void (*entrypoint)(void);
 } S39AIN_DLLFN;
 
 /* DLL 情報 */
-typedef struct {
-	lt_dlhandle *handle;       /* DLL handler */
+typedef struct S39AIN_DLLINF {
 	char        *name;         /* DLL 名      */
 	int          function_num; /* 関数の数    */
 	S39AIN_DLLFN       *function; /* 関数本体 */
@@ -51,9 +50,6 @@ typedef struct {
 
 /* System39.ain 全体の情報 */
 typedef struct {
-	char *path_to_ain; /* system39.ain へのパス  */
-	char *path_to_dll; /* DLL モジュールへのパス */
-	
 	int   dllnum; /* DLL  の数 */
 	int   fncnum; /* FUNC の数 */
 	int   varnum; /* VARI の数 */
@@ -65,6 +61,6 @@ typedef struct {
 	char **msg;           /* MSGI に関する情報 */
 } S39AIN;
 
-extern int s39ain_init(void);
+extern int s39ain_init(const char *path, S39AIN *ain);
 
 #endif /* __S39AIN_H__ */

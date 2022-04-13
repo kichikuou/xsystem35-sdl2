@@ -1,0 +1,18 @@
+	!RND:0!
+	!D01:0!!D02:0!!D03:0!!D04:0!!D05:0!!D06:0!!D07:0!!D08:0!!D09:0!!D10:0!
+	!D11:0!!D12:0!!D13:0!!D14:0!!D15:0!!D16:0!!D17:0!!D18:0!!D19:0!!D20:0!
+	MZ0,50,100,0:
+	B3,1,8,8,624,464,0:
+	B4,1,0,0,0,1,0:
+	ZH 2:
+
+	!tests_passed:0!
+	!tests_failed:0!
+
+	%#array.adv:
+	%#strvar.adv:
+
+	HH0,tests_passed: ' tests passed' R
+	HH0,tests_failed: ' tests failed' R
+	{tests_failed: A}
+	ZZ0,0:

@@ -24,8 +24,13 @@
 #ifndef __SAVEDATA__
 #define __SAVEDATA__
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+typedef int emscripten_align1_int;
+#endif
+
 #include "portab.h"
-#include "cg.h"
 #include "windowframe.h"
 
 #define SAVE_MAXNUMBER    (26)
@@ -97,17 +102,15 @@ typedef struct {
 } Ald_stackHdr;
 
 typedef struct {
-	int size;
-	int pageNo;
-	int rsv1;
-	int rsv2;
+	emscripten_align1_int size;
+	emscripten_align1_int pageNo;
+	emscripten_align1_int rsv1;
+	emscripten_align1_int rsv2;
 } Ald_sysVarHdr;
 
 /* defined by cmdb.c */
-extern Bcom_WindowInfo msgWinInfo[];
 extern Bcom_WindowInfo selWinInfo[];
 /* defined by variable.c */
-extern int  strvar_cnt;
 extern int  strvar_len;
 
 extern int save_loadAll(int no);
@@ -115,14 +118,12 @@ extern int save_saveAll(int no);
 extern int save_loadPartial(int no, int page, int offset, int cnt);
 extern int save_savePartial(int no, int page, int offset, int cnt);
 extern int save_copyAll(int dstno, int srcno);
-extern int save_save_var_with_file(char *filename, int *start, int cnt);
-extern int save_load_var_with_file(char *filename, int *start, int cnt);
-extern int save_save_str_with_file(char *filename, int start, int cnt);
-extern int save_load_str_with_file(char *filename, int start, int cnt);
-extern BYTE* load_cg_with_file(char *file,int *status);
-extern void save_set_path(char *path);
-extern void save_register_file(char *name, int index);
-extern char* save_get_file(int index);
+extern int save_save_var_with_file(char *fname_utf8, int *start, int cnt);
+extern int save_load_var_with_file(char *fname_utf8, int *start, int cnt);
+extern int save_save_str_with_file(char *fname_utf8, int start, int cnt);
+extern int save_load_str_with_file(char *fname_utf8, int start, int cnt);
+extern BYTE* load_cg_with_file(char *fname_utf8, int *status, long *filesize);
+extern const char *save_get_file(int index);
 extern int save_delete_file(int index);
 
 #endif /* __SAVEDATA__ */

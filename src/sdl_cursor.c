@@ -22,8 +22,7 @@
 
 #include "config.h"
 
-#include <glib.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -83,18 +82,18 @@ static SDL_Cursor *init_system_cursor(const char *image[]) {
 
 /* mouse cursur の初期化 */
 void sdl_cursor_init(void) {
-	cursor[IDC_ARROW] = init_system_cursor(cursor_arrow);
-	cursor[IDC_CROSS] = init_system_cursor(cursor_cross);
-	cursor[IDC_IBEAM] = init_system_cursor(cursor_ibeam);
-	cursor[IDC_NO]    = init_system_cursor(cursor_no);
-	cursor[IDC_SIZE]  = init_system_cursor(cursor_move);
-	cursor[IDC_SIZEALL]  = init_system_cursor(cursor_move);
-	cursor[IDC_SIZENESW] = init_system_cursor(cursor_size_r);
-	cursor[IDC_SIZENS]   = init_system_cursor(cursor_size_v);
-	cursor[IDC_SIZENWSE] = init_system_cursor(cursor_size_l);
-	cursor[IDC_SIZEWE]   = init_system_cursor(cursor_size_h);
-	cursor[IDC_UPARROW]  = init_system_cursor(cursor_uparrow);
-	cursor[IDC_WAIT]     = init_system_cursor(cursor_busy);
+	cursor[CURSOR_ARROW] = init_system_cursor(cursor_arrow);
+	cursor[CURSOR_CROSS] = init_system_cursor(cursor_cross);
+	cursor[CURSOR_IBEAM] = init_system_cursor(cursor_ibeam);
+	cursor[CURSOR_NO]    = init_system_cursor(cursor_no);
+	cursor[CURSOR_SIZE]  = init_system_cursor(cursor_move);
+	cursor[CURSOR_SIZEALL]  = init_system_cursor(cursor_move);
+	cursor[CURSOR_SIZENESW] = init_system_cursor(cursor_size_r);
+	cursor[CURSOR_SIZENS]   = init_system_cursor(cursor_size_v);
+	cursor[CURSOR_SIZENWSE] = init_system_cursor(cursor_size_l);
+	cursor[CURSOR_SIZEWE]   = init_system_cursor(cursor_size_h);
+	cursor[CURSOR_UPARROW]  = init_system_cursor(cursor_uparrow);
+	cursor[CURSOR_WAIT]     = init_system_cursor(cursor_busy);
 }
 
 boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
@@ -112,15 +111,15 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	cursorImage->xormasklen = xormasklen;
 	cursorImage->andmasklen = andmasklen;
 	
-	buf1 = g_new(BYTE, xornum);
-	buf2 = g_new(BYTE, xornum);
-	buf3 = g_new(BYTE, xornum);
-	buf4 = g_new(BYTE, xornum);
+	buf1 = malloc(sizeof(BYTE) * xornum);
+	buf2 = malloc(sizeof(BYTE) * xornum);
+	buf3 = malloc(sizeof(BYTE) * xornum);
+	buf4 = malloc(sizeof(BYTE) * xornum);
 	
-	memcpy(buf1, data, MIN(xormasklen, xornum));
+	memcpy(buf1, data, min(xormasklen, xornum));
 	data += xormasklen;
 	
-	memcpy(buf2, data, MIN(andmasklen, xornum));
+	memcpy(buf2, data, min(andmasklen, xornum));
 	data += andmasklen;
 	
 #define height cursordirentry->bHeight
@@ -136,10 +135,10 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	
 	cursor[no] = SDL_CreateCursor(buf3, buf4, 32, 32, cursordirentry->wxHotspot, cursordirentry->wyHotspot);
 	
-	g_free(buf1);
-	g_free(buf2);
-	g_free(buf3);
-	g_free(buf4);
+	free(buf1);
+	free(buf2);
+	free(buf3);
+	free(buf4);
 	
 #undef height
 #undef width
@@ -147,9 +146,41 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	return TRUE;
 }
 
+MyPoint sdl_translateMouseCoords(int x, int y) {
+	// scale mouse x and y
+	float scalex, scaley;
+	SDL_RenderGetScale(sdl_renderer, &scalex, &scaley);
+	x *= scalex;
+	y *= scaley;
+
+	// calculate window borders
+	int logw, logh;
+	SDL_RenderGetLogicalSize(sdl_renderer, &logw, &logh);
+
+	float scalew, scaleh;
+	scalew = logw * scalex;
+	scaleh = logh * scaley;
+
+	int winw, winh;
+	SDL_GetWindowSize(sdl_window, &winw, &winh);
+
+	float border_left = (winw - scalew) / 2;
+	float border_top  = (winh - scaleh) / 2;
+
+	// offset x and y by window borders
+	x += border_left;
+	y += border_top;
+
+	MyPoint p = { x, y };
+	return p;
+}
+
 /* マウスの位置の移動 */
 void sdl_setCursorLocation(int x, int y) {
-	if (ms_active) SDL_WarpMouse(x, y);
+	if (ms_active) {
+		MyPoint t = sdl_translateMouseCoords(x, y);
+		SDL_WarpMouseInWindow(sdl_window, t.x, t.y);
+	}
 }
 
 /* マウスカーソルの形状の設定 */

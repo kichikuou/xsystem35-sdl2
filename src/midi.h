@@ -36,7 +36,8 @@ typedef struct mididevice mididevice_t;
 struct mididevice {
 	int  (* init)(char *, int);
 	int  (* exit)(void);
-	int  (* start)(int, char*, int);
+	// Play through the music loop times. If loop == 0, loops forever.
+	int  (* start)(int no, int loop, char *data, int datalen);
 	int  (* stop)(void);
 	int  (* pause)(void);
 	int  (* unpause)(void);
@@ -45,10 +46,11 @@ struct mididevice {
 	int  (* setflag)(int mode, int index, int val);
 	int  (* setvol)(int);
 	int  (* getvol)(int);
+	int  (* fadestart)(int time, int volume, int stop);
+	boolean (* fading)();
 };
 
 extern int  midi_init(mididevice_t *);
-extern void midi_set_playername(char *);
 extern void midi_set_devicename(char *);
 extern void midi_set_output_device(int mode);
 

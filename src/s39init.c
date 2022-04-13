@@ -25,14 +25,13 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 #include <gtk/gtk.h>
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
 #include "s39init.h"
 #include "utfsjis.h"
-#include "music_client.h"
+#include "music.h"
 
 // Volume Valancer で扱う最大チャンネル数
 #define MAXVOLCH 16
@@ -65,16 +64,16 @@ int s39ini_init(void) {
 		if (s1[0] == '\0') continue;
 		if (i >= MAXVOLCH || i < 0) continue;
 		s1[strlen(s1)-1] = '\0'; // remove last '"'
-		vval[i].label = sjis2lang(s1);
-		vval_max = MAX(vval_max, i);
+		vval[i].label = sjis2utf(s1);
+		vval_max = max(vval_max, i);
 		//WARNING("VolumeValancer[%d] = %s\n", i, vval[i].label);
 	}
 	
 	if (vval_max <= 0) return NG;
 	
 	// Volume.sav があればそれを読み込む
-	g_snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
-	if (NULL == (fp = fopen(fn, "r"))) {
+	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
+	if (NULL == (fp = fopen(fn, "rb"))) {
 		// とりあえず、初期ボリュームは 100
 		for (i = 0; i < MAXVOLCH; i++) {
 			vol[i] = vval[i].vol = 100;
@@ -143,8 +142,8 @@ int s39ini_remove() {
 		vol[i] = vval[i].vol;
 	}
 	
-	g_snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
-	if (NULL == (fp = fopen(fn, "w"))) {
+	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
+	if (NULL == (fp = fopen(fn, "wb"))) {
 		WARNING("Fail to save Volume.save\n");
 		return NG;
 	}

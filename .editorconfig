@@ -1,0 +1,13 @@
+# https://EditorConfig.org
+root = true
+
+[*]
+charset = utf-8
+
+[*.{h,c}]
+indent_style = tab
+indent_size = 4
+
+[CMakeLists.txt]
+indent_style = space
+indent_size = 2

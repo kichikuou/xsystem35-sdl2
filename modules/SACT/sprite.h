@@ -24,7 +24,6 @@
 #ifndef __SPRITE_H__
 #define __SPRITE_H__
 
-#include <glib.h>
 #include "sact.h"
 
 #define DEFAULT_UPDATE sp_draw
@@ -80,11 +79,11 @@ extern int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
 // in sprite_draw.c
 extern int sp_draw(sprite_t *sf);
 extern int sp_draw2(sprite_t *sf, cginfo_t *cg);
-extern void sp_draw_dmap(gpointer data, gpointer userdata);
+extern void sp_draw_dmap(void* data, void* userdata);
 
 
 // in sprite_msg.c
-extern void smsg_add(char *msg);
+extern void smsg_add(const char *msg);
 extern void smsg_newline(int wNum, int size);
 extern void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, int *wLength);
 extern void smsg_clear(int wNum);
@@ -109,7 +108,7 @@ extern void spev_remove_teventlistener(sprite_t *sp);
 extern void spev_main();
 
 // in sprite_move.c
-extern void spev_move_setup(gpointer data, gpointer userdata);
+extern void spev_move_setup(void* data, void* userdata);
 extern void spev_move_waitend(sprite_t *sp, int dx, int dy, int time);
 extern void spev_wait4moving_sp();
 

@@ -34,13 +34,13 @@ typedef struct {
 	int pmsBpp;     /* pms data depth, 8 or 16      */
 	int pmsBppS;    /* shadow data depth, if exists */
 	int pmsSf;      /* sprite flag (not used?)      */
-	int pmsBf;      /* pallet bank                  */
+	int pmsBf;      /* palette bank                 */
 	int pmsX0;      /* display location x           */
 	int pmsY0;      /* display location y           */
 	int pmsXW;      /* image width                  */
 	int pmsYW;      /* image height                 */
 	int pmsDp;      /* pointer to data              */
-	int pmsPp;      /* pointer to pallet or shadow  */
+	int pmsPp;      /* pointer to palette or shadow */
 	int pmsCp;      /* pointer to comment           */
 } pms_header;
 /*
@@ -49,12 +49,12 @@ typedef struct {
  *  pmsBppS shows shadow's depth (normally 8).
  *
  * pmsBf
- *  If pmsBpp is 8, pmsBf determine which pallets is used in this data and
+ *  If pmsBpp is 8, pmsBf determine which palettes is used in this data and
  *  needed to copy. The pmsBf is mask and if bit is on then copy.
  *  For example, if pmsBf=0xff00, then copy pal[128] ~ pal[255].
  *
  * pmsPp
- *  If pmsBpp is 8 then this is pointer to pallet. If pmsBpp is 16 and
+ *  If pmsBpp is 8 then this is pointer to palette. If pmsBpp is 16 and
  *  pmsPp is not 0, then shadow is exists and this is pointer to it's data.
  *
 */ 
@@ -63,7 +63,6 @@ extern boolean  pms256_checkfmt(BYTE *data);
 extern cgdata  *pms256_extract(BYTE *data);
 extern boolean  pms64k_checkfmt(BYTE *data);
 extern cgdata  *pms64k_extract(BYTE *data);
-extern cgdata  *pms_getpal(BYTE *data);
 
 #endif /* !__PMS__ */
 

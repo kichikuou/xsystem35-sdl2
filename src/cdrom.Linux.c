@@ -40,11 +40,11 @@ struct cdrom_msf0 {
 
 #include "portab.h"
 #include "cdrom.h"
-#include "music_server.h"
+#include "music_private.h"
 
 static int  cdrom_init(char *);
 static int  cdrom_exit();
-static int  cdrom_start(int);
+static int  cdrom_start(int, int);
 static int  cdrom_stop();
 static int  cdrom_getPlayingInfo(cd_time *);
 
@@ -183,7 +183,7 @@ static int cdrom_exit() {
 }
 
 /* トラック番号 trk の演奏 trk = 1~ */
-static int cdrom_start(int trk) {
+static int cdrom_start(int trk, int loop) {
 	struct cdrom_msf msf;
 	struct cdrom_ti  ti;
 
@@ -213,7 +213,7 @@ static int cdrom_start(int trk) {
 		return OK;
 	} else {
 		ti.cdti_trk0 = ti.cdti_trk1 = trk;
-		ti.cdti_ind0 = ti.cdti_ind0 = 0;
+		ti.cdti_ind0 = ti.cdti_ind1 = 0;
 		if (do_ioctl(CDROMPLAYTRKIND, &ti) < 0) {
 			perror("CDROMPLAYTRKIND");
 			return NG;
@@ -241,22 +241,19 @@ static int cdrom_getPlayingInfo (cd_time *info) {
 	struct cdrom_subchnl sc;
 	
 	if (!enabled)
-		goto errexit;
+		return NG;
 	
 	sc.cdsc_format = CDROM_MSF;
 	if (do_ioctl(CDROMSUBCHNL, &sc) < 0) {
 		perror("CDROMSUBCHNL");
-		goto errexit;
+		return NG;
 	}
 	if (sc.cdsc_audiostatus != CDROM_AUDIO_PLAY) {
-		goto errexit;
+		return NG;
 	}
 	info->t = sc.cdsc_trk;
 	info->m = sc.cdsc_reladdr.msf.minute;
 	info->s = sc.cdsc_reladdr.msf.second;
 	info->f = sc.cdsc_reladdr.msf.frame;
 	return OK;
- errexit:
-	info->t = info->m = info->s = info->f = 999;
-	return NG;
 }

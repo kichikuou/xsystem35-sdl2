@@ -40,6 +40,14 @@ extern cdromdevice_t cdrom_linux;
 extern cdromdevice_t cdrom_bsd;
 #define DEV_PLAY_MODE &cdrom_bsd
 
+#elif defined(ENABLE_CDROM_EMSCRIPTEN)
+extern cdromdevice_t cdrom_emscripten;
+#define DEV_PLAY_MODE &cdrom_emscripten
+
+#elif defined(ENABLE_CDROM_ANDROID)
+extern cdromdevice_t cdrom_android;
+#define DEV_PLAY_MODE &cdrom_android
+
 #else
 
 extern cdromdevice_t cdrom_empty;
@@ -69,6 +77,10 @@ static char *dev = CDROM_DEVICE;
          失敗 -1
 */
 int cd_init(cdromdevice_t *cd) {
+#if defined(ENABLE_CDROM_EMSCRIPTEN) || defined(ENABLE_CDROM_ANDROID)
+	memcpy(cd, DEV_PLAY_MODE, sizeof(cdromdevice_t));
+	return cd->init(dev);
+#else
 	struct stat st;
 	int ret = NG;
 	
@@ -80,20 +92,19 @@ int cd_init(cdromdevice_t *cd) {
 		memcpy(cd, DEV_PLAY_MODE, sizeof(cdromdevice_t));
 		ret = cd->init(dev);
 	}
+	else {
 #ifdef ENABLE_CDROM_MP3
-	else if (S_ISREG(st.st_mode)) {
 		/* MP3 MODE */
 		memcpy(cd, &cdrom_mp3, sizeof(cdromdevice_t));
 		ret = cd->init(dev);
-		memcpy(cd, &cdrom_mp3, sizeof(cdromdevice_t));
-	}
-#endif
-	else {
+#else
 		/* error */
 		WARNING("no cdrom device available\n");
 		ret = NG;
+#endif
 	}
 	return ret;
+#endif  // ENABLE_CDROM_EMSCRIPTEN || ENABLE_CDROM_ANDROID
 }
 
 void cd_set_devicename(char *name) {

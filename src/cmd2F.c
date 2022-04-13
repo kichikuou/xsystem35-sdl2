@@ -25,19 +25,29 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/utsname.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "savedata.h"
 #include "menu.h"
+#include "input.h"
+#include "msgskip.h"
 #include "selection.h"
 #include "message.h"
-#include "music_client.h"
+#include "music.h"
 #include "utfsjis.h"
+#include "hankaku.h"
 #include "ags.h"
-#include "graphicsdevice.h"
+#include "sdl_core.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
+#include "gametitle.h"
+#if HAVE_UNAME
+#include <sys/utsname.h>
+#endif
+
+/* defined by cmdm.c */
+extern boolean have_eng_mp_patch;
 
 /* 選択 Window OPEN 時 callback */
 static int cb_sel_init_page = 0;
@@ -230,7 +240,7 @@ void commands2F11() {
 }
 
 void commands2F12() {
-	char *sText = sys_getString(0);
+	const char *sText = sl_getString(0);
 	
 	DEBUG_COMMAND("trace %s:\n", sText);
 
@@ -350,7 +360,7 @@ void commands2F20() {
 }
 
 void commands2F21() {
-	char *str = sys_getString(0);
+	const char *str = sl_getString(0);
 	
 	sys_addMsg(str);
 }
@@ -358,39 +368,43 @@ void commands2F21() {
 void commands2F23() {
 	int x = getCaliValue();
 	int y = getCaliValue();
-	char *vFileName = sys_getString(0);
+	const char *vFileName = sl_getString(0);
 	
-	sysVar[0] = cg_load_with_filename(vFileName, x, y);
+	char *fname_utf8 = toUTF8(vFileName);
+	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LC(new) %d, %d, %s:\n", x, y, vFileName);
 }
 
 void commands2F24() {
-	int type       = sys_getc();
-	char *file_name = sys_getString(0);
+	int type = sl_getc();
+	const char *file_name = sl_getString(0);
 	int *var = NULL, _var = 0;
 	int num = 0;
 
+	char *fname_utf8 = toUTF8(file_name);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();
 		num  = getCaliValue();
-		sysVar[0] = save_load_var_with_file(file_name, var, num);        
+		sysVar[0] = save_load_var_with_file(fname_utf8, var, num);
 		break;
 	case 1:
 		_var = getCaliValue();
 		num  = getCaliValue();
-		sysVar[0] = save_load_str_with_file(file_name, _var, num);
+		sysVar[0] = save_load_str_with_file(fname_utf8, _var, num);
 		break;
 	}
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LE(new) %d, %s, %d, %d:\n", type, file_name, var, num);
 }
 
 void commands2F25() {
 	int file_name = getCaliValue();
-	char *title = sys_getString(0);
-	char *filter = sys_getString(0);
+	const char *title = sl_getString(0);
+	const char *filter = sl_getString(0);
 
 	DEBUG_COMMAND_YET("LXG %d, %s, %s:\n", file_name, title, filter);
 }
@@ -398,11 +412,11 @@ void commands2F25() {
 void commands2F26() {
 	int dst_no  = getCaliValue();
 	int max_len = getCaliValue();
-	char *title  = sys_getString(0);
+	const char *title  = sl_getString(0);
 	char *t1, *t2, *t3;
 	
-	t1 = sjis2lang(title);
-	t2 = sjis2lang(v_str(dst_no -1));
+	t1 = toUTF8(title);
+	t2 = toUTF8(svar_get(dst_no));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -410,17 +424,15 @@ void commands2F26() {
 	
 	menu_inputstring(&mi_param);
 	if (mi_param.newstring == NULL) {
-		v_strcpy(dst_no -1, NULL);
+		svar_set(dst_no, NULL);
 		free(t1); free(t2);
 		return;
 	}
 	
-	t3 = lang2sjis(mi_param.newstring);
+	t3 = fromUTF8(mi_param.newstring);
 	
-	/* 全角文字以外は不可 */
-	if (!sjis_has_hankaku(t3)) {
-		v_strcpy(dst_no -1, t3);
-	}
+	svar_set(dst_no, t3);
+
 	free(t1);
 	free(t2);
 	free(t3);
@@ -429,69 +441,77 @@ void commands2F26() {
 }
 
 void commands2F27() {
-	int   num    = getCaliValue();
-	char *string = sys_getString(0);
+	int num = getCaliValue();
+	const char *string = sl_getString(0);
 
-	if (num > 0) {
-	        v_strcpy(num - 1, string);
-	} else {
-        	WARNING("MS: num <= 0\n");
-	}
-	
+	svar_set(num, string);
 	DEBUG_COMMAND("MS(new) %d, %s:\n", num, string);
 }
 
 void commands2F28() {
-	char *title = sys_getString(0);
+	const char *title = sl_getString(0);
 	
-	strncpy(nact->game_title_name, title, 30);
+	if (nact->game_title_utf8)
+		free(nact->game_title_utf8);
+	nact->game_title_utf8 = toUTF8(title);
+
 	ags_setWindowTitle(title);
-	
+
+	if (0 == strcmp(nact->game_title_utf8, GT_RANCE3_ENG) ||
+		0 == strcmp(nact->game_title_utf8, GT_RANCE4_ENG)) {
+		have_eng_mp_patch = TRUE;
+	}
+
 	DEBUG_COMMAND("MT(new) %s:\n",title);
 }
 
 /* defined in cmdn.c */
 extern INPUTNUM_PARAM ni_param;
 void commands2F29() {
-	char *title = sys_getString(0);
+	const char *title = sl_getString(0);
 	char *t;
 	
 	if (ni_param.title != NULL) {
 		free(ni_param.title);
 	}
-	t = sjis2lang(title);
+	t = toUTF8(title);
 	ni_param.title = t;
 	
 	DEBUG_COMMAND("NT(new) %s:\n", title);
 }
 
 void commands2F2A() {
-	int type = sys_getc();
-	char *file_name = sys_getString(0);
+	int type = sl_getc();
+	const char *file_name = sl_getString(0);
 	int *var, _var = 0, cnt;
 
+	char *fname_utf8 = toUTF8(file_name);
 	switch(type) {
 	case 0:
 		var = getCaliVariable();
 		cnt = getCaliValue();
-		sysVar[0] = save_save_var_with_file(file_name, var, cnt);
+		sysVar[0] = save_save_var_with_file(fname_utf8, var, cnt);
 		break;
 	case 1:
 		_var = getCaliValue();
 		cnt  = getCaliValue();
-		sysVar[0] = save_save_str_with_file(file_name, _var, cnt);
+		sysVar[0] = save_save_str_with_file(fname_utf8, _var, cnt);
 		break;
 	default:
-		WARNING("Unknown QE command\n"); return;
+		_var = getCaliValue();
+		cnt  = getCaliValue();
+		WARNING("Unknown QE command\n");
+		break;
 	}
+	free(fname_utf8);
 
 	DEBUG_COMMAND("QE(new) %d, %s, %d, %d:\n", type, file_name, _var, cnt);
 }
 
 void commands2F2B() {
-	int type = sys_getc();
-	char *work_dir = sys_getString(0);
-	char *file_name = sys_getString(0);
+	int type = sl_getc();
+	const char *work_dir = sl_getString(0);
+	const char *file_name = sl_getString(0);
 
 	DEBUG_COMMAND_YET("UP(new) %d, %s, %s:\n", type, work_dir, file_name);
 }
@@ -535,16 +555,16 @@ void commands2F30() {
 }
 
 void commands2F31() {
-	int fPage = sys_getw();
-	int fIndex = sys_getaddress();
+	int fPage = sl_getw();
+	int fIndex = sl_getaddr();
 	
 	sel_setCallback(1, fPage, fIndex);
 	DEBUG_COMMAND("menuSetCbkSelect page=%d, index=%x:\n", fPage, fIndex);
 }
 
 void commands2F32() {
-	int fPage = sys_getw();
-	int fIndex = sys_getaddress();
+	int fPage = sl_getw();
+	int fIndex = sl_getaddr();
 	
 	sel_setCallback(2, fPage, fIndex);
 	DEBUG_COMMAND("menuSetCbkCancel page=%d, index=%x:\n", fPage, fIndex);
@@ -630,22 +650,7 @@ void commands2F3C() {
 	int ePos = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	if (eNum <= 0 || v_strlen(eNum -1) < ePos) {
-		*vResult = 0;
-	} else {
-		BYTE b1, b2 = 0;
-		b1 = *(v_str(eNum - 1) + ePos);
-		if (ePos == 0) {
-			*vResult = CHECKSJIS1BYTE(b1) ? 2 : 1;
-		} else {
-			b2 = *(v_str(eNum - 1) + ePos -1);
-			if (CHECKSJIS1BYTE(b1)) {
-				*vResult = 2;
-			} else {
-				*vResult = CHECKSJIS1BYTE(b2) ? 2 : 1;
-			}
-		}
-	}
+	*vResult = svar_getCharType(eNum, ePos);
 	
 	DEBUG_COMMAND("strGetCharType %d, %d, %d:\n", eNum, ePos, *vResult);
 }
@@ -654,7 +659,7 @@ void commands2F3D() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = v_strlen(eNum -1);
+	*vResult = svar_width(eNum);
 
 	DEBUG_COMMAND("strGetLengthASCII %d, %d:\n", eNum, *vResult);
 }
@@ -737,24 +742,16 @@ void commands2F44() {
 	int num1 = getCaliValue();
 	int fig  = getCaliValue();
 	int num2 = getCaliValue();
-	char s[256];
+	char buf[256];
 
-	if (fig) {
-		char *ss="%%%dd";
-		char sss[256];
-		sprintf(sss, ss, fig);
-		sprintf(s, sss, num2);
-	} else {
-		sprintf(s, "%d", num2);
-	}
-	v_strcpy(num1 - 1, s);
+	svar_set(num1, format_number(num2, fig, buf));
 	
 	DEBUG_COMMAND("MHH %d, %d, %d:\n", num1, fig, num2);
 }
 
 void commands2F45() {
-	int fPage = sys_getw();
-	int fIndex = sys_getaddress();
+	int fPage = sl_getw();
+	int fIndex = sl_getaddr();
 	
 	cb_sel_init_page    = fPage;
 	cb_sel_init_address = fIndex;
@@ -776,14 +773,14 @@ void commands2F47() {
 }
 
 void commands2F48() {
-	char *sText = sys_getString(0);
+	const char *sText = sl_getString(0);
 	
 	DEBUG_COMMAND_YET("sysOpenShell %s:\n", sText);
 }
 
 void commands2F49() {
-	char *sTitle = sys_getString(0);
-	char *sUrl = sys_getString(0);
+	const char *sTitle = sl_getString(0);
+	const char *sUrl = sl_getString(0);
 	
 	DEBUG_COMMAND_YET("sysAddWebMenu %s, %s:\n", sTitle, sUrl);
 }
@@ -810,13 +807,10 @@ void commands2F4C() {
 	int eWidth  = getCaliValue();
 	int eHeight = getCaliValue();
 
-	MyRectangle r;
-	MyPoint p;
-
-	r.x = eSrcX; r.y = eSrcY; r.width = eWidth; r.height = eHeight;
-	p.x = eX, p.y = eY;
+	MyRectangle r = {eSrcX, eSrcY, eWidth, eHeight};
+	MyPoint p = {eX, eY};
 	
-	UpdateArea(&r, &p);
+	sdl_updateArea(&r, &p);
 	
 	DEBUG_COMMAND("grBlt %d, %d, %d, %d, %d, %d:\n",
 		      eX, eY, eSrcX, eSrcY, eWidth, eHeight);
@@ -824,7 +818,7 @@ void commands2F4C() {
 
 void commands2F4D() {
 	int eNum = getCaliValue();
-	char *sText = sys_getString(0);
+	const char *sText = sl_getString(0);
 
 	DEBUG_COMMAND_YET("LXWT %d, %s:\n", eNum, sText);
 }
@@ -845,7 +839,7 @@ void commands2F4F() {
 
 void commands2F50() {
 	int eFile = getCaliValue();
-	int nFlg = sys_getc();
+	int nFlg = sl_getc();
 	int eNum = getCaliValue();
 
 	DEBUG_COMMAND_YET("LXWH %d, %d, %d:\n", eFile, nFlg, eNum);
@@ -853,7 +847,7 @@ void commands2F50() {
 
 void commands2F51() {
 	int eFile = getCaliValue();
-	int nFlg  = sys_getc();
+	int nFlg  = sl_getc();
 	int eNum  = getCaliValue();
 
 	DEBUG_COMMAND_YET("LXWHH %d, %d, %d:\n", eFile, nFlg, eNum);
@@ -861,17 +855,21 @@ void commands2F51() {
 
 void commands2F52() {
 	int eNum = getCaliValue();
+	if (eNum <= 0) return;
+
+#if HAVE_UNAME
 	struct utsname un;
 	char s[256];
-	
-	if (eNum <= 0) return;
 	if (uname(&un) < 0) return;
 	NOTICE("sysname %s nodename %s release %s version %s machine %s\n",
 	       un.sysname, un.nodename, un.release, un.version, un.machine);
 	sprintf(s,"%s %s %s",
 		un.sysname, un.release, un.machine);
-	v_strcpy(eNum -1, s);
-	
+#else
+	const char *s = CMAKE_SYSTEM_NAME;
+#endif
+
+	svar_set(eNum, s);
 	DEBUG_COMMAND("sysGetOsName %d: %s\n", eNum, s);
 }
 
@@ -906,14 +904,14 @@ void commands2F55() {
 
 void commands2F56() {
 	int file_name = getCaliValue();
-	char *title = sys_getString(0);
-	char *folder = sys_getString(0);
+	const char *title = sl_getString(0);
+	const char *folder = sl_getString(0);
 
 	DEBUG_COMMAND_YET("LXF %d, %s, %s:\n", file_name, title, folder);
 }
 
 void commands2F57() {
-	char *sTitle = sys_getString(0);
+	const char *sTitle = sl_getString(0);
 	int eStrVar = getCaliValue();
 	int eLength = getCaliValue();
 	int *vResult = getCaliVariable();
@@ -921,8 +919,8 @@ void commands2F57() {
 	char *t1, *t2, *t3;
 	INPUTSTRING_PARAM p;
 	
-	t1 = sjis2lang(sTitle);
-	t2 = sjis2lang(v_str(eStrVar -1));
+	t1 = toUTF8(sTitle);
+	t2 = toUTF8(svar_get(eStrVar));
 	p.title = t1;
 	p.oldstring = t2;
 	p.max = eLength;
@@ -931,13 +929,9 @@ void commands2F57() {
 	if (p.newstring == NULL) {
 		*vResult = 65535;
 	} else {
-		t3 = lang2sjis(p.newstring);
-		if (!sjis_has_hankaku(t3)) {
-			v_strcpy(eStrVar -1, t3);
-			*vResult = sjis_count_char(t3);
-		} else {
-			*vResult = 65535;
-		}
+		t3 = fromUTF8(p.newstring);
+		svar_set(eStrVar, t3);
+		*vResult = svar_length(eStrVar);
 		free(t3);
 	}
 	free(t1);
@@ -950,7 +944,7 @@ void commands2F58() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_hankaku(v_str(eNum) -1) ? 1 : 0;
+	*vResult = sjis_has_hankaku(svar_get(eNum)) ? 1 : 0;
 	
 	DEBUG_COMMAND("strCheckASCII %d, %d:\n", eNum, *vResult);
 }
@@ -959,16 +953,16 @@ void commands2F59() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_zenkaku(v_str(eNum) -1) ? 1 : 0;
+	*vResult = sjis_has_zenkaku(svar_get(eNum)) ? 1 : 0;
 	
 	DEBUG_COMMAND("strCheckSJIS %d, %d:\n", eNum, *vResult);
 }
 
 void commands2F5A() {
-	char *sText = sys_getString(0);
+	const char *sText = sl_getString(0);
 	char *t1;
 	
-	t1 = sjis2lang(sText);
+	t1 = toUTF8(sText);
 	menu_msgbox_open(t1);
 	free(t1);
 	
@@ -979,7 +973,7 @@ void commands2F5B() {
 	int eNum = getCaliValue();
 	char *t1;
 	
-	t1 = sjis2lang(v_str(eNum) - 1);
+	t1 = toUTF8(svar_get(eNum));
 	menu_msgbox_open(t1);
 	free(t1);
 	
@@ -1124,8 +1118,8 @@ void commands2F65() {
 
 void commands2F66() {
 	int eNum = getCaliValue();
-	int page  = sys_getw();
-	int index = sys_getdw();
+	int page  = sl_getw();
+	int index = sl_getdw();
 	
 	DEBUG_COMMAND("fncSetTable %d, %d,%d:\n", eNum, page, index);
 
@@ -1145,7 +1139,7 @@ void commands2F67() {
 	int i;
 
 	for (i = 0; i < nact->ain.fncnum; i++) {
-		if (0 == strcmp(nact->ain.fnc[i].name, v_str(eStrNum -1))) {
+		if (0 == strcmp(nact->ain.fnc[i].name, svar_get(eStrNum))) {
 			fnctbl[eNum].page  = nact->ain.fnc[i].page;
 			fnctbl[eNum].index = nact->ain.fnc[i].index;
 			break;
@@ -1248,8 +1242,10 @@ void commands2F70() {
 
 void commands2F71() {
 	int eFlag = getCaliValue();
-	
-	DEBUG_COMMAND_YET("wmenuEnableMsgSkip %d:\n", eFlag);
+
+	msgskip_enableMenu(eFlag);
+
+	DEBUG_COMMAND("wmenuEnableMsgSkip %d:\n", eFlag);
 }
 
 void commands2F72() {
@@ -1267,7 +1263,7 @@ void commands2F73() {
 }
 
 void commands2F74() {
-	char *str1 = sys_getString(0);
+	const char *str1 = sl_getString(0);
 	int *var   = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("dlgErrorOkCancel %s,%d:\n", str1, *var);
@@ -1294,7 +1290,7 @@ void commands2F77() {
 	int eStrNum    = getCaliValue();
 	int eSelectNum = getCaliValue();
 	
-	v_strcpy(eStrNum -1, sel_gettext(eSelectNum));
+	svar_set(eStrNum, sel_gettext(eSelectNum));
 	
 	DEBUG_COMMAND("menuGetText %d,%d:\n", eStrNum, eSelectNum);
 }
@@ -1326,46 +1322,56 @@ void commands2F7B() {
 }
 
 void commands2F7C() {
-	int index = sys_getdw();
-	
+	if (!nact->files.ain) {
+		if (nact->files.gr_fname) {
+			sys_error("System39.ain is needed to run this game. Make sure you have an \"Ain\" line in %s.", nact->files.gr_fname);
+		} else {
+			sys_error("Ain file is needed to run this game. Make sure you have System39.ain file in the game directory.");
+		}
+	}
+
+	int index = sl_getdw();
+	if (index >= nact->ain.msgnum) {
+		WARNING("message id out of bounds (%d)\n", index);
+		return;
+	}
 	sys_addMsg(nact->ain.msg[index]);
-	
+	msgskip_onAinMessage(index);
+
 	DEBUG_COMMAND("2F7C %d:\n", index);
 }
 
 void commands2F7D() {
-	int index = sys_getdw();
+	int index = sl_getdw();
 	
 	commandH();
-	sys_addMsg(nact->ain.msg[index]);
-	
-	// DEBUG_COMMAND_YET("2F7D %d, %d, %d:\n", index, page, p1);
+	msgskip_onAinMessage(index);
+
 	DEBUG_COMMAND("2F7D %d:\n", index);
 }
 
 void commands2F7E() {
-	int index = sys_getdw();
+	int index = sl_getdw();
 	
 	commandHH();
-	sys_addMsg(nact->ain.msg[index]);
-	
-	//DEBUG_COMMAND_YET("2F7E %d, %d, %d:\n", index, p1, p2);
+	msgskip_onAinMessage(index);
+
 	DEBUG_COMMAND("2F7E %d:\n", index);
 }
 
 void commands2F7F() {
-	int index = sys_getdw();
-	int p1    = sys_getCaliValue();
+	int index = sl_getdw();
+	int p1    = getCaliValue();
 	
-	sys_addMsg(v_str(p1 -1));
-	sys_addMsg(nact->ain.msg[index]);
-	
-	DEBUG_COMMAND("2F7F %d, %d(%s,%s):\n", index, p1, nact->ain.msg[index], v_str(p1 -1));
+	sys_addMsg(svar_get(p1));
+	msgskip_onAinMessage(index);
+
+	DEBUG_COMMAND("2F7F %d, %d(%s):\n", index, p1, svar_get(p1));
 }
 
 void commands2F80() {
-	int page  = sys_getw();
-	int index = sys_getdw();
+	int page  = sl_getw();
+	int index = sl_getdw();
 	
 	if (NULL == (nact->datatbl_addr = sl_setDataTable(page -1, index))) {
 		WARNING("dataSetPointer set failed\n");
@@ -1375,8 +1381,8 @@ void commands2F80() {
 }
 
 void commands2F81() {
-	int *vData = sys_getCaliVariable();
-	int eNumof = sys_getCaliValue();
+	int *vData = getCaliVariable();
+	int eNumof = getCaliValue();
 	int i;
 	WORD *p = (WORD *)nact->datatbl_addr;
 
@@ -1392,15 +1398,15 @@ void commands2F81() {
 }
 
 void commands2F82() {
-	int eStrNum = sys_getCaliValue();
-	int eNumof  = sys_getCaliValue();
+	int eStrNum = getCaliValue();
+	int eNumof  = getCaliValue();
 	int i;
 	char *p = (char *)nact->datatbl_addr;
 	
 	DEBUG_COMMAND("dataGetString %d,%d:\n", eStrNum, eNumof);
 	
 	for (i = 0; i < eNumof; i++) {
-		v_strcpy(eStrNum + i -1, p);
+		svar_set(eStrNum + i, p);
 		p += (strlen(p) + 1);
 	}
 
@@ -1408,7 +1414,7 @@ void commands2F82() {
 }
 
 void commands2F83() {
-	int eNumof  = sys_getCaliValue();
+	int eNumof  = getCaliValue();
 	WORD *p = (WORD *)nact->datatbl_addr;
 
 	p += eNumof;
@@ -1419,7 +1425,7 @@ void commands2F83() {
 }
 
 void commands2F84() {
-	int eNumof  = sys_getCaliValue();
+	int eNumof  = getCaliValue();
 	int i;
 	char *p = (char *)nact->datatbl_addr;
 	
@@ -1433,15 +1439,15 @@ void commands2F84() {
 }
 
 void commands2F85() {
-	int *vResult = sys_getCaliVariable();
+	int *vResult = getCaliVariable();
 	
-	*vResult = SYSVAR_MAX;
+	*vResult = nact->ain.varnum;
 	
 	DEBUG_COMMAND("varGetNumof %p:\n", vResult);
 }
 
 void commands2F86() {
-	int eFlag = sys_getCaliValue();
+	int eFlag = getCaliValue();
 	
 	nact->patch_g0 = eFlag;
 	
@@ -1449,10 +1455,10 @@ void commands2F86() {
 }
 
 void commands2F87() {
-	int eSubKeyStrNum = sys_getCaliValue();
-	int eBaneStrNum   = sys_getCaliValue();
-	int eResultStrNum = sys_getCaliValue();
-	int *vResult      = sys_getCaliVariable();
+	int eSubKeyStrNum = getCaliValue();
+	int eBaneStrNum   = getCaliValue();
+	int eResultStrNum = getCaliValue();
+	int *vResult      = getCaliVariable();
 	
 	*vResult = 1;
 	
@@ -1461,8 +1467,8 @@ void commands2F87() {
 }
 
 void commands2F88() {
-	int eFileNameStrNum = sys_getCaliValue();
-	int *vResult        = sys_getCaliVariable();
+	int eFileNameStrNum = getCaliValue();
+	int *vResult        = getCaliVariable();
 	
 	*vResult = 1;
 	
@@ -1470,27 +1476,27 @@ void commands2F88() {
 }
 
 void commands2F89() {
-	int eYear = sys_getCaliValue();
-	int eMonth = sys_getCaliValue();
-	int eData = sys_getCaliValue();
-	int *vResult = sys_getCaliVariable();
+	int eYear = getCaliValue();
+	int eMonth = getCaliValue();
+	int eData = getCaliValue();
+	int *vResult = getCaliVariable();
 	
 	DEBUG_COMMAND_YET("timeCheckCurDate %d,%d,%d,%p:\n", eYear, eMonth, eData, vResult);
 }
 
 void commands2F8A() {
-	char *s2 = sys_getConstString();
-	char *s3 = sys_getConstString();
+	const char *s2 = sl_getConstString();
+	const char *s3 = sl_getConstString();
 
 	DEBUG_COMMAND_YET("dlgManualProtect %s,%s:\n", s2, s3);
 }
 
 void commands2F8B() {
-	char *s2 = sys_getConstString();
-	int c3 = sys_getCaliValue();
-	int c4 = sys_getCaliValue();
-	char *s6 = sys_getConstString();
-	int *c7 = sys_getCaliVariable();
+	const char *s2 = sl_getConstString();
+	int c3 = getCaliValue();
+	int c4 = getCaliValue();
+	const char *s6 = sl_getConstString();
+	int *c7 = getCaliVariable();
 
 	*c7 = 1;
 	

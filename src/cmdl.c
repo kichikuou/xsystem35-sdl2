@@ -24,14 +24,17 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "dri.h"
 #include "savedata.h"
+#include "utfsjis.h"
 #include "cg.h"
 
 void commandLD() {
@@ -105,31 +108,36 @@ void commandLT() {
 }
 
 void commandLE() {
-	int type = sys_getc();
-	char *filename = sys_getString(':');
+	int type = sl_getc();
+	const char *filename = sl_getString(':');
 	int *var, _var = 0;
 	int num;
-	
+
+	char *fname_utf8 = toUTF8(filename);
 	switch(type) {
 	case 0: /* T2 */
 		var = getCaliVariable();
 		num  = getCaliValue();
-		sysVar[0] = save_load_var_with_file(filename, var, num);		
+		sysVar[0] = save_load_var_with_file(fname_utf8, var, num);
 		break;
 	case 1: /* 456 */
 		_var = getCaliValue();
 		num  = getCaliValue();
-		sysVar[0] = save_load_str_with_file(filename, _var, num);
+		sysVar[0] = save_load_str_with_file(fname_utf8, _var, num);
 		break;
 	default:
-		WARNING("Unknown LE command %d\n", type); return;
+		_var = getCaliValue();
+		num  = getCaliValue();
+		WARNING("Unknown LE command %d\n", type);
+		break;
 	}
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LE %d,%s,%d,%d:\n",type, filename, _var, num);
 }
 
 void commandLL() {
-	int type = sys_getc();
+	int type = sl_getc();
 	int link_no = getCaliValue();
 	int *var, _var = 0;
 	int num, i;
@@ -159,11 +167,7 @@ void commandLL() {
 			num = dfile->size / sizeof(WORD);
 		}
 		for (i = 0; i < num; i++) {
-#ifdef WORDS_BIGENDIAN
-			*var = swap16(*data); var++; data++;
-#else
-			*var = *data; var++; data++;
-#endif
+			var[i] = SDL_SwapLE16(data[i]);
 		}
 		break;
 		
@@ -188,7 +192,7 @@ void commandLL() {
 
 void commandLHD() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -198,17 +202,31 @@ void commandLHD() {
 
 void commandLHG() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
-	/* X版では全てをHDDに置くのでサポートしない */
-	
-	sysVar[0] = 255;
+
+	// HACK: Remember the last registered number so that LHG3 called immediately
+	// after LHG1 can return 1. This prevents "HDD is full or CD is not inserted"
+	// error message in Diabolique.
+	static int last_registered = -1;
+	switch (p1) {
+	case 1:  // register
+		last_registered = no;
+		break;
+	case 2:  // unregister
+		last_registered = -1;
+		break;
+	case 3:  // query
+		// Unconditionally returning 1 breaks Atlach-Nacha.
+		sysVar[0] = (no == last_registered) ? 1 : 0;
+		break;
+	}
 	DEBUG_COMMAND("LHG %d,%d:\n",p1,no);
 }
 
 void commandLHM() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -218,7 +236,7 @@ void commandLHM() {
 
 void commandLHS() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -228,7 +246,7 @@ void commandLHS() {
 
 void commandLHW() {
 	// ＣＤのデータをＨＤＤへ登録／削除する
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int no = getCaliValue();
 	// X版では全てをHDDに置くのでサポートしない
 	
@@ -239,9 +257,11 @@ void commandLHW() {
 void commandLC() {
 	int x = getCaliValue();
 	int y = getCaliValue();
-	char *filename = sys_getString(':'); 
+	const char *filename = sl_getString(':');
 	
-	sysVar[0] = cg_load_with_filename(filename, x, y);
+	char *fname_utf8 = toUTF8(filename);
+	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
+	free(fname_utf8);
 	
 	DEBUG_COMMAND("LC %d,%d,%s:\n", x, y, filename);
 }
@@ -249,8 +269,8 @@ void commandLC() {
 void commandLXG() {
 	/* ファイルを選択する */
 	int file_name = getCaliValue();
-	char *title   = sys_getString(':');
-	char *filter  = sys_getString(':');
+	const char *title = sl_getString(':');
+	const char *filter = sl_getString(':');
 
 	DEBUG_COMMAND_YET("LXG %d,%s,%s:\n", file_name, title, filter);
 }

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 
 /* absolete */
@@ -35,7 +36,7 @@ void commandPN() {
 }
 
 void commandPF() {
-	int p1  = sys_getc();
+	int p1  = sl_getc();
 	int num = getCaliValue();
 	boolean cancel_enabled;
 
@@ -63,7 +64,7 @@ void commandPF() {
 }
 
 void commandPW() {
-	int p1  = sys_getc();
+	int p1  = sl_getc();
 	int num = getCaliValue();
 	boolean cancel_enabled;
 	
@@ -98,8 +99,8 @@ void commandPS() {
 	Green = getCaliValue();
 	Blue  = getCaliValue();
 
-	ags_setPallet(Plane , Red, Green, Blue);
-	ags_setPalletToSystem(Plane, 1);
+	ags_setPalette(Plane, Red, Green, Blue);
+	ags_setPaletteToSystem(Plane, 1);
 	DEBUG_COMMAND("PS %d,%d,%d,%d:\n", Plane, Red, Green, Blue);
 }
 
@@ -111,9 +112,9 @@ void commandPG() { /* T2 */
 	int i;
 	
 	for (i = 0; i < num2; i++) {
-		*var = nact->sys_pal->red[num1 + i];   var++;
-		*var = nact->sys_pal->green[num1 + i]; var++;
-		*var = nact->sys_pal->blue[num1 + i];  var++;
+		*var = nact->ags.pal->red[num1 + i];   var++;
+		*var = nact->ags.pal->green[num1 + i]; var++;
+		*var = nact->ags.pal->blue[num1 + i];  var++;
 	}
 	DEBUG_COMMAND("PG %p,%d,%d:\n", var, num1, num2);
 }
@@ -126,9 +127,9 @@ void commandPP() { /* T2 */
 	int i;
 
 	for (i = 0; i < num2; i++) {
-		ags_setPallet(num1 + i, *var, *(var +1), *(var +2)); var+=3;
+		ags_setPalette(num1 + i, *var, *(var +1), *(var +2)); var+=3;
 	}
-	ags_setPalletToSystem(num1, num2);
+	ags_setPaletteToSystem(num1, num2);
 	DEBUG_COMMAND("PP %p,%d,%d:\n", var, num1, num2);
 }
 
@@ -145,7 +146,7 @@ void commandPD() {
 	/* ＣＧ展開の明度を指定する */
 	int num = getCaliValue();
 	
-	cg_alphaLevel = num;
+	cg_brightness = num;
 	
 	DEBUG_COMMAND("PD %d:\n",num);
 }
@@ -155,7 +156,7 @@ void commandPT0() {
 	int *var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	Palette cell;
 	
 	ags_getPixel(x, y, &cell);
 	*var = cell.pixel;
@@ -170,7 +171,7 @@ void commandPT1() {
 	int *b_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	Palette cell;
 	
 	ags_getPixel(x, y, &cell);
 	*r_var = cell.r;
@@ -186,7 +187,7 @@ void commandPT2() {
 	int *low_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	Palette cell;
 	int r, g, b, pic;
 	
 	ags_getPixel(x, y, &cell);

@@ -1,13 +1,11 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
 #include "menu.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
 #include "key.h"
 #include "night.h"
@@ -83,7 +81,7 @@ void ntev_callback(agsevent_t *e) {
 		break;
 		
 	case KEYWAIT_SPRITE:
-		cb_waitkey_sprite(e);
+		// cb_waitkey_sprite(e);
 		break;
 		
 	case KEYWAIT_SELECT:

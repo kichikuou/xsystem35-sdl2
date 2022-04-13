@@ -26,10 +26,10 @@
 #include "portab.h"
 
 /* 文字列入力のパラメータ */
-typedef struct {
+typedef struct inputstring_param {
 	char *title;
 	char *oldstring;
-	char *newstring;
+	const char *newstring;
 	int   max;
 	/* for MJ cmd */
 	boolean need_window;
@@ -37,7 +37,7 @@ typedef struct {
 } INPUTSTRING_PARAM;
 
 /* 数値入力のパラメータ */
-typedef struct {
+typedef struct inputnum_param {
 	char *title;
 	int value;
 	int def;
@@ -54,5 +54,12 @@ extern void menu_msgbox_open(char *);
 extern void menu_widgetinit(void);
 extern void menu_init();
 extern void menu_gtkmainiteration();
+extern void menu_setSkipState(boolean enabled, boolean activated);
+
+#ifdef _WIN32
+struct SDL_SysWMmsg;
+extern void win_menu_init(void);
+extern void win_menu_onsyswmevent(struct SDL_SysWMmsg* msg);
+#endif
 
 #endif /* !__MENULL */

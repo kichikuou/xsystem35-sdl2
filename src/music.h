@@ -1,5 +1,5 @@
 /*
- * music.h  music sever/client shared information
+ * music.h  music interface
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -19,90 +19,82 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: music.h,v 1.25 2003/11/16 15:29:52 chikama Exp $ */
+/* $Id: music_client.h,v 1.7 2003/11/16 15:29:52 chikama Exp $ */
 
-#ifndef __MUSIC_H__
-#define __MUSIC_H__
+#ifndef __MUSIC_CLIENT_H__
+#define __MUSIC_CLIENT_H__
 
-#include <glib.h>
+#include "portab.h"
+#include "midi.h"
 
-/* music command */
-enum {
-	MUS_CDROM_START, /* 0 */
-	MUS_CDROM_STOP,
-	MUS_CDROM_GETPOSITION,
-	MUS_CDROM_GETMAXTRACK,
-	
-	MUS_PCM_START,
-	MUS_PCM_STOP,
-	MUS_PCM_LOAD_NO,
-	MUS_PCM_LOAD_MEM,
-	MUS_PCM_LOAD_LRSW,
-	MUS_PCM_UNLOAD,
-	MUS_PCM_GETPOSITION,
-	MUS_PCM_WAITEND,
-	MUS_PCM_WAITTIME,
-	MUS_PCM_GETWAVETIME,
-	
-	MUS_FADE_START,
-	MUS_FADE_STOP,
-	MUS_FADE_GETSTATE,
-	MUS_FADE_GETLEVEL,
-	
-	MUS_MIDI_START,
-	MUS_MIDI_STOP,
-	MUS_MIDI_PAUSE,
-	MUS_MIDI_UNPAUSE,
-	MUS_MIDI_GETPOSITION,
-	MUS_MIDI_GETFLAG,
-	MUS_MIDI_SETFLAG,
-
-	MUS_MIXER_GETLEVEL,
-	MUS_MIXER_SETVOLVAL,
-	
-	MUS_BGM_PLAY,
-	MUS_BGM_STOP,
-	MUS_BGM_STOPALL,
-	MUS_BGM_FADE,
-	MUS_BGM_GETPOS,
-	MUS_BGM_GETLEN,
-	MUS_BGM_WAIT,
-	MUS_BGM_WAITPOS,
-	
-	MUS_GET_VALIDSUBSYSTEM,
-	MUS_EXIT
+enum MixDevice {
+	MIX_MASTER,
+	MIX_CD,
+	MIX_MIDI,
+	MIX_PCM
 };
 
-/* socket file */
-#define XSYS35MUSSOCK "/xsystem35_sock"
-
-#define XSYS35_PROTOCOL_VERSION 1
-
-typedef struct {
-	guint16 version;
-	guint16 command;
-	guint32 data_length;
-} ClientPktHeader;
-
-typedef struct {
-	guint16 version;
-	guint32 data_length;
-} ServerPktHeader;
-
-typedef struct {
-	ClientPktHeader hdr;
-	gpointer data;
-	gint fd;
-} PacketNode;
-
-typedef struct {
-	boolean cdrom;
-	boolean midi;
-	boolean pcm;
-} ValidSubsystem;
-
 /* init and exit */
-extern int mus_init();
+extern int mus_init(int audio_buffer_size);
 extern int mus_exit();
 
-#endif /* __MUSIC_H__ */
+/* cdrom related function */
+extern int mus_cdrom_start(int track, int loop);
+extern int mus_cdrom_stop(void);
+extern int mus_cdrom_get_playposition(int *t, int *m, int *s, int *f);
+extern int mus_cdrom_get_maxtrack(void);
+extern boolean mus_cdrom_get_state(void);
+
+/* midi related function */
+extern int mus_midi_start(int no, int loop);
+extern int mus_midi_stop(void);
+extern int mus_midi_pause(void);
+extern int mus_midi_unpause(void);
+extern int mus_midi_get_playposition(midiplaystate *state);
+extern int mus_midi_set_flag(int mode, int index, int val);
+extern int mus_midi_get_flag(int mode, int index);
+extern boolean mus_midi_get_state(void);
+
+/* pcm (Scommand) related function */
+extern int mus_pcm_start(int no, int loop);
+extern int mus_pcm_mix(int noL, int noR, int loop);
+extern int mus_pcm_stop(int msec);
+extern int mus_pcm_load(int no);
+extern int mus_pcm_get_playposition(int *pos);
+extern int mus_pcm_check_ability(int bit, int rate, int ch, boolean *able);
+extern boolean mus_pcm_get_state(void);
+
+/* fader/mixer related function */
+extern int mus_mixer_fadeout_start(int device, int time, int volume, int stop);
+extern boolean mus_mixer_fadeout_get_state(int device);
+extern int mus_mixer_fadeout_stop(int device);
+extern int mus_mixer_get_level(int device);
+
+/* wav (command2F) related function */
+extern int mus_wav_load(int ch, int num);
+extern int mus_wav_unload(int ch);
+extern int mus_wav_play(int ch, int loop);
+extern int mus_wav_stop(int ch);
+extern int mus_wav_get_playposition(int ch);
+extern int mus_wav_fadeout_start(int ch, int time, int volume, int stop);
+extern int mus_wav_fadeout_stop(int ch);
+extern boolean mus_wav_fadeout_get_state(int ch);
+extern int mus_wav_waitend(int ch);
+extern int mus_wav_waittime(int ch, int time);
+extern int mus_wav_wavtime(int ch);
+extern int mus_wav_load_lrsw(int ch, int num);
+
+/* Music Stream */
+extern int mus_bgm_play(int no, int time, int vol);
+extern int mus_bgm_stop(int no, int time);
+extern int mus_bgm_stopall(int time);
+extern int mus_bgm_fade(int no, int time, int vol);
+extern int mus_bgm_getpos(int no);
+extern int mus_bgm_getlength(int no);
+extern int mus_bgm_wait(int no, int timeout);
+extern int mus_bgm_waitpos(int no, int index);
+
+/* volume valaner */
+extern int mus_vol_set_valance(int *vols, int num);
+
+#endif /* MUSIC_CLIENT_H__ */

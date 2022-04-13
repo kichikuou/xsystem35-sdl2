@@ -7,17 +7,14 @@
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
-#include "imput.h"
+#include "input.h"
+#include "sdl_core.h"
 #include "xsystem35.h"
 #include "nact.h"
 #include "scenario.h"
 #include "s39ain.h"
 #include "night.h"
 #include "nt_msg.h"
-
-/* defined by cmd_check.c */
-extern void check_command(int c0);
 
 #define MAINLOOP_EVENTCHECK_INTERVAL 16 /* 16 msec */
 
@@ -33,7 +30,7 @@ static struct _scoadr scene2adr(int no) {
 	struct _scoadr adr = {0, 0};
 	
 	snprintf(label, 7, "E%05d", no);
-	WARNING("seaching %6s\n", label);
+	SACT_DEBUG("seaching %6s\n", label);
 	for (i = 0; i < nact->ain.fncnum; i++) {
 		if (0 == strncmp(nact->ain.fnc[i].name, label, 6)) {
 			adr.page  = nact->ain.fnc[i].page;
@@ -51,39 +48,34 @@ void nt_sco_init() {
 }
 
 static void ntmain(struct _scoadr inadr) {
-	int scono = 0, cnt = 0;
+	int scono = 0;
 	struct _scoadr curadr;
 
 	while (!nact->is_quit) {
-		DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
-		//WARNING("%d:%x\n", sl_getPage(), sl_getIndex());
-		if (!nact->popupmenu_opened) {
-			check_command(sl_getc());
-			if (sl_getPage()  == inadr.page &&
-			    sl_getIndex() == inadr.index) {
-				// ~E%05dからの戻り
-				if (nact->fnc_return_value == 0) {
-					break;
-				} else {
-					scono = nact->fnc_return_value;
+		for (int cnt = 0; !nact->wait_vsync && cnt < 10000; cnt++) {
+			//SACT_DEBUG("%d:%x\n", sl_getPage(), sl_getIndex());
+			if (!nact->popupmenu_opened) {
+				exec_command();
+				if (sl_getPage()  == inadr.page &&
+					sl_getIndex() == inadr.index) {
+					// ~E%05dからの戻り
+					if (nact->fnc_return_value == 0) {
+						return;
+					} else {
+						scono = nact->fnc_return_value;
+					}
+					curadr = scene2adr(scono);
+					sl_callFar2(curadr.page -1, curadr.index);
 				}
-				curadr = scene2adr(scono);
-				sl_callFar2(curadr.page -1, curadr.index);
 			}
+			nact->callback();
 		}
-		
 		if (!nact->is_message_locked) {
-			if (get_high_counter(SYSTEMCOUNTER_MAINLOOP)) {
-				sys_getInputInfo();
-				reset_counter_high(SYSTEMCOUNTER_MAINLOOP, MAINLOOP_EVENTCHECK_INTERVAL, 0);
-			}
+			sys_getInputInfo();
 		}
-		if (cnt == 10000) {
-			usleep(10); /* XXXX */
-			cnt = 0;
-		}
-		cnt++;
-		nact->callback();
+		sdl_wait_vsync();
+		nact->frame_count++;
+		nact->wait_vsync = FALSE;
 	}
 }
 

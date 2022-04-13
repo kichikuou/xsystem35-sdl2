@@ -26,9 +26,11 @@
 #include "config.h"
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
-#include "graphicsdevice.h"
-#include "imput.h"
+#include "sdl_core.h"
+#include "input.h"
+#include "msgskip.h"
 
 #define REPEAT_RATE_FAST 60 
 #define REPEAT_RATE_SLOW 600
@@ -38,7 +40,7 @@ static int ik_key = 0;
 
 void commandIK() {
 	/* キー入力関連のコマンド */
-	int num = sys_getc();
+	int num = sl_getc();
 	int key;
 
 	DEBUG_COMMAND("IK %d:\n",num);
@@ -52,11 +54,11 @@ void commandIK() {
 		sysVar[0] = 0;
 		key = sys_getInputInfo();
 		if (ik_key != key) repeating = 0;
-		if (get_skipMode()) break;
-		key = sys_keywait(INT_MAX, TRUE);
+		key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
+		if (msgskip_isSkipping()) break;
 		
 		if (repeating == 1) {
-			sys_keywait(REPEAT_RATE_SLOW, FALSE);
+			sys_keywait(REPEAT_RATE_SLOW, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
 		sys_key_releasewait(key, TRUE);
@@ -66,11 +68,11 @@ void commandIK() {
 		sysVar[0] = 0;
 		key = sys_getInputInfo();
 		if (ik_key != key) repeating = 0;
-		if (get_skipMode()) break;
-		key = sys_keywait(INT_MAX, TRUE);
+		key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
+		if (msgskip_isSkipping()) break;
 		
 		if (repeating == 1) {
-			sys_keywait(REPEAT_RATE_FAST, FALSE);
+			sys_keywait(REPEAT_RATE_FAST, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
 		sys_key_releasewait(key, TRUE);
@@ -133,7 +135,7 @@ void commandIX() {
 	/* 「次の選択肢まで進む」の状態取得 */
 	int *var = getCaliVariable();
 	
-	*var = get_skipMode() == TRUE ? 1 : 0;
+	*var = msgskip_isSkipping() == TRUE ? 1 : 0;
 	DEBUG_COMMAND("IX %p:\n",var);
 }
 
@@ -141,13 +143,13 @@ void commandIY() {
 	int p1 = getCaliValue();
 	
 	if (p1 == 0) {
-		set_skipMode(FALSE);
+		msgskip_activate(FALSE);
 	} else if (p1 == 1) {
-		set_skipMode(TRUE);
+		msgskip_activate(TRUE);
 	} else if (p1 == 2) {
-		set_skipMode2(TRUE);
+		msgskip_setFlags(MSGSKIP_STOP_ON_MENU, MSGSKIP_STOP_ON_MENU);
 	} else if (p1 == 3) {
-		set_skipMode2(FALSE);
+		msgskip_setFlags(0, MSGSKIP_STOP_ON_MENU);
 	}
 	
 	DEBUG_COMMAND("IY %d:\n",p1);

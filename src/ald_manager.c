@@ -21,11 +21,14 @@
 */
 /* $Id: ald_manager.c,v 1.3 2001/05/08 05:36:07 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "dri.h"
 #include "cache.h"
 #include "ald_manager.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 /* drifiles object */
 static drifiles *dri[DRIFILETYPEMAX];
@@ -43,8 +46,8 @@ static void ald_free(dridata *dfile);
  *   dfile: dridata to be free
 */
 static void ald_free(dridata *dfile) {
-	g_free(dfile->data_raw);
-	g_free(dfile);
+	free(dfile->data_raw);
+	free(dfile);
 }
 
 /*
@@ -53,6 +56,7 @@ static void ald_free(dridata *dfile) {
  *   no  : file no ( >= 0 )
  *   return: loaded dridata object
 */
+EMSCRIPTEN_KEEPALIVE
 dridata *ald_getdata(DRIFILETYPE type, int no) {
 	dridata *ddata;
 	
@@ -72,10 +76,12 @@ dridata *ald_getdata(DRIFILETYPE type, int no) {
 	if (NULL == (ddata = (dridata *)cache_foreach(cacheid, (type << 16) + no))) {
 		ddata = dri_getdata(dri[type], no);
 		if (ddata != NULL) {
-			cache_insert(cacheid, (type << 16) + no, (void *)ddata, ddata->size, &(ddata->in_use));
-			ddata->in_use = TRUE;
+			ddata->refcnt = 0;
+			cache_insert(cacheid, (type << 16) + no, (void *)ddata, ddata->size, &(ddata->refcnt));
 		}
 	}
+	if (ddata != NULL)
+		ddata->refcnt++;
 	
 	return ddata;
 }
@@ -84,29 +90,22 @@ dridata *ald_getdata(DRIFILETYPE type, int no) {
  * free dri object
  *   data: object to be free
  */
+EMSCRIPTEN_KEEPALIVE
 void ald_freedata(dridata *data) {
 	if (data == NULL) return;
 	
 	if (data->a->mmapped) {
-		g_free(data);
+		free(data);
 	} else {
-		data->in_use = FALSE;
+		data->refcnt--;
 	}
 }
 
-/*
- * Initilize ald manager
- *   type: data type
- *   file: file name array
- *   cnt : number in file name array
- *   mmap: mmap file or not
-*/
-void ald_init(int type, char **file, int cnt, boolean mmap) {
-	/* check wrong type */
-	if (type < DRIFILETYPEMAX) {
-		dri[type] = dri_init(file, cnt, mmap);
-		if (!dri[type]->mmapped) {
-			cacheid = cache_new(ald_free);
-		}
+void ald_init(int type, const char **file, int cnt, boolean use_mmap) {
+	if (type >= DRIFILETYPEMAX || cnt <= 0)
+		return;
+	dri[type] = dri_init(file, cnt, use_mmap);
+	if (!dri[type]->mmapped) {
+		cacheid = cache_new(ald_free);
 	}
 }

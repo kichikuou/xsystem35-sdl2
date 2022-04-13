@@ -24,24 +24,19 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
 #include "LittleEndian.h"
-#include "imput.h"
+#include "input.h"
 #include "sact.h"
 #include "surface.h"
 #include "ngraph.h"
 #include "sprite.h"
-#include "counter.h"
+#include "sdl_core.h"
 
 static surface_t *smask_get(int no);
 static surface_t *smask_mul(surface_t *sf, int val);
@@ -60,40 +55,21 @@ static ecopyparam_t ecp;
 
 // SACTEFAM.KLD の読み込み
 int smask_init(char *path) {
-	struct stat sbuf;
-	int i, fd;
-	char *adr;
+	int i;
 	SACTEFAM_t *am;
 
-	if (0 > (fd = open(path, O_RDONLY))) {
-		WARNING("open: %s\n", strerror(errno));
+	mmap_t *m = map_file(path);
+	if (!m)
 		return NG;
-	}
-	
-	if (0 > fstat(fd, &sbuf)) {
-		WARNING("fstat: %s\n", strerror(errno));
-		close(fd);
-		return NG;
-	}
-
-	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
-		WARNING("mmap: %s\n", strerror(errno));
-		close(fd);
-		return NG;
-	}
-	
 	am = &sact.am;
-	am->mapadr = adr;
-	am->size = sbuf.st_size;
-	am->fd = fd;
-	
-	am->datanum = LittleEndian_getDW(adr, 0);
-	am->no = g_new(int, am->datanum);
-	am->offset = g_new(int, am->datanum);
+	am->mmap = m;
+	am->datanum = LittleEndian_getDW(m->addr, 0);
+	am->no = malloc(sizeof(int) * am->datanum);
+	am->offset = malloc(sizeof(int) * am->datanum);
 	
 	for (i = 0; i < am->datanum; i++) {
-		am->no[i] = LittleEndian_getDW(adr, 16 + i * 16);
-		am->offset[i] = LittleEndian_getDW(adr, 16 + i * 16 + 8);
+		am->no[i] = LittleEndian_getDW(m->addr, 16 + i * 16);
+		am->offset[i] = LittleEndian_getDW(m->addr, 16 + i * 16 + 8);
 	}
 	
 	return OK;
@@ -110,7 +86,7 @@ static surface_t *smask_get(int no) {
 
 	if (i == am->datanum) return NULL;
 	
-	return sf_getcg(am->mapadr + am->offset[i]);
+	return sf_getcg(am->mmap->addr + am->offset[i], 0 /*FIXME*/);
 }
 
 // ベースになるマスクの alpha 値を拡大して取り出す
@@ -151,11 +127,11 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 	sfdst = sf_dup(sf0);
 	sf_copyall(sf0, sfsrc);
 	
-	ecp.sttime = ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time*10;
 	ecp.oldstep = 0;
 	
-	while ((ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < ecp.edtime) {
+	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
 		int curstep = 255 * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
 		// 元になるマスクのalpha値を16倍して欲しいところだけ取り出す
 		mask2 = smask_mul(mask, curstep);
@@ -163,7 +139,7 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 		gre_BlendUseAMap(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, mask2, 0, 0, 255);
 		ags_updateFull();
 		
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
 		
 		// 一時マスクを削除

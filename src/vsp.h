@@ -33,20 +33,19 @@ typedef struct {
 	int vspY0;  /* display location y    */
 	int vspXW;  /* image width           */
 	int vspYW;  /* image height          */
-	int vspPb;  /* default pallet bank   */
-	int vspPp;  /* pointer to pallet     */
+	int vspPb;  /* default palette bank  */
+	int vspPp;  /* pointer to palette    */
 	int vspDp;  /* pointer to pixel data */
 } vsp_header; 
 /*
  * vspPb:
- *   VSP has only 16 pallets. When 256 pallets mode, this parameter determine
- *  where to copy these 16 pallets in 256 pallets.
+ *   VSP has only 16 palettes. When 256 palettes mode, this parameter determine
+ *  where to copy these 16 palettes in 256 palettes.
  *  The parameter is from 0 to 15, and for example, if it is 1 then copy 
  *  16 palltes into pal[16] ~ pal[31].
 */
 	
 extern boolean vsp_checkfmt(BYTE *data);
 extern cgdata *vsp_extract(BYTE *data);
-extern cgdata *vsp_getpal(BYTE *data);
 
 #endif /* !__VSP__ */

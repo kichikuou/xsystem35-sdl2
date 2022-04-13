@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -102,8 +101,8 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	if (cg->sf == NULL) return NG;
 
 	// 更新領域の確定
-	update.width  = sact.updaterect.width;
-	update.height = sact.updaterect.height;
+	update.width  = sact.updaterect.w;
+	update.height = sact.updaterect.h;
 	sx = 0;
 	sy = 0;
 	dx = sp->cur.x - sact.updaterect.x;
@@ -118,7 +117,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	dx += sact.updaterect.x;
 	dy += sact.updaterect.y;
 	
-	if (cg->sf->has_alpha) {
+	if (cg->sf->alpha) {
 		// alpha map がある場合
 		gre_BlendUseAMap(sf0, dx, dy,
 				 sf0, dx, dy,
@@ -138,7 +137,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 		}
 	}
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n", sp->no, sx, sy, w, h, dx, dy);
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n", sp->no, sx, sy, w, h, dx, dy);
 	
 	return OK;
 }
@@ -146,7 +145,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 /*
   スプライトキー待ち用のdepthmap を更新
 */
-void sp_draw_dmap(gpointer data, gpointer userdata) {
+void sp_draw_dmap(void* data, void* userdata) {
 	sprite_t *sp = (sprite_t *)data;
 	cginfo_t *cg;
 	surface_t update;
@@ -176,7 +175,7 @@ void sp_draw_dmap(gpointer data, gpointer userdata) {
 		return;
 	}
 	
-	if (cg->sf->has_alpha) {
+	if (cg->sf->alpha) {
 		fill_dmap_mask(cg->sf, sx, sy, dx, dy, w, h, sp->no);
 	} else {
 		fill_dmap(dx, dy, w, h, sp->no);

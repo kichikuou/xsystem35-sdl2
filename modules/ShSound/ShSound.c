@@ -26,22 +26,23 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "dri.h"
 #include "ald_manager.h"
-#include "wavfile.h"
-#include "music_client.h"
-#include "pcmlib.h"
+#include "music.h"
+
+#ifdef ENABLE_SDLMIXER
+#include "pcm.sdlmixer.h"
 #include "shpcmlib.c"
 
-/* for wav*Memory */
-static WAVFILE *wfile;
+static Mix_Chunk *chunk;
+#endif
 
-void Init() {
+static void Init() {
 	/*
 	  モジュール初期化
 	*/
@@ -50,7 +51,7 @@ void Init() {
 	DEBUG_COMMAND("ShSound.Init %d:\n", p1);
 }
 
-void wavLoad() {
+static void wavLoad() {
 	/*
 	  指定のスロットにPCMファイルをロード
 	  
@@ -65,7 +66,7 @@ void wavLoad() {
 	mus_wav_load(slot, no);
 }
 
-void wavUnload() {
+static void wavUnload() {
 	/*
 	  指定のスロットのPCMファイルを削除
 	  
@@ -78,7 +79,7 @@ void wavUnload() {
 	DEBUG_COMMAND("ShSound.wavUnload %d:\n",slot);
 }
 
-void wavUnloadRange() {
+static void wavUnloadRange() {
 	/*
 	  指定のスロット(複数)のPCMファイルを削除
 	  
@@ -96,7 +97,7 @@ void wavUnloadRange() {
 	DEBUG_COMMAND("ShSound.wavUnloadRange %d,%d:\n", slot, range);
 }
 
-void wavUnloadAll() {
+static void wavUnloadAll() {
 	/*
 	  すべてのスロットのPCMファイルを削除
 	*/
@@ -109,7 +110,7 @@ void wavUnloadAll() {
 	DEBUG_COMMAND("ShSound.wavUnloadAll:\n");
 }
 
-void wavLoadMemory() {
+static void wavLoadMemory() {
 	/*
 	  指定の番号の WAV ファイルをメモリ上に読み込み
 	  
@@ -117,12 +118,14 @@ void wavLoadMemory() {
 	*/
 	int no = getCaliValue();
 	
-	wfile = pcmlib_load_rw(no);
+#ifdef ENABLE_SDLMIXER
+	chunk = pcm_sdlmixer_load(no);
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavLoadMemory %d:\n", no);
 }
 
-void wavSendMemory() {
+static void wavSendMemory() {
 	/*
 	  wavLoadMemory で読み込んだデータを指定のスロットに投入
 	  
@@ -130,16 +133,17 @@ void wavSendMemory() {
 	*/
 	int slot = getCaliValue();
 	
-	if (wfile) {
-		mus_wav_sendfile(slot, wfile);
-		pcmlib_free(wfile);
-		wfile = NULL;
+#ifdef ENABLE_SDLMIXER
+	if (chunk) {
+		pcm_sdlmixer_load_chunk(slot, chunk);
+		chunk = NULL;
 	}
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavSendMemory %d:\n", slot);
 }
 
-void wavFadeVolumeMemory() {
+static void wavFadeVolumeMemory() {
 	/*
 	  wavLoadMemory で読み込んだデータのボリュームのフェード
 	  
@@ -149,26 +153,30 @@ void wavFadeVolumeMemory() {
 	int start = getCaliValue();
 	int range = getCaliValue();
 	
-	if (wfile == NULL) return;
+#ifdef ENABLE_SDLMIXER
+	if (chunk == NULL) return;
 	
-	pcmlib_fade_volume_memory(wfile, start, range);
+	pcmlib_fade_volume_memory(chunk, start, range);
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavFadeVolumeMemory %d,%d:\n", start, range);
 }
 
-void wavReversePanMemory() {
+static void wavReversePanMemory() {
 	/*
 	  wavLoadMemoryで読み込んだデータの左右のチャンネルを反転
 	*/
 	
-	if (wfile == NULL) return;
+#ifdef ENABLE_SDLMIXER
+	if (chunk == NULL) return;
 	
-	pcmlib_reverse_pan_memory(wfile);
+	pcmlib_reverse_pan_memory(chunk);
+#endif
 	
 	DEBUG_COMMAND("ShSound.wavReversePanMemory:\n");
 }
 
-void wavPlay() {
+static void wavPlay() {
 	/*
 	  指定のスロットのPCMを再生
 	  
@@ -183,7 +191,7 @@ void wavPlay() {
 	DEBUG_COMMAND("ShSound.wavPlay %d, %d:\n", slot, loop);
 }
 
-void wavPlayRing() {
+static void wavPlayRing() {
 	/*
 	  指定の範囲のスロットのPCMを呼ばれる毎に繰り返し
 	  
@@ -201,7 +209,7 @@ void wavPlayRing() {
 	DEBUG_COMMAND("ShSound.wavPlayRing %d,%d,%d:\n", start, cnt, *cur);
 }
 
-void wavStop() {
+static void wavStop() {
 	/*
 	  指定のスロットの再生を停止
 	  
@@ -214,7 +222,7 @@ void wavStop() {
 	mus_wav_stop(slot);
 }
 
-void wavStopAll() {
+static void wavStopAll() {
 	/*
 	  全てのスロットの再生を停止
 	*/
@@ -227,7 +235,7 @@ void wavStopAll() {
 	DEBUG_COMMAND("ShSound.wavStopAll:\n");
 }
 
-void wavPause() {
+static void wavPause() {
 	/*
 	  指定のスロットの再生を一時停止
 	  
@@ -238,7 +246,7 @@ void wavPause() {
 	DEBUG_COMMAND_YET("ShSound.wavPause %d:\n", slot);
 }
 
-void wavIsPlay() {
+static void wavIsPlay() {
 	/*
 	  指定のスロットが再生中かどうかを調べる
 	  
@@ -253,7 +261,7 @@ void wavIsPlay() {
 	DEBUG_COMMAND("ShSound.wavIsPlay %d,%p:\n", slot, result);
 }
 
-void wavIsPlayRange() {
+static void wavIsPlayRange() {
 	/*
 	  指定の範囲のスロットが再生中かどうかを調べる
 	  
@@ -274,3 +282,24 @@ void wavIsPlayRange() {
 	
 	DEBUG_COMMAND("ShSound.wavIsPlayRange %d,%d,%p:\n", slot, range, result);
 }
+
+static const ModuleFunc functions[] = {
+	{"Init", Init},
+	{"wavFadeVolumeMemory", wavFadeVolumeMemory},
+	{"wavIsPlay", wavIsPlay},
+	{"wavIsPlayRange", wavIsPlayRange},
+	{"wavLoad", wavLoad},
+	{"wavLoadMemory", wavLoadMemory},
+	{"wavPause", wavPause},
+	{"wavPlay", wavPlay},
+	{"wavPlayRing", wavPlayRing},
+	{"wavReversePanMemory", wavReversePanMemory},
+	{"wavSendMemory", wavSendMemory},
+	{"wavStop", wavStop},
+	{"wavStopAll", wavStopAll},
+	{"wavUnload", wavUnload},
+	{"wavUnloadAll", wavUnloadAll},
+	{"wavUnloadRange", wavUnloadRange},
+};
+
+const Module module_ShSound = {"ShSound", functions, sizeof(functions) / sizeof(ModuleFunc)};

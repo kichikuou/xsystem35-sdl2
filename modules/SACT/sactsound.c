@@ -25,14 +25,13 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
-#include "imput.h"
+#include "input.h"
 #include "sactsound.h"
-#include "music_client.h"
+#include "music.h"
 #include "sact.h"
 
 // slot番号の 1から 20を SACT用に使用
@@ -136,19 +135,18 @@ int ssnd_waitkey(int no, int *res) {
 	sact.waittype = KEYWAIT_SIMPLE;
 	sact.waitkey = -1;
 	
-	while(sact.waitkey == -1 && mus_wav_get_playposition(slot)) {
-		sys_keywait(25, TRUE);
+	while (sact.waitkey == -1 && mus_wav_get_playposition(slot) && !nact->is_quit) {
+		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	
 	if (sact.waitkey == -1) {
+		cache[slot - SLOTOFFSET] = 0;
 		*res = 0;
 	} else {
 		*res = sact.waitkey;
 	}
 	sact.waittype = KEYWAIT_NONE;
-	
-	cache[slot - SLOTOFFSET] = 0;
-	
+
 	return OK;
 }
 

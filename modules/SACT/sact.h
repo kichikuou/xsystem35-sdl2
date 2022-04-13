@@ -26,13 +26,13 @@
 
 #include "config.h"
 
-#include <glib.h>
 #include "portab.h"
+#include "list.h"
 #include "graphics.h"
 #include "surface.h"
 #include "sacttimer.h"
 #include "variable.h"
-
+#include "mmap.h"
 
 // スプライトの最大数
 #define SPRITEMAX 21845
@@ -63,9 +63,7 @@ typedef struct {
 
 // SACTEFAM を使ったマスク
 typedef struct {
-	int fd;       // SACTEFAM.KLD のファイルディスクプリタ
-	char *mapadr; // mmap された最初のアドレス
-	off_t size;   // mmap した大きさ
+	mmap_t *mmap;
 	int datanum;  // SACTEFAM.KLD 中のマスクファイルの数
 	int *no;      // シナリオ側での番号
 	int *offset;  // データへのオフセット
@@ -154,7 +152,7 @@ struct _sprite {
 	boolean focused; // forcusを得ているか
 	boolean pressed; // このsprite上でマウスが押されているか
 	
-	GSList *expsp; // 説明スプライトのリスト
+	SList *expsp; // 説明スプライトのリスト
 	
 	// move command 用パラメータ
 	struct {
@@ -201,7 +199,7 @@ struct _sprite {
 		
 		// メッセージスプライト
 		struct {
-			GSList    *buf;       // 表示する文字のリスト
+			SList    *buf;       // 表示する文字のリスト
 			surface_t *canvas;    // 文字を描画するsurface
 			MyPoint    dspcur;    // 現在の表示位置
 		} msg;
@@ -217,10 +215,10 @@ struct _sact {
 	// スプライト全体
 	sprite_t *sp[SPRITEMAX];
 	
-	GSList *sp_zhide;  // Zキーで消すスプライトのリスト
-	GSList *sp_quake;  // Quakeで揺らすスプライトのリスト
+	SList *sp_zhide;  // Zキーで消すスプライトのリスト
+	SList *sp_quake;  // Quakeで揺らすスプライトのリスト
 	
-	GSList *updatelist; // 再描画するスプライトのリスト
+	SList *updatelist; // 再描画するスプライトのリスト
 	
 	cginfo_t *cg[CGMAX]; // cgまたはCG_xxで作った CG
 	
@@ -228,8 +226,8 @@ struct _sact {
 	MyPoint origin;
 	
 	// 文字列 push/pop/replce 用
-	GSList *strstack;
-	GSList *strreplace;
+	SList *strstack;
+	SList *strreplace;
 	char   *strreplacesrc;
 	char   *strreplacedst; 
 	
@@ -253,12 +251,12 @@ struct _sact {
 	} sel;
 	
 	// event listener
-	GSList *eventlisteners;
-	GSList *teventlisteners;
-	GSList *teventremovelist;
+	SList *eventlisteners;
+	SList *teventlisteners;
+	SList *teventremovelist;
 	
 	// MOVEするスプライトのリスト
-	GSList *movelist;
+	SList *movelist;
 	int movestarttime; // 一斉に移動を開始するための開始時間
 	int movecurtime;
 	
@@ -299,7 +297,7 @@ struct _sact {
 	
 	// バックログ
 	boolean logging;
-	GList  *log;
+	List  *log;
 };
 typedef struct _sact sact_t;
 

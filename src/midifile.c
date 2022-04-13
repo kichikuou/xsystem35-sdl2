@@ -26,8 +26,8 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -89,7 +89,7 @@ static void make_chunk(struct midievent *ev, int n) {
 	ev->port  = 0;
 	
 	if (n != 0) {
-		ev->data = g_new(unsigned char, n + 1);
+		ev->data = malloc(sizeof(unsigned char) * (n + 1));
 	}
 }
 
@@ -351,7 +351,7 @@ static void msginit() {
 static void msgadd(int c) {
 	if (midi->msgindex >= midi->msgsize) {
 		midi->msgsize *= 2;
-		midi->msgbuffer = (unsigned char *)g_realloc(midi->msgbuffer, midi->msgsize);
+		midi->msgbuffer = (unsigned char *)realloc(midi->msgbuffer, midi->msgsize);
 	}
 	midi->msgbuffer[midi->msgindex++] = (unsigned char)c;
 }
@@ -394,7 +394,7 @@ static void read_playevent() {
 	int c, c1, type;
 	int running = 0; /* 1 when running status used */
 	int status = 0; /* status value (e.g. 0x90==note-on) */
-	int delta, needed, lookfor;
+	int delta, needed, lookfor, len;
 	
 	/* This array is indexed by the high half of a status byte.  It's */
 	/* value is either the number of bytes needed (1 or 2) for a channel */
@@ -443,7 +443,8 @@ static void read_playevent() {
 		switch (c) {
 		case 0xFF: /* meta event */
 			type = midigetc();
-			lookfor = midi->length_left - readvarinum();
+			len = readvarinum();
+			lookfor = midi->length_left - len;
 			msginit();
 			
 			while(midi->length_left > lookfor) {
@@ -454,7 +455,8 @@ static void read_playevent() {
 			break;
 			
 		case 0xF0: /* system exclusive */
-			lookfor = midi->length_left - readvarinum();
+			len = readvarinum();
+			lookfor = midi->length_left - len;
 			msginit();
 			msgadd(0xF0);
 			while(midi->length_left > lookfor) {
@@ -464,7 +466,8 @@ static void read_playevent() {
 			break;
 			
 		case 0xF7: /* system exclusive continuation or arbitrary stuff */
-			lookfor = midi->length_left - readvarinum();
+			len = readvarinum();
+			lookfor = midi->length_left - len;
 			msginit();
 			while(midi->length_left > lookfor) {
 				msgadd(c = midigetc());
@@ -555,10 +558,10 @@ static int read_header(BYTE *stream, off_t len) {
 }
 
 struct midiinfo *mf_read_midifile(BYTE *stream, off_t len) {
-	midi = g_new(struct midiinfo, 1);
+	midi = malloc(sizeof(struct midiinfo));
 	
 	midi->msgsize = 128; /* Initial msg buffer size */
-	midi->msgbuffer = g_new0(unsigned char, midi->msgsize);
+	midi->msgbuffer = calloc(midi->msgsize, sizeof(unsigned char));
 	
 	if (0 > read_header(stream, len)) {
 		return NULL;
@@ -572,10 +575,10 @@ struct midiinfo *mf_read_midifile(BYTE *stream, off_t len) {
 void mf_remove_midifile(struct midiinfo *m) {
 	int i;
 	
-	g_free(m->msgbuffer);
+	free(m->msgbuffer);
 	
 	for (i = 0; i < m->eventsize; i ++) {
-		g_free(m->event[i].data);
+		free(m->event[i].data);
 	}
-	g_free(m);
+	free(m);
 }

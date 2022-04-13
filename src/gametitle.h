@@ -1,4 +1,4 @@
-#define GT_TOSHIN2 "“¬_“ss‡U@‚†‚‚’@‚v‚‰‚‚X‚T@"
-#define GT_RANCE4 "‚q‚‚‚ƒ‚…‚S@|‹³’c‚ÌˆâY|@‚e‚‚’@‚v‚‰‚‚X‚T@"
-#define GT_RANCE5D "ƒ‰ƒ“ƒX‚T‚c@iSRj"
-#define GT_ESUKA "-BeatAngelEscalayer-"
+#define GT_TOSHIN2 "é—˜ç¥éƒ½å¸‚â…¡ã€€ï½†ï½ï½’ã€€ï¼·ï½‰ï½ï¼™ï¼•ã€€"
+#define GT_RANCE4 "ï¼²ï½ï½ï½ƒï½…ï¼”ã€€ï¼æ•™å›£ã®éºç”£ï¼ã€€ï¼¦ï½ï½’ã€€ï¼·ï½‰ï½ï¼™ï¼•ã€€"
+#define GT_RANCE3_ENG "Rance3"
+#define GT_RANCE4_ENG "Rance4 -Legacy of the Sect- For Win95 "

@@ -22,43 +22,39 @@
 /* $Id: cmd2F60.c,v 1.11 2003/01/12 10:48:50 chikama Exp $ */
 
 #include <stdio.h>
-#include <ltdl.h>
 
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
 #include "s39ain.h"
 #include "xsystem35.h"
+#include "scenario.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #define dll  nact->ain.dll
-#define msgi nact->ain.msg
 
 typedef void *entrypoint (void);
 
+EMSCRIPTEN_KEEPALIVE  // Prevent inlining, because this function is listed in ASYNCIFY_ADD
 void commands2F60() {
-	int type = sys_getdw();  /* DLL type */
-	int fnum = sys_getdw();  /* function number */
-	entrypoint *function = NULL;
+	int type = sl_getdw();  /* DLL type */
+	int fnum = sl_getdw();  /* function number */
 
 	if (dll == NULL) {
-		SYSERROR("No DLL initilized\n");
+		SYSERROR("No DLL initilized");
 	}
-	
+
 	if (dll + type == NULL) goto eexit;
-	
-	if (dll[type].handle == NULL) goto eexit;
-	
+
 	if (dll[type].function_num < fnum) goto eexit;
-	
-	if (dll[type].function[fnum].name == NULL) goto eexit;
-	
-	function = lt_dlsym((lt_dlhandle)(dll[type].handle), dll[type].function[fnum].name);
-	
-	if (function) {
-		(*function)();
-		return;
-	}
+
+	if (dll[type].function[fnum].entrypoint == NULL) goto eexit;
+
+	dll[type].function[fnum].entrypoint();
+	return;
 	
  eexit:
-	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)\n", type, fnum, dll[type].name, dll[type].function[fnum].name);
+	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)", type, fnum, dll[type].name, dll[type].function[fnum].name);
 }

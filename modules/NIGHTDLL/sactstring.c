@@ -23,10 +23,11 @@
 
 #include "config.h"
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "variable.h"
 
 // 文字列置換用
@@ -43,15 +44,15 @@ static int idxmax;     // stack pointerの最大
 // 文字列置き換え用 (表示時にon-the-flyで変換して表示)
 #define REPLACEBUFSIZE 3000
 static char repbuf[2][REPLACEBUFSIZE];
-static GSList *strreplace;
+static SList *strreplace;
 static char *replacesrc;
 static char *replacedst;
 
 /**
  * 文字列変数スタックの初期化
  */
-int sstr_init() {
-	stack = g_new(char *, DEFSTACKSIZE);
+int nt_sstr_init() {
+	stack = malloc(sizeof(char *) * DEFSTACKSIZE);
 	idx = 0;
 	idxmax = DEFSTACKSIZE;
 	return OK;
@@ -61,13 +62,13 @@ int sstr_init() {
  * 文字列変数スタックに文字列を積む
  * @param strno: シナリオ上での文字列変数番号
  */
-int sstr_push(char *str) {
+int nt_sstr_push(char *str) {
 	if (idx >= idxmax) {
-		stack = g_renew(char *, stack, idx*2);
+		stack = realloc(stack, sizeof(char *) * idx*2);
 		idxmax = idx*2;
 	}
 	
-	stack[idx++] = g_strdup(str);
+	stack[idx++] = strdup(str);
 	
 	return OK;
 }
@@ -76,11 +77,11 @@ int sstr_push(char *str) {
  * 文字列変数スタックから文字列を取り出す
  * @param strno: スタックから戻した文字列を格納する文字列変数番号
  */
-int sstr_pop(char *str, int maxlen) {
+int nt_sstr_pop(char *str, int maxlen) {
 	if (idx == 0) return NG;
 	
 	strncpy(str, stack[--idx], maxlen);
-	g_free(stack[idx]);
+	free(stack[idx]);
 	
 	return OK;
 }
@@ -90,22 +91,22 @@ int sstr_pop(char *str, int maxlen) {
  * @param sstrno: 変換元文字列変数番号
  * @param dstrno: 変換先文字列変数番号
  */
-int sstr_regist_replace(char *sstr, char *dstr) {
+int nt_sstr_regist_replace(char *sstr, char *dstr) {
 	strexchange_t *ex;
 	
 	if (sstr == dstr) return NG;
 	
-	ex = g_new(strexchange_t, 1);
-	ex->src = strdup(sstr);
-	ex->dst = strdup(dstr);
-	strreplace = g_slist_append(strreplace, ex);
+	ex = malloc(sizeof(strexchange_t));
+	ex->src = sstr;
+	ex->dst = dstr;
+	strreplace = slist_append(strreplace, ex);
 	return OK;
 }
 
 /**
  * 数値 -> 文字列化
  */
-int sstr_num2str(int strno, int fig, int nzeropad, int num) {
+int nt_sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	char s[256], ss[256];
 	
 	if (nzeropad) {
@@ -117,13 +118,13 @@ int sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	}
 	
 	sprintf(s, ss, num);
-	v_strcpy(strno -1, s);
+	svar_set(strno, s);
 	
 	return OK;
 }
 
 // 文字列の置き換え処理
-static void replacestr_cb(gpointer data, gpointer userdata) {
+static void replacestr_cb(void* data, void* userdata) {
 	strexchange_t *ex = (strexchange_t *)data;
 	char *start, *next, *out;
 	
@@ -147,7 +148,7 @@ static void replacestr_cb(gpointer data, gpointer userdata) {
 }
 
 // 文字列の置き換え
-char *sstr_replacestr(char *msg) {
+char *nt_sstr_replacestr(char *msg) {
 	if (strreplace == NULL) return msg;
 	
 	repbuf[0][0] = '\0';
@@ -155,7 +156,7 @@ char *sstr_replacestr(char *msg) {
 	strncpy(repbuf[0], msg, REPLACEBUFSIZE);
 	replacesrc = repbuf[0];
 	replacedst = repbuf[1];
-	g_slist_foreach(strreplace, replacestr_cb, NULL);
+	slist_foreach(strreplace, replacestr_cb, NULL);
 
 	return (repbuf[0][0] == '\0') ? repbuf[1] : repbuf[0];
 }

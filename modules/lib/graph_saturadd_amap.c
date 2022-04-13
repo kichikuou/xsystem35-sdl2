@@ -1,6 +1,7 @@
 // alpha map の飽和加算
 
-#include <glib.h>
+#include <stdio.h>
+
 #include "portab.h"
 #include "system.h"
 #include "surface.h"
@@ -33,7 +34,7 @@ int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx
 		BYTE *yld = dp + y * dst->width;
 		for (x = 0; x < sw; x++) {
 			int s = *yls, d = *yld;
-			*yld = (BYTE)(MIN(255, (s + d)));
+			*yld = (BYTE)(min(255, (s + d)));
 			yls++; yld++;
 		}
 	}

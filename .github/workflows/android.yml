@@ -1,0 +1,23 @@
+name: Android Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Deps
+      run: sudo apt install ninja-build
+
+    - name: Build
+      run: |
+        cd android
+        ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle ./gradlew assembleRelease
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: xsystem35-release-unsigned-apk
+        path: android/app/build/outputs/apk/release/app-release-unsigned.apk

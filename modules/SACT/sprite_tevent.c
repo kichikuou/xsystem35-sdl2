@@ -24,16 +24,16 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "menu.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
-#include "counter.h"
+#include "sdl_core.h"
 
 /*
 
@@ -59,11 +59,11 @@ static void tevent_callback(agsevent_t *e);
  タイマイベント callback メイン
 */
 static void tevent_callback(agsevent_t *e) {
-	GSList *node;
+	SList *node;
 	int update = 0;
 	
 	// SP_MOVE の同期移動のためのカウンタの読み込み
-	sact.movecurtime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	sact.movecurtime = sdl_getTicks();
 	
 	for (node = sact.teventlisteners; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;
@@ -86,9 +86,9 @@ static void tevent_callback(agsevent_t *e) {
 	for (node = sact.teventremovelist; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;
 		if (sp == NULL) continue;
-		sact.teventlisteners = g_slist_remove(sact.teventlisteners, sp);
+		sact.teventlisteners = slist_remove(sact.teventlisteners, sp);
 	}
-	g_slist_free(sact.teventremovelist);
+	slist_free(sact.teventremovelist);
 	sact.teventremovelist = NULL;
 }
 
@@ -99,7 +99,7 @@ static void tevent_callback(agsevent_t *e) {
 */
 void spev_add_teventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) {
 	sp->teventcb = cb;
-	sact.teventlisteners = g_slist_append(sact.teventlisteners, sp);
+	sact.teventlisteners = slist_append(sact.teventlisteners, sp);
 }
 
 /*
@@ -107,7 +107,7 @@ void spev_add_teventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) 
   @param sp: 削除するスプライト
 */
 void spev_remove_teventlistener(sprite_t *sp) {
-	sact.teventlisteners = g_slist_remove(sact.teventlisteners, sp);
+	sact.teventlisteners = slist_remove(sact.teventlisteners, sp);
 }
 
 /*
