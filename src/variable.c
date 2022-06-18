@@ -276,7 +276,7 @@ int svar_find(int no, int start, const char *str) {
 	const char *found = strstr(p, str);
 	if (!found)
 		return -1;
-	int n = start;
+	int n = 0;
 	while (p < found) {
 		p = advance_char(p, nact->encoding);
 		n++;

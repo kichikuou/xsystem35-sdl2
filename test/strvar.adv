@@ -46,11 +46,19 @@ const word str5 = 14:
 	MF D01,str1,str2,0:
 	~AssertEquals RND,0,__LINE__:
 	~AssertEquals D01,5,__LINE__:
-	MF RND,str1,str2,5:
+	MF D01,str1,str2,4:
 	~AssertEquals RND,0,__LINE__:
-	~AssertEquals D01,5,__LINE__:
-	MF RND,str1,str2,6:
+	~AssertEquals D01,1,__LINE__:
+	MF D01,str1,str2,5:
+	~AssertEquals RND,0,__LINE__:
+	~AssertEquals D01,0,__LINE__:
+	MF D01,str1,str2,6:
 	~AssertEquals RND,255,__LINE__:
+
+	MS str2,"":
+	MF D01,str1,str2,0:
+	~AssertEquals RND,0,__LINE__:
+	~AssertEquals D01,0,__LINE__:
 
 	MH str1,0,0:
 	MS str2,"０":
