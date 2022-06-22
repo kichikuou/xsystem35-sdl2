@@ -1001,13 +1001,35 @@ void commands2F5D() {
 	DEBUG_COMMAND_YET("grSetCEParam %d, %d:\n", eNum, eData);
 }
 
+struct grEffectMoveView_data {
+	int origin_x;
+	int origin_y;
+	int target_x;
+	int target_y;
+};
+
+static void grEffectMoveView_step(void *data, double progress) {
+	struct grEffectMoveView_data *d = data;
+	int x = d->origin_x + (d->target_x - d->origin_x) * progress;
+	int y = d->origin_y + (d->target_y - d->origin_y) * progress;
+	ags_setViewArea(x, y, nact->ags.view_area.w, nact->ags.view_area.h);
+	ags_updateFull();
+}
+
 void commands2F5E() {
 	int eX = getCaliValue();
 	int eY = getCaliValue();
 	int eTime = getCaliValue();
 	int eFlag = getCaliValue();
-	
-	DEBUG_COMMAND_YET("grEffectMoveView %d, %d, %d, %d:\n", eX, eY, eTime, eFlag);
+
+	struct grEffectMoveView_data data = {
+		.origin_x = nact->ags.view_area.x,
+		.origin_y = nact->ags.view_area.y,
+		.target_x = eX,
+		.target_y = eY
+	};
+	ags_runEffect(eTime, eFlag, grEffectMoveView_step, &data);
+	DEBUG_COMMAND("grEffectMoveView %d, %d, %d, %d:\n", eX, eY, eTime, eFlag);
 }
 
 void commands2F5F() {
