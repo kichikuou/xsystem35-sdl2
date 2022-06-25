@@ -566,3 +566,7 @@ void commandZU() {
 
 	DEBUG_COMMAND("ZU %d:\n",sw);
 }
+
+void cmdz_reset(void) {
+	memset(counters, 0, sizeof(counters));
+}

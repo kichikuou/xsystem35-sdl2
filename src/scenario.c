@@ -69,6 +69,7 @@ boolean sl_init(void) {
 	labelCallCnt = 0;
 	pageCallCnt = 0;
 	labelCallCnt_afterPageCall = 0;
+	dataPushCnt = 0;
 	return TRUE;
 }
 

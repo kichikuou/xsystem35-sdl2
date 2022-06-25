@@ -56,8 +56,30 @@ void menu_quitmenu_open(void) {
 		return;
 	}
 	if (buttonid == 1) {
-		nact->is_quit = TRUE;
-		nact->wait_vsync = TRUE;
+		nact_quit(FALSE);
+	}
+}
+
+void menu_resetmenu_open(void) {
+	const SDL_MessageBoxButtonData buttons[] = {
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Restart" },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "Cancel" },
+	};
+	const SDL_MessageBoxData messagebox_data = {
+		.flags = SDL_MESSAGEBOX_INFORMATION,
+		.window = sdl_window,
+		.title = "Confirm",
+		.message = "Restart the game?",
+		.numbuttons = SDL_arraysize(buttons),
+		.buttons = buttons,
+	};
+	int buttonid = 0;
+	if (SDL_ShowMessageBox(&messagebox_data, &buttonid) < 0) {
+		WARNING("error displaying message box");
+		return;
+	}
+	if (buttonid == 1) {
+		nact_quit(TRUE);
 	}
 }
 

@@ -117,9 +117,16 @@ void ags_init(const char *render_driver) {
 	cg_init();
 }
 
-void ags_remove() {
+void ags_remove(void) {
 	ags_autorepeat(TRUE);
 	sdl_Remove();
+}
+
+void ags_reset(void) {
+	nact->ags.mouse_movesw = 2;
+	nact->ags.eventcb = NULL;
+	initPal(&pal_256);
+	cg_reset();
 }
 
 void ags_setWorldSize(int width, int height, int depth) {

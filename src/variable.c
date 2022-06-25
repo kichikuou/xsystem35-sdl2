@@ -47,8 +47,8 @@ double longVar[SYSVARLONG_MAX];
 /* 文字列変数 */
 static char **strVar;
 /* 文字列変数の属性(最大,1つあたりの大きさ) */
-int strvar_cnt = STRVAR_MAX;
-int strvar_len = STRVAR_LEN;
+int strvar_cnt;
+int strvar_len;
 
 int preVarPage;      /* 直前にアクセスした変数のページ */
 int preVarIndex;     /* 直前にアクセスした変数のINDEX */
@@ -175,12 +175,28 @@ extern int svar_maxindex(void) {
 }
 
 /* 変数の初期化 */
-extern boolean v_initVars() {
-	strVar = calloc(STRVAR_MAX, sizeof(char *));
-	if (strVar == NULL) {
-		NOMEMERR();
+void v_init(void) {
+	svar_init(STRVAR_MAX - 1, STRVAR_LEN);
+}
+
+void v_reset(void) {
+	memset(sysVar, 0, sizeof(sysVar));
+	memset(attributes, 0, sizeof(attributes));
+	memset(longVar, 0, sizeof(longVar));
+
+	for (int i = 0; i < ARRAYVAR_PAGEMAX; i++) {
+		if (arrayVarBuffer[i].value)
+			free(arrayVarBuffer[i].value);
 	}
-	return true;
+	memset(arrayVarBuffer, 0, sizeof(arrayVarBuffer));
+
+	for (int i = 0; i < strvar_cnt; i++) {
+		if (strVar[i]) {
+			free(strVar[i]);
+			strVar[i] = NULL;
+		}
+	}
+	svar_init(STRVAR_MAX - 1, STRVAR_LEN);
 }
 
 /* 文字変数への代入 */

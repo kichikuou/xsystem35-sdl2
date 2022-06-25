@@ -964,7 +964,7 @@ static void va_updatePreArea(int i) {
 	ags_updateArea(VAcmd[i].preX, VAcmd[i].preY, VAcmd[i].unitWidth, VAcmd[i].unitHeight);
 }
 
-void va_animation() {
+void va_animation(void) {
 	int i;
 	int x, y, w, h;
 
@@ -1049,4 +1049,30 @@ static void va_update() {
 #ifdef __EMSCRIPTEN__
 	status_check_count = 0;
 #endif
+}
+
+void va_reset(void) {
+	free(UnitMap);
+	UnitMap = NULL;
+
+	nPageNum = 0;
+	x0Map = 0;
+	y0Map = 0;
+	cxMap = 0;
+	cyMap = 0;
+	cxUnit = 0;
+	cyUnit = 0;
+
+	free(_vh_src);
+	free(_vh_dst);
+	_vh_src = vh_src = NULL;
+	_vh_dst = vh_dst = NULL;
+	vh_cnt_src = 0;
+	vh_cnt_dst = 0;
+
+	free(srcimg);
+	srcimg = NULL;
+
+	memset(VAcmd, 0, sizeof(VAcmd));
+	inAnimation = FALSE;
 }

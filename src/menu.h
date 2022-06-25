@@ -47,6 +47,7 @@ typedef struct inputnum_param {
 
 extern void menu_open(void);
 extern void menu_quitmenu_open(void);
+extern void menu_resetmenu_open(void);
 extern boolean menu_inputstring(INPUTSTRING_PARAM *);
 extern boolean menu_inputstring2(INPUTSTRING_PARAM *);
 extern boolean menu_inputnumber(INPUTNUM_PARAM *);

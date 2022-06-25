@@ -46,16 +46,26 @@ extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
 extern void sys_setCharacterEncoding(CharacterEncoding encoding);
 
-// extern boolean sys_nact_engine();
 extern void nact_main();
 extern void nact_init();
+extern void nact_reset(void);
+extern void nact_quit(boolean restart);
 
 // cmd_check.c
 extern void exec_command(void);
 
+// cmdv.c
+void va_animation(void);
+void va_reset(void);
+// cmdz.c
+void cmdz_reset(void);
+// cmd2F.c
+void cmd2F_reset(void);
+
 typedef struct {
 	/* general */
 	boolean   is_quit;             /* quit command */
+	boolean   restart;
 	void     (*callback)(void);    /* main の callback */
 	boolean   is_va_animation;     /* VA command working */
 	boolean   is_cursor_animation; /* animation cursor working */
@@ -72,10 +82,7 @@ typedef struct {
 	int fnc_return_value; /* 関数の戻り値として返す値 (~0,cali:で渡す値) */
 	
 	/* key wait */
-	int     waittime;
-	int     waitcancel_key;
-	int     waitcancel_key_mask;
-	boolean waitcancel_enabled;
+	int     waitcancel_key;  // TODO: remove this
 	
 	/* message wait */
 	boolean messagewait_enable;

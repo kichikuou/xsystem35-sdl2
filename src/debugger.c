@@ -51,9 +51,9 @@ void dbg_init(const char *symbols_path, boolean use_dap) {
 	dbg_impl->init(symbols_path);
 }
 
-void dbg_quit(bool restart) {
+void dbg_quit(void) {
 	if (dbg_impl)
-		dbg_impl->quit(restart);
+		dbg_impl->quit();
 }
 
 int dbg_lookup_var(const char *name) {

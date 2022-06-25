@@ -101,10 +101,6 @@ static boolean font_noantialias;
 /* fullscreen on from command line */
 static boolean fs_on;
 
-// for reboot
-static int saved_argc;
-static char **saved_argv;
-
 static void sys35_usage(boolean verbose) {
 	if (verbose) {
 		puts("System35 for X Window System [proj. Rainy Moon]");
@@ -210,7 +206,7 @@ static void sys35_init() {
 	
 	sl_init();
 
-	v_initVars();
+	v_init();
 	
 	ags_init(render_driver);
 
@@ -223,16 +219,13 @@ static void sys35_init() {
 
 	sgenrand(getpid());
 
-	msg_init();
-	sel_init();
-
 	if (nact->files.ain)
 		s39ain_init(nact->files.ain, &nact->ain);
 	msgskip_init(nact->files.msgskip);
 }
 
 static void sys35_remove() {
-	dbg_quit(false);
+	dbg_quit();
 	mus_exit(); 
 	ags_remove();
 #ifdef ENABLE_GTK
@@ -240,15 +233,10 @@ static void sys35_remove() {
 #endif
 }
 
-void sys_reset() {
-	mus_exit();
-	ags_remove();
-#ifdef ENABLE_GTK
-	s39ini_remove();
-#endif
-	dbg_quit(true);  // This may exit().
-	execvp(saved_argv[0], saved_argv);
-	sys_error("exec fail");
+static void sys_reset(void) {
+	nact_reset();
+	ags_reset();
+	mus_reset();
 }
 
 static void sys35_ParseOption(int *argc, char **argv) {
@@ -462,9 +450,6 @@ int main(int argc, char **argv) {
 	sys_set_signalhandler(SIGINT, SIG_IGN);
 #endif
 	
-	saved_argc = argc;
-	saved_argv = argv;
-
 #ifdef __ANDROID__
 	// Handle -gamedir option here so that .xsys35rc is loaded from that directory.
 	if (strcmp(argv[1], "-gamedir") == 0)
@@ -516,7 +501,15 @@ int main(int argc, char **argv) {
 		dbg_init(symbols_path, debugger_mode == DEBUGGER_DAP);
 	}
 
-	nact_main();
+	for (;;) {
+		nact_main();
+		if (nact->restart) {
+			sys_reset();
+		} else {
+			break;
+		}
+	}
+
 #ifdef __EMSCRIPTEN__
 	sdl_sleep(1000000000);
 #endif

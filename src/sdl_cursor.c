@@ -133,6 +133,8 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 		}
 	}
 	
+	if (cursor[no])
+		SDL_FreeCursor(cursor[no]);
 	cursor[no] = SDL_CreateCursor(buf3, buf4, 32, 32, cursordirentry->wxHotspot, cursordirentry->wyHotspot);
 	
 	free(buf1);

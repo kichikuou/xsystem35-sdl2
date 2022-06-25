@@ -41,20 +41,20 @@
 #include "cache.h"
 
 /* VSPのパレット展開バンク */
-int cg_vspPB = -1;
+int cg_vspPB;
 /* cg,palette 展開フラグ (funciotn flag) */
-int cg_fflg = 7;
+int cg_fflg;
 /* CGをロードした回数を書き込む変数 */
-int *cg_loadCountVar = NULL;
+int *cg_loadCountVar;
 /* Brightness (PD command) */
-int cg_brightness = 255;
+int cg_brightness;
 
 #define GCMD_EXTRACTCG(c)    ((c) & 0x01)
 #define GCMD_SET_PALETTE(c)  ((c) & 0x02)
 #define GCMD_LOAD_PALETTE(c) ((c) & 0x04)
 
 /* CG表示位置に関する情報 */
-static CG_WHERETODISP loc_policy = OFFSET_NOMOVE, loc_policy0;
+static CG_WHERETODISP loc_policy, loc_policy0;
 static MyPoint        loc_where, loc_where0;
 
 /* extracted cg data cache control object */
@@ -244,8 +244,19 @@ static cgdata *loader(int no) {
 /*
  * Initilize cache
 */
-void cg_init() {
+void cg_init(void) {
 	cacheid = cache_new(cgdata_free);
+	cg_reset();
+}
+
+void cg_reset(void) {
+	cg_vspPB = -1;
+	cg_fflg = 7;
+	cg_loadCountVar = NULL;
+	cg_brightness = 255;
+	loc_policy = loc_policy0 = OFFSET_NOMOVE;
+	memset(&loc_where, 0, sizeof(loc_where));
+	memset(&loc_where0, 0, sizeof(loc_where0));
 }
 
 /*

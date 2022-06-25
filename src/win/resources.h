@@ -29,7 +29,8 @@
 #define IDS_CHOOSE_GAME_FOLDER 1001
 
 #define ID_SCREENSHOT          40001
-#define ID_EXIT                40002
+#define ID_RESTART             40002
+#define ID_EXIT                40003
 #define ID_SCREEN_WINDOW       40011
 #define ID_SCREEN_FULL         40012
 #define ID_MSGSKIP             40020

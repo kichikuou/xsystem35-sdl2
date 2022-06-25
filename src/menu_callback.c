@@ -178,7 +178,7 @@ on_button5_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
 	menu_ok_exit = TRUE;
-	nact->is_quit = TRUE;
+	nact_quit(FALSE);
 	nact->popupmenu_opened = FALSE;
 }
 

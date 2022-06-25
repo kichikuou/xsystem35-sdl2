@@ -1527,5 +1527,11 @@ void commands2F8B() {
 
 void commands2F8C() {
 	DEBUG_COMMAND("sysReset:\n");
-	sys_reset();
+	nact_quit(TRUE);
+}
+
+void cmd2F_reset(void) {
+	cb_sel_init_page = 0;
+	cb_sel_init_address = 0;
+	memset(fnctbl, 0, sizeof(fnctbl));
 }

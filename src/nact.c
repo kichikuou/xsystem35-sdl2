@@ -54,8 +54,6 @@ MG コマンド: 表示時の ZH に依存
 
 */
 
-/* defined by cmdv.c */
-extern void va_animation();
 /* 半角モード */
 static int msg_msgHankakuMode = 0; /* 0:全角 1:半角, 2: 無変換 */
 
@@ -147,18 +145,56 @@ static void nact_callback() {
 	if (nact->popupmenu_opened) {
 		menu_gtkmainiteration();
 	}
-	if (nact->is_quit) {
+	if (nact->is_quit && !nact->restart) {
 		sys_exit(0);
 	}
 }
 
 void nact_init() {
-	nact->ags.mouse_movesw = 2;
 	nact->is_quit = FALSE;
+	nact->restart = FALSE;
+	nact->callback = nact_callback;
 	nact->is_va_animation = FALSE;
 	nact->is_cursor_animation = FALSE;
 	nact->is_message_locked = FALSE;
+	nact->encoding = SHIFT_JIS;
+
+	free(nact->game_title_utf8);
+	nact->game_title_utf8 = NULL;
+	nact->scenario_version = 0;
+
+	nact->datatbl_addr = NULL;
+	nact->fnc_return_value = 0;
+
+	nact->messagewait_enable = FALSE;
+	nact->messagewait_cancelled = FALSE;
+	nact->messagewait_time = 0;
+	nact->messagewait_cancel = FALSE;
+
+	msg_init();
 	nact->is_msg_out = TRUE;
-	nact->callback = nact_callback;
+	nact->msgout = NULL;
+
+	sel_init();
+
 	nact->patch_ec = 1;  // TODO: revisit
+	nact->patch_emen = 0;
+	nact->patch_g0 = 0;
+
+	msg_msgHankakuMode = 0;
+}
+
+void nact_reset(void) {
+	nact_init();
+	sl_reinit();
+	v_reset();
+	va_reset();
+	cmdz_reset();
+	cmd2F_reset();
+}
+
+void nact_quit(boolean restart) {
+	nact->is_quit = TRUE;
+	nact->restart = restart;
+	nact->wait_vsync = TRUE;
 }

@@ -74,6 +74,9 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 		case ID_SCREENSHOT:
 			saveScreenshot();
 			break;
+		case ID_RESTART:
+			menu_resetmenu_open();
+			break;
 		case ID_EXIT:
 			menu_quitmenu_open();
 			break;

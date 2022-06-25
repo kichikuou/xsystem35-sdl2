@@ -53,7 +53,8 @@ boolean v_allocateArrayBuffer(int page, int size, boolean saveflag);
 boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page);
 boolean v_releaseArrayVar(int datavar);
 boolean v_getArrayBufferStatus(int page);
-boolean v_initVars();
+void v_init(void);
+void v_reset(void);
 
 void svar_init(int max_index, int len);
 int svar_maxindex(void);

@@ -47,13 +47,10 @@
 // static Bcom_WindowInfo winInfo = {8,311,616,80,0};
 /* Window枠の種類 */
 static int frameType;
-static int frameCgNoTop;
-static int frameCgNoMid;
-static int frameCgNoBot;
 static int frameDot;
 /* 文字飾りの設定 */
-static int msgDecorateColor   = 0;
-static int msgDecorateType    = 0;
+static int msgDecorateColor;
+static int msgDecorateType;
 /* 現在の文字表示位置 */
 static MyPoint msgcur;
 static boolean nextLineIsAfterKaigyou = FALSE;
@@ -90,6 +87,12 @@ void msg_init() {
 	msg.mg_policyR       = 0;
 	msg.mg_policyA       = 0;
 
+	for (int i = 0; i < MSGWINMAX; i++) {
+		if (msg.wininfo[i].savedimg)
+			ags_delRegion(msg.wininfo[i].savedimg);
+	}
+	memset(msg.wininfo, 0, sizeof(msg.wininfo));
+
 	msg.winno = 1;
 	msg.win = &msg.wininfo[0];
 	msg.wininfo[0].x = 8;
@@ -97,6 +100,13 @@ void msg_init() {
 	msg.wininfo[0].width = 616;
 	msg.wininfo[0].height = 80;
 	msg.wininfo[0].save = TRUE;
+
+	// Private variables
+	msgDecorateColor = 0;
+	msgDecorateType = 0;
+	msgcur.x = 0;
+	msgcur.y = 0;
+	nextLineIsAfterKaigyou = FALSE;
 }
 
 void msg_setFontSize(int size) {
@@ -304,9 +314,6 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 		frameDot = 8;
 		break;
 	case WINDOW_FRAME_CG:
-		frameCgNoTop = C1;
-		frameCgNoMid = C2;
-		frameCgNoBot = N;
 		frameDot     = M;
 		break;
 	default:

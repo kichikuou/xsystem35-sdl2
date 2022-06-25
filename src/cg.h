@@ -72,7 +72,8 @@ typedef enum {
 	OFFSET_RELATIVE_JC   /* relative location and use til J4 cmd */
 } CG_WHERETODISP;
 
-extern void cg_init();
+extern void cg_init(void);
+extern void cg_reset(void);
 extern void cg_set_display_location(int x, int y, CG_WHERETODISP policy);
 extern void cg_load(int no, int flg);
 extern void cg_load_with_alpha(int cgno, int shadowno);

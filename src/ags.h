@@ -126,8 +126,9 @@ typedef struct _ags ags_t;
 
 
 /* 初期化関係 */
-extern void ags_init(const char *render_driver);
-extern void ags_remove();
+void ags_init(const char *render_driver);
+void ags_remove(void);
+void ags_reset(void);
 
 /* ウィンド関係 */
 extern void ags_setWorldSize(int width, int height, int depth);

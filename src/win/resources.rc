@@ -12,6 +12,7 @@ IDR_MENU1 MENU DISCARDABLE
     POPUP "File"
     {
         MENUITEM "Save Screenshot",             ID_SCREENSHOT
+        MENUITEM "Restart",                     ID_RESTART
         MENUITEM "Exit",                        ID_EXIT
     }
     POPUP "Screen"
@@ -45,6 +46,7 @@ IDR_MENU1 MENU DISCARDABLE
     POPUP "ファイル"
     {
         MENUITEM "画面保存",                      ID_SCREENSHOT
+        MENUITEM "再起動",                        ID_RESTART
         MENUITEM "閉じる",                        ID_EXIT
     }
     POPUP "画面"

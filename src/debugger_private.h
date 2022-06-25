@@ -55,7 +55,7 @@ typedef struct {
 
 typedef struct {
 	void (*init)(const char *symbols_path);
-	void (*quit)(bool restart);
+	void (*quit)(void);
 	void (*repl)(int bp_no);
 	void (*onsleep)(void);
 	void (*console_output)(int lv, const char *output);
