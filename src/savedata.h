@@ -108,8 +108,6 @@ typedef struct {
 	emscripten_align1_int rsv2;
 } Ald_sysVarHdr;
 
-/* defined by cmdb.c */
-extern Bcom_WindowInfo selWinInfo[];
 /* defined by variable.c */
 extern int  strvar_len;
 

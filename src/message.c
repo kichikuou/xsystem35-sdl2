@@ -90,6 +90,7 @@ void msg_init() {
 	msg.mg_policyR       = 0;
 	msg.mg_policyA       = 0;
 
+	msg.winno = 1;
 	msg.win = &msg.wininfo[0];
 	msg.wininfo[0].x = 8;
 	msg.wininfo[0].y = 311;

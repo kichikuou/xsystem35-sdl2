@@ -110,14 +110,13 @@ void sel_init() {
 	sel.WinResizeWidth  = FALSE;
 	sel.WinResizeHeight = TRUE;
 
-#if 0
-	sel.WinInfo.x = 464;
-	sel.WinInfo.y = 80;
-	sel.WinInfo.width  = 160;
-	sel.WinInfo.height = 160;
-	sel.WinInfo.save = TRUE;
-	sel.savedImage = NULL;
-#endif
+	sel.winno = 1;
+	sel.win = &sel.wininfo[0];
+	sel.wininfo[0].x = 464;
+	sel.wininfo[0].y = 80;
+	sel.wininfo[0].width  = 160;
+	sel.wininfo[0].height = 160;
+	sel.wininfo[0].save = TRUE;
 	
 	/* 選択肢を登録中 */
 	sel.in_setting = FALSE;

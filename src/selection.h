@@ -74,7 +74,7 @@ struct _selection {
 	
 	/* 選択肢 Window */
 	int              winno;  
-	Bcom_WindowInfo *win; // 現在使用中の window
+	Bcom_WindowInfo *win; // points to wininfo[winno - 1]
 	Bcom_WindowInfo  wininfo[SELWINMAX];
 	
         /* 選択肢を登録中 */

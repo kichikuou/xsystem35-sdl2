@@ -68,7 +68,7 @@ struct __message {
 	
 	/* メッセージ window */
 	int              winno;  
-	Bcom_WindowInfo *win;  // 現在使用中の window
+	Bcom_WindowInfo *win;  // points to wininfo[winno - 1]
 	Bcom_WindowInfo  wininfo[MSGWINMAX];
 };
 typedef struct __message msg_t;

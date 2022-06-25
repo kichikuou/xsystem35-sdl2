@@ -392,11 +392,11 @@ int save_loadAll(int no) {
 	sl_jmpFar2(save_base->scoPage, save_base->scoIndex);
 
 	for (i = 0; i < SELWINMAX; i++) {
-		selWinInfo[i].x      = save_base->selWinInfo[i].x;
-		selWinInfo[i].y      = save_base->selWinInfo[i].y;
-		selWinInfo[i].width  = save_base->selWinInfo[i].width;
-		selWinInfo[i].height = save_base->selWinInfo[i].height;
-		// selWinInfo[i].save   = TRUE;
+		nact->sel.wininfo[i].x      = save_base->selWinInfo[i].x;
+		nact->sel.wininfo[i].y      = save_base->selWinInfo[i].y;
+		nact->sel.wininfo[i].width  = save_base->selWinInfo[i].width;
+		nact->sel.wininfo[i].height = save_base->selWinInfo[i].height;
+		// nact->sel.wininfo[i].save   = TRUE;
 	}
 	for (i = 0; i < MSGWINMAX; i++) {
 		nact->msg.wininfo[i].x      = save_base->msgWinInfo[i].x;
@@ -468,10 +468,10 @@ int save_saveAll(int no) {
 	save_base->scoIndex      = sl_getIndex();
 	
 	for (i = 0; i < SELWINMAX; i++) {
-		save_base->selWinInfo[i].x      = (WORD)selWinInfo[i].x;
-		save_base->selWinInfo[i].y      = (WORD)selWinInfo[i].y;
-		save_base->selWinInfo[i].width  = (WORD)selWinInfo[i].width;
-		save_base->selWinInfo[i].height = (WORD)selWinInfo[i].height;
+		save_base->selWinInfo[i].x      = (WORD)nact->sel.wininfo[i].x;
+		save_base->selWinInfo[i].y      = (WORD)nact->sel.wininfo[i].y;
+		save_base->selWinInfo[i].width  = (WORD)nact->sel.wininfo[i].width;
+		save_base->selWinInfo[i].height = (WORD)nact->sel.wininfo[i].height;
 	}
 	
 	for (i = 0; i < MSGWINMAX; i++) {
