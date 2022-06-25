@@ -3,13 +3,6 @@
 
 #include "portab.h"
 #include "midi.h"
-#include "ald_manager.h"
-
-struct _midiobj {
-	mididevice_t *dev;
-	dridata *dfile;
-};
-typedef struct _midiobj midiobj_t;
 
 int musmidi_init(void);
 int musmidi_exit(void);

@@ -29,8 +29,6 @@
 #include "midi.h"
 #include "ald_manager.h"
 
-static int midino;
-
 int musmidi_init(void) {
 	int st = midi_init(&prv.mididev);
 
@@ -39,7 +37,6 @@ int musmidi_init(void) {
 		return NG;
 	} else {
 		prv.midi_valid = TRUE;
-		prv.midi.dev = &prv.mididev;
 		return OK;
 	}
 }
@@ -54,25 +51,26 @@ int musmidi_exit(void) {
 int musmidi_reset(void) {
 	if (prv.midi_valid) {
 		prv.mididev.reset();
+		prv.midi_current_track = 0;
 	}
 	return OK;
 }
 
 int musmidi_start(int no, int loop) {
 	if (!prv.midi_valid) return NG;
-	if (midino == no)
+	if (prv.midi_current_track == no)
 		return OK;
 
 	dridata *dfile = ald_getdata(DRIFILE_MIDI, no -1);
 	if (dfile == NULL)
 		return NG;
 	
-	prv.midi.dev->start(no, loop, dfile->data, dfile->size);
+	prv.mididev.start(no, loop, dfile->data, dfile->size);
 
-	if (prv.midi.dfile)
-		ald_freedata(prv.midi.dfile);
-	prv.midi.dfile = dfile;
-	midino = no;
+	if (prv.midi_dfile)
+		ald_freedata(prv.midi_dfile);
+	prv.midi_dfile = dfile;
+	prv.midi_current_track = no;
 
 	return OK;
 }
@@ -80,67 +78,67 @@ int musmidi_start(int no, int loop) {
 int musmidi_stop(void) {
 	if (!prv.midi_valid) return NG;
 
-	prv.midi.dev->stop();
+	prv.mididev.stop();
 
-	if (prv.midi.dfile) {
-		ald_freedata(prv.midi.dfile);
-		prv.midi.dfile = NULL;
+	if (prv.midi_dfile) {
+		ald_freedata(prv.midi_dfile);
+		prv.midi_dfile = NULL;
 	}
-	midino = 0;
+	prv.midi_current_track = 0;
 	return OK;
 }
 
 int musmidi_pause(void) {
 	if (!prv.midi_valid) return NG;
 
-	prv.midi.dev->pause();
+	prv.mididev.pause();
 	return OK;
 }
 
 int musmidi_unpause(void) {
 	if (!prv.midi_valid) return NG;
 
-	prv.midi.dev->unpause();
+	prv.mididev.unpause();
 	return OK;
 }
 
 midiplaystate musmidi_getpos(void) {
 	midiplaystate st = {FALSE, 0, 0};
-	if (!prv.midi_valid || !midino) return st;
+	if (!prv.midi_valid || !prv.midi_current_track) return st;
 
-	prv.midi.dev->getpos(&st);
+	prv.mididev.getpos(&st);
 	if (st.in_play)
-		st.play_no = midino;
+		st.play_no = prv.midi_current_track;
 	else
-		midino = 0;
+		prv.midi_current_track = 0;
 	return st;
 }
 
 int musmidi_setflag(int mode, int index, int val) {
 	if (!prv.midi_valid) return NG;
 
-	prv.midi.dev->setflag(mode, index, val);
+	prv.mididev.setflag(mode, index, val);
 	return OK;
 }
 
 int musmidi_getflag(int mode, int index) {
 	if (!prv.midi_valid) return 0;
 
-	return prv.midi.dev->getflag(mode, index);
+	return prv.mididev.getflag(mode, index);
 }
 
 int musmidi_fadestart(int time, int volume, int stop) {
 	if (!prv.midi_valid) return NG;
 
-	if (!prv.midi.dev->fadestart)
+	if (!prv.mididev.fadestart)
 		return NG;
-	return prv.midi.dev->fadestart(time, volume, stop);
+	return prv.mididev.fadestart(time, volume, stop);
 }
 
 boolean musmidi_fading(void) {
 	if (!prv.midi_valid) return FALSE;
 
-	if (!prv.midi.dev->fading)
+	if (!prv.mididev.fading)
 		return FALSE;
-	return prv.midi.dev->fading();
+	return prv.mididev.fading();
 }

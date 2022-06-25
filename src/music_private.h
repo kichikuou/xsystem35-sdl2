@@ -29,6 +29,7 @@
 #include "music_cdrom.h"
 #include "music_midi.h"
 #include "music_pcm.h"
+#include "ald_manager.h"
 
 struct _musprvdat {
 	boolean cd_valid;
@@ -37,8 +38,6 @@ struct _musprvdat {
 	
 	cdromdevice_t cddev;
 	mididevice_t  mididev;
-	
-	midiobj_t midi;  // midi object
 	
 	// ゲーム内での volume 設定 (%値)
 	int vol_master;
@@ -50,6 +49,9 @@ struct _musprvdat {
 	
 	int cd_maxtrk;
 	int cd_current_track;
+
+	dridata *midi_dfile;
+	int midi_current_track;
 };
 
 #define prv musprv
