@@ -38,7 +38,6 @@ struct _musprvdat {
 	cdromdevice_t cddev;
 	mididevice_t  mididev;
 	
-	cdobj_t cdrom;   // cdrom object
 	midiobj_t midi;  // midi object
 	
 	// ゲーム内での volume 設定 (%値)
@@ -49,8 +48,8 @@ struct _musprvdat {
 	int vol_pcm_sub[128 + 1 + 2]; // volval の channel
 	int volval[16]; // 各channel 毎の volume valance
 	
-	// 最大トラック数
 	int cd_maxtrk;
+	int cd_current_track;
 };
 
 #define prv musprv

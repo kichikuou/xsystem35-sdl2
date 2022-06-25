@@ -37,21 +37,16 @@ static int next_cdrom_loopcnt = 0;
 void commandSS() {
 	/* 音楽演奏を開始する（ＣＤのみ）*/
 	int num = getCaliValue();
-	static int pre = 0;
 	
 	DEBUG_COMMAND("SS %d:\n",num);
 	
 	if (num == 0) {
 		mus_cdrom_stop();
 	} else {
-		if (pre != num) {
-			mus_cdrom_stop();
-			mus_cdrom_start(num + 1, next_cdrom_loopcnt);
-		}
+		mus_cdrom_start(num + 1, next_cdrom_loopcnt);
 	}
 	
 	next_cdrom_loopcnt = 0;
-	pre = num;
 }
 
 void commandSC() {

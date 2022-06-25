@@ -57,9 +57,7 @@ void mus_reset(void) {
  */
 int mus_cdrom_start(int track, int loop) {
 	if (!prv.cd_valid) return NG;
-	muscd_start(track, loop);
-	muscd_cb();
-	return OK;
+	return muscd_start(track, loop);
 }
 
 /*
@@ -67,9 +65,7 @@ int mus_cdrom_start(int track, int loop) {
  */
 int mus_cdrom_stop() {
 	if (!prv.cd_valid) return NG;
-	muscd_stop();
-	muscd_cb();
-	return OK;
+	return muscd_stop();
 }
 
 /*

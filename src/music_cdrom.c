@@ -29,30 +29,15 @@
 #include "music_cdrom.h"
 #include "cdrom.h"
 
-enum {
-	CDROM_START,
-	CDROM_STOPCHECK,
-	CDROM_LOOPCHECK,
-	CDROM_STOP,
-	CDROM_NOP
-};
-
 int muscd_init(void) {
 	int st = cd_init(&prv.cddev);
-	int ret;
-	
 	if (st == -1) {
 		prv.cd_valid = FALSE;
-		ret = NG;
-	} else {
-		prv.cd_valid = TRUE;
-		prv.cdrom.dev = &prv.cddev;
-		prv.cdrom.st = CDROM_NOP;
-		prv.cdrom.in_play = FALSE;
-		ret = OK;
+		return NG;
 	}
-	
-	return ret;
+	prv.cd_valid = TRUE;
+	prv.cd_current_track = 0;
+	return OK;
 }
 
 int muscd_exit(void) {
@@ -65,67 +50,27 @@ int muscd_exit(void) {
 int muscd_reset(void) {
 	if (prv.cd_valid) {
 		prv.cddev.reset();
+		prv.cd_current_track = 0;
 	}
 	return OK;
 }
 
 int muscd_start(int trk, int loop) {
-	prv.cdrom.track = trk;
-	prv.cdrom.loop = loop;
-	prv.cdrom.cnt = 0;
-	
-	prv.cdrom.st = CDROM_START;
-	prv.cdrom.in_play = FALSE;
-	
-	memset(&prv.cdrom.time, 0, sizeof(cd_time));
-	
+	if (trk == prv.cd_current_track)
+		return OK;
+	prv.cddev.stop();
+
+	prv.cddev.start(trk, loop);
+	prv.cd_current_track = trk;
 	return OK;
 }
 
 int muscd_stop(void) {
-	prv.cdrom.st = CDROM_STOP;
+	prv.cddev.stop();
+	prv.cd_current_track = 0;
 	return OK;
 }
 
 int muscd_getpos(cd_time *tm) {
 	return prv.cddev.getpos(tm);
-}
-
-int muscd_cb(void) {
-	cdobj_t *obj = &prv.cdrom;
-	
-	switch(obj->st) {
-	case CDROM_START:
-		obj->in_play = TRUE;
-		obj->dev->start(obj->track, obj->loop);
-		obj->st = CDROM_STOPCHECK;
-		break;
-	case CDROM_STOPCHECK:
-		if (NG == obj->dev->getpos(&(obj->time))) {
-                        obj->st = CDROM_LOOPCHECK;
-                }
-		break;
-	case CDROM_LOOPCHECK:
-		obj->cnt++;
-		if (obj->loop == 0) {
-			obj->st = CDROM_START;
-			break;
-		}
-		if (--obj->loop == 0) {
-			obj->st = CDROM_STOP;
-		} else {
-			obj->st = CDROM_START;
-		}
-                break;
-	case CDROM_STOP:
-                obj->dev->stop();
-                
-                obj->in_play = FALSE;
-                obj->st = CDROM_NOP;
-                break;
-        case CDROM_NOP:
-                break;
-	}
-	
-	return OK;
 }
