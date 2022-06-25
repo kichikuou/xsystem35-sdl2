@@ -92,7 +92,8 @@ int sys_keywait(int msec, unsigned flags) {
 
 	int key=0, n;
 	int end = msec == INT_MAX ? INT_MAX : sdl_getTicks() + msec;
-	while (!((flags & KEYWAIT_SKIPPABLE) && msgskip_isSkipping()) &&
+	while (!nact->is_quit &&
+		   !((flags & KEYWAIT_SKIPPABLE) && msgskip_isSkipping()) &&
 		   (n = end - sdl_getTicks()) > 0) {
 		if (n <= 16)
 			sdl_sleep(n);
@@ -122,19 +123,19 @@ void sys_hit_any_key() {
 	if (nact->messagewait_cancelled) {
 		nact->messagewait_cancelled = FALSE;
 		/* consume the input that cancelled message wait */
-		while(0 == (key & hak_ignore_mask)) {
+		while (!nact->is_quit && !(key & hak_ignore_mask)) {
 			key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE);
 		}
-		while(key & hak_releasewait_mask) {
+		while (!nact->is_quit && key & hak_releasewait_mask) {
 			key = sys_keywait(100, KEYWAIT_CANCELABLE);
 		}
 	}
 
-	while (!msgskip_isSkipping() && 0 == (key & hak_ignore_mask)) {
+	while (!nact->is_quit && !msgskip_isSkipping() && 0 == (key & hak_ignore_mask)) {
 		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 	}
 	
-	while (!msgskip_isSkipping() && (key & hak_releasewait_mask)) {
+	while (!nact->is_quit && !msgskip_isSkipping() && (key & hak_releasewait_mask)) {
 		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
 	}
 }
@@ -148,7 +149,7 @@ void sys_key_releasewait(int key, boolean zi_mask_enabled) {
 		mask = 0xffffffff;
 	}
 	
-	while(key & mask) {
+	while (!nact->is_quit && key & mask) {
 		key = sys_keywait(50, KEYWAIT_NONCANCELABLE);
 	}
 }

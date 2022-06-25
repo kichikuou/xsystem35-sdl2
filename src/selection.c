@@ -457,7 +457,7 @@ void sel_select() {
 	}
 	
 	sys_key_releasewait(SYS35KEY_RET, FALSE);
-	while (1) {
+	while (!nact->is_quit) {
 		key = sys_keywait(25, KEYWAIT_CANCELABLE);
 
 		if (!key && prevkey == SYS35KEY_SPC) break;

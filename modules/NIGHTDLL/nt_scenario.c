@@ -52,7 +52,7 @@ static void ntmain(struct _scoadr inadr) {
 	struct _scoadr curadr;
 
 	while (!nact->is_quit) {
-		for (int cnt = 0; !nact->wait_vsync && cnt < 10000; cnt++) {
+		for (int cnt = 0; !nact->is_quit && !nact->wait_vsync && cnt < 10000; cnt++) {
 			//SACT_DEBUG("%d:%x\n", sl_getPage(), sl_getIndex());
 			if (!nact->popupmenu_opened) {
 				exec_command();
