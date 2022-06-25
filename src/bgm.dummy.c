@@ -22,11 +22,15 @@
 #include "portab.h"
 #include "bgm.h"
 
-int musbgm_init() {
+int musbgm_init(void) {
 	return NG;
 }
 
-int musbgm_exit() {
+int musbgm_exit(void) {
+	return NG;
+}
+
+int musbgm_reset(void) {
 	return NG;
 }
 

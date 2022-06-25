@@ -36,12 +36,18 @@ int mus_init(int audio_buffer_size) {
 	return OK;
 }
 
-int mus_exit() {
+void mus_exit(void) {
 	musbgm_exit();
 	if (prv.cd_valid) muscd_exit();
 	if (prv.midi_valid) musmidi_exit();
 	if (prv.pcm_valid) muspcm_exit();
-	return OK;
+}
+
+void mus_reset(void) {
+	musbgm_reset();
+	if (prv.cd_valid) muscd_reset();
+	if (prv.midi_valid) musmidi_reset();
+	if (prv.pcm_valid) muspcm_reset();
 }
 
 /*

@@ -31,7 +31,7 @@
 
 static int midino;
 
-int musmidi_init() {
+int musmidi_init(void) {
 	int st = midi_init(&prv.mididev);
 
 	if (st == -1) {
@@ -44,9 +44,16 @@ int musmidi_init() {
 	}
 }
 
-int musmidi_exit() {
+int musmidi_exit(void) {
 	if (prv.midi_valid) {
 		prv.mididev.exit();
+	}
+	return OK;
+}
+
+int musmidi_reset(void) {
+	if (prv.midi_valid) {
+		prv.mididev.reset();
 	}
 	return OK;
 }
@@ -70,7 +77,7 @@ int musmidi_start(int no, int loop) {
 	return OK;
 }
 
-int musmidi_stop() {
+int musmidi_stop(void) {
 	if (!prv.midi_valid) return NG;
 
 	prv.midi.dev->stop();
@@ -83,21 +90,21 @@ int musmidi_stop() {
 	return OK;
 }
 
-int musmidi_pause() {
+int musmidi_pause(void) {
 	if (!prv.midi_valid) return NG;
 
 	prv.midi.dev->pause();
 	return OK;
 }
 
-int musmidi_unpause() {
+int musmidi_unpause(void) {
 	if (!prv.midi_valid) return NG;
 
 	prv.midi.dev->unpause();
 	return OK;
 }
 
-midiplaystate musmidi_getpos() {
+midiplaystate musmidi_getpos(void) {
 	midiplaystate st = {FALSE, 0, 0};
 	if (!prv.midi_valid || !midino) return st;
 
@@ -130,7 +137,7 @@ int musmidi_fadestart(int time, int volume, int stop) {
 	return prv.midi.dev->fadestart(time, volume, stop);
 }
 
-boolean musmidi_fading() {
+boolean musmidi_fading(void) {
 	if (!prv.midi_valid) return FALSE;
 
 	if (!prv.midi.dev->fading)

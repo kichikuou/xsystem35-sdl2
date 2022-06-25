@@ -32,6 +32,10 @@ EM_JS(int, muspcm_exit, (void), {
 	return xsystem35.Status.OK;
 });
 
+EM_JS(int, muspcm_reset, (void), {
+	return xsystem35.audio.pcm_reset();;
+});
+
 EM_JS(int, muspcm_load_no, (int slot, int no), {  // async
 	return xsystem35.audio.pcm_load(slot, no);
 });

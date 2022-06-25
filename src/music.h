@@ -36,7 +36,8 @@ enum MixDevice {
 
 /* init and exit */
 extern int mus_init(int audio_buffer_size);
-extern int mus_exit();
+extern void mus_exit(void);
+extern void mus_reset(void);
 
 /* cdrom related function */
 extern int mus_cdrom_start(int track, int loop);

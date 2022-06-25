@@ -142,6 +142,12 @@ int muspcm_exit(void) {
 	return OK;
 }
 
+int muspcm_reset(void) {
+	for (int i = 0; i < PCM_SLOTS; i++)
+		muspcm_unload(i);
+	return OK;
+}
+
 // 番号指定のPCMファイル読み込み
 int muspcm_load_no(int slot, int no) {
 	if ((unsigned)slot >= PCM_SLOTS)

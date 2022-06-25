@@ -39,6 +39,7 @@ typedef struct {
 struct _cdromdevice {
 	int  (* init)(char *);
 	int  (* exit)(void);
+	int  (* reset)(void);
 	// Play through the track loop times. If loop == 0, loops forever.
 	int  (* start)(int trk, int loop);
 	int  (* stop)(void);

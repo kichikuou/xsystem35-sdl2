@@ -40,7 +40,8 @@ typedef struct midievent midievent_t;
 static int midi_thread(void *);
 
 static int midi_initialize(char *devnm, int subdev);
-static int midi_exit();
+static int midi_exit(void);
+static int midi_reset(void);
 static int midi_start(int no, int loop, char *data, int datalen);
 static int midi_stop();
 static int midi_pause();
@@ -50,13 +51,14 @@ static int midi_getflag(int mode, int idx);
 static int midi_setflag(int mode, int idx, int val);
 
 static void midi_allnotesoff();
-static void midi_reset();
+static void midi_send_reset();
 static void midi_settempo(midievent_t event);
 static void midi_sync(midievent_t event);
 
 mididevice_t midi_portmidi = {
 	midi_initialize,
 	midi_exit,
+	midi_reset,
 	midi_start,
 	midi_stop,
 	midi_pause,
@@ -104,7 +106,7 @@ static int midi_initialize(char *devnm, int subdev) {
 	return OK;
 }
 
-static int midi_exit() {
+static int midi_exit(void) {
 	NOTICE("midi_exit\n");
 	if (thread_running) {
 		midi_stop();
@@ -114,6 +116,13 @@ static int midi_exit() {
 	Pm_Close(stream);
 	stream = NULL;
 	Pm_Terminate();
+	return OK;
+}
+
+static int midi_reset(void) {
+	if (thread_running) {
+		midi_stop();
+	}
 	return OK;
 }
 
@@ -222,8 +231,8 @@ static void midi_allnotesoff() {
 	}
 }
 
-static void midi_reset() {
-	NOTICE("midi_reset\n");
+static void midi_send_reset() {
+	NOTICE("midi_send_reset\n");
 	for (int i = 0; i < 16; i++) {
 		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x78, 0x00));
 		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x79, 0x00));
@@ -329,7 +338,7 @@ static int midi_thread(void *args) {
 
  start:
 	midi_allnotesoff();
-	midi_reset();
+	midi_send_reset();
 
 	boolean pausing = FALSE;
 	int nevents = midi->eventsize;
@@ -400,7 +409,7 @@ static int midi_thread(void *args) {
 
 	midi_allnotesoff();
 	usleep(10000);
-	midi_reset();
+	midi_send_reset();
 	usleep(10000);
 
 	should_stop = FALSE;

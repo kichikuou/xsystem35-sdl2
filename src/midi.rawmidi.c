@@ -59,7 +59,8 @@ static struct {
 
 static void send_reset();
 static int midi_initilize(char *devnm, int subdev);
-static int midi_exit();
+static int midi_exit(void);
+static int midi_reset(void);
 static int midi_start(int no, int loop, char *data, int datalen);
 static int midi_stop();
 static int midi_pause(void);
@@ -83,6 +84,7 @@ static void seq_mywrite(unsigned char *d, int n, int p);
 mididevice_t midi_rawmidi = {
 	midi_initilize,
 	midi_exit,
+	midi_reset,
 	midi_start,
 	midi_stop,
 	midi_pause,
@@ -354,7 +356,14 @@ static int midi_initilize(char *devnm, int subdev) {
 	return OK;
 }
 
-static int midi_exit() {
+static int midi_exit(void) {
+	if (enabled) {
+		midi_stop();
+	}
+	return OK;
+}
+
+static int midi_reset(void) {
 	if (enabled) {
 		midi_stop();
 	}

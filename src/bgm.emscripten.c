@@ -26,11 +26,16 @@
 #include "bgi.h"
 #include "sdl_core.h"
 
-int musbgm_init() {
+int musbgm_init(void) {
 	return bgi_read(nact->files.bgi);
 }
 
-int musbgm_exit() {
+int musbgm_exit(void) {
+	musbgm_stopall(0);
+	return OK;
+}
+
+int musbgm_reset(void) {
 	musbgm_stopall(0);
 	return OK;
 }

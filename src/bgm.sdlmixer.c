@@ -75,11 +75,16 @@ static Mix_Music *bgm_load(int no) {
 	return mix_music;
 }
 
-int musbgm_init() {
+int musbgm_init(void) {
 	return bgi_read(nact->files.bgi);
 }
 
-int musbgm_exit() {
+int musbgm_exit(void) {
+	free_music();
+	return OK;
+}
+
+int musbgm_reset(void) {
 	free_music();
 	return OK;
 }

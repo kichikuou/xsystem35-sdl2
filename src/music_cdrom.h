@@ -42,11 +42,12 @@ struct _cdobj {
 };
 typedef struct _cdobj cdobj_t;
 
-extern int muscd_init();
-extern int muscd_exit();
-extern int muscd_start(int trk, int loop);
-extern int muscd_stop();
-extern int muscd_getpos(cd_time *tm);
-extern int muscd_cb();
+int muscd_init(void);
+int muscd_exit(void);
+int muscd_reset(void);
+int muscd_start(int trk, int loop);
+int muscd_stop(void);
+int muscd_getpos(cd_time *tm);
+int muscd_cb(void);
 
 #endif /* __MUSIC_CDROM_H__ */

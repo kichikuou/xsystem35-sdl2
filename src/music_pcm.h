@@ -26,6 +26,7 @@
 
 extern int muspcm_init(int audio_buffer_size);
 extern int muspcm_exit(void);
+extern int muspcm_reset(void);
 extern int muspcm_load_no(int slot, int no);
 extern int muspcm_load_mixlr(int slot, int noL, int noR);
 extern int muspcm_unload(int slot);

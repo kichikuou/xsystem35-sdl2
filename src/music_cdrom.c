@@ -37,7 +37,7 @@ enum {
 	CDROM_NOP
 };
 
-int muscd_init() {
+int muscd_init(void) {
 	int st = cd_init(&prv.cddev);
 	int ret;
 	
@@ -55,9 +55,16 @@ int muscd_init() {
 	return ret;
 }
 
-int muscd_exit() {
+int muscd_exit(void) {
 	if (prv.cd_valid) {
 		prv.cddev.exit();
+	}
+	return OK;
+}
+
+int muscd_reset(void) {
+	if (prv.cd_valid) {
+		prv.cddev.reset();
 	}
 	return OK;
 }
@@ -75,7 +82,7 @@ int muscd_start(int trk, int loop) {
 	return OK;
 }
 
-int muscd_stop() {
+int muscd_stop(void) {
 	prv.cdrom.st = CDROM_STOP;
 	return OK;
 }
@@ -84,7 +91,7 @@ int muscd_getpos(cd_time *tm) {
 	return prv.cddev.getpos(tm);
 }
 
-int muscd_cb() {
+int muscd_cb(void) {
 	cdobj_t *obj = &prv.cdrom;
 	
 	switch(obj->st) {
