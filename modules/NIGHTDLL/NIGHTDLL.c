@@ -13,6 +13,7 @@
 #include "nt_scenario.h"
 #include "nt_msg.h"
 #include "nt_event.h"
+#include "sactcg.h"
 
 #include "sactstring.h"
 
@@ -36,6 +37,17 @@ static void Init(void) { /* 0 */
 	*var = 1;
 	
 	DEBUG_COMMAND_YET("NIGHTDLL.Init %p:\n", var);
+}
+
+static void NIGHTDLL_reset(void) {
+	nt_sstr_reset();
+	nt_sp_clear_updatelist();
+	for (int i = 0; i < SPRITEMAX; i++) {
+		if (night.sp[i])
+			nt_sp_free(night.sp[i]);
+	}
+	nt_scg_freeall();
+	memset(&night, 0, sizeof(night));
 }
 
 static void InitGame() { /* 1 */
@@ -651,4 +663,4 @@ static const ModuleFunc functions[] = {
 	{"WaitKey", WaitKey},
 };
 
-const Module module_NIGHTDLL = {"NIGHTDLL", functions, sizeof(functions) / sizeof(ModuleFunc)};
+const Module module_NIGHTDLL = {"NIGHTDLL", functions, sizeof(functions) / sizeof(ModuleFunc), NIGHTDLL_reset};

@@ -32,7 +32,6 @@
 #include "surface.h"
 #include "sacttimer.h"
 #include "variable.h"
-#include "mmap.h"
 
 // スプライトの最大数
 #define SPRITEMAX 21845
@@ -60,15 +59,6 @@ typedef struct {
 	char *src; // 置き換え元文字列
 	char *dst; // 置き換え文字列
 } strexchange_t;
-
-// SACTEFAM を使ったマスク
-typedef struct {
-	mmap_t *mmap;
-	int datanum;  // SACTEFAM.KLD 中のマスクファイルの数
-	int *no;      // シナリオ側での番号
-	int *offset;  // データへのオフセット
-} SACTEFAM_t;
-
 
 // CG_XX で作るCGの種類
 enum cgtype {
@@ -225,11 +215,8 @@ struct _sact {
 	// 座標系の原点
 	MyPoint origin;
 	
-	// 文字列 push/pop/replce 用
-	SList *strstack;
+	// 文字列 replce 用
 	SList *strreplace;
-	char   *strreplacesrc;
-	char   *strreplacedst; 
 	
 	// メッセージスプライト用メッセージバッファ
 	char msgbuf[MSGBUFMAX];
@@ -287,9 +274,6 @@ struct _sact {
 	
 	// depth map
 	surface_t *dmap;
-	
-	// SACTEFAM.KLD
-	SACTEFAM_t am;
 	
 	boolean zhiding;  // Zkeyによる隠し中
 	int     zofftime;

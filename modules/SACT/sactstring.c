@@ -46,6 +46,24 @@ int sstr_init() {
 	return OK;
 }
 
+int sstr_reset(void) {
+	for (int i = 0; i < idx; i++)
+		free(stack[i]);
+	idx = 0;
+	free(stack);
+	stack = NULL;
+
+	for (SList *l = sact.strreplace; l; l = l->next) {
+		strexchange_t *ex = l->data;
+		free(ex->src);
+		free(ex->dst);
+		free(ex);
+	}
+	slist_free(sact.strreplace);
+	sact.strreplace = NULL;
+	return OK;
+}
+
 /**
  * 文字列変数スタックに文字列を積む
  * @param strno: シナリオ上での文字列変数番号

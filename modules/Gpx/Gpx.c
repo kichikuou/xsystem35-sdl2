@@ -139,6 +139,10 @@ static void Init() {
 	DEBUG_COMMAND("Gpx.Init %d:\n", p1);
 }
 
+static void Gpx_reset(void) {
+	sf_free_all();
+}
+
 static void Create() {
 	/*
 	  Gpx.Create(): 新規 surface の作成(PixelとAlphaマップの両方)
@@ -1217,4 +1221,4 @@ static const ModuleFunc functions[] = {
 	{"StretchBlendScreen2x2WDS", StretchBlendScreen2x2WDS},
 };
 
-const Module module_Gpx = {"Gpx", functions, sizeof(functions) / sizeof(ModuleFunc)};
+const Module module_Gpx = {"Gpx", functions, sizeof(functions) / sizeof(ModuleFunc), Gpx_reset};

@@ -25,6 +25,7 @@
 #define __SACTSTRING_H__
 
 extern int sstr_init();
+extern int sstr_reset(void);
 extern int sstr_push(int strno);
 extern int sstr_pop(int strno);
 extern int sstr_regist_replace(int sstrtno, int dstrno);

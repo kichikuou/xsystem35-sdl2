@@ -206,6 +206,13 @@ void nt_sp_remove_updatelist(sprite_t *sp) {
 	updatelist = slist_remove(updatelist, sp);
 }
 
+void nt_sp_clear_updatelist(void) {
+	slist_free(updatelist);
+	updatelist = NULL;
+	slist_free(updatearea);
+	updatearea = NULL;
+}
+
 // デフォルトの壁紙update
 int nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
 	int sx, sy, w, h;

@@ -121,6 +121,13 @@ int sp_init() {
 	return OK;
 }
 
+int sp_reset(void) {
+	sp_clear_zkey_hidesprite_all();
+	sp_clear_quakesprite_all();
+	sp_free_all();
+	return OK;
+}
+
 /**
  * 新規スプライトの作成
  * @param no: スプライト番号

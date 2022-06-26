@@ -31,6 +31,7 @@ typedef struct {
 	const char *name;
 	const ModuleFunc *funcs;  // must be sorted by name
 	int nfunc;
+	void (*reset)(void);
 } Module;
 
 extern const Module module_AliceLogo;

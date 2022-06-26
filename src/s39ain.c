@@ -81,7 +81,7 @@ int s39ain_init(const char *path_to_ain, S39AIN *ain) {
 	}
 	p += 8;
 	ain->dllnum = LittleEndian_getDW(p, 0);
-	ain->dll = malloc(sizeof(S39AIN_DLLINF) * ain->dllnum);
+	ain->dll = calloc(ain->dllnum, sizeof(S39AIN_DLLINF));
 	
 	p += 4;
 	for (i = 0; i < ain->dllnum; i++) {
@@ -159,5 +159,13 @@ int s39ain_init(const char *path_to_ain, S39AIN *ain) {
 	for (i = 0; i < ain->dllnum; i++)
 		resolve_module(&ain->dll[i]);
 
+	return OK;
+}
+
+int s39ain_reset(S39AIN *ain) {
+	for (int i = 0; i < ain->dllnum; i++) {
+		if (ain->dll[i].reset)
+			ain->dll[i].reset();
+	}
 	return OK;
 }

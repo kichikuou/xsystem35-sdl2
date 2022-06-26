@@ -225,7 +225,9 @@ static void remove_selwindow() {
 	
 	// 作業用 surface の削除
 	sf_free(selcanvas);
+	selcanvas = NULL;
 	sf_free(sact.sel.charcanvas);
+	sact.sel.charcanvas = NULL;
 }
 
 
@@ -259,6 +261,17 @@ void ssel_init() {
 	sact.sel.font_type = FONT_GOTHIC;
 }
 
+void ssel_reset(void) {
+	ssel_clear();
+	if (selcanvas) {
+		sf_free(selcanvas);
+		selcanvas = NULL;
+	}
+	if (sact.sel.charcanvas) {
+		sf_free(sact.sel.charcanvas);
+		sact.sel.charcanvas = NULL;
+	}
+}
 
 /*
   内部の選択肢情報をクリア

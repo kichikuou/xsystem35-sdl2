@@ -237,6 +237,7 @@ static void sys_reset(void) {
 	nact_reset();
 	ags_reset();
 	mus_reset();
+	s39ain_reset(&nact->ain);
 }
 
 static void sys35_ParseOption(int *argc, char **argv) {

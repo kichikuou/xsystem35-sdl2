@@ -27,6 +27,18 @@ static int window_width;
 static int window_height;
 static int map_width;
 
+static void oujimisc_reset(void) {
+	for (int i = 0; i < NUM_MAPS; i++) {
+		free(mapdata[i]);
+		mapdata[i] = NULL;
+	}
+	setChipParam_index = 0;
+	memset(chip_params, 0, sizeof(chip_params));
+	window_width = 0;
+	window_height = 0;
+	map_width = 0;
+}
+
 static void MakeMapSetParam() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
@@ -328,4 +340,4 @@ static const ModuleFunc functions[] = {
 	{"TempMapSaveToShadow", TempMapSaveToShadow},
 };
 
-const Module module_oujimisc = {"oujimisc", functions, sizeof(functions) / sizeof(ModuleFunc)};
+const Module module_oujimisc = {"oujimisc", functions, sizeof(functions) / sizeof(ModuleFunc), oujimisc_reset};

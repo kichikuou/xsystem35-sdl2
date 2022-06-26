@@ -2131,6 +2131,18 @@ static void XMenuTitleGet() {
 	DEBUG_COMMAND_YET("SACT.XMenuTitleGet %d:\n", strno);
 }
 
+static void SACT_reset(void) {
+	ssnd_init();
+	spxm_clear();
+	ssel_reset();
+	sstr_reset();
+	sp_reset();
+
+	scg_freeall();
+	sf_free(sact.dmap);
+	memset(&sact, 0, sizeof(sact));
+}
+
 static const ModuleFunc functions[] = {
 	{"AddZKeyHideSprite", AddZKeyHideSprite},
 	{"CG_Clear", CG_Clear},
@@ -2254,4 +2266,4 @@ static const ModuleFunc functions[] = {
 	{"XMenuTitleRegister", XMenuTitleRegister},
 };
 
-const Module module_SACT = {"SACT", functions, sizeof(functions) / sizeof(ModuleFunc)};
+const Module module_SACT = {"SACT", functions, sizeof(functions) / sizeof(ModuleFunc), SACT_reset};

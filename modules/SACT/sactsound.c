@@ -67,6 +67,7 @@ static int slt_find(int no) {
 int ssnd_init() {
 	// ch 1-8 をキャッシュとして使おう
 	cachei = 0;
+	memset(cache, 0, sizeof(cache));
 	return OK;
 }
 

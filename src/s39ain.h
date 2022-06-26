@@ -39,6 +39,7 @@ typedef struct S39AIN_DLLINF {
 	char        *name;         /* DLL 名      */
 	int          function_num; /* 関数の数    */
 	S39AIN_DLLFN       *function; /* 関数本体 */
+	void (*reset)(void);
 } S39AIN_DLLINF;
 
 /* シナリオ関数情報 */
@@ -61,6 +62,7 @@ typedef struct {
 	char **msg;           /* MSGI に関する情報 */
 } S39AIN;
 
-extern int s39ain_init(const char *path, S39AIN *ain);
+int s39ain_init(const char *path, S39AIN *ain);
+int s39ain_reset(S39AIN *ain);
 
 #endif /* __S39AIN_H__ */

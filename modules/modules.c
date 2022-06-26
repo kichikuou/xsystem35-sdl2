@@ -76,6 +76,7 @@ int resolve_module(S39AIN_DLLINF *dll) {
 		if (strcasecmp((*mod)->name, dll->name) == 0) {
 			for (int i = 0; i < dll->function_num; i++)
 				resolve_func(&dll->function[i], *mod);
+			dll->reset = (*mod)->reset;
 			return OK;
 		}
 	}

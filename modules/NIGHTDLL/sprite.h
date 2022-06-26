@@ -122,6 +122,7 @@ extern int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
 extern void nt_sp_add_updatelist(sprite_t *sp);
 extern void nt_sp_remove_updatelist(sprite_t *sp);
 extern int nt_sp_draw_wall(sprite_t *sp, MyRectangle *r);
+extern void nt_sp_clear_updatelist(void);
 
 /* in nt_sprite_draw.c */
 extern int nt_sp_draw(sprite_t *sp, MyRectangle *r);

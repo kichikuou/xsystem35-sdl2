@@ -37,11 +37,20 @@
 #include "ngraph.h"
 #include "sprite.h"
 #include "sdl_core.h"
+#include "mmap.h"
 
 static surface_t *smask_get(int no);
 static surface_t *smask_mul(surface_t *sf, int val);
 
+// SACTEFAM を使ったマスク
+typedef struct {
+	mmap_t *mmap;
+	int datanum;  // SACTEFAM.KLD 中のマスクファイルの数
+	int *no;      // シナリオ側での番号
+	int *offset;  // データへのオフセット
+} SACTEFAM_t;
 
+static SACTEFAM_t am;
 
 struct ecopyparam {
 	int sttime;
@@ -55,21 +64,20 @@ static ecopyparam_t ecp;
 
 // SACTEFAM.KLD の読み込み
 int smask_init(char *path) {
-	int i;
-	SACTEFAM_t *am;
+	if (am.mmap)
+		return OK;  // already loaded
 
 	mmap_t *m = map_file(path);
 	if (!m)
 		return NG;
-	am = &sact.am;
-	am->mmap = m;
-	am->datanum = LittleEndian_getDW(m->addr, 0);
-	am->no = malloc(sizeof(int) * am->datanum);
-	am->offset = malloc(sizeof(int) * am->datanum);
+	am.mmap = m;
+	am.datanum = LittleEndian_getDW(m->addr, 0);
+	am.no = malloc(sizeof(int) * am.datanum);
+	am.offset = malloc(sizeof(int) * am.datanum);
 	
-	for (i = 0; i < am->datanum; i++) {
-		am->no[i] = LittleEndian_getDW(m->addr, 16 + i * 16);
-		am->offset[i] = LittleEndian_getDW(m->addr, 16 + i * 16 + 8);
+	for (int i = 0; i < am.datanum; i++) {
+		am.no[i] = LittleEndian_getDW(m->addr, 16 + i * 16);
+		am.offset[i] = LittleEndian_getDW(m->addr, 16 + i * 16 + 8);
 	}
 	
 	return OK;
@@ -78,15 +86,14 @@ int smask_init(char *path) {
 // 指定番号の alphamask ファイルをよみだす
 static surface_t *smask_get(int no) {
 	int i;
-	SACTEFAM_t *am = &sact.am;
 	
-	for (i = 0; i < am->datanum; i++) {
-		if (am->no[i] == no) break;
+	for (i = 0; i < am.datanum; i++) {
+		if (am.no[i] == no) break;
 	}
 
-	if (i == am->datanum) return NULL;
+	if (i == am.datanum) return NULL;
 	
-	return sf_getcg(am->mmap->addr + am->offset[i], 0 /*FIXME*/);
+	return sf_getcg(am.mmap->addr + am.offset[i], 0 /*FIXME*/);
 }
 
 // ベースになるマスクの alpha 値を拡大して取り出す

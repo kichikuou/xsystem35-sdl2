@@ -30,6 +30,7 @@
 
 // in sprite.c
 extern int sp_init();
+extern int sp_reset(void);
 extern int sp_new(int no, int cg1, int cg2, int cg3, int type);
 extern int sp_new_msg(int no, int x, int y, int width, int height);
 extern int sp_set_wall_paper(int no);
@@ -93,6 +94,7 @@ extern int smsg_update(sprite_t *sp);
 
 // in sprite_sel.c
 extern void ssel_init();
+extern void ssel_reset(void);
 extern void ssel_clear();
 extern void ssel_add(int nString, int wI);
 extern int ssel_select(int wNum, int wChoiceSize, int wMenuOutSpc, int wChoiceLineSpace, int wChoiceAutoMoveCursor, int nAlign);
