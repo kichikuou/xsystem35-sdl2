@@ -504,17 +504,23 @@ int main(int argc, char **argv) {
 
 	for (;;) {
 		nact_main();
-		if (nact->restart) {
-			sys_reset();
-		} else {
+#ifndef __EMSCRIPTEN__
+		if (!nact->restart)
 			break;
-		}
+#endif
+		sys_reset();
 	}
 
-#ifdef __EMSCRIPTEN__
-	sdl_sleep(1000000000);
-#endif
 	sys35_remove();
 	
 	return 0;
 }
+
+#ifdef __EMSCRIPTEN__
+
+EMSCRIPTEN_KEEPALIVE
+void sys_restart(void) {
+	nact_quit(TRUE);
+}
+
+#endif

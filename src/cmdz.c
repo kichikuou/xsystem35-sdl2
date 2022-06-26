@@ -339,7 +339,11 @@ void commandZZ0() {
 	DEBUG_COMMAND("ZZ0 %d:\n",sw);
 	
 	if (sw == 0) {
+#ifdef __EMSCRIPTEN__
+		nact_quit(TRUE);
+#else
 		sys_exit(sysVar[0]);
+#endif
 	} else if (sw == 1) {
 		while (TRUE) {
 			usleep(1000*1000);
