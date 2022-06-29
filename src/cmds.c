@@ -98,7 +98,12 @@ void commandSR() {
 	if (num == 0) {
 		int t, m, s, f;
 		if (mus_cdrom_get_playposition(&t, &m, &s, &f) == OK) {
-			*var = t - 1;
+			// System3.5 returns the music number (track_no - 1),
+			// while System3.6 and later return the track number.
+			if (!memcmp(sl_sco, "S350", 4))
+				*var = t - 1;
+			else
+				*var = t;
 		} else {
 			*var = 0;
 		}
