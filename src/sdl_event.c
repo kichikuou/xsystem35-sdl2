@@ -325,7 +325,6 @@ int sdl_getMouseInfo(MyPoint *p) {
 }
 
 void sdl_getWheelInfo(int *forward, int *back) {
-	sdl_getEvent();
 	*forward = mouse_wheel_up;
 	*back = mouse_wheel_down;
 
