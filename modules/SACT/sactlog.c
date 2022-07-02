@@ -109,6 +109,9 @@ static void draw_log() {
 
 
 int sblog_start(void) {
+	if (sact.version < 120)
+		return NG;
+
 	static char *logmsg[LOGMSG_LINES];
 	if (!logmsg[0]) {
 		for (int i = 0; i < LOGMSG_LINES; i++)
