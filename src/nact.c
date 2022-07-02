@@ -123,10 +123,7 @@ void nact_main() {
 
 		if (++cnt >= 10000 || nact->wait_vsync || nact->popupmenu_opened || dbg_trapped()) {
 			nact->callback();  // Async in emscripten
-
-			if (!nact->is_message_locked)
-				sys_getInputInfo();
-
+			sys_getInputInfo();
 			sdl_wait_vsync();
 			nact->frame_count++;
 			nact->wait_vsync = FALSE;
@@ -156,7 +153,6 @@ void nact_init() {
 	nact->callback = nact_callback;
 	nact->is_va_animation = FALSE;
 	nact->is_cursor_animation = FALSE;
-	nact->is_message_locked = FALSE;
 	nact->encoding = SHIFT_JIS;
 
 	free(nact->game_title_utf8);

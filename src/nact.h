@@ -69,7 +69,6 @@ typedef struct {
 	void     (*callback)(void);    /* main の callback */
 	boolean   is_va_animation;     /* VA command working */
 	boolean   is_cursor_animation; /* animation cursor working */
-	boolean   is_message_locked;   /* pointer 等の event handler を呼び出さない */
 	boolean   popupmenu_opened;    /* popup menu が 開いているか */
 	CharacterEncoding encoding;
 	

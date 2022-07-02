@@ -70,9 +70,7 @@ static void ntmain(struct _scoadr inadr) {
 			}
 			nact->callback();
 		}
-		if (!nact->is_message_locked) {
-			sys_getInputInfo();
-		}
+		sys_getInputInfo();
 		sdl_wait_vsync();
 		nact->frame_count++;
 		nact->wait_vsync = FALSE;

@@ -665,12 +665,12 @@ void commands2F3D() {
 }
 
 void commands2F3E() {
-	nact->is_message_locked = TRUE;
+	// no-op
 	DEBUG_COMMAND("sysWinMsgLock:\n");
 }
 
 void commands2F3F() {
-	nact->is_message_locked = FALSE;
+	// no-op
 	DEBUG_COMMAND("sysWinMsgUnlock:\n");
 }
 
