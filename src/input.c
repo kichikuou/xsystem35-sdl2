@@ -65,6 +65,14 @@ int sys_getMouseInfo(MyPoint *p, boolean is_dibgeo) {
 	return key;
 }
 
+void sys_getWheelInfo(int *forward, int *back) {
+	sdl_getWheelInfo(forward, back);
+}
+
+void sys_clearWheelInfo(void) {
+	sdl_clearWheelInfo();
+}
+
 int sys_getKeyInfo() {
 	return sdl_getKeyInfo();
 }

@@ -619,6 +619,7 @@ void commands2F37() {
 }
 
 void commands2F38() {
+	sys_clearWheelInfo();
 	DEBUG_COMMAND("iptClearWheelCount:\n");
 }
 
@@ -626,8 +627,7 @@ void commands2F39() {
 	int *vForward = getCaliVariable();
 	int *vBack = getCaliVariable();
 	
-	*vForward = 0;
-	*vBack = 0;
+	sys_getWheelInfo(vForward, vBack);
 	DEBUG_COMMAND("iptGetWheelCount %d, %d:\n", *vForward, *vBack);
 }
 

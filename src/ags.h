@@ -91,12 +91,11 @@ typedef struct _agsevent agsevent_t;
 #define AGSEVENT_KEY_PRESS 4
 #define AGSEVENT_KEY_RELEASE 5
 #define AGSEVENT_TIMER 6
+#define AGSEVENT_MOUSE_WHEEL 7
 
 #define AGSEVENT_BUTTON_LEFT  1
 #define AGSEVENT_BUTTON_MID   2
 #define AGSEVENT_BUTTON_RIGHT 3
-#define AGSEVENT_WHEEL_UP 4
-#define AGSEVENT_WHEEL_DN 5
 
 
 struct _ags {

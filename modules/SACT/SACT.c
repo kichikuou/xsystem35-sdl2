@@ -153,6 +153,9 @@ static void Init() {
 	
 	if (sact.version >= 120) {
 		sact.logging = TRUE;
+#ifdef __EMSCRIPTEN__
+		EM_ASM( xsystem35.texthook.disableWheelEvent(0xffffffff) );
+#endif
 	} else {
 		sact.logging = FALSE;
 	}

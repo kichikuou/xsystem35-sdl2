@@ -44,6 +44,7 @@ static void keyEventProsess(SDL_KeyboardEvent *e, boolean pressed);
 
 /* pointer の状態 */
 static int mousex, mousey, mouseb;
+static int mouse_wheel_up, mouse_wheel_down;
 boolean RawKeyInfo[256];
 
 /* SDL Joystick */
@@ -156,6 +157,18 @@ static void sdl_getEvent(void) {
 			mousey = e.motion.y;
 			send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 			break;
+
+		case SDL_MOUSEWHEEL:
+			{
+				int y = e.wheel.y * (e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1);
+				if (y > 0)
+					mouse_wheel_up += y;
+				else if (y < 0)
+					mouse_wheel_down -= y;
+				send_agsevent(AGSEVENT_MOUSE_WHEEL, y);
+				break;
+			}
+
 		case SDL_MOUSEBUTTONDOWN:
 			mouseb |= (1 << e.button.button);
 			RawKeyInfo[mouse_to_rawkey(e.button.button)] = TRUE;
@@ -309,6 +322,20 @@ int sdl_getMouseInfo(MyPoint *p) {
 	int m1 = mouseb & (1 << 1) ? SYS35KEY_RET : 0;
 	int m2 = mouseb & (1 << 3) ? SYS35KEY_SPC : 0;
 	return m1 | m2;
+}
+
+void sdl_getWheelInfo(int *forward, int *back) {
+	sdl_getEvent();
+	*forward = mouse_wheel_up;
+	*back = mouse_wheel_down;
+
+#ifdef __EMSCRIPTEN__
+	EM_ASM( xsystem35.texthook.disableWheelEvent(100) );
+#endif
+}
+
+void sdl_clearWheelInfo(void) {
+	mouse_wheel_up = mouse_wheel_down = 0;
 }
 
 int sdl_getJoyInfo(void) {
