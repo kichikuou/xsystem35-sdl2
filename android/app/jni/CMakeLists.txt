@@ -13,11 +13,10 @@ FetchContent_Declare(
   URL https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.0.18.tar.gz
   URL_HASH SHA1=6fc5130757b447d46c3da6abd58687e8576de8b8
 )
-# TODO: Use SDL2_mixer 2.0.5 once released
 FetchContent_Declare(
   SDL_mixer
-  GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-  GIT_TAG 6845d9f3cb3f35542f1ec7e74dba6b30bf968959
+  URL https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-2.6.0.tar.gz
+  URL_HASH SHA1=a2aef03d74ac3dd9cd0004cff1834602a5dafa66
 )
 
 # Compilation of SDL and companion libraries
@@ -34,9 +33,12 @@ endif()
 FetchContent_GetProperties(SDL_mixer)
 if(NOT sdl_mixer_POPULATED)
   FetchContent_Populate(SDL_mixer)
-  SET(SUPPORT_OGG ON CACHE BOOL "Enable OGG support in SDL_mixer" FORCE)
+  SET(SDL2MIXER_OPUS OFF CACHE BOOL "Enable Opus music" FORCE)
+  SET(SDL2MIXER_FLAC OFF CACHE BOOL "Enable FLAC music" FORCE)
+  SET(SDL2MIXER_MOD  OFF CACHE BOOL "Support loading MOD music" FORCE)
+  SET(SDL2MIXER_MIDI OFF CACHE BOOL "Enable MIDI music" FORCE)
+  SET(SDL2MIXER_SAMPLES OFF CACHE BOOL "Build the SDL2_mixer sample program(s)" FORCE)
   add_subdirectory(${sdl_mixer_SOURCE_DIR} ${sdl_mixer_BINARY_DIR})
-  target_compile_definitions(SDL2_mixer PRIVATE MUSIC_WAV)
 endif()
 
 # The main CMakeLists.txt of xsystem35
