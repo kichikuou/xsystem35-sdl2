@@ -18,7 +18,11 @@
 */
 
 #include <stdlib.h>
+#include <SDL_cpuinfo.h>
 
+#if defined(__ARM_NEON)
+#define STBI_NEON
+#endif
 #define STBI_NO_STDIO
 #define STBI_ONLY_JPEG
 #define STB_IMAGE_IMPLEMENTATION
