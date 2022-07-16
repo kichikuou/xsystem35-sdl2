@@ -1336,11 +1336,13 @@ void commands2F79() {
 }
 
 void commands2F7A() {
-	DEBUG_COMMAND_YET("menuFreeShelterDIB:\n");
+	// no-op
+	DEBUG_COMMAND("menuFreeShelterDIB:\n");
 }
 
 void commands2F7B() {
-	DEBUG_COMMAND_YET("msgFreeShelterDIB:\n");
+	// no-op
+	DEBUG_COMMAND("msgFreeShelterDIB:\n");
 }
 
 void commands2F7C() {
