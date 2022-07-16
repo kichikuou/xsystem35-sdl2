@@ -33,9 +33,7 @@
 #include "pms.h"
 #include "bmp.h"
 #include "qnt.h"
-#ifdef HAVE_JPEG
 #include "jpeg.h"
-#endif
 #include "ald_manager.h"
 #include "savedata.h"
 #include "cache.h"
@@ -87,10 +85,8 @@ static CG_TYPE check_cgformat(BYTE *data) {
 		return ALCG_BMP8;
 	} else if (vsp_checkfmt(data)) {
 		return ALCG_VSP;
-#ifdef HAVE_JPEG
 	} else if (jpeg_checkfmt(data) && nact->ags.world_depth >= 15) {
 		return ALCG_JPEG;
-#endif
 	}
 	WARNING("Unknown Cg Type\n");
 	return ALCG_UNKNOWN;
@@ -221,11 +217,9 @@ static cgdata *loader(int no) {
 	case ALCG_QNT:
 		cg = qnt_extract(dfile->data);
 		break;
-#ifdef HAVE_JPEG
 	case ALCG_JPEG:
 		cg = jpeg_extract(dfile->data, dfile->size);
 		break;
-#endif
 	default:
 		break;
 	}
@@ -424,11 +418,9 @@ int cg_load_with_filename(char *fname_utf8, int x, int y) {
 	case ALCG_BMP24:
 		cg = bmp16m_extract(data);
 		break;
-#ifdef HAVE_JPEG
 	case ALCG_JPEG:
 		cg = jpeg_extract(data, filesize);
 		break;
-#endif
 	default:
 		return status;
 	}

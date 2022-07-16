@@ -25,7 +25,6 @@
 #cmakedefine SEQ_DEVICE "@SEQ_DEVICE@"
 
 #cmakedefine HAVE_GETLOGIN @HAVE_GETLOGIN@
-#cmakedefine HAVE_JPEG @HAVE_JPEG@
 #cmakedefine HAVE_MMAP @HAVE_MMAP@
 #cmakedefine HAVE_SIGACTION @HAVE_SIGACTION@
 #cmakedefine HAVE_UNAME @HAVE_UNAME@

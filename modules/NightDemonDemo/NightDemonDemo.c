@@ -36,11 +36,7 @@
 #include "input.h"
 #include "ngraph.h"
 #include "cg.h"
-#ifdef HAVE_JPEG
 #include "jpeg.h"
-#endif
-
-#ifdef HAVE_JPEG
 
 #define FPS 30
 
@@ -88,8 +84,6 @@ static void ndd_run(int demonum) {
 	alk_free(alk);
 }
 
-#endif
-
 static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
 	int p2 = getCaliValue(); /* IWinMsg */
@@ -105,9 +99,7 @@ static void Run() {
 	int p1 = getCaliValue(); // デモ番号 0,1,2
 	int p2 = getCaliValue();
 	
-#ifdef HAVE_JPEG
 	ndd_run(p1);
-#endif
 	
 	DEBUG_COMMAND("NightDemonDemo.Run %d,%d:\n", p1, p2);
 }

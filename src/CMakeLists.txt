@@ -41,13 +41,7 @@ target_sources(xsystem35 PRIVATE
 
 # CG
 target_sources(xsystem35 PRIVATE
-  pms.c vsp.c bmp.c qnt.c)
-if (HAVE_JPEG)
-  target_sources(xsystem35 PRIVATE jpeg.c)
-  if (NOT EMSCRIPTEN)
-    target_link_libraries(xsystem35 PRIVATE JPEG::JPEG)
-  endif()
-endif()
+  pms.c vsp.c bmp.c qnt.c jpeg.c)
 if (HAVE_WEBP)
   target_sources(xsystem35 PRIVATE webp.c)
   target_link_libraries(xsystem35 PRIVATE PkgConfig::WEBP)
@@ -88,7 +82,6 @@ if (EMSCRIPTEN)
 
   set(LIBS
     "SHELL:-s USE_ZLIB=1"
-    "SHELL:-s USE_LIBJPEG=1"
     "SHELL:-s USE_SDL=2"
     "SHELL:-s USE_SDL_TTF=2")
   target_compile_options(xsystem35 PRIVATE ${LIBS})

@@ -102,7 +102,6 @@ target_compile_options(modules PRIVATE -Wno-pointer-sign)
 if (EMSCRIPTEN)
   set(LIBS
     "SHELL:-s USE_ZLIB=1"
-    "SHELL:-s USE_LIBJPEG=1"
     "SHELL:-s USE_SDL=2")
   target_compile_options(modules PRIVATE ${LIBS})
   target_link_options(modules PRIVATE ${LIBS})
@@ -116,8 +115,4 @@ else()
   if (SDL2MIXER_FOUND)
     target_link_libraries(modules PRIVATE PkgConfig::SDL2MIXER)
   endif()
-endif()
-
-if (HAVE_JPEG AND NOT EMSCRIPTEN)
-  target_link_libraries(modules PRIVATE JPEG::JPEG)
 endif()

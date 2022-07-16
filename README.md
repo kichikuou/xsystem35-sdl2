@@ -81,7 +81,7 @@ Run xsystem35 from within the game directory.
 
 [Homebrew](https://brew.sh/index_ja) is needed.
 
-    $ brew install cmake pkg-config sdl2 sdl2_mixer sdl2_ttf libjpeg webp cjson
+    $ brew install cmake pkg-config sdl2 sdl2_mixer sdl2_ttf webp cjson
     $ mkdir -p out/debug
     $ cd out/debug
     $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
@@ -91,7 +91,7 @@ Run xsystem35 from within the game directory.
 
 [MSYS2](https://www.msys2.org) is needed.
 
-    $ pacman -S cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-libwebp mingw-w64-x86_64-cjson
+    $ pacman -S cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-libwebp mingw-w64-x86_64-cjson
     $ mkdir -p out/debug
     $ cd out/debug
     $ cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../

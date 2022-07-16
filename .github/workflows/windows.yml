@@ -26,7 +26,6 @@ jobs:
           SDL2:p
           SDL2_ttf:p
           SDL2_mixer:p
-          libjpeg-turbo:p
           libwebp:p
           cjson:p
           nsis:p
