@@ -54,6 +54,14 @@ int preVarPage;      /* 直前にアクセスした変数のページ */
 int preVarIndex;     /* 直前にアクセスした変数のINDEX */
 int preVarNo;        /* 直前にアクセスした変数の番号 */
 
+static const char *varname(int var) {
+	if (var < nact->ain.varnum)
+		return nact->ain.var[var];
+	static char buf[10];
+	sprintf(buf, "VAR%d", var);
+	return buf;
+}
+
 static char *advance(const char *s, int n) {
 	while (*s && n > 0) {
 		s = advance_char(s, nact->encoding);
@@ -78,7 +86,7 @@ int *v_ref(int var) {
 	int page   = attr->page;
 	int offset = attr->offset;
 	if (*index + offset >= arrayVarBuffer[page - 1].size) {
-		WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), var, *index, page, offset);
+		WARNING("%03d:%05x: Out of bounds array access: %s\n", sl_getPage(), sl_getIndex(), varname(var));
 		return NULL;
 	}
 	preVarIndex = offset + *index;
@@ -93,7 +101,7 @@ int *v_ref_indexed(int var, int index) {
 	if (attr->page == 0) {
 		// If VAR_n is not an array variable, VAR_n[i] points to VAR_(n+i).
 		if ((var + index) >= SYSVAR_MAX) {
-			WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d)\n", sl_getPage(), sl_getIndex(), var, index);
+			WARNING("%03d:%05x: Out of bounds index access: %s[%d]\n", sl_getPage(), sl_getIndex(), varname(var), index);
 			return NULL;
 		}
 		preVarIndex = var + index;
@@ -104,7 +112,7 @@ int *v_ref_indexed(int var, int index) {
 	int page   = attr->page;
 	int offset = attr->offset;
 	if (offset + index >= arrayVarBuffer[page - 1].size) {
-		WARNING("%03d:%05x: ArrayIndexOutOfBounds (%d, %d, %d, %d)\n", sl_getPage(), sl_getIndex(), var, index, page, offset);
+		WARNING("%03d:%05x: Out of bounds index access: %s[%d]\n", sl_getPage(), sl_getIndex(), varname(var), index);
 		return NULL;
 	}
 	preVarIndex = offset + index;

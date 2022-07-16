@@ -161,7 +161,7 @@ void commandLL() {
 		DEBUG_COMMAND("LL %d,%d,%d,%d:\n",type, link_no, _var, num);
 		
 		if (dfile->size < num * sizeof(WORD)) {
-			WARNING("data shortage (req = %d, result = %d)\n", num, dfile->size/ sizeof(WORD));
+			WARNING("data shortage (link_no = %d, requested %d, loaded %d)\n", link_no, num, dfile->size/ sizeof(WORD));
 			/* sysVar[0] = 254; 大嘘*/
 			/* return; */
 			num = dfile->size / sizeof(WORD);
