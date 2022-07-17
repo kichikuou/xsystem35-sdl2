@@ -41,7 +41,7 @@ examine / modify variables in the game. There are two ways to use the debugger:
 - Through [Visual Studio Code](https://code.visualstudio.com/) (recommended):
   The [vscode-system3x](https://github.com/kichikuou/vscode-system3x) extension
   provides graphical debugging interface for System 3.x.
-- Using CUI debugger: Running xsystem35 with `-debugger` option will start the
+- Using CUI debugger: Running xsystem35 with `-debug` option will start the
   debugger with console interface. Type `help` to see a list of available
   commands.
 
