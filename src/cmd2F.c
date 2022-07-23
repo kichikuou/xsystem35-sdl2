@@ -735,7 +735,10 @@ void commands2F43() {
 	int eLength = getCaliValue();
 	int eColor  = getCaliValue();
 
-	DEBUG_COMMAND_YET("grDrawFillCircle %d, %d, %d, %d:\n", eX, eY, eLength, eColor);
+	sdl_fillCircle(eX, eY, eLength, eColor);
+	ags_updateArea(eX, eY, eLength, eLength);
+
+	DEBUG_COMMAND("grDrawFillCircle %d, %d, %d, %d:\n", eX, eY, eLength, eColor);
 }
 
 void commands2F44() {

@@ -49,6 +49,12 @@ static void sdl_pal_check(void) {
 	}
 }
 
+static Uint32 palette_color(BYTE c) {
+	if (sdl_dib->format->BitsPerPixel == 8)
+		return c;
+	return SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+}
+
 void sdl_updateScreen(void) {
 	if (!sdl_dirty)
 		return;
@@ -129,9 +135,7 @@ void sdl_setPalette(Palette256 *pal, int src, int cnt) {
 /* 矩形の描画 */
 void sdl_drawRectangle(int x, int y, int w, int h, BYTE c) {
 	sdl_pal_check();
-
-	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
-		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+	Uint32 col = palette_color(c);
 
 	SDL_Rect rect = {x, y, w, 1};
 	SDL_FillRect(sdl_dib, &rect, col);
@@ -151,11 +155,7 @@ void sdl_fillRectangle(int x, int y, int w, int h, BYTE c) {
 	sdl_pal_check();
 	
 	SDL_Rect rect = {x, y, w, h};
-
-	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
-		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
-	
-	SDL_FillRect(sdl_dib, &rect, col);
+	SDL_FillRect(sdl_dib, &rect, palette_color(c));
 }
 
 void sdl_fillRectangleRGB(int x, int y, int w, int h, BYTE r, BYTE g, BYTE b) {
@@ -164,6 +164,28 @@ void sdl_fillRectangleRGB(int x, int y, int w, int h, BYTE r, BYTE g, BYTE b) {
 
 	SDL_Rect rect = {x, y, w, h};
 	SDL_FillRect(sdl_dib, &rect, SDL_MapRGB(sdl_dib->format, r, g, b));
+}
+
+void sdl_fillCircle(int left, int top, int diameter, BYTE c) {
+	diameter &= ~1;
+	if (diameter <= 0)
+		return;
+
+	Uint32 col = palette_color(c);
+
+	// This draws a circle that is pixel-identical to System3.9's grDrawFillCircle.
+	for (int y = 0; y < diameter; y++) {
+		int dy = diameter - 2*y;
+		int dx = diameter - 1;
+		for (int x = 0; 2*x < diameter; x++) {
+			if (dy*dy + dx*dx <= diameter*diameter) {
+				SDL_Rect rect = {left + x, top + y, diameter - 2*x, 1};
+				SDL_FillRect(sdl_dib, &rect, col);
+				break;
+			}
+			dx -= 2;
+		}
+	}
 }
 
 /* 領域コピー */
@@ -264,8 +286,7 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, BYTE c) {
 #undef TYPE
 
 SDL_Rect sdl_floodFill(int x, int y, int c) {
-	Uint32 col = (sdl_dib->format->BitsPerPixel == 8) ? c
-		: SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+	Uint32 col = palette_color(c);
 
 	switch (sdl_dib->format->BytesPerPixel) {
 	case 1:
@@ -312,10 +333,8 @@ void sdl_wrapColor(int sx, int sy, int w, int h, BYTE c, int rate) {
 	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
 	assert(s->format->BitsPerPixel > 8);
 
-	Uint32 col = SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
-
 	SDL_Rect r_src = {0, 0, w, h};
-	SDL_FillRect(s, &r_src, col);
+	SDL_FillRect(s, &r_src, palette_color(c));
 	
 	SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(s, rate);

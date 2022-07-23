@@ -60,6 +60,7 @@ extern void sdl_setPalette(Palette256 *pal, int src, int cnt);
 extern void sdl_drawRectangle(int x, int y, int w, int h, BYTE c);
 extern void sdl_fillRectangle(int x, int y, int w, int h, BYTE c);
 extern void sdl_fillRectangleRGB(int x, int y, int w, int h, BYTE r, BYTE g, BYTE b);
+extern void sdl_fillCircle(int left, int top, int diameter, BYTE c);
 extern void sdl_drawLine(int x1, int y1, int x2, int y2, BYTE c);
 extern SDL_Rect sdl_floodFill(int x, int y, int col);
 extern SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, BYTE col);
