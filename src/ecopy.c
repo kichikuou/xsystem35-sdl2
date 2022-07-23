@@ -279,100 +279,6 @@ static int eCopyArea23(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	return key;
 }
 
-#define SCA25_6_SLICE 10
-static int eCopyArea25(int sx, int sy, int w, int h, int dx, int dy, int opt) {
-	int r, rr, x, xx, y, yy, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	int w2=w/2,h2=h/2,h1=h-1,mr=(int)(sqrt(w2*w2+h2*h2));
-	int ux=0,uy=0,ux_y=h2-1,uw,uh;
-
-	cnt = sdl_getTicks();
-	for (r = SCA25_6_SLICE; r < mr; r += SCA25_6_SLICE ) {
-		cnt += waitcnt;
-		rr=r*r;
-		uw=uh=0;
-		for (y = 0; y < h2; y++) {
-			yy=h2-y;
-			xx=rr-yy*yy;
-			if (xx > 0) {
-				x=(int)(sqrt(xx));
-				x=(w2>x)?x:w2;
-				xx=w2-x;
-				ux=dx+xx;
-				uw=x*2;
-				if (uh == 0) {
-					uh=(h2-y)*2;
-					uy=dy+y;
-				}
-				if (xx == 0) {
-					ags_copyArea(sx+xx, sy+y,       uw, ux_y-y+1, ux, dy+y);
-					ags_copyArea(sx+xx, sy+h1-ux_y, uw, ux_y-y+1, ux, dy+h1-ux_y);
-					ux_y=y;
-					break;
-				} 
-				ags_copyArea(sx+xx, sy+y   , uw, 1, ux, dy+y   );
-				ags_copyArea(sx+xx, sy+h1-y, uw, 1, ux, dy+h1-y);
-			}
-		}
-		ags_updateArea(ux,uy,uw,uh);
-		EC_WAIT;
-	}
-
-	ags_copyArea(sx,sy,w,h,dx,dy);
-	ags_updateArea(dx, dy, w, h);
-	return key;
-}
-
-static int eCopyArea26(int sx, int sy, int w, int h, int dx, int dy, int opt) {
-	int r, rr, x, xx=0, y, yy, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	int w2=w/2,w1=w-1,h2=h/2,h1=h-1,mr=(int)(sqrt(w2*w2+h2*h2));
-	int ux=0,uy=0,ux_y=0,uw,uh;
-
-	cnt = sdl_getTicks();
-	for (r = mr - SCA25_6_SLICE; r > 0; r -= SCA25_6_SLICE) {
-		cnt += waitcnt;
-		rr=r*r;
-		uy=ux_y;
-		uw=uh=0;
-		for (y = ux_y; y < h2; y++) {
-			yy=h2-y;
-			xx=rr-yy*yy;
-			if (xx < 0) {
-				uy++;
-				continue;
-			}
-			x=(int)(sqrt(xx));
-			x=(w2>x)?x:w2;
-			xx=w2-x;
-			if (xx == 0) break;
-			if ((xx-ux) > uw) uw=xx-ux;
-			uh++;
-			ags_copyArea(sx+ux,    sy+y, xx-ux, 1, dx+ux,    dy+y);
-			ags_copyArea(sx+w1-xx, sy+y, xx-ux, 1, dx+w1-xx, dy+y);
-			ags_copyArea(sx+ux,    sy+h1-y, xx-ux, 1, dx+ux,    dy+h1-y);
-			ags_copyArea(sx+w1-xx, sy+h1-y, xx-ux, 1, dx+w1-xx, dy+h1-y);
-		}
-		if (uy != ux_y) {
-			ags_copyArea(sx, sy+ux_y,w,uy-ux_y,dx,dy+ux_y);
-			ags_updateArea(dx,dy+ux_y,w,uy-ux_y);
-			ags_copyArea(sx, sy+h-uy,w,uy-ux_y,dx,dy+h-uy);
-			ags_updateArea(dx,dy+h-uy,w,uy-ux_y);
-			ux_y=uy;
-		}
-		ags_updateArea(dx+ux,       dy+uy, uw, uh);
-		ags_updateArea(dx+w1-ux-uw, dy+uy, uw, uh);
-		ags_updateArea(dx+ux,       dy+h-uy-uh, uw, uh);
-		ags_updateArea(dx+w1-ux-uw, dy+h-uy-uh, uw, uh);
-		ux=xx;
-		EC_WAIT;
-	}
-
-	ags_copyArea(sx,sy,w,h,dx,dy);
-	ags_updateArea(dx, dy, w, h);
-	return key;
-}
-
 static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
 	/* XOR */
 	return sys_getInputInfo();
@@ -457,6 +363,9 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 		return (opt ? opt : 30) * rect->h / 16;
 	case NACT_EFFECT_MOSAIC:
 		return (opt ? opt : 100) * 8;
+	case NACT_EFFECT_CIRCLE_WIPE_OUT:
+	case NACT_EFFECT_CIRCLE_WIPE_IN:
+		return (opt ? opt : 20) * sqrt(rect->w * rect->w + rect->h * rect->h) / 40;
 	case NACT_EFFECT_FADEIN:
 	case NACT_EFFECT_WHITEIN:
 	case NACT_EFFECT_FADEOUT:
@@ -607,12 +516,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		break;
 	case 23:
 		ret = eCopyArea23(sx, sy, w, h, dx, dy, opt);
-		break;
-	case 25:
-		ret = eCopyArea25(sx, sy, w, h, dx, dy, opt);
-		break;
-	case 26:
-		ret = eCopyArea26(sx, sy, w, h, dx, dy, opt);
 		break;
 		
 	case 1000:

@@ -44,6 +44,8 @@ enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	case NACT_EFFECT_WIPE_OUT_H:        return EFFECT_WIPE_OUT_H;
 	case NACT_EFFECT_WIPE_IN_H:         return EFFECT_WIPE_IN_H;
 	case NACT_EFFECT_MOSAIC:            return EFFECT_MOSAIC;
+	case NACT_EFFECT_CIRCLE_WIPE_OUT:   return EFFECT_CIRCLE_WIPE_OUT;
+	case NACT_EFFECT_CIRCLE_WIPE_IN:    return EFFECT_CIRCLE_WIPE_IN;
 	case NACT_EFFECT_FADEIN:            return EFFECT_FADEIN;
 	case NACT_EFFECT_WHITEIN:           return EFFECT_WHITEIN;
 	case NACT_EFFECT_FADEOUT:           return EFFECT_FADEOUT_FROM_NEW;
@@ -630,6 +632,56 @@ static void wipe_step(struct sdl_effect *eff, double progress) {
 }
 
 static void wipe_free(struct sdl_effect *eff) {
+	effect_finish(eff, true);
+	free(eff);
+}
+
+// EFFECT_CIRCLE_WIPE_*
+
+static void circle_wipe_step(struct sdl_effect *eff, double progress);
+static void circle_wipe_free(struct sdl_effect *eff);
+
+static struct sdl_effect *circle_wipe_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(eff, rect, old, new, type);
+	eff->step = circle_wipe_step;
+	eff->finish = circle_wipe_free;
+	return eff;
+}
+
+static void circle_wipe_step(struct sdl_effect *eff, double progress) {
+	SDL_Texture *bg = eff->tx_old;
+	SDL_Texture *fg = eff->tx_new;
+	if (eff->type == EFFECT_CIRCLE_WIPE_IN) {
+		bg = eff->tx_new;
+		fg = eff->tx_old;
+		progress = 1 - progress;
+	}
+	SDL_RenderCopy(sdl_renderer, bg, NULL, &eff->dst_rect);
+
+	int hw = eff->dst_rect.w / 2;
+	int hh = eff->dst_rect.h / 2;
+	int r = sqrt(hw*hw + hh*hh) * progress;
+
+	for (int y = -r; y < r; y++) {
+		if (y < -hh || y >= hh)
+			continue;
+		for (int x = max(-r, -hw); x < 0; x++) {
+			if (y*y + x*x <= r*r) {
+				SDL_Rect sr = {hw + x, hh + y, -2*x, 1};
+				SDL_Rect dr = {eff->dst_rect.x + hw + x, eff->dst_rect.y + hh + y, -2*x, 1};
+				SDL_RenderCopy(sdl_renderer, fg, &sr, &dr);
+				break;
+			}
+		}
+	}
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void circle_wipe_free(struct sdl_effect *eff) {
 	effect_finish(eff, true);
 	free(eff);
 }
@@ -1530,6 +1582,9 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_WIPE_OUT_H:
 	case EFFECT_WIPE_IN_H:
 		return wipe_new(rect, sf_old, sf_new, type);
+	case EFFECT_CIRCLE_WIPE_OUT:
+	case EFFECT_CIRCLE_WIPE_IN:
+		return circle_wipe_new(rect, sf_old, sf_new, type);
 	case EFFECT_BLIND_DOWN:
 	case EFFECT_BLIND_UP:
 	case EFFECT_BLIND_LR:
