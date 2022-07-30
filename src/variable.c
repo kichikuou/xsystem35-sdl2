@@ -28,7 +28,6 @@
 #include "utfsjis.h"
 #include "variable.h"
 #include "xsystem35.h"
-#include "scenario.h"
 
 typedef struct {
 	int *pointvar;
@@ -54,7 +53,7 @@ int preVarPage;      /* 直前にアクセスした変数のページ */
 int preVarIndex;     /* 直前にアクセスした変数のINDEX */
 int preVarNo;        /* 直前にアクセスした変数の番号 */
 
-static const char *varname(int var) {
+const char *v_name(int var) {
 	if (var < nact->ain.varnum)
 		return nact->ain.var[var];
 	static char buf[10];
@@ -85,10 +84,8 @@ int *v_ref(int var) {
 	int *index = attr->pointvar;
 	int page   = attr->page;
 	int offset = attr->offset;
-	if (*index + offset >= arrayVarBuffer[page - 1].size) {
-		WARNING("%03d:%05x: Out of bounds array access: %s\n", sl_getPage(), sl_getIndex(), varname(var));
+	if (*index + offset >= arrayVarBuffer[page - 1].size)
 		return NULL;
-	}
 	preVarIndex = offset + *index;
 	return arrayVarBuffer[page - 1].value + offset + *index;
 }
@@ -100,10 +97,8 @@ int *v_ref_indexed(int var, int index) {
 
 	if (attr->page == 0) {
 		// If VAR_n is not an array variable, VAR_n[i] points to VAR_(n+i).
-		if ((var + index) >= SYSVAR_MAX) {
-			WARNING("%03d:%05x: Out of bounds index access: %s[%d]\n", sl_getPage(), sl_getIndex(), varname(var), index);
+		if ((var + index) >= SYSVAR_MAX)
 			return NULL;
-		}
 		preVarIndex = var + index;
 		return sysVar + var + index;
 	}
@@ -111,10 +106,8 @@ int *v_ref_indexed(int var, int index) {
 	// Indexed array access
 	int page   = attr->page;
 	int offset = attr->offset;
-	if (offset + index >= arrayVarBuffer[page - 1].size) {
-		WARNING("%03d:%05x: Out of bounds index access: %s[%d]\n", sl_getPage(), sl_getIndex(), varname(var), index);
+	if (offset + index >= arrayVarBuffer[page - 1].size)
 		return NULL;
-	}
 	preVarIndex = offset + index;
 	return arrayVarBuffer[page - 1].value + offset + index;
 }

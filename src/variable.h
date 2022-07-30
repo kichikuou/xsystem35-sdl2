@@ -47,6 +47,7 @@ extern int preVarPage;
 extern int preVarIndex;
 extern int preVarNo;
 
+const char *v_name(int var);
 int *v_ref(int var);
 int *v_ref_indexed(int var, int index);
 boolean v_allocateArrayBuffer(int page, int size, boolean saveflag);

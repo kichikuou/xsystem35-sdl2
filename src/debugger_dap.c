@@ -374,7 +374,11 @@ static void cmd_variables(cJSON *args, cJSON *resp) {
 			cJSON_AddItemToArray(variables, var);
 			cJSON_AddStringToObject(var, "name", dsym_variable_name(symbols, i));
 			char value[20];
-			sprintf(value, "%d", *v_ref(i));
+			int *store = v_ref(i);
+			if (store)
+				sprintf(value, "%d", *store);
+			else
+				strcpy(value, "(Out of bounds)");
 			cJSON_AddStringToObject(var, "value", value);
 			cJSON_AddNumberToObject(var, "variablesReference", 0);
 		}
@@ -426,13 +430,19 @@ static void cmd_setVariable(cJSON *args, cJSON *resp) {
 			cJSON_AddStringToObject(resp, "message", "syntax error");
 			return;
 		}
-		*v_ref(var) = parsed_value & 0xffff;
+		int *store = v_ref(var);
+		if (!store) {
+			cJSON_AddBoolToObject(resp, "success", false);
+			cJSON_AddStringToObject(resp, "message", "out of bounds array access");
+			return;
+		}
+		*store = parsed_value & 0xffff;
 
 		cJSON *body;
 		cJSON_AddBoolToObject(resp, "success", true);
 		cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
 		char new_value[20];
-		sprintf(new_value, "%d", *v_ref(var));
+		sprintf(new_value, "%d", *store);
 		cJSON_AddStringToObject(body, "value", new_value);
 	} else if (cJSON_IsNumber(vref) && vref->valueint == VREF_STRINGS) {
 		int idx;

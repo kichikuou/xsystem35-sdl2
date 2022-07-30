@@ -51,25 +51,35 @@ int *getVariable();
 static int buf[CALI_DEPTH_MAX]; /* 計算式バッファ */
 static int *cali = buf;         /* インデックス */
 
-/* 変数番号を返す */
 static int *getVar(int c0) {
-	if ((c0 & 0x40) == 0)
-		return v_ref(c0 & 0x3f);  // 0 - 0x3f
-
-	int c1 = sl_getc();
-	if (c0 != 0xc0)
-		return v_ref(((c0 & 0x3f) * 256) + c1);  // 0x100 - 0x3fff
-
-	if (c1 == 1) {
-		c0 = sl_getc();
-		c1 = sl_getc();
-		int index = getCaliValue();
-		return v_ref_indexed(c0 << 8 | c1, index);
-	} else if (c1 >= 0x40) {
-		return v_ref(c1);  // 0x40 - 0xff
+	int addr = sl_getIndex();
+	int var;
+	if ((c0 & 0x40) == 0) {
+		var = c0 & 0x3f;  // 0 - 0x3f
+	} else {
+		int c1 = sl_getc();
+		if (c0 != 0xc0)
+			var = (c0 & 0x3f) * 256 + c1;  // 0x100 - 0x3fff
+		else if (c1 == 1) {
+			c0 = sl_getc();
+			c1 = sl_getc();
+			var = c0 << 8 | c1;
+			int index = getCaliValue();
+			int *store = v_ref_indexed(var, index);
+			if (!store)
+				WARNING("%03d:%05x: Out of bounds index access: %s[%d]\n", sl_getPage(), addr, v_name(var), index);
+			return store;
+		} else if (c1 >= 0x40) {
+			var = c1;  // 0x40 - 0xff
+		} else {
+			SYSERROR("Invalid variable reference at %d:0x%x", sl_getPage(), addr);
+			return NULL;
+		}
 	}
-	SYSERROR("Invalid variable reference at %d:0x%x", sl_getPage(), sl_getIndex() - 2);
-	return NULL;
+	int *store = v_ref(var);
+	if (!store)
+		WARNING("%03d:%05x: Out of bounds array access: %s\n", sl_getPage(), addr, v_name(var));
+	return store;
 }
 
 /* 変数番号が返る */

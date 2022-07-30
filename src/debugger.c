@@ -142,13 +142,17 @@ static int eval_variable(void) {
 	int var = dbg_lookup_var(buf);
 	if (var < 0)
 		eval_error("unknown variable \"%s\"", buf);
+	int *store;
 	if (consume('[')) {
 		int index = eval_expr();
 		expect(']');
-		return *v_ref_indexed(var, index);;
+		store = v_ref_indexed(var, index);
 	} else {
-		return *v_ref(var);
+		store = v_ref(var);
 	}
+	if (!store)
+		eval_error("out of bounds array access");
+	return *store;
 }
 
 static int eval_prim(void) {
