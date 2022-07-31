@@ -118,18 +118,14 @@ void sdl_updateAll(MyRectangle *view_rect) {
 }
 
 /* Color の複数個指定 */
-void sdl_setPalette(Palette256 *pal, int src, int cnt) {
-	int i;
-	
-	for (i = 0; i < cnt; i++) {
-		sdl_col[src + i].r = pal->red  [src + i];
-		sdl_col[src + i].g = pal->green[src + i];
-		sdl_col[src + i].b = pal->blue [src + i];
+void sdl_setPalette(Palette256 *pal, int first, int count) {
+	for (int i = 0; i < count; i++) {
+		sdl_col[first + i].r = pal->red  [first + i];
+		sdl_col[first + i].g = pal->green[first + i];
+		sdl_col[first + i].b = pal->blue [first + i];
 	}
-	
-	if (sdl_dib->format->BitsPerPixel == 8) {
-		SDL_SetPaletteColors(sdl_dib->format->palette, sdl_col, src, cnt);
-	}
+	if (sdl_dib->format->BitsPerPixel == 8)
+		SDL_SetPaletteColors(sdl_dib->format->palette, &sdl_col[first], first, count);
 }
 
 /* 矩形の描画 */

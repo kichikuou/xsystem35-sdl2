@@ -54,7 +54,7 @@ extern void sdl_updateAll(MyRectangle *view_rect);
 extern void sdl_updateScreen(void);
 
 /* パレット関係 */
-extern void sdl_setPalette(Palette256 *pal, int src, int cnt);
+extern void sdl_setPalette(Palette256 *pal, int first, int count);
 
 /* 描画関係 */
 extern void sdl_drawRectangle(int x, int y, int w, int h, BYTE c);
