@@ -301,6 +301,20 @@ void ags_getPixel(int x, int y, Palette *cell) {
 	sdl_getPixel(x, y, cell);
 }
 
+void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, BYTE sprite) {
+	if (!ags_check_param(&sx, &sy, &w, &h)) return;
+	if (!ags_check_param(&dx, &dy, &w, &h)) return;
+
+	for (int y = 0; y < h; y++) {
+		BYTE *src = GETOFFSET_PIXEL(nact->ags.dib, sx, sy + y);
+		BYTE *dst = GETOFFSET_PIXEL(nact->ags.dib, dx, dy + y);
+		for (int x = 0; x < w; x++, src++, dst++) {
+			if (*src != sprite)
+				*dst = (*src & 0xf0) | (*dst & 0x0f);
+		}
+	}
+}
+
 void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt) {
 	if (nact->ags.world_depth != 8) return;
 	

@@ -161,6 +161,7 @@ extern void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, i
 
 extern void ags_wrapColor(int x, int y, int w, int h, int p1, int p2);
 extern void ags_getPixel(int x, int y, Palette *cell);
+extern void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, BYTE sprite);
 extern void ags_changeColorArea(int x, int y, int w, int h, int dst, int src, int cnt);
 
 extern void* ags_saveRegion(int x, int y, int w, int h);

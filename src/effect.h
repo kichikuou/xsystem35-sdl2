@@ -20,7 +20,7 @@
 #ifndef __EFFECT_H__
 #define __EFFECT_H__
 
-// Effect types of the CE command.
+// Effect types of the CE/CD command.
 enum nact_effect {
 	NACT_EFFECT_WIPE_IN           = 7,
 	NACT_EFFECT_WIPE_OUT          = 8,
@@ -64,6 +64,7 @@ enum nact_effect {
 	NACT_EFFECT_WINDMILL_180      = 51,
 	NACT_EFFECT_WINDMILL_360      = 52,
 	NACT_EFFECT_LINEAR_BLUR       = 53,
+	NACT_EFFECT_PALETTE_SHIFT     = 1001,  // CD command only
 };
 
 // Effect types of SCAT.DrawEffect and Gpx.EffectCopy.

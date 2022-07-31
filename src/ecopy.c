@@ -284,11 +284,6 @@ static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, 
 	return sys_getInputInfo();
 }
 
-static int eCopyArea1001(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
-	/* パレットシフト */
-	return sys_getInputInfo();
-}
-
 static int eCopyArea2000(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	sdl_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
 	ags_copyArea_alphaLevel(sx, sy, w, h, dx, dy, opt);
@@ -401,6 +396,8 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 		 return opt ? opt : 1000;
 	case NACT_EFFECT_LINEAR_BLUR:
 		return opt ? opt : 1700;
+	case NACT_EFFECT_PALETTE_SHIFT:
+		return 0;
 	}
 	return 1000;
 }
@@ -522,9 +519,11 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		if (nact->ags.world_depth != 8) return;
 		ret = eCopyArea1000(sx, sy, w, h, dx, dy, opt, spCol);
 		break;
-	case 1001:
-		if (nact->ags.world_depth != 8) return;
-		ret = eCopyArea1001(sx, sy, w, h, dx, dy, opt, spCol);
+	case NACT_EFFECT_PALETTE_SHIFT:
+		if (nact->ags.world_depth != 8 || spCol == -1) return;
+		ags_copyPaletteShift(sx, sy, w, h, dx, dy, spCol);
+		ags_updateArea(dx, dy, w, h);
+		ret = sys_getInputInfo();
 		break;
 	case 2000:
 		if (nact->ags.world_depth == 8) return;
