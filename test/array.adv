@@ -22,6 +22,12 @@
 	DI 255,used,size:
 	~AssertEquals used,1,__LINE__:
 	~AssertEquals size,0,__LINE__:
+	DI 256,used,size:
+	~AssertEquals used,0,__LINE__:
+	~AssertEquals size,0,__LINE__:
+	DI 0,used,size:
+	~AssertEquals used,0,__LINE__:
+	~AssertEquals size,1,__LINE__:
 
 	DS index,array,0,1:	; array maps page1[0..]
 
@@ -47,7 +53,7 @@
 
 	!index:0!
 	DS index,array,0,2:    ; array maps page2[0..]
-        !array:33!
+	!array:33!
 	~AssertEquals array[0],33,__LINE__:
 	DF array,1,66:
 	~AssertEquals array[0],66,__LINE__:

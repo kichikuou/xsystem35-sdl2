@@ -28,19 +28,17 @@
 #include "portab.h"
 
 #define SYSVAR_MAX       65536
-#define SYSVARLONG_MAX   128
 #define STRVAR_MAX       5000
 #define STRVAR_LEN       101
-#define ARRAYVAR_PAGEMAX 256
 
-typedef struct {
+struct VarPage {
 	int size;
 	boolean saveflag;
 	int *value;
-} arrayVarBufferStruct;
+};
 
 extern int sysVar[];
-extern arrayVarBufferStruct arrayVarBuffer[];
+extern struct VarPage varPage[];
 extern double longVar[];
 
 extern int preVarPage;
@@ -50,10 +48,10 @@ extern int preVarNo;
 const char *v_name(int var);
 int *v_ref(int var);
 int *v_ref_indexed(int var, int index);
-boolean v_allocateArrayBuffer(int page, int size, boolean saveflag);
-boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page);
-boolean v_releaseArrayVar(int datavar);
-boolean v_getArrayBufferStatus(int page);
+bool v_allocatePage(int page, int size, bool saveflag);
+bool v_bindArray(int datavar, int *pointvar, int offset, int page);
+bool v_unbindArray(int datavar);
+void v_getPageStatus(int page, int *in_use, int *size);
 void v_init(void);
 void v_reset(void);
 

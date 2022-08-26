@@ -29,6 +29,9 @@
 #include "variable.h"
 #include "xsystem35.h"
 
+#define SYSVARLONG_MAX 128
+#define PAGE_MAX 256
+
 typedef struct {
 	int *pointvar;
 	int page;
@@ -40,7 +43,7 @@ int sysVar[SYSVAR_MAX];
 /* 配列変数の情報 */
 static VariableAttributes attributes[SYSVAR_MAX];
 /* 配列本体 */
-arrayVarBufferStruct arrayVarBuffer[ARRAYVAR_PAGEMAX];
+struct VarPage varPage[PAGE_MAX];
 /* 64bit変数 */
 double longVar[SYSVARLONG_MAX];
 /* 文字列変数 */
@@ -84,10 +87,10 @@ int *v_ref(int var) {
 	int *index = attr->pointvar;
 	int page   = attr->page;
 	int offset = attr->offset;
-	if (*index + offset >= arrayVarBuffer[page - 1].size)
+	if (*index + offset >= varPage[page].size)
 		return NULL;
 	preVarIndex = offset + *index;
-	return arrayVarBuffer[page - 1].value + offset + *index;
+	return varPage[page].value + offset + *index;
 }
 
 int *v_ref_indexed(int var, int index) {
@@ -106,18 +109,18 @@ int *v_ref_indexed(int var, int index) {
 	// Indexed array access
 	int page   = attr->page;
 	int offset = attr->offset;
-	if (offset + index >= arrayVarBuffer[page - 1].size)
+	if (offset + index >= varPage[page].size)
 		return NULL;
 	preVarIndex = offset + index;
-	return arrayVarBuffer[page - 1].value + offset + index;
+	return varPage[page].value + offset + index;
 }
 
-/* 配列バッファの確保 DC ,page = 1~ */
-extern boolean v_allocateArrayBuffer(int page, int size, boolean saveflag) {
-	if (page <= 0 || page > 256)   { return false; }
-	if (size <= 0 || size > 65536) { return false; }
+// DC command
+bool v_allocatePage(int page, int size, bool saveflag) {
+	if (page <= 0 || page >= PAGE_MAX) { return false; }
+	if (size <= 0 || size > 65536)     { return false; }
 	
-	void *buf = arrayVarBuffer[page - 1].value;
+	void *buf = varPage[page].value;
 	if (buf != NULL)
 		buf = realloc(buf, size * sizeof(int));
 	else
@@ -125,18 +128,18 @@ extern boolean v_allocateArrayBuffer(int page, int size, boolean saveflag) {
 	if (!buf)
 		NOMEMERR();
 
-	arrayVarBuffer[page - 1].value    = buf;
-	arrayVarBuffer[page - 1].size     = size;
-	arrayVarBuffer[page - 1].saveflag = saveflag;
+	varPage[page].value    = buf;
+	varPage[page].size     = size;
+	varPage[page].saveflag = saveflag;
 	
 	return true;
 }
 
-/*　配列変数の割り当て DS */
-extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page) {
-	if (datavar < 0 || datavar >  SYSVAR_MAX - 1)                { return false; }
-	if (page    < 0 || page    >  ARRAYVAR_PAGEMAX - 1)          { return false; }
-	if (offset  < 0 || offset  >= arrayVarBuffer[page - 1].size) { return false; }
+// DS command
+bool v_bindArray(int datavar, int *pointvar, int offset, int page) {
+	if (datavar <  0 || datavar >= SYSVAR_MAX)         { return false; }
+	if (page    <= 0 || page    >= PAGE_MAX)           { return false; }
+	if (offset  <  0 || offset  >= varPage[page].size) { return false; }
 	
 	attributes[datavar].pointvar = pointvar;
 	attributes[datavar].page     = page;
@@ -144,19 +147,28 @@ extern boolean v_defineArrayVar(int datavar, int *pointvar, int offset, int page
 	return true;
 }
 
-/* 配列変数の割り当て解除 DR */
-extern boolean v_releaseArrayVar(int datavar) {
+// DR command
+bool v_unbindArray(int datavar) {
 	attributes[datavar].page = 0;
 	return true;
 }
 
-/* 指定ページは使用中 page = 1~ */
-extern boolean v_getArrayBufferStatus(int page) {
-	return (arrayVarBuffer[page - 1].value != NULL) ? true : false;
+// DI command
+void v_getPageStatus(int page, int *in_use, int *size) {
+	if (page == 0) {
+		*in_use = false;
+		*size = 1;  // why...
+	} else if (page >= PAGE_MAX) {
+		*in_use = false;
+		*size = 0;
+	} else {
+		*in_use = varPage[page].value != NULL;
+		*size = varPage[page].size & 0xffff;
+	}
 }
 
 /* 文字列変数の再初期化 */
-extern void svar_init(int max_index, int len) {
+void svar_init(int max_index, int len) {
 	for (int i = max_index + 1; i < strvar_cnt; i++) {
 		if (strVar[i])
 			free(strVar[i]);
@@ -171,12 +183,15 @@ extern void svar_init(int max_index, int len) {
 	strvar_len = len;
 }
 
-extern int svar_maxindex(void) {
+int svar_maxindex(void) {
 	return strvar_cnt - 1;
 }
 
 /* 変数の初期化 */
 void v_init(void) {
+	varPage[0].value = sysVar;
+	varPage[0].size = SYSVAR_MAX;
+	varPage[0].saveflag = true;
 	svar_init(STRVAR_MAX - 1, STRVAR_LEN);
 }
 
@@ -185,11 +200,11 @@ void v_reset(void) {
 	memset(attributes, 0, sizeof(attributes));
 	memset(longVar, 0, sizeof(longVar));
 
-	for (int i = 0; i < ARRAYVAR_PAGEMAX; i++) {
-		if (arrayVarBuffer[i].value)
-			free(arrayVarBuffer[i].value);
+	for (int i = 1; i < PAGE_MAX; i++) {
+		if (varPage[i].value)
+			free(varPage[i].value);
 	}
-	memset(arrayVarBuffer, 0, sizeof(arrayVarBuffer));
+	memset(varPage, 0, sizeof(varPage));
 
 	for (int i = 0; i < strvar_cnt; i++) {
 		if (strVar[i]) {
@@ -197,7 +212,7 @@ void v_reset(void) {
 			strVar[i] = NULL;
 		}
 	}
-	svar_init(STRVAR_MAX - 1, STRVAR_LEN);
+	v_init();
 }
 
 /* 文字変数への代入 */

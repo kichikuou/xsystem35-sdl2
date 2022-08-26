@@ -265,13 +265,8 @@ int save_loadPartial(int no, int page, int offset, int cnt) {
 	if (no >= SAVE_MAXNUMBER) {
 		return SAVE_SAVEERR;
 	}
-	if (page == 0) {
-		cnt = min(cnt, SYSVAR_MAX - offset);
-		var = sysVar + offset;
-	} else {
-		cnt = min(cnt, arrayVarBuffer[page - 1].size - offset);
-		var = arrayVarBuffer[page - 1].value + offset;
-	}
+	cnt = min(cnt, varPage[page].size - offset);
+	var = varPage[page].value + offset;
 	
 	saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL) {
@@ -321,15 +316,10 @@ int save_savePartial(int no, int page, int offset, int cnt) {
 	if (no >= SAVE_MAXNUMBER) {
 		return SAVE_SAVEERR;
 	}
-	if (page == 0) {
-		cnt = min(cnt, SYSVAR_MAX - offset);
-		var = sysVar + offset;
-	} else {
-		if (arrayVarBuffer[page - 1].saveflag == FALSE)
-			goto errexit;
-		cnt = min(cnt, arrayVarBuffer[page - 1].size - offset);
-		var = arrayVarBuffer[page - 1].value + offset;
-	}
+	if (!varPage[page].saveflag)
+		goto errexit;
+	cnt = min(cnt, varPage[page].size - offset);
+	var = varPage[page].value + offset;
 	
 	saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL)
@@ -611,17 +601,14 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	int *var;
 	int cnt, i;
 	WORD *tmp, *_tmp;
-	if (page == 0) { /* sysVar */
-		cnt = min(savefile_sysvar_cnt, SYSVAR_MAX);
-		var = sysVar;
-	} else if (!arrayVarBuffer[page - 1].saveflag) {
+	if (!varPage[page].saveflag)
 		return NULL;
-	} else {
-		cnt = arrayVarBuffer[page - 1].size;
-		var = arrayVarBuffer[page - 1].value;
-		if (var == NULL)
-			return NULL;
-	}
+	cnt = varPage[page].size;
+	if (page == 0 && savefile_sysvar_cnt < cnt)
+		cnt = savefile_sysvar_cnt;
+	var = varPage[page].value;
+	if (var == NULL)
+		return NULL;
 	head->size   = cnt * sizeof(WORD);
 	head->pageNo = page;
 	tmp = _tmp = (WORD *)malloc(cnt * sizeof(WORD));
@@ -643,32 +630,17 @@ static int loadSysVar(char *buf) {
 	Ald_sysVarHdr *head = (Ald_sysVarHdr *)buf;
 	int page = head->pageNo;
 
-	if (page == 0) {
-#if 0
-		if (head->size != SYSVAR_MAX * sizeof(WORD))
+	cnt = head->size / sizeof(WORD);
+	if (page == 0)
+		savefile_sysvar_cnt = cnt;
+	if (varPage[page].size < cnt || varPage[page].value == NULL) {
+		if (!v_allocatePage(page, cnt, TRUE)) {
+			WARNING("Array allocation failed: page=%d size=%d\n", page, cnt);
 			return SAVE_LOADERR;
-		var = sysVar;
-		cnt = SYSVAR_MAX;
-#endif
-		var = sysVar;
-		cnt = savefile_sysvar_cnt = head->size / sizeof(WORD);
-	} else {
-		cnt = head->size / sizeof(WORD);
-		if (arrayVarBuffer[page - 1].size < cnt ||
-		    arrayVarBuffer[page - 1].value == NULL) {
-			/*
-			fprintf(stderr, "loadSysVar(): undef array\n");
-			return SAVE_LOADERR;
-			*/
-			
-			if (!v_allocateArrayBuffer(page, cnt, TRUE)) {
-				fprintf(stderr, "v_allocateArrayBuffer fail\n");
-				return SAVE_LOADERR;
-			}
-			
 		}
-		var = arrayVarBuffer[page - 1].value;
 	}
+	var = varPage[page].value;
+
 	buf += sizeof(Ald_sysVarHdr);
 	data = (WORD *)buf;
 	for (i = 0; i < cnt; i++) {

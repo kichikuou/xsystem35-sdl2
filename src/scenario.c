@@ -422,15 +422,11 @@ static void popVars(int *tmp) {
 	page  = *(tmp + 2);
 	index = *(tmp + 3);
 
-	if (page == 0) {
-		topVar = sysVar + index;
-	} else {
-		if ((arrayVarBuffer + page - 1) -> value == NULL) {
-			WARNING("Illegal Variable pop\n");
-			return;
-		}
-		topVar = ((arrayVarBuffer + page - 1) -> value) + index;
+	if (!varPage[page].value) {
+		WARNING("Illegal Variable pop\n");
+		return;
 	}
+	topVar = &varPage[page].value[index];
 	
 	memcpy(topVar, tmp + 4, sizeof(int) * cnt); 
 }
