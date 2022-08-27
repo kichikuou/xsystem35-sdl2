@@ -110,11 +110,12 @@ typedef struct {
 
 /* defined by variable.c */
 extern int  strvar_len;
+struct VarRef;
 
 extern int save_loadAll(int no);
 extern int save_saveAll(int no);
-extern int save_loadPartial(int no, int page, int offset, int cnt);
-extern int save_savePartial(int no, int page, int offset, int cnt);
+extern int save_loadPartial(int no, struct VarRef *vref, int cnt);
+extern int save_savePartial(int no, struct VarRef *vref, int cnt);
 extern int save_copyAll(int dstno, int srcno);
 extern int save_save_var_with_file(char *fname_utf8, int *start, int cnt);
 extern int save_load_var_with_file(char *fname_utf8, int *start, int cnt);

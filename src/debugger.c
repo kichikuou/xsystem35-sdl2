@@ -146,9 +146,9 @@ static int eval_variable(void) {
 	if (consume('[')) {
 		int index = eval_expr();
 		expect(']');
-		store = v_ref_indexed(var, index);
+		store = v_ref_indexed(var, index, NULL);
 	} else {
-		store = v_ref(var);
+		store = v_ref(var, NULL);
 	}
 	if (!store)
 		eval_error("out of bounds array access");

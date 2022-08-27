@@ -165,22 +165,22 @@ static void TempMapInit() {
 
 static void TempMapLoadToShadow() {
 	int map = getCaliValue();
-	int *a1 = getCaliVariable();
-	int a1page = preVarPage;
-	int *a2 = getCaliVariable();
-	int a2page = preVarPage;
-	int *a3 = getCaliVariable();
-	int a3page = preVarPage;
+	struct VarRef r1, r2, r3;
+	if (!getCaliArray(&r1) || !getCaliArray(&r2) || !getCaliArray(&r3))
+		return;
 	int size = getCaliValue();
 
 	if (!mapdata[map]) {
 		WARNING("No map %d\n", map);
 		return;
 	}
-	if (a1page == 0 || a2page == 0 || a3page == 0) {
+	if (r1.page == 0 || r2.page == 0 || r3.page == 0) {
 		WARNING("non-array destination variable\n");
 		return;
 	}
+	int *a1 = v_resolveRef(&r1);
+	int *a2 = v_resolveRef(&r2);
+	int *a3 = v_resolveRef(&r3);
 	WORD *p = mapdata[map];
 	for (int i = 0; i < size; i++)
 		*a1++ = SDL_SwapLE16(*p++);
@@ -194,22 +194,22 @@ static void TempMapLoadToShadow() {
 
 static void TempMapSaveToShadow() {
 	int map = getCaliValue();
-	int *a1 = getCaliVariable();
-	int a1page = preVarPage;
-	int *a2 = getCaliVariable();
-	int a2page = preVarPage;
-	int *a3 = getCaliVariable();
-	int a3page = preVarPage;
+	struct VarRef r1, r2, r3;
+	if (!getCaliArray(&r1) || !getCaliArray(&r2) || !getCaliArray(&r3))
+		return;
 	int size = getCaliValue();
 
 	if (!mapdata[map]) {
 		WARNING("No map %d\n", map);
 		return;
 	}
-	if (a1page == 0 || a2page == 0 || a3page == 0) {
+	if (r1.page == 0 || r2.page == 0 || r3.page == 0) {
 		WARNING("non-array source variable\n");
 		return;
 	}
+	int *a1 = v_resolveRef(&r1);
+	int *a2 = v_resolveRef(&r2);
+	int *a3 = v_resolveRef(&r3);
 	WORD *p = mapdata[map];
 	for (int i = 0; i < size; i++)
 		*p++ = SDL_SwapLE16(*a1++);

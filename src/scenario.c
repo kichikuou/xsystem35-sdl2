@@ -380,37 +380,37 @@ void sl_stackClear_labelCall(int cnt) {
 }
 
 /* US */
-void sl_pushVar(int *topVar, int cnt) {
+void sl_pushVar(struct VarRef *vref, int cnt) {
 	int *tmp = malloc(sizeof(int) * (cnt + 2));
 
 	if (tmp == NULL) {
 		NOMEMERR();
 	}
 	
-	*tmp     = preVarPage;
-	*(tmp+1) = preVarIndex;
-	memcpy(tmp + 2, topVar, sizeof(int) * cnt);
+	*tmp     = vref->page;
+	*(tmp+1) = vref->index;
+	memcpy(tmp + 2, v_resolveRef(vref), sizeof(int) * cnt);
 	sl_push(STACK_VARIABLE, tmp, cnt + 2);
 	free(tmp);
 }
 
 /* UG */
-void sl_popVar(int *topvar, int cnt) {
+void sl_popVar(struct VarRef *vref, int cnt) {
 	int *tmp = sl_pop();
 
 	if (*tmp != STACK_VARIABLE) {
 		SYSERROR("Stack buffer is illegal");
 	}
-	if (*(tmp + 2) != preVarPage){
+	if (*(tmp + 2) != vref->page){
 		WARNING("Variable is not match with stacked variable\n");
 	}
-	if (*(tmp + 3) != preVarIndex) {
+	if (*(tmp + 3) != vref->index) {
 		WARNING("Variable is not match with stacked variable\n");
 	}
 	if (*(tmp + 1) != cnt + 2) {
 		WARNING("Variable count is not match with stacked variable\n");
 	}
-	memcpy(topvar, tmp + 4, sizeof(int) * cnt);
+	memcpy(v_resolveRef(vref), tmp + 4, sizeof(int) * cnt);
 	free(tmp);
 }
 

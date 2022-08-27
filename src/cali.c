@@ -31,6 +31,7 @@
 #include "portab.h"
 #include "variable.h"
 #include "scenario.h"
+#include "nact.h"
 #include "xsystem35.h"
 
 #define CALI_TRUE       (1)            /* comparison is ture  */
@@ -44,14 +45,10 @@
 
 #define CALI_DEPTH_MAX  (256)
 
-int getCaliValue();
-int *getCaliVariable();
-int *getVariable();
-
 static int buf[CALI_DEPTH_MAX]; /* 計算式バッファ */
 static int *cali = buf;         /* インデックス */
 
-static int *getVar(int c0) {
+static int *getVar(int c0, struct VarRef *ref) {
 	int addr = sl_getIndex();
 	int var;
 	if ((c0 & 0x40) == 0) {
@@ -65,7 +62,7 @@ static int *getVar(int c0) {
 			c1 = sl_getc();
 			var = c0 << 8 | c1;
 			int index = getCaliValue();
-			int *store = v_ref_indexed(var, index);
+			int *store = v_ref_indexed(var, index, ref);
 			if (!store)
 				WARNING("%03d:%05x: Out of bounds index access: %s[%d]\n", sl_getPage(), addr, v_name(var), index);
 			return store;
@@ -76,28 +73,36 @@ static int *getVar(int c0) {
 			return NULL;
 		}
 	}
-	int *store = v_ref(var);
+	int *store = v_ref(var, ref);
 	if (!store)
 		WARNING("%03d:%05x: Out of bounds array access: %s\n", sl_getPage(), addr, v_name(var));
 	return store;
 }
 
 /* 変数番号が返る */
-int *getCaliVariable() {
-	int *c0 = getVar(sl_getc());
+int *getCaliVariable(void) {
+	int *c0 = getVar(sl_getc(), NULL);
 	if (sl_getc() != 0x7f) {
 		SYSERROR("Something is Wrong @ %03d:%05x", sl_getPage(), sl_getIndex());
 	}
 	return c0;
 }
 
+bool getCaliArray(struct VarRef *ref) {
+	bool ok = getVar(sl_getc(), ref) != NULL;
+	if (sl_getc() != 0x7f) {
+		SYSERROR("Something is Wrong @ %03d:%05x", sl_getPage(), sl_getIndex());
+	}
+	return ok;
+}
+
 /* 変数代入コマンド用 */
-int *getVariable() {
-	return getVar(sl_getc());
+int *getVariable(void) {
+	return getVar(sl_getc(), NULL);
 }
 
 /* 計算式の評価後の値が返る */
-int getCaliValue() {
+int getCaliValue(void) {
 	register int ingVal,edVal,rstVal;
 	int c0,c1;
 	int *bufc = cali;
@@ -139,7 +144,7 @@ int getCaliValue() {
 				}
 			}
 		l_var:
-			t = getVar(c0);
+			t = getVar(c0, NULL);
 			*cali++ = t ? *t : 0;
 		} else {
 			switch(c0) {

@@ -37,23 +37,32 @@ struct VarPage {
 	int *value;
 };
 
+struct VarRef {
+	int var;
+	int page;
+	int index;
+};
+
 extern int sysVar[];
 extern struct VarPage varPage[];
 extern double longVar[];
 
-extern int preVarPage;
-extern int preVarIndex;
-extern int preVarNo;
+static inline int *v_resolveRef(struct VarRef *r) {
+	return varPage[r->page].value + r->index;
+}
 
 const char *v_name(int var);
-int *v_ref(int var);
-int *v_ref_indexed(int var, int index);
+int *v_ref_indexed(int var, int index, struct VarRef *ref);
 bool v_allocatePage(int page, int size, bool saveflag);
 bool v_bindArray(int datavar, int *pointvar, int offset, int page);
 bool v_unbindArray(int datavar);
 void v_getPageStatus(int page, int *in_use, int *size);
 void v_init(void);
 void v_reset(void);
+
+static inline int *v_ref(int var, struct VarRef *ref) {
+	return v_ref_indexed(var, -1, ref);
+}
 
 void svar_init(int max_index, int len);
 int svar_maxindex(void);

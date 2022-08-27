@@ -52,10 +52,6 @@ static char **strVar;
 int strvar_cnt;
 int strvar_len;
 
-int preVarPage;      /* 直前にアクセスした変数のページ */
-int preVarIndex;     /* 直前にアクセスした変数のINDEX */
-int preVarNo;        /* 直前にアクセスした変数の番号 */
-
 const char *v_name(int var) {
 	if (var < nact->ain.varnum)
 		return nact->ain.var[var];
@@ -72,47 +68,37 @@ static char *advance(const char *s, int n) {
 	return (char *)s;
 }
 
-int *v_ref(int var) {
+int *v_ref_indexed(int var, int index, struct VarRef *ref) {
 	VariableAttributes *attr = &attributes[var];
-	preVarPage = attr->page;
-	preVarNo   = var;
+	int page = attr->page;
 
-	if (attr->page == 0) {
-		// Normal variable access
-		preVarIndex = var;
-		return sysVar + var;
-	}
-
-	// Implicit array access
-	int *index = attr->pointvar;
-	int page   = attr->page;
-	int offset = attr->offset;
-	if (*index + offset >= varPage[page].size)
-		return NULL;
-	preVarIndex = offset + *index;
-	return varPage[page].value + offset + *index;
-}
-
-int *v_ref_indexed(int var, int index) {
-	VariableAttributes *attr = &attributes[var];
-	preVarPage = attr->page;
-	preVarNo   = var;
-
-	if (attr->page == 0) {
+	if (page == 0) {
+		if (index < 0)
+			index = 0;
 		// If VAR_n is not an array variable, VAR_n[i] points to VAR_(n+i).
-		if ((var + index) >= SYSVAR_MAX)
+		index += var;
+		if (ref) {
+			ref->var = var;
+			ref->page = page;
+			ref->index = index;
+		}
+		if (index >= SYSVAR_MAX)
 			return NULL;
-		preVarIndex = var + index;
-		return sysVar + var + index;
+		return sysVar + index;
 	}
 
-	// Indexed array access
-	int page   = attr->page;
-	int offset = attr->offset;
-	if (offset + index >= varPage[page].size)
+	if (index < 0)  // Implicit array access
+		index = *attr->pointvar;
+
+	index += attr->offset;
+	if (ref) {
+		ref->var = var;
+		ref->page = page;
+		ref->index = index;
+	}
+	if (index >= varPage[page].size)
 		return NULL;
-	preVarIndex = offset + index;
-	return varPage[page].value + offset + index;
+	return varPage[page].value + index;
 }
 
 // DC command

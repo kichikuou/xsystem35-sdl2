@@ -374,7 +374,7 @@ static void cmd_variables(cJSON *args, cJSON *resp) {
 			cJSON_AddItemToArray(variables, var);
 			cJSON_AddStringToObject(var, "name", dsym_variable_name(symbols, i));
 			char value[20];
-			int *store = v_ref(i);
+			int *store = v_ref(i, NULL);
 			if (store)
 				sprintf(value, "%d", *store);
 			else
@@ -430,7 +430,7 @@ static void cmd_setVariable(cJSON *args, cJSON *resp) {
 			cJSON_AddStringToObject(resp, "message", "syntax error");
 			return;
 		}
-		int *store = v_ref(var);
+		int *store = v_ref(var, NULL);
 		if (!store) {
 			cJSON_AddBoolToObject(resp, "success", false);
 			cJSON_AddStringToObject(resp, "message", "out of bounds array access");

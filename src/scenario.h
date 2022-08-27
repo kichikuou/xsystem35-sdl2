@@ -27,6 +27,8 @@
 #include "portab.h"
 #include "system.h"
 
+struct VarRef;
+
 // Warning: changing these enum values will break savedata compatibility.
 enum stack_frame_type {
 	STACK_NEARJMP = 1,
@@ -70,8 +72,8 @@ void sl_retFar2(void);
 void sl_stackClear_allCall(void);
 void sl_stackClear_labelCall(int cnt);
 void sl_stackClear_pageCall(int cnt);
-void sl_pushVar(int *topvar, int cnt);
-void sl_popVar(int *topvar, int cnt);
+void sl_pushVar(struct VarRef *vref, int cnt);
+void sl_popVar(struct VarRef *vref, int cnt);
 int *sl_getStackInfo(int *size);
 void sl_putStackInfo(int *data, int size);
 void sl_pushData(int *data, int cnt);

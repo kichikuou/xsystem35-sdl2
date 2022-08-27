@@ -254,7 +254,7 @@ int save_copyAll(int dstno, int srcno) {
 }
 
 /* データの一部ロード */
-int save_loadPartial(int no, int page, int offset, int cnt) {
+int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 	Ald_baseHdr *save_base;
 	char *vtop;
 	WORD *tmp;
@@ -265,8 +265,8 @@ int save_loadPartial(int no, int page, int offset, int cnt) {
 	if (no >= SAVE_MAXNUMBER) {
 		return SAVE_SAVEERR;
 	}
-	cnt = min(cnt, varPage[page].size - offset);
-	var = varPage[page].value + offset;
+	cnt = min(cnt, varPage[vref->page].size - vref->index);
+	var = varPage[vref->page].value + vref->index;
 	
 	saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL) {
@@ -283,14 +283,14 @@ int save_loadPartial(int no, int page, int offset, int cnt) {
 	if (save_base->version != SAVE_DATAVERSION) {
 		fprintf(stderr, "save_loadPartial(): endian mismatch\n");
 		goto errexit;
-        }
+	}
 
-	if (save_base->varSys[page] == 0) { 
+	if (save_base->varSys[vref->page] == 0) {
 		// fprintf(stderr, "No available Variable\n");
 		goto errexit;
 	}
-	vtop = saveTop + save_base->varSys[page] + sizeof(Ald_sysVarHdr);
-	tmp = (WORD *)vtop + offset;
+	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
+	tmp = (WORD *)vtop + vref->index;
 	for (i = 0; i < cnt; i++) {
 		*var = *tmp; tmp++; var++;
 	}
@@ -305,7 +305,7 @@ int save_loadPartial(int no, int page, int offset, int cnt) {
 }
 
 /* データの一部セーブ */
-int save_savePartial(int no, int page, int offset, int cnt) {
+int save_savePartial(int no, struct VarRef *vref, int cnt) {
 	Ald_baseHdr *save_base;
 	WORD *tmp;
 	char *vtop;
@@ -316,10 +316,10 @@ int save_savePartial(int no, int page, int offset, int cnt) {
 	if (no >= SAVE_MAXNUMBER) {
 		return SAVE_SAVEERR;
 	}
-	if (!varPage[page].saveflag)
+	if (!varPage[vref->page].saveflag)
 		goto errexit;
-	cnt = min(cnt, varPage[page].size - offset);
-	var = varPage[page].value + offset;
+	cnt = min(cnt, varPage[vref->page].size - vref->index);
+	var = varPage[vref->page].value + vref->index;
 	
 	saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL)
@@ -331,8 +331,8 @@ int save_savePartial(int no, int page, int offset, int cnt) {
 		fprintf(stderr, "save_savePartial(): endian mismatch\n");
 		goto errexit;
         }
-	vtop = saveTop + save_base->varSys[page] + sizeof(Ald_sysVarHdr);
-	tmp = (WORD *)vtop + offset;
+	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
+	tmp = (WORD *)vtop + vref->index;
 	for (i = 0; i < cnt; i++) {
 		*tmp = (WORD)*var; tmp++; var++;
 	}

@@ -68,20 +68,22 @@ void commandUR() {
 
 void commandUS() {
 	/* ローカル変数指定(変数 PUSH) */
-	int *var = getCaliVariable();
+	struct VarRef vref;
+	getCaliArray(&vref);
 	int cnt = getCaliValue();
 	
-	sl_pushVar(var, cnt);
-	DEBUG_COMMAND("US %p,%d:\n",var,cnt);
+	sl_pushVar(&vref, cnt);
+	DEBUG_COMMAND("US %d,%d:\n", vref.var, cnt);
 }
 
 void commandUG() {
 	/* ローカル変数指定(変数 POP) */
-	int *var = getCaliVariable();
+	struct VarRef vref;
+	getCaliArray(&vref);
 	int cnt = getCaliValue();
 	
-	sl_popVar(var, cnt);
-	DEBUG_COMMAND("UG %p,%d:\n",var,cnt);
+	sl_popVar(&vref, cnt);
+	DEBUG_COMMAND("UG %p,%d:\n", vref.var, cnt);
 }
 
 void commandUP0() {

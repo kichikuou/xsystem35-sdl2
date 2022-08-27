@@ -48,14 +48,14 @@ void commandDI() {
 }
 
 void commandDS() {
+	struct VarRef data_var;
 	int *point_var = getCaliVariable();
-	int *data_var  = getCaliVariable();
-	int varno      = preVarNo;
+	getCaliArray(&data_var);
 	int offset     = getCaliValue();
 	int page       = getCaliValue();
 	
-	DEBUG_COMMAND("DS %p,%p,%d,%d:\n",point_var, data_var, offset, page);
-	if (!v_bindArray(varno, point_var, offset, page)) {
+	DEBUG_COMMAND("DS %p,%d,%d,%d:\n",point_var, data_var.var, offset, page);
+	if (!v_bindArray(data_var.var, point_var, offset, page)) {
 		WARNING("commandDS(): Array allocate failed\n");
 		WARNING("if you are playing 'Pastel Chime', please patch to scenario(see patch/README.TXT for detail)\n");
 	}
@@ -63,30 +63,30 @@ void commandDS() {
 
 
 void commandDR() {
-	int *data_var = getCaliVariable();
-	v_unbindArray(preVarNo);
+	struct VarRef data_var;
+	getCaliArray(&data_var);
+	v_unbindArray(data_var.var);
 	
-	DEBUG_COMMAND("DR %p:\n", data_var);
+	DEBUG_COMMAND("DR %d:\n", data_var.var);
 }
 
 void commandDF() {
-	int *data_var = getCaliVariable();
-	int page      = preVarPage;
-	int offset    = preVarIndex;
-	int cnt       = getCaliValue();
-	int data      = getCaliValue();
+	struct VarRef data_var;
+	getCaliArray(&data_var);
+	int cnt  = getCaliValue();
+	int data = getCaliValue();
 	
 	DEBUG_COMMAND("DF %p,%d,%d:\n", data_var, cnt, data);
 
-	if (page) {
-		int maxlen = varPage[page].size - offset;
+	if (data_var.page) {
+		int maxlen = varPage[data_var.page].size - data_var.index;
 		if (cnt > maxlen) {
 			WARNING("%03d:%05x: count exceeds array boundary (%d > %d)\n", sl_getPage(), sl_getIndex(), cnt, maxlen);
 			cnt = maxlen;
 		}
 	}
 
-	while (cnt--) {
-		*data_var = data; data_var++;
-	}
+	int *p = v_resolveRef(&data_var);
+	while (cnt--)
+		*p++ = data;
 }

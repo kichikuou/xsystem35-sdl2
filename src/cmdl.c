@@ -51,18 +51,17 @@ void commandLD() {
 
 void commandLP() {
 	/* セーブデータの一部分をロードする。(数値変数部) */
-	int num    = getCaliValue();
-	int *point = getCaliVariable();
-	int page   = preVarPage;
-	int index  = preVarIndex;
-	int cnt    = getCaliValue();
+	struct VarRef point;
+	int num = getCaliValue();
+	getCaliArray(&point);
+	int cnt = getCaliValue();
 	
 	if (num <= 0) {
 		sysVar[0] = 255;
 	} else {
-		sysVar[0]  = save_loadPartial(num - 1, page, index, cnt);
+		sysVar[0] = save_loadPartial(num - 1, &point, cnt);
 	}
-	DEBUG_COMMAND("LP %d,%p,%d:\n",num, point, cnt);
+	DEBUG_COMMAND("LP %d,%d,%d:\n",num, point.var, cnt);
 }
 
 void commandLT() {

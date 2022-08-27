@@ -38,10 +38,6 @@
 #define fromUTF8(s) codeconv(nact->encoding, UTF8, s)
 #define fromSJIS(s) codeconv(nact->encoding, SHIFT_JIS, s)
 
-/* コマンド解析時に参照する */
-extern int getCaliValue();
-extern int *getCaliVariable();
-extern int *getVariable();
 extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
 extern void sys_setCharacterEncoding(CharacterEncoding encoding);
@@ -50,6 +46,13 @@ extern void nact_main();
 extern void nact_init();
 extern void nact_reset(void);
 extern void nact_quit(boolean restart);
+
+// cali.c
+struct VarRef;
+int getCaliValue(void);
+int *getCaliVariable(void);
+bool getCaliArray(struct VarRef *ref);
+int *getVariable(void);
 
 // cmd_check.c
 extern void exec_command(void);

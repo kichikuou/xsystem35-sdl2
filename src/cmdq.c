@@ -50,21 +50,20 @@ void commandQD() {
 
 void commandQP() {
 	/* 変数領域などのデータを一部セーブする。(数値変数部) */
-	int num    = getCaliValue();
-	int *point = getCaliVariable();
-	int page   = preVarPage;
-	int index  = preVarIndex;
-	int cnt    = getCaliValue();
+	struct VarRef point;
+	int num = getCaliValue();
+	getCaliArray(&point);
+	int cnt = getCaliValue();
 	
 	if (num <= 0) {
 		sysVar[0] = 255;
 	} else {
-		sysVar[0] = save_savePartial(num - 1, page, index, cnt);
+		sysVar[0] = save_savePartial(num - 1, &point, cnt);
 	}
 	
 	WARN_SAVEERR("QP", sysVar[0]);
 	
-	DEBUG_COMMAND("QP %d,%p,%d:\n", num, point, cnt);
+	DEBUG_COMMAND("QP %d,%d,%d:\n", num, point.var, cnt);
 }
 
 void commandQC() {
