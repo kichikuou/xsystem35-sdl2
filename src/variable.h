@@ -50,6 +50,9 @@ extern double longVar[];
 static inline int *v_resolveRef(struct VarRef *r) {
 	return varPage[r->page].value + r->index;
 }
+static inline int v_sliceSize(struct VarRef *r) {
+	return varPage[r->page].size - r->index;
+}
 
 const char *v_name(int var);
 int *v_ref_indexed(int var, int index, struct VarRef *ref);

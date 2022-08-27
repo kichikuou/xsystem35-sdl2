@@ -76,76 +76,62 @@ int save_delete_file(int index) {
 	return 1; /* とりあえず */
 }
 
-/* 指定ファイルへの変数の書き込み */
-int save_save_var_with_file(char *fname_utf8, int *start, int cnt) {
-	int status = 0, size, i;
-	FILE *fp;
-	WORD *tmp;
-	
-	tmp = (WORD *)malloc(cnt * sizeof(WORD));
-	
-	if (tmp == NULL) {
-		WARNING("Out of memory\n");
+// QE command
+int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt) {
+	// FIXME: System39.exe does not truncate existing file.
+	FILE *fp = fc_open(fname_utf8, 'w');
+	if (!fp)
 		return SAVE_SAVEERR;
+
+	if (cnt > v_sliceSize(src)) {
+		WARNING("QE: array size too small (size = %d, data count = %d)\n", v_sliceSize(src), cnt);
+		cnt = v_sliceSize(src);
 	}
-	
-	for (i = 0; i < cnt; i++) {
-		tmp[i] = SDL_SwapLE16((WORD)start[i]);
+
+	int *p = v_resolveRef(src);
+	while (cnt--) {
+		fputc(*p & 0xff, fp);
+		fputc(*p >> 8, fp);
+		p++;
 	}
-	
-	if (NULL == (fp = fc_open(fname_utf8, 'w'))) {
-		status = SAVE_SAVEERR; goto errexit;
-	}
-	
-	size = fwrite(tmp, sizeof(WORD), cnt, fp);
-	
-	if (size != cnt) {
-		status = SAVE_OTHERERR;
-	} else {
-		status = SAVE_SAVEOK0;
-	}
-	
 	fclose(fp);
 	scheduleSync();
- errexit:	
-	free(tmp);
-	
-	return status;
+	return SAVE_SAVEOK0;
 }
 
-/* 指定ファイルからの変数の読み込み */
-int save_load_var_with_file(char *fname_utf8, int *start, int cnt) {
-	int status = 0, size, i;
-	FILE *fp;
-	WORD *tmp;
-	
-	tmp = (WORD *)malloc(cnt * sizeof(WORD));
-	
-	if (tmp == NULL) {
+// LE command
+int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
+	FILE *fp = fc_open(fname_utf8, 'r');
+	if (!fp)
+		return SAVE_LOADERR;
+
+	WORD *tmp = malloc(cnt * sizeof(WORD));
+	if (!tmp) {
 		WARNING("Out of memory\n");
+		fclose(fp);
 		return SAVE_LOADERR;
 	}
-	
-	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
-		status = SAVE_LOADERR; goto errexit;
-	}
-	
-	size = fread(tmp, sizeof(WORD), cnt, fp);
+
+	size_t size = fread(tmp, sizeof(WORD), cnt, fp);
+	fclose(fp);
 
 	if (size != cnt) {
-		status = SAVE_LOADSHORTAGE;
-	} else {
-		status = SAVE_LOADOK;
-	}
-	
-	for (i = 0; i < cnt; i++) {
-		start[i] = SDL_SwapLE16(tmp[i]);
+		WARNING("LE: data file too small (requested = %d, loaded = %d)", cnt, size);
+		cnt = size;
+		// NOTE: System39.exe never returns SAVE_LOADSHORTAGE (254).
 	}
 
-	fclose(fp);
- errexit:	
+	if (cnt > v_sliceSize(dest)) {
+		WARNING("LE: array size too small (size = %d, data count = %d)\n", v_sliceSize(dest), cnt);
+		cnt = v_sliceSize(dest);
+	}
+
+	int *start = v_resolveRef(dest);
+	for (int i = 0; i < cnt; i++)
+		start[i] = SDL_SwapLE16(tmp[i]);
+
 	free(tmp);
-	return status;
+	return SAVE_LOADOK;
 }
 
 
@@ -265,8 +251,8 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 	if (no >= SAVE_MAXNUMBER) {
 		return SAVE_SAVEERR;
 	}
-	cnt = min(cnt, varPage[vref->page].size - vref->index);
-	var = varPage[vref->page].value + vref->index;
+	cnt = min(cnt, v_sliceSize(vref));
+	var = v_resolveRef(vref);
 	
 	saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL) {
@@ -318,8 +304,8 @@ int save_savePartial(int no, struct VarRef *vref, int cnt) {
 	}
 	if (!varPage[vref->page].saveflag)
 		goto errexit;
-	cnt = min(cnt, varPage[vref->page].size - vref->index);
-	var = varPage[vref->page].value + vref->index;
+	cnt = min(cnt, v_sliceSize(vref));
+	var = v_resolveRef(vref);
 	
 	saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL)

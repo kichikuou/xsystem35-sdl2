@@ -83,30 +83,32 @@ void commandQC() {
 }
 
 void commandQE() {
-	int type       = sl_getc();
+	int type = sl_getc();
 	const char *filename = sl_getString(':');
-	int *var, _var = 0, cnt;
+	int var, cnt;
+	struct VarRef vref;
 
 	char *fname_utf8 = toUTF8(filename);
-	switch(type) {
+	switch (type) {
 	case 0:
-		var = getCaliVariable();
+		getCaliArray(&vref);
+		var = vref.var;
 		cnt = getCaliValue();
-		sysVar[0] = save_save_var_with_file(fname_utf8, var, cnt);
+		sysVar[0] = save_vars_to_file(fname_utf8, &vref, cnt);
 		break;
 	case 1:
-		_var = getCaliValue();
-		cnt  = getCaliValue();
-		sysVar[0] = save_save_str_with_file(fname_utf8, _var, cnt);
+		var = getCaliValue();
+		cnt = getCaliValue();
+		sysVar[0] = save_save_str_with_file(fname_utf8, var, cnt);
 		break;
 	default:
-		_var = getCaliValue();
-		cnt  = getCaliValue();
+		var = getCaliValue();
+		cnt = getCaliValue();
 		WARNING("Unknown QE command %d\n", type);
 		break;
 	}
 	free(fname_utf8);
 	WARN_SAVEERR("QE", sysVar[0]);
 	
-	DEBUG_COMMAND("QE %d,%s,%d,%d:\n", type, filename, _var, cnt);
+	DEBUG_COMMAND("QE %d,%s,%d,%d:\n", type, filename, var, cnt);
 }

@@ -79,7 +79,7 @@ void commandDF() {
 	DEBUG_COMMAND("DF %p,%d,%d:\n", data_var, cnt, data);
 
 	if (data_var.page) {
-		int maxlen = varPage[data_var.page].size - data_var.index;
+		int maxlen = v_sliceSize(&data_var);
 		if (cnt > maxlen) {
 			WARNING("%03d:%05x: count exceeds array boundary (%d > %d)\n", sl_getPage(), sl_getIndex(), cnt, maxlen);
 			cnt = maxlen;

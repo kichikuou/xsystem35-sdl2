@@ -109,30 +109,31 @@ void commandLT() {
 void commandLE() {
 	int type = sl_getc();
 	const char *filename = sl_getString(':');
-	int *var, _var = 0;
-	int num;
+	int var, cnt;
+	struct VarRef vref;
 
 	char *fname_utf8 = toUTF8(filename);
-	switch(type) {
+	switch (type) {
 	case 0: /* T2 */
-		var = getCaliVariable();
-		num  = getCaliValue();
-		sysVar[0] = save_load_var_with_file(fname_utf8, var, num);
+		getCaliArray(&vref);
+		var = vref.var;
+		cnt = getCaliValue();
+		sysVar[0] = load_vars_from_file(fname_utf8, &vref, cnt);
 		break;
 	case 1: /* 456 */
-		_var = getCaliValue();
-		num  = getCaliValue();
-		sysVar[0] = save_load_str_with_file(fname_utf8, _var, num);
+		var = getCaliValue();
+		cnt = getCaliValue();
+		sysVar[0] = save_load_str_with_file(fname_utf8, var, cnt);
 		break;
 	default:
-		_var = getCaliValue();
-		num  = getCaliValue();
+		var = getCaliValue();
+		cnt = getCaliValue();
 		WARNING("Unknown LE command %d\n", type);
 		break;
 	}
 	free(fname_utf8);
 	
-	DEBUG_COMMAND("LE %d,%s,%d,%d:\n",type, filename, _var, num);
+	DEBUG_COMMAND("LE %d,%s,%d,%d:\n",type, filename, var, cnt);
 }
 
 void commandLL() {

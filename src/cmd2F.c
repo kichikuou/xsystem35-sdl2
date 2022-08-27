@@ -380,25 +380,31 @@ void commands2F23() {
 void commands2F24() {
 	int type = sl_getc();
 	const char *file_name = sl_getString(0);
-	int *var = NULL, _var = 0;
-	int num = 0;
+	int var, cnt;
+	struct VarRef vref;
 
 	char *fname_utf8 = toUTF8(file_name);
-	switch(type) {
+	switch (type) {
 	case 0:
-		var = getCaliVariable();
-		num  = getCaliValue();
-		sysVar[0] = save_load_var_with_file(fname_utf8, var, num);
+		getCaliArray(&vref);
+		var = vref.var;
+		cnt = getCaliValue();
+		sysVar[0] = load_vars_from_file(fname_utf8, &vref, cnt);
 		break;
 	case 1:
-		_var = getCaliValue();
-		num  = getCaliValue();
-		sysVar[0] = save_load_str_with_file(fname_utf8, _var, num);
+		var = getCaliValue();
+		cnt = getCaliValue();
+		sysVar[0] = save_load_str_with_file(fname_utf8, var, cnt);
+		break;
+	default:
+		var = getCaliValue();
+		cnt = getCaliValue();
+		WARNING("Unknown LE command type %d\n", type);
 		break;
 	}
 	free(fname_utf8);
 	
-	DEBUG_COMMAND("LE(new) %d, %s, %d, %d:\n", type, file_name, var, num);
+	DEBUG_COMMAND("LE(new) %d, %s, %d, %d:\n", type, file_name, var, cnt);
 }
 
 void commands2F25() {
@@ -483,29 +489,31 @@ void commands2F29() {
 void commands2F2A() {
 	int type = sl_getc();
 	const char *file_name = sl_getString(0);
-	int *var, _var = 0, cnt;
+	int var, cnt;
+	struct VarRef vref;
 
 	char *fname_utf8 = toUTF8(file_name);
 	switch(type) {
 	case 0:
-		var = getCaliVariable();
+		getCaliArray(&vref);
+		var = vref.var;
 		cnt = getCaliValue();
-		sysVar[0] = save_save_var_with_file(fname_utf8, var, cnt);
+		sysVar[0] = save_vars_to_file(fname_utf8, &vref, cnt);
 		break;
 	case 1:
-		_var = getCaliValue();
-		cnt  = getCaliValue();
-		sysVar[0] = save_save_str_with_file(fname_utf8, _var, cnt);
+		var = getCaliValue();
+		cnt = getCaliValue();
+		sysVar[0] = save_save_str_with_file(fname_utf8, var, cnt);
 		break;
 	default:
-		_var = getCaliValue();
-		cnt  = getCaliValue();
+		var = getCaliValue();
+		cnt = getCaliValue();
 		WARNING("Unknown QE command\n");
 		break;
 	}
 	free(fname_utf8);
 
-	DEBUG_COMMAND("QE(new) %d, %s, %d, %d:\n", type, file_name, _var, cnt);
+	DEBUG_COMMAND("QE(new) %d, %s, %d, %d:\n", type, file_name, var, cnt);
 }
 
 void commands2F2B() {
