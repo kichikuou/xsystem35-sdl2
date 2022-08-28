@@ -194,3 +194,8 @@ void nact_quit(boolean restart) {
 	nact->restart = restart;
 	nact->wait_vsync = TRUE;
 }
+
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE int nact_current_page(void) { return nact->current_page; }
+EMSCRIPTEN_KEEPALIVE int nact_current_addr(void) { return nact->current_addr; }
+#endif
