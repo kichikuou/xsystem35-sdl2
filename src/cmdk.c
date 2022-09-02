@@ -34,7 +34,7 @@ void commandKI() {
 	
 	*var = network_create_channel(port_num, user_max);
 	
-	DEBUG_COMMAND_YET("KI %d,%d,%d:\n", *var, port_num, user_max);
+	DEBUG_COMMAND_YET("KI %d,%d,%d:", *var, port_num, user_max);
 	return;
 }
 
@@ -44,7 +44,7 @@ void commandKK() {
 
 	network_close(use_num);
 	
-	DEBUG_COMMAND_YET("KK %d:\n", use_num);
+	DEBUG_COMMAND_YET("KK %d:", use_num);
 	return;
 }
 
@@ -54,7 +54,7 @@ void commandKN() {
 
 	*var = network_get_channel();
 	
-	DEBUG_COMMAND_YET("KN %d:\n", *var);
+	DEBUG_COMMAND_YET("KN %d:", *var);
 	return;
 }
 
@@ -64,7 +64,7 @@ void commandKP() {
 	
 	*var = network_check_buffer();
 	
-	DEBUG_COMMAND_YET("KP %d:\n", *var);
+	DEBUG_COMMAND_YET("KP %d:", *var);
 	return;
 }
 
@@ -75,7 +75,7 @@ void commandKQ() {
 	
 	*var = network_get_user_state(user_num);
 	
-	DEBUG_COMMAND_YET("KQ %d,%d:\n", *var, user_num);
+	DEBUG_COMMAND_YET("KQ %d,%d:", *var, user_num);
 	return;
 }
 
@@ -85,7 +85,7 @@ void commandKR() {
 	
 	network_read_buffer(var);
 	
-	DEBUG_COMMAND_YET("KR %d:\n", *var);
+	DEBUG_COMMAND_YET("KR %d:", *var);
 	return;
 }
 
@@ -96,6 +96,6 @@ void commandKW() {
 
 	network_write_buffer(var, num);
 	
-	DEBUG_COMMAND_YET("KR %d,%d:\n", *var, num);
+	DEBUG_COMMAND_YET("KR %d,%d:", *var, num);
 	return;
 }

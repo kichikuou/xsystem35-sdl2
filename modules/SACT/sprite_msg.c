@@ -194,7 +194,7 @@ void smsg_add(const char *msg) {
 	
 	len = MSGBUFMAX - (int)strlen(sact.msgbuf);
 	if (len < 0) {
-		WARNING("buf shortage (%d)\n", len);
+		WARNING("buf shortage (%d)", len);
 		return;
 	}
 	
@@ -461,7 +461,7 @@ int smsg_update(sprite_t *sp) {
 	
 	gre_BlendUseAMap(sf0, dx, dy, sf0, dx, dy, sp->u.msg.canvas, sx, sy, w, h, sp->u.msg.canvas, sx, sy, sp->blendrate);
 	
-	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
 	
 	return OK;

@@ -33,8 +33,8 @@ void commandDC() {
 	int save = getCaliValue();
 
 	if (!v_allocatePage(page, maxindex + 1, !!save))
-		WARNING("Array allocation failed: page=%d size=%d\n", page, maxindex);
-	DEBUG_COMMAND("DC %d,%d,%d:\n", page, maxindex, save);
+		WARNING("Array allocation failed: page=%d size=%d", page, maxindex);
+	DEBUG_COMMAND("DC %d,%d,%d:", page, maxindex, save);
 }
 
 void commandDI() {
@@ -44,7 +44,7 @@ void commandDI() {
 	
 	v_getPageStatus(page, var_use, var_size);
 
-	DEBUG_COMMAND("DI %d,%p,%p:\n", page, var_use, var_size);
+	DEBUG_COMMAND("DI %d,%p,%p:", page, var_use, var_size);
 }
 
 void commandDS() {
@@ -54,10 +54,10 @@ void commandDS() {
 	int offset     = getCaliValue();
 	int page       = getCaliValue();
 	
-	DEBUG_COMMAND("DS %p,%d,%d,%d:\n",point_var, data_var.var, offset, page);
+	DEBUG_COMMAND("DS %p,%d,%d,%d:",point_var, data_var.var, offset, page);
 	if (!v_bindArray(data_var.var, point_var, offset, page)) {
-		WARNING("commandDS(): Array allocate failed\n");
-		WARNING("if you are playing 'Pastel Chime', please patch to scenario(see patch/README.TXT for detail)\n");
+		WARNING("commandDS(): Array allocate failed");
+		WARNING("if you are playing 'Pastel Chime', please patch to scenario(see patch/README.TXT for detail)");
 	}
 }
 
@@ -67,7 +67,7 @@ void commandDR() {
 	getCaliArray(&data_var);
 	v_unbindArray(data_var.var);
 	
-	DEBUG_COMMAND("DR %d:\n", data_var.var);
+	DEBUG_COMMAND("DR %d:", data_var.var);
 }
 
 void commandDF() {
@@ -76,12 +76,12 @@ void commandDF() {
 	int cnt  = getCaliValue();
 	int data = getCaliValue();
 	
-	DEBUG_COMMAND("DF %p,%d,%d:\n", data_var, cnt, data);
+	DEBUG_COMMAND("DF %p,%d,%d:", data_var, cnt, data);
 
 	if (data_var.page) {
 		int maxlen = v_sliceSize(&data_var);
 		if (cnt > maxlen) {
-			WARNING("%03d:%05x: count exceeds array boundary (%d > %d)\n", sl_getPage(), sl_getIndex(), cnt, maxlen);
+			WARNING("%03d:%05x: count exceeds array boundary (%d > %d)", sl_getPage(), sl_getIndex(), cnt, maxlen);
 			cnt = maxlen;
 		}
 	}

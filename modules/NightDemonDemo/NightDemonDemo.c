@@ -65,7 +65,7 @@ static void ndd_run(int demonum) {
 			ags_updateFull();
 			cgdata_free(cg);
 		} else {
-			WARNING("Cannot decode CG %d in %s\n", i, alk_path);
+			WARNING("Cannot decode CG %d in %s", i, alk_path);
 		}
 
 		int wait_ms = (i + 1) * (1000 / FPS) - (sdl_getTicks() - start);
@@ -92,7 +92,7 @@ static void Init() {
 	
 	*var = 1;
 	
-	DEBUG_COMMAND("NightDemonDemo.Init %d,%d,%d,%p:\n", p1, p2, p3, var);
+	DEBUG_COMMAND("NightDemonDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }
 
 static void Run() {
@@ -101,7 +101,7 @@ static void Run() {
 	
 	ndd_run(p1);
 	
-	DEBUG_COMMAND("NightDemonDemo.Run %d,%d:\n", p1, p2);
+	DEBUG_COMMAND("NightDemonDemo.Run %d,%d:", p1, p2);
 }
 
 static const ModuleFunc functions[] = {

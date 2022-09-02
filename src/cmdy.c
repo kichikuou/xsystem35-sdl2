@@ -125,7 +125,7 @@ void commandY() {
 			sysVar[0] = (int)(genrand() * p2) +1;
 		}
 	} else {
-		WARNING("Y undefined command %d\n", p1);
+		WARNING("Y undefined command %d", p1);
 	}
-	DEBUG_COMMAND("Y %d,%d:\n",p1,p2);
+	DEBUG_COMMAND("Y %d,%d:",p1,p2);
 }

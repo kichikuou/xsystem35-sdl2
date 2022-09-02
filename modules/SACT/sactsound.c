@@ -167,7 +167,7 @@ int ssnd_playLRrev(int no) {
 
 // 指定の番号の効果音が存在するかどうかをチェック
 int ssnd_getlinknum(int no) {
-	WARNING("NOT IMPLEMENTED\n");
+	WARNING("NOT IMPLEMENTED");
 	return OK;
 }
 

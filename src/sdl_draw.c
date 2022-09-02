@@ -292,7 +292,7 @@ SDL_Rect sdl_floodFill(int x, int y, int c) {
 	case 4:
 		return sdl_floodFill___DWORD(x, y, col);
 	default:
-		WARNING("sdl_floodFill: unsupported DIB format\n");
+		WARNING("sdl_floodFill: unsupported DIB format");
 		return (SDL_Rect){};
 	}
 }

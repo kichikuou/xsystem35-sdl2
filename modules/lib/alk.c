@@ -37,7 +37,7 @@ alk_t *alk_new(const char *path) {
 	mmap_t *m = map_file(path);
 	
 	if (0 != strncmp(m->addr, "ALK0", 4)) {
-		WARNING("%s: not an ALK file\n", path);
+		WARNING("%s: not an ALK file", path);
 		unmap_file(m);
 		return NULL;
 	}		

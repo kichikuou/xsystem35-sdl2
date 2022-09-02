@@ -46,7 +46,7 @@ void commandLD() {
 	} else {
 		sysVar[0] = save_loadAll(num - 1);
 	}
-	DEBUG_COMMAND("LD %d:\n",num);
+	DEBUG_COMMAND("LD %d:",num);
 }
 
 void commandLP() {
@@ -61,7 +61,7 @@ void commandLP() {
 	} else {
 		sysVar[0] = save_loadPartial(num - 1, &point, cnt);
 	}
-	DEBUG_COMMAND("LP %d,%d,%d:\n",num, point.var, cnt);
+	DEBUG_COMMAND("LP %d,%d,%d:",num, point.var, cnt);
 }
 
 void commandLT() {
@@ -103,7 +103,7 @@ void commandLT() {
 		*(var + 5) =        lc->tm_sec;
 		sysVar[0]  = 0;
 	}
-	DEBUG_COMMAND("LT %d,%p\n",num, var);
+	DEBUG_COMMAND("LT %d,%p",num, var);
 }
 
 void commandLE() {
@@ -128,12 +128,12 @@ void commandLE() {
 	default:
 		var = getCaliValue();
 		cnt = getCaliValue();
-		WARNING("Unknown LE command %d\n", type);
+		WARNING("Unknown LE command %d", type);
 		break;
 	}
 	free(fname_utf8);
 	
-	DEBUG_COMMAND("LE %d,%s,%d,%d:\n",type, filename, var, cnt);
+	DEBUG_COMMAND("LE %d,%s,%d,%d:",type, filename, var, cnt);
 }
 
 void commandLL() {
@@ -158,10 +158,10 @@ void commandLL() {
 		var = getCaliVariable();
 		num  = getCaliValue();
 
-		DEBUG_COMMAND("LL %d,%d,%d,%d:\n",type, link_no, _var, num);
+		DEBUG_COMMAND("LL %d,%d,%d,%d:",type, link_no, _var, num);
 		
 		if (dfile->size < num * sizeof(WORD)) {
-			WARNING("data shortage (link_no = %d, requested %d, loaded %d)\n", link_no, num, dfile->size/ sizeof(WORD));
+			WARNING("data shortage (link_no = %d, requested %d, loaded %d)", link_no, num, dfile->size/ sizeof(WORD));
 			/* sysVar[0] = 254; 大嘘*/
 			/* return; */
 			num = dfile->size / sizeof(WORD);
@@ -174,13 +174,13 @@ void commandLL() {
 	case 1:
 		_var = getCaliValue();
 		num  = getCaliValue();
-		DEBUG_COMMAND_YET("LL1 not yet %d, %d\n", _var, num);
+		DEBUG_COMMAND_YET("LL1 not yet %d, %d", _var, num);
 		sysVar[0] = 255;
 		goto out;
 		break;
 		
 	default:
-		WARNING("Unknown LL command %d\n", type);
+		WARNING("Unknown LL command %d", type);
 		goto out;
 	}
 	
@@ -197,7 +197,7 @@ void commandLHD() {
 	// X版では全てをHDDに置くのでサポートしない
 	
 	sysVar[0] = 255;
-	DEBUG_COMMAND("LHD %d,%d:\n",p1,no);
+	DEBUG_COMMAND("LHD %d,%d:",p1,no);
 }
 
 void commandLHG() {
@@ -221,7 +221,7 @@ void commandLHG() {
 		sysVar[0] = (no == last_registered) ? 1 : 0;
 		break;
 	}
-	DEBUG_COMMAND("LHG %d,%d:\n",p1,no);
+	DEBUG_COMMAND("LHG %d,%d:",p1,no);
 }
 
 void commandLHM() {
@@ -231,7 +231,7 @@ void commandLHM() {
 	// X版では全てをHDDに置くのでサポートしない
 	
 	sysVar[0] = 255;
-	DEBUG_COMMAND("LHM %d,%d:\n",p1,no);
+	DEBUG_COMMAND("LHM %d,%d:",p1,no);
 }
 
 void commandLHS() {
@@ -241,7 +241,7 @@ void commandLHS() {
 	// X版では全てをHDDに置くのでサポートしない
 	
 	sysVar[0] = 255;
-	DEBUG_COMMAND("LHS %d,%d:\n",p1,no);
+	DEBUG_COMMAND("LHS %d,%d:",p1,no);
 }
 
 void commandLHW() {
@@ -251,7 +251,7 @@ void commandLHW() {
 	// X版では全てをHDDに置くのでサポートしない
 	
 	sysVar[0] = 255;
-	DEBUG_COMMAND("LHW %d,%d:\n",p1,no);
+	DEBUG_COMMAND("LHW %d,%d:",p1,no);
 }
 
 void commandLC() {
@@ -263,7 +263,7 @@ void commandLC() {
 	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
 	free(fname_utf8);
 	
-	DEBUG_COMMAND("LC %d,%d,%s:\n", x, y, filename);
+	DEBUG_COMMAND("LC %d,%d,%s:", x, y, filename);
 }
 
 void commandLXG() {
@@ -272,7 +272,7 @@ void commandLXG() {
 	const char *title = sl_getString(':');
 	const char *filter = sl_getString(':');
 
-	DEBUG_COMMAND_YET("LXG %d,%s,%s:\n", file_name, title, filter);
+	DEBUG_COMMAND_YET("LXG %d,%s,%s:", file_name, title, filter);
 }
 
 void commandLXO() {
@@ -282,14 +282,14 @@ void commandLXO() {
 	int how_to_create = getCaliValue();
 
 	sysVar[0]=255;
-	DEBUG_COMMAND_YET("LXO %d,%d,%d:\n",num,file_name,how_to_create);
+	DEBUG_COMMAND_YET("LXO %d,%d,%d:",num,file_name,how_to_create);
 }
 
 void commandLXC() {
 	/* ファイルをクローズする */
 	int num = getCaliValue();
 	
-	DEBUG_COMMAND_YET("LXC %d:\n",num);
+	DEBUG_COMMAND_YET("LXC %d:",num);
 }
 
 void commandLXL() {
@@ -298,7 +298,7 @@ void commandLXL() {
 	int y         = getCaliValue();
 	int file_name = getCaliValue();
 	
-	DEBUG_COMMAND_YET("LXL %d,%d,%d:\n",x,y,file_name);
+	DEBUG_COMMAND_YET("LXL %d,%d,%d:",x,y,file_name);
 }
 
 void commandLXS() {
@@ -307,7 +307,7 @@ void commandLXS() {
 	int *hi = getCaliVariable();
 	int *lo = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("LXS %d,%d,%d:\n", num, *hi, *lo);
+	DEBUG_COMMAND_YET("LXS %d,%d,%d:", num, *hi, *lo);
 }
 
 void commandLXP() {
@@ -316,7 +316,7 @@ void commandLXP() {
 	int hi  = getCaliValue();
 	int lo  = getCaliValue();
 	
-	DEBUG_COMMAND_YET("LXP %d,%d,%d:\n",num,hi,lo);
+	DEBUG_COMMAND_YET("LXP %d,%d,%d:",num,hi,lo);
 }
 
 void commandLXR() {
@@ -325,7 +325,7 @@ void commandLXR() {
 	int *var = getCaliVariable();
 	int size = getCaliValue();
 	
-	DEBUG_COMMAND_YET("LXR %d,%d,%d:\n",num,*var,size);
+	DEBUG_COMMAND_YET("LXR %d,%d,%d:",num,*var,size);
 }
 
 void commandLXW() {
@@ -334,5 +334,5 @@ void commandLXW() {
 	int *var = getCaliVariable();
 	int size = getCaliValue();
 	
-	DEBUG_COMMAND_YET("LXW %d,%d,%d:\n",num,*var,size);
+	DEBUG_COMMAND_YET("LXW %d,%d,%d:",num,*var,size);
 }

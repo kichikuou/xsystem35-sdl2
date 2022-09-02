@@ -26,7 +26,7 @@ void gpx_effect(int no,
 
 	enum sdl_effect_type type = from_sact_effect(no);
 	if (type == EFFECT_INVALID) {
-		WARNING("Unimplemented effect %d\n", no);
+		WARNING("Unimplemented effect %d", no);
 		type = EFFECT_CROSSFADE;
 	}
 	SDL_Rect rect = { wx, wy, width, height };

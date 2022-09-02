@@ -406,7 +406,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	int ret = 0;
 
 #if 0
-	NOTICE("ec_area sx %d sy %d w %d h %d dx %d dy %d sw %d opt %d spc %d cancel %s\n",
+	NOTICE("ec_area sx %d sy %d w %d h %d dx %d dy %d sw %d opt %d spc %d cancel %s",
 	       sx, sy, w, h, dx, dy, sw, opt, spCol, cancel ? "True" : "False");
 #endif
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
@@ -535,7 +535,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		break;
 	default:
 		eCopyUpdateArea(dx, dy, w, h, dx, dy);
-		WARNING("effect %d is not presented.\n", sw);
+		WARNING("effect %d is not presented.", sw);
 		break;
 	}
 	nact->waitcancel_key = ret;

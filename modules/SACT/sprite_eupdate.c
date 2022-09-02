@@ -48,7 +48,7 @@ int sp_eupdate(int type, int time, int cancel) {
 
 	enum sdl_effect_type sdl_effect = from_sact_effect(type);
 	if (sdl_effect == EFFECT_INVALID) {
-		WARNING("Unimplemented effect %d\n", type);
+		WARNING("Unimplemented effect %d", type);
 		type = EFFECT_CROSSFADE;
 	}
 	SDL_Rect rect = { 0, 0, sf0->width, sf0->height };

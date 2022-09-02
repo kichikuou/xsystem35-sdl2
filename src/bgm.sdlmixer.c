@@ -58,7 +58,7 @@ static Mix_Music *bgm_load(int no) {
 
 	dfile = ald_getdata(DRIFILE_BGM, no -1);
 	if (dfile == NULL) {
-		WARNING("DRIFILE_BGM fail to open %d\n", no -1);
+		WARNING("DRIFILE_BGM fail to open %d", no -1);
 		return NULL;
 	}
 
@@ -66,7 +66,7 @@ static Mix_Music *bgm_load(int no) {
 
 	mix_music = Mix_LoadMUS_RW(rwops, SDL_TRUE /* freesrc */);
 	if (mix_music == NULL) {
-		WARNING("Failed to load BGM %d: %s\n", no, SDL_GetError());
+		WARNING("Failed to load BGM %d: %s", no, SDL_GetError());
 		free_music();
 		return NULL;
 	}

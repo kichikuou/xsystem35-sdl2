@@ -66,7 +66,7 @@ int s39ini_init(void) {
 		s1[strlen(s1)-1] = '\0'; // remove last '"'
 		vval[i].label = sjis2utf(s1);
 		vval_max = max(vval_max, i);
-		//WARNING("VolumeValancer[%d] = %s\n", i, vval[i].label);
+		//WARNING("VolumeValancer[%d] = %s", i, vval[i].label);
 	}
 	
 	if (vval_max <= 0) return NG;
@@ -144,7 +144,7 @@ int s39ini_remove() {
 	
 	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
 	if (NULL == (fp = fopen(fn, "wb"))) {
-		WARNING("Fail to save Volume.save\n");
+		WARNING("Fail to save Volume.save");
 		return NG;
 	}
 	

@@ -51,7 +51,7 @@ static void letVar(int type) {
 	int val    = getCaliValue();
 
 	if (varno == NULL) {
-		WARNING("varno is NULL\n");
+		WARNING("varno is NULL");
 		return;
 	}
 	
@@ -93,7 +93,7 @@ static void getDataTableAdr() {
 	}
 	
 	if (NULL == (nact->datatbl_addr = sl_setDataTable(sl_getPage(), index))) {
-		WARNING("data table address set failed\n");
+		WARNING("data table address set failed");
 	}
 }
 
@@ -535,7 +535,7 @@ void exec_command(void) {
 		/* hit Any Key */
 		sys_hit_any_key();
 		msg_nextPage(TRUE);
-		DEBUG_COMMAND("A\n");
+		DEBUG_COMMAND("A");
 		break;
 	case 'B':
 		switch(sl_getc()) {
@@ -1081,7 +1081,7 @@ void exec_command(void) {
 	{
 		int num=getCaliValue();
 		sys_addMsg(svar_get(num));
-		DEBUG_COMMAND("X %d:\n", num);
+		DEBUG_COMMAND("X %d:", num);
 	}
 		break;
 	case 'Y':

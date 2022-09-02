@@ -14,17 +14,17 @@ static void Init() {
 	int p3 = getCaliValue();
 	int *var = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("nDEMOE.Init %p:\n", var);
+	DEBUG_COMMAND_YET("nDEMOE.Init %p:", var);
 }
 
 static void SetKeyCancelFlag() {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("nDEMOE.SetKeyCancelFlag %d:\n", p1);
+	DEBUG_COMMAND_YET("nDEMOE.SetKeyCancelFlag %d:", p1);
 }
 
 static void Run() {
-	DEBUG_COMMAND_YET("nDEMOE.Run:\n");
+	DEBUG_COMMAND_YET("nDEMOE.Run:");
 }
 
 static const ModuleFunc functions[] = {

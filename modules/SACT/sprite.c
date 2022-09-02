@@ -44,14 +44,14 @@ static int compare_spriteno_smallfirst(const void *a, const void *b);
 
 #define sp_assert_no(no) do {                                        \
   if ((no) >= SPRITEMAX) {                                           \
-    WARNING("no is too large (should be %d < %d)\n", no, SPRITEMAX); \
+    WARNING("no is too large (should be %d < %d)", no, SPRITEMAX); \
     return NG;                                                       \
   }                                                                  \
 } while (0)
 
 #define sp_assert_null(no) do {                                      \
   if (sact.sp[no] == NULL) {                                         \
-    WARNING("sprite %d is NULL\n", no);                              \
+    WARNING("sprite %d is NULL", no);                              \
     return NG;                                                       \
   }                                                                  \
 } while (0)
@@ -81,7 +81,7 @@ static int sp_draw_wall(sprite_t *sp) {
 	h = sact.updaterect.h;
 	gr_fill(sf0, sx, sy, w, h, 0, 0, 0);
 	
-	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, \n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d",
 		sp->no, sx, sy, w, h);
 	
 	return OK;
@@ -711,7 +711,7 @@ int sp_sound_set(int wNumSP, int wNumWave1, int wNumWave2, int wNumWave3) {
 
 // すべてのスプライトサウンドの終了を待つ
 int sp_sound_wait() {
-	WARNING("NOT IMPLEMENTED\n");
+	WARNING("NOT IMPLEMENTED");
 	return OK;
 }
 

@@ -54,7 +54,7 @@ int bgi_read(const char *path) {
 
 	FILE *fp = fopen(path, "rb");
 	if (!fp) {
-		WARNING("Could not open %s\n", path);
+		WARNING("Could not open %s", path);
 		return NG;
 	}
 

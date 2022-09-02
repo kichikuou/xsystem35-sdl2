@@ -30,14 +30,14 @@ void commandG0() {
 	int num = getCaliValue();
 	
 	if (num == 0) {
-		WARNING("G0 num: num = 0!!\n");
+		WARNING("G0 num: num = 0!!");
 		cg_clear_display_loc();
 		return;
 	}
 	
 	cg_load(num - 1, -1);
 	
-	DEBUG_COMMAND("G %d:\n",num);
+	DEBUG_COMMAND("G %d:",num);
 }
 
 void commandG1() {
@@ -45,14 +45,14 @@ void commandG1() {
 	int sprite = getCaliValue();
 	
 	if (num == 0) {
-		WARNING("G1 num: num = 0!!\n");
+		WARNING("G1 num: num = 0!!");
 		cg_clear_display_loc();
 		return;
 	}
 	
 	cg_load(num - 1, sprite);
 	
-	DEBUG_COMMAND("G %d,%d:\n",num,sprite);
+	DEBUG_COMMAND("G %d,%d:",num,sprite);
 }
 
 void commandGS() {
@@ -62,7 +62,7 @@ void commandGS() {
 	int *var = getCaliVariable();
 
 	if (num == 0) {
-		WARNING("GS num: num = 0!!\n");
+		WARNING("GS num: num = 0!!");
 		return;
 	}
 	
@@ -72,7 +72,7 @@ void commandGS() {
 	var[2] = r.w;
 	var[3] = r.h;
 	
-	DEBUG_COMMAND("GS %d,%p:\n",num,var);
+	DEBUG_COMMAND("GS %d,%p:",num,var);
 }
 
 void commandGX() {
@@ -80,11 +80,11 @@ void commandGX() {
 	int shadow_num = getCaliValue();
 
 	if (shadow_num == 0) {
-		WARNING("GX shadow_now = 0!!\n");
+		WARNING("GX shadow_now = 0!!");
 		return;
 	}
 	
 	cg_load_with_alpha(cg_num -1, shadow_num -1);
 	
-	DEBUG_COMMAND("GX %d,%d:\n",cg_num, shadow_num);
+	DEBUG_COMMAND("GX %d,%d:",cg_num, shadow_num);
 }

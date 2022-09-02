@@ -41,7 +41,7 @@
 
 #define spcg_assert_no(no) \
   if ((no) > (CGMAX -1)) { \
-    WARNING("no is too large (should be %d < %d)\n", (no), CGMAX); \
+    WARNING("no is too large (should be %d < %d)", (no), CGMAX); \
     return NG; \
   } \
 
@@ -68,7 +68,7 @@ static cginfo_t *scg_new(enum cgtype type, int no, surface_t *sf) {
 */
 static cginfo_t *scg_get(int no) {
 	if (no >= (CGMAX -1)) {
-		WARNING("no is too large (should be %d < %d)\n", (no), CGMAX);
+		WARNING("no is too large (should be %d < %d)", (no), CGMAX);
 		return NULL;
 	}
 	
@@ -77,7 +77,7 @@ static cginfo_t *scg_get(int no) {
 
 	surface_t *sf = sf_loadcg_no(no - 1);
 	if (!sf) {
-		WARNING("load fail (%d)\n", no -1);
+		WARNING("load fail (%d)", no -1);
 		return NULL;
 	}
 	return scg_new(CG_LINKED, no, sf);

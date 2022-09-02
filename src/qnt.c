@@ -90,7 +90,7 @@ static void extract_pixel(qnt_header *qnt, BYTE *pic, BYTE *b) {
 	BYTE *raw = malloc(sizeof(BYTE) * ucbuf);
 	
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->pixel_size)) {
-		WARNING("uncompress failed\n");
+		WARNING("uncompress failed");
 		free(raw);
 		return;
 	}
@@ -172,7 +172,7 @@ static void extract_alpha(qnt_header *qnt, BYTE *pic, BYTE *b) {
 	BYTE *raw = malloc(sizeof(BYTE) * ucbuf);
 
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->alpha_size)) {
-		WARNING("uncompress failed\n");
+		WARNING("uncompress failed");
 		free(raw);
 		return;
 	}

@@ -90,12 +90,12 @@ static boolean check_iconheader(BYTE *data) {
 	
 	/* Number of images (>0) */
 	if (cursorHeader.idCount == 0) {
-		WARNING("Cursor: no images in file!\n");
+		WARNING("Cursor: no images in file!");
 		return FALSE;
 	}
 	
 	if (cursorHeader.idCount > 1) {
-		WARNING("Cursor:  warning:  too much images in file!\n"); 
+		WARNING("Cursor:  warning:  too much images in file!"); 
 	}
 	return TRUE;
 }
@@ -112,7 +112,7 @@ static int read_direntries(BYTE* data) {
 	data++;
 	
 	/* and validate data */
-	NOTICE("Cursor:  bWidth==%d  bHeight==%d\n",
+	NOTICE("Cursor:  bWidth==%d  bHeight==%d",
 	       (int)cursordirentry.bWidth,
 	       (int)cursordirentry.bHeight);
 	
@@ -142,15 +142,15 @@ static int read_direntries(BYTE* data) {
 		return 0;
 	}
 	
-	NOTICE("Cursor:  x==%d  y==%d\n",
+	NOTICE("Cursor:  x==%d  y==%d",
 	       (int)cursordirentry.wxHotspot,
 	       (int)cursordirentry.wyHotspot);
 	
 	
-	NOTICE("Width: %d\n", (int)(cursordirentry.bWidth));
-	NOTICE("Height: %d\n", (int)(cursordirentry.bHeight));
-	NOTICE("Bit Count (unused): %d\n", (int)(cursordirentry.dwBytesInRes));
-	NOTICE("Total bytes: %ld\n", (long)(cursordirentry.dwBytesInRes));
+	NOTICE("Width: %d", (int)(cursordirentry.bWidth));
+	NOTICE("Height: %d", (int)(cursordirentry.bHeight));
+	NOTICE("Bit Count (unused): %d", (int)(cursordirentry.dwBytesInRes));
+	NOTICE("Total bytes: %ld", (long)(cursordirentry.dwBytesInRes));
 	
 	return (int)(data - p);
 }
@@ -173,7 +173,7 @@ static int read_bitmapinfo(BYTE* data) {
 	ih.biHeight=LittleEndian_getDW(data,0);
 	data += 4;
 	
-	NOTICE("Cursor:  biWidth==%d  biHeight==%d\n", (int)ih.biWidth, (int)ih.biHeight);
+	NOTICE("Cursor:  biWidth==%d  biHeight==%d", (int)ih.biWidth, (int)ih.biHeight);
 
 	if (ih.biWidth == 0 || ih.biHeight == 0) {
 		return 0;
@@ -186,7 +186,7 @@ static int read_bitmapinfo(BYTE* data) {
 	/* number of color bits (2,4,8) */
 	ih.biBitCount = LittleEndian_getW(data, 0);
 	if (ih.biBitCount != 1) {
-		WARNING("Cursor: %d not supported color bit\n", ih.biBitCount);
+		WARNING("Cursor: %d not supported color bit", ih.biBitCount);
 		return 0;
 	}
 	data += 2;
@@ -196,7 +196,7 @@ static int read_bitmapinfo(BYTE* data) {
 	data += 4;
 	
 	if (ih.biCompression != 0) {
-		WARNING("Cursor:  invalid compression value of %d\n", (int)ih.biCompression);
+		WARNING("Cursor:  invalid compression value of %d", (int)ih.biCompression);
 		return 0;
 	}
 	
@@ -204,7 +204,7 @@ static int read_bitmapinfo(BYTE* data) {
 	ih.biSizeImage = LittleEndian_getDW(data, 0);
 	data += 4;
 	
-	NOTICE("Cursor:  biSizeImage==%d\n", (int)ih.biSizeImage);
+	NOTICE("Cursor:  biSizeImage==%d", (int)ih.biSizeImage);
 	
 	ih.biXPelsPerMeter = LittleEndian_getDW(data, 0);
 	data += 4;
@@ -249,7 +249,7 @@ static int read_rgbquad(BYTE* data) {
 		data++;
 		cc[j].rgbReserved = *data;
 		data++;
-		NOTICE("#%d:  Red: %d  Green: %d  Blue: %d\n", j, 
+		NOTICE("#%d:  Red: %d  Green: %d  Blue: %d", j, 
 		       cc[j].rgbRed,
 		       cc[j].rgbGreen,
 		       cc[j].rgbBlue);
@@ -264,20 +264,20 @@ static boolean cursor_load_mono(BYTE *d, int no) {
 	
 	/* check header information */
 	if (check_iconheader(d) == FALSE) {
-		WARNING("check_iconhdader fail\n");
+		WARNING("check_iconhdader fail");
 		return FALSE;
 	}
 	
 	/* read dentries */
 	if ((pos += read_direntries(d + pos)) <= 6) {
-		WARNING("read dentries fail\n");
+		WARNING("read dentries fail");
 		return FALSE;
 	}
 	
 	/* read bitmap info */
 	p1 = read_bitmapinfo(d + pos);
 	if (p1 == 0) {
-		WARNING("unable to read bitmap info\n");
+		WARNING("unable to read bitmap info");
 		return FALSE;
 	}
 	
@@ -286,7 +286,7 @@ static boolean cursor_load_mono(BYTE *d, int no) {
 	/* read rgb quad */
 	p1 = read_rgbquad(d + pos);
 	if (p1 == 0) {
-		WARNING("unable to read palette table\n");
+		WARNING("unable to read palette table");
 		return FALSE;
 	}
 	
@@ -294,7 +294,7 @@ static boolean cursor_load_mono(BYTE *d, int no) {
 	
 	/* read pixedl data */
 	if (sdl_cursorNew(d + pos, no, &cursorImage, &cursordirentry) == FALSE) {
-		WARNING("unable to read pixel data\n");
+		WARNING("unable to read pixel data");
 		return FALSE;
 	}
 	return TRUE;
@@ -316,11 +316,11 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 	
 	while (b < (data + riffsize)) {
 		if (search_chunk(b, "LIST", "INFO", &c)) {
-			NOTICE("LIST(INFO) ignore size = %d\n", c.size);
+			NOTICE("LIST(INFO) ignore size = %d", c.size);
 			b += c.size + 8;
 		} else if (search_chunk(b, "anih", NULL, &c)) {
 			BYTE *src = c.data;
-			NOTICE("anih size = %d\n", c.size);
+			NOTICE("anih size = %d", c.size);
 			anicurHeader.cbSizeof  = LittleEndian_getW(src, 0);
 			anicurHeader.cFrames   = LittleEndian_getW(src, 4);
 			anicurHeader.cSteps    = LittleEndian_getW(src, 8);
@@ -336,7 +336,7 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 			b += c.size + 8;
 		} else if (search_chunk(b, "rate", NULL, &c)) {
 			BYTE *src = c.data;
-			NOTICE("rate size = %d\n", c.size);
+			NOTICE("rate size = %d", c.size);
 			if (anicurHeader.fl & 0x01) {
 				int i;
 				anicurHeader.rate = malloc(sizeof(int) * anicurHeader.cSteps);
@@ -347,11 +347,11 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 			}
 			b += c.size + 8;
 		} else if (search_chunk(b, "icon", NULL, &c)) {
-			NOTICE("icon size = %d\n", c.size);
+			NOTICE("icon size = %d", c.size);
 			cursor_load_mono(c.data, no); /* last pattern is uesd */
 			b += c.size + 8;
 		} else if (search_chunk(b, "LIST", "frame", &c)) {
-			NOTICE("LIST(frame) size = %d\n", c.size);
+			NOTICE("LIST(frame) size = %d", c.size);
 			b += 12;
 		} else {
 			WARNING("UnKnown chunk");
@@ -366,12 +366,12 @@ void cursor_load(int no, int linkno) {
 
 	/* no must be from 100 to 255 */
 	if (no < 100 || no > 256){
-		WARNING("wrong cursor number(%d)\n", no);
+		WARNING("wrong cursor number(%d)", no);
 	}
 	
 	/* load data */
 	if (NULL == (dfile = ald_getdata(DRIFILE_RSC, linkno -1))) {
-		WARNING("ald_getdata fail\n");
+		WARNING("ald_getdata fail");
 		return;
 	}
 	

@@ -148,7 +148,7 @@ void commandVC() { /* from Rance4 */
 	cxUnit   = getCaliValue();
 	cyUnit   = getCaliValue();
 	
-	DEBUG_COMMAND("VC %d,%d,%d,%d,%d,%d,%d:\n",nPageNum, x0Map, y0Map, cxMap, cyMap, cxUnit, cyUnit);
+	DEBUG_COMMAND("VC %d,%d,%d,%d,%d,%d,%d:",nPageNum, x0Map, y0Map, cxMap, cyMap, cxUnit, cyUnit);
 	
 	if (NULL != UnitMap ) {
 		free(UnitMap);
@@ -158,7 +158,7 @@ void commandVC() { /* from Rance4 */
 	}
 	
 	if (nPageNum > UNITMAP_DISPLAY_PAGE_MAX) {
-		WARNING("VC nPageNum too big %d\n", nPageNum);
+		WARNING("VC nPageNum too big %d", nPageNum);
 		sysVar[0] = 0;
 		return;
 	}
@@ -186,10 +186,10 @@ void commandVP() { /* from T2 */
 	int nyUnit = getCaliValue();
 	int bSpCol = getCaliValue();
 	
-	DEBUG_COMMAND("VP %d,%d,%d,%d,%d,%d:\n",nPage, x0Unit, y0Unit, nxUnit, nyUnit, bSpCol);
+	DEBUG_COMMAND("VP %d,%d,%d,%d,%d,%d:",nPage, x0Unit, y0Unit, nxUnit, nyUnit, bSpCol);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VP nPage too large %d\n", nPage);
+		WARNING("VP nPage too large %d", nPage);
 		return;
 	}
 	
@@ -209,24 +209,24 @@ void commandVS() { /* from Rance4 */
 	int y     = getCaliValue();
 	int wData = getCaliValue();
 	
-	DEBUG_COMMAND("VS %d,%d,%d,%d,%d:\n",nPage, nType, x, y, wData);
+	DEBUG_COMMAND("VS %d,%d,%d,%d,%d:",nPage, nType, x, y, wData);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VS nPage too large %d\n", nPage);
+		WARNING("VS nPage too large %d", nPage);
 		return;
 	}
 	
 	if (x >= cxMap || x < 0) {
-		WARNING("VS x out of range %d\n", x);
+		WARNING("VS x out of range %d", x);
 		return;
 	}
 	
 	if (y >= cyMap || y < 0) {
-		WARNING("VS y out of range %d\n", y);
+		WARNING("VS y out of range %d", y);
 		return;
 	}
 	if (wData < 0) {
-		WARNING("VS wData illegal value %d\n", wData);
+		WARNING("VS wData illegal value %d", wData);
 		return;
 	}
 
@@ -249,7 +249,7 @@ void commandVS() { /* from Rance4 */
 		*UNITMAP_WALKRESULT(nPage, x, y) = wData;
 		break;
 	default:
-		WARNING("VS unknown type %d\n", nType);
+		WARNING("VS unknown type %d", nType);
 	}
 }
 
@@ -259,21 +259,21 @@ void commandVG() { /* from Rance4 */
 	int x = getCaliValue();
 	int y = getCaliValue();
 	
-	DEBUG_COMMAND("VG %d,%d,%d,%d:\n",nPage, nType, x, y);
+	DEBUG_COMMAND("VG %d,%d,%d,%d:",nPage, nType, x, y);
 
 	if (nPage >= nPageNum) {
-		WARNING("VG nPage too large %d\n", nPage);
+		WARNING("VG nPage too large %d", nPage);
 		return;
 	}
 	
 	if (x >= cxMap || x < 0) {
-		NOTICE("VG x out of range %d\n", x);
+		NOTICE("VG x out of range %d", x);
 		sysVar[0] = UNITMAP_VARIABLE_OUTOFRANGE;
 		return;
 	}
 	
 	if (y >= cyMap || y < 0) {
-		NOTICE("VG y out of range %d\n", y);
+		NOTICE("VG y out of range %d", y);
 		sysVar[0] = UNITMAP_VARIABLE_OUTOFRANGE;
 		return;
 	}
@@ -289,7 +289,7 @@ void commandVG() { /* from Rance4 */
 	case 4:
 		sysVar[0] = *UNITMAP_WALKRESULT(nPage, x, y); break;
 	default:
-		WARNING("VG unknown type %d\n", nType);
+		WARNING("VG unknown type %d", nType);
 	}
 }
 
@@ -303,19 +303,19 @@ void commandVH() { /* from Rance4 */
 	int xx, yy, i, n;
 	int maxfoot, lmtx, lmty, lmtw, lmth;
 	
-	DEBUG_COMMAND("VH %d,%d,%d,%d,%d,%d:\n",nPage, x, y, width, height, _max);
+	DEBUG_COMMAND("VH %d,%d,%d,%d,%d,%d:",nPage, x, y, width, height, _max);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VH nPage too large %d\n", nPage);
+		WARNING("VH nPage too large %d", nPage);
 		return;
 	}
 	if (x >= cxMap || x < 0) {
-		WARNING("VH x out of range %d\n", x);
+		WARNING("VH x out of range %d", x);
 		return;
 	}
 	
 	if (y >= cyMap || y < 0) {
-		WARNING("VH y out of range %d\n", y);
+		WARNING("VH y out of range %d", y);
 		return;
 	}
 
@@ -445,14 +445,14 @@ void commandVF() { /* from Panyo */
 	}
 	
 	ags_updateArea(x0Map, y0Map, cxMap * cxUnit, cyMap * cyUnit);
-	DEBUG_COMMAND("VF:\n");
+	DEBUG_COMMAND("VF:");
 }
 
 void commandVV() { /* from T2 */
 	int nPage   = getCaliValue();
 	int fEnable = getCaliValue();
 	
-	DEBUG_COMMAND("VV %d,%d:\n",nPage, fEnable);
+	DEBUG_COMMAND("VV %d,%d:",nPage, fEnable);
 	
 	srcimg[nPage].fEnable = (fEnable == 1 ? TRUE : FALSE);
 }
@@ -463,10 +463,10 @@ void commandVR() { /* from Rance4 */
 	int *var  = getCaliVariable();
 	int *dst;
 	
-	DEBUG_COMMAND("VR %d,%d,%p:\n",nPage, nType, var);
+	DEBUG_COMMAND("VR %d,%d,%p:",nPage, nType, var);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VR nPage too large %d\n", nPage);
+		WARNING("VR nPage too large %d", nPage);
 		return;
 	}
 	
@@ -480,7 +480,7 @@ void commandVR() { /* from Rance4 */
 	case 4:
 		dst = UNITMAP_WALKRESULT_PAGETOP(nPage); break;
 	default:
-		WARNING("VR unknown type %d\n", nType);
+		WARNING("VR unknown type %d", nType);
 		return;
 	}
 	
@@ -493,10 +493,10 @@ void commandVW() { /* from Rance4 */
 	int *var  = getCaliVariable();
 	int *src;
 	
-	DEBUG_COMMAND("VW %d,%d,%p:\n",nPage, nType, var);
+	DEBUG_COMMAND("VW %d,%d,%p:",nPage, nType, var);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VW nPage too large %d\n", nPage);
+		WARNING("VW nPage too large %d", nPage);
 		return;
 	}
 	
@@ -510,7 +510,7 @@ void commandVW() { /* from Rance4 */
 	case 4:
 		src = UNITMAP_WALKRESULT_PAGETOP(nPage); break;
 	default:
-		WARNING("VW unknown type %d\n", nType);
+		WARNING("VW unknown type %d", nType);
 		return;
 	}
 	
@@ -528,9 +528,9 @@ void commandVE() { /* from T2 */
 	int unit, unit_x, unit_y;
 	UnitMapSrcImg *img;
 	
-	DEBUG_COMMAND("VE %d,%d,%d,%d,%d,%d:\n", x, y, width, height, out_ptn, flag);
+	DEBUG_COMMAND("VE %d,%d,%d,%d,%d,%d:", x, y, width, height, out_ptn, flag);
 	if (flag == 1) {
-		WARNING("VE flag1 is not yet\n");
+		WARNING("VE flag1 is not yet");
 	}
 	
 	for (i = 0; i < nPageNum; i++) {
@@ -567,7 +567,7 @@ void commandVZ() { /* from T2 */
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	
-	DEBUG_COMMAND("VZ %d,%d,%d:\n", p1, p2, p3);
+	DEBUG_COMMAND("VZ %d,%d,%d:", p1, p2, p3);
 	
 	switch(p1) {
 	case 0:
@@ -583,7 +583,7 @@ void commandVZ() { /* from T2 */
 		cxUnit = p2; cyUnit = p3;
 		break;
 	default:
-		WARNING("unknown VZ %d:\n", p1);
+		WARNING("unknown VZ %d:", p1);
 	}
 }
 
@@ -593,7 +593,7 @@ void commandVX() { /* from T2 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	
-	DEBUG_COMMAND("VX %d,%d,%d,%d:\n", p1, p2, p3, p4);
+	DEBUG_COMMAND("VX %d,%d,%d,%d:", p1, p2, p3, p4);
 	
 	switch(p1) {
 	case 0:
@@ -609,7 +609,7 @@ void commandVX() { /* from T2 */
 		// commandVF();
 		break;
 	default:
-		WARNING("VX unknown command %d:\n", p1);
+		WARNING("VX unknown command %d:", p1);
 	}
 }
 
@@ -638,7 +638,7 @@ void commandVT() { /* from Panyo */
 			case 4:
 				u = *UNITMAP_WALKRESULT(sp, sx + x, sy + y); break;
 			default:
-				WARNING("VT unknown type %d\n", sa); u = 0;
+				WARNING("VT unknown type %d", sa); u = 0;
 			}
 			switch(da) {
 			case 1:
@@ -653,7 +653,7 @@ void commandVT() { /* from Panyo */
 		}
 	}
 	
-	DEBUG_COMMAND("VT %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", sp, sa, sx, sy, width, height, dp, da, dx, dy);
+	DEBUG_COMMAND("VT %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", sp, sa, sx, sy, width, height, dp, da, dx, dy);
 }
 
 void commandVB() {
@@ -665,7 +665,7 @@ void commandVB() {
 	int y_size = getCaliValue();
 	int data   = getCaliValue();
 	
-	DEBUG_COMMAND_YET("VB %d,%d,%d,%d,%d,%d,%d:\n", page, type, x_pos, y_pos, x_size, y_size, data);
+	DEBUG_COMMAND_YET("VB %d,%d,%d,%d,%d,%d,%d:", page, type, x_pos, y_pos, x_size, y_size, data);
 }
 
 void commandVIC() { /* from Panyo */
@@ -677,7 +677,7 @@ void commandVIC() { /* from Panyo */
 	int x, y, i;
 	UnitMapSrcImg *img;
 
-	DEBUG_COMMAND("VIC %d,%d,%d,%d:\n", sx, sy, width, height);
+	DEBUG_COMMAND("VIC %d,%d,%d,%d:", sx, sy, width, height);
 	
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
@@ -706,7 +706,7 @@ void commandVIP() {
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	
-	DEBUG_COMMAND_YET("VIP %d,%d,%d,%d:\n", x, y, width, height);
+	DEBUG_COMMAND_YET("VIP %d,%d,%d,%d:", x, y, width, height);
 }
 
 void commandVJ() {
@@ -716,7 +716,7 @@ void commandVJ() {
 	int y     = getCaliValue();
 	int max   = getCaliValue();
 	
-	DEBUG_COMMAND_YET("VJ %d,%d,%d,%d:\n", page, x, y, max);
+	DEBUG_COMMAND_YET("VJ %d,%d,%d,%d:", page, x, y, max);
 }
 
 static void throttle() {
@@ -737,15 +737,15 @@ void commandVA() { /* from Panyo */
 	if (no >= 10) {
 		var1 = getCaliVariable();
 		var2 = getCaliVariable();
-		DEBUG_COMMAND("VA %d,%d,%p,%p:\n", no, p1, var1, var2);
+		DEBUG_COMMAND("VA %d,%d,%p,%p:", no, p1, var1, var2);
 	} else {
 		p2 = getCaliValue();
 		p3 = getCaliValue();
-		DEBUG_COMMAND("VA %d,%d,%d,%d:\n", no, p1, p2, p3);
+		DEBUG_COMMAND("VA %d,%d,%d,%d:", no, p1, p2, p3);
 	}
 	
 	if (p1 > VACMD_MAX) {
-		WARNING("VA p1 is too lagrge %d\n", p1);
+		WARNING("VA p1 is too lagrge %d", p1);
 		return;
 	}
 	
@@ -861,7 +861,7 @@ void commandVA() { /* from Panyo */
 		throttle();
 		break;
 	default:
-		WARNING("Unknown VA command %d\n", no);
+		WARNING("Unknown VA command %d", no);
 	}
 }
 	

@@ -105,7 +105,7 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	
 	xornum = (cursordirentry->bWidth * cursordirentry->bHeight);
 	xormasklen = (xornum * cursorImage->icHeader.biBitCount) / 8;
-	NOTICE("Cursor:  xormasklen==%d,  xornum==%d\n", xormasklen, xornum);
+	NOTICE("Cursor:  xormasklen==%d,  xornum==%d", xormasklen, xornum);
 	
 	andmasklen = xornum / 8;
 	cursorImage->xormasklen = xormasklen;

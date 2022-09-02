@@ -31,7 +31,7 @@
 #include "utfsjis.h"
 
 #define WARN_SAVEERR(cmd, st) \
-if (st > 200) fprintf(stderr, "WARNING: Fail to save (cmd=%s, stat=%d)\n", cmd, st)
+if (st > 200) fprintf(stderr, "WARNING: Fail to save (cmd=%s, stat=%d)", cmd, st)
 
 void commandQD() {
 	/* 変数領域などのデータをセーブする。（全セーブ）*/
@@ -45,7 +45,7 @@ void commandQD() {
 	
 	WARN_SAVEERR("QD", sysVar[0]);
 	
-	DEBUG_COMMAND("QD %d:\n",num);
+	DEBUG_COMMAND("QD %d:",num);
 }
 
 void commandQP() {
@@ -63,7 +63,7 @@ void commandQP() {
 	
 	WARN_SAVEERR("QP", sysVar[0]);
 	
-	DEBUG_COMMAND("QP %d,%d,%d:\n", num, point.var, cnt);
+	DEBUG_COMMAND("QP %d,%d,%d:", num, point.var, cnt);
 }
 
 void commandQC() {
@@ -79,7 +79,7 @@ void commandQC() {
 	
 	WARN_SAVEERR("QC", sysVar[0]);
 	
-	DEBUG_COMMAND("QC %d,%d:\n",num1,num2);
+	DEBUG_COMMAND("QC %d,%d:",num1,num2);
 }
 
 void commandQE() {
@@ -104,11 +104,11 @@ void commandQE() {
 	default:
 		var = getCaliValue();
 		cnt = getCaliValue();
-		WARNING("Unknown QE command %d\n", type);
+		WARNING("Unknown QE command %d", type);
 		break;
 	}
 	free(fname_utf8);
 	WARN_SAVEERR("QE", sysVar[0]);
 	
-	DEBUG_COMMAND("QE %d,%s,%d,%d:\n", type, filename, var, cnt);
+	DEBUG_COMMAND("QE %d,%s,%d,%d:", type, filename, var, cnt);
 }

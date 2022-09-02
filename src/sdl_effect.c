@@ -203,7 +203,7 @@ static void crossfade_free(struct sdl_effect *eff) {
 }
 
 static struct sdl_effect *fallback_effect_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
-	WARNING("Effect %d is not supported in this system. Falling back to crossfade.\n", type);
+	WARNING("Effect %d is not supported in this system. Falling back to crossfade.", type);
 	return crossfade_new(rect, old, new);
 }
 
@@ -1622,7 +1622,7 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_ZIGZAG_CROSSFADE:
 		return zigzag_crossfade_new(rect, sf_old, sf_new);
 	default:
-		WARNING("Unknown effect %d\n", type);
+		WARNING("Unknown effect %d", type);
 		return crossfade_new(rect, sf_old, sf_new);
 	}
 }

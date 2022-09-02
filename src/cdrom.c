@@ -99,7 +99,7 @@ int cd_init(cdromdevice_t *cd) {
 		ret = cd->init(dev);
 #else
 		/* error */
-		WARNING("no cdrom device available\n");
+		WARNING("no cdrom device available");
 		ret = NG;
 #endif
 	}

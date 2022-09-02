@@ -72,7 +72,7 @@ static int cdrom_init(char *playlist_path) {
 		fp = fopen("_inmm.ini", "r");
 	}
 	if (!fp) {
-		NOTICE("cdrom: Cannot open playlist %s\n", playlist_path);
+		NOTICE("cdrom: Cannot open playlist %s", playlist_path);
 		return NG;
 	}
 
@@ -93,7 +93,7 @@ static int cdrom_init(char *playlist_path) {
 		}
 	}
 	fclose(fp);
-	NOTICE("cdrom: Loaded playlist from %s\n", playlist_path);
+	NOTICE("cdrom: Loaded playlist from %s", playlist_path);
 	
 	trackno = 0;
 	enabled = TRUE;
@@ -135,7 +135,7 @@ static int cdrom_start(int trk, int loop) {
 #endif
 
 	if (!mix_music) {
-		WARNING("Cannot load %s: %s\n", playlist[trk], Mix_GetError());
+		WARNING("Cannot load %s: %s", playlist[trk], Mix_GetError());
 		return NG;
 	}
 	if (Mix_PlayMusic(mix_music, loop == 0 ? -1 : loop) != 0) {

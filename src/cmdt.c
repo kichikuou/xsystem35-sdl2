@@ -33,5 +33,5 @@ void commandT() {
 	int y = getCaliValue();
 	msg_setMessageLocation(x, y);
 	
-	DEBUG_COMMAND("T %d,%d:\n",x,y);
+	DEBUG_COMMAND("T %d,%d:",x,y);
 }

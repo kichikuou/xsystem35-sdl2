@@ -204,7 +204,7 @@ void v_reset(void) {
 /* 文字変数への代入 */
 void svar_set(int no, const char *str) {
 	if ((unsigned)no >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", no);
+		WARNING("string index out of range: %d", no);
 		return;
 	}
 	if (strVar[no])
@@ -214,7 +214,7 @@ void svar_set(int no, const char *str) {
 
 void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len) {
 	if ((unsigned)dstno >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", dstno);
+		WARNING("string index out of range: %d", dstno);
 		return;
 	}
 	if (!strVar[dstno])
@@ -242,7 +242,7 @@ void svar_copy(int dstno, int dstpos, int srcno, int srcpos, int len) {
 /* 文字変数への接続 */
 void svar_append(int no, const char *str) {
 	if ((unsigned)no >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", no);
+		WARNING("string index out of range: %d", no);
 		return;
 	}
 	if (!strVar[no]) {
@@ -275,7 +275,7 @@ int svar_width(int no) {
 /* 文字変数そのもの */
 const char *svar_get(int no) {
 	if ((unsigned)no >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", no);
+		WARNING("string index out of range: %d", no);
 		return "";
 	}
 	return strVar[no] ? strVar[no] : "";
@@ -283,7 +283,7 @@ const char *svar_get(int no) {
 
 int svar_find(int no, int start, const char *str) {
 	if ((unsigned)no >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", no);
+		WARNING("string index out of range: %d", no);
 		return -1;
 	}
 	if (!*str)
@@ -304,7 +304,7 @@ int svar_find(int no, int start, const char *str) {
 
 void svar_fromVars(int no, const int *vars) {
 	if ((unsigned)no >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", no);
+		WARNING("string index out of range: %d", no);
 		return;
 	}
 	int len = 0;
@@ -328,7 +328,7 @@ void svar_fromVars(int no, const int *vars) {
 
 int svar_toVars(int no, int *vars) {
 	if ((unsigned)no >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", no);
+		WARNING("string index out of range: %d", no);
 		return 0;
 	}
 	if (!strVar[no]) {
@@ -362,7 +362,7 @@ void svar_replaceAll(int no, int pattern, int replacement) {
 	const char *repl = svar_get(replacement);
 
 	if ((unsigned)no >= strvar_cnt) {
-		WARNING("string index out of range: %d\n", no);
+		WARNING("string index out of range: %d", no);
 		return;
 	}
 	if (!strVar[no])

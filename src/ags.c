@@ -63,11 +63,11 @@ static void initPal(Palette256 *pal) {
 
 boolean ags_check_param(int *x, int *y, int *w, int *h) {
 	if (*x >= nact->ags.world_size.width) {
-		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)\n", *x, nact->ags.world_size.width, sl_getPage(), sl_getIndex());
+		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)", *x, nact->ags.world_size.width, sl_getPage(), sl_getIndex());
 		return FALSE;
 	}
 	if (*y >= nact->ags.world_size.height) {
-		WARNING("Illegal Param y = %d (max=%d)\n", *y, nact->ags.world_size.height);
+		WARNING("Illegal Param y = %d (max=%d)", *y, nact->ags.world_size.height);
 		return FALSE;
 	}
 	
@@ -85,11 +85,11 @@ boolean ags_check_param(int *x, int *y, int *w, int *h) {
 
 boolean ags_check_param_xy(int *x, int *y) {
 	if (*x >= nact->ags.world_size.width) {
-		WARNING("Illegal Param x = %d\n", *x);
+		WARNING("Illegal Param x = %d", *x);
 		return FALSE;
 	}
 	if (*y >= nact->ags.world_size.height) {
-		WARNING("Illegal Param y = %d\n", *y);
+		WARNING("Illegal Param y = %d", *y);
 		return FALSE;
 	}
 	

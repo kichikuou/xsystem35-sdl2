@@ -16,23 +16,23 @@ static void Init() {
 	
 	*var = 0;
 	
-	DEBUG_COMMAND_YET("nDEMO.Init %p:\n", var);
+	DEBUG_COMMAND_YET("nDEMO.Init %p:", var);
 }
 
 static void SetKeyCancelFlag() {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("nDEMO.SetKeyCancelFlag %d:\n", p1);
+	DEBUG_COMMAND_YET("nDEMO.SetKeyCancelFlag %d:", p1);
 }
 
 static void SetLoopFlag() {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("nDEMO.SetLoopFlag %d:\n", p1);
+	DEBUG_COMMAND_YET("nDEMO.SetLoopFlag %d:", p1);
 }
 
 static void Run() {
-	DEBUG_COMMAND_YET("nDEMO.Run:\n");
+	DEBUG_COMMAND_YET("nDEMO.Run:");
 }
 
 static const ModuleFunc functions[] = {

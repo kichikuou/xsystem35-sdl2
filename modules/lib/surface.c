@@ -37,7 +37,7 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 			s->bytes_per_pixel = 4;
 			break;
 		default:
-			WARNING("depth %d is not supported\n", s->depth);
+			WARNING("depth %d is not supported", s->depth);
 		}
 	}
 	

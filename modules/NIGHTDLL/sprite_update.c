@@ -68,7 +68,7 @@ static MyRectangle get_updatearea() {
 	// surface0との領域の積をとる
 	SDL_IntersectRect(&rsf0, &clip, &result);
 	
-	SACT_DEBUG("clipped area x=%d y=%d w=%d h=%d\n",
+	SACT_DEBUG("clipped area x=%d y=%d w=%d h=%d",
 		result.x, result.y, result.w, result.h);
 	
 	return result;
@@ -150,7 +150,7 @@ int nt_sp_updateme(sprite_t *sp) {
 	
 	updatearea = slist_append(updatearea, r);
 	
-	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d\n",
+	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d",
 		r->x, r->y, sp->no, r->w, r->h);
 	
 	return OK;
@@ -178,7 +178,7 @@ int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	
 	updatearea = slist_append(updatearea, r);
 	
-	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d\n",
+	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d",
 		r->x, r->y, sp->no, r->w, r->h);
 	
 	return OK;
@@ -223,7 +223,7 @@ int nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
 	h  = area->h;
 	gr_fill(sf0, sx, sy, w, h, 0, 0, 0);
 	
-	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, \n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d",
 		sp->no, sx, sy, w, h);
 	
 	return OK;

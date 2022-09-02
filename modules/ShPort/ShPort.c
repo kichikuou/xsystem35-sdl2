@@ -59,7 +59,7 @@ static void OutputMessageBox(void) { /* 0 */
 	free(title_utf8);
 	free(msg_utf8);
 
-	DEBUG_COMMAND("ShPort.OutputMessageBox: %d,%d,%d,%d,%p,%d:\n", p1, p2, title, msg, res, ISys3xSystem);
+	DEBUG_COMMAND("ShPort.OutputMessageBox: %d,%d,%d,%d,%p,%d:", p1, p2, title, msg, res, ISys3xSystem);
 }
 
 static void InputListNum(void) { /* 1 */
@@ -87,7 +87,7 @@ static void InputListNum(void) { /* 1 */
 	}
 
 	free(ni_param.title);
-	DEBUG_COMMAND("ShPort.InputListNum: %d,%d,%p,%d,%d,%p,%d:\n", flags, title, val, minval, maxval, res, ISys3xSystem);
+	DEBUG_COMMAND("ShPort.InputListNum: %d,%d,%p,%d,%d,%p,%d:", flags, title, val, minval, maxval, res, ISys3xSystem);
 }
 
 /**
@@ -98,7 +98,7 @@ static void InputListNum(void) { /* 1 */
 static void Init(void) {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShPort.Init: %d:\n", p1);
+	DEBUG_COMMAND_YET("ShPort.Init: %d:", p1);
 }
 
 /**
@@ -110,7 +110,7 @@ static void InitKeyStatus(void) {
 	int no = getCaliValue();
 	
 	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)\n", no);
+		WARNING("Overflow keymap table(p1)", no);
 		return;
 	}
 	
@@ -120,7 +120,7 @@ static void InitKeyStatus(void) {
 		memset(keymap[no -1], 0, 256);
 	}
 	
-	DEBUG_COMMAND("ShPort.InitKeyStatus: %d:\n", no);
+	DEBUG_COMMAND("ShPort.InitKeyStatus: %d:", no);
 }
 
 /**
@@ -136,13 +136,13 @@ static void SetKeyStatus(void) {
 	int func = getCaliValue();
 	
 	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)\n", no);
+		WARNING("Overflow keymap table(p1)", no);
 		return;
 	}
 	
 	keymap[no -1][key] = func;
 	
-	DEBUG_COMMAND("ShPort.SetKeyStatus: %d,%d,%d:\n", no, key, func);
+	DEBUG_COMMAND("ShPort.SetKeyStatus: %d,%d,%d:", no, key, func);
 }
 
 /**
@@ -157,7 +157,7 @@ static void GetKeyStatus(void) {
 	int i;
 	
 	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)\n", no);
+		WARNING("Overflow keymap table(p1)", no);
 		return;
 	}
 	
@@ -166,7 +166,7 @@ static void GetKeyStatus(void) {
 		*var |= (keymap[no -1][i] * RawKeyInfo[i]);
 	}
 	
-	DEBUG_COMMAND("ShPort.GetKeyStatus: %d,%p:\n", no, var);
+	DEBUG_COMMAND("ShPort.GetKeyStatus: %d,%p:", no, var);
 }
 
 static void InputListString(void) {
@@ -178,7 +178,7 @@ static void InputListString(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputListString: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
+	DEBUG_COMMAND_YET("ShPort.InputListString: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
 static void InputOpenFile(void) {
@@ -190,7 +190,7 @@ static void InputOpenFile(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputOpenFile: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
+	DEBUG_COMMAND_YET("ShPort.InputOpenFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
 static void InputSaveFile(void) {
@@ -202,7 +202,7 @@ static void InputSaveFile(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputSaveFile: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
+	DEBUG_COMMAND_YET("ShPort.InputSaveFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
 static const ModuleFunc functions[] = {

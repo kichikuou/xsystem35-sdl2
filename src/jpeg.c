@@ -41,7 +41,7 @@ cgdata *jpeg_extract(BYTE *data, size_t size) {
 	int width, height, channels;
 	BYTE *pixels = stbi_load_from_memory(data, size, &width, &height, &channels, 3);
 	if (!pixels) {
-		WARNING("cannot decode jpeg: %s\n", stbi_failure_reason());
+		WARNING("cannot decode jpeg: %s", stbi_failure_reason());
 		return NULL;
 	}
 

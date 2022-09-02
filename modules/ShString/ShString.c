@@ -46,35 +46,35 @@ static void ExchangeString(void) {
 	int pat    = getCaliValue();
 	int patr   = getCaliValue();
 	svar_replaceAll(target, pat, patr);
-	DEBUG_COMMAND("ShString.ExchangeString: %d,%d,%d:\n", target, pat, patr);
+	DEBUG_COMMAND("ShString.ExchangeString: %d,%d,%d:", target, pat, patr);
 }
 
 static void SetNum16String(void) { /* 1 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShString.SetNum16String: %d,%d:\n", p1, p2);
+	DEBUG_COMMAND_YET("ShString.SetNum16String: %d,%d:", p1, p2);
 }
 
 static void SetNum16HalfString(void) { /* 2 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShString.SetNum16HalfString: %d,%d:\n", p1, p2);
+	DEBUG_COMMAND_YET("ShString.SetNum16HalfString: %d,%d:", p1, p2);
 }
 
 static void SetNum32String(void) { /* 3 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShString.SetNum32String: %d,%d:\n", p1, p2);
+	DEBUG_COMMAND_YET("ShString.SetNum32String: %d,%d:", p1, p2);
 }
 
 static void SetNum32HalfString(void) { /* 4 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShString.SetNum32HalfString: %d,%d:\n", p1, p2);
+	DEBUG_COMMAND_YET("ShString.SetNum32HalfString: %d,%d:", p1, p2);
 }
 
 static void GetArrayString(void) { /* 5 */
@@ -82,7 +82,7 @@ static void GetArrayString(void) { /* 5 */
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShString.GetArrayString: %d,%d,%d:\n", p1, p2, p3);
+	DEBUG_COMMAND_YET("ShString.GetArrayString: %d,%d,%d:", p1, p2, p3);
 }
 
 static void SetWindowTitle(void) { /* 6 */
@@ -91,7 +91,7 @@ static void SetWindowTitle(void) { /* 6 */
 	
 	ags_setWindowTitle(svar_get(strno));
 	
-	DEBUG_COMMAND("ShString.SetWindowTitle: %d,%d:\n", strno, p2);
+	DEBUG_COMMAND("ShString.SetWindowTitle: %d,%d:", strno, p2);
 }
 
 static void FillString() {
@@ -113,7 +113,7 @@ static void FillString() {
 			svar_set(st + i, svar_get(src));
 	}
 	
-	DEBUG_COMMAND("ShString.FillString: %d,%d,%d,%d:\n", st, cnt, src, p4);
+	DEBUG_COMMAND("ShString.FillString: %d,%d,%d,%d:", st, cnt, src, p4);
 }
 
 static void SetStringNum16(void) {
@@ -130,7 +130,7 @@ static void SetStringNum16(void) {
 	char _dst[100];
 	char *dst = _dst;
 	
-	DEBUG_COMMAND("ShString.SetStringNum16: %d,%p:\n", st, var);
+	DEBUG_COMMAND("ShString.SetStringNum16: %d,%p:", st, var);
 	
 	
 	while(*str) {
@@ -160,7 +160,7 @@ static void SetStringNum32(void) {
 	int p1 = getCaliValue();
 	int *p2 = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("ShString.SetStringNum32: %d,%p:\n", p1, p2);
+	DEBUG_COMMAND_YET("ShString.SetStringNum32: %d,%p:", p1, p2);
 }
 
 static const ModuleFunc functions[] = {

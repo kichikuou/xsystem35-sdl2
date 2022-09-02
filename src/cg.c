@@ -88,7 +88,7 @@ static CG_TYPE check_cgformat(BYTE *data) {
 	} else if (jpeg_checkfmt(data) && nact->ags.world_depth >= 15) {
 		return ALCG_JPEG;
 	}
-	WARNING("Unknown Cg Type\n");
+	WARNING("Unknown Cg Type");
 	return ALCG_UNKNOWN;
 }
 
@@ -364,7 +364,7 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 	if (cgno >= 0) {
 		if (NULL == (cg = loader(cgno))) return;
 		if (cg->type != ALCG_PMS16) {
-			WARNING("commandGX cg_no != 16bitPMS\n");
+			WARNING("commandGX cg_no != 16bitPMS");
 			return;
 		}
 	}
@@ -372,7 +372,7 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 	/* load alpha pixel */
 	if (NULL == (scg = loader(shadowno))) return;
 	if (scg->type != ALCG_PMS8) {
-		WARNING("commandGX shadow_no != 8bitPMS\n");
+		WARNING("commandGX shadow_no != 8bitPMS");
 		return;
 	}
 	

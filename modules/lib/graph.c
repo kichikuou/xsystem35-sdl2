@@ -45,38 +45,38 @@ boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds
 	int w, h;
 	
 	if (ss == NULL) {
-		WARNING("ss surface is null\n");
+		WARNING("ss surface is null");
 		return FALSE;
 	}
 	if (ss == NULL) {
-		WARNING("ss surface is null\n");
+		WARNING("ss surface is null");
 		return FALSE;
 	}
 	
 	if (*sx > ss->width) {
-		WARNING("sx is too large (sx=%d,width=%d)\n", *sx, ss->width);
+		WARNING("sx is too large (sx=%d,width=%d)", *sx, ss->width);
 		return FALSE;
 	}
 	if (*sy > ss->height) {
-		WARNING("sy is too large (sy=%d,height=%d)\n", *sy, ss->height);
+		WARNING("sy is too large (sy=%d,height=%d)", *sy, ss->height);
 		return FALSE;
 	}
 	
 	if (*sx < 0) {
-		WARNING("sx is too small (sx=%d)\n", *sx);
+		WARNING("sx is too small (sx=%d)", *sx);
 		return FALSE;
 	}
 	if (*sy < 0) {
-		WARNING("sy is too small (sy=%d)\n", *sy);
+		WARNING("sy is too small (sy=%d)", *sy);
 		return FALSE;
 	}
 	
 	if (*dx > ds->width) {
-		WARNING("dx is too large (dx=%d,width=%d)\n", *dx, ds->width);
+		WARNING("dx is too large (dx=%d,width=%d)", *dx, ds->width);
 		return FALSE;
 	}
 	if (*dy > ds->height) {
-		WARNING("dy is too large (dy=%d,height=%d)\n", *dy, ds->height);
+		WARNING("dy is too large (dy=%d,height=%d)", *dy, ds->height);
 		return FALSE;
 	}
 	
@@ -94,19 +94,19 @@ boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds
 	*sh = min(ss->height - *sy, min(ds->height - *dy, *sh));
 
 	if (*sw <= 0) {
-		WARNING("sw become <=0\n");
+		WARNING("sw become <=0");
 		return FALSE;
 	}
 	if (*sh <= 0) {
-		WARNING("sh become <=0\n");
+		WARNING("sh become <=0");
 		return FALSE;
 	}
 	
 	if (*sw != w) {
-		NOTICE("width change %d -> %d\n", w, *sw);
+		NOTICE("width change %d -> %d", w, *sw);
 	}
 	if (*sh != h) {
-		NOTICE("height change %d -> %d\n", h, *sh);
+		NOTICE("height change %d -> %d", h, *sh);
 	}
 	
 	return TRUE;
@@ -129,16 +129,16 @@ boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
 	int w, h;
 	
 	if (ss == NULL) {
-		WARNING("ss surface is null\n");
+		WARNING("ss surface is null");
 		return FALSE;
 	}
 	
 	if (*sx > ss->width) {
-		WARNING("sx is too large (sx=%d,width=%d)\n", *sx, ss->width);
+		WARNING("sx is too large (sx=%d,width=%d)", *sx, ss->width);
 		return FALSE;
 	}
 	if (*sy > ss->height) {
-		WARNING("sy is too large (sy=%d,height=%d)\n", *sy, ss->height);
+		WARNING("sy is too large (sy=%d,height=%d)", *sy, ss->height);
 		return FALSE;
 	}
 	
@@ -156,19 +156,19 @@ boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
 	*sh = min(ss->height - *sy, *sh);
 	
 	if (*sw <= 0) {
-		WARNING("sw become <=0\n");
+		WARNING("sw become <=0");
 		return FALSE;
 	}
 	if (*sh <= 0) {
-		WARNING("sh become <=0\n");
+		WARNING("sh become <=0");
 		return FALSE;
 	}
 	
 	if (*sw != w) {
-		NOTICE("width change %d -> %d\n", w, *sw);
+		NOTICE("width change %d -> %d", w, *sw);
 	}
 	if (*sh != h) {
-		NOTICE("height change %d -> %d\n", h, *sh);
+		NOTICE("height change %d -> %d", h, *sh);
 	}
 	
 	return TRUE;

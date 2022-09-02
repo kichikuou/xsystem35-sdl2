@@ -56,7 +56,7 @@ static void font_insert(int size, int type, TTF_Font *font) {
 	fonttbl[fontcnt].id   = font;
 	
 	if (fontcnt >= (FONTTABLEMAX -1)) {
-		WARNING("Font table is full.\n");
+		WARNING("Font table is full.");
 	} else {
 		fontcnt++;
 	}
@@ -112,7 +112,7 @@ SDL_Surface *font_get_glyph(const char *str_utf8) {
 		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
 	}
 	if (!fs)
-		WARNING("Text rendering failed: %s\n", TTF_GetError());
+		WARNING("Text rendering failed: %s", TTF_GetError());
 
 	return fs;
 }
@@ -174,7 +174,7 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, BYTE cl) {
 		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, sdl_col[cl]);
 	}
 	if (!fs) {
-		WARNING("Text rendering failed: %s\n", TTF_GetError());
+		WARNING("Text rendering failed: %s", TTF_GetError());
 		return r_dst;
 	}
 	

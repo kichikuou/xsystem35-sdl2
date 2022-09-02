@@ -84,7 +84,7 @@ int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt) {
 		return SAVE_SAVEERR;
 
 	if (cnt > v_sliceSize(src)) {
-		WARNING("QE: array size too small (size = %d, data count = %d)\n", v_sliceSize(src), cnt);
+		WARNING("QE: array size too small (size = %d, data count = %d)", v_sliceSize(src), cnt);
 		cnt = v_sliceSize(src);
 	}
 
@@ -107,7 +107,7 @@ int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
 
 	WORD *tmp = malloc(cnt * sizeof(WORD));
 	if (!tmp) {
-		WARNING("Out of memory\n");
+		WARNING("Out of memory");
 		fclose(fp);
 		return SAVE_LOADERR;
 	}
@@ -122,7 +122,7 @@ int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
 	}
 
 	if (cnt > v_sliceSize(dest)) {
-		WARNING("LE: array size too small (size = %d, data count = %d)\n", v_sliceSize(dest), cnt);
+		WARNING("LE: array size too small (size = %d, data count = %d)", v_sliceSize(dest), cnt);
 		cnt = v_sliceSize(dest);
 	}
 
@@ -143,7 +143,7 @@ int save_save_str_with_file(char *fname_utf8, int start, int cnt) {
 	
 	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
 	if (tmp == NULL) {
-		WARNING("Out of memory\n");
+		WARNING("Out of memory");
 		return SAVE_LOADSHORTAGE;
 	}
 	
@@ -193,7 +193,7 @@ int save_load_str_with_file(char *fname_utf8, int start, int cnt) {
 	
 	tmp = _tmp = (char *)malloc(filesize);
 	if (tmp == NULL) {
-		WARNING("Out of memory\n");
+		WARNING("Out of memory");
 		return SAVE_LOADERR;
 	}
 	
@@ -548,7 +548,7 @@ static void *saveStrVar(Ald_strVarHdr *head) {
 	char *tmp, *_tmp;
 	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
 	if (tmp == NULL) {
-		WARNING("Out of memory\n");
+		WARNING("Out of memory");
 		return NULL;
 	}
 	*tmp = 0;
@@ -572,7 +572,7 @@ static void loadStrVar(char *buf) {
 	cnt = head->count;
 	max = head->maxlen;
 	if (svar_maxindex() != cnt || strvar_len != max) {
-		WARNING("Unexpected number of strings in savedata (%d, expected %d)\n", cnt, svar_maxindex());
+		WARNING("Unexpected number of strings in savedata (%d, expected %d)", cnt, svar_maxindex());
 		svar_init(cnt, max);
 	}
 	buf += sizeof(Ald_strVarHdr);
@@ -599,7 +599,7 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	head->pageNo = page;
 	tmp = _tmp = (WORD *)malloc(cnt * sizeof(WORD));
 	if (tmp == NULL) {
-		WARNING("Out of memory\n");
+		WARNING("Out of memory");
 		return NULL;
 	}
 	for (i = 0; i < cnt; i++) {
@@ -621,7 +621,7 @@ static int loadSysVar(char *buf) {
 		savefile_sysvar_cnt = cnt;
 	if (varPage[page].size < cnt || varPage[page].value == NULL) {
 		if (!v_allocatePage(page, cnt, TRUE)) {
-			WARNING("Array allocation failed: page=%d size=%d\n", page, cnt);
+			WARNING("Array allocation failed: page=%d size=%d", page, cnt);
 			return SAVE_LOADERR;
 		}
 	}
@@ -713,7 +713,7 @@ BYTE* load_cg_with_file(char *fname_utf8, int *status, long *filesize){
 	
 	tmp = (char *)malloc(*filesize);
 	if (tmp == NULL) {
-		WARNING("Out of memory\n");
+		WARNING("Out of memory");
 		*status = SAVE_LOADERR; return NULL;
 	}
 	fseek(fp, 0L, SEEK_SET);

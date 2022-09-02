@@ -66,14 +66,14 @@ static mmap_t *wai_map;
 Mix_Chunk *pcm_sdlmixer_load(int no) {
 	dridata *dfile = ald_getdata(DRIFILE_WAVE, no -1);
 	if (dfile == NULL) {
-		WARNING("DRIFILE_WAVE fail to open %d\n", no -1);
+		WARNING("DRIFILE_WAVE fail to open %d", no -1);
 		return NULL;
 	}
 
 	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(dfile->data, dfile->size), 1);
 	ald_freedata(dfile);
 	if (chunk == NULL) {
-		WARNING("DRIFILE_WAVE %d: not a valid wav file\n", no-1);
+		WARNING("DRIFILE_WAVE %d: not a valid wav file", no-1);
 		return NULL;
 	}
 	assert(chunk->allocated);
@@ -325,7 +325,7 @@ static int load_wai() {
 
 	char *adr = wai_map->addr;
 	if (*adr != 'X' || *(adr+1) != 'I' || *(adr+2) != '2') {
-		WARNING("not WAI file\n");
+		WARNING("not WAI file");
 		unmap_file(wai_map);
 		wai_map = NULL;
 		return NG;

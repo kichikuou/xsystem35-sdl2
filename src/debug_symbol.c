@@ -61,7 +61,7 @@ struct debug_symbols {
 const char *fget4cc(FILE *fp) {
 	static char buf[5];
 	if (fread(buf, 4, 1, fp) != 1) {
-		WARNING("fread: %s\n", strerror(errno));
+		WARNING("fread: %s", strerror(errno));
 		buf[0] = '\0';
 	}
 	return buf;
@@ -70,7 +70,7 @@ const char *fget4cc(FILE *fp) {
 int fgetdw(FILE *fp) {
 	BYTE buf[4];
 	if (fread(buf, 4, 1, fp) != 1) {
-		WARNING("fread: %s\n", strerror(errno));
+		WARNING("fread: %s", strerror(errno));
 		return 0;
 	}
 	return LittleEndian_getDW(buf, 0);
@@ -188,17 +188,17 @@ static boolean load_func(struct debug_symbols *dsym, char *buf) {
 struct debug_symbols *dsym_load(const char *path) {
 	FILE *fp = fopen(path, "rb");
 	if (!fp) {
-		WARNING("Cannot open %s: %s\n", path, strerror(errno));
+		WARNING("Cannot open %s: %s", path, strerror(errno));
 		return NULL;
 	}
 	if (strcmp("DSYM", fget4cc(fp))) {
-		WARNING("%s: wrong signature\n", path);
+		WARNING("%s: wrong signature", path);
 		fclose(fp);
 		return NULL;
 	}
 	int version = fgetdw(fp);
 	if (version != 0) {
-		WARNING("%s: unsupported debug info version\n", path);
+		WARNING("%s: unsupported debug info version", path);
 		fclose(fp);
 		return NULL;
 	}
@@ -211,12 +211,12 @@ struct debug_symbols *dsym_load(const char *path) {
 		int section_size = fgetdw(fp);
 		void *section_content = malloc(section_size);
 		if (!section_content) {
-			WARNING("Memory allocation failure while loading %s\n", path);
+			WARNING("Memory allocation failure while loading %s", path);
 			fclose(fp);
 			return NULL;
 		}
 		if (fread(section_content, section_size - 8, 1, fp) != 1) {
-			WARNING("%s: I/O error\n", path, strerror(errno));
+			WARNING("%s: I/O error", path, strerror(errno));
 			fclose(fp);
 			return NULL;
 		}
@@ -233,7 +233,7 @@ struct debug_symbols *dsym_load(const char *path) {
 		} else if (!strcmp(tag, "FUNC")) {
 			ok = load_func(dsym, section_content);
 		} else {
-			WARNING("%s: unrecognized section %s\n", path, tag);
+			WARNING("%s: unrecognized section %s", path, tag);
 		}
 		if (!ok) {
 			fclose(fp);
@@ -241,7 +241,7 @@ struct debug_symbols *dsym_load(const char *path) {
 		}
 	}
 	if (fgetc(fp) != EOF)
-		WARNING("%s: broken debug information structure\n", path);
+		WARNING("%s: broken debug information structure", path);
 	fclose(fp);
 	return dsym;
 }

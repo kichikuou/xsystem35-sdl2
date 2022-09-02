@@ -107,13 +107,13 @@ int unmap_file(mmap_t *m) {
 mmap_t *map_file(const char *path) {
 	int fd = open(path, O_RDONLY);
 	if (fd < 0) {
-		WARNING("open: %s\n", strerror(errno));
+		WARNING("open: %s", strerror(errno));
 		return NULL;
 	}
 
 	struct stat sbuf;
 	if (fstat(fd, &sbuf) < 0) {
-		WARNING("fstat: %s\n", strerror(errno));
+		WARNING("fstat: %s", strerror(errno));
 		close(fd);
 		return NULL;
 	}
@@ -121,7 +121,7 @@ mmap_t *map_file(const char *path) {
 #ifdef HAVE_MMAP
 	void *addr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0);
 	if (addr == MAP_FAILED) {
-		WARNING("mmap: %s\n", strerror(errno));
+		WARNING("mmap: %s", strerror(errno));
 		close(fd);
 		return NULL;
 	}
@@ -135,7 +135,7 @@ mmap_t *map_file(const char *path) {
 	while (bytes < sbuf.st_size) {
 		ssize_t ret = read(fd, addr + bytes, sbuf.st_size - bytes);
 		if (ret <= 0) {
-			WARNING("read: %s\n", strerror(errno));
+			WARNING("read: %s", strerror(errno));
 			close(fd);
 			free(addr);
 			return NULL;
@@ -157,19 +157,19 @@ mmap_t *map_file_readwrite(const char *path, size_t size) {
 #else
 	int fd = open(path, O_RDWR | O_CREAT, 0644);
 	if (fd < 0) {
-		WARNING("open: %s\n", strerror(errno));
+		WARNING("open: %s", strerror(errno));
 		return NULL;
 	}
 
 	if (ftruncate(fd, size) < 0) {
-		WARNING("ftruncate: %s\n", strerror(errno));
+		WARNING("ftruncate: %s", strerror(errno));
 		close(fd);
 		return NULL;
 	}
 
 	void *addr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (addr == MAP_FAILED) {
-		WARNING("mmap: %s\n", strerror(errno));
+		WARNING("mmap: %s", strerror(errno));
 		close(fd);
 		return NULL;
 	}

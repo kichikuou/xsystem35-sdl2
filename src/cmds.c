@@ -38,7 +38,7 @@ void commandSS() {
 	/* 音楽演奏を開始する（ＣＤのみ）*/
 	int num = getCaliValue();
 	
-	DEBUG_COMMAND("SS %d:\n",num);
+	DEBUG_COMMAND("SS %d:",num);
 	
 	if (num == 0) {
 		mus_cdrom_stop();
@@ -66,7 +66,7 @@ void commandSC() {
 		*var++ = 999;
 	}
 	
-	DEBUG_COMMAND("SC %p:\n",var);
+	DEBUG_COMMAND("SC %p:",var);
 }
 
 void commandSD() {
@@ -74,7 +74,7 @@ void commandSD() {
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("SD %d,%d:\n",num1,num2);
+	DEBUG_COMMAND_YET("SD %d,%d:",num1,num2);
 }
 
 void commandSR() {
@@ -113,7 +113,7 @@ void commandSR() {
 		*var = st.play_no;
 	}
 	
-	DEBUG_COMMAND("SR %d,%p:\n",num, var);
+	DEBUG_COMMAND("SR %d,%p:",num, var);
 }
 
 void commandSL() {
@@ -122,7 +122,7 @@ void commandSL() {
 	
 	next_cdrom_loopcnt = num;
 	
-	DEBUG_COMMAND("SL %d:\n",num);
+	DEBUG_COMMAND("SL %d:",num);
 }
 
 void commandSI() {
@@ -138,7 +138,7 @@ void commandSI() {
 		*var = mus_cdrom_get_state() == TRUE ? 1 : 0;
 	}
 	
-	DEBUG_COMMAND("SI %d,%d:\n",type,*var);
+	DEBUG_COMMAND("SI %d,%d:",type,*var);
 }
 
 void commandSG() {
@@ -153,7 +153,7 @@ void commandSG() {
 		/* 演奏中のＭＩＤＩを停止する */
 		num = getCaliValue();
 		mus_midi_stop();
-		DEBUG_COMMAND("SG0 %d:\n", num);
+		DEBUG_COMMAND("SG0 %d:", num);
 		break;
 	case 1:
 		/* ＭＩＤＩを演奏する */
@@ -163,14 +163,14 @@ void commandSG() {
 		} else {
 			mus_midi_start(num, loopcnt);
 		}
-		DEBUG_COMMAND("SG1 %d:\n", num);
+		DEBUG_COMMAND("SG1 %d:", num);
 		break;
 	case 2:
 		/* ＭＩＤＩ演奏位置を1/100秒単位で取得する */
 		var = getCaliVariable();
 		mus_midi_get_playposition(&st);
 		*var = st.loc_ms / 10;
-		DEBUG_COMMAND("SG2 %p:\n", var);
+		DEBUG_COMMAND("SG2 %p:", var);
 		break;
 	case 3:
 		num = getCaliValue();
@@ -181,40 +181,40 @@ void commandSG() {
 			/* 一時停止中のＭＩＤＩの一時停止を解除する */
 			mus_midi_unpause();
 		}
-		DEBUG_COMMAND("SG3 %d:\n", num);
+		DEBUG_COMMAND("SG3 %d:", num);
 		break;
 	case 4:
 		num = getCaliValue();
 		/* 次のSG1コマンドでのMIDI演奏の繰り返し回数指定 */
 		loopcnt = num;
-		DEBUG_COMMAND("SG4 %d:\n", num);
+		DEBUG_COMMAND("SG4 %d:", num);
 		break;
 	case 5:
 		fnum = getCaliValue() & 0x7f;
 		num  = getCaliValue();
 		mus_midi_set_flag(0, fnum, num);
 		
-		DEBUG_COMMAND("SG5 %d,%d:\n", fnum, num);
+		DEBUG_COMMAND("SG5 %d,%d:", fnum, num);
 		break;
 	case 6:
 		fnum = getCaliValue() & 0x7f;
 		num  = getCaliValue();
 		mus_midi_set_flag(1, fnum, num);
 		
-		DEBUG_COMMAND("SG6 %d,%d:\n", fnum, num);
+		DEBUG_COMMAND("SG6 %d,%d:", fnum, num);
 		break;
 	case 7:
 		fnum = getCaliValue() & 0x7f;
 		var  = getCaliVariable();
 		*var = mus_midi_get_flag(0, fnum);
 		
-		DEBUG_COMMAND("SG7 %d,%d:\n", fnum, *var);
+		DEBUG_COMMAND("SG7 %d,%d:", fnum, *var);
 		break;
 	case 8: {
 		fnum = getCaliValue() & 0x7f;
 		var  = getCaliVariable();
 		*var = mus_midi_get_flag(1, fnum);
-		DEBUG_COMMAND("SG8 %d,%p:\n", fnum, var);
+		DEBUG_COMMAND("SG8 %d,%p:", fnum, var);
 		break;
 	}
 	default:
@@ -228,7 +228,7 @@ void commandSP() {
 	int no = getCaliValue();
 	int loop = getCaliValue();
 
-	DEBUG_COMMAND("SP %d,%d:\n",no,loop);
+	DEBUG_COMMAND("SP %d,%d:",no,loop);
 	
 	if (!mus_pcm_get_state()) {
 		dummy_pcm_in_play = TRUE;
@@ -246,7 +246,7 @@ void commandST() {
 	/* ＰＣＭデータの演奏を停止する。 */
 	int time = getCaliValue();
 	
-	DEBUG_COMMAND("ST %d:\n",time);
+	DEBUG_COMMAND("ST %d:",time);
 	
 	if (!mus_pcm_get_state()) { 
 		dummy_pcm_in_play = FALSE;
@@ -277,7 +277,7 @@ void commandSU() {
 		*var1 = *var2 = 0;
 	}
 	
-	DEBUG_COMMAND("SU %d,%d:\n",*var1, *var2);
+	DEBUG_COMMAND("SU %d,%d:",*var1, *var2);
 }
 
 void commandSQ() {
@@ -286,7 +286,7 @@ void commandSQ() {
 	int noR  = getCaliValue();
 	int loop = getCaliValue();
 	
-	DEBUG_COMMAND("SQ %d,%d,%d:\n", noL, noR, loop);
+	DEBUG_COMMAND("SQ %d,%d,%d:", noL, noR, loop);
 		     
 	if (!mus_pcm_get_state()) {
 		dummy_pcm_in_play = TRUE;
@@ -304,7 +304,7 @@ void commandSO() {
 	// ＰＣＭデバイスのサポート情報を取得
 	int *var = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("SO %p:\n",var);
+	DEBUG_COMMAND_YET("SO %p:",var);
 }
 
 void commandSW() {
@@ -329,13 +329,13 @@ void commandSW() {
 		*var = 0;
 	}
 	
-	DEBUG_COMMAND("SW %p,%d,%d,%d:\n",var, channel, Srate, bit);
+	DEBUG_COMMAND("SW %p,%d,%d,%d:",var, channel, Srate, bit);
 }
 
 void commandSM() {
 	/* ＰＣＭデータをメモリ上に乗せる。*/
 	int no = getCaliValue();
-	DEBUG_COMMAND("SM %d:\n",no);
+	DEBUG_COMMAND("SM %d:",no);
 	
 	mus_pcm_load(no);
 }
@@ -351,7 +351,7 @@ void commandSX() {
 		int volume = getCaliValue();
 		int stop   = getCaliValue();
 		mus_mixer_fadeout_start(device, time, volume, stop);
-		DEBUG_COMMAND("SX %d,%d,%d,%d,%d:\n", device, sw, time, volume, stop);
+		DEBUG_COMMAND("SX %d,%d,%d,%d,%d:", device, sw, time, volume, stop);
 		break;
 	}
 	case 2: {
@@ -360,20 +360,20 @@ void commandSX() {
 		boolean st;
 		st = mus_mixer_fadeout_get_state(device);
 		*var = (st ? 0 : 1);
-		DEBUG_COMMAND("SX %d,%d:\n", device, sw);
+		DEBUG_COMMAND("SX %d,%d:", device, sw);
 		break;
 	}
 	case 3: {
 		/*  フェード強制終了 */
 		mus_mixer_fadeout_stop(device);
-		DEBUG_COMMAND("SX %d,%d:\n", device, sw);
+		DEBUG_COMMAND("SX %d,%d:", device, sw);
 		break;
 	}
 	case 4: {
 		/* ボリューム取得 */
 		int *var   = getCaliVariable();
 		*var = mus_mixer_get_level(device);
-		DEBUG_COMMAND("SX %d,%d:\n", device, sw);
+		DEBUG_COMMAND("SX %d,%d:", device, sw);
 		break;
 	}
 	default:

@@ -263,7 +263,7 @@ static void sdl_getEvent(void) {
 			break;
 
 		default:
-			NOTICE("ev %x\n", e.type);
+			NOTICE("ev %x", e.type);
 			break;
 		}
 	}

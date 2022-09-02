@@ -184,13 +184,13 @@ void ntmsg_newline() {
 void ntmsg_add(const char *msg) {
 	int len;
 	
-	SACT_DEBUG("len = %d\n", strlen(msg));
+	SACT_DEBUG("len = %d", strlen(msg));
 	
 	if (msg[0] == '\0') return;
 	
 	len = MSGBUFMAX - (int)strlen(night.msgbuf);
 	if (len < 0) {
-		WARNING("buf shortage (%d)\n", len);
+		WARNING("buf shortage (%d)", len);
 		return;
 	}
 	strncat(night.msgbuf, msg, len);
@@ -475,7 +475,7 @@ int ntmsg_update(sprite_t *sp, MyRectangle *r) {
 	
 	gre_BlendUseAMap(sf0, dx, dy, sf0, dx, dy, sp->u.msg.canvas, sx, sy, w, h, sp->u.msg.canvas, sx, sy, sp->blendrate);
 	
-	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
 	
 	return OK;

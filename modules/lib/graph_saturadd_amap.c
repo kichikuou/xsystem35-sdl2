@@ -17,12 +17,12 @@ int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx
 	}
 	
 	if (src->alpha == NULL) {
-		WARNING("src alpha NULL\n");
+		WARNING("src alpha NULL");
 		return NG;
 	}
 	
 	if (dst->alpha == NULL) {
-		WARNING("dst alpha NULL\n");
+		WARNING("dst alpha NULL");
 		return NG;
 	}
 	

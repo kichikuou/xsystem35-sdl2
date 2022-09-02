@@ -64,7 +64,7 @@ static int *getVar(int c0, struct VarRef *ref) {
 			int index = getCaliValue();
 			int *store = v_ref_indexed(var, index, ref);
 			if (!store)
-				WARNING("%03d:%05x: Out of bounds index access: %s[%d]\n", sl_getPage(), addr, v_name(var), index);
+				WARNING("%03d:%05x: Out of bounds index access: %s[%d]", sl_getPage(), addr, v_name(var), index);
 			return store;
 		} else if (c1 >= 0x40) {
 			var = c1;  // 0x40 - 0xff
@@ -75,7 +75,7 @@ static int *getVar(int c0, struct VarRef *ref) {
 	}
 	int *store = v_ref(var, ref);
 	if (!store)
-		WARNING("%03d:%05x: Out of bounds array access: %s\n", sl_getPage(), addr, v_name(var));
+		WARNING("%03d:%05x: Out of bounds array access: %s", sl_getPage(), addr, v_name(var));
 	return store;
 }
 
@@ -247,7 +247,7 @@ int getCaliValue(void) {
 	c0 = *--cali;
 
 	if (cali != bufc) {
-		WARNING("Something is wrong @ %03d:%05x\n", sl_getPage(), sl_getIndex());
+		WARNING("Something is wrong @ %03d:%05x", sl_getPage(), sl_getIndex());
 		cali = bufc;
 		return 0;
 	}

@@ -71,7 +71,7 @@ static uint8_t *webp_load(uint8_t *data, size_t size, int *width, int *height, i
 
 	dridata *dfile = ald_getdata(DRIFILE_CG, base - 1);
 	if (!dfile) {
-		WARNING("Cannot load base CG %d\n", base - 1);
+		WARNING("Cannot load base CG %d", base - 1);
 		return pixels;
 	}
 
@@ -79,11 +79,11 @@ static uint8_t *webp_load(uint8_t *data, size_t size, int *width, int *height, i
 	uint8_t *base_pixels = webp_load(dfile->data, dfile->size, &base_width, &base_height, &base_has_alpha);
 	ald_freedata(dfile);
 	if (!base_pixels) {
-		WARNING("Cannot decode base CG %d\n", base - 1);
+		WARNING("Cannot decode base CG %d", base - 1);
 		return pixels;
 	}
 	if (*width != base_width || *height != base_height) {
-		WARNING("webp base CG dimensions don't match: (%d,%d) / (%d,%d)\n",
+		WARNING("webp base CG dimensions don't match: (%d,%d) / (%d,%d)",
 				base_width, base_height, *width, *height);
 		WebPFree(base_pixels);
 		return pixels;

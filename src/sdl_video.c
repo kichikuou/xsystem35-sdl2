@@ -57,7 +57,7 @@ boolean sdl_joy_open(int index) {
 	int axes = SDL_JoystickNumAxes(js);
 	int buttons = SDL_JoystickNumButtons(js);
 	SDL_JoystickEventState(SDL_ENABLE);
-	NOTICE("SDL joystick '%s' %d axes %d buttons\n", name, axes, buttons);
+	NOTICE("SDL joystick '%s' %d axes %d buttons", name, axes, buttons);
 	return TRUE;
 }
 
@@ -111,7 +111,7 @@ void sdl_Remove(void) {
 		
 		SDL_Quit();
 		
-		NOTICE("Done!\n");
+		NOTICE("Done!");
 	}
 }
 

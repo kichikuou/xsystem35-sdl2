@@ -80,7 +80,7 @@ static void commandF1() {
 	int i;
 	char *p;
 	
-	DEBUG_COMMAND("F1 %d,%d:\n", str_number, skip);
+	DEBUG_COMMAND("F1 %d,%d:", str_number, skip);
 	
 	p = (char *)nact->datatbl_addr;
 	for (i = 0; i < skip; i++) {
@@ -104,7 +104,7 @@ static void commandF2() {
 	p++;
 	nact->datatbl_addr = (void *)p;
 	
-	DEBUG_COMMAND("F2 %d,%d:\n", *read_var, skip);
+	DEBUG_COMMAND("F2 %d,%d:", *read_var, skip);
 }
 
 static void commandF3() {
@@ -113,7 +113,7 @@ static void commandF3() {
 	
 	*read_var = LittleEndian_getW(nact->datatbl_addr, skip *2);
 	
-	DEBUG_COMMAND("F3 %d,%d:\n", *read_var, skip);
+	DEBUG_COMMAND("F3 %d,%d:", *read_var, skip);
 }
 
 static void commandF4() {
@@ -130,7 +130,7 @@ static void commandF4() {
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("F4 %d,%d:\n", *read_var, count);
+	DEBUG_COMMAND("F4 %d,%d:", *read_var, count);
 }
 
 static void commandF5() {
@@ -143,7 +143,7 @@ static void commandF5() {
 		read_var++;
 	}
 	
-	DEBUG_COMMAND("F5 %d,%d:\n", *read_var, count);
+	DEBUG_COMMAND("F5 %d,%d:", *read_var, count);
 }
 
 static void commandF6() {
@@ -152,7 +152,7 @@ static void commandF6() {
 	
 	F6Index[index] = var;
 	
-	DEBUG_COMMAND("F6 %d,%d:\n", *var, index);
+	DEBUG_COMMAND("F6 %d,%d:", *var, index);
 }
 
 static void commandF7() {
@@ -170,29 +170,29 @@ static void commandF7() {
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("F7 %d,%d\n", data_width, count);
+	DEBUG_COMMAND("F7 %d,%d", data_width, count);
 }
 
 static void commandF8() {
 	int snum = getCaliValue();
 	int scnt = getCaliValue();
-	DEBUG_COMMAND_YET("F8 %d,%d:\n", snum, scnt);
+	DEBUG_COMMAND_YET("F8 %d,%d:", snum, scnt);
 }
 
 static void commandF9() {
 	int snum = getCaliValue();
 	int scnt = getCaliValue();
-	DEBUG_COMMAND_YET("F9 %d,%d:\n", snum, scnt);
+	DEBUG_COMMAND_YET("F9 %d,%d:", snum, scnt);
 }
 
 static void commandF10() {
 	int snum = getCaliValue();
 	int scnt = getCaliValue();
-	DEBUG_COMMAND_YET("F10 %d,%d:\n", snum, scnt);
+	DEBUG_COMMAND_YET("F10 %d,%d:", snum, scnt);
 }
 
 static void commandF11() {
 	int snum = getCaliValue();
 	int ends = getCaliValue();
-	DEBUG_COMMAND_YET("F11 %d,%d:\n", snum, ends);
+	DEBUG_COMMAND_YET("F11 %d,%d:", snum, ends);
 }

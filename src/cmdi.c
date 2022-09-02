@@ -43,7 +43,7 @@ void commandIK() {
 	int num = sl_getc();
 	int key;
 
-	DEBUG_COMMAND("IK %d:\n",num);
+	DEBUG_COMMAND("IK %d:",num);
 	
 	/* to be fix
 	 *   IK0/1 is affected by ZI
@@ -94,7 +94,7 @@ void commandIK() {
 		sysVar[0] = sys_getInputInfo();
 		break;
 	default:
-		WARNING("commandIK(): Unknown Command %d\n", num);
+		WARNING("commandIK(): Unknown Command %d", num);
 	}
 }
 
@@ -107,7 +107,7 @@ void commandIM() {
 	sysVar[0] = sys_getMouseInfo(&p, FALSE);
 	*x_var = p.x;
 	*y_var = p.y;
-	DEBUG_COMMAND("IM %d,%d:\n", *x_var, *y_var);
+	DEBUG_COMMAND("IM %d,%d:", *x_var, *y_var);
 }
 
 void commandIC() {
@@ -119,7 +119,7 @@ void commandIC() {
 	pre = cursor_num;
 	
 	ags_setCursorType(cursor_num);
-	DEBUG_COMMAND("IC %d,%p:\n", cursor_num, oldcursor);
+	DEBUG_COMMAND("IC %d,%p:", cursor_num, oldcursor);
 }
 
 void commandIZ() {
@@ -128,7 +128,7 @@ void commandIZ() {
 	int y = getCaliValue();
 	
 	ags_setCursorLocation(x, y, TRUE);
-	DEBUG_COMMAND("IZ %d,%d:\n", x, y);
+	DEBUG_COMMAND("IZ %d,%d:", x, y);
 }
 
 void commandIX() {
@@ -136,7 +136,7 @@ void commandIX() {
 	int *var = getCaliVariable();
 	
 	*var = msgskip_isSkipping() == TRUE ? 1 : 0;
-	DEBUG_COMMAND("IX %p:\n",var);
+	DEBUG_COMMAND("IX %p:",var);
 }
 
 void commandIY() {
@@ -152,7 +152,7 @@ void commandIY() {
 		msgskip_setFlags(0, MSGSKIP_STOP_ON_MENU);
 	}
 	
-	DEBUG_COMMAND("IY %d:\n",p1);
+	DEBUG_COMMAND("IY %d:",p1);
 }
 
 void commandIG() { /* T2 */
@@ -167,7 +167,7 @@ void commandIG() { /* T2 */
 		var++;
 	}
 	
-	DEBUG_COMMAND("IG %p,%d,%d,%d\n", var, code, cnt, rsv);
+	DEBUG_COMMAND("IG %p,%d,%d,%d", var, code, cnt, rsv);
 }
 
 void commandIE() {
@@ -175,5 +175,5 @@ void commandIE() {
 	int p2 = getCaliValue();
 	
 	ags_loadCursor(p1, p2);
-	DEBUG_COMMAND("IE %d,%d\n", p1, p2);
+	DEBUG_COMMAND("IE %d,%d", p1, p2);
 }

@@ -95,13 +95,13 @@ static void Init() {
 	*/
 	int p1 = getCaliValue(); /* ISurface */
 	
-	DEBUG_COMMAND("ShGraph.Init %d:\n", p1);
+	DEBUG_COMMAND("ShGraph.Init %d:", p1);
 }
 
 static void GetSurfaceData() {
 	int p1 = getCaliValue(); /* ISurface */
 	
-	DEBUG_COMMAND_YET("ShGraph.GetSurfaceData %d:\n", p1);
+	DEBUG_COMMAND_YET("ShGraph.GetSurfaceData %d:", p1);
 }
 
 static void ChangeEquColor() {
@@ -113,7 +113,7 @@ static void ChangeEquColor() {
 	int *p6 = getCaliVariable();
 	int p7 = getCaliValue(); /* ISurface */
 	
-	DEBUG_COMMAND_YET("ShGraph.ChangeEquColor %d,%d,%d,%d,%p,%p,%d:\n", p1, p2, p3, p4, p5, p6, p7);
+	DEBUG_COMMAND_YET("ShGraph.ChangeEquColor %d,%d,%d,%d,%p,%p,%d:", p1, p2, p3, p4, p5, p6, p7);
 }
 
 static void ChangeNotColor() {
@@ -138,7 +138,7 @@ static void ChangeNotColor() {
 	int x, y;
 	BYTE *dp;
 	
-	DEBUG_COMMAND("ShGraph.ChangeNotColor %d,%d,%d,%d,%p,%p,%d:\n", x0, y0, width, height, src, dst, p7);
+	DEBUG_COMMAND("ShGraph.ChangeNotColor %d,%d,%d,%d,%p,%p,%d:", x0, y0, width, height, src, dst, p7);
 	
 	ags_check_param(&x0, &y0, &width, &height);
 	
@@ -218,7 +218,7 @@ static void ResetAnimeData() {
 	*/
 	int no = getCaliValue();
 	
-	DEBUG_COMMAND("ShGraph.ResetAnimeData %d:\n", no);
+	DEBUG_COMMAND("ShGraph.ResetAnimeData %d:", no);
 	
 	if (no > 0 && no <= SLOT) {
 		memset(&src[no-1], 0, sizeof(struct animsrc));
@@ -258,7 +258,7 @@ static void SetAnimeSrc() {
 	int *pal = getCaliVariable();
 	int r, g, b;
 	
-	DEBUG_COMMAND("ShGraph.SetAnimeSrc %d,%d,%d,%d,%d,%d,%d,%p:\n", no, x0, y0, w, h, uw, uh, pal);
+	DEBUG_COMMAND("ShGraph.SetAnimeSrc %d,%d,%d,%d,%d,%d,%d,%p:", no, x0, y0, w, h, uw, uh, pal);
 
 	if (no <= 0 || no > SLOT) return;
 	
@@ -298,7 +298,7 @@ static void SetAnimeDst() {
 	int p5 = getCaliValue();
 	int p6 = getCaliValue();
 	
-	DEBUG_COMMAND("ShGraph.SetAnimeDst %d,%p,%p,%d,%d,%d,%d:\n", no, p1, p2, p3, p4, p5, p6);
+	DEBUG_COMMAND("ShGraph.SetAnimeDst %d,%p,%p,%d,%d,%d,%d:", no, p1, p2, p3, p4, p5, p6);
 	
 	if (no <= 0 || no > SLOT) return;
 	
@@ -332,7 +332,7 @@ static void AddAnimeData() {
 	int p6 = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShGraph.AddAnimeData %d,%d,%d,%d,%p,%d:\n", no, p2, p3, p4, p5, p6);
+	DEBUG_COMMAND("ShGraph.AddAnimeData %d,%d,%d,%d,%p,%d:", no, p2, p3, p4, p5, p6);
 	
 	if (no <= 0 || no > SLOT) return;
 	
@@ -366,7 +366,7 @@ static void AddAnimeRemain() {
 	int no = getCaliValue();
 	int i, _max = 0;
 	
-       	DEBUG_COMMAND("ShGraph.AddAnimeRemain %d:\n", no);
+       	DEBUG_COMMAND("ShGraph.AddAnimeRemain %d:", no);
 	
 	if (no <= 0 || no > SLOT) return;
 	
@@ -397,7 +397,7 @@ static void SetAnimeRect() {
 	int w = getCaliValue();
 	int h = getCaliValue();
 	
-	DEBUG_COMMAND("ShGraph.SetAnimeRect %d,%d,%d,%d:\n", x, y, w, h);
+	DEBUG_COMMAND("ShGraph.SetAnimeRect %d,%d,%d,%d:", x, y, w, h);
 	
 	maprect.x = x;
 	maprect.y = y;
@@ -423,7 +423,7 @@ static void SetAnimeBack() {
 	int p5 = getCaliValue();
 	int p6 = getCaliValue();
 	
-	DEBUG_COMMAND("ShGraph.SetAnimeBack %d,%d,%d,%d,%d,%d:\n", sx, sy, w, h, p5, p6);
+	DEBUG_COMMAND("ShGraph.SetAnimeBack %d,%d,%d,%d,%d,%d:", sx, sy, w, h, p5, p6);
 
 	mapback.x = sx;
 	mapback.y = sy;
@@ -451,7 +451,7 @@ static void PlayAnimeData() {
 	boolean is_backcopied;
 	agsurface_t *dib;
 	
-	DEBUG_COMMAND("ShGraph.PlayAnimeData %d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5, p6);
+	DEBUG_COMMAND("ShGraph.PlayAnimeData %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
 	
 	interval = p2 * 10;
 	

@@ -42,7 +42,7 @@ static void RandMTInit() {
 	*/
 	int p1 = getCaliValue(); /* ITimer */
 	
-	DEBUG_COMMAND("Math.RandMTInit %d:\n", p1);
+	DEBUG_COMMAND("Math.RandMTInit %d:", p1);
 }
 
 static void RandMTGet() {
@@ -61,7 +61,7 @@ static void RandMTGet() {
 		*var = (int)(genrand() * num) + 1;
 	}
 	
-	DEBUG_COMMAND("Math.RandMTGet %d,%p:\n", num, var);
+	DEBUG_COMMAND("Math.RandMTGet %d,%p:", num, var);
 }
 
 static void RandMTMakeNumTable() {
@@ -74,7 +74,7 @@ static void RandMTMakeNumTable() {
 	
 	numtblmax = p1;
 	
-	DEBUG_COMMAND("Math.RandMTMakeNumTable %d:\n", p1);
+	DEBUG_COMMAND("Math.RandMTMakeNumTable %d:", p1);
 }
 
 static void RandMTGetNumTable() {
@@ -87,7 +87,7 @@ static void RandMTGetNumTable() {
 	
 	*var = (int)(genrand() * numtblmax) + 1;
 	
-	DEBUG_COMMAND("Math.RandMTGetNumTable %d:\n", *var);
+	DEBUG_COMMAND("Math.RandMTGetNumTable %d:", *var);
 }
 
 static const ModuleFunc functions[] = {

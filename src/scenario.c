@@ -279,7 +279,7 @@ void sl_retFar(void) {
 
 	while (*tmp != STACK_FARJMP) {
 		if (*tmp == STACK_NEARJMP) {
-			WARNING("Stack buffer is illegal\n");
+			WARNING("Stack buffer is illegal");
 		} else if (*tmp == STACK_DATA) {
 			popDatas(tmp);
 		} else if (*tmp == STACK_VARIABLE) {
@@ -402,13 +402,13 @@ void sl_popVar(struct VarRef *vref, int cnt) {
 		SYSERROR("Stack buffer is illegal");
 	}
 	if (*(tmp + 2) != vref->page){
-		WARNING("Variable is not match with stacked variable\n");
+		WARNING("Variable is not match with stacked variable");
 	}
 	if (*(tmp + 3) != vref->index) {
-		WARNING("Variable is not match with stacked variable\n");
+		WARNING("Variable is not match with stacked variable");
 	}
 	if (*(tmp + 1) != cnt + 2) {
-		WARNING("Variable count is not match with stacked variable\n");
+		WARNING("Variable count is not match with stacked variable");
 	}
 	memcpy(v_resolveRef(vref), tmp + 4, sizeof(int) * cnt);
 	free(tmp);
@@ -423,7 +423,7 @@ static void popVars(int *tmp) {
 	index = *(tmp + 3);
 
 	if (!varPage[page].value) {
-		WARNING("Illegal Variable pop\n");
+		WARNING("Illegal Variable pop");
 		return;
 	}
 	topVar = &varPage[page].value[index];
@@ -465,7 +465,7 @@ void sl_popData(int *data, int cnt) {
 	if (*tmp != STACK_DATA)
 		SYSERROR("Stack buffer is illegal");
 	if (*(tmp + 1) != cnt)
-		WARNING("Variable count is not match with stacked variable\n");
+		WARNING("Variable count is not match with stacked variable");
 	
 	memcpy(data, tmp + 2, sizeof(int) * cnt);
 	free(tmp);
@@ -477,7 +477,7 @@ static void popDatas(int *tmp) {
 	int d3 = *(tmp + 4);
 
 	if (*(tmp + 1) != 3)
-		WARNING("Variable count is not match with stacked variable\n");
+		WARNING("Variable count is not match with stacked variable");
 	
 	switch(d1) {
 	case TxxTEXTCOLOR:

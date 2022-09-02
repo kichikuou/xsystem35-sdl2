@@ -14,7 +14,7 @@ int gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, i
 	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return NG;
 	
 	if (src->alpha == NULL) {
-		WARNING("src alpha NULL\n");
+		WARNING("src alpha NULL");
 		return NG;
 	}
 	

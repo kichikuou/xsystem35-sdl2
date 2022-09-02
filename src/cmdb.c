@@ -43,7 +43,7 @@ void commandB0() {
 		break;
 	}
 
-	DEBUG_COMMAND("B0 %d:\n", num);
+	DEBUG_COMMAND("B0 %d:", num);
 }
 
 void commandB1() {
@@ -64,7 +64,7 @@ void commandB1() {
 	nact->sel.wininfo[num].height = Y2;
 	nact->sel.wininfo[num].save = (V == 0) ? false : true;
 	
-	DEBUG_COMMAND("B1 %d,%d,%d,%d,%d,%d:\n", num + 1, X1, Y1, X2, Y2, V);
+	DEBUG_COMMAND("B1 %d,%d,%d,%d,%d,%d:", num + 1, X1, Y1, X2, Y2, V);
 }
 
 void commandB2() {
@@ -89,7 +89,7 @@ void commandB2() {
 	nact->sel.FrameCgNoBot = C3;
 	nact->sel.Framedot = W == 0 ? 0 : W == 1 ? 8 : dot ;
 	
-	DEBUG_COMMAND("B2 %d,%d,%d,%d,%d,%d:\n", num, W, C1, C2, C3, dot);
+	DEBUG_COMMAND("B2 %d,%d,%d,%d,%d,%d:", num, W, C1, C2, C3, dot);
 }
 
 void commandB3() {
@@ -110,7 +110,7 @@ void commandB3() {
 	nact->msg.wininfo[num].height = Y2;
 	nact->msg.wininfo[num].save = (V == 0) ? FALSE : TRUE;
 	
-	DEBUG_COMMAND("B3 %d,%d,%d,%d,%d,%d:\n", num + 1, X1, Y1, X2, Y2, V);
+	DEBUG_COMMAND("B3 %d,%d,%d,%d,%d,%d:", num + 1, X1, Y1, X2, Y2, V);
 }
 
 void commandB4() {
@@ -130,7 +130,7 @@ void commandB4() {
 	nact->msg.win = &nact->msg.wininfo[num - 1];
 	msg_openWindow(W, C1, C2, N, M);
 	
-	DEBUG_COMMAND("B4 %d,%d,%d,%d,%d,%d:\n", num, W, C1, C2, N, M);
+	DEBUG_COMMAND("B4 %d,%d,%d,%d,%d,%d:", num, W, C1, C2, N, M);
 }
 
 void commandB10() {
@@ -141,7 +141,7 @@ void commandB10() {
 	msg_getMessageLocation(&p);
 	*x_var = p.x;
 	*y_var = p.y;
-	DEBUG_COMMAND("B10 %d,%d:\n", *x_var, *y_var);
+	DEBUG_COMMAND("B10 %d,%d:", *x_var, *y_var);
 }
 
 void commandB11() {
@@ -151,28 +151,28 @@ void commandB11() {
 	*sel_no_var = nact->sel.winno;
 	*msg_no_var = nact->msg.winno;
 	
-	DEBUG_COMMAND("B11 %d,%d:\n", *sel_no_var, *msg_no_var);
+	DEBUG_COMMAND("B11 %d,%d:", *sel_no_var, *msg_no_var);
 }
 
 void commandB12() {
 	int *var = getCaliVariable();
 	
 	*var = sel_getRegistoredElementNumber();
-	DEBUG_COMMAND("B12 %d:\n", *var);
+	DEBUG_COMMAND("B12 %d:", *var);
 }
 
 void commandB13() {
 	int *var = getCaliVariable();
 	
 	*var = sel_getRegistoredElementWidth(); 
-	DEBUG_COMMAND("B13 %d:\n", *var);
+	DEBUG_COMMAND("B13 %d:", *var);
 }
 
 void commandB14() {
 	int *var = getCaliVariable();
 	
 	*var = sel_getRegistoredElement_strlen(); 
-	DEBUG_COMMAND("B14 %d:\n", *var);
+	DEBUG_COMMAND("B14 %d:", *var);
 }
 
 void commandB21() {
@@ -183,7 +183,7 @@ void commandB21() {
 	*x_var = nact->sel.win->x;
 	*y_var = nact->sel.win->y;
 	
-	DEBUG_COMMAND("B21 %d,%d,%d:\n", no, *x_var, *y_var);
+	DEBUG_COMMAND("B21 %d,%d,%d:", no, *x_var, *y_var);
 }
 
 void commandB22() {
@@ -194,7 +194,7 @@ void commandB22() {
 	*x_var = nact->sel.win->width;
 	*y_var = nact->sel.win->height;
 	
-	DEBUG_COMMAND("B22 %d,%d,%d:\n", no, *x_var, *y_var);
+	DEBUG_COMMAND("B22 %d,%d,%d:", no, *x_var, *y_var);
 }
 
 void commandB23() {
@@ -205,7 +205,7 @@ void commandB23() {
 	*x_var = nact->msg.win->x;
 	*y_var = nact->msg.win->y;
 	
-	DEBUG_COMMAND("B23 %d,%d,%d:\n", no, *x_var, *y_var);
+	DEBUG_COMMAND("B23 %d,%d,%d:", no, *x_var, *y_var);
 }
 
 void commandB24() {
@@ -216,7 +216,7 @@ void commandB24() {
 	*x_var_size = nact->msg.win->width;
 	*y_var_size = nact->msg.win->height;
 	
-	DEBUG_COMMAND("B24 %d,%d,%d:\n", no, *x_var_size, *y_var_size);
+	DEBUG_COMMAND("B24 %d,%d,%d:", no, *x_var_size, *y_var_size);
 }
 
 void commandB31() {
@@ -228,7 +228,7 @@ void commandB31() {
 	*x_var = nact->sel.wininfo[no - 1].x;
 	*y_var = nact->sel.wininfo[no - 1].y;
 	
-	DEBUG_COMMAND("B31 %d,%d,%d:\n", no, *x_var, *y_var);
+	DEBUG_COMMAND("B31 %d,%d,%d:", no, *x_var, *y_var);
 }
 
 void commandB32() {
@@ -239,7 +239,7 @@ void commandB32() {
 	*x_var_size = nact->sel.wininfo[no - 1].width;
 	*y_var_size = nact->sel.wininfo[no - 1].height;
 	
-	DEBUG_COMMAND("B32 %d,%d,%d:\n", no, *x_var_size, *y_var_size);
+	DEBUG_COMMAND("B32 %d,%d,%d:", no, *x_var_size, *y_var_size);
 }
 
 void commandB33() {
@@ -249,7 +249,7 @@ void commandB33() {
 
 	*x_var = nact->msg.wininfo[no - 1].x;
 	*y_var = nact->msg.wininfo[no - 1].y;
-	DEBUG_COMMAND("B33 %d,%d,%d:\n", no, *x_var, *y_var);
+	DEBUG_COMMAND("B33 %d,%d,%d:", no, *x_var, *y_var);
 }
 
 void commandB34() {
@@ -259,6 +259,6 @@ void commandB34() {
 
 	*x_var_size = nact->msg.wininfo[no - 1].width;
 	*y_var_size = nact->msg.wininfo[no - 1].height;
-	DEBUG_COMMAND("B34 %d,%d,%d:\n", no, *x_var_size, *y_var_size);
+	DEBUG_COMMAND("B34 %d,%d,%d:", no, *x_var_size, *y_var_size);
 }
 

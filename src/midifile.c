@@ -77,7 +77,7 @@ static long to32bit(int c1, int c2, int c3, int c4) {
 static void midi_inc() {
 	midi->ceptr++;
 	if (midi->ceptr > MAXMIDIEVENT) {
-		NOTICE("too much event\n");
+		NOTICE("too much event");
 		sys_exit(0);
 	}
 }
@@ -261,7 +261,7 @@ static void chanmessage(int status, int c1, int c2) {
 		midi_chanpressure(chan, c1);
 		break;
 	default:
-		NOTICE("Unknown Message\n");
+		NOTICE("Unknown Message");
 	}
 }
 
@@ -271,52 +271,52 @@ static void metaevent(int type) {
 	
 	switch(type) {
 	case 0x00:
-		NOTICE("seqnum\n");
+		NOTICE("seqnum");
 		break;
 	case 0x01:
-		NOTICE("text event (Text Event, Ignored)\n");
+		NOTICE("text event (Text Event, Ignored)");
 		break;
 	case 0x02:
-		NOTICE("copyright notice (Text Event, Ignored)\n");
+		NOTICE("copyright notice (Text Event, Ignored)");
 		break;
 	case 0x03:
-		NOTICE("sequence / track name (Text Event, Ignored)\n");
+		NOTICE("sequence / track name (Text Event, Ignored)");
 		break;
 	case 0x04:
-		NOTICE("instrument name (Text Event, Ignored)\n");
+		NOTICE("instrument name (Text Event, Ignored)");
 		break;
 	case 0x05:
-		NOTICE("lyric (Text Event, Ignored)\n");
+		NOTICE("lyric (Text Event, Ignored)");
 		break;
 	case 0x06:
-		NOTICE("marker (Text Event, Ignored)\n");
+		NOTICE("marker (Text Event, Ignored)");
 		break;
 	case 0x07:
-		NOTICE("cue point (Text Event, Ignored)\n");
+		NOTICE("cue point (Text Event, Ignored)");
 		break;
 	case 0x08:
-		NOTICE("meta event 0x08 (Text Event, Ignored)\n");
+		NOTICE("meta event 0x08 (Text Event, Ignored)");
 		break;
 	case 0x09:
-		NOTICE("meta event 0x09 (Text Event, Ignored)\n");
+		NOTICE("meta event 0x09 (Text Event, Ignored)");
 		break;
 	case 0x0a:
-		NOTICE("meta event 0x0a (Text Event, Ignored)\n");
+		NOTICE("meta event 0x0a (Text Event, Ignored)");
 		break;
 	case 0x0b:
-		NOTICE("meta event 0x0b (Text Event, Ignored)\n");
+		NOTICE("meta event 0x0b (Text Event, Ignored)");
 		break;
 	case 0x0c:
-		NOTICE("meta event 0x0c (Text Event, Ignored)\n");
+		NOTICE("meta event 0x0c (Text Event, Ignored)");
 		break;
 	case 0x0d:
-		NOTICE("meta event 0x0d (Text Event, Ignored)\n");
+		NOTICE("meta event 0x0d (Text Event, Ignored)");
 		break;
 	case 0x0e:
-		NOTICE("meta event 0x0e (Text Event, Ignored)\n");
+		NOTICE("meta event 0x0e (Text Event, Ignored)");
 		break;
 	case 0x0f:
-		NOTICE("meta event 0x0f (Text Event, Ignored)\n");
+		NOTICE("meta event 0x0f (Text Event, Ignored)");
 		break;
 	case 0x2f:
 		/* EOF */
@@ -327,19 +327,19 @@ static void metaevent(int type) {
 		midi_tempo(to32bit(0, m[0], m[1], m[2]));
 		break;
 	case 0x54:
-		NOTICE("set smpte\n");
+		NOTICE("set smpte");
 		break;
 	case 0x58:
-		NOTICE("time sig (Ignore)\n");
+		NOTICE("time sig (Ignore)");
 		break;
 	case 0x59:
-		NOTICE("keysig (Ignore)\n");
+		NOTICE("keysig (Ignore)");
 		break;
 	case 0x7f:
-		NOTICE("seq specific\n");
+		NOTICE("seq specific");
 		break;
 	default:
-		NOTICE("meta misc\n");
+		NOTICE("meta misc");
 		break;
 	}
 }
@@ -527,7 +527,7 @@ static int read_header(BYTE *stream, off_t len) {
 			midi->ntrks = Read16();
 			midi->division = Read16();
 		} else {
-			WARNING("unknow format\n");
+			WARNING("unknow format");
 			return NG;
 		}
 	}
@@ -537,12 +537,12 @@ static int read_header(BYTE *stream, off_t len) {
 		return NG;
 	}
 	
-	NOTICE("tracklen = %d, format = %d, ntrks = %d, division = %d\n", 
+	NOTICE("tracklen = %d, format = %d, ntrks = %d, division = %d", 
 	       tracklen, midi->format, midi->ntrks, midi->division);
 	
 	i = Read32();
 	if (i != MTrk) {
-		WARNING("Unknow format\n");
+		WARNING("Unknow format");
 	}
 	
 	tracklen = Read32();

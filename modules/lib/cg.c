@@ -94,7 +94,7 @@ surface_t *sf_getcg(void *b, size_t size) {
 	}
 	
 	if (cg == NULL) {
-		WARNING("Unknown Cg Type\n");
+		WARNING("Unknown Cg Type");
 		return NULL;
 	}
 	

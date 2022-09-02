@@ -32,22 +32,22 @@
 */
 
 int scryp_encrypt_word(int *array, int num, int key) {
-	WARNING("NOT IMPLEMENTED\n");
+	WARNING("NOT IMPLEMENTED");
 	return OK;
 }
 
 int scryp_decrypt_word(int *array, int num, int key) {
-	WARNING("NOT IMPLEMENTED\n");
+	WARNING("NOT IMPLEMENTED");
 	return OK;
 }
 
 int scryp_encrypt_str(int strno, int key) {
-	WARNING("NOT IMPLEMENTED\n");
+	WARNING("NOT IMPLEMENTED");
 	return OK;
 }
 
 int scryp_decrypt_str(int strno, int key) {
-	WARNING("str = '%s'\n", svar_get(strno));
-	WARNING("NOT IMPLEMENTED\n");
+	WARNING("str = '%s'", svar_get(strno));
+	WARNING("NOT IMPLEMENTED");
 	return OK;
 }

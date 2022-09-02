@@ -32,7 +32,7 @@ void commandPN() {
 	/* num 番のＣＧを表示する時、カラーパレットを展開しないようにする。*/
 	int num = getCaliValue();
 	
-	DEBUG_COMMAND_YET("PN %d:\n",num);
+	DEBUG_COMMAND_YET("PN %d:",num);
 }
 
 void commandPF() {
@@ -60,7 +60,7 @@ void commandPF() {
 		sysVar[0] = nact->waitcancel_key; break;
 	}
 	
-	DEBUG_COMMAND("PF %d,%d,%d:\n", p1, num, cancel_enabled);
+	DEBUG_COMMAND("PF %d,%d,%d:", p1, num, cancel_enabled);
 }
 
 void commandPW() {
@@ -88,7 +88,7 @@ void commandPW() {
 		sysVar[0] = nact->waitcancel_key; break;
 	}
 	
-	DEBUG_COMMAND("PW %d,%d,%d:\n", p1, num, cancel_enabled);
+	DEBUG_COMMAND("PW %d,%d,%d:", p1, num, cancel_enabled);
 }
 
 void commandPS() {
@@ -101,7 +101,7 @@ void commandPS() {
 
 	ags_setPalette(Plane, Red, Green, Blue);
 	ags_setPaletteToSystem(Plane, 1);
-	DEBUG_COMMAND("PS %d,%d,%d,%d:\n", Plane, Red, Green, Blue);
+	DEBUG_COMMAND("PS %d,%d,%d,%d:", Plane, Red, Green, Blue);
 }
 
 void commandPG() { /* T2 */
@@ -116,7 +116,7 @@ void commandPG() { /* T2 */
 		*var = nact->ags.pal->green[num1 + i]; var++;
 		*var = nact->ags.pal->blue[num1 + i];  var++;
 	}
-	DEBUG_COMMAND("PG %p,%d,%d:\n", var, num1, num2);
+	DEBUG_COMMAND("PG %p,%d,%d:", var, num1, num2);
 }
 
 void commandPP() { /* T2 */
@@ -130,7 +130,7 @@ void commandPP() { /* T2 */
 		ags_setPalette(num1 + i, *var, *(var +1), *(var +2)); var+=3;
 	}
 	ags_setPaletteToSystem(num1, num2);
-	DEBUG_COMMAND("PP %p,%d,%d:\n", var, num1, num2);
+	DEBUG_COMMAND("PP %p,%d,%d:", var, num1, num2);
 }
 
 void commandPC() {
@@ -139,7 +139,7 @@ void commandPC() {
 
 	cg_fflg = num;
 	
-	DEBUG_COMMAND("PC %d:\n",num);
+	DEBUG_COMMAND("PC %d:",num);
 }
 
 void commandPD() {
@@ -148,7 +148,7 @@ void commandPD() {
 	
 	cg_brightness = num;
 	
-	DEBUG_COMMAND("PD %d:\n",num);
+	DEBUG_COMMAND("PD %d:",num);
 }
 
 void commandPT0() {
@@ -161,7 +161,7 @@ void commandPT0() {
 	ags_getPixel(x, y, &cell);
 	*var = cell.pixel;
 	
-	DEBUG_COMMAND("PT0 %p,%d,%d:\n", var, x, y);
+	DEBUG_COMMAND("PT0 %p,%d,%d:", var, x, y);
 }
 
 void commandPT1() {
@@ -178,7 +178,7 @@ void commandPT1() {
 	*g_var = cell.g;
 	*b_var = cell.b;
 
-	DEBUG_COMMAND("PT1 %p,%p,%p,%d,%d:\n", r_var, g_var, b_var, x, y);
+	DEBUG_COMMAND("PT1 %p,%p,%p,%d,%d:", r_var, g_var, b_var, x, y);
 }
 
 void commandPT2() {
@@ -200,5 +200,5 @@ void commandPT2() {
 	*hi_var  = pic >> 8;
 	*low_var = pic & 0xff;
 	
-	DEBUG_COMMAND("PT2 %p,%p,%d,%d:\n", hi_var, low_var, x, y);
+	DEBUG_COMMAND("PT2 %p,%p,%d,%d:", hi_var, low_var, x, y);
 }

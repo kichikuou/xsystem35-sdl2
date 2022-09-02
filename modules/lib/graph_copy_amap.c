@@ -50,12 +50,12 @@ int gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, in
 	dp = GETOFFSET_ALPHA(dst, dx, dy);
 
 	if (sp == NULL) {
-		WARNING("src alpha NULL\n");
+		WARNING("src alpha NULL");
 		return NG;
 	}
 	
 	if (dp == NULL) {
-		WARNING("dst alpha NULL\n");
+		WARNING("dst alpha NULL");
 		return NG;
 	}
 	
