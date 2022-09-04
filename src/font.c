@@ -120,8 +120,6 @@ SDL_Surface *font_get_glyph(const char *str_utf8) {
 // SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
 static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, BYTE col)
 {
-	SDL_LockSurface(sdl_dib);
-
 	Uint8 cache[256*7];
 	memset(cache, 0, 256);
 
@@ -154,8 +152,6 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, BYTE co
 			dp++;
 		}
 	}
-
-	SDL_UnlockSurface(sdl_dib);
 }
 
 SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, BYTE cl) {

@@ -49,8 +49,6 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 	
 	ss = SDL_CreateRGBSurface(0, dw, dh, dst->format->BitsPerPixel, 0, 0, 0, 0);
 	
-	SDL_LockSurface(ss);
-
 	if (dst->format->BitsPerPixel == 8) {
 		memcpy(ss->format->palette->colors, dst->format->palette->colors,
 		       sizeof(SDL_Color) * 256);
@@ -126,8 +124,6 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 		break;
 	}
 	
-	SDL_UnlockSurface(ss);
-	
 	SDL_Rect r_src = { 0,  0, dw, dh};
 	SDL_Rect r_dst = {dx, dy, dw, dh};
 	SDL_BlitSurface(ss, &r_src, dst, &r_dst);
@@ -155,7 +151,6 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool a
 		int x, y, l;
 		
 		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
-		SDL_LockSurface(s);
 		p_ds = s->pixels;
 		l = s->pitch/4;
 		for (y = 0; y < h; y++) {
@@ -168,7 +163,6 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool a
 			p_ds  += l;
 			adata += sdl_dibinfo->width;
 		}
-		SDL_UnlockSurface(s);
 	} else {
 		s = SDL_CreateRGBSurfaceWithFormatFrom(
 			cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
@@ -234,8 +228,6 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 	SDL_Rect r_tmp = { 0,  0, w, h};
 	SDL_BlitSurface(sdl_dib, &r_src, s, &r_tmp);
 
-	SDL_LockSurface(s);
-
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	p_ds = s->pixels + 3;
 #else
@@ -270,7 +262,6 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 		}
 		break;
 	}
-	SDL_UnlockSurface(s);
 
 	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_BlitSurface(s, &r_tmp, sdl_dib, &r_dst);
@@ -297,23 +288,17 @@ void sdl_copyAreaSP16_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, i
 }
 
 void sdl_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
-	SDL_LockSurface(sdl_dib);
 	image_copy_from_alpha(nact->ags.dib, sx, sy, w, h, dx, dy, flag);
-	SDL_UnlockSurface(sdl_dib);
 }
 
 void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
-	SDL_LockSurface(sdl_dib);
 	image_copy_to_alpha(nact->ags.dib, sx, sy, w, h, dx, dy, flag);
-	SDL_UnlockSurface(sdl_dib);
 }
 
 /*
  * dib のピクセル情報を取得
  */
 void sdl_getPixel(int x, int y, Palette *cell) {
-	SDL_LockSurface(sdl_dib);
-
 	BYTE *p = PIXEL_AT(sdl_dib, x, y);
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		cell->pixel = *p;
@@ -343,8 +328,6 @@ void sdl_getPixel(int x, int y, Palette *cell) {
 		}
 		SDL_GetRGB(cl, sdl_dib->format, &cell->r, &cell->g, &cell->b);
 	}
-	
-	SDL_UnlockSurface(sdl_dib);
 }
 
 /*
