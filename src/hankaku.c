@@ -28,6 +28,7 @@
 
 #include "portab.h"
 #include "hankaku.h"
+#include "system.h"
 
 static const BYTE hankakutable[3][192] = {{
 	// 0x8140 - 0x81ff
@@ -137,10 +138,8 @@ static BYTE *zen2han_sjis(const BYTE *src) {
 	char *dst, *_dst;
 	
 	dst = _dst = malloc(strlen(src) + 1);
-	if (dst == NULL) {
-		fprintf(stderr, "zen2han(): Out of Memory (size %zu)", strlen(src) + 1);
-		return NULL;
-	}
+	if (dst == NULL)
+		NOMEMERR();
 	
 	while(0 != (c0 = *src++)) {
 		if (c0 < 0x81) {
@@ -168,10 +167,8 @@ static BYTE *zen2han_sjis(const BYTE *src) {
 static char *zen2han_utf8(const char *src) {
 	char *dst, *_dst;
 	dst = _dst = malloc(strlen(src) + 1);
-	if (dst == NULL) {
-		fprintf(stderr, "zen2han(): Out of Memory (size %zu)", strlen(src) + 1);
-		return NULL;
-	}
+	if (dst == NULL)
+		NOMEMERR();
 
 	const char *p = src;
 	while (*p) {
@@ -364,10 +361,8 @@ BYTE *han2zen(const BYTE *src, CharacterEncoding enc) {
 	BYTE *dst, *_dst;
 	dst = _dst = malloc(strlen(src) * 2 + 1);
 	
-	if (dst == NULL) {
-		fprintf(stderr, "han2zen(): Out of Memory (size %zu)", strlen(src) *2 + 1);
-		return NULL;
-	}
+	if (dst == NULL)
+		NOMEMERR();
 	
 	while(0 != (c0 = *src++)) {
 		if (c0 == 0x20) {

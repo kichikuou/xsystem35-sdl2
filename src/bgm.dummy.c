@@ -35,41 +35,41 @@ int musbgm_reset(void) {
 }
 
 int musbgm_play(int no, int time, int vol) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
 int musbgm_stop(int no, int time) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
 int musbgm_fade(int no, int time, int vol) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
 int musbgm_getpos(int no) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return 0;
 }
 
 int musbgm_getlen(int no) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return 0;
 }
 
 int musbgm_isplaying(int no) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return 0;
 }
 
 int musbgm_stopall(int time) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
 int musbgm_wait(int no, int timeout) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }

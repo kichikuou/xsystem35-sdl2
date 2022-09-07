@@ -30,9 +30,6 @@
 #include "savedata.h"
 #include "utfsjis.h"
 
-#define WARN_SAVEERR(cmd, st) \
-if (st > 200) fprintf(stderr, "WARNING: Fail to save (cmd=%s, stat=%d)", cmd, st)
-
 void commandQD() {
 	/* 変数領域などのデータをセーブする。（全セーブ）*/
 	int num   = getCaliValue();
@@ -43,7 +40,7 @@ void commandQD() {
 		sysVar[0] = save_saveAll(num - 1);
 	}
 	
-	WARN_SAVEERR("QD", sysVar[0]);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
 	DEBUG_COMMAND("QD %d:",num);
 }
@@ -61,7 +58,7 @@ void commandQP() {
 		sysVar[0] = save_savePartial(num - 1, &point, cnt);
 	}
 	
-	WARN_SAVEERR("QP", sysVar[0]);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
 	DEBUG_COMMAND("QP %d,%d,%d:", num, point.var, cnt);
 }
@@ -77,7 +74,7 @@ void commandQC() {
 		sysVar[0] = save_copyAll(num1 - 1, num2 - 1);
 	}
 	
-	WARN_SAVEERR("QC", sysVar[0]);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
 	DEBUG_COMMAND("QC %d,%d:",num1,num2);
 }
@@ -108,7 +105,7 @@ void commandQE() {
 		break;
 	}
 	free(fname_utf8);
-	WARN_SAVEERR("QE", sysVar[0]);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
 	DEBUG_COMMAND("QE %d,%s,%d,%d:", type, filename, var, cnt);
 }

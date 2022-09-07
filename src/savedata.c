@@ -221,17 +221,16 @@ int save_copyAll(int dstno, int srcno) {
 	int status, filesize;
 	
 	if (dstno >= SAVE_MAXNUMBER || srcno >= SAVE_MAXNUMBER) {
-		// fprintf(stderr, "dstno or srcno is outof range\n");
 		return SAVE_SAVEERR;
 	}
 	saveTop = loadGameData(srcno, &status, &filesize);
 	if (saveTop == NULL)
 		return SAVE_SAVEERR;
 	if (((Ald_baseHdr *)saveTop)->version != SAVE_DATAVERSION) {
-		fprintf(stderr, "save_copyAll(): endian mismatch\n");
+		WARNING("endian mismatch");
 		free(saveTop);
 		return SAVE_SAVEERR;
-        }
+	}
 	status = saveGameData(dstno, saveTop, filesize);
 	
 	free(saveTop);
@@ -256,23 +255,20 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 	
 	saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL) {
-		// fprintf(stderr, "loadGameData() faild\n");
 		return status;
 	}
 	
 	if (filesize <= sizeof(Ald_baseHdr)) {
-		// fprintf(stderr, "filesize too short\n");
 		goto errexit;
 	}
 
 	save_base = (Ald_baseHdr *)saveTop;
 	if (save_base->version != SAVE_DATAVERSION) {
-		fprintf(stderr, "save_loadPartial(): endian mismatch\n");
+		WARNING("endian mismatch");
 		goto errexit;
 	}
 
 	if (save_base->varSys[vref->page] == 0) {
-		// fprintf(stderr, "No available Variable\n");
 		goto errexit;
 	}
 	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
@@ -314,9 +310,9 @@ int save_savePartial(int no, struct VarRef *vref, int cnt) {
 		goto errexit;
 	save_base = (Ald_baseHdr *)saveTop;
 	if (save_base->version != SAVE_DATAVERSION) {
-		fprintf(stderr, "save_savePartial(): endian mismatch\n");
+		WARNING("endian mismatch");
 		goto errexit;
-        }
+	}
 	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
 	tmp = (WORD *)vtop + vref->index;
 	for (i = 0; i < cnt; i++) {
@@ -352,7 +348,7 @@ int save_loadAll(int no) {
 	/* 各種データの反映 */
 	save_base = (Ald_baseHdr *)saveTop;
 	if (save_base->version != SAVE_DATAVERSION) {
-		fprintf(stderr, "save_loadAll(): endian mismatch\n");
+		WARNING("endian mismatch");
 		goto errexit;
 	}
 	if (strcmp(SAVE_DATAID, save_base->ID) != 0)

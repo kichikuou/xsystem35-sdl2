@@ -172,13 +172,6 @@ static void makeDIB(int width, int height, int depth) {
 		memset(sdl_dib->format->palette->colors, 0, sizeof(SDL_Color)*256);
 	}
 
-#if 0
-	printf("DIB depth %d\n", sdl_dib->format->BitsPerPixel);
-	printf("  R %04x G %04x B %04x A %04x\n",
-	       sdl_dib->format->Rmask, sdl_dib->format->Gmask,
-	       sdl_dib->format->Bmask, sdl_dib->format->Amask);
-#endif
-	
 	if (sdl_dibinfo) {
 		free(sdl_dibinfo);
 	}

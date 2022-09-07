@@ -21,9 +21,11 @@
 */
 /* $Id: cdrom.Linux.c,v 1.18 2002/08/18 09:35:29 chikama Exp $ */
 
+#include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
@@ -41,6 +43,7 @@ struct cdrom_msf0 {
 #include "portab.h"
 #include "cdrom.h"
 #include "music_private.h"
+#include "system.h"
 
 static int  cdrom_init(char *);
 static int  cdrom_exit(void);
@@ -89,12 +92,12 @@ static int get_cd_entry() {
 	
 	/* 最終トラック番号を得る */
 	if (do_ioctl(CDROMREADTOCHDR, &tochdr) < 0) {
-		perror("CDROMREADTOCHDR");
+		WARNING("CDROMREADTOCHDR: %s", strerror(errno));
 		return NG;
 	}
 	lastindex = endtrk = tochdr.cdth_trk1;
 	if (endtrk <= 1) { /* ２トラック以上ないとダメ */
-		fprintf(stderr, "No CD-AUDIO in CD-ROM\n");
+		WARNING("No CD-AUDIO in CD-ROM");
 		return NG; 
 	}
 	
@@ -105,7 +108,7 @@ static int get_cd_entry() {
 	for (i = 1; i <= endtrk; i++) {
 		toc.cdte_track = i;
 		if (do_ioctl(CDROMREADTOCENTRY, &toc) < 0) {
-			perror("CDROMREADTOCENTRY");
+			WARNING("CDROMREADTOCENTRY: %s", strerror(errno));
 			return NG;
 		}
 		tocmsf[i - 1].minute = toc.cdte_addr.msf.minute;
@@ -115,7 +118,7 @@ static int get_cd_entry() {
 	/* リードアウトを読み出す */
 	toc.cdte_track = CDROM_LEADOUT;
 	if (do_ioctl(CDROMREADTOCENTRY, &toc) < 0) {
-		perror("CDROMREADTOCENTRY");
+		WARNING("CDROMREADTOCENTRY: %s", strerror(errno));
 		return NG;
 	}
 	
@@ -146,13 +149,13 @@ static int get_cd_entry() {
 	msf.cdmsf_sec1   = tocmsf[2].second;
 	msf.cdmsf_frame1 = tocmsf[2].frame;
 	if (do_ioctl(CDROMPLAYMSF, &msf) < 0) {
-		perror("CDROMPLAYMSF");
-		fprintf(stderr, "CD-ROM: change TRKIND mode\n");
+		WARNING("CDROMPLAYMSF: %s", strerror(errno));
+		WARNING("CD-ROM: change TRKIND mode");
 		msfmode = FALSE;
 	}
 	/* stop */
 	if (do_ioctl(CDROMSTOP, NULL) < 0) {
-		perror("CDROMSTOP");
+		WARNING("CDROMSTOP: %s", strerror(errno));
 		return NG;
 	}
 	return OK;
@@ -163,7 +166,7 @@ static int cdrom_init(char *dev_cd) {
 	if (dev_cd == NULL) return NG;
 
 	if ((cd_fd = open(dev_cd, O_RDONLY, 0)) < 0) {
-		perror("CDROM_DEVICE OPEN");
+		WARNING("CDROM_DEVICE OPEN: %s", strerror(errno));
 		enabled = FALSE;
 		return NG;
 	}
@@ -200,9 +203,9 @@ static int cdrom_start(int trk, int loop) {
 		return NG;
 	}
 	/* drive spin up */
-        if (do_ioctl(CDROMSTART, NULL) < 0) {
-		perror("CDROMSTART");
-                return NG;
+	if (do_ioctl(CDROMSTART, NULL) < 0) {
+		WARNING("CDROMSTART: %s", strerror(errno));
+		return NG;
 	}
 	
 	if (msfmode) {
@@ -213,7 +216,7 @@ static int cdrom_start(int trk, int loop) {
 		msf.cdmsf_sec1   = tocmsf[trk].second;
 		msf.cdmsf_frame1 = tocmsf[trk].frame;
 		if (do_ioctl(CDROMPLAYMSF, &msf) < 0) {
-			perror("CDROMPLAYMSF");
+			WARNING("CDROMPLAYMSF: %s", strerror(errno));
 			return NG;
 		}
 		return OK;
@@ -221,7 +224,7 @@ static int cdrom_start(int trk, int loop) {
 		ti.cdti_trk0 = ti.cdti_trk1 = trk;
 		ti.cdti_ind0 = ti.cdti_ind1 = 0;
 		if (do_ioctl(CDROMPLAYTRKIND, &ti) < 0) {
-			perror("CDROMPLAYTRKIND");
+			WARNING("CDROMPLAYTRKIND: %s", strerror(errno));
 			return NG;
 		}
 		return OK;
@@ -233,8 +236,8 @@ static int cdrom_stop() {
 	if (enabled) {
 		/* if (do_ioctl(CDROMSTOP, NULL) < 0) { */
 		if (do_ioctl(CDROMPAUSE, NULL) < 0) {
-			/* perror("CDROMSTOP"); */
-			perror("CDROMPAUSE");
+			/* WARNING("CDROMSTOP: %s", strerror(errno)); */
+			WARNING("CDROMPAUSE: %s", strerror(errno));
 			return NG;
 		}
 		return OK;
@@ -251,7 +254,7 @@ static int cdrom_getPlayingInfo (cd_time *info) {
 	
 	sc.cdsc_format = CDROM_MSF;
 	if (do_ioctl(CDROMSUBCHNL, &sc) < 0) {
-		perror("CDROMSUBCHNL");
+		WARNING("CDROMSUBCHNL: %s", strerror(errno));
 		return NG;
 	}
 	if (sc.cdsc_audiostatus != CDROM_AUDIO_PLAY) {

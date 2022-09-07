@@ -308,7 +308,7 @@ boolean muspcm_isplaying(int slot) {
 
 // 指定のチャンネルの再生が終了するまで待つ
 int muspcm_waitend(int slot) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 

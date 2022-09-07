@@ -293,10 +293,10 @@ static void init_selwindow() {
 		drawLineFrame(r.x, r.y, r.w, r.h);
 		break;
 	case WINDOW_FRAME_CG:
-		printf("frameType is CG %d,%d,%d\n",sel.FrameCgNoTop, sel.FrameCgNoMid, sel.FrameCgNoBot);
+		NOTICE("frameType is CG %d,%d,%d",sel.FrameCgNoTop, sel.FrameCgNoMid, sel.FrameCgNoBot);
 		break;
 	default:
-		printf("frameType is Default");
+		NOTICE("frameType is Default");
 		break;
 	}
 	ags_setFont(FONT_GOTHIC, sel.MsgFontSize);

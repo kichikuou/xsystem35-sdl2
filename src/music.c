@@ -21,8 +21,7 @@
 */
 #include "portab.h"
 
-#include <stdio.h>
-
+#include "system.h"
 #include "music.h"
 #include "music_private.h"
 
@@ -272,7 +271,7 @@ boolean mus_pcm_get_state() {
 int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
 	if (device == MIX_MIDI)
 		return musmidi_fadestart(time, volume, stop);
-	printf("%s(%d, %d, %d, %d) not implemented\n", __func__, device, time, volume, stop);
+	WARNING("(device=%d, time=%d, volume=%d, stop=%d) not implemented", device, time, volume, stop);
 	return NG;
 }
 
@@ -286,7 +285,7 @@ int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
 boolean mus_mixer_fadeout_get_state(int device) {
 	if (device == MIX_MIDI)
 		return musmidi_fading();
-	printf("%s(%d) not implemented\n", __func__, device);
+	WARNING("(device=%d) not implemented", device);
 	return FALSE;
 }
 
@@ -295,7 +294,7 @@ boolean mus_mixer_fadeout_get_state(int device) {
  *   device: 指定デバイス
  */
 int mus_mixer_fadeout_stop(int device) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
@@ -306,7 +305,7 @@ int mus_mixer_fadeout_stop(int device) {
  *   return: ミキサーレベル(0 - 100) (ゲーム内で設定された値)
  */
 int mus_mixer_get_level(int device) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return 0;
 }
 
@@ -380,7 +379,7 @@ int mus_wav_fadeout_start(int ch, int time, int volume, int stop) {
 	if (volume == 0 && stop)
 		return muspcm_fadeout(ch + 1, time);
 
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
@@ -389,7 +388,7 @@ int mus_wav_fadeout_start(int ch, int time, int volume, int stop) {
  *   ch: channel (0-127)
  */
 int mus_wav_fadeout_stop(int ch) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
@@ -401,7 +400,7 @@ int mus_wav_fadeout_stop(int ch) {
  *           FALSE -> フェード中でない
  */
 boolean mus_wav_fadeout_get_state(int ch) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return FALSE;
 }
 
@@ -424,7 +423,7 @@ int mus_wav_waitend(int ch) {
  *   time: 待ち時間(msec)
  */
 int mus_wav_waittime(int ch, int time) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
@@ -444,7 +443,7 @@ int mus_wav_wavtime(int ch) {
  *   num: ファイル番号 (1-65535)
  */
 int mus_wav_load_lrsw(int ch, int num) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
@@ -477,11 +476,11 @@ int mus_bgm_wait(int no, int timeout) {
 }
 
 int mus_bgm_waitpos(int no, int index) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }
 
 int mus_vol_set_valance(int *vols, int num) {
-	printf("%s not implemented\n", __func__);
+	WARNING("not implemented");
 	return NG;
 }

@@ -22,6 +22,7 @@
 */
 /* $Id: profile.c,v 1.6 2001/04/02 21:00:44 chikama Exp $ */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +37,7 @@
 
 #include "portab.h"
 #include "profile.h"
+#include "system.h"
 
 #define RC_NAME ".xsys35rc"
 #define RC_LINE_CHARS_MAX 256
@@ -69,10 +71,8 @@ static boolean insert_profile(const char *name, const char *value)
 	}
 
 	profile = realloc(profile, sizeof(struct profile_kv) * (profile_values + 1));
-	if (!profile) {
-		perror("realloc()");
-		return FALSE;
-	}
+	if (!profile)
+		NOMEMERR();
 
 	profile[profile_values].name = strdup(name);
 	profile[profile_values].value = strdup(value);
@@ -95,7 +95,7 @@ static int load_rc_file(const char *profile_path)
 			if (feof(fp))
 				break;
 			else {
-				perror("fgets()");
+				WARNING("%s: %s", profile_path, strerror(errno));
 				return 1;
 			}
 		}
@@ -122,7 +122,7 @@ static int load_rc_file(const char *profile_path)
 			continue;
 
 		if (!(p = strchr(rc_line, ':'))) {
-			fprintf(stderr, "XSYSTEM35: Syntax Error in '%s' line %d.\n", profile_path, line);
+			WARNING("Syntax Error in '%s' line %d.", profile_path, line);
 			return 1;
 		}
 

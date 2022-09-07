@@ -520,8 +520,7 @@ void sl_returnGoto(int address) {
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
-			fprintf(stderr, "%d \n", *tmp);
-			SYSERROR("Stack buffer is illegal");
+			SYSERROR("Stack buffer is illegal: %d", *tmp);
 		}
 		free(tmp);
 		tmp = sl_pop();
