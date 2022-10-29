@@ -44,9 +44,7 @@ android {
         }
         externalNativeBuild {
             cmake {
-                // xsystem35 requires CMake >=3.13, so SDK-bundled CMake
-                // (3.6 or 3.10.2) cannot be used.
-                version getInstalledCmakeVersion()
+                version '3.22.1'
                 path 'jni/CMakeLists.txt'
             }
         }
@@ -72,8 +70,4 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-}
-
-static String getInstalledCmakeVersion() {
-    ('cmake --version'.execute().text =~ /cmake version ([0-9.]+)/)[0][1]
 }
