@@ -99,14 +99,14 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 }
 	switch(dst->format->BytesPerPixel) {
 	case 1:
-		sccp(BYTE);
+		sccp(uint8_t);
 		break;
 	case 2:
-		sccp(WORD);
+		sccp(uint16_t);
 		break;
 	case 3: {
-		BYTE *p_ss=(BYTE *)(src->pixels+sx*src->format->BytesPerPixel+sy*src->pitch);
-		BYTE *p_src=p_ss,*p_dd=ss->pixels, *p_dst;
+		uint8_t *p_ss=(uint8_t *)(src->pixels+sx*src->format->BytesPerPixel+sy*src->pitch);
+		uint8_t *p_src=p_ss,*p_dd=ss->pixels, *p_dst;
 		for (y = 0; y < dh; y++) {
 			p_src = p_ss + col[y] * src->pitch;
 			p_dst = p_dd + y      * ss->pitch;
@@ -144,10 +144,10 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool a
 
 	SDL_Surface *s;
 	if (cg->alpha && alpha_blend) {
-		unsigned short *p_src = (WORD *)cg->pic;
-		DWORD *p_ds, *p_dst;
-		BYTE *a_src = cg->alpha;
-		BYTE *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
+		unsigned short *p_src = (uint16_t *)cg->pic;
+		uint32_t *p_ds, *p_dst;
+		uint8_t *a_src = cg->alpha;
+		uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
 		int x, y, l;
 		
 		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
@@ -167,8 +167,8 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool a
 		s = SDL_CreateRGBSurfaceWithFormatFrom(
 			cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
 		if (cg->alpha) {
-			BYTE *a_src = cg->alpha;
-			BYTE *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
+			uint8_t *a_src = cg->alpha;
+			uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
 			
 			for (int i = 0; i < h; i++) {
 				memcpy(adata, a_src, w);
@@ -218,8 +218,8 @@ void sdl_shadow_init(void) {
 }
 
 void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	BYTE *adata = GETOFFSET_ALPHA(sdl_dibinfo, sx, sy);
-	BYTE *p_src, *p_dst, *p_ds;
+	uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, sx, sy);
+	uint8_t *p_src, *p_dst, *p_ds;
 	
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
 	int x, y;
@@ -299,7 +299,7 @@ void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
  * dib のピクセル情報を取得
  */
 void sdl_getPixel(int x, int y, Palette *cell) {
-	BYTE *p = PIXEL_AT(sdl_dib, x, y);
+	uint8_t *p = PIXEL_AT(sdl_dib, x, y);
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		cell->pixel = *p;
 	} else {

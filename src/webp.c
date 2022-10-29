@@ -25,7 +25,7 @@
 #include "ald_manager.h"
 #include "LittleEndian.h"
 
-boolean webp_checkfmt(BYTE *data) {
+boolean webp_checkfmt(uint8_t *data) {
 	if (data[0] != 'R' || data[1] != 'I' || data[2] != 'F' || data[3] != 'F')
 		return FALSE;
 	if (data[8] != 'W' || data[9] != 'E' || data[10] != 'B' || data[11] != 'P')
@@ -115,7 +115,7 @@ static void rgba_to_rgb_and_alpha(uint8_t *rgba, uint8_t *rgb, uint8_t *alpha, i
 	}
 }
 
-cgdata *webp_extract(BYTE *data, size_t size) {
+cgdata *webp_extract(uint8_t *data, size_t size) {
 	int width, height, has_alpha;
 	uint8_t *rgba = webp_load(data, size, &width, &height, &has_alpha);
 	if (!rgba) {

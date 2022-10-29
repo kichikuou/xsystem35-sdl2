@@ -136,7 +136,7 @@ static void ChangeNotColor() {
 	int p7 = getCaliValue(); /* ISurface */
 	agsurface_t *dib;
 	int x, y;
-	BYTE *dp;
+	uint8_t *dp;
 	
 	DEBUG_COMMAND("ShGraph.ChangeNotColor %d,%d,%d,%d,%p,%p,%d:", x0, y0, width, height, src, dst, p7);
 	
@@ -148,12 +148,12 @@ static void ChangeNotColor() {
 	switch(dib->depth) {
 	case 16:
 	{
-		WORD pic16s = PIX16(*src, *(src+1), *(src+2));
-		WORD pic16d = PIX16(*dst, *(dst+1), *(dst+2));
-		WORD *yl;
+		uint16_t pic16s = PIX16(*src, *(src+1), *(src+2));
+		uint16_t pic16d = PIX16(*dst, *(dst+1), *(dst+2));
+		uint16_t *yl;
 		
 		for (y = 0; y < height; y++) {
-			yl = (WORD *)(dp + y * dib->bytes_per_line);
+			yl = (uint16_t *)(dp + y * dib->bytes_per_line);
 			for (x = 0; x < width; x++) {
 				if (*yl != pic16s) {
 					*yl = pic16d;
@@ -166,12 +166,12 @@ static void ChangeNotColor() {
 	case 24:
 	case 32:
 	{
-		DWORD pic24s = PIX24(*src, *(src+1), *(src+2)) & 0xf0f0f0;
-		DWORD pic24d = PIX24(*dst, *(dst+1), *(dst+2)) & 0xf0f0f0;
-		DWORD *yl;
+		uint32_t pic24s = PIX24(*src, *(src+1), *(src+2)) & 0xf0f0f0;
+		uint32_t pic24d = PIX24(*dst, *(dst+1), *(dst+2)) & 0xf0f0f0;
+		uint32_t *yl;
 		
 		for (y = 0; y < height; y++) {
-			yl = (DWORD *)(dp + y * dib->bytes_per_line);
+			yl = (uint32_t *)(dp + y * dib->bytes_per_line);
 			for (x = 0; x < width; x++) {
 				if ((*yl & 0xf0f0f0) != pic24s) {
 					*yl = pic24d;
@@ -551,7 +551,7 @@ static void PlayAnimeData() {
 
 static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, int r, int g, int b) {
 	int x, y;
-	BYTE *sp, *dp;
+	uint8_t *sp, *dp;
 	agsurface_t *dib;
 	
 	if (dx < 0 || dy < 0) return;
@@ -567,12 +567,12 @@ static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, i
 	switch(dib->depth) {
 	case 16:
 	{
-		WORD pic16 = PIX16(r, g, b);
-		WORD *yls, *yld;
+		uint16_t pic16 = PIX16(r, g, b);
+		uint16_t *yls, *yld;
 		
 		for (y = 0; y < height; y++) {
-			yls = (WORD *)(sp + y * dib->bytes_per_line);
-			yld = (WORD *)(dp + y * dib->bytes_per_line);
+			yls = (uint16_t *)(sp + y * dib->bytes_per_line);
+			yld = (uint16_t *)(dp + y * dib->bytes_per_line);
 			for (x = 0; x < width; x++) {
 				if (*yls != pic16) {
 					*yld = *yls;
@@ -585,12 +585,12 @@ static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, i
 	case 24:
 	case 32:
 	{
-		DWORD pic24 = PIX24(r, g, b) & 0xf0f0f0;
-		DWORD *yls, *yld;
+		uint32_t pic24 = PIX24(r, g, b) & 0xf0f0f0;
+		uint32_t *yls, *yld;
 		
 		for (y = 0; y < height; y++) {
-			yls = (DWORD *)(sp + y * dib->bytes_per_line);
-			yld = (DWORD *)(dp + y * dib->bytes_per_line);
+			yls = (uint32_t *)(sp + y * dib->bytes_per_line);
+			yld = (uint32_t *)(dp + y * dib->bytes_per_line);
 			for (x = 0; x < width; x++) {
 				if ((*yls & 0xf0f0f0) != pic24) {
 					*yld = *yls;

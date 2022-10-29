@@ -68,7 +68,7 @@ const char *fget4cc(FILE *fp) {
 }
 
 int fgetdw(FILE *fp) {
-	BYTE buf[4];
+	uint8_t buf[4];
 	if (fread(buf, 4, 1, fp) != 1) {
 		WARNING("fread: %s", strerror(errno));
 		return 0;

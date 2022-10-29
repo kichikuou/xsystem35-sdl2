@@ -53,8 +53,8 @@ typedef struct {
 	int height;      // image height
 	int depth;       // pixel depth (8, 16 or 24)
 	
-	BYTE *pic;       // extracted pixel data
-	BYTE *alpha;     // extracted alpha data if exists
+	uint8_t *pic;    // extracted pixel data
+	uint8_t *alpha;  // extracted alpha data if exists
 	Palette256 *pal; // extracted palette data if exists
 	
 	int vsp_bank;    // palette bank for vsp

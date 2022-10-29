@@ -22,7 +22,7 @@
 
 #include "cg.h"
 
-extern boolean jpeg_checkfmt(BYTE *data);
-extern cgdata *jpeg_extract(BYTE *data, size_t size);
+extern boolean jpeg_checkfmt(uint8_t *data);
+extern cgdata *jpeg_extract(uint8_t *data, size_t size);
 
 #endif // __JPEG_H__

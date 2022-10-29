@@ -96,12 +96,12 @@ void sdl_cursor_init(void) {
 	cursor[CURSOR_WAIT]     = init_system_cursor(cursor_busy);
 }
 
-boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
+boolean sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
 	int    xormasklen, andmasklen, xornum;
 	int    i, j;
 	int    h = 0;
 	
-	BYTE   *buf1, *buf2, *buf3, *buf4;
+	uint8_t   *buf1, *buf2, *buf3, *buf4;
 	
 	xornum = (cursordirentry->bWidth * cursordirentry->bHeight);
 	xormasklen = (xornum * cursorImage->icHeader.biBitCount) / 8;
@@ -111,10 +111,10 @@ boolean sdl_cursorNew(BYTE* data, int no, CursorImage *cursorImage, TCursorDirEn
 	cursorImage->xormasklen = xormasklen;
 	cursorImage->andmasklen = andmasklen;
 	
-	buf1 = malloc(sizeof(BYTE) * xornum);
-	buf2 = malloc(sizeof(BYTE) * xornum);
-	buf3 = malloc(sizeof(BYTE) * xornum);
-	buf4 = malloc(sizeof(BYTE) * xornum);
+	buf1 = malloc(sizeof(uint8_t) * xornum);
+	buf2 = malloc(sizeof(uint8_t) * xornum);
+	buf3 = malloc(sizeof(uint8_t) * xornum);
+	buf4 = malloc(sizeof(uint8_t) * xornum);
 	
 	memcpy(buf1, data, min(xormasklen, xornum));
 	data += xormasklen;

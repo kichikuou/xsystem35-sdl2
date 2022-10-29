@@ -5,7 +5,7 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	int      sw, sh;
 	int      *row, *col;
 	int      x, y;
-	BYTE    *sdata, *ddata;
+	uint8_t  *sdata, *ddata;
 	
 	dst->width = dw;
 	dst->height = dh;
@@ -57,14 +57,14 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 #define SCALEDCOPYAREA(type) {                                          \
 	int x, y;                                                       \
 	type *sl, *dl;                                                  \
-	BYTE *_sl, *_dl;                                                \
+	uint8_t *_sl, *_dl;                                                \
 	for (y = 0; y < dh; y++) {                                      \
 		sl = (type *)(sdata + *(y + col) * src->bytes_per_line);\
 		dl = (type *)(ddata +   y        * dst->bytes_per_line);\
 		for (x = 0; x < dw; x++) {                              \
 			*(dl + x) = *(sl + *(row + x));                 \
 		}                                                       \
-		_dl = (BYTE *)dl;                                       \
+		_dl = (uint8_t *)dl;                                       \
 		while(*(col + y) == *(col + y + 1)) {                   \
 			_sl = _dl;                                      \
 			_dl += dst->bytes_per_line;                     \
@@ -75,29 +75,29 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	
 	switch(dst->depth) {
 	case 8:	
-		SCALEDCOPYAREA(BYTE); break;
+		SCALEDCOPYAREA(uint8_t); break;
 	case 16:
-		SCALEDCOPYAREA(WORD); break;
+		SCALEDCOPYAREA(uint16_t); break;
 	case 24:
 	case 32:
-		SCALEDCOPYAREA(DWORD); break;
+		SCALEDCOPYAREA(uint32_t); break;
 	default:
 		break;
 	}
 	
 	if (src->alpha) {
 		int x, y;
-		BYTE *sl, *dl;
-		BYTE *_sl, *_dl;
+		uint8_t *sl, *dl;
+		uint8_t *_sl, *_dl;
 		sdata = GETOFFSET_ALPHA(src, 0, 0);
 		ddata = GETOFFSET_ALPHA(dst, 0, 0);
 		for (y = 0; y < dh; y++) {
-			sl = (BYTE *)(sdata + *(y + col) * src->width);
-			dl = (BYTE *)(ddata +   y        * dst->width);
+			sl = (uint8_t *)(sdata + *(y + col) * src->width);
+			dl = (uint8_t *)(ddata +   y        * dst->width);
 			for (x = 0; x < dw; x++) {
 				*(dl + x) = *(sl + *(row + x));
 			}
-			_dl = (BYTE *)dl;
+			_dl = (uint8_t *)dl;
 			while(*(col + y) == *(col + y + 1)) {
 				_sl = _dl;
 				_dl += dst->width;

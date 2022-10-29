@@ -49,7 +49,7 @@ extern int gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, in
 extern int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
 /* in graph_draw_amap.c */
-extern int gr_draw_amap(surface_t *dst, int dx, int dy, BYTE *src, int width, int height, int scanline);
+extern int gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int height, int scanline);
 
 // /* in graph_bright_dst_only.c */
 #define gr_bright_dst_only(dst,dx,dy,w,h,lv) gr_copy_bright(dst,dx,dy,dst,dx,dy,w,h,lv)

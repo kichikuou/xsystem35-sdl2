@@ -30,7 +30,7 @@
 #include "hankaku.h"
 #include "system.h"
 
-static const BYTE hankakutable[3][192] = {{
+static const uint8_t hankakutable[3][192] = {{
 	// 0x8140 - 0x81ff
 	 ' ', 0xa4, 0xa1,  ',',  '.',  0xa5, ':',  ';',
 	 '?',  '!', 0xde, 0xdf,    0,  '`',    0,  '^',
@@ -108,7 +108,7 @@ static const BYTE hankakutable[3][192] = {{
 	   0,    0,    0,    0,    0,    0,    0,    0,
 }};
 
-static const WORD kanatbl[] = {
+static const uint16_t kanatbl[] = {
 	0x8140, 0x8142, 0x8175, 0x8176, 0x8141, 0x8145, 0x82f0, 0x829f,
 	0x82a1, 0x82a3, 0x82a5, 0x82a7, 0x82e1, 0x82e3, 0x82e5, 0x82c1,
 	0x815b, 0x82a0, 0x82a2, 0x82a4, 0x82a6, 0x82a8, 0x82a9, 0x82ab,
@@ -133,8 +133,8 @@ static const char zenkaku_digits[][3] = {
 	{0x81, 0x40, 0x00}, /* space */
 };
 
-static BYTE *zen2han_sjis(const BYTE *src) {
-	BYTE c0, c1;
+static uint8_t *zen2han_sjis(const uint8_t *src) {
+	uint8_t c0, c1;
 	char *dst, *_dst;
 	
 	dst = _dst = malloc(strlen(src) + 1);
@@ -146,7 +146,7 @@ static BYTE *zen2han_sjis(const BYTE *src) {
 			*dst++ = c0;
 		} else if (c0 <= 0x83) {
 			c1 = *src++;
-			BYTE h = hankakutable[c0 - 0x81][c1 - 0x40];
+			uint8_t h = hankakutable[c0 - 0x81][c1 - 0x40];
 			if (h) {
 				*dst++ = h;
 			} else {
@@ -342,23 +342,23 @@ static char *zen2han_utf8(const char *src) {
 	return _dst;
 }
 
-BYTE *zen2han(const BYTE *src, CharacterEncoding enc) {
+uint8_t *zen2han(const uint8_t *src, CharacterEncoding enc) {
 	switch (enc) {
 	case SHIFT_JIS:
 		return zen2han_sjis(src);
 	case UTF8:
 		return zen2han_utf8(src);
 	default:
-		return (BYTE *)src;
+		return (uint8_t *)src;
 	}
 }
 
-BYTE *han2zen(const BYTE *src, CharacterEncoding enc) {
+uint8_t *han2zen(const uint8_t *src, CharacterEncoding enc) {
 	if (enc != SHIFT_JIS)
-		return (BYTE *)src; // Not implemented
+		return (uint8_t *)src; // Not implemented
 
-	BYTE c0;
-	BYTE *dst, *_dst;
+	uint8_t c0;
+	uint8_t *dst, *_dst;
 	dst = _dst = malloc(strlen(src) * 2 + 1);
 	
 	if (dst == NULL)
@@ -372,7 +372,7 @@ BYTE *han2zen(const BYTE *src, CharacterEncoding enc) {
 		} else if (c0 >= 0xe0) {
 			*dst++ = (char)c0; *dst++ = *src++;
 		} else if (c0 >= 0xa0) {
-			const WORD kana = kanatbl[c0 - 0xa0];
+			const uint16_t kana = kanatbl[c0 - 0xa0];
 			*dst++ = kana >> 8; *dst++ = kana & 0xff;
 		} else {
 			*dst++ = (char)c0; *dst++ = *src++;

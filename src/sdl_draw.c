@@ -49,7 +49,7 @@ static void sdl_pal_check(void) {
 	}
 }
 
-static Uint32 palette_color(BYTE c) {
+static Uint32 palette_color(uint8_t c) {
 	if (sdl_dib->format->BitsPerPixel == 8)
 		return c;
 	return SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
@@ -129,7 +129,7 @@ void sdl_setPalette(Palette256 *pal, int first, int count) {
 }
 
 /* 矩形の描画 */
-void sdl_drawRectangle(int x, int y, int w, int h, BYTE c) {
+void sdl_drawRectangle(int x, int y, int w, int h, uint8_t c) {
 	sdl_pal_check();
 	Uint32 col = palette_color(c);
 
@@ -147,14 +147,14 @@ void sdl_drawRectangle(int x, int y, int w, int h, BYTE c) {
 }
 
 /* 矩形塗りつぶし */
-void sdl_fillRectangle(int x, int y, int w, int h, BYTE c) {
+void sdl_fillRectangle(int x, int y, int w, int h, uint8_t c) {
 	sdl_pal_check();
 	
 	SDL_Rect rect = {x, y, w, h};
 	SDL_FillRect(sdl_dib, &rect, palette_color(c));
 }
 
-void sdl_fillRectangleRGB(int x, int y, int w, int h, BYTE r, BYTE g, BYTE b) {
+void sdl_fillRectangleRGB(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b) {
 	if (sdl_dib->format->BitsPerPixel == 8)
 		return;
 
@@ -162,7 +162,7 @@ void sdl_fillRectangleRGB(int x, int y, int w, int h, BYTE r, BYTE g, BYTE b) {
 	SDL_FillRect(sdl_dib, &rect, SDL_MapRGB(sdl_dib->format, r, g, b));
 }
 
-void sdl_fillCircle(int left, int top, int diameter, BYTE c) {
+void sdl_fillCircle(int left, int top, int diameter, uint8_t c) {
 	diameter &= ~1;
 	if (diameter <= 0)
 		return;
@@ -204,7 +204,7 @@ void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 /*
  * dib に指定のパレット sp を抜いてコピー
  */
-void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, BYTE sp) {
+void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
 	sdl_pal_check();
 
 	Uint32 col = sp;
@@ -235,7 +235,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 	if (sdl_dib->format->BitsPerPixel > 8 && cg->pal) {
 		int i, i_st = 0, i_end = 256;
 		SDL_Color *c = s->format->palette->colors;
-		BYTE *r = cg->pal->red, *g = cg->pal->green, *b = cg->pal->blue;
+		uint8_t *r = cg->pal->red, *g = cg->pal->green, *b = cg->pal->blue;
 		
 		if (cg->type == ALCG_VSP) {
 			i_st  = (cg->vsp_bank << 4);
@@ -262,7 +262,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 }
 
 /* 直線描画 */
-void sdl_drawLine(int x1, int y1, int x2, int y2, BYTE c) {
+void sdl_drawLine(int x1, int y1, int x2, int y2, uint8_t c) {
 	sdl_pal_check();
 	
 	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(sdl_dib);
@@ -271,13 +271,13 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, BYTE c) {
 	SDL_DestroyRenderer(renderer);
 }
 
-#define TYPE ___BYTE
+#define TYPE uint8_t
 #include "flood.h"
 #undef TYPE
-#define TYPE ___WORD
+#define TYPE uint16_t
 #include "flood.h"
 #undef TYPE
-#define TYPE ___DWORD
+#define TYPE uint32_t
 #include "flood.h"
 #undef TYPE
 
@@ -286,11 +286,11 @@ SDL_Rect sdl_floodFill(int x, int y, int c) {
 
 	switch (sdl_dib->format->BytesPerPixel) {
 	case 1:
-		return sdl_floodFill___BYTE(x, y, col);
+		return sdl_floodFill_uint8_t(x, y, col);
 	case 2:
-		return sdl_floodFill___WORD(x, y, col);
+		return sdl_floodFill_uint16_t(x, y, col);
 	case 4:
-		return sdl_floodFill___DWORD(x, y, col);
+		return sdl_floodFill_uint32_t(x, y, col);
 	default:
 		WARNING("sdl_floodFill: unsupported DIB format");
 		return (SDL_Rect){};
@@ -317,7 +317,7 @@ int sdl_nearest_color(int r, int g, int b) {
 	return col;
 }
 
-SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, BYTE col) {
+SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, uint8_t col) {
 	sdl_pal_check();
 	return font_draw_glyph(x, y, str_utf8, col);
 }
@@ -325,7 +325,7 @@ SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, BYTE col) {
 /*
  * 指定範囲にパレット col を rate の割合で重ねる CK1
  */
-void sdl_wrapColor(int sx, int sy, int w, int h, BYTE c, int rate) {
+void sdl_wrapColor(int sx, int sy, int w, int h, uint8_t c, int rate) {
 	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
 	assert(s->format->BitsPerPixel > 8);
 

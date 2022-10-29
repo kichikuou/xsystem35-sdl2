@@ -7,7 +7,7 @@
 #include "ags.h"
 
 int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int r, int g, int b) {
-	BYTE *sp, *dp;
+	uint8_t *sp, *dp;
 	int x, y;
 	int col;
 	
@@ -22,14 +22,14 @@ int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx,
 	case 16:
 		col = PIX16(r, g, b);
 		{
-			WORD *yd;
-			BYTE *ys;
+			uint16_t *yd;
+			uint8_t *ys;
 			for (y = 0; y < sh; y++) {
-				ys = (BYTE *)(sp + y * src->bytes_per_line);
-				yd = (WORD *)(dp + y * dst->bytes_per_line);
+				ys = (uint8_t *)(sp + y * src->bytes_per_line);
+				yd = (uint16_t *)(dp + y * dst->bytes_per_line);
 				for (x = 0; x < sw; x++) {
 					if (*ys) {
-						*yd = ALPHABLEND16(col, *yd, (BYTE)*ys);
+						*yd = ALPHABLEND16(col, *yd, (uint8_t)*ys);
 					}
 					ys++; yd++;
 				}
@@ -38,15 +38,15 @@ int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx,
 		break;
 	case 32:
 	case 24: {
-		DWORD *yd;
-		BYTE *ys;
+		uint32_t *yd;
+		uint8_t *ys;
 		col = PIX24(r, g, b);
 		for (y = 0; y < sh; y++) {
-			ys = (BYTE *)(sp + y * src->bytes_per_line);
-			yd = (DWORD *)(dp + y * dst->bytes_per_line);
+			ys = (uint8_t *)(sp + y * src->bytes_per_line);
+			yd = (uint32_t *)(dp + y * dst->bytes_per_line);
 			for (x = 0; x < sw; x++) {
 				if (*ys) {
-					*yd = ALPHABLEND24(col, *yd, (BYTE)*ys);
+					*yd = ALPHABLEND24(col, *yd, (uint8_t)*ys);
 				}
 				ys++; yd++;
 			}

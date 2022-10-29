@@ -46,7 +46,7 @@
  * @param data: データ列
  * @return CGの種類(QNT/PMS8/PMS16のいずれか)
  */
-static CG_TYPE check_cgformat(BYTE *data) {
+static CG_TYPE check_cgformat(uint8_t *data) {
 	if (qnt_checkfmt(data)) {
 		return ALCG_QNT;
 	} else if (pms256_checkfmt(data)) {

@@ -32,7 +32,7 @@
 #include "LittleEndian.h"
 #include "xsystem35.h"
 
-const BYTE *sl_sco;
+const uint8_t *sl_sco;
 int sl_page;
 int sl_index;
 

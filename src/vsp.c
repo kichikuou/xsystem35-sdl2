@@ -41,16 +41,16 @@
 /*
  * static methods
 */
-static vsp_header *extract_header(BYTE *b);
-static void getpal(Palette256 *pal, BYTE *b);
-static void extract(vsp_header *vsp, BYTE *pic, BYTE *b);
+static vsp_header *extract_header(uint8_t *b);
+static void getpal(Palette256 *pal, uint8_t *b);
+static void extract(vsp_header *vsp, uint8_t *pic, uint8_t *b);
 
 /*
  * Get information from cg header
  *   b: raw data (pointer to header)
  *   return: acquired vsp information object
 */
-static vsp_header *extract_header(BYTE *b) {
+static vsp_header *extract_header(uint8_t *b) {
 	vsp_header *vsp = malloc(sizeof(vsp_header));
 	
 	vsp->vspX0 = LittleEndian_getW(b, 0);
@@ -69,7 +69,7 @@ static vsp_header *extract_header(BYTE *b) {
  *   pal: palette to be stored
  *   b  : raw data (pointer to palette)
 */
-static void getpal(Palette256 *pal, BYTE *b) {
+static void getpal(Palette256 *pal, uint8_t *b) {
 	for (int i = 0; i < 16; i++) {
 		pal->blue[i]  = b[i * 3 + 0] * 17;
 		pal->red[i]   = b[i * 3 + 1] * 17;
@@ -83,16 +83,16 @@ static void getpal(Palette256 *pal, BYTE *b) {
  *   pic: pixel to be stored
  *   b  : raw data (pointer to pixel)
 */
-static void extract(vsp_header *vsp, BYTE *pic, BYTE *b) {
+static void extract(vsp_header *vsp, uint8_t *pic, uint8_t *b) {
 	int c0;
-	BYTE b0, b1, b2, b3, mask = 0;
-	BYTE *bt;
+	uint8_t b0, b1, b2, b3, mask = 0;
+	uint8_t *bt;
 	int i, l, x, y, pl, loc;
 
 	// Extraction buffers.
-	BYTE *buf = malloc(vsp->vspYW * 8);
-	BYTE *bc[4];
-	BYTE *bp[4];
+	uint8_t *buf = malloc(vsp->vspYW * 8);
+	uint8_t *bc[4];
+	uint8_t *bp[4];
 	for (int i = 0; i < 4; i++) {
 		bc[i] = buf + vsp->vspYW * (i * 2);
 		bp[i] = buf + vsp->vspYW * (i * 2 + 1);
@@ -174,7 +174,7 @@ static void extract(vsp_header *vsp, BYTE *pic, BYTE *b) {
  *   data: raw data (pointer to data top)
  *   return: TRUE if data is vsp
 */
-boolean vsp_checkfmt(BYTE *data) {
+boolean vsp_checkfmt(uint8_t *data) {
 	int x0 = LittleEndian_getW(data, 0);
 	int y0 = LittleEndian_getW(data, 2);
 	int w  = LittleEndian_getW(data, 4) - x0;
@@ -192,7 +192,7 @@ boolean vsp_checkfmt(BYTE *data) {
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
-cgdata *vsp_extract(BYTE *data) {
+cgdata *vsp_extract(uint8_t *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	vsp_header *vsp = extract_header(data);
 	
@@ -200,7 +200,7 @@ cgdata *vsp_extract(BYTE *data) {
 	getpal(cg->pal, data + vsp->vspPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = malloc(sizeof(BYTE) * ((vsp->vspXW * 8 + 10) * (vsp->vspYW + 10)));
+	cg->pic = malloc(sizeof(uint8_t) * ((vsp->vspXW * 8 + 10) * (vsp->vspYW + 10)));
 	extract(vsp, cg->pic, data + vsp->vspDp);
 	
 	cg->type = ALCG_VSP;

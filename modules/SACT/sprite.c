@@ -728,10 +728,10 @@ int sp_sound_ob(int wNumWave) {
  * @return: TRUE:入っている, FALSE: 入っていない
  */
 boolean sp_is_insprite(sprite_t *sp, int x, int y) {
-	BYTE *dp;
+	uint8_t *dp;
 	
 	if (x < 0 || y < 0 || x >= sf0->width || y >= sf0->height) return FALSE;
 	
 	dp = GETOFFSET_PIXEL(sact.dmap, x, y);
-	return (*(WORD *)dp == sp->no);
+	return (*(uint16_t *)dp == sp->no);
 }

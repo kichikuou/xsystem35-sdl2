@@ -246,7 +246,7 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 	float    a1, a2, xd, yd;
 	int      *row, *col;
 	int      x, y;
-	BYTE    *sp, *dp, *sa;
+	uint8_t  *sp, *dp, *sa;
 	
 	if (!gr_clip_xywh(dst, &dx, &dy, &dw, &dh)) return;
 	if (!gr_clip_xywh(src, &sx, &sy, &sw, &sh)) return;
@@ -274,13 +274,13 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 	switch(dst->depth) {
 	case 16:
 	{
-		WORD *yls, *yld;
-		BYTE *yla;
+		uint16_t *yls, *yld;
+		uint8_t *yla;
 		
 		for (y = 0; y < dh; y++) {
-			yls = (WORD *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (WORD *)(dp +   y        * dst->bytes_per_line);
-			yla = (BYTE *)(sa + *(y + col) * src->width);
+			yls = (uint16_t *)(sp + *(y + col) * src->bytes_per_line);
+			yld = (uint16_t *)(dp +   y        * dst->bytes_per_line);
+			yla = (uint8_t *)(sa + *(y + col) * src->width);
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = ALPHABLEND16(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
 			}
@@ -297,13 +297,13 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 	case 24:
 	case 32:
 	{
-		DWORD *yls, *yld;
-		BYTE  *yla;
+		uint32_t *yls, *yld;
+		uint8_t  *yla;
 		
 		for (y = 0; y < dh; y++) {
-			yls = (DWORD *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (DWORD *)(dp +   y        * dst->bytes_per_line);
-			yla = (BYTE  *)(sa + *(y + col) * src->width);
+			yls = (uint32_t *)(sp + *(y + col) * src->bytes_per_line);
+			yld = (uint32_t *)(dp +   y        * dst->bytes_per_line);
+			yla = (uint8_t  *)(sa + *(y + col) * src->width);
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = ALPHABLEND24(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
 			}

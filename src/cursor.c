@@ -42,7 +42,7 @@ typedef struct RIFFchunk {
 	char *data;
 } RIFFchunk_t;
 
-static boolean search_chunk(BYTE *src, char *key1, char *key2, RIFFchunk_t *c) {
+static boolean search_chunk(uint8_t *src, char *key1, char *key2, RIFFchunk_t *c) {
 	if (0 == strncmp(src, key1, 4)) {
 		c->size = LittleEndian_getW(src, 4);
 		if (key2) {
@@ -58,14 +58,14 @@ static boolean search_chunk(BYTE *src, char *key1, char *key2, RIFFchunk_t *c) {
 	return FALSE;
 }
 
-static boolean is_riff(BYTE *data) {
+static boolean is_riff(uint8_t *data) {
 	if (0 == strncmp(data, "RIFF", 4)) {
 		return TRUE;
 	}
 	return FALSE;
 }
 
-static boolean check_iconheader(BYTE *data) {
+static boolean check_iconheader(uint8_t *data) {
 	
 	/* read Reserved bit, abort if not 0 */
 	cursorHeader.idReserved = LittleEndian_getW(data, 0);
@@ -100,8 +100,8 @@ static boolean check_iconheader(BYTE *data) {
 	return TRUE;
 }
 
-static int read_direntries(BYTE* data) {
-	BYTE *p = data;
+static int read_direntries(uint8_t* data) {
+	uint8_t *p = data;
 	
 	/* read Width, in pixels */
 	cursordirentry.bWidth = *data;
@@ -155,8 +155,8 @@ static int read_direntries(BYTE* data) {
 	return (int)(data - p);
 }
 
-static int read_bitmapinfo(BYTE* data) {
-	BYTE* p = data;
+static int read_bitmapinfo(uint8_t* data) {
+	uint8_t* p = data;
 	
 #define ih cursorImage.icHeader
 	/* read bitmap info an perform some primitive sanity checks */
@@ -226,10 +226,10 @@ static int read_bitmapinfo(BYTE* data) {
 	return (int)(data - p);
 }
 
-static int read_rgbquad(BYTE* data) {
+static int read_rgbquad(uint8_t* data) {
 	int j;
 	const int colors=2;
-	BYTE* p = data;
+	uint8_t* p = data;
 	
 	free(cursorImage.icColors);
 	cursorImage.icColors = malloc(sizeof(TRGBQuad) * colors);
@@ -259,7 +259,7 @@ static int read_rgbquad(BYTE* data) {
 	return (int)(data - p);
 }
 
-static boolean cursor_load_mono(BYTE *d, int no) {
+static boolean cursor_load_mono(uint8_t *d, int no) {
 	int pos = 6, p1;
 	
 	/* check header information */
@@ -300,8 +300,8 @@ static boolean cursor_load_mono(BYTE *d, int no) {
 	return TRUE;
 }
 
-static boolean cursor_load_anim(BYTE *data, int no) {
-	BYTE *b = data;
+static boolean cursor_load_anim(uint8_t *data, int no) {
+	uint8_t *b = data;
 	int riffsize;
 	RIFFchunk_t c;
 	
@@ -319,7 +319,7 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 			NOTICE("LIST(INFO) ignore size = %d", c.size);
 			b += c.size + 8;
 		} else if (search_chunk(b, "anih", NULL, &c)) {
-			BYTE *src = c.data;
+			uint8_t *src = c.data;
 			NOTICE("anih size = %d", c.size);
 			anicurHeader.cbSizeof  = LittleEndian_getW(src, 0);
 			anicurHeader.cFrames   = LittleEndian_getW(src, 4);
@@ -335,7 +335,7 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 			
 			b += c.size + 8;
 		} else if (search_chunk(b, "rate", NULL, &c)) {
-			BYTE *src = c.data;
+			uint8_t *src = c.data;
 			NOTICE("rate size = %d", c.size);
 			if (anicurHeader.fl & 0x01) {
 				int i;

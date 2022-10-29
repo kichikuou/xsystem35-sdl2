@@ -53,7 +53,7 @@ static char *msg();
 static int  midigetc();
 static long readvarinum();
 static void read_playevent();
-static int  read_header(BYTE *stream, off_t len);
+static int  read_header(uint8_t *stream, off_t len);
 
 static struct midiinfo *midi;
 
@@ -482,9 +482,9 @@ static void read_playevent() {
 	}
 }
 
-static int read_header(BYTE *stream, off_t len) {
+static int read_header(uint8_t *stream, off_t len) {
 	int tracklen, i = 0;
-	BYTE *stream_top = stream;
+	uint8_t *stream_top = stream;
 	
 	while(i == 0 && stream < (stream_top + len)) {
 		if (0 == strncmp(stream, "MThd", 4)) {
@@ -557,7 +557,7 @@ static int read_header(BYTE *stream, off_t len) {
 	return OK;
 }
 
-struct midiinfo *mf_read_midifile(BYTE *stream, off_t len) {
+struct midiinfo *mf_read_midifile(uint8_t *stream, off_t len) {
 	midi = malloc(sizeof(struct midiinfo));
 	
 	midi->msgsize = 128; /* Initial msg buffer size */

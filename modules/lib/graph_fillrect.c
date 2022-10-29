@@ -7,7 +7,7 @@
 #include "ags.h"
 
 int gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b) {
-	BYTE *dp, *dp_;
+	uint8_t *dp, *dp_;
 	int x, y;
 	
 	if (!gr_clip_xywh(dst, &dx, &dy, &dw, &dh)) {
@@ -23,10 +23,10 @@ int gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b)
 		
 	case 16:
 	{
-		WORD pic16 = PIX16(r, g, b);
+		uint16_t pic16 = PIX16(r, g, b);
 		
 		for (x = 0; x < dw; x++) {
-			*((WORD *)dp + x) = pic16;
+			*((uint16_t *)dp + x) = pic16;
 		}
 		
 		break;
@@ -34,10 +34,10 @@ int gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b)
 	case 24:
 	case 32:
 	{
-		DWORD pic24 = PIX24(r, g, b);
+		uint32_t pic24 = PIX24(r, g, b);
 		
 		for (x = 0; x < dw; x++) {
-			*((DWORD *)dp + x) = pic24;
+			*((uint32_t *)dp + x) = pic24;
 		}
 		
 		break;

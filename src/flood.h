@@ -19,7 +19,7 @@
 #define CONCATENATE(x, y) x ## y
 #define CONCAT(x, y) CONCATENATE(x, y)
 
-static SDL_Rect CONCAT(sdl_floodFill, TYPE)(int x, int y, Uint32 col) {
+static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
 	int old_color = *(TYPE *)PIXEL_AT(sdl_dib, x, y);
 	if (old_color == col)
 		return (SDL_Rect){};
@@ -37,8 +37,8 @@ static SDL_Rect CONCAT(sdl_floodFill, TYPE)(int x, int y, Uint32 col) {
 		top--;
 
 		TYPE *line = PIXEL_AT(sdl_dib, 0, y);
-		TYPE *prev_line = (TYPE *)((BYTE *)line - sdl_dib->pitch);
-		TYPE *next_line = (TYPE *)((BYTE *)line + sdl_dib->pitch);
+		TYPE *prev_line = (TYPE *)((uint8_t *)line - sdl_dib->pitch);
+		TYPE *next_line = (TYPE *)((uint8_t *)line + sdl_dib->pitch);
 		while (x >= 0 && line[x] == old_color) x--;
 		x++;
 		minx = min(x, minx);

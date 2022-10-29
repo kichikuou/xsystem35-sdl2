@@ -42,7 +42,7 @@
  * @param sh:  転送高さ
  */
 int gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
-	BYTE *sp, *dp;
+	uint8_t *sp, *dp;
 	
 	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return NG;
 	

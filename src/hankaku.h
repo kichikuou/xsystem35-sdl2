@@ -26,8 +26,8 @@
 #include "portab.h"
 #include "utfsjis.h"
 
-extern BYTE *zen2han(const BYTE *src, CharacterEncoding enc);
-extern BYTE *han2zen(const BYTE *src, CharacterEncoding enc);
+extern uint8_t *zen2han(const uint8_t *src, CharacterEncoding enc);
+extern uint8_t *han2zen(const uint8_t *src, CharacterEncoding enc);
 extern char *format_number(int n, int width, char *buf);
 extern char *format_number_zenkaku(int n, int width, char *buf);
 

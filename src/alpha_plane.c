@@ -37,9 +37,9 @@
  *   src : source alpha plane pixel
  *   src_pitch: soruce alpha plane pitch
 */
-void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, BYTE *src, int src_pitch) {
-	BYTE *ad = GETOFFSET_ALPHA(dst, dx, dy);
-	BYTE *as = src;
+void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, uint8_t *src, int src_pitch) {
+	uint8_t *ad = GETOFFSET_ALPHA(dst, dx, dy);
+	uint8_t *as = src;
 	int i;
 	
 	for (i = 0; i < h; i++) {
@@ -56,7 +56,7 @@ void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, BYTE *src,
  *   y  : location y
  *   pic: acired alpha pixel
 */
-void alpha_get_pixel(agsurface_t *suf, int x, int y, BYTE *pic) {
+void alpha_get_pixel(agsurface_t *suf, int x, int y, uint8_t *pic) {
 	*pic = *GETOFFSET_ALPHA(suf, x, y);
 }
 
@@ -71,13 +71,13 @@ void alpha_get_pixel(agsurface_t *suf, int x, int y, BYTE *pic) {
  *   d  : setteled level
 */
 void alpha_lowercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d) {
-	BYTE *a = GETOFFSET_ALPHA(suf, sx, sy), *b;
+	uint8_t *a = GETOFFSET_ALPHA(suf, sx, sy), *b;
 	int x, y;
 	
 	for (y = 0; y < h; y++) {
 		b = a + y * suf->width;
 		for (x = 0; x < w; x++) {
-			if (*b <= (BYTE)s) *b = (BYTE)d;
+			if (*b <= (uint8_t)s) *b = (uint8_t)d;
 			b++;
 		}
 	}
@@ -94,13 +94,13 @@ void alpha_lowercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d
  *   d  : setteled level
 */
 void alpha_uppercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d) {
-	BYTE *dp = GETOFFSET_ALPHA(suf, sx, sy);
+	uint8_t *dp = GETOFFSET_ALPHA(suf, sx, sy);
 	int x, y;
 	
 	for (y = 0; y < h; y++) {
 		for (x = 0; x < w; x++) {
-			if (*(dp + x) >= (BYTE)s) {
-				*(dp + x) = (BYTE)d;
+			if (*(dp + x) >= (uint8_t)s) {
+				*(dp + x) = (uint8_t)d;
 			}
 		}
 		dp += suf->width;
@@ -117,7 +117,7 @@ void alpha_uppercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d
  *   lv : level to be set
 */
 void alpha_set_level(agsurface_t *suf, int sx, int sy, int w, int h, int lv) {
-	BYTE *a = GETOFFSET_ALPHA(suf, sx, sy);
+	uint8_t *a = GETOFFSET_ALPHA(suf, sx, sy);
 	
 	while(h--){
 		memset(a, lv, w);
@@ -136,8 +136,8 @@ void alpha_set_level(agsurface_t *suf, int sx, int sy, int w, int h, int lv) {
  *   dy : destination y
 */
 void alpha_copy_area(agsurface_t *suf, int sx, int sy, int w, int h, int dx, int dy) {
-	BYTE *src = GETOFFSET_ALPHA(suf, sx, sy);
-	BYTE *dst = GETOFFSET_ALPHA(suf, dx, dy);
+	uint8_t *src = GETOFFSET_ALPHA(suf, sx, sy);
+	uint8_t *dst = GETOFFSET_ALPHA(suf, dx, dy);
 	
 	if (sy <= dy && dy < (sy + h)) {
 		src += (h-1) * suf->width;

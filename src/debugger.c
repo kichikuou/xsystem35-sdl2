@@ -359,7 +359,7 @@ void dbg_delete_breakpoints_in_page(int page) {
 	}
 }
 
-BYTE dbg_handle_breakpoint(int page, int addr) {
+uint8_t dbg_handle_breakpoint(int page, int addr) {
 	for (Breakpoint *bp = breakpoints; bp; bp = bp->next) {
 		if (bp->phys->page != page || bp->phys->addr != addr)
 			continue;
@@ -369,7 +369,7 @@ BYTE dbg_handle_breakpoint(int page, int addr) {
 		dbg_state = bp->no == INTERNAL_BREAKPOINT_NO ?
 			DBG_STOPPED_NEXT : DBG_STOPPED_BREAKPOINT;
 
-		BYTE restore_op = bp->phys->restore_op;
+		uint8_t restore_op = bp->phys->restore_op;
 		dbg_main(bp->no);  // this may destroy bp
 		return restore_op;
 	}

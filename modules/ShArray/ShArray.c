@@ -1270,7 +1270,7 @@ static void ChangeSecretArray(void) { /* 53 */
 	int cnt      = getCaliValue();
 	int type     = getCaliValue();
 	int *vResult = getCaliVariable();
-	static WORD key[4] = { 0x7A7A, 0xADAD, 0xBCBC, 0xCECE }; /* key */
+	static uint16_t key[4] = { 0x7A7A, 0xADAD, 0xBCBC, 0xCECE }; /* key */
 	
 	DEBUG_COMMAND("ShArray.ChangeSecretArray %p,%d,%d,%p:", vAry, cnt, type, vResult);
 	
@@ -1301,7 +1301,7 @@ static void ChangeSecretArray(void) { /* 53 */
 			  エンコードその１
 			*/
 			int i, j = 0;
-			WORD ax = key[3] ^ 0x5a5a;
+			uint16_t ax = key[3] ^ 0x5a5a;
 			for (i = 0; i < cnt; i++) {
 				(*vAry) ^= ax; ax = (key[i&3] ^ *vAry);
 				j ^= ax;
@@ -1322,7 +1322,7 @@ static void ChangeSecretArray(void) { /* 53 */
 			  エンコードその２
 			*/
 			int i, j = 0, k;
-			WORD ax = key[3] ^ 0x5a5a;
+			uint16_t ax = key[3] ^ 0x5a5a;
 			for (i = 0; i < cnt; i++) {
 				k = *vAry; 
 				*vAry ^= ax; ax = (key[i&3] ^ k);

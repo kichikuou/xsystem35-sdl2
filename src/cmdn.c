@@ -87,7 +87,7 @@ void commandN_ADD() {
 	
 	DEBUG_COMMAND("N+ %d,%d,%d:", *var1, num, cnt);
 	while(cnt--) {
-		*var1 = (int)((WORD)(*var1 + num)) ; var1++;
+		*var1 = (uint16_t)(*var1 + num); var1++;
 		// *var1 += num; var1++;
 	}
 }
@@ -113,7 +113,7 @@ void commandN_MUL() {
 	
 	DEBUG_COMMAND("N* %d,%d,%d:", *var1, num, cnt);
 	while(cnt--) {
-		*var1 = (int)((WORD)(*var1 * num)); var1++;
+		*var1 = (uint16_t)(*var1 * num); var1++;
 		// *var1 *= num; var1++;
 	}
 }

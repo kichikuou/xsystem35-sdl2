@@ -52,7 +52,7 @@
     b: raw data 
     qnt: acquired qnt information object
 */
-static void extract_header(BYTE *b, qnt_header *qnt) {
+static void extract_header(uint8_t *b, qnt_header *qnt) {
 	int rsv0 = LittleEndian_getDW(b, 4);
 	if (rsv0 == 0) {
 		qnt->hdr_size = 48;
@@ -84,10 +84,10 @@ static void extract_header(BYTE *b, qnt_header *qnt) {
     pic: pixel to be stored
     b  : raw data (pointer to pixel)
 */
-static void extract_pixel(qnt_header *qnt, BYTE *pic, BYTE *b) {
+static void extract_pixel(qnt_header *qnt, uint8_t *pic, uint8_t *b) {
 	int i, j, x, y, w, h;
 	long ucbuf = (qnt->width+1) * (qnt->height+1) * 3 + ZLIBBUF_MARGIN;
-	BYTE *raw = malloc(sizeof(BYTE) * ucbuf);
+	uint8_t *raw = malloc(sizeof(uint8_t) * ucbuf);
 	
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->pixel_size)) {
 		WARNING("uncompress failed");
@@ -166,10 +166,10 @@ static void extract_pixel(qnt_header *qnt, BYTE *pic, BYTE *b) {
     pic: pixel to be stored
     b  : raw data (pointer to alpha pixel)
 */
-static void extract_alpha(qnt_header *qnt, BYTE *pic, BYTE *b) {
+static void extract_alpha(qnt_header *qnt, uint8_t *pic, uint8_t *b) {
 	int i, x, y, w, h;
 	long ucbuf = (qnt->width+1) * (qnt->height+1) + ZLIBBUF_MARGIN;
-	BYTE *raw = malloc(sizeof(BYTE) * ucbuf);
+	uint8_t *raw = malloc(sizeof(uint8_t) * ucbuf);
 
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->alpha_size)) {
 		WARNING("uncompress failed");
@@ -214,7 +214,7 @@ static void extract_alpha(qnt_header *qnt, BYTE *pic, BYTE *b) {
 
     return: TRUE if data is qnt
 */
-boolean qnt_checkfmt(BYTE *data) {
+boolean qnt_checkfmt(uint8_t *data) {
 	if (data[0] != 'Q' || data[1] != 'N' || data[2] != 'T') return FALSE;
 	return TRUE;
 }
@@ -226,17 +226,17 @@ boolean qnt_checkfmt(BYTE *data) {
 
      return: extracted image data and information
 */
-cgdata *qnt_extract(BYTE *data) {
+cgdata *qnt_extract(uint8_t *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	qnt_header qnt;
 	extract_header(data, &qnt);
 	
-	cg->pic = malloc(sizeof(BYTE) * ((qnt.width+10) * (qnt.height+10) * 3));
+	cg->pic = malloc(sizeof(uint8_t) * ((qnt.width+10) * (qnt.height+10) * 3));
 	extract_pixel(&qnt, cg->pic, data + qnt.hdr_size);
 	
 	if (qnt.alpha_size != 0) {
-		cg->alpha = malloc(sizeof(BYTE) * ((qnt.width+10) * (qnt.height+10)));
-		extract_alpha(&qnt, (BYTE *)cg->alpha, data + qnt.hdr_size + qnt.pixel_size);
+		cg->alpha = malloc(sizeof(uint8_t) * ((qnt.width+10) * (qnt.height+10)));
+		extract_alpha(&qnt, (uint8_t *)cg->alpha, data + qnt.hdr_size + qnt.pixel_size);
 	}
 	
 	cg->type   = ALCG_QNT;

@@ -95,11 +95,11 @@ static void commandF1() {
 static void commandF2() {
 	int *read_var = getCaliVariable();
 	int skip      = getCaliValue();
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 	
 	p += skip;
 	
-	*read_var = LittleEndian_getW((BYTE *)p, 0);
+	*read_var = LittleEndian_getW((uint8_t *)p, 0);
 	
 	p++;
 	nact->datatbl_addr = (void *)p;
@@ -120,10 +120,10 @@ static void commandF4() {
 	int *read_var = getCaliVariable();
 	int count     = getCaliValue();
 	int i;
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 	
 	for (i = 0; i < count; i++) {
-		*read_var = LittleEndian_getW((BYTE *)p, 0);
+		*read_var = LittleEndian_getW((uint8_t *)p, 0);
 		p++;
 		read_var++;
 	}
@@ -159,11 +159,11 @@ static void commandF7() {
 	int data_width = getCaliValue();
 	int count      = getCaliValue();
 	int i, j;
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 	
 	for (i = 0; i < count; i++) {
 		for (j = 0; j < data_width; j++) {
-			*(F6Index[j] + i) = LittleEndian_getW((BYTE *)p, 0);
+			*(F6Index[j] + i) = LittleEndian_getW((uint8_t *)p, 0);
 			p++;
 		}
 	}

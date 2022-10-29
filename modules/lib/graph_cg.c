@@ -42,7 +42,7 @@
  */
 void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 	int dx, dy, dw, dh;
-	BYTE *sp, *dp, r, g, b;
+	uint8_t *sp, *dp, r, g, b;
 	
 	dx = x;
 	dy = y;
@@ -53,16 +53,16 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 	
 	int data_offset = (abs(dy - y) * cg->width + abs(dx - x)) * 3;
 	
-	sp = (BYTE *)(cg->pic + data_offset);
+	sp = (uint8_t *)(cg->pic + data_offset);
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
 	switch(ds->depth) {
 	case 16:
 	{
-		WORD *yl;
+		uint16_t *yl;
 		
 		for (y = 0; y < dh; y++) {
-			yl = (WORD *)(dp + y * ds->bytes_per_line);
+			yl = (uint16_t *)(dp + y * ds->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				r = *sp;
 				g = *(sp +1);
@@ -78,10 +78,10 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 	case 24:
 	case 32:
 	{
-		DWORD *yl;
+		uint32_t *yl;
 		
 		for (y = 0; y < dh; y++) {
-			yl = (DWORD *)(dp + y * ds->bytes_per_line);
+			yl = (uint32_t *)(dp + y * ds->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				r = *sp;
 				g = *(sp +1);
@@ -105,8 +105,8 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
  */
 void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 	int dx, dy, dw, dh;
-	BYTE *dp;
-	WORD pic16, *sp;
+	uint8_t *dp;
+	uint16_t pic16, *sp;
 	
 	dx = x;
 	dy = y;
@@ -117,7 +117,7 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 	
 	int data_offset = (abs(dy - y) * cg->width + abs(dx - x)) * 2;
 	
-	sp = (WORD *)(cg->pic + data_offset);
+	sp = (uint16_t *)(cg->pic + data_offset);
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
 	switch(ds->depth) {
@@ -134,10 +134,10 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 	case 24:
 	case 32:
 	{
-		DWORD *yl;
+		uint32_t *yl;
 		
 		for (y = 0; y < dh; y++) {
-			yl = (DWORD *)(dp + y * ds->bytes_per_line);
+			yl = (uint32_t *)(dp + y * ds->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				pic16 = *sp;
 				*yl = PIX24(PIXR16(pic16), PIXG16(pic16), PIXB16(pic16));

@@ -35,17 +35,17 @@
 /*
  * static methods
 */
-static bmp_header *extract_header(BYTE *b);
-static void getpal(Palette256 *pal, BYTE *b);
-static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b);
-static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b);
+static bmp_header *extract_header(uint8_t *b);
+static void getpal(Palette256 *pal, uint8_t *b);
+static void extract_8bit(bmp_header *bmp, uint8_t *pic, uint8_t *b);
+static void extract_24bit(bmp_header *bmp, uint16_t *pic, uint8_t *b);
 
 /*
  * Get information from cg header
  *   b: raw data (pointer to header)
  *   return: acquired bmp information object
 */
-static bmp_header *extract_header(BYTE *b) {
+static bmp_header *extract_header(uint8_t *b) {
 	bmp_header *bmp = malloc(sizeof(bmp_header));
 	
 	bmp->bmpSize    = LittleEndian_getDW(b, 2);
@@ -68,7 +68,7 @@ static bmp_header *extract_header(BYTE *b) {
  *   pal: palette to be stored
  *   b  : raw data (pointer to palette)
 */
-static void getpal(Palette256 *pal, BYTE *b) {
+static void getpal(Palette256 *pal, uint8_t *b) {
 	int i;
 	
 	for (i = 0; i < 256; i++) {
@@ -84,7 +84,7 @@ static void getpal(Palette256 *pal, BYTE *b) {
  *   pic: pixel to be stored
  *   b  : raw data (pointer to pixel)
 */
-static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b) {
+static void extract_8bit(bmp_header *bmp, uint8_t *pic, uint8_t *b) {
 	int i, j;
 	int pos;
 	int LineNeed = (bmp->bmpXW * bmp->bmpBpp) / 8;
@@ -94,7 +94,7 @@ static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b) {
 	
 	pos = LineNeed * (bmp->bmpYW);           /* 最上行の位置 */
 	for (i = 0; i < bmp->bmpYW; i++) {
-		const BYTE* p;
+		const uint8_t* p;
 		pos -= LineNeed;
 		p = b + pos;
 		for (j = 0; j < bmp->bmpXW; j++)
@@ -108,7 +108,7 @@ static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b) {
  *   pic: pixel to be stored (16 bit converted)
  *   b  : raw data (pointer to pixel)
 */
-static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
+static void extract_24bit(bmp_header *bmp, uint16_t *pic, uint8_t *b) {
 	int i, j;
 	int pos;
 	int LineNeed = (bmp->bmpXW * bmp->bmpBpp) / 8;
@@ -118,12 +118,12 @@ static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
 	
 	pos = LineNeed * (bmp->bmpYW); /* 最上行の位置 */
 	for (i = 0; i < bmp->bmpYW; i++) {
-		const BYTE* p;
+		const uint8_t* p;
 		pos -= LineNeed;
 		p = b + pos;
 		
 		for (j = 0; j < bmp->bmpXW; j++) {
-			WORD r,g,b;
+			uint16_t r,g,b;
 			b = (*p++);
 			g = (*p++);
 			r = (*p++);
@@ -145,7 +145,7 @@ static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
  *   data: raw data (pointer to data top)
  *   return: TRUE if data is bmp
 */
-boolean bmp256_checkfmt(BYTE *data) {
+boolean bmp256_checkfmt(uint8_t *data) {
 	int w, h, bpp;
 	if (data[0] != 'B' || data[1] != 'M') return FALSE;
 	
@@ -164,7 +164,7 @@ boolean bmp256_checkfmt(BYTE *data) {
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
-cgdata *bmp256_extract(BYTE *data) {
+cgdata *bmp256_extract(uint8_t *data) {
 	bmp_header *bmp = extract_header(data);
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	
@@ -172,7 +172,7 @@ cgdata *bmp256_extract(BYTE *data) {
 	getpal(cg->pal, data + bmp->bmpPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = malloc(sizeof(BYTE) * ((bmp->bmpXW + 10) * (bmp->bmpYW + 10)));
+	cg->pic = malloc(sizeof(uint8_t) * ((bmp->bmpXW + 10) * (bmp->bmpYW + 10)));
 	extract_8bit(bmp, cg->pic, data + bmp->bmpDp);
 	
 	cg->type = ALCG_BMP8;
@@ -193,7 +193,7 @@ cgdata *bmp256_extract(BYTE *data) {
  *   data: raw data (pointer to data top)
  *   return: TRUE if data is pms
 */
-boolean bmp16m_checkfmt(BYTE *data) {
+boolean bmp16m_checkfmt(uint8_t *data) {
 	int w, h, bpp;
 	
 	if (data[0] != 'B' || data[1] != 'M') return FALSE;
@@ -213,13 +213,13 @@ boolean bmp16m_checkfmt(BYTE *data) {
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
-cgdata *bmp16m_extract(BYTE *data) {
+cgdata *bmp16m_extract(uint8_t *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	bmp_header *bmp = extract_header(data);
 	
 	/* +10: margin for broken cg */
-	cg->pic = (BYTE *)malloc(sizeof(WORD) * (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
-	extract_24bit(bmp, (WORD *)cg->pic, data + bmp->bmpDp);
+	cg->pic = (uint8_t *)malloc(sizeof(uint16_t) * (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
+	extract_24bit(bmp, (uint16_t *)cg->pic, data + bmp->bmpDp);
 	
 	cg->type = ALCG_BMP24;
 	cg->x = 0;

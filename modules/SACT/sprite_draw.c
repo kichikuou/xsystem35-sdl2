@@ -35,20 +35,20 @@
 #include "ngraph.h"
 #include "sprite.h"
 
-static void fill_dmap(int dx ,int dy, int w, int h, WORD val);
-static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w, int h, WORD val);
+static void fill_dmap(int dx ,int dy, int w, int h, uint16_t val);
+static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w, int h, uint16_t val);
 
 
 
 // 矩形の depthmap を描画
-static void fill_dmap(int dx ,int dy, int w, int h, WORD val) {
-	BYTE *dp, *dp_;
+static void fill_dmap(int dx ,int dy, int w, int h, uint16_t val) {
+	uint8_t *dp, *dp_;
 	int x, y;
 	
 	dp = dp_ = (GETOFFSET_PIXEL(sact.dmap, dx, dy));
 	
 	for (x = 0; x < w; x++) {
-		*((WORD *)dp + x) = val;
+		*((uint16_t *)dp + x) = val;
 	}
 	dp += sact.dmap->bytes_per_line;
 	
@@ -59,16 +59,16 @@ static void fill_dmap(int dx ,int dy, int w, int h, WORD val) {
 }
 
 // alphamapにしたがって、alpha値が0より大きいところを指定のdepthとする
-static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w, int h, WORD val) {
-	BYTE *sp, *dp;
+static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w, int h, uint16_t val) {
+	uint8_t *sp, *dp;
 	int x, y;
 	
 	dp = GETOFFSET_PIXEL(sact.dmap, dx, dy);
 	sp = GETOFFSET_ALPHA(src, sx, sy);
 	
 	for (y = 0; y < h; y++) {
-		BYTE *yls = (BYTE *)(sp + y * src->width);
-		WORD *yld = (WORD *)(dp + y * sact.dmap->bytes_per_line);
+		uint8_t *yls = (uint8_t *)(sp + y * src->width);
+		uint16_t *yld = (uint16_t *)(dp + y * sact.dmap->bytes_per_line);
 		for (x = 0; x < w; x++) {
 			if (*yls > 0) *yld = val;
 			yls++; yld++;

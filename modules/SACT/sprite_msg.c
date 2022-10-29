@@ -51,8 +51,8 @@ static void replacestr_cb(void* data, void* userdata);
 static char *replacestr(char *msg);
 static void update_mark(sprite_t *sp, cginfo_t *cg);
 static int  setupmark(int wNum1, int wNum2, struct markinfo *minfo);
-static int  get_linelen(BYTE *msg);
-static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax);
+static int  get_linelen(uint8_t *msg);
+static uint8_t *get_char(uint8_t *msg, char *mbuf, char *rbuf, int bufmax);
 static void append_to_log(char *msg);
 static void sactlog_newline();
 static void set_align(char *msg, sprite_t *sp, int wSize, int wAlign);
@@ -210,7 +210,7 @@ void smsg_add(const char *msg) {
   @param size: 改行幅
 */
 void smsg_newline(int wNum, int size) {
-	BYTE buf[3];
+	uint8_t buf[3];
 	
 	if (!is_messagesprite(wNum)) return;
 
@@ -468,7 +468,7 @@ int smsg_update(sprite_t *sp) {
 }
 
 // 改行を含む文字列バッファ中から、改行までの文字列の長さを取り出す
-static int get_linelen(BYTE *msg) {
+static int get_linelen(uint8_t *msg) {
 	int c = 0;
 	
 	while (*msg) {
@@ -494,7 +494,7 @@ static int get_linelen(BYTE *msg) {
 //   改行の場合        : 改行幅もいっしょに
 //   ルビつき文字の場合: メッセージ本体と対応するルビ文字列
 //   それ以外          : 全角|半角文字１文字
-static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
+static uint8_t *get_char(uint8_t *msg, char *mbuf, char *rbuf, int bufmax) {
 	if (msg[0] == '\n') {
 		mbuf[0] = '\n';
 		mbuf[1] = msg[1];
@@ -515,7 +515,7 @@ static BYTE *get_char(BYTE *msg, char *mbuf, char *rbuf, int bufmax) {
 		}
 		msg++; rbuf[i] = '\0';
 	} else {
-		BYTE *p = advance_char(msg, nact->encoding);
+		uint8_t *p = advance_char(msg, nact->encoding);
 		while (msg < p)
 			*mbuf++ = *msg++;
 		*mbuf = '\0';

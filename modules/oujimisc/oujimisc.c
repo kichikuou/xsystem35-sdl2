@@ -13,11 +13,11 @@
 
 #define NUM_MAPS 16
 #define NUM_LAYERS 3
-#define MAPDATASIZE (128 * 128 * sizeof(WORD) * NUM_LAYERS)
+#define MAPDATASIZE (128 * 128 * sizeof(uint16_t) * NUM_LAYERS)
 
 typedef struct {
-	DWORD size;
-	DWORD map;
+	uint32_t size;
+	uint32_t map;
 } RecordHeader;
 
 static void *mapdata[NUM_MAPS];
@@ -181,7 +181,7 @@ static void TempMapLoadToShadow() {
 	int *a1 = v_resolveRef(&r1);
 	int *a2 = v_resolveRef(&r2);
 	int *a3 = v_resolveRef(&r3);
-	WORD *p = mapdata[map];
+	uint16_t *p = mapdata[map];
 	for (int i = 0; i < size; i++)
 		*a1++ = SDL_SwapLE16(*p++);
 	for (int i = 0; i < size; i++)
@@ -210,7 +210,7 @@ static void TempMapSaveToShadow() {
 	int *a1 = v_resolveRef(&r1);
 	int *a2 = v_resolveRef(&r2);
 	int *a3 = v_resolveRef(&r3);
-	WORD *p = mapdata[map];
+	uint16_t *p = mapdata[map];
 	for (int i = 0; i < size; i++)
 		*p++ = SDL_SwapLE16(*a1++);
 	for (int i = 0; i < size; i++)

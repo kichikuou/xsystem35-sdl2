@@ -47,32 +47,32 @@ typedef int emscripten_align1_int;
 #define SAVE_DATAVERSION 0x350200
 
 typedef struct {
-        WORD x;
-        WORD y;
-        WORD width;
-        WORD height;
+        uint16_t x;
+        uint16_t y;
+        uint16_t width;
+        uint16_t height;
 } RectangleW;
 
 typedef struct {
         char ID[32];
 	int version;
 	char gameName[28];
-	BYTE selMsgSize;
-	BYTE selMsgColor;
-	BYTE selBackColor;
-	BYTE selFrameColor;
-	BYTE msgMsgSize;
-	BYTE msgMsgColor;
-	BYTE msgBackColor;
-	BYTE msgFrameColor;
-	BYTE rsvB1;
-	BYTE rsvB2;
-	BYTE rsvB3;
-	BYTE rsvB4;
-	BYTE rsvB5;
-	BYTE rsvB6;
-	BYTE rsvB7;
-	BYTE rsvB8;
+	uint8_t selMsgSize;
+	uint8_t selMsgColor;
+	uint8_t selBackColor;
+	uint8_t selFrameColor;
+	uint8_t msgMsgSize;
+	uint8_t msgMsgColor;
+	uint8_t msgBackColor;
+	uint8_t msgFrameColor;
+	uint8_t rsvB1;
+	uint8_t rsvB2;
+	uint8_t rsvB3;
+	uint8_t rsvB4;
+	uint8_t rsvB5;
+	uint8_t rsvB6;
+	uint8_t rsvB7;
+	uint8_t rsvB8;
 	int  scoPage;
 	int  scoIndex;
 	int  rsvI1;
@@ -121,7 +121,7 @@ extern int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt);
 extern int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt);
 extern int save_save_str_with_file(char *fname_utf8, int start, int cnt);
 extern int save_load_str_with_file(char *fname_utf8, int start, int cnt);
-extern BYTE* load_cg_with_file(char *fname_utf8, int *status, long *filesize);
+extern uint8_t* load_cg_with_file(char *fname_utf8, int *status, long *filesize);
 extern const char *save_get_file(int index);
 extern int save_delete_file(int index);
 

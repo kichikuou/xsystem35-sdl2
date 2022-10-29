@@ -44,7 +44,7 @@ enum txx_type {
 };
 
 // Use functions below instead of accessing these variables directly.
-extern const BYTE *sl_sco; // scenario page buffer
+extern const uint8_t *sl_sco; // scenario page buffer
 extern int sl_page;        // current scenario page (0-based)
 extern int sl_index;       // cureent scenario address
 

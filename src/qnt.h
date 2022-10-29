@@ -41,7 +41,7 @@ typedef struct {
 	int alpha_size;   /* compressed alpha pixel size */
 } qnt_header;
 
-extern boolean qnt_checkfmt(BYTE *data);
-extern cgdata *qnt_extract(BYTE *data);
+extern boolean qnt_checkfmt(uint8_t *data);
+extern cgdata *qnt_extract(uint8_t *data);
 
 #endif /* __QNT_H__ */

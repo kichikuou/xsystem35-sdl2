@@ -105,14 +105,14 @@ int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
 	if (!fp)
 		return SAVE_LOADERR;
 
-	WORD *tmp = malloc(cnt * sizeof(WORD));
+	uint16_t *tmp = malloc(cnt * sizeof(uint16_t));
 	if (!tmp) {
 		WARNING("Out of memory");
 		fclose(fp);
 		return SAVE_LOADERR;
 	}
 
-	size_t size = fread(tmp, sizeof(WORD), cnt, fp);
+	size_t size = fread(tmp, sizeof(uint16_t), cnt, fp);
 	fclose(fp);
 
 	if (size != cnt) {
@@ -242,7 +242,7 @@ int save_copyAll(int dstno, int srcno) {
 int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 	Ald_baseHdr *save_base;
 	char *vtop;
-	WORD *tmp;
+	uint16_t *tmp;
 	int *var;
 	char *saveTop = NULL;
 	int i, status, filesize;
@@ -272,7 +272,7 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 		goto errexit;
 	}
 	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
-	tmp = (WORD *)vtop + vref->index;
+	tmp = (uint16_t *)vtop + vref->index;
 	for (i = 0; i < cnt; i++) {
 		*var = *tmp; tmp++; var++;
 	}
@@ -289,7 +289,7 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 /* データの一部セーブ */
 int save_savePartial(int no, struct VarRef *vref, int cnt) {
 	Ald_baseHdr *save_base;
-	WORD *tmp;
+	uint16_t *tmp;
 	char *vtop;
 	int *var;
 	char *saveTop = NULL;
@@ -314,9 +314,9 @@ int save_savePartial(int no, struct VarRef *vref, int cnt) {
 		goto errexit;
 	}
 	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
-	tmp = (WORD *)vtop + vref->index;
+	tmp = (uint16_t *)vtop + vref->index;
 	for (i = 0; i < cnt; i++) {
-		*tmp = (WORD)*var; tmp++; var++;
+		*tmp = (uint16_t)*var; tmp++; var++;
 	}
 	status = saveGameData(no, saveTop, filesize);
 	free(saveTop);
@@ -428,29 +428,29 @@ int save_saveAll(int no) {
 	/* 各種データのセーブ */
 	strncpy(save_base->ID, SAVE_DATAID, 32);
 	save_base->version       = SAVE_DATAVERSION;
-	save_base->selMsgSize    = (BYTE)nact->sel.MsgFontSize;
-	save_base->selMsgColor   = (BYTE)nact->sel.MsgFontColor;
-	save_base->selBackColor  = (BYTE)nact->sel.WinBackgroundColor;
-	save_base->selFrameColor = (BYTE)nact->sel.WinFrameColor;
-	save_base->msgMsgSize    = (BYTE)nact->msg.MsgFontSize;
-	save_base->msgMsgColor   = (BYTE)nact->msg.MsgFontColor;
-	save_base->msgBackColor  = (BYTE)nact->msg.WinBackgroundColor;
-	save_base->msgFrameColor = (BYTE)nact->msg.WinFrameColor;
+	save_base->selMsgSize    = (uint8_t)nact->sel.MsgFontSize;
+	save_base->selMsgColor   = (uint8_t)nact->sel.MsgFontColor;
+	save_base->selBackColor  = (uint8_t)nact->sel.WinBackgroundColor;
+	save_base->selFrameColor = (uint8_t)nact->sel.WinFrameColor;
+	save_base->msgMsgSize    = (uint8_t)nact->msg.MsgFontSize;
+	save_base->msgMsgColor   = (uint8_t)nact->msg.MsgFontColor;
+	save_base->msgBackColor  = (uint8_t)nact->msg.WinBackgroundColor;
+	save_base->msgFrameColor = (uint8_t)nact->msg.WinFrameColor;
 	save_base->scoPage       = sl_getPage();
 	save_base->scoIndex      = sl_getIndex();
 	
 	for (i = 0; i < SELWINMAX; i++) {
-		save_base->selWinInfo[i].x      = (WORD)nact->sel.wininfo[i].x;
-		save_base->selWinInfo[i].y      = (WORD)nact->sel.wininfo[i].y;
-		save_base->selWinInfo[i].width  = (WORD)nact->sel.wininfo[i].width;
-		save_base->selWinInfo[i].height = (WORD)nact->sel.wininfo[i].height;
+		save_base->selWinInfo[i].x      = (uint16_t)nact->sel.wininfo[i].x;
+		save_base->selWinInfo[i].y      = (uint16_t)nact->sel.wininfo[i].y;
+		save_base->selWinInfo[i].width  = (uint16_t)nact->sel.wininfo[i].width;
+		save_base->selWinInfo[i].height = (uint16_t)nact->sel.wininfo[i].height;
 	}
 	
 	for (i = 0; i < MSGWINMAX; i++) {
-		save_base->msgWinInfo[i].x      = (WORD)nact->msg.wininfo[i].x;
-		save_base->msgWinInfo[i].y      = (WORD)nact->msg.wininfo[i].y;
-		save_base->msgWinInfo[i].width  = (WORD)nact->msg.wininfo[i].width;
-		save_base->msgWinInfo[i].height = (WORD)nact->msg.wininfo[i].height;
+		save_base->msgWinInfo[i].x      = (uint16_t)nact->msg.wininfo[i].x;
+		save_base->msgWinInfo[i].y      = (uint16_t)nact->msg.wininfo[i].y;
+		save_base->msgWinInfo[i].width  = (uint16_t)nact->msg.wininfo[i].width;
+		save_base->msgWinInfo[i].height = (uint16_t)nact->msg.wininfo[i].height;
 	}
 
 	fseek(fp, sizeof(Ald_baseHdr), SEEK_SET);
@@ -582,7 +582,7 @@ static void loadStrVar(char *buf) {
 static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	int *var;
 	int cnt, i;
-	WORD *tmp, *_tmp;
+	uint16_t *tmp, *_tmp;
 	if (!varPage[page].saveflag)
 		return NULL;
 	cnt = varPage[page].size;
@@ -591,15 +591,15 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	var = varPage[page].value;
 	if (var == NULL)
 		return NULL;
-	head->size   = cnt * sizeof(WORD);
+	head->size   = cnt * sizeof(uint16_t);
 	head->pageNo = page;
-	tmp = _tmp = (WORD *)malloc(cnt * sizeof(WORD));
+	tmp = _tmp = (uint16_t *)malloc(cnt * sizeof(uint16_t));
 	if (tmp == NULL) {
 		WARNING("Out of memory");
 		return NULL;
 	}
 	for (i = 0; i < cnt; i++) {
-		*tmp = (WORD)*var; var++; tmp++;
+		*tmp = (uint16_t)*var; var++; tmp++;
 	}
 	return _tmp;
 }
@@ -608,11 +608,11 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 static int loadSysVar(char *buf) {
 	int i, cnt;
 	int  *var;
-	WORD *data;
+	uint16_t *data;
 	Ald_sysVarHdr *head = (Ald_sysVarHdr *)buf;
 	int page = head->pageNo;
 
-	cnt = head->size / sizeof(WORD);
+	cnt = head->size / sizeof(uint16_t);
 	if (page == 0)
 		savefile_sysvar_cnt = cnt;
 	if (varPage[page].size < cnt || varPage[page].value == NULL) {
@@ -624,7 +624,7 @@ static int loadSysVar(char *buf) {
 	var = varPage[page].value;
 
 	buf += sizeof(Ald_sysVarHdr);
-	data = (WORD *)buf;
+	data = (uint16_t *)buf;
 	for (i = 0; i < cnt; i++) {
 		*var++ = *data++;
 	}
@@ -690,10 +690,10 @@ static int saveGameData(int no, char *buf, int size) {
 }
 
 /* 指定ファイルからの画像の読み込み thanx tajiru@wizard */
-BYTE* load_cg_with_file(char *fname_utf8, int *status, long *filesize){
+uint8_t* load_cg_with_file(char *fname_utf8, int *status, long *filesize){
 	int size;
 	FILE *fp;
-	static BYTE *tmp;
+	static uint8_t *tmp;
 	
 	*status = 0;
 	

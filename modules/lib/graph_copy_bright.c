@@ -9,7 +9,7 @@
 
 void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv) {
 	int x, y;
-	BYTE *sp, *dp;
+	uint8_t *sp, *dp;
 	
 	if (!gr_clip(src, &sx, &sy, &width, &height, dst, &dx, &dy)) return;
 	
@@ -21,11 +21,11 @@ void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int 
 	switch(dst->depth) {
 	case 16:
 		{
-			WORD *yls, *yld;
+			uint16_t *yls, *yld;
 			
 			for (y = 0; y < height; y++) {
-				yls = (WORD *)(sp + y * src->bytes_per_line);
-				yld = (WORD *)(dp + y * dst->bytes_per_line);
+				yls = (uint16_t *)(sp + y * src->bytes_per_line);
+				yld = (uint16_t *)(dp + y * dst->bytes_per_line);
 				
 				for (x = 0; x < width; x++) {
 					*yld = ALPHALEVEL16(*yls, lv);
@@ -37,11 +37,11 @@ void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int 
 	case 24:
 	case 32:
 	{
-		DWORD *yls, *yld;
+		uint32_t *yls, *yld;
 		
 		for (y = 0; y < height; y++) {
-			yls = (DWORD *)(sp + y * src->bytes_per_line);
-			yld = (DWORD *)(dp + y * dst->bytes_per_line);
+			yls = (uint32_t *)(sp + y * src->bytes_per_line);
+			yld = (uint32_t *)(dp + y * dst->bytes_per_line);
 			
 			for (x = 0; x < width; x++) {
 				*yld = ALPHALEVEL24(*yls, lv);

@@ -59,8 +59,8 @@ static MyPoint        loc_where, loc_where0;
 static cacher *cacheid;
 
 /* static methods */
-static CG_TYPE check_cgformat(BYTE *data);
-static void set_vspbank(BYTE *pic, int bank, int width, int height);
+static CG_TYPE check_cgformat(uint8_t *data);
+static void set_vspbank(uint8_t *pic, int bank, int width, int height);
 static MyPoint set_display_loc(cgdata *cg);
 static void clear_display_loc();
 static void display_cg(cgdata *cg, int x, int y, int sprite_color, bool alpha_blend);
@@ -72,7 +72,7 @@ static cgdata *loader(int no);
  *   data: pointer to compressed data
  *   return: cg type 
 */
-static CG_TYPE check_cgformat(BYTE *data) {
+static CG_TYPE check_cgformat(uint8_t *data) {
 	if (qnt_checkfmt(data)) {
 		return ALCG_QNT;
 	} else if (pms256_checkfmt(data)) {
@@ -99,11 +99,11 @@ static CG_TYPE check_cgformat(BYTE *data) {
  *   width : image width
  *   height: image height 
 */
-static void set_vspbank(BYTE *pic, int bank, int width, int height) {
+static void set_vspbank(uint8_t *pic, int bank, int width, int height) {
 	int pixels = width * height;
 	
 	while (pixels--) {
-		*pic = (*pic & 0x0f) | (BYTE)bank; pic++;
+		*pic = (*pic & 0x0f) | (uint8_t)bank; pic++;
 	}
 }
 
@@ -401,7 +401,7 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 int cg_load_with_filename(char *fname_utf8, int x, int y) {
 	int status, type;
 	long filesize;
-	BYTE *data;
+	uint8_t *data;
 	cgdata *cg = NULL;
 	MyPoint p;
 	

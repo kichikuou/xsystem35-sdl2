@@ -67,8 +67,8 @@ struct agsurface {
 	int bytes_per_line;   /* bytes per line  */
 	int bytes_per_pixel;  /* bytes per pixel */
 	
-	BYTE *pixel; /* pixel data (can be NULL) */
-	BYTE *alpha; /* alpha pixel data (can be NULL) */
+	uint8_t *pixel; /* pixel data (can be NULL) */
+	uint8_t *alpha; /* alpha pixel data (can be NULL) */
 };
 typedef struct agsurface agsurface_t;
 
@@ -161,7 +161,7 @@ extern void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, i
 
 extern void ags_wrapColor(int x, int y, int w, int h, int p1, int p2);
 extern void ags_getPixel(int x, int y, Palette *cell);
-extern void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, BYTE sprite);
+extern void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, uint8_t sprite);
 extern void ags_changeColorArea(int x, int y, int w, int h, int dst, int src, int cnt);
 
 extern void* ags_saveRegion(int x, int y, int w, int h);
@@ -188,7 +188,7 @@ extern void ags_alpha_lowercut(int sx, int sy, int w, int h, int s, int d);
 extern void ags_alpha_setLevel(int x, int y, int w, int h, int lv);
 extern void ags_alpha_copyArea(int sx, int sy, int w, int h, int dx, int dy);
 extern void ags_alpha_getPixel(int x, int y, int *pic);
-extern void ags_alpha_setPixel(int x, int y, int w, int h, BYTE *b);
+extern void ags_alpha_setPixel(int x, int y, int w, int h, uint8_t *b);
 
 /* fader */
 extern void ags_fadeIn(int rate, boolean flg);
@@ -226,15 +226,15 @@ void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step,
 #define GMASK24 0x0000ff00
 #define BMASK24 0x000000ff
 
-#define PIXR16(pic) (BYTE)(((pic) & RMASK16) >> 8)
-#define PIXG16(pic) (BYTE)(((pic) & GMASK16) >> 3)
-#define PIXB16(pic) (BYTE)(((pic) & BMASK16) << 3)
-#define PIX16(r,g,b) (WORD)((((r) & 0xf8) << 8) | (((g) & 0xfc) << 3) | ((b       ) >> 3))
+#define PIXR16(pic) (uint8_t)(((pic) & RMASK16) >> 8)
+#define PIXG16(pic) (uint8_t)(((pic) & GMASK16) >> 3)
+#define PIXB16(pic) (uint8_t)(((pic) & BMASK16) << 3)
+#define PIX16(r,g,b) (uint16_t)((((r) & 0xf8) << 8) | (((g) & 0xfc) << 3) | ((b       ) >> 3))
 
-#define PIXR24(pic) (BYTE)(((pic) & RMASK24) >> 16)
-#define PIXG24(pic) (BYTE)(((pic) & GMASK24) >>  8)
-#define PIXB24(pic) (BYTE)(((pic) & BMASK24)      )
-#define PIX24(r,g,b) (DWORD)((((r) << 16) | ((g) << 8) | (b)      ))
+#define PIXR24(pic) (uint8_t)(((pic) & RMASK24) >> 16)
+#define PIXG24(pic) (uint8_t)(((pic) & GMASK24) >>  8)
+#define PIXB24(pic) (uint8_t)(((pic) & BMASK24)      )
+#define PIX24(r,g,b) (uint32_t)((((r) << 16) | ((g) << 8) | (b)))
 
 #define ALPHABLEND16(f, b, a)  (PIX16((((PIXR16((f)) - PIXR16((b))) * (a)) >> 8)+ PIXR16((b)),\
                                       (((PIXG16((f)) - PIXG16((b))) * (a)) >> 8)+ PIXG16((b)),\

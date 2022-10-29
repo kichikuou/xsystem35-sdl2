@@ -59,11 +59,11 @@ static void letVar(int type) {
 	case '!':
 		*varno = val; break;
 	case 0x10: /* += */
-		*varno = (int)(WORD)(*varno + val); break;
+		*varno = (uint16_t)(*varno + val); break;
 	case 0x11: /* -= */
 		*varno = max(0, *varno - val); break;
 	case 0x12: /* *= */
-		*varno = (int)(WORD)(*varno * val); break;
+		*varno = (uint16_t)(*varno * val); break;
 	case 0x13: /* /= */
 		if (val == 0) *varno  = 0;
 		else          *varno /= val;

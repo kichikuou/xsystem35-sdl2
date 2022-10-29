@@ -6,9 +6,9 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_draw_amap(surface_t *dst, int dx, int dy, BYTE *src, int width, int height, int scanline) {
+int gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int height, int scanline) {
 	int y;
-	BYTE *sp, *dp;
+	uint8_t *sp, *dp;
 	
 	sp = src;
 	dp = GETOFFSET_ALPHA(dst, dx, dy);

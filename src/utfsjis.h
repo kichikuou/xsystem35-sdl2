@@ -44,10 +44,10 @@ extern char* codeconv(CharacterEncoding tocode,
 					  CharacterEncoding fromcode,
 					  const char *str);
 
-extern BYTE*   sjis2utf(const BYTE *src);
-extern BYTE*   utf2sjis(const BYTE *src);
-extern boolean sjis_has_hankaku(const BYTE *src);
-extern boolean sjis_has_zenkaku(const BYTE *src);
+extern uint8_t* sjis2utf(const uint8_t *src);
+extern uint8_t* utf2sjis(const uint8_t *src);
+extern boolean sjis_has_hankaku(const uint8_t *src);
+extern boolean sjis_has_zenkaku(const uint8_t *src);
 extern int     utf8_next_codepoint(const char **msg);
 
 extern char *advance_char(const char *s, CharacterEncoding e);

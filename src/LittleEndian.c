@@ -25,7 +25,7 @@
 
 #include "portab.h"
 
-int LittleEndian_getDW(const BYTE *b,int index) {
+int LittleEndian_getDW(const uint8_t *b,int index) {
 	int c0, c1, c2, c3;
 	int d0, d1;
 	c0 = *(b + index + 0);
@@ -34,10 +34,10 @@ int LittleEndian_getDW(const BYTE *b,int index) {
 	c3 = *(b + index + 3);
 	d0 = c0 + (c1 << 8);
 	d1 = c2 + (c3 << 8);
-	return (DWORD)(d0 + (d1 << 16));
+	return (uint32_t)(d0 + (d1 << 16));
 }
 
-int LittleEndian_get3B(const BYTE *b,int index) {
+int LittleEndian_get3B(const uint8_t *b,int index) {
 	int c0, c1, c2;
 	c0 = *(b + index + 0);
 	c1 = *(b + index + 1);
@@ -45,14 +45,14 @@ int LittleEndian_get3B(const BYTE *b,int index) {
 	return c0 + (c1 << 8) + (c2 << 16);
 }
 
-int LittleEndian_getW(const BYTE *b,int index) {
+int LittleEndian_getW(const uint8_t *b,int index) {
 	int c0, c1;
 	c0 = *(b + index + 0);
 	c1 = *(b + index + 1);
 	return c0 + (c1 << 8);
 }
 
-void LittleEndian_putW(int num, BYTE *b, int index) {
+void LittleEndian_putW(int num, uint8_t *b, int index) {
 	int c0, c1;
 	num %= 65536;
 	c0 = num % 256;

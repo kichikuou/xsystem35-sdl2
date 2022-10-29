@@ -27,8 +27,8 @@
 #include "portab.h"
 #include "ags.h"
 
-extern void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, BYTE *src, int src_pitch);
-extern void alpha_get_pixel(agsurface_t *suf, int x, int y, BYTE *pic);
+extern void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, uint8_t *src, int src_pitch);
+extern void alpha_get_pixel(agsurface_t *suf, int x, int y, uint8_t *pic);
 extern void alpha_lowercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d);
 extern void alpha_uppercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d);
 extern void alpha_set_level(agsurface_t *suf, int sx, int sy, int w, int h, int lv);

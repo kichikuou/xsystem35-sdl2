@@ -45,7 +45,7 @@ typedef struct {
  *  16 palltes into pal[16] ~ pal[31].
 */
 	
-extern boolean vsp_checkfmt(BYTE *data);
-extern cgdata *vsp_extract(BYTE *data);
+extern boolean vsp_checkfmt(uint8_t *data);
+extern cgdata *vsp_extract(uint8_t *data);
 
 #endif /* !__VSP__ */

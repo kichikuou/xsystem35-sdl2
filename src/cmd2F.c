@@ -1419,10 +1419,10 @@ void commands2F81() {
 	int *vData = getCaliVariable();
 	int eNumof = getCaliValue();
 	int i;
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 
 	for (i = 0; i < eNumof; i++) {
-		*vData = LittleEndian_getW((BYTE *)p, 0);
+		*vData = LittleEndian_getW((uint8_t *)p, 0);
 		p++;
 		vData++;
 	}
@@ -1450,7 +1450,7 @@ void commands2F82() {
 
 void commands2F83() {
 	int eNumof  = getCaliValue();
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 
 	p += eNumof;
 

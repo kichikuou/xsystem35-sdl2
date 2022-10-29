@@ -73,8 +73,8 @@ struct midiinfo {
 	int division; /* division for delta time*/
 	int ntrks;    /* number of track */
 	
-	BYTE *data;
-	BYTE *cdata;
+	uint8_t *data;
+	uint8_t *cdata;
 	int length;
 	int length_left;
 	
@@ -93,7 +93,7 @@ struct midiinfo {
 	int marker;
 };
 
-extern struct midiinfo *mf_read_midifile(BYTE *stream, off_t len);
+extern struct midiinfo *mf_read_midifile(uint8_t *stream, off_t len);
 extern void mf_remove_midifile(struct midiinfo *m);
 
 #endif /* __MIDIFILE_H__ */

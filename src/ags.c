@@ -164,7 +164,7 @@ void ags_setViewArea(int x, int y, int width, int height) {
 
 void ags_setWindowTitle(const char *src) {
 #define TITLEHEAD "XSystem35 Version "VERSION":"
-	BYTE *utf, *d;
+	uint8_t *utf, *d;
 
 	utf = toUTF8(src);
 	if (NULL == (d = malloc(strlen(utf) + strlen(TITLEHEAD) + 1))) {
@@ -301,13 +301,13 @@ void ags_getPixel(int x, int y, Palette *cell) {
 	sdl_getPixel(x, y, cell);
 }
 
-void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, BYTE sprite) {
+void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, uint8_t sprite) {
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 
 	for (int y = 0; y < h; y++) {
-		BYTE *src = GETOFFSET_PIXEL(nact->ags.dib, sx, sy + y);
-		BYTE *dst = GETOFFSET_PIXEL(nact->ags.dib, dx, dy + y);
+		uint8_t *src = GETOFFSET_PIXEL(nact->ags.dib, sx, sy + y);
+		uint8_t *dst = GETOFFSET_PIXEL(nact->ags.dib, dx, dy + y);
 		for (int x = 0; x < w; x++, src++, dst++) {
 			if (*src != sprite)
 				*dst = (*src & 0xf0) | (*dst & 0x0f);
@@ -324,8 +324,8 @@ void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt
 		agsurface_t *dib = nact->ags.dib;
 		int   x, y;
 		int   src_last = src + cnt,dif = dst - src;
-		BYTE *yl;
-		BYTE *sdata = GETOFFSET_PIXEL(dib, sx, sy);
+		uint8_t *yl;
+		uint8_t *sdata = GETOFFSET_PIXEL(dib, sx, sy);
 		
 		for (y = 0; y < h; y++) {
 			yl = sdata + y * dib->bytes_per_line;
@@ -519,11 +519,11 @@ void ags_alpha_getPixel(int x, int y, int *pic) {
 	if (!ags_check_param_xy(&x, &y)) {
 		*pic = 0;
 	} else {
-		alpha_get_pixel(nact->ags.dib, x, y, (BYTE *)pic);
+		alpha_get_pixel(nact->ags.dib, x, y, (uint8_t *)pic);
 	}
 }
 
-void ags_alpha_setPixel(int x, int y, int w, int h, BYTE *b) {
+void ags_alpha_setPixel(int x, int y, int w, int h, uint8_t *b) {
 	int savex, savey, savew, offset;
 	
 	savex = x;

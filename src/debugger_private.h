@@ -29,7 +29,7 @@ typedef struct {
 	int page;
 	int addr;
 	int refcnt;
-	BYTE restore_op;
+	uint8_t restore_op;
 } PhysicalBreakpoint;
 
 typedef struct breakpoint {

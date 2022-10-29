@@ -33,13 +33,13 @@
 #include "system.h"
 #include "jpeg.h"
 
-boolean jpeg_checkfmt(BYTE *data) {
+boolean jpeg_checkfmt(uint8_t *data) {
 	return data[0] == 0xff && data[1] == 0xd8;
 }
 
-cgdata *jpeg_extract(BYTE *data, size_t size) {
+cgdata *jpeg_extract(uint8_t *data, size_t size) {
 	int width, height, channels;
-	BYTE *pixels = stbi_load_from_memory(data, size, &width, &height, &channels, 3);
+	uint8_t *pixels = stbi_load_from_memory(data, size, &width, &height, &channels, 3);
 	if (!pixels) {
 		WARNING("cannot decode jpeg: %s", stbi_failure_reason());
 		return NULL;

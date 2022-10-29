@@ -6,7 +6,7 @@
 #include "ags.h"
 
 int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b) {
-	BYTE *dp;
+	uint8_t *dp;
 	int i;
 	int col = 0;
 	
@@ -30,41 +30,41 @@ int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b)
 	case 8:
 		/* top */
 		for (i = 0; i < w; i++) {
-			*((BYTE *)dp + i) = col;
+			*((uint8_t *)dp + i) = col;
 		}
 		
 		/* side */
 		h-=2;
 		for (i = 0; i < h; i++) {
 			dp += dst->bytes_per_line;
-			*((BYTE *)dp)         = col;
-			*((BYTE *)dp + w - 1) = col;
+			*((uint8_t *)dp)         = col;
+			*((uint8_t *)dp + w - 1) = col;
 		}
 		
 		/* bottom */
 		dp += dst->bytes_per_line;
 		for (i = 0; i < w; i++) {
-			*((BYTE *)dp + i) = col;
+			*((uint8_t *)dp + i) = col;
 		}
 		break;
 	case 16:
 		/* top */
 		for (i = 0; i < w; i++) {
-			*((WORD *)dp + i) = col;
+			*((uint16_t *)dp + i) = col;
 		}
 		
 		/* side */
 		h-=2;
 		for (i = 0; i < h; i++) {
 			dp += dst->bytes_per_line;
-			*((WORD *)dp)         = col;
-			*((WORD *)dp + w - 1) = col;
+			*((uint16_t *)dp)         = col;
+			*((uint16_t *)dp + w - 1) = col;
 		}
 		
 		/* bottom */
 		dp += dst->bytes_per_line;
 		for (i = 0; i < w; i++) {
-			*((WORD *)dp + i) = col;
+			*((uint16_t *)dp + i) = col;
 		}
 		
 		break;
@@ -72,21 +72,21 @@ int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b)
 	case 32:
 		/* top */
 		for (i = 0; i < w; i++) {
-			*((DWORD *)dp + i) = col;
+			*((uint32_t *)dp + i) = col;
 		}
 		
 		/* side */
 		h-=2;
 		for (i = 0; i < h; i++) {
 			dp += dst->bytes_per_line;
-			*((DWORD *)dp)         = col;
-			*((DWORD *)dp + w - 1) = col;
+			*((uint32_t *)dp)         = col;
+			*((uint32_t *)dp + w - 1) = col;
 		}
 		
 		/* bottom */
 		dp += dst->bytes_per_line;
 		for (i = 0; i < w; i++) {
-			*((DWORD *)dp + i) = col;
+			*((uint32_t *)dp + i) = col;
 		}
 		
 		break;

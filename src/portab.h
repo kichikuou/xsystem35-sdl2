@@ -40,22 +40,7 @@
 #define min(x,y) ((x) < (y) ? (x) : (y))
 #define max(x,y) ((x) > (y) ? (x) : (y))
 
-typedef uint8_t  ___BYTE;
-typedef uint16_t ___WORD;
-typedef uint32_t ___DWORD;
 typedef bool     ___boolean;
-
-#ifndef BYTE
-#define BYTE ___BYTE
-#endif
-
-#ifndef WORD
-#define WORD ___WORD
-#endif
-
-#ifndef DWORD
-#define DWORD ___DWORD
-#endif
 
 #ifndef boolean
 #define boolean ___boolean

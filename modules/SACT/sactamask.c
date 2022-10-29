@@ -99,8 +99,8 @@ static surface_t *smask_get(int no) {
 // ベースになるマスクの alpha 値を拡大して取り出す
 static surface_t *smask_mul(surface_t *sf, int val) {
 	surface_t *out = sf_create_alpha(sf->width, sf->height);
-	BYTE *src = sf->alpha;
-	BYTE *dst = out->alpha;
+	uint8_t *src = sf->alpha;
+	uint8_t *dst = out->alpha;
 	int pix = sf->width * sf->height;
 
 	while(pix--) {

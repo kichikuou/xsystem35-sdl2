@@ -7,7 +7,7 @@
 #include "ags.h"
 
 int gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv) {
-	BYTE *a;
+	uint8_t *a;
 	
 	if (!gr_clip_xywh(dst, &dx, &dy, &dw, &dh)) {
 		return NG;

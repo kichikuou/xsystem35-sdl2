@@ -28,14 +28,14 @@
 #include <SDL_rect.h>
 
 typedef struct {
-        BYTE red[256];
-        BYTE green[256];
-        BYTE blue[256];
+        uint8_t red[256];
+        uint8_t green[256];
+        uint8_t blue[256];
 } Palette256;
 
 typedef struct {
-        BYTE r,g,b;
-        DWORD pixel;
+        uint8_t r,g,b;
+        uint32_t pixel;
 } Palette;
 
 typedef SDL_Point MyPoint;

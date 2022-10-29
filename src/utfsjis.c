@@ -45,9 +45,9 @@ char* codeconv(CharacterEncoding tocode,
 	return NULL;
 }
 
-BYTE *sjis2utf(const BYTE *src) {
-	BYTE* dst = malloc(strlen(src) * 3 + 1);
-	BYTE* dstp = dst;
+uint8_t *sjis2utf(const uint8_t *src) {
+	uint8_t* dst = malloc(strlen(src) * 3 + 1);
+	uint8_t* dstp = dst;
 
 	while (*src) {
 		if (*src <= 0x7f) {
@@ -96,9 +96,9 @@ static int unicode_to_sjis(int u) {
 	return 0;
 }
 
-BYTE *utf2sjis(const BYTE *src) {
-	BYTE* dst = malloc(strlen(src) + 1);
-	BYTE* dstp = dst;
+uint8_t *utf2sjis(const uint8_t *src) {
+	uint8_t* dst = malloc(strlen(src) + 1);
+	uint8_t* dstp = dst;
 
 	while (*src) {
 		if (*src <= 0x7f) {
@@ -136,7 +136,7 @@ BYTE *utf2sjis(const BYTE *src) {
 }
 
 /* src 内に半角カナもしくはASCII文字があるかどうか */
-boolean sjis_has_hankaku(const BYTE *src) {
+boolean sjis_has_hankaku(const uint8_t *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
 			src++;
@@ -149,7 +149,7 @@ boolean sjis_has_hankaku(const BYTE *src) {
 }
 
 /* src 内に 全角文字があるかどうか */
-boolean sjis_has_zenkaku(const BYTE *src) {
+boolean sjis_has_zenkaku(const uint8_t *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
 			return TRUE;

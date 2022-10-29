@@ -21,18 +21,18 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 	if (has_pixel) {
 		switch (s->depth) {
 		case 8:
-			s->pixel = calloc(width * (height +1), sizeof(BYTE));
+			s->pixel = calloc(width * (height +1), sizeof(uint8_t));
 			s->bytes_per_line = width;
 			s->bytes_per_pixel = 1;
 			break;
 		case 16:
-			s->pixel = calloc(width * (height +1) * 2, sizeof(BYTE));
+			s->pixel = calloc(width * (height +1) * 2, sizeof(uint8_t));
 			s->bytes_per_line = width * 2;
 			s->bytes_per_pixel = 2;
 			break;
 		case 24:
 		case 32:
-			s->pixel = calloc(width * (height +1) * 4, sizeof(BYTE));
+			s->pixel = calloc(width * (height +1) * 4, sizeof(uint8_t));
 			s->bytes_per_line = width * 4;
 			s->bytes_per_pixel = 4;
 			break;
@@ -42,7 +42,7 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
 	}
 	
 	if (has_alpha) {
-		s->alpha = calloc(width * (height +1), sizeof(BYTE));
+		s->alpha = calloc(width * (height +1), sizeof(uint8_t));
 	}
 	
 	return s;
@@ -108,13 +108,13 @@ surface_t *sf_dup(surface_t *in) {
 	
 	if (in->pixel) {
 		len = sf->bytes_per_line * sf->height;
-		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
+		sf->pixel = malloc(sizeof(uint8_t) * (len + sf->bytes_per_line));
 		memcpy(sf->pixel, in->pixel, len);
 	}
 	
 	if (in->alpha) {
 		len = sf->width * sf->height;
-		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
+		sf->alpha = malloc(sizeof(uint8_t) * (len + sf->width));
 		memcpy(sf->alpha, in->alpha, len);
 	}
 	
@@ -167,7 +167,7 @@ surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 	
 	if (in->pixel) {
 		len = sf->bytes_per_line * sf->height;
-		sf->pixel = malloc(sizeof(BYTE) * (len + sf->bytes_per_line));
+		sf->pixel = malloc(sizeof(uint8_t) * (len + sf->bytes_per_line));
 		if (copypixel) {
 			memcpy(sf->pixel, in->pixel, len);
 		}
@@ -175,7 +175,7 @@ surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
 	
 	if (in->alpha) {
 		len = sf->width * sf->height;
-		sf->alpha = malloc(sizeof(BYTE) * (len + sf->width));
+		sf->alpha = malloc(sizeof(uint8_t) * (len + sf->width));
 		if (copyalpha) {
 			memcpy(sf->alpha, in->alpha, len);
 		}

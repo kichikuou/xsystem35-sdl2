@@ -55,7 +55,7 @@ extern int ntsel_dosel(void);
 
 static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace);
 static void set_align(char *msg, sprite_t *sp, int wSize);
-static BYTE *get_char(BYTE *msg, char *mbuf, int bufmax);
+static uint8_t *get_char(uint8_t *msg, char *mbuf, int bufmax);
 static void cb_keyrelease(agsevent_t *e);
 static void cb_mousemove(agsevent_t *e);
 static void setup_hakanim();
@@ -177,7 +177,7 @@ void ntmsg_set_place(int type) {
 }
 
 void ntmsg_newline() {
-	BYTE buf[2] = {'\n', '\0'};
+	uint8_t buf[2] = {'\n', '\0'};
 	ntmsg_add(buf);
 }
 
@@ -371,14 +371,14 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 	
 }
 
-static BYTE *get_char(BYTE *msg, char *mbuf, int bufmax) {
+static uint8_t *get_char(uint8_t *msg, char *mbuf, int bufmax) {
 	if (msg[0] == '\n') {
 		mbuf[0] = '\n';
 		mbuf[1] = '\0';
 		return msg +1;
 	}
 	
-	BYTE *p = advance_char(msg, nact->encoding);
+	uint8_t *p = advance_char(msg, nact->encoding);
 	while (msg < p)
 		*mbuf++ = *msg++;
 	*mbuf = '\0';

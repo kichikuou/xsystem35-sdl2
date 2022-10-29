@@ -142,7 +142,7 @@ void commandLL() {
 	int *var, _var = 0;
 	int num, i;
 	dridata *dfile = ald_getdata(DRIFILE_DATA, link_no - 1);
-	WORD *data;
+	uint16_t *data;
 	
 	if (dfile == NULL) {
 		getCaliValue();
@@ -151,7 +151,7 @@ void commandLL() {
 		return;
 	}
 	
-	data = (WORD *)dfile->data;
+	data = (uint16_t *)dfile->data;
 	
 	switch(type) {
 	case 0: /* T2 */
@@ -160,11 +160,11 @@ void commandLL() {
 
 		DEBUG_COMMAND("LL %d,%d,%d,%d:",type, link_no, _var, num);
 		
-		if (dfile->size < num * sizeof(WORD)) {
-			WARNING("data shortage (link_no = %d, requested %d, loaded %d)", link_no, num, dfile->size/ sizeof(WORD));
+		if (dfile->size < num * sizeof(uint16_t)) {
+			WARNING("data shortage (link_no = %d, requested %d, loaded %d)", link_no, num, dfile->size/ sizeof(uint16_t));
 			/* sysVar[0] = 254; 大嘘*/
 			/* return; */
-			num = dfile->size / sizeof(WORD);
+			num = dfile->size / sizeof(uint16_t);
 		}
 		for (i = 0; i < num; i++) {
 			var[i] = SDL_SwapLE16(data[i]);

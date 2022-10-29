@@ -43,17 +43,17 @@
 /*
  * static methods
 */
-static pms_header *extract_header(BYTE *b);
-static void getpal(Palette256 *pal, BYTE *b);
-static void extract_8bit(pms_header *pms, BYTE *pic, BYTE *b);
-static void extract_16bit(pms_header *pms, WORD *pic, BYTE *b);
+static pms_header *extract_header(uint8_t *b);
+static void getpal(Palette256 *pal, uint8_t *b);
+static void extract_8bit(pms_header *pms, uint8_t *pic, uint8_t *b);
+static void extract_16bit(pms_header *pms, uint16_t *pic, uint8_t *b);
 
 /*
  * Get information from cg header
  *   b: raw data (pointer to header)
  *   return: acquired pms information object
 */
-static pms_header *extract_header(BYTE *b) {
+static pms_header *extract_header(uint8_t *b) {
 	pms_header *pms = malloc(sizeof(pms_header));
 	
 	pms->pmsVer = LittleEndian_getW(b, 2);
@@ -78,7 +78,7 @@ static pms_header *extract_header(BYTE *b) {
  *   pal: palette to be stored
  *   b  : raw data (pointer to palette)
 */
-static void getpal(Palette256 *pal, BYTE *b) {
+static void getpal(Palette256 *pal, uint8_t *b) {
 	int i;
 	
 	for (i = 0; i < 256; i++) {
@@ -94,7 +94,7 @@ static void getpal(Palette256 *pal, BYTE *b) {
  *   pic: pixel to be stored
  *   b  : raw data (pointer to pixel)
 */
-static void extract_8bit(pms_header *pms, BYTE *pic, BYTE *b) {
+static void extract_8bit(pms_header *pms, uint8_t *pic, uint8_t *b) {
 	int c0, c1;
 	int x, y, loc, l, i;
 	int scanline = pms->pmsXW;
@@ -135,7 +135,7 @@ static void extract_8bit(pms_header *pms, BYTE *pic, BYTE *b) {
  *   pic: pixel to be stored
  *   b  : raw data (pointer to pixel)
 */
-static void extract_16bit(pms_header *pms, WORD *pic, BYTE *b) {
+static void extract_16bit(pms_header *pms, uint16_t *pic, uint8_t *b) {
 	int c0, c1, pc0, pc1;
 	int x, y, i, l, loc;
 	int scanline = pms->pmsXW;
@@ -202,7 +202,7 @@ static void extract_16bit(pms_header *pms, WORD *pic, BYTE *b) {
  *   data: raw data (pointer to data top)
  *   return: TRUE if data is pms
 */
-boolean pms256_checkfmt(BYTE *data) {
+boolean pms256_checkfmt(uint8_t *data) {
 	int x, y, w, h;
 	
 	if (data[0] != 0x50 || data[1] != 0x4d) return FALSE;
@@ -223,7 +223,7 @@ boolean pms256_checkfmt(BYTE *data) {
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
-cgdata *pms256_extract(BYTE *data) {
+cgdata *pms256_extract(uint8_t *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	pms_header *pms = extract_header(data);
 	
@@ -231,7 +231,7 @@ cgdata *pms256_extract(BYTE *data) {
 	getpal(cg->pal, data + pms->pmsPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = malloc(sizeof(BYTE) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
+	cg->pic = malloc(sizeof(uint8_t) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
 	extract_8bit(pms, cg->pic, data + pms->pmsDp);
 	
 	cg->type = ALCG_PMS8;
@@ -253,7 +253,7 @@ cgdata *pms256_extract(BYTE *data) {
  *   data: raw data (pointer to data top)
  *   return: TRUE if data is pms
 */
-boolean pms64k_checkfmt(BYTE *data) {
+boolean pms64k_checkfmt(uint8_t *data) {
 	int x, y, w, h;
 	
 	if (data[0] != 0x50 || data[1] != 0x4d) return FALSE;
@@ -274,17 +274,17 @@ boolean pms64k_checkfmt(BYTE *data) {
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
-cgdata *pms64k_extract(BYTE *data) {
+cgdata *pms64k_extract(uint8_t *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	pms_header *pms = extract_header(data);
 	
 	/* +10: margin for broken cg */
-	cg->pic = (BYTE *)malloc(sizeof(WORD) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
-	extract_16bit(pms, (WORD *)cg->pic, data + pms->pmsDp);
+	cg->pic = (uint8_t *)malloc(sizeof(uint16_t) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
+	extract_16bit(pms, (uint16_t *)cg->pic, data + pms->pmsDp);
 	
 	cg->alpha = NULL;
 	if (pms->pmsPp != 0) {
-		cg->alpha = malloc(sizeof(BYTE) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
+		cg->alpha = malloc(sizeof(uint8_t) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));
 		extract_8bit(pms, cg->alpha, data + pms->pmsPp);
 	}
 	

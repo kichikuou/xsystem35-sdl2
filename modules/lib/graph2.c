@@ -1,5 +1,5 @@
 void gr_fill_alpha_overborder(surface_t *dst, int dx, int dy, int dw, int dh, int s, int d) {
-	BYTE *dp;
+	uint8_t *dp;
 	int x, y;
 	
 	if (dst == NULL) return;
@@ -10,14 +10,14 @@ void gr_fill_alpha_overborder(surface_t *dst, int dx, int dy, int dw, int dh, in
 	
 	for (y = 0; y < dh; y++) {
 		for (x = 0; x < dw; x++) {
-			if (*(dp + x) >= (BYTE)s) *(dp + x) = (BYTE)d;
+			if (*(dp + x) >= (uint8_t)s) *(dp + x) = (uint8_t)d;
 		}
 		dp += dst->width;
 	}
 }
 
 void gr_fill_alpha_underborder(surface_t *dst, int dx, int dy, int dw, int dh, int s, int d) {
-	BYTE *dp;
+	uint8_t *dp;
 	int x, y;
 
 	if (dst == NULL) return;
@@ -28,14 +28,14 @@ void gr_fill_alpha_underborder(surface_t *dst, int dx, int dy, int dw, int dh, i
 	
 	for (y = 0; y < dh; y++) {
 		for (x = 0; x < dw; x++) {
-			if (*(dp + x) <= (BYTE)s) *(dp + x) = (BYTE)d;
+			if (*(dp + x) <= (uint8_t)s) *(dp + x) = (uint8_t)d;
 		}
 		dp += dst->width;
 	}
 }
 
 void gr_copy_alpha_map_sprite(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int cl) {
-	BYTE *sp, *dp;
+	uint8_t *sp, *dp;
 	int x, y;
 	
 	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return;
@@ -86,7 +86,7 @@ void gr_blend_alpha_wds_stretch2x2(surface_t *src1, int sx1, int sy1, surface_t 
 
 void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int sx2, int sy2, int sw, int sh, surface_t *dst, int dx, int dy) {
 	int x, y;
-	BYTE *sp1, *sp2, *dp, *sa;
+	uint8_t *sp1, *sp2, *dp, *sa;
 	
 	sp1  = GETOFFSET_PIXEL(src1, sx1, sy1);
 	sp2  = GETOFFSET_PIXEL(src2, sx2, sy2);
@@ -96,14 +96,14 @@ void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int 
 	switch(dst->depth) {
 	case 16:
 		{
-			WORD *yls1, *yls2, *yld;
-			BYTE *yla;
+			uint16_t *yls1, *yls2, *yld;
+			uint8_t *yla;
 			
 			for (y = 0; y < sh; y++) {
-				yls1 = (WORD *)(sp1  + y * src1->bytes_per_line);
-				yls2 = (WORD *)(sp2  + y * src2->bytes_per_line);
-				yld  = (WORD *)(dp   + y * dst->bytes_per_line);
-				yla  = (BYTE *)(sa   + y * src1->width);
+				yls1 = (uint16_t *)(sp1  + y * src1->bytes_per_line);
+				yls2 = (uint16_t *)(sp2  + y * src2->bytes_per_line);
+				yld  = (uint16_t *)(dp   + y * dst->bytes_per_line);
+				yla  = (uint8_t *)(sa   + y * src1->width);
 				
 				for (x = 0; x < sw; x++) {
 					*yld = SUTURADD16(*yls1, ALPHABLEND16(*yls1, *yls2, *yla));
@@ -116,14 +116,14 @@ void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int 
 	case 24:
 	case 32:
 	{
-		DWORD *yls1, *yls2, *yld;
-		BYTE *yla;
+		uint32_t *yls1, *yls2, *yld;
+		uint8_t *yla;
 		
 		for (y = 0; y < sh; y++) {
-			yls1 = (DWORD *)(sp1  + y * src1->bytes_per_line);
-			yls2 = (DWORD *)(sp2  + y * src2->bytes_per_line);
-			yld  = (DWORD *)(dp   + y * dst->bytes_per_line);
-			yla  = (BYTE  *)(sa   + y * src1->width);
+			yls1 = (uint32_t *)(sp1  + y * src1->bytes_per_line);
+			yls2 = (uint32_t *)(sp2  + y * src2->bytes_per_line);
+			yld  = (uint32_t *)(dp   + y * dst->bytes_per_line);
+			yla  = (uint8_t  *)(sa   + y * src1->width);
 			
 			for (x = 0; x < sw; x++) {
 				*yld = SUTURADD24(*yls1, ALPHABLEND24(*yls1, *yls2, *yla));

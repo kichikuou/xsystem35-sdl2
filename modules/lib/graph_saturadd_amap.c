@@ -9,7 +9,7 @@
 #include "ags.h"
 
 int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
-	BYTE *sp, *dp;
+	uint8_t *sp, *dp;
 	int x, y;
 	
 	if (FALSE == gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) {
@@ -30,11 +30,11 @@ int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx
 	dp = GETOFFSET_ALPHA(dst, dx, dy);
 	
 	for (y = 0; y < sh; y++) {
-		BYTE *yls = sp + y * src->width;
-		BYTE *yld = dp + y * dst->width;
+		uint8_t *yls = sp + y * src->width;
+		uint8_t *yld = dp + y * dst->width;
 		for (x = 0; x < sw; x++) {
 			int s = *yls, d = *yld;
-			*yld = (BYTE)(min(255, (s + d)));
+			*yld = (uint8_t)(min(255, (s + d)));
 			yls++; yld++;
 		}
 	}

@@ -12,7 +12,7 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 	float    a1, a2, xd, yd;
 	int      *row, *col;
 	int      x, y;
-	BYTE    *sp, *dp;
+	uint8_t  *sp, *dp;
 	
 	if (!gr_clip_xywh(dst, &dx, &dy, &dw, &dh)) return;
 	if (!gr_clip_xywh(src, &sx, &sy, &sw, &sh)) return;
@@ -40,16 +40,16 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 	switch(dst->depth) {
 	case 16:
 	{
-		WORD *yls, *yld;
-		BYTE *_yls, *_yld;
+		uint16_t *yls, *yld;
+		uint8_t *_yls, *_yld;
 		
 		for (y = 0; y < dh; y++) {
-			yls = (WORD *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (WORD *)(dp +   y        * dst->bytes_per_line);
+			yls = (uint16_t *)(sp + *(y + col) * src->bytes_per_line);
+			yld = (uint16_t *)(dp +   y        * dst->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = *(yls + *(row + x));
 			}
-			_yld = (BYTE *)yld;
+			_yld = (uint8_t *)yld;
 			while(*(col + y) == *(col + y + 1)) {
 				_yls = _yld;
 				_yld += dst->bytes_per_line;
@@ -62,16 +62,16 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 	case 24:
 	case 32:
 	{
-		DWORD *yls, *yld;
-		BYTE  *_yls, *_yld;
+		uint32_t *yls, *yld;
+		uint8_t  *_yls, *_yld;
 		
 		for (y = 0; y < dh; y++) {
-			yls = (DWORD *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (DWORD *)(dp +   y        * dst->bytes_per_line);
+			yls = (uint32_t *)(sp + *(y + col) * src->bytes_per_line);
+			yld = (uint32_t *)(dp +   y        * dst->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = *(yls+ *(row + x));
 			}
-			_yld = (BYTE *)yld;
+			_yld = (uint8_t *)yld;
 			while(*(col + y) == *(col + y + 1)) {
 				_yls = _yld;
 				_yld += dst->bytes_per_line;

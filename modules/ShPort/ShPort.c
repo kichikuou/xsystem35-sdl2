@@ -41,7 +41,7 @@
 
 // キー変換テーブル
 #define KEYMAP_MAX 8
-static BYTE *keymap[KEYMAP_MAX];
+static uint8_t *keymap[KEYMAP_MAX];
 
 static void OutputMessageBox(void) { /* 0 */
 	int p1 = getCaliValue();
@@ -82,7 +82,7 @@ static void InputListNum(void) { /* 1 */
 	if (ni_param.value < 0) {
 		*res = 0;
 	} else {
-		*val = (WORD)ni_param.value;
+		*val = (uint16_t)ni_param.value;
 		*res = 1;
 	}
 
@@ -115,7 +115,7 @@ static void InitKeyStatus(void) {
 	}
 	
 	if (keymap[no -1] == NULL) {
-		keymap[no -1] = calloc(256, sizeof(BYTE));
+		keymap[no -1] = calloc(256, sizeof(uint8_t));
 	} else {
 		memset(keymap[no -1], 0, 256);
 	}

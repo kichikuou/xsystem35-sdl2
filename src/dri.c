@@ -54,7 +54,7 @@ static long getfilesize(FILE *fp) {
  *   return: TRUE if it's dri file
 */
 static boolean filecheck (FILE *fp) {
-	BYTE b[6];
+	uint8_t b[6];
 	int mapsize, ptrsize;
 	long filesize;
 	
@@ -86,7 +86,7 @@ static boolean filecheck (FILE *fp) {
  *   fp: FILE object
 */
 static void get_filemap(drifiles *d, FILE *fp) {
-	BYTE b[6], *_b;
+	uint8_t b[6], *_b;
 	int mapsize, ptrsize, i;
 	
 	/* read top 6bytes */
@@ -214,7 +214,7 @@ drifiles *dri_init(const char **file, int cnt, boolean use_mmap) {
  *   return: dridata obhect
  */
 dridata *dri_getdata(drifiles *d, int no) {
-	BYTE *data;
+	uint8_t *data;
 	dridata *dfile;
 	int disk, ptr, dataptr, dataptr2, size;
 	
