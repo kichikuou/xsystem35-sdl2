@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install Deps
       run: sudo apt install ninja-build
@@ -17,7 +17,7 @@ jobs:
         ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle ./gradlew assembleRelease
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: xsystem35-release-unsigned-apk
         path: android/app/build/outputs/apk/release/app-release-unsigned.apk

@@ -10,17 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup cache
       id: cache-system-libraries
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{env.EM_CACHE_FOLDER}}
         key: ${{env.EM_VERSION}}-${{ runner.os }}
 
     - name: Setup Emscripten toolchain
-      uses: mymindstorm/setup-emsdk@v10
+      uses: mymindstorm/setup-emsdk@v11
       with:
         version: ${{ env.EM_VERSION }}
         actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
@@ -35,7 +35,7 @@ jobs:
         mv src/xsystem35.* xsystem35/
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: xsystem35-wasm
         path: out/wasm/xsystem35

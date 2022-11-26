@@ -32,7 +32,7 @@ jobs:
           ntldd-git:p
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Build
       run: |
@@ -50,7 +50,7 @@ jobs:
       run: ./make-installer.sh ../../out/release ${{ matrix.installer }}.nsi
 
     - name: Upload
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.installer }}
         path: tools/installer/${{ matrix.installer }}.exe
