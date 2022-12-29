@@ -173,12 +173,8 @@ static void sdl_getEvent(void) {
 			mouseb |= (1 << e.button.button);
 			RawKeyInfo[mouse_to_rawkey(e.button.button)] = TRUE;
 			send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(e.button.button));
-#if 0
-			if (e.button.button == 2) {
-				keywait_flag=TRUE;
-			}
-#endif
 			break;
+
 		case SDL_MOUSEBUTTONUP:
 			mouseb &= (0xffffffff ^ (1 << e.button.button));
 			RawKeyInfo[mouse_to_rawkey(e.button.button)] = FALSE;
@@ -195,8 +191,15 @@ static void sdl_getEvent(void) {
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = TRUE;
 			} else {
-				mouseb |= 1 << SDL_BUTTON_LEFT;
-				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = TRUE;
+				// SDL_RendererEventWatch clamps touch locations outside of the
+				// viewport to 0.0-1.0. Treat such events as right-clicks.
+				if (e.tfinger.x == 0.0f || e.tfinger.x == 1.0f || e.tfinger.y == 0.0f || e.tfinger.y == 1.0f) {
+					mouseb |= 1 << SDL_BUTTON_RIGHT;
+					RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = TRUE;
+				} else {
+					mouseb |= 1 << SDL_BUTTON_LEFT;
+					RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = TRUE;
+				}
 				mousex = e.tfinger.x * view_w;
 				mousey = e.tfinger.y * view_h;
 			}

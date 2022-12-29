@@ -40,7 +40,7 @@ cd xsystem35-sdl2/android
 1. Create a ZIP file containing all the game files and BGM files (see [below](#preparing-a-zip) for details), and transfer it to your device.
 2. Open the app. A list of installed games is displayed. Since nothing has been installed yet, only the "Install from ZIP" button is displayed. Tap it.
 3. Select the ZIP file you created in 1.
-4. The game starts. Two-finger touch is treated as a right click.
+4. The game starts. To simulate right-click, tap the black bars on the left/right or top/bottom of the screen.
 
 ### Preparing a ZIP
 - Include all files in the `GAMEDATA` folder (`.ALD` files and others). `.EXE` and `.DLL` are not really needed, but you can include them as well.

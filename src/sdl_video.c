@@ -129,6 +129,7 @@ void sdl_setWindowTitle(char *name) {
 static void window_init(const char *render_driver) {
 	if (render_driver)
 		SDL_SetHint(SDL_HINT_RENDER_DRIVER, render_driver);
+	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
