@@ -47,8 +47,6 @@ struct sdl_private_data {
 	
 	boolean dirty;
 
-	boolean ms_active;   /* mouse is active */
-
 	boolean fs_on;
 
 	boolean (*custom_event_handler)(const SDL_Event *);
@@ -71,7 +69,6 @@ extern struct sdl_private_data *sdl_videodev;
 #define view_w (sdl_videodev->view_w)
 #define view_h (sdl_videodev->view_h)
 #define sdl_dirty (sdl_videodev->dirty)
-#define ms_active (sdl_videodev->ms_active)
 #define sdl_fs_on (sdl_videodev->fs_on)
 #define sdl_custom_event_handler (sdl_videodev->custom_event_handler)
 

@@ -33,6 +33,7 @@
 #define ID_EXIT                40003
 #define ID_SCREEN_WINDOW       40011
 #define ID_SCREEN_FULL         40012
-#define ID_MSGSKIP             40020
+#define ID_OPTION_MOUSE_MOVE   40021
+#define ID_MSGSKIP             40030
 
 #endif /* __RESOURCES_H__ */

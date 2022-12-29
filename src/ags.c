@@ -100,7 +100,7 @@ boolean ags_check_param_xy(int *x, int *y) {
 }
 
 void ags_init(const char *render_driver) {
-	nact->ags.mouse_movesw = 2; /* 0:IZを無視, 1: 直接指定場所へ, 2: スムーズに指定場所に */
+	nact->ags.mouse_movesw = MOUSE_WARP_SMOOTH;
 	nact->ags.pal = &pal_256;
 	nact->ags.world_size.width  =  SYS35_DEFAULT_WIDTH;
 	nact->ags.world_size.height =  SYS35_DEFAULT_HEIGHT;
@@ -123,7 +123,7 @@ void ags_remove(void) {
 }
 
 void ags_reset(void) {
-	nact->ags.mouse_movesw = 2;
+	nact->ags.mouse_movesw = MOUSE_WARP_SMOOTH;
 	nact->ags.eventcb = NULL;
 	initPal(&pal_256);
 	cg_reset();
@@ -649,11 +649,11 @@ void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
 	}
 	
 	switch(nact->ags.mouse_movesw) {
-	case 0:
+	case MOUSE_WARP_DISABLED:
 		return;
-	case 1:
+	case MOUSE_WARP_DIRECT:
 		sdl_setCursorLocation(x, y); break;
-	case 2:
+	case MOUSE_WARP_SMOOTH:
 		sys_getMouseInfo(&p, is_dibgeo);
 		delx = x - p.x;
 		dely = y - p.y;

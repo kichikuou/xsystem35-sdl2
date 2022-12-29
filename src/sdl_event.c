@@ -111,20 +111,6 @@ static void sdl_getEvent(void) {
 
 		case SDL_WINDOWEVENT:
 			switch (e.window.event) {
-			case SDL_WINDOWEVENT_ENTER:
-				ms_active = true;
-#if 0
-				if (sdl_fs_on)
-					SDL_WM_GrabInput(SDL_GRAB_ON);
-#endif
-				break;
-			case SDL_WINDOWEVENT_LEAVE:
-				ms_active = false;
-#if 0
-				if (sdl_fs_on)
-					SDL_WM_GrabInput(SDL_GRAB_OFF);
-#endif
-				break;
 			case SDL_WINDOWEVENT_EXPOSED:
 				sdl_dirty = TRUE;
 				break;
@@ -309,13 +295,6 @@ int sdl_getKeyInfo() {
 
 int sdl_getMouseInfo(MyPoint *p) {
 	sdl_getEvent();
-	
-	if (!ms_active) {
-		if (p) {
-			p->x = 0; p->y = 0;
-		}
-		return 0;
-	}
 	
 	if (p) {
 		p->x = mousex;

@@ -87,7 +87,7 @@ void
 on_item5_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	nact->ags.mouse_movesw = 2;
+	nact->ags.mouse_movesw = MOUSE_WARP_SMOOTH;
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 }
 
@@ -97,7 +97,7 @@ void
 on_item6_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	nact->ags.mouse_movesw = 0;
+	nact->ags.mouse_movesw = MOUSE_WARP_DISABLED;
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 }
 

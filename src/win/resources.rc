@@ -20,6 +20,10 @@ IDR_MENU1 MENU DISCARDABLE
         MENUITEM "Window",                      ID_SCREEN_WINDOW
         MENUITEM "Fullscreen",                  ID_SCREEN_FULL
     }
+    POPUP "Option"
+    {
+        MENUITEM "Mouse Movement",              ID_OPTION_MOUSE_MOVE
+    }
     MENUITEM "MsgSkip[off]",                    ID_MSGSKIP
 }
 
@@ -53,6 +57,10 @@ IDR_MENU1 MENU DISCARDABLE
     {
         MENUITEM "ウィンドウ",                    ID_SCREEN_WINDOW
         MENUITEM "フルスクリーン",                ID_SCREEN_FULL
+    }
+    POPUP "オプション"
+    {
+        MENUITEM "マウスカーソル移動",            ID_OPTION_MOUSE_MOVE
     }
     MENUITEM "文字送り[off]",                     ID_MSGSKIP
 }

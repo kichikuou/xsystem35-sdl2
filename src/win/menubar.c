@@ -23,6 +23,7 @@
 #include <SDL_syswm.h>
 #include "system.h"
 #include "menu.h"
+#include "nact.h"
 #include "sdl_core.h"
 #include "sdl_private.h"
 #include "resources.h"
@@ -58,6 +59,26 @@ static void saveScreenshot(void) {
 	}
 }
 
+static void toggle_mouse_warp_mode(void) {
+	HWND hwnd = get_hwnd(sdl_window);
+	HMENU hmenu = GetMenu(hwnd);
+
+	MENUITEMINFO menuitem = {
+		.cbSize = sizeof(MENUITEMINFO),
+		.fMask = MIIM_STATE,
+	};
+	if (!GetMenuItemInfo(hmenu, ID_OPTION_MOUSE_MOVE, false, &menuitem))
+		return;
+
+	if (menuitem.fState & MFS_CHECKED) {
+		nact->ags.mouse_movesw = MOUSE_WARP_DISABLED;
+		CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_UNCHECKED);
+	} else {
+		nact->ags.mouse_movesw = MOUSE_WARP_SMOOTH;
+		CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
+	}
+}
+
 void win_menu_init(void) {
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	HMENU hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
@@ -65,6 +86,7 @@ void win_menu_init(void) {
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 	// Let SDL recalc the window size, taking menu height into account.
 	SDL_SetWindowSize(sdl_window, view_w, view_h);
+	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
 }
 
 void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
@@ -85,6 +107,9 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 			break;
 		case ID_SCREEN_FULL:
 			sdl_setFullscreen(TRUE);
+			break;
+		case ID_OPTION_MOUSE_MOVE:
+			toggle_mouse_warp_mode();
 			break;
 		case ID_MSGSKIP:
 			msgskip_activate(!msgskip_isActivated());

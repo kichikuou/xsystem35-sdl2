@@ -179,10 +179,8 @@ MyPoint sdl_translateMouseCoords(int x, int y) {
 
 /* マウスの位置の移動 */
 void sdl_setCursorLocation(int x, int y) {
-	if (ms_active) {
-		MyPoint t = sdl_translateMouseCoords(x, y);
-		SDL_WarpMouseInWindow(sdl_window, t.x, t.y);
-	}
+	MyPoint t = sdl_translateMouseCoords(x, y);
+	SDL_WarpMouseInWindow(sdl_window, t.x, t.y);
 }
 
 /* マウスカーソルの形状の設定 */
