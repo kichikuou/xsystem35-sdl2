@@ -94,6 +94,17 @@
             </intent-filter>
             -->
         </activity>
+
+        <activity android:name=".LicensesMenuActivity"
+            android:label="@string/action_licenses"
+            android:parentActivityName=".LauncherActivity"
+            android:exported="false">
+        </activity>
+
+        <activity android:name=".LicensesActivity"
+            android:parentActivityName=".LicensesMenuActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

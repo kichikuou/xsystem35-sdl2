@@ -39,7 +39,6 @@ android {
     if (!project.hasProperty('EXCLUDE_NATIVE_LIBS')) {
         sourceSets.main {
             jniLibs.srcDir 'libs'
-            assets.srcDir '../../fonts'
         }
         aaptOptions {
             // Disable asset compression for fonts.

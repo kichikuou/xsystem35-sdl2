@@ -3,6 +3,7 @@
     <string name="app_name">xsystem35</string>
     <string name="action_export_save_data">セーブデータをエクスポート</string>
     <string name="action_import_save_data">セーブデータをインポート</string>
+    <string name="action_licenses">オープンソースライセンス</string>
     <string name="cancel">キャンセル</string>
     <string name="cannot_find_ald">System 3.x のファイル (*.ald) が見つかりません。</string>
     <string name="choose_a_file">ファイルを選択</string>

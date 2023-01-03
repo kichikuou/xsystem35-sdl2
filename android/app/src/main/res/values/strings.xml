@@ -2,6 +2,7 @@
     <string name="app_name">xsystem35</string>
     <string name="action_export_save_data">Export Save Files</string>
     <string name="action_import_save_data">Import Save Files</string>
+    <string name="action_licenses">Open source licenses</string>
     <string name="cancel">Cancel</string>
     <string name="cannot_find_ald">Cannot find System 3.x game files (*.ald).</string>
     <string name="choose_a_file">Choose a file</string>

@@ -2,6 +2,7 @@ out
 android/.gradle
 android/app/.externalNativeBuild
 android/app/build
+android/app/src/main/assets
 android/build
 .ccls-cache
 .dir-locals.el

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(GAME)
+set(PROJECT_ROOT_DIR ../../..)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -46,4 +47,18 @@ if(NOT sdl_mixer_POPULATED)
 endif()
 
 # The main CMakeLists.txt of xsystem35
-add_subdirectory(../../.. xsystem35)
+add_subdirectory(${PROJECT_ROOT_DIR} xsystem35)
+
+# Copy asset files
+set(ASSETS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src/main/assets)
+file(MAKE_DIRECTORY ${ASSETS_DIR}/licenses)
+file(COPY_FILE ${PROJECT_ROOT_DIR}/fonts/MTLc3m.ttf ${ASSETS_DIR}/MTLc3m.ttf)
+file(COPY_FILE ${PROJECT_ROOT_DIR}/fonts/mincho.otf ${ASSETS_DIR}/mincho.otf)
+file(COPY_FILE ${PROJECT_ROOT_DIR}/COPYING ${ASSETS_DIR}/licenses/xsystem35)
+file(COPY_FILE ${PROJECT_ROOT_DIR}/fonts/MTLc3m.ttf.license ${ASSETS_DIR}/licenses/MTLc3m)
+file(COPY_FILE ${PROJECT_ROOT_DIR}/fonts/mincho.otf.license ${ASSETS_DIR}/licenses/mincho)
+file(COPY_FILE ${sdl_SOURCE_DIR}/LICENSE.txt ${ASSETS_DIR}/licenses/SDL)
+file(COPY_FILE ${sdl_ttf_SOURCE_DIR}/LICENSE.txt ${ASSETS_DIR}/licenses/SDL_ttf)
+file(COPY_FILE ${sdl_ttf_SOURCE_DIR}/external/freetype/docs/GPLv2.TXT ${ASSETS_DIR}/licenses/freetype)
+file(COPY_FILE ${sdl_ttf_SOURCE_DIR}/external/harfbuzz/COPYING ${ASSETS_DIR}/licenses/harfbuzz)
+file(COPY_FILE ${sdl_mixer_SOURCE_DIR}/LICENSE.txt ${ASSETS_DIR}/licenses/SDL_mixer)
