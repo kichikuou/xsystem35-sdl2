@@ -4,6 +4,7 @@ android/app/.externalNativeBuild
 android/app/build
 android/app/src/main/assets
 android/build
+android/keystore.jks
 .ccls-cache
 .dir-locals.el
 compile_commands.json

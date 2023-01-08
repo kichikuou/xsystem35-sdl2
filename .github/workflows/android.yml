@@ -14,10 +14,15 @@ jobs:
     - name: Build
       run: |
         cd android
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
         ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle ./gradlew assembleRelease
+      env:
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: xsystem35-release-unsigned-apk
-        path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+        name: xsystem35-apk
+        path: android/app/build/outputs/apk/release/app-release.apk
