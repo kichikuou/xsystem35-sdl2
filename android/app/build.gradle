@@ -17,7 +17,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 31
         versionCode 11
-        versionName "2.6.0"
+        versionName "2.6.0" + gitRevision()
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
@@ -82,4 +82,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+
+static String gitRevision() {
+    ' (git ' + "git rev-parse --short HEAD".execute().text.trim() + ')'
 }
