@@ -773,6 +773,8 @@ void exec_command(void) {
 				commandLXR(); break;
 			case 'W':
 				commandLXW(); break;
+			case 'X':
+				commandLXX(); break;
 			default:
 				undeferr();
 			}

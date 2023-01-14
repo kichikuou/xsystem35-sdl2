@@ -135,7 +135,7 @@ extern void commandLXS();
 extern void commandLXP();
 extern void commandLXR();
 extern void commandLXW();
-
+extern void commandLXX();
 
 /* defined by cmdm.c */
 extern void commandMA();

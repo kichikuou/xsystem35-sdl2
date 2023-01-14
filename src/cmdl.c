@@ -72,13 +72,13 @@ void commandLT() {
 	struct stat buf;
 	struct tm *lc;
 	
-	if (num <= 0) {
-		*var       = 0;
-		*(var + 1) = 0;
-		*(var + 2) = 0;
-		*(var + 3) = 0;
-		*(var + 4) = 0;
-		*(var + 5) = 0;
+	if (num <= 0 || num > SAVE_MAXNUMBER) {
+		var[0] = 0;
+		var[1] = 0;
+		var[2] = 0;
+		var[3] = 0;
+		var[4] = 0;
+		var[5] = 0;
 		sysVar[0] = 255;
 		return;
 	}
@@ -86,21 +86,21 @@ void commandLT() {
 	status = stat(save_get_file(num - 1), &buf);
 	if (status) {
 		/* んなんどこにもかいてないやん！ */
-		*var       = 0;
-		*(var + 1) = 0;
-		*(var + 2) = 0;
-		*(var + 3) = 0;
-		*(var + 4) = 0;
-		*(var + 5) = 0;
+		var[0] = 0;
+		var[1] = 0;
+		var[2] = 0;
+		var[3] = 0;
+		var[4] = 0;
+		var[5] = 0;
 		sysVar[0] = 255;
 	} else {
 		lc = localtime(&buf.st_mtime);
-		*var       = 1900 + lc->tm_year;
-		*(var + 1) = 1    + lc->tm_mon;
-		*(var + 2) =        lc->tm_mday;
-		*(var + 3) =        lc->tm_hour;
-		*(var + 4) =        lc->tm_min;
-		*(var + 5) =        lc->tm_sec;
+		var[0] = lc->tm_year + 1900;
+		var[1] = lc->tm_mon + 1;
+		var[2] = lc->tm_mday;
+		var[3] = lc->tm_hour;
+		var[4] = lc->tm_min;
+		var[5] = lc->tm_sec;
 		sysVar[0]  = 0;
 	}
 	DEBUG_COMMAND("LT %d,%p",num, var);
@@ -335,4 +335,44 @@ void commandLXW() {
 	int size = getCaliValue();
 	
 	DEBUG_COMMAND_YET("LXW %d,%d,%d:",num,*var,size);
+}
+
+void commandLXX() {
+	/* Gets file timestamp to [var, var+6] */
+	int type = getCaliValue();
+	int num = getCaliValue();
+	int *var = getCaliVariable();
+
+	struct stat buf;
+	struct tm *lc;
+
+	switch (type) {
+	case 5: // save data
+		if (num <= 0 || num > SAVE_MAXNUMBER || stat(save_get_file(num - 1), &buf)) {
+			sysVar[0] = 255;
+			break;
+		}
+		lc = localtime(&buf.st_mtime);
+		var[0] = lc->tm_year + 1900;
+		var[1] = lc->tm_mon + 1;
+		var[2] = lc->tm_mday;
+		var[3] = lc->tm_hour;
+		var[4] = lc->tm_min;
+		var[5] = lc->tm_sec;
+		var[6] = lc->tm_wday;
+		sysVar[0] = 0;
+		break;
+
+	case 0: // scenario
+	case 1: // CG
+	case 2: // wave
+	case 3: // MIDI
+	case 4: // data
+	case 6: // resource
+	default:
+		DEBUG_COMMAND_YET("LXX %d,%d,%d:", type, num, *var);
+		return;
+	}
+
+	DEBUG_COMMAND("LXX %d,%d,%d:", type, num, *var);
 }
