@@ -123,7 +123,7 @@ static int midi_unpause(void) {
 }
 
 static int midi_get_playing_info(midiplaystate *st) {
-	if (!mix_music) {
+	if (!mix_music || !Mix_PlayingMusic()) {
 		st->in_play = FALSE;
 		st->loc_ms  = 0;
 		return OK;
