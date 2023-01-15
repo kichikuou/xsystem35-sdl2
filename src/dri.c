@@ -30,169 +30,76 @@
 #include "LittleEndian.h"
 #include "dri.h"
 
-/*
- * static maethods
-*/
-static long getfilesize(FILE *fp);
-static boolean filecheck (FILE *fp);
-static void get_filemap(drifiles *d, FILE *fp);
-static void get_fileptr(drifiles *d, FILE *fp, int disk);
-
-/*
- * Get file size of FILE
- *   fp: FILE pointer
- *   return: filesize in byte
-*/
-static long getfilesize(FILE *fp) {
+static bool read_index(int disk, drifiles *d, FILE *fp) {
 	fseek(fp, 0L, SEEK_END);
-	return ftell(fp);
-}
+	int filesize = ftell(fp);
 
-/*
- * Check whether dri file type or not
- *   fp: FILE pointer
- *   return: TRUE if it's dri file
-*/
-static boolean filecheck (FILE *fp) {
-	uint8_t b[6];
-	int mapsize, ptrsize;
-	long filesize;
-	
-	/* get filesize / 256  */
-	filesize = (getfilesize(fp) + 255) >> 8;
-	
-	/* read top 6bytes */
+	// Get ptrsize and mapsize
+	uint8_t hdr[6];
 	fseek(fp, 0L, SEEK_SET);
-	fread(b, 1, 6, fp);
-	
-	/* get ptrsize and mapsize */
-	ptrsize = LittleEndian_get3B(b, 0);
-	mapsize = LittleEndian_get3B(b, 3) - ptrsize;
-	
-	/* must lager than 0 */
-	if (ptrsize < 0 || mapsize < 0) return FALSE;
-	
-	/* must smaller than filesize */
-	if (ptrsize > (int)filesize || mapsize > (int)filesize ) {
-		return FALSE;
+	if (fread(hdr, 6, 1, fp) != 1)
+		return false;
+	int ptrsize = LittleEndian_get3B(hdr, 0) << 8;
+	int mapsize = (LittleEndian_get3B(hdr, 3) << 8) - ptrsize;
+	if (ptrsize <= 0 || mapsize <= 0 || ptrsize + mapsize > filesize)
+		return false;
+
+	// Read the pointer table and the link table
+	uint8_t *ptbl = malloc(ptrsize + mapsize);
+	memcpy(ptbl, hdr, 6);
+	if (fread(ptbl + 6, ptrsize + mapsize - 6, 1, fp) != 1) {
+		free(ptbl);
+		return false;
 	}
-	
-	return TRUE;
-}
+	uint8_t *ltbl = ptbl + ptrsize;
 
-/* 
- * Get file map
- *   d : drifile object
- *   fp: FILE object
-*/
-static void get_filemap(drifiles *d, FILE *fp) {
-	uint8_t b[6], *_b;
-	int mapsize, ptrsize, i;
-	
-	/* read top 6bytes */
-	fseek(fp, 0L, SEEK_SET);
-	fread(b, 1, 6, fp);
-	
-	/* get ptrsize and mapsize */
-	ptrsize = LittleEndian_get3B(b, 0);
-	mapsize = LittleEndian_get3B(b, 3) - ptrsize;
-	
-	/* allocate read buffer */
-	_b = malloc(sizeof(char) * (mapsize << 8));
-	
-	/* read filemap */
-	fseek(fp, ptrsize << 8L , SEEK_SET);
-	fread(_b, 256, mapsize, fp);
-	
-	/* get max file number from mapdata */
-	d->maxfile = (mapsize << 8) / 3;
-	
-	/* map of disk */
-	d->map_disk = malloc(sizeof(char ) * d->maxfile);
-	/* map of data in disk */ 
-	d->map_ptr  = malloc(sizeof(short) * d->maxfile);
-	
-	for (i = 0; i < d->maxfile; i++) {	
-		/* map_disk[?] and map_ptr[?] are from 0 */
-		*(d->map_disk + i) = _b[i * 3] - 1;
-		*(d->map_ptr  + i) = LittleEndian_getW(_b, i * 3 + 1) - 1;
+	// (Re)allocate the index buffers
+	int nr_files = mapsize / 3;
+	if (d->nr_files < nr_files) {
+		d->disk = realloc(d->disk, nr_files);
+		d->offset = realloc(d->offset, sizeof(uint32_t) * nr_files);
+		memset(d->disk + d->nr_files, 0, nr_files - d->nr_files);
+		memset(d->offset + d->nr_files, 0, sizeof(uint32_t) * (nr_files - d->nr_files));
+		d->nr_files = nr_files;
 	}
-	
-	free(_b);
-	return;
-}
 
-/*
- * Get data pointer in file
- *   d   : drifile object
- *   fp  : FILE object
- *   disk: no in drifile object 
-*/
-static void get_fileptr(drifiles *d, FILE *fp, int disk) {
-	char b[6], *_b;
-	int ptrsize, filecnt, i;
-
-	/* read top 6bytes */
-	fseek(fp, 0L, SEEK_SET);
-	fread(b, 1, 6, fp);
-
-	/* get pinter size */
-	ptrsize = LittleEndian_get3B(b,0);
-	
-	/* estimate file number in file */
-	filecnt = (ptrsize << 8) / 3;
-	
-	/* allocate read buffer */
-	_b = malloc(sizeof(char) * (ptrsize << 8));
-	
-	/* read pointers */
-	fseek(fp, 0L, SEEK_SET);
-	fread(_b, 256, ptrsize, fp);
-	
-	/* allocate pointers buffer */
-	d->fileptr[disk] = calloc(filecnt, sizeof(int));
-	
-	/* store pointers */
-	for (i = 0; i < filecnt - 1; i++) {
-		*(d->fileptr[disk] + i) = (LittleEndian_get3B(_b, i * 3 + 3) << 8);
+	// Parse the index
+	for (int i = 0; i < nr_files; i++) {
+		if (disk != ltbl[i * 3] - 1)
+			continue;
+		d->disk[i] = ltbl[i * 3];
+		int ptr = LittleEndian_getW(ltbl, i * 3 + 1);
+		d->offset[i] = LittleEndian_get3B(ptbl, ptr * 3) << 8;
 	}
-	
-	free(_b);
-	return;
+	free(ptbl);
+	return true;
 }
 
 drifiles *dri_init(const char **file, int cnt, boolean use_mmap) {
 	drifiles *d = calloc(1, sizeof(drifiles));
-	FILE *fp;
-	int i;
-	boolean gotmap = FALSE;
 #ifndef HAVE_MEMORY_MAPPED_FILE
 	use_mmap = FALSE;
 #endif
 
-	for (i = 0; i < cnt; i++) {
-		if (file[i] == NULL) continue;
-		/* open check */
-		if (NULL == (fp = fopen(file[i], "rb"))) {
-			SYSERROR("File %s is not found", file[i]);
+	for (int i = 0; i < cnt; i++) {
+		if (!file[i])
+			continue;
+
+		FILE *fp = fopen(file[i], "rb");
+		if (!fp)
+			SYSERROR("%s: %s", file[i], strerror(errno));
+		if (!read_index(i, d, fp)) {
+			// Only errors in *A.ALD are fatal, because some games have
+			// dummy (invalid) *[B-Z].ALD files.
+			if (i == 0)
+				SYSERROR("%s: not an ALD file", file[i]);
+			WARNING("%s: not an ALD file", file[i]);
+			fclose(fp);
+			continue;
 		}
-		/* check is drifile or noe */
-		if (!filecheck(fp)) {
-			SYSERROR("File %s is not dri file", file[i]);
-		}
-		/* get file map */
-		if (!gotmap) {
-			get_filemap(d, fp);
-			gotmap = TRUE;
-		}
-		/* get pointer */
-		get_fileptr(d, fp, i);
-		/* copy filenme */
 		d->fnames[i] = strdup(file[i]);
-		/* close */
 		fclose(fp);
 
-		/* mmap */
 		if (use_mmap) {
 			mmap_t *m = map_file(file[i]);
 			if (!m) {
@@ -207,54 +114,44 @@ drifiles *dri_init(const char **file, int cnt, boolean use_mmap) {
 	return d;
 }
 
-/*
- * Get data 
- *   d : drifile object
- *   no: drifile no ( >= 0 )
- *   return: dridata obhect
- */
 dridata *dri_getdata(drifiles *d, int no) {
+	if (no < 0 || no >= d->nr_files || !d->disk[no] || !d->offset[no])
+		return NULL;
+	int disk = d->disk[no] - 1;
+
 	uint8_t *data;
-	dridata *dfile;
-	int disk, ptr, dataptr, dataptr2, size;
-	
-	/* check no is lager than files which contains */
-	if (no > d->maxfile) return NULL;
-	
-	/* check disk & ptr are negative, if negative, file does not exist */
-	disk = d->map_disk[no];
-	ptr  = d->map_ptr[no];
-	if (disk < 0 || ptr < 0) return NULL;
-	
-	/* no file registered */
-	if (d->fileptr[disk] == NULL) return NULL;
-	
-	/* get pointer in file and size */
-	dataptr = *(d->fileptr[disk] + ptr);
-	dataptr2 = *(d->fileptr[disk] + ptr + 1);
-	if (dataptr == 0 || dataptr2 == 0) return NULL;
-	
-	/* get data top */
+	int ptr, size;
 	if (d->mmapped) {
-		data = d->mmap[disk]->addr + dataptr;
+		data = d->mmap[disk]->addr + d->offset[no];
+		ptr  = LittleEndian_getDW(data, 0);
+		size = LittleEndian_getDW(data, 4);
 	} else {
-		int readsize = dataptr2 - dataptr;
-		FILE *fp;
-		data = malloc(sizeof(char) * readsize);
-		fp = fopen(d->fnames[disk], "rb");
-		fseek(fp, dataptr, SEEK_SET);
-		fread(data, 1, readsize, fp);
+		FILE *fp = fopen(d->fnames[disk], "rb");
+		if (!fp)
+			return NULL;
+		uint8_t entry_header[8];
+		fseek(fp, d->offset[no], SEEK_SET);
+		if (fread(entry_header, sizeof(entry_header), 1, fp) != 1) {
+			fclose(fp);
+			return NULL;
+		}
+		ptr  = LittleEndian_getDW(entry_header, 0);
+		size = LittleEndian_getDW(entry_header, 4);
+		data = malloc(ptr + size);
+		memcpy(data, entry_header, sizeof(entry_header));
+		if (fread(data + sizeof(entry_header), ptr + size - sizeof(entry_header), 1, fp) != 1) {
+			free(data);
+			fclose(fp);
+			return NULL;
+		}
 		fclose(fp);
 	}
 	
-	/* get real data and size */
-	ptr  = LittleEndian_getDW(data, 0);
-	size = LittleEndian_getDW(data, 4);
-	
-	dfile = calloc(1, sizeof(dridata));
+	dridata *dfile = calloc(1, sizeof(dridata));
 	dfile->data_raw = data;    /* dri data header  */
 	dfile->data = data + ptr;  /* real data */
 	dfile->size = size;
+	dfile->name = data + 16;
 	dfile->a = d; /* archive file */
 	return dfile;
 }

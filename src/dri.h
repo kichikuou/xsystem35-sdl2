@@ -28,21 +28,14 @@
 #include "mmap.h"
 
 #define DRIFILEMAX 255     /* maximum file number for one data type */
-#define DRIDATAMAX 65535   /* maximum file number in one file */
 
 struct _drifiles {
-	/* for mmap */
-	boolean     mmapped;
-	mmap_t      *mmap[DRIFILEMAX];
-	/* for file access */
-	char        *fnames[DRIFILEMAX];
-	/* max file number in files */
-	int         maxfile;
-	/* file mapping */
-	char        *map_disk;
-	short       *map_ptr;
-	/* pointers in file */
-	int         *fileptr[DRIFILEMAX];
+	boolean  mmapped;
+	mmap_t   *mmap[DRIFILEMAX];
+	char     *fnames[DRIFILEMAX];
+	int      nr_files; // upper limit on how many files could be referenced by this archive
+	uint8_t  *disk;    // file numbers
+	uint32_t *offset;  // offsets in file
 };
 typedef struct _drifiles drifiles;
 
