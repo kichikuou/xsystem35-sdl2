@@ -3,6 +3,11 @@
 This is a multi-platform port of `xsystem35`, a free implementation of
 AliceSoft's System 3.x game engine.
 
+## Compatiblity
+
+See the [game compatibility table](game_compatibility.md) for a list of games
+that can be played on xsystem35-sdl2.
+
 ## Unique Features
 
 In addition to the original System 3.x's functionalities, xsystem35-sdl2 has
