@@ -26,8 +26,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
+#include "LittleEndian.h"
 #include "xsystem35.h"
 #include "modules.h"
 #include "nact.h"
@@ -35,12 +37,16 @@
 #include "ald_manager.h"
 #include "music.h"
 
-#ifdef ENABLE_SDLMIXER
-#include "pcm.sdlmixer.h"
-#include "shpcmlib.c"
+static struct {
+	SDL_AudioSpec spec;  // must be 16-bit, stereo
+	uint8_t *buf;
+	uint32_t len;
+} memwav;
 
-static Mix_Chunk *chunk;
-#endif
+static void free_memory_wav(void) {
+	SDL_FreeWAV(memwav.buf);
+	memwav.buf = NULL;
+}
 
 static void Init() {
 	/*
@@ -117,10 +123,24 @@ static void wavLoadMemory() {
 	  no: 読み込むファイル番号
 	*/
 	int no = getCaliValue();
-	
-#ifdef ENABLE_SDLMIXER
-	chunk = pcm_sdlmixer_load(no);
-#endif
+
+	if (memwav.buf)
+		free_memory_wav();
+
+	dridata *dfile = ald_getdata(DRIFILE_WAVE, no - 1);
+	if (!dfile) {
+		WARNING("cannot open WAVE %d", no - 1);
+		return;
+	}
+	if (!SDL_LoadWAV_RW(SDL_RWFromConstMem(dfile->data, dfile->size), 1, &memwav.spec, &memwav.buf, &memwav.len)) {
+		WARNING("cannot load WAVE %d", no - 1);
+		return;
+	}
+	if (memwav.spec.channels != 2 || memwav.spec.format != AUDIO_S16LSB) {
+		WARNING("unexpected audio format");
+		free_memory_wav();
+		return;
+	}
 	
 	DEBUG_COMMAND("ShSound.wavLoadMemory %d:", no);
 }
@@ -133,12 +153,38 @@ static void wavSendMemory() {
 	*/
 	int slot = getCaliValue();
 	
-#ifdef ENABLE_SDLMIXER
-	if (chunk) {
-		pcm_sdlmixer_load_chunk(slot, chunk);
-		chunk = NULL;
+	if (!memwav.buf) {
+		WARNING("wave not loaded");
+		return;
 	}
-#endif
+	const uint8_t wave_header[] = {
+		'R', 'I', 'F', 'F',
+		  0,   0,   0,   0,  // filesize - 8 (filled later)
+		'W', 'A', 'V', 'E',
+		'f', 'm', 't', ' ',
+		 16,   0,   0,   0,  // size of fmt chunk
+		  1,   0,            // PCM format
+		  2,   0,            // stereo
+		  0,   0,   0,   0,  // sampling rate (filled later)
+		  0,   0,   0,   0,  // bytes / sec (filled later)
+		  4,   0,            // block size
+		 16,   0,            // bits / sample
+		'd', 'a', 't', 'a',
+		  0,   0,   0,   0,  // size of data chunk (filled later)
+	};
+
+	uint32_t wav_size = sizeof(wave_header) + memwav.len;
+	uint8_t *wav_buf = malloc(wav_size);
+	memcpy(wav_buf, wave_header, sizeof(wave_header));
+	LittleEndian_putDW(wav_size - 8, wav_buf, 4);
+	LittleEndian_putDW(memwav.spec.freq, wav_buf, 24);
+	LittleEndian_putDW(memwav.spec.freq * 4, wav_buf, 28);
+	LittleEndian_putDW(memwav.len, wav_buf, 40);
+	memcpy(wav_buf + sizeof(wave_header), memwav.buf, memwav.len);
+
+	mus_wav_load_data(slot, wav_buf, wav_size);
+	free_memory_wav();
+	free(wav_buf);
 	
 	DEBUG_COMMAND("ShSound.wavSendMemory %d:", slot);
 }
@@ -153,11 +199,26 @@ static void wavFadeVolumeMemory() {
 	int start = getCaliValue();
 	int range = getCaliValue();
 	
-#ifdef ENABLE_SDLMIXER
-	if (chunk == NULL) return;
+	if (!memwav.buf)
+		return;
 	
-	pcmlib_fade_volume_memory(chunk, start, range);
-#endif
+	start *= memwav.spec.freq / 100;  // 10ms -> sample
+	range *= memwav.spec.freq / 100;  // 10ms -> sample
+
+	if (memwav.len / 4 < start + range)
+		return;
+
+	int16_t *buf = (int16_t*)memwav.buf + start * 2;
+
+	// 指定の場所から徐々に音量を下げる
+	for (int i = range; i > 0; i--) {
+		buf[0] = buf[0] * i / range;
+		buf[1] = buf[1] * i / range;
+		buf += 2;
+	}
+
+	// 残りは無音
+	memset(buf, 0, memwav.buf + memwav.len - (uint8_t*)buf);
 	
 	DEBUG_COMMAND("ShSound.wavFadeVolumeMemory %d,%d:", start, range);
 }
@@ -167,11 +228,17 @@ static void wavReversePanMemory() {
 	  wavLoadMemoryで読み込んだデータの左右のチャンネルを反転
 	*/
 	
-#ifdef ENABLE_SDLMIXER
-	if (chunk == NULL) return;
+	if (!memwav.buf)
+		return;
 	
-	pcmlib_reverse_pan_memory(chunk);
-#endif
+	int16_t *buf = (int16_t*)memwav.buf;
+	int len = memwav.len / 4;
+	for (int i = 0; i < len; i++) {
+		int16_t tmp = buf[0];
+		buf[0] = buf[1];
+		buf[1] = tmp;
+		buf += 2;
+	}
 	
 	DEBUG_COMMAND("ShSound.wavReversePanMemory:");
 }

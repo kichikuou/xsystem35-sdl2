@@ -32,5 +32,6 @@ extern int LittleEndian_getDW(const uint8_t *b,int index);
 extern int LittleEndian_get3B(const uint8_t *b,int index);
 extern int LittleEndian_getW(const uint8_t *b,int index);
 extern void LittleEndian_putW(int num, uint8_t *b, int index);
+extern void LittleEndian_putDW(uint32_t num, uint8_t *b, int index);
 
 #endif /* !__LITTLEENDIAN__ */

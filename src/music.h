@@ -71,8 +71,9 @@ extern boolean mus_mixer_fadeout_get_state(int device);
 extern int mus_mixer_fadeout_stop(int device);
 extern int mus_mixer_get_level(int device);
 
-/* wav (command2F) related function */
+/* wav (command2F) / ShSound related function */
 extern int mus_wav_load(int ch, int num);
+extern int mus_wav_load_data(int ch, uint8_t *buf, uint32_t len);
 extern int mus_wav_unload(int ch);
 extern int mus_wav_play(int ch, int loop);
 extern int mus_wav_stop(int ch);

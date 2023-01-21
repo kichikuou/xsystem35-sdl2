@@ -26,6 +26,7 @@ int muspcm_exit(void) { return NG; }
 int muspcm_reset(void) { return NG; }
 int muspcm_load_no(int slot, int no) { return NG; }
 int muspcm_load_mixlr(int slot, int noL, int noR) { return NG; }
+int muspcm_load_data(int slot, uint8_t *buf, uint32_t len) { return NG; }
 int muspcm_unload(int slot) { return NG; }
 int muspcm_start(int slot, int loop) { return NG; }
 int muspcm_stop(int slot) { return NG; }

@@ -60,3 +60,9 @@ void LittleEndian_putW(int num, uint8_t *b, int index) {
 	b[index] = c0; b[index+1] = c1;
 }
 
+
+void LittleEndian_putDW(uint32_t num, uint8_t *b, int index) {
+	LittleEndian_putW(num & 0xffff, b, index);
+	LittleEndian_putW(num >> 16, b, index + 2);
+}
+

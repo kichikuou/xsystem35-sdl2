@@ -40,6 +40,10 @@ EM_JS(int, muspcm_load_no, (int slot, int no), {  // async
 	return xsystem35.audio.pcm_load(slot, no);
 });
 
+EM_JS(int, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {  // async
+	return xsystem35.audio.pcm_load_data(slot, buf, len);
+});
+
 EM_JS(int, muspcm_load_mixlr, (int slot, int noL, int noR), {  // async
 	return xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
 });

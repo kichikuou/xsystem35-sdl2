@@ -29,6 +29,7 @@ extern int muspcm_exit(void);
 extern int muspcm_reset(void);
 extern int muspcm_load_no(int slot, int no);
 extern int muspcm_load_mixlr(int slot, int noL, int noR);
+extern int muspcm_load_data(int slot, uint8_t *buf, uint32_t len);
 extern int muspcm_unload(int slot);
 extern int muspcm_start(int slot, int loop);
 extern int muspcm_stop(int slot);

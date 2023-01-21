@@ -34,7 +34,6 @@
 #include "dri.h"
 #include "music_pcm.h"
 #include "music_private.h"
-#include "pcm.sdlmixer.h"
 #include "sdl_core.h"
 #include "nact.h"
 #include "LittleEndian.h"
@@ -63,7 +62,7 @@ static mmap_t *wai_map;
  * 指定の番号の .WAV|.OGG をロードする。
  * @param no: DRIファイル番号
  */
-Mix_Chunk *pcm_sdlmixer_load(int no) {
+static Mix_Chunk *load_asset(int no) {
 	dridata *dfile = ald_getdata(DRIFILE_WAVE, no -1);
 	if (dfile == NULL) {
 		WARNING("DRIFILE_WAVE fail to open %d", no -1);
@@ -81,6 +80,17 @@ Mix_Chunk *pcm_sdlmixer_load(int no) {
 	return chunk;
 }
 
+static int load_chunk(int slot, Mix_Chunk *chunk) {
+	if ((unsigned)slot >= PCM_SLOTS)
+		return NG;
+
+	if (slots[slot].chunk)
+		muspcm_unload(slot);
+
+	slots[slot].chunk = chunk;
+	return OK;
+}
+
 /**
  * noL と noR の .WAV をロードし、左右合成
  *
@@ -89,8 +99,8 @@ Mix_Chunk *pcm_sdlmixer_load(int no) {
  * @return   : 合成後の Mix_Chunk
  */
 static Mix_Chunk *pcm_mixlr(int noL, int noR) {
-	Mix_Chunk *chunkL = pcm_sdlmixer_load(noL);
-	Mix_Chunk *chunkR = pcm_sdlmixer_load(noR);
+	Mix_Chunk *chunkL = load_asset(noL);
+	Mix_Chunk *chunkR = load_asset(noR);
 	if (chunkL == NULL || chunkR == NULL) {
 		if (chunkL)
 			Mix_FreeChunk(chunkL);
@@ -153,7 +163,7 @@ int muspcm_load_no(int slot, int no) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return NG;
 
-	Mix_Chunk *chunk = pcm_sdlmixer_load(no);
+	Mix_Chunk *chunk = load_asset(no);
 	if (chunk == NULL) {
 		return NG;
 	}
@@ -166,7 +176,7 @@ int muspcm_load_no(int slot, int no) {
 		prv.vol_pcm_sub[slot] = 0;
 	}
 
-	return pcm_sdlmixer_load_chunk(slot, chunk);
+	return load_chunk(slot, chunk);
 }
 
 int muspcm_load_mixlr(int slot, int noL, int noR) {
@@ -179,7 +189,18 @@ int muspcm_load_mixlr(int slot, int noL, int noR) {
 		return NG;
 	}
 
-	return pcm_sdlmixer_load_chunk(slot, chunk);
+	return load_chunk(slot, chunk);
+}
+
+int muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
+	if ((unsigned)slot >= PCM_SLOTS)
+		return NG;
+
+	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(buf, len), 1);
+	if (!chunk)
+		return NG;
+
+	return load_chunk(slot, chunk);
 }
 
 // PCMデータのメモリ上からのアンロード
@@ -194,17 +215,6 @@ int muspcm_unload(int slot) {
 	Mix_FreeChunk(slots[slot].chunk);
 	slots[slot].chunk = NULL;
 
-	return OK;
-}
-
-int pcm_sdlmixer_load_chunk(int slot, Mix_Chunk *chunk) {
-	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
-
-	if (slots[slot].chunk)
-		muspcm_unload(slot);
-
-	slots[slot].chunk = chunk;
 	return OK;
 }
 

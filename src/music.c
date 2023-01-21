@@ -321,6 +321,13 @@ int mus_wav_load(int ch, int num) {
 	return muspcm_load_no(ch + 1, num);
 }
 
+int mus_wav_load_data(int ch, uint8_t *buf, uint32_t len) {
+	if (!prv.pcm_valid) return NG;
+
+	if (ch < 0 || ch > 128) return NG;
+	return muspcm_load_data(ch + 1, buf, len);
+}
+
 /*
  * 指定のチャンネルから wave file を破棄
  *   ch : channel
