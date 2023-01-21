@@ -26,12 +26,35 @@
 #ifndef __LITTLEENDIAN__
 #define __LITTLEENDIAN__
 
-#include "portab.h"
+#include <string.h>
+#include <SDL_endian.h>
 
-extern int LittleEndian_getDW(const uint8_t *b,int index);
-extern int LittleEndian_get3B(const uint8_t *b,int index);
-extern int LittleEndian_getW(const uint8_t *b,int index);
-extern void LittleEndian_putW(int num, uint8_t *b, int index);
-extern void LittleEndian_putDW(uint32_t num, uint8_t *b, int index);
+static inline int LittleEndian_getDW(const uint8_t *b, int index) {
+	uint32_t t;
+	memcpy(&t, b + index, sizeof t);
+	return SDL_SwapLE32(t);
+}
+
+static inline int LittleEndian_get3B(const uint8_t *b, int index) {
+	uint32_t t = 0;
+	memcpy(&t, b + index, 3);
+	return SDL_SwapLE32(t);
+}
+
+static inline int LittleEndian_getW(const uint8_t *b, int index) {
+	uint16_t t;
+	memcpy(&t, b + index, sizeof t);
+	return SDL_SwapLE16(t);
+}
+
+static inline void LittleEndian_putW(uint16_t num, uint8_t *b, int index) {
+	num = SDL_SwapLE16(num);
+	memcpy(b + index, &num, sizeof(num));
+}
+
+static inline void LittleEndian_putDW(uint32_t num, uint8_t *b, int index) {
+	num = SDL_SwapLE32(num);
+	memcpy(b + index, &num, sizeof(num));
+}
 
 #endif /* !__LITTLEENDIAN__ */
