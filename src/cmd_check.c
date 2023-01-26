@@ -976,6 +976,8 @@ void exec_command(void) {
 			commandST(); break;
 		case 'U':
 			commandSU(); break;
+		case 'V':
+			commandSV(); break;
 		case 'W':
 			commandSW(); break;
 		case 'X':

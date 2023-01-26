@@ -280,6 +280,13 @@ void commandSU() {
 	DEBUG_COMMAND("SU %d,%d:",*var1, *var2);
 }
 
+void commandSV() {
+	// Set volume (Rance4 v2.05)
+	int device = getCaliValue();
+	int volume = getCaliValue();
+	DEBUG_COMMAND_YET("SV %d,%d", device, volume);
+}
+
 void commandSQ() {
 	/* 左右別々のＰＣＭデータを合成して演奏する */
 	int noL  = getCaliValue();

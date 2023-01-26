@@ -220,6 +220,7 @@ extern void commandSR();
 extern void commandSS();
 extern void commandST();
 extern void commandSU();
+extern void commandSV();
 extern void commandSW();
 extern void commandSX();
 extern void commandSI();
