@@ -82,7 +82,8 @@ void commandY() {
 	unsigned int p1 = getCaliValue();
 	unsigned int p2 = getCaliValue();
 	
-	if (p1 == 1) {
+	switch (p1) {
+	case 1:
 		if (p2 == 0) {
 			/* メッセージ領域の初期化と、文字の表示位置を左上端にセットする */
 			msg_nextPage(TRUE);
@@ -90,18 +91,23 @@ void commandY() {
 			/* メッセージ領域の文字の表示位置を左上端にセットする */
 			msg_nextPage(FALSE);
 		}
-	} else if (p1 == 2) {
+		break;
+	case 2:
 		/*システム変数 D01〜D20 までを初期化する */ 
 		for (i = 0; i < 20; i++) {
 			sysVar[i + 1] = 0;
 		}
-	} else if (p1 == 3) {
-		int orig_pc = sl_getIndex();
-		if (p2 == 1 && sl_getc() == 'I' && sl_getc() == 'M') {
-			rance4_Y3_IM_hack();
-			return;
+		break;
+	case 3:
+	case 1003:  // Rance4 ver2.05
+		{
+			int orig_pc = sl_getIndex();
+			if (p2 == 1 && sl_getc() == 'I' && sl_getc() == 'M') {
+				rance4_Y3_IM_hack();
+				return;
+			}
+			sl_jmpNear(orig_pc);
 		}
-		sl_jmpNear(orig_pc);
 
 		switch (p2) {
 		case 10000:
@@ -114,18 +120,23 @@ void commandY() {
 			sysVar[0] = sys_getInputInfo();
 			break;
 		default:
+			if (p1 == 1003)
+				sys_key_releasewait(SYS35KEY_RET, FALSE);
 			sysVar[0] = sys_keywait(16 * p2, Y3waitFlags | KEYWAIT_SKIPPABLE);
 			break;
 		}
-	} else if (p1 == 4) {
+		break;
+	case 4:
 		/* 1 〜 n までの乱数を RND に返す。*/
 		if (p2 == 0 || p2 == 1) {
 			sysVar[0] = p2;
 		} else {
 			sysVar[0] = (int)(genrand() * p2) +1;
 		}
-	} else {
+		break;
+	default:
 		WARNING("Y undefined command %d", p1);
+		break;
 	}
 	DEBUG_COMMAND("Y %d,%d:",p1,p2);
 }
