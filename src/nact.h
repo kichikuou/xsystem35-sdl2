@@ -108,7 +108,10 @@ typedef struct {
 	int patch_ec;   /* see patch_ec command   */
 	int patch_emen; /* see patch_emen command */
 	int patch_g0;   /* see patch g0 command */
-	
+
+	// For game-specific hacks.
+	bool game_rance4v2;
+
 	/* ain 関連 */
 	S39AIN ain;
 

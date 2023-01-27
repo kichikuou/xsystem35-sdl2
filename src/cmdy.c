@@ -63,6 +63,9 @@ unsigned Y3waitFlags = KEYWAIT_CANCELABLE;
  *
  * To fix this, this hack processes `Y 3, 1:` followed by the IM command without
  * delay, when a button is pressed.
+ *
+ * For Rance4 v2, this does not work because the UI loop also checks keyboard
+ * status, so we use a different hack. See rance4v2_hack() in sdl_event.c.
  */
 static void rance4_Y3_IM_hack() {
 	static int count;
@@ -120,8 +123,14 @@ void commandY() {
 			sysVar[0] = sys_getInputInfo();
 			break;
 		default:
-			if (p1 == 1003)
+			if (p1 == 1003) {
 				sys_key_releasewait(SYS35KEY_RET, FALSE);
+			} else if (nact->game_rance4v2) {
+				// Return immediately if any key is pressed.
+				sysVar[0] = sys_getInputInfo();
+				if (sysVar[0])
+					break;
+			}
 			sysVar[0] = sys_keywait(16 * p2, Y3waitFlags | KEYWAIT_SKIPPABLE);
 			break;
 		}
@@ -133,6 +142,10 @@ void commandY() {
 		} else {
 			sysVar[0] = (int)(genrand() * p2) +1;
 		}
+		break;
+	case 1900:  // Rance4 ver2
+		// The effect of Y1900 is unknown.
+		nact->game_rance4v2 = true;
 		break;
 	default:
 		WARNING("Y undefined command %d", p1);

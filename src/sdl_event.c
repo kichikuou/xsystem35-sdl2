@@ -91,6 +91,18 @@ void send_agsevent(int type, int code) {
 #endif
 }
 
+// Improves map navigation of Rance4 v2. See also the function comment of
+// rance4_Y3_IM_hack() in cmdy.c.
+static void rance4v2_hack(void) {
+	// Do not wait for vsync while a mouse button or an arrow key is pressed.
+	if (mouseb ||
+		(RawKeyInfo[KEY_UP]    || RawKeyInfo[KEY_PAD_8]) ||
+		(RawKeyInfo[KEY_DOWN]  || RawKeyInfo[KEY_PAD_2]) ||
+		(RawKeyInfo[KEY_LEFT]  || RawKeyInfo[KEY_PAD_4]) ||
+		(RawKeyInfo[KEY_RIGHT] || RawKeyInfo[KEY_PAD_6]))
+		nact->wait_vsync = FALSE;
+}
+
 /* Event処理 */
 static void sdl_getEvent(void) {
 	static int cmd_count_of_prev_input = -1;
@@ -260,6 +272,8 @@ static void sdl_getEvent(void) {
 		cmd_count_of_prev_input = nact->cmd_count;
 	} else if (nact->cmd_count != cmd_count_of_prev_input) {
 		nact->wait_vsync = TRUE;
+		if (nact->game_rance4v2)
+			rance4v2_hack();
 	}
 	
 	if (m2b) {
