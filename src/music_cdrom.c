@@ -29,48 +29,78 @@
 #include "music_cdrom.h"
 #include "cdrom.h"
 
+static char *dev = CDROM_DEVICE;
+
+void muscd_set_devicename(char *name) {
+	if (0 == strcmp("none", name)) dev = NULL;
+	else                           dev = strdup(name);
+}
+
 int muscd_init(void) {
-	int st = cd_init(&prv.cddev);
-	if (st == -1) {
-		prv.cd_valid = FALSE;
+	prv.cddev = cd_init(dev);
+	if (!prv.cddev) {
 		return NG;
 	}
-	prv.cd_valid = TRUE;
+	prv.cddev->init(dev);
 	prv.cd_current_track = 0;
 	return OK;
 }
 
 int muscd_exit(void) {
-	if (prv.cd_valid) {
-		prv.cddev.exit();
+	if (prv.cddev) {
+		prv.cddev->exit();
+		prv.cddev = NULL;
 	}
 	return OK;
 }
 
 int muscd_reset(void) {
-	if (prv.cd_valid) {
-		prv.cddev.reset();
+	if (prv.cddev) {
+		prv.cddev->reset();
 		prv.cd_current_track = 0;
 	}
 	return OK;
 }
 
 int muscd_start(int trk, int loop) {
+	if (!prv.cddev)
+		return NG;
 	if (trk == prv.cd_current_track)
 		return OK;
-	prv.cddev.stop();
+	prv.cddev->stop();
 
-	prv.cddev.start(trk, loop);
+	prv.cddev->start(trk, loop);
 	prv.cd_current_track = trk;
 	return OK;
 }
 
 int muscd_stop(void) {
-	prv.cddev.stop();
+	if (!prv.cddev)
+		return NG;
+	prv.cddev->stop();
 	prv.cd_current_track = 0;
 	return OK;
 }
 
-int muscd_getpos(cd_time *tm) {
-	return prv.cddev.getpos(tm);
+int muscd_getpos(int *t, int *m, int *s, int *f) {
+	if (!prv.cddev)
+		return NG;
+	cd_time info;
+	if (prv.cddev->getpos(&info) != OK)
+		return NG;
+	*t = info.t;
+	*m = info.m;
+	*s = info.s;
+	*f = info.f;
+	return OK;
+}
+
+int muscd_get_maxtrack(void) {
+	if (!prv.cddev)
+		return 0;
+	return prv.cd_maxtrk;
+}
+
+bool muscd_is_available(void) {
+	return prv.cddev;
 }

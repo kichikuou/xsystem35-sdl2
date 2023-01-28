@@ -25,13 +25,15 @@
 #define __MUSIC_CDROM_H__
 
 #include "portab.h"
-#include "cdrom.h"
 
+void muscd_set_devicename(char *);
 int muscd_init(void);
 int muscd_exit(void);
 int muscd_reset(void);
 int muscd_start(int trk, int loop);
 int muscd_stop(void);
-int muscd_getpos(cd_time *tm);
+int muscd_getpos(int *t, int *m, int *s, int *f);
+int muscd_get_maxtrack(void);
+bool muscd_is_available(void);
 
 #endif /* __MUSIC_CDROM_H__ */

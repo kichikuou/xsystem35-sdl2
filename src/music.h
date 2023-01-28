@@ -26,6 +26,7 @@
 
 #include "portab.h"
 #include "midi.h"
+#include "music_cdrom.h"
 
 enum MixDevice {
 	MIX_MASTER,
@@ -38,13 +39,6 @@ enum MixDevice {
 extern int mus_init(int audio_buffer_size);
 extern void mus_exit(void);
 extern void mus_reset(void);
-
-/* cdrom related function */
-extern int mus_cdrom_start(int track, int loop);
-extern int mus_cdrom_stop(void);
-extern int mus_cdrom_get_playposition(int *t, int *m, int *s, int *f);
-extern int mus_cdrom_get_maxtrack(void);
-extern boolean mus_cdrom_get_state(void);
 
 /* midi related function */
 extern int mus_midi_start(int no, int loop);

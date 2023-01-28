@@ -49,14 +49,14 @@ static void Run() {
 	DEBUG_COMMAND_YET("dDemo.Run:");
 	
 #ifdef DDEMODEV
-	mus_cdrom_start(13, 1);
+	muscd_start(13, 1);
 	// ddemo_scene();
 	
 	while(0 == sys_getInputInfo()) {
 		usleep(1000 * 100);
 	}
 
-	mus_cdrom_stop();
+	muscd_stop();
 #endif
 }
 

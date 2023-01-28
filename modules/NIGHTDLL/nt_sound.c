@@ -23,7 +23,7 @@ void nt_voice_set(int no) {
 }
 
 void nt_cd_play(int no) {
-	mus_cdrom_start(no +1, 0);
+	muscd_start(no + 1, 0);
 }
 
 void nt_cd_stop(int msec) {

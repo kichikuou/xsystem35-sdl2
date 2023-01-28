@@ -26,7 +26,6 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 
 #include "portab.h"
 #include "cdrom.h"
@@ -34,80 +33,43 @@
 
 #if defined(ENABLE_CDROM_LINUX)
 extern cdromdevice_t cdrom_linux;
-#define DEV_PLAY_MODE &cdrom_linux
+#define NATIVE_CD_DEVICE &cdrom_linux
 
 #elif defined(ENABLE_CDROM_BSD)
 extern cdromdevice_t cdrom_bsd;
-#define DEV_PLAY_MODE &cdrom_bsd
+#define NATIVE_CD_DEVICE &cdrom_bsd
 
 #elif defined(ENABLE_CDROM_EMSCRIPTEN)
 extern cdromdevice_t cdrom_emscripten;
-#define DEV_PLAY_MODE &cdrom_emscripten
+#define NATIVE_CD_DEVICE &cdrom_emscripten
 
 #elif defined(ENABLE_CDROM_ANDROID)
 extern cdromdevice_t cdrom_android;
-#define DEV_PLAY_MODE &cdrom_android
+#define NATIVE_CD_DEVICE &cdrom_android
 
 #else
 
 extern cdromdevice_t cdrom_empty;
-#define DEV_PLAY_MODE &cdrom_empty
+#define NATIVE_CD_DEVICE &cdrom_empty
 #endif
 
 #ifdef ENABLE_CDROM_MP3
 extern cdromdevice_t cdrom_mp3;
 #endif
 
-
-/*
-  temporary cdrom device name
-   
-  default ... /dev/cdrom
-  
-  FreeBSD  ... /dev/acd0a
-   etc...
-*/
-static char *dev = CDROM_DEVICE;
-
-
-/*
-  初期化
-    dev: cdromdevice に関する情報を格納する場所
-    RET: 成功  0
-         失敗 -1
-*/
-int cd_init(cdromdevice_t *cd) {
+cdromdevice_t *cd_init(const char *dev) {
 #if defined(ENABLE_CDROM_EMSCRIPTEN) || defined(ENABLE_CDROM_ANDROID)
-	memcpy(cd, DEV_PLAY_MODE, sizeof(cdromdevice_t));
-	return cd->init(dev);
+	return NATIVE_CD_DEVICE;
 #else
 	struct stat st;
-	int ret = NG;
-	
-	if (dev == NULL) return -1;
-	
-	stat(dev, &st);
-	if (S_ISBLK(st.st_mode) | S_ISCHR(st.st_mode)) {
-		/* CDROM MODE */
-		memcpy(cd, DEV_PLAY_MODE, sizeof(cdromdevice_t));
-		ret = cd->init(dev);
-	}
-	else {
-#ifdef ENABLE_CDROM_MP3
-		/* MP3 MODE */
-		memcpy(cd, &cdrom_mp3, sizeof(cdromdevice_t));
-		ret = cd->init(dev);
-#else
-		/* error */
-		WARNING("no cdrom device available");
-		ret = NG;
-#endif
-	}
-	return ret;
-#endif  // ENABLE_CDROM_EMSCRIPTEN || ENABLE_CDROM_ANDROID
-}
+	if (dev && stat(dev, &st) && (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode)))
+		return NATIVE_CD_DEVICE;
 
-void cd_set_devicename(char *name) {
-	if (0 == strcmp("none", name)) dev = NULL;
-	else                           dev = strdup(name);
+#ifdef ENABLE_CDROM_MP3
+	return &cdrom_mp3;
+#else
+	WARNING("no cdrom device available");
+	return NULL;
+#endif
+#endif  // ENABLE_CDROM_EMSCRIPTEN || ENABLE_CDROM_ANDROID
 }

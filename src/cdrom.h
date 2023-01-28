@@ -49,8 +49,7 @@ struct _cdromdevice {
 };
 typedef struct _cdromdevice cdromdevice_t;
 
-extern int  cd_init(cdromdevice_t *);
-extern void cd_set_devicename(char *);
+extern cdromdevice_t *cd_init(const char *dev);
 
 #define CD_FPS 75
 #define FRAMES_TO_MSF(f, M,S,F) {                                       \

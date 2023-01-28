@@ -1290,7 +1290,7 @@ void commands2F72() {
 void commands2F73() {
 	int *vTrack = getCaliVariable();
 	
-	*vTrack = mus_cdrom_get_maxtrack();
+	*vTrack = muscd_get_maxtrack();
 	
 	DEBUG_COMMAND("cdGetMaxTrack %d:", *vTrack);
 }

@@ -32,11 +32,10 @@
 #include "ald_manager.h"
 
 struct _musprvdat {
-	boolean cd_valid;
 	boolean midi_valid;
 	boolean pcm_valid;
 	
-	cdromdevice_t cddev;
+	cdromdevice_t *cddev;
 	mididevice_t  mididev;
 	
 	// ゲーム内での volume 設定 (%値)

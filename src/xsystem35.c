@@ -63,7 +63,7 @@
 #include "sdl_core.h"
 #include "menu.h"
 #include "music.h"
-#include "cdrom.h"
+#include "music_cdrom.h"
 #include "savedata.h"
 #include "scenario.h"
 #include "variable.h"
@@ -271,7 +271,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			render_driver = argv[i + 1];
 		} else if (0 == strcmp(argv[i], "-devcd")) {
 			if (argv[i + 1] != NULL) {
-				cd_set_devicename(argv[i + 1]);
+				muscd_set_devicename(argv[i + 1]);
 			}
 		} else if (0 == strcmp(argv[i], "-devmidi")) {
 			if (argv[i + 1] != NULL) {
@@ -359,7 +359,7 @@ static void check_profile() {
 	/* CD-ROM device name の設定 */
 	param = get_profile("cdrom_device");
 	if (param) {
-		cd_set_devicename(param);
+		muscd_set_devicename(param);
 	}
 	/* joystick device name の設定 */
 	param = get_profile("joy_device");

@@ -41,9 +41,9 @@ void commandSS() {
 	DEBUG_COMMAND("SS %d:",num);
 	
 	if (num == 0) {
-		mus_cdrom_stop();
+		muscd_stop();
 	} else {
-		mus_cdrom_start(num + 1, next_cdrom_loopcnt);
+		muscd_start(num + 1, next_cdrom_loopcnt);
 	}
 	
 	next_cdrom_loopcnt = 0;
@@ -54,7 +54,7 @@ void commandSC() {
 	int *var = getCaliVariable();
 	int t, m, s, f;
 	
-	if (mus_cdrom_get_playposition(&t, &m, &s, &f) == OK) {
+	if (muscd_getpos(&t, &m, &s, &f) == OK) {
 		*var++ = t - 1;
 		*var++ = m;
 		*var++ = s;
@@ -97,7 +97,7 @@ void commandSR() {
 	
 	if (num == 0) {
 		int t, m, s, f;
-		if (mus_cdrom_get_playposition(&t, &m, &s, &f) == OK) {
+		if (muscd_getpos(&t, &m, &s, &f) == OK) {
 			// System3.5 returns the music number (track_no - 1),
 			// while System3.6 and later return the track number.
 			if (!memcmp(sl_sco, "S350", 4))
@@ -135,7 +135,7 @@ void commandSI() {
 	} else if (type == 1) { /* PCM */
 		*var = mus_pcm_get_state()   == TRUE ? 1 : 0;
 	} else if (type == 2) { /* CD */
-		*var = mus_cdrom_get_state() == TRUE ? 1 : 0;
+		*var = muscd_is_available() ? 1 : 0;
 	}
 	
 	DEBUG_COMMAND("SI %d,%d:",type,*var);

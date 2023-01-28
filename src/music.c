@@ -37,68 +37,16 @@ int mus_init(int audio_buffer_size) {
 
 void mus_exit(void) {
 	musbgm_exit();
-	if (prv.cd_valid) muscd_exit();
+	muscd_exit();
 	if (prv.midi_valid) musmidi_exit();
 	if (prv.pcm_valid) muspcm_exit();
 }
 
 void mus_reset(void) {
 	musbgm_reset();
-	if (prv.cd_valid) muscd_reset();
+	muscd_reset();
 	if (prv.midi_valid) musmidi_reset();
 	if (prv.pcm_valid) muspcm_reset();
-}
-
-/*
- * cdrom の演奏開始 
- *   track: トラック番号 (第一トラックは 1)
- *   loop : 繰り返し回数 (0の場合は無限)
- */
-int mus_cdrom_start(int track, int loop) {
-	if (!prv.cd_valid) return NG;
-	return muscd_start(track, loop);
-}
-
-/*
- * cdrom の演奏停止
- */
-int mus_cdrom_stop() {
-	if (!prv.cd_valid) return NG;
-	return muscd_stop();
-}
-
-/*
- * cdrom の演奏時間(track/min/sec/frame)の取得
- * 停止している場合は NG が返る
- */
-int mus_cdrom_get_playposition(int *t, int *m, int *s, int *f) {
-	if (!prv.cd_valid) return NG;
-	cd_time info;
-	if (muscd_getpos(&info) != OK)
-		return NG;
-	*t = info.t;
-	*m = info.m;
-	*s = info.s;
-	*f = info.f;
-	return OK;
-}
-
-/*
- * cdrom の最大トラック数の取得
- *   
- */
-int mus_cdrom_get_maxtrack() {
-	if (!prv.cd_valid) return 0;
-	return prv.cd_maxtrk;
-}
-
-/*
- * CDROM の有効/無効 フラグの取得
- *   return: FALASE -> 無効
- *           TRUE   -> 有効
- */
-boolean mus_cdrom_get_state() {
-	return prv.cd_valid;
 }
 
 /*
