@@ -284,15 +284,12 @@ int muspcm_getpos(int slot) {
 	return pos;
 }
 
-// PCMオブジェクトに対してボリュームをセット
-int muspcm_setvol(int dev, int slot, int lv) {
+// Set the volume for a channel.
+int muspcm_setvol(int slot, int lv) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return NG;
 
-	if (!slots[slot].chunk)
-		return NG;
-
-	Mix_VolumeChunk(slots[slot].chunk, lv * MIX_MAX_VOLUME / 100);
+	Mix_Volume(slot, lv * MIX_MAX_VOLUME / 100);
 	return OK;
 }
 

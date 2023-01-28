@@ -37,7 +37,7 @@ extern int muspcm_fadeout(int slot, int msec);
 extern int muspcm_pause(int slot);
 extern int muspcm_unpause(int slot);
 extern int muspcm_getpos(int slot);
-extern int muspcm_setvol(int dev, int slot, int lv);
+extern int muspcm_setvol(int slot, int lv);
 extern int muspcm_getwavelen(int slot);
 extern boolean muspcm_isplaying(int slot);
 extern int muspcm_waitend(int slot);

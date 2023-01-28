@@ -78,7 +78,7 @@ EM_JS(int, muspcm_getpos, (int slot), {
 	return xsystem35.audio.pcm_getpos(slot);
 });
 
-EM_JS(int, muspcm_setvol, (int dev, int slot, int lv), {
+EM_JS(int, muspcm_setvol, (int slot, int lv), {
 	return xsystem35.audio.pcm_setvol(slot, lv);
 });
 

@@ -281,10 +281,12 @@ void commandSU() {
 }
 
 void commandSV() {
-	// Set volume (Rance4 v2.05)
+	// Set volume (Rance4 v2)
 	int device = getCaliValue();
 	int volume = getCaliValue();
-	DEBUG_COMMAND_YET("SV %d,%d", device, volume);
+	mus_mixer_set_level(device, volume);
+
+	DEBUG_COMMAND("SV %d,%d", device, volume);
 }
 
 void commandSQ() {

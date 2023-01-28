@@ -309,6 +309,13 @@ int mus_mixer_get_level(int device) {
 	return 0;
 }
 
+bool mus_mixer_set_level(int device, int level) {
+	if (device == MIX_PCM)
+		return muspcm_setvol(0, level);
+	WARNING("not implemented");
+	return false;
+}
+
 /*
  * 指定のチャンネルに wave file をロード
  *   ch : channel (0-127)

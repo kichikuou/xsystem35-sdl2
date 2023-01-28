@@ -70,6 +70,7 @@ extern int mus_mixer_fadeout_start(int device, int time, int volume, int stop);
 extern boolean mus_mixer_fadeout_get_state(int device);
 extern int mus_mixer_fadeout_stop(int device);
 extern int mus_mixer_get_level(int device);
+extern bool mus_mixer_set_level(int device, int level);
 
 /* wav (command2F) / ShSound related function */
 extern int mus_wav_load(int ch, int num);
