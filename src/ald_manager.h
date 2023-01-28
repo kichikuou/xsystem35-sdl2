@@ -38,9 +38,10 @@ typedef enum {
 	DRIFILE_BGM =6   /* stream music data */
 } DRIFILETYPE;
 
-extern void     ald_init(int type, const char **file, int cnt, boolean use_mmap);
-extern dridata *ald_getdata(DRIFILETYPE type, int no);
-extern void     ald_freedata(dridata *data);
+void ald_init(int type, const char **file, int cnt, boolean use_mmap);
+dridata *ald_getdata(DRIFILETYPE type, int no);
+void ald_freedata(dridata *data);
+int ald_get_maxno(DRIFILETYPE type);
 
 #endif /* !__ALD_MANAGER__ */
 

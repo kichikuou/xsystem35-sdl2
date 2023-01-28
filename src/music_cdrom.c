@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "portab.h"
+#include "ald_manager.h"
 #include "music_private.h"
 #include "music_cdrom.h"
 #include "cdrom.h"
@@ -37,9 +38,14 @@ void muscd_set_devicename(char *name) {
 }
 
 int muscd_init(void) {
-	prv.cddev = cd_init(dev);
-	if (!prv.cddev) {
-		return NG;
+	// In the download edition of Daiakuji, SS command plays music from *BA.ald.
+	if (ald_get_maxno(DRIFILE_BGM) > 0) {
+		prv.cddev = &cdrom_bgm;
+	} else {
+		prv.cddev = cd_init(dev);
+		if (!prv.cddev) {
+			return NG;
+		}
 	}
 	prv.cddev->init(dev);
 	prv.cd_current_track = 0;

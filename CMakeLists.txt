@@ -110,6 +110,7 @@ endif()
 
 # CDROM
 
+list(APPEND SRC_CDROM cdrom.bgm.c)
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   list(APPEND SRC_CDROM cdrom.Linux.c)
   list(APPEND SUMMARY_CDROM "Linux ioctl")

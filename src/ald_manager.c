@@ -37,11 +37,6 @@ static drifiles *dri[DRIFILETYPEMAX];
 static cacher *cacheid;
 
 /*
- * static maethods
-*/
-static void ald_free(dridata *dfile);
-
-/*
  * free dridata 
  *   dfile: dridata to be free
 */
@@ -108,4 +103,10 @@ void ald_init(int type, const char **file, int cnt, boolean use_mmap) {
 	if (!dri[type]->mmapped) {
 		cacheid = cache_new(ald_free);
 	}
+}
+
+int ald_get_maxno(DRIFILETYPE type) {
+	if (type >= DRIFILETYPEMAX || !dri[type])
+		return 0;
+	return dri[type]->nr_files;
 }
