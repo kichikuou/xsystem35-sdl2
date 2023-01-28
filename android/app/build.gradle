@@ -16,8 +16,8 @@ android {
         }
         minSdkVersion 19
         targetSdkVersion 31
-        versionCode 11
-        versionName "2.6.0" + gitRevision()
+        versionCode 12
+        versionName "2.7.0" + gitRevision()
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
