@@ -22,7 +22,7 @@
 #include "portab.h"
 #include "bgm.h"
 
-int musbgm_init(void) {
+int musbgm_init(DRIFILETYPE type, int base_no) {
 	return NG;
 }
 

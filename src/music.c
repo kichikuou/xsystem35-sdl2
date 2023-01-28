@@ -28,7 +28,7 @@
 struct _musprvdat musprv;
 
 int mus_init(int audio_buffer_size) {
-	musbgm_init();
+	musbgm_init(DRIFILE_BGM, 0);
 	muscd_init();
 	musmidi_init();
 	prv.pcm_valid = muspcm_init(audio_buffer_size) == OK;

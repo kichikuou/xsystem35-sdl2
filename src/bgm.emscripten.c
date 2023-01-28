@@ -26,8 +26,12 @@
 #include "bgi.h"
 #include "sdl_core.h"
 
-int musbgm_init(void) {
-	return bgi_read(nact->files.bgi);
+int musbgm_init(DRIFILETYPE type, int base_no) {
+	if (type == DRIFILE_BGM)
+		return bgi_read(nact->files.bgi);
+	else
+		EM_ASM({ xsystem35.cdPlayer.setBGMLoader($0, $1); }, type, base_no);
+	return OK;
 }
 
 int musbgm_exit(void) {

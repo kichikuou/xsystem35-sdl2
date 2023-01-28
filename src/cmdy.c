@@ -32,6 +32,7 @@
 #include "scenario.h"
 #include "cmd_check.h"
 #include "sdl_core.h"
+#include "music_cdrom.h"
 
 unsigned Y3waitFlags = KEYWAIT_CANCELABLE;
 
@@ -143,9 +144,11 @@ void commandY() {
 			sysVar[0] = (int)(genrand() * p2) +1;
 		}
 		break;
-	case 1900:  // Rance4 ver2
-		// The effect of Y1900 is unknown.
+	case 1900:
+		// The effect of Y1900 is unknown, but since it is only used by Rance4
+		// ver2 as the very first command, do some initialization here.
 		nact->game_rance4v2 = true;
+		muscd_init_bgm(DRIFILE_WAVE, 999);
 		break;
 	default:
 		WARNING("Y undefined command %d", p1);

@@ -52,6 +52,12 @@ int muscd_init(void) {
 	return OK;
 }
 
+int muscd_init_bgm(DRIFILETYPE type, int base_no) {
+	muscd_exit();
+	prv.cddev = &cdrom_bgm;
+	return musbgm_init(type, base_no);
+}
+
 int muscd_exit(void) {
 	if (prv.cddev) {
 		prv.cddev->exit();

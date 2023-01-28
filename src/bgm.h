@@ -19,7 +19,9 @@
 #ifndef __BGM_H__
 #define __BGM_H__
 
-int musbgm_init(void);
+#include "ald_manager.h"
+
+int musbgm_init(DRIFILETYPE type, int base_no);
 int musbgm_exit(void);
 int musbgm_reset(void);
 int musbgm_play(int no, int time, int vol);

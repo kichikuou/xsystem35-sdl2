@@ -25,9 +25,11 @@
 #define __MUSIC_CDROM_H__
 
 #include "portab.h"
+#include "ald_manager.h"
 
 void muscd_set_devicename(char *);
 int muscd_init(void);
+int muscd_init_bgm(DRIFILETYPE type, int base_no);
 int muscd_exit(void);
 int muscd_reset(void);
 int muscd_start(int trk, int loop);

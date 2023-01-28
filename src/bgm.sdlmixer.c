@@ -36,6 +36,8 @@
 #include "music_private.h"
 #include "ald_manager.h"
 
+static DRIFILETYPE dri_type;
+static int base_no;
 static int current_no;
 static Mix_Music *mix_music;
 static dridata* dfile;
@@ -56,9 +58,10 @@ static void free_music() {
 static Mix_Music *bgm_load(int no) {
 	free_music();
 
-	dfile = ald_getdata(DRIFILE_BGM, no -1);
+	int ald_no = no + base_no - 1;
+	dfile = ald_getdata(dri_type, ald_no);
 	if (dfile == NULL) {
-		WARNING("DRIFILE_BGM fail to open %d", no -1);
+		WARNING("Failed to open BGM %d", ald_no);
 		return NULL;
 	}
 
@@ -66,7 +69,7 @@ static Mix_Music *bgm_load(int no) {
 
 	mix_music = Mix_LoadMUS_RW(rwops, SDL_TRUE /* freesrc */);
 	if (mix_music == NULL) {
-		WARNING("Failed to load BGM %d: %s", no, SDL_GetError());
+		WARNING("Failed to load BGM %d: %s", ald_no, SDL_GetError());
 		free_music();
 		return NULL;
 	}
@@ -75,8 +78,12 @@ static Mix_Music *bgm_load(int no) {
 	return mix_music;
 }
 
-int musbgm_init(void) {
-	return bgi_read(nact->files.bgi);
+int musbgm_init(DRIFILETYPE type, int base) {
+	dri_type = type;
+	base_no = base;
+	if (type == DRIFILE_BGM)
+		return bgi_read(nact->files.bgi);
+	return OK;
 }
 
 int musbgm_exit(void) {
