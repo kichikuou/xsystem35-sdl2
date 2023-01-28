@@ -26,7 +26,6 @@ add_library(modules STATIC
   SACT/SACT.c
   SACT/sactcg.c
   SACT/sactsound.c
-  SACT/sactbgm.c
   SACT/sacttimer.c
   SACT/sactstring.c
   SACT/sactcrypto.c

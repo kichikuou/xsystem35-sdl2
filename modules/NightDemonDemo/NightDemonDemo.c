@@ -51,7 +51,7 @@ static void ndd_run(int demonum) {
 
 	int mus = ndemo_mus[demonum];
 	if (mus)
-		mus_bgm_play(mus, 0, 100);
+		musbgm_play(mus, 0, 100);
 
 	uint32_t start = sdl_getTicks();
 	while (!nact->is_quit) {
@@ -79,7 +79,7 @@ static void ndd_run(int demonum) {
 	}
 
 	if (mus)
-		mus_bgm_stop(ndemo_mus[demonum], 0);
+		musbgm_stop(ndemo_mus[demonum], 0);
 
 	alk_free(alk);
 }

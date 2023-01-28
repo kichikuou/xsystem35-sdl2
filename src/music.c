@@ -409,39 +409,6 @@ int mus_wav_load_lrsw(int ch, int num) {
 	return NG;
 }
 
-int mus_bgm_play(int no, int time, int vol) {
-	return musbgm_play(no, time, vol);
-}
-
-int mus_bgm_stop(int no, int time) {
-	return musbgm_stop(no, time);
-}
-
-int mus_bgm_stopall(int time) {
-	return musbgm_stopall(time);
-}
-
-int mus_bgm_fade(int no, int time, int vol) {
-	return musbgm_fade(no, time, vol);
-}
-
-int mus_bgm_getpos(int no) {
-	return musbgm_getpos(no);
-}
-
-int mus_bgm_getlength(int no) {
-	return musbgm_getlen(no);
-}
-
-int mus_bgm_wait(int no, int timeout) {
-	return musbgm_wait(no, timeout);
-}
-
-int mus_bgm_waitpos(int no, int index) {
-	WARNING("not implemented");
-	return NG;
-}
-
 int mus_vol_set_valance(int *vols, int num) {
 	WARNING("not implemented");
 	return NG;

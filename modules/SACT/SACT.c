@@ -28,19 +28,20 @@
 
 #include "portab.h"
 #include "system.h"
+#include "ald_manager.h"
 #include "input.h"
 #include "msgskip.h"
 #include "xsystem35.h"
 #include "gametitle.h"
 #include "message.h"
 #include "modules.h"
+#include "music.h"
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
 #include "sactcg.h"
 #include "sactstring.h"
 #include "sactsound.h"
-#include "sactbgm.h"
 #include "sactcrypto.h"
 #include "sactchart.h"
 #include "ngraph.h"
@@ -1790,7 +1791,9 @@ static void MusicCheck() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 	
-	*vRND = smus_check(wNum);
+	dridata *dfile = ald_getdata(DRIFILE_BGM, wNum - 1);
+	*vRND = dfile ? 1 : 0;
+	ald_freedata(dfile);
 	
 	DEBUG_COMMAND_YET("SACT.MusicCheck %d,%p:", wNum, vRND);
 }
@@ -1805,7 +1808,7 @@ static void MusicGetLength() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 	
-	*vRND = smus_getlength(wNum);
+	*vRND = musbgm_getlen(wNum);
 	
 	DEBUG_COMMAND_YET("SACT.MusicGetLength %d,%d:", wNum, *vRND);
 }
@@ -1820,7 +1823,7 @@ static void MusicGetPos() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 	
-	*vRND = smus_getpos(wNum);
+	*vRND = musbgm_getpos(wNum);
 	
 	DEBUG_COMMAND_YET("SACT.MusicGetPos %d,%d:", wNum, *vRND);
 }
@@ -1837,7 +1840,7 @@ static void MusicPlay() {
 	int wFadeTime = getCaliValue();
 	int wVolume = getCaliValue();
 	
-	smus_play(wNum, wFadeTime, wVolume);
+	musbgm_play(wNum, wFadeTime, wVolume);
 	
 	DEBUG_COMMAND_YET("SACT.MusicPlay %d,%d,%d:", wNum, wFadeTime, wVolume);
 }
@@ -1852,7 +1855,7 @@ static void MusicStop() {
 	int wNum = getCaliValue();
 	int wFadeTime = getCaliValue();
 	
-	smus_stop(wNum, wFadeTime);
+	musbgm_stop(wNum, wFadeTime);
 	
 	DEBUG_COMMAND_YET("SACT.MusicStop %d,%d:", wNum, wFadeTime);
 }
@@ -1865,7 +1868,7 @@ static void MusicStop() {
 static void MusicStopAll() {
 	int wFadeTime = getCaliValue();
 	
-	smus_stopall(wFadeTime);
+	musbgm_stopall(wFadeTime);
 	
 	DEBUG_COMMAND_YET("SACT.MusicStopAll %d:", wFadeTime);
 }
@@ -1882,7 +1885,7 @@ static void MusicFade() {
 	int wFadeTime = getCaliValue();
 	int wVolume = getCaliValue();
 	
-	smus_fade(wNum, wFadeTime, wVolume);
+	musbgm_fade(wNum, wFadeTime, wVolume);
 	
 	DEBUG_COMMAND_YET("SACT.MusicFade %d,%d,%d:", wNum, wFadeTime, wVolume);
 }
@@ -1901,7 +1904,7 @@ static void MusicWait() {
 		nTimeOut = getCaliValue();
 	}
 	
-	smus_wait(wNum, nTimeOut);
+	musbgm_wait(wNum, nTimeOut);
 	
 	DEBUG_COMMAND_YET("SACT.MusicWait %d,%d:", wNum, nTimeOut);
 }
@@ -1917,7 +1920,7 @@ static void MusicWaitPos() {
 	int wNum = getCaliValue();
 	int wIndex = getCaliValue();
 	
-	smus_waitpos(wNum, wIndex);
+	WARNING("SACT.MusicWatiPos not implemented");
 	
 	DEBUG_COMMAND_YET("SACT.MusicWaitPos %d,%d:", wNum, wIndex);
 }

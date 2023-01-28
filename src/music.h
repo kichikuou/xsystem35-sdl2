@@ -25,6 +25,7 @@
 #define __MUSIC_CLIENT_H__
 
 #include "portab.h"
+#include "bgm.h"
 #include "midi.h"
 #include "music_cdrom.h"
 
@@ -80,16 +81,6 @@ extern int mus_wav_waitend(int ch);
 extern int mus_wav_waittime(int ch, int time);
 extern int mus_wav_wavtime(int ch);
 extern int mus_wav_load_lrsw(int ch, int num);
-
-/* Music Stream */
-extern int mus_bgm_play(int no, int time, int vol);
-extern int mus_bgm_stop(int no, int time);
-extern int mus_bgm_stopall(int time);
-extern int mus_bgm_fade(int no, int time, int vol);
-extern int mus_bgm_getpos(int no);
-extern int mus_bgm_getlength(int no);
-extern int mus_bgm_wait(int no, int timeout);
-extern int mus_bgm_waitpos(int no, int index);
 
 /* volume valaner */
 extern int mus_vol_set_valance(int *vols, int num);
