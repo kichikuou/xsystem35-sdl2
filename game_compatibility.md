@@ -5,7 +5,7 @@ Game Compatibility
 | ------------------------------------------- | ----------- | ----- |
 | 鬼畜王ランス                                | Supported   |       |
 | Kichikuou Rance (EN)                        | Supported   |       |
-| RanceIV －教団の遺産－                      | Supported   | Win95 edition |
+| RanceIV －教団の遺産－                      | Supported   | Win95 edition, [Win10 edition](https://hannylaboratory.blogspot.com/2023/01/blog-post_26.html) |
 | Rance4 -Legacy of the Sect- (EN)            | Supported   |       |
 | 兰斯IV －教团的遗产－ (CN)                  | Supported   |       |
 | いけないかつみ先生                          | Supported   | Emojis are not supported |
