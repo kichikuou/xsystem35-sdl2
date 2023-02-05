@@ -233,16 +233,11 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 	sdl_pal_check();
 	
 	if (sdl_dib->format->BitsPerPixel > 8 && cg->pal) {
-		int i, i_st = 0, i_end = 256;
 		SDL_Color *c = s->format->palette->colors;
-		uint8_t *r = cg->pal->red, *g = cg->pal->green, *b = cg->pal->blue;
-		
-		if (cg->type == ALCG_VSP) {
-			i_st  = (cg->vsp_bank << 4);
-			i_end = i_st + 16;
-			c += i_st;
-		}
-		for (i = i_st; i < i_end; i++) {
+		uint8_t *r = cg->pal->red;
+		uint8_t *g = cg->pal->green;
+		uint8_t *b = cg->pal->blue;
+		for (int i = 0; i < 256; i++) {
 			c->r = *(r++);
 			c->g = *(g++);
 			c->b = *(b++);
