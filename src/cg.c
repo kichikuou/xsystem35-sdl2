@@ -346,9 +346,9 @@ void cg_load(int no, int flg) {
 		}
 		/* draw cg pixel */
 		display_cg(cg, p.x, p.y, flg, flg != -1);
-		/* clear display offset */
-		clear_display_loc();
 	}
+	/* clear display offset */
+	clear_display_loc();
 }
 
 /*
