@@ -49,7 +49,6 @@ static int stack_size = 1024;
 
 static int labelCallCnt = 0;
 static int pageCallCnt  = 0;
-static int labelCallCnt_afterPageCall = 0;
 static int dataPushCnt = 0;
 
 static char strbuf[512];
@@ -68,7 +67,6 @@ boolean sl_init(void) {
 
 	labelCallCnt = 0;
 	pageCallCnt = 0;
-	labelCallCnt_afterPageCall = 0;
 	dataPushCnt = 0;
 	return TRUE;
 }
@@ -227,7 +225,6 @@ void sl_callNear(int address) {
 	sl_jmpNear(address);
 	
 	labelCallCnt++;
-	labelCallCnt_afterPageCall++;
 }
 
 void sl_retNear(void) {
@@ -250,7 +247,6 @@ void sl_retNear(void) {
 	sl_jmpNear(index);
 	
 	labelCallCnt--;
-	labelCallCnt_afterPageCall--;
 }
 
 void sl_callFar(int page) {
@@ -258,7 +254,6 @@ void sl_callFar(int page) {
 	sl_push(STACK_FARJMP, val, 2);
 	boolean ok = sl_jmpFar(page);
 	pageCallCnt++;
-	labelCallCnt_afterPageCall = 0;
 	if (!ok)
 		sl_retFar();
 }
@@ -267,7 +262,6 @@ void sl_callFar2(int page, int address) {
 	int val[2] = { sl_page, sl_index };
 	sl_push(STACK_FARJMP, val, 2);
 	boolean ok = sl_jmpFar2(page, address);
-	labelCallCnt_afterPageCall = 0;
 	pageCallCnt++;
 	if (!ok)
 		sl_retFar();
@@ -295,7 +289,6 @@ void sl_retFar(void) {
 	free(tmp);
 	sl_jmpFar2(page, index);
 	
-	labelCallCnt_afterPageCall = 0;
 	pageCallCnt--;
 }
 
@@ -323,7 +316,6 @@ void sl_retFar2(void) {
 	sl_jmpFar2(page, index);
 	
 	pageCallCnt--;
-	labelCallCnt_afterPageCall = 0;
 }
 
 /* UC0 */
@@ -353,29 +345,20 @@ void sl_stackClear_pageCall(int cnt) {
 		}
 		free(tmp);
 	}
-	labelCallCnt_afterPageCall = 0;
 }
 
 /* UC 1 */
 void sl_stackClear_labelCall(int cnt) {
-	int *tmp;
-	
-	if (labelCallCnt_afterPageCall == 0) return;
-	
-	tmp = sl_pop();
-	while(cnt--) {
+	while (cnt--) {
+		int *tmp = sl_pop();
 		if (*tmp == STACK_NEARJMP) {
 			labelCallCnt--;
-			labelCallCnt_afterPageCall--;
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
-			SYSERROR("Stack buffer is illegal");
+			SYSERROR("No label call to pop");
 		}
 		free(tmp);
-		if (labelCallCnt_afterPageCall == 0) break;
-		
-		tmp = sl_pop();
 	}
 }
 
@@ -531,7 +514,6 @@ void sl_returnGoto(int address) {
 		// index = *(tmp + 3);
 		free(tmp);
 		sl_jmpFar2(page, address);
-		labelCallCnt_afterPageCall = 0;
 		pageCallCnt--;
 	} else {
 		// index = *(tmp + 2);
@@ -539,6 +521,5 @@ void sl_returnGoto(int address) {
 		sl_jmpNear(address);
 		
 		labelCallCnt--;
-		labelCallCnt_afterPageCall--;
 	}
 }
