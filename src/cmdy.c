@@ -147,7 +147,6 @@ void commandY() {
 	case 1900:
 		// The effect of Y1900 is unknown, but since it is only used by Rance4
 		// ver2 as the very first command, do some initialization here.
-		nact->game_rance4v2 = true;
 		muscd_init_bgm(DRIFILE_WAVE, 999);
 		break;
 	default:

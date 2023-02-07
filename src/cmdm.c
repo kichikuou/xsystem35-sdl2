@@ -165,15 +165,12 @@ void commandMT() {
 	nact->game_title_utf8 = toUTF8(str);
 	ags_setWindowTitle(str);
 	
-	/* 闘神都市II 対策 */
-	if (0 == strcmp(nact->game_title_utf8, GT_TOSHIN2)) {
+	if (!strcmp(nact->game_title_utf8, GT_TOSHIN2))
 		dummy_pcm_su_flag = TRUE;
-	}
-	
-	/* Rance4 対策？ */
-	if (0 == strcmp(nact->game_title_utf8, GT_RANCE4)) {
+	if (!strcmp(nact->game_title_utf8, GT_RANCE4))
 		Y3waitFlags = KEYWAIT_NONCANCELABLE;
-	}
+	if (!strcmp(nact->game_title_utf8, GT_RANCE4V2))
+		nact->game_rance4v2 = true;
 
 	DEBUG_COMMAND("MT %s:",str);
 }
