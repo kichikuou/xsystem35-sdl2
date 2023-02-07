@@ -62,6 +62,13 @@ void commandUD() {
 void commandUR() {
 	/* 最後に積まれたスタックの属性をリード */
 	int *var = getCaliVariable();
+	// TODO: implement
+	var[0] = 0;
+	var[1] = 0;
+	var[2] = 0;
+	var[3] = 0;
+	var[4] = 0;
+	var[5] = 0;
 	
 	DEBUG_COMMAND_YET("UR %p:",var);
 }
