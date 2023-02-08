@@ -145,8 +145,9 @@ void commandY() {
 		}
 		break;
 	case 1900:
-		// The effect of Y1900 is unknown, but since it is only used by Rance4
-		// ver2 as the very first command, do some initialization here.
+		nact->patch_ec = p2;
+		// We're sure this game was built for System3.9 v5.50, which by default
+		// routes CD-DA commands to DRIFILE_WAVE.
 		muscd_init_bgm(DRIFILE_WAVE, 999);
 		break;
 	default:
