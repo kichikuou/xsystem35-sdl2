@@ -271,32 +271,6 @@ void sl_retFar(void) {
 
 	while (*tmp != STACK_FARJMP) {
 		if (*tmp == STACK_NEARJMP) {
-			WARNING("Stack buffer is illegal");
-		} else if (*tmp == STACK_TXXSTATE) {
-			popState(tmp);
-		} else if (*tmp == STACK_VARIABLE) {
-			popVars(tmp);
-		} else {
-			SYSERROR("Stack buffer is illegal");
-		}
-		free(tmp);
-		tmp = sl_pop();
-	}
-	page  = *(tmp + 2);
-	index = *(tmp + 3);
-	free(tmp);
-	sl_jmpFar2(page, index);
-	
-	pageCallCnt--;
-}
-
-/* UD 1 */
-void sl_retFar2(void) {
-	int *tmp = sl_pop();
-	int page, index;
-
-	while (*tmp != STACK_FARJMP) {
-		if (*tmp == STACK_NEARJMP) {
 			labelCallCnt--;
 		} else if (*tmp == STACK_TXXSTATE) {
 			popState(tmp);

@@ -68,7 +68,6 @@ void sl_retNear(void);
 void sl_callFar(int page);
 void sl_callFar2(int page, int address);
 void sl_retFar(void);
-void sl_retFar2(void);
 void sl_clearStack(bool restore);
 void sl_dropLabelCalls(int cnt);
 void sl_dropPageCalls(int cnt);

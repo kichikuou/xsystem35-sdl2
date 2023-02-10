@@ -55,7 +55,7 @@ void commandUD() {
 	case 0:
 		sl_reinit(); break;
 	case 1:
-		sl_retFar2(); break;
+		sl_retFar(); break;
 	default:
 		WARNING("UnKnown UD command %d", mode);
 	}
