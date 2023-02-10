@@ -503,8 +503,7 @@ void sl_returnGoto(int address) {
 	int *tmp = sl_pop();
 	int page;
 
-	while (TRUE) {
-		if (*tmp != STACK_FARJMP || *tmp != STACK_NEARJMP) break;
+	while (*tmp != STACK_FARJMP && *tmp != STACK_NEARJMP) {
 		if (*tmp == STACK_TXXSTATE) {
 			popState(tmp);
 		} else if (*tmp == STACK_VARIABLE) {
