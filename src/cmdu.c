@@ -66,15 +66,17 @@ void commandUD() {
 void commandUR() {
 	/* 最後に積まれたスタックの属性をリード */
 	int *var = getCaliVariable();
-	// TODO: implement
-	var[0] = 0;
-	var[1] = 0;
-	var[2] = 0;
-	var[3] = 0;
-	var[4] = 0;
-	var[5] = 0;
+
+	struct stack_info info;
+	sl_getStackInfo(&info);
+	var[0] = info.top_attr;
+	var[1] = info.page_calls;
+	var[2] = info.label_calls;
+	var[3] = info.var_pushes;
+	var[4] = info.label_calls_after_page_call;
+	var[5] = info.var_pushes_after_call;
 	
-	DEBUG_COMMAND_YET("UR %p:",var);
+	DEBUG_COMMAND("UR %p:",var);
 }
 
 void commandUS() {

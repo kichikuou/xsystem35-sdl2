@@ -43,6 +43,15 @@ enum txx_type {
 	TxxTEXTLOC = 3
 };
 
+struct stack_info {
+	int top_attr;  // always zero?
+	int page_calls;
+	int label_calls;
+	int var_pushes;
+	int label_calls_after_page_call;
+	int var_pushes_after_call;
+};
+
 // Use functions below instead of accessing these variables directly.
 extern const uint8_t *sl_sco; // scenario page buffer
 extern int sl_page;        // current scenario page (0-based)
@@ -73,8 +82,9 @@ void sl_dropLabelCalls(int cnt);
 void sl_dropPageCalls(int cnt);
 void sl_pushVar(struct VarRef *vref, int cnt);
 void sl_popVar(struct VarRef *vref, int cnt);
-int *sl_getStackInfo(int *size);
-void sl_putStackInfo(int *data, int size);
+int *sl_getStack(int *size);
+void sl_putStack(int *data, int size);
+void sl_getStackInfo(struct stack_info *info);
 void sl_pushState(enum txx_type type, int val1, int val2);
 void sl_popState(enum txx_type expected_type);
 void *sl_setDataTable(int page, int index);

@@ -525,7 +525,7 @@ int save_saveAll(int no) {
 /* スタック情報のセーブ */
 static void *saveStackInfo(Ald_stackHdr *head) {
 	int count;
-	int *info = sl_getStackInfo(&count);
+	int *info = sl_getStack(&count);
 	
 	head->size = count * sizeof(int);
 	return (void *)info;
@@ -535,7 +535,7 @@ static void *saveStackInfo(Ald_stackHdr *head) {
 static void loadStackInfo(char *buf) {
 	Ald_stackHdr *head = (Ald_stackHdr *)buf;
 	char         *data = buf + sizeof(Ald_stackHdr);
-	sl_putStackInfo((int *)data, head->size / sizeof(int));
+	sl_putStack((int *)data, head->size / sizeof(int));
 }
 
 /* 文字列変数のセーブ */

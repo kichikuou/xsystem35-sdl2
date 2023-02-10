@@ -47,9 +47,6 @@ static int *stack_buf;
 static int *stack_top;
 static int stack_size = 1024;
 
-static int labelCallCnt = 0;
-static int pageCallCnt  = 0;
-
 static char strbuf[512];
 
 static dridata *dfile;   // dri object for current page
@@ -64,8 +61,6 @@ boolean sl_init(void) {
 	stack_top = stack_buf;
 	sl_jmpFar(0);
 
-	labelCallCnt = 0;
-	pageCallCnt = 0;
 	return TRUE;
 }
 
@@ -221,8 +216,6 @@ void sl_callNear(int address) {
 	val[0] = sl_index;
 	sl_push(STACK_NEARJMP, val, 1);
 	sl_jmpNear(address);
-	
-	labelCallCnt++;
 }
 
 void sl_retNear(void) {
@@ -245,15 +238,12 @@ void sl_retNear(void) {
 	index = *(tmp + 2);
 	free(tmp);
 	sl_jmpNear(index);
-	
-	labelCallCnt--;
 }
 
 void sl_callFar(int page) {
 	int val[2] = { sl_page, sl_index };
 	sl_push(STACK_FARJMP, val, 2);
 	boolean ok = sl_jmpFar(page);
-	pageCallCnt++;
 	if (!ok)
 		sl_retFar();
 }
@@ -262,7 +252,6 @@ void sl_callFar2(int page, int address) {
 	int val[2] = { sl_page, sl_index };
 	sl_push(STACK_FARJMP, val, 2);
 	boolean ok = sl_jmpFar2(page, address);
-	pageCallCnt++;
 	if (!ok)
 		sl_retFar();
 }
@@ -273,7 +262,7 @@ void sl_retFar(void) {
 
 	while (*tmp != STACK_FARJMP) {
 		if (*tmp == STACK_NEARJMP) {
-			labelCallCnt--;
+			// do nothing
 		} else if (*tmp == STACK_TXXSTATE) {
 			popState(tmp);
 		} else if (*tmp == STACK_VARIABLE) {
@@ -288,8 +277,6 @@ void sl_retFar(void) {
 	index = *(tmp + 3);
 	free(tmp);
 	sl_jmpFar2(page, index);
-	
-	pageCallCnt--;
 }
 
 /* UC0 */
@@ -316,7 +303,6 @@ void sl_clearStack(bool restore) {
 		free(tmp);
 	}
 
-	labelCallCnt = pageCallCnt = 0;
 	stack_top = stack_buf;
 }
 
@@ -326,10 +312,8 @@ void sl_dropPageCalls(int cnt) {
 		int *tmp = sl_pop();
 		switch (*tmp) {
 		case STACK_NEARJMP:
-			labelCallCnt--;
 			break;
 		case STACK_FARJMP:
-			pageCallCnt--;
 			cnt--;
 			break;
 		case STACK_VARIABLE:
@@ -351,7 +335,6 @@ void sl_dropLabelCalls(int cnt) {
 		int *tmp = sl_pop();
 		switch (*tmp) {
 		case STACK_NEARJMP:
-			labelCallCnt--;
 			cnt--;
 			break;
 		case STACK_VARIABLE:
@@ -419,12 +402,12 @@ static void popVars(int *tmp) {
 	memcpy(topVar, tmp + 4, sizeof(int) * cnt); 
 }
 
-int *sl_getStackInfo(int *size) {
+int *sl_getStack(int *size) {
 	*size = stack_top - stack_buf;
 	return stack_buf;
 }
 
-void sl_putStackInfo(int *data, int size) {
+void sl_putStack(int *data, int size) {
 	if (size > stack_size) {
 		stack_size = size << 1;
 		stack_buf  = calloc(stack_size, sizeof(int));
@@ -435,6 +418,28 @@ void sl_putStackInfo(int *data, int size) {
 	stack_top = stack_buf + size;
 }
 
+void sl_getStackInfo(struct stack_info *info) {
+	memset(info, 0, sizeof(struct stack_info));
+	for (int *p = stack_top; p > stack_buf; p -= p[-2] + 2) {
+		switch (p[-1]) {
+		case STACK_NEARJMP:
+			info->label_calls++;
+			if (!info->page_calls)
+				info->label_calls_after_page_call++;
+			break;
+		case STACK_FARJMP:
+			info->page_calls++;
+			break;
+		case STACK_VARIABLE:
+			info->var_pushes += p[-2] - 2;
+			if (info->page_calls + info->label_calls == 0)
+				info->var_pushes_after_call += p[-2] - 2;
+			break;
+		case STACK_TXXSTATE:
+			break;
+		}
+	}
+}
 
 /* TPx */
 void sl_pushState(enum txx_type type, int val1, int val2) {
@@ -516,12 +521,9 @@ void sl_returnGoto(int address) {
 		// index = *(tmp + 3);
 		free(tmp);
 		sl_jmpFar2(page, address);
-		pageCallCnt--;
 	} else {
 		// index = *(tmp + 2);
 		free(tmp);
 		sl_jmpNear(address);
-		
-		labelCallCnt--;
 	}
 }

@@ -390,7 +390,7 @@ static void set_stack_frame(StackFrame *frame, int page, int addr, boolean is_re
 
 StackTrace *dbg_stack_trace(void) {
 	int stack_size;
-	const int *stack_base = sl_getStackInfo(&stack_size);
+	const int *stack_base = sl_getStack(&stack_size);
 
 	int page = nact->current_page;
 
@@ -440,7 +440,7 @@ static boolean should_continue_step(void) {
 void dbg_stepout(void) {
 	// Set an internal breakpoint at the return address of current frame.
 	int stack_size;
-	const int *stack_base = sl_getStackInfo(&stack_size);
+	const int *stack_base = sl_getStack(&stack_size);
 	const int *p = stack_base + stack_size - 1;
 	while (p >= stack_base) {
 		int page, addr = -1;
