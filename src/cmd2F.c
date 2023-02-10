@@ -467,6 +467,8 @@ void commands2F28() {
 		0 == strcmp(nact->game_title_utf8, GT_RANCE4_ENG)) {
 		have_eng_mp_patch = TRUE;
 	}
+	if (!strcmp(nact->game_title_utf8, GT_RANCE4V2))
+		nact->game_rance4v2 = true;
 
 	DEBUG_COMMAND("MT(new) %s:",title);
 }
