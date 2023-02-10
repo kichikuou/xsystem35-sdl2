@@ -232,6 +232,8 @@ void sl_retNear(void) {
 	while (*tmp != STACK_NEARJMP) {
 		if (*tmp == STACK_FARJMP) {
 			SYSERROR("Stack buffer is illegal");
+		} else if (*tmp == STACK_TXXSTATE) {
+			popState(tmp);
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
