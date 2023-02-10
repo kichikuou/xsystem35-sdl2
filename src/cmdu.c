@@ -33,12 +33,16 @@ void commandUC() { /* 王道勇者 */
 	
 	switch(mode) {
 	case 0:
-		 sl_stackClear_allCall(); break;
+		sl_clearStack(true);
+		break;
 	case 1:
-		 sl_stackClear_labelCall(num); break;
+		sl_dropLabelCalls(num);
+		break;
 	case 2:
-		 sl_stackClear_pageCall(num); break;
-	default:
+		sl_dropPageCalls(num);
+		break;
+	case 3:
+		sl_clearStack(false);
 		break;
 	}
 	DEBUG_COMMAND("UC %d,%d:",mode,num);

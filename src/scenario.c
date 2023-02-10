@@ -317,44 +317,75 @@ void sl_retFar2(void) {
 }
 
 /* UC0 */
-void sl_stackClear_allCall(void) {
-	free(stack_buf);
-	stack_buf = calloc(stack_size, sizeof(int));
-	if (stack_buf == NULL)
-		NOMEMERR();
+void sl_clearStack(bool restore) {
+	if (!restore) {
+		stack_top = stack_buf;
+		return;
+	}
+	while (stack_top > stack_buf) {
+		int *tmp = sl_pop();
+		switch (*tmp) {
+		case STACK_NEARJMP:
+		case STACK_FARJMP:
+			break;
+		case STACK_VARIABLE:
+			popVars(tmp);
+			break;
+		case STACK_TXXSTATE:
+			popState(tmp);
+			break;
+		default:
+			SYSERROR("broken stack");
+		}
+		free(tmp);
+	}
 
+	labelCallCnt = pageCallCnt = 0;
 	stack_top = stack_buf;
 }
 
 /* UC 2 */
-void sl_stackClear_pageCall(int cnt) {
-	int *tmp;
-	
-	while(cnt--) {
-		tmp = sl_pop();
-		if (*tmp == STACK_NEARJMP) {
+void sl_dropPageCalls(int cnt) {
+	while (cnt > 0 && stack_top > stack_buf) {
+		int *tmp = sl_pop();
+		switch (*tmp) {
+		case STACK_NEARJMP:
 			labelCallCnt--;
-		} else if (*tmp == STACK_FARJMP) {
+			break;
+		case STACK_FARJMP:
 			pageCallCnt--;
-		} else if (*tmp == STACK_VARIABLE) {
+			cnt--;
+			break;
+		case STACK_VARIABLE:
 			popVars(tmp);
-		} else {
-			SYSERROR("Stack buffer is illegal");
+			break;
+		case STACK_TXXSTATE:
+			popState(tmp);
+			break;
+		default:
+			SYSERROR("broken stack");
 		}
 		free(tmp);
 	}
 }
 
 /* UC 1 */
-void sl_stackClear_labelCall(int cnt) {
-	while (cnt--) {
+void sl_dropLabelCalls(int cnt) {
+	while (cnt > 0 && stack_top > stack_buf && stack_top[-1] != STACK_FARJMP) {
 		int *tmp = sl_pop();
-		if (*tmp == STACK_NEARJMP) {
+		switch (*tmp) {
+		case STACK_NEARJMP:
 			labelCallCnt--;
-		} else if (*tmp == STACK_VARIABLE) {
+			cnt--;
+			break;
+		case STACK_VARIABLE:
 			popVars(tmp);
-		} else {
-			SYSERROR("No label call to pop");
+			break;
+		case STACK_TXXSTATE:
+			popState(tmp);
+			break;
+		default:
+			SYSERROR("broken stack");
 		}
 		free(tmp);
 	}
