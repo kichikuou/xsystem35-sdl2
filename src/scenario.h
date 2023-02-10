@@ -34,7 +34,7 @@ enum stack_frame_type {
 	STACK_NEARJMP = 1,
 	STACK_FARJMP = 2,
 	STACK_VARIABLE = 3,
-	STACK_DATA = 4
+	STACK_TXXSTATE = 4
 };
 
 enum txx_type {
@@ -76,8 +76,8 @@ void sl_pushVar(struct VarRef *vref, int cnt);
 void sl_popVar(struct VarRef *vref, int cnt);
 int *sl_getStackInfo(int *size);
 void sl_putStackInfo(int *data, int size);
-void sl_pushData(int *data, int cnt);
-void sl_popData(int *data, int cnt);
+void sl_pushState(enum txx_type type, int val1, int val2);
+void sl_popState(enum txx_type expected_type);
 void *sl_setDataTable(int page, int index);
 void sl_returnGoto(int address);
 

@@ -38,7 +38,7 @@ int sl_index;
 
 /* static mathods */
 static void popVars(int *tmp);
-static void popDatas(int *tmp);
+static void popState(int *tmp);
 static void sl_push(int type, int *val, int cnt);
 static int* sl_pop(void);
 
@@ -49,7 +49,6 @@ static int stack_size = 1024;
 
 static int labelCallCnt = 0;
 static int pageCallCnt  = 0;
-static int dataPushCnt = 0;
 
 static char strbuf[512];
 
@@ -67,7 +66,6 @@ boolean sl_init(void) {
 
 	labelCallCnt = 0;
 	pageCallCnt = 0;
-	dataPushCnt = 0;
 	return TRUE;
 }
 
@@ -274,8 +272,8 @@ void sl_retFar(void) {
 	while (*tmp != STACK_FARJMP) {
 		if (*tmp == STACK_NEARJMP) {
 			WARNING("Stack buffer is illegal");
-		} else if (*tmp == STACK_DATA) {
-			popDatas(tmp);
+		} else if (*tmp == STACK_TXXSTATE) {
+			popState(tmp);
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
@@ -300,8 +298,8 @@ void sl_retFar2(void) {
 	while (*tmp != STACK_FARJMP) {
 		if (*tmp == STACK_NEARJMP) {
 			labelCallCnt--;
-		} else if (*tmp == STACK_DATA) {
-			popDatas(tmp);
+		} else if (*tmp == STACK_TXXSTATE) {
+			popState(tmp);
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {
@@ -432,29 +430,27 @@ void sl_putStackInfo(int *data, int size) {
 
 
 /* TPx */
-void sl_pushData(int *data, int cnt) {
-	dataPushCnt++;
-	sl_push(STACK_DATA, data, cnt);
+void sl_pushState(enum txx_type type, int val1, int val2) {
+	int data[] = {type, val1, val2};
+	sl_push(STACK_TXXSTATE, data, 3);
 }
 
 /* TOx */
-void sl_popData(int *data, int cnt) {
-	int *tmp;
-	if (dataPushCnt == 0) return;
-	
-	tmp = sl_pop();
-	dataPushCnt--;
-	
-	if (*tmp != STACK_DATA)
-		SYSERROR("Stack buffer is illegal");
-	if (*(tmp + 1) != cnt)
-		WARNING("Variable count is not match with stacked variable");
-	
-	memcpy(data, tmp + 2, sizeof(int) * cnt);
+void sl_popState(enum txx_type expected_type) {
+	// No-op if the stack top is of an unexpected type.
+	if (stack_top <= stack_buf ||
+		stack_top[-1] != STACK_TXXSTATE ||
+		stack_top[-3] != expected_type) {
+		WARNING("unexpected stack top type");
+		return;
+	}
+
+	int *tmp = sl_pop();
+	popState(tmp);
 	free(tmp);
 }
 
-static void popDatas(int *tmp) {
+static void popState(int *tmp) {
 	int d1 = *(tmp + 2);
 	int d2 = *(tmp + 3);
 	int d3 = *(tmp + 4);
@@ -481,7 +477,6 @@ static void popDatas(int *tmp) {
 		msg_setMessageLocation(d2, d3);
 		break;
 	}
-	dataPushCnt--;
 }
 
 void *sl_setDataTable(int page, int index) {
@@ -498,8 +493,8 @@ void sl_returnGoto(int address) {
 
 	while (TRUE) {
 		if (*tmp != STACK_FARJMP || *tmp != STACK_NEARJMP) break;
-		if (*tmp == STACK_DATA) {
-			popDatas(tmp);
+		if (*tmp == STACK_TXXSTATE) {
+			popState(tmp);
 		} else if (*tmp == STACK_VARIABLE) {
 			popVars(tmp);
 		} else {

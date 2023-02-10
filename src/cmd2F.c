@@ -68,82 +68,43 @@ static fncall_table fnctbl[FCTBL_MAX];
 
 void commands2F00() {
 	/* テキストカラーをスタックからポップして設定する */
-	int data[3];
-	
-	sl_popData(data, 3);
-	if (data[0] == TxxTEXTCOLOR) {
-		if (data[1] == 0) {
-			nact->msg.MsgFontColor = data[2];
-		} else {
-			nact->sel.MsgFontColor = data[2];
-		}
-	}
-	
+	sl_popState(TxxTEXTCOLOR);
 	DEBUG_COMMAND("TOC:");
 }
 
 void commands2F01() {
 	/* テキストフォントサイズをスタックからポップして設定する */
-	int data[3];
-	
-	sl_popData(data, 3);
-	if (data[0] == TxxTEXTSIZE) {
-		if (data[1] == 0) {
-			nact->msg.MsgFontSize = data[2];
-		} else {
-			nact->sel.MsgFontSize = data[2];
-		}
-	}
-	
+	sl_popState(TxxTEXTSIZE);
 	DEBUG_COMMAND("TOS:");
 }
 
 void commands2F02() {
 	/* 現在のテキストカラーをスタックにプッシュする */
 	int exp = getCaliValue();
-	int data[] = {TxxTEXTCOLOR,0,0};
-	
-	data[1] = exp;
-	data[2] = (exp == 0 ? nact->msg.MsgFontColor : nact->sel.MsgFontColor);
-	sl_pushData(data, 3);
-	
+	int val = exp == 0 ? nact->msg.MsgFontColor : nact->sel.MsgFontColor;
+	sl_pushState(TxxTEXTCOLOR, exp, val);
 	DEBUG_COMMAND("TPC %d", exp);
 }
 
 void commands2F03() {
 	/* 現在のテキストフォントサイズをスタックにプッシュする */
 	int exp = getCaliValue();
-	int data[] = {TxxTEXTSIZE, 0, 0};
-	
-	data[1] = exp;
-	data[2] = (exp == 0 ? nact->msg.MsgFontSize : nact->sel.MsgFontSize);
-	sl_pushData(data, 3);
-	
-	DEBUG_COMMAND("TPS %d:%s", exp, "");
+	int val = exp == 0 ? nact->msg.MsgFontSize : nact->sel.MsgFontSize;
+	sl_pushState(TxxTEXTSIZE, exp, val);
+	DEBUG_COMMAND("TPS %d", exp);
 }
 
 void commands2F04() {
 	/* テキスト表示位置をスタックからポップして設定する */
-	int data[3];
-	
-	sl_popData(data, 3);
-	if (data[0] == TxxTEXTLOC) {
-		msg_setMessageLocation(data[1], data[2]);
-	}
-	
+	sl_popState(TxxTEXTLOC);
 	DEBUG_COMMAND("TOP:");
 }
 
 void commands2F05() {
 	/* 現在のテキスト表示位置をスタックにプッシュする */
-	int data[] = {TxxTEXTLOC, 0, 0};
 	MyPoint loc;
-	
 	msg_getMessageLocation(&loc);
-	data[1] = loc.x;
-	data[2] = loc.y;
-	sl_pushData(data, 3);
-	
+	sl_pushState(TxxTEXTLOC, loc.x, loc.y);
 	DEBUG_COMMAND("TPP:");
 }
 
