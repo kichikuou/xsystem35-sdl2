@@ -27,3 +27,9 @@ const word FILE = 1:
 	' actual: "' X actual: '"'
 	R
 	%0:
+
+**Fail line:
+	inc tests_failed:
+	'[FAIL] ' X FILE: ':' HH0,line:
+	R
+	%0:

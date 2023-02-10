@@ -1,0 +1,58 @@
+	MS FILE,"stack.adv":
+
+const word STACK_TOP_ATTR = 0:
+const word NUM_PAGE_CALLS = 1:
+const word NUM_LABEL_CALLS = 2:
+const word NUM_VAR_PUSHES = 3:
+const word NUM_LABEL_CALLS_AFTER_PAGE_CALL = 4:
+const word NUM_VAR_PUSHES_AFTER_CALL = 5:
+
+	UR D01:
+	~AssertEquals D01[STACK_TOP_ATTR], 0, __LINE__:
+	~AssertEquals D01[NUM_PAGE_CALLS], 1, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS], 0, __LINE__:
+	~AssertEquals D01[NUM_VAR_PUSHES], 0, __LINE__:
+	~TestGlobalReturnFromLocalFunc:
+	%0:
+
+**TestGlobalReturnFromLocalFunc:
+	UR D01:
+	~AssertEquals D01[STACK_TOP_ATTR], 0, __LINE__:
+	~AssertEquals D01[NUM_PAGE_CALLS], 2, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS], 0, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS_AFTER_PAGE_CALL], 0, __LINE__:
+	\LocalFunc:
+	; Unreachable
+	~Fail __LINE__:
+	%0:
+
+*LocalFunc:
+	UR D01:
+	~AssertEquals D01[STACK_TOP_ATTR], 0, __LINE__:
+	~AssertEquals D01[NUM_PAGE_CALLS], 2, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS], 1, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS_AFTER_PAGE_CALL], 1, __LINE__:
+	~NestedGlobalFunc:
+	%0:  ; This returns from TestGlobalReturnFromLocalFunc!
+
+**NestedGlobalFunc:
+	US D01, 20:
+	UR D01:
+	~AssertEquals D01[STACK_TOP_ATTR], 0, __LINE__:
+	~AssertEquals D01[NUM_PAGE_CALLS], 3, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS], 1, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS_AFTER_PAGE_CALL], 0, __LINE__:
+	~AssertEquals D01[NUM_VAR_PUSHES], 20, __LINE__:
+	~AssertEquals D01[NUM_VAR_PUSHES_AFTER_CALL], 20, __LINE__:
+	\NestedLocalFunc:
+	%0:
+
+*NestedLocalFunc:
+	UR D01:
+	~AssertEquals D01[STACK_TOP_ATTR], 0, __LINE__:
+	~AssertEquals D01[NUM_PAGE_CALLS], 3, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS], 2, __LINE__:
+	~AssertEquals D01[NUM_LABEL_CALLS_AFTER_PAGE_CALL], 1, __LINE__:
+	~AssertEquals D01[NUM_VAR_PUSHES], 20, __LINE__:
+	~AssertEquals D01[NUM_VAR_PUSHES_AFTER_CALL], 0, __LINE__:
+	\0:

@@ -3,6 +3,7 @@ test.adv
 util.adv
 array.adv
 strvar.adv
+stack.adv
 
 #DLLHeader
 ShString.HEL
