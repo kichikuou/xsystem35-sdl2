@@ -148,7 +148,7 @@ static void window_init(const char *render_driver) {
 #else
 	Uint32 flags = SDL_WINDOW_RESIZABLE;
 #endif
-	sdl_window = SDL_CreateWindow("XSystem3.5 Version "VERSION,
+	sdl_window = SDL_CreateWindow("XSystem35 Version "VERSION,
 								  SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
 								  flags);

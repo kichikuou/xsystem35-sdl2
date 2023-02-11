@@ -133,7 +133,7 @@ void ags_reset(void);
 /* ウィンド関係 */
 extern void ags_setWorldSize(int width, int height, int depth);
 extern void ags_setViewArea(int x, int y, int width, int height);
-extern void ags_setWindowTitle(const char *str);
+extern void ags_setWindowTitle(const char *title_utf8);
 extern void ags_getDIBInfo(DispInfo *info);
 extern void ags_getWindowInfo(DispInfo *info);
 extern void ags_getViewAreaInfo(DispInfo *info);

@@ -419,7 +419,7 @@ void commands2F28() {
 		free(nact->game_title_utf8);
 	nact->game_title_utf8 = toUTF8(title);
 
-	ags_setWindowTitle(title);
+	ags_setWindowTitle(nact->game_title_utf8);
 
 	enable_hack_by_title(nact->game_title_utf8);
 

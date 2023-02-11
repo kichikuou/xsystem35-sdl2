@@ -162,19 +162,10 @@ void ags_setViewArea(int x, int y, int width, int height) {
 	sdl_setWindowSize(width, height);
 }
 
-void ags_setWindowTitle(const char *src) {
-#define TITLEHEAD "XSystem35 Version "VERSION":"
-	uint8_t *utf, *d;
-
-	utf = toUTF8(src);
-	if (NULL == (d = malloc(strlen(utf) + strlen(TITLEHEAD) + 1))) {
-		NOMEMERR();
-	}
-	strcpy(d, TITLEHEAD);
-	strcat(d, utf);
-	sdl_setWindowTitle(d);
-	free(utf);
-	free(d);
+void ags_setWindowTitle(const char *title_utf8) {
+	char buf[256];
+	snprintf(buf, sizeof(buf), "XSystem35 Version %s: %s", VERSION, title_utf8);
+	sdl_setWindowTitle(buf);
 }
 
 void ags_getDIBInfo(DispInfo *info) {

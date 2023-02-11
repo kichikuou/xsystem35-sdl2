@@ -154,7 +154,7 @@ void commandMT() {
 	if (nact->game_title_utf8)
 		free(nact->game_title_utf8);
 	nact->game_title_utf8 = toUTF8(str);
-	ags_setWindowTitle(str);
+	ags_setWindowTitle(nact->game_title_utf8);
 	
 	enable_hack_by_title(nact->game_title_utf8);
 

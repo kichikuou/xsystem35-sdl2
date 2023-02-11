@@ -89,7 +89,9 @@ static void SetWindowTitle(void) { /* 6 */
 	int strno = getCaliValue();
 	int p2    = getCaliValue(); /* ISys3xSystem */ 
 	
-	ags_setWindowTitle(svar_get(strno));
+	char *title_utf8 = toUTF8(svar_get(strno));
+	ags_setWindowTitle(title_utf8);
+	free(title_utf8);
 	
 	DEBUG_COMMAND("ShString.SetWindowTitle: %d,%d:", strno, p2);
 }
