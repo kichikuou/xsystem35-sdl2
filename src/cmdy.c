@@ -126,7 +126,7 @@ void commandY() {
 		default:
 			if (p1 == 1003) {
 				sys_key_releasewait(SYS35KEY_RET, FALSE);
-			} else if (nact->game_rance4v2 && p2 == 1) {
+			} else if (nact->game == GAME_RANCE4_V2 && p2 == 1) {
 				// Return immediately if any key is pressed.
 				sysVar[0] = sys_getInputInfo();
 				if (sysVar[0])

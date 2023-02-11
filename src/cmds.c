@@ -29,8 +29,6 @@
 
 /* ぱにょ〜ん 異常シナリオ対策 */
 static boolean dummy_pcm_in_play = FALSE;
-/* 闘神都市II 異常シナリオ対策 */
-boolean dummy_pcm_su_flag = FALSE;
 /* 次の cdrom の loop 回数 */ 
 static int next_cdrom_loopcnt = 0;
 
@@ -273,7 +271,8 @@ void commandSU() {
 			dummy_pcm_in_play = dummy_pcm_in_play ? FALSE : TRUE;
 		}
 	}
-	if (dummy_pcm_su_flag) {
+	/* 闘神都市II 異常シナリオ対策 */
+	if (nact->game == GAME_TT2) {
 		*var1 = *var2 = 0;
 	}
 	

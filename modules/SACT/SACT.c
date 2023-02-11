@@ -32,7 +32,6 @@
 #include "input.h"
 #include "msgskip.h"
 #include "xsystem35.h"
-#include "gametitle.h"
 #include "message.h"
 #include "modules.h"
 #include "music.h"

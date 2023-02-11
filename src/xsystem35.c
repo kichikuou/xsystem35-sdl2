@@ -308,8 +308,12 @@ static void sys35_ParseOption(int *argc, char **argv) {
 		} else if (0 == strcmp(argv[i], "-version")) {
 			puts(VERSION);
 			exit(0);
-		}  else if (0 == strcmp(argv[i], "-integerscale")) {
+		} else if (0 == strcmp(argv[i], "-integerscale")) {
 			sdl_setIntegerScaling(TRUE);
+		} else if (0 == strcmp(argv[i], "-game")) {
+			if (argv[i + 1] != NULL) {
+				enable_hack_by_gameid(argv[i + 1]);
+			}
 		}
 	}
 }
@@ -393,6 +397,11 @@ static void check_profile() {
 		if (0 == strcmp(param, "Yes")) {
 			sdl_setIntegerScaling(TRUE);
 		}
+	}
+	/* enable game-specific hacks */
+	param = get_profile("game");
+	if (param) {
+		enable_hack_by_gameid(param);
 	}
 }
 

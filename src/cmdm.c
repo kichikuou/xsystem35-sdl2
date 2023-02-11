@@ -31,21 +31,12 @@
 #include "utfsjis.h"
 #include "menu.h"
 #include "ags.h"
-#include "input.h"
 #include "message.h"
-#include "gametitle.h"
 #include "hankaku.h"
-
-/* defined by cmds.c */
-extern boolean dummy_pcm_su_flag;
-/* defined by cmdy.c */
-extern boolean Y3waitFlags;
 
 
 /* MI 用パラメータ */
 INPUTSTRING_PARAM mi_param;
-
-boolean have_eng_mp_patch = FALSE;
 
 void commandMS() {
 	/* Xコマンドで表示される文字列領域に文字列を入れる */
@@ -69,7 +60,7 @@ void commandMP() {
 	char *str;
 
 	/* Patched English executable appends num2 spaces instead of truncating */
-	if (have_eng_mp_patch) {
+	if (nact->game == GAME_RANCE3_ENG || nact->game == GAME_RANCE4_ENG) {
 		str = calloc(strlen(src) + num2 * strlen(fullwidth_blank[nact->encoding]) + 1, 1);
 		if (NULL == str) {
 			NOMEMERR();
@@ -165,12 +156,7 @@ void commandMT() {
 	nact->game_title_utf8 = toUTF8(str);
 	ags_setWindowTitle(str);
 	
-	if (!strcmp(nact->game_title_utf8, GT_TOSHIN2))
-		dummy_pcm_su_flag = TRUE;
-	if (!strcmp(nact->game_title_utf8, GT_RANCE4))
-		Y3waitFlags = KEYWAIT_NONCANCELABLE;
-	if (!strcmp(nact->game_title_utf8, GT_RANCE4V2))
-		nact->game_rance4v2 = true;
+	enable_hack_by_title(nact->game_title_utf8);
 
 	DEBUG_COMMAND("MT %s:",str);
 }

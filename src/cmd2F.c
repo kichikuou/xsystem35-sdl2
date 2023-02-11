@@ -41,13 +41,10 @@
 #include "sdl_core.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
-#include "gametitle.h"
+#include "hacks.h"
 #if HAVE_UNAME
 #include <sys/utsname.h>
 #endif
-
-/* defined by cmdm.c */
-extern boolean have_eng_mp_patch;
 
 /* 選択 Window OPEN 時 callback */
 static int cb_sel_init_page = 0;
@@ -424,12 +421,7 @@ void commands2F28() {
 
 	ags_setWindowTitle(title);
 
-	if (0 == strcmp(nact->game_title_utf8, GT_RANCE3_ENG) ||
-		0 == strcmp(nact->game_title_utf8, GT_RANCE4_ENG)) {
-		have_eng_mp_patch = TRUE;
-	}
-	if (!strcmp(nact->game_title_utf8, GT_RANCE4V2))
-		nact->game_rance4v2 = true;
+	enable_hack_by_title(nact->game_title_utf8);
 
 	DEBUG_COMMAND("MT(new) %s:",title);
 }

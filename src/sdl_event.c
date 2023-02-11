@@ -272,7 +272,7 @@ static void sdl_getEvent(void) {
 		cmd_count_of_prev_input = nact->cmd_count;
 	} else if (nact->cmd_count != cmd_count_of_prev_input) {
 		nact->wait_vsync = TRUE;
-		if (nact->game_rance4v2)
+		if (nact->game == GAME_RANCE4_V2)
 			rance4v2_hack();
 	}
 	

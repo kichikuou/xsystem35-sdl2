@@ -32,6 +32,7 @@
 #include "message.h"
 #include "ags.h"
 #include "utfsjis.h"
+#include "hacks.h"
 
 #define toUTF8(s)   codeconv(UTF8, nact->encoding, s)
 #define toSJIS(s)   codeconv(SHIFT_JIS, nact->encoding, s)
@@ -110,7 +111,7 @@ typedef struct {
 	int patch_g0;   /* see patch g0 command */
 
 	// For game-specific hacks.
-	bool game_rance4v2;
+	enum gameId game;
 
 	/* ain 関連 */
 	S39AIN ain;
