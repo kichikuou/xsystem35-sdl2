@@ -110,6 +110,7 @@ static void sys35_usage(boolean verbose) {
 	puts("Usage: xsystem35 [OPTIONS]\n");
 	puts("OPTIONS");
 	puts(" -gamefile file : set game resource file to 'file'");
+	puts(" -game     game : enable game-specific hacks");
 	puts(" -renderer name : set rendering driver name to 'name'");
 	puts(" -devcd device  : set cdrom device name to 'device'");
 	puts(" -devmidi device: set midi device name to 'device'");
