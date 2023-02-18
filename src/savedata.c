@@ -43,7 +43,12 @@ typedef int emscripten_align1_int;
 #include "selection.h"
 #include "message.h"
 
-#define SAVE_DATAID "System3.5 SavaData(c)ALICE-SOFT"
+const char *save_signature[] = {
+	[SAVEFMT_XSYS35] = "System3.5 SavaData(c)ALICE-SOFT",
+	[SAVEFMT_SYS36]  = "System3.5 SaveData(c)ALICE-SOFT",
+	[SAVEFMT_SYS38]  = "System3.8 SaveData(c)ALICE-SOFT",
+};
+
 #define SAVE_DATAVERSION 0x350200
 
 typedef struct {
@@ -108,14 +113,16 @@ typedef struct {
 	emscripten_align1_int rsv2;
 } Ald_sysVarHdr;
 
-static int saveStackInfo(FILE *fp);
-static void  loadStackInfo(char *buf);
-static void* saveStrVar(Ald_strVarHdr *head);
-static void  loadStrVar(char *buf);
+static int saveStackInfo(enum save_format format, FILE *fp);
+static void loadStackInfo(enum save_format format, char *buf);
+static void* saveStrVar(enum save_format format, Ald_strVarHdr *head);
+static void loadStrVar(enum save_format format, char *buf);
 static void* saveSysVar(Ald_sysVarHdr *head, int page);
 static int   loadSysVar(char *buf);
 static void* loadGameData(int no, int *status, int *size);
 static int   saveGameData(int no, char *buf, int size);
+
+static enum save_format save_format = SAVEFMT_XSYS35;
 
 #ifdef __EMSCRIPTEN__
 EM_JS(void, scheduleSync, (), {
@@ -124,6 +131,22 @@ EM_JS(void, scheduleSync, (), {
 #else
 #define scheduleSync()
 #endif
+
+int save_setFormat(const char *format_name) {
+	if (!strcmp(format_name, "xsystem35"))
+		save_format = SAVEFMT_XSYS35;
+	else if (!strcmp(format_name, "system36"))
+		save_format = SAVEFMT_SYS36;
+	else if (!strcmp(format_name, "system38"))
+		save_format = SAVEFMT_SYS38;
+	else if (!strcmp(format_name, "system39"))
+		save_format = SAVEFMT_SYS38;
+	else {
+		WARNING("unknown save format %s", format_name);
+		return NG;
+	}
+	return OK;
+}
 
 /* savefile を参照 */
 const char *save_get_file(int index) {
@@ -380,8 +403,18 @@ int save_loadAll(int no) {
 		WARNING("endian mismatch");
 		goto errexit;
 	}
-	if (strcmp(SAVE_DATAID, save_base->ID) != 0)
+	enum save_format format = (enum save_format)-1;
+	for (int i = 0; i < sizeof(save_signature) / sizeof(save_signature[0]); i++) {
+		if (!strcmp(save_signature[i], save_base->ID)) {
+			format = i;
+			break;
+		}
+	}
+	if (format < 0) {
+		WARNING("unrecognized save format");
 		goto errexit;
+	}
+
 	nact->sel.MsgFontSize        = save_base->selMsgSize;
 	nact->sel.MsgFontColor       = save_base->selMsgColor;
 	nact->sel.WinBackgroundColor = save_base->selBackColor;
@@ -390,10 +423,12 @@ int save_loadAll(int no) {
 	nact->msg.MsgFontColor       = save_base->msgMsgColor;
 	nact->msg.WinBackgroundColor = save_base->msgBackColor;
 	nact->msg.WinFrameColor      = save_base->msgFrameColor;
-	sl_jmpFar2(save_base->scoPage, save_base->scoIndex);
+	sl_jmpFar2(save_base->scoPage - (format == SAVEFMT_XSYS35 ? 0 : 1), save_base->scoIndex);
 
 	for (i = 0; i < SELWINMAX; i++) {
-		int j = (i + 1) % SELWINMAX;  // For savedata compatibility
+		int j = format == SAVEFMT_XSYS35
+			? (i + 1) % SELWINMAX  // For savedata compatibility
+			: i;
 		nact->sel.wininfo[j].x      = save_base->selWinInfo[i].x;
 		nact->sel.wininfo[j].y      = save_base->selWinInfo[i].y;
 		nact->sel.wininfo[j].width  = save_base->selWinInfo[i].width;
@@ -401,7 +436,9 @@ int save_loadAll(int no) {
 		// nact->sel.wininfo[i].save   = TRUE;
 	}
 	for (i = 0; i < MSGWINMAX; i++) {
-		int j = (i + 1) % MSGWINMAX;  // For savedata compatibility
+		int j = format == SAVEFMT_XSYS35
+			? (i + 1) % MSGWINMAX  // For savedata compatibility
+			: i;
 		nact->msg.wininfo[j].x      = save_base->msgWinInfo[i].x;
 		nact->msg.wininfo[j].y      = save_base->msgWinInfo[i].y;
 		nact->msg.wininfo[j].width  = save_base->msgWinInfo[i].width;
@@ -410,9 +447,9 @@ int save_loadAll(int no) {
 		// nact->msg.wininfo[i].save   = FALSE;
 	}
 	/* スタックのロード */
-	loadStackInfo(saveTop + save_base->stackinfo);
+	loadStackInfo(format, saveTop + save_base->stackinfo);
 	/* 文字列変数のロード */
-	loadStrVar(saveTop + save_base->varStr);
+	loadStrVar(format, saveTop + save_base->varStr);
 	/* 数値・配列変数のロード */
 	for (i = 0; i < 256; i++) {
 		if (save_base->varSys[i] != 0) {
@@ -430,6 +467,7 @@ int save_loadAll(int no) {
 
 /* データのセーブ */
 int save_saveAll(int no) {
+	enum save_format format = save_format;
 	Ald_baseHdr   *save_base = calloc(1, sizeof(Ald_baseHdr));
 	Ald_strVarHdr save_strHdr;
 	Ald_sysVarHdr save_sysHdr;
@@ -454,7 +492,7 @@ int save_saveAll(int no) {
 	memset(&save_sysHdr, 0, sizeof(Ald_sysVarHdr));
 	
 	/* 各種データのセーブ */
-	strncpy(save_base->ID, SAVE_DATAID, 32);
+	strncpy(save_base->ID, save_signature[format], 32);
 	save_base->version       = SAVE_DATAVERSION;
 	save_base->selMsgSize    = (uint8_t)nact->sel.MsgFontSize;
 	save_base->selMsgColor   = (uint8_t)nact->sel.MsgFontColor;
@@ -464,11 +502,13 @@ int save_saveAll(int no) {
 	save_base->msgMsgColor   = (uint8_t)nact->msg.MsgFontColor;
 	save_base->msgBackColor  = (uint8_t)nact->msg.WinBackgroundColor;
 	save_base->msgFrameColor = (uint8_t)nact->msg.WinFrameColor;
-	save_base->scoPage       = sl_getPage();
+	save_base->scoPage       = sl_getPage() + (format == SAVEFMT_XSYS35 ? 0 : 1);
 	save_base->scoIndex      = sl_getIndex();
 	
 	for (i = 0; i < SELWINMAX; i++) {
-		int j = (i + 1) % SELWINMAX;  // For savedata compatibility
+		int j = format == SAVEFMT_XSYS35
+			? (i + 1) % SELWINMAX  // For savedata compatibility
+			: i;
 		save_base->selWinInfo[i].x      = (uint16_t)nact->sel.wininfo[j].x;
 		save_base->selWinInfo[i].y      = (uint16_t)nact->sel.wininfo[j].y;
 		save_base->selWinInfo[i].width  = (uint16_t)nact->sel.wininfo[j].width;
@@ -476,7 +516,9 @@ int save_saveAll(int no) {
 	}
 	
 	for (i = 0; i < MSGWINMAX; i++) {
-		int j = (i + 1) % MSGWINMAX;  // For savedata compatibility
+		int j = format == SAVEFMT_XSYS35
+			? (i + 1) % MSGWINMAX  // For savedata compatibility
+			: i;
 		save_base->msgWinInfo[i].x      = (uint16_t)nact->msg.wininfo[j].x;
 		save_base->msgWinInfo[i].y      = (uint16_t)nact->msg.wininfo[j].y;
 		save_base->msgWinInfo[i].width  = (uint16_t)nact->msg.wininfo[j].width;
@@ -487,12 +529,12 @@ int save_saveAll(int no) {
 	
 	/* スタック情報 */
 	save_base->stackinfo = totalsize;
-	totalsize += saveStackInfo(fp);
+	totalsize += saveStackInfo(format, fp);
 	if (ferror(fp))
 		goto errexit;
 	
 	/* 文字列変数 */
-	if (NULL == (sd_varStr = saveStrVar(&save_strHdr)))
+	if (NULL == (sd_varStr = saveStrVar(format, &save_strHdr)))
 		goto errexit;
 	
 	if (1 != fwrite(&save_strHdr, sizeof(Ald_strVarHdr), 1, fp))
@@ -526,6 +568,49 @@ int save_saveAll(int no) {
 	if (1 != fwrite(save_base, sizeof(Ald_baseHdr), 1, fp))
 		goto errexit;
 	
+	if (format != SAVEFMT_XSYS35) {
+		// Padding(?)
+		fseek(fp, 0L, SEEK_END);
+		for (int i = 0; i < 256; i++)
+			fputc(0xff, fp);
+		// Write a mark to indicate that this file was created by xsystem35.
+		fputs("XS35", fp);
+	}
+	if (format == SAVEFMT_SYS38) {
+		// Stack info
+		struct stack_info sinfo;
+		sl_getStackInfo(&sinfo);
+		int size = sinfo.page_calls * 2 + sinfo.label_calls;
+		int *buf = calloc(size, sizeof(int));
+		int *ptr = buf + size;
+		int *vars = NULL;
+		int *label_calls = NULL;
+		struct stack_frame_info *sfi = NULL;
+		while ((sfi = sl_next_stack_frame(sfi)) != NULL) {
+			switch (sfi->tag) {
+			case STACK_NEARCALL:
+				if (label_calls)
+					(*label_calls)++;
+				vars = --ptr;
+				break;
+			case STACK_FARCALL:
+				vars = --ptr;
+				label_calls = --ptr;
+				break;
+			case STACK_VARIABLE:
+				if (vars)
+					(*vars)++;
+				break;
+			}
+		}
+		// Note that only the first `size` byte of the `size` words data is
+		// written, so information is lost.
+		fwrite(ptr, size, 1, fp);
+		fwrite(&size, 4, 1, fp);
+		free(buf);
+		fputs("INFS", fp);
+	}
+
 	fclose(fp);
 	scheduleSync();
 	free(save_base);
@@ -546,9 +631,9 @@ int save_saveAll(int no) {
 }
 
 /* スタック情報のセーブ */
-static int saveStackInfo(FILE *fp) {
+static int saveStackInfo(enum save_format format, FILE *fp) {
 	int size;
-	uint8_t *data = sl_saveStack(&size);
+	uint8_t *data = sl_saveStack(format, &size);
 
 	Ald_stackHdr head = { .size = size };
 	fwrite(&head, sizeof(head), 1, fp);
@@ -559,22 +644,22 @@ static int saveStackInfo(FILE *fp) {
 }
 
 /* スタック情報のロード */
-static void loadStackInfo(char *buf) {
+static void loadStackInfo(enum save_format format, char *buf) {
 	Ald_stackHdr *head = (Ald_stackHdr *)buf;
 	uint8_t *data = buf + sizeof(Ald_stackHdr);
-	sl_loadStack(data, head->size);
+	sl_loadStack(format, data, head->size);
 }
 
 /* 文字列変数のセーブ */
-static void *saveStrVar(Ald_strVarHdr *head) {
+static void *saveStrVar(enum save_format format, Ald_strVarHdr *head) {
 	int bufsize = 65536;
 	char *buf = malloc(bufsize);
 	if (!buf)
 		NOMEMERR();
 
+	const int base = format == SAVEFMT_XSYS35 ? 1 : 0;
 	int offset = 0;
-	// Do not save svar[0], for backward compatibility.
-	for (int i = 1; i <= svar_maxindex(); i++) {
+	for (int i = base; i <= svar_maxindex(); i++) {
 		const char *s = svar_get(i);
 		int len = strlen(s);
 		if (offset + len + 1 > bufsize) {
@@ -588,24 +673,24 @@ static void *saveStrVar(Ald_strVarHdr *head) {
 		offset += len + 1;
 	}
 	head->size   = offset;
-	head->count  = svar_maxindex();
-	head->maxlen = 101;  // so that old versions of xystem35 can read this save file
+	head->count  = svar_maxindex() + (1 - base);
+	head->maxlen = (format == SAVEFMT_XSYS35 ? 101 : 0);  // so that old versions of xystem35 can read this save file
 	return buf;
 }
 
 /* 文字列変数のロード */
-static void loadStrVar(char *buf) {
+static void loadStrVar(enum save_format format, char *buf) {
 	Ald_strVarHdr *head = (Ald_strVarHdr *)buf;
-	int cnt, max, i;
+	const int base = format == SAVEFMT_XSYS35 ? 1 : 0;
 	
-	cnt = head->count;
-	if (svar_maxindex() != cnt) {
-		WARNING("Unexpected number of strings in savedata (%d, expected %d)", cnt, svar_maxindex());
-		svar_init(cnt);
+	int cnt = head->count;
+	if ((1 - base) + svar_maxindex() != cnt) {
+		WARNING("Unexpected number of strings in savedata (%d, expected %d)", cnt, (1 - base) + svar_maxindex());
+		svar_init(format == SAVEFMT_XSYS35 ? cnt : cnt - 1);
 	}
 	buf += sizeof(Ald_strVarHdr);
-	for (i = 1; i <= cnt; i++) {
-		svar_set(i, buf);
+	for (int i = 0; i < cnt; i++) {
+		svar_set(i + base, buf);
 		buf += strlen(buf) + 1;
 	}
 }

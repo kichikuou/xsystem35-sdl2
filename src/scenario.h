@@ -27,6 +27,7 @@
 #include "portab.h"
 #include "system.h"
 
+enum save_format;
 struct VarRef;
 
 // Stack frame tags. Changing these will break savedata compatibility.
@@ -86,8 +87,8 @@ void sl_returnGoto(int address);
 void sl_clearStack(bool restore);
 void sl_pushVar(struct VarRef *vref, int cnt);
 void sl_popVar(struct VarRef *vref, int cnt);
-uint8_t *sl_saveStack(int *size);
-void sl_loadStack(uint8_t *data, int size);
+uint8_t *sl_saveStack(enum save_format format, int *size);
+void sl_loadStack(enum save_format format, uint8_t *data, int size);
 void sl_getStackInfo(struct stack_info *info);
 void sl_pushTextColor(uint8_t type, uint8_t color);
 void sl_pushTextSize(uint8_t type, int size);

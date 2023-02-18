@@ -36,8 +36,15 @@
 #define SAVE_SAVEOK1      1
 #define SAVE_SAVEOK0      0
 
+enum save_format {
+	SAVEFMT_XSYS35,
+	SAVEFMT_SYS36,  // System3.5 v2.x - System3.6
+	SAVEFMT_SYS38,  // System3.8 - System3.9
+};
+
 struct VarRef;
 
+int save_setFormat(const char *format_name);
 int save_loadAll(int no);
 int save_saveAll(int no);
 int save_loadPartial(int no, struct VarRef *vref, int cnt);

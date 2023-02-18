@@ -381,9 +381,16 @@ struct save_stack_frame *push_save_stack_frame(int size, struct save_stack_frame
 	return f;
 }
 
-// Serialize the stack to the xsystem35 savedata format (i.e. the stack format
-// used in old versions of xsystem35).
-uint8_t *sl_saveStack(int *size_out) {
+uint8_t *sl_saveStack(enum save_format format, int *size_out) {
+	if (format != SAVEFMT_XSYS35) {
+		int size = stack_top - stack_buf;
+		uint8_t *buf = malloc(size);
+		memcpy(buf, stack_buf, size);
+		*size_out = size;
+		return buf;
+	}
+
+	// Serialize to the stack format used in old versions of xsystem35.
 	struct save_stack_frame *frame = NULL;
 	uint8_t *sp = stack_top;
 	while (sp > stack_buf) {
@@ -487,7 +494,7 @@ uint8_t *sl_saveStack(int *size_out) {
 		uint8_t *orig_stack = malloc(orig_size);
 		memcpy(orig_stack, stack_buf, orig_size);
 
-		sl_loadStack((uint8_t *)buf, *size_out);
+		sl_loadStack(format, (uint8_t *)buf, *size_out);
 
 		if (stack_top - stack_buf != orig_size || memcmp(stack_buf, orig_stack, orig_size)) {
 			FILE *fp = fopen("orig_stack", "wb");
@@ -503,18 +510,31 @@ uint8_t *sl_saveStack(int *size_out) {
 	return (uint8_t *)buf;
 }
 
-// Deserialize the stack from the xsystem35 savedata format.
-void sl_loadStack(uint8_t *unaligned_data, int size) {
+void sl_loadStack(enum save_format format, uint8_t *unaligned_data, int size) {
+	if (format != SAVEFMT_XSYS35) {
+		if (size > stack_size) {
+			while (size > stack_size)
+				stack_size *= 2;
+			free(stack_buf);
+			stack_buf = malloc(stack_size);
+			if (!stack_buf)
+				NOMEMERR();
+		}
+		memcpy(stack_buf, unaligned_data, size);
+		stack_top = stack_buf + size;
+		return;
+	}
+
+	// Deserialize from the stack format used in old versions of xsystem35.
 	int *data = malloc(size);
 	memcpy(data, unaligned_data, size);
 	struct save_stack_frame *frame = NULL;
 
 	for (int *p = data + size / sizeof(int); p > data;) {
-		int type = *--p;
-		int len = *--p;
+		int len = p[-2] + 2;
 		p -= len;
-		frame = push_save_stack_frame(len + 2, frame);
-		memcpy(frame->buf, p, (len + 2) * sizeof(int));
+		frame = push_save_stack_frame(len, frame);
+		memcpy(frame->buf, p, len * sizeof(int));
 	}
 	free(data);
 
