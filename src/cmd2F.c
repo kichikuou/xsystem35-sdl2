@@ -352,7 +352,7 @@ void commands2F24() {
 	case 1:
 		var = getCaliValue();
 		cnt = getCaliValue();
-		sysVar[0] = save_load_str_with_file(fname_utf8, var, cnt);
+		sysVar[0] = load_strs_from_file(fname_utf8, var, cnt);
 		break;
 	default:
 		var = getCaliValue();
@@ -458,7 +458,7 @@ void commands2F2A() {
 	case 1:
 		var = getCaliValue();
 		cnt = getCaliValue();
-		sysVar[0] = save_save_str_with_file(fname_utf8, var, cnt);
+		sysVar[0] = save_strs_to_file(fname_utf8, var, cnt);
 		break;
 	default:
 		var = getCaliValue();

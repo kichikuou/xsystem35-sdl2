@@ -47,8 +47,8 @@ int save_savePartial(int no, struct VarRef *vref, int cnt);
 int save_copyAll(int dstno, int srcno);
 int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt);
 int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt);
-int save_save_str_with_file(char *fname_utf8, int start, int cnt);
-int save_load_str_with_file(char *fname_utf8, int start, int cnt);
+int save_strs_to_file(char *fname_utf8, int start, int cnt);
+int load_strs_from_file(char *fname_utf8, int start, int cnt);
 const char *save_get_file(int index);
 int save_delete_file(int index);
 

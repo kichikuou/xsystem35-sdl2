@@ -201,85 +201,50 @@ int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
 	return SAVE_LOADOK;
 }
 
-
-/* 指定ファイルへの文字列の書き込み, start = 1~ */
-int save_save_str_with_file(char *fname_utf8, int start, int cnt) {
-	int status = 0, size, _size,i;
-	FILE *fp;
-	char *tmp, *_tmp;
-	
-	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
-	if (tmp == NULL) {
-		WARNING("Out of memory");
-		return SAVE_LOADSHORTAGE;
+int save_strs_to_file(char *fname_utf8, int start, int cnt) {
+	FILE *fp = fc_open(fname_utf8, 'w');
+	if (!fp)
+		return SAVE_SAVEERR;
+	for (int i = 0; i < cnt; i++) {
+		fputs(svar_get(start + i), fp);
+		fputc('\0', fp);
 	}
-	
-	*tmp = 0;
-	for (i = 0; i < cnt; i++) {
-		strncpy(tmp, svar_get(start + i), strvar_len - 1);
-		tmp[strvar_len - 1] = '\0';
-		tmp += strlen(tmp) + 1;
-	}
-	
-	if (NULL == (fp = fc_open(fname_utf8, 'w'))) {
-		status = SAVE_SAVEERR; goto errexit;
-	}
-	size = tmp - _tmp;
-	_size = fwrite(_tmp, sizeof(char), size , fp);
-	
-	if (size != _size) {
-		status = SAVE_OTHERERR;
-	} else {
-		status = SAVE_SAVEOK0;
-	}
-	
 	fclose(fp);
 	scheduleSync();
- errexit:      
-	free(_tmp);
-	
-	return status;
+	return 0;
 }
 
-/* 指定ファイルからの文字列の読み込み */
-int save_load_str_with_file(char *fname_utf8, int start, int cnt) {
-	int status = 0, size, i;
-	FILE *fp;
-	char *tmp, *_tmp=NULL;
-	long filesize;
-	
-	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
+int load_strs_from_file(char *fname_utf8, int start, int cnt) {
+	FILE *fp = fc_open(fname_utf8, 'r');
+	if (!fp)
 		return SAVE_LOADERR;
-	}
 	
 	fseek(fp, 0L, SEEK_END);
-	filesize = ftell(fp);
-	if (filesize == 0) {
-		return SAVE_LOADERR;
-	}
-	
-	tmp = _tmp = (char *)malloc(filesize);
-	if (tmp == NULL) {
-		WARNING("Out of memory");
-		return SAVE_LOADERR;
-	}
-	
+	long filesize = ftell(fp);
+	char *buf = malloc(filesize + 1);
+	if (!buf)
+		NOMEMERR();
+
 	fseek(fp, 0L, SEEK_SET);
-	size = fread(tmp, 1, filesize,fp);
-	
-	if (size != filesize) {
-		status = SAVE_LOADSHORTAGE;
-	} else {
-		status = SAVE_LOADOK;
-	}
-	for (i = 0; i < cnt; i++) {
-		svar_set(start + i, tmp);
-		tmp += strlen(tmp) + 1;
-	}
+	int r = fread(buf, filesize, 1, fp);
 	fclose(fp);
-	free(_tmp);
-	
-	return status;
+	if (!r) {
+		free(buf);
+		return SAVE_LOADERR;
+	}
+
+	buf[filesize] = '\0';  // prevents buffer overrun
+	char *p = buf;
+	for (int i = 0; i < cnt; i++) {
+		if (p >= buf + filesize) {
+			free(buf);
+			return SAVE_LOADSHORTAGE;
+		}
+		svar_set(start + i, p);
+		p += strlen(p) + 1;
+	}
+	free(buf);
+	return 0;
 }
 
 /* セーブファイルのコピー */

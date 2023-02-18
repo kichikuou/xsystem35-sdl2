@@ -96,7 +96,7 @@ void commandQE() {
 	case 1:
 		var = getCaliValue();
 		cnt = getCaliValue();
-		sysVar[0] = save_save_str_with_file(fname_utf8, var, cnt);
+		sysVar[0] = save_strs_to_file(fname_utf8, var, cnt);
 		break;
 	default:
 		var = getCaliValue();

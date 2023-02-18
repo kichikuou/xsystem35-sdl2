@@ -114,16 +114,16 @@ void commandLE() {
 
 	char *fname_utf8 = toUTF8(filename);
 	switch (type) {
-	case 0: /* T2 */
+	case 0:
 		getCaliArray(&vref);
 		var = vref.var;
 		cnt = getCaliValue();
 		sysVar[0] = load_vars_from_file(fname_utf8, &vref, cnt);
 		break;
-	case 1: /* 456 */
+	case 1:
 		var = getCaliValue();
 		cnt = getCaliValue();
-		sysVar[0] = save_load_str_with_file(fname_utf8, var, cnt);
+		sysVar[0] = load_strs_from_file(fname_utf8, var, cnt);
 		break;
 	default:
 		var = getCaliValue();
