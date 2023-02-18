@@ -48,9 +48,7 @@ struct VarPage varPage[PAGE_MAX];
 double longVar[SYSVARLONG_MAX];
 /* 文字列変数 */
 static char **strVar;
-/* 文字列変数の属性(最大,1つあたりの大きさ) */
-int strvar_cnt;
-int strvar_len;
+static int strvar_cnt;
 
 const char *v_name(int var) {
 	if (var < nact->ain.varnum)
@@ -154,7 +152,7 @@ void v_getPageStatus(int page, int *in_use, int *size) {
 }
 
 /* 文字列変数の再初期化 */
-void svar_init(int max_index, int len) {
+void svar_init(int max_index) {
 	for (int i = max_index + 1; i < strvar_cnt; i++) {
 		if (strVar[i])
 			free(strVar[i]);
@@ -166,7 +164,6 @@ void svar_init(int max_index, int len) {
 	for (int i = strvar_cnt; i <= max_index; i++)
 		strVar[i] = NULL;
 	strvar_cnt = max_index + 1;
-	strvar_len = len;
 }
 
 int svar_maxindex(void) {
@@ -178,7 +175,7 @@ void v_init(void) {
 	varPage[0].value = sysVar;
 	varPage[0].size = SYSVAR_MAX;
 	varPage[0].saveflag = true;
-	svar_init(STRVAR_MAX - 1, STRVAR_LEN);
+	svar_init(STRVAR_MAX - 1);
 }
 
 void v_reset(void) {

@@ -36,8 +36,6 @@
 #define SAVE_SAVEOK1      1
 #define SAVE_SAVEOK0      0
 
-/* defined by variable.c */
-extern int  strvar_len;
 struct VarRef;
 
 int save_loadAll(int no);

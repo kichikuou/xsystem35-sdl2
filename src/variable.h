@@ -29,7 +29,6 @@
 
 #define SYSVAR_MAX       65536
 #define STRVAR_MAX       5000
-#define STRVAR_LEN       101
 
 struct VarPage {
 	int size;
@@ -67,7 +66,7 @@ static inline int *v_ref(int var, struct VarRef *ref) {
 	return v_ref_indexed(var, -1, ref);
 }
 
-void svar_init(int max_index, int len);
+void svar_init(int max_index);
 int svar_maxindex(void);
 const char *svar_get(int no);
 void svar_set(int no, const char *str);

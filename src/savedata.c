@@ -572,24 +572,30 @@ static void loadStackInfo(char *buf) {
 
 /* 文字列変数のセーブ */
 static void *saveStrVar(Ald_strVarHdr *head) {
-	int i;
-	char *tmp, *_tmp;
-	_tmp = tmp = malloc(svar_maxindex() * strvar_len);
-	if (tmp == NULL) {
-		WARNING("Out of memory");
-		return NULL;
-	}
-	*tmp = 0;
+	int bufsize = 65536;
+	char *buf = malloc(bufsize);
+	if (!buf)
+		NOMEMERR();
+
+	int offset = 0;
 	// Do not save svar[0], for backward compatibility.
-	for (i = 1; i <= svar_maxindex(); i++) {
-		strncpy(tmp, svar_get(i), strvar_len - 1);
-		tmp[strvar_len - 1] = '\0';
-		tmp += strlen(tmp) + 1;
+	for (int i = 1; i <= svar_maxindex(); i++) {
+		const char *s = svar_get(i);
+		int len = strlen(s);
+		if (offset + len + 1 > bufsize) {
+			bufsize *= 2;
+			buf = realloc(buf, bufsize);
+			if (!buf)
+				NOMEMERR();
+		}
+		strcpy(buf + offset, s);
+		buf[offset + len] = '\0';
+		offset += len + 1;
 	}
-	head->size   = tmp - _tmp;
+	head->size   = offset;
 	head->count  = svar_maxindex();
-	head->maxlen = strvar_len;
-	return _tmp;
+	head->maxlen = 101;  // so that old versions of xystem35 can read this save file
+	return buf;
 }
 
 /* 文字列変数のロード */
@@ -598,10 +604,9 @@ static void loadStrVar(char *buf) {
 	int cnt, max, i;
 	
 	cnt = head->count;
-	max = head->maxlen;
-	if (svar_maxindex() != cnt || strvar_len != max) {
+	if (svar_maxindex() != cnt) {
 		WARNING("Unexpected number of strings in savedata (%d, expected %d)", cnt, svar_maxindex());
-		svar_init(cnt, max);
+		svar_init(cnt);
 	}
 	buf += sizeof(Ald_strVarHdr);
 	for (i = 1; i <= cnt; i++) {

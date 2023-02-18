@@ -249,16 +249,13 @@ void commandMF() {
 
 void commandMZ0() {
 	/* 文字列変数の文字数・個数の設定の変更 */
-	int max_len = getCaliValue();
+	int max_len = getCaliValue();  // deprecated in System3.9
 	int max_num = getCaliValue();
 	int rsv     = getCaliValue();
 	
 	DEBUG_COMMAND("MZ0 %d,%d,%d:",max_len, max_num, rsv);
 	
-	/* いつからか、文字列変数の最大長さは∞になったようだ */
-	if (max_len == 0) max_len = STRVAR_LEN * 2;
-	
-	svar_init(max_num, max_len * 2 + 1);
+	svar_init(max_num);
 }
 
 void commandMG() {
