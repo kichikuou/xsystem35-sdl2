@@ -35,7 +35,7 @@
 #include "qnt.h"
 #include "jpeg.h"
 #include "ald_manager.h"
-#include "savedata.h"
+#include "filecheck.h"
 #include "cache.h"
 
 /* VSPのパレット展開バンク */
@@ -391,6 +391,41 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 	clear_display_loc();
 }
 
+static uint8_t* load_cg_from_file(char *fname_utf8, int *status, long *filesize) {
+	int size;
+	FILE *fp;
+	static uint8_t *tmp;
+
+	*status = 0;
+
+	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
+		*status = SAVE_LOADERR; return NULL;
+	}
+
+	fseek(fp, 0L, SEEK_END);
+	*filesize = ftell(fp);
+	if (*filesize == 0) {
+		*status = SAVE_LOADERR; return NULL;
+	}
+
+	tmp = (char *)malloc(*filesize);
+	if (tmp == NULL) {
+		WARNING("Out of memory");
+		*status = SAVE_LOADERR; return NULL;
+	}
+	fseek(fp, 0L, SEEK_SET);
+	size = fread(tmp, 1, *filesize,fp);
+
+	if (size != *filesize) {
+		*status = SAVE_LOADSHORTAGE;
+	} else {
+		*status = SAVE_LOADOK;
+	}
+
+	fclose(fp);
+	return tmp;
+}
+
 /*
  * Load and display cg from file 'name' (not cached right now)
  *   name: file name to be read
@@ -405,7 +440,7 @@ int cg_load_with_filename(char *fname_utf8, int x, int y) {
 	cgdata *cg = NULL;
 	MyPoint p;
 	
-	data = load_cg_with_file(fname_utf8, &status, &filesize);
+	data = load_cg_from_file(fname_utf8, &status, &filesize);
 	if (data == NULL) return status;
 	
 	cg_set_display_location(x, y, OFFSET_ABSOLUTE_GC);

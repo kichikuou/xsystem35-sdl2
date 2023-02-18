@@ -688,39 +688,3 @@ static int saveGameData(int no, char *buf, int size) {
 	scheduleSync();
 	return status;
 }
-
-/* 指定ファイルからの画像の読み込み thanx tajiru@wizard */
-uint8_t* load_cg_with_file(char *fname_utf8, int *status, long *filesize){
-	int size;
-	FILE *fp;
-	static uint8_t *tmp;
-	
-	*status = 0;
-	
-	if (NULL == (fp = fc_open(fname_utf8, 'r'))) {
-		*status = SAVE_LOADERR; return NULL;
-	}
-	
-	fseek(fp, 0L, SEEK_END);
-	*filesize = ftell(fp);
-	if (*filesize == 0) {
-		*status = SAVE_LOADERR; return NULL;
-	}
-	
-	tmp = (char *)malloc(*filesize);
-	if (tmp == NULL) {
-		WARNING("Out of memory");
-		*status = SAVE_LOADERR; return NULL;
-	}
-	fseek(fp, 0L, SEEK_SET);
-	size = fread(tmp, 1, *filesize,fp);
-	
-	if (size != *filesize) {
-		*status = SAVE_LOADSHORTAGE;
-	} else {
-		*status = SAVE_LOADOK;
-	}
-	
-	fclose(fp);
-	return tmp;
-}

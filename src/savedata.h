@@ -121,7 +121,6 @@ extern int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt);
 extern int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt);
 extern int save_save_str_with_file(char *fname_utf8, int start, int cnt);
 extern int save_load_str_with_file(char *fname_utf8, int start, int cnt);
-extern uint8_t* load_cg_with_file(char *fname_utf8, int *status, long *filesize);
 extern const char *save_get_file(int index);
 extern int save_delete_file(int index);
 
