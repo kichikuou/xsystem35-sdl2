@@ -29,6 +29,8 @@
 #include <unistd.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#else
+typedef int emscripten_align1_int;
 #endif
 
 #include "portab.h"
@@ -40,6 +42,71 @@
 #include "windowframe.h"
 #include "selection.h"
 #include "message.h"
+
+#define SAVE_DATAID "System3.5 SavaData(c)ALICE-SOFT"
+#define SAVE_DATAVERSION 0x350200
+
+typedef struct {
+	uint16_t x;
+	uint16_t y;
+	uint16_t width;
+	uint16_t height;
+} RectangleW;
+
+typedef struct {
+	char ID[32];
+	int version;
+	char gameName[28];
+	uint8_t selMsgSize;
+	uint8_t selMsgColor;
+	uint8_t selBackColor;
+	uint8_t selFrameColor;
+	uint8_t msgMsgSize;
+	uint8_t msgMsgColor;
+	uint8_t msgBackColor;
+	uint8_t msgFrameColor;
+	uint8_t rsvB1;
+	uint8_t rsvB2;
+	uint8_t rsvB3;
+	uint8_t rsvB4;
+	uint8_t rsvB5;
+	uint8_t rsvB6;
+	uint8_t rsvB7;
+	uint8_t rsvB8;
+	int  scoPage;
+	int  scoIndex;
+	int  rsvI1;
+	int  rsvI2;
+	RectangleW selWinInfo[SELWINMAX];
+	RectangleW msgWinInfo[MSGWINMAX];
+	int  stackinfo;
+	int  varStr;
+	int  rsvI3;
+	int  rsvI4;
+	int  varSys[256];
+	int  rsvI[228];
+} Ald_baseHdr;
+
+typedef struct {
+	int size;
+	int count;
+	int maxlen;
+	int rsv1;
+} Ald_strVarHdr;
+
+typedef struct {
+	int size;
+	int rsv1;
+	int rsv2;
+	int rsv3;
+} Ald_stackHdr;
+
+typedef struct {
+	emscripten_align1_int size;
+	emscripten_align1_int pageNo;
+	emscripten_align1_int rsv1;
+	emscripten_align1_int rsv2;
+} Ald_sysVarHdr;
 
 /* セーブデータ */
 static int savefile_sysvar_cnt = SYSVAR_MAX;

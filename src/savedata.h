@@ -24,104 +24,32 @@
 #ifndef __SAVEDATA__
 #define __SAVEDATA__
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#else
-typedef int emscripten_align1_int;
-#endif
-
 #include "portab.h"
-#include "windowframe.h"
 
-#define SAVE_MAXNUMBER    (26)
+#define SAVE_MAXNUMBER    26
 
-#define SAVE_SAVEERR      (255)
-#define SAVE_LOADERR      (255)
-#define SAVE_LOADSHORTAGE (254)
-#define SAVE_OTHERERR     (201)
-#define SAVE_LOADOK       (0)
-#define SAVE_SAVEOK1      (1)
-#define SAVE_SAVEOK0      (0)
-
-#define SAVE_DATAID "System3.5 SavaData(c)ALICE-SOFT"
-#define SAVE_DATAVERSION 0x350200
-
-typedef struct {
-        uint16_t x;
-        uint16_t y;
-        uint16_t width;
-        uint16_t height;
-} RectangleW;
-
-typedef struct {
-        char ID[32];
-	int version;
-	char gameName[28];
-	uint8_t selMsgSize;
-	uint8_t selMsgColor;
-	uint8_t selBackColor;
-	uint8_t selFrameColor;
-	uint8_t msgMsgSize;
-	uint8_t msgMsgColor;
-	uint8_t msgBackColor;
-	uint8_t msgFrameColor;
-	uint8_t rsvB1;
-	uint8_t rsvB2;
-	uint8_t rsvB3;
-	uint8_t rsvB4;
-	uint8_t rsvB5;
-	uint8_t rsvB6;
-	uint8_t rsvB7;
-	uint8_t rsvB8;
-	int  scoPage;
-	int  scoIndex;
-	int  rsvI1;
-	int  rsvI2;
-	RectangleW selWinInfo[SELWINMAX];
-	RectangleW msgWinInfo[MSGWINMAX];
-	int  stackinfo;
-	int  varStr;
-	int  rsvI3;
-	int  rsvI4;
-	int  varSys[256];
-	int  rsvI[228];
-} Ald_baseHdr;
-
-typedef struct {
-	int size;
-	int count;
-	int maxlen;
-	int rsv1;
-} Ald_strVarHdr;
-
-typedef struct {
-	int size;
-	int rsv1;
-	int rsv2;
-	int rsv3;
-} Ald_stackHdr;
-
-typedef struct {
-	emscripten_align1_int size;
-	emscripten_align1_int pageNo;
-	emscripten_align1_int rsv1;
-	emscripten_align1_int rsv2;
-} Ald_sysVarHdr;
+#define SAVE_SAVEERR      255
+#define SAVE_LOADERR      255
+#define SAVE_LOADSHORTAGE 254
+#define SAVE_OTHERERR     201
+#define SAVE_LOADOK       0
+#define SAVE_SAVEOK1      1
+#define SAVE_SAVEOK0      0
 
 /* defined by variable.c */
 extern int  strvar_len;
 struct VarRef;
 
-extern int save_loadAll(int no);
-extern int save_saveAll(int no);
-extern int save_loadPartial(int no, struct VarRef *vref, int cnt);
-extern int save_savePartial(int no, struct VarRef *vref, int cnt);
-extern int save_copyAll(int dstno, int srcno);
-extern int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt);
-extern int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt);
-extern int save_save_str_with_file(char *fname_utf8, int start, int cnt);
-extern int save_load_str_with_file(char *fname_utf8, int start, int cnt);
-extern const char *save_get_file(int index);
-extern int save_delete_file(int index);
+int save_loadAll(int no);
+int save_saveAll(int no);
+int save_loadPartial(int no, struct VarRef *vref, int cnt);
+int save_savePartial(int no, struct VarRef *vref, int cnt);
+int save_copyAll(int dstno, int srcno);
+int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt);
+int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt);
+int save_save_str_with_file(char *fname_utf8, int start, int cnt);
+int save_load_str_with_file(char *fname_utf8, int start, int cnt);
+const char *save_get_file(int index);
+int save_delete_file(int index);
 
 #endif /* __SAVEDATA__ */

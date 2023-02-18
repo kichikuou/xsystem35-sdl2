@@ -25,6 +25,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "system.h"

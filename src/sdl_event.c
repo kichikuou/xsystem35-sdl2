@@ -27,6 +27,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
