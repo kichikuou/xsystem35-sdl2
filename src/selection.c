@@ -117,12 +117,12 @@ void sel_init() {
 	memset(sel.wininfo, 0, sizeof(sel.wininfo));
 
 	sel.winno = 1;
-	sel.win = &sel.wininfo[0];
-	sel.wininfo[0].x = 464;
-	sel.wininfo[0].y = 80;
-	sel.wininfo[0].width  = 160;
-	sel.wininfo[0].height = 160;
-	sel.wininfo[0].save = TRUE;
+	sel.win = &sel.wininfo[1];
+	sel.wininfo[1].x = 464;
+	sel.wininfo[1].y = 80;
+	sel.wininfo[1].width  = 160;
+	sel.wininfo[1].height = 160;
+	sel.wininfo[1].save = TRUE;
 	
 	/* 選択肢を登録中 */
 	sel.in_setting = FALSE;

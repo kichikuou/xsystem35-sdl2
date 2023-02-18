@@ -94,12 +94,12 @@ void msg_init() {
 	memset(msg.wininfo, 0, sizeof(msg.wininfo));
 
 	msg.winno = 1;
-	msg.win = &msg.wininfo[0];
-	msg.wininfo[0].x = 8;
-	msg.wininfo[0].y = 311;
-	msg.wininfo[0].width = 616;
-	msg.wininfo[0].height = 80;
-	msg.wininfo[0].save = TRUE;
+	msg.win = &msg.wininfo[1];
+	msg.wininfo[1].x = 8;
+	msg.wininfo[1].y = 311;
+	msg.wininfo[1].width = 616;
+	msg.wininfo[1].height = 80;
+	msg.wininfo[1].save = TRUE;
 
 	// Private variables
 	msgDecorateColor = 0;

@@ -47,7 +47,7 @@ void commandB0() {
 }
 
 void commandB1() {
-	int num = getCaliValue() - 1;
+	int num = getCaliValue();
 	int X1  = getCaliValue();
 	int Y1  = getCaliValue();
 	int X2  = getCaliValue();
@@ -64,7 +64,7 @@ void commandB1() {
 	nact->sel.wininfo[num].height = Y2;
 	nact->sel.wininfo[num].save = (V == 0) ? false : true;
 	
-	DEBUG_COMMAND("B1 %d,%d,%d,%d,%d,%d:", num + 1, X1, Y1, X2, Y2, V);
+	DEBUG_COMMAND("B1 %d,%d,%d,%d,%d,%d:", num, X1, Y1, X2, Y2, V);
 }
 
 void commandB2() {
@@ -75,13 +75,13 @@ void commandB2() {
 	int C3  = getCaliValue();
 	int dot = getCaliValue();
 	
-	if (num < 1 || num - 1 >= SELWINMAX) {
+	if (num < 0 || num >= SELWINMAX) {
 		WARNING("commandB2(): Window number is out of range %d", num);
 		return;
 	}
 
 	nact->sel.winno = num;
-	nact->sel.win = &nact->sel.wininfo[num - 1];
+	nact->sel.win = &nact->sel.wininfo[num];
 	
 	nact->sel.WindowFrameType = W;
 	nact->sel.FrameCgNoTop = C1;
@@ -93,7 +93,7 @@ void commandB2() {
 }
 
 void commandB3() {
-	int num = getCaliValue() - 1;
+	int num = getCaliValue();
 	int X1  = getCaliValue();
 	int Y1  = getCaliValue();
 	int X2  = getCaliValue();
@@ -110,7 +110,7 @@ void commandB3() {
 	nact->msg.wininfo[num].height = Y2;
 	nact->msg.wininfo[num].save = (V == 0) ? FALSE : TRUE;
 	
-	DEBUG_COMMAND("B3 %d,%d,%d,%d,%d,%d:", num + 1, X1, Y1, X2, Y2, V);
+	DEBUG_COMMAND("B3 %d,%d,%d,%d,%d,%d:", num, X1, Y1, X2, Y2, V);
 }
 
 void commandB4() {
@@ -121,13 +121,13 @@ void commandB4() {
 	int N   = getCaliValue();
 	int M   = getCaliValue();
 	
-	if (num < 1 || num - 1 >= MSGWINMAX) {
+	if (num < 0 || num >= MSGWINMAX) {
 		WARNING("commandB4(): Window number is out of range %d", num);
-		num = 0;
+		return;
 	}
 	
 	nact->msg.winno = num;
-	nact->msg.win = &nact->msg.wininfo[num - 1];
+	nact->msg.win = &nact->msg.wininfo[num];
 	msg_openWindow(W, C1, C2, N, M);
 	
 	DEBUG_COMMAND("B4 %d,%d,%d,%d,%d,%d:", num, W, C1, C2, N, M);
@@ -225,8 +225,8 @@ void commandB31() {
 	int *x_var = getCaliVariable();
 	int *y_var = getCaliVariable();
 	
-	*x_var = nact->sel.wininfo[no - 1].x;
-	*y_var = nact->sel.wininfo[no - 1].y;
+	*x_var = nact->sel.wininfo[no].x;
+	*y_var = nact->sel.wininfo[no].y;
 	
 	DEBUG_COMMAND("B31 %d,%d,%d:", no, *x_var, *y_var);
 }
@@ -236,8 +236,8 @@ void commandB32() {
 	int *x_var_size = getCaliVariable();
 	int *y_var_size = getCaliVariable();
 	
-	*x_var_size = nact->sel.wininfo[no - 1].width;
-	*y_var_size = nact->sel.wininfo[no - 1].height;
+	*x_var_size = nact->sel.wininfo[no].width;
+	*y_var_size = nact->sel.wininfo[no].height;
 	
 	DEBUG_COMMAND("B32 %d,%d,%d:", no, *x_var_size, *y_var_size);
 }
@@ -247,8 +247,8 @@ void commandB33() {
 	int *x_var = getCaliVariable();
 	int *y_var = getCaliVariable();
 
-	*x_var = nact->msg.wininfo[no - 1].x;
-	*y_var = nact->msg.wininfo[no - 1].y;
+	*x_var = nact->msg.wininfo[no].x;
+	*y_var = nact->msg.wininfo[no].y;
 	DEBUG_COMMAND("B33 %d,%d,%d:", no, *x_var, *y_var);
 }
 
@@ -257,8 +257,8 @@ void commandB34() {
 	int *x_var_size = getCaliVariable();
 	int *y_var_size = getCaliVariable();
 
-	*x_var_size = nact->msg.wininfo[no - 1].width;
-	*y_var_size = nact->msg.wininfo[no - 1].height;
+	*x_var_size = nact->msg.wininfo[no].width;
+	*y_var_size = nact->msg.wininfo[no].height;
 	DEBUG_COMMAND("B34 %d,%d,%d:", no, *x_var_size, *y_var_size);
 }
 
