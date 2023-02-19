@@ -65,35 +65,41 @@ static fncall_table fnctbl[FCTBL_MAX];
 
 void commands2F00() {
 	/* テキストカラーをスタックからポップして設定する */
-	sl_popState(TxxTEXTCOLOR);
+	sl_popState(STACK_TEXTCOLOR);
 	DEBUG_COMMAND("TOC:");
 }
 
 void commands2F01() {
 	/* テキストフォントサイズをスタックからポップして設定する */
-	sl_popState(TxxTEXTSIZE);
+	sl_popState(STACK_TEXTSIZE);
 	DEBUG_COMMAND("TOS:");
 }
 
 void commands2F02() {
 	/* 現在のテキストカラーをスタックにプッシュする */
-	int exp = getCaliValue();
-	int val = exp == 0 ? nact->msg.MsgFontColor : nact->sel.MsgFontColor;
-	sl_pushState(TxxTEXTCOLOR, exp, val);
+	int type = getCaliValue();
+	switch (type) {
+	case 0: sl_pushTextColor(type, nact->msg.MsgFontColor); break;
+	case 1: sl_pushTextColor(type, nact->sel.MsgFontColor); break;
+	default: WARNING("TPC: unknown type %d", type); break;
+	}
 	DEBUG_COMMAND("TPC %d", exp);
 }
 
 void commands2F03() {
 	/* 現在のテキストフォントサイズをスタックにプッシュする */
-	int exp = getCaliValue();
-	int val = exp == 0 ? nact->msg.MsgFontSize : nact->sel.MsgFontSize;
-	sl_pushState(TxxTEXTSIZE, exp, val);
+	int type = getCaliValue();
+	switch (type) {
+	case 0: sl_pushTextSize(type, nact->msg.MsgFontSize); break;
+	case 1: sl_pushTextSize(type, nact->sel.MsgFontSize); break;
+	default: WARNING("TPS: unknown type %d", type); break;
+	}
 	DEBUG_COMMAND("TPS %d", exp);
 }
 
 void commands2F04() {
 	/* テキスト表示位置をスタックからポップして設定する */
-	sl_popState(TxxTEXTLOC);
+	sl_popState(STACK_TEXTLOC);
 	DEBUG_COMMAND("TOP:");
 }
 
@@ -101,7 +107,7 @@ void commands2F05() {
 	/* 現在のテキスト表示位置をスタックにプッシュする */
 	MyPoint loc;
 	msg_getMessageLocation(&loc);
-	sl_pushState(TxxTEXTLOC, loc.x, loc.y);
+	sl_pushTextLoc(loc.x, loc.y);
 	DEBUG_COMMAND("TPP:");
 }
 

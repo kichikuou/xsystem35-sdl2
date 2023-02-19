@@ -29,19 +29,13 @@
 
 struct VarRef;
 
-// Warning: changing these enum values will break savedata compatibility.
-enum stack_frame_type {
-	STACK_NEARJMP = 1,
-	STACK_FARJMP = 2,
-	STACK_VARIABLE = 3,
-	STACK_TXXSTATE = 4
-};
-
-enum txx_type {
-	TxxTEXTCOLOR = 1,
-	TxxTEXTSIZE = 2,
-	TxxTEXTLOC = 3
-};
+// Stack frame tags. Changing these will break savedata compatibility.
+#define STACK_FARCALL   0xFF
+#define STACK_NEARCALL  0xEE
+#define STACK_VARIABLE  0xDD
+#define STACK_TEXTCOLOR 0xCC
+#define STACK_TEXTSIZE  0xBB
+#define STACK_TEXTLOC   0xAA
 
 struct stack_info {
 	int top_attr;  // always zero?
@@ -50,6 +44,13 @@ struct stack_info {
 	int var_pushes;
 	int label_calls_after_page_call;
 	int var_pushes_after_call;
+};
+
+struct stack_frame_info {
+	uint8_t tag;
+	uint16_t page;  // STACK_FARCALL
+	int addr;       // STACK_FARCALL or STACK_NEARCALL
+	uint8_t *p;     // for internal use
 };
 
 // Use functions below instead of accessing these variables directly.
@@ -77,18 +78,22 @@ void sl_retNear(void);
 void sl_callFar(int page);
 void sl_callFar2(int page, int address);
 void sl_retFar(void);
-void sl_clearStack(bool restore);
 void sl_dropLabelCalls(int cnt);
 void sl_dropPageCalls(int cnt);
-void sl_pushVar(struct VarRef *vref, int cnt);
-void sl_popVar(struct VarRef *vref, int cnt);
-int *sl_getStack(int *size);
-void sl_putStack(int *data, int size);
-void sl_getStackInfo(struct stack_info *info);
-void sl_pushState(enum txx_type type, int val1, int val2);
-void sl_popState(enum txx_type expected_type);
 void *sl_setDataTable(int page, int index);
 void sl_returnGoto(int address);
+
+void sl_clearStack(bool restore);
+void sl_pushVar(struct VarRef *vref, int cnt);
+void sl_popVar(struct VarRef *vref, int cnt);
+uint8_t *sl_saveStack(int *size);
+void sl_loadStack(uint8_t *data, int size);
+void sl_getStackInfo(struct stack_info *info);
+void sl_pushTextColor(uint8_t type, uint8_t color);
+void sl_pushTextSize(uint8_t type, int size);
+void sl_pushTextLoc(int x, int y);
+void sl_popState(uint8_t expected_type);
+struct stack_frame_info *sl_next_stack_frame(struct stack_frame_info *frame_info);
 
 static inline int sl_getIndex(void) { return sl_index; }
 static inline int sl_getPage(void) { return sl_page; }

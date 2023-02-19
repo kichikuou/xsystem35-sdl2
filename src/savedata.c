@@ -111,7 +111,7 @@ typedef struct {
 /* セーブデータ */
 static int savefile_sysvar_cnt = SYSVAR_MAX;
 
-static void* saveStackInfo(Ald_stackHdr *head);
+static int saveStackInfo(FILE *fp);
 static void  loadStackInfo(char *buf);
 static void* saveStrVar(Ald_strVarHdr *head);
 static void  loadStrVar(char *buf);
@@ -435,10 +435,8 @@ int save_loadAll(int no) {
 int save_saveAll(int no) {
 	Ald_baseHdr   *save_base = calloc(1, sizeof(Ald_baseHdr));
 	Ald_strVarHdr save_strHdr;
-	Ald_stackHdr  save_stackHdr;
 	Ald_sysVarHdr save_sysHdr;
 	char *sd_varStr = NULL;
-	char *sd_stack  = NULL;
 	char *sd_varSys = NULL;
 	int i, totalsize = sizeof(Ald_baseHdr);
 	FILE *fp = NULL;
@@ -455,7 +453,6 @@ int save_saveAll(int no) {
 	if (fp == NULL)
 		goto errexit;
 	
-	memset(&save_stackHdr, 0, sizeof(Ald_stackHdr));
 	memset(&save_strHdr, 0, sizeof(Ald_strVarHdr));
 	memset(&save_sysHdr, 0, sizeof(Ald_sysVarHdr));
 	
@@ -492,17 +489,10 @@ int save_saveAll(int no) {
 	fseek(fp, sizeof(Ald_baseHdr), SEEK_SET);
 	
 	/* スタック情報 */
-	if (NULL == (sd_stack = saveStackInfo(&save_stackHdr)))
+	save_base->stackinfo = totalsize;
+	totalsize += saveStackInfo(fp);
+	if (ferror(fp))
 		goto errexit;
-
-	if (1 != fwrite(&save_stackHdr, sizeof(save_stackHdr), 1, fp))
-		goto errexit;
-	
-	if (save_stackHdr.size != 0 && 1 != fwrite(sd_stack, save_stackHdr.size, 1, fp))
-		goto errexit;
-	
-	save_base->stackinfo  = totalsize;
-	totalsize            += save_stackHdr.size + sizeof(Ald_stackHdr);
 	
 	/* 文字列変数 */
 	if (NULL == (sd_varStr = saveStrVar(&save_strHdr)))
@@ -559,19 +549,23 @@ int save_saveAll(int no) {
 }
 
 /* スタック情報のセーブ */
-static void *saveStackInfo(Ald_stackHdr *head) {
-	int count;
-	int *info = sl_getStack(&count);
-	
-	head->size = count * sizeof(int);
-	return (void *)info;
+static int saveStackInfo(FILE *fp) {
+	int size;
+	uint8_t *data = sl_saveStack(&size);
+
+	Ald_stackHdr head = { .size = size };
+	fwrite(&head, sizeof(head), 1, fp);
+	if (size > 0)
+		fwrite(data, size, 1, fp);
+	free(data);
+	return sizeof(head) + size;
 }
 
 /* スタック情報のロード */
 static void loadStackInfo(char *buf) {
 	Ald_stackHdr *head = (Ald_stackHdr *)buf;
-	char         *data = buf + sizeof(Ald_stackHdr);
-	sl_putStack((int *)data, head->size / sizeof(int));
+	uint8_t *data = buf + sizeof(Ald_stackHdr);
+	sl_loadStack(data, head->size);
 }
 
 /* 文字列変数のセーブ */

@@ -389,9 +389,6 @@ static void set_stack_frame(StackFrame *frame, int page, int addr, boolean is_re
 }
 
 StackTrace *dbg_stack_trace(void) {
-	int stack_size;
-	const int *stack_base = sl_getStack(&stack_size);
-
 	int page = nact->current_page;
 
 	int cap = 16;
@@ -399,26 +396,17 @@ StackTrace *dbg_stack_trace(void) {
 	set_stack_frame(&trace->frames[0], page, nact->current_addr, false);
 	trace->nr_frame = 1;
 
-	const int *p = stack_base + stack_size - 1;
-	while (p >= stack_base) {
-		int addr = -1;
-		switch (*p) {
-		case STACK_NEARJMP:
-			addr = p[-2];
-			break;
-		case STACK_FARJMP:
-			page = p[-2];
-			addr = p[-3];
-			break;
+	struct stack_frame_info *sfi = NULL;
+	while ((sfi = sl_next_stack_frame(sfi)) != NULL) {
+		if (sfi->tag != STACK_NEARCALL && sfi->tag != STACK_FARCALL)
+			continue;
+		if (trace->nr_frame >= cap) {
+			cap *= 2;
+			trace = realloc(trace, sizeof(StackTrace) + cap * sizeof(StackFrame));
 		}
-		if (addr >= 0) {
-			if (trace->nr_frame >= cap) {
-				cap *= 2;
-				trace = realloc(trace, sizeof(StackTrace) + cap * sizeof(StackFrame));
-			}
-			set_stack_frame(&trace->frames[trace->nr_frame++], page, addr, true);
-		}
-		p -= p[-1] + 2;
+		if (sfi->tag == STACK_FARCALL)
+			page = sfi->page;
+		set_stack_frame(&trace->frames[trace->nr_frame++], page, sfi->addr, true);
 	}
 
 	return trace;
@@ -439,26 +427,16 @@ static boolean should_continue_step(void) {
 
 void dbg_stepout(void) {
 	// Set an internal breakpoint at the return address of current frame.
-	int stack_size;
-	const int *stack_base = sl_getStack(&stack_size);
-	const int *p = stack_base + stack_size - 1;
-	while (p >= stack_base) {
-		int page, addr = -1;
-		switch (*p) {
-		case STACK_NEARJMP:
-			page = nact->current_page;
-			addr = p[-2];
-			break;
-		case STACK_FARJMP:
-			page = p[-2];
-			addr = p[-3];
-			break;
-		}
-		if (addr >= 0) {
-			internal_breakpoint = dbg_set_breakpoint(page, addr, true);
+	struct stack_frame_info *sfi = NULL;
+	while ((sfi = sl_next_stack_frame(sfi)) != NULL) {
+		switch (sfi->tag) {
+		case STACK_NEARCALL:
+			internal_breakpoint = dbg_set_breakpoint(nact->current_page, sfi->addr, true);
+			return;
+		case STACK_FARCALL:
+			internal_breakpoint = dbg_set_breakpoint(sfi->page, sfi->addr, true);
 			return;
 		}
-		p -= p[-1] + 2;
 	}
 	// No parent frame found, continue execution.
 }
