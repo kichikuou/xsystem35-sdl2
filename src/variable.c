@@ -105,18 +105,20 @@ int *v_ref_indexed(int var, int index, struct VarRef *ref) {
 
 // DC command
 bool v_allocatePage(int page, int size, bool saveflag) {
-	if (page <= 0 || page >= PAGE_MAX) { return false; }
+	if (page <  0 || page >= PAGE_MAX) { return false; }
 	if (size <= 0 || size > 65536)     { return false; }
-	
-	void *buf = varPage[page].value;
-	if (buf != NULL)
-		buf = realloc(buf, size * sizeof(int));
-	else
-		buf = calloc(size, sizeof(int));
-	if (!buf)
-		NOMEMERR();
 
-	varPage[page].value    = buf;
+	if (page != 0) {
+		void *buf = varPage[page].value;
+		if (buf != NULL)
+			buf = realloc(buf, size * sizeof(int));
+		else
+			buf = calloc(size, sizeof(int));
+		if (!buf)
+			NOMEMERR();
+		varPage[page].value = buf;
+	}
+
 	varPage[page].size     = size;
 	varPage[page].saveflag = saveflag;
 	
