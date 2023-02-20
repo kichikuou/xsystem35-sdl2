@@ -29,6 +29,10 @@
 #include "variable.h"
 #include "xsystem35.h"
 
+// For some reasons, System3.9's initial system page size is 65537.
+#define SYSVAR_MAX 65537
+#define STRVAR_MAX 5000
+
 #define SYSVARLONG_MAX 128
 #define PAGE_MAX 256
 

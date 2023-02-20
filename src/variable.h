@@ -27,9 +27,6 @@
 #include <sys/types.h>
 #include "portab.h"
 
-#define SYSVAR_MAX       65536
-#define STRVAR_MAX       5000
-
 struct VarPage {
 	int size;
 	boolean saveflag;

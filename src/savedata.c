@@ -108,9 +108,6 @@ typedef struct {
 	emscripten_align1_int rsv2;
 } Ald_sysVarHdr;
 
-/* セーブデータ */
-static int savefile_sysvar_cnt = SYSVAR_MAX;
-
 static int saveStackInfo(FILE *fp);
 static void  loadStackInfo(char *buf);
 static void* saveStrVar(Ald_strVarHdr *head);
@@ -621,8 +618,6 @@ static void *saveSysVar(Ald_sysVarHdr *head, int page) {
 	if (!varPage[page].saveflag)
 		return NULL;
 	cnt = varPage[page].size;
-	if (page == 0 && savefile_sysvar_cnt < cnt)
-		cnt = savefile_sysvar_cnt;
 	var = varPage[page].value;
 	if (var == NULL)
 		return NULL;
@@ -648,8 +643,6 @@ static int loadSysVar(char *buf) {
 	int page = head->pageNo;
 
 	cnt = head->size / sizeof(uint16_t);
-	if (page == 0)
-		savefile_sysvar_cnt = cnt;
 	if (varPage[page].size < cnt || varPage[page].value == NULL) {
 		if (!v_allocatePage(page, cnt, TRUE)) {
 			WARNING("Array allocation failed: page=%d size=%d", page, cnt);
