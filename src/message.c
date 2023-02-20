@@ -93,12 +93,14 @@ void msg_init() {
 	}
 	memset(msg.wininfo, 0, sizeof(msg.wininfo));
 
+	for (int i = 0; i < MSGWINMAX; i++) {
+		msg.wininfo[i].x = 100;
+		msg.wininfo[i].y = 300;
+		msg.wininfo[i].width = 400;
+		msg.wininfo[i].height = 90;
+	}
 	msg.winno = 1;
 	msg.win = &msg.wininfo[1];
-	msg.wininfo[1].x = 8;
-	msg.wininfo[1].y = 311;
-	msg.wininfo[1].width = 616;
-	msg.wininfo[1].height = 80;
 	msg.wininfo[1].save = TRUE;
 
 	// Private variables

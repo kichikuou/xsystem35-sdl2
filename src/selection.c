@@ -116,12 +116,14 @@ void sel_init() {
 	}
 	memset(sel.wininfo, 0, sizeof(sel.wininfo));
 
+	for (int i = 0; i < SELWINMAX; i++) {
+		sel.wininfo[i].x = 450;
+		sel.wininfo[i].y = 100;
+		sel.wininfo[i].width  = 150;
+		sel.wininfo[i].height = 100;
+	}
 	sel.winno = 1;
 	sel.win = &sel.wininfo[1];
-	sel.wininfo[1].x = 464;
-	sel.wininfo[1].y = 80;
-	sel.wininfo[1].width  = 160;
-	sel.wininfo[1].height = 160;
 	sel.wininfo[1].save = TRUE;
 	
 	/* 選択肢を登録中 */
