@@ -7,6 +7,15 @@ const word NUM_VAR_PUSHES = 3:
 const word NUM_LABEL_CALLS_AFTER_PAGE_CALL = 4:
 const word NUM_VAR_PUSHES_AFTER_CALL = 5:
 
+	!D01 : 1!
+	!D02 : 2!
+	!D03 : 3!
+	US D01, 3:
+	UG D02, 3:
+	~AssertEquals D02, 1, __LINE__:
+	~AssertEquals D03, 2, __LINE__:
+	~AssertEquals D04, 3, __LINE__:
+
 	UR D01:
 	~AssertEquals D01[STACK_TOP_ATTR], 0, __LINE__:
 	~AssertEquals D01[NUM_PAGE_CALLS], 1, __LINE__:

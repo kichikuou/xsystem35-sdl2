@@ -345,11 +345,11 @@ void sl_pushVar(struct VarRef *vref, int cnt) {
 
 /* UG */
 void sl_popVar(struct VarRef *vref, int cnt) {
-	int *val = v_resolveRef(vref);
+	int *val = v_resolveRef(vref) + cnt;
 	while (cnt-- > 0) {
 		if (stack_pop_byte() != STACK_VARIABLE)
 			SYSERROR("stack top is not a variable push");
-		*val++ = stack_pop_word();
+		*--val = stack_pop_word();
 		stack_drop(2 + 2);
 	}
 }
