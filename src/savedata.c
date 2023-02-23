@@ -90,37 +90,28 @@ typedef struct {
 	int  rsvI4;
 	int  varSys[256];
 	int  rsvI[228];
-} Ald_baseHdr;
+} asd_baseHdr;
 
 typedef struct {
 	int size;
 	int count;
 	int maxlen;
 	int rsv1;
-} Ald_strVarHdr;
+} asd_strVarHdr;
 
 typedef struct {
 	int size;
 	int rsv1;
 	int rsv2;
 	int rsv3;
-} Ald_stackHdr;
+} asd_stackHdr;
 
 typedef struct {
 	emscripten_align1_int size;
 	emscripten_align1_int pageNo;
 	emscripten_align1_int rsv1;
 	emscripten_align1_int rsv2;
-} Ald_sysVarHdr;
-
-static int saveStackInfo(enum save_format format, FILE *fp);
-static void loadStackInfo(enum save_format format, char *buf);
-static void* saveStrVar(enum save_format format, Ald_strVarHdr *head);
-static void loadStrVar(enum save_format format, char *buf);
-static void* saveSysVar(Ald_sysVarHdr *head, int page);
-static int   loadSysVar(char *buf);
-static void* loadGameData(int no, int *status, int *size);
-static int   saveGameData(int no, char *buf, int size);
+} asd_varPageHdr;
 
 static enum save_format save_format = SAVEFMT_XSYS35;
 
@@ -131,6 +122,203 @@ EM_JS(void, scheduleSync, (), {
 #else
 #define scheduleSync()
 #endif
+
+static void fputw(uint16_t n, FILE *fp) {
+	fputc(n & 0xff, fp);
+	fputc(n >> 8, fp);
+}
+
+static int saveStack(enum save_format format, FILE *fp) {
+	int size;
+	uint8_t *data = sl_saveStack(format, &size);
+
+	asd_stackHdr head = { .size = size };
+	fwrite(&head, sizeof(head), 1, fp);
+	if (size > 0)
+		fwrite(data, size, 1, fp);
+	free(data);
+	return sizeof(head) + size;
+}
+
+static void loadStack(enum save_format format, char *buf) {
+	asd_stackHdr *head = (asd_stackHdr *)buf;
+	uint8_t *data = buf + sizeof(asd_stackHdr);
+	sl_loadStack(format, data, head->size);
+}
+
+static int saveStrVars(enum save_format format, FILE *fp) {
+	const int base = format == SAVEFMT_XSYS35 ? 1 : 0;
+	asd_strVarHdr head = {
+		.size   = 0,
+		.count  = svar_maxindex() + (1 - base),
+		.maxlen = (format == SAVEFMT_XSYS35 ? 101 : 0)  // so that old versions of xystem35 can read this save file
+	};
+	fseek(fp, sizeof(head), SEEK_CUR);
+
+	for (int i = base; i <= svar_maxindex(); i++) {
+		const char *s = svar_get(i);
+		int len = strlen(s) + 1;
+		fwrite(s, len, 1, fp);
+		head.size += len;
+	}
+	if (ferror(fp))
+		return 0;
+	fseek(fp, -(sizeof(head) + head.size), SEEK_CUR);
+	fwrite(&head, sizeof(head), 1, fp);
+	fseek(fp, head.size, SEEK_CUR);
+
+	return sizeof(head) + head.size;
+}
+
+static void loadStrVars(enum save_format format, char *buf) {
+	asd_strVarHdr *head = (asd_strVarHdr *)buf;
+	const int base = format == SAVEFMT_XSYS35 ? 1 : 0;
+
+	int cnt = head->count;
+	if ((1 - base) + svar_maxindex() != cnt) {
+		WARNING("Unexpected number of strings in savedata (%d, expected %d)", cnt, (1 - base) + svar_maxindex());
+		svar_init(format == SAVEFMT_XSYS35 ? cnt : cnt - 1);
+	}
+	buf += sizeof(asd_strVarHdr);
+	for (int i = 0; i < cnt; i++) {
+		svar_set(i + base, buf);
+		buf += strlen(buf) + 1;
+	}
+}
+
+static int saveVarPage(int page, FILE *fp) {
+	if (!varPage[page].saveflag)
+		return 0;
+	int cnt = varPage[page].size;
+	int *var = varPage[page].value;
+	if (!var)
+		return 0;
+	asd_varPageHdr head = {
+		.size   = cnt * sizeof(uint16_t),
+		.pageNo = page
+	};
+	fwrite(&head, sizeof(head), 1, fp);
+	for (int i = 0; i < cnt; i++)
+		fputw(var[i], fp);
+
+	return sizeof(head) + head.size;
+}
+
+static int loadVarPage(char *buf) {
+	asd_varPageHdr *head = (asd_varPageHdr *)buf;
+	int page = head->pageNo;
+
+	int cnt = head->size / sizeof(uint16_t);
+	if (varPage[page].size < cnt || varPage[page].value == NULL) {
+		if (!v_allocatePage(page, cnt, TRUE)) {
+			WARNING("Array allocation failed: page=%d size=%d", page, cnt);
+			return SAVE_LOADERR;
+		}
+	}
+	int *var = varPage[page].value;
+	uint16_t *data = (uint16_t *)(buf + sizeof(asd_varPageHdr));
+	for (int i = 0; i < cnt; i++)
+		*var++ = *data++;
+
+	return SAVE_LOADOK;
+}
+
+static void writeAsdFooter(enum save_format format, FILE *fp) {
+	if (format != SAVEFMT_XSYS35) {
+		// Padding(?)
+		for (int i = 0; i < 256; i++)
+			fputc(0xff, fp);
+		// Write a mark to indicate that this file was created by xsystem35.
+		fputs("XS35", fp);
+	}
+	if (format == SAVEFMT_SYS38) {
+		// Stack info
+		struct stack_info sinfo;
+		sl_getStackInfo(&sinfo);
+		int size = sinfo.page_calls * 2 + sinfo.label_calls;
+		int *buf = calloc(size, sizeof(int));
+		int *ptr = buf + size;
+		int *vars = NULL;
+		int *label_calls = NULL;
+		struct stack_frame_info *sfi = NULL;
+		while ((sfi = sl_next_stack_frame(sfi)) != NULL) {
+			switch (sfi->tag) {
+			case STACK_NEARCALL:
+				if (label_calls)
+					(*label_calls)++;
+				vars = --ptr;
+				break;
+			case STACK_FARCALL:
+				vars = --ptr;
+				label_calls = --ptr;
+				break;
+			case STACK_VARIABLE:
+				if (vars)
+					(*vars)++;
+				break;
+			}
+		}
+		// Note that only the first `size` byte of the `size` words data is
+		// written, so information is lost.
+		fwrite(ptr, size, 1, fp);
+		fwrite(&size, 4, 1, fp);
+		free(buf);
+		fputs("INFS", fp);
+	}
+}
+
+/* ゲームデータのロード
+
+ no:    セーブファイル番号 0~
+ *status:  ステータス
+ *size: データの大きさを返すポインタ
+
+あとで free(*buf)するのを忘れないように
+*/
+static void* loadGameData(int no, int *status, int *size) {
+	FILE *fp = fopen(nact->files.save_fname[no], "rb");
+	if (!fp)
+		goto errexit;
+	fseek(fp, 0L, SEEK_END);
+	long filesize = ftell(fp);
+	if (filesize == 0)
+		goto errexit;
+
+	char *buf = (char *)malloc(filesize);
+	if (buf == NULL)
+		goto errexit;
+
+	fseek(fp, 0L, SEEK_SET);
+	fread(buf, filesize, 1, fp);
+	fclose(fp);
+
+	*size = (int)filesize;
+	*status = SAVE_LOADOK;
+	return buf;
+
+ errexit:
+	if (fp != NULL)
+		fclose(fp);
+	*status = SAVE_LOADERR;
+	return NULL;
+}
+
+static int saveGameData(int no, char *buf, int size) {
+	FILE *fp;
+	int status = SAVE_SAVEOK1;
+
+	fc_backup_oldfile(nact->files.save_fname[no]);
+	fp = fopen(nact->files.save_fname[no], "wb");
+	if (fp == NULL) {
+		return SAVE_SAVEERR;
+	}
+	if (1 != fwrite(buf, size, 1, fp)) {
+		status = SAVE_SAVEERR;
+	}
+	fclose(fp);
+	scheduleSync();
+	return status;
+}
 
 int save_setFormat(const char *format_name) {
 	if (!strcmp(format_name, "xsystem35"))
@@ -176,11 +364,9 @@ int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt) {
 	}
 
 	int *p = v_resolveRef(src);
-	while (cnt--) {
-		fputc(*p & 0xff, fp);
-		fputc(*p >> 8, fp);
-		p++;
-	}
+	while (cnt--)
+		fputw(*p++, fp);
+
 	fclose(fp);
 	scheduleSync();
 	return SAVE_SAVEOK0;
@@ -193,11 +379,8 @@ int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
 		return SAVE_LOADERR;
 
 	uint16_t *tmp = malloc(cnt * sizeof(uint16_t));
-	if (!tmp) {
-		WARNING("Out of memory");
-		fclose(fp);
-		return SAVE_LOADERR;
-	}
+	if (!tmp)
+		NOMEMERR();
 
 	size_t size = fread(tmp, sizeof(uint16_t), cnt, fp);
 	fclose(fp);
@@ -278,7 +461,7 @@ int save_copyAll(int dstno, int srcno) {
 	saveTop = loadGameData(srcno, &status, &filesize);
 	if (saveTop == NULL)
 		return SAVE_SAVEERR;
-	if (((Ald_baseHdr *)saveTop)->version != SAVE_DATAVERSION) {
+	if (((asd_baseHdr *)saveTop)->version != SAVE_DATAVERSION) {
 		WARNING("endian mismatch");
 		free(saveTop);
 		return SAVE_SAVEERR;
@@ -292,40 +475,32 @@ int save_copyAll(int dstno, int srcno) {
 
 /* データの一部ロード */
 int save_loadPartial(int no, struct VarRef *vref, int cnt) {
-	Ald_baseHdr *save_base;
-	char *vtop;
-	uint16_t *tmp;
-	int *var;
-	char *saveTop = NULL;
-	int i, status, filesize;
-
-	if (no >= SAVE_MAXNUMBER) {
+	if (no >= SAVE_MAXNUMBER)
 		return SAVE_SAVEERR;
-	}
-	cnt = min(cnt, v_sliceSize(vref));
-	var = v_resolveRef(vref);
-	
-	saveTop = loadGameData(no, &status, &filesize);
-	if (saveTop == NULL) {
-		return status;
-	}
-	
-	if (filesize <= sizeof(Ald_baseHdr)) {
-		goto errexit;
-	}
 
-	save_base = (Ald_baseHdr *)saveTop;
+	cnt = min(cnt, v_sliceSize(vref));
+	int *var = v_resolveRef(vref);
+	
+	int status, filesize;
+	char *saveTop = loadGameData(no, &status, &filesize);
+	if (!saveTop)
+		return status;
+	
+	if (filesize <= sizeof(asd_baseHdr))
+		goto errexit;
+
+	asd_baseHdr *save_base = (asd_baseHdr *)saveTop;
 	if (save_base->version != SAVE_DATAVERSION) {
 		WARNING("endian mismatch");
 		goto errexit;
 	}
 
-	if (save_base->varSys[vref->page] == 0) {
+	if (save_base->varSys[vref->page] == 0)
 		goto errexit;
-	}
-	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
-	tmp = (uint16_t *)vtop + vref->index;
-	for (i = 0; i < cnt; i++) {
+
+	char *vtop = saveTop + save_base->varSys[vref->page] + sizeof(asd_varPageHdr);
+	uint16_t *tmp = (uint16_t *)vtop + vref->index;
+	for (int i = 0; i < cnt; i++) {
 		*var = *tmp; tmp++; var++;
 	}
 	free(saveTop);
@@ -340,34 +515,28 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 
 /* データの一部セーブ */
 int save_savePartial(int no, struct VarRef *vref, int cnt) {
-	Ald_baseHdr *save_base;
-	uint16_t *tmp;
-	char *vtop;
-	int *var;
-	char *saveTop = NULL;
-	int i, status, filesize;
-
 	if (no >= SAVE_MAXNUMBER) {
 		return SAVE_SAVEERR;
 	}
 	if (!varPage[vref->page].saveflag)
 		goto errexit;
 	cnt = min(cnt, v_sliceSize(vref));
-	var = v_resolveRef(vref);
+	int *var = v_resolveRef(vref);
 	
-	saveTop = loadGameData(no, &status, &filesize);
+	int status, filesize;
+	char *saveTop = loadGameData(no, &status, &filesize);
 	if (saveTop == NULL)
 		return status;
-	if (filesize <= sizeof(Ald_baseHdr))
+	if (filesize <= sizeof(asd_baseHdr))
 		goto errexit;
-	save_base = (Ald_baseHdr *)saveTop;
+	asd_baseHdr *save_base = (asd_baseHdr *)saveTop;
 	if (save_base->version != SAVE_DATAVERSION) {
 		WARNING("endian mismatch");
 		goto errexit;
 	}
-	vtop = saveTop + save_base->varSys[vref->page] + sizeof(Ald_sysVarHdr);
-	tmp = (uint16_t *)vtop + vref->index;
-	for (i = 0; i < cnt; i++) {
+	char *vtop = saveTop + save_base->varSys[vref->page] + sizeof(asd_varPageHdr);
+	uint16_t *tmp = (uint16_t *)vtop + vref->index;
+	for (int i = 0; i < cnt; i++) {
 		*tmp = (uint16_t)*var; tmp++; var++;
 	}
 	status = saveGameData(no, saveTop, filesize);
@@ -385,20 +554,17 @@ int save_savePartial(int no, struct VarRef *vref, int cnt) {
 
 /* データのロード */
 int save_loadAll(int no) {
-	Ald_baseHdr *save_base;
-	char *saveTop = NULL;
-	int i, status, filesize;
-	
-	if (no >= SAVE_MAXNUMBER) {
+	if (no >= SAVE_MAXNUMBER)
 		return SAVE_SAVEERR;
-	}
-	saveTop = loadGameData(no, &status, &filesize);
-	if (saveTop == NULL)
+
+	int status, filesize;
+	char *saveTop = loadGameData(no, &status, &filesize);
+	if (!saveTop)
 		return status;
-	if (filesize <= sizeof(Ald_baseHdr))
+	if (filesize <= sizeof(asd_baseHdr))
 		goto errexit;
 	/* 各種データの反映 */
-	save_base = (Ald_baseHdr *)saveTop;
+	asd_baseHdr *save_base = (asd_baseHdr *)saveTop;
 	if (save_base->version != SAVE_DATAVERSION) {
 		WARNING("endian mismatch");
 		goto errexit;
@@ -425,7 +591,7 @@ int save_loadAll(int no) {
 	nact->msg.WinFrameColor      = save_base->msgFrameColor;
 	sl_jmpFar2(save_base->scoPage - (format == SAVEFMT_XSYS35 ? 0 : 1), save_base->scoIndex);
 
-	for (i = 0; i < SELWINMAX; i++) {
+	for (int i = 0; i < SELWINMAX; i++) {
 		int j = format == SAVEFMT_XSYS35
 			? (i + 1) % SELWINMAX  // For savedata compatibility
 			: i;
@@ -435,7 +601,7 @@ int save_loadAll(int no) {
 		nact->sel.wininfo[j].height = save_base->selWinInfo[i].height;
 		// nact->sel.wininfo[i].save   = TRUE;
 	}
-	for (i = 0; i < MSGWINMAX; i++) {
+	for (int i = 0; i < MSGWINMAX; i++) {
 		int j = format == SAVEFMT_XSYS35
 			? (i + 1) % MSGWINMAX  // For savedata compatibility
 			: i;
@@ -447,13 +613,13 @@ int save_loadAll(int no) {
 		// nact->msg.wininfo[i].save   = FALSE;
 	}
 	/* スタックのロード */
-	loadStackInfo(format, saveTop + save_base->stackinfo);
+	loadStack(format, saveTop + save_base->stackinfo);
 	/* 文字列変数のロード */
-	loadStrVar(format, saveTop + save_base->varStr);
+	loadStrVars(format, saveTop + save_base->varStr);
 	/* 数値・配列変数のロード */
-	for (i = 0; i < 256; i++) {
+	for (int i = 0; i < 256; i++) {
 		if (save_base->varSys[i] != 0) {
-			if (SAVE_LOADOK != loadSysVar(saveTop + save_base->varSys[i]))
+			if (SAVE_LOADOK != loadVarPage(saveTop + save_base->varSys[i]))
 				goto errexit;
 			
 		}
@@ -468,336 +634,93 @@ int save_loadAll(int no) {
 /* データのセーブ */
 int save_saveAll(int no) {
 	enum save_format format = save_format;
-	Ald_baseHdr   *save_base = calloc(1, sizeof(Ald_baseHdr));
-	Ald_strVarHdr save_strHdr;
-	Ald_sysVarHdr save_sysHdr;
-	char *sd_varStr = NULL;
-	char *sd_varSys = NULL;
-	int i, totalsize = sizeof(Ald_baseHdr);
-	FILE *fp = NULL;
+	asd_baseHdr save_base = {};
+	int totalsize = sizeof(asd_baseHdr);
 	
 	if (no >= SAVE_MAXNUMBER)
-		goto errexit;
-	
-	if (save_base == NULL)
-		goto errexit;
+		return SAVE_SAVEERR;
 	
 	fc_backup_oldfile(nact->files.save_fname[no]);
-	fp = fopen(nact->files.save_fname[no], "wb");
-	
-	if (fp == NULL)
-		goto errexit;
-	
-	memset(&save_strHdr, 0, sizeof(Ald_strVarHdr));
-	memset(&save_sysHdr, 0, sizeof(Ald_sysVarHdr));
+	FILE *fp = fopen(nact->files.save_fname[no], "wb");
+	if (!fp)
+		return SAVE_SAVEERR;
 	
 	/* 各種データのセーブ */
-	strncpy(save_base->ID, save_signature[format], 32);
-	save_base->version       = SAVE_DATAVERSION;
-	save_base->selMsgSize    = (uint8_t)nact->sel.MsgFontSize;
-	save_base->selMsgColor   = (uint8_t)nact->sel.MsgFontColor;
-	save_base->selBackColor  = (uint8_t)nact->sel.WinBackgroundColor;
-	save_base->selFrameColor = (uint8_t)nact->sel.WinFrameColor;
-	save_base->msgMsgSize    = (uint8_t)nact->msg.MsgFontSize;
-	save_base->msgMsgColor   = (uint8_t)nact->msg.MsgFontColor;
-	save_base->msgBackColor  = (uint8_t)nact->msg.WinBackgroundColor;
-	save_base->msgFrameColor = (uint8_t)nact->msg.WinFrameColor;
-	save_base->scoPage       = sl_getPage() + (format == SAVEFMT_XSYS35 ? 0 : 1);
-	save_base->scoIndex      = sl_getIndex();
-	
-	for (i = 0; i < SELWINMAX; i++) {
+	strncpy(save_base.ID, save_signature[format], 32);
+	save_base.version       = SAVE_DATAVERSION;
+	save_base.selMsgSize    = (uint8_t)nact->sel.MsgFontSize;
+	save_base.selMsgColor   = (uint8_t)nact->sel.MsgFontColor;
+	save_base.selBackColor  = (uint8_t)nact->sel.WinBackgroundColor;
+	save_base.selFrameColor = (uint8_t)nact->sel.WinFrameColor;
+	save_base.msgMsgSize    = (uint8_t)nact->msg.MsgFontSize;
+	save_base.msgMsgColor   = (uint8_t)nact->msg.MsgFontColor;
+	save_base.msgBackColor  = (uint8_t)nact->msg.WinBackgroundColor;
+	save_base.msgFrameColor = (uint8_t)nact->msg.WinFrameColor;
+	save_base.scoPage       = sl_getPage() + (format == SAVEFMT_XSYS35 ? 0 : 1);
+	save_base.scoIndex      = sl_getIndex();
+
+	for (int i = 0; i < SELWINMAX; i++) {
 		int j = format == SAVEFMT_XSYS35
 			? (i + 1) % SELWINMAX  // For savedata compatibility
 			: i;
-		save_base->selWinInfo[i].x      = (uint16_t)nact->sel.wininfo[j].x;
-		save_base->selWinInfo[i].y      = (uint16_t)nact->sel.wininfo[j].y;
-		save_base->selWinInfo[i].width  = (uint16_t)nact->sel.wininfo[j].width;
-		save_base->selWinInfo[i].height = (uint16_t)nact->sel.wininfo[j].height;
+		save_base.selWinInfo[i].x      = (uint16_t)nact->sel.wininfo[j].x;
+		save_base.selWinInfo[i].y      = (uint16_t)nact->sel.wininfo[j].y;
+		save_base.selWinInfo[i].width  = (uint16_t)nact->sel.wininfo[j].width;
+		save_base.selWinInfo[i].height = (uint16_t)nact->sel.wininfo[j].height;
 	}
 	
-	for (i = 0; i < MSGWINMAX; i++) {
+	for (int i = 0; i < MSGWINMAX; i++) {
 		int j = format == SAVEFMT_XSYS35
 			? (i + 1) % MSGWINMAX  // For savedata compatibility
 			: i;
-		save_base->msgWinInfo[i].x      = (uint16_t)nact->msg.wininfo[j].x;
-		save_base->msgWinInfo[i].y      = (uint16_t)nact->msg.wininfo[j].y;
-		save_base->msgWinInfo[i].width  = (uint16_t)nact->msg.wininfo[j].width;
-		save_base->msgWinInfo[i].height = (uint16_t)nact->msg.wininfo[j].height;
+		save_base.msgWinInfo[i].x      = (uint16_t)nact->msg.wininfo[j].x;
+		save_base.msgWinInfo[i].y      = (uint16_t)nact->msg.wininfo[j].y;
+		save_base.msgWinInfo[i].width  = (uint16_t)nact->msg.wininfo[j].width;
+		save_base.msgWinInfo[i].height = (uint16_t)nact->msg.wininfo[j].height;
 	}
 
-	fseek(fp, sizeof(Ald_baseHdr), SEEK_SET);
+	fseek(fp, sizeof(asd_baseHdr), SEEK_SET);
 	
 	/* スタック情報 */
-	save_base->stackinfo = totalsize;
-	totalsize += saveStackInfo(format, fp);
+	save_base.stackinfo = totalsize;
+	totalsize += saveStack(format, fp);
 	if (ferror(fp))
 		goto errexit;
 	
 	/* 文字列変数 */
-	if (NULL == (sd_varStr = saveStrVar(format, &save_strHdr)))
+	save_base.varStr = totalsize;
+	totalsize += saveStrVars(format, fp);
+	if (ferror(fp))
 		goto errexit;
-	
-	if (1 != fwrite(&save_strHdr, sizeof(Ald_strVarHdr), 1, fp))
-		goto errexit;
-	
-	if (save_strHdr.size != 0 && 1 != fwrite(sd_varStr, save_strHdr.size, 1, fp))
-		goto errexit;
-	
-	save_base->varStr  = totalsize;
-	totalsize         += save_strHdr.size + sizeof(Ald_strVarHdr);
-	free(sd_varStr);
 	
 	/* 数値変数・配列変数 */
-	for (i = 0; i < 256; i++) {
-		sd_varSys = saveSysVar(&save_sysHdr, i);
-		if (sd_varSys == NULL) {
-			save_base->varSys[i] = 0;
+	for (int i = 0; i < 256; i++) {
+		int size = saveVarPage(i, fp);
+		if (size) {
+			save_base.varSys[i] = totalsize;
+			totalsize += size;
 		} else {
-			if (1 != fwrite(&save_sysHdr, sizeof(Ald_sysVarHdr), 1, fp))
-				goto errexit;
-			if (1 != fwrite(sd_varSys, save_sysHdr.size, 1, fp))
-				goto errexit;
-			save_base->varSys[i] = totalsize;
-			totalsize           += save_sysHdr.size + sizeof(Ald_sysVarHdr);
-			free(sd_varSys);
+			save_base.varSys[i] = 0;
 		}
+		if (ferror(fp))
+			goto errexit;
 	}
 	
 	fseek(fp, 0, SEEK_SET);
 	
-	if (1 != fwrite(save_base, sizeof(Ald_baseHdr), 1, fp))
+	if (1 != fwrite(&save_base, sizeof(asd_baseHdr), 1, fp))
 		goto errexit;
 	
-	if (format != SAVEFMT_XSYS35) {
-		// Padding(?)
-		fseek(fp, 0L, SEEK_END);
-		for (int i = 0; i < 256; i++)
-			fputc(0xff, fp);
-		// Write a mark to indicate that this file was created by xsystem35.
-		fputs("XS35", fp);
-	}
-	if (format == SAVEFMT_SYS38) {
-		// Stack info
-		struct stack_info sinfo;
-		sl_getStackInfo(&sinfo);
-		int size = sinfo.page_calls * 2 + sinfo.label_calls;
-		int *buf = calloc(size, sizeof(int));
-		int *ptr = buf + size;
-		int *vars = NULL;
-		int *label_calls = NULL;
-		struct stack_frame_info *sfi = NULL;
-		while ((sfi = sl_next_stack_frame(sfi)) != NULL) {
-			switch (sfi->tag) {
-			case STACK_NEARCALL:
-				if (label_calls)
-					(*label_calls)++;
-				vars = --ptr;
-				break;
-			case STACK_FARCALL:
-				vars = --ptr;
-				label_calls = --ptr;
-				break;
-			case STACK_VARIABLE:
-				if (vars)
-					(*vars)++;
-				break;
-			}
-		}
-		// Note that only the first `size` byte of the `size` words data is
-		// written, so information is lost.
-		fwrite(ptr, size, 1, fp);
-		fwrite(&size, 4, 1, fp);
-		free(buf);
-		fputs("INFS", fp);
-	}
+	fseek(fp, 0L, SEEK_END);
+	writeAsdFooter(format, fp);
 
 	fclose(fp);
 	scheduleSync();
-	free(save_base);
 
 	return SAVE_SAVEOK1;
 	
  errexit:
-	if (fp != NULL)
-		fclose(fp);
-	if (save_base != NULL)
-		free(save_base);
-	if (sd_varStr != NULL)
-		free(sd_varStr);
-	if (sd_varSys != NULL)
-		free(sd_varSys);
-	
+	fclose(fp);
 	return SAVE_SAVEERR;
 }
 
-/* スタック情報のセーブ */
-static int saveStackInfo(enum save_format format, FILE *fp) {
-	int size;
-	uint8_t *data = sl_saveStack(format, &size);
-
-	Ald_stackHdr head = { .size = size };
-	fwrite(&head, sizeof(head), 1, fp);
-	if (size > 0)
-		fwrite(data, size, 1, fp);
-	free(data);
-	return sizeof(head) + size;
-}
-
-/* スタック情報のロード */
-static void loadStackInfo(enum save_format format, char *buf) {
-	Ald_stackHdr *head = (Ald_stackHdr *)buf;
-	uint8_t *data = buf + sizeof(Ald_stackHdr);
-	sl_loadStack(format, data, head->size);
-}
-
-/* 文字列変数のセーブ */
-static void *saveStrVar(enum save_format format, Ald_strVarHdr *head) {
-	int bufsize = 65536;
-	char *buf = malloc(bufsize);
-	if (!buf)
-		NOMEMERR();
-
-	const int base = format == SAVEFMT_XSYS35 ? 1 : 0;
-	int offset = 0;
-	for (int i = base; i <= svar_maxindex(); i++) {
-		const char *s = svar_get(i);
-		int len = strlen(s);
-		if (offset + len + 1 > bufsize) {
-			bufsize *= 2;
-			buf = realloc(buf, bufsize);
-			if (!buf)
-				NOMEMERR();
-		}
-		strcpy(buf + offset, s);
-		buf[offset + len] = '\0';
-		offset += len + 1;
-	}
-	head->size   = offset;
-	head->count  = svar_maxindex() + (1 - base);
-	head->maxlen = (format == SAVEFMT_XSYS35 ? 101 : 0);  // so that old versions of xystem35 can read this save file
-	return buf;
-}
-
-/* 文字列変数のロード */
-static void loadStrVar(enum save_format format, char *buf) {
-	Ald_strVarHdr *head = (Ald_strVarHdr *)buf;
-	const int base = format == SAVEFMT_XSYS35 ? 1 : 0;
-	
-	int cnt = head->count;
-	if ((1 - base) + svar_maxindex() != cnt) {
-		WARNING("Unexpected number of strings in savedata (%d, expected %d)", cnt, (1 - base) + svar_maxindex());
-		svar_init(format == SAVEFMT_XSYS35 ? cnt : cnt - 1);
-	}
-	buf += sizeof(Ald_strVarHdr);
-	for (int i = 0; i < cnt; i++) {
-		svar_set(i + base, buf);
-		buf += strlen(buf) + 1;
-	}
-}
-
-/* 数値・配列変数のセーブ */
-static void *saveSysVar(Ald_sysVarHdr *head, int page) {
-	int *var;
-	int cnt, i;
-	uint16_t *tmp, *_tmp;
-	if (!varPage[page].saveflag)
-		return NULL;
-	cnt = varPage[page].size;
-	var = varPage[page].value;
-	if (var == NULL)
-		return NULL;
-	head->size   = cnt * sizeof(uint16_t);
-	head->pageNo = page;
-	tmp = _tmp = (uint16_t *)malloc(cnt * sizeof(uint16_t));
-	if (tmp == NULL) {
-		WARNING("Out of memory");
-		return NULL;
-	}
-	for (i = 0; i < cnt; i++) {
-		*tmp = (uint16_t)*var; var++; tmp++;
-	}
-	return _tmp;
-}
-
-/* 数値・配列変数のロード */
-static int loadSysVar(char *buf) {
-	int i, cnt;
-	int  *var;
-	uint16_t *data;
-	Ald_sysVarHdr *head = (Ald_sysVarHdr *)buf;
-	int page = head->pageNo;
-
-	cnt = head->size / sizeof(uint16_t);
-	if (varPage[page].size < cnt || varPage[page].value == NULL) {
-		if (!v_allocatePage(page, cnt, TRUE)) {
-			WARNING("Array allocation failed: page=%d size=%d", page, cnt);
-			return SAVE_LOADERR;
-		}
-	}
-	var = varPage[page].value;
-
-	buf += sizeof(Ald_sysVarHdr);
-	data = (uint16_t *)buf;
-	for (i = 0; i < cnt; i++) {
-		*var++ = *data++;
-	}
-	return SAVE_LOADOK;
-}
-
-
-/* ゲームデータのロード
-
- no:    セーブファイル番号 0~ 
- *status:  ステータス
- *size: データの大きさを返すポインタ
-
-あとで free(*buf)するのを忘れないように
-*/
-static void* loadGameData(int no, int *status, int *size) {
-	FILE *fp;
-	long filesize;
-	char *buf;
-	
-	fp = fopen(nact->files.save_fname[no], "rb");
-	if (fp == NULL)
-		goto errexit;
-	fseek(fp, 0L, SEEK_END);
-	filesize = ftell(fp);
-	if (filesize == 0)
-		goto errexit;
-
-	buf = (char *)malloc(filesize);
-	if (buf == NULL)
-		goto errexit;
-
-	fseek(fp, 0L, SEEK_SET);
-	fread(buf, filesize, 1, fp);
-	fclose(fp);
-
-	*size = (int)filesize;
-	*status = SAVE_LOADOK;
-	return buf;
-
- errexit:
-	if (fp != NULL)
-		fclose(fp);
-	*status = SAVE_LOADERR;
-	return NULL;
-}
-
-static int saveGameData(int no, char *buf, int size) {
-	FILE *fp;
-	int status = SAVE_SAVEOK1;
-	
-	fc_backup_oldfile(nact->files.save_fname[no]);
-	fp = fopen(nact->files.save_fname[no], "wb");
-	if (fp == NULL) {
-		return SAVE_SAVEERR;
-	}
-	if (1 != fwrite(buf, size, 1, fp)) {
-		status = SAVE_SAVEERR;
-	}
-	fclose(fp);
-	scheduleSync();
-	return status;
-}
