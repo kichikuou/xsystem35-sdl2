@@ -66,6 +66,8 @@ static void storeSaveName(GameResource *gr, int no, char *src) {
 boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_readdir)(DIR *)) {
 	memset(gr, 0, sizeof(GameResource));
 
+	char *basename = NULL;
+	bool found_xsleep = false;
 	struct dirent* d;
 	while ((d = p_readdir(dir))) {
 		char *filename = d->d_name;
@@ -91,6 +93,10 @@ boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_r
 			switch (toupper(filename[len - 6])) {
 			case 'S':
 				storeDataName(gr, DRIFILE_SCO, dno, filename);
+				if (!basename) {
+					basename = strdup(filename);
+					basename[len - 5] = '\0';
+				}
 				break;
 			case 'G':
 				storeDataName(gr, DRIFILE_CG, dno, filename);
@@ -111,13 +117,26 @@ boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_r
 				storeDataName(gr, DRIFILE_BGM, dno, filename);
 				break;
 			}
+		} else if (strcasecmp(filename + 1, "sleep.asd") == 0) {
+			found_xsleep = true;
 		}
 	}
-	for (int i = 0; i < SAVE_MAXNUMBER; i++) {
-		char buf[] = "asleep.asd";
-		buf[0] = 'a' + i;
-		storeSaveName(gr, i, buf);
+	if (basename && !found_xsleep) {
+		char *buf = malloc(strlen(basename) + 6);
+		int a = basename[strlen(basename) - 1] == 'S' ? 'A' : 'a';
+		for (int i = 0; i < SAVE_MAXNUMBER; i++) {
+			sprintf(buf, "%s%c.asd", basename, a + i);
+			storeSaveName(gr, i, buf);
+		}
+		free(buf);
+	} else {
+		for (int i = 0; i < SAVE_MAXNUMBER; i++) {
+			char buf[] = "asleep.asd";
+			buf[0] = 'a' + i;
+			storeSaveName(gr, i, buf);
+		}
 	}
+	free(basename);
 
 	return (gr->cnt[DRIFILE_SCO] > 0) ? TRUE : FALSE;
 }

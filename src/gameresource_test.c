@@ -74,50 +74,69 @@ static struct dirent *mockReaddir(DIR *dir) {
 }
 
 static void initGameResourceFromDir_test(void) {
-	const char *files[] = {
-		"ADISK.ALD",
-		"FOOSB.ALD",
-		"foogz.ald",
-		"WA.ALD",
-		"unknownXA.ald",
-		"a.ald",
-		".ald",
-		"a",
-		"SYSTEM39.AIN",
-		"foo_WA.WAI",
-		"foo_BA.BGI",
-		"SACTEFAM.KLD",
-		"System39.ini",
-		"foo1.alk",
-		"0.alk",
-		".alk",
-		NULL
-	};
-	const char **dir = files;
-	GameResource gr;
-	ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
-	ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 2);
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "ADISK.ALD");
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][1], "FOOSB.ALD");
-	ASSERT_EQUAL(gr.cnt[DRIFILE_CG], 26);
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_CG][25], "foogz.ald");
-	ASSERT_EQUAL(gr.cnt[DRIFILE_WAVE], 1);
-	ASSERT_STRCMP(gr.game_fname[DRIFILE_WAVE][0], "WA.ALD");
-	for (int i = 0; i < 26; i++) {
-		char buf[16];
-		sprintf(buf, "%csleep.asd", 'a' + i);
-		ASSERT_STRCMP(gr.save_fname[i], buf);
+	{
+		const char *files[] = {
+			"FOOSA.ALD",
+			"FOOSB.ALD",
+			"foogz.ald",
+			"WA.ALD",
+			"unknownXA.ald",
+			"a.ald",
+			".ald",
+			"a",
+			"SYSTEM39.AIN",
+			"foo_WA.WAI",
+			"foo_BA.BGI",
+			"SACTEFAM.KLD",
+			"System39.ini",
+			"foo1.alk",
+			"0.alk",
+			".alk",
+			NULL
+		};
+		const char **dir = files;
+		GameResource gr;
+		ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
+		ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 2);
+		ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "FOOSA.ALD");
+		ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][1], "FOOSB.ALD");
+		ASSERT_EQUAL(gr.cnt[DRIFILE_CG], 26);
+		ASSERT_STRCMP(gr.game_fname[DRIFILE_CG][25], "foogz.ald");
+		ASSERT_EQUAL(gr.cnt[DRIFILE_WAVE], 1);
+		ASSERT_STRCMP(gr.game_fname[DRIFILE_WAVE][0], "WA.ALD");
+		for (int i = 0; i < 26; i++) {
+			char buf[16];
+			sprintf(buf, "FOOS%c.asd", 'A' + i);
+			ASSERT_STRCMP(gr.save_fname[i], buf);
+		}
+		ASSERT_STRCMP(gr.save_path, ".");
+		ASSERT_STRCMP(gr.ain, "SYSTEM39.AIN");
+		ASSERT_STRCMP(gr.wai, "foo_WA.WAI");
+		ASSERT_STRCMP(gr.bgi, "foo_BA.BGI");
+		ASSERT_STRCMP(gr.sact01, "SACTEFAM.KLD");
+		ASSERT_STRCMP(gr.init, "System39.ini");
+		ASSERT_STRCMP(gr.alk[0], "0.alk");
+		ASSERT_STRCMP(gr.alk[1], "foo1.alk");
+		for (int i = 2; i < 10; i++)
+			ASSERT_NULL(gr.alk[i]);
 	}
-	ASSERT_STRCMP(gr.save_path, ".");
-	ASSERT_STRCMP(gr.ain, "SYSTEM39.AIN");
-	ASSERT_STRCMP(gr.wai, "foo_WA.WAI");
-	ASSERT_STRCMP(gr.bgi, "foo_BA.BGI");
-	ASSERT_STRCMP(gr.sact01, "SACTEFAM.KLD");
-	ASSERT_STRCMP(gr.init, "System39.ini");
-	ASSERT_STRCMP(gr.alk[0], "0.alk");
-	ASSERT_STRCMP(gr.alk[1], "foo1.alk");
-	for (int i = 2; i < 10; i++)
-		ASSERT_NULL(gr.alk[i]);
+	{
+		const char *files[] = {
+			"ADISK.ALD",
+			"asleep.asd",
+			NULL
+		};
+		const char **dir = files;
+		GameResource gr;
+		ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
+		ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 1);
+		ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "ADISK.ALD");
+		for (int i = 0; i < 26; i++) {
+			char buf[16];
+			sprintf(buf, "%csleep.asd", 'a' + i);
+			ASSERT_STRCMP(gr.save_fname[i], buf);
+		}
+	}
 }
 
 void gameresource_test(void) {
