@@ -354,7 +354,7 @@ void sl_popVar(struct VarRef *vref, int cnt) {
 	}
 }
 
-enum save_stack_frame_type {
+enum xsys35_stack_frame_type {
 	SAVE_NEARJMP = 1,
 	SAVE_FARJMP = 2,
 	SAVE_VARIABLE = 3,
@@ -367,15 +367,15 @@ enum txx_type {
 	TxxTEXTLOC = 3
 };
 
-struct save_stack_frame {
-	struct save_stack_frame *next;
+struct xsys35_stack_frame {
+	struct xsys35_stack_frame *next;
 	int len;
 	int buf[];
 };
 
-struct save_stack_frame *push_save_stack_frame(int size, struct save_stack_frame *next) {
-	struct save_stack_frame *f =
-		malloc(sizeof(struct save_stack_frame) + sizeof(int) * size);
+struct xsys35_stack_frame *push_xsys35_stack_frame(int size, struct xsys35_stack_frame *next) {
+	struct xsys35_stack_frame *f =
+		malloc(sizeof(struct xsys35_stack_frame) + sizeof(int) * size);
 	f->next = next;
 	f->len = size;
 	return f;
@@ -391,13 +391,13 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 	}
 
 	// Serialize to the stack format used in old versions of xsystem35.
-	struct save_stack_frame *frame = NULL;
+	struct xsys35_stack_frame *frame = NULL;
 	uint8_t *sp = stack_top;
 	while (sp > stack_buf) {
 		switch (sp[-1]) {
 		case STACK_FARCALL:
 			sp -= 7;
-			frame = push_save_stack_frame(4, frame);
+			frame = push_xsys35_stack_frame(4, frame);
 			frame->buf[3] = SAVE_FARJMP;
 			frame->buf[2] = 2;
 			frame->buf[1] = LittleEndian_getW(sp, 0) - 1; // page
@@ -405,7 +405,7 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 			break;
 		case STACK_NEARCALL:
 			sp -= 5;
-			frame = push_save_stack_frame(3, frame);
+			frame = push_xsys35_stack_frame(3, frame);
 			frame->buf[2] = SAVE_NEARJMP;
 			frame->buf[1] = 1;
 			frame->buf[0] = LittleEndian_getDW(sp, 0); // addr
@@ -422,7 +422,7 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 					int base  = frame->buf[frame->len - 4];
 					// Merge into existing SAVE_VARIABLE frame.
 					if (page == fpage && index == base - 1) {
-						frame = realloc(frame, sizeof(struct save_stack_frame) + sizeof(int) * (frame->len + 1));
+						frame = realloc(frame, sizeof(struct xsys35_stack_frame) + sizeof(int) * (frame->len + 1));
 						frame->len++;
 						frame->buf[frame->len - 1] = SAVE_VARIABLE;
 						frame->buf[frame->len - 2] = count + 1;
@@ -432,7 +432,7 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 						break;
 					}
 				}
-				frame = push_save_stack_frame(5, frame);
+				frame = push_xsys35_stack_frame(5, frame);
 				frame->buf[4] = SAVE_VARIABLE;
 				frame->buf[3] = 3;
 				frame->buf[2] = page;
@@ -442,7 +442,7 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 			break;
 		case STACK_TEXTCOLOR:
 			sp -= 3;
-			frame = push_save_stack_frame(5, frame);
+			frame = push_xsys35_stack_frame(5, frame);
 			frame->buf[4] = SAVE_TXXSTATE;
 			frame->buf[3] = 3;
 			frame->buf[2] = TxxTEXTCOLOR;
@@ -451,7 +451,7 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 			break;
 		case STACK_TEXTSIZE:
 			sp -= 6;
-			frame = push_save_stack_frame(5, frame);
+			frame = push_xsys35_stack_frame(5, frame);
 			frame->buf[4] = SAVE_TXXSTATE;
 			frame->buf[3] = 3;
 			frame->buf[2] = TxxTEXTSIZE;
@@ -460,7 +460,7 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 			break;
 		case STACK_TEXTLOC:
 			sp -= 9;
-			frame = push_save_stack_frame(5, frame);
+			frame = push_xsys35_stack_frame(5, frame);
 			frame->buf[4] = SAVE_TXXSTATE;
 			frame->buf[3] = 3;
 			frame->buf[2] = TxxTEXTLOC;
@@ -472,15 +472,15 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 		}
 	}
 	int total_len = 0;
-	for (struct save_stack_frame *f = frame; f; f = f->next)
+	for (struct xsys35_stack_frame *f = frame; f; f = f->next)
 		total_len += f->len;
 
 	int *buf = malloc(total_len * sizeof(int));
 	int *p = buf;
-	for (struct save_stack_frame *f = frame; f;) {
+	for (struct xsys35_stack_frame *f = frame; f;) {
 		memcpy(p, f->buf, f->len * sizeof(int));
 		p += f->len;
-		struct save_stack_frame *next = f->next;
+		struct xsys35_stack_frame *next = f->next;
 		free(f);
 		f = next;
 	}
@@ -510,36 +510,22 @@ uint8_t *sl_saveStack(enum save_format format, int *size_out) {
 	return (uint8_t *)buf;
 }
 
-void sl_loadStack(enum save_format format, uint8_t *unaligned_data, int size) {
-	if (format != SAVEFMT_XSYS35) {
-		if (size > stack_size) {
-			while (size > stack_size)
-				stack_size *= 2;
-			free(stack_buf);
-			stack_buf = malloc(stack_size);
-			if (!stack_buf)
-				NOMEMERR();
-		}
-		memcpy(stack_buf, unaligned_data, size);
-		stack_top = stack_buf + size;
-		return;
-	}
-
+static void load_stack_xsys35(uint8_t *unaligned_data, int size) {
 	// Deserialize from the stack format used in old versions of xsystem35.
 	int *data = malloc(size);
 	memcpy(data, unaligned_data, size);
-	struct save_stack_frame *frame = NULL;
+	struct xsys35_stack_frame *frame = NULL;
 
 	for (int *p = data + size / sizeof(int); p > data;) {
 		int len = p[-2] + 2;
 		p -= len;
-		frame = push_save_stack_frame(len, frame);
+		frame = push_xsys35_stack_frame(len, frame);
 		memcpy(frame->buf, p, len * sizeof(int));
 	}
 	free(data);
 
 	stack_top = stack_buf;
-	for (struct save_stack_frame *f = frame; f;) {
+	for (struct xsys35_stack_frame *f = frame; f;) {
 		switch (f->buf[f->len - 1]) {
 		case SAVE_NEARJMP:
 			if (f->len != 3)
@@ -601,9 +587,108 @@ void sl_loadStack(enum save_format format, uint8_t *unaligned_data, int size) {
 		default:
 			SYSERROR("broken stack data");
 		}
-		struct save_stack_frame *next = f->next;
+		struct xsys35_stack_frame *next = f->next;
 		free(f);
 		f = next;
+	}
+}
+
+struct asdv1_stack_frame {
+	struct asdv1_stack_frame *next;
+	int len;
+	uint8_t buf[];
+};
+
+struct asdv1_stack_frame *push_asdv1_stack_frame(int size, struct asdv1_stack_frame *next) {
+	struct asdv1_stack_frame *f =
+		malloc(sizeof(struct asdv1_stack_frame) + size);
+	f->next = next;
+	f->len = size;
+	return f;
+}
+
+static void load_stack_sys35(uint8_t *data, int size) {
+	struct asdv1_stack_frame *frame = NULL;
+	for (uint8_t *p = data + size; p > data;) {
+		int frame_size = 0;
+		switch (p[-1]) {
+		case STACK_FARCALL:
+			frame_size = 13;
+			break;
+		case 0xee:
+			frame_size = 5;
+			break;
+		case 0xdd:
+			frame_size = LittleEndian_getW(p, -3) * 2 + 5;
+			break;
+		}
+		if (!frame_size)
+			break;  // System3.5 save files has some junk data at the stack bottom.
+		p -= frame_size;
+		frame = push_asdv1_stack_frame(frame_size, frame);
+		memcpy(frame->buf, p, frame_size);
+	}
+
+	stack_top = stack_buf;
+	for (struct asdv1_stack_frame *f = frame; f;) {
+		switch (f->buf[f->len - 1]) {
+		case STACK_FARCALL:
+			stack_reserve(2 + 4 + 1);
+			if (LittleEndian_getDW(f->buf, 0) != 0)
+				WARNING("unexpected stack structure");
+			stack_push_word(LittleEndian_getDW(f->buf, 4));
+			stack_push_dword(LittleEndian_getDW(f->buf, 8));
+			stack_push_byte(STACK_FARCALL);
+			break;
+		case STACK_NEARCALL:
+			stack_reserve(4 + 1);
+			stack_push_dword(LittleEndian_getDW(f->buf, 0));
+			stack_push_byte(STACK_NEARCALL);
+			break;
+		case STACK_VARIABLE:
+			{
+				int count = LittleEndian_getW(f->buf, f->len - 3);
+				int base = LittleEndian_getW(f->buf, f->len - 5);
+				stack_reserve((2 + 2 + 2 + 1) * count);
+				for (int i = 0; i < count; i++) {
+					stack_push_word(base + 1);
+					stack_push_word(0);  // page
+					stack_push_word(LittleEndian_getW(f->buf, i * 2));
+					stack_push_byte(STACK_VARIABLE);
+				}
+			}
+			break;
+		}
+		struct asdv1_stack_frame *next = f->next;
+		free(f);
+		f = next;
+	}
+}
+
+static void load_stack_sys39(uint8_t *data, int size) {
+	if (size > stack_size) {
+		while (size > stack_size)
+			stack_size *= 2;
+		free(stack_buf);
+		stack_buf = malloc(stack_size);
+		if (!stack_buf)
+			NOMEMERR();
+	}
+	memcpy(stack_buf, data, size);
+	stack_top = stack_buf + size;
+}
+
+void sl_loadStack(enum save_format format, uint8_t *unaligned_data, int size) {
+	switch (format) {
+	case SAVEFMT_XSYS35:
+		load_stack_xsys35(unaligned_data, size);
+		break;
+	case SAVEFMT_SYS35:
+		load_stack_sys35(unaligned_data, size);
+		break;
+	default:
+		load_stack_sys39(unaligned_data, size);
+		break;
 	}
 }
 

@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,6 +45,7 @@ typedef int emscripten_align1_int;
 #include "message.h"
 
 const char *save_signature[] = {
+	[SAVEFMT_SYS35]  = "This is save data for System3.5 Win95 For NACT/ADV system       (C) 1996 ALICE-SOFT",
 	[SAVEFMT_XSYS35] = "System3.5 SavaData(c)ALICE-SOFT",
 	[SAVEFMT_SYS36]  = "System3.5 SaveData(c)ALICE-SOFT",
 	[SAVEFMT_SYS38]  = "System3.8 SaveData(c)ALICE-SOFT",
@@ -473,19 +475,83 @@ int save_copyAll(int dstno, int srcno) {
 	return status;
 }
 
+static int loadpartial_sys35(char *saveTop, int filesize, struct VarRef *vref, int cnt) {
+	if (filesize < 0xb0)
+		return SAVE_LOADERR;
+	cnt = min(cnt, v_sliceSize(vref));
+	int *var = v_resolveRef(vref);
+
+	if (vref->page == 0) {
+		// SysVar section
+		int section_offset = LittleEndian_getDW(saveTop, 0x90);
+		int section_length = LittleEndian_getDW(saveTop, 0x94);
+		if (section_offset + 16 + section_length > filesize)
+			return SAVE_LOADERR;
+
+		int sysvar_count = LittleEndian_getDW(saveTop, section_offset);
+		if (sysvar_count > varPage[0].size)
+			return SAVE_LOADERR;  // resizing system page is not supported in sys3.5
+		int offset = section_offset + 16 + vref->index * 2;
+		for (int i = 0; i < cnt; i++) {
+			var[i] = LittleEndian_getW(saveTop, offset);
+			offset += 2;
+		}
+		return SAVE_LOADOK;
+	}
+	// Arrays section
+	int section_offset = LittleEndian_getDW(saveTop, 0xa0);
+	int section_length = LittleEndian_getDW(saveTop, 0xa4);
+	if (section_offset + 16 + section_length > filesize)
+		return SAVE_LOADERR;
+	int page_count = LittleEndian_getDW(saveTop, section_offset + 4);
+	int offset = section_offset + 16;
+	// TODO: section size check
+	for (int i = 0; i < page_count; i++) {
+		int page = LittleEndian_getDW(saveTop, offset); offset += 4;
+		int count = LittleEndian_getDW(saveTop, offset); offset += 4;
+		int content_offset = LittleEndian_getDW(saveTop, offset); offset += 4;
+		offset += 4;
+		if (page != vref->page)
+			continue;
+		// TODO page resize
+		// TODO: section size check
+		content_offset += vref->index * 2;
+		for (int j = 0; j < cnt; j++) {
+			var[j] = LittleEndian_getW(saveTop, content_offset + j * 2);
+		}
+		return SAVE_LOADOK;
+	}
+	return SAVE_LOADERR;
+}
+
 /* データの一部ロード */
 int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 	if (no >= SAVE_MAXNUMBER)
 		return SAVE_SAVEERR;
 
-	cnt = min(cnt, v_sliceSize(vref));
-	int *var = v_resolveRef(vref);
-	
 	int status, filesize;
 	char *saveTop = loadGameData(no, &status, &filesize);
 	if (!saveTop)
 		return status;
-	
+	if (filesize < 0x60)
+		goto errexit;
+	enum save_format format = (enum save_format)-1;
+	for (int i = 0; i < sizeof(save_signature) / sizeof(save_signature[0]); i++) {
+		if (!strcmp(save_signature[i], saveTop)) {
+			format = i;
+			break;
+		}
+	}
+	if (format < 0) {
+		WARNING("unrecognized save format");
+		goto errexit;
+	}
+
+	if (format == SAVEFMT_SYS35) {
+		int result = loadpartial_sys35(saveTop, filesize, vref, cnt);
+		free(saveTop);
+		return result;
+	}
 	if (filesize <= sizeof(asd_baseHdr))
 		goto errexit;
 
@@ -495,6 +561,8 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 		goto errexit;
 	}
 
+	cnt = min(cnt, v_sliceSize(vref));
+	int *var = v_resolveRef(vref);
 	if (save_base->varSys[vref->page] == 0)
 		goto errexit;
 
@@ -551,6 +619,125 @@ int save_savePartial(int no, struct VarRef *vref, int cnt) {
 	return SAVE_SAVEERR;
 }
 
+static int loadall_sys35(char *saveTop, int filesize) {
+	if (filesize < 0xb0)
+		return SAVE_LOADERR;
+
+	int page = LittleEndian_getDW(saveTop, 0x80);
+	int addr = LittleEndian_getDW(saveTop, 0x84);
+	sl_jmpFar2(page - 1, addr);
+
+	// SysVar section
+	int section_offset = LittleEndian_getDW(saveTop, 0x90);
+	int section_length = LittleEndian_getDW(saveTop, 0x94);
+	if (section_offset + 16 + section_length > filesize)
+		return SAVE_LOADERR;
+
+	int sysvar_count = LittleEndian_getDW(saveTop, section_offset);
+	if (sysvar_count > varPage[0].size)
+		return SAVE_LOADERR;  // resizing system page is not supported in sys3.5
+	int offset = section_offset + 16;
+	for (int i = 0; i < sysvar_count; i++) {
+		varPage[0].value[i] = LittleEndian_getW(saveTop, offset);
+		offset += 2;
+	}
+	nact->sel.MsgFontSize = LittleEndian_getW(saveTop, offset); offset += 2;
+	nact->msg.MsgFontSize = LittleEndian_getW(saveTop, offset); offset += 2;
+	cg_vspPB = LittleEndian_getW(saveTop, offset); offset += 2;
+	nact->msg.MsgFontColor = LittleEndian_getW(saveTop, offset); offset += 2;
+	nact->sel.MsgFontColor = LittleEndian_getW(saveTop, offset); offset += 2;
+	nact->sel.WinFrameColor = LittleEndian_getW(saveTop, offset); offset += 2;
+	nact->sel.WinBackgroundColor = LittleEndian_getW(saveTop, offset); offset += 2;
+	nact->msg.WinFrameColor = LittleEndian_getW(saveTop, offset); offset += 2;
+	nact->msg.WinBackgroundColor = LittleEndian_getW(saveTop, offset); offset += 2;
+	int left = section_offset + 16 + section_length - offset;
+	WARNING("0x%x bytes for window info", left);
+	if (left < 0)
+		return SAVE_LOADERR;
+	int win_info_count = left / 32;
+	if (win_info_count >= SELWINMAX)
+		return SAVE_LOADERR;
+	for (int i = 1; i <= win_info_count; i++) {
+		offset += 2;
+		nact->sel.wininfo[i].x = LittleEndian_getW(saveTop, offset); offset += 2;
+		nact->sel.wininfo[i].y = LittleEndian_getW(saveTop, offset); offset += 2;
+		int ex = LittleEndian_getW(saveTop, offset); offset += 2;
+		int ey = LittleEndian_getW(saveTop, offset); offset += 2;
+		nact->sel.wininfo[i].width = ex + 1 - nact->sel.wininfo[i].x;
+		nact->sel.wininfo[i].height = ey + 1 - nact->sel.wininfo[i].y;
+		offset += 6;
+	}
+	for (int i = 1; i <= win_info_count; i++) {
+		offset += 2;
+		nact->msg.wininfo[i].x = LittleEndian_getW(saveTop, offset); offset += 2;
+		nact->msg.wininfo[i].y = LittleEndian_getW(saveTop, offset); offset += 2;
+		int ex = LittleEndian_getW(saveTop, offset); offset += 2;
+		int ey = LittleEndian_getW(saveTop, offset); offset += 2;
+		nact->msg.wininfo[i].width = ex + 1 - nact->msg.wininfo[i].x;
+		nact->msg.wininfo[i].height = ey + 1 - nact->msg.wininfo[i].y;
+		offset += 6;
+	}
+	//assert(offset == section_offset + 16 + section_length);
+
+	// Strings section
+	section_offset = LittleEndian_getDW(saveTop, 0x98);
+	section_length = LittleEndian_getDW(saveTop, 0x9c);
+	if (section_offset + 16 + section_length > filesize)
+		return SAVE_LOADERR;
+
+	int strvar_count = LittleEndian_getDW(saveTop, section_offset);
+	int strvar_length = LittleEndian_getDW(saveTop, section_offset + 4);
+	offset = section_offset + 16;
+	if (section_length != strvar_count * strvar_length)
+		return SAVE_LOADERR;
+	if (strvar_count > svar_maxindex())
+		strvar_count = svar_maxindex();
+	char *buf = malloc(strvar_length + 1);
+	buf[strvar_length] = '\0';
+	for (int i = 1; i <= strvar_count; i++) {
+		memcpy(buf, saveTop + offset, strvar_length);
+		svar_set(i, buf);
+		offset += strvar_length;
+	}
+
+	// Arrays section
+	section_offset = LittleEndian_getDW(saveTop, 0xa0);
+	section_length = LittleEndian_getDW(saveTop, 0xa4);
+	if (section_offset + 16 + section_length > filesize)
+		return SAVE_LOADERR;
+
+	int array_total_size = LittleEndian_getDW(saveTop, section_offset);
+	int page_count = LittleEndian_getDW(saveTop, section_offset + 4);
+	offset = section_offset + 16;
+	// TODO: section size check
+	int total = 0;
+	for (int i = 0; i < page_count; i++) {
+		int page = LittleEndian_getDW(saveTop, offset); offset += 4;
+		int count = LittleEndian_getDW(saveTop, offset); offset += 4;
+		int content_offset = LittleEndian_getDW(saveTop, offset); offset += 4;
+		offset += 4;
+		total += count;
+		// TODO page resize
+		// TODO: section size check
+		for (int j = 0; j < count; j++) {
+			varPage[page].value[j] = LittleEndian_getW(saveTop, content_offset + j * 2);
+		}
+	}
+	if (total != array_total_size) {
+		WARNING("wrong array total size");
+	} else {
+		WARNING("correct array total size");
+	}
+
+	// Stack section
+	section_offset = LittleEndian_getDW(saveTop, 0xa8);
+	section_length = LittleEndian_getDW(saveTop, 0xac);
+	if (section_offset + section_length > filesize)
+		return SAVE_LOADERR;
+
+	sl_loadStack(SAVEFMT_SYS35, saveTop + section_offset, section_length);
+	return SAVE_LOADOK;
+}
 
 /* データのロード */
 int save_loadAll(int no) {
@@ -561,23 +748,32 @@ int save_loadAll(int no) {
 	char *saveTop = loadGameData(no, &status, &filesize);
 	if (!saveTop)
 		return status;
-	if (filesize <= sizeof(asd_baseHdr))
+	if (filesize < 0x60)
 		goto errexit;
-	/* 各種データの反映 */
-	asd_baseHdr *save_base = (asd_baseHdr *)saveTop;
-	if (save_base->version != SAVE_DATAVERSION) {
-		WARNING("endian mismatch");
-		goto errexit;
-	}
 	enum save_format format = (enum save_format)-1;
 	for (int i = 0; i < sizeof(save_signature) / sizeof(save_signature[0]); i++) {
-		if (!strcmp(save_signature[i], save_base->ID)) {
+		if (!strcmp(save_signature[i], saveTop)) {
 			format = i;
 			break;
 		}
 	}
 	if (format < 0) {
 		WARNING("unrecognized save format");
+		goto errexit;
+	}
+
+	if (format == SAVEFMT_SYS35) {
+		int result = loadall_sys35(saveTop, filesize);
+		free(saveTop);
+		return result;
+	}
+
+	if (filesize <= sizeof(asd_baseHdr))
+		goto errexit;
+	/* 各種データの反映 */
+	asd_baseHdr *save_base = (asd_baseHdr *)saveTop;
+	if (save_base->version != SAVE_DATAVERSION) {
+		WARNING("endian mismatch");
 		goto errexit;
 	}
 

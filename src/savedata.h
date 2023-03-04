@@ -38,6 +38,7 @@
 
 enum save_format {
 	SAVEFMT_XSYS35,
+	SAVEFMT_SYS35,  // System3.5 v1.x
 	SAVEFMT_SYS36,  // System3.5 v2.x - System3.6
 	SAVEFMT_SYS38,  // System3.8 - System3.9
 };
