@@ -37,24 +37,20 @@ class GameActivity : SDLActivity() {
     }
 
     private lateinit var gameRoot: File
-    private lateinit var cdda: CddaPlayer
     private val midi = MidiPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         gameRoot = File(intent.getStringExtra(EXTRA_GAME_ROOT)!!)
-        cdda = CddaPlayer(File(gameRoot, Launcher.PLAYLIST_FILE))
     }
 
     override fun onStop() {
         super.onStop()
-        cdda.onActivityStop()
         midi.onActivityStop()
     }
 
     override fun onResume() {
         super.onResume()
-        cdda.onActivityResume()
         midi.onActivityResume()
     }
 
@@ -63,7 +59,9 @@ class GameActivity : SDLActivity() {
     }
 
     override fun getArguments(): Array<String> {
-        return arrayOf("-gamedir", intent.getStringExtra(EXTRA_GAME_ROOT)!!)
+        return arrayOf(
+            "-gamedir", intent.getStringExtra(EXTRA_GAME_ROOT)!!,
+            "-devcd", Launcher.PLAYLIST_FILE)
     }
 
     override fun setTitle(title: CharSequence?) {
@@ -120,9 +118,6 @@ class GameActivity : SDLActivity() {
     }
 
     // The functions below are called in the SDL thread by JNI.
-    @Suppress("unused") fun cddaStart(track: Int, loop: Boolean) = cdda.start(track, loop)
-    @Suppress("unused") fun cddaStop() = cdda.stop()
-    @Suppress("unused") fun cddaCurrentPosition() = cdda.currentPosition()
     @Suppress("unused") fun midiStart(path: String, loop: Boolean) = midi.start(path, loop)
     @Suppress("unused") fun midiStop() = midi.stop()
     @Suppress("unused") fun midiCurrentPosition() = midi.currentPosition()
@@ -153,69 +148,6 @@ class GameActivity : SDLActivity() {
             }
         }
         return result[0]
-    }
-}
-
-private class CddaPlayer(private val playlistPath: File) {
-    private val playlist =
-        try {
-            playlistPath.readLines()
-        } catch (e: IOException) {
-            Log.e("loadPlaylist", "Cannot load $playlistPath", e)
-            emptyList()
-        }
-    private var currentTrack = 0
-    private val player = MediaPlayer()
-    private var playerPaused = false
-
-    fun start(track: Int, loop: Boolean) {
-        val f = playlist.elementAtOrNull(track - 1)
-        if (f.isNullOrEmpty()) {
-            Log.w("cddaStart", "No playlist entry for track $track")
-            return
-        }
-        Log.v("cddaStart", "$f Loop:$loop")
-        try {
-            player.apply {
-                reset()
-                setDataSource(File(playlistPath.parent, f).path)
-                isLooping = loop
-                prepare()
-                start()
-            }
-            currentTrack = track
-        } catch (e: IOException) {
-            Log.e("cddaStart", "Cannot play $f", e)
-            player.reset()
-        }
-    }
-
-    fun stop() {
-        if (currentTrack > 0 && player.isPlaying) {
-            player.stop()
-            currentTrack = 0
-        }
-    }
-
-    fun currentPosition(): Int {
-        if (currentTrack == 0)
-            return 0
-        val frames = player.currentPosition * 75 / 1000
-        return currentTrack or (frames shl 8)
-    }
-
-    fun onActivityStop() {
-        if (currentTrack > 0 && player.isPlaying) {
-            player.pause()
-            playerPaused = true
-        }
-    }
-
-    fun onActivityResume() {
-        if (playerPaused) {
-            player.start()
-            playerPaused = false
-        }
     }
 }
 

@@ -43,10 +43,6 @@ extern cdromdevice_t cdrom_bsd;
 extern cdromdevice_t cdrom_emscripten;
 #define NATIVE_CD_DEVICE &cdrom_emscripten
 
-#elif defined(ENABLE_CDROM_ANDROID)
-extern cdromdevice_t cdrom_android;
-#define NATIVE_CD_DEVICE &cdrom_android
-
 #else
 
 extern cdromdevice_t cdrom_empty;
@@ -58,7 +54,7 @@ extern cdromdevice_t cdrom_mp3;
 #endif
 
 cdromdevice_t *cd_init(const char *dev) {
-#if defined(ENABLE_CDROM_EMSCRIPTEN) || defined(ENABLE_CDROM_ANDROID)
+#if defined(ENABLE_CDROM_EMSCRIPTEN)
 	return NATIVE_CD_DEVICE;
 #else
 	struct stat st;
@@ -71,5 +67,5 @@ cdromdevice_t *cd_init(const char *dev) {
 	WARNING("no cdrom device available");
 	return NULL;
 #endif
-#endif  // ENABLE_CDROM_EMSCRIPTEN || ENABLE_CDROM_ANDROID
+#endif  // ENABLE_CDROM_EMSCRIPTEN
 }
