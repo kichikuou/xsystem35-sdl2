@@ -72,7 +72,7 @@ static void send_json(cJSON *json) {
 	printf("Content-Length: %zu\r\n\r\n%s", strlen(str), str);
 	fflush(stdout);
 	free(str);
-	cJSON_free(json);
+	cJSON_Delete(json);
 }
 
 static void emit_initialized_event(void) {
@@ -494,7 +494,7 @@ static boolean handle_request(cJSON *request) {
 	if (!cJSON_IsString(command)) {
 		fprintf(stderr, "protocol error: command is not a string\n");
 		// FIXME: return an error response
-		cJSON_free(resp);
+		cJSON_Delete(resp);
 		return continue_repl;
 	}
 
@@ -549,7 +549,7 @@ static boolean handle_message(char *msg) {
 	boolean continue_repl = true;
 	if (cJSON_IsString(type) && !strcmp(type->valuestring, "request"))
 		continue_repl = handle_request(json);
-	cJSON_free(json);
+	cJSON_Delete(json);
 	free(msg);
 	return continue_repl;
 }
