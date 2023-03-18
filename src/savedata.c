@@ -515,11 +515,9 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 
 /* データの一部セーブ */
 int save_savePartial(int no, struct VarRef *vref, int cnt) {
-	if (no >= SAVE_MAXNUMBER) {
+	if (no >= SAVE_MAXNUMBER || !varPage[vref->page].saveflag)
 		return SAVE_SAVEERR;
-	}
-	if (!varPage[vref->page].saveflag)
-		goto errexit;
+
 	cnt = min(cnt, v_sliceSize(vref));
 	int *var = v_resolveRef(vref);
 	
