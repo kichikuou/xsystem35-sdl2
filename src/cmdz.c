@@ -345,10 +345,8 @@ void commandZZ0() {
 		sys_exit(sysVar[0]);
 #endif
 	} else if (sw == 1) {
-		while (TRUE) {
-			usleep(1000*1000);
-			sys_getInputInfo();
-		}
+		while (!nact->is_quit)
+			sys_keywait(1000, 0);
 	}
 }
 
