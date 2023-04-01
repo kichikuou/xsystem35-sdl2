@@ -24,42 +24,14 @@
 #include "portab.h"
 #include "midi.h"
 
-static int midi_initilize(char *pname, int subdev);
-static int midi_exit(void);
-static int midi_reset(void);
-static int midi_start(int no, int loop, char *data, int datalen);
-static int midi_stop();
-extern int midi_pause(void);
-extern int midi_unpause(void);
-static int midi_get_playing_info(midiplaystate *st);
-static int midi_getflag(int mode, int index);
-static int midi_setflag(int mode, int index, int val);
-extern int midi_setvol(int vol);
-extern int midi_getvol();
-extern int midi_fadestart(int time, int volume, int stop);
-extern boolean midi_fading();
-
-#define midi midi_emscripten
-mididevice_t midi = {
-	midi_initilize,
-	midi_exit,
-	midi_reset,
-	midi_start,
-	midi_stop,
-	midi_pause,
-	midi_unpause,
-	midi_get_playing_info,
-	midi_getflag,
-	midi_setflag,
-	midi_setvol,
-	midi_getvol,
-	midi_fadestart,
-	midi_fading
-};
-
 static int midi_initilize(char *pname, int subdev) {
 	return OK;
 }
+
+EM_JS(int, midi_stop, (void), {
+	xsystem35.midiPlayer.stop();
+	return xsystem35.Status.OK;
+});
 
 static int midi_exit(void) {
 	midi_stop();
@@ -73,11 +45,6 @@ static int midi_reset(void) {
 
 static int midi_start(int no, int loop, char *data, int datalen) {
 	EM_ASM_ARGS({ xsystem35.midiPlayer.play($0, $1, $2); }, loop, data, datalen);
-	return OK;
-}
-
-static int midi_stop() {
-	EM_ASM( xsystem35.midiPlayer.stop(); );
 	return OK;
 }
 
@@ -127,3 +94,20 @@ EM_JS(int, midi_fadestart, (int time, int volume, int stop), {
 EM_JS(boolean, midi_fading, (), {
 	return xsystem35.midiPlayer.isFading();
 });
+
+mididevice_t midi_emscripten = {
+	midi_initilize,
+	midi_exit,
+	midi_reset,
+	midi_start,
+	midi_stop,
+	midi_pause,
+	midi_unpause,
+	midi_get_playing_info,
+	midi_getflag,
+	midi_setflag,
+	midi_setvol,
+	midi_getvol,
+	midi_fadestart,
+	midi_fading
+};

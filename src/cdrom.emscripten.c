@@ -27,36 +27,7 @@
 
 static int frame_of_getpos = -1;
 
-static int  cdrom_init(char *);
-static int  cdrom_exit(void);
-static int  cdrom_reset(void);
-extern int  cdrom_start(int, int);
-extern int  cdrom_stop();
-static int  cdrom_getPlayingInfo(cd_time *);
-
-#define cdrom cdrom_emscripten
-cdromdevice_t cdrom = {
-	cdrom_init,
-	cdrom_exit,
-	cdrom_reset,
-	cdrom_start,
-	cdrom_stop,
-	cdrom_getPlayingInfo,
-	NULL,
-	NULL
-};
-
 int cdrom_init(char *name) {
-	return OK;
-}
-
-int cdrom_exit(void) {
-	cdrom_stop();
-	return OK;
-}
-
-int cdrom_reset(void) {
-	cdrom_stop();
 	return OK;
 }
 
@@ -70,6 +41,16 @@ EM_JS(int, cdrom_stop, (), {
 	return xsystem35.Status.OK;
 });
 
+int cdrom_exit(void) {
+	cdrom_stop();
+	return OK;
+}
+
+int cdrom_reset(void) {
+	cdrom_stop();
+	return OK;
+}
+
 int cdrom_getPlayingInfo(cd_time *info) {
 	if (nact->frame_count == frame_of_getpos)
 		nact->wait_vsync = TRUE;
@@ -82,3 +63,14 @@ int cdrom_getPlayingInfo(cd_time *info) {
 	FRAMES_TO_MSF(t >> 8, &info->m, &info->s, &info->f);
 	return OK;
 }
+
+cdromdevice_t cdrom_emscripten = {
+	cdrom_init,
+	cdrom_exit,
+	cdrom_reset,
+	cdrom_start,
+	cdrom_stop,
+	cdrom_getPlayingInfo,
+	NULL,
+	NULL
+};

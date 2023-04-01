@@ -84,6 +84,7 @@ if (EMSCRIPTEN)
     "SHELL:-s USE_ZLIB=1"
     "SHELL:-s USE_SDL=2"
     "SHELL:-s USE_SDL_TTF=2")
+  target_compile_options(src_lib PRIVATE ${LIBS})
   target_compile_options(xsystem35 PRIVATE ${LIBS})
   target_link_options(xsystem35 PRIVATE ${LIBS})
   target_link_libraries(xsystem35 PRIVATE idbfs.js)
@@ -99,6 +100,7 @@ if (EMSCRIPTEN)
     "SHELL:-s ASYNCIFY_ADD=commands2F60,nact_main,send_agsevent,cb_waitkey_sprite"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
     "SHELL:-s NO_EXIT_RUNTIME=1"
+    "SHELL:-s EXPORTED_FUNCTIONS=_main,_malloc"
     "SHELL:-s EXPORTED_RUNTIME_METHODS=getValue,addRunDependency,removeRunDependency")
 
 elseif (ANDROID)
