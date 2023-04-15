@@ -17,11 +17,13 @@
 */
 package io.github.kichikuou.xsystem35
 
-import android.annotation.SuppressLint
 import android.os.Build
-import android.os.Handler
-import android.os.Message
 import android.util.Log
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.*
 import java.lang.StringBuilder
 import java.nio.charset.Charset
@@ -40,9 +42,6 @@ interface LauncherObserver {
 }
 
 private const val SAVE_DIR = "save"
-private const val PROGRESS = 0
-private const val SUCCESS = 1
-private const val FAILURE = 2
 
 class Launcher private constructor(private val rootDir: File) {
     companion object {
@@ -74,31 +73,28 @@ class Launcher private constructor(private val rootDir: File) {
         updateGameList()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun install(input: InputStream, archiveName: String?) {
         val dir = createDirForGame()
-        @SuppressLint("HandlerLeak")
-        val handler = object : Handler() {
-            override fun handleMessage(msg: Message) {
-                when (msg.what) {
-                    PROGRESS -> {
-                        observer?.onInstallProgress(msg.obj as String)
-                    }
-                    SUCCESS -> {
-                        isInstalling = false
-                        observer?.onInstallSuccess(msg.obj as File, archiveName)
-                    }
-                    FAILURE -> {
-                        isInstalling = false
-                        observer?.onInstallFailure(msg.obj as Int)
+        isInstalling = true
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                withContext(Dispatchers.IO) {
+                    extractFiles(input, dir) { msg ->
+                        GlobalScope.launch(Dispatchers.Main) {
+                            observer?.onInstallProgress(msg)
+                        }
                     }
                 }
+                observer?.onInstallSuccess(dir, archiveName)
+            } catch (e: InstallFailureException) {
+                observer?.onInstallFailure(e.msgId)
+            } catch (e: Exception) {
+                Log.e("launcher", "Failed to extract ZIP", e)
+                observer?.onInstallFailure(R.string.zip_extraction_error)
             }
+            isInstalling = false
         }
-        val t = Thread {
-            extractFiles(input, dir, handler)
-        }
-        t.start()
-        isInstalling = true
     }
 
     fun uninstall(id: Int) {
@@ -183,32 +179,26 @@ class Launcher private constructor(private val rootDir: File) {
         }
     }
 
-    private fun extractFiles(input: InputStream, outDir: File, handler: Handler) {
-        try {
-            val configWriter = GameConfigWriter()
-            val hadDecodeError = forEachZipEntry(input) { zipEntry, zip ->
-                Log.i("extractFiles", zipEntry.name)
-                val path = File(outDir, zipEntry.name)
-                if (zipEntry.isDirectory)
-                    return@forEachZipEntry
-                path.parentFile?.mkdirs()
-                handler.sendMessage(handler.obtainMessage(PROGRESS, zipEntry.name))
-                FileOutputStream(path).buffered().use {
-                    zip.copyTo(it)
-                }
-                configWriter.maybeAdd(zipEntry.name)
+    private fun extractFiles(input: InputStream, outDir: File, progressCallback: (String) -> Unit) {
+        val configWriter = GameConfigWriter()
+        val hadDecodeError = forEachZipEntry(input) { zipEntry, zip ->
+            Log.i("extractFiles", zipEntry.name)
+            val path = File(outDir, zipEntry.name)
+            if (zipEntry.isDirectory)
+                return@forEachZipEntry
+            path.parentFile?.mkdirs()
+            progressCallback(zipEntry.name)
+            FileOutputStream(path).buffered().use {
+                zip.copyTo(it)
             }
-            if (!configWriter.readyToWrite()) {
-                val msgId = if (hadDecodeError) R.string.unsupported_zip else R.string.cannot_find_ald
-                handler.sendMessage(handler.obtainMessage(FAILURE, msgId))
-                return
-            }
-            configWriter.write(outDir)
-            handler.sendMessage(handler.obtainMessage(SUCCESS, outDir))
-        } catch (e: IOException) {
-            Log.e("launcher", "Failed to extract ZIP", e)
-            handler.sendMessage(handler.obtainMessage(FAILURE, R.string.zip_extraction_error))
+            configWriter.maybeAdd(zipEntry.name)
         }
+        if (!configWriter.readyToWrite()) {
+            if (hadDecodeError)
+                throw InstallFailureException(R.string.unsupported_zip)
+            throw InstallFailureException(R.string.cannot_find_ald)
+        }
+        configWriter.write(outDir)
     }
 
     // Xsystem35-sdl2 <=2.2.0 had a bug where playlist had an extra empty line at
@@ -219,11 +209,13 @@ class Launcher private constructor(private val rootDir: File) {
         if (!oldPlaylist.exists())
             return
         var tracks = oldPlaylist.readLines()
-        if (!tracks.isEmpty())
+        if (tracks.isNotEmpty())
             tracks = tracks.subList(1, tracks.size)
         File(dir, PLAYLIST_FILE).writeText(tracks.joinToString("\n"))
         oldPlaylist.delete()
     }
+
+    class InstallFailureException(val msgId: Int) : Exception()
 
     // A helper class which generates xsystem35.gr and playlist.txt in the game root directory.
     private class GameConfigWriter {
