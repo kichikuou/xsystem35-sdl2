@@ -45,6 +45,12 @@
 static void sdl_getEvent(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, boolean pressed);
 
+static uint32_t custom_event_type = (uint32_t)-1;
+
+enum CustomEventCode {
+	SIMULATE_RIGHT_BUTTON,
+};
+
 /* pointer の状態 */
 static int mousex, mousey, mouseb;
 static int mouse_wheel_up, mouse_wheel_down;
@@ -52,6 +58,11 @@ boolean RawKeyInfo[256];
 
 /* SDL Joystick */
 static int joyinfo=0;
+
+void sdl_event_init(void) {
+	if (custom_event_type == (uint32_t)-1)
+		custom_event_type = SDL_RegisterEvents(1);
+}
 
 static int mouse_to_rawkey(int button) {
 	switch(button) {
@@ -195,14 +206,17 @@ static void sdl_getEvent(void) {
 			} else {
 				// SDL_RendererEventWatch clamps touch locations outside of the
 				// viewport to 0.0-1.0. Treat such events as right-clicks.
-				int button = (e.tfinger.x == 0.0f || e.tfinger.x == 1.0f ||
-				              e.tfinger.y == 0.0f || e.tfinger.y == 1.0f)
-					? SDL_BUTTON_RIGHT : SDL_BUTTON_LEFT;
-				mousex = e.tfinger.x * view_w;
-				mousey = e.tfinger.y * view_h;
+				int button;
+				if  (e.tfinger.x == 0.0f || e.tfinger.x == 1.0f || e.tfinger.y == 0.0f || e.tfinger.y == 1.0f) {
+					button = SDL_BUTTON_RIGHT;
+				} else {
+					button = SDL_BUTTON_LEFT;
+					mousex = e.tfinger.x * view_w;
+					mousey = e.tfinger.y * view_h;
+					send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+				}
 				mouseb |= 1 << button;
 				RawKeyInfo[mouse_to_rawkey(button)] = TRUE;
-				send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 				send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(button));
 			}
 			break;
@@ -269,9 +283,22 @@ static void sdl_getEvent(void) {
 				}
 			}
 			break;
-
 		default:
-			NOTICE("ev %x", e.type);
+			if (e.type == custom_event_type) {
+				switch (e.user.code) {
+				case SIMULATE_RIGHT_BUTTON:
+					if ((intptr_t)e.user.data1) {
+						mouseb |= 1 << SDL_BUTTON_RIGHT;
+						RawKeyInfo[KEY_MOUSE_RIGHT] = TRUE;
+						send_agsevent(AGSEVENT_BUTTON_PRESS, AGSEVENT_BUTTON_RIGHT);
+					} else {
+						mouseb &= ~(1 << SDL_BUTTON_RIGHT);
+						RawKeyInfo[KEY_MOUSE_RIGHT] = FALSE;
+						send_agsevent(AGSEVENT_BUTTON_RELEASE, AGSEVENT_BUTTON_RIGHT);
+					}
+					break;
+				}
+			}
 			break;
 		}
 	}
@@ -344,3 +371,17 @@ int sdl_getJoyInfo(void) {
 	sdl_getEvent();
 	return joyinfo;
 }
+
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE
+void simulate_right_button(int pressed) {
+	SDL_Event event = {
+		.user = {
+			.type = custom_event_type,
+			.code = SIMULATE_RIGHT_BUTTON,
+			.data1 = (void*)pressed
+		}
+	};
+	SDL_PushEvent(&event);
+}
+#endif

@@ -81,7 +81,7 @@ int sdl_Initialize(const char *render_driver) {
 	/* offscreen Pixmap */
 	makeDIB(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SYS35_DEFAULT_DEPTH);
 	
-	/* init cursor */
+	sdl_event_init();
 	sdl_cursor_init();
 	
 	sdl_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);

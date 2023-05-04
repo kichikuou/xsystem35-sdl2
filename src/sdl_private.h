@@ -52,6 +52,7 @@ struct sdl_private_data {
 	boolean (*custom_event_handler)(const SDL_Event *);
 };
 
+void sdl_event_init(void);
 void sdl_cursor_init(void);
 void sdl_shadow_init(void);
 int sdl_nearest_color(int r, int g, int b);
