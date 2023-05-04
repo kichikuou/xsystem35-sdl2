@@ -111,7 +111,7 @@ static void sys35_usage(boolean verbose) {
 	puts("OPTIONS");
 	puts(" -gamefile file  : set game resource file to 'file'");
 	puts(" -game game      : enable game-specific hacks");
-	puts(" -saveformat fmt : save file format. 'xsystem35' (default), 'system36' or 'system39'");
+	puts(" -saveformat fmt : save file format. 'xsystem35', 'system36' or 'system39' (default)");
 	puts(" -renderer name  : set rendering driver name to 'name'");
 	puts(" -devcd device   : set cdrom device name to 'device'");
 	puts(" -devmidi device : set midi device name to 'device'");

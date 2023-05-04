@@ -113,7 +113,11 @@ typedef struct {
 	emscripten_align1_int rsv2;
 } asd_varPageHdr;
 
+#ifdef __EMSCRIPTEN__
 static enum save_format save_format = SAVEFMT_XSYS35;
+#else
+static enum save_format save_format = SAVEFMT_SYS38;
+#endif
 
 #ifdef __EMSCRIPTEN__
 EM_JS(void, scheduleSync, (), {
