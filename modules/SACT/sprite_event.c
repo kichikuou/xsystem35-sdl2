@@ -213,7 +213,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	
 	switch (e->type) {
 	case AGSEVENT_KEY_PRESS:
-		if (e->d3 == KEY_Z) {
+		if (e->code == KEY_Z) {
 			cur = sdl_getTicks();
 			if (!sact.zhiding) {
 				slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
@@ -242,7 +242,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 		// fall through
 		
 	case AGSEVENT_KEY_RELEASE:
-		switch(e->d3) {
+		switch(e->code) {
 		case KEY_Z:
 			cur = sdl_getTicks();
 			if (500 < (cur - sact.zofftime) || !sact.zdooff) {
@@ -258,7 +258,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 				sact.waittype = KEYWAIT_BACKLOG;
 			break;
 		default:
-			sact.waitkey = e->d3;
+			sact.waitkey = e->code;
 			break;
 		}
 	}
@@ -292,7 +292,7 @@ void cb_waitkey_sprite(agsevent_t *e) {
 		// 右クリックキャンセル
 		// drag中でない時のみ、キャンセルを受け付ける
 		if (e->type == AGSEVENT_BUTTON_RELEASE &&
-		    e->d3   == AGSEVENT_BUTTON_RIGHT) {
+		    e->code == AGSEVENT_BUTTON_RIGHT) {
 			sact.waitkey = 0;
 			return;
 		}
@@ -311,7 +311,7 @@ void cb_waitkey_sprite(agsevent_t *e) {
 		// dragg中の sprite は無視する
 		if (sp == sact.draggedsp) continue;
 		
-		if (focused_sp == NULL && sp_is_insprite(sp, e->d1, e->d2)) {
+		if (focused_sp == NULL && sp_is_insprite(sp, e->mousex, e->mousey)) {
 			/*
 			  focusを得ている sprite
 			*/
@@ -388,7 +388,7 @@ static void cb_waitkey_selection(agsevent_t *e) {
 static void cb_waitkey_backlog(agsevent_t *e) {
 	switch (e->type) {
 	case AGSEVENT_KEY_RELEASE:
-		switch (e->d3) {
+		switch (e->code) {
 		case KEY_ESC:
 			sblog_end();
 			sact.waittype = KEYWAIT_MESSAGE;
@@ -409,14 +409,14 @@ static void cb_waitkey_backlog(agsevent_t *e) {
 		break;
 		
 	case AGSEVENT_BUTTON_RELEASE:
-		if (e->d3 == AGSEVENT_BUTTON_RIGHT) {
+		if (e->code == AGSEVENT_BUTTON_RIGHT) {
 			sblog_end();
 			sact.waittype = KEYWAIT_MESSAGE;
 		}
 		break;
 
 	case AGSEVENT_MOUSE_WHEEL:
-		if (e->d3 > 0)
+		if (e->code > 0)
 			sblog_pagenext();
 		else
 			sblog_pagepre();
@@ -434,15 +434,15 @@ void spev_callback(agsevent_t *e) {
 	}
 	
 	if (sact.waittype != KEYWAIT_BACKLOG) {
-		if (e->type == AGSEVENT_KEY_PRESS && e->d3 == KEY_CTRL) {
+		if (e->type == AGSEVENT_KEY_PRESS && e->code == KEY_CTRL) {
 			sact.waitskiplv = 2;
-			sact.waitkey = e->d3;
+			sact.waitkey = e->code;
 			return;
 		}
 		
-		if (e->type == AGSEVENT_KEY_RELEASE && e->d3 == KEY_CTRL) {
+		if (e->type == AGSEVENT_KEY_RELEASE && e->code == KEY_CTRL) {
 			sact.waitskiplv = 0;
-			sact.waitkey = e->d3;
+			sact.waitkey = e->code;
 			return;
 		}
 	}

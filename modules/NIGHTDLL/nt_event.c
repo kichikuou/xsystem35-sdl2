@@ -33,7 +33,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	switch (e->type) {
 	case AGSEVENT_BUTTON_RELEASE:
 	case AGSEVENT_KEY_RELEASE:
-		night.waitkey = e->d3;
+		night.waitkey = e->code;
 		break;
 	}
 }
@@ -59,15 +59,15 @@ void ntev_callback(agsevent_t *e) {
 		return;
 	}
 	
-	if (e->type == AGSEVENT_KEY_PRESS && e->d3 == KEY_CTRL) {
+	if (e->type == AGSEVENT_KEY_PRESS && e->code == KEY_CTRL) {
 		night.waitskiplv = 2;
-		night.waitkey = e->d3;
+		night.waitkey = e->code;
 		return;
 	}
 	
-	if (e->type == AGSEVENT_KEY_RELEASE && e->d3 == KEY_CTRL) {
+	if (e->type == AGSEVENT_KEY_RELEASE && e->code == KEY_CTRL) {
 		night.waitskiplv = 0;
-		night.waitkey = e->d3;
+		night.waitkey = e->code;
 		return;
 	}
 	

@@ -78,24 +78,27 @@ typedef struct agsurface agsurface_t;
 // for SDL_surface
 #define PIXEL_AT(suf, x, y) ((suf)->pixels + (y) * (suf)->pitch + (x) * (suf)->format->BytesPerPixel)
 
-struct _agsevent {
+typedef struct {
 	int type;
-	int d1, d2, d3;
+	int code;
+	int mousex, mousey;
+} agsevent_t;
+
+enum agsevent_type {
+	AGSEVENT_MOUSE_MOTION,
+	AGSEVENT_BUTTON_PRESS,
+	AGSEVENT_BUTTON_RELEASE,
+	AGSEVENT_KEY_PRESS,
+	AGSEVENT_KEY_RELEASE,
+	AGSEVENT_TIMER,
+	AGSEVENT_MOUSE_WHEEL,
 };
-typedef struct _agsevent agsevent_t;
 
-
-#define	AGSEVENT_MOUSE_MOTION 1
-#define	AGSEVENT_BUTTON_PRESS 2
-#define	AGSEVENT_BUTTON_RELEASE 3
-#define AGSEVENT_KEY_PRESS 4
-#define AGSEVENT_KEY_RELEASE 5
-#define AGSEVENT_TIMER 6
-#define AGSEVENT_MOUSE_WHEEL 7
-
-#define AGSEVENT_BUTTON_LEFT  1
-#define AGSEVENT_BUTTON_MID   2
-#define AGSEVENT_BUTTON_RIGHT 3
+enum agsevent_button {
+	AGSEVENT_BUTTON_LEFT,
+	AGSEVENT_BUTTON_MID,
+	AGSEVENT_BUTTON_RIGHT,
+};
 
 enum mouse_warp_mode {
 	MOUSE_WARP_DISABLED,

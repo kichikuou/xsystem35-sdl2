@@ -41,7 +41,7 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 	
 	switch(e->type) {
 	case AGSEVENT_BUTTON_PRESS:
-		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
+		if (e->code != AGSEVENT_BUTTON_LEFT) return 0;
 		
 		// ボタン押下時のスプライトがあれば、それを表示
 		if (sp->cg3) {
@@ -53,7 +53,7 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 		break;
 		
 	case AGSEVENT_BUTTON_RELEASE:
-		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
+		if (e->code != AGSEVENT_BUTTON_LEFT) return 0;
 		
 		// ここにくるときは forcusが当たっているときしかこないので、
 		// curcg は cg2 に戻せばよい

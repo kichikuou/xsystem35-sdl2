@@ -40,7 +40,7 @@ static int eventCB_PUT(sprite_t *sp, agsevent_t *e) {
 	
 	switch(e->type) {
 	case AGSEVENT_BUTTON_PRESS:
-		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
+		if (e->code != AGSEVENT_BUTTON_LEFT) return 0;
 		
 		// ボタン押下時のスプライトがあれば、それを表示
 		if (sp->cg3) {

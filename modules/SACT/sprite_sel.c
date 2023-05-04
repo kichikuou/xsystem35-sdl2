@@ -77,7 +77,7 @@ static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
 
 // マウスが移動したときの callback
 static void cb_select_move(agsevent_t *e) {
-	int x = e->d1, y = e->d2;
+	int x = e->mousex, y = e->mousey;
 	sprite_t *sp = sact.sp[sact.sel.spno];
 	boolean newstate;
 	int newindex;
@@ -115,12 +115,12 @@ static void cb_select_move(agsevent_t *e) {
 
 // ボタンがリリースされたときの callback
 static void cb_select_release(agsevent_t *e) {
-	int x = e->d1, y = e->d2;
+	int x = e->mousex, y = e->mousey;
 	sprite_t *sp = sact.sp[sact.sel.spno];
 	boolean st;
 	int iy;
 	
-	switch (e->d3) {
+	switch (e->code) {
 	case AGSEVENT_BUTTON_LEFT:
 		st = sp_is_insprite2(sp, x, y, sact.sel.frame_dot);
 		iy = (y - (sp->cur.y + sact.sel.frame_dot)) / (sact.sel.font_size + sact.sel.linespace);

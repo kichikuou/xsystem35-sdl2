@@ -89,20 +89,16 @@ static int mouse_to_agsevent(int button) {
 }
 
 EMSCRIPTEN_KEEPALIVE
-void send_agsevent(int type, int code) {
+void send_agsevent(enum agsevent_type type, int code) {
 	if (!nact->ags.eventcb)
 		return;
-	agsevent_t agse;
-	agse.type = type;
-	agse.d1 = mousex;
-	agse.d2 = mousey;
-	agse.d3 = code;
+	agsevent_t agse = {
+		.type = type,
+		.code = code,
+		.mousex = mousex,
+		.mousey = mousey
+	};
 	nact->ags.eventcb(&agse);  // Async in emscripten
-
-#ifdef __EMSCRIPTEN__
-	// HACK: this ensures that callers of this function are instrumented.
-	emscripten_sleep(0);
-#endif
 }
 
 // Improves map navigation of Rance4 v2. See also the function comment of

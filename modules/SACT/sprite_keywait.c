@@ -135,13 +135,13 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	{
 		// とりあえず、現在のマウス位置を送って、switch sprite の
 		// 状態を更新しておく
-		agsevent_t agse;
 		MyPoint p;
 		sys_getMouseInfo(&p, FALSE);
-		agse.type = AGSEVENT_MOUSE_MOTION;
-		agse.d1 = p.x;
-		agse.d2 = p.y;
-		agse.d3 = 0;
+		agsevent_t agse = {
+			.type = AGSEVENT_MOUSE_MOTION,
+			.mousex = p.x,
+			.mousey = p.y
+		};
 		spev_callback(&agse);
 	}
 	

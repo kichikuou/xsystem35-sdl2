@@ -58,12 +58,12 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 	
 	switch(e->type) {
 	case AGSEVENT_BUTTON_PRESS:
-		if (e->d3 != AGSEVENT_BUTTON_LEFT) break;
+		if (e->code != AGSEVENT_BUTTON_LEFT) break;
 		
 		// drag開始時のマウスの位置記録
 		sp->u.get.dragging = TRUE;
-		sp->u.get.dragstart.x = e->d1;
-		sp->u.get.dragstart.y = e->d2;
+		sp->u.get.dragstart.x = e->mousex;
+		sp->u.get.dragstart.y = e->mousey;
 		
 		if (sp->cg3) {
 			sp->curcg = sp->cg3;
@@ -104,8 +104,8 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		// if (!sp->u.get.dragging) break;
 		
 		// マウスの現在位置により新しい場所を計算
-		newx = sp->loc.x + (e->d1 - sp->u.get.dragstart.x);
-		newy = sp->loc.y + (e->d2 - sp->u.get.dragstart.y);
+		newx = sp->loc.x + (e->mousex - sp->u.get.dragstart.x);
+		newy = sp->loc.y + (e->mousey - sp->u.get.dragstart.y);
 		if (newx != sp->cur.x || newy != sp->cur.y) {
 			sp_updateme(sp);
 			sp->cur.x = newx;

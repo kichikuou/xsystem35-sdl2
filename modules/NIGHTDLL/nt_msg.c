@@ -392,13 +392,11 @@ static void is_in_icon() {
 
 
 static void cb_keyrelease(agsevent_t *e) {
-	int x = e->d1, y = e->d2;
-	
-	switch (e->d3) {
+	switch (e->code) {
 	case AGSEVENT_BUTTON_LEFT:
 #if 0
 		if (is_in_icon()) {
-			do_icon(x, y);
+			do_icon(e->mousex, e->mousey);
 			break;
 		}
 #endif
@@ -408,19 +406,15 @@ static void cb_keyrelease(agsevent_t *e) {
 			// unhide();
 			break;
 		}
-		night.waitkey = e->d3;
+		night.waitkey = e->code;
 		break;
 	}
 	
 }
 
 static void cb_mousemove(agsevent_t *e) {
-	int x = e->d1, y = e->d2;
-	
 	// 音声mute/メッセージスキップ/メッセージ枠消去の領域に
 	// マウスが移動したら、その部分のアイコンを変化させる
-
-	
 }
 
 // メッセージ表示時に、キー入力を促すアニメーションの設定
