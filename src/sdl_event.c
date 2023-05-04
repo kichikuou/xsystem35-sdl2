@@ -191,34 +191,38 @@ static void sdl_getEvent(void) {
 				mouseb |= 1 << SDL_BUTTON_RIGHT;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = TRUE;
+				send_agsevent(AGSEVENT_BUTTON_PRESS, AGSEVENT_BUTTON_RIGHT);
 			} else {
 				// SDL_RendererEventWatch clamps touch locations outside of the
 				// viewport to 0.0-1.0. Treat such events as right-clicks.
-				if (e.tfinger.x == 0.0f || e.tfinger.x == 1.0f || e.tfinger.y == 0.0f || e.tfinger.y == 1.0f) {
-					mouseb |= 1 << SDL_BUTTON_RIGHT;
-					RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = TRUE;
-				} else {
-					mouseb |= 1 << SDL_BUTTON_LEFT;
-					RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = TRUE;
-				}
+				int button = (e.tfinger.x == 0.0f || e.tfinger.x == 1.0f ||
+				              e.tfinger.y == 0.0f || e.tfinger.y == 1.0f)
+					? SDL_BUTTON_RIGHT : SDL_BUTTON_LEFT;
 				mousex = e.tfinger.x * view_w;
 				mousey = e.tfinger.y * view_h;
+				mouseb |= 1 << button;
+				RawKeyInfo[mouse_to_rawkey(button)] = TRUE;
+				send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+				send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(button));
 			}
 			break;
 
 		case SDL_FINGERUP:
 			if (SDL_GetNumTouchFingers(e.tfinger.touchId) == 0) {
+				int ags_button = (mouseb & 1 << SDL_BUTTON_LEFT) ? AGSEVENT_BUTTON_LEFT : AGSEVENT_BUTTON_RIGHT;
 				mouseb &= ~(1 << SDL_BUTTON_LEFT | 1 << SDL_BUTTON_RIGHT);
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = FALSE;
 				mousex = e.tfinger.x * view_w;
 				mousey = e.tfinger.y * view_h;
+				send_agsevent(AGSEVENT_BUTTON_RELEASE, ags_button);
 			}
 			break;
 
 		case SDL_FINGERMOTION:
 			mousex = e.tfinger.x * view_w;
 			mousey = e.tfinger.y * view_h;
+			send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 			break;
 
 		case SDL_JOYDEVICEADDED:
