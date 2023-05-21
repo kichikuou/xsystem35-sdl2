@@ -37,6 +37,7 @@
 #include "modules.h"
 #include "sdl_core.h"
 #include "sdl_private.h"
+#include "input.h"
 #include "menu.h"
 
 // キー変換テーブル
@@ -162,7 +163,7 @@ static void GetKeyStatus(void) {
 	}
 	
 	*var = 0;
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < NUM_KEYCODES; i++) {
 		*var |= (keymap[no -1][i] * RawKeyInfo[i]);
 	}
 	

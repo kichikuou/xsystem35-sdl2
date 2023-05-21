@@ -7,7 +7,6 @@
 #include "menu.h"
 #include "input.h"
 #include "nact.h"
-#include "key.h"
 #include "night.h"
 #include "sprite.h"
 

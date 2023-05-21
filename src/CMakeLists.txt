@@ -142,10 +142,3 @@ else()  # non-emscripten, non-android
   add_test(NAME src_tests COMMAND src_tests)
   configure_file(testdata/test.gr ${CMAKE_CURRENT_BINARY_DIR}/testdata/test.gr COPYONLY)
 endif()
-
-# FIXME: set up dependency for xsystem35 on this
-if (NOT EMSCRIPTEN AND NOT ANDROID)
-  add_custom_target(sdl_keytable.h
-    COMMAND perl ../tools/xsyskey.pl ${SDL2_INCLUDE_DIRS} > sdl_keytable.h
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()

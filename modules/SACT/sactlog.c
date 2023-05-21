@@ -33,7 +33,6 @@
 #include "menu.h"
 #include "input.h"
 #include "nact.h"
-#include "key.h"
 #include "sact.h"
 #include "sprite.h"
 #include "ngraph.h"

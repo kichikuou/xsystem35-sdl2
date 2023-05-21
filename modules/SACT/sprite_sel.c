@@ -31,7 +31,6 @@
 #include "nact.h"
 #include "ags.h"
 #include "input.h"
-#include "key.h"
 #include "sact.h"
 #include "sprite.h"
 #include "ngraph.h"

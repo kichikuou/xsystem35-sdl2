@@ -34,7 +34,6 @@
 #include "menu.h"
 #include "input.h"
 #include "nact.h"
-#include "key.h"
 #include "sact.h"
 #include "sprite.h"
 #include "sactsound.h"
@@ -389,7 +388,7 @@ static void cb_waitkey_backlog(agsevent_t *e) {
 	switch (e->type) {
 	case AGSEVENT_KEY_RELEASE:
 		switch (e->code) {
-		case KEY_ESC:
+		case KEY_ESCAPE:
 			sblog_end();
 			sact.waittype = KEYWAIT_MESSAGE;
 			break;
