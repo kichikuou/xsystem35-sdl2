@@ -140,7 +140,7 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 			yl = (uint32_t *)(dp + y * ds->bytes_per_line);
 			for (x = 0; x < dw; x++) {
 				pic16 = *sp;
-				*yl = PIX24(PIXR16(pic16), PIXG16(pic16), PIXB16(pic16));
+				*yl = rgb565_to_rgb888(pic16);
 				yl++; sp++;
 			}
 			sp += (cg->width - dw);

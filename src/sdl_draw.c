@@ -207,14 +207,7 @@ void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
 	sdl_pal_check();
 
-	Uint32 col = sp;
-	if (sdl_dib->format->BitsPerPixel > 8) {
-		col = SDL_MapRGB(sdl_dib->format,
-				sdl_col[sp].r & 0xf8,
-				sdl_col[sp].g & 0xfc,
-				sdl_col[sp].b & 0xf8);
-	}
-	
+	Uint32 col = palette_color(sp);
 	SDL_SetColorKey(sdl_dib, SDL_TRUE, col);
 	
 	SDL_Rect r_src = {sx, sy, w, h};

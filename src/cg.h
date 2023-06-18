@@ -87,4 +87,11 @@ extern int cg_fflg;
 extern int *cg_loadCountVar;
 extern int cg_brightness;
 
+static inline uint32_t rgb565_to_rgb888(uint16_t rgb) {
+	uint32_t r = rgb >> 11;
+	uint32_t g = (rgb >> 5) & 0x3f;
+	uint32_t b = rgb & 0x1f;
+	return (r << 19) | (r >> 2 << 16) | (g << 10) | (g >> 4 << 8) | (b << 3) | (b >> 2);
+}
+
 #endif /* !__CG__ */

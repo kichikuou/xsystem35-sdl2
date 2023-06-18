@@ -22,7 +22,7 @@ Game Compatibility
 | DALK                                        | Supported   | From ALICEの館４・５・６ |
 | 闘神都市                                    | Supported   | From ALICEの館４・５・６ |
 | Dr.STOP                                     | Supported   | From ALICEの館４・５・６ |
-| 人間狩り                                    | Unsupported | From ALICEの館４・５・６ / アリスCD |
+| 人間狩り                                    | Supported   | From ALICEの館４・５・６ / アリスCD |
 | 女の子図鑑                                  | Unknown     | From ALICEの館４・５・６ |
 | 恋のおわり                                  | Unknown     |       |
 | 王道勇者                                    | Supported   |       |
@@ -71,13 +71,13 @@ Game Compatibility
 | ［扉］                                      | Supported   | From アリスCD |
 | 叩き殺し太郎                                | Supported   | From アリスCD |
 | バルーンぽっぷ                              | Supported   | From アリスCD |
-| 高速ひよこ２                                | Unsupported | From アリスCD |
+| 高速ひよこ２                                | Supported   | From アリスCD |
 | おせろっと                                  | Supported   | From アリスCD |
 | マスカレイド                                | Supported   | From アリスCD |
 | キャロル ～聖なる鐘が響く夜～               | Supported   | From アリスCD, Online match is not supported |
 | できるかなー？                              | Supported   | From アリスCD |
 | Child Assassin                              | Supported   | From アリスCD |
 | Klavier                                     | Supported   | From アリスCD |
-| 弱肉狂食                                    | Unsupported | From アリスCD |
+| 弱肉狂食                                    | Supported   | From アリスCD |
 | 眼鏡大戦２                                  | Supported   | From アリスCD |
 | 妄想くん                                    | Supported   | From アリスCD |

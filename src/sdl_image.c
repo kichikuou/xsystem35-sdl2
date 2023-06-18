@@ -142,40 +142,43 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool a
 	int w = cg->width;
 	int h = cg->height;
 
-	SDL_Surface *s;
-	if (cg->alpha && alpha_blend) {
-		unsigned short *p_src = (uint16_t *)cg->pic;
-		uint32_t *p_ds, *p_dst;
+	if (cg->alpha) {
 		uint8_t *a_src = cg->alpha;
 		uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
-		int x, y, l;
-		
-		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
-		p_ds = s->pixels;
-		l = s->pitch/4;
-		for (y = 0; y < h; y++) {
-			p_dst = p_ds;
+
+		for (int i = 0; i < h; i++) {
 			memcpy(adata, a_src, w);
-			for (x = 0; x < w; x++) {
-				*p_dst++ = *a_src++ << 24 | PIX24(PIXR16(*p_src), PIXG16(*p_src), PIXB16(*p_src));
-				p_src++;
-			}
-			p_ds  += l;
 			adata += sdl_dibinfo->width;
+			a_src += cg->width;
+		}
+	}
+
+	SDL_Surface *s;
+	if (cg->alpha && alpha_blend) {
+		uint16_t *p_src = (uint16_t *)cg->pic;
+		uint8_t *a_src = cg->alpha;
+		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+		for (int y = 0; y < h; y++) {
+			uint32_t *dst = (uint32_t *)(((uint8_t *)s->pixels) + y * s->pitch);
+			for (int x = 0; x < w; x++) {
+				*dst++ = rgb565_to_rgb888(*p_src++) | *a_src++ << 24;
+			}
+		}
+	} else if (sdl_dibinfo->depth > 16) {
+		// Convert to RGB888 by ourselves. SDL blit functions use a slightly
+		// different mapping, so the color expanded by SDL may not match the
+		// color key specified in the CX command.
+		uint16_t *src = (uint16_t *)cg->pic;
+		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
+		for (int y = 0; y < h; y++) {
+			uint32_t *dst = (uint32_t *)(((uint8_t *)s->pixels) + y * s->pitch);
+			for (int x = 0; x < w; x++) {
+				*dst++ = rgb565_to_rgb888(*src++);
+			}
 		}
 	} else {
 		s = SDL_CreateRGBSurfaceWithFormatFrom(
 			cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
-		if (cg->alpha) {
-			uint8_t *a_src = cg->alpha;
-			uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
-			
-			for (int i = 0; i < h; i++) {
-				memcpy(adata, a_src, w);
-				adata += sdl_dibinfo->width;
-				a_src += cg->width;
-			}
-		}
 	}
 
 	if (brightness != 255)
