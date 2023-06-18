@@ -321,7 +321,7 @@ SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, uint8_t col) {
  * 指定範囲にパレット col を rate の割合で重ねる CK1
  */
 void sdl_wrapColor(int sx, int sy, int w, int h, uint8_t c, int rate) {
-	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel, 0, 0, 0, 0);
+	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, sdl_dib->format->BitsPerPixel, sdl_dib->format->format);
 	assert(s->format->BitsPerPixel > 8);
 
 	SDL_Rect r_src = {0, 0, w, h};

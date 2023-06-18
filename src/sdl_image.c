@@ -47,7 +47,7 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 	SDL_Surface *src = sdl_dib;
 	SDL_Surface *dst = sdl_dib;
 	
-	ss = SDL_CreateRGBSurface(0, dw, dh, dst->format->BitsPerPixel, 0, 0, 0, 0);
+	ss = SDL_CreateRGBSurfaceWithFormat(0, dw, dh, dst->format->BitsPerPixel, dst->format->format);
 	
 	if (dst->format->BitsPerPixel == 8) {
 		memcpy(ss->format->palette->colors, dst->format->palette->colors,
@@ -334,9 +334,7 @@ void sdl_getPixel(int x, int y, Palette *cell) {
  * dib から領域の切り出し
  */
 void* sdl_saveRegion(int x, int y, int w, int h) {
-	SDL_Surface *s = SDL_CreateRGBSurface(0, w, h, sdl_dib->format->BitsPerPixel,
-			     sdl_dib->format->Rmask, sdl_dib->format->Gmask,
-			     sdl_dib->format->Bmask, sdl_dib->format->Amask);
+	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, sdl_dib->format->BitsPerPixel, sdl_dib->format->format);
 	if (sdl_dib->format->BitsPerPixel == 8)
 		memcpy(s->format->palette->colors, sdl_dib->format->palette->colors,
 		       sizeof(SDL_Color) * sdl_dib->format->palette->ncolors);

@@ -162,12 +162,25 @@ static void makeDIB(int width, int height, int depth) {
 	if (sdl_dib) {
 		SDL_FreeSurface(sdl_dib);
 	}
-	
-	// Graphic routines in modules/ assume 4 bytes/pixel mode for 24-bit surfaces.
-	if (depth == 24)
-		depth = 32;
 
-	sdl_dib = SDL_CreateRGBSurface(0, width, height, depth, 0, 0, 0, 0);
+	uint32_t format;
+	switch (depth) {
+	case 8:
+		format = SDL_PIXELFORMAT_INDEX8;
+		break;
+	case 16:
+		format = SDL_PIXELFORMAT_RGB565;
+		break;
+	case 24:
+		format = SDL_PIXELFORMAT_RGB888;
+		// Graphic routines in modules/ assume 4 bytes/pixel mode for 24-bit surfaces.
+		depth = 32;
+		break;
+	default:
+		SYSERROR("invalid pixel depth %d", depth);
+	}
+
+	sdl_dib = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
 	
 	if (sdl_dib->format->BitsPerPixel == 8) {
 		memset(sdl_dib->format->palette->colors, 0, sizeof(SDL_Color)*256);
