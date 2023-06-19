@@ -360,21 +360,23 @@ void dbg_delete_breakpoints_in_page(int page) {
 }
 
 uint8_t dbg_handle_breakpoint(int page, int addr) {
+	uint8_t restore_op = BREAKPOINT;
 	for (Breakpoint *bp = breakpoints; bp; bp = bp->next) {
 		if (bp->phys->page != page || bp->phys->addr != addr)
 			continue;
+		restore_op = bp->phys->restore_op;
 		if (bp->condition && !eval_condition(bp->condition))
 			continue;
 
 		dbg_state = bp->no == INTERNAL_BREAKPOINT_NO ?
 			DBG_STOPPED_NEXT : DBG_STOPPED_BREAKPOINT;
 
-		uint8_t restore_op = bp->phys->restore_op;
 		dbg_main(bp->no);  // this may destroy bp
 		return restore_op;
 	}
-	SYSERROR("Illegal BREAKPOINT instruction");
-	return BREAKPOINT;
+	if (restore_op == BREAKPOINT)
+		SYSERROR("Illegal BREAKPOINT instruction");
+	return restore_op;
 }
 
 static void set_stack_frame(StackFrame *frame, int page, int addr, boolean is_return_addr) {
