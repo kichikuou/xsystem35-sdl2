@@ -54,7 +54,6 @@ struct sdl_private_data {
 
 void sdl_event_init(void);
 void sdl_cursor_init(void);
-void sdl_shadow_init(void);
 int sdl_nearest_color(int r, int g, int b);
 boolean sdl_joy_open(int index);
 

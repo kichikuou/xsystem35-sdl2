@@ -86,8 +86,6 @@ int sdl_Initialize(const char *render_driver) {
 	
 	sdl_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 
-	sdl_shadow_init();
-	
 #ifdef __EMSCRIPTEN__
 	// Prevent SDL from calling emscripten_exit_fullscreen on visibilitychange
 	emscripten_set_visibilitychange_callback(NULL, 0, NULL);

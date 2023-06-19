@@ -34,8 +34,6 @@
 #include "alpha_plane.h"
 #include "image.h"
 
-static unsigned char shlv_tbl[256*256];
-
 /*
  * dib内での拡大・縮小コピー
  */
@@ -206,65 +204,31 @@ void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int brightness) {
 	SDL_FreeSurface(s);
 }
 
-/*
- * 16bit専用の dib の指定領域コピー alphaつき
- */
-void sdl_shadow_init(void) {
-	int i, j;
-	unsigned char *c = shlv_tbl;
-
-	for (i = 0; i < 255; i++) {
-		for (j = 0; j < 256; j++) {
-			*(c++) = (unsigned char)(i * j / 255);
-		}
-	}
-}
-
 void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, sx, sy);
-	uint8_t *p_src, *p_dst, *p_ds;
-	
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
-	int x, y;
 
 	SDL_Rect r_src = {sx, sy, w, h};
 	SDL_Rect r_tmp = { 0,  0, w, h};
 	SDL_BlitSurface(sdl_dib, &r_src, s, &r_tmp);
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	p_ds = s->pixels + 3;
+	uint8_t *p_ds = s->pixels + 3;
 #else
-	p_ds = s->pixels;
+	uint8_t *p_ds = s->pixels;
 #endif
-	switch(lv) {
-	case 255:
-		for (y = 0; y < h; y++) {
-			p_src = adata;
-			p_dst = p_ds;
-			for (x = 0; x < w; x++) {
-				*p_dst = *(p_src++);
-				p_dst += 4;
-			}
-			adata += sdl_dibinfo->width;
-			p_ds  += s->pitch;
+	uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, sx, sy);
+	for (int y = 0; y < h; y++) {
+		uint8_t *p_src = adata;
+		uint8_t *p_dst = p_ds;
+		for (int x = 0; x < w; x++) {
+			*p_dst = *(p_src++);
+			p_dst += 4;
 		}
-		break;
-	default:
-		{
-			unsigned char *lvtbl = shlv_tbl + lv * 256;
-			for (y = 0; y < h; y++) {
-				p_src = adata;
-				p_dst = p_ds;
-				for (x = 0; x < w; x++) {
-					*p_dst = lvtbl[(int)(*(p_src++))];
-					p_dst += 4;
-				}
-				adata += sdl_dibinfo->width;
-				p_ds += s->pitch;
-			}
-		}
-		break;
+		adata += sdl_dibinfo->width;
+		p_ds  += s->pitch;
 	}
+	if (lv < 255)
+		SDL_SetSurfaceAlphaMod(s, lv);
 
 	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_BlitSurface(s, &r_tmp, sdl_dib, &r_dst);
