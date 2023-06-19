@@ -37,6 +37,7 @@
 #include "ags.h"
 #include "music.h"
 #include "sdl_core.h"
+#include "hacks.h"
 
 #define SLOT 40
 
@@ -182,6 +183,9 @@ static void ChangeNotColor() {
 		break;
 	}
 	}
+	// The CX command after ChangeNotColor (in FIGHT.ADV) must use a precise
+	// calculation.
+	daiakuji_cx_hack = true;
 }
 
 /*

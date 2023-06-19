@@ -27,6 +27,7 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "ags.h"
+#include "hacks.h"
 
 void commandCC() {
 	int src_x  = getCaliValue();
@@ -69,7 +70,16 @@ void commandCX() {
 	
 	switch(mode) {
 	case 0:
-		ags_copyArea_shadow(src_x, src_y, width, height, dst_x, dst_y);
+		// In Daiakuji, the image after the blending is used as a source image
+		// for sprite copy (CX 1). SDL's SIMD blending implementation has some
+		// error (blending #ff00ff and #ff00ff results in #fd00fd), so the
+		// resulting color may not match the colorkey of CX 1. To workaround
+		// this, specify a small alpha mod so that SDL will use a "slow path"
+		// that does accurate calculation.
+		if (daiakuji_cx_hack)
+			ags_copyArea_shadow_withrate(src_x, src_y, width, height, dst_x, dst_y, 254);
+		else
+			ags_copyArea_shadow(src_x, src_y, width, height, dst_x, dst_y);
 		ags_updateArea(dst_x, dst_y, width, height);
 		break;
 	case 1:
@@ -94,6 +104,7 @@ void commandCX() {
 		DEBUG_COMMAND_YET("CX %d,%d,%d,%d,%d,%d,%d,%d:", mode, src_x, src_y, width, height, dst_x, dst_y, col);
 		break;
 	}
+	daiakuji_cx_hack = false;
 
 	DEBUG_COMMAND("CX %d,%d,%d,%d,%d,%d,%d,%d:", mode, src_x, src_y, width, height, dst_x, dst_y, col);
 }

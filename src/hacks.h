@@ -20,6 +20,8 @@
 #ifndef __HACKS_H_
 #define __HACKS_H_
 
+#include <stdbool.h>
+
 enum gameId {
 	GAME_UNKNOWN = 0,
 	GAME_TT2,
@@ -30,5 +32,7 @@ enum gameId {
 
 void enable_hack_by_gameid(const char *gameid);
 void enable_hack_by_title(const char *game_title_utf8);
+
+extern bool daiakuji_cx_hack;
 
 #endif // __HACKS_H_

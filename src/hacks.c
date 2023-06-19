@@ -33,6 +33,8 @@
 /* defined by cmdy.c */
 extern boolean Y3waitFlags;
 
+bool daiakuji_cx_hack;
+
 void enable_hack_by_gameid(const char *gameid) {
 	if (!strcmp(gameid, "toushin2"))
 		nact->game = GAME_TT2;
