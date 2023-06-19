@@ -166,14 +166,14 @@ static void ChangeNotColor() {
 	case 24:
 	case 32:
 	{
-		uint32_t pic24s = PIX24(*src, *(src+1), *(src+2)) & 0xf0f0f0;
-		uint32_t pic24d = PIX24(*dst, *(dst+1), *(dst+2)) & 0xf0f0f0;
+		uint32_t pic24s = PIX24(*src, *(src+1), *(src+2));
+		uint32_t pic24d = PIX24(*dst, *(dst+1), *(dst+2));
 		uint32_t *yl;
 		
 		for (y = 0; y < height; y++) {
 			yl = (uint32_t *)(dp + y * dib->bytes_per_line);
 			for (x = 0; x < width; x++) {
-				if ((*yl & 0xf0f0f0) != pic24s) {
+				if (*yl != pic24s) {
 					*yl = pic24d;
 				}
 				yl++;
@@ -585,14 +585,14 @@ static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, i
 	case 24:
 	case 32:
 	{
-		uint32_t pic24 = PIX24(r, g, b) & 0xf0f0f0;
+		uint32_t pic24 = PIX24(r, g, b);
 		uint32_t *yls, *yld;
 		
 		for (y = 0; y < height; y++) {
 			yls = (uint32_t *)(sp + y * dib->bytes_per_line);
 			yld = (uint32_t *)(dp + y * dib->bytes_per_line);
 			for (x = 0; x < width; x++) {
-				if ((*yls & 0xf0f0f0) != pic24) {
+				if (*yls != pic24) {
 					*yld = *yls;
 				}
 				yls++; yld++;
