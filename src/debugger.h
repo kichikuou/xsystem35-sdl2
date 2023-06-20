@@ -47,6 +47,7 @@ void dbg_main(int bp_no);
 void dbg_onsleep(void);
 uint8_t dbg_handle_breakpoint(int page, int addr);
 boolean dbg_console_vprintf(int lv, const char *format, va_list ap);
+void dbg_post_command(void *data);
 
 #else // ENABLE_DEBUGGER
 
@@ -57,6 +58,7 @@ boolean dbg_console_vprintf(int lv, const char *format, va_list ap);
 #define dbg_onsleep()
 #define dbg_handle_breakpoint(page, addr) BREAKPOINT
 #define dbg_console_vprintf(lv, format, ap) false
+#define dbg_post_command(data)
 
 #endif // ENABLE_DEBUGGER
 

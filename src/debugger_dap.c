@@ -567,13 +567,13 @@ static int read_command_thread(void *data) {
 			}
 			char *buf = malloc(content_length);
 			fread(buf, content_length, 1, stdin);
-			msgq_enqueue(queue, buf);
+			sdl_post_debugger_command(buf);
 			content_length = -1;
 		} else {
 			fprintf(stderr, "Unknown Debug Adapter Protocol header: %s", header);
 		}
 	}
-	msgq_enqueue(queue, NULL);  // EOF
+	sdl_post_debugger_command(NULL);  // end of messages
 	return 0;
 }
 
@@ -588,11 +588,16 @@ static void dbg_dap_init(const char *path) {
 
 	SDL_CreateThread(read_command_thread, "Debugger", NULL);
 
-	while (!initialized) {
-		char *msg = msgq_dequeue(queue);
-		if (!msg)
-			break;
-		handle_message(msg);
+	while (!initialized && !nact->is_quit) {
+		SDL_Event e;
+		SDL_WaitEvent(&e);
+		sdl_handle_event(&e);
+		while (!msgq_isempty(queue)) {
+			char *msg = msgq_dequeue(queue);
+			if (!msg)
+				return;
+			handle_message(msg);
+		}
 	}
 }
 
@@ -605,11 +610,16 @@ static void dbg_dap_repl(int bp_no) {
 	dbg_state = DBG_RUNNING;
 
 	boolean continue_repl = true;
-	while (continue_repl) {
-		char *msg = msgq_dequeue(queue);
-		if (!msg)
-			break;
-		continue_repl = handle_message(msg);
+	while (continue_repl && !nact->is_quit) {
+		SDL_Event e;
+		SDL_WaitEvent(&e);
+		sdl_handle_event(&e);
+		while (!msgq_isempty(queue)) {
+			char *msg = msgq_dequeue(queue);
+			if (!msg)
+				return;
+			continue_repl = handle_message(msg);
+		}
 	}
 }
 
@@ -622,6 +632,10 @@ static void dbg_dap_onsleep(void) {
 	}
 	if (dbg_state == DBG_STOPPED_INTERRUPT || dbg_state == DBG_STOPPED_EXCEPTION)
 		dbg_main(0);
+}
+
+void dbg_post_command(void *data) {
+	msgq_enqueue(queue, data);
 }
 
 DebuggerImpl dbg_dap_impl = {

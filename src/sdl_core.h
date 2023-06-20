@@ -25,6 +25,7 @@
 
 #include "config.h"
 #include <sys/types.h>
+#include <SDL_events.h>
 #include <SDL_surface.h>
 #include "portab.h"
 #include "ags.h"
@@ -110,5 +111,7 @@ extern uint32_t sdl_getTicks(void);
 extern void sdl_sleep(int msec);
 extern void sdl_wait_vsync();
 extern boolean sdl_inputString(struct inputstring_param *);
+extern void sdl_post_debugger_command(void *data);
+extern void sdl_handle_event(SDL_Event *e);
 
 #endif /* !__SDL_CORE__ */
