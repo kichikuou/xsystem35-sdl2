@@ -72,7 +72,9 @@ static int cdrom_init(char *playlist_path) {
 		fp = fopen("_inmm.ini", "r");
 	}
 	if (!fp) {
-		NOTICE("cdrom: Cannot open playlist %s", playlist_path);
+		// If the game has MIDI music, lack of the playlist is not a problem.
+		if (ald_get_maxno(DRIFILE_MIDI) == 0)
+			NOTICE("cdrom: Cannot open playlist %s", playlist_path);
 		return NG;
 	}
 

@@ -29,9 +29,10 @@ BGM/track03.mp3
 
 The first line is not used, because track 1 of game CD is usually a data track.
 
-Some games have the music integrated as MIDI, if this is the case the music won't play using the fake CD.
-If this is the case and the music does not play, SDL might need to use the `SDL_SOUNDFONTS` enviroment variable,
-set `SDL_SOUNDFONTS` to point to a sf2 file.
+Some games have the music integrated as MIDI, if this is the case the music
+won't play using the fake CD. If you get `Cannot load MIDI` error message, SDL
+might need to use the `SDL_SOUNDFONTS` environment variable, set
+`SDL_SOUNDFONTS` to point to a sf2 file. For example:
 
 ```
 SDL_SOUNDFONTS=/usr/share/soundfonts/GeneralUser.sf2 xsystem35

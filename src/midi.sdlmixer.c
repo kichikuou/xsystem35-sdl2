@@ -89,10 +89,13 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 
 	SDL_RWops *rwops = SDL_RWFromConstMem(data, datalen);
 	mix_music = Mix_LoadMUSType_RW(rwops, MUS_MID, SDL_TRUE /* freesrc */);
-	if (!mix_music)
+	if (!mix_music) {
+		WARNING("Cannot load MIDI: %s", SDL_GetError());
 		return NG;
+	}
 
 	if (Mix_PlayMusic(mix_music, loop ? loop : -1) != 0) {
+		WARNING("Cannot play MIDI: %s", SDL_GetError());
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
 		return NG;
