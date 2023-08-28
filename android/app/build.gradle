@@ -38,7 +38,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            if (rootProject.file('keystore.jks').exists()) {
+                signingConfig signingConfigs.release
+            }
         }
     }
     applicationVariants.all { variant ->
