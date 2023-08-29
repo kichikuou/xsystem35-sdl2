@@ -1,7 +1,8 @@
 # xsystem35 for Android
 
 ## Download
-Prebuilt APKs are [here](https://github.com/kichikuou/xsystem35-sdl2/releases).
+You can download prebuilt APKs
+[here](https://github.com/kichikuou/xsystem35-sdl2/releases).
 
 ## Build
 Prerequisites:
@@ -11,8 +12,8 @@ Prerequisites:
 ### Using Android Studio
 Open this directory as an Android Studio project.
 
-### Command line build
-Configure environment variables and run the `gradlew` script in this folder.
+### Command Line Build
+Set environment variables and run the `gradlew` script in this directory.
 
 Example build instructions (for Debian bookworm):
 ```sh
@@ -25,35 +26,48 @@ mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
 wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
 unzip commandlinetools-linux-10406996_latest.zip -d $ANDROID_SDK_ROOT/cmdline-tools
 mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/tools
-yes |$ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
+yes | $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
 $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager ndk-bundle 'cmake;3.22.1'
 export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle
 
-# Check out and build xsystem35
+# Clone and build xsystem35
 git clone https://github.com/kichikuou/xsystem35-sdl2.git
 cd xsystem35-sdl2/android
 ./gradlew build  # or ./gradlew installDebug if you have a connected device
 ```
 
-## Use
+## Usage
 ### Basic Usage
-1. Create a ZIP file containing all the game files and BGM files (see [below](#preparing-a-zip) for details), and transfer it to your device.
-2. Open the app. A list of installed games is displayed. Since nothing has been installed yet, only the "Install from ZIP" button is displayed. Tap it.
-3. Select the ZIP file you created in 1.
-4. The game starts. To simulate right-click, tap the black bars on the left/right or top/bottom of the screen.
+1. Create a ZIP file containing all the game files and BGM files (see
+   [below](#preparing-a-zip) for details), and transfer it to your device.
+2. Open the app. A list of installed games will be displayed. Since no games
+   have been installed yet, only the "Install from ZIP" button will be visible.
+   Tap it.
+3. Select the ZIP file you created in step 1.
+4. The game will start. To simulate a right-click, tap the black bars on either
+   the left or right, or top or bottom of the screen.
 
 ### Preparing a ZIP
-- Include all files in the `GAMEDATA` folder (`.ALD` files and others). `.EXE` and `.DLL` are not really needed, but you can include them as well.
-- Music files (`.mp3`, `.ogg` or `.wav`) whose file names end with a number are recognized as BGM files. For example:
+- Include all files from the `GAMEDATA` folder (such as `.ALD` files and
+  others). `.EXE` and `.DLL` files are not necessary, but you can include them
+  if you want.
+- Music files (`.mp3`, `.ogg`, or `.wav`) whose filenames end with a number
+  will be recognized as BGM files. For example:
   - `Track2.mp3`
   - `15.ogg`
-  - `rance4_03.wav` (This shouldn't be `rance403.wav`, because it would be treated as the 403rd track)
+  - `rance4_03.wav` (Note: The filename shouldn't be `rance403.wav`, as it
+    would be treated as the 403rd track.)
 
-Note: This form of ZIP can be used in [Kichikuou on Web](http://kichikuou.github.io/web/) as well.
+Note: This ZIP format is also compatible with
+[Kichikuou on Web](http://kichikuou.github.io/web/).
 
 ### Miscellaneous
-- You can export / import saved files using the option menu of the game list.
-- To uninstall a game, long-tap the title in the game list.
+- You can export or import save files via the game list's option menu.
+- To uninstall a game, long-tap its title in the game list.
 
 ## Known Issues
-- Android versions older than 7.0 cannot handle ZIPs containing Shift-JIS file names. This is the case with some ZIPs distributed on [retroc.net](http://retropc.net/alice/). If you get the error "This type of ZIP is not supported.", unzip the ZIP file on your PC and re-archive it with a modern ZIP creation software.
+- Android versions older than 7.0 cannot handle ZIP files containing Shift-JIS
+  filenames. This issue occurs with some ZIP files distributed on
+  [retroc.net](http://retropc.net/alice/). If you encounter the error message
+  "This type of ZIP is not supported," unzip the file on your PC and re-archive
+  it using modern ZIP creation software.
