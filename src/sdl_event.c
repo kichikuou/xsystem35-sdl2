@@ -381,14 +381,26 @@ void sdl_handle_event(SDL_Event *e) {
 
 	case SDL_JOYBUTTONDOWN:
 	case SDL_JOYBUTTONUP:
-		if (e->jbutton.button < 4) {
-			int i = 1 << (e->jbutton.button+4);
-			if (e->jbutton.state == SDL_PRESSED)
-				joyinfo |= i;
-			else
-				joyinfo &= ~i;
-		} else {
-			if (e->jbutton.state == SDL_RELEASED) {
+		{
+			int mask = 0;
+			switch (e->jbutton.button) {
+			case 0: case 1: case 2: case 3:
+				mask = 1 << (e->jbutton.button + 4);
+				break;
+#ifdef __EMSCRIPTEN__
+			// Gamepads known to browsers get a "standard" mapping where D-pad
+			// keys are mapped to buttons 12-15.
+			case 12: mask = SYS35KEY_UP;    break;
+			case 13: mask = SYS35KEY_DOWN;  break;
+			case 14: mask = SYS35KEY_LEFT;  break;
+			case 15: mask = SYS35KEY_RIGHT; break;
+#endif
+			}
+			if (mask) {
+				if (e->jbutton.state == SDL_PRESSED)
+					joyinfo |= mask;
+				else
+					joyinfo &= ~mask;
 			}
 		}
 		break;
