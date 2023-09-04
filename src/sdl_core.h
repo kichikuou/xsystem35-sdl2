@@ -95,6 +95,7 @@ void sdl_effect_finish(struct sdl_effect *eff);
 /* key/pointer 関係 */
 extern void sdl_setJoyDeviceIndex(int index);
 extern void sdl_setCursorLocation(int x, int y);
+extern void sdl_setCursorInternalLocation(int x, int y);
 extern void sdl_setCursorType(int type);
 extern boolean sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage,  TCursorDirEntry *cursordirentry);
 extern int  sdl_getKeyInfo();

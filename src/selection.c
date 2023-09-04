@@ -309,28 +309,26 @@ static void init_selwindow() {
 	ags_updateArea(saveArea.x, saveArea.y, saveArea.w, saveArea.h);
 	
 	/* マウスカーソルの自動移動 */
+	int x = r.x + r.w * MOUSE_INIT_X_RATIO/100;
 	if (default_element == 0) {
 		MyPoint p;
 		sys_getMouseInfo(&p, TRUE);
 		if (p.y < r.y) {
-			ags_setCursorLocation(r.x + r.w * MOUSE_INIT_X_RATIO/100,
-					      r.y + (sel.MsgFontSize +2) * MOUSE_INIT_Y_RATIO/100,
-					      TRUE);
+			int y = r.y + (sel.MsgFontSize +2) * MOUSE_INIT_Y_RATIO/100;
+			ags_setCursorLocation(x, y, true, true);
 		} else if (p.y > (r.y + r.h)) {
-			ags_setCursorLocation(r.x + r.w * MOUSE_INIT_X_RATIO/100,
-					      r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100,
-					      TRUE);
+			int y = r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100;
+			ags_setCursorLocation(x, y, true, true);
 		} else {
-			ags_setCursorLocation(r.x + r.w * MOUSE_INIT_X_RATIO/100,
-					      p.y * MOUSE_INIT_Y_RATIO/100, 
-					      TRUE);
+			int y = p.y * MOUSE_INIT_Y_RATIO/100;
+			ags_setCursorLocation(x, y, true, true);
 		}
 	} else if (default_element < regnum) {
-		ags_setCursorLocation(r.x + r.w * MOUSE_INIT_X_RATIO/100,
-				      r.y + (sel.MsgFontSize +2) * default_element * MOUSE_INIT_Y_RATIO/100, TRUE);
+		int y = r.y + (sel.MsgFontSize +2) * default_element * MOUSE_INIT_Y_RATIO/100;
+		ags_setCursorLocation(x, y, true, true);
 	} else if (default_element < 1000) {
-		ags_setCursorLocation(r.x + r.w * MOUSE_INIT_X_RATIO/100,
-				      r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100, TRUE);
+		int y = r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100;
+		ags_setCursorLocation(x, y, true, true);
 	}
 }
 

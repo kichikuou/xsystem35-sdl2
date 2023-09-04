@@ -197,8 +197,10 @@ static void setup_selwindow() {
 	
 	// デフォルトで選択される選択肢がある場合、そこへカーソルを移動
 	if (sact.sel.movecursor) {
-		ags_setCursorLocation(sp->cur.x + sact.sel.frame_dot + 2,
-				      sp->cur.y + sact.sel.frame_dot + 2 + (sact.sel.font_size + sact.sel.linespace)*(sact.sel.movecursor -1), TRUE);
+		int x = sp->cur.x + sact.sel.frame_dot + 2;
+		int y = sp->cur.y + sact.sel.frame_dot + 2 +
+			(sact.sel.font_size + sact.sel.linespace) * (sact.sel.movecursor - 1);
+		ags_setCursorLocation(x, y, true, true);
 		selected_item = (sact.sel.movecursor -1);
 		oldstate = TRUE;
 		oldindex = selected_item -1;

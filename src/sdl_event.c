@@ -223,6 +223,12 @@ void send_agsevent(enum agsevent_type type, int code) {
 	nact->ags.eventcb(&agse);  // Async in emscripten
 }
 
+void sdl_setCursorInternalLocation(int x, int y) {
+	mousex = x;
+	mousey = y;
+	send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+}
+
 // Improves map navigation of Rance4 v2. See also the function comment of
 // rance4_Y3_IM_hack() in cmdy.c.
 static void rance4v2_hack(void) {
@@ -274,9 +280,7 @@ void sdl_handle_event(SDL_Event *e) {
 		}
 		break;
 	case SDL_MOUSEMOTION:
-		mousex = e->motion.x;
-		mousey = e->motion.y;
-		send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+		sdl_setCursorInternalLocation(e->motion.x, e->motion.y);
 		break;
 
 	case SDL_MOUSEWHEEL:

@@ -627,42 +627,48 @@ void ags_loadCursor(int p1,int p2) {
 	}
 }
 
-void ags_setCursorLocation(int x, int y, boolean is_dibgeo) {
-	int dx[8], dy[8];
-	int i, delx, dely;
-	MyPoint p;
+void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 	if (!ags_check_param_xy(&x, &y)) return;
 
-	/* DIB 座表系か Window 座表系か */
 	if (is_dibgeo) {
+		// DIB coordinates -> Window coordinates
 		x -= nact->ags.view_area.x;
 		y -= nact->ags.view_area.y;
 	}
-	
+
+#ifdef __EMSCRIPTEN__
+	if (!for_selection) {
+		// We can't move the actual cursor in the browser, but can change the
+		// internal mouse coordinates. This can help with keyboard/gamepad
+		// navigation.
+		sdl_setCursorInternalLocation(x, y);
+	}
+#else
 	switch(nact->ags.mouse_movesw) {
 	case MOUSE_WARP_DISABLED:
-		return;
+		if (!for_selection)
+			sdl_setCursorInternalLocation(x, y);
+		break;
 	case MOUSE_WARP_DIRECT:
-		sdl_setCursorLocation(x, y); break;
+		sdl_setCursorLocation(x, y);
+		break;
 	case MOUSE_WARP_SMOOTH:
-		sys_getMouseInfo(&p, is_dibgeo);
-		delx = x - p.x;
-		dely = y - p.y;
-		
-		for (i = 1; i < 8; i++) {
-			dx[i-1] = ((delx*i*i*i) >> 9) - ((3*delx*i*i)>> 6) + ((3*delx*i) >> 3) + p.x;
-			dy[i-1] = ((dely*i*i*i) >> 9) - ((3*dely*i*i)>> 6) + ((3*dely*i) >> 3) + p.y;
-		}
-		dx[7] = x; dy[7] = y;
-		
-		for (i = 0; i < 8; i++) {
-			sdl_setCursorLocation(dx[i], dy[i]);
-			usleep(cursor_move_time * 1000 / 8);
+		{
+			MyPoint p;
+			sys_getMouseInfo(&p, is_dibgeo);
+			int dx = x - p.x;
+			int dy = y - p.y;
+			for (int i = 1; i < 8; i++) {
+				int xi = ((dx*i*i*i) >> 9) - ((3*dx*i*i)>> 6) + ((3*dx*i) >> 3) + p.x;
+				int yi = ((dy*i*i*i) >> 9) - ((3*dy*i*i)>> 6) + ((3*dy*i) >> 3) + p.y;
+				sdl_setCursorLocation(xi, yi);
+				usleep(cursor_move_time * 1000 / 8);
+			}
+			sdl_setCursorLocation(x, y);
 		}
 		break;
-	default:
-		return;
 	}
+#endif
 }
 
 EMSCRIPTEN_KEEPALIVE

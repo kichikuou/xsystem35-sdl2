@@ -127,7 +127,7 @@ void commandIZ() {
 	int x = getCaliValue();
 	int y = getCaliValue();
 	
-	ags_setCursorLocation(x, y, TRUE);
+	ags_setCursorLocation(x, y, true, false);
 	DEBUG_COMMAND("IZ %d,%d:", x, y);
 }
 

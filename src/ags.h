@@ -211,7 +211,7 @@ extern agsurface_t *ags_drawStringToSurface(const char *str);
 /* カーソル関係 */
 extern void ags_setCursorType(int type);
 extern void ags_loadCursor(int ,int);
-extern void ags_setCursorLocation(int x, int y, boolean dibgeo);
+extern void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection);
 extern void ags_setCursorMoveTime(int msec);
 extern int  ags_getCursorMoveTime();
 

@@ -326,7 +326,7 @@ void commandMJ() {
 	mj_param.h = h;
 	mj_param.oldstring = t1;
 	
-	ags_setCursorLocation(x, y, FALSE); /* XXX */
+	ags_setCursorLocation(x, y, false, false);
 	menu_inputstring2(&mj_param);
 	if (mj_param.newstring == NULL) return;
 	
