@@ -643,12 +643,15 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 		// navigation.
 		sdl_setCursorInternalLocation(x, y);
 		EM_ASM({ xsystem35.shell.showMouseMoveEffect($0, $1); }, x, y);
+		sdl_sleep(cursor_move_time);
 	}
 #else
 	switch(nact->ags.mouse_movesw) {
 	case MOUSE_WARP_DISABLED:
-		if (!for_selection)
+		if (!for_selection) {
 			sdl_setCursorInternalLocation(x, y);
+			sdl_sleep(cursor_move_time);
+		}
 		break;
 	case MOUSE_WARP_DIRECT:
 		sdl_setCursorLocation(x, y);
@@ -663,7 +666,7 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 				int xi = ((dx*i*i*i) >> 9) - ((3*dx*i*i)>> 6) + ((3*dx*i) >> 3) + p.x;
 				int yi = ((dy*i*i*i) >> 9) - ((3*dy*i*i)>> 6) + ((3*dy*i) >> 3) + p.y;
 				sdl_setCursorLocation(xi, yi);
-				usleep(cursor_move_time * 1000 / 8);
+				usleep(cursor_move_time * 1000 / 7);
 			}
 			sdl_setCursorLocation(x, y);
 		}
