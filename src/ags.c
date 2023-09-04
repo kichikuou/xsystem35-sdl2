@@ -642,6 +642,7 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 		// internal mouse coordinates. This can help with keyboard/gamepad
 		// navigation.
 		sdl_setCursorInternalLocation(x, y);
+		EM_ASM({ xsystem35.shell.showMouseMoveEffect($0, $1); }, x, y);
 	}
 #else
 	switch(nact->ags.mouse_movesw) {
