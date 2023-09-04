@@ -100,7 +100,7 @@ boolean ags_check_param_xy(int *x, int *y) {
 }
 
 void ags_init(const char *render_driver) {
-	nact->ags.mouse_movesw = MOUSE_WARP_SMOOTH;
+	nact->ags.mouse_warp_enabled = true;
 	nact->ags.pal = &pal_256;
 	nact->ags.world_size.width  =  SYS35_DEFAULT_WIDTH;
 	nact->ags.world_size.height =  SYS35_DEFAULT_HEIGHT;
@@ -123,7 +123,7 @@ void ags_remove(void) {
 }
 
 void ags_reset(void) {
-	nact->ags.mouse_movesw = MOUSE_WARP_SMOOTH;
+	nact->ags.mouse_warp_enabled = true;
 	nact->ags.eventcb = NULL;
 	initPal(&pal_256);
 	cg_reset();
@@ -646,31 +646,21 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 		sdl_sleep(cursor_move_time);
 	}
 #else
-	switch(nact->ags.mouse_movesw) {
-	case MOUSE_WARP_DISABLED:
-		if (!for_selection) {
-			sdl_setCursorInternalLocation(x, y);
-			sdl_sleep(cursor_move_time);
+	if (nact->ags.mouse_warp_enabled) {
+		MyPoint p;
+		sys_getMouseInfo(&p, is_dibgeo);
+		int dx = x - p.x;
+		int dy = y - p.y;
+		for (int i = 1; i < 8; i++) {
+			int xi = ((dx*i*i*i) >> 9) - ((3*dx*i*i)>> 6) + ((3*dx*i) >> 3) + p.x;
+			int yi = ((dy*i*i*i) >> 9) - ((3*dy*i*i)>> 6) + ((3*dy*i) >> 3) + p.y;
+			sdl_setCursorLocation(xi, yi);
+			sdl_sleep(cursor_move_time / 7);
 		}
-		break;
-	case MOUSE_WARP_DIRECT:
 		sdl_setCursorLocation(x, y);
-		break;
-	case MOUSE_WARP_SMOOTH:
-		{
-			MyPoint p;
-			sys_getMouseInfo(&p, is_dibgeo);
-			int dx = x - p.x;
-			int dy = y - p.y;
-			for (int i = 1; i < 8; i++) {
-				int xi = ((dx*i*i*i) >> 9) - ((3*dx*i*i)>> 6) + ((3*dx*i) >> 3) + p.x;
-				int yi = ((dy*i*i*i) >> 9) - ((3*dy*i*i)>> 6) + ((3*dy*i) >> 3) + p.y;
-				sdl_setCursorLocation(xi, yi);
-				usleep(cursor_move_time * 1000 / 7);
-			}
-			sdl_setCursorLocation(x, y);
-		}
-		break;
+	} else if (!for_selection) {
+		sdl_setCursorInternalLocation(x, y);
+		sdl_sleep(cursor_move_time);
 	}
 #endif
 }

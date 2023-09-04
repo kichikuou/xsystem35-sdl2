@@ -100,12 +100,6 @@ enum agsevent_button {
 	AGSEVENT_BUTTON_RIGHT,
 };
 
-enum mouse_warp_mode {
-	MOUSE_WARP_DISABLED,
-	MOUSE_WARP_DIRECT,
-	MOUSE_WARP_SMOOTH,
-};
-
 struct _ags {
 	Palette256 *pal;             /* system palette */
 	boolean   pal_changed;      /* system palette has changed */
@@ -116,11 +110,10 @@ struct _ags {
 	
 	int world_depth;            /* depth of off-screen (bits per pixel) */
 
-	enum mouse_warp_mode mouse_movesw;
-
 	agsurface_t *dib;           /* main surface */
 	void (*eventcb)(agsevent_t *e); /* deliver event */
 
+	bool mouse_warp_enabled;
 	boolean noantialias; /* antialias を使用しない */
 	boolean noimagecursor; /* リソースファイルのカーソルを読みこまない */
 };

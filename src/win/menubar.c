@@ -71,10 +71,10 @@ static void toggle_mouse_warp_mode(void) {
 		return;
 
 	if (menuitem.fState & MFS_CHECKED) {
-		nact->ags.mouse_movesw = MOUSE_WARP_DISABLED;
+		nact->ags.mouse_warp_enabled = false;
 		CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_UNCHECKED);
 	} else {
-		nact->ags.mouse_movesw = MOUSE_WARP_SMOOTH;
+		nact->ags.mouse_warp_enabled = true;
 		CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
 	}
 }
