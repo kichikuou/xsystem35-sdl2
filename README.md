@@ -113,7 +113,7 @@ $ make && make install
 [MSYS2](https://www.msys2.org) is required.
 
 ```bash
-$ pacman -S cmake mingw-w64-x86_64-cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-libwebp mingw-w64-x86_64-cjson
+$ pacman -S cmake mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-SDL2 mingw-w64-ucrt-x86_64-SDL2_ttf mingw-w64-ucrt-x86_64-SDL2_mixer mingw-w64-ucrt-x86_64-libwebp mingw-w64-ucrt-x86_64-cjson
 $ mkdir -p out/debug
 $ cd out/debug
 $ cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../
