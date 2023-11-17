@@ -15,7 +15,7 @@ jobs:
       run: |
         cd android
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
-        ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle ./gradlew assembleRelease
+        JAVA_HOME=$JAVA_HOME_17_X64 ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk-bundle ./gradlew assembleRelease
       env:
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
