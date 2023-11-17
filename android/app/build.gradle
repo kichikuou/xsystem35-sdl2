@@ -9,18 +9,18 @@ else {
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    if (buildAsApplication) {
+        namespace "io.github.kichikuou.xsystem35"
+    }
+    compileSdkVersion 34
     defaultConfig {
-        if (buildAsApplication) {
-            applicationId "io.github.kichikuou.xsystem35"
-        }
         minSdkVersion 19
-        targetSdkVersion 31
+        targetSdkVersion 34
         versionCode 15
         versionName "2.9.1" + gitRevision()
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_APP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
+                arguments "-DANDROID_APP_PLATFORM=android-19", "-DANDROID_STL=c++_static"
                 // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 abiFilters 'armeabi-v7a', 'arm64-v8a'
             }
@@ -64,10 +64,10 @@ android {
         }
        
     }
-    lintOptions {
+    lint {
         abortOnError false
     }
-    
+
     if (buildAsLibrary) {
         libraryVariants.all { variant ->
             variant.outputs.each { output ->
