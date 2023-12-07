@@ -42,11 +42,17 @@
 #include "font.h"
 #include "cursor.h"
 #include "image.h"
+#include "debugger.h"
 
 static Palette256 pal_256;
 static boolean need_update = TRUE;
 static boolean fade_outed = FALSE;
 static int cursor_move_time = 50; /* カーソル移動にかかる時間(ms) */
+
+static void palette_changed(void) {
+	nact->ags.pal_changed = TRUE;
+	dbg_on_palette_change();
+}
 
 static void initPal(Palette256 *pal) {
 	int i;
@@ -58,7 +64,7 @@ static void initPal(Palette256 *pal) {
 	pal->red[15]  = 255; pal->green[15]  = 255; pal->blue[15]  = 255;
 	pal->red[255] = 255; pal->green[255] = 255; pal->blue[255] = 255;
 	sdl_setPalette(pal, 0, 256);
-	nact->ags.pal_changed = TRUE;
+	palette_changed();
 }
 
 boolean ags_check_param(int *x, int *y, int *w, int *h) {
@@ -151,7 +157,7 @@ void ags_setWorldSize(int width, int height, int depth) {
 	
 	fade_outed = FALSE;  /* thanx tajiri@wizard */
 	
-	nact->ags.pal_changed = TRUE;
+	palette_changed();
 }
 
 void ags_setViewArea(int x, int y, int width, int height) {
@@ -223,14 +229,14 @@ void ags_setPalettes(Palette256 *src_pal, int src, int dst, int cnt) {
 		nact->ags.pal->green[dst + i] = src_pal->green[src + i];
 		nact->ags.pal->blue [dst + i] = src_pal->blue [src + i];
 	}
-	nact->ags.pal_changed = TRUE;
+	palette_changed();
 }
 
 void ags_setPalette(int no, int red, int green, int blue) {
 	nact->ags.pal->red[no]   = red;
 	nact->ags.pal->green[no] = green;
 	nact->ags.pal->blue[no]  = blue;
-	nact->ags.pal_changed = TRUE;
+	palette_changed();
 }
 
 void ags_setPaletteToSystem(int src, int cnt) {

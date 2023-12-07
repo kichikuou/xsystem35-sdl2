@@ -45,6 +45,7 @@ void dbg_init(const char *symbols_path, boolean use_dap);
 void dbg_quit(void);
 void dbg_main(int bp_no);
 void dbg_onsleep(void);
+void dbg_on_palette_change(void);
 uint8_t dbg_handle_breakpoint(int page, int addr);
 boolean dbg_console_vprintf(int lv, const char *format, va_list ap);
 void dbg_post_command(void *data);
@@ -56,6 +57,7 @@ void dbg_post_command(void *data);
 #define dbg_quit()
 #define dbg_main(bp_no)
 #define dbg_onsleep()
+#define dbg_on_palette_change()
 #define dbg_handle_breakpoint(page, addr) BREAKPOINT
 #define dbg_console_vprintf(lv, format, ap) false
 #define dbg_post_command(data)

@@ -58,6 +58,7 @@ typedef struct {
 	void (*quit)(void);
 	void (*repl)(int bp_no);
 	void (*onsleep)(void);
+	void (*on_palette_change)(void);
 	void (*console_output)(int lv, const char *output);
 } DebuggerImpl;
 

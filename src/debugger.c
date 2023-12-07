@@ -530,6 +530,11 @@ void dbg_onsleep(void) {
 		dbg_impl->onsleep();
 }
 
+void dbg_on_palette_change(void) {
+	if (dbg_impl)
+		dbg_impl->on_palette_change();
+}
+
 boolean dbg_console_vprintf(int lv, const char *format, va_list ap) {
 	if (!dbg_impl || !dbg_impl->console_output)
 		return false;

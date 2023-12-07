@@ -51,6 +51,7 @@ static char *symbols_path;
 static char *src_dir;
 static struct msgq *queue;
 static bool break_on_warnings;
+static uint32_t palette_version;
 
 cJSON *create_source(const char *name) {
 	cJSON *source = cJSON_CreateObject();
@@ -480,6 +481,20 @@ static void cmd_disconnect(cJSON *args, cJSON *resp) {
 	sys_exit(0);
 }
 
+static void cmd_palette(cJSON *args, cJSON *resp) {
+	cJSON *body, *palette;
+	cJSON_AddBoolToObject(resp, "success", true);
+	cJSON_AddItemToObjectCS(resp, "body", body = cJSON_CreateObject());
+	cJSON_AddNumberToObject(body, "version", palette_version);
+	cJSON_AddItemToObjectCS(body, "palette", palette = cJSON_CreateArray());
+	for (int i = 0; i < 256; i++) {
+		int val = nact->ags.pal->red[i] << 16 |
+			nact->ags.pal->green[i] << 8 |
+			nact->ags.pal->blue[i];
+		cJSON_AddItemToArray(palette, cJSON_CreateNumber(val));
+	}
+}
+
 static boolean handle_request(cJSON *request) {
 	boolean continue_repl = true;
 
@@ -536,8 +551,15 @@ static boolean handle_request(cJSON *request) {
 		cmd_setVariable(args, resp);
 	} else if (!strcmp(command->valuestring, "disconnect")) {
 		cmd_disconnect(args, resp);
+	} else if (!strcmp(command->valuestring, "xsystem35.palette")) {
+		cmd_palette(args, resp);
 	} else {
-		fprintf(stderr, "unknown command \"%s\"\n", command->valuestring);
+		cJSON_AddBoolToObject(resp, "success", false);
+		char *buf = malloc(strlen(command->valuestring) + 30);
+		sprintf(buf, "unknown request \"%s\"", command->valuestring);
+		cJSON_AddStringToObject(resp, "message", buf);
+		fprintf(stderr, "%s\n", buf);
+		free(buf);
 	}
 	send_json(resp);
 	return continue_repl;
@@ -634,6 +656,15 @@ static void dbg_dap_onsleep(void) {
 		dbg_main(0);
 }
 
+static void dbg_dap_on_palette_change(void) {
+	cJSON *event = cJSON_CreateObject(), *body;
+	cJSON_AddStringToObject(event, "type", "event");
+	cJSON_AddStringToObject(event, "event", "xsystem35.paletteChanged");
+	cJSON_AddItemToObjectCS(event, "body", body = cJSON_CreateObject());
+	cJSON_AddNumberToObject(body, "version", ++palette_version);
+	send_json(event);
+}
+
 void dbg_post_command(void *data) {
 	msgq_enqueue(queue, data);
 }
@@ -643,5 +674,6 @@ DebuggerImpl dbg_dap_impl = {
 	.quit = dbg_dap_quit,
 	.repl = dbg_dap_repl,
 	.onsleep = dbg_dap_onsleep,
+	.on_palette_change = dbg_dap_on_palette_change,
 	.console_output = emit_output_event,
 };
