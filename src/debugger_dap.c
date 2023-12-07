@@ -68,7 +68,7 @@ cJSON *create_source(const char *name) {
 static void send_json(cJSON *json) {
 	static int seq = 0;
 
-	cJSON_AddNumberToObject(json, "seq", seq);
+	cJSON_AddNumberToObject(json, "seq", ++seq);
 	char *str = cJSON_PrintUnformatted(json);
 	printf("Content-Length: %zu\r\n\r\n%s", strlen(str), str);
 	fflush(stdout);
