@@ -1306,7 +1306,7 @@ static void ChangeSecretArray(void) { /* 53 */
 				(*vAry) ^= ax; ax = (key[i&3] ^ *vAry);
 				j ^= ax;
 				if (i & 2) {
-					ax = !ax ^ (i*3);
+					ax = ~ax ^ (i*3);
 				}
 				if (i & 4) {
 					ax = (ax >> 4) | (ax << 12);
@@ -1328,13 +1328,12 @@ static void ChangeSecretArray(void) { /* 53 */
 				*vAry ^= ax; ax = (key[i&3] ^ k);
 				j ^= ax;
 				if (i & 2) {
-					ax = !ax ^ (i*3);
+					ax = ~ax ^ (i*3);
 				}
 				if (i & 4) {
 					ax = (ax >> 4) | (ax << 12);
 				}
 				vAry++;
-				
 			}
 			*vResult = j;
 		}
