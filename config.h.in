@@ -1,5 +1,5 @@
 #cmakedefine PACKAGE "@PACKAGE@"
-#define VERSION "2.9.1"
+#define VERSION "2.10.0"
 
 #cmakedefine CMAKE_SYSTEM_NAME "@CMAKE_SYSTEM_NAME@"
 
