@@ -108,5 +108,5 @@ void ald_init(int type, const char **file, int cnt, boolean use_mmap) {
 int ald_get_maxno(DRIFILETYPE type) {
 	if (type >= DRIFILETYPEMAX || !dri[type])
 		return 0;
-	return dri[type]->nr_files;
+	return dri[type]->maxno;
 }

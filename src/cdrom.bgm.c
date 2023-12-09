@@ -22,11 +22,14 @@
 #include <stdio.h>
 
 #include "cdrom.h"
+#include "ald_manager.h"
 #include "music.h"
+#include "music_private.h"
 
 static int current_track;
 
 static int cdrom_bgm_init(char *dev) {
+	prv.cd_maxtrk = ald_get_maxno(DRIFILE_BGM) + 1;
 	return OK;
 }
 

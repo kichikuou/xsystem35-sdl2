@@ -67,6 +67,8 @@ static bool read_index(int disk, drifiles *d, FILE *fp) {
 	for (int i = 0; i < nr_files; i++) {
 		if (disk != ltbl[i * 3] - 1)
 			continue;
+		if (d->maxno < i)
+			d->maxno = i;
 		d->disk[i] = ltbl[i * 3];
 		int ptr = LittleEndian_getW(ltbl, i * 3 + 1);
 		d->offset[i] = LittleEndian_get3B(ptbl, ptr * 3) << 8;

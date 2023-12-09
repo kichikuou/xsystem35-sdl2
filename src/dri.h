@@ -34,6 +34,7 @@ struct _drifiles {
 	mmap_t   *mmap[DRIFILEMAX];
 	char     *fnames[DRIFILEMAX];
 	int      nr_files; // upper limit on how many files could be referenced by this archive
+	int      maxno;
 	uint8_t  *disk;    // file numbers
 	uint32_t *offset;  // offsets in file
 };
