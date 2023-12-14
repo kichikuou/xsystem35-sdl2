@@ -41,7 +41,6 @@ static void makeDIB(int width, int height, int depth);
 
 struct sdl_private_data *sdl_videodev;
 static int joy_device_index = -1;
-static boolean integer_scaling = FALSE;
 
 static SDL_Joystick *js;
 
@@ -152,7 +151,6 @@ static void window_init(const char *render_driver) {
 								  flags);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderSetIntegerScale(sdl_renderer, integer_scaling);
 }
 
 static void makeDIB(int width, int height, int depth) {
@@ -274,7 +272,7 @@ void sdl_setJoyDeviceIndex(int index) {
 }
 
 void sdl_setIntegerScaling(boolean enable) {
-	integer_scaling = enable;
+	SDL_RenderSetIntegerScale(sdl_renderer, enable);
 }
 
 #ifdef __EMSCRIPTEN__

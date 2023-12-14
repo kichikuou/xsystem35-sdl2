@@ -19,6 +19,9 @@
 #antialias: No
 
 # ------------------------------------------------------------
+# Enforce integer scaling
+
+#integerscale: Yes
 
 # ------------------------------------------------------------
 # Enables game-specific hacks. Usually auto-detected, but must be

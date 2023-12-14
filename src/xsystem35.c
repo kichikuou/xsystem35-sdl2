@@ -97,7 +97,7 @@ static char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF}
 static char fontface[FONTTYPEMAX];
 
 static boolean font_noantialias;
-
+static bool integer_scaling = false;
 /* fullscreen on from command line */
 static boolean fs_on;
 
@@ -311,7 +311,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			puts(VERSION);
 			exit(0);
 		} else if (0 == strcmp(argv[i], "-integerscale")) {
-			sdl_setIntegerScaling(TRUE);
+			integer_scaling = true;
 		} else if (0 == strcmp(argv[i], "-game")) {
 			if (argv[i + 1] != NULL) {
 				enable_hack_by_gameid(argv[i + 1]);
@@ -401,7 +401,7 @@ static void check_profile() {
 	param = get_profile("integerscale");
 	if (param) {
 		if (0 == strcmp(param, "Yes")) {
-			sdl_setIntegerScaling(TRUE);
+			integer_scaling = TRUE;
 		}
 	}
 	/* enable game-specific hacks */
@@ -509,6 +509,8 @@ int main(int argc, char **argv) {
 #endif
 
 	sys35_init();
+	if (integer_scaling)
+		sdl_setIntegerScaling(true);
 
 #ifdef ENABLE_GTK
 	gtk_init(&argc, &argv);

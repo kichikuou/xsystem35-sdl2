@@ -19,6 +19,7 @@ IDR_MENU1 MENU DISCARDABLE
     {
         MENUITEM "Window",                      ID_SCREEN_WINDOW
         MENUITEM "Fullscreen",                  ID_SCREEN_FULL
+        MENUITEM "Integer Scaling",             ID_SCREEN_INTEGER_SCALING
     }
     POPUP "Option"
     {
@@ -57,6 +58,7 @@ IDR_MENU1 MENU DISCARDABLE
     {
         MENUITEM "ウィンドウ",                    ID_SCREEN_WINDOW
         MENUITEM "フルスクリーン",                ID_SCREEN_FULL
+        MENUITEM "整数倍スケーリング",            ID_SCREEN_INTEGER_SCALING
     }
     POPUP "オプション"
     {

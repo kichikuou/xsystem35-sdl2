@@ -59,7 +59,7 @@ static void saveScreenshot(void) {
 	}
 }
 
-static void toggle_mouse_warp_mode(void) {
+static bool toggle_menu_item(UINT id, bool *checked_out) {
 	HWND hwnd = get_hwnd(sdl_window);
 	HMENU hmenu = GetMenu(hwnd);
 
@@ -67,16 +67,17 @@ static void toggle_mouse_warp_mode(void) {
 		.cbSize = sizeof(MENUITEMINFO),
 		.fMask = MIIM_STATE,
 	};
-	if (!GetMenuItemInfo(hmenu, ID_OPTION_MOUSE_MOVE, false, &menuitem))
-		return;
+	if (!GetMenuItemInfo(hmenu, id, false, &menuitem))
+		return false;
 
 	if (menuitem.fState & MFS_CHECKED) {
-		nact->ags.mouse_warp_enabled = false;
-		CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_UNCHECKED);
+		CheckMenuItem(hmenu, id, MF_BYCOMMAND | MFS_UNCHECKED);
+		*checked_out = false;
 	} else {
-		nact->ags.mouse_warp_enabled = true;
-		CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
+		CheckMenuItem(hmenu, id, MF_BYCOMMAND | MFS_CHECKED);
+		*checked_out = true;
 	}
+	return true;
 }
 
 void win_menu_init(void) {
@@ -90,6 +91,7 @@ void win_menu_init(void) {
 }
 
 void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
+	bool checked;
 	switch (msg->msg.win.msg) {
 	case WM_COMMAND:
 		switch (msg->msg.win.wParam) {
@@ -108,8 +110,13 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 		case ID_SCREEN_FULL:
 			sdl_setFullscreen(TRUE);
 			break;
+		case ID_SCREEN_INTEGER_SCALING:
+			if (toggle_menu_item(ID_SCREEN_INTEGER_SCALING, &checked))
+				sdl_setIntegerScaling(checked);
+			break;
 		case ID_OPTION_MOUSE_MOVE:
-			toggle_mouse_warp_mode();
+			if (toggle_menu_item(ID_OPTION_MOUSE_MOVE, &checked))
+				nact->ags.mouse_warp_enabled = checked;
 			break;
 		case ID_MSGSKIP:
 			msgskip_activate(!msgskip_isActivated());
