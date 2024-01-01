@@ -488,9 +488,9 @@ static void cmd_palette(cJSON *args, cJSON *resp) {
 	cJSON_AddNumberToObject(body, "version", palette_version);
 	cJSON_AddItemToObjectCS(body, "palette", palette = cJSON_CreateArray());
 	for (int i = 0; i < 256; i++) {
-		int val = nact->ags.pal->red[i] << 16 |
-			nact->ags.pal->green[i] << 8 |
-			nact->ags.pal->blue[i];
+		int val = nact->ags.pal[i].r << 16 |
+			nact->ags.pal[i].g << 8 |
+			nact->ags.pal[i].b;
 		cJSON_AddItemToArray(palette, cJSON_CreateNumber(val));
 	}
 }

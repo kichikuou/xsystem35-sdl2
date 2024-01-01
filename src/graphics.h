@@ -28,10 +28,10 @@
 #include <SDL_rect.h>
 
 typedef struct {
-        uint8_t red[256];
-        uint8_t green[256];
-        uint8_t blue[256];
-} Palette256;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+} Color;
 
 typedef struct {
         uint8_t r,g,b;

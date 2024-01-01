@@ -118,11 +118,11 @@ void sdl_updateAll(MyRectangle *view_rect) {
 }
 
 /* Color の複数個指定 */
-void sdl_setPalette(Palette256 *pal, int first, int count) {
+void sdl_setPalette(Color *pal, int first, int count) {
 	for (int i = 0; i < count; i++) {
-		sdl_col[first + i].r = pal->red  [first + i];
-		sdl_col[first + i].g = pal->green[first + i];
-		sdl_col[first + i].b = pal->blue [first + i];
+		sdl_col[first + i].r = pal[first + i].r;
+		sdl_col[first + i].g = pal[first + i].g;
+		sdl_col[first + i].b = pal[first + i].b;
 	}
 	if (sdl_dib->format->BitsPerPixel == 8)
 		SDL_SetPaletteColors(sdl_dib->format->palette, &sdl_col[first], first, count);
@@ -227,13 +227,10 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 	
 	if (sdl_dib->format->BitsPerPixel > 8 && cg->pal) {
 		SDL_Color *c = s->format->palette->colors;
-		uint8_t *r = cg->pal->red;
-		uint8_t *g = cg->pal->green;
-		uint8_t *b = cg->pal->blue;
 		for (int i = 0; i < 256; i++) {
-			c->r = *(r++);
-			c->g = *(g++);
-			c->b = *(b++);
+			c->r = cg->pal[i].r;
+			c->g = cg->pal[i].g;
+			c->b = cg->pal[i].b;
 			c++;
 		}
 	} else {

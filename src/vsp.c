@@ -42,7 +42,6 @@
  * static methods
 */
 static vsp_header *extract_header(uint8_t *b);
-static void getpal(Palette256 *pal, uint8_t *b);
 static void extract(vsp_header *vsp, uint8_t *pic, uint8_t *b);
 
 /*
@@ -66,15 +65,16 @@ static vsp_header *extract_header(uint8_t *b) {
 
 /*
  * Get palette from raw data
- *   pal: palette to be stored
  *   b  : raw data (pointer to palette)
 */
-static void getpal(Palette256 *pal, uint8_t *b) {
+static Color *getpal(uint8_t *b) {
+	Color *pal = malloc(sizeof(Color) * 256);
 	for (int i = 0; i < 16; i++) {
-		pal->blue[i]  = b[i * 3 + 0] * 17;
-		pal->red[i]   = b[i * 3 + 1] * 17;
-		pal->green[i] = b[i * 3 + 2] * 17;
+		pal[i].b = b[i * 3 + 0] * 17;
+		pal[i].r = b[i * 3 + 1] * 17;
+		pal[i].g = b[i * 3 + 2] * 17;
 	}
+	return pal;
 }
 
 /*
@@ -196,8 +196,7 @@ cgdata *vsp_extract(uint8_t *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	vsp_header *vsp = extract_header(data);
 	
-	cg->pal = malloc(sizeof(Palette256));
-	getpal(cg->pal, data + vsp->vspPp);
+	cg->pal = getpal(data + vsp->vspPp);
 	
 	/* +10: margin for broken cg */
 	cg->pic = malloc(sizeof(uint8_t) * ((vsp->vspXW * 8 + 10) * (vsp->vspYW + 10)));

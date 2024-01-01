@@ -44,7 +44,6 @@
  * static methods
 */
 static pms_header *extract_header(uint8_t *b);
-static void getpal(Palette256 *pal, uint8_t *b);
 static void extract_8bit(pms_header *pms, uint8_t *pic, uint8_t *b);
 static void extract_16bit(pms_header *pms, uint16_t *pic, uint8_t *b);
 
@@ -75,17 +74,16 @@ static pms_header *extract_header(uint8_t *b) {
 
 /*
  * Get palette from raw data
- *   pal: palette to be stored
  *   b  : raw data (pointer to palette)
 */
-static void getpal(Palette256 *pal, uint8_t *b) {
-	int i;
-	
-	for (i = 0; i < 256; i++) {
-		pal->red[i]   = *b++;
-		pal->green[i] = *b++;
-		pal->blue[i]  = *b++;
+static Color *getpal(uint8_t *b) {
+	Color *pal = malloc(sizeof(Color) * 256);
+	for (int i = 0; i < 256; i++) {
+		pal[i].r = *b++;
+		pal[i].g = *b++;
+		pal[i].b = *b++;
 	}
+	return pal;
 }
 
 /*
@@ -227,8 +225,7 @@ cgdata *pms256_extract(uint8_t *data) {
 	cgdata *cg = calloc(1, sizeof(cgdata));
 	pms_header *pms = extract_header(data);
 	
-	cg->pal = malloc(sizeof(Palette256));
-	getpal(cg->pal, data + pms->pmsPp);
+	cg->pal = getpal(data + pms->pmsPp);
 	
 	/* +10: margin for broken cg */
 	cg->pic = malloc(sizeof(uint8_t) * ((pms->pmsXW + 10) * (pms->pmsYW + 10)));

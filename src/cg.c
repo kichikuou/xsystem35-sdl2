@@ -293,13 +293,8 @@ void cg_load(int no, int flg) {
 		bank = cg_vspPB == -1 ? cg->vsp_bank : cg_vspPB;
 		set_vspbank(cg->pic, bank << 4, cg->width, cg->height);
 		/* copy palettes 0 -> bank */
-		{
-			int i, i_dst = bank << 4;
-			for (i = 0; i < 16; i++) {
-				cg->pal->red[i + i_dst]   = cg->pal->red[i];
-				cg->pal->green[i + i_dst] = cg->pal->green[i];
-				cg->pal->blue[i + i_dst]  = cg->pal->blue[i];
-			}
+		if (bank != 0) {
+			memcpy(cg->pal + bank * 16, cg->pal, 16 * sizeof(cg->pal[0]));
 		}
 		if (flg != -1) {
 			flg |= (bank << 4);
@@ -310,22 +305,22 @@ void cg_load(int no, int flg) {
 	if (GCMD_LOAD_PALETTE(cg_fflg)) {
 		switch(cg->type) {
 		case ALCG_VSP:
-			ags_setPalettes(cg->pal, 0, bank << 4, 16);
+			ags_setPalettes(cg->pal, bank << 4, 16);
 			break;
 		case ALCG_PMS8:
 			if (cg->pms_bank & 1)
-				ags_setPalettes(cg->pal, 10, 10,  6);
+				ags_setPalettes(cg->pal + 10, 10,  6);
 			if (cg->pms_bank & (1 << 15))
-				//ags_setPalettes(cg->pal, 240, 240, 15);
-				ags_setPalettes(cg->pal, 240, 240, 10);
+				//ags_setPalettes(cg->pal + 240, 240, 15);
+				ags_setPalettes(cg->pal + 240, 240, 10);
 			for (i = 1; i < 15; i++) {
 				if (cg->pms_bank & (1 << i)) {
-					ags_setPalettes(cg->pal, i * 16, i * 16, 16);
+					ags_setPalettes(cg->pal + i * 16, i * 16, 16);
 				}
 			}
 			break;
 		case ALCG_BMP8:
-			ags_setPalettes(cg->pal, 10, 10, 236);
+			ags_setPalettes(cg->pal + 10, 10, 236);
 			break;
 		default:
 			break;
@@ -463,7 +458,7 @@ int cg_load_with_filename(char *fname_utf8, int x, int y) {
 	/* load palette if not extracted */
 	if (cg->depth == 8) {
 		if (GCMD_LOAD_PALETTE(cg_fflg))
-			ags_setPalettes(cg->pal, 10, 10, 236);
+			ags_setPalettes(cg->pal + 10, 10, 236);
 		if (GCMD_SET_PALETTE(cg_fflg))
 			ags_setPaletteToSystem(0, 256);
 	}

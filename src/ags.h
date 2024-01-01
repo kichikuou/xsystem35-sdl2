@@ -101,7 +101,7 @@ enum agsevent_button {
 };
 
 struct _ags {
-	Palette256 *pal;             /* system palette */
+	Color pal[256];             /* system palette */
 	boolean   pal_changed;      /* system palette has changed */
 	
 	MyDimension world_size;     /* size of off-screen */
@@ -143,7 +143,7 @@ extern void ags_updateFull(void);
 extern void ags_updateArea(int x, int y, int width, int height);
 
 /* パレット関係 */
-extern void ags_setPalettes(Palette256 *src_pal, int src, int dst, int cnt);
+extern void ags_setPalettes(Color *src, int dst, int cnt);
 extern void ags_setPalette(int no, int red, int green, int blue);
 extern void ags_setPaletteToSystem(int src, int cnt);
 

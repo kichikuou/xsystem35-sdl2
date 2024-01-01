@@ -44,7 +44,6 @@
 #include "image.h"
 #include "debugger.h"
 
-static Palette256 pal_256;
 static boolean need_update = TRUE;
 static boolean fade_outed = FALSE;
 static int cursor_move_time = 50; /* カーソル移動にかかる時間(ms) */
@@ -54,16 +53,15 @@ static void palette_changed(void) {
 	dbg_on_palette_change();
 }
 
-static void initPal(Palette256 *pal) {
-	int i;
-	for (i = 0; i < 256; i++) {
-		pal->red[i]   =   0; pal->green[i]   =   0; pal->blue[i]   =   0;
-	}
-	pal->red[0]   =   0; pal->green[0]   =   0; pal->blue[0]   =   0;
-	pal->red[7]   = 255; pal->green[7]   = 255; pal->blue[7]   = 255;
-	pal->red[15]  = 255; pal->green[15]  = 255; pal->blue[15]  = 255;
-	pal->red[255] = 255; pal->green[255] = 255; pal->blue[255] = 255;
-	sdl_setPalette(pal, 0, 256);
+static void initPal(void) {
+	static const Color initial_palette[256] = {
+		[  0] = {  0,   0,   0},
+		[  7] = {255, 255, 255},
+		[ 15] = {255, 255, 255},
+		[255] = {255, 255, 255},
+	};
+	memcpy(nact->ags.pal, initial_palette, sizeof(initial_palette));
+	sdl_setPalette(nact->ags.pal, 0, 256);
 	palette_changed();
 }
 
@@ -107,7 +105,6 @@ boolean ags_check_param_xy(int *x, int *y) {
 
 void ags_init(const char *render_driver) {
 	nact->ags.mouse_warp_enabled = true;
-	nact->ags.pal = &pal_256;
 	nact->ags.world_size.width  =  SYS35_DEFAULT_WIDTH;
 	nact->ags.world_size.height =  SYS35_DEFAULT_HEIGHT;
 	nact->ags.world_depth =  SYS35_DEFAULT_DEPTH;
@@ -119,7 +116,7 @@ void ags_init(const char *render_driver) {
 	sdl_Initialize(render_driver);
 	font_init();
 
-	initPal(&pal_256);
+	initPal();
 	cg_init();
 }
 
@@ -131,7 +128,7 @@ void ags_remove(void) {
 void ags_reset(void) {
 	nact->ags.mouse_warp_enabled = true;
 	nact->ags.eventcb = NULL;
-	initPal(&pal_256);
+	initPal();
 	cg_reset();
 }
 
@@ -222,20 +219,17 @@ void ags_updateFull() {
 	sdl_updateArea(&r, &p);
 }
 
-void ags_setPalettes(Palette256 *src_pal, int src, int dst, int cnt) {
-	int i;
-	for (i = 0; i < cnt; i++) {
-		nact->ags.pal->red  [dst + i] = src_pal->red  [src + i];
-		nact->ags.pal->green[dst + i] = src_pal->green[src + i];
-		nact->ags.pal->blue [dst + i] = src_pal->blue [src + i];
+void ags_setPalettes(Color *src, int dst, int cnt) {
+	for (int i = 0; i < cnt; i++) {
+		nact->ags.pal[dst + i] = src[i];
 	}
 	palette_changed();
 }
 
 void ags_setPalette(int no, int red, int green, int blue) {
-	nact->ags.pal->red[no]   = red;
-	nact->ags.pal->green[no] = green;
-	nact->ags.pal->blue[no]  = blue;
+	nact->ags.pal[no].r = red;
+	nact->ags.pal[no].g = green;
+	nact->ags.pal[no].b = blue;
 	palette_changed();
 }
 
@@ -583,9 +577,9 @@ void ags_fadeOut(int rate, boolean flag) {
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEOUT : EFFECT_DITHERING_FADEOUT);
 
 	if (nact->ags.world_depth == 8) {
-		Palette256 pal;
+		Color pal[256];
 		memset(&pal, 0, sizeof(pal));
-		sdl_setPalette(&pal, 0, 256);
+		sdl_setPalette(pal, 0, 256);
 	}
 }
 
@@ -612,9 +606,9 @@ void ags_whiteOut(int rate, boolean flag) {
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEOUT);
 
 	if (nact->ags.world_depth == 8) {
-		Palette256 pal;
+		Color pal[256];
 		memset(&pal, 255, sizeof(pal));
-		sdl_setPalette(&pal, 0, 256);
+		sdl_setPalette(pal, 0, 256);
 	}
 }
 
