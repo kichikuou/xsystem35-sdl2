@@ -308,11 +308,11 @@ void cg_load(int no, int flg) {
 			ags_setPalettes(cg->pal, bank << 4, 16);
 			break;
 		case ALCG_PMS8:
+			// Avoid changing the Windows' reserved palette area (0-9, 246-255)
 			if (cg->pms_bank & 1)
 				ags_setPalettes(cg->pal + 10, 10,  6);
 			if (cg->pms_bank & (1 << 15))
-				//ags_setPalettes(cg->pal + 240, 240, 15);
-				ags_setPalettes(cg->pal + 240, 240, 10);
+				ags_setPalettes(cg->pal + 240, 240, 6);
 			for (i = 1; i < 15; i++) {
 				if (cg->pms_bank & (1 << i)) {
 					ags_setPalettes(cg->pal + i * 16, i * 16, 16);
