@@ -25,7 +25,6 @@ endmacro()
 check_symbol_exists(getlogin "unistd.h" HAVE_GETLOGIN)
 check_symbol_exists(mmap "sys/mman.h" HAVE_MMAP)
 check_symbol_exists(sigaction "signal.h" HAVE_SIGACTION)
-check_symbol_exists(uname "sys/utsname.h" HAVE_UNAME)
 
 if (EMSCRIPTEN)
   set(DEFAULT_FONT_PATH /fonts/)

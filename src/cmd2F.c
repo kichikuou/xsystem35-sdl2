@@ -42,9 +42,6 @@
 #include "ald_manager.h"
 #include "LittleEndian.h"
 #include "hacks.h"
-#if HAVE_UNAME
-#include <sys/utsname.h>
-#endif
 
 /* 選択 Window OPEN 時 callback */
 static int cb_sel_init_page = 0;
@@ -829,20 +826,9 @@ void commands2F52() {
 	int eNum = getCaliValue();
 	if (eNum <= 0) return;
 
-#if HAVE_UNAME
-	struct utsname un;
-	char s[256];
-	if (uname(&un) < 0) return;
-	NOTICE("sysname %s nodename %s release %s version %s machine %s",
-	       un.sysname, un.nodename, un.release, un.version, un.machine);
-	sprintf(s,"%s %s %s",
-		un.sysname, un.release, un.machine);
-#else
-	const char *s = CMAKE_SYSTEM_NAME;
-#endif
-
+	const char *s = SDL_GetPlatform();
 	svar_set(eNum, s);
-	DEBUG_COMMAND("sysGetOsName %d: %s", eNum, s);
+	DEBUG_COMMAND("sysGetOSName %d: %s", eNum, s);
 }
 
 void commands2F53() {
