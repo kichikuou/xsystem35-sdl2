@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.14)
 
 project(GAME)
 set(PROJECT_ROOT_DIR ../../..)
 
+# Compilation of SDL and companion libraries
 include(FetchContent)
 FetchContent_Declare(
   SDL
@@ -20,31 +21,20 @@ FetchContent_Declare(
   URL_HASH SHA1=036fc7839a6b8dc1af3dbfed4e2531224bbacdd7
 )
 
-# Compilation of SDL and companion libraries
-FetchContent_GetProperties(SDL)
-if(NOT sdl_POPULATED)
-  FetchContent_Populate(SDL)
-  add_subdirectory(${sdl_SOURCE_DIR} ${sdl_BINARY_DIR})
-endif()
-FetchContent_GetProperties(SDL_ttf)
-if(NOT sdl_ttf_POPULATED)
-  FetchContent_Populate(SDL_ttf)
-  set(SDL2TTF_SAMPLES OFF CACHE BOOL "Build the SDL2_ttf sample program(s)" FORCE)
-  set(SDL2TTF_INSTALL OFF CACHE BOOL "Enable SDL2_ttf install target" FORCE)
-  set(SDL2TTF_VENDORED ON CACHE BOOL "Use vendored third-party libraries" FORCE)
-  add_subdirectory(${sdl_ttf_SOURCE_DIR} ${sdl_ttf_BINARY_DIR})
-endif()
-FetchContent_GetProperties(SDL_mixer)
-if(NOT sdl_mixer_POPULATED)
-  FetchContent_Populate(SDL_mixer)
-  set(SDL2MIXER_OPUS OFF CACHE BOOL "Enable Opus music" FORCE)
-  set(SDL2MIXER_FLAC OFF CACHE BOOL "Enable FLAC music" FORCE)
-  set(SDL2MIXER_MOD  OFF CACHE BOOL "Support loading MOD music" FORCE)
-  set(SDL2MIXER_MIDI OFF CACHE BOOL "Enable MIDI music" FORCE)
-  set(SDL2MIXER_SAMPLES OFF CACHE BOOL "Build the SDL2_mixer sample program(s)" FORCE)
-  set(SDL2MIXER_INSTALL OFF CACHE BOOL "Enable SDL2_mixer install target" FORCE)
-  add_subdirectory(${sdl_mixer_SOURCE_DIR} ${sdl_mixer_BINARY_DIR})
-endif()
+set(SDL2TTF_SAMPLES OFF CACHE BOOL "Build the SDL2_ttf sample program(s)" FORCE)
+set(SDL2TTF_INSTALL OFF CACHE BOOL "Enable SDL2_ttf install target" FORCE)
+set(SDL2TTF_VENDORED ON CACHE BOOL "Use vendored third-party libraries" FORCE)
+
+set(SDL2MIXER_OPUS OFF CACHE BOOL "Enable Opus music" FORCE)
+set(SDL2MIXER_FLAC OFF CACHE BOOL "Enable FLAC music" FORCE)
+set(SDL2MIXER_MOD  OFF CACHE BOOL "Support loading MOD music" FORCE)
+set(SDL2MIXER_MIDI OFF CACHE BOOL "Enable MIDI music" FORCE)
+set(SDL2MIXER_SAMPLES OFF CACHE BOOL "Build the SDL2_mixer sample program(s)" FORCE)
+set(SDL2MIXER_INSTALL OFF CACHE BOOL "Enable SDL2_mixer install target" FORCE)
+
+FetchContent_MakeAvailable(SDL)
+FetchContent_MakeAvailable(SDL_ttf)
+FetchContent_MakeAvailable(SDL_mixer)
 
 # The main CMakeLists.txt of xsystem35
 add_subdirectory(${PROJECT_ROOT_DIR} xsystem35)
