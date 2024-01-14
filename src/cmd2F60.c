@@ -46,9 +46,9 @@ void commands2F60() {
 		SYSERROR("No DLL initilized");
 	}
 
-	if (dll + type == NULL) goto eexit;
+	if (type < 0 || type >= nact->ain.dllnum) goto eexit;
 
-	if (dll[type].function_num < fnum) goto eexit;
+	if (fnum < 0 || fnum >= dll[type].function_num) goto eexit;
 
 	if (dll[type].function[fnum].entrypoint == NULL) goto eexit;
 
