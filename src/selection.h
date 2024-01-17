@@ -55,7 +55,6 @@ struct _selection {
 	
 	/* メッセージフォントの大きさ */
 	int MsgFontSize;
-	int MsgFontWeight;
 	
 	/* 各種色 */
 	int MsgFontColor;

@@ -113,7 +113,10 @@ struct _ags {
 	agsurface_t *dib;           /* main surface */
 	void (*eventcb)(agsevent_t *e); /* deliver event */
 
+	int font_weight;
+
 	bool mouse_warp_enabled;
+	bool enable_zb;
 	boolean noantialias; /* antialias を使用しない */
 	boolean noimagecursor; /* リソースファイルのカーソルを読みこまない */
 };
@@ -122,7 +125,7 @@ typedef struct _ags ags_t;
 
 
 /* 初期化関係 */
-void ags_init(const char *render_driver);
+void ags_init(const char *render_driver, bool enable_zb);
 void ags_remove(void);
 void ags_reset(void);
 

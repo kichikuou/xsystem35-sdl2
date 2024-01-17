@@ -32,6 +32,7 @@
 #define FONTTYPEMAX 2
 
 #define FONT_WEIGHT_NORMAL 4
+#define FONT_WEIGHT_BOLD 7
 
 extern void font_init(void);
 extern void font_set_name_and_index(int type, const char *name, int index);

@@ -120,7 +120,7 @@ boolean ags_check_param_xy(int *x, int *y) {
 	return TRUE;
 }
 
-void ags_init(const char *render_driver) {
+void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.mouse_warp_enabled = true;
 	nact->ags.world_size.width  =  SYS35_DEFAULT_WIDTH;
 	nact->ags.world_size.height =  SYS35_DEFAULT_HEIGHT;
@@ -129,6 +129,9 @@ void ags_init(const char *render_driver) {
 	nact->ags.view_area.y = 0;
 	nact->ags.view_area.w = SYS35_DEFAULT_WIDTH;
 	nact->ags.view_area.h = SYS35_DEFAULT_HEIGHT;
+
+	nact->ags.enable_zb = enable_zb;
+	nact->ags.font_weight = enable_zb ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 	
 	sdl_Initialize(render_driver);
 	font_init();

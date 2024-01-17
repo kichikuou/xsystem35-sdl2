@@ -97,6 +97,7 @@ static char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF}
 static char fontface[FONTTYPEMAX];
 
 static boolean font_noantialias;
+static bool enable_zb = false;
 static bool integer_scaling = false;
 /* fullscreen on from command line */
 static boolean fs_on;
@@ -210,7 +211,7 @@ static void sys35_init() {
 
 	v_init();
 	
-	ags_init(render_driver);
+	ags_init(render_driver, enable_zb);
 
 	for (i = 0; i < FONTTYPEMAX; i++)
 		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
@@ -293,6 +294,8 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			fs_on = TRUE;
 		} else if (0 == strcmp(argv[i], "-noantialias")) {
 			font_noantialias = TRUE;
+		} else if (0 == strcmp(argv[i], "-enable_zb")) {
+			enable_zb = TRUE;
 		} else if (0 == strcmp(argv[i], "-ttfont_gothic")) {
 			if (argv[i + 1] != NULL) {
 				fontname_tt[FONT_GOTHIC] = argv[i + 1];
@@ -352,6 +355,13 @@ static void check_profile() {
 	if (param) {
 		if (0 == strcmp(param, "No")) {
 			font_noantialias = TRUE;
+		}
+	}
+	/* Enable ZB command (font weight) */
+	param = get_profile("enable_zb");
+	if (param) {
+		if (0 == strcmp(param, "Yes")) {
+			enable_zb = TRUE;
 		}
 	}
 	/* Audio buffer size */

@@ -115,8 +115,8 @@ void commandZB() {
 	/* メッセージ文字を太さを設定 */
 	int weight = getCaliValue();
 
-	nact->msg.MsgFontWeight = weight;
-	nact->sel.MsgFontWeight = weight;
+	if (nact->ags.enable_zb)
+		nact->ags.font_weight = weight;
 
 	DEBUG_COMMAND("ZB %d:", weight);
 }
