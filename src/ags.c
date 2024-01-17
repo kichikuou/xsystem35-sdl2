@@ -630,7 +630,11 @@ void ags_whiteOut(int rate, boolean flag) {
 }
 
 void ags_setFont(int type, int size) {
-	font_select(type, size);
+	font_select(type, size, FONT_WEIGHT_NORMAL);
+}
+
+void ags_setFontWithWeight(int type, int size, int weight) {
+	font_select(type, size, weight);
 }
 
 void ags_setCursorType(int type) {

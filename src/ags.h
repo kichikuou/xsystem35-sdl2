@@ -199,6 +199,7 @@ enum FontType {
 	FONT_MINCHO,
 };
 extern void ags_setFont(int type, int size);
+extern void ags_setFontWithWeight(int type, int size, int weight);
 extern agsurface_t *ags_drawStringToSurface(const char *str);
 
 /* カーソル関係 */

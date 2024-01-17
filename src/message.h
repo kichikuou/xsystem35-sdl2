@@ -44,7 +44,7 @@ extern void msg_mg6_command(int cmd);
 struct __message {
 	/* メッセージフォントの大きさ */
 	int MsgFontSize;
-	int MsgFontBoldSize;
+	int MsgFontWeight;
 	int MsgFont;
 	
 	/* 各種色 */

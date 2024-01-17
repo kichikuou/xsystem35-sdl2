@@ -93,6 +93,7 @@ void sel_init() {
 	
 	/* メッセージフォントの大きさ */
 	sel.MsgFontSize = 16;
+	sel.MsgFontWeight = 7;
 	
 	/* 各種色 */
 	sel.MsgFontColor             = 255;
@@ -301,7 +302,7 @@ static void init_selwindow() {
 		NOTICE("frameType is Default");
 		break;
 	}
-	ags_setFont(FONT_GOTHIC, sel.MsgFontSize);
+	ags_setFontWithWeight(FONT_GOTHIC, sel.MsgFontSize, sel.MsgFontWeight);
 	for (i = 0; i < regnum; i++) {
 		DEBUG_MESSAGE("%d:%s\n", i +1, elm[i]);
 		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +1, elm[i], sel.MsgFontColor);

@@ -113,11 +113,12 @@ void commandZS() {
 
 void commandZB() {
 	/* メッセージ文字を太さを設定 */
-	int size = getCaliValue();
-	
-	nact->msg.MsgFontBoldSize = size;
-	
-	DEBUG_COMMAND("ZB %d:",size);
+	int weight = getCaliValue();
+
+	nact->msg.MsgFontWeight = weight;
+	nact->sel.MsgFontWeight = weight;
+
+	DEBUG_COMMAND("ZB %d:", weight);
 }
 
 void commandZH() {

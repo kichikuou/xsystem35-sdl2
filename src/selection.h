@@ -53,8 +53,9 @@ struct _selection {
 	int FrameCgNoBot;
 	int Framedot;
 	
-        /* メッセージフォントの大きさ */
+	/* メッセージフォントの大きさ */
 	int MsgFontSize;
+	int MsgFontWeight;
 	
 	/* 各種色 */
 	int MsgFontColor;

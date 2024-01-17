@@ -73,7 +73,7 @@ static FontTable *font_lookup(int size, int type) {
 	return NULL;
 }
 
-void font_select(int type, int size) {
+void font_select(int type, int size, int weight) {
 	FontTable *tbl;
 
 	if (NULL == (tbl = font_lookup(size, type))) {
@@ -98,6 +98,7 @@ void font_select(int type, int size) {
 	} else {
 		fontset = tbl;
 	}
+	TTF_SetFontStyle(fontset->id, weight > 5 ? TTF_STYLE_BOLD : TTF_STYLE_NORMAL);
 }
 
 SDL_Surface *font_get_glyph(const char *str_utf8) {
