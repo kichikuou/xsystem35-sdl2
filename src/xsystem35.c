@@ -138,12 +138,15 @@ static void sys35_usage(boolean verbose) {
 	puts(" -ttfont_gothic  : set TrueType font for mincho");
 	
 #ifdef DEBUG
-	puts(" -debuglv #      : debug level");
+	puts(" -debuglv #      : logging level");
 	puts("                 :  1: warings");
 	puts("                 :  2: unimplemented commands");
 	puts("                 :  5: command trace");
 	puts("                 :  6: message trace");
-#endif  
+#endif
+#ifdef ENABLE_DEBUGGER
+	puts(" -debug          : start with debugger");
+#endif
 	puts(" -noantialias    : never use antialiased string");
 	puts(" -fullscreen     : start with fullscreen");
 	puts(" -integerscale   : use integer scaling when resizing");
@@ -516,9 +519,13 @@ int main(int argc, char **argv) {
 	menu_init();
 	
 	if (debugger_mode != DEBUGGER_DISABLED) {
+#ifdef ENABLE_DEBUGGER
 		char symbols_path[500];
 		snprintf(symbols_path, sizeof(symbols_path), "%s.symbols", nact->files.game_fname[DRIFILE_SCO][0]);
 		dbg_init(symbols_path, debugger_mode == DEBUGGER_DAP);
+#else
+		sys_error("Debugging is not supported in this build.");
+#endif
 	}
 
 	for (;;) {
