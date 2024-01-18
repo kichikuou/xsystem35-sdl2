@@ -28,7 +28,7 @@
 #include <stdbool.h>
 
 int  load_profile(void);
-char *get_profile(const char *name);
+const char *get_profile(const char *name);
 bool get_boolean_profile(const char *name, bool *out);
 
 #endif /* __PROFILE_H__ */

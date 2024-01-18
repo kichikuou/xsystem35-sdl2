@@ -178,8 +178,7 @@ int load_profile(void)
 	return load_rc_file(RC_NAME);
 }
 
-char *get_profile(const char *name)
-{
+const char *get_profile(const char *name) {
 	struct profile_kv *kv;
 
 	if (!(kv = check_profile(name)))

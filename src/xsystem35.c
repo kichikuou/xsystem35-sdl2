@@ -80,7 +80,7 @@ static void    sys35_remove();
 static void    sys35_ParseOption(int *argc, char **argv);
 static void    check_profile();
 
-static char *render_driver = NULL;
+static const char *render_driver = NULL;
 
 /* for debugging */
 static int debuglv = DEBUGLEVEL;
@@ -93,7 +93,7 @@ enum {
 static int audio_buffer_size = 0;
 
 /* font name from rcfile */
-static char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF};
+static const char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF};
 static char fontface[FONTTYPEMAX];
 
 static boolean font_noantialias;
@@ -328,7 +328,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 }
 
 static void check_profile() {
-	char *param;
+	const char *param;
 	
 	/* ゴシックフォント(TT)の設定 */
 	param = get_profile("ttfont_gothic");

@@ -32,7 +32,7 @@
 
 static char *dev = CDROM_DEVICE;
 
-void muscd_set_devicename(char *name) {
+void muscd_set_devicename(const char *name) {
 	if (0 == strcmp("none", name)) dev = NULL;
 	else                           dev = strdup(name);
 }

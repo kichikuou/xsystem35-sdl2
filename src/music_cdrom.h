@@ -27,7 +27,7 @@
 #include "portab.h"
 #include "ald_manager.h"
 
-void muscd_set_devicename(char *);
+void muscd_set_devicename(const char *);
 int muscd_init(void);
 int muscd_init_bgm(DRIFILETYPE type, int base_no);
 int muscd_exit(void);

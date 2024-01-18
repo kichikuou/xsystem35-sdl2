@@ -90,7 +90,7 @@ int midi_init(mididevice_t *midi) {
 	return ret;
 }
 
-void midi_set_devicename(char *name) {
+void midi_set_devicename(const char *name) {
 	if (dev) free(dev);
 	if (0 == strcmp("none", name)) dev = NULL;
 	else                           dev = strdup(name);
