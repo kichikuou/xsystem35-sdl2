@@ -351,19 +351,14 @@ static void check_profile() {
 		fontface[FONT_MINCHO] = *param - '0';
 	}
 	/* Font antialiasing */
-	param = get_profile("antialias");
-	if (param) {
-		if (0 == strcmp(param, "No")) {
-			font_noantialias = TRUE;
-		}
+	bool antialias;
+	if (get_boolean_profile("antialias", &antialias)) {
+		font_noantialias = !antialias;
 	}
+
 	/* Enable ZB command (font weight) */
-	param = get_profile("enable_zb");
-	if (param) {
-		if (0 == strcmp(param, "Yes")) {
-			enable_zb = TRUE;
-		}
-	}
+	get_boolean_profile("enable_zb", &enable_zb);
+
 	/* Audio buffer size */
 	param = get_profile("audio_buffer_size");
 	if (param) {
@@ -401,19 +396,11 @@ static void check_profile() {
 		midi_set_output_device(*param | subdev);
 	}
 	/* disable image cursor */
-	param = get_profile("no_imagecursor");
-	if (param) {
-		if (0 == strcmp(param, "Yes")) {
-			nact->ags.noimagecursor = TRUE;
-		}
-	}
+	get_boolean_profile("no_imagecursor", &nact->ags.noimagecursor);
+
 	/* enable integer scaling */
-	param = get_profile("integerscale");
-	if (param) {
-		if (0 == strcmp(param, "Yes")) {
-			integer_scaling = TRUE;
-		}
-	}
+	get_boolean_profile("integerscale", &integer_scaling);
+
 	/* enable game-specific hacks */
 	param = get_profile("game");
 	if (param) {

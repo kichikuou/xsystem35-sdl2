@@ -186,3 +186,25 @@ char *get_profile(const char *name)
 		return NULL;
 	return kv->value;
 }
+
+bool get_boolean_profile(const char *name, bool *out) {
+	const char *value = get_profile(name);
+	if (!value)
+		return false;
+	const char *yes_values[] = {"yes", "true", "on", "1", NULL};
+	const char *no_values[] = {"no", "false", "off", "0", NULL};
+	for (int i = 0; yes_values[i]; i++) {
+		if (!strcasecmp(value, yes_values[i])) {
+			*out = true;
+			return true;
+		}
+	}
+	for (int i = 0; no_values[i]; i++) {
+		if (!strcasecmp(value, no_values[i])) {
+			*out = false;
+			return true;
+		}
+	}
+	WARNING("invalid profile value for %s: \"%s\"\n", name, value);
+	return false;
+}
