@@ -5,10 +5,17 @@ jobs:
   build:
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - { sys: MINGW32, installer: "xsystem35-32bit" }
-          - { sys: UCRT64, installer: "xsystem35-64bit" }
+          - sys: MINGW32
+            installer: "xsystem35-32bit"
+            cmake_args: "-DENABLE_DEBUGGER=no"
+            deps: ""
+          - sys: UCRT64
+            installer: "xsystem35-64bit"
+            cmake_args: ""
+            deps: "cjson:p"
     defaults:
       run:
         shell: msys2 {0}
@@ -27,9 +34,9 @@ jobs:
           SDL2_ttf:p
           SDL2_mixer:p
           libwebp:p
-          cjson:p
           nsis:p
           ntldd:p
+          ${{ matrix.deps }}
 
     - name: Checkout
       uses: actions/checkout@v3
@@ -38,7 +45,7 @@ jobs:
       run: |
         mkdir -p out/release
         cd out/release
-        cmake -G"Ninja" -DCMAKE_BUILD_TYPE=Release ../../
+        cmake -G"Ninja" -DCMAKE_BUILD_TYPE=Release ${{ matrix.cmake_args }} ../../
         ninja
 
     - name: Test
