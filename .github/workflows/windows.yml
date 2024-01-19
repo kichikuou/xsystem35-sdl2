@@ -9,11 +9,11 @@ jobs:
       matrix:
         include:
           - sys: MINGW32
-            installer: "xsystem35-32bit"
+            package: "xsystem35-32bit"
             cmake_args: "-DENABLE_DEBUGGER=no"
             deps: ""
           - sys: UCRT64
-            installer: "xsystem35-64bit"
+            package: "xsystem35-64bit"
             cmake_args: ""
             deps: "cjson:p"
     defaults:
@@ -34,8 +34,6 @@ jobs:
           SDL2_ttf:p
           SDL2_mixer:p
           libwebp:p
-          nsis:p
-          ntldd:p
           ${{ matrix.deps }}
 
     - name: Checkout
@@ -52,12 +50,8 @@ jobs:
       run: ctest --output-on-failure
       working-directory: out/release
 
-    - name: Package
-      working-directory: tools/installer
-      run: ./make-installer.sh ../../out/release ${{ matrix.installer }}.nsi
-
     - name: Upload
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.installer }}
-        path: tools/installer/${{ matrix.installer }}.exe
+        name: ${{ matrix.package }}
+        path: out/release/src/xsystem35.exe
