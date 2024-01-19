@@ -28,16 +28,33 @@ check_symbol_exists(mmap "sys/mman.h" HAVE_MMAP)
 check_symbol_exists(sigaction "signal.h" HAVE_SIGACTION)
 
 if (EMSCRIPTEN)
+  function(add_emscripten_library name option)
+    add_library(${name} INTERFACE)
+    set_target_properties(${name} PROPERTIES
+        INTERFACE_COMPILE_OPTIONS ${option}
+        INTERFACE_LINK_OPTIONS ${option})
+  endfunction()
+  add_emscripten_library(zlib "SHELL:-s USE_ZLIB=1")
+  add_emscripten_library(sdl2 "SHELL:-s USE_SDL=2")
+  add_emscripten_library(sdl2_ttf "SHELL:-s USE_SDL_TTF=2")
   set(DEFAULT_FONT_PATH /fonts/)
+
 elseif (ANDROID)
+  add_library(sdl2 ALIAS SDL2)
+  add_library(sdl2_ttf ALIAS SDL2_ttf)
+  add_library(sdl2_mixer ALIAS SDL2_mixer)
   set(SDL2MIXER_FOUND 1)
-  find_library(ndk_zlib z)
   find_library(ndk_log log)
-else()
+  find_library(ndk_zlib z)
+  add_library(zlib INTERFACE)
+  set_target_properties(zlib PROPERTIES INTERFACE_LINK_LIBRARIES ${ndk_zlib})
+
+else()  # non-emscripten, non-android
   if (WIN32)
     set(ZLIB_USE_STATIC_LIBS ON)
   endif()
   find_package(ZLIB REQUIRED)
+  add_library(zlib ALIAS ZLIB::ZLIB)
 
   include(FindPkgConfig)
   optional_pkg_check_modules(GTK3 IMPORTED_TARGET gtk+-3.0)
@@ -54,7 +71,6 @@ else()
     # Workaround for linking error
     set_property(TARGET sdl2_ttf PROPERTY INTERFACE_LINK_LIBRARIES
         $<LINK_GROUP:RESCAN,${SDL2TTF_STATIC_LIBRARIES} -lstdc++>)
-
     if (SDL2MIXER_FOUND)
       add_static_library(sdl2_mixer SDL2MIXER)
     endif()

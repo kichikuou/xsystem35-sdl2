@@ -81,15 +81,13 @@ if (WIN32)
   target_sources(xsystem35 PRIVATE win/dialog.c win/resources.rc win/menubar.c win/console.c)
 endif()
 
-if (EMSCRIPTEN)
+target_link_libraries(src_lib PRIVATE sdl2 zlib)
+target_link_libraries(xsystem35 PRIVATE m zlib sdl2 sdl2_ttf)
+if (TARGET sdl2_mixer)
+  target_link_libraries(xsystem35 PRIVATE sdl2_mixer)
+endif()
 
-  set(LIBS
-    "SHELL:-s USE_ZLIB=1"
-    "SHELL:-s USE_SDL=2"
-    "SHELL:-s USE_SDL_TTF=2")
-  target_compile_options(src_lib PRIVATE ${LIBS})
-  target_compile_options(xsystem35 PRIVATE ${LIBS})
-  target_link_options(xsystem35 PRIVATE ${LIBS})
+if (EMSCRIPTEN)
   target_link_libraries(xsystem35 PRIVATE idbfs.js)
 
   # Without optimizations, Asyncify generates very large code.
@@ -107,16 +105,9 @@ if (EMSCRIPTEN)
     "SHELL:-s EXPORTED_RUNTIME_METHODS=getValue,addRunDependency,removeRunDependency")
 
 elseif (ANDROID)
-
-  target_link_libraries(src_lib PRIVATE SDL2)
-  target_link_libraries(xsystem35 PRIVATE SDL2 SDL2_ttf SDL2_mixer ${ndk_zlib} ${ndk_log})
+  target_link_libraries(xsystem35 PRIVATE ${ndk_log})
 
 else()  # non-emscripten, non-android
-  target_link_libraries(src_lib PRIVATE sdl2)
-  target_link_libraries(xsystem35 PRIVATE m ZLIB::ZLIB sdl2 sdl2_ttf)
-  if (TARGET sdl2_mixer)
-    target_link_libraries(xsystem35 PRIVATE sdl2_mixer)
-  endif()
   if (TARGET cJSON)
     target_link_libraries(xsystem35 PRIVATE cJSON)
   endif()
