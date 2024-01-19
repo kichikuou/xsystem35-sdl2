@@ -4,15 +4,7 @@ project(xsystem35 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 enable_testing()
 
-include(CheckIncludeFile)
-include(CheckLibraryExists)
 include(CheckSymbolExists)
-
-# In msys, `pkg-config --libs` returns `-lmingw32` but find_library() cannot
-# find it in default search paths.
-if (MSYS)
-  list(APPEND CMAKE_LIBRARY_PATH $ENV{MINGW_PREFIX}/$ENV{MINGW_CHOST}/lib)
-endif ()
 
 # A wrapper around pkg_check_modules() that skips the check if ENABLE_<prefix> is false
 macro (optional_pkg_check_modules prefix)
@@ -21,6 +13,15 @@ macro (optional_pkg_check_modules prefix)
     pkg_check_modules(${prefix} ${ARGN})
   endif()
 endmacro()
+
+# Generates a static library from pkg_check_modules() result
+function(add_static_library name pkg)
+  add_library(${name} INTERFACE)
+  set_target_properties(${name}
+      PROPERTIES
+          INTERFACE_INCLUDE_DIRECTORIES "${${pkg}_INCLUDE_DIRS}"
+          INTERFACE_LINK_LIBRARIES "${${pkg}_STATIC_LIBRARIES}")
+endfunction()
 
 check_symbol_exists(getlogin "unistd.h" HAVE_GETLOGIN)
 check_symbol_exists(mmap "sys/mman.h" HAVE_MMAP)
@@ -33,6 +34,9 @@ elseif (ANDROID)
   find_library(ndk_zlib z)
   find_library(ndk_log log)
 else()
+  if (WIN32)
+    set(ZLIB_USE_STATIC_LIBS ON)
+  endif()
   find_package(ZLIB REQUIRED)
 
   include(FindPkgConfig)
@@ -41,25 +45,54 @@ else()
     set(ENABLE_GTK 1)
   endif()
 
-  pkg_check_modules(SDL2 IMPORTED_TARGET sdl2)
-  pkg_check_modules(SDL2TTF IMPORTED_TARGET SDL2_ttf)
+  pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
+  pkg_check_modules(SDL2TTF REQUIRED IMPORTED_TARGET SDL2_ttf)
   optional_pkg_check_modules(SDL2MIXER IMPORTED_TARGET SDL2_mixer)
+  if (WIN32)
+    add_static_library(sdl2 SDL2)
+    add_static_library(sdl2_ttf SDL2TTF)
+    # Workaround for linking error
+    set_property(TARGET sdl2_ttf PROPERTY INTERFACE_LINK_LIBRARIES
+        $<LINK_GROUP:RESCAN,${SDL2TTF_STATIC_LIBRARIES} -lstdc++>)
+
+    if (SDL2MIXER_FOUND)
+      add_static_library(sdl2_mixer SDL2MIXER)
+    endif()
+  else()
+    add_library(sdl2 ALIAS PkgConfig::SDL2)
+    add_library(sdl2_ttf ALIAS PkgConfig::SDL2TTF)
+    if (SDL2MIXER_FOUND)
+      add_library(sdl2_mixer ALIAS PkgConfig::SDL2MIXER)
+    endif()
+  endif()
 
   option(ENABLE_DEBUGGER "Enable built-in debugger" ON)
   if (ENABLE_DEBUGGER)
     pkg_check_modules(cJSON IMPORTED_TARGET libcjson)
-    if (NOT cJSON_FOUND)
+    if (cJSON_FOUND)
+      if (WIN32)
+        add_static_library(cJSON cJSON)
+      else ()
+        add_library(cJSON ALIAS PkgConfig::cJSON)
+      endif()
+    else ()
       # libcjson-dev of Debian buster / Ubuntu 20.04 does not install pkgconfig files.
       find_library(cJSON cjson)
       if (NOT cJSON)
         message(FATAL_ERROR "libcjson is required but not found.")
       endif()
+      add_library(cJSON ALIAS ${cJSON})
     endif()
   endif()
 
   optional_pkg_check_modules(WEBP IMPORTED_TARGET libwebp)
   if (WEBP_FOUND)
     set(HAVE_WEBP 1)
+    if (WIN32)
+      add_static_library(WebP WEBP)
+    else()
+      add_library(WebP ALIAS PkgConfig::WEBP)
+    endif()
   endif()
 
   find_library(PORTMIDI portmidi)
