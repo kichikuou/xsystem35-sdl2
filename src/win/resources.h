@@ -37,4 +37,7 @@
 #define ID_OPTION_MOUSE_MOVE      40021
 #define ID_MSGSKIP                40030
 
+struct SDL_RWops;
+struct SDL_RWops *open_resource(const char* name, const char* type);
+
 #endif /* __RESOURCES_H__ */

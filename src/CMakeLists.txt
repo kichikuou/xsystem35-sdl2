@@ -78,7 +78,8 @@ if (ENABLE_DEBUGGER)
 endif()
 
 if (WIN32)
-  target_sources(xsystem35 PRIVATE win/dialog.c win/resources.rc win/menubar.c win/console.c)
+  target_sources(xsystem35 PRIVATE
+    win/dialog.c win/resources.rc win/resources.c win/menubar.c win/console.c)
 endif()
 
 target_link_libraries(src_lib PRIVATE sdl2 zlib)

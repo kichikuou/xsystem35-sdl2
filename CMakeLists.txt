@@ -80,6 +80,7 @@ else()  # non-emscripten, non-android
     if (SDL2MIXER_FOUND)
       add_library(sdl2_mixer ALIAS PkgConfig::SDL2MIXER)
     endif()
+    set(DEFAULT_FONT_PATH ${CMAKE_INSTALL_PREFIX}/share/xsystem35/fonts/)
   endif()
 
   option(ENABLE_DEBUGGER "Enable built-in debugger" ON)
@@ -116,8 +117,6 @@ else()  # non-emscripten, non-android
     set(HAVE_PORTMIDI 1)
     set(ENABLE_MIDI_PORTMIDI 1)
   endif()
-
-  set(DEFAULT_FONT_PATH ${CMAKE_INSTALL_PREFIX}/share/xsystem35/fonts/)
 endif()
 
 # Menu

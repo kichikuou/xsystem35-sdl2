@@ -4,6 +4,14 @@
 
 100 ICON DISCARDABLE "xsystem35.ico"
 
+// Note for game translators:
+// Rather than replacing these, use the "ttfont_gothic" and "ttfont_mincho"
+// options in .xsys35rc.  That will allow your translated game run on other
+// other platforms, such as Android and Web.
+MTLc3m.ttf  FONTS  DISCARDABLE  "../../fonts/MTLc3m.ttf"
+mincho.otf  FONTS  DISCARDABLE  "../../fonts/mincho.otf"
+
+
 ////////////////////////////////////////////////////////////////////////
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 

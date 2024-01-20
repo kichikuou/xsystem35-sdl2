@@ -23,6 +23,11 @@
 #include <math.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
+
+#ifdef _WIN32
+#include "win/resources.h"
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -89,6 +94,11 @@ void font_select(int type, int size, int weight) {
 			if (fp)
 				fs = TTF_OpenFontIndexRW(SDL_RWFromFP(fp, true), true, size, this.face[type]);
 		}
+#endif
+#ifdef _WIN32
+		SDL_RWops *r = open_resource(this.name[type], "fonts");
+		if (r)
+			fs = TTF_OpenFontIndexRW(r, true, size, this.face[type]);
 #endif
 		if (!fs)
 			SYSERROR("Cannot open font %s", this.name[type]);
