@@ -19,8 +19,10 @@ function(add_static_library name pkg)
   add_library(${name} INTERFACE)
   set_target_properties(${name}
       PROPERTIES
-          INTERFACE_INCLUDE_DIRECTORIES "${${pkg}_INCLUDE_DIRS}"
-          INTERFACE_LINK_LIBRARIES "${${pkg}_STATIC_LIBRARIES}")
+          INTERFACE_INCLUDE_DIRECTORIES "${${pkg}_STATIC_INCLUDE_DIRS}"
+          INTERFACE_COMPILE_OPTIONS "${${pkg}_STATIC_CFLAGS_OTHER}"
+          INTERFACE_LINK_LIBRARIES "${${pkg}_STATIC_LIBRARIES}"
+          INTERFACE_LINK_OPTIONS "${${pkg}_STATIC_LDFLAGS_OTHER}")
 endfunction()
 
 check_symbol_exists(getlogin "unistd.h" HAVE_GETLOGIN)
