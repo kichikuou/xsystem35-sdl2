@@ -1,39 +1,84 @@
 #----------------------------------------------------------
-# XSyetem35 設定ファイル
+# XSyetem35 Configuration File
 #
-#   行頭が '#' で始まる行はコメント行です
+# XSystem35 reads configuration from ~/.xsys35rc and .xsys35rc in the current
+# directory. The latter takes precedence over the former, so you should put
+# general settings in ~/.xsys35rc and game-specific settings in .xsys35rc
+# in the game directory.
+#
+# Lines starting with '#' are comments.
 
 # ------------------------------------------------------------
-# 使用するフォントの指定
+# Fonts
 #
 
-#ttfont_mincho: /usr/local/share/xsystem35/fonts/mincho.otf
-#ttfont_gothic: /usr/local/share/xsystem35/fonts/MTLc3m.ttf
+# Gothic (sans-serif) and Mincho (serif) fonts. .ttf and .otf files are
+# supported.
 
-# True Type フォントのフェイス指定
+#ttfont_gothic: /usr/local/share/xsystem35/fonts/MTLc3m.ttf
+#ttfont_mincho: /usr/local/share/xsystem35/fonts/mincho.otf
+
+# Some fonts have multiple "faces" included. This specifies which face to use
+# from the font file.
+
 #ttfont_mincho_face: 0
 #ttfont_gothic_face: 0
 
-# ------------------------------------------------------------
-# フォントのアンチエイリアスを無効にする
+# Disable font antialiasing.
+
 #antialias: No
 
 # ------------------------------------------------------------
-# Enforce integer scaling
+# Display
+#
+
+# Enforce integer scaling.
 
 #integerscale: Yes
 
+# Disable custom mouse cursor defined in resource files.
+
+#no_imagecursor: Yes
+
 # ------------------------------------------------------------
-# Enables game-specific hacks. Usually auto-detected, but must be
-# specified for games with modified / translated titles.
+# Audio
 #
-# Possible values are: toushin2, rance3_eng, rance4_eng, rance4_v2.
 
-#game: rance4_v2
+# CD-ROM device name.
+
+#cdrom_device: /dev/cdrom
+
+# device name of the raw midi device or sequencer device.
+
+#midi_device: /dev/midi
+#midi_device: /dev/sequencer
+
+# Audio buffer size in bytes.
+# Too small value causes sound glitches, too large value causes sound delay.
+
+#audio_buffer_size: 2048
+
+# MIDI Output method
+# 'e'  : SDL_mixer (default)
+# 'pX' : via PortMidi (X is the device number, usually 0)
+# 'r'  : raw midi device
+# 'sX' : sequencer device (X is the port number, usually 0)
+# '0'  : disable MIDI
+
+#midi_output_device: e
 
 # ------------------------------------------------------------
+# Input
+#
 
-# ------------------------------------------------------------
+# joystick device number (0-)
+
+#joy_device: 0
+
+# -----------------------------------------------------------
+# Miscellaneous
+#
+
 # The format when writing save files.
 #  xsystem35 : default
 #  system36  : compatible with System3.5 v2 - System3.6
@@ -41,62 +86,12 @@
 
 #saveformat: xsystem35
 
-# ------------------------------------------------------------
-
-# ------------------------------------------------------------
-# CD-ROM のデバイス名
+# Enables game-specific hacks. Usually auto-detected, but must be
+# specified for games with modified / translated titles.
 #
+# Possible values are: toushin2, rance3_eng, rance4_eng, rance4_v2.
 
-#cdrom_device: /dev/cdrom
-
-# ------------------------------------------------------------
-
-# ------------------------------------------------------------
-# raw midi device または sequencer device のデバイス名
-#
-
-#midi_device: /dev/midi
-##midi_device: /dev/sequencer
-
-# ------------------------------------------------------------
-
-# ------------------------------------------------------------
-# オーディオバッファのバイト数
-# 小さすぎると音が途切れ、大きくすると効果音が遅れるようになります。
-
-#audio_buffer_size: 2048
-
-# ------------------------------------------------------------
-
-# ------------------------------------------------------------
-# MIDI Output method
-# 'e'  : SDL_mixer (default)
-# 'pX' : via PortMidi (X is the device number, usually 0)
-# 'r'  : raw midi device
-# 'sX' : sequencer device (X is the port number, usually 0)
-# '0'  : disable MIDI
-#
-
-#midi_output_device: e
-
-# ------------------------------------------------------------
-
-# ------------------------------------------------------------
-# joystick device のデバイス番号 (0-)
-#
-
-#joy_device: 0
-
-# ------------------------------------------------------------
-
-# -----------------------------------------------------------
-# リソースファイルによるマウスカーソルの形状変更を無効にする
-# にする場合、以下を Yes にする (なにも指定しない場合は有効)
-# 
-
-#no_imagecursor: Yes
-
-# -----------------------------------------------------------
+#game: rance4_v2
 
 # Enables the ZB command (change the font weight). It is disabled by default
 # because it makes the text too bold with our default fonts.

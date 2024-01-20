@@ -58,7 +58,7 @@ jobs:
 
     - name: Package
       run: |
-        cp out/release/src/xsystem35.exe *.md COPYING dist/
+        cp out/release/src/xsystem35.exe *.md COPYING xsys35rc.sample dist/
 
     - name: Upload
       uses: actions/upload-artifact@v3
