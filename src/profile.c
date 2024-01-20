@@ -133,8 +133,12 @@ static int load_rc_file(const char *profile_path)
 
 int load_profile(void)
 {
-	char *home_dir;
-	if ((home_dir = getenv("HOME"))) {
+	char *home_dir = getenv("HOME");
+#ifdef _WIN32
+	if (!home_dir)
+		home_dir = getenv("USERPROFILE");
+#endif
+	if (home_dir) {
 		char profile_path[PATH_MAX];
 		sprintf(profile_path, "%s/%s", home_dir, RC_NAME);
 		load_rc_file(profile_path);
