@@ -8,11 +8,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - sys: MINGW32
+          - sys: mingw32
             package: "xsystem35-32bit"
             cmake_args: "-DENABLE_DEBUGGER=no"
             deps: ""
-          - sys: UCRT64
+          - sys: ucrt64
             package: "xsystem35-64bit"
             cmake_args: ""
             deps: "cjson:p"
@@ -27,9 +27,6 @@ jobs:
       with:
         msystem: ${{ matrix.sys }}
         pacboy: >-
-          gcc:p
-          cmake:p
-          ninja:p
           SDL2:p
           SDL2_ttf:p
           SDL2_mixer:p
@@ -38,6 +35,15 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v3
+
+    - name: Copy licenses
+      run: |
+        ls /${{ matrix.sys }}/share/licenses
+        mkdir dist
+        cp -r /${{ matrix.sys }}/share/licenses dist/
+
+    - name: Install dev dependencies
+      run: pacboy --noconfirm -S --needed gcc:p cmake:p ninja:p
 
     - name: Build
       run: |
@@ -50,8 +56,12 @@ jobs:
       run: ctest --output-on-failure
       working-directory: out/release
 
+    - name: Package
+      run: |
+        cp out/release/src/xsystem35.exe *.md COPYING dist/
+
     - name: Upload
       uses: actions/upload-artifact@v3
       with:
         name: ${{ matrix.package }}
-        path: out/release/src/xsystem35.exe
+        path: dist
