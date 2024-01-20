@@ -1,5 +1,5 @@
 #cmakedefine PACKAGE "@PACKAGE@"
-#define VERSION "2.10.1"
+#define VERSION "2.11.0"
 
 #cmakedefine CACHE_TOTALSIZE @CACHE_TOTALSIZE@
 

@@ -16,8 +16,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 34
-        versionCode 17
-        versionName "2.10.1" + gitRevision()
+        versionCode 18
+        versionName "2.11.0" + gitRevision()
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_APP_PLATFORM=android-19", "-DANDROID_STL=c++_static"
