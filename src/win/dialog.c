@@ -17,7 +17,6 @@
  *
  */
 #include <windows.h>
-#include <shlobj.h>
 #undef min
 #undef max
 #include <SDL_syswm.h>
@@ -25,56 +24,11 @@
 #include "sdl_private.h"
 #include "resources.h"
 
-#define REGVAL_RECENT_FOLDER "RecentFolder"
-
 static HWND get_hwnd(SDL_Window *window) {
 	SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
 	SDL_GetWindowWMInfo(window, &info);
 	return info.info.win.window;
-}
-
-static int CALLBACK select_game_callback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
-	if (uMsg == BFFM_INITIALIZED)
-		SendMessage(hwnd, BFFM_SETSELECTION, (WPARAM)TRUE, lpData);
-	return 0;
-}
-
-boolean current_folder_has_ald(void) {
-	WIN32_FIND_DATA find_data;
-	HANDLE hFind = FindFirstFile("*.ALD", &find_data);
-	if (hFind == INVALID_HANDLE_VALUE)
-		return FALSE;
-	FindClose(hFind);
-	return TRUE;
-}
-
-boolean select_game_folder(void) {
-	char title[256];
-	LoadString(GetModuleHandle(NULL), IDS_CHOOSE_GAME_FOLDER, title, sizeof(title));
-
-	char path[MAX_PATH] = "";
-	DWORD value_size = sizeof(path);
-	RegGetValue(HKEY_CURRENT_USER, XSYSTEM35_REGKEY, REGVAL_RECENT_FOLDER,
-				RRF_RT_REG_SZ, NULL, path, &value_size);
-
-	BROWSEINFO bi = {
-		.lpszTitle = title,
-		.ulFlags = BIF_RETURNONLYFSDIRS,
-		.lpfn = &select_game_callback,
-		.lParam = (LPARAM)path,
-	};
-	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
-	if (!pidl)
-		return FALSE;
-	SHGetPathFromIDList(pidl, path);
-	CoTaskMemFree(pidl);
-	if (!SetCurrentDirectory(path))
-		return FALSE;
-
-	RegSetKeyValue(HKEY_CURRENT_USER, XSYSTEM35_REGKEY, REGVAL_RECENT_FOLDER,
-				   REG_SZ, path, strlen(path) + 1);
-	return TRUE;
 }
 
 static INT_PTR CALLBACK text_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)

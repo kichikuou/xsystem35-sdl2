@@ -35,7 +35,6 @@
 
 #define RC_NAME ".xsys35rc"
 #define RC_LINE_CHARS_MAX 256
-#define REGKEY_PROFILE XSYSTEM35_REGKEY "\\profile"
 
 struct profile_kv {
 	char *name;

@@ -476,12 +476,6 @@ int main(int argc, char **argv) {
 	if (strcmp(argv[1], "-gamedir") == 0)
 		chdir(argv[2]);
 #endif
-#ifdef _WIN32
-	if (argc == 1 && !current_folder_has_ald()) {
-		if (!select_game_folder())
-			return 0;
-	}
-#endif
 	
 	load_profile();
 	check_profile();

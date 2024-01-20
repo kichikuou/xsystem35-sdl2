@@ -69,8 +69,7 @@ other platforms, refer to the [Building](#building) section.
 ## Running
 ### Windows
 
-Execute `xsystem35`, and a dialog will appear for you to select a folder.
-Choose the game folder (where the ALD files are located).
+Copy `xsystem35.exe` to the game folder and run it.
 
 ### Android
 

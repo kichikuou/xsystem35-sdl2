@@ -19,8 +19,6 @@
 #ifndef __RESOURCES_H__
 #define __RESOURCES_H__
 
-#define XSYSTEM35_REGKEY "Software\\Kichikuou\\xsystem35"
-
 #define IDR_MENU1              101
 #define IDD_DIALOG1            103
 #define IDC_TEXT               104
