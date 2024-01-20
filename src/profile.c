@@ -28,12 +28,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#ifdef _WIN32
-#include <windows.h>
-#include "win/resources.h"
-#undef min
-#undef max
-#endif
 
 #include "portab.h"
 #include "profile.h"
@@ -138,37 +132,8 @@ static int load_rc_file(const char *profile_path)
 	return 0;
 }
 
-#ifdef _WIN32
-static void load_profile_from_registry(HKEY rootKey)
-{
-	HKEY hKey;
-	LSTATUS err = RegOpenKeyEx(rootKey, REGKEY_PROFILE, 0, KEY_QUERY_VALUE, &hKey);
-	if (err != ERROR_SUCCESS)
-		return;
-
-	for (DWORD index = 0;; index++) {
-		char name[64];
-		BYTE value[RC_LINE_CHARS_MAX];
-		DWORD name_size = sizeof(name);
-		DWORD value_size = sizeof(value);
-		DWORD type;
-		err = RegEnumValue(hKey, index, name, &name_size, NULL, &type, value, &value_size);
-		if (err != ERROR_SUCCESS)
-			break;
-		if (type != REG_SZ)
-			continue;
-		insert_profile(name, value);
-	}
-}
-#endif // _WIN32
-
 int load_profile(void)
 {
-#ifdef _WIN32
-	load_profile_from_registry(HKEY_LOCAL_MACHINE);
-	load_profile_from_registry(HKEY_CURRENT_USER);
-#endif // _WIN32
-
 	char *home_dir;
 	if ((home_dir = getenv("HOME"))) {
 		char profile_path[PATH_MAX];
