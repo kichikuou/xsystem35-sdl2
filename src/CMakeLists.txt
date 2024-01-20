@@ -21,57 +21,131 @@ target_include_directories(xsystem35 PRIVATE .)
 target_link_libraries(xsystem35 PRIVATE src_lib)
 
 target_sources(xsystem35 PRIVATE
-  xsystem35.c
-  dri.c
+  ags.c
   ald_manager.c
+  alpha_plane.c
+  bmp.c
   cache.c
-  ${SRC_AUDIO}
-  ${SRC_CDROM}
-  ${SRC_MIDI}
-  ${SRC_MENU})
+  cali.c
+  cdrom.bgm.c
+  cdrom.c
+  cg.c
+  cmd2F.c
+  cmd2F60.c
+  cmd_check.c
+  cmdb.c
+  cmdc.c
+  cmdd.c
+  cmde.c
+  cmdf.c
+  cmdg.c
+  cmdh.c
+  cmdi.c
+  cmdj.c
+  cmdk.c
+  cmdl.c
+  cmdm.c
+  cmdn.c
+  cmdo.c
+  cmdp.c
+  cmdq.c
+  cmds.c
+  cmdt.c
+  cmdu.c
+  cmdv.c
+  cmdw.c
+  cmdy.c
+  cmdz.c
+  cursor.c
+  dri.c
+  ecopy.c
+  filecheck.c
+  font.c
+  hacks.c
+  image.c
+  input.c
+  jpeg.c
+  message.c
+  midi.c
+  mmap.c
+  msgskip.c
+  mt19937-1.c
+  music.c
+  music_cdrom.c
+  music_midi.c
+  nact.c
+  network.c
+  pms.c
+  profile.c
+  qnt.c
+  s39ain.c
+  savedata.c
+  scenario.c
+  sdl_cursor.c
+  sdl_draw.c
+  sdl_effect.c
+  sdl_event.c
+  sdl_image.c
+  sdl_video.c
+  selection.c
+  texthook.c
+  variable.c
+  vsp.c
+  xsystem35.c
+  )
 
-# System3.x commands
-target_sources(xsystem35 PRIVATE
-  cmdb.c cmdc.c cmdd.c cmde.c cmdf.c cmdg.c cmdh.c cmdi.c cmdj.c
-  cmdk.c cmdl.c cmdm.c cmdn.c cmdo.c cmdp.c cmdq.c cmds.c cmdt.c
-  cmdu.c cmdv.c cmdw.c cmdy.c cmdz.c cmd2F.c cmd2F60.c)
+if (EMSCRIPTEN)
+  target_sources(xsystem35 PRIVATE pcm.emscripten.c bgm.emscripten.c bgi.c)
+elseif (SDL2MIXER_FOUND)
+  target_sources(xsystem35 PRIVATE pcm.sdlmixer.c bgm.sdlmixer.c bgi.c)
+else()
+  target_sources(xsystem35 PRIVATE pcm.dummy.c bgm.dummy.c)
+endif()
 
-# Graphics
+if (ENABLE_CDROM_LINUX)
+  target_sources(xsystem35 PRIVATE cdrom.Linux.c)
+elseif (ENABLE_CDROM_BSD)
+  target_sources(xsystem35 PRIVATE cdrom.FreeBSD.c)
+elseif (ENABLE_CDROM_EMSCRIPTEN)
+  target_sources(xsystem35 PRIVATE cdrom.emscripten.c)
+else()
+  target_sources(xsystem35 PRIVATE cdrom.empty.c)
+endif()
+if (ENABLE_CDROM_MP3)
+  target_sources(xsystem35 PRIVATE cdrom.mp3.c)
+endif()
 
-target_sources(xsystem35 PRIVATE
-  sdl_video.c sdl_draw.c sdl_event.c sdl_image.c sdl_cursor.c sdl_effect.c
-  image.c font.c)
+if (EMSCRIPTEN)
+  target_sources(xsystem35 PRIVATE midi.emscripten.c)
+elseif (ANDROID)
+  target_sources(xsystem35 PRIVATE midi.android.c)
+else()
+  if (ENABLE_MIDI_RAWMIDI)
+    target_sources(xsystem35 PRIVATE midi.rawmidi.c midifile.c)
+  endif()
+  if (ENABLE_MIDI_SDLMIXER)
+    target_sources(xsystem35 PRIVATE midi.sdlmixer.c)
+  endif()
+  if (ENABLE_MIDI_PORTMIDI)
+    target_sources(xsystem35 PRIVATE midi.portmidi.c)
+  endif()
+endif()
 
-# CG
-target_sources(xsystem35 PRIVATE
-  pms.c vsp.c bmp.c qnt.c jpeg.c)
+if (EMSCRIPTEN)
+  target_sources(xsystem35 PRIVATE menu_emscripten.c)
+elseif (ANDROID)
+  target_sources(xsystem35 PRIVATE menu_android.c)
+elseif (ENABLE_GTK)
+  target_sources(xsystem35 PRIVATE menu.c menu_callback.c menu_gui.c s39init.c)
+else ()
+  target_sources(xsystem35 PRIVATE menu_sdl.c sdl_input.c)
+endif()
+
 if (HAVE_WEBP)
   target_sources(xsystem35 PRIVATE webp.c)
   target_link_libraries(xsystem35 PRIVATE WebP)
 endif()
 
-# Music
-target_sources(xsystem35 PRIVATE
-  music.c music_cdrom.c music_midi.c midi.c cdrom.c)
-
-# Misc
-target_sources(xsystem35 PRIVATE
-  input.c profile.c mt19937-1.c filecheck.c mmap.c hacks.c)
-
-# Scenario
-target_sources(xsystem35 PRIVATE
-  cali.c scenario.c variable.c cmd_check.c nact.c
-  selection.c message.c savedata.c s39ain.c texthook.c msgskip.c)
-
-# Graphics
-target_sources(xsystem35 PRIVATE
-  ags.c cg.c ecopy.c alpha_plane.c cursor.c)
-
-# Network
-target_sources(xsystem35 PRIVATE
-  network.c)
-
-# Debugger
 if (ENABLE_DEBUGGER)
   target_sources(xsystem35 PRIVATE
     debug_symbol.c debugger.c debugger_cui.c debugger_dap.c)

@@ -20,9 +20,7 @@
 */
 /* $Id: menu_callback.c,v 1.11 2003/04/25 17:23:55 chikama Exp $ */
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
+#include "config.h"
 
 #include "portab.h"
 #include "menu.h"
