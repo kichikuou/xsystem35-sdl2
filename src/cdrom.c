@@ -31,15 +31,7 @@
 #include "cdrom.h"
 #include "system.h"
 
-#if defined(ENABLE_CDROM_LINUX)
-extern cdromdevice_t cdrom_linux;
-#define NATIVE_CD_DEVICE &cdrom_linux
-
-#elif defined(ENABLE_CDROM_BSD)
-extern cdromdevice_t cdrom_bsd;
-#define NATIVE_CD_DEVICE &cdrom_bsd
-
-#elif defined(ENABLE_CDROM_EMSCRIPTEN)
+#if defined(ENABLE_CDROM_EMSCRIPTEN)
 extern cdromdevice_t cdrom_emscripten;
 #define NATIVE_CD_DEVICE &cdrom_emscripten
 

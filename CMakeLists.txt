@@ -145,13 +145,7 @@ endif()
 
 # CDROM
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  list(APPEND SUMMARY_CDROM "Linux ioctl")
-  set(ENABLE_CDROM_LINUX 1)
-elseif (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-  list(APPEND SUMMARY_CDROM "*BSD ioctl")
-  set(ENABLE_CDROM_BSD 1)
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   list(APPEND SUMMARY_CDROM "Emscripten")
   set(ENABLE_CDROM_EMSCRIPTEN 1)
 endif()
