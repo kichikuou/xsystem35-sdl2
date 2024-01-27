@@ -24,11 +24,11 @@ target_sources(xsystem35 PRIVATE
   ags.c
   ald_manager.c
   alpha_plane.c
+  bgi.c
   bmp.c
   cache.c
   cali.c
   cdrom.bgm.c
-  cdrom.c
   cg.c
   cmd2F.c
   cmd2F60.c
@@ -95,19 +95,14 @@ target_sources(xsystem35 PRIVATE
   )
 
 if (EMSCRIPTEN)
-  target_sources(xsystem35 PRIVATE pcm.emscripten.c bgm.emscripten.c bgi.c)
-elseif (SDL2MIXER_FOUND)
-  target_sources(xsystem35 PRIVATE pcm.sdlmixer.c bgm.sdlmixer.c bgi.c)
+  target_sources(xsystem35 PRIVATE pcm.emscripten.c bgm.emscripten.c)
 else()
-  target_sources(xsystem35 PRIVATE pcm.dummy.c bgm.dummy.c)
+  target_sources(xsystem35 PRIVATE pcm.sdlmixer.c bgm.sdlmixer.c)
 endif()
 
-if (ENABLE_CDROM_EMSCRIPTEN)
+if (EMSCRIPTEN)
   target_sources(xsystem35 PRIVATE cdrom.emscripten.c)
 else()
-  target_sources(xsystem35 PRIVATE cdrom.empty.c)
-endif()
-if (ENABLE_CDROM_MP3)
   target_sources(xsystem35 PRIVATE cdrom.mp3.c)
 endif()
 
@@ -116,11 +111,9 @@ if (EMSCRIPTEN)
 elseif (ANDROID)
   target_sources(xsystem35 PRIVATE midi.android.c)
 else()
+  target_sources(xsystem35 PRIVATE midi.sdlmixer.c)
   if (ENABLE_MIDI_RAWMIDI)
     target_sources(xsystem35 PRIVATE midi.rawmidi.c midifile.c)
-  endif()
-  if (ENABLE_MIDI_SDLMIXER)
-    target_sources(xsystem35 PRIVATE midi.sdlmixer.c)
   endif()
   if (ENABLE_MIDI_PORTMIDI)
     target_sources(xsystem35 PRIVATE midi.portmidi.c)

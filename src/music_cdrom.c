@@ -30,6 +30,14 @@
 #include "music_cdrom.h"
 #include "cdrom.h"
 
+#ifdef __EMSCRIPTEN__
+extern cdromdevice_t cdrom_emscripten;
+#define NATIVE_CD_DEVICE &cdrom_emscripten
+#else
+extern cdromdevice_t cdrom_mp3;
+#define NATIVE_CD_DEVICE &cdrom_mp3
+#endif
+
 static char *dev = CDROM_DEVICE;
 
 void muscd_set_devicename(const char *name) {
@@ -42,10 +50,7 @@ int muscd_init(void) {
 	if (ald_get_maxno(DRIFILE_BGM) > 0) {
 		prv.cddev = &cdrom_bgm;
 	} else {
-		prv.cddev = cd_init(dev);
-		if (!prv.cddev) {
-			return NG;
-		}
+		prv.cddev = NATIVE_CD_DEVICE;
 	}
 	prv.cddev->init(dev);
 	prv.cd_current_track = 0;
