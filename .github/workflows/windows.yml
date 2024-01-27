@@ -34,13 +34,14 @@ jobs:
           ${{ matrix.deps }}
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Copy licenses
       run: |
         ls /${{ matrix.sys }}/share/licenses
         mkdir dist
         cp -r /${{ matrix.sys }}/share/licenses dist/
+        cp fonts/*.license dist/licenses/
 
     - name: Install dev dependencies
       run: pacboy --noconfirm -S --needed gcc:p cmake:p ninja:p
@@ -61,7 +62,8 @@ jobs:
         cp out/release/src/xsystem35.exe *.md COPYING xsys35rc.sample dist/
 
     - name: Upload
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.package }}
         path: dist
+        compression-level: 9  # because we use it for releases

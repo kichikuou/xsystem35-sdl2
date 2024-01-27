@@ -10,7 +10,7 @@ jobs:
 
     name: Linux ${{ matrix.build-type }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install Deps
       run: |
@@ -22,7 +22,7 @@ jobs:
         mkdir -p out/${{ matrix.build-type }}
         cd out/${{ matrix.build-type }}
         cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ../../
-        make
+        make -j4
 
     - name: Test
       run: ctest --output-on-failure

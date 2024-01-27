@@ -10,17 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup cache
       id: cache-system-libraries
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{env.EM_CACHE_FOLDER}}
         key: ${{env.EM_VERSION}}-${{ runner.os }}
 
     - name: Setup Emscripten toolchain
-      uses: mymindstorm/setup-emsdk@v13
+      uses: mymindstorm/setup-emsdk@v14
       with:
         version: ${{ env.EM_VERSION }}
         actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
@@ -30,12 +30,12 @@ jobs:
         mkdir -p out/wasm
         cd out/wasm
         emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_COMPILE_WARNING_AS_ERROR=YES ../../
-        make
+        make -j4
         mkdir xsystem35
         mv src/xsystem35.* xsystem35/
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: xsystem35-wasm
         path: out/wasm/xsystem35
