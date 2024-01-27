@@ -29,7 +29,7 @@ jobs:
       run: |
         mkdir -p out/wasm
         cd out/wasm
-        emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../../
+        emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_COMPILE_WARNING_AS_ERROR=YES ../../
         make
         mkdir xsystem35
         mv src/xsystem35.* xsystem35/

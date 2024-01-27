@@ -49,7 +49,7 @@ jobs:
       run: |
         mkdir -p out/release
         cd out/release
-        cmake -G"Ninja" -DCMAKE_BUILD_TYPE=Release ${{ matrix.cmake_args }} ../../
+        cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_COMPILE_WARNING_AS_ERROR=YES ${{ matrix.cmake_args }} ../../
         ninja
 
     - name: Test
