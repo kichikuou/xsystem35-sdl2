@@ -64,6 +64,9 @@ static int          start_time;
 static int cdrom_init(char *playlist_path) {
 	char buf[256];
 
+	if (!playlist_path || !playlist_path[0])
+		return NG;
+
 	FILE *fp = fopen(playlist_path, "r");
 	if (fp) {
 		// Skip the first line

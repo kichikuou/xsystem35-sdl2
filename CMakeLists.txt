@@ -144,7 +144,7 @@ if (EMSCRIPTEN)
 else()
   list(APPEND SUMMARY_CDROM "SDL_mixer (wav|mp3|ogg...)")
 endif()
-set(CDROM_DEVICE "playlist.txt" CACHE STRING "CDROM Device Name")
+set(DEFAULT_PLAYLIST_PATH "playlist.txt" CACHE STRING "Default playlist path")
 
 # MIDI
 

@@ -44,9 +44,10 @@
 # Audio
 #
 
-# CD-ROM device name.
+# Path to the CD playlist. The playlist is a text file with one filename per
+# line, in the order of CD tracks.
 
-#cdrom_device: /dev/cdrom
+#playlist: playlist.txt
 
 # device name of the raw midi device or sequencer device.
 

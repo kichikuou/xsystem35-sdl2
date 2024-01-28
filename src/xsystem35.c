@@ -114,7 +114,7 @@ static void sys35_usage(boolean verbose) {
 	puts(" -game game      : enable game-specific hacks");
 	puts(" -saveformat fmt : save file format. 'xsystem35', 'system36' or 'system39' (default)");
 	puts(" -renderer name  : set rendering driver name to 'name'");
-	puts(" -devcd device   : set cdrom device name to 'device'");
+	puts(" -playlist file  : load CD playlist from 'file'");
 	puts(" -devmidi device : set midi device name to 'device'");
 	
 	puts(" -M?             : select output midi methos");
@@ -275,9 +275,9 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			debugger_mode = DEBUGGER_DAP;
 		} else if (0 == strcmp(argv[i], "-renderer")) {
 			render_driver = argv[i + 1];
-		} else if (0 == strcmp(argv[i], "-devcd")) {
+		} else if (0 == strcmp(argv[i], "-playlist") || 0 == strcmp(argv[i], "-devcd")) {
 			if (argv[i + 1] != NULL) {
-				muscd_set_devicename(argv[i + 1]);
+				muscd_set_playlist(argv[i + 1]);
 			}
 		} else if (0 == strcmp(argv[i], "-devmidi")) {
 			if (argv[i + 1] != NULL) {
@@ -374,11 +374,14 @@ static void check_profile() {
 		render_driver = param;
 	}
 
-	/* CD-ROM device name の設定 */
-	param = get_profile("cdrom_device");
+	/* CD-ROM playlist */
+	param = get_profile("playlist");
+	if (!param)
+		param = get_profile("cdrom_device");  // For backwards compatibility
 	if (param) {
-		muscd_set_devicename(param);
+		muscd_set_playlist(param);
 	}
+
 	/* joystick device name の設定 */
 	param = get_profile("joy_device");
 	if (param) {

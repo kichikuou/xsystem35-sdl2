@@ -27,7 +27,7 @@
 
 static int frame_of_getpos = -1;
 
-int cdrom_init(char *name) {
+int cdrom_init(char *playlist) {
 	return OK;
 }
 

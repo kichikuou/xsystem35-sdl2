@@ -28,7 +28,7 @@
 
 static int current_track;
 
-static int cdrom_bgm_init(char *dev) {
+static int cdrom_bgm_init(char *playlist) {
 	prv.cd_maxtrk = ald_get_maxno(DRIFILE_BGM) + 1;
 	return OK;
 }
