@@ -136,6 +136,10 @@ static void window_init(const char *render_driver) {
 	// indirectly, which does not work with ASYNCIFY_IGNORE_INDIRECT=1. For
 	// details, see https://github.com/emscripten-core/emscripten/issues/10746.
 	SDL_SetHint(SDL_HINT_EMSCRIPTEN_ASYNCIFY, "0");
+
+	const char *title = NULL;  // Don't let SDL change document.title.
+#else
+	const char title[] = "XSystem35 Version " VERSION;
 #endif
 
 #ifdef __ANDROID__
@@ -145,10 +149,9 @@ static void window_init(const char *render_driver) {
 #else
 	Uint32 flags = SDL_WINDOW_RESIZABLE;
 #endif
-	sdl_window = SDL_CreateWindow("XSystem35 Version "VERSION,
-								  SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-								  SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT,
-								  flags);
+	sdl_window = SDL_CreateWindow(
+		title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, flags);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 }
