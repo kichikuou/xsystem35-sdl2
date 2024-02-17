@@ -531,7 +531,7 @@ void dbg_onsleep(void) {
 }
 
 void dbg_on_palette_change(void) {
-	if (dbg_impl)
+	if (dbg_impl && dbg_impl->on_palette_change)
 		dbg_impl->on_palette_change();
 }
 
