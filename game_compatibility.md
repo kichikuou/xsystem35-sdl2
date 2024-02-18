@@ -76,7 +76,7 @@ Game Compatibility
 | マスカレイド                                | Supported   | From アリスCD |
 | キャロル ～聖なる鐘が響く夜～               | Supported   | From アリスCD, Online match is not supported |
 | できるかなー？                              | Supported   | From アリスCD |
-| Child Assassin                              | Supported   | From アリスCD |
+| Child Assassin                              | Unsupported | From アリスCD |
 | Klavier                                     | Supported   | From アリスCD |
 | 弱肉狂食                                    | Supported   | From アリスCD |
 | 眼鏡大戦２                                  | Supported   | From アリスCD |

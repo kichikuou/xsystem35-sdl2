@@ -35,7 +35,7 @@ struct _drifiles {
 	char     *fnames[DRIFILEMAX];
 	int      nr_files; // upper limit on how many files could be referenced by this archive
 	int      maxno;
-	uint8_t  *disk;    // file numbers
+	uint8_t  *link;    // link table
 	uint32_t *offset;  // offsets in file
 };
 typedef struct _drifiles drifiles;
