@@ -81,7 +81,8 @@ void sdl_sleep(int msec) {
 
 #ifdef __EMSCRIPTEN__
 EM_JS(void, wait_vsync, (void), {
-	Asyncify.handleSleep(function(wakeUp) {
+	// We need a `return` here for JSPI support (ASYNCIFY=2).
+	return Asyncify.handleSleep(function(wakeUp) {
 		window.requestAnimationFrame(function() {
 			wakeUp();
 		});
