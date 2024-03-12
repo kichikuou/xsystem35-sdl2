@@ -37,9 +37,9 @@ if (EMSCRIPTEN)
         INTERFACE_COMPILE_OPTIONS ${option}
         INTERFACE_LINK_OPTIONS ${option})
   endfunction()
-  add_emscripten_library(zlib "SHELL:-s USE_ZLIB=1")
-  add_emscripten_library(sdl2 "SHELL:-s USE_SDL=2")
-  add_emscripten_library(sdl2_ttf "SHELL:-s USE_SDL_TTF=2")
+  add_emscripten_library(zlib -sUSE_ZLIB=1)
+  add_emscripten_library(sdl2 -sUSE_SDL=2)
+  add_emscripten_library(sdl2_ttf -sUSE_SDL_TTF=2)
   set(DEFAULT_FONT_PATH /fonts/)
 
 elseif (ANDROID)
