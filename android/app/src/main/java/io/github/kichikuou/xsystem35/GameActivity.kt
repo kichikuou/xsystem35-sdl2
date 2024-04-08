@@ -63,8 +63,7 @@ class GameActivity : SDLActivity() {
     override fun getArguments(): Array<String> {
         return arrayOf(
             "-gamedir", intent.getStringExtra(EXTRA_GAME_ROOT)!!,
-            "-savedir", intent.getStringExtra(EXTRA_SAVE_DIRECTORY)!!,
-            "-playlist", Launcher.PLAYLIST_FILE)
+            "-savedir", intent.getStringExtra(EXTRA_SAVE_DIRECTORY)!!)
     }
 
     override fun setTitle(title: CharSequence?) {

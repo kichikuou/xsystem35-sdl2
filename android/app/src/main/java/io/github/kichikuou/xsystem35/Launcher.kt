@@ -44,8 +44,8 @@ class Launcher private constructor(private val rootDir: File) {
         const val SAVE_DIR = "save"
         const val TITLE_FILE = "title.txt"
         const val GAMEDIR_FILE = "game_directory.txt"
-        const val PLAYLIST_FILE = "playlist2.txt"
-        const val OLD_PLAYLIST_FILE = "playlist.txt"
+        const val PLAYLIST_FILE = "playlist.txt"
+        const val OLD_PLAYLIST_FILE = "playlist2.txt"
 
         fun getInstance(rootDir: File): Launcher {
             if (gLauncher == null) {
@@ -202,18 +202,12 @@ class Launcher private constructor(private val rootDir: File) {
         return configWriter.gameDir?.let { File(outDir, it) } ?: outDir
     }
 
-    // Xsystem35-sdl2 <=2.2.0 had a bug where playlist had an extra empty line at
-    // the beginning of the file. This migrates playlist.txt created by an old
-    // version of xsystem35-sdl2 to playlist2.txt.
+    // Xsystem35-sdl2 2.3.0 - 2.11.1 used playlist2.txt. Rename it to playlist.txt.
     private fun migratePlaylist(dir: File) {
         val oldPlaylist = File(dir, OLD_PLAYLIST_FILE)
-        if (!oldPlaylist.exists())
-            return
-        var tracks = oldPlaylist.readLines()
-        if (tracks.isNotEmpty())
-            tracks = tracks.subList(1, tracks.size)
-        File(dir, PLAYLIST_FILE).writeText(tracks.joinToString("\n"))
-        oldPlaylist.delete()
+        if (oldPlaylist.exists()) {
+            oldPlaylist.renameTo(File(dir, PLAYLIST_FILE))
+        }
     }
 
     class InstallFailureException(val msgId: Int) : Exception()
