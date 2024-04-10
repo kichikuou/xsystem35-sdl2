@@ -63,7 +63,7 @@ static void storeSaveName(GameResource *gr, int no, char *src) {
 	if (path) free(path);
 }
 
-boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_readdir)(DIR *)) {
+boolean initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir, struct dirent *(*p_readdir)(DIR *)) {
 	memset(gr, 0, sizeof(GameResource));
 
 	char *basename = NULL;
@@ -121,11 +121,13 @@ boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_r
 			found_xsleep = true;
 		}
 	}
-	if (basename && !found_xsleep) {
-		char *buf = malloc(strlen(basename) + 6);
+	if (basename && (savedir || !found_xsleep)) {
+		const char *dir = savedir ? savedir : "";
+		const char *sep = savedir ? "/" : "";
+		char *buf = malloc(strlen(dir) + strlen(sep) + strlen(basename) + 6);
 		int a = basename[strlen(basename) - 1] == 'S' ? 'A' : 'a';
 		for (int i = 0; i < SAVE_MAXNUMBER; i++) {
-			sprintf(buf, "%s%c.asd", basename, a + i);
+			sprintf(buf, "%s%s%s%c.asd", dir, sep, basename, a + i);
 			storeSaveName(gr, i, buf);
 		}
 		free(buf);
@@ -220,7 +222,7 @@ static boolean initGameResourceFromFile(GameResource *gr, FILE *fp, const char *
 	return FALSE;
 }
 
-boolean initGameResource(GameResource *gr, const char *gr_fname) {
+boolean initGameResource(GameResource *gr, const char *gr_fname, const char *savedir) {
 	FILE *fp = fopen(gr_fname, "r");
 	if (fp) {
 		boolean result = initGameResourceFromFile(gr, fp, gr_fname);
@@ -229,7 +231,7 @@ boolean initGameResource(GameResource *gr, const char *gr_fname) {
 	}
 	DIR *dir = opendir(".");
 	if (dir) {
-		boolean result = initGameResourceFromDir(gr, dir, readdir);
+		boolean result = initGameResourceFromDir(gr, dir, savedir, readdir);
 		closedir(dir);
 		return result;
 	}

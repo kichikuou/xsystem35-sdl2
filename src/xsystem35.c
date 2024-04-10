@@ -96,6 +96,7 @@ static int audio_buffer_size = 0;
 static const char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF};
 static char fontface[FONTTYPEMAX];
 
+static const char *savedir;
 static boolean font_noantialias;
 static bool enable_zb = false;
 static bool integer_scaling = false;
@@ -112,6 +113,7 @@ static void sys35_usage(boolean verbose) {
 	puts("OPTIONS");
 	puts(" -gamefile file  : set game resource file to 'file'");
 	puts(" -game game      : enable game-specific hacks");
+	puts(" -savedir dir    : directory to save game state files");
 	puts(" -saveformat fmt : save file format. 'xsystem35', 'system36' or 'system39' (default)");
 	puts(" -renderer name  : set rendering driver name to 'name'");
 	puts(" -playlist file  : load CD playlist from 'file'");
@@ -258,6 +260,13 @@ static void sys35_ParseOption(int *argc, char **argv) {
 		}
 	}
 	for (i = 1; i < *argc; i++) {
+		if (0 == strcmp(argv[i], "-savedir")) {
+			if (i == *argc - 1) {
+				fprintf(stderr, "xsystem35: The -savedir option requires directory name\n\n");
+				sys35_usage(FALSE);
+			}
+			savedir = argv[++i];
+		}
 		if (0 == strcmp(argv[i], "-gamefile")) {
 			if (i == *argc - 1) {
 				fprintf(stderr, "xsystem35: The -gamefile option requires file value\n\n");
@@ -333,6 +342,10 @@ static void sys35_ParseOption(int *argc, char **argv) {
 static void check_profile() {
 	const char *param;
 	
+	param = get_profile("savedir");
+	if (param) {
+		savedir = param;
+	}
 	/* ゴシックフォント(TT)の設定 */
 	param = get_profile("ttfont_gothic");
 	if (param) {
@@ -484,7 +497,7 @@ int main(int argc, char **argv) {
 	check_profile();
 	sys35_ParseOption(&argc, argv);
 	
-	if (!initGameResource(&nact->files, gameResourceFile)) {
+	if (!initGameResource(&nact->files, gameResourceFile, savedir)) {
 #ifdef _WIN32
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)", NULL);
 		exit(1);

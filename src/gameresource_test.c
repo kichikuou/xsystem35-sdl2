@@ -25,7 +25,7 @@
 
 static void initGameResource_test(void) {
 	GameResource gr;
-	ASSERT_TRUE(initGameResource(&gr, "testdata/test.gr"));
+	ASSERT_TRUE(initGameResource(&gr, "testdata/test.gr", NULL));
 
 	ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 1);
 	ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "fooSA.ALD");
@@ -96,7 +96,7 @@ static void initGameResourceFromDir_test(void) {
 		};
 		const char **dir = files;
 		GameResource gr;
-		ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
+		ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, NULL, mockReaddir));
 		ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 2);
 		ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "FOOSA.ALD");
 		ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][1], "FOOSB.ALD");
@@ -122,13 +122,30 @@ static void initGameResourceFromDir_test(void) {
 	}
 	{
 		const char *files[] = {
+			"foosa.ald",
+			NULL
+		};
+		const char **dir = files;
+		GameResource gr;
+		ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, "~/save", mockReaddir));
+		ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 1);
+		ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "foosa.ald");
+		for (int i = 0; i < 26; i++) {
+			char buf[32];
+			sprintf(buf, "/home/kichikuou/save/foos%c.asd", 'a' + i);
+			ASSERT_STRCMP(gr.save_fname[i], buf);
+		}
+		ASSERT_STRCMP(gr.save_path, "/home/kichikuou/save");
+	}
+	{
+		const char *files[] = {
 			"ADISK.ALD",
 			"asleep.asd",
 			NULL
 		};
 		const char **dir = files;
 		GameResource gr;
-		ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, mockReaddir));
+		ASSERT_TRUE(initGameResourceFromDir(&gr, (DIR *)&dir, NULL, mockReaddir));
 		ASSERT_EQUAL(gr.cnt[DRIFILE_SCO], 1);
 		ASSERT_STRCMP(gr.game_fname[DRIFILE_SCO][0], "ADISK.ALD");
 		for (int i = 0; i < 26; i++) {

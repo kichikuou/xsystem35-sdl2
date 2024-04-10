@@ -43,7 +43,7 @@ typedef struct {
 	const char *msgskip;
 } GameResource;
 
-boolean initGameResource(GameResource *gr, const char *gr_fname);
-boolean initGameResourceFromDir(GameResource *gr, DIR *dir, struct dirent *(*p_readdir)(DIR *));
+boolean initGameResource(GameResource *gr, const char *gr_fname, const char *savedir);
+boolean initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir, struct dirent *(*p_readdir)(DIR *));
 
 #endif /* !__GAMERESOURCE_H__ */

@@ -80,6 +80,11 @@
 # Miscellaneous
 #
 
+# Directory to save game state files.
+# If it begins with '~', it is expanded to the user's home directory ($HOME).
+
+#savedir: ~/.xsystem35-saves
+
 # The format when writing save files.
 #  xsystem35 : default
 #  system36  : compatible with System3.5 v2 - System3.6
