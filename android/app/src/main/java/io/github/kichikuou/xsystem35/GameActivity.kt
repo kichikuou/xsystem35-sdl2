@@ -30,9 +30,11 @@ import java.io.IOException
 
 // Intent for this activity must have the following extra:
 // - EXTRA_GAME_ROOT (string): A path to the game installation.
+// - EXTRA_SAVE_DIRECTORY (string): A path to the save data directory.
 class GameActivity : SDLActivity() {
     companion object {
         const val EXTRA_GAME_ROOT = "GAME_ROOT"
+        const val EXTRA_SAVE_DIRECTORY = "SAVE_DIRECTORY"
         const val EXTRA_ARCHIVE_NAME = "ARCHIVE_NAME"
     }
 
@@ -61,6 +63,7 @@ class GameActivity : SDLActivity() {
     override fun getArguments(): Array<String> {
         return arrayOf(
             "-gamedir", intent.getStringExtra(EXTRA_GAME_ROOT)!!,
+            "-savedir", intent.getStringExtra(EXTRA_SAVE_DIRECTORY)!!,
             "-playlist", Launcher.PLAYLIST_FILE)
     }
 

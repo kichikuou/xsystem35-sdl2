@@ -25,9 +25,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.*
-import java.lang.StringBuilder
 import java.nio.charset.Charset
-import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -41,11 +39,11 @@ interface LauncherObserver {
     fun onInstallFailure(msgId: Int)
 }
 
-private const val SAVE_DIR = "save"
-
 class Launcher private constructor(private val rootDir: File) {
     companion object {
+        const val SAVE_DIR = "save"
         const val TITLE_FILE = "title.txt"
+        const val GAMEDIR_FILE = "game_directory.txt"
         const val PLAYLIST_FILE = "playlist2.txt"
         const val OLD_PLAYLIST_FILE = "playlist.txt"
 
@@ -79,14 +77,14 @@ class Launcher private constructor(private val rootDir: File) {
         isInstalling = true
         GlobalScope.launch(Dispatchers.Main) {
             try {
-                withContext(Dispatchers.IO) {
+                val gameDir = withContext(Dispatchers.IO) {
                     extractFiles(input, dir) { msg ->
                         GlobalScope.launch(Dispatchers.Main) {
                             observer?.onInstallProgress(msg)
                         }
                     }
                 }
-                observer?.onInstallSuccess(dir, archiveName)
+                observer?.onInstallSuccess(gameDir, archiveName)
             } catch (e: InstallFailureException) {
                 observer?.onInstallFailure(e.msgId)
             } catch (e: Exception) {
@@ -114,9 +112,11 @@ class Launcher private constructor(private val rootDir: File) {
                 continue
             }
             try {
-                val titleFile = File(path, TITLE_FILE)
+                val gameDirFile = File(path, GAMEDIR_FILE)
+                val gamePath = if (gameDirFile.exists()) File(path, gameDirFile.readText()) else path
+                val titleFile = File(gamePath, TITLE_FILE)
                 val title = titleFile.readText()
-                games.add(Entry(path, title, titleFile.lastModified()))
+                games.add(Entry(gamePath, title, titleFile.lastModified()))
                 migratePlaylist(path)
             } catch (e: IOException) {
                 // Incomplete game installation. Delete it.
@@ -179,7 +179,7 @@ class Launcher private constructor(private val rootDir: File) {
         }
     }
 
-    private fun extractFiles(input: InputStream, outDir: File, progressCallback: (String) -> Unit) {
+    private fun extractFiles(input: InputStream, outDir: File, progressCallback: (String) -> Unit): File {
         val configWriter = GameConfigWriter()
         val hadDecodeError = forEachZipEntry(input) { zipEntry, zip ->
             Log.i("extractFiles", zipEntry.name)
@@ -193,12 +193,13 @@ class Launcher private constructor(private val rootDir: File) {
             }
             configWriter.maybeAdd(zipEntry.name)
         }
-        if (!configWriter.readyToWrite()) {
+        if (!configWriter.ready) {
             if (hadDecodeError)
                 throw InstallFailureException(R.string.unsupported_zip)
             throw InstallFailureException(R.string.cannot_find_ald)
         }
         configWriter.write(outDir)
+        return configWriter.gameDir?.let { File(outDir, it) } ?: outDir
     }
 
     // Xsystem35-sdl2 <=2.2.0 had a bug where playlist had an extra empty line at
@@ -217,66 +218,43 @@ class Launcher private constructor(private val rootDir: File) {
 
     class InstallFailureException(val msgId: Int) : Exception()
 
-    // A helper class which generates xsystem35.gr and playlist.txt in the game root directory.
+    // A helper class which generates GAMEDIR_FILE and PLAYLIST_FILE.
     private class GameConfigWriter {
-        private val grb = StringBuilder()
-        private var basename: String? = null
-        private val aldRegex = """(.*?)([a-z])([a-z])\.(ald|wai|bgi)""".toRegex(RegexOption.IGNORE_CASE)
-        private val aldType = mapOf(
-                "b" to "BGM",
-                "d" to "Data",
-                "g" to "Graphics",
-                "m" to "Midi",
-                "r" to "Resource",
-                "s" to "Scenario",
-                "w" to "Wave")
-        private val specialResources = mapOf(
-                "system39.ain" to "Ain",
-                "system39.ini" to "Init",
-                "sactefam.kld" to "SACT01"
-        )
+        var ready = false
+            private set
+        var gameDir: String? = null
+            private set
+        private val aldRegex = """.*?s[a-z]\.ald""".toRegex(RegexOption.IGNORE_CASE)
         private val audioRegex = """.*?(\d+)\.(wav|mp3|ogg)""".toRegex(RegexOption.IGNORE_CASE)
         private val audioFiles: Array<String?> = arrayOfNulls(100)
 
         fun maybeAdd(path: String) {
-            val name = File(path).name
-
-            specialResources[name.lowercase(Locale.US)]?.let {
-                grb.appendLine("$it $path")
-                return
+            aldRegex.matchEntire(path)?.let {
+                gameDir = File(path).parent
+                ready = true
             }
-            aldRegex.matchEntire(name)?.let {
-                val ext = it.groupValues[4].uppercase(Locale.US)
-                val type = if (ext == "ALD") {
-                    aldType[it.groupValues[2].lowercase(Locale.US)]
-                } else {
-                    ext
-                }
-                val id = it.groupValues[3].uppercase(Locale.US)
-                if (type != null) {
-                    grb.appendLine("$type$id $path")
-                    basename = it.groupValues[1]
-                }
-            }
-            audioRegex.matchEntire(name)?.let {
+            audioRegex.matchEntire(path)?.let {
                 val track = it.groupValues[1].toInt()
                 if (0 < track && track <= audioFiles.size)
                     audioFiles[track - 1] = path
             }
         }
 
-        fun readyToWrite() = basename != null
-
         fun write(outDir: File) {
-            for (id in 'A' .. 'Z') {
-                grb.appendLine("Save$id ../save/${basename}s${id.lowercase(Locale.US)}.asd")
+            // Generate GAMEDIR_FILE
+            gameDir?.let {
+                File(outDir, GAMEDIR_FILE).writeText(it)
             }
-            val gr = grb.toString()
-            Log.i("xsystem35.gr", gr)
-            File(outDir, "xsystem35.gr").writeText(gr)
-
-            val playlist = audioFiles.joinToString("\n") { it ?: "" }.trimEnd('\n')
-            File(outDir, PLAYLIST_FILE).writeText(playlist)
+            // Generate PLAYLIST_FILE
+            val absGameDir = gameDir?.let { File(outDir, it) } ?: outDir
+            val playlistFile = File(absGameDir, PLAYLIST_FILE)
+            if (!playlistFile.exists()) {
+                val prefixToRemove = gameDir?.let { "$it/" } ?: ""
+                val playlist = audioFiles.joinToString("\n") {
+                    it?.removePrefix(prefixToRemove) ?: ""
+                }.trimEnd('\n')
+                playlistFile.writeText(playlist)
+            }
         }
     }
 }

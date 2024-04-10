@@ -180,6 +180,7 @@ class LauncherActivity : Activity(), LauncherObserver {
         val i = Intent()
         i.setClass(applicationContext, GameActivity::class.java)
         i.putExtra(GameActivity.EXTRA_GAME_ROOT, path.path)
+        i.putExtra(GameActivity.EXTRA_SAVE_DIRECTORY, File(filesDir, Launcher.SAVE_DIR).path)
         i.putExtra(GameActivity.EXTRA_ARCHIVE_NAME, archiveName)
         startActivity(i)
     }
