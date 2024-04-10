@@ -21,12 +21,16 @@
 */
 /* $Id: filecheck.c,v 1.5 2006/04/21 16:40:48 chikama Exp $ */
 
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
 #ifdef _WIN32
+#include <direct.h>
 #include <windows.h>
 #undef min
 #undef max
@@ -47,9 +51,65 @@ static char *get_fullpath(const char* dir, const char *filename) {
 	return fn;
 }
 
+#ifdef _WIN32
+
+static int make_dir(const char *path)
+{
+	wchar_t wpath[PATH_MAX + 1];
+	if (!MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, wpath, PATH_MAX + 1)) {
+		errno = EILSEQ;
+		return -1;
+	}
+	return _wmkdir(wpath);
+}
+
+#else
+#define make_dir(path) mkdir(path, S_IRWXU)
+#endif
+
+// Adapted from http://stackoverflow.com/a/2336245/119527
+static int mkdir_p(const char *path)
+{
+	const size_t len = strlen(path);
+	char _path[PATH_MAX];
+	char *p;
+
+	errno = 0;
+
+	// Copy string so its mutable
+	if (len > sizeof(_path)-1) {
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+	strcpy(_path, path);
+
+	// Iterate the string
+	for (p = _path + 1; *p; p++) {
+		if (*p == '/') {
+			// Temporarily truncate
+			*p = '\0';
+
+			if (make_dir(_path) != 0) {
+				if (errno != EEXIST)
+					return -1;
+			}
+
+			*p = '/';
+		}
+	}
+
+	if (make_dir(_path) != 0) {
+		if (errno != EEXIST)
+			return -1;
+	}
+
+	return 0;
+}
+
 /* list up file in current directory */
 /*   name : save/load directory      */
 void fc_init(const char *name) {
+	mkdir_p(name);
 	saveDataPath = strdup(name);
 }
 
