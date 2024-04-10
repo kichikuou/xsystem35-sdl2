@@ -7,18 +7,18 @@ set(PROJECT_ROOT_DIR ../../..)
 include(FetchContent)
 FetchContent_Declare(
   SDL
-  URL https://github.com/libsdl-org/SDL/releases/download/release-2.28.5/SDL2-2.28.5.tar.gz
-  URL_HASH SHA1=50af6b564890d702e57e2a72d6429b43778ed29a
+  URL https://github.com/libsdl-org/SDL/releases/download/release-2.30.2/SDL2-2.30.2.tar.gz
+  URL_HASH SHA1=37a0557fc39460dc2a4fbbf162d95f115d2c9be2
 )
 FetchContent_Declare(
   SDL_ttf
-  URL https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.20.1/SDL2_ttf-2.20.1.tar.gz
-  URL_HASH SHA1=f774ff407915ae4afa3d03e5a9395283d9090f28
+  URL https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.22.0/SDL2_ttf-2.22.0.tar.gz
+  URL_HASH SHA1=da5e86b601ad299a697878fab1af6f3be47b529d
 )
 FetchContent_Declare(
   SDL_mixer
-  URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.6.2/SDL2_mixer-2.6.2.tar.gz
-  URL_HASH SHA1=036fc7839a6b8dc1af3dbfed4e2531224bbacdd7
+  URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.0/SDL2_mixer-2.8.0.tar.gz
+  URL_HASH SHA1=a58c69f9d00e44833b9e00e1adb58d85759ca499
 )
 
 set(SDL2TTF_SAMPLES OFF CACHE BOOL "Build the SDL2_ttf sample program(s)" FORCE)
@@ -29,6 +29,7 @@ set(SDL2MIXER_OPUS OFF CACHE BOOL "Enable Opus music" FORCE)
 set(SDL2MIXER_FLAC OFF CACHE BOOL "Enable FLAC music" FORCE)
 set(SDL2MIXER_MOD  OFF CACHE BOOL "Support loading MOD music" FORCE)
 set(SDL2MIXER_MIDI OFF CACHE BOOL "Enable MIDI music" FORCE)
+set(SDL2MIXER_WAVPACK OFF CACHE BOOL "Enable WavPack music" FORCE)
 set(SDL2MIXER_SAMPLES OFF CACHE BOOL "Build the SDL2_mixer sample program(s)" FORCE)
 set(SDL2MIXER_INSTALL OFF CACHE BOOL "Enable SDL2_mixer install target" FORCE)
 
