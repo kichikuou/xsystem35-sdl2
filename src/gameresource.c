@@ -124,13 +124,19 @@ boolean initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir,
 	if (basename && (savedir || !found_xsleep)) {
 		const char *dir = savedir ? savedir : "";
 		const char *sep = savedir ? "/" : "";
-		char *buf = malloc(strlen(dir) + strlen(sep) + strlen(basename) + 6);
+		char *buf = malloc(strlen(dir) + strlen(sep) + strlen(basename) + 9);
 		int a = basename[strlen(basename) - 1] == 'S' ? 'A' : 'a';
 		for (int i = 0; i < SAVE_MAXNUMBER; i++) {
 			sprintf(buf, "%s%s%s%c.asd", dir, sep, basename, a + i);
 			storeSaveName(gr, i, buf);
 		}
+#ifdef __EMSCRIPTEN__
+		basename[strlen(basename) - 1] = '\0';
+		sprintf(buf, "%s%s%s.msgskip", dir, sep, basename);
+		gr->msgskip = buf;
+#else
 		free(buf);
+#endif
 	} else {
 		for (int i = 0; i < SAVE_MAXNUMBER; i++) {
 			char buf[] = "asleep.asd";
