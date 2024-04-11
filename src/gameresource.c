@@ -125,7 +125,13 @@ boolean initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir,
 		const char *dir = savedir ? savedir : "";
 		const char *sep = savedir ? "/" : "";
 		char *buf = malloc(strlen(dir) + strlen(sep) + strlen(basename) + 9);
+#if defined(__ANDROID__) || defined(__EMSCRIPTEN__)
+		// Use lowercase 's[a-z].asd' in Android and Emscripten, for compatibility.
+		basename[strlen(basename) - 1] = 's';
+		int a = 'a';
+#else
 		int a = basename[strlen(basename) - 1] == 'S' ? 'A' : 'a';
+#endif
 		for (int i = 0; i < SAVE_MAXNUMBER; i++) {
 			sprintf(buf, "%s%s%s%c.asd", dir, sep, basename, a + i);
 			storeSaveName(gr, i, buf);
