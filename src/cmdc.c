@@ -72,7 +72,7 @@ void commandCX() {
 	case 0:
 		// In Daiakuji, the image after the blending is used as a source image
 		// for sprite copy (CX 1). SDL's SIMD blending implementation has some
-		// error (blending #ff00ff and #ff00ff results in #fd00fd), so the
+		// error (https://github.com/libsdl-org/SDL/issues/3364), so the
 		// resulting color may not match the colorkey of CX 1. To workaround
 		// this, specify a small alpha mod so that SDL will use a "slow path"
 		// that does accurate calculation.
