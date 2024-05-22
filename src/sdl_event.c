@@ -260,7 +260,7 @@ void sdl_handle_event(SDL_Event *e) {
 		break;
 #ifdef _WIN32
 	case SDL_SYSWMEVENT:
-		win_menu_onsyswmevent(e->syswm.msg);
+		win_menu_onSysWMEvent(e->syswm.msg);
 		break;
 #endif
 	case SDL_APP_DIDENTERFOREGROUND:
@@ -282,6 +282,9 @@ void sdl_handle_event(SDL_Event *e) {
 		break;
 	case SDL_MOUSEMOTION:
 		sdl_setCursorInternalLocation(e->motion.x, e->motion.y);
+#ifdef _WIN32
+		win_menu_onMouseMotion(e->motion.x, e->motion.y);
+#endif
 		break;
 
 	case SDL_MOUSEWHEEL:

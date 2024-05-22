@@ -59,8 +59,9 @@ extern void menu_setSkipState(boolean enabled, boolean activated);
 
 #ifdef _WIN32
 struct SDL_SysWMmsg;
-extern void win_menu_init(void);
-extern void win_menu_onsyswmevent(struct SDL_SysWMmsg* msg);
+void win_menu_init(void);
+void win_menu_onSysWMEvent(struct SDL_SysWMmsg* msg);
+void win_menu_onMouseMotion(int x, int y);
 #endif
 
 #endif /* !__MENULL */

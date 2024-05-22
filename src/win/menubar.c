@@ -29,6 +29,8 @@
 #include "resources.h"
 #include "msgskip.h"
 
+static HMENU hmenu;
+
 static HWND get_hwnd(SDL_Window *window) {
 	SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
@@ -60,9 +62,6 @@ static void saveScreenshot(void) {
 }
 
 static bool toggle_menu_item(UINT id, bool *checked_out) {
-	HWND hwnd = get_hwnd(sdl_window);
-	HMENU hmenu = GetMenu(hwnd);
-
 	MENUITEMINFO menuitem = {
 		.cbSize = sizeof(MENUITEMINFO),
 		.fMask = MIIM_STATE,
@@ -82,7 +81,7 @@ static bool toggle_menu_item(UINT id, bool *checked_out) {
 
 void win_menu_init(void) {
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
-	HMENU hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
+	hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
 	SetMenu(get_hwnd(sdl_window), hmenu);
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 	// Let SDL recalc the window size, taking menu height into account.
@@ -90,7 +89,7 @@ void win_menu_init(void) {
 	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
 }
 
-void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
+void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 	bool checked;
 	switch (msg->msg.win.msg) {
 	case WM_COMMAND:
@@ -106,9 +105,11 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 			break;
 		case ID_SCREEN_WINDOW:
 			sdl_setFullscreen(FALSE);
+			SetMenu(get_hwnd(sdl_window), hmenu);
 			break;
 		case ID_SCREEN_FULL:
 			sdl_setFullscreen(TRUE);
+			SetMenu(get_hwnd(sdl_window), NULL);
 			break;
 		case ID_SCREEN_INTEGER_SCALING:
 			if (toggle_menu_item(ID_SCREEN_INTEGER_SCALING, &checked))
@@ -126,9 +127,14 @@ void win_menu_onsyswmevent(SDL_SysWMmsg* msg) {
 	}
 }
 
+void win_menu_onMouseMotion(int x, int y) {
+	if (!sdl_isFullscreen())
+		return;
+	SetMenu(get_hwnd(sdl_window), y > 0 ? NULL : hmenu);
+}
+
 void menu_setSkipState(boolean enabled, boolean activated) {
 	HWND hwnd = get_hwnd(sdl_window);
-	HMENU hmenu = GetMenu(hwnd);
 
 	EnableMenuItem(hmenu, ID_MSGSKIP, enabled ? MF_ENABLED : MF_GRAYED);
 
