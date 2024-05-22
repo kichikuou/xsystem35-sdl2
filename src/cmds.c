@@ -26,6 +26,7 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "music.h"
+#include "hacks.h"
 
 /* ぱにょ〜ん 異常シナリオ対策 */
 static boolean dummy_pcm_in_play = FALSE;
@@ -272,7 +273,7 @@ void commandSU() {
 		}
 	}
 	/* 闘神都市II 異常シナリオ対策 */
-	if (nact->game == GAME_TT2) {
+	if (game_id == GAME_TT2) {
 		*var1 = *var2 = 0;
 	}
 	

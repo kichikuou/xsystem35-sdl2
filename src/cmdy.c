@@ -33,6 +33,7 @@
 #include "cmd_check.h"
 #include "sdl_core.h"
 #include "music_cdrom.h"
+#include "hacks.h"
 
 unsigned Y3waitFlags = KEYWAIT_CANCELABLE;
 
@@ -126,7 +127,7 @@ void commandY() {
 		default:
 			if (p1 == 1003) {
 				sys_key_releasewait(SYS35KEY_RET, FALSE);
-			} else if (nact->game == GAME_RANCE4_V2 && p2 == 1) {
+			} else if (game_id == GAME_RANCE4_V2 && p2 == 1) {
 				// Return immediately if any key is pressed.
 				sysVar[0] = sys_getInputInfo();
 				if (sysVar[0])

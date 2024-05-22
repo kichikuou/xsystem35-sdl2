@@ -110,9 +110,6 @@ typedef struct {
 	int patch_emen; /* see patch_emen command */
 	int patch_g0;   /* see patch g0 command */
 
-	// For game-specific hacks.
-	enum gameId game;
-
 	/* ain 関連 */
 	S39AIN ain;
 

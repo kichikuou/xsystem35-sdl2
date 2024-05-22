@@ -25,10 +25,13 @@
 enum gameId {
 	GAME_UNKNOWN = 0,
 	GAME_TT2,
+	GAME_RANCE3,
 	GAME_RANCE3_ENG,
 	GAME_RANCE4_ENG,
 	GAME_RANCE4_V2,
 };
+
+extern enum gameId game_id;
 
 void enable_hack_by_gameid(const char *gameid);
 void enable_hack_by_title(const char *game_title_utf8);

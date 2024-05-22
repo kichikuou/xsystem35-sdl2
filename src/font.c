@@ -36,6 +36,7 @@
 #include "system.h"
 #include "font.h"
 #include "sdl_private.h"
+#include "hacks.h"
 
 typedef struct {
 	int      size;
@@ -175,7 +176,15 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
 	if (!fontset)
 		return r_dst;
 	
-	if (this.antialiase_on) {
+	bool antialias = this.antialiase_on;
+	// The post-effect in Rance 3 opening does not work properly if colors other
+	// than the specified text color (32) are used.
+	// https://github.com/kichikuou/xsystem35-sdl2/issues/54
+	// In Rance 3, text color 32 is only used in the opening.
+	if ((game_id == GAME_RANCE3 || game_id == GAME_RANCE3_ENG) && cl == 32)
+		antialias = false;
+
+	if (antialias) {
 		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, sdl_col[cl]);
 	} else {
 		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, sdl_col[cl]);
@@ -190,7 +199,7 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
 	y -= (TTF_FontHeight(fontset->id) - fontset->size) / 2;
 	r_dst = (SDL_Rect){x, y, w, h};
 	
-	if (sdl_dib->format->BitsPerPixel == 8 && this.antialiase_on) {
+	if (sdl_dib->format->BitsPerPixel == 8 && antialias) {
 		sdl_drawAntiAlias_8bpp(x, y, fs, cl);
 	} else {
 		r_src = (SDL_Rect){0, 0, w, h};

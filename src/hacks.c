@@ -27,23 +27,27 @@
 #define GT_TOSHIN2 "闘神都市Ⅱ　ｆｏｒ　Ｗｉｎ９５　"
 #define GT_RANCE4 "Ｒａｎｃｅ４　－教団の遺産－　Ｆｏｒ　Ｗｉｎ９５　"
 #define GT_RANCE4_V2 "RanceⅣ　－教団の遺産－　for Windows　"
+#define GT_RANCE3 "Ｒａｎｃｅ３"
 #define GT_RANCE3_ENG "Rance3"
 #define GT_RANCE4_ENG "Rance4 -Legacy of the Sect- For Win95 "
 
 /* defined by cmdy.c */
 extern boolean Y3waitFlags;
 
+enum gameId game_id;
 bool daiakuji_cx_hack;
 
 void enable_hack_by_gameid(const char *gameid) {
 	if (!strcmp(gameid, "toushin2"))
-		nact->game = GAME_TT2;
+		game_id = GAME_TT2;
+	else if (!strcmp(gameid, "rance3"))
+		game_id = GAME_RANCE3;
 	else if (!strcmp(gameid, "rance3_eng"))
-		nact->game = GAME_RANCE3_ENG;
+		game_id = GAME_RANCE3_ENG;
 	else if (!strcmp(gameid, "rance4_eng"))
-		nact->game = GAME_RANCE4_ENG;
+		game_id = GAME_RANCE4_ENG;
 	else if (!strcmp(gameid, "rance4_v2"))
-		nact->game = GAME_RANCE4_V2;
+		game_id = GAME_RANCE4_V2;
 	else
 		sys_error("Unknown game id \"%s\"", gameid);
 }
@@ -52,15 +56,17 @@ void enable_hack_by_title(const char *title_utf8) {
 	if (!strcmp(title_utf8, GT_RANCE4))
 		Y3waitFlags = KEYWAIT_NONCANCELABLE;
 
-	if (nact->game != GAME_UNKNOWN)
+	if (game_id != GAME_UNKNOWN)
 		return;
 
 	if (!strcmp(title_utf8, GT_TOSHIN2))
-		nact->game = GAME_TT2;
+		game_id = GAME_TT2;
 	else if (!strcmp(title_utf8, GT_RANCE4_V2))
-		nact->game = GAME_RANCE4_V2;
+		game_id = GAME_RANCE4_V2;
+	else if (!strcmp(title_utf8, GT_RANCE3))
+		game_id = GAME_RANCE3;
 	else if (!strcmp(title_utf8, GT_RANCE3_ENG))
-		nact->game = GAME_RANCE3_ENG;
+		game_id = GAME_RANCE3_ENG;
 	else if (!strcmp(title_utf8, GT_RANCE4_ENG))
-		nact->game = GAME_RANCE4_ENG;
+		game_id = GAME_RANCE4_ENG;
 }

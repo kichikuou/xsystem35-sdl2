@@ -33,7 +33,7 @@
 #include "ags.h"
 #include "message.h"
 #include "hankaku.h"
-
+#include "hacks.h"
 
 /* MI 用パラメータ */
 INPUTSTRING_PARAM mi_param;
@@ -60,7 +60,7 @@ void commandMP() {
 	char *str;
 
 	/* Patched English executable appends num2 spaces instead of truncating */
-	if (nact->game == GAME_RANCE3_ENG || nact->game == GAME_RANCE4_ENG) {
+	if (game_id == GAME_RANCE3_ENG || game_id == GAME_RANCE4_ENG) {
 		str = calloc(strlen(src) + num2 * strlen(fullwidth_blank[nact->encoding]) + 1, 1);
 		if (NULL == str) {
 			NOMEMERR();
