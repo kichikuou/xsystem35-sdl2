@@ -33,9 +33,26 @@ set(SDL2MIXER_WAVPACK OFF CACHE BOOL "Enable WavPack music" FORCE)
 set(SDL2MIXER_SAMPLES OFF CACHE BOOL "Build the SDL2_mixer sample program(s)" FORCE)
 set(SDL2MIXER_INSTALL OFF CACHE BOOL "Enable SDL2_mixer install target" FORCE)
 
-FetchContent_MakeAvailable(SDL)
-FetchContent_MakeAvailable(SDL_ttf)
-FetchContent_MakeAvailable(SDL_mixer)
+FetchContent_MakeAvailable(SDL SDL_ttf SDL_mixer)
+
+# libwebp
+FetchContent_Declare(
+  libwebp
+  URL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.4.0.tar.gz
+  URL_HASH SHA1=0b1c8bea200caaa010182609dbaaa91aec69b64d
+)
+set(WEBP_BUILD_ANIM_UTILS OFF CACHE BOOL "Build animation utilities." FORCE)
+set(WEBP_BUILD_CWEBP OFF CACHE BOOL "Build the cwebp command line tool." FORCE)
+set(WEBP_BUILD_DWEBP OFF CACHE BOOL "Build the dwebp command line tool." FORCE)
+set(WEBP_BUILD_GIF2WEBP OFF CACHE BOOL "Build the gif2webp conversion tool." FORCE)
+set(WEBP_BUILD_IMG2WEBP OFF CACHE BOOL "Build the img2webp animation tool." FORCE)
+set(WEBP_BUILD_VWEBP OFF CACHE BOOL "Build the vwebp viewer tool." FORCE)
+set(WEBP_BUILD_WEBPINFO OFF CACHE BOOL "Build the webpinfo command line tool." FORCE)
+set(WEBP_BUILD_LIBWEBPMUX OFF CACHE BOOL "Build the libwebpmux library." FORCE)
+set(WEBP_BUILD_WEBPMUX OFF CACHE BOOL "Build the webpmux command line tool." FORCE)
+set(WEBP_BUILD_EXTRAS OFF CACHE BOOL "Build extras." FORCE)
+set(WEBP_BUILD_WEBP_JS OFF CACHE BOOL "Emscripten build of webp.js." OFORCE)
+FetchContent_MakeAvailable(libwebp)
 
 # The main CMakeLists.txt of xsystem35
 add_subdirectory(${PROJECT_ROOT_DIR} xsystem35)

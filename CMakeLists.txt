@@ -50,6 +50,8 @@ elseif (ANDROID)
   find_library(ndk_zlib z)
   add_library(zlib INTERFACE)
   set_target_properties(zlib PROPERTIES INTERFACE_LINK_LIBRARIES ${ndk_zlib})
+  set(HAVE_WEBP 1)
+  add_library(WebP ALIAS webp)
 
 else()  # non-emscripten, non-android
   if (WIN32)
