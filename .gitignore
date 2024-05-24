@@ -1,10 +1,13 @@
 out
 android/.gradle
+android/.idea
+android/app/.cxx
 android/app/.externalNativeBuild
 android/app/build
 android/app/src/main/assets
 android/build
 android/keystore.jks
+android/local.properties
 .ccls-cache
 .dir-locals.el
 compile_commands.json
