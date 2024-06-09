@@ -42,10 +42,13 @@
 #include "ald_manager.h"
 #include "LittleEndian.h"
 #include "hacks.h"
+#include "filecheck.h"
 
 /* 選択 Window OPEN 時 callback */
 static int cb_sel_init_page = 0;
 static int cb_sel_init_address = 0;
+
+static const char REGREADSTRING_RESULT[] = "*regReadString*";
 
 extern INPUTSTRING_PARAM mi_param;
 
@@ -1441,7 +1444,10 @@ void commands2F87() {
 	int eBaneStrNum   = getCaliValue();
 	int eResultStrNum = getCaliValue();
 	int *vResult      = getCaliVariable();
-	
+
+	// This command is used to check if the game is installed, so we always
+	// return 1 with the dummy string REGREADSTRING_RESULT.
+	svar_set(eResultStrNum, REGREADSTRING_RESULT);
 	*vResult = 1;
 	
 	DEBUG_COMMAND("regReadString %d,%d,%d,%d:",
@@ -1451,8 +1457,17 @@ void commands2F87() {
 void commands2F88() {
 	int eFileNameStrNum = getCaliValue();
 	int *vResult        = getCaliVariable();
-	
-	*vResult = 1;
+
+	const char *fname = svar_get(eFileNameStrNum);
+	if (strcmp(fname, REGREADSTRING_RESULT) == 0) {
+		// If this command is called with the result of regReadString, the game
+		// is checking if the game CD is inserted. We return 1 in this case.
+		*vResult = 1;
+	} else {
+		char *fname_utf8 = sjis2utf(fname);
+		*vResult = fc_exists(fname_utf8) ? 1 : 0;
+		free(fname_utf8);
+	}
 	
 	DEBUG_COMMAND("fileCheckExist %d,%d:", eFileNameStrNum, *vResult);
 }

@@ -24,9 +24,12 @@
 #ifndef __FILECHECK_H__
 #define __FILECHECK_H__
 
-extern void fc_init(const char *name);
-extern char *fc_get_path(const char *fname_utf8);
-extern FILE *fc_open(const char *fname_utf8, char type);
-extern void fc_backup_oldfile(const char *filename);
+#include <stdbool.h>
+
+void fc_init(const char *name);
+char *fc_get_path(const char *fname_utf8);
+bool fc_exists(const char *fname_utf8);
+FILE *fc_open(const char *fname_utf8, char type);
+void fc_backup_oldfile(const char *filename);
 
 #endif /* !__FILECHECK_H__ */

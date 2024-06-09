@@ -29,11 +29,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <unistd.h>
 #ifdef _WIN32
 #include <direct.h>
 #include <windows.h>
-#undef min
-#undef max
 #endif
 
 #include "filecheck.h"
@@ -126,6 +125,18 @@ char *fc_get_path(const char *fname_utf8) {
 	return get_fullpath(saveDataPath, fname_utf8);
 }
 
+bool fc_exists(const char *fname_utf8)
+{
+	char *path = fc_get_path(fname_utf8);
+	wchar_t wpath[PATH_MAX + 1];
+	bool result = false;
+	if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, wpath, PATH_MAX + 1)) {
+		result = _waccess(wpath, F_OK) != -1;
+	}
+	free(path);
+	return result;
+}
+
 FILE *fc_open(const char *fname_utf8, char type) {
 	char *path = fc_get_path(fname_utf8);
 	FILE *fp = fopen_utf8(path, type);
@@ -160,6 +171,14 @@ char *fc_get_path(const char *fname_utf8) {
 	if (path)
 		return path;
 	return get_fullpath(saveDataPath, fname_utf8);
+}
+
+bool fc_exists(const char *fname_utf8)
+{
+	char *path = fc_get_path(fname_utf8);
+	bool result = access(path, F_OK) != -1;
+	free(path);
+	return result;
 }
 
 FILE *fc_open(const char *fname_utf8, char type) {
