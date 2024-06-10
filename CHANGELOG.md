@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11.5 - 2024-06-10
+- Android: Fixed a black screen issue in the MangaGamer version of Rance 5D.
+- Fixed `fileCheckExist` command. (#55)
+
 ## 2.11.4 - 2024-05-22
 - Windows: In full-screen mode, the menu bar now appears only when the mouse pointer is at the top of the screen. (#53)
 - Fixed text rendering issue in Rance 3 intro. (#54)
@@ -12,7 +16,7 @@
 - Android: Fixed a bug where .xsys35rc in a subdirectory of ZIP was not loaded. (#51)
 
 ## 2.11.1 - 2024-02-18
-- Fixed a black screen issue in the MangaGamer version of Rance 5D (#45).
+- Windows: Fixed a black screen issue in the MangaGamer version of Rance 5D (#45).
 - Fixed a crash bug in command-line debugger.
 
 ## 2.11.0 - 2024-01-20
