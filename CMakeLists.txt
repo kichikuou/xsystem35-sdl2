@@ -6,6 +6,7 @@ enable_testing()
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 include(CheckSymbolExists)
+include(FetchContent)
 
 # A wrapper around pkg_check_modules() that skips the check if ENABLE_<prefix> is false
 macro (optional_pkg_check_modules prefix)
@@ -26,6 +27,27 @@ function(add_static_library name pkg)
           INTERFACE_LINK_OPTIONS "${${pkg}_STATIC_LDFLAGS_OTHER}")
 endfunction()
 
+function(fetch_webp)
+  FetchContent_Declare(
+    libwebp
+    URL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.4.0.tar.gz
+    URL_HASH SHA1=0b1c8bea200caaa010182609dbaaa91aec69b64d
+    )
+  set(WEBP_BUILD_ANIM_UTILS OFF CACHE BOOL "Build animation utilities." FORCE)
+  set(WEBP_BUILD_CWEBP OFF CACHE BOOL "Build the cwebp command line tool." FORCE)
+  set(WEBP_BUILD_DWEBP OFF CACHE BOOL "Build the dwebp command line tool." FORCE)
+  set(WEBP_BUILD_GIF2WEBP OFF CACHE BOOL "Build the gif2webp conversion tool." FORCE)
+  set(WEBP_BUILD_IMG2WEBP OFF CACHE BOOL "Build the img2webp animation tool." FORCE)
+  set(WEBP_BUILD_VWEBP OFF CACHE BOOL "Build the vwebp viewer tool." FORCE)
+  set(WEBP_BUILD_WEBPINFO OFF CACHE BOOL "Build the webpinfo command line tool." FORCE)
+  set(WEBP_BUILD_LIBWEBPMUX OFF CACHE BOOL "Build the libwebpmux library." FORCE)
+  set(WEBP_BUILD_WEBPMUX OFF CACHE BOOL "Build the webpmux command line tool." FORCE)
+  set(WEBP_BUILD_EXTRAS OFF CACHE BOOL "Build extras." FORCE)
+  set(WEBP_BUILD_WEBP_JS OFF CACHE BOOL "Emscripten build of webp.js." FORCE)
+  FetchContent_MakeAvailable(libwebp)
+  add_library(WebP ALIAS webp)
+endfunction()
+
 check_symbol_exists(getlogin "unistd.h" HAVE_GETLOGIN)
 check_symbol_exists(mmap "sys/mman.h" HAVE_MMAP)
 check_symbol_exists(sigaction "signal.h" HAVE_SIGACTION)
@@ -41,6 +63,8 @@ if (EMSCRIPTEN)
   add_emscripten_library(sdl2 -sUSE_SDL=2)
   add_emscripten_library(sdl2_ttf -sUSE_SDL_TTF=2)
   set(DEFAULT_FONT_PATH /fonts/)
+  fetch_webp()
+  set(HAVE_WEBP 1)
 
 elseif (ANDROID)
   add_library(sdl2 ALIAS SDL2)
@@ -50,8 +74,8 @@ elseif (ANDROID)
   find_library(ndk_zlib z)
   add_library(zlib INTERFACE)
   set_target_properties(zlib PROPERTIES INTERFACE_LINK_LIBRARIES ${ndk_zlib})
+  fetch_webp()
   set(HAVE_WEBP 1)
-  add_library(WebP ALIAS webp)
 
 else()  # non-emscripten, non-android
   if (WIN32)
