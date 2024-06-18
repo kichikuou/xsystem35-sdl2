@@ -460,7 +460,9 @@ void sel_select() {
 	while (!nact->is_quit) {
 		key = sys_keywait(25, KEYWAIT_CANCELABLE);
 
-		if (!key && prevkey == SYS35KEY_SPC) break;
+		// Right-click exits the menu without waiting for button up.
+		if (key == SYS35KEY_SPC) break;
+
 		if (!key && prevkey == SYS35KEY_RET && curElement != -1) break;
 		prevkey = key;
 
