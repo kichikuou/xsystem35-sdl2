@@ -1,0 +1,103 @@
+= xsystem35.gr(5)
+:doctype: manpage
+:manmanual: xsystem35 manual
+:mansource: xsystem35
+
+== Name
+
+xsystem35.gr - game resource file for xsystem35
+
+== DESCRIPTION
+
+Game resource file is a plain text file that defines the locations of the
+various game data files for xsystem35. This file is only needed if you want to
+place game data files in a location other than the current directory.
+
+The path to the game resource file is specified with the `-gamefile` option of
+xref:xsystem35.adoc[*xsystem35(6)*]. If it is not specified, xsystem35 reads
+`xsystem35.gr` in the current directory.
+
+Each line of the file specifies a single data file and follows the format:
+
+_keyword_ _path-to-data_
+
+If multiple files of the same type exist, suffixes `A`, `B`, `C`... are
+appended to the _keyword_.
+
+Comments can be added by starting the line with `#`. Blank lines are ignored.
+
+== KEYWORDS
+
+*Scenario*::
+  Scenario files (`*S?.ALD`).
+
+*Graphics*::
+  Graphic files (`*G?.ALD`).
+
+*Wave*::
+  PCM data files (`*W?.ALD`).
+
+*Midi*::
+  MIDI data files (`*M?.ALD`).
+
+*Data*::
+  Miscellaneous data files (`*D?.ALD`).
+
+*Resource*::
+  Resource files (`*R?.ALD`).
+
+*BGM*::
+  BGM files (`*B?.ALD`).
+
+*Save*::
+  Save files (`*S?.ASD`). If the path begins with '`~`', it is expanded to the
+  user's home directory (`$HOME`).
+
+*Ain*::
+  The `System39.ain` file.
+
+*WAI*::
+  Additional information for PCM data (`*WA.WAI`)
+
+*BGI*::
+  Additional information for BGM data (`*BA.BGI`)
+
+*SACT01*::
+  Data for SACT.DLL (`SACTEFAM.KLD`)
+
+*ALK01* - *ALK09*::
+  Archive files for demo data (`*1.ALK` - `*9.ALK`)
+
+*Init*::
+  The `System39.ini` file.
+
+== NOTES
+
+Data files not categorized under the above keywords (e.g., map files for
+Kaeru nyo Panyon) should not be listed in the game resource file, and should be
+placed in the same directory as the save files.
+
+== EXAMPLES
+
+The following is a game resource file for the English translation of Kichikuou
+Rance.
+
+  ScenarioA KICHIKUSA.ALD
+  GraphicsA KICHIKUGA.ALD
+  GraphicsB KICHIKUGB.ALD
+  WaveA KICHIKUWA.ALD
+  Ain System39.ain
+  SaveA ~/.xsys35/saves/kichikuou/KICHIKUSA.ASD
+  SaveB ~/.xsys35/saves/kichikuou/KICHIKUSB.ASD
+  SaveC ~/.xsys35/saves/kichikuou/KICHIKUSC.ASD
+  SaveD ~/.xsys35/saves/kichikuou/KICHIKUSD.ASD
+  SaveE ~/.xsys35/saves/kichikuou/KICHIKUSE.ASD
+  SaveF ~/.xsys35/saves/kichikuou/KICHIKUSF.ASD
+  SaveG ~/.xsys35/saves/kichikuou/KICHIKUSG.ASD
+  SaveH ~/.xsys35/saves/kichikuou/KICHIKUSH.ASD
+  SaveI ~/.xsys35/saves/kichikuou/KICHIKUSI.ASD
+  SaveJ ~/.xsys35/saves/kichikuou/KICHIKUSJ.ASD
+
+== SEE ALSO
+
+xref:xsystem35.adoc[*xsystem35(6)*]

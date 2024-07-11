@@ -44,7 +44,7 @@ jobs:
         cp fonts/*.license dist/licenses/
 
     - name: Install dev dependencies
-      run: pacboy --noconfirm -S --needed gcc:p cmake:p ninja:p
+      run: pacboy --noconfirm -S --needed gcc:p cmake:p ninja:p asciidoctor:p
 
     - name: Build
       run: |
@@ -59,7 +59,7 @@ jobs:
 
     - name: Package
       run: |
-        cp out/release/src/xsystem35.exe *.md COPYING xsys35rc.sample dist/
+        cp out/release/src/xsystem35.exe out/release/doc/*.html *.md COPYING xsys35rc.sample dist/
 
     - name: Upload
       uses: actions/upload-artifact@v4

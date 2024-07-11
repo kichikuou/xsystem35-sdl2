@@ -1,0 +1,150 @@
+= xsystem35(6)
+:doctype: manpage
+:manmanual: xsystem35 manual
+:mansource: xsystem35
+
+== Name
+
+xsystem35 - play System 3.x games
+
+== SYNOPSIS
+
+*xsystem35* [_OPTION_]...
+
+== DESCRIPTION
+
+This man page describes *xsystem35-sdl2*, a multi-platform port of the
+AliceSoft's System3.5/3.6/3.8/3.9 game engine derived from the original
+*xsystem35*.
+
+`xsystem35` reads the game resource file from the path specified by the
+`-gamefile` option, or from `xsystem35.gr` in the current directory if the
+option is not specified. If the game resource file is not found, `xsystem35`
+finds System 3.x game files (*.ALD) from the current directory.
+
+== OPTIONS
+
+*-gamefile* _file_::
+  Load game resouce file from _file_. See <<FILES>> section for details.
+
+*-game* _game_::
+  Enables game-specific hacks. Usually auto-detected, but must be specified for
+  games with modified / translated titles. Possible values are: `toushin2`,
+  `rance3_eng`, `rance4_eng`, `rance4_v2`.
+
+*-savedir* _dir_::
+  Directory to save game state files. If _dir_ begins with '~', it is expanded
+  to the user's home directory (`$HOME`).
+
+*-saveformat* _fmt_::
+  The format when writing save files. Possible values are: `xsystem35`,
+  `system36`, `system39` (default).
+
+*-renderer* _name_::
+  Use the SDL rendering driver named _name_.
+
+*-playlist* _file_::
+  Load the CD playlist from _file_. The playlist is a text file with one
+  filename per line, in the order of CD tracks. See <<FILES>> section for details.
+
+*-devmidi* _device_::
+  Path to the midi device.
+
+*-Me*::
+  Use SDL_mixer for MIDI playback.
+
+*-Mr*::
+  Use raw MIDI device for MIDI playback.
+
+**-Ms**_device_number_::
+  Use sequencer device of the given number for MIDI playback.
+
+**-Mp**_device_number_::
+  Use ALSA (via PortMidi) for MIDI playback.
+
+*-M0*::
+  Disable MIDI playback.
+
+*-devjoy* _device_index_::
+  Use the joystick device with the given index.
+
+*-ttfont_mincho* _file_::
+  Use the given TrueType or OpenType font file for mincho (serif) text.
+
+*-ttfont_gothic* _file_::
+  Use the given TrueType or OpenType font file for gothic (sans-serif) text.
+
+*-debuglv* _level_::
+  Set the debug level to _level_. The higher the level, the more verbose
+  the debug output.
+
+*-debug*::
+  Start with the debugger enabled.
+
+*-noantialias*::
+  Disable text antialiasing.
+
+*-fullscreen*::
+  Start in fullscreen mode.
+
+*-integerscale*::
+  Use integer scaling for the window.
+
+*-noimagecursor*::
+  Disable custom mouse cursor images.
+
+*-version*::
+  Print the version number and exit.
+
+*-h, --help*::
+    Print a help message and exit.
+
+== FILES
+
+*.xsys35rc*::
+  `xsystem35` reads its configuration from `${HOME}/.xsys35rc` and `.xsys35rc`
+  in the game directory. The latter takes precedence over the former, so you
+  can put general settings in `${HOME}/.xsys35rc` and game-specific settings in
+  `.xsys35rc` in the game directory. Options specified on the command line
+  override both. See xsys35rc.sample for the format of the configuration file.
+
+*playlist.txt*::
+  `xsystem35` does not support playing BGM directly from a CD. Instead, it
+  supports playing BGM from audio files on your filesystem. `xsystem35` reads
+  the playlist from a file specified by the `-playlist` option, or from
+  `playlist.txt` in the game directory. The first line is the path to the audio
+  file for track 1, the second line is the path to the audio file for track 2,
+  and so on. The first line is usually empty, because track 1 is not an audio
+  track but a data track.
+
+*xsystem35.gr*::
+  Game resource file which lists the locations of various files needed to run
+  a game. This is optional; `xsystem35` can automatically find the files it
+  needs when run inside a game directory. See
+  xref:xsystem35.gr.adoc[*xsystem35.gr(5)*] for the format of the game resource
+  file.
+
+== KEYBOARD SHORTCUTS
+
+System 3.x games basically only use the UP, DOWN, LEFT, RIGHT, SPACE, RET, ESC,
+and TAB keys (some games use other keys). `xsystem35` uses the following
+special key assignments:
+
+*F1*::
+  Toggle message skip mode.
+
+*F4*::
+  Toggle fullscreen mode.
+
+Also, in some platforms, the middle mouse button opens the menu.
+
+== HISTORY
+
+*xsystem35* was originally developed by Masaki Chikama (Wren)
+<masaki-c@is.aist-nara.ac.jp> between 1998 and 2006. The project was later
+forked by Kichikuou <KichikuouChrome@gmail.com> as *xsystem35-sdl2* and ported
+to SDL2.
+
+== SEE ALSO
+
+xsystem35-sdl2 project page: https://github.com/kichikuou/xsystem35-sdl2
