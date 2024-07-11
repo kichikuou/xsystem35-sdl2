@@ -28,7 +28,11 @@ else()
     add_custom_command(
       OUTPUT ${OUTPUT}
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SRC}
-      COMMAND ${ASCIIDOCTOR} -b ${BACKEND} -o ${OUTPUT} ${CMAKE_CURRENT_SOURCE_DIR}/${SRC}
+      COMMAND ${ASCIIDOCTOR}
+        --attribute xsystem35-version=${XSYSTEM35_VERSION}
+        --backend ${BACKEND}
+        --out-file ${OUTPUT}
+        ${CMAKE_CURRENT_SOURCE_DIR}/${SRC}
     )
     list(APPEND MANUALS ${OUTPUT})
   endforeach()

@@ -1,5 +1,5 @@
 #cmakedefine PACKAGE "@PACKAGE@"
-#define VERSION "2.11.5"
+#define VERSION "@XSYSTEM35_VERSION@"
 
 #cmakedefine CACHE_TOTALSIZE @CACHE_TOTALSIZE@
 

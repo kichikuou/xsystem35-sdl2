@@ -1,7 +1,7 @@
 = xsystem35(6)
 :doctype: manpage
 :manmanual: xsystem35 manual
-:mansource: xsystem35
+:mansource: xsystem35 {xsystem35-version}
 
 == Name
 
