@@ -116,7 +116,7 @@ else()
     target_sources(xsystem35 PRIVATE midi.rawmidi.c midifile.c)
   endif()
   if (ENABLE_MIDI_PORTMIDI)
-    target_sources(xsystem35 PRIVATE midi.portmidi.c)
+    target_sources(xsystem35 PRIVATE midi.portmidi.c midifile.c)
   endif()
 endif()
 
