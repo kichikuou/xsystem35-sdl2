@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.11.6 - 2024-07-22
+- Fixed strange behavior when canceling the battle selection menu in Kichikuou Rance. (#56)
+- Use system mouse cursors whenever possible. They look better on high dpi displays.
+- Added manual page for the xsystem35 command.
+
 ## 2.11.5 - 2024-06-10
 - Android: Fixed a black screen issue in the MangaGamer version of Rance 5D.
 - Fixed `fileCheckExist` command. (#55)
