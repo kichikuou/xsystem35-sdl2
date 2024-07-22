@@ -30,17 +30,7 @@
 #include "sdl_private.h"
 
 /* マウスカーソルフォントイメージ*/
-#include "bitmaps/cursor_arrow.xpm"
-#include "bitmaps/cursor_busy.xpm"
-#include "bitmaps/cursor_no.xpm"
-#include "bitmaps/cursor_move.xpm"
-#include "bitmaps/cursor_cross.xpm"
-#include "bitmaps/cursor_size_h.xpm"
-#include "bitmaps/cursor_size_l.xpm"
-#include "bitmaps/cursor_size_r.xpm"
-#include "bitmaps/cursor_size_v.xpm"
 #include "bitmaps/cursor_uparrow.xpm"
-#include "bitmaps/cursor_ibeam.xpm"
 
 static SDL_Cursor      *cursor[256];
 
@@ -80,20 +70,20 @@ static SDL_Cursor *init_system_cursor(const char *image[]) {
 	return SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
 }
 
-/* mouse cursur の初期化 */
 void sdl_cursor_init(void) {
-	cursor[CURSOR_ARROW] = init_system_cursor(cursor_arrow);
-	cursor[CURSOR_CROSS] = init_system_cursor(cursor_cross);
-	cursor[CURSOR_IBEAM] = init_system_cursor(cursor_ibeam);
-	cursor[CURSOR_NO]    = init_system_cursor(cursor_no);
-	cursor[CURSOR_SIZE]  = init_system_cursor(cursor_move);
-	cursor[CURSOR_SIZEALL]  = init_system_cursor(cursor_move);
-	cursor[CURSOR_SIZENESW] = init_system_cursor(cursor_size_r);
-	cursor[CURSOR_SIZENS]   = init_system_cursor(cursor_size_v);
-	cursor[CURSOR_SIZENWSE] = init_system_cursor(cursor_size_l);
-	cursor[CURSOR_SIZEWE]   = init_system_cursor(cursor_size_h);
+	cursor[CURSOR_ARROW]    = SDL_GetDefaultCursor();
+	cursor[CURSOR_CROSS]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
+	cursor[CURSOR_IBEAM]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+	cursor[CURSOR_ICON]     = SDL_GetDefaultCursor();
+	cursor[CURSOR_NO]       = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
+	cursor[CURSOR_SIZE]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	cursor[CURSOR_SIZEALL]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	cursor[CURSOR_SIZENESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
+	cursor[CURSOR_SIZENS]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+	cursor[CURSOR_SIZENWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
+	cursor[CURSOR_SIZEWE]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
 	cursor[CURSOR_UPARROW]  = init_system_cursor(cursor_uparrow);
-	cursor[CURSOR_WAIT]     = init_system_cursor(cursor_busy);
+	cursor[CURSOR_WAIT]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
 }
 
 boolean sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
