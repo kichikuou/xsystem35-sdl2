@@ -36,16 +36,16 @@ EM_JS(int, muspcm_reset, (void), {
 	return xsystem35.audio.pcm_reset();;
 });
 
-EM_JS(int, muspcm_load_no, (int slot, int no), {  // async
-	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_load(slot, no, wakeUp));
+EM_ASYNC_JS(int, muspcm_load_no, (int slot, int no), {
+	return await xsystem35.audio.pcm_load(slot, no);
 });
 
-EM_JS(int, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {  // async
-	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_load_data(slot, buf, len, wakeUp));
+EM_ASYNC_JS(int, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {
+	return await xsystem35.audio.pcm_load_data(slot, buf, len);
 });
 
-EM_JS(int, muspcm_load_mixlr, (int slot, int noL, int noR), {  // async
-	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_load_mixlr(slot, noL, noR, wakeUp));
+EM_ASYNC_JS(int, muspcm_load_mixlr, (int slot, int noL, int noR), {
+	return await xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
 });
 
 EM_JS(int, muspcm_unload, (int slot), {
@@ -91,6 +91,6 @@ EM_JS(boolean, muspcm_isplaying, (int slot), {
 	return xsystem35.audio.pcm_isplaying(slot);
 });
 
-EM_JS(int, muspcm_waitend, (int slot), {  // async
-	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_waitend(slot, wakeUp));
+EM_ASYNC_JS(int, muspcm_waitend, (int slot), {
+	return await xsystem35.audio.pcm_waitend(slot);
 });

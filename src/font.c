@@ -235,9 +235,7 @@ boolean font_get_antialias(void) {
 }
 
 #ifdef __EMSCRIPTEN__
-EM_JS(int, load_mincho_font, (void), {
-	return Asyncify.handleSleep(function(wakeUp) {
-		xsystem35.load_mincho_font().then(wakeUp);
-	});
+EM_ASYNC_JS(int, load_mincho_font, (void), {
+	await xsystem35.load_mincho_font();
 });
 #endif
