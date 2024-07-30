@@ -37,15 +37,15 @@ EM_JS(int, muspcm_reset, (void), {
 });
 
 EM_JS(int, muspcm_load_no, (int slot, int no), {  // async
-	return xsystem35.audio.pcm_load(slot, no);
+	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_load(slot, no, wakeUp));
 });
 
 EM_JS(int, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {  // async
-	return xsystem35.audio.pcm_load_data(slot, buf, len);
+	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_load_data(slot, buf, len, wakeUp));
 });
 
 EM_JS(int, muspcm_load_mixlr, (int slot, int noL, int noR), {  // async
-	return xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
+	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_load_mixlr(slot, noL, noR, wakeUp));
 });
 
 EM_JS(int, muspcm_unload, (int slot), {
@@ -92,5 +92,5 @@ EM_JS(boolean, muspcm_isplaying, (int slot), {
 });
 
 EM_JS(int, muspcm_waitend, (int slot), {  // async
-	return xsystem35.audio.pcm_waitend(slot);
+	return Asyncify.handleSleep((wakeUp) => xsystem35.audio.pcm_waitend(slot, wakeUp));
 });

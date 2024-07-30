@@ -159,6 +159,8 @@ if (EMSCRIPTEN)
 
   target_link_options(xsystem35 PRIVATE
     -sENVIRONMENT=web
+    -sMODULARIZE=1
+    -sEXPORT_ES6=1
     -sASYNCIFY=1
     -sASYNCIFY_IGNORE_INDIRECT=1
     -sASYNCIFY_REMOVE=SDL_Delay
@@ -167,7 +169,9 @@ if (EMSCRIPTEN)
     -sALLOW_MEMORY_GROWTH=1
     -sNO_EXIT_RUNTIME=1
     -sEXPORTED_FUNCTIONS=_main,_malloc
-    -sEXPORTED_RUNTIME_METHODS=getValue,addRunDependency,removeRunDependency)
+    -sEXPORTED_RUNTIME_METHODS=FS,IDBFS,getValue,addRunDependency,removeRunDependency
+    --emit-tsd=xsystem35.d.ts
+    )
 
 elseif (ANDROID)
   target_link_libraries(xsystem35 PRIVATE ${ndk_log})
