@@ -31,6 +31,7 @@ jobs:
           SDL2_ttf:p
           SDL2_mixer:p
           libwebp:p
+          portmidi:p
           ${{ matrix.deps }}
 
     - name: Checkout
