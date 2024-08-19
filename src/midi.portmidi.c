@@ -1,5 +1,10 @@
 /*
- * Copyright (C) 2021 bsdf <EMAILBEN145@gmail.com>
+ * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
+ *               1998-                           <masaki-c@is.aist-nara.ac.jp>
+ *               2021 bsdf <EMAILBEN145@gmail.com>
+ *               2024 kichikuou <KichikuouChrome@gmail.com>
+ *
+ * Based on midiplay+ by Daisuke NAGANO  <breeze.nagano@nifty.ne.jp>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,43 +22,36 @@
  *
  */
 
-#include <stdio.h>
-#include <unistd.h>
+#include "config.h"
 
-#include <time.h>
-#include <sys/time.h>
+#include <assert.h>
+#include <portmidi.h>
 #include <SDL_thread.h>
 #include <SDL_timer.h>
-#include <portmidi.h>
 
+#include "portab.h"
 #include "system.h"
 #include "midi.h"
 #include "midifile.h"
+#include "msgqueue.h"
+
+#define MIDI_LATENCY 20
 
 static struct {
 	char midi_variable[128];
 	char midi_flag[128];
 } flags;
 
-typedef struct midievent midievent_t;
-
-static int midi_thread(void *);
-
 static int midi_initialize(char *devnm, int subdev);
 static int midi_exit(void);
 static int midi_reset(void);
 static int midi_start(int no, int loop, char *data, int datalen);
-static int midi_stop();
-static int midi_pause();
-static int midi_unpause();
+static int midi_stop(void);
+static int midi_pause(void);
+static int midi_unpause(void);
 static int midi_getpos(midiplaystate *st);
-static int midi_getflag(int mode, int idx);
-static int midi_setflag(int mode, int idx, int val);
-
-static void midi_allnotesoff();
-static void midi_send_reset();
-static void midi_settempo(midievent_t event);
-static void midi_sync(midievent_t event);
+static int midi_getflag(int mode, int index);
+static int midi_setflag(int mode, int index, int val);
 
 mididevice_t midi_portmidi = {
 	midi_initialize,
@@ -72,115 +70,260 @@ mididevice_t midi_portmidi = {
 	NULL
 };
 
+static boolean enabled = FALSE;
 static PortMidiStream *stream;
-static struct midiinfo *midi;
+static PmDeviceID device_id;
+static SDL_Thread *thread;
+static struct msgq *queue;
 static int start_time;
 
-static SDL_Thread *thread;
-static boolean thread_running = FALSE;
-static boolean should_stop    = FALSE;
-static boolean should_pause   = FALSE;
-static boolean should_unpause = FALSE;
-static boolean should_loop    = FALSE;
+static char cmd_pause[] = "pause";
+static char cmd_unpause[] = "unpause";
+static char cmd_stop[] = "stop";
+
+static void allnotesoff() {
+	for (int i = 0; i < 16; i++) {
+		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x7b, 0x00));
+	}
+}
+
+static void send_reset() {
+	for (int i = 0; i < 16; i++) {
+		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x78, 0x00));
+		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x79, 0x00));
+	}
+	return;
+}
+
+static void midi_write(struct midievent *event, uint32_t timestamp) {
+	assert(event->n <= 3);
+	Pm_WriteShort(stream, timestamp, Pm_Message(event->data[0], event->data[1], event->data[2]));
+}
+
+static PmTimestamp midi_time_proc(void *time_info) {
+	return SDL_GetTicks();
+}
+
+static uint32_t ticks2ms(int ticks, int division, unsigned int tempo) {
+	return ticks * tempo / (division * 1000);
+}
+
+static void *midi_mainloop(struct midiinfo *midi) {
+	int i = 0;
+	int ctick = 0;
+	int tempo = 500000;
+	uint32_t last_time = SDL_GetTicks();
+
+	void *cmd;
+	while (i < midi->eventsize) {
+		if (ctick < midi->event[i].ctime) {
+			int delta = midi->event[i].ctime - ctick;
+			uint32_t target_time = last_time + ticks2ms(delta, midi->division, tempo);
+			uint32_t current_time = SDL_GetTicks();
+			while (current_time < target_time) {
+				cmd = msgq_dequeue_timeout(queue, target_time - current_time);
+				if (cmd == cmd_stop)
+					return cmd;
+
+				if (cmd == cmd_pause) {
+					while (TRUE) {
+						cmd = msgq_dequeue(queue);
+						if (cmd == cmd_stop)
+							return cmd;
+						if (cmd == cmd_unpause)
+							break;
+					}
+					target_time += SDL_GetTicks() - current_time;
+				}
+				current_time = SDL_GetTicks();
+			}
+			last_time = target_time;
+			ctick = midi->event[i].ctime;
+		}
+
+		if (midi->event[i].type == MIDI_EVENT_NORMAL) {
+			midi_write(&midi->event[i], last_time);
+			i++;
+		} else if (midi->event[i].type == MIDI_EVENT_TEMPO) {
+			int *p = (int*)midi->event[i].data;
+			tempo = (unsigned int)*p;
+			i++;
+		} else if (midi->event[i].type == MIDI_EVENT_SYS35) {
+			int vn1 = midi->event[i+1].data[2];
+			int vn2 = midi->event[i+2].data[2];
+			int vn3 = midi->event[i+3].data[2];
+
+			switch (vn1) {
+			case 0:
+				/* set label */
+				i += 6;
+				break;
+			case 1:
+				/* jump */
+				allnotesoff();
+				i = midi->sys35_label[vn2];
+				ctick = midi->event[i].ctime;
+				break;
+			case 2:
+				/* set flag */
+				flags.midi_flag[vn2] = vn3;
+				i += 6;
+				break;
+			case 3:
+				/* flag jump */
+				if (flags.midi_flag[vn2] == 1) {
+					i = midi->sys35_label[vn3];
+					ctick = midi->event[i].ctime;
+					allnotesoff();
+				} else {
+					i += 6;
+				}
+				break;
+			case 4:
+				/* set variable */
+				flags.midi_variable[vn2] = vn3;
+				i += 6;
+				break;
+			case 5:
+				/* variable jump */
+				if (--(flags.midi_variable[vn2]) == 0) {
+					i = midi->sys35_label[vn3];
+					ctick = midi->event[i].ctime;
+					allnotesoff();
+				} else {
+					i += 6;
+				}
+				break;
+			}
+		} else {
+			WARNING("Unknown type of event %x (NEVER!).", midi->event[i].type);
+		}
+	}
+	return NULL;
+}
 
 static int midi_initialize(char *devnm, int subdev) {
-	NOTICE("midi_initialize: devnm = [%s] subdev = [%i]", devnm, subdev);
-	PmError err;
+	enabled = FALSE;
 
-	if ((err = Pm_Initialize()) != pmNoError) {
+	PmError err = Pm_Initialize();
+	if (err != pmNoError) {
 		WARNING("%s", Pm_GetErrorText(err));
 		return NG;
 	}
 
 	int ndevices = Pm_CountDevices();
-	if (ndevices == 0 || subdev >= ndevices) {
+	for (int i = 0; i < ndevices; i++) {
+		const PmDeviceInfo *info = Pm_GetDeviceInfo(i);
+		NOTICE("MIDI #%d: interf=\"%s\", name=\"%s\", input=%d, output=%d",
+		       i, info->interf, info->name, info->input, info->output);
+	}
+	if (subdev < 0 || subdev >= ndevices) {
 		WARNING("invalid midi device number");
 		return NG;
 	}
 
-	if ((err = Pm_OpenOutput(&stream, subdev, NULL, 0, NULL, NULL, 10)) != pmNoError) {
-		WARNING("%s", Pm_GetErrorText(err));
-		return NG;
-	}
-
+	device_id = subdev;
+	enabled = TRUE;
 	return OK;
 }
 
 static int midi_exit(void) {
-	NOTICE("midi_exit");
-	if (thread_running) {
+	if (enabled) {
 		midi_stop();
 	}
-	NOTICE("midi stopped");
-
-	Pm_Close(stream);
-	stream = NULL;
 	Pm_Terminate();
 	return OK;
 }
 
 static int midi_reset(void) {
-	if (thread_running) {
+	if (enabled) {
 		midi_stop();
 	}
 	return OK;
 }
 
+static int midi_thread(void *data) {
+	send_reset();
+
+	void *cmd = midi_mainloop(data);
+
+	send_reset();
+	SDL_Delay(MIDI_LATENCY);
+
+	mf_remove_midifile(data);
+	Pm_Close(stream);
+	stream = NULL;
+
+	while (cmd != cmd_stop)
+		cmd = msgq_dequeue(queue);
+	return 0;
+}
+
+/* no = 0~ */
 static int midi_start(int no, int loop, char *data, int datalen) {
-	NOTICE("midi_start: no = %i loop = %i datalen = %i", no, loop, datalen);
-	should_stop    = FALSE;
-	should_pause   = FALSE;
-	should_unpause = FALSE;
-	should_loop    = loop;
+	if (queue)
+		midi_stop();
 
-	if (thread_running) {
-		if (midi_stop() == NG) {
-			WARNING("error stopping midi thread");
-			return NG;
-		}
-	}
-
-	midi = mf_read_midifile(data, datalen);
-	if (midi == NULL) {
+	struct midiinfo *midi = mf_read_midifile(data, datalen);
+	if (!midi) {
 		WARNING("error reading midi file");
 		return NG;
 	}
 
-	thread = SDL_CreateThread(midi_thread, "PortMIDI", NULL);
-	if (!thread) {
-		WARNING("could not create midi thread");
+	PmError err = Pm_OpenOutput(&stream, device_id, NULL, 0, midi_time_proc, NULL, MIDI_LATENCY);
+	if (err != pmNoError) {
+		WARNING("Pm_OpenOutput failed: %s", Pm_GetErrorText(err));
+		mf_remove_midifile(midi);
 		return NG;
 	}
 
+	queue = msgq_new();
+	thread = SDL_CreateThread(midi_thread, "MIDI", midi);
+
 	start_time = SDL_GetTicks();
+
 	return OK;
 }
 
-static int midi_stop() {
-	NOTICE("midi_stop");
-	should_stop = TRUE;
+static int midi_stop(void) {
+	if (!enabled || !queue) {
+		return OK;
+	}
+
+	msgq_enqueue(queue, cmd_stop);
 	SDL_WaitThread(thread, NULL);
 	thread = NULL;
+	msgq_free(queue);
+	queue = NULL;
+
 	return OK;
 }
 
-static int midi_pause() {
-	NOTICE("midi_pause");
-	should_pause = TRUE;
+static int midi_pause(void) {
+	if (!enabled || !queue) return OK;
+
+	msgq_enqueue(queue, cmd_pause);
 	return OK;
 }
 
-static int midi_unpause() {
-	NOTICE("midi_unpause");
-	should_unpause = TRUE;
+static int midi_unpause(void) {
+	if (!enabled || !queue) return OK;
+
+	msgq_enqueue(queue, cmd_unpause);
 	return OK;
 }
 
 static int midi_getpos(midiplaystate *st) {
-	NOTICE("midi_getpos");
-	if (!thread_running) {
+	if (!enabled || !queue) {
 		st->in_play = FALSE;
-		st->loc_ms = 0;
+		st->loc_ms  = 0;
+		return OK;
+	}
+
+	if (!stream) {
+		midi_stop();
+		st->in_play = FALSE;
+		st->loc_ms  = 0;
 		return OK;
 	}
 
@@ -190,230 +333,23 @@ static int midi_getpos(midiplaystate *st) {
 	return OK;
 }
 
-static int midi_getflag(int mode, int idx) {
-	NOTICE("midi_getflag: %i = %i", mode, idx);
+static int midi_getflag(int mode, int index) {
 	if (mode == 0) {
 		/* flag */
-		return flags.midi_flag[idx];
-	}
-	else {
+		return flags.midi_flag[index];
+	} else {
 		/* variable */
-		return flags.midi_variable[idx];
+		return flags.midi_variable[index];
 	}
 }
 
-static int midi_setflag(int mode, int idx, int val) {
-	NOTICE("midi_setflag: %i %i = %i", mode, idx, val);
+static int midi_setflag(int mode, int index, int val) {
 	if (mode == 0) {
 		/* flag */
-		return flags.midi_flag[idx] = val;
-	}
-	else {
+		flags.midi_flag[index] = val;
+	} else {
 		/* variable */
-		flags.midi_variable[idx] = val;
+		flags.midi_variable[index] = val;
 	}
-
 	return OK;
-}
-
-static uint64_t pc, tick, ctick, tempo, ppqn;
-
-static void midi_write(midievent_t event) {
-	uint64_t ts = (event.ctime * ppqn) / 1000;
-	Pm_WriteShort(stream, ts, Pm_Message(event.data[0], event.data[1], event.data[2]));
-	pc++;
-}
-
-static void midi_allnotesoff() {
-	NOTICE("midi_allnotesoff");
-	for (int i = 0; i < 16; i++) {
-		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x7b, 0x00));
-	}
-}
-
-static void midi_send_reset() {
-	NOTICE("midi_send_reset");
-	for (int i = 0; i < 16; i++) {
-		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x78, 0x00));
-		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x79, 0x00));
-	}
-}
-
-static void midi_settempo(midievent_t event) {
-	int *p;
-	p = (int*)event.data;
-	tempo = (unsigned int)*p;
-	NOTICE("midi_settempo(%i)", tempo);
-	ppqn = tempo / midi->division;
-	pc++;
-}
-
-// the timing here feels a little ...off. it could just be that i've
-// been listening way too hard and overanalyzing but there are a few
-// things that don't feel right. i've tweaked this every way i can think of
-// so any new ideas welcome.
-static void midi_sync(midievent_t event) {
-	int delta = event.ctime - ctick;
-	// (delta * ppqn) SHOULD return the clock time in microseconds.
-	// the 1000 is subtracted to give portmidi some time to queue the events
-	uint64_t stime = (uint64_t) (delta * ppqn) - 1000;
-
-	if (stime > 0) {
-		struct timespec req;
-		// since stime should be in microseconds, we should be dividing by 10^6
-		// but here we are dividing by 10^7 instead. i can't figure out why
-		// the numbers are off.
-		req.tv_sec  = (time_t)   stime / 10000000;
-		req.tv_nsec = (uint64_t)(stime % 10000000) * 1000;
-
-		nanosleep(&req, NULL);
-	}
-
-	ctick = event.ctime;
-}
-
-static void midi_handlesys35(midievent_t event) {
-	NOTICE("midi_handlesys35: ");
-	int vn1 = midi->event[pc+1].data[2];
-	int vn2 = midi->event[pc+2].data[2];
-	int vn3 = midi->event[pc+3].data[2];
-
-	switch (vn1) {
-	case 0:
-		/* set label */
-		NOTICE("set label");
-		pc += 6;
-		break;
-	case 1:
-		/* jump */
-		midi_allnotesoff();
-		pc = midi->sys35_label[vn2];
-		NOTICE("jump to tick [%i]", pc);
-		break;
-	case 2:
-		/* set flag */
-		NOTICE("set flag %i = %i", vn2, vn3);
-		flags.midi_flag[vn2] = vn3;
-		pc += 6;
-		break;
-	case 3:
-		/* flag jump */
-		if (flags.midi_flag[vn2] == 1) {
-			pc = midi->sys35_label[vn3];
-			tick = ctick = event.ctime;
-			midi_allnotesoff();
-			NOTICE("jump to tick [%i] ctime = [%i]", pc, tick);
-		} else {
-			NOTICE("flag [%i] not set, not jumping", vn2);
-			pc += 6;
-		}
-		break;
-	case 4:
-		/* set variable */
-		NOTICE("set var %i = %i", vn2, vn3);
-		flags.midi_variable[vn2] = vn3;
-		pc += 6;
-		break;
-	case 5:
-		/* variable jump */
-		if (--(flags.midi_variable[vn2]) == 0) {
-			pc = midi->sys35_label[vn3];
-			tick = ctick = event.ctime;
-			midi_allnotesoff();
-			NOTICE("jump to tick [%i] ctime = [%i]", pc, tick);
-		} else {
-			NOTICE("var [%i] not set, not jumping", vn2);
-			pc += 6;
-		}
-		break;
-	default:
-		NOTICE("unknown [%i]", vn2);
-		break;
-	}
-}
-
-static int midi_thread(void *args) {
-	thread_running = TRUE;
-	NOTICE("midi_thread started");
-
- start:
-	midi_allnotesoff();
-	midi_send_reset();
-
-	boolean pausing = FALSE;
-	int nevents = midi->eventsize;
-
-	pc = tick = ctick = 0;
-	tempo = 500000;
-	ppqn = tempo / midi->division;
-
-	while (TRUE) {
-		if (pc >= nevents) {
-			NOTICE("midi_thread finished midi file");
-			break;
-		}
-
-		if (should_stop) {
-			NOTICE("midi_thread received stop command");
-			break;
-		}
-
-		if (should_pause) {
-			NOTICE("midi_thread pausing");
-			midi_allnotesoff();
-			should_pause = FALSE;
-			pausing = TRUE;
-		}
-
-		if (should_unpause) {
-			NOTICE("midi_thread unpausing");
-			should_unpause = FALSE;
-			pausing = FALSE;
-		}
-
-		if (pausing) {
-			usleep(50*1000);
-			continue;
-		}
-
-		while (tick == midi->event[pc].ctime) {
-			midievent_t event = midi->event[pc];
-			midi_sync(event);
-
-			switch (midi->event[pc].type) {
-			case MIDI_EVENT_NORMAL:
-				midi_write(event);
-				break;
-			case MIDI_EVENT_TEMPO:
-				midi_settempo(event);
-				break;
-			case MIDI_EVENT_SYS35:
-				midi_handlesys35(event);
-				break;
-			default:
-				NOTICE("unknown type of event [%x]", event.type);
-				break;
-			}
-		}
-		tick++;
-	}
-
-	if (should_loop && !should_stop)
-		goto start;
-
-	if (midi != NULL) {
-		NOTICE("freeing midi file");
-		mf_remove_midifile(midi);
-		midi = NULL;
-	}
-
-	midi_allnotesoff();
-	usleep(10000);
-	midi_send_reset();
-	usleep(10000);
-
-	should_stop = FALSE;
-	thread_running = FALSE;
-	NOTICE("midi_thread done.");
-	return 0;
 }
