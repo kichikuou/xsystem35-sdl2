@@ -26,74 +26,41 @@
 #ifndef __MIDIFILE_H__
 #define __MIDIFILE_H__
 
-#include <stdio.h>
-#include <sys/types.h>
-
 #include "portab.h"
 
-/* Non-standard MIDI file formats */
-#define RIFF                    0x52494646
-#define CTMF                    0x43544d46
-/* Standard MIDI file format definitions */
-#define MThd                    0x4d546864
-#define MTrk                    0x4d54726b
+enum midi_event_type {
+	MIDI_EVENT_NORMAL,
+	MIDI_EVENT_TEMPO,  /* tempo change (msec/midi-qnote) */
+	MIDI_EVENT_SYS35
+};
 
-/* MIDI COMMANDS */
-#define MIDI_NOTEOFF    0x80    /* Note off */
-#define MIDI_NOTEON     0x90    /* Note on */
-#define MIDI_PRESSURE   0xa0    /* Polyphonic key pressure */
-#define MIDI_CONTROL    0xb0    /* Control change */
-#define MIDI_PROGRAM    0xc0    /* Program change */
-#define MIDI_CHANPRES   0xd0    /* Channel pressure */
-#define MIDI_PITCHB     0xe0    /* Pitch wheel change */
-#define MIDI_SYSEX      0xf0    /* System exclusive data */
+#define MIDI_SYS35_EVENT_SIZE 6
 
-#define MIDI_EVENT_NORMAL   0
-#define MIDI_EVENT_TEXT     1
-#define MIDI_EVENT_TEMPO    2
-#define MIDI_EVENT_SYS35    3
-
-#define MAXMIDIEVENT 65536 /* maxium event sequence number */
+enum midi_sys35_event_type {
+	MIDI_SYS35_LABEL_DEFINITION = 0,
+	MIDI_SYS35_LABEL_JUMP       = 1,
+	MIDI_SYS35_FLAG_SET         = 2,
+	MIDI_SYS35_FLAG_JUMP        = 3,
+	MIDI_SYS35_VARIABLE_SET     = 4,
+	MIDI_SYS35_VARIABLE_JUMP    = 5,
+};
 
 struct midievent {
-	int type;             /* Data type 
-				 0: normal
-				 1: text
-				 2: tempo change
-				 3: system35 message
-			      */
-	unsigned long ctime;  /* steptime */
-	int n;                /* data length */
-	int port;             /* midi port */
-	unsigned char *data;  /* midi data */
+	enum midi_event_type type;
+	int ctime;  /* steptime */
+	int32_t data;
 };
 
 struct midiinfo {
-	int format;   /* MIDI format version ( only 0 is supported) */
 	int division; /* division for delta time*/
-	int ntrks;    /* number of track */
-	
-	uint8_t *data;
-	uint8_t *cdata;
-	int length;
-	int length_left;
-	
-	struct midievent event[MAXMIDIEVENT]; /* event data */
-	int eventsize; /* total event size */
-	int ceptr; /* current event pointer */
-	
-	/* work info */
-	long curtime;    /* current time */
-	size_t msgindex; /* midi message buffer index */
-	size_t msgsize;  /* size of current allocaed msg */
-	unsigned char *msgbuffer; /* message buffer */
-	
-	/* system35 jump info */
-	int  sys35_label[127];
-	int marker;
+
+	struct midievent *event;
+	int nr_events;
+
+	int sys35_label[128]; /* system35 jump info */
 };
 
-extern struct midiinfo *mf_read_midifile(uint8_t *stream, off_t len);
+extern struct midiinfo *mf_read_midifile(uint8_t *stream, size_t len);
 extern void mf_remove_midifile(struct midiinfo *m);
 
 #endif /* __MIDIFILE_H__ */

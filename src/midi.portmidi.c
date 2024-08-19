@@ -96,8 +96,7 @@ static void send_reset() {
 }
 
 static void midi_write(struct midievent *event, uint32_t timestamp) {
-	assert(event->n <= 3);
-	Pm_WriteShort(stream, timestamp, Pm_Message(event->data[0], event->data[1], event->data[2]));
+	Pm_WriteShort(stream, timestamp, event->data);
 }
 
 static PmTimestamp midi_time_proc(void *time_info) {
@@ -115,7 +114,7 @@ static void *midi_mainloop(struct midiinfo *midi) {
 	uint32_t last_time = SDL_GetTicks();
 
 	void *cmd;
-	while (i < midi->eventsize) {
+	while (i < midi->nr_events) {
 		if (ctick < midi->event[i].ctime) {
 			int delta = midi->event[i].ctime - ctick;
 			uint32_t target_time = last_time + ticks2ms(delta, midi->division, tempo);
@@ -145,53 +144,46 @@ static void *midi_mainloop(struct midiinfo *midi) {
 			midi_write(&midi->event[i], last_time);
 			i++;
 		} else if (midi->event[i].type == MIDI_EVENT_TEMPO) {
-			int *p = (int*)midi->event[i].data;
-			tempo = (unsigned int)*p;
+			tempo = midi->event[i].data;
 			i++;
 		} else if (midi->event[i].type == MIDI_EVENT_SYS35) {
-			int vn1 = midi->event[i+1].data[2];
-			int vn2 = midi->event[i+2].data[2];
-			int vn3 = midi->event[i+3].data[2];
+			int vn1 = Pm_MessageData2(midi->event[i+1].data);
+			int vn2 = Pm_MessageData2(midi->event[i+2].data);
+			int vn3 = Pm_MessageData2(midi->event[i+3].data);
 
 			switch (vn1) {
-			case 0:
-				/* set label */
-				i += 6;
+			case MIDI_SYS35_LABEL_DEFINITION:
+				i += MIDI_SYS35_EVENT_SIZE;
 				break;
-			case 1:
-				/* jump */
+			case MIDI_SYS35_LABEL_JUMP:
 				allnotesoff();
 				i = midi->sys35_label[vn2];
 				ctick = midi->event[i].ctime;
 				break;
-			case 2:
-				/* set flag */
+			case MIDI_SYS35_FLAG_SET:
 				flags.midi_flag[vn2] = vn3;
-				i += 6;
+				i += MIDI_SYS35_EVENT_SIZE;
 				break;
-			case 3:
-				/* flag jump */
+			case MIDI_SYS35_FLAG_JUMP:
 				if (flags.midi_flag[vn2] == 1) {
 					i = midi->sys35_label[vn3];
 					ctick = midi->event[i].ctime;
 					allnotesoff();
 				} else {
-					i += 6;
+					i += MIDI_SYS35_EVENT_SIZE;
 				}
 				break;
-			case 4:
-				/* set variable */
+			case MIDI_SYS35_VARIABLE_SET:
 				flags.midi_variable[vn2] = vn3;
-				i += 6;
+				i += MIDI_SYS35_EVENT_SIZE;
 				break;
-			case 5:
-				/* variable jump */
+			case MIDI_SYS35_VARIABLE_JUMP:
 				if (--(flags.midi_variable[vn2]) == 0) {
 					i = midi->sys35_label[vn3];
 					ctick = midi->event[i].ctime;
 					allnotesoff();
 				} else {
-					i += 6;
+					i += MIDI_SYS35_EVENT_SIZE;
 				}
 				break;
 			}

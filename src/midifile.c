@@ -3,6 +3,7 @@
  * 
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
+ *               2024 kichikuou <KichikuouChrome@gmail.com>
  *
  * Based on midiplay+ by Daisuke NAGANO  <breeze.nagano@nifty.ne.jp>
  *
@@ -28,557 +29,261 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <portmidi.h>
 
 #include "portab.h"
 #include "system.h"
 #include "midifile.h"
 
-static long to32bit(int c1, int c2, int c3, int c4);
-static void midi_inc();
-static void make_chunk(struct midievent *ev, int n);
-static void midi_noteoff(int chan, int note, int vol);
-static void midi_noteon(int chan, int note, int vol);
-static void midi_pressure(int chan, int note, int press);
-static void midi_controlparameter(int chan, int cnt, int val);
-static void midi_pitchbend(int chan, int lsb, int msg);
-static void midi_program(int chan, int prog);
-static void midi_chanpressure(int chan, int press);
-static void midi_tempo(int tempo);
-static void chanmessage(int status, int c1, int c2);
-static void metaevent(int type);
-static void msginit();
-static void msgadd(int c);
-// static int  msglen();
-static char *msg();
-static int  midigetc();
-static long readvarinum();
-static void read_playevent();
-static int  read_header(uint8_t *stream, off_t len);
+// magic bytes
+#define RIFF 0x52494646
+#define MThd 0x4d546864
+#define MTrk 0x4d54726b
 
-static struct midiinfo *midi;
+// MIDI commands
+#define MIDI_CONTROL 0xb0
 
-#define Read16() \
-(*stream << 8) | (*(stream + 1)), stream+=2
+#define META_END_OF_TRACK 0x2f
+#define META_SET_TEMPO 0x51
 
-#define Read32() \
-(*stream << 24) | (*(stream + 1) << 16) | (*(stream + 2) << 8) | (*(stream + 3)), stream+=4
+struct stream {
+	uint8_t *p;
+	uint8_t *end;
+};
 
-static long to32bit(int c1, int c2, int c3, int c4) {
-	long value = 0L;
-	
-	value = (c1 & 0xff);
-	value = (value << 8) + (c2 & 0xff);
-	value = (value << 8) + (c3 & 0xff);
-	value = (value << 8) + (c4 & 0xff);
-	
+static inline uint8_t read8(struct stream *input) {
+	return *input->p++;
+}
+
+static inline uint16_t read16_be(struct stream *s) {
+	uint16_t val = s->p[0] << 8 | s->p[1];
+	s->p += 2;
+	return val;
+}
+
+static inline uint32_t read32_be(struct stream *s) {
+	uint32_t val = s->p[0] << 24 | s->p[1] << 16 | s->p[2] << 8 | s->p[3];
+	s->p += 4;
+	return val;
+}
+
+static int read_vlq(struct stream *input) {
+	int c, value = 0;
+	do {
+		c = read8(input);
+		value = (value << 7) | (c & 0x7f);
+	} while (c & 0x80);
 	return value;
 }
 
-static void midi_inc() {
-	midi->ceptr++;
-	if (midi->ceptr > MAXMIDIEVENT) {
-		NOTICE("too much event");
-		sys_exit(0);
+/*
+ * System 3.x defines custom (non-standard) MIDI commands using Registered
+ * Parameter Numbers (RPN). A custom command is represented by the following
+ * sequence of MIDI events:
+ *
+ *   b0 65 64  ; set RPN MSB to 100
+ *   b0 64 XX  ; set RPN LSB to XX
+ *   b0 06 YY  ; set data MSB to YY
+ *   b0 26 ZZ  ; set data LSB to ZZ
+ *   b0 65 7f  ; unset RPN MSB
+ *   b0 64 7f  ; unset RPN LSB
+ *
+ * XX represents the command number, and YY and ZZ are data values. The
+ * following commands are defined:
+ *
+ * 00: Label definition. Defines a label #YY at the location of this event.
+ * 01: Label jump. Jumps to the label #YY.
+ * 02: Flag set. Sets the flag #YY to the value ZZ.
+ * 03: Flag jump. If the flag #YY is set to 1, jumps to the label #YY.
+ * 04: Variable set. Sets the variable #YY to the value ZZ.
+ * 05: Variable jump. Decrements the variable #YY by 1. If it reaches 0, jumps
+ *     to the label #ZZ.
+ *
+ * Flags and variables can be retrieved or set from scenario scripts, using the
+ * SG command.
+ */
+
+#define CC_DATA_ENTRY_MSB 0x06
+#define CC_DATA_ENTRY_LSB 0x26
+#define CC_RPN_LSB 0x64
+#define CC_RPN_MSB 0x65
+#define SYS35_RPN_MSB 0x64
+#define RPN_NULL 0x7f
+
+static bool check_sys35cmd(int32_t msg, int *state) {
+	if ((Pm_MessageStatus(msg) & 0xf0) != MIDI_CONTROL) {
+		*state = 0;
+		return false;
 	}
-}
 
-static void make_chunk(struct midievent *ev, int n) {
-	ev->type  = 0;
-	ev->ctime = midi->curtime;
-	ev->n     = n;
-	ev->port  = 0;
-	
-	if (n != 0) {
-		ev->data = malloc(sizeof(unsigned char) * (n + 1));
-	}
-}
+	int data1 = Pm_MessageData1(msg);
+	int data2 = Pm_MessageData2(msg);
+	(*state)++;
 
-static void midi_noteoff(int chan, int note, int vol) {
-	make_chunk(&midi->event[midi->ceptr], 3);
-	
-	midi->event[midi->ceptr].data[0] = MIDI_NOTEOFF + chan;
-	midi->event[midi->ceptr].data[1] = note;
-	midi->event[midi->ceptr].data[2] = vol;
-	
-	midi_inc();
-}
-
-static void midi_noteon(int chan, int note, int vol) {
-	make_chunk(&midi->event[midi->ceptr], 3);
-	
-	midi->event[midi->ceptr].data[0] = MIDI_NOTEON + chan;
-	midi->event[midi->ceptr].data[1] = note;
-	midi->event[midi->ceptr].data[2] = vol;
-	
-	midi_inc();
-}
-
-static void midi_pressure(int chan, int note, int press) {
-	make_chunk(&midi->event[midi->ceptr], 3);
-	
-	midi->event[midi->ceptr].data[0] = MIDI_PRESSURE + chan;
-	midi->event[midi->ceptr].data[1] = note;
-	midi->event[midi->ceptr].data[2] = press;
-	
-	midi_inc();
-}
-
-static int check_sys35mark(int *fnc, int *val1, int *val2) {
-	midi->marker++;
-	
-	switch(midi->marker) {
+	switch (*state) {
 	case 1:
-		if (midi->event[midi->ceptr].data[1] != 101 ||
-		    midi->event[midi->ceptr].data[2] != 100) {
-			midi->marker = 0;
-		}
+		if (data1 == CC_RPN_MSB && data2 == SYS35_RPN_MSB)
+			return false;
 		break;
 	case 2:
-		if (midi->event[midi->ceptr].data[1] != 100) {
-			midi->marker = 0;
-		}
+		if (data1 == CC_RPN_LSB)
+			return false;
 		break;
 	case 3:
-		if (midi->event[midi->ceptr].data[1] != 6) {
-			midi->marker = 0;
-		}
+		if (data1 == CC_DATA_ENTRY_MSB)
+			return false;
 		break;
 	case 4:
-		if (midi->event[midi->ceptr].data[1] != 38) {
-			midi->marker = 0;
-		}
+		if (data1 == CC_DATA_ENTRY_LSB)
+			return false;
 		break;
 	case 5:
-		if (midi->event[midi->ceptr].data[1] != 101 ||
-		    midi->event[midi->ceptr].data[2] != 127) {
-			midi->marker = 0;
-		}
+		if (data1 == CC_RPN_MSB && data2 == RPN_NULL)
+			return false;
 		break;
 	case 6:
-		if (midi->event[midi->ceptr].data[1] != 100 ||
-		    midi->event[midi->ceptr].data[2] != 127) {
-			midi->marker = 0;
-		} else {
-			midi->marker = 0;
-			*fnc  = midi->event[midi->ceptr-4].data[2];
-			*val1 = midi->event[midi->ceptr-3].data[2];
-			*val2 = midi->event[midi->ceptr-2].data[2];
-			return 1;
+		if (data1 == CC_RPN_LSB && data2 == RPN_NULL) {
+			*state = 0;
+			return true;
 		}
 		break;
 	}
-	return 0;
+	*state = 0;
+	return false;
 }
 
-static void midi_controlparameter(int chan, int cnt, int val) {
-	int fnc, val1, val2;
-	
-	make_chunk(&midi->event[midi->ceptr], 3);
-	
-	midi->event[midi->ceptr].data[0] = MIDI_CONTROL + chan;
-	midi->event[midi->ceptr].data[1] = cnt;
-	midi->event[midi->ceptr].data[2] = val;
-	
-	if (check_sys35mark(&fnc, &val1, &val2) > 0) {
-		midi->event[midi->ceptr - 5].type = 3;
-		/* ラベル登録 */
-		if (fnc == 0) {
-			midi->sys35_label[val1] = midi->ceptr -5;
-		}
+static void add_event(struct midiinfo *midi, int *event_buffer_size, enum midi_event_type type, int curtime, int32_t data) {
+	if (midi->nr_events >= *event_buffer_size) {
+		*event_buffer_size = *event_buffer_size ? *event_buffer_size * 3 / 2 : 4096;
+		midi->event = realloc(midi->event, *event_buffer_size * sizeof(struct midievent));
 	}
-	
-	midi_inc();
+	midi->event[midi->nr_events].type = type;
+	midi->event[midi->nr_events].ctime = curtime;
+	midi->event[midi->nr_events].data = data;
+	midi->nr_events++;
 }
 
-static void midi_pitchbend(int chan, int lsb, int msg) {
-	make_chunk(&midi->event[midi->ceptr], 3);
-	
-	midi->event[midi->ceptr].data[0] = MIDI_PITCHB + chan;
-	midi->event[midi->ceptr].data[1] = lsb;
-	midi->event[midi->ceptr].data[2] = msg;
-	
-	midi_inc();
-}
-
-static void midi_program(int chan, int prog) {
-	make_chunk(&midi->event[midi->ceptr], 2);
-	
-	midi->event[midi->ceptr].data[0] = MIDI_PROGRAM + chan;
-	midi->event[midi->ceptr].data[1] = prog;
-	
-	midi_inc();
-}
-
-static void midi_chanpressure(int chan, int press) {
-	make_chunk(&midi->event[midi->ceptr], 2);
-	
-	midi->event[midi->ceptr].data[0] = MIDI_CHANPRES + chan;
-	midi->event[midi->ceptr].data[1] = press;
-	
-	midi_inc();
-}
-
-static void midi_tempo(int tempo) {
-	unsigned char x[4];
-	unsigned int *p;
-	
-	p = (unsigned int*)x;
-	*p = (unsigned int)tempo;
-	
-	make_chunk(&midi->event[midi->ceptr], sizeof(unsigned long));
-	midi->event[midi->ceptr].type = 2; /* tempo change (msec/midi-qnote) */
-	midi->event[midi->ceptr].data[0] = x[0];
-	midi->event[midi->ceptr].data[1] = x[1];
-	midi->event[midi->ceptr].data[2] = x[2];
-	midi->event[midi->ceptr].data[3] = x[3];
-	
-	midi_inc();
-}
-
-static void chanmessage(int status, int c1, int c2) {
-	int chan = status & 0xf;
-	
-	switch (status & 0xf0) {
-	case 0x80:
-		midi_noteoff(chan, c1, c2);
-		break;
-	case 0x90:
-		midi_noteon(chan, c1, c2);
-		break;
-	case 0xa0:
-		midi_pressure(chan, c1, c2);
-		break;
-	case 0xb0:
-		midi_controlparameter(chan, c1, c2);
-		break;
-	case 0xe0:
-		midi_pitchbend(chan, c1, c2);
-		break;
-	case 0xc0:
-		midi_program(chan, c1);
-		break;
-	case 0xd0:
-		midi_chanpressure(chan, c1);
-		break;
-	default:
-		NOTICE("Unknown Message");
-	}
-}
-
-static void metaevent(int type) {
-	// int  len = msglen();
-	char *m = msg();
-	
-	switch(type) {
-	case 0x00:
-		NOTICE("seqnum");
-		break;
-	case 0x01:
-		NOTICE("text event (Text Event, Ignored)");
-		break;
-	case 0x02:
-		NOTICE("copyright notice (Text Event, Ignored)");
-		break;
-	case 0x03:
-		NOTICE("sequence / track name (Text Event, Ignored)");
-		break;
-	case 0x04:
-		NOTICE("instrument name (Text Event, Ignored)");
-		break;
-	case 0x05:
-		NOTICE("lyric (Text Event, Ignored)");
-		break;
-	case 0x06:
-		NOTICE("marker (Text Event, Ignored)");
-		break;
-	case 0x07:
-		NOTICE("cue point (Text Event, Ignored)");
-		break;
-	case 0x08:
-		NOTICE("meta event 0x08 (Text Event, Ignored)");
-		break;
-	case 0x09:
-		NOTICE("meta event 0x09 (Text Event, Ignored)");
-		break;
-	case 0x0a:
-		NOTICE("meta event 0x0a (Text Event, Ignored)");
-		break;
-	case 0x0b:
-		NOTICE("meta event 0x0b (Text Event, Ignored)");
-		break;
-	case 0x0c:
-		NOTICE("meta event 0x0c (Text Event, Ignored)");
-		break;
-	case 0x0d:
-		NOTICE("meta event 0x0d (Text Event, Ignored)");
-		break;
-	case 0x0e:
-		NOTICE("meta event 0x0e (Text Event, Ignored)");
-		break;
-	case 0x0f:
-		NOTICE("meta event 0x0f (Text Event, Ignored)");
-		break;
-	case 0x2f:
-		/* EOF */
-		midi->length_left = 0;
-		midi->eventsize = midi->ceptr;
-		break;
-	case 0x51:
-		midi_tempo(to32bit(0, m[0], m[1], m[2]));
-		break;
-	case 0x54:
-		NOTICE("set smpte");
-		break;
-	case 0x58:
-		NOTICE("time sig (Ignore)");
-		break;
-	case 0x59:
-		NOTICE("keysig (Ignore)");
-		break;
-	case 0x7f:
-		NOTICE("seq specific");
-		break;
-	default:
-		NOTICE("meta misc");
-		break;
-	}
-}
-
-static void msginit() {
-	midi->msgindex = 0;
-}
-
-static void msgadd(int c) {
-	if (midi->msgindex >= midi->msgsize) {
-		midi->msgsize *= 2;
-		midi->msgbuffer = (unsigned char *)realloc(midi->msgbuffer, midi->msgsize);
-	}
-	midi->msgbuffer[midi->msgindex++] = (unsigned char)c;
-}
-
-#if 0
-static int msglen() {
-	return midi->msgindex;
-}
-#endif
-
-static char *msg() {
-	return midi->msgbuffer;
-}
-
-static int midigetc() {
-	midi->length_left--;
-	return *midi->cdata++;
-}
-
-/* readvarinum - read a varying-length number, and return the */
-/* number of characters it took. */
-
-static long readvarinum() {
-	long value;
-	int  c;
-	
-	value = c = midigetc();
-	
-	if (c & 0x80) {
-		value &= 0x7f;
-		do {
-			c = midigetc();
-			value = (value << 7) + (c & 0x7f);
-		} while (c & 0x80);
-	}
-	return value;
-}
-
-static void read_playevent() {
-	int c, c1, type;
-	int running = 0; /* 1 when running status used */
-	int status = 0; /* status value (e.g. 0x90==note-on) */
-	int delta, needed, lookfor, len;
-	
+static void read_events(struct midiinfo *midi, struct stream *input) {
 	/* This array is indexed by the high half of a status byte.  It's */
 	/* value is either the number of bytes needed (1 or 2) for a channel */
 	/* message, or 0 (meaning it's not  a channel message). */
-	static int      chantype[] = {
+	const int chantype[] = {
 		0, 0, 0, 0, 0, 0, 0, 0,	/* 0x00 through 0x70 */
 		2, 2, 2, 2, 1, 1, 2, 0	/* 0x80 through 0xf0 */
 	};
-	
-	midi->cdata = midi->data;
-	midi->length_left = midi->length;
-	midi->curtime = 0;
-	midi->ceptr = 0;
-	
-	while(midi->length_left > 0) {
-		midi->curtime += (delta = readvarinum()); /* delta time for midi event */
 
-		c = midigetc();
-		
-		if ((c & 0x80) == 0) {
-			running = 1;
+	int curtime = 0;
+	int event_buffer_size = 0;
+
+	int status = 0; /* status value (e.g. 0x90==note-on) */
+	bool running = false;
+	int sys35cmd_state = 0;
+	while (input->p < input->end) {
+		int delta = read_vlq(input);
+		curtime += delta; /* delta time for midi event */
+
+		int c = read8(input);
+
+		if (!(c & 0x80)) {
+			running = true;
 		} else {
 			status = c;
-			running = 0;
-		}
-		
-		needed = chantype[(status >> 4) & 0x0f];
-		
-		if (needed) {	/* ie. is it a channel message? */
-			
-			if (running) {
-				c1 = c;
-			} else {
-				c1 = midigetc();
-			}
-			chanmessage(status, c1, (needed > 1) ? midigetc() : 0);
-			
-			if ((status & 0xf0) != 0xb0) {
-				midi->marker = 0; /* maker flag clear */
-			}
-			continue;;
+			running = false;
 		}
 
-		midi->marker = 0; /* maker flag clear */
-		
+		int needed = chantype[(status >> 4) & 0x0f];
+
+		if (needed) {	/* ie. is it a channel message? */
+			int c1 = running ? c : read8(input);
+			int c2 = needed > 1 ? read8(input) : 0;
+			int32_t msg = Pm_Message(status, c1, c2);
+			add_event(midi, &event_buffer_size, MIDI_EVENT_NORMAL, curtime, msg);
+
+			if (check_sys35cmd(msg, &sys35cmd_state)) {
+				int command_top = midi->nr_events - MIDI_SYS35_EVENT_SIZE;
+				midi->event[command_top].type = MIDI_EVENT_SYS35;
+				int cmd = Pm_MessageData2(midi->event[command_top + 1].data);
+				int val1 = Pm_MessageData2(midi->event[command_top + 2].data);
+				if (cmd == MIDI_SYS35_LABEL_DEFINITION)
+					midi->sys35_label[val1] = command_top;
+			}
+			continue;
+		}
+
+		sys35cmd_state = 0;
+
+		int type, len;
 		switch (c) {
 		case 0xFF: /* meta event */
-			type = midigetc();
-			len = readvarinum();
-			lookfor = midi->length_left - len;
-			msginit();
-			
-			while(midi->length_left > lookfor) {
-				msgadd(midigetc());
+			type = read8(input);
+			len = read_vlq(input);
+			switch(type) {
+			case META_END_OF_TRACK:
+				return;
+			case META_SET_TEMPO:
+				add_event(midi, &event_buffer_size, MIDI_EVENT_TEMPO, curtime, input->p[0] << 16 | input->p[1] << 8 | input->p[2]);
+				break;
 			}
-			
-			metaevent(type);
+			input->p += len;
 			break;
-			
+
 		case 0xF0: /* system exclusive */
-			len = readvarinum();
-			lookfor = midi->length_left - len;
-			msginit();
-			msgadd(0xF0);
-			while(midi->length_left > lookfor) {
-				msgadd(midigetc());
-			}
-			NOTICE("system exculsive ( not supported )");
+			input->p += read_vlq(input);
 			break;
-			
+
 		case 0xF7: /* system exclusive continuation or arbitrary stuff */
-			len = readvarinum();
-			lookfor = midi->length_left - len;
-			msginit();
-			while(midi->length_left > lookfor) {
-				msgadd(c = midigetc());
-			}
-			NOTICE("system exclusive cont. ( not supporte d)");
+			input->p += read_vlq(input);
 			break;
-			
+
 		default:
-			NOTICE("Unknow Event ( not supported )");
+			WARNING("SMF: Unknown Event 0x%x", c);
 		}
-		
 	}
 }
 
-static int read_header(uint8_t *stream, off_t len) {
-	int tracklen, i = 0;
-	uint8_t *stream_top = stream;
-	
-	while(i == 0 && stream < (stream_top + len)) {
-		if (0 == strncmp(stream, "MThd", 4)) {
-			stream += 4;
-			i++;
-		} else {
-			stream++;
-		}
+static bool read_header(struct midiinfo *midi, struct stream *input) {
+	int magic = read32_be(input);
+	if (magic == RIFF) {
+		input->p += 16;
+		magic = read32_be(input);
 	}
-	
-	if (stream != stream_top) {
-		stream -= 4;
-	}
-	
-	i = Read32();
-	
-	if (i == RIFF) {
-		stream += 16;
-		i = Read32();
-	}
-	
-	if (i == MThd) {
-		tracklen = Read32();
-		midi->format = Read16();
-		midi->ntrks = Read16();
-		midi->division = Read16();
-	} else {
-		boolean found = FALSE;
-		while (!found && stream < (stream_top + len - 8)) {
-			if (0 == strncmp(stream, "MThd", 4)) {
-				found = TRUE;
-			} else {
-				stream++;
-			}
-		}
-		if (found) {
-			stream += 4;
-			tracklen = Read32();
-			midi->format = Read16();
-			midi->ntrks = Read16();
-			midi->division = Read16();
-		} else {
-			WARNING("unknow format");
-			return NG;
-		}
-	}
-	
-	if (midi->ntrks != 1) {
-		WARNING("multiple track (format 1) is not supported");
-		return NG;
-	}
-	
-	NOTICE("tracklen = %d, format = %d, ntrks = %d, division = %d", 
-	       tracklen, midi->format, midi->ntrks, midi->division);
-	
-	i = Read32();
-	if (i != MTrk) {
-		WARNING("Unknow format");
-	}
-	
-	tracklen = Read32();
-	
-	if (stream + tracklen > stream_top + len) {
-		tracklen = stream + len - stream_top;
-	}
-	
-	midi->length = tracklen;
-	midi->data = stream;
-	
-	return OK;
+	if (magic != MThd)
+		return false;
+
+	if (read32_be(input) != 6)  // header size
+		return false;
+	if (read16_be(input) != 0)  // format
+		return false;
+	if (read16_be(input) != 1)  // number of tracks
+		return false;
+	midi->division = read16_be(input);
+
+	magic = read32_be(input);
+	if (magic != MTrk)
+		return false;
+
+	int tracklen = read32_be(input);
+	if (input->p + tracklen < input->end)
+		input->end = input->p + tracklen;
+
+	return true;
 }
 
-struct midiinfo *mf_read_midifile(uint8_t *stream, off_t len) {
-	midi = malloc(sizeof(struct midiinfo));
-	
-	midi->msgsize = 128; /* Initial msg buffer size */
-	midi->msgbuffer = calloc(midi->msgsize, sizeof(unsigned char));
-	
-	if (0 > read_header(stream, len)) {
+struct midiinfo *mf_read_midifile(uint8_t *data, size_t len) {
+	struct stream input = { .p = data, .end = data + len };
+	struct midiinfo *midi = calloc(1, sizeof(struct midiinfo));
+
+	if (!read_header(midi, &input)) {
+		free(midi);
 		return NULL;
 	}
-	
-	read_playevent();
-	
+
+	read_events(midi, &input);
+
 	return midi;
 }
 
 void mf_remove_midifile(struct midiinfo *m) {
-	int i;
-	
-	free(m->msgbuffer);
-	
-	for (i = 0; i < m->eventsize; i ++) {
-		free(m->event[i].data);
-	}
+	free(m->event);
 	free(m);
 }
