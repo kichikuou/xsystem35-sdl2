@@ -49,11 +49,6 @@
 
 #playlist: playlist.txt
 
-# device name of the raw midi device or sequencer device.
-
-#midi_device: /dev/midi
-#midi_device: /dev/sequencer
-
 # Audio buffer size in bytes.
 # Too small value causes sound glitches, too large value causes sound delay.
 
@@ -62,8 +57,6 @@
 # MIDI Output method
 # 'e'  : SDL_mixer (default)
 # 'pX' : via PortMidi (X is the device number, usually 0)
-# 'r'  : raw midi device
-# 'sX' : sequencer device (X is the port number, usually 0)
 # '0'  : disable MIDI
 
 #midi_output_device: e

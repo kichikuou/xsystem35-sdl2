@@ -47,17 +47,8 @@ finds System 3.x game files (*.ALD) from the current directory.
   Load the CD playlist from _file_. The playlist is a text file with one
   filename per line, in the order of CD tracks. See <<FILES>> section for details.
 
-*-devmidi* _device_::
-  Path to the midi device.
-
 *-Me*::
   Use SDL_mixer for MIDI playback.
-
-*-Mr*::
-  Use raw MIDI device for MIDI playback.
-
-**-Ms**_device_number_::
-  Use sequencer device of the given number for MIDI playback.
 
 **-Mp**_device_number_::
   Use ALSA (via PortMidi) for MIDI playback.

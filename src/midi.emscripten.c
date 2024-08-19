@@ -24,7 +24,7 @@
 #include "portab.h"
 #include "midi.h"
 
-static int midi_initilize(char *pname, int subdev) {
+static int midi_initialize(int subdev) {
 	return OK;
 }
 
@@ -96,7 +96,7 @@ EM_JS(boolean, midi_fading, (), {
 });
 
 mididevice_t midi_emscripten = {
-	midi_initilize,
+	midi_initialize,
 	midi_exit,
 	midi_reset,
 	midi_start,

@@ -23,13 +23,11 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"
 #include "midi.h"
 
-static char *dev;
 static char default_mode = 'e';
 static int subdev = -1;
 
@@ -45,10 +43,6 @@ extern mididevice_t midi_android;
 extern mididevice_t midi_sdlmixer;
 #endif
 
-#if defined(ENABLE_MIDI_RAWMIDI) || defined(ENABLE_MIDI_SEQMIDI)
-extern mididevice_t midi_rawmidi;
-#endif
-
 #ifdef ENABLE_MIDI_PORTMIDI
 extern mididevice_t midi_portmidi;
 #endif
@@ -57,30 +51,23 @@ int midi_init(mididevice_t *midi) {
 	int ret = NG;
 
 	switch(default_mode) {
-	case 'r':
-	case 's':
-#if defined(ENABLE_MIDI_RAWMIDI) || defined(ENABLE_MIDI_SEQMIDI)
-		memcpy(midi, &midi_rawmidi, sizeof(mididevice_t));
-		ret = midi->init(dev, subdev);
-#endif
-		break;
 	case 'e':
 #ifdef __EMSCRIPTEN__
-		ret = midi_emscripten.init(NULL, 0);
+		ret = midi_emscripten.init(0);
 		memcpy(midi, &midi_emscripten, sizeof(mididevice_t));
 #endif
 #ifdef __ANDROID__
-		ret = midi_android.init(NULL, 0);
+		ret = midi_android.init(0);
 		memcpy(midi, &midi_android, sizeof(mididevice_t));
 #endif
 #ifdef ENABLE_MIDI_SDLMIXER
-		ret = midi_sdlmixer.init(NULL, 0);
+		ret = midi_sdlmixer.init(0);
 		memcpy(midi, &midi_sdlmixer, sizeof(mididevice_t));
 #endif
 		break;
 	case 'p':
 #ifdef ENABLE_MIDI_PORTMIDI
-		ret = midi_portmidi.init(NULL, subdev);
+		ret = midi_portmidi.init(subdev);
 		memcpy(midi, &midi_portmidi, sizeof(mididevice_t));
 #endif
 	case '0':
@@ -90,26 +77,11 @@ int midi_init(mididevice_t *midi) {
 	return ret;
 }
 
-void midi_set_devicename(const char *name) {
-	if (dev) free(dev);
-	if (0 == strcmp("none", name)) dev = NULL;
-	else                           dev = strdup(name);
-}
-
 void midi_set_output_device(int mode) {
 	switch(mode & 0x7f) {
 	case 'e':
 		/* external player */
 		default_mode = 'e';
-		break;
-	case 'r':
-		/* raw midi mode */
-		default_mode = 'r';
-		break;
-	case 's':
-		/* sequencer midi mode */
-		default_mode = 's';
-		subdev = mode >> 8;
 		break;
 	case 'p':
 		/* portmidi midi mode */

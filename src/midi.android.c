@@ -23,7 +23,7 @@
 #include "portab.h"
 #include "midi.h"
 
-static int midi_initilize(char *pname, int subdev);
+static int midi_initialize(int subdev);
 static int midi_exit(void);
 static int midi_reset(void);
 static int midi_start(int no, int loop, char *data, int datalen);
@@ -40,7 +40,7 @@ static boolean midi_fading();
 
 #define midi midi_android
 mididevice_t midi = {
-	midi_initilize,
+	midi_initialize,
 	midi_exit,
 	midi_reset,
 	midi_start,
@@ -56,7 +56,7 @@ mididevice_t midi = {
 	midi_fading
 };
 
-static int midi_initilize(char *pname, int subdev) {
+static int midi_initialize(int subdev) {
 	return OK;
 }
 

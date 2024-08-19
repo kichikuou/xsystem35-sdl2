@@ -123,12 +123,6 @@ static void sys35_usage(boolean verbose) {
 #ifdef ENABLE_MIDI_SDLMIXER
 	puts(" -Me             : SDL_mixer midi player");
 #endif
-#ifdef ENABLE_MIDI_RAWMIDI
-	puts(" -Mr             : Raw Midi device");
-#endif
-#ifdef ENABLE_MIDI_SEQMIDI
-	puts(" -Ms?            : Sequenceer device (?:devicenumber)");
-#endif
 #ifdef ENABLE_MIDI_PORTMIDI
 	puts(" -Mp?            : ALSA (via PortMidi) (?:devicenumber)");
 #endif
@@ -288,10 +282,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			if (argv[i + 1] != NULL) {
 				muscd_set_playlist(argv[i + 1]);
 			}
-		} else if (0 == strcmp(argv[i], "-devmidi")) {
-			if (argv[i + 1] != NULL) {
-				midi_set_devicename(argv[i + 1]);
-			}
 		} else if (0 == strncmp(argv[i], "-M", 2)) {
 			int subdev = 0;
 			if (argv[i][3] != '\0') {
@@ -399,11 +389,6 @@ static void check_profile() {
 	param = get_profile("joy_device");
 	if (param) {
 		sdl_setJoyDeviceIndex(atoi(param));
-	}
-	/* Raw MIDI device name の設定 */
-	param = get_profile("midi_device");
-	if (param) {
-		midi_set_devicename(param);
 	}
 	/* MIDI output device の設定 */
 	param = get_profile("midi_output_device");

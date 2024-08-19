@@ -42,7 +42,7 @@ static struct {
 	char midi_flag[128];
 } flags;
 
-static int midi_initialize(char *devnm, int subdev);
+static int midi_initialize(int subdev);
 static int midi_exit(void);
 static int midi_reset(void);
 static int midi_start(int no, int loop, char *data, int datalen);
@@ -202,7 +202,7 @@ static void *midi_mainloop(struct midiinfo *midi) {
 	return NULL;
 }
 
-static int midi_initialize(char *devnm, int subdev) {
+static int midi_initialize(int subdev) {
 	enabled = FALSE;
 
 	PmError err = Pm_Initialize();

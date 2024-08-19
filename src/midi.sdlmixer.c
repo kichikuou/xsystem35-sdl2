@@ -31,7 +31,7 @@
 #define MIX_INIT_MID MIX_INIT_FLUIDSYNTH
 #endif
 
-static int midi_initilize(char *pname, int subdev);
+static int midi_initialize(int subdev);
 static int midi_exit(void);
 static int midi_reset(void);
 static int midi_start(int no, int loop, char *data, int datalen);
@@ -48,7 +48,7 @@ static boolean midi_fading();
 
 #define midi midi_sdlmixer
 mididevice_t midi = {
-	midi_initilize,
+	midi_initialize,
 	midi_exit,
 	midi_reset,
 	midi_start,
@@ -68,7 +68,7 @@ static Mix_Music *mix_music;
 static int start_time;
 static uint32_t fade_tick;
 
-static int midi_initilize(char *pname, int subdev) {
+static int midi_initialize(int subdev) {
 	if (Mix_Init(MIX_INIT_MID) != MIX_INIT_MID)
 		return NG;
 	return OK;
