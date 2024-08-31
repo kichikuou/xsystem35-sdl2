@@ -27,6 +27,7 @@
 #include "sdl_core.h"
 #include "sdl_private.h"
 
+#define M_PIf ((float)M_PI)
 #define HAS_SDL_RenderGeometry SDL_VERSION_ATLEAST(2, 0, 18)
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
@@ -111,7 +112,7 @@ enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 }
 
 struct sdl_effect {
-	void (*step)(struct sdl_effect *this, double progress);
+	void (*step)(struct sdl_effect *this, float progress);
 	void (*finish)(struct sdl_effect *this);
 	enum sdl_effect_type type;
 	SDL_Rect dst_rect;
@@ -175,7 +176,7 @@ static inline void move_rect(SDL_Rect *r, int off_x, int off_y) {
 
 // EFFECT_CROSSFADE
 
-static void crossfade_step(struct sdl_effect *eff, double progress);
+static void crossfade_step(struct sdl_effect *eff, float progress);
 static void crossfade_free(struct sdl_effect *eff);
 
 static struct sdl_effect *crossfade_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new) {
@@ -188,7 +189,7 @@ static struct sdl_effect *crossfade_new(SDL_Rect *rect, SDL_Surface *old, SDL_Su
 	return eff;
 }
 
-static void crossfade_step(struct sdl_effect *eff, double progress) {
+static void crossfade_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
 	SDL_SetTextureBlendMode(eff->tx_new, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(eff->tx_new, progress * 255);
@@ -209,7 +210,7 @@ static struct sdl_effect *fallback_effect_new(SDL_Rect *rect, SDL_Surface *old, 
 
 // EFFECT_CROSSFADE_{UP,DOWN,LR,RL}
 
-static void crossfade_animation_step(struct sdl_effect *eff, double progress);
+static void crossfade_animation_step(struct sdl_effect *eff, float progress);
 static void crossfade_animation_free(struct sdl_effect *eff);
 
 static struct sdl_effect *crossfade_animation_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -222,7 +223,7 @@ static struct sdl_effect *crossfade_animation_new(SDL_Rect *rect, SDL_Surface *o
 	return eff;
 }
 
-static void crossfade_animation_step_sub(SDL_Rect *rect, SDL_Texture *tx, int tx_x, int tx_y, double progress, int band_width, bool lr, bool flip) {
+static void crossfade_animation_step_sub(SDL_Rect *rect, SDL_Texture *tx, int tx_x, int tx_y, float progress, int band_width, bool lr, bool flip) {
 	int maxstep = (lr ? rect->w : rect->h) + band_width;
 	int band_top = maxstep * progress - band_width;
 	if (band_top > 0) {
@@ -267,7 +268,7 @@ static void crossfade_animation_step_sub(SDL_Rect *rect, SDL_Texture *tx, int tx
 	SDL_SetTextureBlendMode(tx, SDL_BLENDMODE_NONE);
 }
 
-static void crossfade_animation_step(struct sdl_effect *eff, double progress) {
+static void crossfade_animation_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
 
 	switch (eff->type) {
@@ -324,7 +325,7 @@ struct mosaic_effect {
 	SDL_Texture *tmp_old, *tmp_new, *tx_mosaic;
 };
 
-static void mosaic_step(struct sdl_effect *eff, double progress);
+static void mosaic_step(struct sdl_effect *eff, float progress);
 static void mosaic_free(struct sdl_effect *eff);
 
 static struct sdl_effect *mosaic_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -343,7 +344,7 @@ static struct sdl_effect *mosaic_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surfa
 	return &eff->eff;
 }
 
-static void mosaic(SDL_Texture *src, SDL_Texture *tmp, SDL_Texture *dst, int w, int h, double scale) {
+static void mosaic(SDL_Texture *src, SDL_Texture *tmp, SDL_Texture *dst, int w, int h, float scale) {
 	int cx = w / 2;
 	int cy = h / 2;
 	SDL_FRect fr = {
@@ -372,17 +373,17 @@ static void mosaic(SDL_Texture *src, SDL_Texture *tmp, SDL_Texture *dst, int w, 
 	SDL_SetRenderTarget(sdl_renderer, NULL);
 }
 
-static void mosaic_step(struct sdl_effect *eff, double progress) {
+static void mosaic_step(struct sdl_effect *eff, float progress) {
 	struct mosaic_effect *this = (struct mosaic_effect *)eff;
 
 	if (eff->type == EFFECT_MOSAIC) {
 		const int max_scale = 80;
-		int scale = (1.0 - progress) * (max_scale - 1) + 1;
+		int scale = (1.f - progress) * (max_scale - 1) + 1;
 		mosaic(eff->tx_new, this->tmp_new, this->tx_mosaic, eff->dst_rect.w, eff->dst_rect.h, scale);
 		SDL_RenderCopy(sdl_renderer, this->tx_mosaic, NULL, &eff->dst_rect);
 	} else if (eff->type == EFFECT_CROSSFADE_MOSAIC) {
 		const int max_scale = 96;
-		double scale = (progress < 0.5 ? progress : 1.0 - progress) * 2 * (max_scale - 1) + 1;
+		float scale = (progress < 0.5f ? progress : 1.f - progress) * 2 * (max_scale - 1) + 1;
 		mosaic(eff->tx_old, this->tmp_old, this->tx_mosaic, eff->dst_rect.w, eff->dst_rect.h, scale);
 		SDL_RenderCopy(sdl_renderer, this->tx_mosaic, NULL, &eff->dst_rect);
 		mosaic(eff->tx_new, this->tmp_new, this->tx_mosaic, eff->dst_rect.w, eff->dst_rect.h, scale);
@@ -408,7 +409,7 @@ static void mosaic_free(struct sdl_effect *eff) {
 
 // EFFECT_{FADE,WHITE}{OUT,IN}
 
-static void brightness_step(struct sdl_effect *eff, double progress);
+static void brightness_step(struct sdl_effect *eff, float progress);
 static void brightness_free(struct sdl_effect *eff);
 
 static struct sdl_effect *brightness_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -421,7 +422,7 @@ static struct sdl_effect *brightness_new(SDL_Rect *rect, SDL_Surface *old, SDL_S
 	return eff;
 }
 
-static void brightness_step(struct sdl_effect *eff, double progress) {
+static void brightness_step(struct sdl_effect *eff, float progress) {
 	SDL_Texture *texture;
 	int color;
 	int alpha;
@@ -439,7 +440,7 @@ static void brightness_step(struct sdl_effect *eff, double progress) {
 	case EFFECT_FADEIN:
 		texture = eff->tx_new;
 		color = 0;
-		alpha = (1.0 - progress) * 255;
+		alpha = (1.f - progress) * 255;
 		break;
 	case EFFECT_WHITEOUT:
 		texture = eff->tx_old;
@@ -454,7 +455,7 @@ static void brightness_step(struct sdl_effect *eff, double progress) {
 	case EFFECT_WHITEIN:
 		texture = eff->tx_new;
 		color = 255;
-		alpha = (1.0 - progress) * 255;
+		alpha = (1.f - progress) * 255;
 		break;
 	default:
 		assert(!"Cannot happen");
@@ -475,7 +476,7 @@ static void brightness_free(struct sdl_effect *eff) {
 
 // EFFECT_DITHERING_{FADE,WHITE}{OUT,IN}
 
-static void dithering_fade_step(struct sdl_effect *eff, double progress);
+static void dithering_fade_step(struct sdl_effect *eff, float progress);
 static void dithering_fade_free(struct sdl_effect *eff);
 
 static SDL_Texture *create_dither_pattern_texture(int w, int h, int val) {
@@ -532,15 +533,15 @@ static struct sdl_effect *dithering_fade_new(SDL_Rect *rect, SDL_Surface *old, S
 	return eff;
 }
 
-static void dithering_fade_step(struct sdl_effect *eff, double progress) {
+static void dithering_fade_step(struct sdl_effect *eff, float progress) {
 	static const int dither_x[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
 	static const int dither_y[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
 
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
 
 	if (eff->type == EFFECT_DITHERING_FADEIN || eff->type == EFFECT_DITHERING_WHITEIN)
-		progress = 1 - progress;
-	int level = round(progress * 16);
+		progress = 1.f - progress;
+	int level = roundf(progress * 16);
 
 	assert(eff->is_fullscreen);
 	SDL_Rect dr = eff->dst_rect;
@@ -564,7 +565,7 @@ static void dithering_fade_free(struct sdl_effect *eff) {
 
 // EFFECT_WIPE_*
 
-static void wipe_step(struct sdl_effect *eff, double progress);
+static void wipe_step(struct sdl_effect *eff, float progress);
 static void wipe_free(struct sdl_effect *eff);
 
 static struct sdl_effect *wipe_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -577,7 +578,7 @@ static struct sdl_effect *wipe_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface
 	return eff;
 }
 
-static void wipe_step(struct sdl_effect *eff, double progress) {
+static void wipe_step(struct sdl_effect *eff, float progress) {
 	SDL_Texture *bg = eff->tx_old;
 	SDL_Texture *fg = eff->tx_new;
 	if (eff->type == EFFECT_WIPE_RL ||
@@ -587,7 +588,7 @@ static void wipe_step(struct sdl_effect *eff, double progress) {
 		eff->type == EFFECT_WIPE_IN_H) {
 		bg = eff->tx_new;
 		fg = eff->tx_old;
-		progress = 1 - progress;
+		progress = 1.f - progress;
 	}
 
 	SDL_RenderCopy(sdl_renderer, bg, NULL, &eff->dst_rect);
@@ -638,7 +639,7 @@ static void wipe_free(struct sdl_effect *eff) {
 
 // EFFECT_CIRCLE_WIPE_*
 
-static void circle_wipe_step(struct sdl_effect *eff, double progress);
+static void circle_wipe_step(struct sdl_effect *eff, float progress);
 static void circle_wipe_free(struct sdl_effect *eff);
 
 static struct sdl_effect *circle_wipe_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -651,7 +652,7 @@ static struct sdl_effect *circle_wipe_new(SDL_Rect *rect, SDL_Surface *old, SDL_
 	return eff;
 }
 
-static void circle_wipe_step(struct sdl_effect *eff, double progress) {
+static void circle_wipe_step(struct sdl_effect *eff, float progress) {
 	SDL_Texture *bg = eff->tx_old;
 	SDL_Texture *fg = eff->tx_new;
 	if (eff->type == EFFECT_CIRCLE_WIPE_IN) {
@@ -663,7 +664,7 @@ static void circle_wipe_step(struct sdl_effect *eff, double progress) {
 
 	int hw = eff->dst_rect.w / 2;
 	int hh = eff->dst_rect.h / 2;
-	int r = sqrt(hw*hw + hh*hh) * progress;
+	int r = sqrtf(hw*hw + hh*hh) * progress;
 
 	for (int y = -r; y < r; y++) {
 		if (y < -hh || y >= hh)
@@ -688,7 +689,7 @@ static void circle_wipe_free(struct sdl_effect *eff) {
 
 // EFFECT_BLIND_*
 
-static void blind_step(struct sdl_effect *eff, double progress);
+static void blind_step(struct sdl_effect *eff, float progress);
 static void blind_free(struct sdl_effect *eff);
 
 static struct sdl_effect *blind_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -701,7 +702,7 @@ static struct sdl_effect *blind_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surfac
 	return eff;
 }
 
-static void blind_vstep(double progress, SDL_Rect *rect, SDL_Texture *tx_new, int offset_y, bool flip) {
+static void blind_vstep(float progress, SDL_Rect *rect, SDL_Texture *tx_new, int offset_y, bool flip) {
 	const int N = 16;
 
 	int nr_bands = rect->h / N + N - 1;
@@ -733,7 +734,7 @@ static void blind_vstep(double progress, SDL_Rect *rect, SDL_Texture *tx_new, in
 	}
 }
 
-static void blind_step(struct sdl_effect *eff, double progress) {
+static void blind_step(struct sdl_effect *eff, float progress) {
 	const int N = 16;
 
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
@@ -790,7 +791,7 @@ static void blind_free(struct sdl_effect *eff) {
 
 // EFFECT_BLEND_*
 
-static void blend_animation_step(struct sdl_effect *eff, double progress);
+static void blend_animation_step(struct sdl_effect *eff, float progress);
 static void blend_animation_free(struct sdl_effect *eff);
 
 static struct sdl_effect *blend_animation_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -803,17 +804,17 @@ static struct sdl_effect *blend_animation_new(SDL_Rect *rect, SDL_Surface *old, 
 	return eff;
 }
 
-static void blend_animation_step(struct sdl_effect *eff, double progress) {
+static void blend_animation_step(struct sdl_effect *eff, float progress) {
 	const bool lr = eff->type == EFFECT_BLEND_LR_RL;
 
 	SDL_Texture *bg, *fg;
-	if (progress < 0.5) {
+	if (progress < 0.5f) {
 		bg = eff->tx_old;
 		fg = eff->tx_new;
 	} else {
 		bg = eff->tx_new;
 		fg = eff->tx_old;
-		progress = 1.0 - progress;
+		progress = 1.f - progress;
 	}
 
 	SDL_RenderCopy(sdl_renderer, bg, NULL, &eff->dst_rect);
@@ -857,7 +858,7 @@ struct zoom_blend_blur_effect {
 	int index;
 };
 
-static void zoom_blend_blur_step(struct sdl_effect *eff, double progress);
+static void zoom_blend_blur_step(struct sdl_effect *eff, float progress);
 static void zoom_blend_blur_free(struct sdl_effect *eff);
 
 static struct sdl_effect *zoom_blend_blur_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new) {
@@ -873,14 +874,14 @@ static struct sdl_effect *zoom_blend_blur_new(SDL_Rect *rect, SDL_Surface *old, 
 	return &eff->eff;
 }
 
-static void zoom_blend_blur_step(struct sdl_effect *eff, double progress) {
+static void zoom_blend_blur_step(struct sdl_effect *eff, float progress) {
 	struct zoom_blend_blur_effect *this = (struct zoom_blend_blur_effect *)eff;
 
 	if (!this->tx[this->index]) {
 		this->tx[this->index] = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, eff->dst_rect.w, eff->dst_rect.h);
 	}
 
-	double scale = (progress < 0.5 ? 1 - progress * 2 : (progress - 0.5) * 2) * 0.9 + 0.1;  // 0.1 - 1.0
+	float scale = (progress < 0.5f ? 1 - progress * 2 : (progress - 0.5f) * 2) * 0.9f + 0.1f;  // 0.1 - 1.0
 	int w = eff->dst_rect.w * scale;
 	int h = eff->dst_rect.h * scale;
 	SDL_Rect r = {
@@ -927,7 +928,7 @@ struct linear_blur_effect {
 	SDL_Texture *blurred_new[LINEAR_BLUR_STEPS];
 };
 
-static void linear_blur_step(struct sdl_effect *eff, double progress);
+static void linear_blur_step(struct sdl_effect *eff, float progress);
 static void linear_blur_free(struct sdl_effect *eff);
 
 static struct sdl_effect *linear_blur_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -983,7 +984,7 @@ static SDL_Texture *blur(struct linear_blur_effect *this, SDL_Texture *src, int 
 	return dst;
 }
 
-static void linear_blur_step(struct sdl_effect *eff, double progress) {
+static void linear_blur_step(struct sdl_effect *eff, float progress) {
 	struct linear_blur_effect *this = (struct linear_blur_effect *)eff;
 
 	int step = progress * LINEAR_BLUR_STEPS * 2;
@@ -1029,7 +1030,7 @@ struct polygon_mask_effect {
 	SDL_Texture *tx_tmp;
 };
 
-static void polygon_mask_step(struct sdl_effect *eff, double progress);
+static void polygon_mask_step(struct sdl_effect *eff, float progress);
 static void polygon_mask_free(struct sdl_effect *eff);
 
 static struct sdl_effect *polygon_mask_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -1051,7 +1052,7 @@ static struct sdl_effect *polygon_mask_new(SDL_Rect *rect, SDL_Surface *old, SDL
 
 #if HAS_SDL_RenderGeometry
 
-static void draw_pentagram(int center_x, int center_y, double radius, double rotate) {
+static void draw_pentagram(int center_x, int center_y, float radius, float rotate) {
 	const SDL_FPoint p[10] = {
 		{ 1.5,     0     },
 		{ 0.4635,  0.3368},
@@ -1065,8 +1066,8 @@ static void draw_pentagram(int center_x, int center_y, double radius, double rot
 		{ 0.4635, -0.3368},
 	};
 	SDL_Vertex v[10];
-	double sin_r = sin(rotate);
-	double cos_r = cos(rotate);
+	float sin_r = sinf(rotate);
+	float cos_r = cosf(rotate);
 	for (int i = 0; i < 10; i++) {
 		v[i].position.x = radius * (p[i].x * cos_r - p[i].y * sin_r) + center_x;
 		v[i].position.y = radius * (p[i].x * sin_r + p[i].y * cos_r) + center_y;
@@ -1082,7 +1083,7 @@ static void draw_pentagram(int center_x, int center_y, double radius, double rot
 	SDL_RenderGeometry(sdl_renderer, NULL, v, 10, indices, 15);
 }
 
-static void draw_hexagram(int center_x, int center_y, double radius, double rotate) {
+static void draw_hexagram(int center_x, int center_y, float radius, float rotate) {
 	const SDL_FPoint p[6] = {
 		{ 0,     -1.0},
 		{-0.866,  0.5},
@@ -1093,8 +1094,8 @@ static void draw_hexagram(int center_x, int center_y, double radius, double rota
 		{ 0.866, -0.5}
 	};
 	SDL_Vertex v[6];
-	double sin_r = sin(rotate);
-	double cos_r = cos(rotate);
+	float sin_r = sinf(rotate);
+	float cos_r = cosf(rotate);
 	for (int i = 0; i < 6; i++) {
 		v[i].position.x = radius * (p[i].x * cos_r - p[i].y * sin_r) + center_x;
 		v[i].position.y = radius * (p[i].x * sin_r + p[i].y * cos_r) + center_y;
@@ -1103,12 +1104,12 @@ static void draw_hexagram(int center_x, int center_y, double radius, double rota
 	SDL_RenderGeometry(sdl_renderer, NULL, v, 6, NULL, 0);
 }
 
-static void draw_windmill_90(int w, int h, double theta) {
-	double cx = w / 2.0;
-	double cy = h / 2.0;
-	double r = max(cx, cy) * sqrt(2);
-	double r_sin = r * sin(theta);
-	double r_cos = r * cos(theta);
+static void draw_windmill_90(int w, int h, float theta) {
+	float cx = w / 2.f;
+	float cy = h / 2.f;
+	float r = max(cx, cy) * sqrtf(2);
+	float r_sin = r * sinf(theta);
+	float r_cos = r * cosf(theta);
 
 	SDL_Vertex v[13] = {
 		// center
@@ -1131,7 +1132,7 @@ static void draw_windmill_90(int w, int h, double theta) {
 		{.position = {cx - r_cos, cy - r_sin}},
 	};
 
-	if (theta <= M_PI / 4) {
+	if (theta <= M_PIf / 4) {
 		const int indices[12] = {
 			0, 1, 3,
 			0, 4, 6,
@@ -1154,12 +1155,12 @@ static void draw_windmill_90(int w, int h, double theta) {
 	}
 }
 
-static void draw_windmill_180(int w, int h, double theta) {
-	double cx = w / 2.0;
-	double cy = h / 2.0;
-	double r = max(cx, cy) * sqrt(2);
-	double r_sin = r * sin(theta);
-	double r_cos = r * cos(theta);
+static void draw_windmill_180(int w, int h, float theta) {
+	float cx = w / 2.f;
+	float cy = h / 2.f;
+	float r = max(cx, cy) * sqrtf(2);
+	float r_sin = r * sinf(theta);
+	float r_cos = r * cosf(theta);
 
 	SDL_Vertex v[11] = {
 		{.position = {cx,         cy        }},  // center
@@ -1174,7 +1175,7 @@ static void draw_windmill_180(int w, int h, double theta) {
 		{.position = {cx,         cy + r    }},  // bottom
 		{.position = {cx - r,     cy + r    }},  // left-bottom
 		{.position = {cx - r,     cy        }},  // left
-		{.position = {cx + r_cos, cy + r_sin}},  // theta+M_PI
+		{.position = {cx + r_cos, cy + r_sin}},  // theta+M_PIf
 	};
 
 	int indices[24];
@@ -1182,7 +1183,7 @@ static void draw_windmill_180(int w, int h, double theta) {
 
 	indices[i++] = 0;  // center
 	indices[i++] = 9;  // left
-	for (int j = 1; theta > M_PI / 4 * j; j++) {
+	for (int j = 1; theta > M_PIf / 4 * j; j++) {
 		indices[i++] = j;
 		indices[i++] = 0;  // center
 		indices[i++] = j;
@@ -1191,22 +1192,22 @@ static void draw_windmill_180(int w, int h, double theta) {
 
 	indices[i++] = 0;  // center
 	indices[i++] = 4;  // right
-	for (int j = 1; theta > M_PI / 4 * j; j++) {
+	for (int j = 1; theta > M_PIf / 4 * j; j++) {
 		indices[i++] = j + 5;
 		indices[i++] = 0;  // center
 		indices[i++] = j + 5;
 	}
-	indices[i++] = 10;  // theta+M_PI
+	indices[i++] = 10;  // theta+M_PIf
 
 	SDL_RenderGeometry(sdl_renderer, NULL, v, 11, indices, i);
 }
 
-static void draw_windmill_360(int w, int h, double theta) {
-	double cx = w / 2.0;
-	double cy = h / 2.0;
-	double r = max(cx, cy) * sqrt(2);
-	double r_sin = r * sin(theta);
-	double r_cos = r * cos(theta);
+static void draw_windmill_360(int w, int h, float theta) {
+	float cx = w / 2.f;
+	float cy = h / 2.f;
+	float r = max(cx, cy) * sqrtf(2);
+	float r_sin = r * sinf(theta);
+	float r_cos = r * cosf(theta);
 
 	SDL_Vertex v[10] = {
 		{.position = {cx,         cy        }},  // center
@@ -1226,7 +1227,7 @@ static void draw_windmill_360(int w, int h, double theta) {
 
 	indices[i++] = 0;  // center
 	indices[i++] = 8;  // left
-	for (int j = 1; theta > M_PI / 4 * j; j++) {
+	for (int j = 1; theta > M_PIf / 4 * j; j++) {
 		indices[i++] = j;
 		indices[i++] = 0;  // center
 		indices[i++] = j;
@@ -1235,7 +1236,7 @@ static void draw_windmill_360(int w, int h, double theta) {
 	SDL_RenderGeometry(sdl_renderer, NULL, v, 10, indices, i);
 }
 
-static void polygon_mask_step(struct sdl_effect *eff, double progress) {
+static void polygon_mask_step(struct sdl_effect *eff, float progress) {
 	struct polygon_mask_effect *this = (struct polygon_mask_effect *)eff;
 	int w = eff->dst_rect.w;
 	int h = eff->dst_rect.h;
@@ -1243,25 +1244,25 @@ static void polygon_mask_step(struct sdl_effect *eff, double progress) {
 	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, NULL);
 	switch (eff->type) {
 	case EFFECT_PENTAGRAM_IN_OUT:
-		draw_pentagram(w / 2, h / 2, max(w, h) * progress, M_PI * progress);
+		draw_pentagram(w / 2, h / 2, max(w, h) * progress, M_PIf * progress);
 		break;
 	case EFFECT_PENTAGRAM_OUT_IN:
-		draw_pentagram(w / 2, h / 2, max(w, h) * (1 - progress), M_PI * progress);
+		draw_pentagram(w / 2, h / 2, max(w, h) * (1 - progress), M_PIf * progress);
 		break;
 	case EFFECT_HEXAGRAM_IN_OUT:
-		draw_hexagram(w / 2, h / 2, max(w, h) * progress, M_PI * progress);
+		draw_hexagram(w / 2, h / 2, max(w, h) * progress, M_PIf * progress);
 		break;
 	case EFFECT_HEXAGRAM_OUT_IN:
-		draw_hexagram(w / 2, h / 2, max(w, h) * (1 - progress), M_PI * progress);
+		draw_hexagram(w / 2, h / 2, max(w, h) * (1 - progress), M_PIf * progress);
 		break;
 	case EFFECT_WINDMILL:
-		draw_windmill_90(w, h, M_PI / 2 * progress);
+		draw_windmill_90(w, h, M_PIf / 2 * progress);
 		break;
 	case EFFECT_WINDMILL_180:
-		draw_windmill_180(w, h, M_PI * progress);
+		draw_windmill_180(w, h, M_PIf * progress);
 		break;
 	case EFFECT_WINDMILL_360:
-		draw_windmill_360(w, h, M_PI * 2 * progress);
+		draw_windmill_360(w, h, M_PIf * 2 * progress);
 		break;
 	default:
 		assert(!"Cannot happen");
@@ -1284,7 +1285,7 @@ static void polygon_mask_free(struct sdl_effect *eff) {
 
 // EFFECT_ROTATE_*
 
-static void rotate_step(struct sdl_effect *eff, double progress);
+static void rotate_step(struct sdl_effect *eff, float progress);
 static void rotate_free(struct sdl_effect *eff);
 
 static struct sdl_effect *rotate_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -1297,24 +1298,24 @@ static struct sdl_effect *rotate_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surfa
 	return eff;
 }
 
-static void rotate_step(struct sdl_effect *eff, double progress) {
+static void rotate_step(struct sdl_effect *eff, float progress) {
 	SDL_Texture *bg_texture, *fg_texture;
-	double angle = progress * 360;
-	double scale = progress;
+	float angle = progress * 360;
+	float scale = progress;
 	switch (eff->type) {
 	case EFFECT_ROTATE_OUT:
-		scale = 1.0 - scale;
+		scale = 1.f - scale;
 		bg_texture = eff->tx_new;
 		fg_texture = eff->tx_old;
-		angle *= -1.0;
+		angle *= -1.f;
 		break;
 	case EFFECT_ROTATE_IN:
 		bg_texture = eff->tx_old;
 		fg_texture = eff->tx_new;
-		angle *= -1.0;
+		angle *= -1.f;
 		break;
 	case EFFECT_ROTATE_OUT_CW:
-		scale = 1.0 - scale;
+		scale = 1.f - scale;
 		bg_texture = eff->tx_new;
 		fg_texture = eff->tx_old;
 		break;
@@ -1331,8 +1332,8 @@ static void rotate_step(struct sdl_effect *eff, double progress) {
 		assert(!"Cannot happen");
 	}
 	SDL_Rect r = eff->dst_rect;
-	r.x += (1.0 - scale) * r.w / 2;
-	r.y += (1.0 - scale) * r.h / 2;
+	r.x += (1.f - scale) * r.w / 2;
+	r.y += (1.f - scale) * r.h / 2;
 	r.w *= scale;
 	r.h *= scale;
 	SDL_RenderCopy(sdl_renderer, bg_texture, NULL, &eff->dst_rect);
@@ -1347,7 +1348,7 @@ static void rotate_free(struct sdl_effect *eff) {
 
 // EFFECT_POLYGON_ROTATE_*
 
-static void polygon_rotate_step(struct sdl_effect *eff, double progress);
+static void polygon_rotate_step(struct sdl_effect *eff, float progress);
 static void polygon_rotate_free(struct sdl_effect *eff);
 
 static struct sdl_effect *polygon_rotate_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
@@ -1360,35 +1361,35 @@ static struct sdl_effect *polygon_rotate_new(SDL_Rect *rect, SDL_Surface *old, S
 	return eff;
 }
 
-static void polygon_rotate_step(struct sdl_effect *eff, double progress) {
+static void polygon_rotate_step(struct sdl_effect *eff, float progress) {
 	bool vertical = eff->type == EFFECT_POLYGON_ROTATE_Y || eff->type == EFFECT_POLYGON_ROTATE_Y_CW;
-	SDL_Texture *texture = progress < 0.5 ? eff->tx_old : eff->tx_new;
-	double angle = progress < 0.5 ? progress * M_PI : (progress - 1.0) * M_PI;
+	SDL_Texture *texture = progress < 0.5f ? eff->tx_old : eff->tx_new;
+	float angle = progress < 0.5f ? progress * M_PIf : (progress - 1.f) * M_PIf;
 	if (eff->type == EFFECT_POLYGON_ROTATE_Y_CW || eff->type == EFFECT_POLYGON_ROTATE_X_CW)
 		angle *= -1;
 
-	const double distance = 2.0;
-	double cos_a = cos(angle);
-	double sin_a = sin(angle);
-	double lz = -0.5 * sin_a + distance;
-	double rz = 0.5 * sin_a + distance;
-	double lx = -0.5 * cos_a / lz;
-	double rx = 0.5 * cos_a / rz;
+	const float distance = 2.f;
+	float cos_a = cosf(angle);
+	float sin_a = sinf(angle);
+	float lz = -0.5f * sin_a + distance;
+	float rz = 0.5f * sin_a + distance;
+	float lx = -0.5f * cos_a / lz;
+	float rx = 0.5f * cos_a / rz;
 
 	int w = vertical ? eff->dst_rect.w : eff->dst_rect.h;
 	int h = vertical ? eff->dst_rect.h : eff->dst_rect.w;
-	double dlx = w * (lx * distance + 0.5);
-	double drx = w * (rx * distance + 0.5);
+	float dlx = w * (lx * distance + 0.5f);
+	float drx = w * (rx * distance + 0.5f);
 
 	// Perspective-correct interpolation.
 	for (int x = dlx; x <= drx; x++) {
 		if (x < 0 || x >= w)
 			continue;
-		double t = (x - dlx) / (drx - dlx);
-		double recip_z = (1 - t) * (1 / lz) + t * (1 / rz);
-		double tx = t * (w / rz) / recip_z;
+		float t = (x - dlx) / (drx - dlx);
+		float recip_z = (1 - t) * (1 / lz) + t * (1 / rz);
+		float tx = t * (w / rz) / recip_z;
 		SDL_Rect sr = {tx, 0, 1, h};
-		double dh = h * recip_z * distance;
+		float dh = h * recip_z * distance;
 		SDL_Rect dr = {x, (h - dh) / 2, 1, dh};
 		if (!vertical) {
 			transpose_rect(&sr);
@@ -1412,7 +1413,7 @@ struct zigzag_crossfade_effect {
 	SDL_Texture *tmp1, *tmp2;
 };
 
-static void zigzag_crossfade_step(struct sdl_effect *eff, double progress);
+static void zigzag_crossfade_step(struct sdl_effect *eff, float progress);
 static void zigzag_crossfade_free(struct sdl_effect *eff);
 
 static struct sdl_effect *zigzag_crossfade_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new) {
@@ -1430,38 +1431,38 @@ static struct sdl_effect *zigzag_crossfade_new(SDL_Rect *rect, SDL_Surface *old,
 	return &eff->eff;
 }
 
-static void wave_warp_h(SDL_Texture *src, SDL_Texture *dst, int w, int h, double amplitude, double length, double phase) {
+static void wave_warp_h(SDL_Texture *src, SDL_Texture *dst, int w, int h, float amplitude, float length, float phase) {
 	SDL_SetRenderTarget(sdl_renderer, dst);
 	SDL_RenderClear(sdl_renderer);
 	SDL_Rect sr = {0, 0, w, 1};
 	SDL_Rect dr = {0, 0, w, 1};
 	for (int y = 0; y < h; y++) {
 		sr.y = dr.y = y;
-		dr.x = sin(phase + y * (2 * M_PI / 360 * length)) * amplitude;
+		dr.x = sinf(phase + y * (2 * M_PIf / 360 * length)) * amplitude;
 		SDL_RenderCopy(sdl_renderer, src, &sr, &dr);
 	}
 	SDL_SetRenderTarget(sdl_renderer, NULL);
 }
 
-static void wave_warp_v(SDL_Texture *src, SDL_Texture *dst, int w, int h, double amplitude, double length, double phase) {
+static void wave_warp_v(SDL_Texture *src, SDL_Texture *dst, int w, int h, float amplitude, float length, float phase) {
 	SDL_SetRenderTarget(sdl_renderer, dst);
 	SDL_RenderClear(sdl_renderer);
 	SDL_Rect sr = {0, 0, 1, h};
 	SDL_Rect dr = {0, 0, 1, h};
 	for (int x = 0; x < w; x++) {
 		sr.x = dr.x = x;
-		dr.y = sin(phase + x * (2 * M_PI / 360 * length)) * amplitude;
+		dr.y = sinf(phase + x * (2 * M_PIf / 360 * length)) * amplitude;
 		SDL_RenderCopy(sdl_renderer, src, &sr, &dr);
 	}
 	SDL_SetRenderTarget(sdl_renderer, NULL);
 }
 
-static void zigzag_crossfade_step(struct sdl_effect *eff, double progress) {
+static void zigzag_crossfade_step(struct sdl_effect *eff, float progress) {
 	struct zigzag_crossfade_effect *this = (struct zigzag_crossfade_effect *)eff;
 
-	double amp = (progress < 0.5 ? progress : 1.0 - progress) * 80;
-	double len = (progress < 0.5 ? progress : 1.0 - progress) * 20;
-	double phase = progress * 10;
+	float amp = (progress < 0.5f ? progress : 1.f - progress) * 80;
+	float len = (progress < 0.5f ? progress : 1.f - progress) * 20;
+	float phase = progress * 10;
 
 	wave_warp_h(eff->tx_old, this->tmp1, eff->dst_rect.w, eff->dst_rect.h, amp, len, phase);
 	wave_warp_v(this->tmp1, this->tmp2, eff->dst_rect.w, eff->dst_rect.h, amp, len, phase);
@@ -1492,7 +1493,7 @@ struct magnify_effect {
 	SDL_Rect new_rect;
 };
 
-static void magnify_step(struct sdl_effect *eff, double progress);
+static void magnify_step(struct sdl_effect *eff, float progress);
 static void magnify_free(struct sdl_effect *eff);
 
 static struct sdl_effect *magnify_new(SDL_Surface *sf, SDL_Rect *old_rect, SDL_Rect *new_rect) {
@@ -1506,7 +1507,7 @@ static struct sdl_effect *magnify_new(SDL_Surface *sf, SDL_Rect *old_rect, SDL_R
 	return &eff->eff;
 }
 
-static void magnify_step(struct sdl_effect *eff, double progress) {
+static void magnify_step(struct sdl_effect *eff, float progress) {
 	struct magnify_effect *this = (struct magnify_effect *)eff;
 	SDL_Rect *or = &eff->dst_rect;
 	SDL_Rect *nr = &this->new_rect;
@@ -1527,7 +1528,7 @@ static void magnify_free(struct sdl_effect *eff) {
 
 // EFFECT_RASTER_BLEND
 
-static void raster_blend_step(struct sdl_effect *eff, double progress);
+static void raster_blend_step(struct sdl_effect *eff, float progress);
 static void raster_blend_free(struct sdl_effect *eff);
 
 static struct sdl_effect *raster_blend_new(SDL_Rect *rect, int sx, int sy) {
@@ -1541,13 +1542,13 @@ static struct sdl_effect *raster_blend_new(SDL_Rect *rect, int sx, int sy) {
 	return eff;
 }
 
-static void raster_blend_step(struct sdl_effect *eff, double progress) {
+static void raster_blend_step(struct sdl_effect *eff, float progress) {
 	SDL_Rect s_rect = { 0, 0, eff->dst_rect.w, 1 };
 	SDL_Rect d_rect = eff->dst_rect;
 	d_rect.h = 1;
 	for (int y = 0; y < eff->dst_rect.h; y++) {
 		float t = 1.f - 4.f * progress + 3.f * y / eff->dst_rect.h;
-		d_rect.x = eff->dst_rect.x + (t < 0 ? 0 : sinf(2 * M_PI * t) * 50);
+		d_rect.x = eff->dst_rect.x + (t < 0 ? 0 : sinf(2 * M_PIf * t) * 50);
 		SDL_RenderCopy(sdl_renderer, eff->tx_new, &s_rect, &d_rect);
 		s_rect.y++;
 		d_rect.y++;
@@ -1671,7 +1672,7 @@ struct sdl_effect *sdl_effect_raster_blend_init(SDL_Rect *rect, int sx, int sy) 
 	return raster_blend_new(rect, sx, sy);
 }
 
-void sdl_effect_step(struct sdl_effect *eff, double progress) {
+void sdl_effect_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderClear(sdl_renderer);
 	if (!eff->is_fullscreen)
 		SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);

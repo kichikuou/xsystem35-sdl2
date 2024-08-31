@@ -75,7 +75,7 @@ void commandNR() {
 	int var1  = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	*var2 = (int)sqrt(var1);
+	*var2 = (int)sqrtf(var1);
 	DEBUG_COMMAND("NR %d,%d:", var1, *var2);
 }
 

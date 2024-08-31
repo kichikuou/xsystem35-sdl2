@@ -58,7 +58,7 @@ int nt_sp_eupdate(int no, int time, int cancel) {
 	int edtime = curtime + time;
 
 	while ((curtime = sdl_getTicks()) < edtime) {
-		sdl_effect_step(eff, (double)(curtime - sttime) / (edtime - sttime));
+		sdl_effect_step(eff, (float)(curtime - sttime) / (edtime - sttime));
 		int rest = 16 - (sdl_getTicks() - curtime);
 		int key = sys_keywait(rest, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key)

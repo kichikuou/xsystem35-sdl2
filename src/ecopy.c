@@ -328,7 +328,7 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 		return (opt ? opt : 100) * 8;
 	case NACT_EFFECT_CIRCLE_WIPE_OUT:
 	case NACT_EFFECT_CIRCLE_WIPE_IN:
-		return (opt ? opt : 20) * sqrt(rect->w * rect->w + rect->h * rect->h) / 40;
+		return (opt ? opt : 20) * sqrtf(rect->w * rect->w + rect->h * rect->h) / 40;
 	case NACT_EFFECT_FADEIN:
 	case NACT_EFFECT_WHITEIN:
 	case NACT_EFFECT_FADEOUT:

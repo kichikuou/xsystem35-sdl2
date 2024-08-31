@@ -969,7 +969,7 @@ struct grEffectMoveView_data {
 	int target_y;
 };
 
-static void grEffectMoveView_step(void *data, double progress) {
+static void grEffectMoveView_step(void *data, float progress) {
 	struct grEffectMoveView_data *d = data;
 	int x = d->origin_x + (d->target_x - d->origin_x) * progress;
 	int y = d->origin_y + (d->target_y - d->origin_y) * progress;

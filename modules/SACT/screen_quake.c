@@ -39,10 +39,12 @@
 #include "sdl_core.h"
 #include "randMT.h"
 
-typedef void entrypoint (double step, int p1, int p2, int *retx, int *rety);
+#define M_PIf ((float)M_PI)
+
+typedef void entrypoint (float step, int p1, int p2, int *retx, int *rety);
 
 // 上下左右方向の揺らし
-static void quake0(double step, int ampx, int ampy, int *adjx, int *adjy) {
+static void quake0(float step, int ampx, int ampy, int *adjx, int *adjy) {
 	static int i = 0;
 	
 	*adjx = (int)(genrand() * ampx/2);
@@ -53,12 +55,12 @@ static void quake0(double step, int ampx, int ampy, int *adjx, int *adjy) {
 }
 
 // 回転の揺らし
-static void quake1(double curstep, int diam, int round, int *adjx, int *adjy) {
-	double R = (1 - curstep) * diam / 2;
-	double th = curstep * 2 * M_PI * round;
+static void quake1(float curstep, int diam, int round, int *adjx, int *adjy) {
+	float R = (1 - curstep) * diam / 2;
+	float th = curstep * 2 * M_PIf * round;
 
-	*adjx = (int)(R * cos(th));
-	*adjy = (int)(R * sin(th));
+	*adjx = (int)(R * cosf(th));
+	*adjy = (int)(R * sinf(th));
 }
 
 /*
@@ -83,7 +85,7 @@ int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	while ((curtime = sdl_getTicks()) < edtime) {
 		int adjx, adjy;
 		
-		cb[type]((double)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);
+		cb[type]((float)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);
 		ags_setViewArea(adjx, adjy, sf0->width, sf0->height);
 		ags_updateFull();
 		

@@ -129,7 +129,7 @@ void spev_move_setup(void* data, void* userdata) {
 		// speed から timeへ
 		int dx = sp->move.to.x - sp->loc.x;
 		int dy = sp->move.to.y - sp->loc.y;
-		int d = (int)sqrt(dx*dx+dy*dy);
+		int d = (int)sqrtf(dx*dx+dy*dy);
 		sp->move.time = d * 100 / sp->move.speed;
 	}
 	

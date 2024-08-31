@@ -89,7 +89,7 @@ struct sdl_effect;
 struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type effect);
 struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect);
 struct sdl_effect *sdl_effect_raster_blend_init(SDL_Rect *rect, int sx, int sy);
-void sdl_effect_step(struct sdl_effect *eff, double progress);
+void sdl_effect_step(struct sdl_effect *eff, float progress);
 void sdl_effect_finish(struct sdl_effect *eff);
 
 /* key/pointer 関係 */

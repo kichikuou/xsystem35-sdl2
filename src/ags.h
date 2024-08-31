@@ -217,7 +217,7 @@ extern void    ags_setAntialiasedStringMode(boolean mode);
 extern boolean ags_getAntialiasedStringMode();
 extern void    ags_autorepeat(boolean enable);
 
-typedef void (*ags_EffectStepFunc)(void *, double);
+typedef void (*ags_EffectStepFunc)(void *, float);
 void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step, void *arg);
 
 #define RMASK16 0xf800

@@ -543,7 +543,7 @@ void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step,
 	unsigned wflags = cancelable ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE;
 	int start = sdl_getTicks();
 	for (int t = 0; t < duration_ms; t = sdl_getTicks() - start) {
-		step(arg, (double)t / duration_ms);
+		step(arg, (float)t / duration_ms);
 		int key = sys_keywait(start + t + 16 - sdl_getTicks(), wflags);
 		if (cancelable && key) {
 			nact->waitcancel_key = key;
