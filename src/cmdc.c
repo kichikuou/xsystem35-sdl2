@@ -137,7 +137,7 @@ void commandCE() {
 	int option    = getCaliValue();
 	int wait_flag = getCaliValue();
 	
-	ags_eCopyArea(src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag, -1); 
+	ags_eCopyArea(src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag);
 	
 	if (wait_flag == 1) {
 		sysVar[0] = nact->waitcancel_key;
@@ -167,7 +167,7 @@ void commandCD() {
 	int wait_flag = getCaliValue();
 	int color     = getCaliValue();
 	
-	ags_eCopyArea(src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag, color);
+	ags_eSpriteCopyArea(src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag, color);
 	
 	if (wait_flag == 1) {
 		sysVar[0] = nact->waitcancel_key;

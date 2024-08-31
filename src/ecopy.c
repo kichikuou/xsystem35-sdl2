@@ -279,7 +279,7 @@ static int eCopyArea23(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	return key;
 }
 
-static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt, int spCol) {
+static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	/* XOR */
 	return sys_getInputInfo();
 }
@@ -402,12 +402,12 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	return 1000;
 }
 
-void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, boolean cancel, int spCol) {
+void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, bool cancel) {
 	int ret = 0;
 
 #if 0
-	NOTICE("ec_area sx %d sy %d w %d h %d dx %d dy %d sw %d opt %d spc %d cancel %s",
-	       sx, sy, w, h, dx, dy, sw, opt, spCol, cancel ? "True" : "False");
+	NOTICE("ags_eCopyArea sx %d sy %d w %d h %d dx %d dy %d sw %d opt %d cancel %s",
+	       sx, sy, w, h, dx, dy, sw, opt, cancel ? "True" : "False");
 #endif
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
@@ -430,7 +430,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	enum sdl_effect_type sdl_effect = from_nact_effect(sw);
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
-		struct sdl_effect *eff = sdl_effect_init(&rect, sdl_getDIB(), dx, dy, sdl_getDIB(), sx, sy, from_nact_effect(sw));
+		struct sdl_effect *eff = sdl_effect_init(&rect, sdl_getDIB(), dx, dy, sdl_getDIB(), sx, sy, sdl_effect);
 		ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
 		sdl_effect_finish(eff);
 
@@ -463,11 +463,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	case 16:
 	case 17:
 	case 54:
-		if (spCol == -1) {
-			ags_copyArea(sx, sy, w, h, dx, dy);
-		} else {
-			ags_copyAreaSP(sx, sy, w, h, dx, dy, spCol);
-		}
+		ags_copyArea(sx, sy, w, h, dx, dy);
 		{
 			MyRectangle r = {dx, dy, w, h}, update;
 			SDL_IntersectRect(&nact->ags.view_area, &r, &update);
@@ -490,11 +486,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		ret = eCopyArea4(dx, dy, w, h, opt);
 		break;
 	case 5:
-		if (spCol == -1) {
-			ret = eCopyArea5(sx, sy, w, h, dx, dy, opt);
-		} else {
-			ret = eCopyArea5sp(sx, sy, w, h, dx, dy, opt);
-		}
+		ret = eCopyArea5(sx, sy, w, h, dx, dy, opt);
 		break;
 	case 6:
 		ret = eCopyArea6(dx, dy, w, h, opt);
@@ -517,13 +509,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		
 	case 1000:
 		if (nact->ags.world_depth != 8) return;
-		ret = eCopyArea1000(sx, sy, w, h, dx, dy, opt, spCol);
-		break;
-	case NACT_EFFECT_PALETTE_SHIFT:
-		if (nact->ags.world_depth != 8 || spCol == -1) return;
-		ags_copyPaletteShift(sx, sy, w, h, dx, dy, spCol);
-		ags_updateArea(dx, dy, w, h);
-		ret = sys_getInputInfo();
+		ret = eCopyArea1000(sx, sy, w, h, dx, dy, opt);
 		break;
 	case 2000:
 		if (nact->ags.world_depth == 8) return;
@@ -536,6 +522,56 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	default:
 		eCopyUpdateArea(dx, dy, w, h, dx, dy);
 		WARNING("effect %d is not presented.", sw);
+		break;
+	}
+	nact->waitcancel_key = ret;
+}
+
+void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, bool cancel, int spCol) {
+#if 0
+	NOTICE("ags_eSpriteCopyArea sx %d sy %d w %d h %d dx %d dy %d sw %d opt %d spc %d cancel %s",
+	       sx, sy, w, h, dx, dy, sw, opt, spCol, cancel ? "True" : "False");
+#endif
+	if (!ags_check_param(&sx, &sy, &w, &h)) return;
+	if (!ags_check_param(&dx, &dy, &w, &h)) return;
+
+	nact->waitcancel_key = 0;
+
+	ecp_cancel = cancel;
+
+	if (1 <= sw && sw <= 4) {
+		ags_copyAreaSP(sx, sy, w, h, dx, dy, spCol);
+		MyRectangle r = {dx, dy, w, h}, update;
+		SDL_IntersectRect(&nact->ags.view_area, &r, &update);
+		w = update.w;
+		h = update.h;
+	}
+
+	int ret = 0;
+	switch(sw) {
+	case 1:
+		ret = eCopyArea1(dx, dy, w, h, opt);
+		break;
+	case 2:
+		ret = eCopyArea2(dx, dy, w, h, opt);
+		break;
+	case 3:
+		ret = eCopyArea3(dx, dy, w, h, opt);
+		break;
+	case 4:
+		ret = eCopyArea4(dx, dy, w, h, opt);
+		break;
+	case 5:
+		ret = eCopyArea5sp(sx, sy, w, h, dx, dy, opt);
+		break;
+	case NACT_EFFECT_PALETTE_SHIFT:
+		if (nact->ags.world_depth != 8) return;
+		ags_copyPaletteShift(sx, sy, w, h, dx, dy, spCol);
+		ags_updateArea(dx, dy, w, h);
+		ret = sys_getInputInfo();
+		break;
+	default:
+		WARNING("Invalid effect: %d", sw);
 		break;
 	}
 	nact->waitcancel_key = ret;

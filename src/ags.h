@@ -178,7 +178,8 @@ extern void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int d
 extern void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv);
 extern void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv);
 extern MyRectangle ags_floodFill(int x, int y, int col);
-extern void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int type, int opt, boolean flg, int spCol);
+extern void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, bool cancel);
+extern void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, bool cancel, int spCol);
 
 /* alpha channel 操作 */
 extern void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg);
