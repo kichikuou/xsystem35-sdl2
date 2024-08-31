@@ -575,26 +575,25 @@ static void fade(int duration, boolean cancelable, enum sdl_effect_type type) {
 }
 
 void ags_fadeIn(int rate, boolean flag) {
-	int duration = rate * 16 * 1000 / 60;
-	if (!need_update)
-		duration = 0;
 	fade_outed = FALSE;
-
 	if (nact->ags.world_depth == 8)
 		sdl_setPalette(nact->ags.pal, 0, 256);
 
+	if (!need_update)
+		return;
+
+	int duration = rate * 16 * 1000 / 60;
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEIN : EFFECT_DITHERING_FADEIN);
 
 	sdl_updateAll(&nact->ags.view_area);
 }
 
 void ags_fadeOut(int rate, boolean flag) {
-	int duration = rate * 16 * 1000 / 60;
-	if (!need_update || fade_outed)
-		duration = 0;
+	if (need_update && !fade_outed) {
+		int duration = rate * 16 * 1000 / 60;
+		fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEOUT : EFFECT_DITHERING_FADEOUT);
+	}
 	fade_outed = TRUE;
-
-	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEOUT : EFFECT_DITHERING_FADEOUT);
 
 	if (nact->ags.world_depth == 8) {
 		Color pal[256];
@@ -604,26 +603,25 @@ void ags_fadeOut(int rate, boolean flag) {
 }
 
 void ags_whiteIn(int rate, boolean flag) {	
-	int duration = rate * 16 * 1000 / 60;
-	if (!need_update)
-		duration = 0;
 	fade_outed = FALSE;
-
 	if (nact->ags.world_depth == 8)
 		sdl_setPalette(nact->ags.pal, 0, 256);
 
+	if (!need_update)
+		return;
+
+	int duration = rate * 16 * 1000 / 60;
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEIN);
 
 	sdl_updateAll(&nact->ags.view_area);
 }
 
 void ags_whiteOut(int rate, boolean flag) {
-	int duration = rate * 16 * 1000 / 60;
-	if (!need_update || fade_outed)
-		duration = 0;
+	if (need_update && !fade_outed) {
+		int duration = rate * 16 * 1000 / 60;
+		fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEOUT);
+	}
 	fade_outed = TRUE;
-
-	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEOUT);
 
 	if (nact->ags.world_depth == 8) {
 		Color pal[256];
