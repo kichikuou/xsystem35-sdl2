@@ -98,17 +98,10 @@ void sdl_Remove(void) {
 	if (sdl_videodev == NULL) return;
 
 	if (sdl_display) {
-		NOTICE("Now SDL shutdown ... ");
-		
 		SDL_FreeSurface(sdl_dib);
-
 		SDL_DestroyRenderer(sdl_renderer);
-		
 		SDL_JoystickClose(js);
-		
 		SDL_Quit();
-		
-		NOTICE("Done!");
 	}
 }
 
