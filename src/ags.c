@@ -370,15 +370,6 @@ void ags_putRegion(void *region, int x, int y) {
 	sdl_putRegion(region, x, y);
 }
 
-void ags_copyRegion(void *region, int sx, int sy , int w, int h, int dx, int dy) {
-	if (region == NULL) return;
-	
-	if (!ags_check_param_xy(&dx, &dy)) return;
-	if (!ags_check_param(&dx, &dy, &w, &h)) return;
-	
-	sdl_CopyRegion(region, sx, sy, w, h, dx, dy);
-}
-
 void ags_delRegion(void *region) {
 	if (region == NULL) return;
 	

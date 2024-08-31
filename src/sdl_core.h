@@ -79,7 +79,6 @@ extern void sdl_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, AL
 extern void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 extern void sdl_getPixel(int x, int y, Palette *cell);
 extern void sdl_putRegion(void *src, int x, int y);
-extern void sdl_CopyRegion(void *src, int sx, int sy, int w, int h, int dx, int dy);
 extern void sdl_restoreRegion(void *src, int x, int y);
 extern void* sdl_saveRegion(int x, int y, int w, int h);
 extern void sdl_delRegion(void *src);
@@ -89,6 +88,7 @@ extern SDL_Surface *com2surface(agsurface_t *s);
 struct sdl_effect;
 struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type effect);
 struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect);
+struct sdl_effect *sdl_effect_raster_blend_init(SDL_Rect *rect, int sx, int sy);
 void sdl_effect_step(struct sdl_effect *eff, double progress);
 void sdl_effect_finish(struct sdl_effect *eff);
 

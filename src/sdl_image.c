@@ -204,19 +204,18 @@ void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int brightness) {
 	SDL_FreeSurface(s);
 }
 
-void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv) {
+SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h) {
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
 
-	SDL_Rect r_src = {sx, sy, w, h};
-	SDL_Rect r_tmp = { 0,  0, w, h};
-	SDL_BlitSurface(sdl_dib, &r_src, s, &r_tmp);
+	SDL_Rect r_src = {x, y, w, h};
+	SDL_BlitSurface(sdl_dib, &r_src, s, NULL);
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	uint8_t *p_ds = s->pixels + 3;
 #else
 	uint8_t *p_ds = s->pixels;
 #endif
-	uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, sx, sy);
+	uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, x, y);
 	for (int y = 0; y < h; y++) {
 		uint8_t *p_src = adata;
 		uint8_t *p_dst = p_ds;
@@ -227,11 +226,16 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 		adata += sdl_dibinfo->width;
 		p_ds  += s->pitch;
 	}
+	return s;
+}
+
+void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv) {
+	SDL_Surface *s = sdl_dib_to_surface_with_alpha(sx, sy, w, h);
 	if (lv < 255)
 		SDL_SetSurfaceAlphaMod(s, lv);
 
 	SDL_Rect r_dst = {dx, dy, w, h};
-	SDL_BlitSurface(s, &r_tmp, sdl_dib, &r_dst);
+	SDL_BlitSurface(s, NULL, sdl_dib, &r_dst);
 	SDL_FreeSurface(s);
 }
 
@@ -326,18 +330,6 @@ void sdl_putRegion(void *psrc, int x, int y) {
 	
 	SDL_Rect r_src = {0, 0, src->w, src->h};
 	SDL_Rect r_dst = {x, y, src->w, src->h};
-
-	SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
-}
-
-/*
- * dib にセーブした領域からコピー
- */
-void sdl_CopyRegion(void *psrc, int sx, int sy, int w,int h, int dx, int dy) {
-	SDL_Surface *src = (SDL_Surface *)psrc;
-
-	SDL_Rect r_src = {sx, sy, w, h};
-	SDL_Rect r_dst = {dx, dy, w, h};
 
 	SDL_BlitSurface(src, &r_src, sdl_dib, &r_dst);
 }

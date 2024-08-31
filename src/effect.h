@@ -173,6 +173,7 @@ enum sdl_effect_type {
 	EFFECT_POLYGON_ROTATE_X_CW,
 	EFFECT_ZIGZAG_CROSSFADE,
 	EFFECT_MAGNIFY,
+	EFFECT_RASTER_BLEND,
 };
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect);

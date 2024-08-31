@@ -297,38 +297,6 @@ static int eCopyArea2001(int sx, int sy, int w, int h, int dx, int dy, int opt) 
 	return sys_getInputInfo();
 }
 
-static int eCopyArea5sp(int sx, int sy, int w, int h, int dx, int dy, int opt) {
-	int i, j, k, key = 0, cnt;
-	int st_i, ed_i;
-	int waitcnt = opt == 0 ? 50 : opt * 10;
-	int step[200];
-	void *save = ags_saveRegion(dx - 50, dy, w + 100, h);
-	
-	for (i = 0; i < 200; i++) {
-		step[i] = 50 * sin((2 * M_PI * i) / 50);
-	}
-	
-	cnt = sdl_getTicks();
-	
-	for (i = 150; i < h + 200; i++) {
-		cnt += waitcnt;
-		st_i = max(0, i - 200);
-		ed_i = h;
-		ags_copyRegion(save, 0, st_i, w + 100, ed_i - st_i, dx - 50, dy + st_i);
-		for (j = st_i, k = 0; j < ed_i; j++, k++) {
-			ags_copyArea_shadow(sx , sy + j, w, 1,
-					    dx + step[(k + max(0, 200 - i)) % 200],
-					    dy + j);
-		}
-		ags_updateArea(dx - 50, dy + st_i, w + 100, ed_i - st_i);
-		EC_WAIT;
-	}
-	
-	ags_delRegion(save);
-	
-	return key;
-}
-
 static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	switch (effect) {
 	case NACT_EFFECT_ZOOM_IN:
@@ -537,6 +505,17 @@ void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, i
 
 	nact->waitcancel_key = 0;
 
+	if (sw == 5) {
+		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
+		struct sdl_effect *eff = sdl_effect_raster_blend_init(&rect, sx, sy);
+		ags_runEffect((opt ? opt : 25) * h, cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
+		sdl_effect_finish(eff);
+		// Actual copy.
+		ags_copyArea_shadow(sx, sy, w, h, dx, dy);
+		ags_updateArea(dx, dy, w, h);
+		return;
+	}
+
 	ecp_cancel = cancel;
 
 	if (1 <= sw && sw <= 4) {
@@ -560,9 +539,6 @@ void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, i
 		break;
 	case 4:
 		ret = eCopyArea4(dx, dy, w, h, opt);
-		break;
-	case 5:
-		ret = eCopyArea5sp(sx, sy, w, h, dx, dy, opt);
 		break;
 	case NACT_EFFECT_PALETTE_SHIFT:
 		if (nact->ags.world_depth != 8) return;

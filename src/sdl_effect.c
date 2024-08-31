@@ -1525,6 +1525,41 @@ static void magnify_free(struct sdl_effect *eff) {
 	free(eff);
 }
 
+// EFFECT_RASTER_BLEND
+
+static void raster_blend_step(struct sdl_effect *eff, double progress);
+static void raster_blend_free(struct sdl_effect *eff);
+
+static struct sdl_effect *raster_blend_new(SDL_Rect *rect, int sx, int sy) {
+	SDL_Surface *sprite = sdl_dib_to_surface_with_alpha(sx, sy, rect->w, rect->h);
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(eff, rect, NULL, sprite, EFFECT_RASTER_BLEND);
+	eff->step = raster_blend_step;
+	eff->finish = raster_blend_free;
+	return eff;
+}
+
+static void raster_blend_step(struct sdl_effect *eff, double progress) {
+	SDL_Rect s_rect = { 0, 0, eff->dst_rect.w, 1 };
+	SDL_Rect d_rect = eff->dst_rect;
+	d_rect.h = 1;
+	for (int y = 0; y < eff->dst_rect.h; y++) {
+		float t = 1.f - 4.f * progress + 3.f * y / eff->dst_rect.h;
+		d_rect.x = eff->dst_rect.x + (t < 0 ? 0 : sinf(2 * M_PI * t) * 50);
+		SDL_RenderCopy(sdl_renderer, eff->tx_new, &s_rect, &d_rect);
+		s_rect.y++;
+		d_rect.y++;
+	}
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void raster_blend_free(struct sdl_effect *eff) {
+	effect_finish(eff, false);
+	free(eff);
+}
+
 // -----------------
 
 static SDL_Surface *create_surface(agsurface_t *as, int x, int y, int w, int h) {
@@ -1630,6 +1665,10 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
 	SDL_Surface *sf = create_surface(surface, view_rect->x, view_rect->y, view_rect->w, view_rect->h);
 	return magnify_new(sf, view_rect, target_rect);
+}
+
+struct sdl_effect *sdl_effect_raster_blend_init(SDL_Rect *rect, int sx, int sy) {
+	return raster_blend_new(rect, sx, sy);
 }
 
 void sdl_effect_step(struct sdl_effect *eff, double progress) {

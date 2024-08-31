@@ -167,7 +167,6 @@ extern void ags_changeColorArea(int x, int y, int w, int h, int dst, int src, in
 extern void* ags_saveRegion(int x, int y, int w, int h);
 extern void ags_restoreRegion(void *region, int x, int y);
 extern void ags_putRegion(void *region, int x, int y);
-extern void ags_copyRegion(void *region, int sx, int sy, int w,int h,int dx,int dy);
 extern void ags_delRegion(void *region);
 
 extern MyRectangle ags_drawString(int x, int y, const char *src, int col);
