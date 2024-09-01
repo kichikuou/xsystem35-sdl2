@@ -57,6 +57,7 @@ void sdl_cursor_init(void);
 int sdl_nearest_color(int r, int g, int b);
 boolean sdl_joy_open(int index);
 SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h);
+SDL_Surface *sdl_dib_to_surface_colorkey(int x, int y, int w, int h, int col);
 
 extern struct sdl_private_data *sdl_videodev;
 

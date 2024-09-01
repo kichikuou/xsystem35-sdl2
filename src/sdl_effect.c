@@ -32,6 +32,10 @@
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
+	case NACT_EFFECT_PAN_IN_DOWN:       return EFFECT_PAN_IN_DOWN;
+	case NACT_EFFECT_PAN_IN_UP:         return EFFECT_PAN_IN_UP;
+	case NACT_EFFECT_SKIP_LINE_UP_DOWN: return EFFECT_SKIP_LINE_UP_DOWN;
+	case NACT_EFFECT_SKIP_LINE_LR_RL:   return EFFECT_SKIP_LINE_LR_RL;
 	case NACT_EFFECT_WIPE_IN:           return EFFECT_WIPE_IN;
 	case NACT_EFFECT_WIPE_OUT:          return EFFECT_WIPE_OUT;
 	case NACT_EFFECT_ZOOM_IN:           return EFFECT_ZOOM_IN;
@@ -560,6 +564,107 @@ static void dithering_fade_free(struct sdl_effect *eff) {
 	else if (eff->type == EFFECT_DITHERING_WHITEOUT)
 		SDL_FillRect(sdl_display, &eff->dst_rect, SDL_MapRGB(sdl_display->format, 255, 255, 255));
 	effect_finish(eff, false);
+	free(eff);
+}
+
+// EFFECT_PAN_IN_*
+
+static void pan_in_step(struct sdl_effect *eff, float progress);
+static void pan_in_free(struct sdl_effect *eff);
+
+static struct sdl_effect *pan_in_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(eff, rect, old, new, type);
+	eff->step = pan_in_step;
+	eff->finish = pan_in_free;
+	return eff;
+}
+
+static void pan_in_step(struct sdl_effect *eff, float progress) {
+	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
+
+	int h = eff->dst_rect.h * progress;
+	SDL_Rect sr = { 0, 0, eff->dst_rect.w, h };
+	SDL_Rect dr = eff->dst_rect;
+	dr.h = h;
+	if (eff->type == EFFECT_PAN_IN_DOWN) {
+		sr.y = eff->dst_rect.h - h;
+	} else {
+		dr.y += eff->dst_rect.h - h;
+	}
+	SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void pan_in_free(struct sdl_effect *eff) {
+	effect_finish(eff, true);
+	free(eff);
+}
+
+// EFFECT_SKIP_LINE_*
+
+static void skip_line_step(struct sdl_effect *eff, float progress);
+static void skip_line_free(struct sdl_effect *eff);
+
+static struct sdl_effect *skip_line_new(SDL_Rect *rect, SDL_Surface *old, SDL_Surface *new, enum sdl_effect_type type) {
+	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	if (!eff)
+		NOMEMERR();
+	effect_init(eff, rect, old, new, type);
+	eff->step = skip_line_step;
+	eff->finish = skip_line_free;
+	return eff;
+}
+
+static void skip_line_step(struct sdl_effect *eff, float progress) {
+	SDL_RenderCopy(sdl_renderer, eff->tx_old, NULL, &eff->dst_rect);
+
+	if (eff->type == EFFECT_SKIP_LINE_UP_DOWN) {
+		int h = eff->dst_rect.h * progress;
+		SDL_Rect sr = { 0, 0, eff->dst_rect.w, 1 };
+		SDL_Rect dr = eff->dst_rect;
+		dr.h = 1;
+
+		int bottom = (eff->dst_rect.h - 1) | 1;
+		for (int y = 0; y < h; y += 2) {
+			sr.y = y;
+			dr.y = eff->dst_rect.y + y;
+			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+
+			if (y == 0 && eff->dst_rect.h & 1)
+				continue;
+			sr.y = bottom - y;
+			dr.y = eff->dst_rect.y + bottom - y;
+			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+		}
+	} else {
+		int w = eff->dst_rect.w * progress;
+		SDL_Rect sr = { 0, 0, 1, eff->dst_rect.h };
+		SDL_Rect dr = eff->dst_rect;
+		dr.w = 1;
+
+		int right = (eff->dst_rect.w - 1) | 1;
+		for (int x = 0; x < w; x += 2) {
+			sr.x = x;
+			dr.x = eff->dst_rect.x + x;
+			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+
+			if (x == 0 && eff->dst_rect.w & 1)
+				continue;
+			sr.x = right - x;
+			dr.x = eff->dst_rect.x + right - x;
+			SDL_RenderCopy(sdl_renderer, eff->tx_new, &sr, &dr);
+		}
+	}
+
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void skip_line_free(struct sdl_effect *eff) {
+	effect_finish(eff, true);
 	free(eff);
 }
 
@@ -1607,6 +1712,12 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	case EFFECT_DITHERING_WHITEOUT:
 	case EFFECT_DITHERING_WHITEIN:
 		return dithering_fade_new(rect, sf_old, sf_new, type);
+	case EFFECT_PAN_IN_DOWN:
+	case EFFECT_PAN_IN_UP:
+		return pan_in_new(rect, sf_old, sf_new, type);
+	case EFFECT_SKIP_LINE_UP_DOWN:
+	case EFFECT_SKIP_LINE_LR_RL:
+		return skip_line_new(rect, sf_old, sf_new, type);
 	case EFFECT_WIPE_IN:
 	case EFFECT_WIPE_OUT:
 	case EFFECT_WIPE_LR:
@@ -1660,6 +1771,23 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int
 	default:
 		WARNING("Unknown effect %d", type);
 		return crossfade_new(rect, sf_old, sf_new);
+	}
+}
+
+struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx, int sy, int col, enum sdl_effect_type type) {
+	SDL_Surface *sf_old = create_surface(sdl_dibinfo, dx, dy, rect->w, rect->h);
+	SDL_Surface *sprite = sdl_dib_to_surface_colorkey(sx, sy, rect->w, rect->h, col);
+
+	switch (type) {
+	case EFFECT_PAN_IN_DOWN:
+	case EFFECT_PAN_IN_UP:
+		return pan_in_new(rect, sf_old, sprite, type);
+	case EFFECT_SKIP_LINE_UP_DOWN:
+	case EFFECT_SKIP_LINE_LR_RL:
+		return skip_line_new(rect, sf_old, sprite, type);
+	default:
+		SYSERROR("Unknown sprite effect %d", type);
+		return NULL;
 	}
 }
 

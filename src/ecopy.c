@@ -54,84 +54,6 @@ static void eCopyUpdateArea(int sx, int sy, int w, int h, int dx, int dy) {
 	sdl_updateArea(&src, &dst);
 }
 
-static int eCopyArea1(int dx, int dy, int w, int h, int opt) {
-	int y, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	
-	cnt = sdl_getTicks();
-	for (y = 0; y < h - 24; y += 24) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, dy + h - y, w, y, dx, dy);
-		EC_WAIT;
-	}
-
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea2(int dx, int dy, int w, int h, int opt) {
-	int y, key = 0, cnt;
-	int waitcnt = opt == 0 ? 20 : opt;
-	
-	cnt = sdl_getTicks();
-	for (y = 0; y < h - 24; y += 24) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, dy , w, y, dx, dy + h - y);
-		EC_WAIT;
-	}
-	
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea3(int dx, int dy, int w, int h, int opt) {
-	int y1, y2, key = 0, cnt;
-	int waitcnt = opt == 0 ? 3 : opt;
-	
-	if (h % 2) {
-		h--;
-		eCopyUpdateArea(dx , dy + h, w, 1, dx, dy + h);
-	}
-	y1 = dy;
-	y2 = dy + h - 1;
-	cnt = sdl_getTicks();
-	while (h > 0) {
-		cnt += waitcnt;
-		eCopyUpdateArea(dx, y1, w, 1, dx, y1);
-		eCopyUpdateArea(dx, y2, w, 1, dx, y2);
-		y1 += 2;
-		y2 -= 2;
-		h -= 2;
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
-static int eCopyArea4(int dx, int dy, int w, int h, int opt) {
-	int x1,x2, key = 0, cnt;
-	int waitcnt = opt == 0 ? 3 : opt;
-	
-	if (w % 2) {
-		w--;
-		eCopyUpdateArea(dx + w , dy, 1, h, dx + w, dy);
-	}
-	x1 = dx;
-	x2 = dx + w - 1;
-	cnt = sdl_getTicks();
-	while (w > 0) {
-		cnt += waitcnt;
-		eCopyUpdateArea(x1, dy, 1, h, x1, dy);
-		eCopyUpdateArea(x2, dy, 1, h, x2, dy);
-		x1 += 2;
-		x2 -= 2;
-		w -= 2;
-		EC_WAIT;
-	}
-	eCopyUpdateArea(dx, dy, w, h, dx, dy);
-	return key;
-}
-
 static int eCopyArea5(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int i, x, y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 20 : opt;
@@ -299,6 +221,13 @@ static int eCopyArea2001(int sx, int sy, int w, int h, int dx, int dy, int opt) 
 
 static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 	switch (effect) {
+	case NACT_EFFECT_PAN_IN_DOWN:
+	case NACT_EFFECT_PAN_IN_UP:
+		return (opt ? opt : 20) * (rect->h / 24);
+	case NACT_EFFECT_SKIP_LINE_UP_DOWN:
+		return (opt ? opt : 3) * (rect->h / 2);
+	case NACT_EFFECT_SKIP_LINE_LR_RL:
+		return (opt ? opt : 3) * (rect->w / 2);
 	case NACT_EFFECT_ZOOM_IN:
 		return opt ? opt * 64 : 500;
 	case NACT_EFFECT_BLIND_DOWN:
@@ -423,10 +352,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	ecp_cancel = cancel;
 	
 	switch(sw) {
-	case 1:
-	case 2:
-	case 3:
-	case 4:
 	case 6:
 	case 16:
 	case 17:
@@ -441,18 +366,6 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	}
 	
 	switch(sw) {
-	case 1:
-		ret = eCopyArea1(dx, dy, w, h, opt);
-		break;
-	case 2:
-		ret = eCopyArea2(dx, dy, w, h, opt);
-		break;
-	case 3:
-		ret = eCopyArea3(dx, dy, w, h, opt);
-		break;
-	case 4:
-		ret = eCopyArea4(dx, dy, w, h, opt);
-		break;
 	case 5:
 		ret = eCopyArea5(sx, sy, w, h, dx, dy, opt);
 		break;
@@ -505,6 +418,16 @@ void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, i
 
 	nact->waitcancel_key = 0;
 
+	if (1 <= sw && sw <= 4) {
+		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
+		struct sdl_effect *eff = sdl_sprite_effect_init(&rect, dx, dy, sx, sy, spCol, from_nact_effect(sw));
+		ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
+		sdl_effect_finish(eff);
+		// Actual copy.
+		ags_copyAreaSP(sx, sy, w, h, dx, dy, spCol);
+		ags_updateArea(dx, dy, w, h);
+		return;
+	}
 	if (sw == 5) {
 		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
 		struct sdl_effect *eff = sdl_effect_raster_blend_init(&rect, sx, sy);
@@ -518,28 +441,8 @@ void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, i
 
 	ecp_cancel = cancel;
 
-	if (1 <= sw && sw <= 4) {
-		ags_copyAreaSP(sx, sy, w, h, dx, dy, spCol);
-		MyRectangle r = {dx, dy, w, h}, update;
-		SDL_IntersectRect(&nact->ags.view_area, &r, &update);
-		w = update.w;
-		h = update.h;
-	}
-
 	int ret = 0;
 	switch(sw) {
-	case 1:
-		ret = eCopyArea1(dx, dy, w, h, opt);
-		break;
-	case 2:
-		ret = eCopyArea2(dx, dy, w, h, opt);
-		break;
-	case 3:
-		ret = eCopyArea3(dx, dy, w, h, opt);
-		break;
-	case 4:
-		ret = eCopyArea4(dx, dy, w, h, opt);
-		break;
 	case NACT_EFFECT_PALETTE_SHIFT:
 		if (nact->ags.world_depth != 8) return;
 		ags_copyPaletteShift(sx, sy, w, h, dx, dy, spCol);

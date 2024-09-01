@@ -202,10 +202,7 @@ void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	}
 }
 
-/*
- * dib に指定のパレット sp を抜いてコピー
- */
-void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
+static void sdl_dib_sprite_copy(SDL_Surface *dst, int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
 	sdl_pal_check();
 
 	Uint32 col = palette_color(sp);
@@ -214,8 +211,22 @@ void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
 	SDL_Rect r_src = {sx, sy, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
-	SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
+	SDL_BlitSurface(sdl_dib, &r_src, dst, &r_dst);
 	SDL_SetColorKey(sdl_dib, SDL_FALSE, 0);
+}
+
+/*
+ * dib に指定のパレット sp を抜いてコピー
+ */
+void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
+	sdl_dib_sprite_copy(sdl_dib, sx, sy, w, h, dx, dy, sp);
+}
+
+SDL_Surface *sdl_dib_to_surface_colorkey(int x, int y, int w, int h, int sp) {
+	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_FillRect(s, NULL, 0);
+	sdl_dib_sprite_copy(s, x, y, w, h, 0, 0, sp);
+	return s;
 }
 
 void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
