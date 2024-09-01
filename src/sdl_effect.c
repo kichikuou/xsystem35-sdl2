@@ -82,6 +82,17 @@ enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	}
 }
 
+enum sdl_effect_type from_nact_sprite_effect(enum nact_effect effect) {
+	switch (effect) {
+	case NACT_EFFECT_PAN_IN_DOWN:       return EFFECT_PAN_IN_DOWN;
+	case NACT_EFFECT_PAN_IN_UP:         return EFFECT_PAN_IN_UP;
+	case NACT_EFFECT_SKIP_LINE_UP_DOWN: return EFFECT_SKIP_LINE_UP_DOWN;
+	case NACT_EFFECT_SKIP_LINE_LR_RL:   return EFFECT_SKIP_LINE_LR_RL;
+	case NACT_SP_EFFECT_RASTER_BLEND:   return EFFECT_RASTER_BLEND;
+	default:                            return EFFECT_INVALID;
+	}
+}
+
 enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 	switch (effect) {
 	case SACT_EFFECT_CROSSFADE:           return EFFECT_CROSSFADE;
@@ -1785,6 +1796,8 @@ struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx
 	case EFFECT_SKIP_LINE_UP_DOWN:
 	case EFFECT_SKIP_LINE_LR_RL:
 		return skip_line_new(rect, sf_old, sprite, type);
+	case EFFECT_RASTER_BLEND:
+		return raster_blend_new(rect, sx, sy);
 	default:
 		SYSERROR("Unknown sprite effect %d", type);
 		return NULL;
@@ -1794,10 +1807,6 @@ struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx
 struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
 	SDL_Surface *sf = create_surface(surface, view_rect->x, view_rect->y, view_rect->w, view_rect->h);
 	return magnify_new(sf, view_rect, target_rect);
-}
-
-struct sdl_effect *sdl_effect_raster_blend_init(SDL_Rect *rect, int sx, int sy) {
-	return raster_blend_new(rect, sx, sy);
 }
 
 void sdl_effect_step(struct sdl_effect *eff, float progress) {

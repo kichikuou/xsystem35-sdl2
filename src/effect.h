@@ -26,6 +26,7 @@ enum nact_effect {
 	NACT_EFFECT_PAN_IN_UP         = 2,
 	NACT_EFFECT_SKIP_LINE_UP_DOWN = 3,
 	NACT_EFFECT_SKIP_LINE_LR_RL   = 4,
+	NACT_SP_EFFECT_RASTER_BLEND   = 5,  // CD 5
 	NACT_EFFECT_WIPE_IN           = 7,
 	NACT_EFFECT_WIPE_OUT          = 8,
 	NACT_EFFECT_ZOOM_IN           = 10,
@@ -185,6 +186,7 @@ enum sdl_effect_type {
 };
 
 enum sdl_effect_type from_nact_effect(enum nact_effect effect);
+enum sdl_effect_type from_nact_sprite_effect(enum nact_effect effect);
 enum sdl_effect_type from_sact_effect(enum sact_effect effect);
 
 #endif /* __EFFECT_H__ */

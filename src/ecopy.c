@@ -228,6 +228,8 @@ static int duration(enum nact_effect effect, int opt, SDL_Rect *rect) {
 		return (opt ? opt : 3) * (rect->h / 2);
 	case NACT_EFFECT_SKIP_LINE_LR_RL:
 		return (opt ? opt : 3) * (rect->w / 2);
+	case NACT_SP_EFFECT_RASTER_BLEND:
+		return (opt ? opt : 25) * rect->h;
 	case NACT_EFFECT_ZOOM_IN:
 		return opt ? opt * 64 : 500;
 	case NACT_EFFECT_BLIND_DOWN:
@@ -418,40 +420,28 @@ void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, i
 
 	nact->waitcancel_key = 0;
 
-	if (1 <= sw && sw <= 4) {
-		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
-		struct sdl_effect *eff = sdl_sprite_effect_init(&rect, dx, dy, sx, sy, spCol, from_nact_effect(sw));
-		ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
-		sdl_effect_finish(eff);
-		// Actual copy.
-		ags_copyAreaSP(sx, sy, w, h, dx, dy, spCol);
-		ags_updateArea(dx, dy, w, h);
-		return;
-	}
-	if (sw == 5) {
-		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
-		struct sdl_effect *eff = sdl_effect_raster_blend_init(&rect, sx, sy);
-		ags_runEffect((opt ? opt : 25) * h, cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
-		sdl_effect_finish(eff);
-		// Actual copy.
-		ags_copyArea_shadow(sx, sy, w, h, dx, dy);
-		ags_updateArea(dx, dy, w, h);
-		return;
-	}
-
-	ecp_cancel = cancel;
-
-	int ret = 0;
-	switch(sw) {
-	case NACT_EFFECT_PALETTE_SHIFT:
+	if (sw == NACT_EFFECT_PALETTE_SHIFT) {
 		if (nact->ags.world_depth != 8) return;
 		ags_copyPaletteShift(sx, sy, w, h, dx, dy, spCol);
 		ags_updateArea(dx, dy, w, h);
-		ret = sys_getInputInfo();
-		break;
-	default:
-		WARNING("Invalid effect: %d", sw);
-		break;
+		nact->waitcancel_key = sys_getInputInfo();
+		return;
 	}
-	nact->waitcancel_key = ret;
+
+	enum sdl_effect_type type = from_nact_sprite_effect(sw);
+	if (type == EFFECT_INVALID) {
+		WARNING("Invalid effect: %d", sw);
+		return;
+	}
+	SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
+	struct sdl_effect *eff = sdl_sprite_effect_init(&rect, dx, dy, sx, sy, spCol, type);
+	ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
+	sdl_effect_finish(eff);
+	// Actual copy.
+	if (sw == 5) {
+		ags_copyArea_shadow(sx, sy, w, h, dx, dy);
+	} else {
+		ags_copyAreaSP(sx, sy, w, h, dx, dy, spCol);
+	}
+	ags_updateArea(dx, dy, w, h);
 }
