@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11.7 - 2024-11-12
+- Fixed crash when canceling menu with two-finger touch (#58)
+- Fixed screen artifact in Rance 3 immediately after selecting "Game Start"
+
 ## 2.11.6 - 2024-07-22
 - Fixed strange behavior when canceling the battle selection menu in Kichikuou Rance. (#56)
 - Use system mouse cursors whenever possible. They look better on high dpi displays.
