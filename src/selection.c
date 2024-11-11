@@ -461,7 +461,10 @@ void sel_select() {
 		key = sys_keywait(25, KEYWAIT_CANCELABLE);
 
 		// Right-click exits the menu without waiting for button up.
-		if (key == SYS35KEY_SPC) break;
+		if (key == SYS35KEY_SPC) {
+			curElement = -1;
+			break;
+		}
 
 		if (!key && prevkey == SYS35KEY_RET && curElement != -1) break;
 		prevkey = key;
@@ -536,7 +539,7 @@ void sel_select() {
 		msg_nextPage(TRUE);
 	}
 	
-	if (prevkey == SYS35KEY_RET) {
+	if (curElement != -1) {
 		sl_jmpNear(elmv[curElement]);
 		if (cb_select_page != 0) {
 			sl_callFar2(cb_select_page -1, cb_select_address);
