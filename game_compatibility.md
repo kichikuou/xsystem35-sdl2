@@ -55,7 +55,7 @@ Game Compatibility
 | Rance 5D - The Lonely Girl (MangaGamer)     | Supported   |       |
 | 俺の下であがけ                              | Unknown     |       |
 | 楽園行                                      | Unknown     |       |
-| 妻みぐい２                                  | Supported   | Opening demo is not supported |
+| 妻みぐい２                                  | Supported   |       |
 | シェル・クレイル                            | Supported   |       |
 | ナイトデーモン                              | Supported   |       |
 | 学園KING                                    | Supported   | From アリスCD |
