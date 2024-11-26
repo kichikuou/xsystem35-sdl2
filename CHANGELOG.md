@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.12.0 - 2024-11-26
+- Implemented playback of the opening movie for 妻みぐい２.
+
 ## 2.11.7 - 2024-11-12
 - Fixed crash when canceling menu with two-finger touch (#58)
 - Fixed screen artifact in Rance 3 immediately after selecting "Game Start"
