@@ -162,6 +162,9 @@ if (EMSCRIPTEN)
     -sASYNCIFY_IGNORE_INDIRECT=1
     -sASYNCIFY_REMOVE=SDL_Delay
     -sASYNCIFY_IMPORTS=wait_vsync
+    # Functions that call an asynchronous function via a function pointer must
+    # be added to ASYNCIFY_ADD, even if it had a direct call to another
+    # asynchronous function, so that the indirect call itself is instrumented.
     -sASYNCIFY_ADD=commands2F60,nact_main,send_agsevent,cb_waitkey_sprite
     -sALLOW_MEMORY_GROWTH=1
     -sNO_EXIT_RUNTIME=1

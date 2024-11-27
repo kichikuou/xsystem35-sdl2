@@ -222,6 +222,13 @@ void send_agsevent(enum agsevent_type type, int code) {
 		.mousey = mousey
 	};
 	nact->ags.eventcb(&agse);  // Async in emscripten
+
+#ifdef __EMSCRIPTEN__
+	// HACK: this ensures that callers of this function are instrumented.
+	// This is necessary because ASYNCIFY_PROPAGATE_ADD does not work:
+	// https://github.com/emscripten-core/emscripten/issues/23015
+	emscripten_sleep(0);
+#endif
 }
 
 void sdl_setCursorInternalLocation(int x, int y) {
