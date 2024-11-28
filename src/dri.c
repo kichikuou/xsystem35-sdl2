@@ -77,7 +77,7 @@ static bool read_index(int volume, drifiles *d, FILE *fp) {
 
 drifiles *dri_init(const char **file, int cnt, boolean use_mmap) {
 	drifiles *d = calloc(1, sizeof(drifiles));
-#ifndef HAVE_MEMORY_MAPPED_FILE
+#if !defined(HAVE_MEMORY_MAPPED_FILE) || defined(__EMSCRIPTEN__)
 	use_mmap = FALSE;
 #endif
 
