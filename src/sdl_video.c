@@ -155,7 +155,7 @@ static void makeDIB(int width, int height, int depth) {
 		SDL_FreeSurface(sdl_dib);
 	}
 
-	uint32_t format;
+	uint32_t format = 0;
 	switch (depth) {
 	case 8:
 		format = SDL_PIXELFORMAT_INDEX8;
