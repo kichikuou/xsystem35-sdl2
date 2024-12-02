@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.12.1 - 2024-12-02
+- Windows: Fixed missing DLL error (#60)
+
 ## 2.12.0 - 2024-11-26
 - Implemented playback of the opening movie for 妻みぐい２.
 
