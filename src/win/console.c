@@ -36,6 +36,7 @@ static BOOL WINAPI CtrlHandler(DWORD fdwCtrlType) {
 void win_alloc_console(void) {
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
 	freopen("CONIN$", "r", stdin);
 	SetConsoleCP(CP_UTF8);
 	SetConsoleOutputCP(CP_UTF8);
