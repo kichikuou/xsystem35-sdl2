@@ -32,6 +32,7 @@ IDR_MENU1 MENU DISCARDABLE
     POPUP "Option"
     {
         MENUITEM "Mouse Movement",              ID_OPTION_MOUSE_MOVE
+        MENUITEM "Auto Copy Text to Clipboard", ID_OPTION_AUTO_COPY
     }
     MENUITEM "MsgSkip[off]",                    ID_MSGSKIP
 }
@@ -71,6 +72,7 @@ IDR_MENU1 MENU DISCARDABLE
     POPUP "オプション"
     {
         MENUITEM "マウスカーソル移動",            ID_OPTION_MOUSE_MOVE
+        MENUITEM "テキストを自動コピー",          ID_OPTION_AUTO_COPY
     }
     MENUITEM "文字送り[off]",                     ID_MSGSKIP
 }

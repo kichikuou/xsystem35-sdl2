@@ -20,6 +20,13 @@
 #ifndef __TEXTHOOK__
 #define __TEXTHOOK__
 
+enum texthook_mode {
+	TEXTHOOK_NONE,
+	TEXTHOOK_PRINT,
+	TEXTHOOK_COPY,
+};
+
+void texthook_set_mode(enum texthook_mode mode);
 void texthook_message(const char *m);
 void texthook_newline(void);
 void texthook_nextpage(void);

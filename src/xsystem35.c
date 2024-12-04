@@ -72,6 +72,7 @@
 #include "filecheck.h"
 #include "s39init.h"
 #include "msgskip.h"
+#include "texthook.h"
 
 static char *gameResourceFile = "xsystem35.gr";
 static void    sys35_usage(boolean verbose);
@@ -117,7 +118,7 @@ static void sys35_usage(boolean verbose) {
 	puts(" -saveformat fmt : save file format. 'xsystem35', 'system36' or 'system39' (default)");
 	puts(" -renderer name  : set rendering driver name to 'name'");
 	puts(" -playlist file  : load CD playlist from 'file'");
-	puts(" -devmidi device : set midi device name to 'device'");
+	puts(" -texthook mode  : text hook mode. 'none' (default), 'print' or 'copy'");
 	
 	puts(" -M?             : select output midi methos");
 #ifdef ENABLE_MIDI_SDLMIXER
@@ -242,6 +243,19 @@ static void sys_reset(void) {
 	s39ain_reset(&nact->ain);
 }
 
+static bool set_texthook_mode(const char *mode) {
+	if (!strcasecmp(mode, "none")) {
+		texthook_set_mode(TEXTHOOK_NONE);
+	} else if (!strcasecmp(mode, "print")) {
+		texthook_set_mode(TEXTHOOK_PRINT);
+	} else if (!strcasecmp(mode, "copy")) {
+		texthook_set_mode(TEXTHOOK_COPY);
+	} else {
+		return false;
+	}
+	return true;
+}
+
 static void sys35_ParseOption(int *argc, char **argv) {
 	int i;
 	FILE *fp;
@@ -281,6 +295,13 @@ static void sys35_ParseOption(int *argc, char **argv) {
 		} else if (0 == strcmp(argv[i], "-playlist") || 0 == strcmp(argv[i], "-devcd")) {
 			if (argv[i + 1] != NULL) {
 				muscd_set_playlist(argv[i + 1]);
+			}
+		} else if (0 == strcmp(argv[i], "-texthook")) {
+			if (argv[i + 1] != NULL) {
+				if (!set_texthook_mode(argv[i + 1])) {
+					fprintf(stderr, "xsystem35: Invalid texthook mode '%s'\n\n", argv[i + 1]);
+					sys35_usage(FALSE);
+				}
 			}
 		} else if (0 == strncmp(argv[i], "-M", 2)) {
 			int subdev = 0;
@@ -414,6 +435,14 @@ static void check_profile() {
 	param = get_profile("saveformat");
 	if (param) {
 		save_setFormat(param);
+	}
+
+	/* text hook */
+	param = get_profile("texthook");
+	if (param) {
+		if (!set_texthook_mode(param)) {
+			sys_error("Invalid texthook mode '%s'", param);
+		}
 	}
 }
 

@@ -33,6 +33,7 @@
 #define ID_SCREEN_FULL            40012
 #define ID_SCREEN_INTEGER_SCALING 40013
 #define ID_OPTION_MOUSE_MOVE      40021
+#define ID_OPTION_AUTO_COPY       40022
 #define ID_MSGSKIP                40030
 
 struct SDL_RWops;

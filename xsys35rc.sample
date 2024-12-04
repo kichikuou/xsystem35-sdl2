@@ -92,6 +92,13 @@
 
 #game: rance4_v2
 
+# Text hook mode.
+#  none  : no text hook (default)
+#  print : print text to console
+#  copy  : automatically copy text to clipboard (for use with text hooker tools)
+
+#texthook: none
+
 # Enables the ZB command (change the font weight). It is disabled by default
 # because it makes the text too bold with our default fonts.
 # This option is experimental and may be removed in the future. See

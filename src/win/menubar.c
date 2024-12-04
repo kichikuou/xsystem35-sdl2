@@ -28,6 +28,7 @@
 #include "sdl_private.h"
 #include "resources.h"
 #include "msgskip.h"
+#include "texthook.h"
 
 static HMENU hmenu;
 
@@ -118,6 +119,10 @@ void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 		case ID_OPTION_MOUSE_MOVE:
 			if (toggle_menu_item(ID_OPTION_MOUSE_MOVE, &checked))
 				nact->ags.mouse_warp_enabled = checked;
+			break;
+		case ID_OPTION_AUTO_COPY:
+			if (toggle_menu_item(ID_OPTION_AUTO_COPY, &checked))
+				texthook_set_mode(checked ? TEXTHOOK_COPY : TEXTHOOK_NONE);
 			break;
 		case ID_MSGSKIP:
 			msgskip_activate(!msgskip_isActivated());

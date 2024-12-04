@@ -40,6 +40,10 @@ finds System 3.x game files (*.ALD) from the current directory.
   The format when writing save files. Possible values are: `xsystem35`,
   `system36`, `system39` (default).
 
+*-texthook* _mode_::
+  Set the text hook mode. Possible values are: `none` (default), `print` (print
+  text to console), `copy` (copy text to clipboard).
+
 *-renderer* _name_::
   Use the SDL rendering driver named _name_.
 

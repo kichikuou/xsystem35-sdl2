@@ -19,12 +19,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL.h>
 #include "scenario.h"
 #include "texthook.h"
 #include "nact.h"
 
-#ifdef __EMSCRIPTEN__  // ----------------------------------------------
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+
+void texthook_set_mode(enum texthook_mode m) {
+	// Do nothing
+}
 
 void texthook_message(const char *m) {
 	char *utf = toUTF8(m);
@@ -45,52 +50,136 @@ EM_JS(void, texthook_keywait, (void), {
 	xsystem35.texthook.keywait();
 });
 
+#else
 
-#elif defined(TEXTHOOK_PRINT)  // --------------------------------------
+static enum texthook_mode mode = TEXTHOOK_NONE;
 
-static int newlines = 0;
+static struct {
+	int newlines;
+} print;
 
-void texthook_message(const char *m) {
-	if (newlines)
+static void texthook_print_message(const char *m) {
+	if (print.newlines)
 		printf("%d:", sl_getPage());
 	char *utf = toUTF8(m);
 	printf("%s", utf);
 	free(utf);
-	newlines = 0;
+	print.newlines = 0;
 }
 
-void texthook_newline(void) {
-	if (newlines < 2) {
+static void texthook_print_newline(void) {
+	if (print.newlines < 2) {
 		putchar('\n');
 		fflush(stdout);
-		newlines++;
+		print.newlines++;
 	}
 }
 
-void texthook_nextpage(void) {
-	while (newlines < 2) {
+static void texthook_print_nextpage(void) {
+	while (print.newlines < 2) {
 		putchar('\n');
 		fflush(stdout);
-		newlines++;
+		print.newlines++;
 	}
 }
 
-void texthook_keywait(void) {
-	texthook_newline();
+static void texthook_print_keywait(void) {
+	texthook_print_newline();
 }
 
-#else  // --------------------------------------------------------------
+static struct {
+	char *buf;
+	size_t size;
+	size_t pos;
+} copy;
+
+static void texthook_copy_message(const char *m) {
+	size_t len = strlen(m);
+	if (copy.pos + len + 1 > copy.size) {
+		copy.size += min(copy.pos + len + 1, 100);
+		copy.buf = realloc(copy.buf, copy.size);
+	}
+	strcpy(copy.buf + copy.pos, m);
+	copy.pos += len;
+}
+
+static void texthook_copy_newline(void) {
+	if (copy.pos == 0)
+		return;
+	texthook_message("\n");
+}
+
+static void texthook_copy_to_clipboard(void) {
+	char *utf = toUTF8(copy.buf);
+	SDL_SetClipboardText(utf);
+	free(utf);
+	copy.pos = 0;
+}
+
+static void texthook_copy_nextpage(void) {
+	if (copy.pos > 0)
+		texthook_copy_to_clipboard();
+}
+
+static void texthook_copy_keywait(void) {
+	if (copy.pos > 0)
+		texthook_copy_to_clipboard();
+}
+
+void texthook_set_mode(enum texthook_mode m) {
+	mode = m;
+}
 
 void texthook_message(const char *m) {
+	switch (mode) {
+	case TEXTHOOK_NONE:
+		break;
+	case TEXTHOOK_PRINT:
+		texthook_print_message(m);
+		break;
+	case TEXTHOOK_COPY:
+		texthook_copy_message(m);
+		break;
+	}
 }
 
 void texthook_newline(void) {
+	switch (mode) {
+	case TEXTHOOK_NONE:
+		break;
+	case TEXTHOOK_PRINT:
+		texthook_print_newline();
+		break;
+	case TEXTHOOK_COPY:
+		texthook_copy_newline();
+		break;
+	}
 }
 
 void texthook_nextpage(void) {
+	switch (mode) {
+	case TEXTHOOK_NONE:
+		break;
+	case TEXTHOOK_PRINT:
+		texthook_print_nextpage();
+		break;
+	case TEXTHOOK_COPY:
+		texthook_copy_nextpage();
+		break;
+	}
 }
 
 void texthook_keywait(void) {
+	switch (mode) {
+	case TEXTHOOK_NONE:
+		break;
+	case TEXTHOOK_PRINT:
+		texthook_print_keywait();
+		break;
+	case TEXTHOOK_COPY:
+		texthook_copy_keywait();
+		break;
+	}
 }
 
-#endif  // -------------------------------------------------------------
+#endif
