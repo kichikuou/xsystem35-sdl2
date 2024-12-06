@@ -52,8 +52,6 @@ EM_JS(void, texthook_keywait, (void), {
 
 #else
 
-static enum texthook_mode mode = TEXTHOOK_NONE;
-
 static struct {
 	int newlines;
 } print;
@@ -126,11 +124,67 @@ static void texthook_copy_keywait(void) {
 		texthook_copy_to_clipboard();
 }
 
+static enum texthook_mode mode = TEXTHOOK_NONE;
+static int *suppression_list = NULL;
+static enum {
+	INIT,
+	SUPPRESSING,
+	EMITTING,
+} suppression_state = INIT;
+
 void texthook_set_mode(enum texthook_mode m) {
 	mode = m;
 }
 
+// suppressions is a comma-separated list of page numbers to suppress.
+void texthook_set_suppression_list(const char *suppressions) {
+	if (suppression_list != NULL) {
+		free(suppression_list);
+	}
+	if (!suppressions) {
+		suppression_list = NULL;
+		return;
+	}
+
+	int count = 1;
+	for (const char *p = suppressions; *p; p++) {
+		if (*p == ',')
+			count++;
+	}
+
+	suppression_list = (int*)malloc((count + 1) * sizeof(int));
+
+	int index = 0;
+	char *buf = strdup(suppressions);
+	char *token = strtok(buf, ",");
+	while (token) {
+		suppression_list[index++] = atoi(token);
+		token = strtok(NULL, ",");
+	}
+	free(buf);
+
+	suppression_list[index] = -1;  // sentinel
+}
+
+static void set_suppression_state(void) {
+	int page = sl_getPage();
+	if (suppression_list != NULL) {
+		for (int i = 0; suppression_list[i] != -1; i++) {
+			if (page == suppression_list[i]) {
+				suppression_state = SUPPRESSING;
+				return;
+			}
+		}
+	}
+	suppression_state = EMITTING;
+}
+
 void texthook_message(const char *m) {
+	if (suppression_state == INIT)
+		set_suppression_state();
+	if (suppression_state == SUPPRESSING)
+		return;
+
 	switch (mode) {
 	case TEXTHOOK_NONE:
 		break;
@@ -154,6 +208,7 @@ void texthook_newline(void) {
 		texthook_copy_newline();
 		break;
 	}
+	suppression_state = INIT;
 }
 
 void texthook_nextpage(void) {
@@ -167,6 +222,7 @@ void texthook_nextpage(void) {
 		texthook_copy_nextpage();
 		break;
 	}
+	suppression_state = INIT;
 }
 
 void texthook_keywait(void) {
@@ -180,6 +236,7 @@ void texthook_keywait(void) {
 		texthook_copy_keywait();
 		break;
 	}
+	suppression_state = INIT;
 }
 
 #endif

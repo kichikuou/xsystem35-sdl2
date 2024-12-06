@@ -44,6 +44,10 @@ finds System 3.x game files (*.ALD) from the current directory.
   Set the text hook mode. Possible values are: `none` (default), `print` (print
   text to console), `copy` (copy text to clipboard).
 
+*-texthook_suppress* _list_::
+  Suppress text hook on specified scenario pages. _list_ is a comma-separated
+  list of page numbers. Used to suppress system messages, etc.
+
 *-renderer* _name_::
   Use the SDL rendering driver named _name_.
 

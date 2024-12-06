@@ -27,6 +27,7 @@ enum texthook_mode {
 };
 
 void texthook_set_mode(enum texthook_mode mode);
+void texthook_set_suppression_list(const char *suppressions);
 void texthook_message(const char *m);
 void texthook_newline(void);
 void texthook_nextpage(void);

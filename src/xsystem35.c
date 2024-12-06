@@ -112,45 +112,46 @@ static void sys35_usage(boolean verbose) {
 	}
 	puts("Usage: xsystem35 [OPTIONS]\n");
 	puts("OPTIONS");
-	puts(" -gamefile file  : set game resource file to 'file'");
-	puts(" -game game      : enable game-specific hacks");
-	puts(" -savedir dir    : directory to save game state files");
-	puts(" -saveformat fmt : save file format. 'xsystem35', 'system36' or 'system39' (default)");
-	puts(" -renderer name  : set rendering driver name to 'name'");
-	puts(" -playlist file  : load CD playlist from 'file'");
-	puts(" -texthook mode  : text hook mode. 'none' (default), 'print' or 'copy'");
+	puts(" -gamefile file          : set game resource file to 'file'");
+	puts(" -game game              : enable game-specific hacks");
+	puts(" -savedir dir            : directory to save game state files");
+	puts(" -saveformat fmt         : save file format. 'xsystem35', 'system36' or 'system39' (default)");
+	puts(" -renderer name          : set rendering driver name to 'name'");
+	puts(" -playlist file          : load CD playlist from 'file'");
+	puts(" -texthook mode          : text hook mode. 'none' (default), 'print' or 'copy'");
+	puts(" -texthook_suppress list : suppress text hook on specified pages");
 	
-	puts(" -M?             : select output midi methos");
+	puts(" -M?                     : select output midi methos");
 #ifdef ENABLE_MIDI_SDLMIXER
-	puts(" -Me             : SDL_mixer midi player");
+	puts(" -Me                     : SDL_mixer midi player");
 #endif
 #ifdef ENABLE_MIDI_PORTMIDI
-	puts(" -Mp?            : ALSA (via PortMidi) (?:devicenumber)");
+	puts(" -Mp?                    : ALSA (via PortMidi) (?:devicenumber)");
 #endif
-	puts(" -M0             : Disable MIDI output");
+	puts(" -M0                     : Disable MIDI output");
 	
-	puts(" -devjoy device  : joystick device index (0-)");
+	puts(" -devjoy device          : joystick device index (0-)");
 
-	puts(" -ttfont_mincho  : set TrueType font for mincho");
-	puts(" -ttfont_gothic  : set TrueType font for mincho");
+	puts(" -ttfont_mincho          : set TrueType font for mincho");
+	puts(" -ttfont_gothic          : set TrueType font for mincho");
 	
 #ifdef DEBUG
-	puts(" -debuglv #      : logging level");
-	puts("                 :  1: warings");
-	puts("                 :  2: unimplemented commands");
-	puts("                 :  5: command trace");
-	puts("                 :  6: message trace");
+	puts(" -debuglv #              : logging level");
+	puts("                         :  1: warings");
+	puts("                         :  2: unimplemented commands");
+	puts("                         :  5: command trace");
+	puts("                         :  6: message trace");
 #endif
 #ifdef ENABLE_DEBUGGER
-	puts(" -debug          : start with debugger");
+	puts(" -debug                  : start with debugger");
 #endif
-	puts(" -noantialias    : never use antialiased string");
-	puts(" -fullscreen     : start with fullscreen");
-	puts(" -integerscale   : use integer scaling when resizing");
-	puts(" -noimagecursor  : disable image cursor");
-	puts(" -version        : show version");
-	puts(" -h              : show this message");
-	puts(" --help          : show this message");
+	puts(" -noantialias            : never use antialiased string");
+	puts(" -fullscreen             : start with fullscreen");
+	puts(" -integerscale           : use integer scaling when resizing");
+	puts(" -noimagecursor          : disable image cursor");
+	puts(" -version                : show version");
+	puts(" -h                      : show this message");
+	puts(" --help                  : show this message");
 	exit(1);
 }
 
@@ -303,6 +304,10 @@ static void sys35_ParseOption(int *argc, char **argv) {
 					sys35_usage(FALSE);
 				}
 			}
+		} else if (0 == strcmp(argv[i], "-texthook_suppress")) {
+			if (argv[i + 1] != NULL) {
+				texthook_set_suppression_list(argv[i + 1]);
+			}
 		} else if (0 == strncmp(argv[i], "-M", 2)) {
 			int subdev = 0;
 			if (argv[i][3] != '\0') {
@@ -443,6 +448,10 @@ static void check_profile() {
 		if (!set_texthook_mode(param)) {
 			sys_error("Invalid texthook mode '%s'", param);
 		}
+	}
+	param = get_profile("texthook_suppress");
+	if (param) {
+		texthook_set_suppression_list(param);
 	}
 }
 
