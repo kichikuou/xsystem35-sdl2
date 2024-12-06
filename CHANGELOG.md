@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.13.0 - 2024-12-07
+- Windows: `Option` -> `Auto Copy Text to Clipboard` menu command has been added.
+  When enabled, in-game text will be copied to the clipboard automatically. This
+  can be used with text hooker tools that support clipboard monitoring.
+
 ## 2.12.1 - 2024-12-02
 - Windows: Fixed missing DLL error (#60)
 
