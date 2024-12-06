@@ -26,31 +26,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-
-void texthook_set_mode(enum texthook_mode m) {
-	// Do nothing
-}
-
-void texthook_message(const char *m) {
-	char *utf = toUTF8(m);
-	EM_ASM_({ xsystem35.texthook.message(UTF8ToString($0), $1); },
-			utf, sl_getPage());
-	free(utf);
-}
-
-EM_JS(void, texthook_newline, (void), {
-	xsystem35.texthook.newline();
-});
-
-EM_JS(void, texthook_nextpage, (void), {
-	xsystem35.texthook.nextpage();
-});
-
-EM_JS(void, texthook_keywait, (void), {
-	xsystem35.texthook.keywait();
-});
-
-#else
+#endif
 
 static struct {
 	int newlines;
@@ -137,6 +113,7 @@ void texthook_set_mode(enum texthook_mode m) {
 }
 
 // suppressions is a comma-separated list of page numbers to suppress.
+EMSCRIPTEN_KEEPALIVE
 void texthook_set_suppression_list(const char *suppressions) {
 	if (suppression_list != NULL) {
 		free(suppression_list);
@@ -185,6 +162,11 @@ void texthook_message(const char *m) {
 	if (suppression_state == SUPPRESSING)
 		return;
 
+#ifdef __EMSCRIPTEN__
+	char *utf = toUTF8(m);
+	EM_ASM(xsystem35.texthook.message(UTF8ToString($0)), utf);
+	free(utf);
+#else
 	switch (mode) {
 	case TEXTHOOK_NONE:
 		break;
@@ -195,9 +177,13 @@ void texthook_message(const char *m) {
 		texthook_copy_message(m);
 		break;
 	}
+#endif
 }
 
 void texthook_newline(void) {
+#ifdef __EMSCRIPTEN__
+	EM_ASM(xsystem35.texthook.newline());
+#else
 	switch (mode) {
 	case TEXTHOOK_NONE:
 		break;
@@ -208,10 +194,14 @@ void texthook_newline(void) {
 		texthook_copy_newline();
 		break;
 	}
+#endif
 	suppression_state = INIT;
 }
 
 void texthook_nextpage(void) {
+#ifdef __EMSCRIPTEN__
+	EM_ASM(xsystem35.texthook.nextpage());
+#else
 	switch (mode) {
 	case TEXTHOOK_NONE:
 		break;
@@ -222,10 +212,14 @@ void texthook_nextpage(void) {
 		texthook_copy_nextpage();
 		break;
 	}
+#endif
 	suppression_state = INIT;
 }
 
 void texthook_keywait(void) {
+#ifdef __EMSCRIPTEN__
+	EM_ASM(xsystem35.texthook.keywait());
+#else
 	switch (mode) {
 	case TEXTHOOK_NONE:
 		break;
@@ -236,7 +230,6 @@ void texthook_keywait(void) {
 		texthook_copy_keywait();
 		break;
 	}
+#endif
 	suppression_state = INIT;
 }
-
-#endif
