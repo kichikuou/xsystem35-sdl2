@@ -284,7 +284,7 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = ALPHABLEND16(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
 			}
-			while(*(col + y) == *(col + y + 1)) {
+			while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
 				yld += dst->width;
 				for (x = 0; x < dw; x++) {
 					*(yld + x) = ALPHABLEND16(*(yls+ *(row+x)), *(yld+x), *(yla+*(row+x)));
@@ -307,7 +307,7 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = ALPHABLEND24(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
 			}
-			while(*(col + y) == *(col + y + 1)) {
+			while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
 				yld += dst->width;
 				for (x = 0; x < dw; x++) {
 					*(yld + x) = ALPHABLEND24(*(yls+ *(row+x)), *(yld+x), *(yla+*(row+x)));

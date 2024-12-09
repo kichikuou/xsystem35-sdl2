@@ -50,7 +50,7 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 				*(yld + x) = *(yls + *(row + x));
 			}
 			_yld = (uint8_t *)yld;
-			while(*(col + y) == *(col + y + 1)) {
+			while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
 				_yls = _yld;
 				_yld += dst->bytes_per_line;
 				memcpy(_yld, _yls, dw * 2);
@@ -72,7 +72,7 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 				*(yld + x) = *(yls+ *(row + x));
 			}
 			_yld = (uint8_t *)yld;
-			while(*(col + y) == *(col + y + 1)) {
+			while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
 				_yls = _yld;
 				_yld += dst->bytes_per_line;
 				memcpy(_yld, _yls, dw * 4);

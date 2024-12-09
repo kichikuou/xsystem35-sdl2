@@ -57,15 +57,15 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 #define SCALEDCOPYAREA(type) {                                          \
 	int x, y;                                                       \
 	type *sl, *dl;                                                  \
-	uint8_t *_sl, *_dl;                                                \
+	uint8_t *_sl, *_dl;                                             \
 	for (y = 0; y < dh; y++) {                                      \
 		sl = (type *)(sdata + *(y + col) * src->bytes_per_line);\
 		dl = (type *)(ddata +   y        * dst->bytes_per_line);\
 		for (x = 0; x < dw; x++) {                              \
 			*(dl + x) = *(sl + *(row + x));                 \
 		}                                                       \
-		_dl = (uint8_t *)dl;                                       \
-		while(*(col + y) == *(col + y + 1)) {                   \
+		_dl = (uint8_t *)dl;                                    \
+		while (y < dh - 1 && *(col + y) == *(col + y + 1)) {	\
 			_sl = _dl;                                      \
 			_dl += dst->bytes_per_line;                     \
 			memcpy(_dl, _sl, dw * sizeof(type));            \
@@ -98,7 +98,7 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 				*(dl + x) = *(sl + *(row + x));
 			}
 			_dl = (uint8_t *)dl;
-			while(*(col + y) == *(col + y + 1)) {
+			while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
 				_sl = _dl;
 				_dl += dst->width;
 				memcpy(_dl, _sl, dw);
