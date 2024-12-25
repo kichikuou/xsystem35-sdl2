@@ -10,6 +10,7 @@ assignees: ''
 ### Environment
  - xsystem35 version:
  - OS:
+ - Game title:
 
 ### Steps to reproduce the behavior
 1. 
@@ -22,3 +23,4 @@ assignees: ''
 <!-- If applicable, add screenshots to help explain your problem. -->
 
 ### Additional context
+<!-- Note: Please do not post copyrighted game files. -->
