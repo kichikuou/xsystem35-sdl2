@@ -216,7 +216,7 @@ struct debug_symbols *dsym_load(const char *path) {
 			return NULL;
 		}
 		if (fread(section_content, section_size - 8, 1, fp) != 1) {
-			WARNING("%s: I/O error", path, strerror(errno));
+			WARNING("%s: %s", path, strerror(errno));
 			fclose(fp);
 			return NULL;
 		}
