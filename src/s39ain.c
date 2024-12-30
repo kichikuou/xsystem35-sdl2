@@ -21,6 +21,7 @@
 */
 /* $Id: s39ain.c,v 1.9 2003/07/21 23:06:47 chikama Exp $ */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -52,7 +53,12 @@ int s39ain_init(const char *path_to_ain, S39AIN *ain) {
 	len = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	buf = malloc(len + 4); /* +4 : VARI/MSGI... 拡張のため */
-	fread(buf, 1, len, fp);
+	if (fread(buf, len, 1, fp) != 1) {
+		WARNING("%s: %s", path_to_ain, strerror(errno));
+		free(buf);
+		fclose(fp);
+		return NG;
+	}
 	fclose(fp);
 	
 	p = buf;

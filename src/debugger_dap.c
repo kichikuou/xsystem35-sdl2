@@ -588,7 +588,11 @@ static int read_command_thread(void *data) {
 				continue;
 			}
 			char *buf = malloc(content_length);
-			fread(buf, content_length, 1, stdin);
+			if (fread(buf, content_length, 1, stdin) != 1) {
+				fprintf(stderr, "Failed to read message\n");
+				free(buf);
+				break;
+			}
 			sdl_post_debugger_command(buf);
 			content_length = -1;
 		} else {

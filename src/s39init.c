@@ -79,9 +79,9 @@ int s39ini_init(void) {
 			vol[i] = vval[i].vol = 100;
 		}
 	} else {
-		fread(vol, sizeof(int), MAXVOLCH, fp);
+		int n = fread(vol, sizeof(int), MAXVOLCH, fp);
 		fclose(fp);
-		for (i = 0; i < MAXVOLCH; i++) {
+		for (i = 0; i < n; i++) {
 			vval[i].vol = vol[i];
 		}
 	}

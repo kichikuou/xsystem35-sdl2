@@ -280,6 +280,7 @@ static void writeAsdFooter(enum save_format format, FILE *fp) {
 あとで free(*buf)するのを忘れないように
 */
 static void* loadGameData(int no, int *status, int *size) {
+	void *buf = NULL;
 	FILE *fp = fopen(nact->files.save_fname[no], "rb");
 	if (!fp)
 		goto errexit;
@@ -288,12 +289,13 @@ static void* loadGameData(int no, int *status, int *size) {
 	if (filesize == 0)
 		goto errexit;
 
-	char *buf = (char *)malloc(filesize);
+	buf = malloc(filesize);
 	if (buf == NULL)
 		goto errexit;
 
 	fseek(fp, 0L, SEEK_SET);
-	fread(buf, filesize, 1, fp);
+	if (fread(buf, filesize, 1, fp) != 1)
+		goto errexit;
 	fclose(fp);
 
 	*size = (int)filesize;
@@ -301,6 +303,8 @@ static void* loadGameData(int no, int *status, int *size) {
 	return buf;
 
  errexit:
+	if (buf != NULL)
+		free(buf);
 	if (fp != NULL)
 		fclose(fp);
 	*status = SAVE_LOADERR;
