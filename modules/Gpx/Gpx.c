@@ -230,24 +230,16 @@ static void CreateAMapOnly() {
 
 static void IsSurface() {
 	/*
-	  Gpx.IsSurface(): 指定の番号の surface が surface かどうか
-	                   (pixel と alpha の両方のデータを持つ)を調べる
+	  Gpx.IsSurface(): 指定の番号が surface かどうかを調べる
 	  
 	   p1  : surface 番号
 	   var : 結果を返す変数。surface ならば 1, !surface ならば 0
 	*/
 	int p1   = getCaliValue();
 	int *var = getCaliVariable();
-	surface_t *s;
-	
-	s = sf_get(p1);
-	
-	if (s == NULL) {
-		*var = 0;
-	} else {
-		*var = (s->alpha && s->pixel) ? 1 : 0;
-	}
-	
+
+	*var = sf_get(p1) ? 1 : 0;
+
 	DEBUG_COMMAND("Gpx.IsSurface %d,%p:", p1, var);
 }
 
