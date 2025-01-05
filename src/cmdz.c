@@ -182,9 +182,9 @@ void commandZF() {
 }
 
 void commandZD() {
-	/* デバッグモード時のデバッグメッセージの出力 ON/OFF/PAUSE */
 	int c0 = sl_getc();
 	int sw = 0, *var;
+	char *msg;
 	
 	switch(c0) {
 	case 0:
@@ -193,10 +193,14 @@ void commandZD() {
 		break;
 	case 2:
 		sw = getCaliValue();
-		DEBUG_MESSAGE("(ZD2)%s\n", svar_get(sw));
+		msg = toUTF8(svar_get(sw));
+		sys_message(2, "[DEBUG] %s\n", msg);
+		free(msg);
 		break;
 	case 3:
-		sw = getCaliValue(); break;
+		sw = getCaliValue();
+		sys_message(2, "[DEBUG] %d\n", sw);
+		break;
 	case 4:
 		var = getCaliVariable(); *var = 0; break;
 	}
