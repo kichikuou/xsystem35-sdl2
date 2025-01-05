@@ -24,7 +24,7 @@
 int musbgm_init(DRIFILETYPE type, int base_no);
 int musbgm_exit(void);
 int musbgm_reset(void);
-int musbgm_play(int no, int time, int vol);
+int musbgm_play(int no, int time, int vol, int loop_count);
 int musbgm_stop(int no, int time);
 int musbgm_fade(int no, int time, int vol);
 int musbgm_getpos(int no);

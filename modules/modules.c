@@ -35,6 +35,7 @@ static const Module *modules[] = {
 	&module_NIGHTDLL,
 	&module_NightDemonDemo,
 	&module_RandMT,
+	&module_S3xMusic,
 	&module_SACT,
 	&module_ShArray,
 	&module_ShCalc,

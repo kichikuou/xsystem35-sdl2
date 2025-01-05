@@ -42,6 +42,7 @@ extern const Module module_MsgSkip;
 extern const Module module_NIGHTDLL;
 extern const Module module_NightDemonDemo;
 extern const Module module_RandMT;
+extern const Module module_S3xMusic;
 extern const Module module_SACT;
 extern const Module module_ShArray;
 extern const Module module_ShCalc;

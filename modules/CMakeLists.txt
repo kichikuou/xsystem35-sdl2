@@ -23,6 +23,7 @@ add_library(modules STATIC
   NIGHTDLL/nt_sound.c
   NightDemonDemo/NightDemonDemo.c
   RandMT/RandMT.c
+  S3xMusic/S3xMusic.c
   SACT/SACT.c
   SACT/sactcg.c
   SACT/sactsound.c

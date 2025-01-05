@@ -44,9 +44,9 @@ int musbgm_reset(void) {
 	return OK;
 }
 
-EM_JS(int, musbgm_play, (int no, int time, int vol), {
+EM_JS(int, musbgm_play, (int no, int time, int vol, int loop_count), {
 	xsystem35.cdPlayer.fade(time * 10, vol / 100);
-	xsystem35.cdPlayer.play(no, 1);
+	xsystem35.cdPlayer.play(no, loop_count == 0);
 	return xsystem35.Status.OK;
 });
 

@@ -96,7 +96,7 @@ int musbgm_reset(void) {
 	return OK;
 }
 
-int musbgm_play(int no, int time, int vol) {
+int musbgm_play(int no, int time, int vol, int loop_count) {
 	if (current_no)
 		musbgm_stop(current_no, 0);
 
@@ -107,7 +107,7 @@ int musbgm_play(int no, int time, int vol) {
 	// understands loop info in the WAVE's "smpl" chunk.
 
 	Mix_VolumeMusic(vol * MIX_MAX_VOLUME / 100);
-	if (Mix_FadeInMusic(mix_music, -1, time * 10) != 0) {
+	if (Mix_FadeInMusic(mix_music, loop_count == 0 ? -1 : loop_count, time * 10) != 0) {
 		free_music();
 		return NG;
 	}

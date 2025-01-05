@@ -1838,7 +1838,7 @@ static void MusicPlay() {
 	int wFadeTime = getCaliValue();
 	int wVolume = getCaliValue();
 	
-	musbgm_play(wNum, wFadeTime, wVolume);
+	musbgm_play(wNum, wFadeTime, wVolume, 0);
 	
 	TRACE("SACT.MusicPlay %d,%d,%d:", wNum, wFadeTime, wVolume);
 }

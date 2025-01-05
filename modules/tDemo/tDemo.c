@@ -71,7 +71,7 @@ static void Run() {
 
 	while (sys_getInputInfo());  // wait for key up
 
-	musbgm_play(TDEMO_MUSIC_NO, 0, 100);
+	musbgm_play(TDEMO_MUSIC_NO, 0, 100, 0);
 
 	uint32_t start = sdl_getTicks();
 	while (!nact->is_quit) {

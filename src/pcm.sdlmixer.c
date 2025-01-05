@@ -62,8 +62,8 @@ static mmap_t *wai_map;
  * 指定の番号の .WAV|.OGG をロードする。
  * @param no: DRIファイル番号
  */
-static Mix_Chunk *load_asset(int no) {
-	dridata *dfile = ald_getdata(DRIFILE_WAVE, no -1);
+static Mix_Chunk *load_asset(DRIFILETYPE type, int no) {
+	dridata *dfile = ald_getdata(type, no -1);
 	if (dfile == NULL) {
 		WARNING("DRIFILE_WAVE fail to open %d", no -1);
 		return NULL;
@@ -99,8 +99,8 @@ static int load_chunk(int slot, Mix_Chunk *chunk) {
  * @return   : 合成後の Mix_Chunk
  */
 static Mix_Chunk *pcm_mixlr(int noL, int noR) {
-	Mix_Chunk *chunkL = load_asset(noL);
-	Mix_Chunk *chunkR = load_asset(noR);
+	Mix_Chunk *chunkL = load_asset(DRIFILE_WAVE, noL);
+	Mix_Chunk *chunkR = load_asset(DRIFILE_WAVE, noR);
 	if (chunkL == NULL || chunkR == NULL) {
 		if (chunkL)
 			Mix_FreeChunk(chunkL);
@@ -163,7 +163,7 @@ int muspcm_load_no(int slot, int no) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return NG;
 
-	Mix_Chunk *chunk = load_asset(no);
+	Mix_Chunk *chunk = load_asset(DRIFILE_WAVE, no);
 	if (chunk == NULL) {
 		return NG;
 	}
@@ -175,6 +175,19 @@ int muspcm_load_no(int slot, int no) {
 	} else {
 		prv.vol_pcm_sub[slot] = 0;
 	}
+
+	return load_chunk(slot, chunk);
+}
+
+int muspcm_load_bgm(int slot, int no) {
+	if ((unsigned)slot >= PCM_SLOTS)
+		return NG;
+
+	Mix_Chunk *chunk = load_asset(DRIFILE_BGM, no);
+	if (chunk == NULL) {
+		return NG;
+	}
+	prv.vol_pcm_sub[slot] = 0;
 
 	return load_chunk(slot, chunk);
 }
