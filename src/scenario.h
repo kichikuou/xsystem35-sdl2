@@ -101,11 +101,11 @@ static inline int sl_getPage(void) { return sl_page; }
 static inline int sl_getc(void) { return sl_sco[sl_index++]; }
 
 #define TRACE_UNIMPLEMENTED(fmt, ...) \
-	sys_message(2, "Unimplemented: " fmt "\n", ##__VA_ARGS__)
+	sys_message(2, "[UNIMPLEMENTED] " fmt "\n", ##__VA_ARGS__)
 
 #ifdef DEBUG
 #define TRACE(fmt, ...) \
-	sys_message(5, fmt "\n", ##__VA_ARGS__)
+	sys_message(5, "[TRACE] " fmt "\n", ##__VA_ARGS__)
 #define TRACE_MESSAGE(...) sys_message(6, __VA_ARGS__)
 #else
 #define TRACE(...)

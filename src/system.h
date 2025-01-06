@@ -48,13 +48,13 @@ extern void sys_message(int lv, char *format, ...);  /* show various message */
 #define NOMEMERR()        sys_error("Out of memory at %s()\n", __func__)
 
 #define SYSERROR(fmt, ...) \
-	sys_error("*ERROR*(%s): " fmt, __func__, ##__VA_ARGS__)
+	sys_error("[ERROR] %s: " fmt, __func__, ##__VA_ARGS__)
 #define WARNING(fmt, ...) \
-	sys_message(1, "*WARNING*(%s): " fmt "\n", __func__, ##__VA_ARGS__)
+	sys_message(1, "[WARNING] %s: " fmt "\n", __func__, ##__VA_ARGS__)
 #define NOTICE(fmt, ...) \
-	sys_message(2, fmt "\n", ##__VA_ARGS__)
+	sys_message(2, "[INFO] " fmt "\n", ##__VA_ARGS__)
 #define SACT_DEBUG(fmt, ...) \
-	sys_message(5, "%s: " fmt "\n", __func__, ##__VA_ARGS__)
+	sys_message(5, "[SACT] %s: " fmt "\n", __func__, ##__VA_ARGS__)
 
 #ifdef HAVE_SIGACTION
 void sys_set_signalhandler(int SIG, void (*handler)(int));
