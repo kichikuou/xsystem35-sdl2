@@ -420,18 +420,22 @@ static void Copy() {
 	gr_copy(dst, dx, dy, src, sx, sy, sw, sh);
 }
 
-static void CopyBright() { /* not used ? */
-	int p1 = getCaliValue();
-	int p2 = getCaliValue();
-	int p3 = getCaliValue();
-	int p4 = getCaliValue();
-	int p5 = getCaliValue();
-	int p6 = getCaliValue();
-	int p7 = getCaliValue();
-	int p8 = getCaliValue();
-	int p9 = getCaliValue();
+static void CopyBright(void) {
+	int ds = getCaliValue();
+	int dx = getCaliValue();
+	int dy = getCaliValue();
+	int ss = getCaliValue();
+	int sx = getCaliValue();
+	int sy = getCaliValue();
+	int w = getCaliValue();
+	int h = getCaliValue();
+	int lv = getCaliValue();
 
-	TRACE_UNIMPLEMENTED("Gpx.CopyBright %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	surface_t *dst = sf_get(ds);
+	surface_t *src = sf_get(ss);
+	gr_copy_bright(dst, dx, dy, src, sx, sy, w, h, lv);
+
+	TRACE("Gpx.CopyBright %d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss, sx, sy, w, h, lv);
 }
 
 static void CopyAMap() {
@@ -464,18 +468,22 @@ static void CopyAMap() {
 	gr_copy_alpha_map(dst, dx, dy, src, sx, sy, sw, sh);
 }
 
-static void Blend() { /* not used ? */
-	int p1 = getCaliValue();
-	int p2 = getCaliValue();
-	int p3 = getCaliValue();
-	int p4 = getCaliValue();
-	int p5 = getCaliValue();
-	int p6 = getCaliValue();
-	int p7 = getCaliValue();
-	int p8 = getCaliValue();
-	int p9 = getCaliValue();
-	
-	TRACE_UNIMPLEMENTED("Gpx.Blend %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
+static void Blend(void) {
+	int ds = getCaliValue();
+	int dx = getCaliValue();
+	int dy = getCaliValue();
+	int ss = getCaliValue();
+	int sx = getCaliValue();
+	int sy = getCaliValue();
+	int w = getCaliValue();
+	int h = getCaliValue();
+	int lv = getCaliValue();
+
+	surface_t *dst = sf_get(ds);
+	surface_t *src = sf_get(ss);
+	gr_blend(dst, dx, dy, src, sx, sy, w, h, lv);
+
+	TRACE("Gpx.Blend %d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss, sx, sy, w, h, lv);
 }
 
 static void BlendSrcBright() { /* not used ? */
@@ -729,15 +737,18 @@ static void FillAlphaColor() { /* not used ? */
 	gr_fill_alpha_color(dst, dx, dy, dw, dh, r, g, b, lv);
 }
 
-static void FillAMap() { /* not used ? */
-	int p1 = getCaliValue();
-	int p2 = getCaliValue();
-	int p3 = getCaliValue();
-	int p4 = getCaliValue();
-	int p5 = getCaliValue();
-	int p6 = getCaliValue();
-	
-	TRACE_UNIMPLEMENTED("Gpx.FillAMap %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
+static void FillAMap(void) {
+	int ds = getCaliValue();
+	int x = getCaliValue();
+	int y = getCaliValue();
+	int w = getCaliValue();
+	int h = getCaliValue();
+	int lv = getCaliValue();
+
+	surface_t *dst = sf_get(ds);
+	gr_fill_alpha_map(dst, x, y, w, h, lv);
+
+	TRACE("Gpx.FillAMap %d,%d,%d,%d,%d,%d:", ds, x, y, w, h, lv);
 }
 
 static void FillAMapOverBorder() {
@@ -1129,25 +1140,11 @@ static void EffectCopy() {
 	int sh   = getCaliValue();
 	int time = getCaliValue();
 	int *var = getCaliVariable();
-	surface_t *dib, *dst, *src;
-	
-	switch(no) {
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-	case 7:
-	case 11:
-	case 12:
-	case 13:
-		TRACE("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
-		break;
-	default:
-		TRACE_UNIMPLEMENTED("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
-	}
-	dst = sf_get(ss1);
-	src = sf_get(ss2);
+
+	TRACE("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
+
+	surface_t *dst = sf_get(ss1);
+	surface_t *src = sf_get(ss2);
 	gpx_effect(no, dx, dy, dst, sx1, sy1, src, sx2, sy2, sw, sh, time, var);
 	
 }

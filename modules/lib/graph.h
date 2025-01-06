@@ -6,6 +6,7 @@
 
 extern void gr_init();
 
+extern void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv);
 extern void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh);
 extern void gr_fill_alpha_overborder(surface_t *dst, int dx, int dy, int dw, int dh, int s, int d);
 extern void gr_fill_alpha_underborder(surface_t *dst, int dx, int dy, int dw, int dh, int s, int d);

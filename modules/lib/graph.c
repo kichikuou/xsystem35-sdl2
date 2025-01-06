@@ -179,8 +179,8 @@ void gr_init() {
 
 
 void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv) {
-	
-	
+	if (!gr_clip(src, &sx, &sy, &width, &height, dst, &dx, &dy)) return;
+	gre_Blend(dst, dx, dy, dst, dx, dy, src, sx, sy, width, height, lv);
 }
 
 void gr_blend_src_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int alpha, int rate) {
