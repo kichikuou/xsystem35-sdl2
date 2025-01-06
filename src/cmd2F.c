@@ -50,6 +50,8 @@ static int cb_sel_init_address = 0;
 
 static const char REGREADSTRING_RESULT[] = "*regReadString*";
 
+static SDL_Rect clip_window;
+
 extern INPUTSTRING_PARAM mi_param;
 
 extern void commandH();
@@ -847,8 +849,13 @@ void commands2F54() {
 	int eY = getCaliValue();
 	int eWidth = getCaliValue();
 	int eHeight = getCaliValue();
+
+	clip_window.x = eX;
+	clip_window.y = eY;
+	clip_window.w = eWidth;
+	clip_window.h = eHeight;
 	
-	TRACE_UNIMPLEMENTED("mathSetClipWindow %d, %d, %d, %d:", eX, eY, eWidth, eHeight);
+	TRACE("mathSetClipWindow %d, %d, %d, %d:", eX, eY, eWidth, eHeight);
 }
 
 void commands2F55() {
@@ -858,9 +865,19 @@ void commands2F55() {
 	int *vSy = getCaliVariable();
 	int *vWidth  = getCaliVariable();
 	int *vHeight = getCaliVariable();
-	
-	TRACE_UNIMPLEMENTED("mathClip %d, %d, %d, %d, %d, %d:",
-			  *vDx, *vDy, *vSx, *vSy, *vWidth, *vHeight);
+
+	TRACE("mathClip %d, %d, %d, %d, %d, %d:", *vDx, *vDy, *vSx, *vSy, *vWidth, *vHeight);
+
+	SDL_Rect r = { *vDx, *vDy, *vWidth, *vHeight };
+	if (SDL_IntersectRect(&r, &clip_window, &r)) {
+		*vDx = r.x;
+		*vDy = r.y;
+		*vWidth = r.w;
+		*vHeight = r.h;
+	} else {
+		*vWidth = 0;
+		*vHeight = 0;
+	}
 }
 
 void commands2F56() {
