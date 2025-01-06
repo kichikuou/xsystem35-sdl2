@@ -38,9 +38,7 @@
 #include "randMT.h"
 
 static int numbase;
-static int64_t  l_1000A0C8;
-static int64_t  l_1000A0D0;
-static int64_t  l_1000A0D8;
+static int64_t  accumulator;
 
 static int64_t mul64(int64_t a1, int64_t a2) {
 	return a1 * a2;
@@ -50,6 +48,10 @@ static int64_t div64(int64_t a1, int64_t a2) {
 	if (a1 == 0 || a2 == 0) return 0;
 	
 	return a1 / a2;
+}
+
+static int64_t get32(int *var) {
+	return var[0] + mul64(var[1], 0x10000);
 }
 
 static void SetIntNumBase(void) { /* 0 */
@@ -74,15 +76,17 @@ static void SetIntNum16(void) { /* 1 */
 	*/
 	int *var = getCaliVariable();
 	
-	l_1000A0D8 = mul64(*var, numbase);
+	accumulator = mul64(*var, numbase);
 	
 	TRACE("ShCalc.SetIntNum16 %p:", var);
 }
 
 static void SetIntNum32(void) { /* 2 */
-	int p1 = getCaliValue();
+	int *var = getCaliVariable();
+
+	accumulator = mul64(get32(var), numbase);
 	
-	TRACE_UNIMPLEMENTED("ShCalc.SetIntNum32: %d:", p1);
+	TRACE("ShCalc.SetIntNum32: %p:", var);
 }
 
 static void GetIntNum16(void) { /* 3 */
@@ -94,10 +98,10 @@ static void GetIntNum16(void) { /* 3 */
 	int *var = getCaliVariable();
 	int64_t i;
 	
-	i = div64(l_1000A0D8, numbase);
+	i = div64(accumulator, numbase);
 	
 	if (i > 65535) {
-		i = l_1000A0C8 = 65535;
+		i = 65535;
 	}
 	
 	*var = i;
@@ -106,9 +110,14 @@ static void GetIntNum16(void) { /* 3 */
 }
 
 static void GetIntNum32(void) { /* 4 */
-	int p1 = getCaliValue();
+	int *var = getCaliVariable();
+	int64_t i = div64(accumulator, numbase);
 	
-	TRACE_UNIMPLEMENTED("ShCalc.GetIntNum32: %d:", p1);
+	var[0] = i & 0xFFFF;
+	i >>= 16;
+	var[1] = i > 0xFFFF ? 0xFFFF : i;
+
+	TRACE("ShCalc.GetIntNum32: %p:", var);
 }
 
 static void AddIntNum16(void) { /* 5 */
@@ -119,15 +128,17 @@ static void AddIntNum16(void) { /* 5 */
 	 */
 	int *var = getCaliVariable();
 	
-	l_1000A0D8 += mul64(*var, numbase);
+	accumulator += mul64(*var, numbase);
 	
 	TRACE("ShCalc.AddIntNum16 %p:", var);
 }
 
 static void AddIntNum32(void) { /* 6 */
-	int p1 = getCaliValue();
-	
-	TRACE_UNIMPLEMENTED("ShCalc.AddIntNum32: %d:", p1);
+	int *var = getCaliVariable();
+
+	accumulator += mul64(get32(var), numbase);
+
+	TRACE("ShCalc.AddIntNum32: %p:", var);
 }
 
 static void SubIntNum16(void) { /* 7 */
@@ -137,9 +148,11 @@ static void SubIntNum16(void) { /* 7 */
 }
 
 static void SubIntNum32(void) { /* 8 */
-	int p1 = getCaliValue();
-	
-	TRACE_UNIMPLEMENTED("ShCalc.SubIntNum32: %d:", p1);
+	int *var = getCaliVariable();
+
+	accumulator -= mul64(get32(var), numbase);
+
+	TRACE("ShCalc.SubIntNum32: %p:", var);
 }
 
 static void MulIntNum16(void) {  /* 9 */
@@ -150,7 +163,7 @@ static void MulIntNum16(void) {  /* 9 */
 	 */
 	int *var = getCaliVariable();
 	
-	l_1000A0D8 *= mul64(*var, numbase);
+	accumulator *= mul64(*var, numbase);
 	
 	TRACE("ShCalc.MulIntNum16: %p:", var);
 }
@@ -170,10 +183,8 @@ static void DivIntNum16(void) { /* 11 */
 	int *var = getCaliVariable();
 	int64_t i;
 	
-	l_1000A0C8 = *var;
-	
-	i = mul64(l_1000A0C8, numbase);
-	l_1000A0D8 = div64(l_1000A0D8, i);
+	i = mul64(*var, numbase);
+	accumulator = div64(accumulator, i);
 	
 	TRACE("ShCalc.DivIntNum16 %p:", var);
 }
@@ -193,11 +204,24 @@ static void CmpIntNum16(void) { /* 13 */
 }
 
 static void CmpIntNum32(void) { /* 14 */
-	int p1 = getCaliValue();
-	int p2 = getCaliValue();
-	int p3 = getCaliValue();
+	int *var = getCaliVariable();
+	int op = getCaliValue();
+	int *result = getCaliVariable();
 
-	TRACE_UNIMPLEMENTED("ShCalc.CmpIntNum32: %d,%d,%d:", p1, p2, p3);
+	int64_t val = mul64(get32(var), numbase);
+
+	switch (op) {
+	case 1: *result = val == accumulator; break;
+	case 2: *result = val > accumulator; break;
+	case 3: *result = val < accumulator; break;
+	case 4: *result = val >= accumulator; break;
+	case 5: *result = val <= accumulator; break;
+	default:
+		WARNING("ShCalc.CmpIntNum32: unknown operator %d", op);
+		break;
+	}
+
+	TRACE("ShCalc.CmpIntNum32: %p,%d,%p:", var, op, result);
 }
 	
 static void GetLengthNum16(void) { /* 15 */
