@@ -60,7 +60,7 @@ static void OutputMessageBox(void) { /* 0 */
 	free(title_utf8);
 	free(msg_utf8);
 
-	DEBUG_COMMAND("ShPort.OutputMessageBox: %d,%d,%d,%d,%p,%d:", p1, p2, title, msg, res, ISys3xSystem);
+	TRACE("ShPort.OutputMessageBox: %d,%d,%d,%d,%p,%d:", p1, p2, title, msg, res, ISys3xSystem);
 }
 
 static void InputListNum(void) { /* 1 */
@@ -88,7 +88,7 @@ static void InputListNum(void) { /* 1 */
 	}
 
 	free(ni_param.title);
-	DEBUG_COMMAND("ShPort.InputListNum: %d,%d,%p,%d,%d,%p,%d:", flags, title, val, minval, maxval, res, ISys3xSystem);
+	TRACE("ShPort.InputListNum: %d,%d,%p,%d,%d,%p,%d:", flags, title, val, minval, maxval, res, ISys3xSystem);
 }
 
 /**
@@ -99,7 +99,7 @@ static void InputListNum(void) { /* 1 */
 static void Init(void) {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShPort.Init: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShPort.Init: %d:", p1);
 }
 
 /**
@@ -121,7 +121,7 @@ static void InitKeyStatus(void) {
 		memset(keymap[no -1], 0, 256);
 	}
 	
-	DEBUG_COMMAND("ShPort.InitKeyStatus: %d:", no);
+	TRACE("ShPort.InitKeyStatus: %d:", no);
 }
 
 /**
@@ -143,7 +143,7 @@ static void SetKeyStatus(void) {
 	
 	keymap[no -1][key] = func;
 	
-	DEBUG_COMMAND("ShPort.SetKeyStatus: %d,%d,%d:", no, key, func);
+	TRACE("ShPort.SetKeyStatus: %d,%d,%d:", no, key, func);
 }
 
 /**
@@ -167,7 +167,7 @@ static void GetKeyStatus(void) {
 		*var |= (keymap[no -1][i] * RawKeyInfo[i]);
 	}
 	
-	DEBUG_COMMAND("ShPort.GetKeyStatus: %d,%p:", no, var);
+	TRACE("ShPort.GetKeyStatus: %d,%p:", no, var);
 }
 
 static void InputListString(void) {
@@ -179,7 +179,7 @@ static void InputListString(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputListString: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShPort.InputListString: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
 static void InputOpenFile(void) {
@@ -191,7 +191,7 @@ static void InputOpenFile(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputOpenFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShPort.InputOpenFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
 static void InputSaveFile(void) {
@@ -203,7 +203,7 @@ static void InputSaveFile(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputSaveFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShPort.InputSaveFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
 static const ModuleFunc functions[] = {

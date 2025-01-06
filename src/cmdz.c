@@ -85,7 +85,7 @@ void commandZC() {
 		WARNING("commandZC(): Unknown Command (%d)", m); break;
 	}
 	
-	DEBUG_COMMAND("ZC %d,%d:",m,n);
+	TRACE("ZC %d,%d:",m,n);
 }
 
 void commandZM() {
@@ -99,7 +99,7 @@ void commandZM() {
 	
 	nact->msg.MsgFontSize = size;
 
-	DEBUG_COMMAND("ZM %d:",size);
+	TRACE("ZM %d:",size);
 }
 
 void commandZS() {
@@ -108,7 +108,7 @@ void commandZS() {
 	
 	nact->sel.MsgFontSize = size;
 	
-	DEBUG_COMMAND("ZS %d:",size);
+	TRACE("ZS %d:",size);
 }
 
 void commandZB() {
@@ -118,7 +118,7 @@ void commandZB() {
 	if (nact->ags.enable_zb)
 		nact->ags.font_weight = weight;
 
-	DEBUG_COMMAND("ZB %d:", weight);
+	TRACE("ZB %d:", weight);
 }
 
 void commandZH() {
@@ -127,7 +127,7 @@ void commandZH() {
 	
 	sys_setHankakuMode(sw);
 	
-	DEBUG_COMMAND("ZH %d:",sw);
+	TRACE("ZH %d:",sw);
 }
 
 void commandZW() {
@@ -142,7 +142,7 @@ void commandZW() {
 		nact->messagewait_cancel = (sw & 0x200) ? TRUE : FALSE;
 	}
 	
-	DEBUG_COMMAND("ZW %d:", sw);
+	TRACE("ZW %d:", sw);
 }
 
 void commandZL() {
@@ -151,7 +151,7 @@ void commandZL() {
 	
 	nact->msg.LineIncrement = line;
 	
-	DEBUG_COMMAND("ZL %d:",line);
+	TRACE("ZL %d:",line);
 }
 
 void commandZE() {
@@ -160,7 +160,7 @@ void commandZE() {
 	
 	nact->sel.ClearMsgWindow = sw == 0 ? FALSE : TRUE;
 	
-	DEBUG_COMMAND("ZE %d:", sw);
+	TRACE("ZE %d:", sw);
 }
 
 void commandZF() {
@@ -178,7 +178,7 @@ void commandZF() {
 		nact->sel.WinResizeWidth =  TRUE;  break;
 	}
 	
-	DEBUG_COMMAND("ZF %d:", sw);
+	TRACE("ZF %d:", sw);
 }
 
 void commandZD() {
@@ -205,7 +205,7 @@ void commandZD() {
 		var = getCaliVariable(); *var = 0; break;
 	}
 	
-	DEBUG_COMMAND("ZD %d,%d:", c0, sw);
+	TRACE("ZD %d,%d:", c0, sw);
 }
 
 void commandZT0() {
@@ -236,7 +236,7 @@ void commandZT0() {
 	*(var + 5) =        lc->tm_sec;
 	*(var + 6) = 1    + lc->tm_wday;
 	
-	DEBUG_COMMAND("ZT0 %p:", var);
+	TRACE("ZT0 %p:", var);
 }
 
 void commandZT1() {
@@ -245,7 +245,7 @@ void commandZT1() {
 	
 	reset_counter(0, 1, n);
 	
-	DEBUG_COMMAND("ZT1 %d:", n);
+	TRACE("ZT1 %d:", n);
 }
 
 void commandZT2() {
@@ -255,7 +255,7 @@ void commandZT2() {
 	
 	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT2 %p:", var);
+	TRACE("ZT2 %p:", var);
 }
 
 void commandZT3() {
@@ -265,7 +265,7 @@ void commandZT3() {
 	
 	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT3 %p:", var);
+	TRACE("ZT3 %p:", var);
 }
 
 void commandZT4() {
@@ -275,7 +275,7 @@ void commandZT4() {
 	
 	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT4 %p:", var);
+	TRACE("ZT4 %p:", var);
 }
 
 void commandZT5() {
@@ -285,7 +285,7 @@ void commandZT5() {
 	
 	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT5 %d:", val);
+	TRACE("ZT5 %d:", val);
 }
 
 void commandZT10() {
@@ -303,7 +303,7 @@ void commandZT10() {
 		reset_counter(num, base, count);
 	}
 	
-	DEBUG_COMMAND("ZT10 %d,%d,%d:", num, base, count);
+	TRACE("ZT10 %d,%d,%d:", num, base, count);
 }
 
 void commandZT11() {
@@ -317,7 +317,7 @@ void commandZT11() {
 	else
 		*var = (get_counter(num) / divisor) & 0xffff;
 
-	DEBUG_COMMAND("ZT11 %d,%d:", num, *var);
+	TRACE("ZT11 %d,%d:", num, *var);
 }
 
 void commandZT20() {
@@ -325,7 +325,7 @@ void commandZT20() {
 	int p1  = getCaliValue();
 	
 	sysVar[0] = sys_keywait(p1, KEYWAIT_NONCANCELABLE);
-	DEBUG_COMMAND("ZT20 %d:",p1);
+	TRACE("ZT20 %d:",p1);
 }
 
 void commandZT21() {
@@ -334,14 +334,14 @@ void commandZT21() {
 	
 	sysVar[0] = sys_keywait(p1, KEYWAIT_CANCELABLE);
 	
-	DEBUG_COMMAND("ZT21 %d:",p1);
+	TRACE("ZT21 %d:",p1);
 }
 
 void commandZZ0() {
 	/* ＳＹＳＴＥＭ３．５を終了する */
 	int sw = getCaliValue();
 	
-	DEBUG_COMMAND("ZZ0 %d:",sw);
+	TRACE("ZZ0 %d:",sw);
 	
 	if (sw == 0) {
 #ifdef __EMSCRIPTEN__
@@ -367,7 +367,7 @@ void commandZZ1() {
 	*var = 6;
 #endif
 #endif
-	DEBUG_COMMAND("ZZ1 %p:",var);
+	TRACE("ZZ1 %p:",var);
 }
 
 void commandZZ2() {
@@ -392,7 +392,7 @@ void commandZZ2() {
 #endif
 	svar_set(num, str);
 
-	DEBUG_COMMAND("ZZ2 %d:",num);
+	TRACE("ZZ2 %d:",num);
 }
 
 void commandZZ3() {
@@ -405,7 +405,7 @@ void commandZZ3() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ3 %p:",var);
+	TRACE("ZZ3 %p:",var);
 }
 
 void commandZZ4() {
@@ -418,7 +418,7 @@ void commandZZ4() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ4 %p:",var);
+	TRACE("ZZ4 %p:",var);
 }
 
 void commandZZ5() {
@@ -431,7 +431,7 @@ void commandZZ5() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ5 %p:",var);
+	TRACE("ZZ5 %p:",var);
 }
 
 void commandZZ7() {
@@ -440,14 +440,14 @@ void commandZZ7() {
 	
 	*var = 65535;
 	
-	DEBUG_COMMAND("ZZ7 %p:",var);
+	TRACE("ZZ7 %p:",var);
 }
 
 void commandZZ8() {
 	// メモリオンバッファの残り容量を得る
 	int *var = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("ZZ8 %p:",var);
+	TRACE_UNIMPLEMENTED("ZZ8 %p:",var);
 }
 
 void commandZZ9() {
@@ -460,7 +460,7 @@ void commandZZ9() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ9 %p:",var);
+	TRACE("ZZ9 %p:",var);
 }
 
 void commandZZ10() {
@@ -469,7 +469,7 @@ void commandZZ10() {
 
 	*var = sdl_isFullscreen() ? 1 : 0;
 	
-	DEBUG_COMMAND("ZZ10 %d:",*var);
+	TRACE("ZZ10 %d:",*var);
 }
 
 void commandZZ13() {
@@ -483,7 +483,7 @@ void commandZZ13() {
 #endif
 	nact->msg.MsgFont = num;
 	
-	DEBUG_COMMAND("ZZ13 %d:",num);
+	TRACE("ZZ13 %d:",num);
 }
 
 void commandZZ14() {
@@ -499,7 +499,7 @@ void commandZZ14() {
 	if (no <= 0) return;
 	svar_set(no, s);
 	
-	DEBUG_COMMAND("ZZ14 %d:", no);
+	TRACE("ZZ14 %d:", no);
 }
 
 void commandZG() {
@@ -508,7 +508,7 @@ void commandZG() {
 	
 	cg_loadCountVar = var;
 	
-	DEBUG_COMMAND("ZG %p:",var);
+	TRACE("ZG %p:",var);
 }
 
 void commandZI() { /* T2 */
@@ -518,7 +518,7 @@ void commandZI() { /* T2 */
 	
 	set_hak_keymode(key, mode);
 	
-	DEBUG_COMMAND("ZI %d,%d:", key, mode);
+	TRACE("ZI %d,%d:", key, mode);
 }
 
 void commandZA() { /* T2 */
@@ -538,7 +538,7 @@ void commandZA() { /* T2 */
 		WARNING("Unknown ZA comannd %d, %d", p1, p2);
 	}
 	
-	DEBUG_COMMAND("ZA %d,%d:", p1, p2);
+	TRACE("ZA %d,%d:", p1, p2);
 }
 
 void commandZK() {
@@ -547,7 +547,7 @@ void commandZK() {
 	int p2 = getCaliValue();
 	const char *str = sl_getString(':');
 	
-	DEBUG_COMMAND("ZK %d,%d,%s:", p1, p2, str);
+	TRACE("ZK %d,%d,%s:", p1, p2, str);
 }
 
 void commandZR() {
@@ -561,7 +561,7 @@ void commandZR() {
 		*var = (int)(genrand() * num) +1;
 	}
 	
-	DEBUG_COMMAND("ZR %d,%d:", num, *var);
+	TRACE("ZR %d,%d:", num, *var);
 }
 
 void commandZU() {
@@ -571,7 +571,7 @@ void commandZU() {
 	if (sw <= CHARACTER_ENCODING_MAX)
 		sys_setCharacterEncoding(sw);
 
-	DEBUG_COMMAND("ZU %d:",sw);
+	TRACE("ZU %d:",sw);
 }
 
 void cmdz_reset(void) {

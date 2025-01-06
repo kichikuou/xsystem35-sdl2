@@ -303,7 +303,7 @@ static void init_selwindow() {
 	}
 	ags_setFontWithWeight(FONT_GOTHIC, sel.MsgFontSize, nact->ags.font_weight);
 	for (i = 0; i < regnum; i++) {
-		DEBUG_MESSAGE("%d:%s\n", i +1, elm[i]);
+		TRACE_MESSAGE("%d:%s\n", i +1, elm[i]);
 		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +1, elm[i], sel.MsgFontColor);
 	}
 	ags_updateArea(saveArea.x, saveArea.y, saveArea.w, saveArea.h);

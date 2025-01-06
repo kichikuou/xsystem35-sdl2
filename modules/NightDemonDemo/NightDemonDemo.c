@@ -93,7 +93,7 @@ static void Init() {
 	
 	*var = 1;
 	
-	DEBUG_COMMAND("NightDemonDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);
+	TRACE("NightDemonDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }
 
 static void Run() {
@@ -102,7 +102,7 @@ static void Run() {
 	
 	ndd_run(p1);
 	
-	DEBUG_COMMAND("NightDemonDemo.Run %d,%d:", p1, p2);
+	TRACE("NightDemonDemo.Run %d,%d:", p1, p2);
 }
 
 static const ModuleFunc functions[] = {

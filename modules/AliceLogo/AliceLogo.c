@@ -16,21 +16,21 @@ static void Init() {
 	
 	*var = 1;
 	
-	DEBUG_COMMAND_YET("AliceLogo.Init %d,%d,%d,%p:", p1, p2, p3, var);
+	TRACE_UNIMPLEMENTED("AliceLogo.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }
 
 static void SetWaveNum() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("AliceLogo.SetWaveNum %d,%d:", p1, p2);
+	TRACE_UNIMPLEMENTED("AliceLogo.SetWaveNum %d,%d:", p1, p2);
 }
 
 static void Run() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("AliceLogo.Run %d,%d:", p1, p2);
+	TRACE_UNIMPLEMENTED("AliceLogo.Run %d,%d:", p1, p2);
 }
 
 static const ModuleFunc functions[] = {

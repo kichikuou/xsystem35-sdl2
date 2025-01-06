@@ -37,7 +37,7 @@ void commandG0() {
 	
 	cg_load(num - 1, -1);
 	
-	DEBUG_COMMAND("G %d:",num);
+	TRACE("G %d:",num);
 }
 
 void commandG1() {
@@ -52,7 +52,7 @@ void commandG1() {
 	
 	cg_load(num - 1, sprite);
 	
-	DEBUG_COMMAND("G %d,%d:",num,sprite);
+	TRACE("G %d,%d:",num,sprite);
 }
 
 void commandGS() {
@@ -72,7 +72,7 @@ void commandGS() {
 	var[2] = r.w;
 	var[3] = r.h;
 	
-	DEBUG_COMMAND("GS %d,%p:",num,var);
+	TRACE("GS %d,%p:",num,var);
 }
 
 void commandGX() {
@@ -86,5 +86,5 @@ void commandGX() {
 	
 	cg_load_with_alpha(cg_num -1, shadow_num -1);
 	
-	DEBUG_COMMAND("GX %d,%d:",cg_num, shadow_num);
+	TRACE("GX %d,%d:",cg_num, shadow_num);
 }

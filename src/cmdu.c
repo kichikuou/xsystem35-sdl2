@@ -45,7 +45,7 @@ void commandUC() { /* 王道勇者 */
 		sl_clearStack(false);
 		break;
 	}
-	DEBUG_COMMAND("UC %d,%d:",mode,num);
+	TRACE("UC %d,%d:",mode,num);
 }
 
 void commandUD() {
@@ -60,7 +60,7 @@ void commandUD() {
 		WARNING("UnKnown UD command %d", mode);
 	}
 	
-	DEBUG_COMMAND("UD %d:",mode);
+	TRACE("UD %d:",mode);
 }
 
 void commandUR() {
@@ -76,7 +76,7 @@ void commandUR() {
 	var[4] = info.label_calls_after_page_call;
 	var[5] = info.var_pushes_after_call;
 	
-	DEBUG_COMMAND("UR %p:",var);
+	TRACE("UR %p:",var);
 }
 
 void commandUS() {
@@ -86,7 +86,7 @@ void commandUS() {
 	int cnt = getCaliValue();
 	
 	sl_pushVar(&vref, cnt);
-	DEBUG_COMMAND("US %d,%d:", vref.var, cnt);
+	TRACE("US %d,%d:", vref.var, cnt);
 }
 
 void commandUG() {
@@ -96,7 +96,7 @@ void commandUG() {
 	int cnt = getCaliValue();
 	
 	sl_popVar(&vref, cnt);
-	DEBUG_COMMAND("UG %p,%d:", vref.var, cnt);
+	TRACE("UG %p,%d:", vref.var, cnt);
 }
 
 void commandUP0() {
@@ -104,7 +104,7 @@ void commandUP0() {
 	int no = getCaliValue();
 	int mode = getCaliValue();
 	
-	DEBUG_COMMAND_YET("UP0 %d,%d:",no,mode);
+	TRACE_UNIMPLEMENTED("UP0 %d,%d:",no,mode);
 }
 
 void commandUP1() {
@@ -112,7 +112,7 @@ void commandUP1() {
 	const char *str = sl_getString(':');
 	int mode = getCaliValue();
 	
-	DEBUG_COMMAND_YET("UP1 %s,%d:",str,mode);
+	TRACE_UNIMPLEMENTED("UP1 %s,%d:",str,mode);
 }
 
 void commandUP3() {
@@ -120,5 +120,5 @@ void commandUP3() {
 	const char *str1 = sl_getString(':');
 	const char *str2 = sl_getString(':');
 	
-	DEBUG_COMMAND_YET("UP3 %s,%s:",str1,str2);
+	TRACE_UNIMPLEMENTED("UP3 %s,%s:",str1,str2);
 }

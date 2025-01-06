@@ -10,7 +10,7 @@
 static void Init() {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Confirm.Init %d:", p1);
+	TRACE_UNIMPLEMENTED("Confirm.Init %d:", p1);
 }
 
 static void ExistKeyFile() {
@@ -20,7 +20,7 @@ static void ExistKeyFile() {
 	
 	*var = 1;
 	
-	DEBUG_COMMAND_YET("Confirm.ExistKeyFile %s,%p,%p:",p1, p2, var);
+	TRACE_UNIMPLEMENTED("Confirm.ExistKeyFile %s,%p,%p:",p1, p2, var);
 }
 
 static void CheckProtectFile() {
@@ -30,7 +30,7 @@ static void CheckProtectFile() {
 	
 	*var = 1;
 
-	DEBUG_COMMAND_YET("Confirm.CheckProtectFile %s,%p,%p:", p1,p2,var);
+	TRACE_UNIMPLEMENTED("Confirm.CheckProtectFile %s,%p,%p:", p1,p2,var);
 }
 
 static void CreateKeyFile() {
@@ -40,7 +40,7 @@ static void CreateKeyFile() {
 	
 	*var = 1;
 
-	DEBUG_COMMAND_YET("Confirm.CreateKeyFile %s,%p,%p:", p1,p2,var);
+	TRACE_UNIMPLEMENTED("Confirm.CreateKeyFile %s,%p,%p:", p1,p2,var);
 }
 
 static const ModuleFunc functions[] = {

@@ -90,7 +90,7 @@ void sys_addMsg(const char *str) {
 		sel_addElement(msg);
 	} else {
 		// 通常のメッセージ
-		DEBUG_MESSAGE("%s", msg);
+		TRACE_MESSAGE("%s", msg);
 		if (nact->is_msg_out) {
 			msg_putMessage(msg);
 		}

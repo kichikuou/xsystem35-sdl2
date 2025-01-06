@@ -54,7 +54,7 @@ static void Init() {
 	*/
 	int p1 = getCaliValue(); /* ISys3x */
 	
-	DEBUG_COMMAND("ShSound.Init %d:", p1);
+	TRACE("ShSound.Init %d:", p1);
 }
 
 static void wavLoad() {
@@ -67,7 +67,7 @@ static void wavLoad() {
 	int slot = getCaliValue();
 	int no   = getCaliValue();
 	
-	DEBUG_COMMAND("ShSound.wavLoad %d,%d:", slot, no);
+	TRACE("ShSound.wavLoad %d,%d:", slot, no);
 	
 	mus_wav_load(slot, no);
 }
@@ -82,7 +82,7 @@ static void wavUnload() {
 	
 	mus_wav_unload(slot);
 	
-	DEBUG_COMMAND("ShSound.wavUnload %d:",slot);
+	TRACE("ShSound.wavUnload %d:",slot);
 }
 
 static void wavUnloadRange() {
@@ -100,7 +100,7 @@ static void wavUnloadRange() {
 		mus_wav_unload(i);
 	}
 	
-	DEBUG_COMMAND("ShSound.wavUnloadRange %d,%d:", slot, range);
+	TRACE("ShSound.wavUnloadRange %d,%d:", slot, range);
 }
 
 static void wavUnloadAll() {
@@ -113,7 +113,7 @@ static void wavUnloadAll() {
 		mus_wav_unload(i);
 	}
 	
-	DEBUG_COMMAND("ShSound.wavUnloadAll:");
+	TRACE("ShSound.wavUnloadAll:");
 }
 
 static void wavLoadMemory() {
@@ -142,7 +142,7 @@ static void wavLoadMemory() {
 		return;
 	}
 	
-	DEBUG_COMMAND("ShSound.wavLoadMemory %d:", no);
+	TRACE("ShSound.wavLoadMemory %d:", no);
 }
 
 static void wavSendMemory() {
@@ -186,7 +186,7 @@ static void wavSendMemory() {
 	free_memory_wav();
 	free(wav_buf);
 	
-	DEBUG_COMMAND("ShSound.wavSendMemory %d:", slot);
+	TRACE("ShSound.wavSendMemory %d:", slot);
 }
 
 static void wavFadeVolumeMemory() {
@@ -220,7 +220,7 @@ static void wavFadeVolumeMemory() {
 	// 残りは無音
 	memset(buf, 0, memwav.buf + memwav.len - (uint8_t*)buf);
 	
-	DEBUG_COMMAND("ShSound.wavFadeVolumeMemory %d,%d:", start, range);
+	TRACE("ShSound.wavFadeVolumeMemory %d,%d:", start, range);
 }
 
 static void wavReversePanMemory() {
@@ -240,7 +240,7 @@ static void wavReversePanMemory() {
 		buf += 2;
 	}
 	
-	DEBUG_COMMAND("ShSound.wavReversePanMemory:");
+	TRACE("ShSound.wavReversePanMemory:");
 }
 
 static void wavPlay() {
@@ -255,7 +255,7 @@ static void wavPlay() {
 	
 	mus_wav_play(slot, loop == 0 ? 1 : -1);
 	
-	DEBUG_COMMAND("ShSound.wavPlay %d, %d:", slot, loop);
+	TRACE("ShSound.wavPlay %d, %d:", slot, loop);
 }
 
 static void wavPlayRing() {
@@ -273,7 +273,7 @@ static void wavPlayRing() {
 	mus_wav_play(start + (*cur % cnt), 1);
 	*cur = (*cur + 1) % cnt;
 	
-	DEBUG_COMMAND("ShSound.wavPlayRing %d,%d,%d:", start, cnt, *cur);
+	TRACE("ShSound.wavPlayRing %d,%d,%d:", start, cnt, *cur);
 }
 
 static void wavStop() {
@@ -284,7 +284,7 @@ static void wavStop() {
 	*/
 	int slot = getCaliValue();
 	
-	DEBUG_COMMAND("ShSound.wavStop %d:", slot);
+	TRACE("ShSound.wavStop %d:", slot);
 	
 	mus_wav_stop(slot);
 }
@@ -299,7 +299,7 @@ static void wavStopAll() {
 		mus_wav_stop(i);
 	}
 	
-	DEBUG_COMMAND("ShSound.wavStopAll:");
+	TRACE("ShSound.wavStopAll:");
 }
 
 static void wavPause() {
@@ -310,7 +310,7 @@ static void wavPause() {
 	*/
 	int slot = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShSound.wavPause %d:", slot);
+	TRACE_UNIMPLEMENTED("ShSound.wavPause %d:", slot);
 }
 
 static void wavIsPlay() {
@@ -325,7 +325,7 @@ static void wavIsPlay() {
 	
 	*result = mus_wav_get_playposition(slot);
 	
-	DEBUG_COMMAND("ShSound.wavIsPlay %d,%p:", slot, result);
+	TRACE("ShSound.wavIsPlay %d,%p:", slot, result);
 }
 
 static void wavIsPlayRange() {
@@ -347,7 +347,7 @@ static void wavIsPlayRange() {
 	
 	*result = ret;
 	
-	DEBUG_COMMAND("ShSound.wavIsPlayRange %d,%d,%p:", slot, range, result);
+	TRACE("ShSound.wavIsPlayRange %d,%d,%p:", slot, range, result);
 }
 
 static const ModuleFunc functions[] = {

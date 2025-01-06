@@ -17,24 +17,24 @@ static void Init() {
 	
 	*var = 1;
 	
-	DEBUG_COMMAND_YET("oDEMO.Init %d,%d,%d,%p:", p1, p2, p3, var);
+	TRACE_UNIMPLEMENTED("oDEMO.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }
 
 static void SetKeyCancelFlag() {
 	int cancelflag = getCaliValue();
 	
-	DEBUG_COMMAND_YET("oDEMO.SetKeyCancelFlag %d:", cancelflag);
+	TRACE_UNIMPLEMENTED("oDEMO.SetKeyCancelFlag %d:", cancelflag);
 }
 
 static void SetLoopFlag() {
 	/* Loop Flag */
 	int loopflag = getCaliValue(); /* 0 なら無限繰り返し */
 	
-	DEBUG_COMMAND_YET("oDEMO.SetLoopFlag %d:", loopflag);
+	TRACE_UNIMPLEMENTED("oDEMO.SetLoopFlag %d:", loopflag);
 }
 
 static void Run() {
-	DEBUG_COMMAND_YET("oDEMO.Run:");
+	TRACE_UNIMPLEMENTED("oDEMO.Run:");
 }
 
 static const ModuleFunc functions[] = {

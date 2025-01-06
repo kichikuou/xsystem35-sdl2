@@ -136,7 +136,7 @@ static void Init() {
 	// surface0 を pre_freesurfno として返さないように。
 	pre_freesurfno = 1;
 	
-	DEBUG_COMMAND("Gpx.Init %d:", p1);
+	TRACE("Gpx.Init %d:", p1);
 }
 
 static void Gpx_reset(void) {
@@ -171,7 +171,7 @@ static void Create() {
 		suf[no] = s;
 	}
 	
-	DEBUG_COMMAND("Gpx.Create %p,%d,%d,%d:", var, width, height, bpp);
+	TRACE("Gpx.Create %p,%d,%d,%d:", var, width, height, bpp);
 }
 
 static void CreatePixelOnly() {
@@ -199,7 +199,7 @@ static void CreatePixelOnly() {
 		suf[no] = s;
 	}
 	
-	DEBUG_COMMAND("Gpx.CreatePixelOnly %d,%d,%d,%d:", *var, width, height, bpp);
+	TRACE("Gpx.CreatePixelOnly %d,%d,%d,%d:", *var, width, height, bpp);
 }
 
 static void CreateAMapOnly() {
@@ -225,7 +225,7 @@ static void CreateAMapOnly() {
 		suf[no] = s;
 	}
 	
-	DEBUG_COMMAND("Gpx.CreateAMapOnly %p,%d,%d:", var, width, height);
+	TRACE("Gpx.CreateAMapOnly %p,%d,%d:", var, width, height);
 }
 
 static void IsSurface() {
@@ -240,7 +240,7 @@ static void IsSurface() {
 
 	*var = sf_get(p1) ? 1 : 0;
 
-	DEBUG_COMMAND("Gpx.IsSurface %d,%p:", p1, var);
+	TRACE("Gpx.IsSurface %d,%p:", p1, var);
 }
 
 static void IsPixel() {
@@ -262,7 +262,7 @@ static void IsPixel() {
 		*var = s->pixel ? 1 : 0;
 	}
 	
-	DEBUG_COMMAND("Gpx.IsPixel %d,%p:", p1, var);
+	TRACE("Gpx.IsPixel %d,%p:", p1, var);
 }
 
 static void IsAlpha() {
@@ -284,7 +284,7 @@ static void IsAlpha() {
 		*var = s->alpha ? 1 : 0;
 	}
 	
-	DEBUG_COMMAND("Gpx.IsAlpha %d,%p:", p1, var);
+	TRACE("Gpx.IsAlpha %d,%p:", p1, var);
 }
 
 static void GetWidth() {
@@ -306,7 +306,7 @@ static void GetWidth() {
 		*var = s->width;
 	}
 	
-	DEBUG_COMMAND("Gpx.GetWidth %d,%d:", p1, *var);
+	TRACE("Gpx.GetWidth %d,%d:", p1, *var);
 }
 
 static void GetHeight() {
@@ -328,13 +328,13 @@ static void GetHeight() {
 		*var = s->height;
 	}
 	
-	DEBUG_COMMAND("Gpx.GetHeight %d,%d:", p1, *var);
+	TRACE("Gpx.GetHeight %d,%d:", p1, *var);
 }
 
 static void GetCreatedSurface() { /* not used ? */
 	int *var = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("Gpx.GetCreatedSurface %p:", var);
+	TRACE_UNIMPLEMENTED("Gpx.GetCreatedSurface %p:", var);
 }
 
 static void LoadCG() {
@@ -349,21 +349,21 @@ static void LoadCG() {
 	
 	*var = load_cg_main(p1 -1);
 	
-	DEBUG_COMMAND("Gpx.LoadCG %p,%d (%d):", var, p1, *var);
+	TRACE("Gpx.LoadCG %p,%d (%d):", var, p1, *var);
 }
 
 static void GetCGPosX() { /* not useed ? */
 	int *var = getCaliVariable();
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.GetCgPosX %p,%d:", var, p1);
+	TRACE_UNIMPLEMENTED("Gpx.GetCgPosX %p,%d:", var, p1);
 }
 
 static void GetCGPosY() { /* not useed ? */
 	int *var = getCaliVariable();
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.GetCgPosY %p,%d:", var, p1);
+	TRACE_UNIMPLEMENTED("Gpx.GetCgPosY %p,%d:", var, p1);
 }
 
 static void Free() {
@@ -374,7 +374,7 @@ static void Free() {
 	*/
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND("Gpx.Free %d:", p1);
+	TRACE("Gpx.Free %d:", p1);
 	
 	if (p1 != 0) {
 		sf_free_one(p1);
@@ -387,7 +387,7 @@ static void FreeAll() {
 	*/
 	sf_free_all();
 	
-	DEBUG_COMMAND("Gpx.FreeAll:");
+	TRACE("Gpx.FreeAll:");
 }
 
 static void Copy() {
@@ -413,7 +413,7 @@ static void Copy() {
 	int sh = getCaliValue();
 	surface_t *src, *dst;
 	
-	DEBUG_COMMAND("Gpx.Copy %d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss, sx, sy, sw, sh);
+	TRACE("Gpx.Copy %d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss, sx, sy, sw, sh);
 	
 	src = sf_get(ss);
 	dst = sf_get(ds);
@@ -431,7 +431,7 @@ static void CopyBright() { /* not used ? */
 	int p8 = getCaliValue();
 	int p9 = getCaliValue();
 
-	DEBUG_COMMAND_YET("Gpx.CopyBright %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	TRACE_UNIMPLEMENTED("Gpx.CopyBright %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 static void CopyAMap() {
@@ -457,7 +457,7 @@ static void CopyAMap() {
 	int sh = getCaliValue();
 	surface_t *src, *dst;
 	
-	DEBUG_COMMAND("Gpx.CopyAMap %d,%d,%d,%d,%d,%d,%d,%d:", da, dx, dy, sa, sx, sy, sw, sh);
+	TRACE("Gpx.CopyAMap %d,%d,%d,%d,%d,%d,%d,%d:", da, dx, dy, sa, sx, sy, sw, sh);
 	
 	src = sf_get(sa);
 	dst = sf_get(da);
@@ -475,7 +475,7 @@ static void Blend() { /* not used ? */
 	int p8 = getCaliValue();
 	int p9 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.Blend %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	TRACE_UNIMPLEMENTED("Gpx.Blend %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 static void BlendSrcBright() { /* not used ? */
@@ -490,7 +490,7 @@ static void BlendSrcBright() { /* not used ? */
 	int p9 = getCaliValue();
 	int p10 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendSrcBright %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+	TRACE_UNIMPLEMENTED("Gpx.BlendSrcBright %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 }
 
 static void BlendAddSatur() { /* not used ? */
@@ -503,7 +503,7 @@ static void BlendAddSatur() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAddStatur %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.BlendAddStatur %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 static void BlendAMap() {
@@ -529,7 +529,7 @@ static void BlendAMap() {
 	int sh = getCaliValue();
 	surface_t *src, *dst;
 	
-	DEBUG_COMMAND("Gpx.BlendAMap %d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss, sx, sy, sw, sh);
+	TRACE("Gpx.BlendAMap %d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss, sx, sy, sw, sh);
 	
 	src = sf_get(ss);
 	dst = sf_get(ds);
@@ -546,7 +546,7 @@ static void BlendAMapSrcOnly() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAMapSrcOnly %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.BlendAMapSrcOnly %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 static void BlendAMapColor() { /* not used ? */
@@ -562,7 +562,7 @@ static void BlendAMapColor() { /* not used ? */
 	int p10 = getCaliValue();
 	int p11 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAMapColor %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
+	TRACE_UNIMPLEMENTED("Gpx.BlendAMapColor %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 }
 
 static void BlendAMapColorAlpha() { /* not used ? */
@@ -579,7 +579,7 @@ static void BlendAMapColorAlpha() { /* not used ? */
 	int p11 = getCaliValue();
 	int p12 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAMapColorAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
+	TRACE_UNIMPLEMENTED("Gpx.BlendAMapColorAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 }
 
 static void BlendAMapAlpha() { /* not used ? */
@@ -593,7 +593,7 @@ static void BlendAMapAlpha() { /* not used ? */
 	int p8 = getCaliValue();
 	int p9 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAMapAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	TRACE_UNIMPLEMENTED("Gpx.BlendAMapAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 static void BlendAMapBright() { /* not used ? */
@@ -607,7 +607,7 @@ static void BlendAMapBright() { /* not used ? */
 	int p8 = getCaliValue();
 	int p9 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAMapBright %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	TRACE_UNIMPLEMENTED("Gpx.BlendAMapBright %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 static void BlendAMapAlphaSrcBright() { /* not used ? */
@@ -622,7 +622,7 @@ static void BlendAMapAlphaSrcBright() { /* not used ? */
 	int p9 = getCaliValue();
 	int p10 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendAMapBright %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+	TRACE_UNIMPLEMENTED("Gpx.BlendAMapBright %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 }
 
 static void BlendUseAMapColor() { /* not used ? */
@@ -639,7 +639,7 @@ static void BlendUseAMapColor() { /* not used ? */
 	int p11 = getCaliValue();
 	int p12 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendUseAMapColor %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
+	TRACE_UNIMPLEMENTED("Gpx.BlendUseAMapColor %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 }
 
 static void BlendScreen() { /* not used ? */
@@ -652,7 +652,7 @@ static void BlendScreen() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendScreen %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.BlendScreen %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 static void BlendMultiply() { /* not used ? */
@@ -665,7 +665,7 @@ static void BlendMultiply() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendMultiply %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.BlendMultiply %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 static void BlendScreenAlpha() { /* not used ? */
@@ -679,7 +679,7 @@ static void BlendScreenAlpha() { /* not used ? */
 	int p8 = getCaliValue();
 	int p9 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.BlendScreenAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
+	TRACE_UNIMPLEMENTED("Gpx.BlendScreenAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 static void Fill() {
@@ -705,7 +705,7 @@ static void Fill() {
 	int b  = getCaliValue();
 	surface_t *dst;
 	
-	DEBUG_COMMAND("Gpx.Fill %d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, r, g, b);
+	TRACE("Gpx.Fill %d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, r, g, b);
 	
 	dst = sf_get(ds);
 	gr_fill(dst, dx, dy, dw, dh, r, g, b);
@@ -723,7 +723,7 @@ static void FillAlphaColor() { /* not used ? */
 	int lv = getCaliValue();
 	surface_t *dst;
 	
-	DEBUG_COMMAND_YET("Gpx.FillAlphaColor %d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, r, g, b, lv);
+	TRACE("Gpx.FillAlphaColor %d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, r, g, b, lv);
 
 	dst = sf_get(ds);
 	gr_fill_alpha_color(dst, dx, dy, dw, dh, r, g, b, lv);
@@ -737,7 +737,7 @@ static void FillAMap() { /* not used ? */
 	int p5 = getCaliValue();
 	int p6 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.FillAMap %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
+	TRACE_UNIMPLEMENTED("Gpx.FillAMap %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
 }
 
 static void FillAMapOverBorder() {
@@ -762,7 +762,7 @@ static void FillAMapOverBorder() {
 	int d = getCaliValue();
 	surface_t *dst;
 	
-	DEBUG_COMMAND("Gpx.FillAMapOverBorder %d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, s, d);
+	TRACE("Gpx.FillAMapOverBorder %d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, s, d);
 
 	dst = sf_get(ds);
 	gr_fill_alpha_overborder(dst, dx, dy, dw, dh, s, d);
@@ -777,7 +777,7 @@ static void FillAMapUnderBorder() { /* not used ? */
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.FillAMapUnderBorder %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("Gpx.FillAMapUnderBorder %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
 }
 
 static void SaturDP_DPxSA() { /* not used ? */
@@ -790,7 +790,7 @@ static void SaturDP_DPxSA() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.SaturDP_DPxSA %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.SaturDP_DPxSA %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 static void ScreenDA_DAxSA() { /* not used ? */
@@ -803,7 +803,7 @@ static void ScreenDA_DAxSA() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.ScreenDA_DAxSA %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.ScreenDA_DAxSA %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 static void AddDA_DAxSA() { /* not used ? */
@@ -816,7 +816,7 @@ static void AddDA_DAxSA() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.AddDA_DAxSA %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.AddDA_DAxSA %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 static void SpriteCopyAMap() {
@@ -844,7 +844,7 @@ static void SpriteCopyAMap() {
 	int cl = getCaliValue();
 	surface_t *src, *dst;
 	
-	DEBUG_COMMAND("Gpx.SpriteCopyAMap %d,%d,%d,%d,%d,%d,%d,%d,%d:", da, dx, dy, sa, sx, sy, sw, sh, cl);
+	TRACE("Gpx.SpriteCopyAMap %d,%d,%d,%d,%d,%d,%d,%d,%d:", da, dx, dy, sa, sx, sy, sw, sh, cl);
 	
 	src = sf_get(sa);
 	dst = sf_get(da);
@@ -871,7 +871,7 @@ static void BrightDestOnly() {
 	int r  = getCaliValue();
 	surface_t *dst;
 	
-	DEBUG_COMMAND("Gpx.BrightDestOnly %d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, r);
+	TRACE("Gpx.BrightDestOnly %d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, r);
 	
 	dst = sf_get(ds);
 	
@@ -892,7 +892,7 @@ static void CopyTextureWrap() { /* not used ? */
 	int p11 = getCaliValue();
 	int p12 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.CopyTextureWrap %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
+	TRACE_UNIMPLEMENTED("Gpx.CopyTextureWrap %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
 }
 
 static void CopyTextureWrapAlpha() { /* not used ? */
@@ -910,7 +910,7 @@ static void CopyTextureWrapAlpha() { /* not used ? */
 	int p12 = getCaliValue();
 	int p13 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.CopyTextureWrapAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
+	TRACE_UNIMPLEMENTED("Gpx.CopyTextureWrapAlpha %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
 }
 
 static void CopyStretch() {
@@ -940,7 +940,7 @@ static void CopyStretch() {
 	int sh = getCaliValue();
 	surface_t *src, *dst;
 
-	DEBUG_COMMAND_YET("Gpx.CopyStretch %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, ss, sx, sy, sw, sh);
+	TRACE("Gpx.CopyStretch %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, ss, sx, sy, sw, sh);
 	
 	src = sf_get(ss);
 	dst = sf_get(ds);
@@ -960,7 +960,7 @@ static void CopyStretchBlend() { /* not used ? */
 	int p10 = getCaliValue();
 	int p11 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.CopyStretchBlend %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
+	TRACE_UNIMPLEMENTED("Gpx.CopyStretchBlend %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 }
 
 static void CopyStretchBlendAMap() {
@@ -990,7 +990,7 @@ static void CopyStretchBlendAMap() {
 	int sh = getCaliValue();
 	surface_t *src, *dst;
 	
-	DEBUG_COMMAND("Gpx.CopyStretchBlendAMap %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, ss, sx, sy, sw, sh);
+	TRACE("Gpx.CopyStretchBlendAMap %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, dw, dh, ss, sx, sy, sw, sh);
 
 	src = sf_get(ss);
 	dst = sf_get(ds);
@@ -1007,7 +1007,7 @@ static void StretchBlendScreen2x2() { /* not used ? */
 	int p7 = getCaliValue();
 	int p8 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.StretchBlendScreen2x2 %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
+	TRACE_UNIMPLEMENTED("Gpx.StretchBlendScreen2x2 %d,%d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
 
@@ -1041,7 +1041,7 @@ static void StretchBlendScreen2x2WDS() {
 	int sh  = getCaliValue();
 	surface_t *src1, *src2, *dst;
 	
-	DEBUG_COMMAND("Gpx.StretchBlendScreen2x2WDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
+	TRACE("Gpx.StretchBlendScreen2x2WDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
 	
 	src1 = sf_get(ss1);
 	src2 = sf_get(ss2);
@@ -1078,7 +1078,7 @@ static void BlendScreenWDS() {
 	int sh  = getCaliValue();
 	surface_t *src1, *src2, *dst;
 	
-	DEBUG_COMMAND("Gpx.BlendScreenWDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
+	TRACE("Gpx.BlendScreenWDS %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", ds, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh);
 	
 	src1 = sf_get(ss1);
 	src2 = sf_get(ss2);
@@ -1141,10 +1141,10 @@ static void EffectCopy() {
 	case 11:
 	case 12:
 	case 13:
-		DEBUG_COMMAND("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
+		TRACE("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
 		break;
 	default:
-		DEBUG_COMMAND_YET("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
+		TRACE_UNIMPLEMENTED("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
 	}
 	dst = sf_get(ss1);
 	src = sf_get(ss2);
@@ -1155,7 +1155,7 @@ static void EffectCopy() {
 static void SetClickCancelFlag() { /* not used ? */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("Gpx.SetClikCancelFlag %d:", p1);
+	TRACE_UNIMPLEMENTED("Gpx.SetClikCancelFlag %d:", p1);
 }
 
 static const ModuleFunc functions[] = {

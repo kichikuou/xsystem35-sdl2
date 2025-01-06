@@ -17,31 +17,31 @@ static void Init() {
         
         *var = 1;
         
-        DEBUG_COMMAND_YET("eDEMO.Init %d,%d,%d,%p:", p1, p2, p3, var);
+        TRACE_UNIMPLEMENTED("eDEMO.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }
 
 static void SetKeyCancelFlag() {
         int cancelflag = getCaliValue();
         
-        DEBUG_COMMAND_YET("eDEMO.SetKeyCancelFlag %d:", cancelflag);
+        TRACE_UNIMPLEMENTED("eDEMO.SetKeyCancelFlag %d:", cancelflag);
 }
 
 static void SetLoopFlag() {
         /* Loop Flag */
         int loopflag = getCaliValue(); /* 0 なら無限繰り返し */
         
-        DEBUG_COMMAND_YET("eDEMO.SetLoopFlag %d:", loopflag);
+        TRACE_UNIMPLEMENTED("eDEMO.SetLoopFlag %d:", loopflag);
 }
 
 static void SetDrawStaffFlag() {
         /* Loop Flag */
         int staffflag = getCaliValue();
         
-        DEBUG_COMMAND_YET("eDEMO.SetDrawStaffFlag %d:", staffflag);
+        TRACE_UNIMPLEMENTED("eDEMO.SetDrawStaffFlag %d:", staffflag);
 }
 
 static void Run() {
-        DEBUG_COMMAND_YET("eDEMO.Run:");
+        TRACE_UNIMPLEMENTED("eDEMO.Run:");
 }
 
 static const ModuleFunc functions[] = {

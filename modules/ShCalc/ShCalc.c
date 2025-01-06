@@ -62,7 +62,7 @@ static void SetIntNumBase(void) { /* 0 */
 	
 	numbase = base;
 	
-	DEBUG_COMMAND("ShCalc.SetIntNumBase %d:", base);
+	TRACE("ShCalc.SetIntNumBase %d:", base);
 	
 }
 
@@ -76,13 +76,13 @@ static void SetIntNum16(void) { /* 1 */
 	
 	l_1000A0D8 = mul64(*var, numbase);
 	
-	DEBUG_COMMAND("ShCalc.SetIntNum16 %p:", var);
+	TRACE("ShCalc.SetIntNum16 %p:", var);
 }
 
 static void SetIntNum32(void) { /* 2 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.SetIntNum32: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.SetIntNum32: %d:", p1);
 }
 
 static void GetIntNum16(void) { /* 3 */
@@ -102,13 +102,13 @@ static void GetIntNum16(void) { /* 3 */
 	
 	*var = i;
 	
-	DEBUG_COMMAND("ShCalc.GetIntNum16 %d:", var);
+	TRACE("ShCalc.GetIntNum16 %d:", var);
 }
 
 static void GetIntNum32(void) { /* 4 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.GetIntNum32: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.GetIntNum32: %d:", p1);
 }
 
 static void AddIntNum16(void) { /* 5 */
@@ -121,25 +121,25 @@ static void AddIntNum16(void) { /* 5 */
 	
 	l_1000A0D8 += mul64(*var, numbase);
 	
-	DEBUG_COMMAND("ShCalc.AddIntNum16 %p:", var);
+	TRACE("ShCalc.AddIntNum16 %p:", var);
 }
 
 static void AddIntNum32(void) { /* 6 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.AddIntNum32: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.AddIntNum32: %d:", p1);
 }
 
 static void SubIntNum16(void) { /* 7 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.SubIntNum16: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.SubIntNum16: %d:", p1);
 }
 
 static void SubIntNum32(void) { /* 8 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.SubIntNum32: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.SubIntNum32: %d:", p1);
 }
 
 static void MulIntNum16(void) {  /* 9 */
@@ -152,13 +152,13 @@ static void MulIntNum16(void) {  /* 9 */
 	
 	l_1000A0D8 *= mul64(*var, numbase);
 	
-	DEBUG_COMMAND("ShCalc.MulIntNum16: %p:", var);
+	TRACE("ShCalc.MulIntNum16: %p:", var);
 }
 
 static void MulIntNum32(void) {  /* 10 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.MulIntNum32: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.MulIntNum32: %d:", p1);
 }
 
 static void DivIntNum16(void) { /* 11 */
@@ -175,13 +175,13 @@ static void DivIntNum16(void) { /* 11 */
 	i = mul64(l_1000A0C8, numbase);
 	l_1000A0D8 = div64(l_1000A0D8, i);
 	
-	DEBUG_COMMAND("ShCalc.DivIntNum16 %p:", var);
+	TRACE("ShCalc.DivIntNum16 %p:", var);
 }
 
 static void DivIntNum32(void) { /* 12 */
 	int p1 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShCalc.DivIntNum32: %d:", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.DivIntNum32: %d:", p1);
 }
 
 static void CmpIntNum16(void) { /* 13 */
@@ -189,7 +189,7 @@ static void CmpIntNum16(void) { /* 13 */
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShCalc.CmpIntNum16: %d,%d,%d:", p1, p2, p3);
+	TRACE_UNIMPLEMENTED("ShCalc.CmpIntNum16: %d,%d,%d:", p1, p2, p3);
 }
 
 static void CmpIntNum32(void) { /* 14 */
@@ -197,7 +197,7 @@ static void CmpIntNum32(void) { /* 14 */
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShCalc.CmpIntNum32: %d,%d,%d:", p1, p2, p3);
+	TRACE_UNIMPLEMENTED("ShCalc.CmpIntNum32: %d,%d,%d:", p1, p2, p3);
 }
 	
 static void GetLengthNum16(void) { /* 15 */
@@ -221,14 +221,14 @@ static void GetLengthNum16(void) { /* 15 */
 		*vResult = 1;
 	}
 	
-	DEBUG_COMMAND("ShCalc.GetLengthNum16 %p,%p:", var, vResult);
+	TRACE("ShCalc.GetLengthNum16 %p,%p:", var, vResult);
 }
 
 static void GetLengthNum32(void) { /* 16 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.GetLengthNum32: %d,%d:", p1, p2);
+	TRACE_UNIMPLEMENTED("ShCalc.GetLengthNum32: %d,%d:", p1, p2);
 }
 
 static void NumToRate(void) { /* 17 */
@@ -259,7 +259,7 @@ static void NumToRate(void) { /* 17 */
 	
 	*vResult = i;
 	
-	DEBUG_COMMAND("ShCalc.NumToRate %d,%d,%d,%d,%p:", p1, p2, p3, flag, vResult);
+	TRACE("ShCalc.NumToRate %d,%d,%d,%d,%p:", p1, p2, p3, flag, vResult);
 	
 }
 
@@ -291,7 +291,7 @@ static void NumToRateNum(void) { /* 18 */
 	
 	*vResult = i;
 	
-	DEBUG_COMMAND("ShCalc.NumToRateNum %d,%d,%d,%d,%p:", p1, p2, p3, flag, vResult);
+	TRACE("ShCalc.NumToRateNum %d,%d,%d,%d,%p:", p1, p2, p3, flag, vResult);
 }
 
 static void SetRandomSeed() {
@@ -304,7 +304,7 @@ static void SetRandomSeed() {
 
 	sgenrand(seed);
 	
-	DEBUG_COMMAND("ShCalc.SetRandomSeed %d:", seed);
+	TRACE("ShCalc.SetRandomSeed %d:", seed);
 }
 
 static void GetRandomNumA() {
@@ -317,7 +317,7 @@ static void GetRandomNumA() {
 		*var = (int)(genrand() * num) + 1;
 	}
 	
-	DEBUG_COMMAND("ShCalc.GetRandomNumA %d,%p:", num, var);
+	TRACE("ShCalc.GetRandomNumA %d,%p:", num, var);
 }
 
 static void NumToBit() {
@@ -339,7 +339,7 @@ static void NumToBit() {
 		*var = 0;
 	}
 
-	DEBUG_COMMAND("ShCalc.NumToBit %d,%p:", beki, var);
+	TRACE("ShCalc.NumToBit %d,%p:", beki, var);
 }
 
 static void BitToNum() {
@@ -358,7 +358,7 @@ static void BitToNum() {
 	int *var = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShCalc.BitToNum %d,%p:", val, var);
+	TRACE("ShCalc.BitToNum %d,%p:", val, var);
 	
 	if (val == 0) {
 		*var = 0;

@@ -39,7 +39,7 @@ void commandH() {
 	sys_addMsg(s);
 	free(s);
 
-	DEBUG_COMMAND("H %d,%d:",fig,num);
+	TRACE("H %d,%d:",fig,num);
 }
 
 void commandHH(void) {
@@ -49,5 +49,5 @@ void commandHH(void) {
 
 	sys_addMsg(format_number(num, fig, buf));
 
-	DEBUG_COMMAND("HH %d,%d:",fig,num);
+	TRACE("HH %d,%d:",fig,num);
 }

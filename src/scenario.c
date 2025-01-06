@@ -201,7 +201,7 @@ boolean sl_jmpFar2(int page, int address) {
 	
 	dfile = ald_getdata(DRIFILE_SCO, page);
 	if (dfile == NULL) {
-		DEBUG_MESSAGE("ald_getdata fail\n");
+		TRACE_MESSAGE("ald_getdata fail\n");
 		return FALSE;
 	}
 	sl_sco   = dfile->data;

@@ -174,7 +174,7 @@ static void message(int c0) {
 }
 
 void exec_command(void) {
-	DEBUG_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
+	TRACE_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
 
 	int page, index;
 	int c0 = sl_getc();
@@ -535,7 +535,7 @@ void exec_command(void) {
 		/* hit Any Key */
 		sys_hit_any_key();
 		msg_nextPage(TRUE);
-		DEBUG_COMMAND("A");
+		TRACE("A");
 		break;
 	case 'B':
 		switch(sl_getc()) {
@@ -949,7 +949,7 @@ void exec_command(void) {
 		break;
 	case 'R':
 		/* 改行 */
-		DEBUG_MESSAGE("\n");
+		TRACE_MESSAGE("\n");
 		msg_nextLine();
 		break;
 	case 'S':
@@ -1085,7 +1085,7 @@ void exec_command(void) {
 	{
 		int num=getCaliValue();
 		sys_addMsg(svar_get(num));
-		DEBUG_COMMAND("X %d:", num);
+		TRACE("X %d:", num);
 	}
 		break;
 	case 'Y':

@@ -163,7 +163,7 @@ static void Init() {
 		sact.logging = FALSE;
 	}
 	
-	DEBUG_COMMAND("SACT.Init %d:", p1);
+	TRACE("SACT.Init %d:", p1);
 }
 
 /**
@@ -184,7 +184,7 @@ static void CreateSprite() {
 	
 	sp_new(wNum, wNumCG1, wNumCG2, wNumCG3, wType);
 	
-	DEBUG_COMMAND_YET("SACT.CreateSprite %d,%d,%d,%d,%d:", wNum, wNumCG1, wNumCG2, wNumCG3, wType);
+	TRACE("SACT.CreateSprite %d,%d,%d,%d,%d:", wNum, wNumCG1, wNumCG2, wNumCG3, wType);
 }
 
 /**
@@ -205,7 +205,7 @@ static void CreateTextSprite() {
 	
 	sp_new_msg(wNum, wX, wY, wWidth, wHeight);
 	
-	DEBUG_COMMAND_YET("SACT.CreateTextSprite %d,%d,%d,%d,%d:", wNum, wX, wY, wWidth, wHeight);
+	TRACE("SACT.CreateTextSprite %d,%d,%d,%d,%d:", wNum, wX, wY, wWidth, wHeight);
 }
 
 /**
@@ -218,7 +218,7 @@ static void SetWallPaper() {
 	
 	sp_set_wall_paper(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.SetWallPaper %d:", wNum);
+	TRACE("SACT.SetWallPaper %d:", wNum);
 }
 
 /**
@@ -228,7 +228,7 @@ static void SetWallPaper() {
 static void Clear() {
 	sp_free_all();
 	
-	DEBUG_COMMAND_YET("SACT.Clear:");
+	TRACE("SACT.Clear:");
 }
 
 /**
@@ -241,7 +241,7 @@ static void Delete() {
 	
 	sp_free(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.Delete %d:", wNum);
+	TRACE("SACT.Delete %d:", wNum);
 }
 
 /**
@@ -259,7 +259,7 @@ static void SpriteDeleteCount() {
 		sp_free(i);
 	}
 	
-	DEBUG_COMMAND_YET("SACT.SpriteDeleteCount %d,%d:", wNum, wCount);
+	TRACE("SACT.SpriteDeleteCount %d,%d:", wNum, wCount);
 }
 
 /**
@@ -269,7 +269,7 @@ static void SpriteDeleteCount() {
 static void Draw() {
 	sp_update_all(TRUE);
 
-	DEBUG_COMMAND_YET("SACT.Draw:");
+	TRACE("SACT.Draw:");
 }
 
 /**
@@ -290,7 +290,7 @@ static void DrawEffect() {
 	
 	sp_eupdate(wType, wEffectTime, wEffectkey);
 	
-	DEBUG_COMMAND_YET("SACT.DrawEffect %d,%d,%d:", wType, wEffectTime, wEffectkey);
+	TRACE("SACT.DrawEffect %d,%d,%d:", wType, wEffectTime, wEffectkey);
 }
 
 /**
@@ -307,7 +307,7 @@ static void DrawEffectAlphaMap() {
 	
 	sp_eupdate_amap(nIndexAlphaMap, wEffectTime, wEffectKey);
 	
-	DEBUG_COMMAND_YET("SACT.DrawEffectAlphaMap %d,%d,%d:", nIndexAlphaMap, wEffectTime, wEffectKey);
+	TRACE("SACT.DrawEffectAlphaMap %d,%d,%d:", nIndexAlphaMap, wEffectTime, wEffectKey);
 }
 
 /**
@@ -334,7 +334,7 @@ static void QuakeScreen() {
 	
 	sp_quake_screen(wType, wParam1, wParam2, wCount, nfKeyEnable);
 	
-	DEBUG_COMMAND_YET("SACT.QuakeScreen %d,%d,%d,%d,%d:", wType, wParam1, wParam2, wCount, nfKeyEnable);
+	TRACE("SACT.QuakeScreen %d,%d,%d,%d,%d:", wType, wParam1, wParam2, wCount, nfKeyEnable);
 }
 
 /**
@@ -350,7 +350,7 @@ static void SetOrigin() {
 	sact.origin.x = wX;
 	sact.origin.y = wY;
 	
-	DEBUG_COMMAND_YET("SACT.SetOrigin %d,%d:", wX, wY);
+	TRACE("SACT.SetOrigin %d,%d:", wX, wY);
 }
 
 /**
@@ -367,7 +367,7 @@ static void SetShow() {
 	
 	sp_set_show(wNum, wCount, wShow);
 
-	DEBUG_COMMAND_YET("SACT.SetShow %d,%d,%d:", wNum, wCount, wShow);
+	TRACE("SACT.SetShow %d,%d,%d:", wNum, wCount, wShow);
 }
 
 /**
@@ -384,7 +384,7 @@ static void SetBlendRate() {
 	
 	sp_set_blendrate(wNum, wCount, nBlendRate);
 	
-	DEBUG_COMMAND_YET("SACT.SetBlendRate %d,%d,%d:", wNum, wCount, nBlendRate);
+	TRACE("SACT.SetBlendRate %d,%d,%d:", wNum, wCount, nBlendRate);
 }
 
 /**
@@ -401,7 +401,7 @@ static void SetPos() {
 	
 	sp_set_pos(wNum, wX, wY);
 	
-	DEBUG_COMMAND_YET("SACT.SetPos %d,%d,%d:", wNum, wX, wY);
+	TRACE("SACT.SetPos %d,%d,%d:", wNum, wX, wY);
 }
 
 /**
@@ -418,7 +418,7 @@ static void SetMove() {
 	
 	sp_set_move(wNum, wX, wY);
 	
-	DEBUG_COMMAND_YET("SACT.SetMove %d,%d,%d:", wNum, wX, wY);
+	TRACE("SACT.SetMove %d,%d,%d:", wNum, wX, wY);
 }
 
 /**
@@ -433,7 +433,7 @@ static void SetMoveTime() {
 	
 	sp_set_movetime(wNum, wTime);
 	
-	DEBUG_COMMAND_YET("SACT.SetMoveTime %d,%d:", wNum, wTime);
+	TRACE("SACT.SetMoveTime %d,%d:", wNum, wTime);
 }
 
 /**
@@ -448,7 +448,7 @@ static void SetMoveSpeed() {
 	
 	sp_set_movespeed(wNum, wSpeed);
 	
-	DEBUG_COMMAND_YET("SACT.SetMoveSpeed %d,%d:", wNum, wSpeed);
+	TRACE("SACT.SetMoveSpeed %d,%d:", wNum, wSpeed);
 }
 
 /**
@@ -468,7 +468,7 @@ static void SetMoveSpeedCount() {
 		sp_set_movespeed(i, wSpeed);
 	}
 	
-	DEBUG_COMMAND_YET("SACT.SetMoveSpeedCount %d,%d,%d:", wNum, wCount, wSpeed);
+	TRACE("SACT.SetMoveSpeedCount %d,%d,%d:", wNum, wCount, wSpeed);
 }
 
 /**
@@ -488,7 +488,7 @@ static void SetSpriteAnimeTimeInterval() {
 		sp_set_animeinterval(i, nTime);
 	}
 	
-	DEBUG_COMMAND_YET("SACT.SetSpriteAnimeTimeInterval %d,%d,%d:", wNum, wCount, nTime);
+	TRACE("SACT.SetSpriteAnimeTimeInterval %d,%d,%d:", wNum, wCount, nTime);
 }
 
 /**
@@ -501,7 +501,7 @@ static void AddZKeyHideSprite() {
 	
 	sp_add_zkey_hidesprite(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.AddZKeyHideSprite %d:", wNum);
+	TRACE("SACT.AddZKeyHideSprite %d:", wNum);
 }
 
 /**
@@ -511,7 +511,7 @@ static void AddZKeyHideSprite() {
 static void ClearZKeyHideSprite() {
 	sp_clear_zkey_hidesprite_all();
 	
-	DEBUG_COMMAND_YET("SACT.ClearZKeyHideSprite:");
+	TRACE("SACT.ClearZKeyHideSprite:");
 }
 
 /**
@@ -527,7 +527,7 @@ static void SpriteFreeze() {
 	
 	sp_freeze_sprite(wNum, wIndex);
 	
-	DEBUG_COMMAND_YET("SACT.SpriteFreeze %d,%d:", wNum, wIndex);
+	TRACE("SACT.SpriteFreeze %d,%d:", wNum, wIndex);
 }
 
 /**
@@ -540,7 +540,7 @@ static void SpriteThaw() {
 	
 	sp_thaw_sprite(wNum);
 
-	DEBUG_COMMAND_YET("SACT.SpriteThaw %d:", wNum);
+	TRACE("SACT.SpriteThaw %d:", wNum);
 }
 
 /**
@@ -560,7 +560,7 @@ static void SpriteFreezeCount() {
 		sp_freeze_sprite(i, wIndex);
 	}
 	
-	DEBUG_COMMAND_YET("SACT.SpriteFreezeCount %d,%d,%d:", wNum, wCount, wIndex);
+	TRACE("SACT.SpriteFreezeCount %d,%d,%d:", wNum, wCount, wIndex);
 }
 
 /**
@@ -578,7 +578,7 @@ static void SpriteThawCount() {
 		sp_thaw_sprite(i);
 	}
 	
-	DEBUG_COMMAND_YET("SACT.SpriteThawCount %d,%d:", wNum, wCount);
+	TRACE("SACT.SpriteThawCount %d,%d:", wNum, wCount);
 }
 
 /**
@@ -591,7 +591,7 @@ static void QuakeSpriteAdd() {
 	
 	sp_add_quakesprite(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.QuakeSpriteAdd %d:", wNum);
+	TRACE("SACT.QuakeSpriteAdd %d:", wNum);
 }
 
 /**
@@ -600,7 +600,7 @@ static void QuakeSpriteAdd() {
  */
 static void QuakeSpriteReset() {
 	sp_clear_quakesprite_all();
-	DEBUG_COMMAND_YET("SACT.QuakeSpriteReset:");
+	TRACE("SACT.QuakeSpriteReset:");
 }
 
 /**
@@ -626,7 +626,7 @@ static void QuakeSprite() {
 	
 	sp_quake_sprite(wType, wAmplitudeX, wAmplitudeY, wCount, nfKeyEnable);
 	
-	DEBUG_COMMAND_YET("SACT.QuakeSprite %d,%d,%d,%d:", wType, wAmplitudeX, wAmplitudeY, wCount);
+	TRACE("SACT.QuakeSprite %d,%d,%d,%d:", wType, wAmplitudeX, wAmplitudeY, wCount);
 }
 
 /**
@@ -641,7 +641,7 @@ static void QuerySpriteIsExist() {
 
 	sp_query_isexist(wNum, var);
 	
-	DEBUG_COMMAND_YET("SACT.QuerySpriteIsExist %d,%p:", wNum, var);
+	TRACE("SACT.QuerySpriteIsExist %d,%p:", wNum, var);
 }
 
 /**
@@ -662,7 +662,7 @@ static void QuerySpriteInfo() {
 	
 	sp_query_info(wNum, vType, vCG1, vCG2, vCG3);
 	
-	DEBUG_COMMAND_YET("SACT.QuerySpriteInfo %d,%p,%p,%p,%p:", wNum, vType, vCG1, vCG2, vCG3);
+	TRACE("SACT.QuerySpriteInfo %d,%p,%p,%p,%p:", wNum, vType, vCG1, vCG2, vCG3);
 }
 
 /**
@@ -677,7 +677,7 @@ static void QuerySpriteShow() {
 
 	sp_query_show(wNum, vShow);
 	
-	DEBUG_COMMAND_YET("SACT.QuerySpriteShow %d,%p:", wNum, vShow);
+	TRACE("SACT.QuerySpriteShow %d,%p:", wNum, vShow);
 }
 
 /**
@@ -694,7 +694,7 @@ static void QuerySpritePos() {
 	
 	sp_query_pos(wNum, vX, vY);
 	
-	DEBUG_COMMAND_YET("SACT.QuerySpritePos %d,%p,%p:", wNum, vX, vY);
+	TRACE("SACT.QuerySpritePos %d,%p,%p:", wNum, vX, vY);
 }
 
 /**
@@ -711,7 +711,7 @@ static void QuerySpriteSize() {
 	
 	sp_query_size(wNum, vWidth, vHeight);
 	
-	DEBUG_COMMAND_YET("SACT.QuerySpriteSize %d,%p,%p:", wNum, vWidth, vHeight);
+	TRACE("SACT.QuerySpriteSize %d,%p,%p:", wNum, vWidth, vHeight);
 }
 
 /**
@@ -728,7 +728,7 @@ static void QueryTextPos() {
 	
 	sp_query_textpos(wNum, vX, vY);
 	
-	DEBUG_COMMAND_YET("SACT.QueryTextPos %d,%p,%p:", wNum, vX, vY);
+	TRACE("SACT.QueryTextPos %d,%p,%p:", wNum, vX, vY);
 }
 
 /**
@@ -738,7 +738,7 @@ static void QueryTextPos() {
 static void CG_Clear() {
 	scg_freeall();
 	
-	DEBUG_COMMAND_YET("SACT.CG_Clear:");
+	TRACE("SACT.CG_Clear:");
 }
 
 /**
@@ -751,7 +751,7 @@ static void CG_Reset() {
 	
 	scg_free(wNumCG);
 	
-	DEBUG_COMMAND_YET("SACT.CG_Reset %d:", wNumCG);
+	TRACE("SACT.CG_Reset %d:", wNumCG);
 }
 
 /**
@@ -767,7 +767,7 @@ static void CG_QueryType() {
 	
 	scg_querytype(wNumCG, vType);
 	
-	DEBUG_COMMAND_YET("SACT.CG_QueryType %d,%p:", wNumCG, vType);
+	TRACE("SACT.CG_QueryType %d,%p:", wNumCG, vType);
 }
 
 /**
@@ -784,7 +784,7 @@ static void CG_QuerySize() {
 	
 	scg_querysize(wNumCG, vWidth, vHeight);
 	
-	DEBUG_COMMAND_YET("SACT.CG_QuerySize %d,%p,%p:", wNumCG, vWidth, vHeight);
+	TRACE("SACT.CG_QuerySize %d,%p,%p:", wNumCG, vWidth, vHeight);
 }
 
 /**
@@ -799,7 +799,7 @@ static void CG_QueryBpp() {
 	
 	scg_querybpp(wNumCG, vBpp);
 	
-	DEBUG_COMMAND_YET("SACT.CG_QueryBpp %d,%p:", wNumCG, vBpp);
+	TRACE("SACT.CG_QueryBpp %d,%p:", wNumCG, vBpp);
 }
 
 /**
@@ -814,7 +814,7 @@ static void CG_ExistAlphaMap() {
 	
 	scg_existalphamap(wNumCG, vMask);
 	
-	DEBUG_COMMAND_YET("SACT.CG_ExistAlphaMap %d,%p:", wNumCG, vMask);
+	TRACE("SACT.CG_ExistAlphaMap %d,%p:", wNumCG, vMask);
 }
 
 /**
@@ -839,7 +839,7 @@ static void CG_Create() {
 	
 	scg_create(wNumCG, wWidth, wHeight, wR, wG, wB, wBlendRate);
 	
-	DEBUG_COMMAND_YET("SACT.CG_Create %d,%d,%d,%d,%d,%d,%d:", wNumCG, wWidth, wHeight, wR, wG, wB, wBlendRate);
+	TRACE("SACT.CG_Create %d,%d,%d,%d,%d,%d,%d:", wNumCG, wWidth, wHeight, wR, wG, wB, wBlendRate);
 }
 
 /**
@@ -858,7 +858,7 @@ static void CG_CreateReverse() {
 
 	scg_create_reverse(wNumCG, wNumSrcCG, wReverseX, wReverseY);
 	
-	DEBUG_COMMAND_YET("SACT.CG_CreateReverse %d,%d,%d,%d:", wNumCG, wNumSrcCG, wReverseX, wReverseY);
+	TRACE("SACT.CG_CreateReverse %d,%d,%d,%d:", wNumCG, wNumSrcCG, wReverseX, wReverseY);
 }
 
 /**
@@ -877,7 +877,7 @@ static void CG_CreateStretch() {
 
 	scg_create_stretch(wNumCG, wWidth, wHeight, wNumSrcCG);
 	
-	DEBUG_COMMAND_YET("SACT.CG_CreateStretch %d,%d,%d,%d:", wNumCG, wWidth, wHeight, wNumSrcCG);
+	TRACE("SACT.CG_CreateStretch %d,%d,%d,%d:", wNumCG, wWidth, wHeight, wNumSrcCG);
 }
 
 /**
@@ -898,7 +898,7 @@ static void CG_CreateBlend() {
 	int wNumBlendCG   = getCaliValue();
 	int wAlphaMapMode = getCaliValue();
 	
-	DEBUG_COMMAND_YET("SACT.CG_CreateBlend %d,%d,%d,%d,%d,%d:", wNumDstCG, wNumBaseCG, wX, wY, wNumBlendCG, wAlphaMapMode);
+	TRACE("SACT.CG_CreateBlend %d,%d,%d,%d,%d,%d:", wNumDstCG, wNumBaseCG, wX, wY, wNumBlendCG, wAlphaMapMode);
 	scg_create_blend(wNumDstCG, wNumBaseCG, wX, wY, wNumBlendCG, wAlphaMapMode);
 	
 }
@@ -923,7 +923,7 @@ static void CG_CreateText() {
 	
 	scg_create_text(wNumCG, wSize, wR, wG, wB, wText);
 	
-	DEBUG_COMMAND_YET("SACT.CG_CreateText %d,%d,%d,%d,%d,%d:", wNumCG, wSize, wR, wG, wB, wText);
+	TRACE("SACT.CG_CreateText %d,%d,%d,%d,%d,%d:", wNumCG, wSize, wR, wG, wB, wText);
 }
 
 /**
@@ -951,7 +951,7 @@ static void CG_CreateTextNum() {
 	
 	scg_create_textnum(wNumCG, wSize, wR, wG, wB, wFigs, wZeroPadding, wValue);
 	
-	DEBUG_COMMAND_YET("SACT.CG_CreateTextNum %d,%d,%d,%d,%d,%d,%d,%d:", wNumCG, wSize, wR, wG, wB, wFigs, wZeroPadding, wValue);
+	TRACE("SACT.CG_CreateTextNum %d,%d,%d,%d,%d,%d,%d,%d:", wNumCG, wSize, wR, wG, wB, wFigs, wZeroPadding, wValue);
 }
 
 /**
@@ -966,7 +966,7 @@ static void CG_Copy() {
 	
 	scg_copy(wNumDst, wNumSrc);
 
-	DEBUG_COMMAND_YET("SACT.CG_Copy %d,%d:", wNumDst, wNumSrc);
+	TRACE("SACT.CG_Copy %d,%d:", wNumDst, wNumSrc);
 }
 
 /**
@@ -989,7 +989,7 @@ static void CG_Cut() {
 	
 	scg_cut(wNumDstCG, wNumSrcCG, wX, wY, wWidth, wHeight);
 	
-	DEBUG_COMMAND_YET("SACT.CG_Cut %d,%d,%d,%d,%d,%d:", wNumDstCG, wNumSrcCG, wX, wY, wWidth, wHeight);
+	TRACE("SACT.CG_Cut %d,%d,%d,%d,%d,%d:", wNumDstCG, wNumSrcCG, wX, wY, wWidth, wHeight);
 }
 
 /**
@@ -1013,7 +1013,7 @@ static void CG_PartCopy() {
 	
 	scg_partcopy(wNumDstCG, wNumSrcCG, wX, wY, wWidth, wHeight);
 	
-	DEBUG_COMMAND_YET("SACT.PartCopy %d,%d,%d,%d,%d,%d:", wNumDstCG, wNumSrcCG, wX, wY, wWidth, wHeight);
+	TRACE("SACT.PartCopy %d,%d,%d,%d,%d,%d:", wNumDstCG, wNumSrcCG, wX, wY, wWidth, wHeight);
 }
 
 /**
@@ -1024,7 +1024,7 @@ static void CG_PartCopy() {
 static void WaitKeySimple() {
 	int *vKey = getCaliVariable();
 
-	DEBUG_COMMAND_YET("SACT.WaitKeySimple %d:", vKey);
+	TRACE("SACT.WaitKeySimple %d:", vKey);
 
 	// とりあえず全更新
 	sp_update_all(TRUE);
@@ -1060,7 +1060,7 @@ static void WaitKeyMessage() {
 	
 	smsg_keywait(wMessageMark1, wMessageMark2, wMessageLength);
 	
-	DEBUG_COMMAND_YET("SACT.WaitKeyMessage %d,%d,%d:", wMessageMark1, wMessageMark2, wMessageLength);
+	TRACE("SACT.WaitKeyMessage %d,%d,%d:", wMessageMark1, wMessageMark2, wMessageLength);
 }
 
 /**
@@ -1077,11 +1077,11 @@ static void WaitKeySprite() {
 	int *vRsv1 = getCaliVariable();
 	int *vRsv2 = getCaliVariable();
 	
-	DEBUG_COMMAND("SACT.WaitKeySprite %p,%p,%p,%p:", vOK, vRND, vRsv1, vRsv2);
+	TRACE("SACT.WaitKeySprite %p,%p,%p,%p:", vOK, vRND, vRsv1, vRsv2);
 	
 	sp_keywait(vOK, vRND, vRsv1, vRsv2, NULL, -1);
 	
-	DEBUG_COMMAND_YET("SACT.WaitKeySprite %d,%d,%d,%d:", *vOK, *vRND, *vRsv1, *vRsv2);
+	TRACE("SACT.WaitKeySprite %d,%d,%d,%d:", *vOK, *vRND, *vRsv1, *vRsv2);
 }
 
 /**
@@ -1093,9 +1093,8 @@ static void WaitKeySprite() {
 static void PeekKey() {
 	int nKeyCode = getCaliValue();
 	int *vResult = getCaliVariable();
-	
-	WARNING("NOT IMPLEMENTED");
-	DEBUG_COMMAND_YET("SACT.PeekKey %d,%p:", nKeyCode, vResult);
+
+	TRACE_UNIMPLEMENTED("SACT.PeekKey %d,%p:", nKeyCode, vResult);
 }
 
 /**
@@ -1103,8 +1102,7 @@ static void PeekKey() {
  *   文字送りキーが押されっぱなしの時、離されるまで待つ
  */
 static void WaitMsgSkipKeyUp() {
-	WARNING("NOT IMPLEMENTED");
-	DEBUG_COMMAND_YET("SACT.WaitMsgSkipKeyUp:");
+	TRACE_UNIMPLEMENTED("SACT.WaitMsgSkipKeyUp:");
 }
 
 /**
@@ -1133,7 +1131,7 @@ static void WaitKeySimpleTimeOut() {
 	
 	sact.waittype = KEYWAIT_NONE;
 	
-	DEBUG_COMMAND_YET("SACT.WaitKeySimpleTimeOut %p,%p,%d:", vRND, vD03, wTime);
+	TRACE("SACT.WaitKeySimpleTimeOut %p,%p,%d:", vRND, vD03, wTime);
 }
 
 /**
@@ -1156,7 +1154,7 @@ static void WaitKeySpriteTimeOut() {
 	
 	sp_keywait(vOK, vRND, vD01, vD02, vD03, wTime);
 	
-	DEBUG_COMMAND_YET("SACT.WaitKeySpriteTimeOut %p,%p,%p,%p,%p,%d:", vOK, vRND, vD01, vD02, vD03, wTime);
+	TRACE("SACT.WaitKeySpriteTimeOut %p,%p,%p,%p,%p,%d:", vOK, vRND, vD01, vD02, vD03, wTime);
 }
 
 /**
@@ -1169,7 +1167,7 @@ static void QueryMessageSkip() {
 
 	*vSkip = msgskip_isSkipping() ? 1 : 0;
 	
-	DEBUG_COMMAND_YET("SACT.QueryMessageSkip %p:", vSkip);
+	TRACE("SACT.QueryMessageSkip %p:", vSkip);
 }
 
 /**
@@ -1184,7 +1182,7 @@ static void RegistReplaceString() {
 	
 	sstr_regist_replace(sstr, dstr);
 	
-	DEBUG_COMMAND_YET("SACT.RegistReplaceString %d,%d:", sstr, dstr);
+	TRACE("SACT.RegistReplaceString %d,%d:", sstr, dstr);
 }
 
 /**
@@ -1224,7 +1222,7 @@ static void MessageOutput() {
 	
 	smsg_out(wMessageSpriteNumber, wMessageSize, wMessageColorR, wMessageColorG, wMessageColorB, wMessageFont, wMessageSpeed, wMessageLineSpace, wMessageAlign, 0, 0, 0, vMessageLength);
 	
-	DEBUG_COMMAND_YET("SACT.MessageOutput %d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", wMessageSpriteNumber, wMessageSize, wMessageColorR, wMessageColorG, wMessageColorB, wMessageFont, wMessageSpeed, wMessageLineSpace, wMessageAlign, vMessageLength);
+	TRACE("SACT.MessageOutput %d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", wMessageSpriteNumber, wMessageSize, wMessageColorR, wMessageColorG, wMessageColorB, wMessageFont, wMessageSpeed, wMessageLineSpace, wMessageAlign, vMessageLength);
 }
 
 /**
@@ -1268,7 +1266,7 @@ static void MessageOutputEx() {
 	
 	smsg_out(wMessageSpriteNumber, wMessageSize, wMessageColorR, wMessageColorG, wMessageColorB, wMessageFont, wMessageSpeed, wMessageLineSpace, wMessageAlign, wRubySize, wRubyFont, wRubyLineSpace, vLength);
 	
-	DEBUG_COMMAND_YET("SACT.MessageOutputEx %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", wMessageSpriteNumber, wMessageSize, wMessageColorR, wMessageColorG, wMessageColorB, wMessageFont, wMessageSpeed, wMessageLineSpace,wMessageAlign, wRubySize, wRubyFont, wRubyLineSpace, vLength);
+	TRACE("SACT.MessageOutputEx %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", wMessageSpriteNumber, wMessageSize, wMessageColorR, wMessageColorG, wMessageColorB, wMessageFont, wMessageSpeed, wMessageLineSpace,wMessageAlign, wRubySize, wRubyFont, wRubyLineSpace, vLength);
 }
 
 /**
@@ -1283,7 +1281,7 @@ static void MessageNewLine() {
 	
 	smsg_newline(wMessageSpriteNumber, wMessageSize);
 	
-	DEBUG_COMMAND_YET("SACT.MessageNewLine %d,%d:", wMessageSpriteNumber, wMessageSize);
+	TRACE("SACT.MessageNewLine %d,%d:", wMessageSpriteNumber, wMessageSize);
 }
 
 /**
@@ -1296,7 +1294,7 @@ static void MessageClear() {
 	
 	smsg_clear(wMessageSpriteNumber);
 	
-	DEBUG_COMMAND_YET("SACT.MessageClear %d:", wMessageSpriteNumber);
+	TRACE("SACT.MessageClear %d:", wMessageSpriteNumber);
 }
 
 /**
@@ -1309,7 +1307,7 @@ static void MessageIsEmpty() {
 
 	*wResult = smsg_is_empty();
 	
-	DEBUG_COMMAND_YET("SACT.MessageIsEmpty %p:", wResult);
+	TRACE("SACT.MessageIsEmpty %p:", wResult);
 }
 
 /**
@@ -1322,9 +1320,7 @@ static void MessagePeek() {
 	int *vCount = getCaliVariable();
 	int nTopStringNum = getCaliValue();
 
-	WARNING("NOT IMPLEMENTED");
-	
-	DEBUG_COMMAND_YET("SACT.MessagePeek %p,%d:", vCount, nTopStringNum);
+	TRACE_UNIMPLEMENTED("SACT.MessagePeek %p,%d:", vCount, nTopStringNum);
 }
 
 /**
@@ -1333,7 +1329,7 @@ static void MessagePeek() {
  */
 static void Log_Stop() {
 	sact.logging = FALSE;
-	DEBUG_COMMAND_YET("SACT.Log_Stop:");
+	TRACE("SACT.Log_Stop:");
 }
 
 /**
@@ -1342,7 +1338,7 @@ static void Log_Stop() {
  */
 static void Log_Start() {
 	sact.logging = TRUE;
-	DEBUG_COMMAND_YET("SACT.Log_Start:");
+	TRACE("SACT.Log_Start:");
 }
 
 /**
@@ -1352,7 +1348,7 @@ static void Log_Start() {
 static void MenuClear() {
 	ssel_clear();
 	
-	DEBUG_COMMAND_YET("SACT.MenuClear:");
+	TRACE("SACT.MenuClear:");
 }
 
 /**
@@ -1367,7 +1363,7 @@ static void MenuAdd() {
 
 	ssel_add(nString, wI);
 	
-	DEBUG_COMMAND_YET("SACT.MenuAdd %d,%d:", nString, wI);
+	TRACE("SACT.MenuAdd %d,%d:", nString, wI);
 }
 
 /**
@@ -1396,7 +1392,7 @@ static void MenuOpen() {
 	
 	*wMenuResult = ssel_select(wNum, wChoiceSize, wMenuOutSpc, wChoiceLineSpace, wChoiceAutoMoveCursor, nAlign);
 	
-	DEBUG_COMMAND_YET("SACT.MenuOpen %p,%d,%d,%d,%d,%d,%d:", wMenuResult, wNum, wChoiceSize, wMenuOutSpc, wChoiceLineSpace, wChoiceAutoMoveCursor, nAlign);
+	TRACE("SACT.MenuOpen %p,%d,%d,%d,%d,%d,%d:", wMenuResult, wNum, wChoiceSize, wMenuOutSpc, wChoiceLineSpace, wChoiceAutoMoveCursor, nAlign);
 }
 
 /**
@@ -1409,7 +1405,7 @@ static void PushString() {
 	
 	sstr_push(nString);
 	
-	DEBUG_COMMAND_YET("SACT.PushString %d:", nString);
+	TRACE("SACT.PushString %d:", nString);
 }
 
 /**
@@ -1422,7 +1418,7 @@ static void PopString() {
 
 	sstr_pop(nString);
 	
-	DEBUG_COMMAND_YET("SACT.PopString %d:", nString);
+	TRACE("SACT.PopString %d:", nString);
 }
 
 /**
@@ -1445,7 +1441,7 @@ static void Numeral_SetCG() {
 	
 	sp_num_setcg(nNum, nIndex, nCG);
 	
-	DEBUG_COMMAND_YET("SACT.Numeral_SetCG %d,%d,%d:", nNum, nIndex, nCG);
+	TRACE("SACT.Numeral_SetCG %d,%d,%d:", nNum, nIndex, nCG);
 }
 
 /**
@@ -1462,7 +1458,7 @@ static void Numeral_GetCG() {
 	
 	sp_num_getcg(nNum, nIndex, vCG);
 	
-	DEBUG_COMMAND_YET("SACT.Numeral_GetCG %d,%d,%p:", nNum, nIndex, vCG);
+	TRACE("SACT.Numeral_GetCG %d,%d,%p:", nNum, nIndex, vCG);
 }
 
 /**
@@ -1479,7 +1475,7 @@ static void Numeral_SetPos() {
 	
 	sp_num_setpos(nNum, nX, nY);
 	
-	DEBUG_COMMAND_YET("SACT.Numeral_SetPos %d,%d,%d:", nNum, nX, nY);
+	TRACE("SACT.Numeral_SetPos %d,%d,%d:", nNum, nX, nY);
 }
 
 /**
@@ -1496,7 +1492,7 @@ static void Numeral_GetPos() {
 	
 	sp_num_getpos(nNum, vX, vY);
 	
-	DEBUG_COMMAND_YET("SACT.Numeral_GetPos %d,%p,%p:", nNum, vX, vY);
+	TRACE("SACT.Numeral_GetPos %d,%p,%p:", nNum, vX, vY);
 }
 
 /**
@@ -1511,7 +1507,7 @@ static void Numeral_SetSpan() {
 	
 	sp_num_setspan(nNum, nSpan);
 	
-	DEBUG_COMMAND_YET("SACT.Numeral_SetSpan %d,%d:", nNum, nSpan);
+	TRACE("SACT.Numeral_SetSpan %d,%d:", nNum, nSpan);
 }
 
 /**
@@ -1526,7 +1522,7 @@ static void Numeral_GetSpan() {
 
 	sp_num_getspan(nNum, vSpan);
 	
-	DEBUG_COMMAND_YET("SACT.Numeral_GetSpan %d,%p:", nNum, vSpan);
+	TRACE("SACT.Numeral_GetSpan %d,%p:", nNum, vSpan);
 }
 
 /**
@@ -1534,7 +1530,7 @@ static void Numeral_GetSpan() {
  *   説明スプライト設定クリア
  */
 static void ExpSp_Clear() {
-	DEBUG_COMMAND_YET("SACT.ExpSp_Clear:");
+	TRACE("SACT.ExpSp_Clear:");
 
 	sp_exp_clear();
 }
@@ -1551,7 +1547,7 @@ static void ExpSp_Add() {
 	
 	sp_exp_add(wNumSP1, wNumSP2);
 	
-	DEBUG_COMMAND_YET("SACT.ExpSp_Add %d,%d:", wNumSP1, wNumSP2);
+	TRACE("SACT.ExpSp_Add %d,%d:", wNumSP1, wNumSP2);
 }
 
 /**
@@ -1564,7 +1560,7 @@ static void ExpSp_Del() {
 	
 	sp_exp_del(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.ExpSp_Del %d:", wNum);
+	TRACE("SACT.ExpSp_Del %d:", wNum);
 }
 
 /**
@@ -1579,7 +1575,7 @@ static void TimerSet() {
 	
 	stimer_reset(wTimerID, wCount);
 	
-	DEBUG_COMMAND("SACT.TimerSet %d,%d:", wTimerID, wCount);
+	TRACE("SACT.TimerSet %d,%d:", wTimerID, wCount);
 }
 
 /**
@@ -1594,7 +1590,7 @@ static void TimerGet() {
 
 	*vRND = stimer_get(wTimerID);
 	
-	DEBUG_COMMAND("SACT.TimerGet %d,%p:", wTimerID, vRND);
+	TRACE("SACT.TimerGet %d,%p:", wTimerID, vRND);
 }
 
 /**
@@ -1611,7 +1607,7 @@ static void TimerWait() {
 		sys_keywait(10, KEYWAIT_NONCANCELABLE);
 	}
 	
-	DEBUG_COMMAND("SACT.TimerWait %d,%d:", wTimerID, wCount);
+	TRACE("SACT.TimerWait %d,%d:", wTimerID, wCount);
 }
 
 /**
@@ -1624,7 +1620,7 @@ static void Wait() {
 	
 	sys_keywait(wCount*10, KEYWAIT_NONCANCELABLE);
 	
-	DEBUG_COMMAND_YET("SACT.Wait %d:", wCount);
+	TRACE("SACT.Wait %d:", wCount);
 }
 
 /**
@@ -1637,7 +1633,7 @@ static void SoundPlay() {
 	
 	ssnd_play(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.SoundPlay %d:", wNum);
+	TRACE("SACT.SoundPlay %d:", wNum);
 }
 
 /**
@@ -1652,7 +1648,7 @@ static void SoundStop() {
 	
 	ssnd_stop(wNum, wFadeTime);
 	
-	DEBUG_COMMAND_YET("SACT.SoundStop %d,%d:", wNum, wFadeTime);
+	TRACE("SACT.SoundStop %d,%d:", wNum, wFadeTime);
 }
 
 /**
@@ -1666,7 +1662,7 @@ static void SoundStopAll() {
 	
 	ssnd_stopall(wFadeTime);
 	
-	DEBUG_COMMAND_YET("SACT.SoundStopAll %d:", wFadeTime);
+	TRACE("SACT.SoundStopAll %d:", wFadeTime);
 }
 
 /**
@@ -1679,7 +1675,7 @@ static void SoundWait() {
 	
 	ssnd_wait(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.SoundWait %d:", wNum);
+	TRACE("SACT.SoundWait %d:", wNum);
 }
 
 /**
@@ -1694,7 +1690,7 @@ static void SoundWaitKey() {
 	
 	ssnd_waitkey(wNum, vKey);
 	
-	DEBUG_COMMAND_YET("SACT.SoundWaitKey %d,%p:", wNum, vKey);
+	TRACE("SACT.SoundWaitKey %d,%p:", wNum, vKey);
 }
 
 /**
@@ -1707,7 +1703,7 @@ static void SoundPrepare() {
 	
 	ssnd_prepare(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.SoundPrepare %d:", wNum);
+	TRACE("SACT.SoundPrepare %d:", wNum);
 }
 
 /**
@@ -1720,7 +1716,7 @@ static void SoundPrepareLR() {
 
 	ssnd_prepareLRrev(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.SoundPrepareLR %d:", wNum);
+	TRACE("SACT.SoundPrepareLR %d:", wNum);
 }
 
 /**
@@ -1733,7 +1729,7 @@ static void SoundPlayLR() {
 	
 	ssnd_playLRrev(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.SoundPlayLR %d:", wNum);
+	TRACE("SACT.SoundPlayLR %d:", wNum);
 }
 
 /**
@@ -1757,7 +1753,7 @@ static void SpriteSound() {
 		sp_sound_set(i, wNumWave1, wNumWave2, wNumWave3);
 	}
 	
-	DEBUG_COMMAND_YET("SACT.SpriteSound %d,%d,%d,%d,%d:", wNumSP, nCount, wNumWave1, wNumWave2, wNumWave3);
+	TRACE("SACT.SpriteSound %d,%d,%d,%d,%d:", wNumSP, nCount, wNumWave1, wNumWave2, wNumWave3);
 }
 
 /**
@@ -1765,7 +1761,7 @@ static void SpriteSound() {
  *   SpriteSoundで設定したすべての音の再生終了まで待つ (~SP_SOUND_WAIT)
  */
 static void SpriteSoundWait() {
-	DEBUG_COMMAND_YET("SACT.SpriteSoundWait:");
+	TRACE("SACT.SpriteSoundWait:");
 
 	sp_sound_wait();
 }
@@ -1780,7 +1776,7 @@ static void SpriteSoundOB() {
 	
 	sp_sound_ob(wNumWave);
 	
-	DEBUG_COMMAND_YET("SACT.SpriteSoundOB %d:", wNumWave);
+	TRACE("SACT.SpriteSoundOB %d:", wNumWave);
 }
 
 /**
@@ -1797,7 +1793,7 @@ static void MusicCheck() {
 	*vRND = dfile ? 1 : 0;
 	ald_freedata(dfile);
 	
-	DEBUG_COMMAND_YET("SACT.MusicCheck %d,%p:", wNum, vRND);
+	TRACE("SACT.MusicCheck %d,%p:", wNum, vRND);
 }
 
 /**
@@ -1812,7 +1808,7 @@ static void MusicGetLength() {
 	
 	*vRND = musbgm_getlen(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.MusicGetLength %d,%d:", wNum, *vRND);
+	TRACE("SACT.MusicGetLength %d,%d:", wNum, *vRND);
 }
 
 /**
@@ -1827,7 +1823,7 @@ static void MusicGetPos() {
 	
 	*vRND = musbgm_getpos(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.MusicGetPos %d,%d:", wNum, *vRND);
+	TRACE("SACT.MusicGetPos %d,%d:", wNum, *vRND);
 }
 
 /**
@@ -1844,7 +1840,7 @@ static void MusicPlay() {
 	
 	musbgm_play(wNum, wFadeTime, wVolume);
 	
-	DEBUG_COMMAND_YET("SACT.MusicPlay %d,%d,%d:", wNum, wFadeTime, wVolume);
+	TRACE("SACT.MusicPlay %d,%d,%d:", wNum, wFadeTime, wVolume);
 }
 
 /**
@@ -1859,7 +1855,7 @@ static void MusicStop() {
 	
 	musbgm_stop(wNum, wFadeTime);
 	
-	DEBUG_COMMAND_YET("SACT.MusicStop %d,%d:", wNum, wFadeTime);
+	TRACE("SACT.MusicStop %d,%d:", wNum, wFadeTime);
 }
 
 /**
@@ -1872,7 +1868,7 @@ static void MusicStopAll() {
 	
 	musbgm_stopall(wFadeTime);
 	
-	DEBUG_COMMAND_YET("SACT.MusicStopAll %d:", wFadeTime);
+	TRACE("SACT.MusicStopAll %d:", wFadeTime);
 }
 
 /**
@@ -1889,7 +1885,7 @@ static void MusicFade() {
 	
 	musbgm_fade(wNum, wFadeTime, wVolume);
 	
-	DEBUG_COMMAND_YET("SACT.MusicFade %d,%d,%d:", wNum, wFadeTime, wVolume);
+	TRACE("SACT.MusicFade %d,%d,%d:", wNum, wFadeTime, wVolume);
 }
 
 /**
@@ -1908,7 +1904,7 @@ static void MusicWait() {
 	
 	musbgm_wait(wNum, nTimeOut);
 	
-	DEBUG_COMMAND_YET("SACT.MusicWait %d,%d:", wNum, nTimeOut);
+	TRACE("SACT.MusicWait %d,%d:", wNum, nTimeOut);
 }
 
 /**
@@ -1921,10 +1917,8 @@ static void MusicWait() {
 static void MusicWaitPos() {
 	int wNum = getCaliValue();
 	int wIndex = getCaliValue();
-	
-	WARNING("SACT.MusicWatiPos not implemented");
-	
-	DEBUG_COMMAND_YET("SACT.MusicWaitPos %d,%d:", wNum, wIndex);
+
+	TRACE_UNIMPLEMENTED("SACT.MusicWaitPos %d,%d:", wNum, wIndex);
 }
 
 /**
@@ -1939,7 +1933,7 @@ static void SoundGetLinkNum() {
 
 	*vRND = ssnd_getlinknum(wNum);
 	
-	DEBUG_COMMAND_YET("SACT.SoundGetLinkNum %d,%p:", wNum, vRND);
+	TRACE("SACT.SoundGetLinkNum %d,%p:", wNum, vRND);
 }
 
 /**
@@ -1964,7 +1958,7 @@ static void ChartPos() {
 	
 	schart_pos(pos, pos1, pos2, val1, val2, val);
 	
-	DEBUG_COMMAND_YET("SACT.ChartPos %p,%d,%d,%d,%d,%d:", pos, pos1, pos2, val1, val2, val);
+	TRACE("SACT.ChartPos %p,%d,%d,%d,%d,%d:", pos, pos1, pos2, val1, val2, val);
 }
 
 /**
@@ -1983,7 +1977,7 @@ static void NumToStr() {
 	
 	sstr_num2str(strno, fig, zeropad, num);
 	
-	DEBUG_COMMAND_YET("SACT.NumToStr %d,%d,%d,%d:", strno, fig, zeropad, num);
+	TRACE("SACT.NumToStr %d,%d,%d,%d:", strno, fig, zeropad, num);
 }
 
 /**
@@ -1993,9 +1987,7 @@ static void Maze_Create() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 
-	WARNING("NOT IMPLEMENTED");
-	
-	DEBUG_COMMAND_YET("SACT.Maze_Create %d,%d:", p1,p2);
+	TRACE_UNIMPLEMENTED("SACT.Maze_Create %d,%d:", p1,p2);
 }
 
 /**
@@ -2005,10 +1997,8 @@ static void Maze_Get() {
 	int *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
-	
-	WARNING("NOT IMPLEMENTED");
-	
-	DEBUG_COMMAND_YET("SACT.Maze_Get %p,%d,%d:", p1,p2,p3);
+
+	TRACE_UNIMPLEMENTED("SACT.Maze_Get %p,%d,%d:", p1,p2,p3);
 }
 
 /**
@@ -2021,7 +2011,7 @@ static void EncryptWORD() {
 
 	scryp_encrypt_word(array, num, key);
 	
-	DEBUG_COMMAND_YET("SACT.EncryptWORD %p,%d,%d:", array, num, key);
+	TRACE("SACT.EncryptWORD %p,%d,%d:", array, num, key);
 }
 
 /**
@@ -2034,7 +2024,7 @@ static void DecryptWORD() {
 
 	scryp_encrypt_word(array, num, key);
 	
-	DEBUG_COMMAND_YET("SACT.DecryptWORD %p,%d,%d:", array, num, key);
+	TRACE("SACT.DecryptWORD %p,%d,%d:", array, num, key);
 }
 
 /**
@@ -2046,7 +2036,7 @@ static void EncryptString() {
 
 	scryp_encrypt_str(p1, p2);
 	
-	DEBUG_COMMAND_YET("SACT.EncryptString %d,%d:", p1,p2);
+	TRACE("SACT.EncryptString %d,%d:", p1,p2);
 }
 
 /**
@@ -2058,7 +2048,7 @@ static void DecryptString() {
 
 	scryp_decrypt_str(p1, p2);
 	
-	DEBUG_COMMAND_YET("SACT.DecryptString %d,%d:", p1,p2);
+	TRACE("SACT.DecryptString %d,%d:", p1,p2);
 }
 
 /**
@@ -2068,7 +2058,7 @@ static void DecryptString() {
 static void XMenuClear() {
 	spxm_clear();
 	
-	DEBUG_COMMAND_YET("SACT.XMenuClear:");
+	TRACE("SACT.XMenuClear:");
 }
 
 /**
@@ -2083,7 +2073,7 @@ static void XMenuRegister() {
 	
 	spxm_register(nRegiNum, nMenuID);
 	
-	DEBUG_COMMAND_YET("SACT.XMenuRegister %d,%d:", nRegiNum, nMenuID);
+	TRACE("SACT.XMenuRegister %d,%d:", nRegiNum, nMenuID);
 }
 
 /**
@@ -2098,7 +2088,7 @@ static void XMenuGetNum() {
 	
 	*vMenuID = spxm_getnum(nRegiNum);
 	
-	DEBUG_COMMAND_YET("SACT.XMenuGetNum %d,%p:", nRegiNum, vMenuID);
+	TRACE("SACT.XMenuGetNum %d,%p:", nRegiNum, vMenuID);
 }
 
 /**
@@ -2113,7 +2103,7 @@ static void XMenuGetText() {
 	
 	spxm_gettext(nRegiNum, strno);
 	
-	DEBUG_COMMAND_YET("SACT.XMenuGetText %d,%d:", nRegiNum, strno);
+	TRACE("SACT.XMenuGetText %d,%d:", nRegiNum, strno);
 }
 
 /**
@@ -2123,7 +2113,7 @@ static void XMenuGetText() {
 static void XMenuTitleRegister() {
 	spxm_titlereg();
 	
-	DEBUG_COMMAND_YET("SACT.XMenuTitleRegister:");
+	TRACE("SACT.XMenuTitleRegister:");
 }
 
 /**
@@ -2136,7 +2126,7 @@ static void XMenuTitleGet() {
 	
 	spxm_titleget(strno);
 	
-	DEBUG_COMMAND_YET("SACT.XMenuTitleGet %d:", strno);
+	TRACE("SACT.XMenuTitleGet %d:", strno);
 }
 
 static void SACT_reset(void) {

@@ -49,7 +49,7 @@ static void GetAtArray(void) { /* 0 */
 	int *vResult = getCaliVariable();
 	int i, j;
 
-	DEBUG_COMMAND("ShArray.GetAtArray %p,%d,%d,%p:", vAry, cnt, type, vResult);
+	TRACE("ShArray.GetAtArray %p,%d,%d,%p:", vAry, cnt, type, vResult);
 	
 	j = *vAry; vAry++;
 	for (i = 1; i < cnt; i++) {
@@ -93,7 +93,7 @@ static void AddAtArray(void) { /* 1 */
 	int cnt    = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AddAtArray %p,%p,%d:", vAry1, vAry2, cnt);
+	TRACE("ShArray.AddAtArray %p,%p,%d:", vAry1, vAry2, cnt);
 	
 	for (i = 0; i < cnt; i++) {
 		int result = (*vAry1) + (*vAry2);
@@ -119,7 +119,7 @@ static void SubAtArray(void) { /* 2 */
 	int cnt    = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.SubAtArray %p,%p,%d:", vAry1, vAry2, cnt);
+	TRACE("ShArray.SubAtArray %p,%p,%d:", vAry1, vAry2, cnt);
 	
 	for (i = 0; i < cnt; i++) {
 		int result = (*vAry1) - (*vAry2);
@@ -145,7 +145,7 @@ static void MulAtArray(void) { /* 3 */
 	int cnt    = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.MulAtArray %p,%p,%d:", vAry1, vAry2, cnt);
+	TRACE("ShArray.MulAtArray %p,%p,%d:", vAry1, vAry2, cnt);
 	
 	for (i = 0; i < cnt; i++) {
 		int result = (*vAry1) * (*vAry2);
@@ -171,7 +171,7 @@ static void DivAtArray(void) { /* 4 */
 	int cnt    = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.DivAtArray: %d,%d,%d:", vAry1, vAry2, cnt);
+	TRACE("ShArray.DivAtArray: %d,%d,%d:", vAry1, vAry2, cnt);
 	
 	for (i = 0; i < cnt; i++) {
 		if (*vAry2 == 0) {
@@ -201,7 +201,7 @@ static void MinAtArray(void) { /* 5 */
 	int cnt    = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.MinAtArray: %d,%d,%d:", vAry1, vAry2, cnt);
+	TRACE("ShArray.MinAtArray: %d,%d,%d:", vAry1, vAry2, cnt);
 	
 	for (i = 0; i < cnt; i++) {
 		if (*vAry1 < *vAry2) {
@@ -224,7 +224,7 @@ static void MaxAtArray(void) { /* 6 */
 	int cnt    = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.MaxAtArray: %d,%d,%d:", vAry1, vAry2, cnt);
+	TRACE("ShArray.MaxAtArray: %d,%d,%d:", vAry1, vAry2, cnt);
 	
 	for (i = 0; i < cnt; i++) {
 		if (*vAry1 > *vAry2) {
@@ -247,7 +247,7 @@ static void AndNumArray(void) { /* 7 */
 	int val   = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AndNumArray: %p,%d,%d:", vAry, cnt, val);
+	TRACE("ShArray.AndNumArray: %p,%d,%d:", vAry, cnt, val);
 	
 	for (i = 0; i < cnt; i++) {
 		(*vAry) &= val;
@@ -268,7 +268,7 @@ static void OrNumArray(void) { /* 8 */
 	int val   = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND_YET("ShArray.OrNumArray: %p,%d,%d:", vAry, cnt, val);
+	TRACE("ShArray.OrNumArray: %p,%d,%d:", vAry, cnt, val);
 	
 	for (i = 0; i < cnt; i++) {
 		(*vAry) |= val;
@@ -289,7 +289,7 @@ static void XorNumArray(void) { /* 9 */
 	int val   = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.XorNumArray %p,%d,%d:", vAry, cnt, val);
+	TRACE("ShArray.XorNumArray %p,%d,%d:", vAry, cnt, val);
 	
 	for (i = 0; i < cnt; i++) {
 		(*vAry) ^= val;
@@ -313,7 +313,7 @@ static void SetEquArray(void) { /* 10 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.SetEquArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
+	TRACE("ShArray.SetEquArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults = (*vAry == val) ? 1 : 0;
@@ -337,7 +337,7 @@ static void SetNotArray(void) { /* 11 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.SetNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
+	TRACE("ShArray.SetNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
 
 	for (i = 0; i < cnt; i++) {
 		*vResults = (*vAry != val) ? 1 : 0;
@@ -360,7 +360,7 @@ static void SetLowArray(void) { /* 12 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.SetLowArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
+	TRACE("ShArray.SetLowArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		(*vResults) = ((*vAry < val) ? 1 : 0);
@@ -383,7 +383,7 @@ static void SetHighArray(void) { /* 13 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.SetHighArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
+	TRACE("ShArray.SetHighArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		(*vResults) = ((*vAry > val) ? 1 : 0);
@@ -410,7 +410,7 @@ static void SetRangeArray(void) { /* 14 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.SetRangeArray %p,%d,%d,%d,%p:", vAry, cnt, min, max, vResults);
+	TRACE("ShArray.SetRangeArray %p,%d,%d,%d,%p:", vAry, cnt, min, max, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults = ((*vAry > min) && (*vAry < max)) ? 1 : 0;
@@ -437,7 +437,7 @@ static void SetAndEquArray(void) { /* 15 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.SetAndEquArray: %p,%d,%d,%d,%p:", vAry, mask, cnt, val, vResults);
+	TRACE("ShArray.SetAndEquArray: %p,%d,%d,%d,%p:", vAry, mask, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults = ((*vAry & mask) == val) ? 1 : 0;
@@ -461,7 +461,7 @@ static void AndEquArray(void) { /* 16 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AndEquArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
+	TRACE("ShArray.AndEquArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults &= ((*vAry == val) ? 1 : 0);
@@ -485,7 +485,7 @@ static void AndNotArray(void) { /* 17 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AndNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
+	TRACE("ShArray.AndNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults &= ((*vAry != val) ? 1 : 0);
@@ -509,7 +509,7 @@ static void AndLowArray(void) { /* 18 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AndLowArray: %d,%d,%d,%d:", vAry, cnt, min, vResults);
+	TRACE("ShArray.AndLowArray: %d,%d,%d,%d:", vAry, cnt, min, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults &= ((*vAry < min) ? 1 : 0);
@@ -533,7 +533,7 @@ static void AndHighArray(void) { /* 19 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AndHighArray: %p,%d,%d,%p:", vAry, cnt, max, vResults);
+	TRACE("ShArray.AndHighArray: %p,%d,%d,%p:", vAry, cnt, max, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults &= ((*vAry > max) ? 1 : 0);
@@ -559,7 +559,7 @@ static void AndRangeArray(void) { /* 20 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AndRangeArray %d,%d,%d,%d,%d:", vAry, cnt, min, max, vResults);
+	TRACE("ShArray.AndRangeArray %d,%d,%d,%d,%d:", vAry, cnt, min, max, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		*vResults &= (((*vAry > min) && (*vAry < max)) ? 1 : 0);
@@ -586,7 +586,7 @@ static void AndAndEquArray(void) { /* 21 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.AndAndEquArray: %d,%d,%d,%d,%d:", vAry, mask, cnt, val, vResults);
+	TRACE("ShArray.AndAndEquArray: %d,%d,%d,%d,%d:", vAry, mask, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		(*vResults) &= (((*vAry & mask) == val) ? 1 : 0);
@@ -600,7 +600,7 @@ static void OrEquArray(void) { /* 22 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.OrEquArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.OrEquArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void OrNotArray(void) { /* 23 */
@@ -618,7 +618,7 @@ static void OrNotArray(void) { /* 23 */
 	int *vResults = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.OrNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
+	TRACE("ShArray.OrNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
 	
 	for (i = 0; i < cnt; i++) {
 		// if (*vAry != val) *vResults = 1;
@@ -633,7 +633,7 @@ static void OrLowArray(void) { /* 24 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.OrLowArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.OrLowArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void OrHighArray(void) { /* 25 */
@@ -642,7 +642,7 @@ static void OrHighArray(void) { /* 25 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.OrHighArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.OrHighArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void OrRangeArray(void) { /* 26 */
@@ -652,7 +652,7 @@ static void OrRangeArray(void) { /* 26 */
 	int p4 = getCaliValue();
 	int p5 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.OrRangeArray: %d,%d,%d,%d,%d:", p1, p2, p3, p4,p5);
+	TRACE_UNIMPLEMENTED("ShArray.OrRangeArray: %d,%d,%d,%d,%d:", p1, p2, p3, p4,p5);
 }
 
 static void OrAndEquArray(void) { /* 27 */
@@ -662,7 +662,7 @@ static void OrAndEquArray(void) { /* 27 */
 	int p4 = getCaliValue();
 	int p5 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.OrAndEquArray: %d,%d,%d,%d,%d:", p1, p2, p3, p4,p5);
+	TRACE_UNIMPLEMENTED("ShArray.OrAndEquArray: %d,%d,%d,%d,%d:", p1, p2, p3, p4,p5);
 }
 
 static void EnumEquArray(void) { /* 28 */
@@ -680,7 +680,7 @@ static void EnumEquArray(void) { /* 28 */
 	int *vResult = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.EnumEquArray %p,%d,%d,%p:", vAry, cnt, val, vResult);
+	TRACE("ShArray.EnumEquArray %p,%d,%d,%p:", vAry, cnt, val, vResult);
 	
 	*vResult = 0;
 	
@@ -698,7 +698,7 @@ static void EnumEquArray2(void) { /* 29 */
 	int p5 = getCaliValue();
 	int p6 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.EnumEquArray2: %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
+	TRACE_UNIMPLEMENTED("ShArray.EnumEquArray2: %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
 }
 
 static void EnumEquNotArray2(void) { /* 30 */
@@ -721,7 +721,7 @@ static void EnumEquNotArray2(void) { /* 30 */
 	int *vResult = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.EnumEquNotArray2 %p,%p,%d,%d,%d,%p:", vAry1, vAry2, cnt, val1, val2, vResult);
+	TRACE("ShArray.EnumEquNotArray2 %p,%p,%d,%d,%d,%p:", vAry1, vAry2, cnt, val1, val2, vResult);
 	
 	*vResult = 0;
 	
@@ -748,7 +748,7 @@ static void EnumNotArray(void) { /* 31 */
 	int *vResult = getCaliVariable();
 	int i;
 
-	DEBUG_COMMAND("ShArray.EnumNotArray %p, %d, %d, %p:", vAry, cnt, val, vResult);
+	TRACE("ShArray.EnumNotArray %p, %d, %d, %p:", vAry, cnt, val, vResult);
 	
 	*vResult = 0;
 	
@@ -768,7 +768,7 @@ static void EnumNotArray2(void) { /* 32 */
 	int p5 = getCaliValue();
 	int p6 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.EnumNotArray2: %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
+	TRACE_UNIMPLEMENTED("ShArray.EnumNotArray2: %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
 }
 
 static void EnumLowArray(void) { /* 33 */
@@ -777,7 +777,7 @@ static void EnumLowArray(void) { /* 33 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShArray.EnumLowArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.EnumLowArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void EnumHighArray(void) { /* 34 */
@@ -786,7 +786,7 @@ static void EnumHighArray(void) { /* 34 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShArray.EnumHighArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.EnumHighArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void EnumRangeArray(void) { /* 35 */
@@ -806,7 +806,7 @@ static void EnumRangeArray(void) { /* 35 */
 	int *vResult = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.EnumRangeArray %d,%d,%d,%d,%d:", vAry, cnt, min, max, vResult);
+	TRACE("ShArray.EnumRangeArray %d,%d,%d,%d,%d:", vAry, cnt, min, max, vResult);
 	
 	*vResult = 0;
 	
@@ -837,7 +837,7 @@ static void GrepEquArray(void) { /* 36 */
 	int *vResult = getCaliVariable();
 	int i;
 
-	DEBUG_COMMAND("ShArray.GrepEquArray  %p,%d,%d,%p,%p:", vAry, cnt, val, vMatch, vResult);
+	TRACE("ShArray.GrepEquArray  %p,%d,%d,%p,%p:", vAry, cnt, val, vMatch, vResult);
 	
 	*vResult = 0;
 	
@@ -869,7 +869,7 @@ static void GrepNotArray(void) { /* 37 */
 	int *vResult = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.GrepNotArray %p,%d,%d,%p,%p:", vAry, cnt, val, vMatch, vResult);
+	TRACE("ShArray.GrepNotArray %p,%d,%d,%p,%p:", vAry, cnt, val, vMatch, vResult);
 	
 	*vResult = 0;
 	
@@ -892,7 +892,7 @@ static void GrepEquArray2(void) { /* 38 */
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.GrepEquArray2: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShArray.GrepEquArray2: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
 }
 
 static void GrepNotArray2(void) { /* 39 */
@@ -904,7 +904,7 @@ static void GrepNotArray2(void) { /* 39 */
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.GrepNotArray2: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShArray.GrepNotArray2: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
 }
 
 static void GrepEquNotArray2(void) { /* 40 */
@@ -916,7 +916,7 @@ static void GrepEquNotArray2(void) { /* 40 */
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShArray.GrepEquNotArray2: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShArray.GrepEquNotArray2: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6, p7);
 }
 
 static void GrepLowArray(void) { /* 41 */
@@ -937,7 +937,7 @@ static void GrepLowArray(void) { /* 41 */
 	int *vResult = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.GrepLowArray: %p,%d,%d,%p,%p:", vAry, cnt, min, vMatch, vResult);
+	TRACE("ShArray.GrepLowArray: %p,%d,%d,%p,%p:", vAry, cnt, min, vMatch, vResult);
 	
 	*vResult = 0;
 	
@@ -969,7 +969,7 @@ static void GrepHighArray(void) { /* 42 */
 	int *vResult = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.GrepHighArray: %p,%d,%d,%p,%p:", vAry, cnt, max, vMatch, vResult);
+	TRACE("ShArray.GrepHighArray: %p,%d,%d,%p,%p:", vAry, cnt, max, vMatch, vResult);
 	
 	*vResult = 0;
 	
@@ -1003,7 +1003,7 @@ static void GrepRangeArray(void) { /* 43 */
 	int *vResult    = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.GrepRangeArray %p,%d,%d,%d,%p,%p:", vAry, cnt, max, min, vMatch, vResult);
+	TRACE("ShArray.GrepRangeArray %p,%d,%d,%d,%p,%p:", vAry, cnt, max, min, vMatch, vResult);
 	
 	*vResult = 0;
 	
@@ -1040,7 +1040,7 @@ static void GrepLowOrderArray(void) { /* 44 */
 	int *vResult    = getCaliVariable();
 	int i, j, k = 0;
 	
-	DEBUG_COMMAND("ShArray.GrepLowOrderArray %p,%d,%d,%d,%p,%p,%p:", vAry, cnt, min, max, v1, vLastMatch, vResult);
+	TRACE("ShArray.GrepLowOrderArray %p,%d,%d,%d,%p,%p,%p:", vAry, cnt, min, max, v1, vLastMatch, vResult);
 	
 	*vResult = 0;
 	for (i = 0; i < cnt; i++) {
@@ -1091,7 +1091,7 @@ static void GrepHighOrderArray(void) { /* 45 */
 	int *vResult    = getCaliVariable();
 	int i, j, k = 0;
 	
-	DEBUG_COMMAND("ShArray.GrepHighOrderArray %p,%d,%d,%d,%p,%p,%p:", vAry, cnt, min, max, v1, vLastMatch, vResult);
+	TRACE("ShArray.GrepHighOrderArray %p,%d,%d,%d,%p,%p,%p:", vAry, cnt, min, max, v1, vLastMatch, vResult);
 	
 	*vResult = 0;
 	for (i = 0; i < cnt; i++) {
@@ -1125,7 +1125,7 @@ static void ChangeEquArray(void) { /* 46 */
 	int dst = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.ChangeEquArray: %d,%d,%d,%d:", vAry, cnt, src, dst);
+	TRACE("ShArray.ChangeEquArray: %d,%d,%d,%d:", vAry, cnt, src, dst);
 	
 	for (i = 0; i < cnt; i++) {
 		if (*vAry == src) {
@@ -1141,7 +1141,7 @@ static void ChangeNotArray(void) { /* 47 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShArray.ChangeNotArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.ChangeNotArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void ChangeLowArray(void) { /* 48 */
@@ -1150,7 +1150,7 @@ static void ChangeLowArray(void) { /* 48 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShArray.ChangeLowArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.ChangeLowArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void ChangeHighArray(void) { /* 49 */
@@ -1159,7 +1159,7 @@ static void ChangeHighArray(void) { /* 49 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShArray.ChangeHighArray: %d,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE_UNIMPLEMENTED("ShArray.ChangeHighArray: %d,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void ChangeRangeArray(void) { /* 50 */
@@ -1179,7 +1179,7 @@ static void ChangeRangeArray(void) { /* 50 */
 	int val   = getCaliValue();
 	int i;
 	
-	DEBUG_COMMAND("ShArray.ChangeRangeArray %p,%d,%d,%d,%d:", vAry, cnt, min, max, val);
+	TRACE("ShArray.ChangeRangeArray %p,%d,%d,%d,%d:", vAry, cnt, min, max, val);
 	
 	for (i = 0; i < cnt; i++) {
 		if ((*vAry > min) && (*vAry < max)) {
@@ -1212,7 +1212,7 @@ static void CopyArrayToRect(void) { /* 51 */
 	int dh    = getCaliValue();
 	int x, y;
 
-	DEBUG_COMMAND("ShArray.CopyArrayToRect %p,%d,%d,%d,%d,%p,%d,%d:", vSrc, sw, sh, sx, sy, vDst, dw, dh);
+	TRACE("ShArray.CopyArrayToRect %p,%d,%d,%d,%d,%p,%d,%d:", vSrc, sw, sh, sx, sy, vDst, dw, dh);
 	
 	vSrc += (sy * sw + sx);
 	for (y = 0; y < dh; y++) {
@@ -1246,7 +1246,7 @@ static void CopyRectToArray(void) { /* 52 */
 	int dy    = getCaliValue();
 	int x, y;
 	
-	DEBUG_COMMAND("ShArray.CopyRectToArray %p,%d,%d,%p,%d,%d,%d,%d:", vSrc, sw, sh, vDst, dw, dh, dx, dy);
+	TRACE("ShArray.CopyRectToArray %p,%d,%d,%p,%d,%d,%d,%d:", vSrc, sw, sh, vDst, dw, dh, dx, dy);
 	
 	vDst += (dy * dw + dx);
 	for (y = 0; y < sh; y++) {
@@ -1272,7 +1272,7 @@ static void ChangeSecretArray(void) { /* 53 */
 	int *vResult = getCaliVariable();
 	static uint16_t key[4] = { 0x7A7A, 0xADAD, 0xBCBC, 0xCECE }; /* key */
 	
-	DEBUG_COMMAND("ShArray.ChangeSecretArray %p,%d,%d,%p:", vAry, cnt, type, vResult);
+	TRACE("ShArray.ChangeSecretArray %p,%d,%d,%p:", vAry, cnt, type, vResult);
 	
 	*vResult = 0;
 	

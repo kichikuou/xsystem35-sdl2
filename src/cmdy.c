@@ -155,5 +155,5 @@ void commandY() {
 		WARNING("Y undefined command %d", p1);
 		break;
 	}
-	DEBUG_COMMAND("Y %d,%d:",p1,p2);
+	TRACE("Y %d,%d:",p1,p2);
 }

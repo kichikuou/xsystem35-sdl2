@@ -42,7 +42,7 @@ void commandQD() {
 	
 	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	DEBUG_COMMAND("QD %d:",num);
+	TRACE("QD %d:",num);
 }
 
 void commandQP() {
@@ -60,7 +60,7 @@ void commandQP() {
 	
 	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	DEBUG_COMMAND("QP %d,%d,%d:", num, point.var, cnt);
+	TRACE("QP %d,%d,%d:", num, point.var, cnt);
 }
 
 void commandQC() {
@@ -76,7 +76,7 @@ void commandQC() {
 	
 	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	DEBUG_COMMAND("QC %d,%d:",num1,num2);
+	TRACE("QC %d,%d:",num1,num2);
 }
 
 void commandQE() {
@@ -107,5 +107,5 @@ void commandQE() {
 	free(fname_utf8);
 	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	DEBUG_COMMAND("QE %d,%s,%d,%d:", type, filename, var, cnt);
+	TRACE("QE %d,%s,%d,%d:", type, filename, var, cnt);
 }

@@ -35,7 +35,7 @@ void commandWW() {
 	
 	ags_setWorldSize(x_size, y_size, color);
 	
-        DEBUG_COMMAND("WW %d,%d,%d:",x_size, y_size, color);
+        TRACE("WW %d,%d,%d:",x_size, y_size, color);
 }
 
 void commandWV() {
@@ -48,7 +48,7 @@ void commandWV() {
 	ags_setViewArea(start_x, start_y, size_x, size_y);
 	ags_updateFull();
 	
-	DEBUG_COMMAND("WV %d,%d,%d,%d:",start_x,start_y,size_x, size_y);
+	TRACE("WV %d,%d,%d,%d:",start_x,start_y,size_x, size_y);
 }
 
 void commandWZ() {
@@ -70,7 +70,7 @@ void commandWZ() {
 	default:
 		break;
 	}
-	DEBUG_COMMAND("WZ %d,%d:", p1, sw);
+	TRACE("WZ %d,%d:", p1, sw);
 }
 
 void commandWX() {
@@ -83,5 +83,5 @@ void commandWX() {
 	ags_setExposeSwitch(TRUE);
 	ags_updateArea(x0, y0, cx, cy);
 	
-	DEBUG_COMMAND("WX %d,%d,%d,%d:", x0, y0, cx, cy);
+	TRACE("WX %d,%d,%d,%d:", x0, y0, cx, cy);
 }

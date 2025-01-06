@@ -66,13 +66,13 @@ static fncall_table fnctbl[FCTBL_MAX];
 void commands2F00() {
 	/* テキストカラーをスタックからポップして設定する */
 	sl_popState(STACK_TEXTCOLOR);
-	DEBUG_COMMAND("TOC:");
+	TRACE("TOC:");
 }
 
 void commands2F01() {
 	/* テキストフォントサイズをスタックからポップして設定する */
 	sl_popState(STACK_TEXTSIZE);
-	DEBUG_COMMAND("TOS:");
+	TRACE("TOS:");
 }
 
 void commands2F02() {
@@ -83,7 +83,7 @@ void commands2F02() {
 	case 1: sl_pushTextColor(type, nact->sel.MsgFontColor); break;
 	default: WARNING("TPC: unknown type %d", type); break;
 	}
-	DEBUG_COMMAND("TPC %d", exp);
+	TRACE("TPC %d", exp);
 }
 
 void commands2F03() {
@@ -94,13 +94,13 @@ void commands2F03() {
 	case 1: sl_pushTextSize(type, nact->sel.MsgFontSize); break;
 	default: WARNING("TPS: unknown type %d", type); break;
 	}
-	DEBUG_COMMAND("TPS %d", exp);
+	TRACE("TPS %d", exp);
 }
 
 void commands2F04() {
 	/* テキスト表示位置をスタックからポップして設定する */
 	sl_popState(STACK_TEXTLOC);
-	DEBUG_COMMAND("TOP:");
+	TRACE("TOP:");
 }
 
 void commands2F05() {
@@ -108,7 +108,7 @@ void commands2F05() {
 	MyPoint loc;
 	msg_getMessageLocation(&loc);
 	sl_pushTextLoc(loc.x, loc.y);
-	DEBUG_COMMAND("TPP:");
+	TRACE("TPP:");
 }
 
 void commands2F08() {
@@ -117,7 +117,7 @@ void commands2F08() {
 	
 	ags_setAntialiasedStringMode(exp == 1);
 	
-	DEBUG_COMMAND("TAA %d:", exp);
+	TRACE("TAA %d:", exp);
 }
 
 void commands2F09() {
@@ -126,7 +126,7 @@ void commands2F09() {
 
 	*var = ags_getAntialiasedStringMode() ? 1 : 0;
 	
-	DEBUG_COMMAND("TAB %d:", *var);
+	TRACE("TAB %d:", *var);
 }
 
 void commands2F0A() {
@@ -136,7 +136,7 @@ void commands2F0A() {
 
 	mus_wav_load(eCh, eLinkNum);
 	
-	DEBUG_COMMAND("wavLoad %d, %d:", eCh, eLinkNum);
+	TRACE("wavLoad %d, %d:", eCh, eLinkNum);
 }
 
 void commands2F0B() {
@@ -146,7 +146,7 @@ void commands2F0B() {
 
 	mus_wav_play(eCh, eLoopFlag);
 	
-	DEBUG_COMMAND("wavPlay %d, %d", eCh, eLoopFlag);
+	TRACE("wavPlay %d, %d", eCh, eLoopFlag);
 }
 
 void commands2F0C() {
@@ -154,7 +154,7 @@ void commands2F0C() {
 	
 	mus_wav_stop(eCh);
 	
-	DEBUG_COMMAND("wavStop %d", eCh);
+	TRACE("wavStop %d", eCh);
 }
 
 void commands2F0D() {
@@ -162,7 +162,7 @@ void commands2F0D() {
 	
 	mus_wav_unload(eCh);
 	
-	DEBUG_COMMAND("wavUnload %d:", eCh);
+	TRACE("wavUnload %d:", eCh);
 }
 
 void commands2F0E() {
@@ -172,7 +172,7 @@ void commands2F0E() {
 	
 	*vResult = ((pos == 0 || pos == 65535) ? 0 : 1);
 	
-	DEBUG_COMMAND("wavIsPlay %d, %d:", eCh, *vResult);
+	TRACE("wavIsPlay %d, %d:", eCh, *vResult);
 }
 
 void commands2F0F() {
@@ -183,7 +183,7 @@ void commands2F0F() {
 
 	mus_wav_fadeout_start(eCh, eTime, eVolume, eStopFlag);
 	
-	DEBUG_COMMAND("wavFade %d, %d, %d, %d:", eCh, eTime, eVolume, eStopFlag);
+	TRACE("wavFade %d, %d, %d, %d:", eCh, eTime, eVolume, eStopFlag);
 }
 
 void commands2F10() {
@@ -192,7 +192,7 @@ void commands2F10() {
 	
 	*vResult = (mus_wav_fadeout_get_state(eCh) ? 1 : 0);
 	
-	DEBUG_COMMAND("wavIsFade %d, %d:", eCh, *vResult);
+	TRACE("wavIsFade %d, %d:", eCh, *vResult);
 }
 
 void commands2F11() {
@@ -200,13 +200,13 @@ void commands2F11() {
 
 	mus_wav_fadeout_stop(eCh);
 	
-	DEBUG_COMMAND("wavStopFade %d:", eCh);
+	TRACE("wavStopFade %d:", eCh);
 }
 
 void commands2F12() {
 	const char *sText = sl_getString(0);
 	
-	DEBUG_COMMAND("trace %s:", sText);
+	TRACE("trace %s:", sText);
 
 }
 
@@ -216,11 +216,11 @@ void commands2F13() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DSetPos %d, %d, %d, %d:", eCh, eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DSetPos %d, %d, %d, %d:", eCh, eX, eY, eZ);
 }
 
 void commands2F14() {
-	DEBUG_COMMAND_YET("wav3DCommit:");
+	TRACE_UNIMPLEMENTED("wav3DCommit:");
 }
 
 void commands2F15() {
@@ -232,7 +232,7 @@ void commands2F15() {
 	*eX = 0;
 	*eY = 0;
 	*eZ = 0;
-	DEBUG_COMMAND_YET("wav3DGetPos %d, %d, %d, %d:", eCh, *eX, *eY, *eZ);
+	TRACE_UNIMPLEMENTED("wav3DGetPos %d, %d, %d, %d:", eCh, *eX, *eY, *eZ);
 }
 
 void commands2F16() {
@@ -240,7 +240,7 @@ void commands2F16() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 	
-	DEBUG_COMMAND_YET("wav3DSetPosL %d, %d, %d:", eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DSetPosL %d, %d, %d:", eX, eY, eZ);
 }
 
 void commands2F17() {
@@ -251,7 +251,7 @@ void commands2F17() {
 	*vX = 0;
 	*vY = 0;
 	*vZ = 0;
-	DEBUG_COMMAND_YET("wav3DGetPosL %d, %d, %d:%s", *vX, *vY, *vZ);
+	TRACE_UNIMPLEMENTED("wav3DGetPosL %d, %d, %d:%s", *vX, *vY, *vZ);
 }
 
 void commands2F18() {
@@ -261,7 +261,7 @@ void commands2F18() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DFadePos %d, %d, %d, %d, %d:", eCh, eTime, eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DFadePos %d, %d, %d, %d, %d:", eCh, eTime, eX, eY, eZ);
 }
 
 void commands2F19() {
@@ -269,13 +269,13 @@ void commands2F19() {
 	int *vResult = getCaliVariable();
 
 	*vResult = 0;
-	DEBUG_COMMAND_YET("wav3DIsFadePos %d, %d:", eCh, *vResult);
+	TRACE_UNIMPLEMENTED("wav3DIsFadePos %d, %d:", eCh, *vResult);
 }
 
 void commands2F1A() {
 	int eCh = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DStopFadePos %d:", eCh);
+	TRACE_UNIMPLEMENTED("wav3DStopFadePos %d:", eCh);
 }
 
 void commands2F1B() {
@@ -284,18 +284,18 @@ void commands2F1B() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DFadePosL %d, %d, %d, %d:", eTime, eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DFadePosL %d, %d, %d, %d:", eTime, eX, eY, eZ);
 }
 
 void commands2F1C() {
 	int *vResult = getCaliVariable();
 	
 	*vResult = 0;
-	DEBUG_COMMAND_YET("wav3DIsFadePosL %d:", *vResult);
+	TRACE_UNIMPLEMENTED("wav3DIsFadePosL %d:", *vResult);
 }
 
 void commands2F1D() {
-	DEBUG_COMMAND_YET("wav3DStopFadePosL");
+	TRACE_UNIMPLEMENTED("wav3DStopFadePosL");
 }
 
 void commands2F1E() {
@@ -306,13 +306,13 @@ void commands2F1E() {
 		mus_pcm_start(eLinkNum , eLoop);
 	}
 	
-	DEBUG_COMMAND("sndPlay %d, %d:", eLinkNum, eLoop);
+	TRACE("sndPlay %d, %d:", eLinkNum, eLoop);
 }
 
 void commands2F1F() {
 	mus_pcm_stop(0);
 	
-	DEBUG_COMMAND("sndStop:");
+	TRACE("sndStop:");
 }
 
 void commands2F20() {
@@ -320,7 +320,7 @@ void commands2F20() {
 	
 	mus_pcm_get_playposition(vResult);
 	
-	DEBUG_COMMAND("sndIsPlay %d:", *vResult);
+	TRACE("sndIsPlay %d:", *vResult);
 }
 
 void commands2F21() {
@@ -338,7 +338,7 @@ void commands2F23() {
 	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
 	free(fname_utf8);
 	
-	DEBUG_COMMAND("LC(new) %d, %d, %s:", x, y, vFileName);
+	TRACE("LC(new) %d, %d, %s:", x, y, vFileName);
 }
 
 void commands2F24() {
@@ -368,7 +368,7 @@ void commands2F24() {
 	}
 	free(fname_utf8);
 	
-	DEBUG_COMMAND("LE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
+	TRACE("LE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
 }
 
 void commands2F25() {
@@ -376,7 +376,7 @@ void commands2F25() {
 	const char *title = sl_getString(0);
 	const char *filter = sl_getString(0);
 
-	DEBUG_COMMAND_YET("LXG %d, %s, %s:", file_name, title, filter);
+	TRACE_UNIMPLEMENTED("LXG %d, %s, %s:", file_name, title, filter);
 }
 
 void commands2F26() {
@@ -407,7 +407,7 @@ void commands2F26() {
 	free(t2);
 	free(t3);
 	
-	DEBUG_COMMAND("MI(new) %d, %d, %s:", dst_no, max_len, title);
+	TRACE("MI(new) %d, %d, %s:", dst_no, max_len, title);
 }
 
 void commands2F27() {
@@ -415,7 +415,7 @@ void commands2F27() {
 	const char *string = sl_getString(0);
 
 	svar_set(num, string);
-	DEBUG_COMMAND("MS(new) %d, %s:", num, string);
+	TRACE("MS(new) %d, %s:", num, string);
 }
 
 void commands2F28() {
@@ -429,7 +429,7 @@ void commands2F28() {
 
 	enable_hack_by_title(nact->game_title_utf8);
 
-	DEBUG_COMMAND("MT(new) %s:",title);
+	TRACE("MT(new) %s:",title);
 }
 
 /* defined in cmdn.c */
@@ -444,7 +444,7 @@ void commands2F29() {
 	t = toUTF8(title);
 	ni_param.title = t;
 	
-	DEBUG_COMMAND("NT(new) %s:", title);
+	TRACE("NT(new) %s:", title);
 }
 
 void commands2F2A() {
@@ -474,7 +474,7 @@ void commands2F2A() {
 	}
 	free(fname_utf8);
 
-	DEBUG_COMMAND("QE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
+	TRACE("QE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
 }
 
 void commands2F2B() {
@@ -482,7 +482,7 @@ void commands2F2B() {
 	const char *work_dir = sl_getString(0);
 	const char *file_name = sl_getString(0);
 
-	DEBUG_COMMAND_YET("UP(new) %d, %s, %s:", type, work_dir, file_name);
+	TRACE_UNIMPLEMENTED("UP(new) %d, %s, %s:", type, work_dir, file_name);
 }
 
 void commands2F2D() {
@@ -492,7 +492,7 @@ void commands2F2D() {
 	/* 該当する eCh が演奏中の場合 eTime だけ wait をいれる */
 	mus_wav_waittime(eCh, eTime);
 	
-	DEBUG_COMMAND("wavWaitTime %d, %d:", eCh, eTime);
+	TRACE("wavWaitTime %d, %d:", eCh, eTime);
 }
 
 void commands2F2E() {
@@ -501,7 +501,7 @@ void commands2F2E() {
 	
 	*vTime = mus_wav_get_playposition(eCh);
 	
-	DEBUG_COMMAND("wavGetPlayPos %d, %d:", eCh, *vTime);
+	TRACE("wavGetPlayPos %d, %d:", eCh, *vTime);
 }
 
 void commands2F2F() {
@@ -511,7 +511,7 @@ void commands2F2F() {
 	/* ただし、無限ループの場合は１回目終了時まで */
 	mus_wav_waitend(eCh);
 	
-	DEBUG_COMMAND("wavWaitEnd %d:", eCh);
+	TRACE("wavWaitEnd %d:", eCh);
 }
 
 void commands2F30() {
@@ -520,7 +520,7 @@ void commands2F30() {
 	
 	*vTime = mus_wav_wavtime(eCh);
 	
-	DEBUG_COMMAND("wavGetWavTime %d, %d:", eCh, *vTime);
+	TRACE("wavGetWavTime %d, %d:", eCh, *vTime);
 }
 
 void commands2F31() {
@@ -528,7 +528,7 @@ void commands2F31() {
 	int fIndex = sl_getaddr();
 	
 	sel_setCallback(1, fPage, fIndex);
-	DEBUG_COMMAND("menuSetCbkSelect page=%d, index=%x:", fPage, fIndex);
+	TRACE("menuSetCbkSelect page=%d, index=%x:", fPage, fIndex);
 }
 
 void commands2F32() {
@@ -536,24 +536,24 @@ void commands2F32() {
 	int fIndex = sl_getaddr();
 	
 	sel_setCallback(2, fPage, fIndex);
-	DEBUG_COMMAND("menuSetCbkCancel page=%d, index=%x:", fPage, fIndex);
+	TRACE("menuSetCbkCancel page=%d, index=%x:", fPage, fIndex);
 }
 
 void commands2F33() {
 	sel_setCallback(1, 0, 0);
-	DEBUG_COMMAND("menuClearCbkSelect:");
+	TRACE("menuClearCbkSelect:");
 }
 
 void commands2F34() {
 	sel_setCallback(2, 0, 0);
-	DEBUG_COMMAND("menuClearCbkCancel:");
+	TRACE("menuClearCbkCancel:");
 }
 
 void commands2F35() {
 	int eCh = getCaliValue();
 	int eMode = getCaliValue();
 	
-	DEBUG_COMMAND_YET("wav3DSetMode %d, %d:", eCh, eMode);
+	TRACE_UNIMPLEMENTED("wav3DSetMode %d, %d:", eCh, eMode);
 }
 
 void commands2F36() {
@@ -571,7 +571,7 @@ void commands2F36() {
 			   eDestX, eDestY, eDestWidth, eDestHeight, 0);
 	ags_updateArea(eDestX, eDestY, eDestWidth, eDestHeight);
 	
-	DEBUG_COMMAND("grCopyStrerch %d, %d, %d, %d, %d, %d, %d, %d, %d:",
+	TRACE("grCopyStrerch %d, %d, %d, %d, %d, %d, %d, %d, %d:",
 		      eDestX, eDestY, eDestWidth, eDestHeight,
 		      eSrcX, eSrcY, eSrcWidth, eSrcHeight, eMode);
 }
@@ -583,13 +583,13 @@ void commands2F37() {
 	int eHeight = getCaliValue();
 	int eType   = getCaliValue();
 	
-	DEBUG_COMMAND_YET("grFilterRect %d, %d, %d, %d, %d:",
+	TRACE_UNIMPLEMENTED("grFilterRect %d, %d, %d, %d, %d:",
 			  eX, eY, eWidth, eHeight, eType);
 }
 
 void commands2F38() {
 	sys_clearWheelInfo();
-	DEBUG_COMMAND("iptClearWheelCount:");
+	TRACE("iptClearWheelCount:");
 }
 
 void commands2F39() {
@@ -597,21 +597,21 @@ void commands2F39() {
 	int *vBack = getCaliVariable();
 	
 	sys_getWheelInfo(vForward, vBack);
-	DEBUG_COMMAND("iptGetWheelCount %d, %d:", *vForward, *vBack);
+	TRACE("iptGetWheelCount %d, %d:", *vForward, *vBack);
 }
 
 void commands2F3A() {
 	int *vSize = getCaliVariable();
 
 	*vSize = nact->sel.MsgFontSize;
-	DEBUG_COMMAND("menuGetFontSize %d:", *vSize);
+	TRACE("menuGetFontSize %d:", *vSize);
 }
 
 void commands2F3B() {
 	int *vSize = getCaliVariable();
 	
 	*vSize = nact->msg.MsgFontSize;
-	DEBUG_COMMAND("msgGetFontSize %d:", *vSize);
+	TRACE("msgGetFontSize %d:", *vSize);
 }	
 
 void commands2F3C() {
@@ -621,7 +621,7 @@ void commands2F3C() {
 	
 	*vResult = svar_getCharType(eNum, ePos);
 	
-	DEBUG_COMMAND("strGetCharType %d, %d, %d:", eNum, ePos, *vResult);
+	TRACE("strGetCharType %d, %d, %d:", eNum, ePos, *vResult);
 }
 
 void commands2F3D() {
@@ -630,17 +630,17 @@ void commands2F3D() {
 	
 	*vResult = svar_width(eNum);
 
-	DEBUG_COMMAND("strGetLengthASCII %d, %d:", eNum, *vResult);
+	TRACE("strGetLengthASCII %d, %d:", eNum, *vResult);
 }
 
 void commands2F3E() {
 	// no-op
-	DEBUG_COMMAND("sysWinMsgLock:");
+	TRACE("sysWinMsgLock:");
 }
 
 void commands2F3F() {
 	// no-op
-	DEBUG_COMMAND("sysWinMsgUnlock:");
+	TRACE("sysWinMsgUnlock:");
 }
 
 void commands2F40() {
@@ -650,7 +650,7 @@ void commands2F40() {
 	int *vResult = getCaliVariable();
 	int cnt = 0;
 	
-	DEBUG_COMMAND("aryCmpCount %d, %d, %d, %d:", *vAry, eCount, eNum, *vResult);
+	TRACE("aryCmpCount %d, %d, %d, %d:", *vAry, eCount, eNum, *vResult);
 	
 	while(eCount--) {
 		if (*vAry == eNum) cnt++;
@@ -668,7 +668,7 @@ void commands2F41() {
 	int *vResult = getCaliVariable();
 	int cnt = 0;
 	
-	DEBUG_COMMAND("aryCmpTrans %d, %d, %d, %d, %d, %d:", 
+	TRACE("aryCmpTrans %d, %d, %d, %d, %d, %d:", 
 		      *vAry, eNumof, eNum, eTransNum, eMaxTrans, *vResult);
 	
 	while(eNumof--) {
@@ -693,7 +693,7 @@ void commands2F42() {
 	int eSrcRate  = getCaliValue();
 	int eType     = getCaliValue();
 
-	DEBUG_COMMAND_YET("grBlendColorRect %d, %d, %d, %d, %d, %d, %d, %d, %d:",
+	TRACE_UNIMPLEMENTED("grBlendColorRect %d, %d, %d, %d, %d, %d, %d, %d, %d:",
 			  eDestX, eDestY, eWidth, eHeight, eDestRate,
 			  eSrcX, eSrcY, eSrcRate, eType);
 }
@@ -707,7 +707,7 @@ void commands2F43() {
 	sdl_fillCircle(eX, eY, eLength, eColor);
 	ags_updateArea(eX, eY, eLength, eLength);
 
-	DEBUG_COMMAND("grDrawFillCircle %d, %d, %d, %d:", eX, eY, eLength, eColor);
+	TRACE("grDrawFillCircle %d, %d, %d, %d:", eX, eY, eLength, eColor);
 }
 
 void commands2F44() {
@@ -718,7 +718,7 @@ void commands2F44() {
 
 	svar_set(num1, format_number(num2, fig, buf));
 	
-	DEBUG_COMMAND("MHH %d, %d, %d:", num1, fig, num2);
+	TRACE("MHH %d, %d, %d:", num1, fig, num2);
 }
 
 void commands2F45() {
@@ -728,12 +728,12 @@ void commands2F45() {
 	cb_sel_init_page    = fPage;
 	cb_sel_init_address = fIndex;
 	
-	DEBUG_COMMAND("menuSetCbkInit page=%d, index=%x:", fPage, fIndex);
+	TRACE("menuSetCbkInit page=%d, index=%x:", fPage, fIndex);
 }
 
 void commands2F46() {
 	cb_sel_init_page = 0;
-	DEBUG_COMMAND("menuClearCbkInit:");
+	TRACE("menuClearCbkInit:");
 }
 
 void commands2F47() {
@@ -741,34 +741,34 @@ void commands2F47() {
 		sl_jmpNear(sl_getIndex());
 		sl_callFar2(cb_sel_init_page -1, cb_sel_init_address);
 	}
-	DEBUG_COMMAND("new ]:");
+	TRACE("new ]:");
 }
 
 void commands2F48() {
 	const char *sText = sl_getString(0);
 	
-	DEBUG_COMMAND_YET("sysOpenShell %s:", sText);
+	TRACE_UNIMPLEMENTED("sysOpenShell %s:", sText);
 }
 
 void commands2F49() {
 	const char *sTitle = sl_getString(0);
 	const char *sUrl = sl_getString(0);
 	
-	DEBUG_COMMAND_YET("sysAddWebMenu %s, %s:", sTitle, sUrl);
+	TRACE_UNIMPLEMENTED("sysAddWebMenu %s, %s:", sTitle, sUrl);
 }
 
 void commands2F4A() {
 	int eTime = getCaliValue();
 	
 	ags_setCursorMoveTime(eTime);
-	DEBUG_COMMAND("iptSetMoveCursorTime %d:", eTime);
+	TRACE("iptSetMoveCursorTime %d:", eTime);
 }
 
 void commands2F4B() {
 	int *vTime = getCaliVariable();
 	
 	*vTime = ags_getCursorMoveTime();
-	DEBUG_COMMAND("iptGetMoveCursorTime %d:", *vTime);
+	TRACE("iptGetMoveCursorTime %d:", *vTime);
 }
 
 void commands2F4C() {
@@ -784,7 +784,7 @@ void commands2F4C() {
 	
 	sdl_updateArea(&r, &p);
 	
-	DEBUG_COMMAND("grBlt %d, %d, %d, %d, %d, %d:",
+	TRACE("grBlt %d, %d, %d, %d, %d, %d:",
 		      eX, eY, eSrcX, eSrcY, eWidth, eHeight);
 }
 
@@ -792,21 +792,21 @@ void commands2F4D() {
 	int eNum = getCaliValue();
 	const char *sText = sl_getString(0);
 
-	DEBUG_COMMAND_YET("LXWT %d, %s:", eNum, sText);
+	TRACE_UNIMPLEMENTED("LXWT %d, %s:", eNum, sText);
 }
 
 void commands2F4E() {
 	int eNum = getCaliValue();
 	int eTextNum = getCaliValue();
 
-	DEBUG_COMMAND_YET("LXWS %d, %d:", eNum, eTextNum);
+	TRACE_UNIMPLEMENTED("LXWS %d, %d:", eNum, eTextNum);
 }
 
 void commands2F4F() {
 	int eNum = getCaliValue();
 	int eType = getCaliValue();
 
-	DEBUG_COMMAND_YET("LXWE %d, %d:", eNum, eType);
+	TRACE_UNIMPLEMENTED("LXWE %d, %d:", eNum, eType);
 }
 
 void commands2F50() {
@@ -814,7 +814,7 @@ void commands2F50() {
 	int nFlg = sl_getc();
 	int eNum = getCaliValue();
 
-	DEBUG_COMMAND_YET("LXWH %d, %d, %d:", eFile, nFlg, eNum);
+	TRACE_UNIMPLEMENTED("LXWH %d, %d, %d:", eFile, nFlg, eNum);
 }
 
 void commands2F51() {
@@ -822,7 +822,7 @@ void commands2F51() {
 	int nFlg  = sl_getc();
 	int eNum  = getCaliValue();
 
-	DEBUG_COMMAND_YET("LXWHH %d, %d, %d:", eFile, nFlg, eNum);
+	TRACE_UNIMPLEMENTED("LXWHH %d, %d, %d:", eFile, nFlg, eNum);
 }
 
 void commands2F52() {
@@ -831,7 +831,7 @@ void commands2F52() {
 
 	const char *s = SDL_GetPlatform();
 	svar_set(eNum, s);
-	DEBUG_COMMAND("sysGetOSName %d: %s", eNum, s);
+	TRACE("sysGetOSName %d: %s", eNum, s);
 }
 
 void commands2F53() {
@@ -839,7 +839,7 @@ void commands2F53() {
 	
 	nact->patch_ec = eFlag;
 	
-	DEBUG_COMMAND("patchEC %d:", eFlag);
+	TRACE("patchEC %d:", eFlag);
 }
 
 void commands2F54() {
@@ -848,7 +848,7 @@ void commands2F54() {
 	int eWidth = getCaliValue();
 	int eHeight = getCaliValue();
 	
-	DEBUG_COMMAND_YET("mathSetClipWindow %d, %d, %d, %d:", eX, eY, eWidth, eHeight);
+	TRACE_UNIMPLEMENTED("mathSetClipWindow %d, %d, %d, %d:", eX, eY, eWidth, eHeight);
 }
 
 void commands2F55() {
@@ -859,7 +859,7 @@ void commands2F55() {
 	int *vWidth  = getCaliVariable();
 	int *vHeight = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("mathClip %d, %d, %d, %d, %d, %d:",
+	TRACE_UNIMPLEMENTED("mathClip %d, %d, %d, %d, %d, %d:",
 			  *vDx, *vDy, *vSx, *vSy, *vWidth, *vHeight);
 }
 
@@ -868,7 +868,7 @@ void commands2F56() {
 	const char *title = sl_getString(0);
 	const char *folder = sl_getString(0);
 
-	DEBUG_COMMAND_YET("LXF %d, %s, %s:", file_name, title, folder);
+	TRACE_UNIMPLEMENTED("LXF %d, %s, %s:", file_name, title, folder);
 }
 
 void commands2F57() {
@@ -897,7 +897,7 @@ void commands2F57() {
 	}
 	free(t1);
 	free(t2);
-	DEBUG_COMMAND("strInputDlg %s, %d, %d, %d:",
+	TRACE("strInputDlg %s, %d, %d, %d:",
 		      sTitle, eStrVar, eLength, *vResult);
 }
 
@@ -907,7 +907,7 @@ void commands2F58() {
 	
 	*vResult = sjis_has_hankaku(svar_get(eNum)) ? 1 : 0;
 	
-	DEBUG_COMMAND("strCheckASCII %d, %d:", eNum, *vResult);
+	TRACE("strCheckASCII %d, %d:", eNum, *vResult);
 }
 
 void commands2F59() {
@@ -916,7 +916,7 @@ void commands2F59() {
 	
 	*vResult = sjis_has_zenkaku(svar_get(eNum)) ? 1 : 0;
 	
-	DEBUG_COMMAND("strCheckSJIS %d, %d:", eNum, *vResult);
+	TRACE("strCheckSJIS %d, %d:", eNum, *vResult);
 }
 
 void commands2F5A() {
@@ -927,7 +927,7 @@ void commands2F5A() {
 	menu_msgbox_open(t1);
 	free(t1);
 	
-	DEBUG_COMMAND("strMessageBox %s:", sText);
+	TRACE("strMessageBox %s:", sText);
 }
 
 void commands2F5B() {
@@ -938,7 +938,7 @@ void commands2F5B() {
 	menu_msgbox_open(t1);
 	free(t1);
 	
-	DEBUG_COMMAND("strMessageBoxStr %d:", eNum);
+	TRACE("strMessageBoxStr %d:", eNum);
 }
 
 void commands2F5C() {
@@ -951,7 +951,7 @@ void commands2F5C() {
 	int eAlpha = getCaliValue();
 	
 	ags_copyArea_shadow_withrate(eSrcX, eSrcY, eWidth, eHeight, eDestX, eDestY, eAlpha);
-	DEBUG_COMMAND("grCopyUseAMapUseA %d, %d, %d, %d, %d, %d, %d:",
+	TRACE("grCopyUseAMapUseA %d, %d, %d, %d, %d, %d, %d:",
 		      eDestX, eDestY, eSrcX, eSrcY, eWidth, eHeight, eAlpha);
 }
 
@@ -959,7 +959,7 @@ void commands2F5D() {
 	int eNum = getCaliValue();
 	int eData = getCaliValue();
 	
-	DEBUG_COMMAND_YET("grSetCEParam %d, %d:", eNum, eData);
+	TRACE_UNIMPLEMENTED("grSetCEParam %d, %d:", eNum, eData);
 }
 
 struct grEffectMoveView_data {
@@ -990,24 +990,24 @@ void commands2F5E() {
 		.target_y = eY
 	};
 	ags_runEffect(eTime, eFlag, grEffectMoveView_step, &data);
-	DEBUG_COMMAND("grEffectMoveView %d, %d, %d, %d:", eX, eY, eTime, eFlag);
+	TRACE("grEffectMoveView %d, %d, %d, %d:", eX, eY, eTime, eFlag);
 }
 
 void commands2F5F() {
 	int eSize = getCaliValue();
 	
-	DEBUG_COMMAND_YET("cgSetCacheSize %d:", eSize);
+	TRACE_UNIMPLEMENTED("cgSetCacheSize %d:", eSize);
 }
 
 void commands2F61() {
 	int eChar = getCaliValue();
 	int eCGNum = getCaliValue();
 	
-	DEBUG_COMMAND_YET("gaijiSet %d, %d:", eChar, eCGNum);
+	TRACE_UNIMPLEMENTED("gaijiSet %d, %d:", eChar, eCGNum);
 }
 
 void commands2F62() {
-	DEBUG_COMMAND_YET("gaijiClearAll:");
+	TRACE_UNIMPLEMENTED("gaijiClearAll:");
 }
 
 void commands2F63() {
@@ -1015,7 +1015,7 @@ void commands2F63() {
 	
 	*vSelect = sel_getLastElement();
 
-	DEBUG_COMMAND("menuGetLatestSelect %d:", *vSelect);
+	TRACE("menuGetLatestSelect %d:", *vSelect);
 }
 
 void commands2F64() {
@@ -1055,7 +1055,7 @@ void commands2F64() {
 	
 	ald_freedata(dfile);
 	
-	DEBUG_COMMAND("lnkIsLink %d, %d, %d:", eType, eNum, *vResult);
+	TRACE("lnkIsLink %d, %d, %d:", eType, eNum, *vResult);
 }
 
 void commands2F65() {
@@ -1096,7 +1096,7 @@ void commands2F65() {
 	
 	ald_freedata(dfile);
 	
-	DEBUG_COMMAND("lnkIsData %d, %d, %d:", eType, eNum, *vResult);
+	TRACE("lnkIsData %d, %d, %d:", eType, eNum, *vResult);
 }
 
 void commands2F66() {
@@ -1104,7 +1104,7 @@ void commands2F66() {
 	int page  = sl_getw();
 	int index = sl_getdw();
 	
-	DEBUG_COMMAND("fncSetTable %d, %d,%d:", eNum, page, index);
+	TRACE("fncSetTable %d, %d,%d:", eNum, page, index);
 
 	if (eNum >= FCTBL_MAX) {
 		WARNING("fncSetTable: too many table number %d", eNum);
@@ -1131,13 +1131,13 @@ void commands2F67() {
 	
 	*vResult = (i == nact->ain.fncnum) ? 0 : !0;
 	
-	DEBUG_COMMAND("fncSetTableFromStr %d, %d, %d:", eNum, eStrNum, *vResult);
+	TRACE("fncSetTableFromStr %d, %d, %d:", eNum, eStrNum, *vResult);
 }
 
 void commands2F68() {
 	int eNum = getCaliValue();
 	
-	DEBUG_COMMAND("fncClearTable %d:", eNum);
+	TRACE("fncClearTable %d:", eNum);
 	
 	if (eNum >= FCTBL_MAX) {
 		WARNING("fncClearTable: too many table number %d", eNum);
@@ -1151,7 +1151,7 @@ void commands2F68() {
 void commands2F69() {
 	int eNum = getCaliValue();
 	
-	DEBUG_COMMAND("fncCall %d:", eNum);
+	TRACE("fncCall %d:", eNum);
 	
 	if (eNum >= FCTBL_MAX) {
 		WARNING("fncClearTable: too many table number %d", eNum);
@@ -1170,7 +1170,7 @@ void commands2F6A() {
 
 	nact->fnc_return_value = eNum;
 	
-	DEBUG_COMMAND("fncSetReturnCode %d:", eNum);
+	TRACE("fncSetReturnCode %d:", eNum);
 }
 
 void commands2F6B() {
@@ -1178,7 +1178,7 @@ void commands2F6B() {
 	
 	*vNum = nact->fnc_return_value;
 	
-	DEBUG_COMMAND("fncGetReturnCode %d:", *vNum);
+	TRACE("fncGetReturnCode %d:", *vNum);
 }
 
 void commands2F6C() {
@@ -1186,7 +1186,7 @@ void commands2F6C() {
 	
 	nact->is_msg_out = eFlag != 0 ? TRUE : FALSE;
 	
-	DEBUG_COMMAND("msgSetOutputFlag %d:", eFlag);
+	TRACE("msgSetOutputFlag %d:", eFlag);
 }
 
 void commands2F6D() {
@@ -1195,13 +1195,13 @@ void commands2F6D() {
 
 	*vResult = save_delete_file(eNum -1);
 	
-	DEBUG_COMMAND("saveDeleteFile %d, %d:", eNum, *vResult);
+	TRACE("saveDeleteFile %d, %d:", eNum, *vResult);
 }
 
 void commands2F6E() {
 	int eFlag = getCaliValue();
 	
-	DEBUG_COMMAND_YET("wav3DSetUseFlag %d:", eFlag);
+	TRACE_UNIMPLEMENTED("wav3DSetUseFlag %d:", eFlag);
 }
 
 void commands2F6F() {
@@ -1212,7 +1212,7 @@ void commands2F6F() {
 	
 	mus_wav_fadeout_start(eCh, eTime, eVolume, eStopFlag);
 	
-	DEBUG_COMMAND("wavFadeVolume %d, %d, %d, %d:", eCh, eTime, eVolume, eStopFlag);
+	TRACE("wavFadeVolume %d, %d, %d, %d:", eCh, eTime, eVolume, eStopFlag);
 }
 
 void commands2F70() {
@@ -1220,7 +1220,7 @@ void commands2F70() {
 	
 	nact->patch_emen = eFlag;
 	
-	DEBUG_COMMAND("patchEMEN %d:", eFlag);
+	TRACE("patchEMEN %d:", eFlag);
 }
 
 void commands2F71() {
@@ -1228,13 +1228,13 @@ void commands2F71() {
 
 	msgskip_enableMenu(eFlag);
 
-	DEBUG_COMMAND("wmenuEnableMsgSkip %d:", eFlag);
+	TRACE("wmenuEnableMsgSkip %d:", eFlag);
 }
 
 void commands2F72() {
 	int *vFlag = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("winGetFlipFlag %p:", vFlag);
+	TRACE_UNIMPLEMENTED("winGetFlipFlag %p:", vFlag);
 }
 
 void commands2F73() {
@@ -1242,14 +1242,14 @@ void commands2F73() {
 	
 	*vTrack = muscd_get_maxtrack();
 	
-	DEBUG_COMMAND("cdGetMaxTrack %d:", *vTrack);
+	TRACE("cdGetMaxTrack %d:", *vTrack);
 }
 
 void commands2F74() {
 	const char *str1 = sl_getString(0);
 	int *var   = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("dlgErrorOkCancel %s,%d:", str1, *var);
+	TRACE_UNIMPLEMENTED("dlgErrorOkCancel %s,%d:", str1, *var);
 }
 
 void commands2F75() {
@@ -1257,7 +1257,7 @@ void commands2F75() {
 	
 	sel_reduce(eNumof);
 	
-	DEBUG_COMMAND("menuReduce %d:", eNumof);
+	TRACE("menuReduce %d:", eNumof);
 }
 
 void commands2F76() {
@@ -1265,8 +1265,8 @@ void commands2F76() {
 
 	*var = sel_getnumberof();
 	
-	//DEBUG_COMMAND("menuGetNumof %p:", var);
-	DEBUG_COMMAND("menuGetNumof %d:", *var);
+	//TRACE("menuGetNumof %p:", var);
+	TRACE("menuGetNumof %d:", *var);
 }
 
 void commands2F77() {
@@ -1275,7 +1275,7 @@ void commands2F77() {
 	
 	svar_set(eStrNum, sel_gettext(eSelectNum));
 	
-	DEBUG_COMMAND("menuGetText %d,%d:", eStrNum, eSelectNum);
+	TRACE("menuGetText %d,%d:", eStrNum, eSelectNum);
 }
 
 void commands2F78() {
@@ -1284,7 +1284,7 @@ void commands2F78() {
 
 	sel_goto(eSelectNum, eClearFlag);
 	
-	DEBUG_COMMAND("menuGoto %d,%d:", eSelectNum, eClearFlag);
+	TRACE("menuGoto %d,%d:", eSelectNum, eClearFlag);
 }
 
 void commands2F79() {
@@ -1293,17 +1293,17 @@ void commands2F79() {
 	
 	sel_returengoto(eSelectNum, eClearFlag);
 	
-	DEBUG_COMMAND("menuReturnGoto %d,%d:", eSelectNum, eClearFlag);
+	TRACE("menuReturnGoto %d,%d:", eSelectNum, eClearFlag);
 }
 
 void commands2F7A() {
 	// no-op
-	DEBUG_COMMAND("menuFreeShelterDIB:");
+	TRACE("menuFreeShelterDIB:");
 }
 
 void commands2F7B() {
 	// no-op
-	DEBUG_COMMAND("msgFreeShelterDIB:");
+	TRACE("msgFreeShelterDIB:");
 }
 
 void commands2F7C() {
@@ -1323,7 +1323,7 @@ void commands2F7C() {
 	sys_addMsg(nact->ain.msg[index]);
 	msgskip_onAinMessage(index);
 
-	DEBUG_COMMAND("2F7C %d:", index);
+	TRACE("2F7C %d:", index);
 }
 
 void commands2F7D() {
@@ -1332,7 +1332,7 @@ void commands2F7D() {
 	commandH();
 	msgskip_onAinMessage(index);
 
-	DEBUG_COMMAND("2F7D %d:", index);
+	TRACE("2F7D %d:", index);
 }
 
 void commands2F7E() {
@@ -1341,7 +1341,7 @@ void commands2F7E() {
 	commandHH();
 	msgskip_onAinMessage(index);
 
-	DEBUG_COMMAND("2F7E %d:", index);
+	TRACE("2F7E %d:", index);
 }
 
 void commands2F7F() {
@@ -1351,7 +1351,7 @@ void commands2F7F() {
 	sys_addMsg(svar_get(p1));
 	msgskip_onAinMessage(index);
 
-	DEBUG_COMMAND("2F7F %d, %d(%s):", index, p1, svar_get(p1));
+	TRACE("2F7F %d, %d(%s):", index, p1, svar_get(p1));
 }
 
 void commands2F80() {
@@ -1362,7 +1362,7 @@ void commands2F80() {
 		WARNING("dataSetPointer set failed");
 	}
 	
-	DEBUG_COMMAND("dataSetPointer %d,%x", page, index);
+	TRACE("dataSetPointer %d,%x", page, index);
 }
 
 void commands2F81() {
@@ -1379,7 +1379,7 @@ void commands2F81() {
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("dataGetWORD %p,%d(%p):", vData, eNumof, nact->datatbl_addr);
+	TRACE("dataGetWORD %p,%d(%p):", vData, eNumof, nact->datatbl_addr);
 }
 
 void commands2F82() {
@@ -1388,7 +1388,7 @@ void commands2F82() {
 	int i;
 	char *p = (char *)nact->datatbl_addr;
 	
-	DEBUG_COMMAND("dataGetString %d,%d:", eStrNum, eNumof);
+	TRACE("dataGetString %d,%d:", eStrNum, eNumof);
 	
 	for (i = 0; i < eNumof; i++) {
 		svar_set(eStrNum + i, p);
@@ -1406,7 +1406,7 @@ void commands2F83() {
 
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("dataSkipWORD %d:", eNumof);
+	TRACE("dataSkipWORD %d:", eNumof);
 }
 
 void commands2F84() {
@@ -1420,7 +1420,7 @@ void commands2F84() {
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("dataSkipString %d:", eNumof);
+	TRACE("dataSkipString %d:", eNumof);
 }
 
 void commands2F85() {
@@ -1428,7 +1428,7 @@ void commands2F85() {
 	
 	*vResult = nact->ain.varnum;
 	
-	DEBUG_COMMAND("varGetNumof %p:", vResult);
+	TRACE("varGetNumof %p:", vResult);
 }
 
 void commands2F86() {
@@ -1436,7 +1436,7 @@ void commands2F86() {
 	
 	nact->patch_g0 = eFlag;
 	
-	DEBUG_COMMAND("patchG0 %d:", eFlag);
+	TRACE("patchG0 %d:", eFlag);
 }
 
 void commands2F87() {
@@ -1450,7 +1450,7 @@ void commands2F87() {
 	svar_set(eResultStrNum, REGREADSTRING_RESULT);
 	*vResult = 1;
 	
-	DEBUG_COMMAND("regReadString %d,%d,%d,%d:",
+	TRACE("regReadString %d,%d,%d,%d:",
 		      eSubKeyStrNum, eBaneStrNum, eResultStrNum, *vResult);
 }
 
@@ -1469,7 +1469,7 @@ void commands2F88() {
 		free(fname_utf8);
 	}
 	
-	DEBUG_COMMAND("fileCheckExist %d,%d:", eFileNameStrNum, *vResult);
+	TRACE("fileCheckExist %d,%d:", eFileNameStrNum, *vResult);
 }
 
 void commands2F89() {
@@ -1478,14 +1478,14 @@ void commands2F89() {
 	int eData = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("timeCheckCurDate %d,%d,%d,%p:", eYear, eMonth, eData, vResult);
+	TRACE_UNIMPLEMENTED("timeCheckCurDate %d,%d,%d,%p:", eYear, eMonth, eData, vResult);
 }
 
 void commands2F8A() {
 	const char *s2 = sl_getConstString();
 	const char *s3 = sl_getConstString();
 
-	DEBUG_COMMAND_YET("dlgManualProtect %s,%s:", s2, s3);
+	TRACE_UNIMPLEMENTED("dlgManualProtect %s,%s:", s2, s3);
 }
 
 void commands2F8B() {
@@ -1497,11 +1497,11 @@ void commands2F8B() {
 
 	*c7 = 1;
 	
-	DEBUG_COMMAND_YET("fileCheckDVD %s,%d,%d,%s,%p:", s2, c3, c4, s6, c7);
+	TRACE_UNIMPLEMENTED("fileCheckDVD %s,%d,%d,%s,%p:", s2, c3, c4, s6, c7);
 }
 
 void commands2F8C() {
-	DEBUG_COMMAND("sysReset:");
+	TRACE("sysReset:");
 	nact_quit(TRUE);
 }
 

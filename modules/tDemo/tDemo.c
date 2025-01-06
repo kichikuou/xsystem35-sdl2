@@ -46,20 +46,20 @@ static void Init() {
 	
 	*var = 1;
 	
-	DEBUG_COMMAND("tDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);
+	TRACE("tDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }
 
 static void SetKeyCancelFlag() {
 	int cancelflag = getCaliValue();
 	
-	DEBUG_COMMAND_YET("tDemo.SetKeyCancelFlag %d:", cancelflag);
+	TRACE_UNIMPLEMENTED("tDemo.SetKeyCancelFlag %d:", cancelflag);
 }
 
 static void SetLoopFlag() {
 	/* Loop Flag */
 	int loopflag = getCaliValue(); /* 0 なら無限繰り返し */
 	
-	DEBUG_COMMAND_YET("tDemo.SetLoopFlag %d:", loopflag);
+	TRACE_UNIMPLEMENTED("tDemo.SetLoopFlag %d:", loopflag);
 }
 
 static void Run() {
@@ -103,7 +103,7 @@ static void Run() {
 
 	alk_free(alk);
 
-	DEBUG_COMMAND("tDemo.Run:");
+	TRACE("tDemo.Run:");
 }
 
 static const ModuleFunc functions[] = {

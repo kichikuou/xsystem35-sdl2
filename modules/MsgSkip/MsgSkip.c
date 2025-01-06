@@ -26,7 +26,7 @@ static void Init() {
 	valid = true;
 	*p1 = 0;
 
-	DEBUG_COMMAND("MsgSkip.Init %p,%d,%d,%d:", p1, p2, p3, p4);
+	TRACE("MsgSkip.Init %p,%d,%d,%d:", p1, p2, p3, p4);
 }
 
 static void Start() {
@@ -39,7 +39,7 @@ static void Start() {
 	free(path);
 	free(fname_utf8);
 
-	DEBUG_COMMAND("MsgSkip.Start %p,%d:", p1, p2);
+	TRACE("MsgSkip.Start %p,%d:", p1, p2);
 }
 
 static void SetValid() {
@@ -48,7 +48,7 @@ static void SetValid() {
 	valid = p1;
 	msgskip_pause(!valid);
 
-	DEBUG_COMMAND("MsgSkip.SetValid %d:", p1);
+	TRACE("MsgSkip.SetValid %d:", p1);
 }
 
 static void GetValid() {
@@ -56,7 +56,7 @@ static void GetValid() {
 
 	*p1 = valid;
 
-	DEBUG_COMMAND("MsgSkip.GetValid %p:", p1);
+	TRACE("MsgSkip.GetValid %p:", p1);
 }
 
 static void SetAction() {
@@ -64,7 +64,7 @@ static void SetAction() {
 
 	action = p1;
 
-	DEBUG_COMMAND("MsgSkip.SetAcion %d:", p1);
+	TRACE("MsgSkip.SetAcion %d:", p1);
 }
 
 static void GetAction() {
@@ -72,19 +72,19 @@ static void GetAction() {
 
 	*p1 = action;
 
-	DEBUG_COMMAND("MsgSkip.GetAcion %p:", p1);
+	TRACE("MsgSkip.GetAcion %p:", p1);
 }
 
 static void PushStr() {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("MsgSkip.PushStr %d:", p1);
+	TRACE_UNIMPLEMENTED("MsgSkip.PushStr %d:", p1);
 }
 
 static void PopStr() {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("MsgSkip.PopStr %d:", p1);
+	TRACE_UNIMPLEMENTED("MsgSkip.PopStr %d:", p1);
 }
 
 static const ModuleFunc functions[] = {

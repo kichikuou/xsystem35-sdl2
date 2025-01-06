@@ -44,7 +44,7 @@ void commandMS() {
 	const char *str = sl_getString(':');
 	
 	svar_set(num, str);
-	DEBUG_COMMAND("MS %d,%s:",num,str);
+	TRACE("MS %d,%s:",num,str);
 }
 
 void commandMP() {
@@ -85,7 +85,7 @@ void commandMP() {
 	}
 
 	sys_addMsg(str);
-	DEBUG_COMMAND("MP %d,%d:",num1,num2);
+	TRACE("MP %d,%d:",num1,num2);
 	
 	free(str);
 }
@@ -118,7 +118,7 @@ void commandMI() { /* T2 */
 	free(t1);
 	free(t2);
 	free(t3);
-	DEBUG_COMMAND("MI %d,%d,%s:",dst_no,max_len, title);
+	TRACE("MI %d,%d,%s:",dst_no,max_len, title);
 }
 
 void commandMA() {
@@ -134,7 +134,7 @@ void commandMA() {
 		svar_append(num1, svar_get(num2));
 	}
 	
-	DEBUG_COMMAND("MA %d,%d:",num1,num2);
+	TRACE("MA %d,%d:",num1,num2);
 }
 
 void commandMC() {
@@ -144,7 +144,7 @@ void commandMC() {
 	
 	sysVar[0] = strcmp(svar_get(num1), svar_get(num2)) == 0 ? 1 : 0;
 	
-	DEBUG_COMMAND("MC %d,%d:",num1,num2);
+	TRACE("MC %d,%d:",num1,num2);
 }
 
 void commandMT() {
@@ -158,7 +158,7 @@ void commandMT() {
 	
 	enable_hack_by_title(nact->game_title_utf8);
 
-	DEBUG_COMMAND("MT %s:",str);
+	TRACE("MT %s:",str);
 }
 
 void commandMM() {
@@ -169,7 +169,7 @@ void commandMM() {
 	if (num1 != num2)
 		svar_set(num1, svar_get(num2));
 	
-	DEBUG_COMMAND("MM %d,%d:",num1, num2);
+	TRACE("MM %d,%d:",num1, num2);
 }
 
 void commandMH() {
@@ -183,7 +183,7 @@ void commandMH() {
 	svar_set(num1, s);
 	free(s);
 
-	DEBUG_COMMAND("MH %d,%d,%d:",num1,fig,num2);
+	TRACE("MH %d,%d,%d:",num1,fig,num2);
 }
 
 void commandMV() {
@@ -191,7 +191,7 @@ void commandMV() {
 	int version = getCaliValue();
 
 	nact->scenario_version = version;
-	DEBUG_COMMAND("MV %d:",version);
+	TRACE("MV %d:",version);
 }
 
 void commandML() {
@@ -201,7 +201,7 @@ void commandML() {
 	
 	*var = svar_length(str_no);
 	
-	DEBUG_COMMAND("ML %p,%d:",var, str_no);
+	TRACE("ML %p,%d:",var, str_no);
 }
 
 void commandMD() {
@@ -212,7 +212,7 @@ void commandMD() {
 	
 	svar_copy(dst_str_no, 0, src_str_no, 0, len);
 	
-	DEBUG_COMMAND("MD %d,%d,%d:",dst_str_no, src_str_no, len);
+	TRACE("MD %d,%d,%d:",dst_str_no, src_str_no, len);
 }
 
 void commandME() {
@@ -225,7 +225,7 @@ void commandME() {
 	
 	svar_copy(dst_str_no, dst_pos, src_str_no, src_pos, len);
 	
-	DEBUG_COMMAND("ME %d,%d,%d,%d,%d:",dst_str_no, dst_pos, src_str_no, src_pos, len);
+	TRACE("ME %d,%d,%d,%d,%d:",dst_str_no, dst_pos, src_str_no, src_pos, len);
 }
 
 void commandMF() {
@@ -244,7 +244,7 @@ void commandMF() {
 		sysVar[0] = 0;
 	}
 	
-	DEBUG_COMMAND("MF %p,%d,%d,%d:",var, dst_no, key_no, start_pos);
+	TRACE("MF %p,%d,%d,%d:",var, dst_no, key_no, start_pos);
 }
 
 void commandMZ0() {
@@ -253,7 +253,7 @@ void commandMZ0() {
 	int max_num = getCaliValue();
 	int rsv     = getCaliValue();
 	
-	DEBUG_COMMAND("MZ0 %d,%d,%d:",max_len, max_num, rsv);
+	TRACE("MZ0 %d,%d,%d:",max_len, max_num, rsv);
 	
 	svar_init(max_num);
 }
@@ -306,7 +306,7 @@ void commandMG() {
 		break;
 	}
 
-	DEBUG_COMMAND("MG %d,%d:",no, sw);
+	TRACE("MG %d,%d:",no, sw);
 }
 
 void commandMJ() {
@@ -335,7 +335,7 @@ void commandMJ() {
 
 	free(t1);
 	free(t2);
-	DEBUG_COMMAND("MJ %d,%d,%d,%d,%d:", num, x, y, h, max_len);
+	TRACE("MJ %d,%d,%d,%d,%d:", num, x, y, h, max_len);
 }
 
 void commandMN() {
@@ -355,5 +355,5 @@ void commandMN() {
 	default:
 		WARNING("UnKnown MN command(%d)", no);
 	}
-	DEBUG_COMMAND("MN %d,%d,%d:",no, num, *var);
+	TRACE("MN %d,%d,%d:",no, num, *var);
 }

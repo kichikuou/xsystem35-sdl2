@@ -54,7 +54,7 @@ static void MakeMapSetParam() {
 	window_height = p3;
 	map_width = p4;
 
-	DEBUG_COMMAND("oujimisc.MakeMapSetParam %d,%d,%d,%d:", p1,p2,p3,p4);
+	TRACE("oujimisc.MakeMapSetParam %d,%d,%d,%d:", p1,p2,p3,p4);
 }
 
 static void MakeMapSetChipParam() {
@@ -74,7 +74,7 @@ static void MakeMapSetChipParam() {
 	r->w = p3;
 	r->h = p4;
 
-	DEBUG_COMMAND("oujimisc.MakeMapSeChipParam %d,%d,%d,%d,%d:", p1,p2,p3,p4,p5);
+	TRACE("oujimisc.MakeMapSeChipParam %d,%d,%d,%d,%d:", p1,p2,p3,p4,p5);
 }
 
 static void MakeMapDraw() {
@@ -106,13 +106,13 @@ static void MakeMapDraw() {
 		}
 	}
 
-	DEBUG_COMMAND("oujimisc.MakeMapDraw %d,%d,%d,%d,%d,%p,%p,%p:", p1,dstX,dstY,posX,posY,a1,a2,a3);
+	TRACE("oujimisc.MakeMapDraw %d,%d,%d,%d,%d,%p,%p,%p:", p1,dstX,dstY,posX,posY,a1,a2,a3);
 }
 
 static void MakeMapInit() {
 	int p1 = getCaliValue(); /* ISys3x */
 	
-	DEBUG_COMMAND_YET("oujimisc.MakeMapInit %d:", p1);
+	TRACE_UNIMPLEMENTED("oujimisc.MakeMapInit %d:", p1);
 }	
 
 static void DrawNumber() {
@@ -137,7 +137,7 @@ static void DrawNumber() {
 		dstX += width;
 	}
 
-	DEBUG_COMMAND("oujimisc.DrawNumber %d,%d,%d,%d,%d,%d,%d,%d:", p1,srcX,srcY,width,height,dstX,dstY,num);
+	TRACE("oujimisc.DrawNumber %d,%d,%d,%d,%d,%d,%d,%d:", p1,srcX,srcY,width,height,dstX,dstY,num);
 }
 
 static void TempMapCreateShadow() {
@@ -153,14 +153,14 @@ static void TempMapCreateShadow() {
 		ald_freedata(dfile);
 	}
 
-	DEBUG_COMMAND("oujimisc.TempMapCreateShadow:");
+	TRACE("oujimisc.TempMapCreateShadow:");
 }
 
 static void TempMapInit() {
 	int p1 = getCaliValue(); /* ISys3x */
 	int p2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("oujimisc.TempMapInit %d,%d:", p1,p2);
+	TRACE_UNIMPLEMENTED("oujimisc.TempMapInit %d,%d:", p1,p2);
 }
 
 static void TempMapLoadToShadow() {
@@ -189,7 +189,7 @@ static void TempMapLoadToShadow() {
 	for (int i = 0; i < size; i++)
 		*a3++ = SDL_SwapLE16(*p++);
 
-	DEBUG_COMMAND("oujimisc.TempMapLoadToShadow %d,%p,%p,%p,%d:", map,a1,a2,a3,size);
+	TRACE("oujimisc.TempMapLoadToShadow %d,%p,%p,%p,%d:", map,a1,a2,a3,size);
 }
 
 static void TempMapSaveToShadow() {
@@ -218,7 +218,7 @@ static void TempMapSaveToShadow() {
 	for (int i = 0; i < size; i++)
 		*p++ = SDL_SwapLE16(*a3++);
 
-	DEBUG_COMMAND("oujimisc.TempMapSaveToShadow %d,%p,%p,%p,%d:", map,a1,a2,a3,size);
+	TRACE("oujimisc.TempMapSaveToShadow %d,%p,%p,%p,%d:", map,a1,a2,a3,size);
 }
 
 static void TempMapFileSave() {
@@ -250,7 +250,7 @@ static void TempMapFileSave() {
 	}
 	fclose(fp);
 
-	DEBUG_COMMAND("oujimisc.TempMapFileSave %d:", p1);
+	TRACE("oujimisc.TempMapFileSave %d:", p1);
 }
 
 static void TempMapFileLoad() {
@@ -292,7 +292,7 @@ static void TempMapFileLoad() {
 	}
 	fclose(fp);
 
-	DEBUG_COMMAND("oujimisc.TempMapFileLoad %d:", p1);
+	TRACE("oujimisc.TempMapFileLoad %d:", p1);
 }
 
 static void CalcMoveDiffer() {
@@ -322,7 +322,7 @@ static void CalcMoveDiffer() {
 
 	*pt = t >= duration ? 1 : 0;
 
-	DEBUG_COMMAND("oujimisc.CalcMoveDiffer %p,%p,%d,%d,%d,%d,%p,%d:", dx,dy,moveL,moveU,moveR,moveD,pt,duration);
+	TRACE("oujimisc.CalcMoveDiffer %p,%p,%d,%d,%d,%d,%p,%d:", dx,dy,moveL,moveU,moveR,moveD,pt,duration);
 }
 
 static const ModuleFunc functions[] = {

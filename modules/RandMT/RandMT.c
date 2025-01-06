@@ -40,7 +40,7 @@ static void Init() {
 	*/
 	int p1 = getCaliValue(); /* ITimer */
 	
-	DEBUG_COMMAND_YET("RandMT.Init %p:", p1);
+	TRACE_UNIMPLEMENTED("RandMT.Init %p:", p1);
 }
 
 static void Get() {
@@ -59,7 +59,7 @@ static void Get() {
 		*var = (int)(genrand() * num) + 1;
 	}
 	
-	DEBUG_COMMAND("RandMT.Get %d,%p:", num, var);
+	TRACE("RandMT.Get %d,%p:", num, var);
 }
 
 static void GetNoOverlap() {
@@ -69,7 +69,7 @@ static void GetNoOverlap() {
 
 	*var = (int)(genrand() * n) + min;
 
-	DEBUG_COMMAND("RandMT.GetNoOverlap %d,%d,%p:", min, n, var);
+	TRACE("RandMT.GetNoOverlap %d,%d,%p:", min, n, var);
 }
 
 static const ModuleFunc functions[] = {

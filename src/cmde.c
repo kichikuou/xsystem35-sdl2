@@ -49,7 +49,7 @@ void commandES() {
 	tbl[num - 1].r.h = height;
 	tbl[num - 1].pal = pal;
 	
-	DEBUG_COMMAND("ES %d,%d,%d,%d,%d,%d:", num, pal, x, y, width, height);
+	TRACE("ES %d,%d,%d,%d,%d,%d:", num, pal, x, y, width, height);
 }
 
 void commandEC() {
@@ -67,7 +67,7 @@ void commandEC() {
 		ags_fillRectangle(e->r.x, e->r.y, e->r.w + adj, e->r.h + adj, e->pal);
 		ags_updateArea(e->r.x, e->r.y, e->r.w + adj, e->r.h + adj);
 	}
-	DEBUG_COMMAND("EC %d:", num);
+	TRACE("EC %d:", num);
 }
 
 void commandEG() {
@@ -82,7 +82,7 @@ void commandEG() {
 	*width  = tbl[num -1].r.w;
 	*height = tbl[num -1].r.h;
 
-	DEBUG_COMMAND("EG %d,%d,%d,%d,%d:", num, *x, *y, *width, *height);
+	TRACE("EG %d,%d,%d,%d,%d:", num, *x, *y, *width, *height);
 }
 
 void commandEM() {
@@ -98,7 +98,7 @@ void commandEM() {
 		r.h -= 1;
 	}
 	*var = SDL_PointInRect(&p, &r) ? 1 : 0;
-	DEBUG_COMMAND("EM %d,%d,%d,%d:", num, *var, x, y);
+	TRACE("EM %d,%d,%d,%d:", num, *var, x, y);
 }
 
 void commandEN() {
@@ -121,5 +121,5 @@ void commandEN() {
 			*var = i;
 	}
 	
-	DEBUG_COMMAND("EN %d,%d,%d,%d,%d:", *var, min, max, x, y);
+	TRACE("EN %d,%d,%d,%d,%d:", *var, min, max, x, y);
 }

@@ -40,7 +40,7 @@ void commandCC() {
 	ags_copyArea(src_x, src_y, width, height, dst_x, dst_y);
 	ags_updateArea(dst_x, dst_y, width, height);
 	
-	DEBUG_COMMAND("CC %d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y);
+	TRACE("CC %d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y);
 }
 
 void commandCS() {
@@ -55,7 +55,7 @@ void commandCS() {
 	ags_copyAreaSP(src_x, src_y, width, height, dst_x, dst_y, sprite);
 	ags_updateArea(dst_x, dst_y, width, height);
 
-	DEBUG_COMMAND("CS %d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, sprite);
+	TRACE("CS %d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, sprite);
 }
 
 void commandCX() {
@@ -101,12 +101,12 @@ void commandCX() {
 		ags_copyToAlpha(src_x, src_y, width, height, dst_x, dst_y, col == 1 ? FROM_24R : col == 2 ? FROM_24G : FROM_24B);
 		break;
 	case 6:
-		DEBUG_COMMAND_YET("CX %d,%d,%d,%d,%d,%d,%d,%d:", mode, src_x, src_y, width, height, dst_x, dst_y, col);
+		TRACE_UNIMPLEMENTED("CX %d,%d,%d,%d,%d,%d,%d,%d:", mode, src_x, src_y, width, height, dst_x, dst_y, col);
 		break;
 	}
 	daiakuji_cx_hack = false;
 
-	DEBUG_COMMAND("CX %d,%d,%d,%d,%d,%d,%d,%d:", mode, src_x, src_y, width, height, dst_x, dst_y, col);
+	TRACE("CX %d,%d,%d,%d,%d,%d,%d,%d:", mode, src_x, src_y, width, height, dst_x, dst_y, col);
 }
 
 void commandCM() {
@@ -123,7 +123,7 @@ void commandCM() {
 	ags_scaledCopyArea(src_x, src_y, src_width, src_height, dst_x, dst_y, dst_width, dst_height, mirror_sw);
 	ags_updateArea(dst_x, dst_y, dst_width, dst_height);
 	
-	DEBUG_COMMAND("CM %d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, src_width, src_height, dst_x, dst_y, dst_width, dst_height, mirror_sw);
+	TRACE("CM %d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, src_width, src_height, dst_x, dst_y, dst_width, dst_height, mirror_sw);
 }
 
 void commandCE() {
@@ -148,10 +148,10 @@ void commandCE() {
 	case 54:
 	case 1000:
 	case 1001:
-		DEBUG_COMMAND_YET("CE %d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag);
+		TRACE_UNIMPLEMENTED("CE %d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag);
 		break;
 	default:
-		DEBUG_COMMAND("CE %d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag);
+		TRACE("CE %d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag);
 	}
 }
 
@@ -189,10 +189,10 @@ void commandCD() {
 	case 1000:
 	case 2000:
 	case 2001:
-		DEBUG_COMMAND_YET("CD %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag, color);
+		TRACE_UNIMPLEMENTED("CD %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag, color);
 		break;
 	default:
-		DEBUG_COMMAND("CD %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag, color);
+		TRACE("CD %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", src_x, src_y, width, height, dst_x, dst_y, effect_sw, option, wait_flag, color);
 	}
 }
 
@@ -211,14 +211,14 @@ void commandCK() {
 	case 1:
 		ags_wrapColor(x, y, width, height, d1, d2); break;
 	case 2:
-		DEBUG_COMMAND_YET("CK %d,%d,%d,%d,%d,%d,%d,%d,%d:", no, x, y, width, height, d1, d2, d3, d4); break;
+		TRACE_UNIMPLEMENTED("CK %d,%d,%d,%d,%d,%d,%d,%d,%d:", no, x, y, width, height, d1, d2, d3, d4); break;
 	case 3: /* from T2 */
 		ags_changeColorArea(x, y, width, height, d1, d2, d3); break;
 	default:
 		WARNING("Unknown CK Command %d", no);
 	}
 	ags_updateArea(x, y, width, height);
-	DEBUG_COMMAND("CK %d,%d,%d,%d,%d,%d,%d,%d,%d:", no, x, y, width, height, d1, d2, d3, d4);
+	TRACE("CK %d,%d,%d,%d,%d,%d,%d,%d,%d:", no, x, y, width, height, d1, d2, d3, d4);
 }
 
 void commandCL() {
@@ -231,7 +231,7 @@ void commandCL() {
 	ags_drawLine(x0, y0, x1, y1, color);
 	ags_updateArea(min(x0, x1), min(y0, y1), abs(x1 - x0) + 1, abs(y1 - y0) + 1); 
 	
-	DEBUG_COMMAND("CL %d,%d,%d,%d,%d:", x0, y0, x1, y1, color);
+	TRACE("CL %d,%d,%d,%d,%d:", x0, y0, x1, y1, color);
 }
 
 void commandCB() {
@@ -244,7 +244,7 @@ void commandCB() {
 	ags_drawRectangle(x, y, width, height, color);
 	ags_updateArea   (x, y, width, height);
 	
-	DEBUG_COMMAND("CB %d,%d,%d,%d,%d:", x, y, width, height, color);
+	TRACE("CB %d,%d,%d,%d,%d:", x, y, width, height, color);
 }
 
 void commandCF() {
@@ -257,7 +257,7 @@ void commandCF() {
 	ags_fillRectangle(x, y, width, height, color);
 	ags_updateArea   (x, y, width, height);
 
-	DEBUG_COMMAND("CF %d,%d,%d,%d,%d:", x, y, width, height, color);
+	TRACE("CF %d,%d,%d,%d,%d:", x, y, width, height, color);
 }
 
 void commandCP() {
@@ -269,7 +269,7 @@ void commandCP() {
 	if (!SDL_RectEmpty(&rec))
 		ags_updateArea(rec.x, rec.y, rec.w, rec.h);
 
-	DEBUG_COMMAND("CP %d,%d,%d:", x, y, color);
+	TRACE("CP %d,%d,%d:", x, y, color);
 }
 
 void commandCT() {
@@ -279,7 +279,7 @@ void commandCT() {
 	int y     = getCaliValue();
 
 	ags_alpha_getPixel(x, y, var);
-	DEBUG_COMMAND("CT %d,%d,%d:", *var, x, y);
+	TRACE("CT %d,%d,%d:", *var, x, y);
 }
 
 void commandCU() {
@@ -292,7 +292,7 @@ void commandCU() {
 	int set    = getCaliValue();
 	
 	ags_alpha_lowercut(x, y, width, height, border, set);
-	DEBUG_COMMAND("CU %d,%d,%d,%d,%d,%d:", x, y, width, height, border, set);
+	TRACE("CU %d,%d,%d,%d,%d,%d:", x, y, width, height, border, set);
 }
 
 void commandCV() {
@@ -305,7 +305,7 @@ void commandCV() {
 	int set    = getCaliValue();
 	
 	ags_alpha_uppercut(x, y, width, height, border, set);
-	DEBUG_COMMAND("CV %d,%d,%d,%d,%d,%d:", x, y, width, height, border, set);
+	TRACE("CV %d,%d,%d,%d,%d,%d:", x, y, width, height, border, set);
 }
 
 void commandCY() {
@@ -317,7 +317,7 @@ void commandCY() {
 	int lv = getCaliValue();
 	
 	ags_alpha_setLevel(x, y, w, h, lv);
-	DEBUG_COMMAND("CY %d,%d,%d,%d,%d:", x, y, w, h, lv);
+	TRACE("CY %d,%d,%d,%d,%d:", x, y, w, h, lv);
 }
 
 void commandCZ() {
@@ -331,5 +331,5 @@ void commandCZ() {
 	int op = getCaliValue();
 	
 	ags_alpha_copyArea(sx, sy, w, h, dx, dy);
-	DEBUG_COMMAND("CZ %d,%d,%d,%d,%d,%d,%d:", sx, sy, w, h, dx, dy, op);
+	TRACE("CZ %d,%d,%d,%d,%d,%d,%d:", sx, sy, w, h, dx, dy, op);
 }
