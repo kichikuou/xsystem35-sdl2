@@ -73,7 +73,7 @@ static void ntmain(struct _scoadr inadr) {
 			nact->callback();
 		}
 		sys_getInputInfo();
-		sdl_wait_vsync();
+		scheduler_yield();
 	}
 }
 

@@ -88,7 +88,7 @@
 # Enables game-specific hacks. Usually auto-detected, but must be
 # specified for games with modified / translated titles.
 #
-# Possible values are: toushin2, rance3_eng, rance4_eng, rance4_v2.
+# Possible values are: toushin2, rance3_eng, rance4_eng, rance4_v2, agake.
 
 #game: rance4_v2
 

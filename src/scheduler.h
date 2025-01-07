@@ -35,6 +35,7 @@ extern bool scheduler_yield_requested;
 static inline void request_yield(void) { scheduler_yield_requested = true; }
 static inline void cancel_yield(void) { scheduler_yield_requested = false; }
 static inline bool is_yield_requested(void) { return scheduler_yield_requested; }
+void scheduler_yield(void);
 
 extern int scheduler_cmd_count;
 static inline void scheduler_on_command(void) {

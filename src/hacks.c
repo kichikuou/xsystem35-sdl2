@@ -30,6 +30,7 @@
 #define GT_RANCE3 "Ｒａｎｃｅ３"
 #define GT_RANCE3_ENG "Rance3"
 #define GT_RANCE4_ENG "Rance4 -Legacy of the Sect- For Win95 "
+#define GT_AGAKE "俺の下であがけ"
 
 /* defined by cmdy.c */
 extern boolean Y3waitFlags;
@@ -48,6 +49,8 @@ void enable_hack_by_gameid(const char *gameid) {
 		game_id = GAME_RANCE4_ENG;
 	else if (!strcmp(gameid, "rance4_v2"))
 		game_id = GAME_RANCE4_V2;
+	else if (!strcmp(gameid, "agake"))
+		game_id = GAME_AGAKE;
 	else
 		sys_error("Unknown game id \"%s\"", gameid);
 }
@@ -69,4 +72,6 @@ void enable_hack_by_title(const char *title_utf8) {
 		game_id = GAME_RANCE3_ENG;
 	else if (!strcmp(title_utf8, GT_RANCE4_ENG))
 		game_id = GAME_RANCE4_ENG;
+	else if (!strcmp(title_utf8, GT_AGAKE))
+		game_id = GAME_AGAKE;
 }

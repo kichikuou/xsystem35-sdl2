@@ -120,7 +120,7 @@ void nact_main() {
 		if (is_yield_requested() || nact->popupmenu_opened || dbg_trapped()) {
 			nact->callback();  // Async in emscripten
 			sys_getInputInfo();
-			sdl_wait_vsync();
+			scheduler_yield();
 		}
 	}
 }

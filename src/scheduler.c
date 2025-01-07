@@ -18,7 +18,9 @@
 */
 #include "scheduler.h"
 #include "scenario.h"
+#include "sdl_core.h"
 #include "nact.h"
+#include "hacks.h"
 
 bool scheduler_yield_requested;
 int scheduler_cmd_count;
@@ -80,4 +82,11 @@ void scheduler_on_event(enum scheduler_event event) {
 		}
 		break;
 	}
+}
+
+void scheduler_yield(void) {
+	if (game_id == GAME_AGAKE)
+		sdl_sleep(6);  // The slot game runs in a 6ms-cycle loop.
+	else
+		sdl_wait_vsync();
 }
