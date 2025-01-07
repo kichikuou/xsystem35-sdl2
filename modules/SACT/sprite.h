@@ -89,6 +89,7 @@ extern void smsg_newline(int wNum, int size);
 extern void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, int *wLength);
 extern void smsg_clear(int wNum);
 extern int smsg_is_empty();
+extern int smsg_peek(int nTopStringNum);
 extern int smsg_keywait(int sp1, int sp2, int timeout);
 extern int smsg_update(sprite_t *sp);
 

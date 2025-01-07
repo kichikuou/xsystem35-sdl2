@@ -385,6 +385,25 @@ int smsg_is_empty() {
 	return (sact.msgbuf[0] == '\0');
 }
 
+int smsg_peek(int nTopStringNum) {
+	char *p = sact.msgbuf;
+	int i;
+	for (i = 0; *p; i++) {
+		char *q = strchr(p, '\n');
+		if (q)
+			*q = '\0';
+		svar_set(nTopStringNum + i, p);
+		if (q) {
+			*q = '\n';
+			p = q + 2;
+		} else {
+			i++;
+			break;
+		}
+	}
+	return i;
+}
+
 /*
   メッセージキー入力待ち
    @param wNum1: スプライト番号1(アニメーションスプライト)

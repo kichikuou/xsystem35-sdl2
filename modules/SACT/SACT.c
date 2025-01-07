@@ -1086,15 +1086,24 @@ static void WaitKeySprite() {
 
 /**
  * SACT.PeekKey (1.2~)
- *   ?????
+ *   Get the status of the key
  *   @param nKeyCode:
  *   @param vResult:
  */
 static void PeekKey() {
+	static int prevKeyCode = NUM_KEYCODES;
 	int nKeyCode = getCaliValue();
 	int *vResult = getCaliVariable();
 
-	TRACE_UNIMPLEMENTED("SACT.PeekKey %d,%p:", nKeyCode, vResult);
+	// This function is called successively with different nKeyCodes.
+	// Only the first call hits the scheduler.
+	if (nKeyCode <= prevKeyCode)
+		sys_getKeyInfo();
+	prevKeyCode = nKeyCode;
+
+	*vResult = RawKeyInfo[nKeyCode] ? 1 : 0;
+
+	TRACE("SACT.PeekKey %d,%p:", nKeyCode, vResult);
 }
 
 /**
@@ -1320,7 +1329,9 @@ static void MessagePeek() {
 	int *vCount = getCaliVariable();
 	int nTopStringNum = getCaliValue();
 
-	TRACE_UNIMPLEMENTED("SACT.MessagePeek %p,%d:", vCount, nTopStringNum);
+	*vCount = smsg_peek(nTopStringNum);
+
+	TRACE("SACT.MessagePeek %p,%d:", vCount, nTopStringNum);
 }
 
 /**
