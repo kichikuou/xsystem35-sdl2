@@ -28,6 +28,7 @@
 #include "portab.h"
 #include "xsystem35.h"
 #include "sdl_core.h"
+#include "scheduler.h"
 #include "ags.h"
 #include "scenario.h"
 #include "randMT.h"
@@ -48,17 +49,7 @@ static void reset_counter(int num, int divisor, int offset) {
 }
 
 static uint32_t get_counter(int num) {
-	// Allow up to 10 get_counter() calls in single animation frame.
-	static int frame = -1;
-	static int count = 0;
-	if (nact->frame_count == frame) {
-		if (++count >= 10)
-			nact->wait_vsync = TRUE;
-	} else {
-		frame = nact->frame_count;
-		count = 0;
-	}
-
+	scheduler_on_event(SCHEDULER_EVENT_TIMER_CHECK);
 	return sdl_getTicks() - counters[num].base;
 }
 

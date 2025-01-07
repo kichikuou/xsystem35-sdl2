@@ -81,6 +81,7 @@ target_sources(xsystem35 PRIVATE
   s39ain.c
   savedata.c
   scenario.c
+  scheduler.c
   sdl_cursor.c
   sdl_draw.c
   sdl_effect.c

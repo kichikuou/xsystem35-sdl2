@@ -32,6 +32,7 @@
 #include "scenario.h"
 #include "xsystem35.h"
 #include "sdl_core.h"
+#include "scheduler.h"
 #include "ags.h"
 #include "nact.h"
 #include "debugger.h"
@@ -107,11 +108,6 @@ void sys_addMsg(const char *str) {
 
 EMSCRIPTEN_KEEPALIVE
 void nact_main() {
-	nact->frame_count = 0;
-	nact->cmd_count = 0;
-	nact->wait_vsync = FALSE;
-
-	int cnt = 0;
 	while (!nact->is_quit) {
 		nact->current_page = sl_getPage();
 		nact->current_addr = sl_getIndex();
@@ -119,15 +115,13 @@ void nact_main() {
 			dbg_main(0);
 
 		exec_command();
-		nact->cmd_count++;
+		scheduler_on_command();
 
-		if (++cnt >= 10000 || nact->wait_vsync || nact->popupmenu_opened || dbg_trapped()) {
+		if (is_yield_requested() || nact->popupmenu_opened || dbg_trapped()) {
 			nact->callback();  // Async in emscripten
 			sys_getInputInfo();
 			sdl_wait_vsync();
-			nact->frame_count++;
-			nact->wait_vsync = FALSE;
-			cnt = 0;
+			scheduler_on_event(SCHEDULER_EVENT_NEW_FRAME);
 		}
 	}
 }
@@ -192,7 +186,7 @@ void nact_reset(void) {
 void nact_quit(boolean restart) {
 	nact->is_quit = TRUE;
 	nact->restart = restart;
-	nact->wait_vsync = TRUE;
+	request_yield();
 }
 
 #ifdef __EMSCRIPTEN__

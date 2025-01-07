@@ -23,9 +23,7 @@
 #include <emscripten.h>
 #include "portab.h"
 #include "cdrom.h"
-#include "nact.h"
-
-static int frame_of_getpos = -1;
+#include "scheduler.h"
 
 int cdrom_init(char *playlist) {
 	return OK;
@@ -52,9 +50,7 @@ int cdrom_reset(void) {
 }
 
 int cdrom_getPlayingInfo(cd_time *info) {
-	if (nact->frame_count == frame_of_getpos)
-		nact->wait_vsync = TRUE;
-	frame_of_getpos = nact->frame_count;
+	scheduler_on_event(SCHEDULER_EVENT_AUDIO_CHECK);
 
 	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
 	if (!t)

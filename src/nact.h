@@ -115,10 +115,6 @@ typedef struct {
 
 	/* data file names */
 	GameResource files;
-	
-	int frame_count;
-	int cmd_count;
-	boolean wait_vsync;
 
 	/* start address of the command currently being executed */
 	int current_page;

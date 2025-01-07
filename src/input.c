@@ -26,6 +26,7 @@
 #include "config.h"
 #include "input.h"
 #include "sdl_core.h"
+#include "scheduler.h"
 #include "xsystem35.h"
 #include "message.h"
 #include "texthook.h"
@@ -109,7 +110,7 @@ int sys_keywait(int msec, unsigned flags) {
 			sdl_wait_vsync();
 		nact->callback();
 		key = sys_getInputInfo();
-		nact->wait_vsync = FALSE;  // We just waited!
+		cancel_yield();  // We just yielded!
 		if ((flags & KEYWAIT_CANCELABLE) && key) break;
 	}
 

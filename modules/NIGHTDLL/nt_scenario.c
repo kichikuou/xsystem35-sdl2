@@ -9,6 +9,7 @@
 #include "system.h"
 #include "input.h"
 #include "sdl_core.h"
+#include "scheduler.h"
 #include "xsystem35.h"
 #include "nact.h"
 #include "scenario.h"
@@ -52,7 +53,8 @@ static void ntmain(struct _scoadr inadr) {
 	struct _scoadr curadr;
 
 	while (!nact->is_quit) {
-		for (int cnt = 0; !nact->is_quit && !nact->wait_vsync && cnt < 10000; cnt++) {
+		while (!nact->is_quit && !is_yield_requested()) {
+			scheduler_on_command();
 			//SACT_DEBUG("%d:%x", sl_getPage(), sl_getIndex());
 			if (!nact->popupmenu_opened) {
 				exec_command();
@@ -72,8 +74,7 @@ static void ntmain(struct _scoadr inadr) {
 		}
 		sys_getInputInfo();
 		sdl_wait_vsync();
-		nact->frame_count++;
-		nact->wait_vsync = FALSE;
+		scheduler_on_event(SCHEDULER_EVENT_NEW_FRAME);
 	}
 }
 

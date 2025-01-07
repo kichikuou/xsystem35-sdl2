@@ -37,6 +37,7 @@
 #include "nact.h"
 #include "sdl_core.h"
 #include "sdl_private.h"
+#include "scheduler.h"
 #include "menu.h"
 #include "input.h"
 #include "msgskip.h"
@@ -246,7 +247,7 @@ static void rance4v2_hack(void) {
 		(RawKeyInfo[KEY_DOWN]  || RawKeyInfo[KEY_PAD_2]) ||
 		(RawKeyInfo[KEY_LEFT]  || RawKeyInfo[KEY_PAD_4]) ||
 		(RawKeyInfo[KEY_RIGHT] || RawKeyInfo[KEY_PAD_6]))
-		nact->wait_vsync = FALSE;
+		cancel_yield();
 }
 
 void sdl_handle_event(SDL_Event *e) {
@@ -444,21 +445,16 @@ void sdl_handle_event(SDL_Event *e) {
 
 /* Event処理 */
 static void sdl_getEvent(void) {
-	static int cmd_count_of_prev_input = -1;
-	boolean had_input = false;
+	enum scheduler_event scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_MISS;
 
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {
-		had_input = true;
+		scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_HIT;
 		sdl_handle_event(&e);
 	}
-	if (had_input) {
-		cmd_count_of_prev_input = nact->cmd_count;
-	} else if (nact->cmd_count != cmd_count_of_prev_input) {
-		nact->wait_vsync = TRUE;
-		if (game_id == GAME_RANCE4_V2)
-			rance4v2_hack();
-	}
+	scheduler_on_event(scheduler_event);
+	if (game_id == GAME_RANCE4_V2)
+		rance4v2_hack();
 }
 
 /* キー情報の取得 */

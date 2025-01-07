@@ -28,6 +28,7 @@
 #include <sys/time.h>
 #include "portab.h"
 #include "sdl_core.h"
+#include "scheduler.h"
 #include "xsystem35.h"
 #include "scenario.h"
 #include "ags.h"
@@ -110,9 +111,6 @@ static UnitMapSrcImg *srcimg;
 #define VACMD_MAX 20                      /* Panyoで18まで */
 static  VaParam VAcmd[VACMD_MAX];         
 static  boolean inAnimation      = FALSE; /* 画面更新中 */
-#ifdef __EMSCRIPTEN__
-static int status_check_count;
-#endif
 
 /* UnitMap 各種マクロ */
 #define MAPSIZE_PER_ATTRIB (cxMap * cyMap)
@@ -719,15 +717,6 @@ void commandVJ() {
 	TRACE_UNIMPLEMENTED("VJ %d,%d,%d,%d:", page, x, y, max);
 }
 
-static void throttle() {
-#ifdef __EMSCRIPTEN__
-	if (++status_check_count > 1) {
-		status_check_count = 0;
-		nact->wait_vsync = TRUE;
-	}
-#endif
-}
-
 void commandVA() { /* from Panyo */
 	int no = sl_getc();
 	int p1 = getCaliValue();
@@ -852,13 +841,13 @@ void commandVA() { /* from Panyo */
 		/* 状態取得(var1=0:停止1:動,var2=番号) */
 		*var1 = VAcmd[p1].state == 0 ? 0 : 1;
 		*var2 = VAcmd[p1].elaspCut;
-		throttle();
+		scheduler_on_event(SCHEDULER_EVENT_VA_STATUS_CHECK);
 		break;
 	case 11:
 		/* 位置取得 */
 		*var1 = VAcmd[p1].curX;
 		*var2 = VAcmd[p1].curY;
-		throttle();
+		scheduler_on_event(SCHEDULER_EVENT_VA_STATUS_CHECK);
 		break;
 	default:
 		WARNING("Unknown VA command %d", no);
@@ -1046,9 +1035,7 @@ static void va_update() {
 	if (!proceeding) {
 		nact->is_va_animation = FALSE;
 	}
-#ifdef __EMSCRIPTEN__
-	status_check_count = 0;
-#endif
+	scheduler_on_event(SCHEDULER_EVENT_VA_UPDATE);
 }
 
 void va_reset(void) {

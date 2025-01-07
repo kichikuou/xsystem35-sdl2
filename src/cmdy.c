@@ -32,6 +32,7 @@
 #include "scenario.h"
 #include "cmd_check.h"
 #include "sdl_core.h"
+#include "scheduler.h"
 #include "music_cdrom.h"
 #include "hacks.h"
 
@@ -79,7 +80,7 @@ static void rance4_Y3_IM_hack() {
 	}
 	commandIM();
 	if (button_pressed && ++count & 15)
-		nact->wait_vsync = FALSE;
+		cancel_yield();
 }
 
 void commandY() {
