@@ -22,13 +22,12 @@
 #include <stdbool.h>
 
 enum scheduler_event {
-	SCHEDULER_EVENT_NEW_FRAME,
+	SCHEDULER_EVENT_SLEEP,
 	SCHEDULER_EVENT_INPUT_CHECK_MISS,
 	SCHEDULER_EVENT_INPUT_CHECK_HIT,
 	SCHEDULER_EVENT_TIMER_CHECK,
 	SCHEDULER_EVENT_AUDIO_CHECK,
 	SCHEDULER_EVENT_VA_STATUS_CHECK,
-	SCHEDULER_EVENT_VA_UPDATE,
 };
 void scheduler_on_event(enum scheduler_event event);
 
@@ -39,10 +38,8 @@ static inline bool is_yield_requested(void) { return scheduler_yield_requested; 
 
 extern int scheduler_cmd_count;
 static inline void scheduler_on_command(void) {
-	if (++scheduler_cmd_count >= 10000) {
+	if (++scheduler_cmd_count >= 10000)
 		request_yield();
-		scheduler_cmd_count = 0;
-	}
 }
 
 #endif // __SCHEDULER__

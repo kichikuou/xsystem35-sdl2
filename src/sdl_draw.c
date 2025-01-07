@@ -36,6 +36,7 @@
 #include "system.h"
 #include "sdl_core.h"
 #include "sdl_private.h"
+#include "scheduler.h"
 #include "font.h"
 #include "ags.h"
 #include "image.h"
@@ -77,6 +78,7 @@ void sdl_sleep(int msec) {
 #else
 	SDL_Delay(msec);
 #endif
+	scheduler_on_event(SCHEDULER_EVENT_SLEEP);
 }
 
 #ifdef __EMSCRIPTEN__
@@ -98,6 +100,7 @@ void sdl_wait_vsync() {
 #else
 	SDL_Delay(16);
 #endif
+	scheduler_on_event(SCHEDULER_EVENT_SLEEP);
 }
 
 /* off-screen の指定領域を Main Window へ転送 */

@@ -1035,7 +1035,6 @@ static void va_update() {
 	if (!proceeding) {
 		nact->is_va_animation = FALSE;
 	}
-	scheduler_on_event(SCHEDULER_EVENT_VA_UPDATE);
 }
 
 void va_reset(void) {

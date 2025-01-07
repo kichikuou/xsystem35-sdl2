@@ -74,7 +74,6 @@ static void ntmain(struct _scoadr inadr) {
 		}
 		sys_getInputInfo();
 		sdl_wait_vsync();
-		scheduler_on_event(SCHEDULER_EVENT_NEW_FRAME);
 	}
 }
 

@@ -17,10 +17,18 @@
  *
 */
 #include "scheduler.h"
+#include "scenario.h"
 #include "nact.h"
 
 bool scheduler_yield_requested;
 int scheduler_cmd_count;
+
+#define BLOOM_FILTER_HASHES 4
+
+// Knuth's multiplicative hash.
+static uint32_t hash(uint32_t x, int s) {
+	return (x * 2654435761ULL) >> s;
+}
 
 /*
  * System 3.x games are basically driven by busy loops that repeatedly check
@@ -30,54 +38,46 @@ int scheduler_cmd_count;
  * loops and schedules a yield.
 */
 void scheduler_on_event(enum scheduler_event event) {
-	static int frame_count = 0;
-	static int cmd_count_of_prev_input = -1;
-	static int timer_check_frame = -1;
-	static int timer_check_count = 0;
-	static int audio_check_frame = -1;
-	static int va_status_check_count;
+	static int prev_cmd_count = -1;
+	static uint64_t bloom = 0;
 
 	switch (event) {
-	case SCHEDULER_EVENT_NEW_FRAME:
-		frame_count++;
+	case SCHEDULER_EVENT_SLEEP:
 		scheduler_yield_requested = false;
+		bloom = 0;
+		scheduler_cmd_count = 0;
+		prev_cmd_count = -1;
 		break;
 
 	case SCHEDULER_EVENT_INPUT_CHECK_MISS:
-		if (scheduler_cmd_count != cmd_count_of_prev_input)
-			scheduler_yield_requested = true;
-		break;
-
 	case SCHEDULER_EVENT_INPUT_CHECK_HIT:
-		cmd_count_of_prev_input = scheduler_cmd_count;
-		break;
-
 	case SCHEDULER_EVENT_TIMER_CHECK:
-		// Allow up to 10 timer checks in single animation frame.
-		if (frame_count == timer_check_frame) {
-			if (++timer_check_count >= 10)
-				scheduler_yield_requested = true;
-		} else {
-			timer_check_frame = frame_count;
-			timer_check_count = 0;
-		}
-		break;
-
 	case SCHEDULER_EVENT_AUDIO_CHECK:
-		if (frame_count == audio_check_frame)
-			scheduler_yield_requested = true;
-		audio_check_frame = frame_count;
-		break;
-
 	case SCHEDULER_EVENT_VA_STATUS_CHECK:
-		if (++va_status_check_count > 1) {
-			va_status_check_count = 0;
-			scheduler_yield_requested = true;
-		}
-		break;
+		// A single Sys3x command may generate multiple scheduler events.
+		// Deduplicate them.
+		if (prev_cmd_count == scheduler_cmd_count)
+			break;
+		prev_cmd_count = scheduler_cmd_count;
 
-	case SCHEDULER_EVENT_VA_UPDATE:
-		va_status_check_count = 0;
+		if (event == SCHEDULER_EVENT_INPUT_CHECK_HIT) {
+			// There are new input events. Let's process them without delay.
+			bloom = 0;
+		} else {
+			uint32_t h1 = hash(sl_getPage(), 7);
+			uint32_t h2 = hash(sl_getIndex(), 15);
+			uint64_t bits = 0;
+			for (int i = 0; i < BLOOM_FILTER_HASHES; i++) {
+				uint32_t h = (h1 + (i + 1) * h2) % 64;
+				bits |= 1ULL << h;
+			}
+			if ((bloom & bits) == bits) {
+				request_yield();
+				bloom = 0;
+			} else {
+				bloom |= bits;
+			}
+		}
 		break;
 	}
 }

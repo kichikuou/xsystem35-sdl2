@@ -121,7 +121,6 @@ void nact_main() {
 			nact->callback();  // Async in emscripten
 			sys_getInputInfo();
 			sdl_wait_vsync();
-			scheduler_on_event(SCHEDULER_EVENT_NEW_FRAME);
 		}
 	}
 }
