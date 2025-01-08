@@ -30,27 +30,18 @@
 #include "portab.h"
 #include "ags.h"
 
-struct sdl_private_data {
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-	SDL_Texture *texture;
-	SDL_Surface     *dsp; /* toplevel surface */
-
-	SDL_Surface     *dib; /* offscreen surface */
-	
-	SDL_Color       col[256]; /* color palette */
-	
-	agsurface_t *cimg;
-	
-	int     view_w;
-	int     view_h;
-	
-	boolean dirty;
-
-	boolean fs_on;
-
-	boolean (*custom_event_handler)(const SDL_Event *);
-};
+extern SDL_Window *sdl_window;
+extern SDL_Renderer *sdl_renderer;
+extern SDL_Texture *sdl_texture;
+extern SDL_Surface *sdl_display; // toplevel surface
+extern SDL_Surface *sdl_dib; // offscreen surface
+extern SDL_Color sdl_col[256]; // color palette
+extern agsurface_t *sdl_dibinfo;
+extern int view_w;
+extern int view_h;
+extern bool sdl_dirty;
+extern bool sdl_fs_on;
+extern boolean (*sdl_custom_event_handler)(const SDL_Event *);
 
 void sdl_event_init(void);
 void sdl_cursor_init(void);
@@ -58,20 +49,5 @@ int sdl_nearest_color(int r, int g, int b);
 boolean sdl_joy_open(int index);
 SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h);
 SDL_Surface *sdl_dib_to_surface_colorkey(int x, int y, int w, int h, int col);
-
-extern struct sdl_private_data *sdl_videodev;
-
-#define sdl_window (sdl_videodev->window)
-#define sdl_renderer (sdl_videodev->renderer)
-#define sdl_texture (sdl_videodev->texture)
-#define sdl_display (sdl_videodev->dsp)
-#define sdl_dib (sdl_videodev->dib)
-#define sdl_col (sdl_videodev->col)
-#define sdl_dibinfo (sdl_videodev->cimg)
-#define view_w (sdl_videodev->view_w)
-#define view_h (sdl_videodev->view_h)
-#define sdl_dirty (sdl_videodev->dirty)
-#define sdl_fs_on (sdl_videodev->fs_on)
-#define sdl_custom_event_handler (sdl_videodev->custom_event_handler)
 
 #endif /* __SDL_PRIVATE_H__ */

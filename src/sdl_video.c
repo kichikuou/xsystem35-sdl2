@@ -36,10 +36,22 @@
 #include "xsystem35.h"
 #include "image.h"
 
+SDL_Window *sdl_window;
+SDL_Renderer *sdl_renderer;
+SDL_Texture *sdl_texture;
+SDL_Surface *sdl_display; // toplevel surface
+SDL_Surface *sdl_dib; // offscreen surface
+SDL_Color sdl_col[256]; // color palette
+agsurface_t *sdl_dibinfo;
+int view_w;
+int view_h;
+bool sdl_dirty;
+bool sdl_fs_on;
+boolean (*sdl_custom_event_handler)(const SDL_Event *);
+
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
 
-struct sdl_private_data *sdl_videodev;
 static int joy_device_index = -1;
 
 static SDL_Joystick *js;
@@ -73,8 +85,6 @@ static boolean joy_open(void) {
 
 /* SDL の初期化 */
 int sdl_Initialize(const char *render_driver) {
-	sdl_videodev = calloc(1, sizeof(struct sdl_private_data));
-
 	window_init(render_driver);
 	
 	/* offscreen Pixmap */
@@ -95,8 +105,6 @@ int sdl_Initialize(const char *render_driver) {
 }
 
 void sdl_Remove(void) {
-	if (sdl_videodev == NULL) return;
-
 	if (sdl_display) {
 		SDL_FreeSurface(sdl_dib);
 		SDL_DestroyRenderer(sdl_renderer);
