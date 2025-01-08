@@ -2,6 +2,7 @@
 #include <afxres.h>
 #include "resources.h"
 
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "xsystem35.exe.manifest"
 100 ICON DISCARDABLE "xsystem35.ico"
 
 // Note for game translators:
