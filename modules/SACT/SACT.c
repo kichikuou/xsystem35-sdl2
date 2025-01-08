@@ -1800,9 +1800,7 @@ static void MusicCheck() {
 	int wNum = getCaliValue();
 	int *vRND = getCaliVariable();
 	
-	dridata *dfile = ald_getdata(DRIFILE_BGM, wNum - 1);
-	*vRND = dfile ? 1 : 0;
-	ald_freedata(dfile);
+	*vRND = ald_exists(DRIFILE_BGM, wNum - 1) ? 1 : 0;
 	
 	TRACE("SACT.MusicCheck %d,%p:", wNum, vRND);
 }

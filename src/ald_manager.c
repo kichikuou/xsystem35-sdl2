@@ -45,6 +45,18 @@ static void ald_free(dridata *dfile) {
 	free(dfile);
 }
 
+bool ald_is_linked(DRIFILETYPE type, int no) {
+	if (type >= DRIFILETYPEMAX || !dri[type])
+		return false;
+	return dri_is_linked(dri[type], no);
+}
+
+bool ald_exists(DRIFILETYPE type, int no) {
+	if (type >= DRIFILETYPEMAX || !dri[type])
+		return false;
+	return dri_exists(dri[type], no);
+}
+
 /*
  * load dri data
  *   type: data type

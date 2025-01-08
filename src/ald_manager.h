@@ -39,6 +39,8 @@ typedef enum {
 } DRIFILETYPE;
 
 void ald_init(int type, const char **file, int cnt, boolean use_mmap);
+bool ald_is_linked(DRIFILETYPE type, int no);
+bool ald_exists(DRIFILETYPE type, int no);
 dridata *ald_getdata(DRIFILETYPE type, int no);
 void ald_freedata(dridata *data);
 int ald_get_maxno(DRIFILETYPE type);

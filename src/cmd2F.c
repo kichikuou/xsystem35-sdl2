@@ -1040,8 +1040,7 @@ void commands2F64() {
 	int eNum  = getCaliValue();
 	int *vResult = getCaliVariable();
 	DRIFILETYPE t = DRIFILE_DATA;
-	dridata *dfile;
-	
+
 	switch(eType) {
 	case 0:
 		t = DRIFILE_DATA;
@@ -1062,16 +1061,9 @@ void commands2F64() {
 		t = DRIFILE_RSC;
 		break;
 	}
-	
-	dfile = ald_getdata(t, eNum -1);
-	if (dfile == NULL) {
-		*vResult = 0;
-	} else {
-		*vResult = 1;
-	}
-	
-	ald_freedata(dfile);
-	
+
+	*vResult = ald_is_linked(t, eNum - 1) ? 1 : 0;
+
 	TRACE("lnkIsLink %d, %d, %d:", eType, eNum, *vResult);
 }
 
@@ -1081,8 +1073,7 @@ void commands2F65() {
 	int *vResult = getCaliVariable();
 	
 	DRIFILETYPE t = DRIFILE_DATA;
-	dridata *dfile;
-	
+
 	switch(eType) {
 	case 0:
 		t = DRIFILE_DATA;
@@ -1103,16 +1094,9 @@ void commands2F65() {
 		t = DRIFILE_RSC;
 		break;
 	}
-	
-	dfile = ald_getdata(t, eNum -1);
-	if (dfile == NULL) {
-		*vResult = 0;
-	} else {
-		*vResult = 1;
-	}
-	
-	ald_freedata(dfile);
-	
+
+	*vResult = ald_exists(t, eNum - 1) ? 1 : 0;
+
 	TRACE("lnkIsData %d, %d, %d:", eType, eNum, *vResult);
 }
 

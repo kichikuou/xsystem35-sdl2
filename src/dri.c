@@ -114,8 +114,16 @@ drifiles *dri_init(const char **file, int cnt, boolean use_mmap) {
 	return d;
 }
 
+bool dri_is_linked(drifiles *d, int no) {
+	return no >= 0 && no < d->nr_files && d->link[no * 3];
+}
+
+bool dri_exists(drifiles *d, int no) {
+	return dri_is_linked(d, no) && d->offset[no];
+}
+
 dridata *dri_getdata(drifiles *d, int no) {
-	if (no < 0 || no >= d->nr_files || !d->link[no * 3] || !d->offset[no])
+	if (!dri_exists(d, no))
 		return NULL;
 	int volume = d->link[no * 3];
 
