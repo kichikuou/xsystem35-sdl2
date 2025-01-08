@@ -107,10 +107,15 @@ extern void sdl_setAutoRepeat(boolean enable);
 extern MyPoint sdl_translateMouseCoords(int x, int y);
 
 /* misc */
-extern void sdl_mainIteration();
+enum messagebox_type {
+	MESSAGEBOX_ERROR,
+	MESSAGEBOX_WARNING,
+	MESSAGEBOX_INFO,
+};
 extern uint32_t sdl_getTicks(void);
 extern void sdl_sleep(int msec);
 extern void sdl_wait_vsync();
+extern void sdl_showMessageBox(enum messagebox_type type, const char* title_utf8, const char* message_utf8);
 extern boolean sdl_inputString(struct inputstring_param *);
 extern void sdl_post_debugger_command(void *data);
 extern void sdl_handle_event(SDL_Event *e);

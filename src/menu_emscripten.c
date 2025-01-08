@@ -63,10 +63,6 @@ boolean menu_inputnumber(INPUTNUM_PARAM *p) {
 	return TRUE;
 }
 
-EM_JS(void, menu_msgbox_open, (char *msg), {
-	window.alert(UTF8ToString(msg));
-});
-
 void menu_init(void) {
 	return;
 }

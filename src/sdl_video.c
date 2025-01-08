@@ -263,6 +263,16 @@ void sdl_setWindowSize(int w, int h) {
 #endif
 }
 
+void sdl_showMessageBox(enum messagebox_type type, const char* title_utf8, const char* message_utf8) {
+	uint32_t flags = 0;
+	switch (type) {
+	case MESSAGEBOX_ERROR: flags = SDL_MESSAGEBOX_ERROR; break;
+	case MESSAGEBOX_WARNING: flags = SDL_MESSAGEBOX_WARNING; break;
+	case MESSAGEBOX_INFO: flags = SDL_MESSAGEBOX_INFORMATION; break;
+	}
+	SDL_ShowSimpleMessageBox(flags, title_utf8, message_utf8, sdl_window);
+}
+
 void sdl_setJoyDeviceIndex(int index) {
 	joy_device_index = index;
 }

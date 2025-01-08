@@ -187,7 +187,7 @@ void sys_error(char *format, ...) {
 	va_start(args, format);
 	vsnprintf(buf, sizeof buf, format, args);
 	va_end(args);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35", buf, NULL);
+	sdl_showMessageBox(MESSAGEBOX_ERROR, "xsystem35", buf);
 
 	sys35_remove();
 	exit(1);
@@ -522,7 +522,7 @@ int main(int argc, char **argv) {
 	
 	if (!initGameResource(&nact->files, gameResourceFile, savedir)) {
 #ifdef _WIN32
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)", NULL);
+		sdl_showMessageBox(MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)");
 		exit(1);
 #else
 		sys35_usage(TRUE);

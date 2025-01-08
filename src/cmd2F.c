@@ -941,7 +941,7 @@ void commands2F5A() {
 	char *t1;
 	
 	t1 = toUTF8(sText);
-	menu_msgbox_open(t1);
+	sdl_showMessageBox(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
 	free(t1);
 	
 	TRACE("strMessageBox %s:", sText);
@@ -952,7 +952,7 @@ void commands2F5B() {
 	char *t1;
 	
 	t1 = toUTF8(svar_get(eNum));
-	menu_msgbox_open(t1);
+	sdl_showMessageBox(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
 	free(t1);
 	
 	TRACE("strMessageBoxStr %d:", eNum);

@@ -36,7 +36,6 @@
 #include "xsystem35.h"
 #include "modules.h"
 #include "sdl_core.h"
-#include "sdl_private.h"
 #include "input.h"
 #include "menu.h"
 
@@ -55,7 +54,7 @@ static void OutputMessageBox(void) { /* 0 */
 	char *title_utf8 = toUTF8(svar_get(title));
 	char *msg_utf8 = toUTF8(svar_get(msg));
 
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title_utf8, msg_utf8, sdl_window);
+	sdl_showMessageBox(MESSAGEBOX_INFO, title_utf8, msg_utf8);
 
 	free(title_utf8);
 	free(msg_utf8);

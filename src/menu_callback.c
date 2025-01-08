@@ -41,7 +41,6 @@ GtkWidget *menu_label_inputstring_maxchar;
 GtkWidget *menu_label_inputnum_max;
 GtkWidget *menu_label_inputnum_min;
 GtkWidget *menu_label_inputnum_def;
-GtkWidget *menu_label_msgbox;
 GtkWidget *menu_spinbutton;
 GtkWidget *menu_textentry;
 GtkWidget *menu_textentry2;
@@ -53,7 +52,6 @@ GtkWidget *menu_window_is;    /* input string window */
 GtkWidget *menu_window_is2;   /* input string window no 2*/
 GtkWidget *menu_window_in;    /* input number window */
 GtkWidget *menu_window_about; /* about xsystem35 window */
-GtkWidget *menu_window_msgbox;/* message box window */
 
 void
 on_window3_destroy                     (GObject       *object,
@@ -242,13 +240,5 @@ on_entry2_activate                     (GtkEditable     *editable,
 	menu_textentry_string = gtk_entry_get_text(GTK_ENTRY(editable));
 	menu_ok_input = TRUE;
 	gtk_widget_hide(menu_window_is2);
-	gtk_main_quit();
-}
-
-void
-on_button16_clicked                    (GtkButton       *button,
-                                        gpointer         user_data)
-{
-	gtk_widget_hide(menu_window_msgbox);
 	gtk_main_quit();
 }

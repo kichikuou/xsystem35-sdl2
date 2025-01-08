@@ -51,7 +51,6 @@ extern void menu_resetmenu_open(void);
 extern boolean menu_inputstring(INPUTSTRING_PARAM *);
 extern boolean menu_inputstring2(INPUTSTRING_PARAM *);
 extern boolean menu_inputnumber(INPUTNUM_PARAM *);
-extern void menu_msgbox_open(char *);
 extern void menu_widgetinit(void);
 extern void menu_init();
 extern void menu_gtkmainiteration();

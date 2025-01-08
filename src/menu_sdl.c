@@ -105,10 +105,6 @@ boolean menu_inputnumber(INPUTNUM_PARAM *p) {
 #endif
 }
 
-void menu_msgbox_open(char *msg) {
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, nact->game_title_utf8, msg, sdl_window);
-}
-
 void menu_init(void) {
 #ifdef _WIN32
 	win_menu_init();

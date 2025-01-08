@@ -56,8 +56,7 @@ static void saveScreenshot(void) {
 	if (!GetSaveFileName(&ofn))
 		return;
 	if (SDL_SaveBMP(sdl_display, pathbuf) != 0) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "xsystem35",
-								 SDL_GetError(), sdl_window);
+		sdl_showMessageBox(MESSAGEBOX_ERROR, "xsystem35", SDL_GetError());
 		SDL_ClearError();
 	}
 }

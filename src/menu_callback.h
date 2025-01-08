@@ -36,7 +36,6 @@ extern GtkWidget *menu_label_inputstring_maxchar;
 extern GtkWidget *menu_label_inputnum_max;
 extern GtkWidget *menu_label_inputnum_min;
 extern GtkWidget *menu_label_inputnum_def;
-extern GtkWidget *menu_label_msgbox;
 extern GtkWidget *menu_spinbutton;
 extern GtkWidget *menu_textentry;
 extern GtkWidget *menu_textentry2;
@@ -48,7 +47,6 @@ extern GtkWidget *menu_window_is;    /* input string window */
 extern GtkWidget *menu_window_is2;   /* input string window no 2*/
 extern GtkWidget *menu_window_in;    /* input number window */
 extern GtkWidget *menu_window_about; /* about xsystem35 window */
-extern GtkWidget *menu_window_msgbox;/* message box window */
 
 
 void
@@ -125,9 +123,5 @@ on_spinbutton1_activate                (GtkEditable     *editable,
 
 void
 on_entry2_activate                     (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-on_button16_clicked                    (GtkButton       *button,
                                         gpointer         user_data);
 #endif /* !__MENU_CALLBACK__ */

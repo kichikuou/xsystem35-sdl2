@@ -143,16 +143,6 @@ boolean menu_inputnumber(INPUTNUM_PARAM *p) {
 	return TRUE;
 }
 
-void menu_msgbox_open(char *msg) {
-	if (!menu_initilized) return;
-	
-	gtk_label_set_text(GTK_LABEL(menu_label_msgbox), msg);
-	gtk_widget_show(menu_window_msgbox);
-	g_idle_add((GSourceFunc)sys_getInputInfo, menu_window_msgbox);
-	gtk_main();
-	g_idle_remove_by_data(menu_window_msgbox);
-}
-
 void menu_init() {
 	menu_initilized = TRUE;
 	menu_window_popup = create_menu1();
@@ -161,7 +151,6 @@ void menu_init() {
 	menu_window_exit  = create_window3();
 	menu_window_about = create_window4();
 	menu_window_is2   = create_window5();
-	menu_window_msgbox= create_window6();
 }
 
 void menu_gtkmainiteration() {
