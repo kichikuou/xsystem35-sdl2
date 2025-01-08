@@ -586,10 +586,11 @@ int sp_query_size(int wNum, int *vw, int *vh) {
 // テキストスプライトの現在の文字表示位置の取得
 int sp_query_textpos(int wNum, int *vx, int *vy) {
 	if (wNum >= SPRITEMAX) goto errexit;
-	if (sact.sp[wNum]->type != SPRITE_MSG) goto errexit;
-	
-	*vx = sact.sp[wNum]->u.msg.dspcur.x;
-	*vy = sact.sp[wNum]->u.msg.dspcur.y;
+	sprite_t *sp = sact.sp[wNum];
+	if (sp->type != SPRITE_MSG) goto errexit;
+
+	*vx = sp->u.msg.dspcur.x + sp->loc.x;
+	*vy = sp->u.msg.dspcur.y + sp->loc.y;
 	return OK;
 	
  errexit:
