@@ -85,8 +85,15 @@ void scheduler_on_event(enum scheduler_event event) {
 }
 
 void scheduler_yield(void) {
-	if (game_id == GAME_AGAKE)
+	switch (game_id) {
+	case GAME_AGAKE:
 		sdl_sleep(6);  // The slot game runs in a 6ms-cycle loop.
-	else
+		break;
+	case GAME_PERSIOM:
+		sdl_sleep(10);  // The slot game runs in a 10ms-cycle loop.
+		break;
+	default:
 		sdl_wait_vsync();
+		break;
+	}
 }

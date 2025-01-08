@@ -30,6 +30,7 @@ enum gameId {
 	GAME_RANCE4_ENG,
 	GAME_RANCE4_V2,
 	GAME_AGAKE,
+	GAME_PERSIOM,
 };
 
 extern enum gameId game_id;
