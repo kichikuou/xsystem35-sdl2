@@ -4,10 +4,10 @@ Game Compatibility
 |                 Game                        |   Status    | Notes |
 | ------------------------------------------- | ----------- | ----- |
 | 鬼畜王ランス                                | Supported   |       |
-| Kichikuou Rance (EN)                        | Supported   |       |
+| Kichikuou Rance (EN)                        | Supported   | Fan translation |
 | RanceIV －教団の遺産－                      | Supported   | Win95 edition and [Ver2.05](https://hannylaboratory.blogspot.com/2023/01/blog-post_26.html) |
-| Rance4 -Legacy of the Sect- (EN)            | Supported   |       |
-| 兰斯IV －教团的遗产－ (CN)                  | Supported   |       |
+| Rance4 -Legacy of the Sect- (EN)            | Supported   | Fan translation |
+| 兰斯IV －教团的遗产－ (CN)                  | Supported   | Fan translation |
 | ランス4.1                                   | Supported   | [Ver1.05](https://hannylaboratory.blogspot.com/2023/02/blog-post_9.html). Use system3-sdl2 for older versions |
 | ランス4.2                                   | Supported   | [Ver1.05](https://hannylaboratory.blogspot.com/2023/02/blog-post_9.html). Use system3-sdl2 for older versions |
 | いけないかつみ先生                          | Supported   | Emojis are not supported |
@@ -52,9 +52,9 @@ Game Compatibility
 | 妻みぐい                                    | Supported   | Opening demo is not supported |
 | 超昂天使エスカレイヤー                      | Supported   | Opening demo is not supported |
 | ランス５Ｄ                                  | Supported   |       |
-| Rance 5D - The Lonely Girl (MangaGamer)     | Supported   |       |
-| 俺の下であがけ                              | Unknown     |       |
-| 楽園行                                      | Unknown     |       |
+| Rance 5D - The Lonely Girl (EN)             | Supported   | MangaGamer version |
+| 俺の下であがけ                              | Supported   |       |
+| 楽園行                                      | Supported   |       |
 | 妻みぐい２                                  | Supported   |       |
 | シェル・クレイル                            | Supported   |       |
 | ナイトデーモン                              | Supported   |       |
