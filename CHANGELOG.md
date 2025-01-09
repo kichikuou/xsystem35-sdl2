@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.14.0 - 2024-01-09
+- New supported games: 俺の下であがけ and 楽園行.
+- Windows: On Windows 10 version 1903 or above, now xsystem35 can handle
+  Japanese filenames correctly even if the system locale is not Japanese.
+
 ## 2.13.0 - 2024-12-07
 - Windows: `Option` -> `Auto Copy Text to Clipboard` menu command has been added.
   When enabled, in-game text will be copied to the clipboard automatically. This
