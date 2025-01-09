@@ -29,6 +29,7 @@
 #include "system.h"
 #include "LittleEndian.h"
 #include "dri.h"
+#include "sdl_core.h"
 
 static bool read_index(int volume, drifiles *d, FILE *fp) {
 	fseek(fp, 0L, SEEK_END);
@@ -122,9 +123,34 @@ bool dri_exists(drifiles *d, int no) {
 	return dri_is_linked(d, no) && d->offset[no];
 }
 
+static void warn_missing_ald(drifiles *d, int no) {
+	static bool warned = false;
+	if (warned) return;
+	warned = true;
+
+	int vol = d->link[no * 3];
+	char msgbuf[1024];
+	if (d->fnames[vol - 1]) {
+		snprintf(msgbuf, sizeof(msgbuf), "Cannot read resource #%d from %s.", no, d->fnames[vol - 1]);
+	} else if (d->fnames[0]) {
+		char *fname = strdup(d->fnames[0]);
+		char *p = strrchr(fname, '.');
+		if (p && p > fname)
+			p[-1] = vol - 1 + 'A';
+		snprintf(msgbuf, sizeof(msgbuf), "%s is not found.\nPlease make sure you have all .ALD files copied from the CD-ROM.", fname);
+		free(fname);
+	} else {
+		snprintf(msgbuf, sizeof(msgbuf), "Cannot read resource #%d.", no);
+	}
+	sdl_showMessageBox(MESSAGEBOX_WARNING, "xsystem35", msgbuf);
+}
+
 dridata *dri_getdata(drifiles *d, int no) {
-	if (!dri_exists(d, no))
+	if (!dri_exists(d, no)) {
+		if (dri_is_linked(d, no))
+			warn_missing_ald(d, no);
 		return NULL;
+	}
 	int volume = d->link[no * 3];
 
 	uint8_t *data;
