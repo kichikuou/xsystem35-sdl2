@@ -30,6 +30,7 @@
 #include "ags.h"
 #include "graphics.h"
 #include "surface.h"
+#include "graph.h"
 #include "ngraph.h"
 #include "sprite.h"
 
@@ -89,10 +90,7 @@ int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 			gr_copy(sf0, dx, dy, cg->sf, sx, sy, w, h);
 		} else if (sp->blendrate > 0) {
 			// alpha値指定がある場合
-			gre_Blend(sf0, dx, dy,
-				  sf0, dx, dy,
-				  cg->sf, sx, sy, w, h,
-				  sp->blendrate);
+			gr_blend(sf0, dx, dy, cg->sf, sx, sy, w, h, sp->blendrate);
 		}
 	}
 	
@@ -132,9 +130,7 @@ int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	dx += r->x;
 	dy += r->y;
 	
-	gre_BlendScreen(sf0, dx, dy,
-			sf0, dx, dy,
-			cg->sf, sx, sy, w, h);
+	gr_blend_screen(sf0, dx, dy, cg->sf, sx, sy, w, h);
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);

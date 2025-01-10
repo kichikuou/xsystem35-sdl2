@@ -5,6 +5,7 @@
 #include "cg.h"
 #include "ags.h"
 #include "surface.h"
+#include "graph.h"
 #include "ngraph.h"
 #include "night.h"
 #include "sprite.h"
@@ -195,7 +196,7 @@ void nt_gr_screencg(int no, int x, int y) {
 	
 	sf = sf_loadcg_no(no -1);
 	
-	gre_BlendScreen(sf0, x, y, sf0, x, y, sf, 0, 0, sf->width, sf->height);
+	gr_blend_screen(sf0, x, y, sf, 0, 0, sf->width, sf->height);
 	
 	ags_updateArea(x, y, sf->width, sf->height);
 	

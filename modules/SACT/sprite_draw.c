@@ -32,6 +32,7 @@
 #include "graphics.h"
 #include "sact.h"
 #include "surface.h"
+#include "graph.h"
 #include "ngraph.h"
 #include "sprite.h"
 
@@ -130,10 +131,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 			gr_copy(sf0, dx, dy, cg->sf, sx, sy, w, h);
 		} else if (sp->blendrate > 0) {
 			// alpha値指定がある場合
-			gre_Blend(sf0, dx, dy,
-				  sf0, dx, dy,
-				  cg->sf, sx, sy, w, h,
-				  sp->blendrate);
+			gr_blend(sf0, dx, dy, cg->sf, sx, sy, w, h, sp->blendrate);
 		}
 	}
 	

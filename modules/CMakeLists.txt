@@ -80,8 +80,6 @@ add_library(modules STATIC
   lib/graph_stretch.c
   lib/graph_cg.c
   lib/gre_blend_useamap.c
-  lib/gre_blend.c
-  lib/gre_blend_screen.c
   nDEMO/nDEMO.c
   nDEMOE/nDEMOE.c
   oDEMO/oDEMO.c

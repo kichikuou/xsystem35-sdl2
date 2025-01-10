@@ -180,7 +180,34 @@ void gr_init() {
 
 void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv) {
 	if (!gr_clip(src, &sx, &sy, &width, &height, dst, &dx, &dy)) return;
-	gre_Blend(dst, dx, dy, dst, dx, dy, src, sx, sy, width, height, lv);
+
+	uint8_t *sp = GETOFFSET_PIXEL(src,   sx, sy);
+	uint8_t *dp = GETOFFSET_PIXEL(dst,   dx, dy);
+
+	switch(dst->depth) {
+	case 16:
+		for (int y = 0; y < height; y++) {
+			uint16_t *yls = (uint16_t *)(sp + y * src->bytes_per_line);
+			uint16_t *yld = (uint16_t *)(dp + y * dst->bytes_per_line);
+			for (int x = 0; x < width; x++) {
+				*yld = ALPHABLEND16(*yls, *yld, lv);
+				yls++; yld++;
+			}
+		}
+		break;
+
+	case 24:
+	case 32:
+		for (int y = 0; y < height; y++) {
+			uint32_t *yls = (uint32_t *)(sp + y * src->bytes_per_line);
+			uint32_t *yld = (uint32_t *)(dp + y * dst->bytes_per_line);
+			for (int x = 0; x < width; x++) {
+				*yld = ALPHABLEND24(*yls, *yld, lv);
+				yls++; yld++;
+			}
+		}
+		break;
+	}
 }
 
 void gr_blend_src_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int alpha, int rate) {

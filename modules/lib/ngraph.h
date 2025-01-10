@@ -58,12 +58,6 @@ extern int gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width,
 /* in gre_blend_useamap.c */
 extern int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, surface_t *alpha, int ax, int ay, int lv);
 
-/* in gre_blend.c */
-extern int gre_Blend(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv);
-
-/* in gre_blend_screen.c */
-extern int gre_BlendScreen(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height);
-
 /* in graph_stretch.c */
 extern void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh);
 
