@@ -24,8 +24,8 @@
 
 #include "config.h"
 
-#include <assert.h>
 #include <portmidi.h>
+#include <SDL_atomic.h>
 #include <SDL_thread.h>
 #include <SDL_timer.h>
 
@@ -70,33 +70,60 @@ mididevice_t midi_portmidi = {
 	NULL
 };
 
-static boolean enabled = FALSE;
-static PortMidiStream *stream;
+enum midi_command {
+	CMD_PLAY,
+	CMD_STOP,
+	CMD_QUIT,
+	CMD_PAUSE,
+	CMD_UNPAUSE,
+};
+
+struct midi_message {
+	enum midi_command command;
+	// for CMD_PLAY
+	int seq;
+	struct midiinfo *music;
+};
+
 static PmDeviceID device_id;
 static SDL_Thread *thread;
 static struct msgq *queue;
 static int start_time;
+static SDL_atomic_t atomic_seq;
 
-static char cmd_pause[] = "pause";
-static char cmd_unpause[] = "unpause";
-static char cmd_stop[] = "stop";
+static void enqueue(struct midi_message msg) {
+	struct midi_message *buf = malloc(sizeof(struct midi_message));
+	*buf = msg;
+	msgq_enqueue(queue, buf);
+}
+#define ENQUEUE(...) enqueue((struct midi_message){__VA_ARGS__})
 
-static void allnotesoff() {
+static void dequeue(struct midi_message *msg_out) {
+	struct midi_message *msg = msgq_dequeue(queue);
+	*msg_out = *msg;
+	free(msg);
+}
+
+static bool dequeue_timeout(uint32_t timeout_ms, struct midi_message *msg_out) {
+	struct midi_message *msg = msgq_dequeue_timeout(queue, timeout_ms);
+	if (!msg)
+		return false;
+	*msg_out = *msg;
+	free(msg);
+	return true;
+}
+
+static void allnotesoff(PortMidiStream *stream) {
 	for (int i = 0; i < 16; i++) {
 		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x7b, 0x00));
 	}
 }
 
-static void send_reset() {
+static void send_reset(PortMidiStream *stream) {
 	for (int i = 0; i < 16; i++) {
 		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x78, 0x00));
 		Pm_WriteShort(stream, 0, Pm_Message(0xb0 + i, 0x79, 0x00));
 	}
-	return;
-}
-
-static void midi_write(struct midievent *event, uint32_t timestamp) {
-	Pm_WriteShort(stream, timestamp, event->data);
 }
 
 static PmTimestamp midi_time_proc(void *time_info) {
@@ -107,32 +134,45 @@ static uint32_t ticks2ms(int ticks, int division, unsigned int tempo) {
 	return ticks * tempo / (division * 1000);
 }
 
-static void *midi_mainloop(struct midiinfo *midi) {
+static void midi_playloop(PortMidiStream *stream, struct midiinfo *midi) {
 	int i = 0;
 	int ctick = 0;
 	int tempo = 500000;
 	uint32_t last_time = SDL_GetTicks();
 
-	void *cmd;
 	while (i < midi->nr_events) {
 		if (ctick < midi->event[i].ctime) {
 			int delta = midi->event[i].ctime - ctick;
 			uint32_t target_time = last_time + ticks2ms(delta, midi->division, tempo);
 			uint32_t current_time = SDL_GetTicks();
 			while (current_time < target_time) {
-				cmd = msgq_dequeue_timeout(queue, target_time - current_time);
-				if (cmd == cmd_stop)
-					return cmd;
-
-				if (cmd == cmd_pause) {
-					while (TRUE) {
-						cmd = msgq_dequeue(queue);
-						if (cmd == cmd_stop)
-							return cmd;
-						if (cmd == cmd_unpause)
-							break;
+				struct midi_message msg;
+				if (dequeue_timeout(target_time - current_time, &msg)) {
+					switch (msg.command) {
+					case CMD_PAUSE:
+						while (msg.command != CMD_UNPAUSE) {
+							dequeue(&msg);
+							switch (msg.command) {
+							case CMD_UNPAUSE:
+							case CMD_PAUSE:
+								break;
+							case CMD_STOP:
+								return;
+							case CMD_PLAY:
+							case CMD_QUIT:
+								SYSERROR("Cannot happen");
+							}
+						}
+						target_time += SDL_GetTicks() - current_time;
+						break;
+					case CMD_UNPAUSE:
+						break;
+					case CMD_STOP:
+						return;
+					case CMD_PLAY:
+					case CMD_QUIT:
+						SYSERROR("Cannot happen");
 					}
-					target_time += SDL_GetTicks() - current_time;
 				}
 				current_time = SDL_GetTicks();
 			}
@@ -141,7 +181,7 @@ static void *midi_mainloop(struct midiinfo *midi) {
 		}
 
 		if (midi->event[i].type == MIDI_EVENT_NORMAL) {
-			midi_write(&midi->event[i], last_time);
+			Pm_WriteShort(stream, last_time, midi->event[i].data);
 			i++;
 		} else if (midi->event[i].type == MIDI_EVENT_TEMPO) {
 			tempo = midi->event[i].data;
@@ -156,7 +196,7 @@ static void *midi_mainloop(struct midiinfo *midi) {
 				i += MIDI_SYS35_EVENT_SIZE;
 				break;
 			case MIDI_SYS35_LABEL_JUMP:
-				allnotesoff();
+				allnotesoff(stream);
 				i = midi->sys35_label[vn2];
 				ctick = midi->event[i].ctime;
 				break;
@@ -168,7 +208,7 @@ static void *midi_mainloop(struct midiinfo *midi) {
 				if (flags.midi_flag[vn2] == 1) {
 					i = midi->sys35_label[vn3];
 					ctick = midi->event[i].ctime;
-					allnotesoff();
+					allnotesoff(stream);
 				} else {
 					i += MIDI_SYS35_EVENT_SIZE;
 				}
@@ -181,7 +221,7 @@ static void *midi_mainloop(struct midiinfo *midi) {
 				if (--(flags.midi_variable[vn2]) == 0) {
 					i = midi->sys35_label[vn3];
 					ctick = midi->event[i].ctime;
-					allnotesoff();
+					allnotesoff(stream);
 				} else {
 					i += MIDI_SYS35_EVENT_SIZE;
 				}
@@ -191,12 +231,48 @@ static void *midi_mainloop(struct midiinfo *midi) {
 			WARNING("Unknown type of event %x (NEVER!).", midi->event[i].type);
 		}
 	}
-	return NULL;
+}
+
+static int midi_thread(void*) {
+	PortMidiStream *stream;
+	PmError err = Pm_OpenOutput(&stream, device_id, NULL, 0, midi_time_proc, NULL, MIDI_LATENCY);
+	if (err != pmNoError) {
+		WARNING("Pm_OpenOutput failed: %s", Pm_GetErrorText(err));
+		stream = NULL;
+	}
+
+	if (stream)
+		send_reset(stream);
+
+	for (;;) {
+		struct midi_message msg;
+		dequeue(&msg);
+		switch (msg.command) {
+		case CMD_PLAY:
+			if (stream) {
+				midi_playloop(stream, msg.music);
+				send_reset(stream);
+			}
+			SDL_AtomicCAS(&atomic_seq, msg.seq, 0);
+			mf_remove_midifile(msg.music);
+			break;
+
+		case CMD_STOP:
+		case CMD_PAUSE:
+		case CMD_UNPAUSE:
+			break;
+
+		case CMD_QUIT:
+			if (stream) {
+				SDL_Delay(MIDI_LATENCY);
+				Pm_Close(stream);
+			}
+			return 0;
+		}
+	}
 }
 
 static int midi_initialize(int subdev) {
-	enabled = FALSE;
-
 	PmError err = Pm_Initialize();
 	if (err != pmNoError) {
 		WARNING("%s", Pm_GetErrorText(err));
@@ -215,62 +291,45 @@ static int midi_initialize(int subdev) {
 	}
 
 	device_id = subdev;
-	enabled = TRUE;
 	return OK;
 }
 
 static int midi_exit(void) {
-	if (enabled) {
-		midi_stop();
+	if (queue) {
+		ENQUEUE(CMD_STOP);
+		ENQUEUE(CMD_QUIT);
+		SDL_WaitThread(thread, NULL);
+		thread = NULL;
+		msgq_free(queue);
+		queue = NULL;
 	}
 	Pm_Terminate();
 	return OK;
 }
 
 static int midi_reset(void) {
-	if (enabled) {
-		midi_stop();
-	}
+	midi_stop();
 	return OK;
-}
-
-static int midi_thread(void *data) {
-	send_reset();
-
-	void *cmd = midi_mainloop(data);
-
-	send_reset();
-	SDL_Delay(MIDI_LATENCY);
-
-	mf_remove_midifile(data);
-	Pm_Close(stream);
-	stream = NULL;
-
-	while (cmd != cmd_stop)
-		cmd = msgq_dequeue(queue);
-	return 0;
 }
 
 /* no = 0~ */
 static int midi_start(int no, int loop, char *data, int datalen) {
-	if (queue)
-		midi_stop();
+	static int seq = 0;
+
+	if (queue) {
+		ENQUEUE(CMD_STOP);
+	} else {
+		queue = msgq_new();
+		thread = SDL_CreateThread(midi_thread, "MIDI", NULL);
+	}
 
 	struct midiinfo *midi = mf_read_midifile(data, datalen);
 	if (!midi) {
 		WARNING("error reading midi file");
 		return NG;
 	}
-
-	PmError err = Pm_OpenOutput(&stream, device_id, NULL, 0, midi_time_proc, NULL, MIDI_LATENCY);
-	if (err != pmNoError) {
-		WARNING("Pm_OpenOutput failed: %s", Pm_GetErrorText(err));
-		mf_remove_midifile(midi);
-		return NG;
-	}
-
-	queue = msgq_new();
-	thread = SDL_CreateThread(midi_thread, "MIDI", midi);
+	SDL_AtomicSet(&atomic_seq, ++seq);
+	ENQUEUE(CMD_PLAY, seq, midi);
 
 	start_time = SDL_GetTicks();
 
@@ -278,42 +337,27 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 }
 
 static int midi_stop(void) {
-	if (!enabled || !queue) {
-		return OK;
+	if (queue) {
+		SDL_AtomicSet(&atomic_seq, 0);
+		ENQUEUE(CMD_STOP);
 	}
-
-	msgq_enqueue(queue, cmd_stop);
-	SDL_WaitThread(thread, NULL);
-	thread = NULL;
-	msgq_free(queue);
-	queue = NULL;
-
 	return OK;
 }
 
 static int midi_pause(void) {
-	if (!enabled || !queue) return OK;
-
-	msgq_enqueue(queue, cmd_pause);
+	if (queue)
+		ENQUEUE(CMD_PAUSE);
 	return OK;
 }
 
 static int midi_unpause(void) {
-	if (!enabled || !queue) return OK;
-
-	msgq_enqueue(queue, cmd_unpause);
+	if (queue)
+		ENQUEUE(CMD_UNPAUSE);
 	return OK;
 }
 
 static int midi_getpos(midiplaystate *st) {
-	if (!enabled || !queue) {
-		st->in_play = FALSE;
-		st->loc_ms  = 0;
-		return OK;
-	}
-
-	if (!stream) {
-		midi_stop();
+	if (SDL_AtomicGet(&atomic_seq) == 0) {
 		st->in_play = FALSE;
 		st->loc_ms  = 0;
 		return OK;
