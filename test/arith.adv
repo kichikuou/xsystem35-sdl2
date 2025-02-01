@@ -1,0 +1,35 @@
+	MS FILE, "arith.adv":
+	~AssertEquals 3+4, 7, __LINE__:
+	~AssertEquals 50000+50000, 65535, __LINE__:
+	~AssertEquals 10-3, 7, __LINE__:
+	~AssertEquals 3-10, 0, __LINE__:
+	~AssertEquals 3*4, 12, __LINE__:
+	~AssertEquals 1000*1000, 65535, __LINE__:
+	~AssertEquals 1000*1000-1, 65534, __LINE__:
+	~AssertEquals 10/2, 5, __LINE__:
+	~AssertEquals 10/3, 3, __LINE__:
+	~AssertEquals 10/0, 0, __LINE__:
+	~AssertEquals 10%3, 1, __LINE__:
+	~AssertEquals 10%0, 0, __LINE__:
+
+	~AssertEquals 5&3, 1, __LINE__:
+	~AssertEquals 5|3, 7, __LINE__:
+	~AssertEquals 5^3, 6, __LINE__:
+
+	~AssertEquals 3<2, 0, __LINE__:
+	~AssertEquals 3<3, 0, __LINE__:
+	~AssertEquals 3<4, 1, __LINE__:
+	~AssertEquals 3<=2, 0, __LINE__:
+	~AssertEquals 3<=3, 1, __LINE__:
+	~AssertEquals 3<=4, 1, __LINE__:
+	~AssertEquals 3>2, 1, __LINE__:
+	~AssertEquals 3>3, 0, __LINE__:
+	~AssertEquals 3>4, 0, __LINE__:
+	~AssertEquals 3>=2, 1, __LINE__:
+	~AssertEquals 3>=3, 1, __LINE__:
+	~AssertEquals 3>=4, 0, __LINE__:
+	~AssertEquals 3=2, 0, __LINE__:
+	~AssertEquals 3=3, 1, __LINE__:
+	~AssertEquals 3\2, 1, __LINE__:
+	~AssertEquals 3\3, 0, __LINE__:
+	%0:

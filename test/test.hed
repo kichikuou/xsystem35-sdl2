@@ -1,6 +1,7 @@
 #SYSTEM35
 test.adv
 util.adv
+arith.adv
 array.adv
 strvar.adv
 stack.adv

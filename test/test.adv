@@ -9,6 +9,7 @@
 	!tests_passed:0!
 	!tests_failed:0!
 
+	%#arith.adv:
 	%#array.adv:
 	%#strvar.adv:
 	%#stack.adv:
