@@ -34,24 +34,7 @@
 #include "cdrom.h"
 #include "music_private.h"
 
-static int cdrom_init(char *);
-static int cdrom_exit(void);
-static int cdrom_reset(void);
-static int cdrom_start(int, int);
-static int cdrom_stop();
-static int cdrom_getPlayingInfo(cd_time *);
-
-#define cdrom cdrom_mp3
-cdromdevice_t cdrom = {
-	cdrom_init,
-	cdrom_exit,
-	cdrom_reset,
-	cdrom_start,
-	cdrom_stop,
-	cdrom_getPlayingInfo,
-	NULL,
-	NULL
-};
+static void cdrom_stop(void);
 
 #define PLAYLIST_MAX 256
 
@@ -61,11 +44,11 @@ static Mix_Music    *mix_music;
 static int          trackno; // 現在演奏中のトラック
 static int          start_time;
 
-static int cdrom_init(char *playlist_path) {
+static bool cdrom_init(char *playlist_path) {
 	char buf[256];
 
 	if (!playlist_path || !playlist_path[0])
-		return NG;
+		return false;
 
 	FILE *fp = fopen(playlist_path, "r");
 	if (fp) {
@@ -78,7 +61,7 @@ static int cdrom_init(char *playlist_path) {
 		// If the game has MIDI music, lack of the playlist is not a problem.
 		if (ald_get_maxno(DRIFILE_MIDI) == 0)
 			NOTICE("cdrom: Cannot open playlist %s", playlist_path);
-		return NG;
+		return false;
 	}
 
 	for (int track = 2; track < PLAYLIST_MAX; track++) {
@@ -102,29 +85,27 @@ static int cdrom_init(char *playlist_path) {
 	
 	trackno = 0;
 	enabled = true;
-	return OK;
+	return true;
 }
 
-static int cdrom_exit(void) {
+static void cdrom_exit(void) {
 	if (enabled) {
 		cdrom_stop();
 	}
-	return OK;
 }
 
-static int cdrom_reset(void) {
+static void cdrom_reset(void) {
 	if (enabled) {
 		cdrom_stop();
 	}
-	return OK;
 }
 
 /* トラック番号 trk の演奏 trk = 1~ */
-static int cdrom_start(int trk, int loop) {
+static bool cdrom_start(int trk, int loop) {
 	if (!enabled) return 0;
 	
 	if (trk >= PLAYLIST_MAX || !playlist[trk])
-		return NG;
+		return false;
 	
 	if (mix_music)
 		Mix_FreeMusic(mix_music);
@@ -133,7 +114,7 @@ static int cdrom_start(int trk, int loop) {
 	// Mix_LoadMUS uses SDL_RWFromFile which requires absolute path on Android
 	char path[PATH_MAX];
 	if (!realpath(playlist[trk], path))
-		return NG;
+		return false;
 	mix_music = Mix_LoadMUS(path);
 #else
 	mix_music = Mix_LoadMUS(playlist[trk]);
@@ -141,41 +122,37 @@ static int cdrom_start(int trk, int loop) {
 
 	if (!mix_music) {
 		WARNING("Cannot load %s: %s", playlist[trk], Mix_GetError());
-		return NG;
+		return false;
 	}
 	if (Mix_PlayMusic(mix_music, loop == 0 ? -1 : loop) != 0) {
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
-		return NG;
+		return false;
 	}
 
 	trackno = trk;
 	start_time = SDL_GetTicks();
 	
-	return OK;
+	return true;
 }
 
-/* 演奏停止 */
-static int cdrom_stop() {
-	if (!enabled || !mix_music) {
-		return OK;
-	}
+static void cdrom_stop(void) {
+	if (!enabled || !mix_music)
+		return;
 	Mix_FreeMusic(mix_music);
 	mix_music = NULL;
 	trackno = 0;
-	
-	return OK;
 }
 
 /* 現在演奏中のトラック情報の取得 */
-static int cdrom_getPlayingInfo (cd_time *inf) {
+static bool cdrom_getPlayingInfo (cd_time *inf) {
 	if (!enabled || !mix_music)
-		return NG;
+		return false;
 	
 	if (!Mix_PlayingMusic()) {
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
-		return NG;
+		return false;
 	}
 	int ms = SDL_GetTicks() - start_time;
 	
@@ -184,5 +161,14 @@ static int cdrom_getPlayingInfo (cd_time *inf) {
 	inf->s = ms / 1000;      ms %= 1000;
 	inf->f = (ms * CD_FPS) / 1000;
 	
-	return OK;
+	return true;
 }
+
+cdromdevice_t cdrom_mp3 = {
+	.init = cdrom_init,
+	.exit = cdrom_exit,
+	.reset = cdrom_reset,
+	.start = cdrom_start,
+	.stop = cdrom_stop,
+	.getpos = cdrom_getPlayingInfo,
+};

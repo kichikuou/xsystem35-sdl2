@@ -25,48 +25,47 @@
 #include "cdrom.h"
 #include "scheduler.h"
 
-int cdrom_init(char *playlist) {
-	return OK;
+static bool cdrom_init(char *playlist) {
+	return true;
 }
 
-EM_JS(int, cdrom_start, (int trk, int loop), {
+EM_JS(bool, cdrom_start, (int trk, int loop), {
 	xsystem35.cdPlayer.play(trk, loop == 0 ? 1 : 0);
-	return xsystem35.Status.OK;
+	return 1;
 });
 
-EM_JS(int, cdrom_stop, (), {
+EM_JS(void, cdrom_stop, (void), {
 	xsystem35.cdPlayer.stop();
-	return xsystem35.Status.OK;
 });
 
-int cdrom_exit(void) {
+static void cdrom_exit(void) {
 	cdrom_stop();
-	return OK;
 }
 
-int cdrom_reset(void) {
+static void cdrom_reset(void) {
 	cdrom_stop();
-	return OK;
 }
 
-int cdrom_getPlayingInfo(cd_time *info) {
+static bool cdrom_getPlayingInfo(cd_time *info) {
 	scheduler_on_event(SCHEDULER_EVENT_AUDIO_CHECK);
 
 	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
 	if (!t)
-		return NG;
+		return false;
 	info->t = t & 0xff;
-	FRAMES_TO_MSF(t >> 8, &info->m, &info->s, &info->f);
-	return OK;
+	t >>= 8;
+	info->f = t % CD_FPS;
+	t /= CD_FPS;
+	info->s = t % 60;
+	info->m = t / 60;
+	return true;
 }
 
 cdromdevice_t cdrom_emscripten = {
-	cdrom_init,
-	cdrom_exit,
-	cdrom_reset,
-	cdrom_start,
-	cdrom_stop,
-	cdrom_getPlayingInfo,
-	NULL,
-	NULL
+	.init = cdrom_init,
+	.exit = cdrom_exit,
+	.reset = cdrom_reset,
+	.start = cdrom_start,
+	.stop = cdrom_stop,
+	.getpos = cdrom_getPlayingInfo,
 };

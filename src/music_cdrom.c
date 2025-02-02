@@ -51,9 +51,8 @@ int muscd_init(void) {
 	} else {
 		prv.cddev = NATIVE_CD_DEVICE;
 	}
-	prv.cddev->init(playlist);
 	prv.cd_current_track = 0;
-	return OK;
+	return prv.cddev->init(playlist) ? OK : NG;
 }
 
 int muscd_init_bgm(DRIFILETYPE type, int base_no) {
@@ -85,9 +84,8 @@ int muscd_start(int trk, int loop) {
 		return OK;
 	prv.cddev->stop();
 
-	prv.cddev->start(trk, loop);
 	prv.cd_current_track = trk;
-	return OK;
+	return prv.cddev->start(trk, loop) ? OK : NG;
 }
 
 int muscd_stop(void) {
@@ -102,7 +100,7 @@ int muscd_getpos(int *t, int *m, int *s, int *f) {
 	if (!prv.cddev)
 		return NG;
 	cd_time info;
-	if (prv.cddev->getpos(&info) != OK)
+	if (!prv.cddev->getpos(&info))
 		return NG;
 	*t = info.t;
 	*m = info.m;

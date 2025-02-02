@@ -28,48 +28,46 @@
 
 static int current_track;
 
-static int cdrom_bgm_init(char *playlist) {
+static bool cdrom_bgm_init(char *playlist) {
 	prv.cd_maxtrk = ald_get_maxno(DRIFILE_BGM) + 1;
-	return OK;
+	return true;
 }
 
-static int cdrom_bgm_exit(void) {
-	return OK;
+static void cdrom_bgm_exit(void) {
+	// Do nothing
 }
 
-static int cdrom_bgm_reset(void) {
-	return OK;
+static void cdrom_bgm_reset(void) {
+	// Do nothing
 }
 
-static int cdrom_bgm_start(int trk, int loop) {
+static bool cdrom_bgm_start(int trk, int loop) {
 	if (musbgm_play(trk, 0, 100, loop) != OK)
-		return NG;
+		return false;
 	current_track = trk;
-	return OK;
+	return true;
 }
 
-static int cdrom_bgm_stop(void) {
-	return musbgm_stop(current_track, 0);
+static void cdrom_bgm_stop(void) {
+	musbgm_stop(current_track, 0);
 }
 
-static int cdrom_bgm_getPlayingInfo(cd_time *info) {
+static bool cdrom_bgm_getPlayingInfo(cd_time *info) {
 	int t = musbgm_getpos(current_track);  // in 10ms
 	if (!t)
-		return NG;
+		return false;
 	info->t = current_track;
 	info->m = t / (60*100); t %= (60*100);
 	info->s = t / 100;      t %= 100;
 	info->f = t * CD_FPS / 100;
-	return OK;
+	return true;
 }
 
 cdromdevice_t cdrom_bgm = {
-	cdrom_bgm_init,
-	cdrom_bgm_exit,
-	cdrom_bgm_reset,
-	cdrom_bgm_start,
-	cdrom_bgm_stop,
-	cdrom_bgm_getPlayingInfo,
-	NULL,
-	NULL
+	.init = cdrom_bgm_init,
+	.exit = cdrom_bgm_exit,
+	.reset = cdrom_bgm_reset,
+	.start = cdrom_bgm_start,
+	.stop = cdrom_bgm_stop,
+	.getpos = cdrom_bgm_getPlayingInfo,
 };
