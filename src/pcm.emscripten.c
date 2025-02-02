@@ -24,66 +24,64 @@
 #include "portab.h"
 #include "music_pcm.h"
 
-EM_JS(int, muspcm_init, (int audio_buffer_size), {
-	return xsystem35.Status.OK;
+bool muspcm_init(int audio_buffer_size) {
+	return true;
+}
+
+void muspcm_exit(void) {
+	// do nothing
+}
+
+EM_JS(void, muspcm_reset, (void), {
+	xsystem35.audio.pcm_reset();
 });
 
-EM_JS(int, muspcm_exit, (void), {
-	return xsystem35.Status.OK;
-});
-
-EM_JS(int, muspcm_reset, (void), {
-	return xsystem35.audio.pcm_reset();;
-});
-
-EM_ASYNC_JS(int, muspcm_load_no, (int slot, int no), {
+EM_ASYNC_JS(bool, muspcm_load_no, (int slot, int no), {
 	return await xsystem35.audio.pcm_load(slot, no);
 });
 
-EM_ASYNC_JS(int, muspcm_load_bgm, (int slot, int no), {
+EM_ASYNC_JS(bool, muspcm_load_bgm, (int slot, int no), {
 	return await xsystem35.audio.pcm_load_bgm(slot, no);
 });
 
-EM_ASYNC_JS(int, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {
+EM_ASYNC_JS(bool, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {
 	return await xsystem35.audio.pcm_load_data(slot, buf, len);
 });
 
-EM_ASYNC_JS(int, muspcm_load_mixlr, (int slot, int noL, int noR), {
+EM_ASYNC_JS(bool, muspcm_load_mixlr, (int slot, int noL, int noR), {
 	return await xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
 });
 
-EM_JS(int, muspcm_unload, (int slot), {
-	return xsystem35.audio.pcm_unload(slot);
+EM_JS(void, muspcm_unload, (int slot), {
+	xsystem35.audio.pcm_unload(slot);
 });
 
-EM_JS(int, muspcm_start, (int slot, int loop), {
+EM_JS(bool, muspcm_start, (int slot, int loop), {
 	return xsystem35.audio.pcm_start(slot, loop);
 });
 
-EM_JS(int, muspcm_stop, (int slot), {
-	return xsystem35.audio.pcm_stop(slot);
+EM_JS(void, muspcm_stop, (int slot), {
+	xsystem35.audio.pcm_stop(slot);
 });
 
-EM_JS(int, muspcm_fadeout, (int slot, int msec), {
-	return xsystem35.audio.pcm_fadeout(slot, msec);
+EM_JS(void, muspcm_fadeout, (int slot, int msec), {
+	xsystem35.audio.pcm_fadeout(slot, msec);
 });
 
-EM_JS(int, muspcm_pause, (int slot), {
+EM_JS(void, muspcm_pause, (int slot), {
 	console.log('muspcm_pause: not implemented');
-	return xsystem35.Status.NG;
 });
 
-EM_JS(int, muspcm_unpause, (int slot), {
+EM_JS(void, muspcm_unpause, (int slot), {
 	console.log('muspcm_unpause: not implemented');
-	return xsystem35.Status.NG;
 });
 
 EM_JS(int, muspcm_getpos, (int slot), {
 	return xsystem35.audio.pcm_getpos(slot);
 });
 
-EM_JS(int, muspcm_setvol, (int slot, int lv), {
-	return xsystem35.audio.pcm_setvol(slot, lv);
+EM_JS(void, muspcm_setvol, (int slot, int lv), {
+	xsystem35.audio.pcm_setvol(slot, lv);
 });
 
 EM_JS(int, muspcm_getwavelen, (int slot), {
@@ -95,6 +93,6 @@ EM_JS(bool, muspcm_isplaying, (int slot), {
 	return xsystem35.audio.pcm_isplaying(slot);
 });
 
-EM_ASYNC_JS(int, muspcm_waitend, (int slot), {
-	return await xsystem35.audio.pcm_waitend(slot);
+EM_ASYNC_JS(void, muspcm_waitend, (int slot), {
+	await xsystem35.audio.pcm_waitend(slot);
 });

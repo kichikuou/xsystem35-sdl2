@@ -31,7 +31,7 @@ int mus_init(int audio_buffer_size) {
 	musbgm_init(DRIFILE_BGM, 0);
 	muscd_init();
 	musmidi_init();
-	prv.pcm_valid = muspcm_init(audio_buffer_size) == OK;
+	prv.pcm_valid = muspcm_init(audio_buffer_size);
 	return OK;
 }
 
@@ -129,9 +129,9 @@ bool mus_midi_get_state() {
  */
 int mus_pcm_start(int no, int loop) {
 	if (!prv.pcm_valid) return NG;
-	if (muspcm_load_no(0, no) == NG)
+	if (!muspcm_load_no(0, no))
 		return NG;
-	return muspcm_start(0, loop);
+	return muspcm_start(0, loop) ? OK : NG;
 }
 
 /*
@@ -142,9 +142,9 @@ int mus_pcm_start(int no, int loop) {
  */
 int mus_pcm_mix(int noL, int noR, int loop) {
 	if (!prv.pcm_valid) return NG;
-	if (muspcm_load_mixlr(0, noL, noR) == NG)
+	if (!muspcm_load_mixlr(0, noL, noR))
 		return NG;
-	return muspcm_start(0, loop);
+	return muspcm_start(0, loop) ? OK : NG;
 }
 
 /*
@@ -165,7 +165,7 @@ int mus_pcm_stop(int msec) {
 int mus_pcm_load(int no) {
 	if (!prv.pcm_valid) return NG;
 
-	return muspcm_load_no(0, no);
+	return muspcm_load_no(0, no) ? OK : NG;
 }
 
 /*
@@ -258,8 +258,10 @@ int mus_mixer_get_level(int device) {
 }
 
 bool mus_mixer_set_level(int device, int level) {
-	if (device == MIX_PCM)
-		return muspcm_setvol(0, level);
+	if (device == MIX_PCM) {
+		muspcm_setvol(0, level);
+		return true;
+	}
 	WARNING("not implemented");
 	return false;
 }
@@ -273,14 +275,14 @@ int mus_wav_load(int ch, int num) {
 	if (!prv.pcm_valid) return NG;
 
 	if (ch < 0 || ch > 128) return NG;
-	return muspcm_load_no(ch + 1, num);
+	return muspcm_load_no(ch + 1, num) ? OK : NG;
 }
 
 int mus_wav_load_data(int ch, uint8_t *buf, uint32_t len) {
 	if (!prv.pcm_valid) return NG;
 
 	if (ch < 0 || ch > 128) return NG;
-	return muspcm_load_data(ch + 1, buf, len);
+	return muspcm_load_data(ch + 1, buf, len) ? OK : NG;
 }
 
 /*
@@ -291,7 +293,8 @@ int mus_wav_unload(int ch) {
 	if (!prv.pcm_valid) return NG;
 
 	if (ch < 0 || ch > 128) return NG;
-	return muspcm_unload(ch + 1);
+	muspcm_unload(ch + 1);
+	return OK;
 }
 
 /*
@@ -304,7 +307,7 @@ int mus_wav_play(int ch, int loop) {
 	if (!prv.pcm_valid) return NG;
 
 	if (ch < 0 || ch > 128) return NG;
-	return muspcm_start(ch + 1, loop);
+	return muspcm_start(ch + 1, loop) ? OK : NG;
 }
 
 /*
@@ -315,7 +318,8 @@ int mus_wav_stop(int ch) {
 	if (!prv.pcm_valid) return NG;
 
 	if (ch < 0 || ch > 128) return NG;
-	return muspcm_stop(ch + 1);
+	muspcm_stop(ch + 1);
+	return OK;
 }
 
 /*
@@ -338,8 +342,10 @@ int mus_wav_get_playposition(int ch) {
  *             1: する
  */
 int mus_wav_fadeout_start(int ch, int time, int volume, int stop) {
-	if (volume == 0 && stop)
-		return muspcm_fadeout(ch + 1, time);
+	if (volume == 0 && stop) {
+		muspcm_fadeout(ch + 1, time);
+		return OK;
+	}
 
 	WARNING("not implemented");
 	return NG;
@@ -374,7 +380,8 @@ int mus_wav_waitend(int ch) {
 	if (!prv.pcm_valid) return NG;
 
 	if (ch < 0 || ch > 128) return NG;
-	return muspcm_waitend(ch + 1);
+	muspcm_waitend(ch + 1);
+	return OK;
 }
 
 /*

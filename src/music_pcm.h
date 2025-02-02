@@ -24,23 +24,23 @@
 #ifndef __MUSIC_PCM_H__
 #define __MUSIC_PCM_H__
 
-extern int muspcm_init(int audio_buffer_size);
-extern int muspcm_exit(void);
-extern int muspcm_reset(void);
-extern int muspcm_load_no(int slot, int no);
-extern int muspcm_load_bgm(int slot, int no);
-extern int muspcm_load_mixlr(int slot, int noL, int noR);
-extern int muspcm_load_data(int slot, uint8_t *buf, uint32_t len);
-extern int muspcm_unload(int slot);
-extern int muspcm_start(int slot, int loop);
-extern int muspcm_stop(int slot);
-extern int muspcm_fadeout(int slot, int msec);
-extern int muspcm_pause(int slot);
-extern int muspcm_unpause(int slot);
-extern int muspcm_getpos(int slot);
-extern int muspcm_setvol(int slot, int lv);
-extern int muspcm_getwavelen(int slot);
-extern bool muspcm_isplaying(int slot);
-extern int muspcm_waitend(int slot);
+bool muspcm_init(int audio_buffer_size);
+void muspcm_exit(void);
+void muspcm_reset(void);
+bool muspcm_load_no(int slot, int no);
+bool muspcm_load_bgm(int slot, int no);
+bool muspcm_load_mixlr(int slot, int noL, int noR);
+bool muspcm_load_data(int slot, uint8_t *buf, uint32_t len);
+void muspcm_unload(int slot);
+bool muspcm_start(int slot, int loop);
+void muspcm_stop(int slot);
+void muspcm_fadeout(int slot, int msec);
+void muspcm_pause(int slot);
+void muspcm_unpause(int slot);
+int muspcm_getpos(int slot);
+void muspcm_setvol(int slot, int lv);
+int muspcm_getwavelen(int slot);
+bool muspcm_isplaying(int slot);
+void muspcm_waitend(int slot);
 
 #endif /* __MUSIC_PCM_H__ */

@@ -80,15 +80,15 @@ static Mix_Chunk *load_asset(DRIFILETYPE type, int no) {
 	return chunk;
 }
 
-static int load_chunk(int slot, Mix_Chunk *chunk) {
+static bool load_chunk(int slot, Mix_Chunk *chunk) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
+		return false;
 
 	if (slots[slot].chunk)
 		muspcm_unload(slot);
 
 	slots[slot].chunk = chunk;
-	return OK;
+	return true;
 }
 
 /**
@@ -134,38 +134,36 @@ static Mix_Chunk *pcm_mixlr(int noL, int noR) {
 	}
 }
 
-int muspcm_init(int audio_buffer_size) {
+bool muspcm_init(int audio_buffer_size) {
 	if (!audio_buffer_size)
 		audio_buffer_size = DEFAULT_AUDIO_BUFFER_SIZE;
 
 	Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
 	if (Mix_OpenAudio(SAMPLE_RATE, AUDIO_S16LSB, 2, audio_buffer_size) < 0)
-		return NG;
+		return false;
 	Mix_AllocateChannels(PCM_SLOTS);
 	load_wai();
-	return OK;
+	return true;
 }
 
-int muspcm_exit(void) {
+void muspcm_exit(void) {
 	Mix_CloseAudio();
 	Mix_Quit();
-	return OK;
 }
 
-int muspcm_reset(void) {
+void muspcm_reset(void) {
 	for (int i = 0; i < PCM_SLOTS; i++)
 		muspcm_unload(i);
-	return OK;
 }
 
 // 番号指定のPCMファイル読み込み
-int muspcm_load_no(int slot, int no) {
+bool muspcm_load_no(int slot, int no) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
+		return false;
 
 	Mix_Chunk *chunk = load_asset(DRIFILE_WAVE, no);
 	if (chunk == NULL) {
-		return NG;
+		return false;
 	}
 	
 	// if has .wai file
@@ -179,107 +177,96 @@ int muspcm_load_no(int slot, int no) {
 	return load_chunk(slot, chunk);
 }
 
-int muspcm_load_bgm(int slot, int no) {
+bool muspcm_load_bgm(int slot, int no) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
+		return false;
 
 	Mix_Chunk *chunk = load_asset(DRIFILE_BGM, no);
 	if (chunk == NULL) {
-		return NG;
+		return false;
 	}
 	prv.vol_pcm_sub[slot] = 0;
 
 	return load_chunk(slot, chunk);
 }
 
-int muspcm_load_mixlr(int slot, int noL, int noR) {
+bool muspcm_load_mixlr(int slot, int noL, int noR) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
+		return false;
 
 	/* mix 2 wave files */
 	Mix_Chunk* chunk = pcm_mixlr(noL, noR);
 	if (chunk == NULL) {
-		return NG;
+		return false;
 	}
 
 	return load_chunk(slot, chunk);
 }
 
-int muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
+bool muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
+		return false;
 
 	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(buf, len), 1);
 	if (!chunk)
-		return NG;
+		return false;
 
 	return load_chunk(slot, chunk);
 }
 
 // PCMデータのメモリ上からのアンロード
-int muspcm_unload(int slot) {
+void muspcm_unload(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
-
+		return;
 	if (!slots[slot].chunk)
-		return NG;
+		return;
 
 	Mix_HaltChannel(slot);
 	Mix_FreeChunk(slots[slot].chunk);
 	slots[slot].chunk = NULL;
-
-	return OK;
 }
 
 // PCMデータを再生
-int muspcm_start(int slot, int loop) {
+bool muspcm_start(int slot, int loop) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
+		return false;
 
 	if (!slots[slot].chunk)
-		return NG;
+		return false;
 
 	if (Mix_PlayChannel(slot, slots[slot].chunk, loop - 1) < 0)
-		return NG;
+		return false;
 
 	slots[slot].start_time = sdl_getTicks();
-	return OK;
+	return true;
 }
 
 // PCMデータの再生停止
-int muspcm_stop(int slot) {
+void muspcm_stop(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
-
+		return;
 	Mix_HaltChannel(slot);
-	return OK;
 }
 
 // 指定時間のフェードアウトの後に再生停止
-int muspcm_fadeout(int slot, int msec) {
+void muspcm_fadeout(int slot, int msec) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
-
+		return;
 	Mix_FadeOutChannel(slot, msec);
-	return OK;
 }
 
 // PCMデータ再生一時停止
-int muspcm_pause(int slot) {
+void muspcm_pause(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
-
+		return;
 	Mix_Pause(slot);
-	return OK;
 }
 
 // PCMデータ再生一時停止解除
-int muspcm_unpause(int slot) {
+void muspcm_unpause(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
-
+		return;
 	Mix_Resume(slot);
-	return OK;
 }
 
 // 現在の再生位置を返す
@@ -298,12 +285,10 @@ int muspcm_getpos(int slot) {
 }
 
 // Set the volume for a channel.
-int muspcm_setvol(int slot, int lv) {
+void muspcm_setvol(int slot, int lv) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return NG;
-
+		return;
 	Mix_Volume(slot, lv * MIX_MAX_VOLUME / 100);
-	return OK;
 }
 
 // PCMデータの長さを取得
@@ -327,9 +312,8 @@ bool muspcm_isplaying(int slot) {
 }
 
 // 指定のチャンネルの再生が終了するまで待つ
-int muspcm_waitend(int slot) {
+void muspcm_waitend(int slot) {
 	WARNING("not implemented");
-	return NG;
 }
 
 static int load_wai() {

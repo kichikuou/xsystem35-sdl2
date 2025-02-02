@@ -48,7 +48,7 @@ static void Prepare(void) {
 		current_no = no;
 		*result = 1;
 	} else {
-		*result = muspcm_load_bgm(SLOT, no) == OK;
+		*result = muspcm_load_bgm(SLOT, no) ? 1 : 0;
 	}
 	TRACE("S3xMusic.Prepare %d, %d => %d:", ch, no, *result);
 }
