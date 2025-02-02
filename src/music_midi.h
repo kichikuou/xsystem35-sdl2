@@ -15,6 +15,6 @@ midiplaystate musmidi_getpos(void);
 int musmidi_setflag(int mode, int index, int val);
 int musmidi_getflag(int mode, int index);
 int musmidi_fadestart(int time, int volume, int stop);
-boolean musmidi_fading(void);
+bool musmidi_fading(void);
 
 #endif /* __MUSIC_MIDI_H__ */

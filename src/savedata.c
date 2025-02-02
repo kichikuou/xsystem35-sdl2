@@ -214,7 +214,7 @@ static int loadVarPage(char *buf) {
 
 	int cnt = head->size / sizeof(uint16_t);
 	if (varPage[page].size < cnt || varPage[page].value == NULL) {
-		if (!v_allocatePage(page, cnt, TRUE)) {
+		if (!v_allocatePage(page, cnt, true)) {
 			WARNING("Array allocation failed: page=%d size=%d", page, cnt);
 			return SAVE_LOADERR;
 		}
@@ -605,7 +605,7 @@ int save_loadAll(int no) {
 		nact->sel.wininfo[j].y      = save_base->selWinInfo[i].y;
 		nact->sel.wininfo[j].width  = save_base->selWinInfo[i].width;
 		nact->sel.wininfo[j].height = save_base->selWinInfo[i].height;
-		// nact->sel.wininfo[i].save   = TRUE;
+		// nact->sel.wininfo[i].save   = true;
 	}
 	for (int i = 0; i < MSGWINMAX; i++) {
 		int j = format == SAVEFMT_XSYS35
@@ -616,7 +616,7 @@ int save_loadAll(int no) {
 		nact->msg.wininfo[j].width  = save_base->msgWinInfo[i].width;
 		nact->msg.wininfo[j].height = save_base->msgWinInfo[i].height;
 		// nact->msg.wininfo[i].savedImage = NULL;
-		// nact->msg.wininfo[i].save   = FALSE;
+		// nact->msg.wininfo[i].save   = false;
 	}
 	/* スタックのロード */
 	loadStack(format, saveTop + save_base->stackinfo);

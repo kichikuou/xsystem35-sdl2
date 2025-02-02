@@ -34,7 +34,7 @@ void menu_quitmenu_open(void) {
 	return;
 }
 
-boolean menu_inputstring(INPUTSTRING_PARAM *p) {
+bool menu_inputstring(INPUTSTRING_PARAM *p) {
 	static char buf[256];
 	int ok = EM_ASM_({
 			var r = xsystem35.shell.inputString(UTF8ToString($0), UTF8ToString($1), $2);
@@ -51,16 +51,16 @@ boolean menu_inputstring(INPUTSTRING_PARAM *p) {
 	return ok;
 }
 
-boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
+bool menu_inputstring2(INPUTSTRING_PARAM *p) {
 	p->newstring = p->oldstring;
-	return TRUE;
+	return true;
 }
 
-boolean menu_inputnumber(INPUTNUM_PARAM *p) {
+bool menu_inputnumber(INPUTNUM_PARAM *p) {
 	p->value = EM_ASM_({
 			return xsystem35.shell.inputNumber(UTF8ToString($0), $1, $2, $3);
 		}, p->title, p->min, p->max, p->def);
-	return TRUE;
+	return true;
 }
 
 void menu_init(void) {
@@ -71,6 +71,6 @@ void menu_gtkmainiteration() {
 	return;
 }
 
-EM_JS(void, menu_setSkipState, (boolean enabled, boolean activated), {
+EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
 	xsystem35.shell.setSkipButtonState(enabled, activated);
 });

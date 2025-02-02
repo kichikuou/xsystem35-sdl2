@@ -53,7 +53,7 @@ static int msgDecorateColor;
 static int msgDecorateType;
 /* 現在の文字表示位置 */
 static MyPoint msgcur;
-static boolean nextLineIsAfterKaigyou = FALSE;
+static bool nextLineIsAfterKaigyou = false;
 
 /* Private Methods */
 static void drawLineFrame(Bcom_WindowInfo *info);
@@ -74,13 +74,13 @@ void msg_init() {
 	msg.HitAnyKeyMsgColor        = 255;
 	msg.WinBackgroundTransparent = 255;
 	
-	msg.AutoPageChange = TRUE;  /* 自動改ページ */
+	msg.AutoPageChange = true;  /* 自動改ページ */
 	msg.LineIncrement  = 2;     /* 改行幅 */
 	msg.WinBackgroundTransparentColor = -1; /* Window背景の透過色 -1:指定無し*/
 	
 	/* MG コマンドによるメッセージの文字列変数への取り込み */
-	msg.mg_getString     = FALSE;
-	msg.mg_dspMsg        = TRUE;
+	msg.mg_getString     = false;
+	msg.mg_dspMsg        = true;
 	msg.mg_startStrVarNo = 1;
 	msg.mg_curStrVarNo   = 1;
 	msg.mg_policyR       = 0;
@@ -100,14 +100,14 @@ void msg_init() {
 	}
 	msg.winno = 1;
 	msg.win = &msg.wininfo[1];
-	msg.wininfo[1].save = TRUE;
+	msg.wininfo[1].save = true;
 
 	// Private variables
 	msgDecorateColor = 0;
 	msgDecorateType = 0;
 	msgcur.x = 0;
 	msgcur.y = 0;
-	nextLineIsAfterKaigyou = FALSE;
+	nextLineIsAfterKaigyou = false;
 }
 
 void msg_setFontSize(int size) {
@@ -127,7 +127,7 @@ void msg_putMessage(const char *m) {
 	
 	if (nextLineIsAfterKaigyou) {
 		sys_hit_any_key();
-		msg_nextPage(TRUE);
+		msg_nextPage(true);
 	}
 	
 	texthook_message(m);
@@ -201,7 +201,7 @@ void msg_putMessage(const char *m) {
 			ags_updateArea(drawn.x + x, drawn.y, 16, drawn.h);
 			if (nact->messagewait_cancel) {
 				if (sys_getInputInfo()) {
-					nact->messagewait_cancelled = TRUE;
+					nact->messagewait_cancelled = true;
 					ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
 					break;
 				}
@@ -227,11 +227,11 @@ void msg_nextLine() {
 	msgcur.y += (msg.MsgFontSize + msg.LineIncrement);
 	
 	if ((msgcur.y + msg.MsgFontSize) > (msg.win->y + msg.win->height)) {
-		nextLineIsAfterKaigyou = TRUE;
+		nextLineIsAfterKaigyou = true;
 	}
 }
 
-void msg_nextPage(boolean innerclear) {
+void msg_nextPage(bool innerclear) {
 	texthook_nextpage();
 
 	// puts("next Page");
@@ -267,7 +267,7 @@ void msg_nextPage(boolean innerclear) {
 		if (msg.mg_getString) msgget_at_a();
 	}
 	
-	nextLineIsAfterKaigyou = FALSE;
+	nextLineIsAfterKaigyou = false;
 }
 
 void msg_openWindow(int W, int C1, int C2, int N, int M) {
@@ -328,7 +328,7 @@ void msg_setMessageLocation(int x, int y) {
 	texthook_newline();
 	msgcur.x = x;
 	msgcur.y = y;
-	nextLineIsAfterKaigyou = FALSE;
+	nextLineIsAfterKaigyou = false;
 }
 
 void msg_getMessageLocation(MyPoint *loc) {

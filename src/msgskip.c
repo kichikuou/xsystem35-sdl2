@@ -45,14 +45,14 @@ static struct {
 	mmap_t *map;
 	MsgSkipData *data;
 	unsigned flags;
-	boolean for_ain_message;
-	boolean dirty;
-	boolean enabled;	// The menu item is enabled
-	boolean activated;	// Turned on by the user
-	boolean paused;		// Used by MsgSkip module
+	bool for_ain_message;
+	bool dirty;
+	bool enabled;	// The menu item is enabled
+	bool activated;	// Turned on by the user
+	bool paused;		// Used by MsgSkip module
 } msgskip = {
 	.flags = MSGSKIP_STOP_ON_UNSEEN | MSGSKIP_STOP_ON_MENU | MSGSKIP_STOP_ON_CLICK,
-	.enabled = TRUE,
+	.enabled = true,
 };
 
 // Knuth's multiplicative hash.
@@ -60,13 +60,13 @@ static uint32_t hash(uint32_t x, int s) {
 	return (x * 2654435761ULL) >> s;
 }
 
-static void msgskip_action(boolean unseen) {
+static void msgskip_action(bool unseen) {
 	if (unseen && !(msgskip.flags & MSGSKIP_SKIP_UNSEEN)) {
 		if (msgskip.flags & MSGSKIP_STOP_ON_UNSEEN)
-			msgskip_activate(FALSE);
-		msgskip_enableMenu(FALSE);
+			msgskip_activate(false);
+		msgskip_enableMenu(false);
 	} else {
-		msgskip_enableMenu(TRUE);
+		msgskip_enableMenu(true);
 	}
 }
 
@@ -106,15 +106,15 @@ void msgskip_init(const char *msgskip_file) {
 #endif
 }
 
-boolean msgskip_isSkipping(void) {
+bool msgskip_isSkipping(void) {
 	return msgskip.enabled & msgskip.activated;
 }
 
-boolean msgskip_isActivated(void) {
+bool msgskip_isActivated(void) {
 	return msgskip.activated;
 }
 
-void msgskip_enableMenu(boolean enable) {
+void msgskip_enableMenu(bool enable) {
 	if (enable == msgskip.enabled)
 		return;
 	msgskip.enabled = enable;
@@ -122,7 +122,7 @@ void msgskip_enableMenu(boolean enable) {
 }
 
 EMSCRIPTEN_KEEPALIVE
-void msgskip_activate(boolean activate) {
+void msgskip_activate(bool activate) {
 	if (msgskip.activated == activate)
 		return;
 	msgskip.activated = activate;
@@ -151,14 +151,14 @@ void msgskip_onAinMessage(int msgid) {
 		|| (unsigned)msgid >= msgskip.data->size)
 		return;
 	uint8_t bit = 1 << (msgid & 7);
-	boolean unseen = !(msgskip.data->seen[msgid >> 3] & bit);
+	bool unseen = !(msgskip.data->seen[msgid >> 3] & bit);
 	msgskip.data->seen[msgid >> 3] |= bit;
 	if (unseen)
 		msgskip.dirty = true;
 	msgskip_action(unseen);
 }
 
-void msgskip_pause(boolean pause) {
+void msgskip_pause(bool pause) {
 	msgskip.paused = pause;
 }
 

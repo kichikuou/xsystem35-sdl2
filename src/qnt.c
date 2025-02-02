@@ -212,11 +212,11 @@ static void extract_alpha(qnt_header *qnt, uint8_t *pic, uint8_t *b) {
 
     data: raw data (pointer to data top)
 
-    return: TRUE if data is qnt
+    return: true if data is qnt
 */
-boolean qnt_checkfmt(uint8_t *data) {
-	if (data[0] != 'Q' || data[1] != 'N' || data[2] != 'T') return FALSE;
-	return TRUE;
+bool qnt_checkfmt(uint8_t *data) {
+	if (data[0] != 'Q' || data[1] != 'N' || data[2] != 'T') return false;
+	return true;
 }
 
 /*

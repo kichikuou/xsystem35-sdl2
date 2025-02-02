@@ -40,7 +40,7 @@ static int vval_max;  // 最大チャンネル番号
 struct _volval {
 	char *label;
 	int vol;
-	boolean mute;
+	bool mute;
 };
 static struct _volval vval[MAXVOLCH];
 static GtkWidget *vval_win;
@@ -100,7 +100,7 @@ int s39ini_init(void) {
 int s39ini_winopen() {
 	if (vval_win) {
 		gtk_widget_show(vval_win);
-		nact->popupmenu_opened = TRUE;
+		nact->popupmenu_opened = true;
 	}
 	return OK;
 }
@@ -109,7 +109,7 @@ int s39ini_winopen() {
 int s39ini_winclose() {
 	if (vval_win) {
 		gtk_widget_hide(vval_win);
-		nact->popupmenu_opened = FALSE;
+		nact->popupmenu_opened = false;
 	}
 	return OK;
 }

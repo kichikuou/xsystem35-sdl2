@@ -1503,7 +1503,7 @@ void commands2F8B() {
 
 void commands2F8C() {
 	TRACE("sysReset:");
-	nact_quit(TRUE);
+	nact_quit(true);
 }
 
 void cmd2F_reset(void) {

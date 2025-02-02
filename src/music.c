@@ -116,9 +116,9 @@ int mus_midi_get_flag(int mode, int index) {
 /*
  * MIDI の有効/無効 フラグの取得
  *   return: FALASE -> 無効
- *           TRUE   -> 有効
+ *           true   -> 有効
  */
-boolean mus_midi_get_state() {
+bool mus_midi_get_state() {
 	return prv.midi_valid;
 }
 
@@ -189,21 +189,21 @@ int mus_pcm_get_playposition(int *pos) {
  *   ch  : Mono or Stereo
  *   able: 可能かどうかの状態を受け取る場所
  */
-int mus_pcm_check_ability(int bit, int rate, int ch, boolean *able) {
+int mus_pcm_check_ability(int bit, int rate, int ch, bool *able) {
 	if (!prv.pcm_valid) {
-		*able = FALSE;
+		*able = false;
 		return NG;
 	}
-	*able = TRUE;
+	*able = true;
 	return OK;
 }
 
 /*
  * PCM の有効/無効 フラグの取得
  *   return: FALASE -> 無効
- *           TRUE   -> 有効
+ *           true   -> 有効
  */
-boolean mus_pcm_get_state() {
+bool mus_pcm_get_state() {
 	return prv.pcm_valid;
 }
 
@@ -227,14 +227,14 @@ int mus_mixer_fadeout_start(int device, int time, int volume, int stop) {
  * 指定のデバイスが現在フェード中かどうかを調べる
  *   device: 指定デバイス
  *
- *   return: TRUE  -> フェード中
- *           FALSE -> フェード中でない
+ *   return: true  -> フェード中
+ *           false -> フェード中でない
  */
-boolean mus_mixer_fadeout_get_state(int device) {
+bool mus_mixer_fadeout_get_state(int device) {
 	if (device == MIX_MIDI)
 		return musmidi_fading();
 	WARNING("(device=%d) not implemented", device);
-	return FALSE;
+	return false;
 }
 
 /*
@@ -358,12 +358,12 @@ int mus_wav_fadeout_stop(int ch) {
  * 指定のチャンネルが現在フェード中かどうかを調べる
  *   ch: channel
  *
- *   return: TRUE  -> フェード中
- *           FALSE -> フェード中でない
+ *   return: true  -> フェード中
+ *           false -> フェード中でない
  */
-boolean mus_wav_fadeout_get_state(int ch) {
+bool mus_wav_fadeout_get_state(int ch) {
 	WARNING("not implemented");
-	return FALSE;
+	return false;
 }
 
 /*

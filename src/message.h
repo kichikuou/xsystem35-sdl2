@@ -34,7 +34,7 @@ extern void msg_setStringDecorationColor(int col);
 extern void msg_setStringDecorationType(int type);
 extern void msg_putMessage(const char *msg);
 extern void msg_nextLine();
-extern void msg_nextPage(boolean clear);
+extern void msg_nextPage(bool clear);
 extern void msg_hitAnyKey();
 extern void msg_openWindow(int W, int C1, int C2, int N, int M);
 extern void msg_setMessageLocation(int x, int y);
@@ -53,13 +53,13 @@ struct __message {
 	int HitAnyKeyMsgColor;
 	int WinBackgroundTransparentColor;
 	
-	boolean AutoPageChange;
+	bool AutoPageChange;
 	int     LineIncrement;
 	int     WinBackgroundTransparent;
 	
 	/* MG command関連 */
-	boolean mg_getString;
-	boolean mg_dspMsg;
+	bool mg_getString;
+	bool mg_dspMsg;
 	int     mg_startStrVarNo;
 	int     mg_curStrVarNo;
 	int     mg_policyR;

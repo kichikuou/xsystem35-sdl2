@@ -25,8 +25,8 @@
 
 #include <gtk/gtk.h>
 
-extern boolean menu_ok_exit;
-extern boolean menu_ok_input;
+extern bool menu_ok_exit;
+extern bool menu_ok_input;
 
 extern GtkWidget *menu_item_msgskip_on;
 extern GtkWidget *menu_item_msgskip_off;

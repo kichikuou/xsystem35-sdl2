@@ -43,8 +43,8 @@ typedef struct {
 	int nxUnit;
 	int nyUnit;
 	int bSpCol;
-	boolean fEnable;
-	boolean useTTP;
+	bool fEnable;
+	bool useTTP;
 	int TTPunit;
 } UnitMapSrcImg;
 
@@ -71,9 +71,9 @@ typedef struct {
 	int preY;
 	int curX;          /* 現在位置 */
 	int curY;
-	boolean draw;      /* UNITを描く？ */
-	boolean nomove;    /* 移動あり・なし */
-	boolean rewrite;   /* 画面更新の必要あり */
+	bool draw;      /* UNITを描く？ */
+	bool nomove;    /* 移動あり・なし */
+	bool rewrite;   /* 画面更新の必要あり */
 } VaParam;
 
 typedef struct {
@@ -110,7 +110,7 @@ static UnitMapSrcImg *srcimg;
 #define VA_RUNNING     1
 #define VACMD_MAX 20                      /* Panyoで18まで */
 static  VaParam VAcmd[VACMD_MAX];         
-static  boolean inAnimation      = FALSE; /* 画面更新中 */
+static  bool inAnimation      = false; /* 画面更新中 */
 
 /* UnitMap 各種マクロ */
 #define MAPSIZE_PER_ATTRIB (cxMap * cyMap)
@@ -126,7 +126,7 @@ static  boolean inAnimation      = FALSE; /* 画面更新中 */
 #define UNITMAP_WALKPAINT_PAGETOP(page)  UNITMAP_WALKPAINT((page),0,0)
 #define UNITMAP_WALKRESULT_PAGETOP(page) UNITMAP_WALKRESULT((page),0,0)
 
-static boolean vh_checkImmovableArea(int page, int x, int y, int w, int h);
+static bool vh_checkImmovableArea(int page, int x, int y, int w, int h);
 static void    vh_append_pos(int x, int y);
 static void    vh_copy_to_src();
 static void    vh_check_udlr(int n, int nPage, int x, int y);
@@ -196,8 +196,8 @@ void commandVP() { /* from T2 */
 	srcimg[nPage].nxUnit = nxUnit;
 	srcimg[nPage].nyUnit = nyUnit;
 	srcimg[nPage].bSpCol = bSpCol;
-	srcimg[nPage].useTTP = FALSE;
-	srcimg[nPage].fEnable = TRUE;
+	srcimg[nPage].useTTP = false;
+	srcimg[nPage].fEnable = true;
 }
 
 void commandVS() { /* from Rance4 */
@@ -376,7 +376,7 @@ void commandVH() { /* from Rance4 */
 	vh_cnt_src = n = 1;
 	vh_cnt_dst = 0;
 	
-	while(TRUE) {
+	while(true) {
 		for (i = 0; i < vh_cnt_src; i++) {
 			vh_check_udlr(n, nPage, (vh_src + i)->x, (vh_src + i)->y);
 		}
@@ -569,9 +569,9 @@ void commandVZ() { /* from T2 */
 	
 	switch(p1) {
 	case 0:
-		srcimg[p2].useTTP = FALSE; break;
+		srcimg[p2].useTTP = false; break;
 	case 1:
-		srcimg[p2].useTTP = TRUE;
+		srcimg[p2].useTTP = true;
 		srcimg[p2].TTPunit = p3;
 		break;
 	case 2:
@@ -743,9 +743,9 @@ void commandVA() { /* from Panyo */
 	case 0:
 		if (p2 == 0) {
 			/* 停止 */
-			inAnimation = TRUE;
+			inAnimation = true;
 			VAcmd[p1].state = VA_STOPPED;
-			VAcmd[p1].draw  = TRUE;
+			VAcmd[p1].draw  = true;
 			if (p3 == 0) {
 				/* ユニット消し */
 				va_restoreUnit(p1);
@@ -755,32 +755,32 @@ void commandVA() { /* from Panyo */
 				va_drawUnit(p1);
 				va_updateUnit(p1);
 			}
-			VAcmd[p1].draw  = FALSE;
+			VAcmd[p1].draw  = false;
 		} else {
 			/* 開始 (p3=コマ数,0:無限(開始位置==終了位置のとき))*/
-			inAnimation = TRUE;
+			inAnimation = true;
 			VAcmd[p1].elaspCut  = 0;
 			VAcmd[p1].startTime = sdl_getTicks();
 			VAcmd[p1].totalCut  = p3;
 			
 			if (p3 == 0) {
-				VAcmd[p1].nomove = TRUE;
+				VAcmd[p1].nomove = true;
 			} else {
 				if (VAcmd[p1].startX == VAcmd[p1].endX && VAcmd[p1].startY == VAcmd[p1].endY) {
-					VAcmd[p1].nomove = TRUE;
+					VAcmd[p1].nomove = true;
 				} else {
-					VAcmd[p1].nomove = FALSE;
+					VAcmd[p1].nomove = false;
 				}
 			}
 			/* animation start */
-			nact->is_va_animation = TRUE;
+			nact->is_va_animation = true;
 	
 			VAcmd[p1].state   = VA_RUNNING;
-			VAcmd[p1].draw    = TRUE;
+			VAcmd[p1].draw    = true;
 			va_drawUnit(p1);
 			va_updateUnit(p1);
 			if (p2 == 2) {
-				VAcmd[p1].rewrite = TRUE;
+				VAcmd[p1].rewrite = true;
 				/* キー抜け無し ,p3=0は指定不可 */
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
@@ -791,7 +791,7 @@ void commandVA() { /* from Panyo */
 			} else if (p2 == 3) {
 				/* キー抜けあり ,p3=0は指定不可*/
 				int key = 0;
-				VAcmd[p1].rewrite = TRUE;
+				VAcmd[p1].rewrite = true;
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
 					sdl_sleep(10);
@@ -854,20 +854,20 @@ void commandVA() { /* from Panyo */
 	}
 }
 	
-static boolean vh_checkImmovableArea(int page, int x, int y, int w, int h) {
+static bool vh_checkImmovableArea(int page, int x, int y, int w, int h) {
 	int _x, _y;
 	
-	if (x + w > cxMap) return TRUE; 
+	if (x + w > cxMap) return true; 
 	
-	if (y + h > cyMap) return TRUE; 
+	if (y + h > cyMap) return true; 
 
 	for (_y = y; _y < (y+h); _y++) {
 		for (_x = x; _x < (x+w); _x++) {
-			if (*UNITMAP_WALKRESULT(page, _x, _y) == 255) return TRUE;
+			if (*UNITMAP_WALKRESULT(page, _x, _y) == 255) return true;
 		}
 	}
 	
-	return FALSE;
+	return false;
 }
 
 static void vh_append_pos(int x, int y) {
@@ -959,7 +959,7 @@ void va_animation(void) {
 
 	va_update();
 
-	inAnimation = TRUE;
+	inAnimation = true;
 	
 	for (i = 0; i < VACMD_MAX; i++) {
 		if (VAcmd[i].state == VA_STOPPED) continue;
@@ -972,10 +972,10 @@ void va_animation(void) {
 		h = max(VAcmd[i].curY + VAcmd[i].unitHeight, VAcmd[i].preY + VAcmd[i].unitHeight) - y; 
 		ags_updateArea(x, y, w, h);
 		// printf("x = %d, y = %d, w = %d, h = %d\n", x, y, w, h);
-		VAcmd[i].rewrite = FALSE;
+		VAcmd[i].rewrite = false;
 	}
 	
-	inAnimation = FALSE;
+	inAnimation = false;
 }
 	
 static void va_animationAlone(int i) {
@@ -985,7 +985,7 @@ static void va_animationAlone(int i) {
 
 	if (!VAcmd[i].rewrite) return;
 
-	inAnimation = TRUE;
+	inAnimation = true;
 	
 	va_restoreUnit(i);
 	va_drawUnit(i);
@@ -996,24 +996,24 @@ static void va_animationAlone(int i) {
 	h = max(VAcmd[i].curY + VAcmd[i].unitHeight, VAcmd[i].preY + VAcmd[i].unitHeight) - y; 
 	ags_updateArea(x, y, w, h);
 	
-	VAcmd[i].rewrite = FALSE;
-	inAnimation = FALSE;
+	VAcmd[i].rewrite = false;
+	inAnimation = false;
 }
 
 static void va_update() {
-	boolean proceeding = FALSE;
+	bool proceeding = false;
 	int i;
 	int curTime = sdl_getTicks();
 	
 	for (i = 0; i < VACMD_MAX; i++) {
 		if (VAcmd[i].state == VA_RUNNING) {
-			proceeding = TRUE;
+			proceeding = true;
 			int cut = (curTime - VAcmd[i].startTime) / VAcmd[i].intervaltime;
 			
 			if (cut > VAcmd[i].elaspCut) {
 				/* まだ更新していない場合はskip */
 				if (VAcmd[i].rewrite) continue;
-				VAcmd[i].rewrite = TRUE;
+				VAcmd[i].rewrite = true;
 				VAcmd[i].elaspCut++;
 				/* 古い場所 */
 				VAcmd[i].preX = VAcmd[i].curX;
@@ -1033,7 +1033,7 @@ static void va_update() {
 	}
 	/* 更新するものが無い場合は、タイマーを止めて、アニメーションストップ */
 	if (!proceeding) {
-		nact->is_va_animation = FALSE;
+		nact->is_va_animation = false;
 	}
 }
 
@@ -1060,5 +1060,5 @@ void va_reset(void) {
 	srcimg = NULL;
 
 	memset(VAcmd, 0, sizeof(VAcmd));
-	inAnimation = FALSE;
+	inAnimation = false;
 }

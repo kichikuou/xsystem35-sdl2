@@ -29,7 +29,7 @@
 #include "hacks.h"
 
 /* ぱにょ〜ん 異常シナリオ対策 */
-static boolean dummy_pcm_in_play = FALSE;
+static bool dummy_pcm_in_play = false;
 /* 次の cdrom の loop 回数 */ 
 static int next_cdrom_loopcnt = 0;
 
@@ -230,7 +230,7 @@ void commandSP() {
 	TRACE("SP %d,%d:",no,loop);
 	
 	if (!mus_pcm_get_state()) {
-		dummy_pcm_in_play = TRUE;
+		dummy_pcm_in_play = true;
 	}
 	
 	/* ???? */
@@ -248,7 +248,7 @@ void commandST() {
 	TRACE("ST %d:",time);
 	
 	if (!mus_pcm_get_state()) { 
-		dummy_pcm_in_play = FALSE;
+		dummy_pcm_in_play = false;
 	}
 	mus_pcm_stop(time);
 }
@@ -261,7 +261,7 @@ void commandSU() {
 	if (!mus_pcm_get_state()) {
 		*var1 = dummy_pcm_in_play ? 1 : 0;
 		*var2 = 0;
-		if (dummy_pcm_in_play) dummy_pcm_in_play = FALSE;
+		if (dummy_pcm_in_play) dummy_pcm_in_play = false;
 	} else {
 		*var2 = 0;
 		mus_pcm_get_playposition(var2);
@@ -298,7 +298,7 @@ void commandSQ() {
 	TRACE("SQ %d,%d,%d:", noL, noR, loop);
 		     
 	if (!mus_pcm_get_state()) {
-		dummy_pcm_in_play = TRUE;
+		dummy_pcm_in_play = true;
 	}
 	
 	if( noL<1 || noR<1 ) {
@@ -325,7 +325,7 @@ void commandSW() {
 	
 	if (mus_pcm_get_state()) {
 		int rate = Srate == 11 ? 11025 : Srate == 22 ? 22050 : Srate == 44 ? 44100 : 8000;
-		boolean able;
+		bool able;
 		int ret;
 		
 		ret = mus_pcm_check_ability(bit, rate, channel, &able);
@@ -366,7 +366,7 @@ void commandSX() {
 	case 2: {
 		/* フェード終了確認 */
 		int *var   = getCaliVariable();
-		boolean st;
+		bool st;
 		st = mus_mixer_fadeout_get_state(device);
 		*var = (st ? 0 : 1);
 		TRACE("SX %d,%d:", device, sw);

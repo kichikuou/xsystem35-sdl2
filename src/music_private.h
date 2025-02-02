@@ -32,8 +32,8 @@
 #include "ald_manager.h"
 
 struct _musprvdat {
-	boolean midi_valid;
-	boolean pcm_valid;
+	bool midi_valid;
+	bool pcm_valid;
 	
 	cdromdevice_t *cddev;
 	mididevice_t  mididev;

@@ -116,8 +116,8 @@ struct _sprite {
 	cginfo_t *curcg;
 	
 	// スプライトを表示するか
-	boolean show;
-	boolean show_save; // Zkey hide save用
+	bool show;
+	bool show_save; // Zkey hide save用
 	
 	// 表示する際のブレンド率 0:全く見えない, 255: 通常表示
 	int blendrate; 
@@ -139,8 +139,8 @@ struct _sprite {
 	// spriteを再描画するときの callback
 	int  (* update)(struct _sprite *sp);
 	
-	boolean focused; // forcusを得ているか
-	boolean pressed; // このsprite上でマウスが押されているか
+	bool focused; // forcusを得ているか
+	bool pressed; // このsprite上でマウスが押されているか
 	
 	SList *expsp; // 説明スプライトのリスト
 	
@@ -151,7 +151,7 @@ struct _sprite {
 		int speed;      // 移動速度
 		int starttime;  // 移動開始時刻
 		int endtime;    // 移動終了予定時刻
-		boolean moving; // 移動中かどうか
+		bool moving; // 移動中かどうか
 	} move;
 	
 	// SACT.Numeral用パラメータ
@@ -170,7 +170,7 @@ struct _sprite {
 		
 		// ゲットスプライト
 		struct {
-			boolean dragging;  // ドラッグ中
+			bool dragging;  // ドラッグ中
 			MyPoint dragstart; // ドラッグ開始位置
 		} get;
 
@@ -254,7 +254,7 @@ struct _sact {
 	
 	// DnDに関するもの
 	sprite_t *draggedsp;  // drag中のスプライト
-	boolean dropped;      // スプライトがドロップされたかどうか
+	bool dropped;      // スプライトがドロップされたかどうか
 	
 	// keywaitの種類
 	int waittype;
@@ -275,12 +275,12 @@ struct _sact {
 	// depth map
 	surface_t *dmap;
 	
-	boolean zhiding;  // Zkeyによる隠し中
+	bool zhiding;  // Zkeyによる隠し中
 	int     zofftime;
-	boolean zdooff;
+	bool zdooff;
 	
 	// バックログ
-	boolean logging;
+	bool logging;
 	List  *log;
 };
 typedef struct _sact sact_t;

@@ -62,7 +62,7 @@ static void move_drain(sprite_t *sp) {
 	// 後で、movelist から外してもらうための処理
 	sact.teventremovelist = slist_append(sact.teventremovelist, sp);
 	
-	sp->move.moving = FALSE;
+	sp->move.moving = false;
 	if (sp->move.speed > 0)
 		sp->move.time = 0;
 }
@@ -122,7 +122,7 @@ void spev_move_setup(void* data, void* userdata) {
 	
 	// move 開始時刻の記録
 	sp->move.starttime = sact.movestarttime;
-	sp->move.moving = TRUE;
+	sp->move.moving = true;
 	
 	// MOVE_SPEED で設定した場合は、移動量を考慮して移動時間を決定
 	if (sp->move.speed > 0) {

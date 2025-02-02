@@ -107,9 +107,9 @@ void nt_sco_callevent(int ev) {
 }
 
 
-boolean nt_sco_is_natsu() {
-	if (night.Month < 6 || night.Month > 9) return FALSE;
-	if (night.Month == 6 && night.Day < 11) return FALSE;
-	return TRUE;
+bool nt_sco_is_natsu() {
+	if (night.Month < 6 || night.Month > 9) return false;
+	if (night.Month == 6 && night.Day < 11) return false;
+	return true;
 }
 

@@ -56,7 +56,7 @@ static const char *format_address(int page, int addr) {
 	return buf;
 }
 
-static boolean parse_address(const char *str, int *page, int *addr) {
+static bool parse_address(const char *str, int *page, int *addr) {
 	// <page>:<address>
 	if (sscanf(str, "%i:%i", page, addr) == 2)
 		return true;
@@ -99,7 +99,7 @@ static boolean parse_address(const char *str, int *page, int *addr) {
 	return false;
 }
 
-static boolean print_source_line(int page, int addr) {
+static bool print_source_line(int page, int addr) {
 	int line_no = dsym_addr2line(symbols, page, addr);
 	if (line_no <= 0)
 		return false;

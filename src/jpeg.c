@@ -33,7 +33,7 @@
 #include "system.h"
 #include "jpeg.h"
 
-boolean jpeg_checkfmt(uint8_t *data) {
+bool jpeg_checkfmt(uint8_t *data) {
 	return data[0] == 0xff && data[1] == 0xd8;
 }
 

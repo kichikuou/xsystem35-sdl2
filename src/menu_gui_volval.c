@@ -76,13 +76,13 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
 	  g_object_set_data_full(G_OBJECT(window1), "hscale1", hscale1,
 				    (GDestroyNotify) g_object_unref);
 	  gtk_widget_show (hscale1);
-	  gtk_widget_set_hexpand(hscale1, TRUE);
+	  gtk_widget_set_hexpand(hscale1, true);
 	  gtk_widget_set_margin_start(hscale1, 5);
 	  gtk_widget_set_margin_end(hscale1, 5);
 	  gtk_widget_set_margin_top(hscale1, 2);
 	  gtk_widget_set_margin_bottom(hscale1, 2);
 	  gtk_grid_attach(GTK_GRID(grid2), hscale1, 1, j+1, 1, 1);
-	  gtk_scale_set_draw_value (GTK_SCALE (hscale1), FALSE);
+	  gtk_scale_set_draw_value (GTK_SCALE (hscale1), false);
 	  gtk_scale_set_digits (GTK_SCALE (hscale1), 0);
 
 	  checkbutton1 = gtk_check_button_new_with_label (_("mute"));
@@ -104,8 +104,8 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
   g_object_set_data_full(G_OBJECT(window1), "hbox1", hbox1,
                             (GDestroyNotify) g_object_unref);
   gtk_widget_show (hbox1);
-  gtk_widget_set_hexpand(hbox1, TRUE);
-  gtk_widget_set_vexpand(hbox1, TRUE);
+  gtk_widget_set_hexpand(hbox1, true);
+  gtk_widget_set_vexpand(hbox1, true);
   gtk_grid_attach(GTK_GRID(grid2), hbox1, 1, 0, 1, 1);
 
   label6 = gtk_label_new (_("small"));
@@ -113,7 +113,7 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
   g_object_set_data_full(G_OBJECT(window1), "label6", label6,
                             (GDestroyNotify) g_object_unref);
   gtk_widget_show (label6);
-  gtk_box_pack_start (GTK_BOX (hbox1), label6, TRUE, FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (hbox1), label6, true, false, 3);
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
 
   label7 = gtk_label_new (_("large"));
@@ -121,7 +121,7 @@ static GtkWidget* vval_win_open(struct _volval *vval, int max) {
   g_object_set_data_full(G_OBJECT(window1), "label7", label7,
                             (GDestroyNotify) g_object_unref);
   gtk_widget_show (label7);
-  gtk_box_pack_start (GTK_BOX (hbox1), label7, TRUE, FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (hbox1), label7, true, false, 3);
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_RIGHT);
 
   g_signal_connect(window1, "delete_event",
@@ -135,12 +135,12 @@ static void
 on_checkbutton1_toggled                (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-	boolean *muted = (boolean *)user_data;
+	bool *muted = (bool *)user_data;
 	
 	if (gtk_toggle_button_get_active(togglebutton)) {
-		*muted = TRUE; 
+		*muted = true; 
 	} else {
-		*muted = FALSE; 
+		*muted = false; 
 	}
 	s39ini_setvol();
 }
@@ -160,5 +160,5 @@ on_window1_destroy                     (GtkWindow     *window,
 					gpointer       user_data)
 {
 	s39ini_winclose();
-	return TRUE;
+	return true;
 }

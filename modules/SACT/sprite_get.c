@@ -42,9 +42,9 @@ static void cb_remove(sprite_t *sp);
 static void cb_defocused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
-	sp->show = FALSE;
+	sp->show = false;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -61,7 +61,7 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		if (e->code != AGSEVENT_BUTTON_LEFT) break;
 		
 		// drag開始時のマウスの位置記録
-		sp->u.get.dragging = TRUE;
+		sp->u.get.dragging = true;
 		sp->u.get.dragstart.x = e->mousex;
 		sp->u.get.dragstart.y = e->mousey;
 		
@@ -73,7 +73,7 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		
 		// スプライトの表示を一番前に持って来る
 		sact.draggedsp = sp;
-		sact.dropped = FALSE;
+		sact.dropped = false;
 		
 		// 説明スプライトがある場合は、それを非表示にする
 		if (sp->expsp) {
@@ -92,7 +92,7 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		
 		if (!sp->u.get.dragging) break;
 		
-		sact.dropped = TRUE;
+		sact.dropped = true;
 		break;
 
 	case AGSEVENT_MOUSE_MOTION:

@@ -55,7 +55,7 @@ cdromdevice_t cdrom = {
 
 #define PLAYLIST_MAX 256
 
-static boolean      enabled = FALSE;
+static bool      enabled = false;
 static char         *playlist[PLAYLIST_MAX];
 static Mix_Music    *mix_music;
 static int          trackno; // 現在演奏中のトラック
@@ -101,7 +101,7 @@ static int cdrom_init(char *playlist_path) {
 	NOTICE("cdrom: Loaded playlist from %s", playlist_path);
 	
 	trackno = 0;
-	enabled = TRUE;
+	enabled = true;
 	return OK;
 }
 

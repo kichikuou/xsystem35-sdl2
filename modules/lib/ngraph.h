@@ -11,8 +11,8 @@
 // DLL 用 graphic 関連関数 
 
 /* in graph.c */
-extern boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy);
-extern boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
+extern bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy);
+extern bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
 
 
 /* in graph_expandcolor_blend.c */

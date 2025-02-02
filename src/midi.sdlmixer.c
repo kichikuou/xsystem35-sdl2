@@ -44,7 +44,7 @@ static int midi_setflag(int mode, int index, int val);
 static int midi_setvol(int vol);
 static int midi_getvol();
 static int midi_fadestart(int time, int volume, int stop);
-static boolean midi_fading();
+static bool midi_fading();
 
 #define midi midi_sdlmixer
 mididevice_t midi = {
@@ -127,12 +127,12 @@ static int midi_unpause(void) {
 
 static int midi_get_playing_info(midiplaystate *st) {
 	if (!mix_music || !Mix_PlayingMusic()) {
-		st->in_play = FALSE;
+		st->in_play = false;
 		st->loc_ms  = 0;
 		return OK;
 	}
 
-	st->in_play = TRUE;
+	st->in_play = true;
 	st->loc_ms = SDL_GetTicks() - start_time;
 	return OK;
 }
@@ -171,6 +171,6 @@ static int midi_fadestart(int time, int volume, int stop) {
 	return NG;
 }
 
-static boolean midi_fading() {
+static bool midi_fading() {
 	return SDL_GetTicks() < fade_tick;
 }

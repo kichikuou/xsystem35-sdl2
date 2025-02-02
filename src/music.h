@@ -49,7 +49,7 @@ extern int mus_midi_unpause(void);
 extern int mus_midi_get_playposition(midiplaystate *state);
 extern int mus_midi_set_flag(int mode, int index, int val);
 extern int mus_midi_get_flag(int mode, int index);
-extern boolean mus_midi_get_state(void);
+extern bool mus_midi_get_state(void);
 
 /* pcm (Scommand) related function */
 extern int mus_pcm_start(int no, int loop);
@@ -57,12 +57,12 @@ extern int mus_pcm_mix(int noL, int noR, int loop);
 extern int mus_pcm_stop(int msec);
 extern int mus_pcm_load(int no);
 extern int mus_pcm_get_playposition(int *pos);
-extern int mus_pcm_check_ability(int bit, int rate, int ch, boolean *able);
-extern boolean mus_pcm_get_state(void);
+extern int mus_pcm_check_ability(int bit, int rate, int ch, bool *able);
+extern bool mus_pcm_get_state(void);
 
 /* fader/mixer related function */
 extern int mus_mixer_fadeout_start(int device, int time, int volume, int stop);
-extern boolean mus_mixer_fadeout_get_state(int device);
+extern bool mus_mixer_fadeout_get_state(int device);
 extern int mus_mixer_fadeout_stop(int device);
 extern int mus_mixer_get_level(int device);
 extern bool mus_mixer_set_level(int device, int level);
@@ -76,7 +76,7 @@ extern int mus_wav_stop(int ch);
 extern int mus_wav_get_playposition(int ch);
 extern int mus_wav_fadeout_start(int ch, int time, int volume, int stop);
 extern int mus_wav_fadeout_stop(int ch);
-extern boolean mus_wav_fadeout_get_state(int ch);
+extern bool mus_wav_fadeout_get_state(int ch);
 extern int mus_wav_waitend(int ch);
 extern int mus_wav_waittime(int ch, int time);
 extern int mus_wav_wavtime(int ch);

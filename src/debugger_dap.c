@@ -495,8 +495,8 @@ static void cmd_palette(cJSON *args, cJSON *resp) {
 	}
 }
 
-static boolean handle_request(cJSON *request) {
-	boolean continue_repl = true;
+static bool handle_request(cJSON *request) {
+	bool continue_repl = true;
 
 	cJSON *resp = cJSON_CreateObject();
 	cJSON_AddStringToObject(resp, "type", "response");
@@ -565,10 +565,10 @@ static boolean handle_request(cJSON *request) {
 	return continue_repl;
 }
 
-static boolean handle_message(char *msg) {
+static bool handle_message(char *msg) {
 	cJSON *json = cJSON_Parse(msg);
 	cJSON *type = cJSON_GetObjectItemCaseSensitive(json, "type");
-	boolean continue_repl = true;
+	bool continue_repl = true;
 	if (cJSON_IsString(type) && !strcmp(type->valuestring, "request"))
 		continue_repl = handle_request(json);
 	cJSON_Delete(json);
@@ -635,7 +635,7 @@ static void dbg_dap_repl(int bp_no) {
 	emit_stopped_event();
 	dbg_state = DBG_RUNNING;
 
-	boolean continue_repl = true;
+	bool continue_repl = true;
 	while (continue_repl && !nact->is_quit) {
 		SDL_Event e;
 		SDL_WaitEvent(&e);

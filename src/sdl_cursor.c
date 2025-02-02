@@ -86,7 +86,7 @@ void sdl_cursor_init(void) {
 	cursor[CURSOR_WAIT]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
 }
 
-boolean sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
+bool sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
 	int    xormasklen, andmasklen, xornum;
 	int    i, j;
 	int    h = 0;
@@ -135,7 +135,7 @@ boolean sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage, TCursorDi
 #undef height
 #undef width
 	
-	return TRUE;
+	return true;
 }
 
 MyPoint sdl_translateMouseCoords(int x, int y) {

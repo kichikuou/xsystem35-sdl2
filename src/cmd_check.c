@@ -211,10 +211,10 @@ void exec_command(void) {
 		/* 選択肢の登録 */
 		if (nact->sel.in_setting) {
 			sel_fixElement();
-			nact->sel.in_setting = FALSE;
+			nact->sel.in_setting = false;
 		} else {
 			sel_addRetValue(sl_getaddr());
-			nact->sel.in_setting = TRUE;
+			nact->sel.in_setting = true;
 		}
 		break;
 	case '%':
@@ -534,7 +534,7 @@ void exec_command(void) {
 	case 'A':
 		/* hit Any Key */
 		sys_hit_any_key();
-		msg_nextPage(TRUE);
+		msg_nextPage(true);
 		TRACE("A");
 		break;
 	case 'B':

@@ -48,7 +48,7 @@ static int eventCB_PUT(sprite_t *sp, agsevent_t *e) {
 			update++;
 		}
 		
-		sp->pressed = TRUE;
+		sp->pressed = true;
 		break;
 		
 	case AGSEVENT_BUTTON_RELEASE:
@@ -76,7 +76,7 @@ static int eventCB_PUT(sprite_t *sp, agsevent_t *e) {
 					ssnd_play(sp->numsound2);
 				}
 			}
-			sp->pressed = FALSE;
+			sp->pressed = false;
 		}
 		break;
 	}

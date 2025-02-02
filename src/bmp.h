@@ -46,9 +46,9 @@ typedef struct {
 	BMP_Type bmpTp; /* bmp type             */
 } bmp_header;
 
-extern boolean bmp256_checkfmt(uint8_t *data);
+extern bool bmp256_checkfmt(uint8_t *data);
 extern cgdata *bmp256_extract(uint8_t *data);
-extern boolean bmp16m_checkfmt(uint8_t *data);
+extern bool bmp16m_checkfmt(uint8_t *data);
 extern cgdata *bmp16m_extract(uint8_t *data);
 
 #endif /* !__BMP__ */

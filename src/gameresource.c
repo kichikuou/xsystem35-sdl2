@@ -63,7 +63,7 @@ static void storeSaveName(GameResource *gr, int no, char *src) {
 	if (path) free(path);
 }
 
-boolean initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir, struct dirent *(*p_readdir)(DIR *)) {
+bool initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir, struct dirent *(*p_readdir)(DIR *)) {
 	memset(gr, 0, sizeof(GameResource));
 
 	char *basename = NULL;
@@ -160,7 +160,7 @@ static void trimRight(char *str) {
 		*p = '\0';
 }
 
-static boolean initGameResourceFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
+static bool initGameResourceFromFile(GameResource *gr, FILE *fp, const char *gr_fname) {
 	int linecnt = 0, dno;
 	char line[256];
 	char key[256], path[256];
@@ -227,26 +227,26 @@ static boolean initGameResourceFromFile(GameResource *gr, FILE *fp, const char *
 		}
 	}
 	gr->gr_fname = strdup(gr_fname);
-	return TRUE;
+	return true;
 
  errexit:
 	SYSERROR("Illigal resource at line(%d) file<%s>", linecnt, gr_fname);
-	return FALSE;
+	return false;
 }
 
-boolean initGameResource(GameResource *gr, const char *gr_fname, const char *savedir) {
+bool initGameResource(GameResource *gr, const char *gr_fname, const char *savedir) {
 	FILE *fp = fopen(gr_fname, "r");
 	if (fp) {
-		boolean result = initGameResourceFromFile(gr, fp, gr_fname);
+		bool result = initGameResourceFromFile(gr, fp, gr_fname);
 		fclose(fp);
 		return result;
 	}
 	DIR *dir = opendir(".");
 	if (dir) {
-		boolean result = initGameResourceFromDir(gr, dir, savedir, readdir);
+		bool result = initGameResourceFromDir(gr, dir, savedir, readdir);
 		closedir(dir);
 		return result;
 	}
 	SYSERROR("Game Resource File open failed");
-	return FALSE;
+	return false;
 }

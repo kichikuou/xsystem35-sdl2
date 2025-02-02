@@ -41,13 +41,13 @@ extern DebuggerState dbg_state;
 #ifdef ENABLE_DEBUGGER
 
 #define dbg_trapped() (dbg_state != DBG_RUNNING)
-void dbg_init(const char *symbols_path, boolean use_dap);
+void dbg_init(const char *symbols_path, bool use_dap);
 void dbg_quit(void);
 void dbg_main(int bp_no);
 void dbg_onsleep(void);
 void dbg_on_palette_change(void);
 uint8_t dbg_handle_breakpoint(int page, int addr);
-boolean dbg_console_vprintf(int lv, const char *format, va_list ap);
+bool dbg_console_vprintf(int lv, const char *format, va_list ap);
 void dbg_post_command(void *data);
 
 #else // ENABLE_DEBUGGER

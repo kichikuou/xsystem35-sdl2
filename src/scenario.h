@@ -59,8 +59,8 @@ extern const uint8_t *sl_sco; // scenario page buffer
 extern int sl_page;        // current scenario page (0-based)
 extern int sl_index;       // cureent scenario address
 
-boolean sl_init(void);
-boolean sl_reinit(void);
+bool sl_init(void);
+bool sl_reinit(void);
 int sl_getw(void);
 #define sl_getdw sl_getaddr
 int sl_getdAt(int address);
@@ -72,8 +72,8 @@ const char *sl_getString(char term);
 const char *sl_getConstString(void);
 
 void sl_jmpNear(int address);
-boolean sl_jmpFar(int page);
-boolean sl_jmpFar2(int page, int address);
+bool sl_jmpFar(int page);
+bool sl_jmpFar2(int page, int address);
 void sl_callNear(int address);
 void sl_retNear(void);
 void sl_callFar(int page);

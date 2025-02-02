@@ -51,7 +51,7 @@ static void NIGHTDLL_reset(void) {
 }
 
 static void InitGame() { /* 1 */
-	ags_setAntialiasedStringMode(TRUE);
+	ags_setAntialiasedStringMode(true);
 	sys_setHankakuMode(2);
 	
 	nact->msgout = ntmsg_add;

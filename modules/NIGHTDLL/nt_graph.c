@@ -179,15 +179,15 @@ void nt_gr_draw(int effectno) {
 		// 全消し
 		break;
 	case 1:
-		nt_sp_update_all(TRUE);
+		nt_sp_update_all(true);
 		break;
 	default:
 		if (night.waitskiplv > 1) {
-			nt_sp_update_all(TRUE);
+			nt_sp_update_all(true);
 			break;
 		}
-		//nt_sp_eupdate(effectno, effecttime, TRUE);
-		nt_sp_eupdate(effectno, 1000, TRUE);
+		//nt_sp_eupdate(effectno, effecttime, true);
+		nt_sp_eupdate(effectno, 1000, true);
 	}
 }
 

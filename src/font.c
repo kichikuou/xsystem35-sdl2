@@ -51,7 +51,7 @@ static int       fontcnt = 0;
 static FontTable *fontset;
 
 static struct {
-	boolean antialiase_on;
+	bool antialiase_on;
 	const char *name[FONTTYPEMAX];
 	int face[FONTTYPEMAX];
 } this;
@@ -215,7 +215,7 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
 }
 
 void font_init(void) {
-	this.antialiase_on = FALSE;
+	this.antialiase_on = false;
 	
 	if (TTF_Init() == -1)
 		SYSERROR("Failed to intialize SDL_ttf: %s", TTF_GetError());
@@ -226,11 +226,11 @@ void font_set_name_and_index(int type, const char *name, int index) {
 	this.face[type] = index;
 }
 
-void font_set_antialias(boolean enable) {
+void font_set_antialias(bool enable) {
 	this.antialiase_on = enable;
 }
 
-boolean font_get_antialias(void) {
+bool font_get_antialias(void) {
 	return this.antialiase_on;
 }
 

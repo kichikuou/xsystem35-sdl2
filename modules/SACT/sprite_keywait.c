@@ -41,7 +41,7 @@
 
 
 static void hidesprite(sprite_t *sp);
-static boolean waitcond(int endtime);
+static bool waitcond(int endtime);
 
 
 
@@ -57,23 +57,23 @@ static void hidesprite(sprite_t *sp) {
 	}
 	
 	sp_updateme(sp);
-	sp->show = FALSE;
+	sp->show = false;
 	sp_update_clipped();
 }
 
 /*
   キー待ち終了の条件チェック
    @param endtime: 終了時間
-   @return: 終了なら TRUE、継続なら FALSE
+   @return: 終了なら true、継続なら false
    
    スプライトがドロップされた時の各種処理を含む
 */
-static boolean waitcond(int endtime) {
+static bool waitcond(int endtime) {
 	int curtime = sdl_getTicks();
-	if (curtime >= endtime) return TRUE;
+	if (curtime >= endtime) return true;
 	
 	if (sact.dropped) {
-		sact.draggedsp->u.get.dragging = FALSE;
+		sact.draggedsp->u.get.dragging = false;
 		if (sact.waitkey != -1) {
 			// dropしたスプライトをじわじわ消す 
 			hidesprite(sact.draggedsp);
@@ -81,8 +81,8 @@ static boolean waitcond(int endtime) {
 			sact.sp_result_put = sact.waitkey;
 			sp_free(sact.draggedsp->no);
 			sact.draggedsp = NULL;
-			sact.dropped = FALSE;
-			return TRUE;
+			sact.dropped = false;
+			return true;
 		} else {
 			// PUT/SWPUTスプライト以外のところにdropした場合
 			sprite_t *sp = sact.draggedsp;
@@ -99,7 +99,7 @@ static boolean waitcond(int endtime) {
 				ssnd_play(sact.draggedsp->numsound3);
 			}
 			sact.draggedsp = NULL;
-			sact.dropped = FALSE;
+			sact.dropped = false;
 		}
 	}
 	
@@ -120,7 +120,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	int curtime, endtime;
 	
 	// とりあえず全更新
-	sp_update_all(TRUE);
+	sp_update_all(true);
 	
 	// depthmap を準備
 	slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
@@ -136,7 +136,7 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 		// とりあえず、現在のマウス位置を送って、switch sprite の
 		// 状態を更新しておく
 		MyPoint p;
-		sys_getMouseInfo(&p, FALSE);
+		sys_getMouseInfo(&p, false);
 		agsevent_t agse = {
 			.type = AGSEVENT_MOUSE_MOTION,
 			.mousex = p.x,

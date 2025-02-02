@@ -90,7 +90,7 @@ static void do_update_each(void* data, void* userdata) {
   画面全体の更新
   @param syncscreen: surface0 に描画したものを Screen に反映させるかどうか
  */
-int sp_update_all(boolean syncscreen) {
+int sp_update_all(bool syncscreen) {
 
 	// スプライト移動がある場合は移動開始
 	if (sact.movelist) {

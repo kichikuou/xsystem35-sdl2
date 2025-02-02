@@ -43,7 +43,7 @@ static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
 		x++;
 		minx = min(x, minx);
 
-		boolean span_above = FALSE, span_below = FALSE;
+		bool span_above = false, span_below = false;
 		for (; x < sdl_dib->w && line[x] == old_color; x++) {
 			line[x] = col;
 			if (y > 0) {
@@ -53,9 +53,9 @@ static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
 						stack = realloc(stack, sizeof(SDL_Point) * stack_size);
 					}
 					stack[top] = (SDL_Point){x, y - 1};
-					span_above = TRUE;
+					span_above = true;
 				} else if (span_above && prev_line[x] != old_color) {
-					span_above = FALSE;
+					span_above = false;
 				}
 			}
 			if (y < sdl_dib->h - 1) {
@@ -65,9 +65,9 @@ static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
 						stack = realloc(stack, sizeof(SDL_Point) * stack_size);
 					}
 					stack[top] = (SDL_Point){x, y + 1};
-					span_below = TRUE;
+					span_below = true;
 				} else if (span_below && next_line[x] != old_color) {
-					span_below = FALSE;
+					span_below = false;
 				}
 			}
 		}

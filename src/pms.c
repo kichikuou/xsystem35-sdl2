@@ -198,22 +198,22 @@ static void extract_16bit(pms_header *pms, uint16_t *pic, uint8_t *b) {
 /*
  * Check data is 8bit pms format cg or not
  *   data: raw data (pointer to data top)
- *   return: TRUE if data is pms
+ *   return: true if data is pms
 */
-boolean pms256_checkfmt(uint8_t *data) {
+bool pms256_checkfmt(uint8_t *data) {
 	int x, y, w, h;
 	
-	if (data[0] != 0x50 || data[1] != 0x4d) return FALSE;
-	if (data[6] != 8) return FALSE;
+	if (data[0] != 0x50 || data[1] != 0x4d) return false;
+	if (data[6] != 8) return false;
 	
 	x = LittleEndian_getDW(data, 16);
 	y = LittleEndian_getDW(data, 20);
 	w = LittleEndian_getDW(data, 24);
 	h = LittleEndian_getDW(data, 28);
 	
-	if (x < 0 || y < 0 || w < 0 || h < 0) return FALSE;
+	if (x < 0 || y < 0 || w < 0 || h < 0) return false;
 	
-	return TRUE;
+	return true;
 }
 
 /*
@@ -248,22 +248,22 @@ cgdata *pms256_extract(uint8_t *data) {
 /*
  * Check data is 16bit pms format cg or not
  *   data: raw data (pointer to data top)
- *   return: TRUE if data is pms
+ *   return: true if data is pms
 */
-boolean pms64k_checkfmt(uint8_t *data) {
+bool pms64k_checkfmt(uint8_t *data) {
 	int x, y, w, h;
 	
-	if (data[0] != 0x50 || data[1] != 0x4d) return FALSE;
-	if (data[6] != 16) return FALSE;
+	if (data[0] != 0x50 || data[1] != 0x4d) return false;
+	if (data[6] != 16) return false;
 	
 	x = LittleEndian_getDW(data, 16);
 	y = LittleEndian_getDW(data, 20);
 	w = LittleEndian_getDW(data, 24);
 	h = LittleEndian_getDW(data, 28);
 	
-	if (x < 0 || y < 0 || w < 0 || h < 0) return FALSE;
+	if (x < 0 || y < 0 || w < 0 || h < 0) return false;
 	
-	return TRUE;
+	return true;
 }
 
 /*

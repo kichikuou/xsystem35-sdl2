@@ -58,7 +58,7 @@ create_window1 (void)
   window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   g_object_set_data(G_OBJECT(window1), "window1", window1);
   gtk_window_set_title (GTK_WINDOW (window1), _("InputNumber"));
-  gtk_window_set_resizable(GTK_WINDOW (window1), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW (window1), false);
   gtk_window_set_position(GTK_WINDOW (window1), GTK_WIN_POS_MOUSE);
 
   hbox1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -73,7 +73,7 @@ create_window1 (void)
   g_object_set_data_full(G_OBJECT(window1), "vbox1", vbox1,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (vbox1);
-  gtk_box_pack_start (GTK_BOX (hbox1), vbox1, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox1), vbox1, true, true, 0);
   gtk_widget_set_size_request(vbox1, 128, -2);
   gtk_container_set_border_width (GTK_CONTAINER (vbox1), 10);
 
@@ -83,14 +83,14 @@ create_window1 (void)
   g_object_set_data_full(G_OBJECT(window1), "spinbutton1", spinbutton1,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (spinbutton1);
-  gtk_box_pack_start (GTK_BOX (vbox1), spinbutton1, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), spinbutton1, false, false, 0);
 
   grid1 = gtk_grid_new();
   g_object_ref(grid1);
   g_object_set_data_full(G_OBJECT(window1), "grid1", grid1,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (grid1);
-  gtk_box_pack_start (GTK_BOX (vbox1), grid1, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox1), grid1, false, false, 0);
   gtk_grid_set_row_spacing(GTK_GRID(grid1), 5);
   gtk_grid_set_column_spacing(GTK_GRID(grid1), 3);
 
@@ -143,33 +143,33 @@ create_window1 (void)
   gtk_label_set_justify (GTK_LABEL (label13), GTK_JUSTIFY_LEFT);
 
   vbox2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_set_homogeneous(GTK_BOX(vbox2), TRUE);
+  gtk_box_set_homogeneous(GTK_BOX(vbox2), true);
   g_object_ref(vbox2);
   g_object_set_data_full(G_OBJECT(window1), "vbox2", vbox2,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (vbox2);
-  gtk_box_pack_start (GTK_BOX (hbox1), vbox2, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox1), vbox2, false, true, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox2), 10);
   button1 = gtk_button_new_with_label (_("OK"));
   g_object_ref(button1);
   g_object_set_data_full(G_OBJECT(window1), "button1", button1,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (button1);
-  gtk_box_pack_start (GTK_BOX (vbox2), button1, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox2), button1, false, false, 0);
 
   button2 = gtk_button_new_with_label (_("Cancel"));
   g_object_ref(button2);
   g_object_set_data_full(G_OBJECT(window1), "button2", button2,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (button2);
-  gtk_box_pack_start (GTK_BOX (vbox2), button2, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox2), button2, false, false, 0);
 
   label4 = gtk_label_new ("");
   g_object_ref(label4);
   g_object_set_data_full(G_OBJECT(window1), "label4", label4,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label4);
-  gtk_box_pack_start (GTK_BOX (vbox2), label4, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox2), label4, false, false, 0);
 
   g_signal_connect(spinbutton1, "activate",
                       G_CALLBACK(on_spinbutton1_activate),
@@ -201,11 +201,11 @@ create_window2 (void)
   g_object_set_data(G_OBJECT(window2), "window2", window2);
   gtk_container_set_border_width (GTK_CONTAINER (window2), 10);
   gtk_window_set_title (GTK_WINDOW (window2), _("InputString"));
-  gtk_window_set_resizable(GTK_WINDOW (window2), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW (window2), false);
   gtk_window_set_position(GTK_WINDOW (window2), GTK_WIN_POS_MOUSE);
 
   vbox3 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_set_homogeneous(GTK_BOX(vbox3), TRUE);
+  gtk_box_set_homogeneous(GTK_BOX(vbox3), true);
   g_object_ref(vbox3);
   g_object_set_data_full(G_OBJECT(window2), "vbox3", vbox3,
                             (GDestroyNotify)g_object_unref);
@@ -217,7 +217,7 @@ create_window2 (void)
   g_object_set_data_full(G_OBJECT(window2), "label5", label5,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label5);
-  gtk_box_pack_start (GTK_BOX (vbox3), label5, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), label5, false, false, 0);
   gtk_label_set_justify (GTK_LABEL (label5), GTK_JUSTIFY_LEFT);
   gtk_label_set_xalign(GTK_LABEL(label5), 0.00);
 
@@ -226,14 +226,14 @@ create_window2 (void)
   g_object_set_data_full(G_OBJECT(window2), "entry1", entry1,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (entry1);
-  gtk_box_pack_start (GTK_BOX (vbox3), entry1, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), entry1, false, false, 0);
 
   menu_label_inputstring_maxchar = label6 = gtk_label_new (_("MAX charater"));
   g_object_ref(label6);
   g_object_set_data_full(G_OBJECT(window2), "label6", label6,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label6);
-  gtk_box_pack_start (GTK_BOX (vbox3), label6, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), label6, false, false, 0);
   gtk_label_set_justify (GTK_LABEL (label6), GTK_JUSTIFY_LEFT);
   gtk_label_set_xalign(GTK_LABEL(label6), 0.00);
 
@@ -242,7 +242,7 @@ create_window2 (void)
   g_object_set_data_full(G_OBJECT(window2), "label7", label7,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label7);
-  gtk_box_pack_start (GTK_BOX (vbox3), label7, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), label7, false, false, 0);
   gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
   gtk_label_set_xalign(GTK_LABEL(label7), 0.00);
 
@@ -251,21 +251,21 @@ create_window2 (void)
   g_object_set_data_full(G_OBJECT(window2), "hbox2", hbox2,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (hbox2);
-  gtk_box_pack_start (GTK_BOX (vbox3), hbox2, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), hbox2, true, true, 0);
 
   button4 = gtk_button_new_with_label (_("Cancel"));
   g_object_ref(button4);
   g_object_set_data_full(G_OBJECT(window2), "button4", button4,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (button4);
-  gtk_box_pack_end (GTK_BOX (hbox2), button4, FALSE, FALSE, 0);
+  gtk_box_pack_end (GTK_BOX (hbox2), button4, false, false, 0);
 
   button3 = gtk_button_new_with_label (_("OK"));
   g_object_ref(button3);
   g_object_set_data_full(G_OBJECT(window2), "button3", button3,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (button3);
-  gtk_box_pack_end (GTK_BOX (hbox2), button3, FALSE, FALSE, 0);
+  gtk_box_pack_end (GTK_BOX (hbox2), button3, false, false, 0);
 
   g_signal_connect(button4, "clicked",
                       G_CALLBACK(on_button4_clicked),
@@ -294,11 +294,11 @@ create_window3 (void)
   g_object_set_data(G_OBJECT(window3), "window3", window3);
   gtk_container_set_border_width (GTK_CONTAINER (window3), 10);
   gtk_window_set_title (GTK_WINDOW (window3), _("Exit"));
-  gtk_window_set_resizable(GTK_WINDOW (window3), FALSE);
+  gtk_window_set_resizable(GTK_WINDOW (window3), false);
   gtk_window_set_position(GTK_WINDOW (window3), GTK_WIN_POS_MOUSE);
 
   vbox4 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-  gtk_box_set_homogeneous(GTK_BOX(vbox4), TRUE);
+  gtk_box_set_homogeneous(GTK_BOX(vbox4), true);
   g_object_ref(vbox4);
   g_object_set_data_full(G_OBJECT(window3), "vbox4", vbox4,
                             (GDestroyNotify)g_object_unref);
@@ -310,29 +310,29 @@ create_window3 (void)
   g_object_set_data_full(G_OBJECT(window3), "label8", label8,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (label8);
-  gtk_box_pack_start (GTK_BOX (vbox4), label8, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox4), label8, false, false, 0);
 
   hbox3 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-  gtk_box_set_homogeneous(GTK_BOX(hbox3), TRUE);
+  gtk_box_set_homogeneous(GTK_BOX(hbox3), true);
   g_object_ref(hbox3);
   g_object_set_data_full(G_OBJECT(window3), "hbox3", hbox3,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (hbox3);
-  gtk_box_pack_start (GTK_BOX (vbox4), hbox3, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox4), hbox3, true, true, 0);
 
   button5 = gtk_button_new_with_label (_("Yes"));
   g_object_ref(button5);
   g_object_set_data_full(G_OBJECT(window3), "button5", button5,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (button5);
-  gtk_box_pack_start (GTK_BOX (hbox3), button5, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox3), button5, false, true, 0);
 
   button6 = gtk_button_new_with_label (_("No"));
   g_object_ref(button6);
   g_object_set_data_full(G_OBJECT(window3), "button6", button6,
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (button6);
-  gtk_box_pack_start (GTK_BOX (hbox3), button6, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox3), button6, false, true, 0);
 
   g_signal_connect(window3, "destroy",
                       G_CALLBACK(on_window3_destroy),
@@ -485,7 +485,7 @@ create_menu1 (void)
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (__________1);
   gtk_container_add (GTK_CONTAINER (menu1), __________1);
-  gtk_widget_set_sensitive (__________1, FALSE);
+  gtk_widget_set_sensitive (__________1, false);
 
   item4 = gtk_menu_item_new_with_label (_("MouseAutoMove"));
   g_object_ref(item4);
@@ -521,7 +521,7 @@ create_menu1 (void)
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (__________2);
   gtk_container_add (GTK_CONTAINER (menu1), __________2);
-  gtk_widget_set_sensitive (__________2, FALSE);
+  gtk_widget_set_sensitive (__________2, false);
 
   item7 = gtk_menu_item_new_with_label (_("VolumeValance"));
   g_object_ref(item7);
@@ -543,7 +543,7 @@ create_menu1 (void)
                             (GDestroyNotify)g_object_unref);
   gtk_widget_show (__________4);
   gtk_container_add (GTK_CONTAINER (menu1), __________4);
-  gtk_widget_set_sensitive (__________4, FALSE);
+  gtk_widget_set_sensitive (__________4, false);
 
   item17 = gtk_menu_item_new_with_label (_("Exit"));
   g_object_ref(item17);

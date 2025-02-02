@@ -358,12 +358,12 @@ static int midi_unpause(void) {
 
 static int midi_getpos(midiplaystate *st) {
 	if (SDL_AtomicGet(&atomic_seq) == 0) {
-		st->in_play = FALSE;
+		st->in_play = false;
 		st->loc_ms  = 0;
 		return OK;
 	}
 
-	st->in_play = TRUE;
+	st->in_play = true;
 	st->loc_ms = SDL_GetTicks() - start_time;
 
 	return OK;

@@ -452,7 +452,7 @@ static void PlayAnimeData() {
 	int p6 = getCaliValue(); /* IWinMsg */
 	int interval, loop;
 	int i;
-	boolean is_backcopied;
+	bool is_backcopied;
 	agsurface_t *dib;
 	
 	TRACE("ShGraph.PlayAnimeData %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
@@ -470,7 +470,7 @@ static void PlayAnimeData() {
 	
 	for (loop = 0; loop < p1; loop++) {
 		int cnt = sdl_getTicks();
-		is_backcopied = FALSE;
+		is_backcopied = false;
 		
 		for (i = 0; i < SLOT; i++) {
 			int srcno = s1[i].add_p2;
@@ -489,7 +489,7 @@ static void PlayAnimeData() {
 				int sx, sy, dx, dy;
 				
 				if (!is_backcopied) {
-					is_backcopied = TRUE;
+					is_backcopied = true;
 					ags_copyArea(mapback.x, mapback.y, mapback.w, mapback.h,
 								 mapback_p5, mapback_p6);
 				}

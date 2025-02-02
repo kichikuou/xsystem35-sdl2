@@ -44,11 +44,11 @@ static int selected_item_cur;
 static surface_t *selcanvas;
 
 // 前のカーソルの状態
-static boolean oldstate; // spriteの中か外か
+static bool oldstate; // spriteの中か外か
 static int oldindex; // 何番目の要素か(0~)
 
 
-static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin);
+static bool sp_is_insprite2(sprite_t *sp, int x, int y, int margin);
 static void cb_select_move(agsevent_t *e);
 static void cb_select_release(agsevent_t *e);
 static int update_selwindow(sprite_t *sp);
@@ -63,7 +63,7 @@ static int sel_main();
  *  内側にマージンを含む sprite内領域チェック
  *  マージン内はsprite内部とは判断しない
  */
-static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
+static bool sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
 	MyPoint p = {x, y};
 	MyRectangle r = {
 		sp->cur.x + margin,
@@ -78,7 +78,7 @@ static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
 static void cb_select_move(agsevent_t *e) {
 	int x = e->mousex, y = e->mousey;
 	sprite_t *sp = sact.sp[sact.sel.spno];
-	boolean newstate;
+	bool newstate;
 	int newindex;
 	
 	// sprite内か？
@@ -116,7 +116,7 @@ static void cb_select_move(agsevent_t *e) {
 static void cb_select_release(agsevent_t *e) {
 	int x = e->mousex, y = e->mousey;
 	sprite_t *sp = sact.sp[sact.sel.spno];
-	boolean st;
+	bool st;
 	int iy;
 	
 	switch (e->code) {
@@ -202,7 +202,7 @@ static void setup_selwindow() {
 			(sact.sel.font_size + sact.sel.linespace) * (sact.sel.movecursor - 1);
 		ags_setCursorLocation(x, y, true, true);
 		selected_item = (sact.sel.movecursor -1);
-		oldstate = TRUE;
+		oldstate = true;
 		oldindex = selected_item -1;
 	}
 
@@ -315,7 +315,7 @@ void ssel_add(int nString, int wI) {
 */
 int ssel_select(int wNum, int wChoiceSize, int wMenuOutSpc, int wChoiceLineSpace, int wChoiceAutoMoveCursor, int nAlign) {
 	int ret = 0;
-	boolean saveflag;
+	bool saveflag;
 	
 	// check sprite number is sane
 	if (wNum >= (SPRITEMAX-1) || wNum <= 0) return ret;
@@ -335,7 +335,7 @@ int ssel_select(int wNum, int wChoiceSize, int wMenuOutSpc, int wChoiceLineSpace
 
 	// 古い sprite の表示フラグを保存
 	saveflag = sact.sp[wNum]->show;
-	sact.sp[wNum]->show = TRUE;
+	sact.sp[wNum]->show = true;
 	setup_selwindow();
 	
 	ret = sel_main();

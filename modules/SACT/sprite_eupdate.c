@@ -40,11 +40,11 @@
 */
 int sp_eupdate(int type, int time, int cancel) {
 	if (sact.waitskiplv > 1) {
-		sp_update_all(TRUE);
+		sp_update_all(true);
 		return OK;
 	}
 
-	sp_update_all(FALSE);
+	sp_update_all(false);
 
 	enum sdl_effect_type sdl_effect = from_sact_effect(type);
 	if (sdl_effect == EFFECT_INVALID) {

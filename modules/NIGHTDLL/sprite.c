@@ -22,7 +22,7 @@ sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	sp->cg3 = cg3 ? nt_scg_addref(cg3) : NULL;
 	
 	sp->curcg = sp->cg1;
-	sp->show = TRUE;
+	sp->show = true;
 	sp->blendrate = 255;
 	sp->loc.x = 0;
 	sp->loc.y = 0;
@@ -54,7 +54,7 @@ sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height) {
 	
 	sp->no = no;
 	sp->type = SPRITE_MSG;
-	sp->show = TRUE;
+	sp->show = true;
 	sp->blendrate = 255;
 	sp->loc.x = x;
 	sp->loc.y = y;
@@ -83,8 +83,8 @@ void nt_sp_free(sprite_t *sp) {
 	free(sp);
 }
 
-void nt_sp_set_show(sprite_t *sp, boolean show) {
-	boolean oldshow;
+void nt_sp_set_show(sprite_t *sp, bool show) {
+	bool oldshow;
 	
 	if (sp == NULL) return;
 	

@@ -53,14 +53,14 @@ static struct profile_kv *check_profile(const char *name)
 	return NULL;
 }
 
-static boolean insert_profile(const char *name, const char *value)
+static bool insert_profile(const char *name, const char *value)
 {
 	struct profile_kv *kv;
 
 	if ((kv = check_profile(name))) {
 		free(kv->value);
 		kv->value = strdup(value);
-		return TRUE;
+		return true;
 	}
 
 	profile = realloc(profile, sizeof(struct profile_kv) * (profile_values + 1));
@@ -70,7 +70,7 @@ static boolean insert_profile(const char *name, const char *value)
 	profile[profile_values].name = strdup(name);
 	profile[profile_values].value = strdup(value);
 	profile_values++;
-	return TRUE;
+	return true;
 }
 
 static int load_rc_file(const char *profile_path)
@@ -96,11 +96,11 @@ static int load_rc_file(const char *profile_path)
 
 		/* 読み込んだ行をパースする */
 		p = q = rc_line;
-		is_flag = FALSE;
+		is_flag = false;
 
 		while (*q) {
 			if (*q == ':')
-				is_flag = TRUE;
+				is_flag = true;
 
 			if (iscntrl(*q) || (!is_flag && isspace(*q)))
 				q++;

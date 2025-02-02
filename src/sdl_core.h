@@ -43,11 +43,11 @@ extern void sdl_setWorldSize(int width, int height, int depth);
 extern void sdl_setWindowSize(int w, int h);
 extern void sdl_setWindowTitle(char *name);
 extern void sdl_getWindowInfo(DispInfo *info);
-extern void sdl_setFullscreen(boolean on);
-extern boolean sdl_isFullscreen(void);
+extern void sdl_setFullscreen(bool on);
+extern bool sdl_isFullscreen(void);
 extern void sdl_raiseWindow(void);
 extern agsurface_t *sdl_getDIB(void);
-extern void sdl_setIntegerScaling(boolean enable);
+extern void sdl_setIntegerScaling(bool enable);
 
 /* 画面更新 */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);
@@ -97,13 +97,13 @@ extern void sdl_setJoyDeviceIndex(int index);
 extern void sdl_setCursorLocation(int x, int y);
 extern void sdl_setCursorInternalLocation(int x, int y);
 extern void sdl_setCursorType(int type);
-extern boolean sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage,  TCursorDirEntry *cursordirentry);
+extern bool sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage,  TCursorDirEntry *cursordirentry);
 extern int  sdl_getKeyInfo();
 extern int  sdl_getMouseInfo(MyPoint *p);
 extern void sdl_getWheelInfo(int *forward, int *back);
 extern void sdl_clearWheelInfo(void);
 extern int  sdl_getJoyInfo(void);
-extern void sdl_setAutoRepeat(boolean enable);
+extern void sdl_setAutoRepeat(bool enable);
 extern MyPoint sdl_translateMouseCoords(int x, int y);
 
 /* misc */
@@ -116,7 +116,7 @@ extern uint32_t sdl_getTicks(void);
 extern void sdl_sleep(int msec);
 extern void sdl_wait_vsync();
 extern void sdl_showMessageBox(enum messagebox_type type, const char* title_utf8, const char* message_utf8);
-extern boolean sdl_inputString(struct inputstring_param *);
+extern bool sdl_inputString(struct inputstring_param *);
 extern void sdl_post_debugger_command(void *data);
 extern void sdl_handle_event(SDL_Event *e);
 

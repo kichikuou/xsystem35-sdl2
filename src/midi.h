@@ -27,7 +27,7 @@
 #include "portab.h"
 
 typedef struct {
-	boolean in_play; /* now playing ? */
+	bool in_play; /* now playing ? */
 	int loc_ms;      /* playing posion in ms */
 	int play_no;     /* current playing no */
 } midiplaystate;
@@ -48,7 +48,7 @@ struct mididevice {
 	int  (* setvol)(int);
 	int  (* getvol)(int);
 	int  (* fadestart)(int time, int volume, int stop);
-	boolean (* fading)();
+	bool (* fading)();
 };
 
 extern int  midi_init(mididevice_t *);

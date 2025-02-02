@@ -91,7 +91,7 @@ EM_JS(int, muspcm_getwavelen, (int slot), {
 	return len > 65535 ? 65535 : len;
 });
 
-EM_JS(boolean, muspcm_isplaying, (int slot), {
+EM_JS(bool, muspcm_isplaying, (int slot), {
 	return xsystem35.audio.pcm_isplaying(slot);
 });
 

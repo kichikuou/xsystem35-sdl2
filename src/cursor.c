@@ -42,35 +42,35 @@ typedef struct RIFFchunk {
 	char *data;
 } RIFFchunk_t;
 
-static boolean search_chunk(uint8_t *src, char *key1, char *key2, RIFFchunk_t *c) {
+static bool search_chunk(uint8_t *src, char *key1, char *key2, RIFFchunk_t *c) {
 	if (0 == strncmp(src, key1, 4)) {
 		c->size = LittleEndian_getW(src, 4);
 		if (key2) {
 			if (0 == strncmp(src+8, key2, 4)) {
 				c->data = src + 12;
-				return TRUE;
+				return true;
 			}
-			return FALSE;
+			return false;
 		}
 		c->data = src + 8;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-static boolean is_riff(uint8_t *data) {
+static bool is_riff(uint8_t *data) {
 	if (0 == strncmp(data, "RIFF", 4)) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-static boolean check_iconheader(uint8_t *data) {
+static bool check_iconheader(uint8_t *data) {
 	
 	/* read Reserved bit, abort if not 0 */
 	cursorHeader.idReserved = LittleEndian_getW(data, 0);
 	if (cursorHeader.idReserved != 0) {
-		return FALSE;
+		return false;
 	}
 	
 	data += 2;
@@ -78,7 +78,7 @@ static boolean check_iconheader(uint8_t *data) {
 	/* read Resource Type, 2 is for cursors, abort if different */
 	cursorHeader.idType = LittleEndian_getW(data, 0);
 	if (cursorHeader.idType != 2) {
-		return FALSE;
+		return false;
 	}
 	
 	data += 2;
@@ -91,13 +91,13 @@ static boolean check_iconheader(uint8_t *data) {
 	/* Number of images (>0) */
 	if (cursorHeader.idCount == 0) {
 		WARNING("Cursor: no images in file!");
-		return FALSE;
+		return false;
 	}
 	
 	if (cursorHeader.idCount > 1) {
 		WARNING("Cursor:  warning:  too much images in file!"); 
 	}
-	return TRUE;
+	return true;
 }
 
 static int read_direntries(uint8_t* data) {
@@ -259,26 +259,26 @@ static int read_rgbquad(uint8_t* data) {
 	return (int)(data - p);
 }
 
-static boolean cursor_load_mono(uint8_t *d, int no) {
+static bool cursor_load_mono(uint8_t *d, int no) {
 	int pos = 6, p1;
 	
 	/* check header information */
 	if (!check_iconheader(d)) {
 		WARNING("check_iconhdader fail");
-		return FALSE;
+		return false;
 	}
 	
 	/* read dentries */
 	if ((pos += read_direntries(d + pos)) <= 6) {
 		WARNING("read dentries fail");
-		return FALSE;
+		return false;
 	}
 	
 	/* read bitmap info */
 	p1 = read_bitmapinfo(d + pos);
 	if (p1 == 0) {
 		WARNING("unable to read bitmap info");
-		return FALSE;
+		return false;
 	}
 	
 	pos += p1;
@@ -287,7 +287,7 @@ static boolean cursor_load_mono(uint8_t *d, int no) {
 	p1 = read_rgbquad(d + pos);
 	if (p1 == 0) {
 		WARNING("unable to read palette table");
-		return FALSE;
+		return false;
 	}
 	
 	pos += p1;
@@ -295,19 +295,19 @@ static boolean cursor_load_mono(uint8_t *d, int no) {
 	/* read pixedl data */
 	if (!sdl_cursorNew(d + pos, no, &cursorImage, &cursordirentry)) {
 		WARNING("unable to read pixel data");
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
-static boolean cursor_load_anim(uint8_t *data, int no) {
+static bool cursor_load_anim(uint8_t *data, int no) {
 	uint8_t *b = data;
 	int riffsize;
 	RIFFchunk_t c;
 	
 	if (!search_chunk(b, "RIFF", "ACON", &c)) {
 		WARNING("Not animation icon format");
-		return FALSE;
+		return false;
 	}
 	
 	riffsize = c.size;
@@ -358,7 +358,7 @@ static boolean cursor_load_anim(uint8_t *data, int no) {
 			b += c.size + 8;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 void cursor_load(int no, int linkno) {

@@ -8,7 +8,7 @@
 #include "surface.h"
 #include "system.h"
 
-static surface_t *create(int width, int height, int depth, boolean has_pixel, boolean has_alpha) {
+static surface_t *create(int width, int height, int depth, bool has_pixel, bool has_alpha) {
 	surface_t *s = calloc(1, sizeof(surface_t));
 	
 	s->width = width;
@@ -56,7 +56,7 @@ static surface_t *create(int width, int height, int depth, boolean has_pixel, bo
  * @return 生成した surface オブジェクト
  */
 surface_t *sf_create_surface(int width, int height, int depth) {
-	return create(width, height, depth, TRUE, TRUE);
+	return create(width, height, depth, true, true);
 }
 
 /**
@@ -66,7 +66,7 @@ surface_t *sf_create_surface(int width, int height, int depth) {
  * @return 生成した surface オブジェクト
  */
 surface_t *sf_create_alpha(int width, int height) {
-	return create(width, height, 8, FALSE, TRUE);
+	return create(width, height, 8, false, true);
 }
 
 /**
@@ -77,7 +77,7 @@ surface_t *sf_create_alpha(int width, int height) {
  * @return 生成した surface オブジェクト
  */
 surface_t *sf_create_pixel(int width, int height, int depth) {
-	return create(width, height, depth, TRUE, FALSE);
+	return create(width, height, depth, true, false);
 }
 
 /**
@@ -156,7 +156,7 @@ void sf_copyall(surface_t *dst, surface_t *src) {
  * @param copyalpha: alpha pixel をコピーするか
  * @return: 複製した surface
  */
-surface_t *sf_dup2(surface_t *in, boolean copypixel, boolean copyalpha) {
+surface_t *sf_dup2(surface_t *in, bool copypixel, bool copyalpha) {
 	surface_t *sf;
 	int len;
 	

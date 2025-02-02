@@ -47,7 +47,7 @@ int view_w;
 int view_h;
 bool sdl_dirty;
 bool sdl_fs_on;
-boolean (*sdl_custom_event_handler)(const SDL_Event *);
+bool (*sdl_custom_event_handler)(const SDL_Event *);
 
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
@@ -56,31 +56,31 @@ static int joy_device_index = -1;
 
 static SDL_Joystick *js;
 
-boolean sdl_joy_open(int index) {
+bool sdl_joy_open(int index) {
 	if (js)
-		return FALSE;
+		return false;
 
 	js = SDL_JoystickOpen(index);
 	if (!js)
-		return FALSE;
+		return false;
 
 	const char *name = SDL_JoystickName(js);
 	int axes = SDL_JoystickNumAxes(js);
 	int buttons = SDL_JoystickNumButtons(js);
 	SDL_JoystickEventState(SDL_ENABLE);
 	NOTICE("SDL joystick '%s' %d axes %d buttons", name, axes, buttons);
-	return TRUE;
+	return true;
 }
 
-static boolean joy_open(void) {
+static bool joy_open(void) {
 	if (joy_device_index >= 0)
 		return sdl_joy_open(joy_device_index);
 
 	for (int i = 0; i < SDL_NumJoysticks(); i++) {
 		if (sdl_joy_open(i))
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
 /* SDL の初期化 */
@@ -223,7 +223,7 @@ agsurface_t *sdl_getDIB(void) {
 }
 
 /* AutoRepeat の設定 */
-void sdl_setAutoRepeat(boolean enable) {
+void sdl_setAutoRepeat(bool enable) {
 	if (enable) {
 		// SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	} else {
@@ -231,7 +231,7 @@ void sdl_setAutoRepeat(boolean enable) {
 	}
 }
 
-void sdl_setFullscreen(boolean on) {
+void sdl_setFullscreen(bool on) {
 #ifndef __EMSCRIPTEN__
 	if (on == sdl_fs_on)
 		return;
@@ -240,7 +240,7 @@ void sdl_setFullscreen(boolean on) {
 #endif
 }
 
-boolean sdl_isFullscreen(void) {
+bool sdl_isFullscreen(void) {
 	return sdl_fs_on;
 }
 
@@ -285,7 +285,7 @@ void sdl_setJoyDeviceIndex(int index) {
 	joy_device_index = index;
 }
 
-void sdl_setIntegerScaling(boolean enable) {
+void sdl_setIntegerScaling(bool enable) {
 	SDL_RenderSetIntegerScale(sdl_renderer, enable);
 }
 

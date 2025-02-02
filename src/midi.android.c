@@ -36,7 +36,7 @@ static int midi_setflag(int mode, int index, int val);
 static int midi_setvol(int vol);
 static int midi_getvol();
 static int midi_fadestart(int time, int volume, int stop);
-static boolean midi_fading();
+static bool midi_fading();
 
 #define midi midi_android
 mididevice_t midi = {
@@ -128,7 +128,7 @@ static int midi_unpause(void) {
 }
 
 static int midi_get_playing_info(midiplaystate *st) {
-	st->in_play = FALSE;
+	st->in_play = false;
 	st->loc_ms  = 0;
 
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
@@ -143,7 +143,7 @@ static int midi_get_playing_info(midiplaystate *st) {
 	(*env)->PopLocalFrame(env, NULL);
 
 	if (pos >= 0) {
-		st->in_play = TRUE;
+		st->in_play = true;
 		st->loc_ms = pos;
 	}
 	return OK;
@@ -169,6 +169,6 @@ static int midi_fadestart(int time, int volume, int stop) {
 	return NG; // FIXME
 }
 
-static boolean midi_fading() {
-	return FALSE; // FIXME
+static bool midi_fading() {
+	return false; // FIXME
 }

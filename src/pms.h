@@ -59,9 +59,9 @@ typedef struct {
  *
 */ 
 
-extern boolean  pms256_checkfmt(uint8_t *data);
+extern bool  pms256_checkfmt(uint8_t *data);
 extern cgdata  *pms256_extract(uint8_t *data);
-extern boolean  pms64k_checkfmt(uint8_t *data);
+extern bool  pms64k_checkfmt(uint8_t *data);
 extern cgdata  *pms64k_extract(uint8_t *data);
 
 #endif /* !__PMS__ */

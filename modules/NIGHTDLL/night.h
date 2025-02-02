@@ -55,7 +55,7 @@ struct _night {
 
 	// msg
 	char msgbuf[MSGBUFMAX];
-	boolean zhiding;
+	bool zhiding;
 	struct {
 		void (* cbmove)(agsevent_t *);
 		void (* cbrelease)(agsevent_t *);

@@ -13,7 +13,7 @@
 #include "msgskip.h"
 #include "utfsjis.h"
 
-static boolean valid;
+static bool valid;
 static int action;
 
 static void Init() {

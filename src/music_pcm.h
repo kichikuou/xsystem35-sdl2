@@ -40,7 +40,7 @@ extern int muspcm_unpause(int slot);
 extern int muspcm_getpos(int slot);
 extern int muspcm_setvol(int slot, int lv);
 extern int muspcm_getwavelen(int slot);
-extern boolean muspcm_isplaying(int slot);
+extern bool muspcm_isplaying(int slot);
 extern int muspcm_waitend(int slot);
 
 #endif /* __MUSIC_PCM_H__ */

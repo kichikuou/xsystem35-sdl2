@@ -41,12 +41,12 @@ extern int view_w;
 extern int view_h;
 extern bool sdl_dirty;
 extern bool sdl_fs_on;
-extern boolean (*sdl_custom_event_handler)(const SDL_Event *);
+extern bool (*sdl_custom_event_handler)(const SDL_Event *);
 
 void sdl_event_init(void);
 void sdl_cursor_init(void);
 int sdl_nearest_color(int r, int g, int b);
-boolean sdl_joy_open(int index);
+bool sdl_joy_open(int index);
 SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h);
 SDL_Surface *sdl_dib_to_surface_colorkey(int x, int y, int w, int h, int col);
 

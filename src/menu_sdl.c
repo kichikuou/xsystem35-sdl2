@@ -56,7 +56,7 @@ void menu_quitmenu_open(void) {
 		return;
 	}
 	if (buttonid == 1) {
-		nact_quit(FALSE);
+		nact_quit(false);
 	}
 }
 
@@ -79,29 +79,29 @@ void menu_resetmenu_open(void) {
 		return;
 	}
 	if (buttonid == 1) {
-		nact_quit(TRUE);
+		nact_quit(true);
 	}
 }
 
-boolean menu_inputstring(INPUTSTRING_PARAM *p) {
+bool menu_inputstring(INPUTSTRING_PARAM *p) {
 #ifdef _WIN32
 	return input_string(p);
 #else
 	p->newstring = p->oldstring;
-	return TRUE;
+	return true;
 #endif
 }
 
-boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
+bool menu_inputstring2(INPUTSTRING_PARAM *p) {
 	return sdl_inputString(p);
 }
 
-boolean menu_inputnumber(INPUTNUM_PARAM *p) {
+bool menu_inputnumber(INPUTNUM_PARAM *p) {
 #ifdef _WIN32
 	return input_number(p);
 #else
 	p->value = p->def;
-	return TRUE;
+	return true;
 #endif
 }
 
@@ -116,6 +116,6 @@ void menu_gtkmainiteration() {
 }
 
 #ifndef _WIN32
-void menu_setSkipState(boolean enabled, boolean activated) {
+void menu_setSkipState(bool enabled, bool activated) {
 }
 #endif

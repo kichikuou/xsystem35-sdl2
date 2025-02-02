@@ -34,7 +34,7 @@
 #define GT_PERSIOM "ＰＥＲＳＩＯＭ"
 
 /* defined by cmdy.c */
-extern boolean Y3waitFlags;
+extern bool Y3waitFlags;
 
 enum gameId game_id;
 bool daiakuji_cx_hack;

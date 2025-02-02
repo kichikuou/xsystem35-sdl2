@@ -30,7 +30,7 @@
 #define DRIFILEMAX 255     /* maximum file number for one data type */
 
 struct _drifiles {
-	boolean  mmapped;
+	bool  mmapped;
 	mmap_t   *mmap[DRIFILEMAX];
 	char     *fnames[DRIFILEMAX];
 	int      nr_files; // upper limit on how many files could be referenced by this archive
@@ -50,7 +50,7 @@ struct _dridata {
 };
 typedef struct _dridata dridata;
 
-drifiles *dri_init(const char **file, int cnt, boolean use_mmap);
+drifiles *dri_init(const char **file, int cnt, bool use_mmap);
 bool dri_is_linked(drifiles *d, int no);
 bool dri_exists(drifiles *d, int no);
 dridata *dri_getdata(drifiles *d, int no);

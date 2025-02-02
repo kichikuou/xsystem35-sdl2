@@ -94,7 +94,7 @@ static int stack_pop_dword(void) {
 }
 
 /* initilize stack and load first scenario data */
-boolean sl_init(void) {
+bool sl_init(void) {
 	stack_buf = malloc(stack_size);
 	if (stack_buf == NULL)
 		NOMEMERR();
@@ -102,11 +102,11 @@ boolean sl_init(void) {
 	stack_top = stack_buf;
 	sl_jmpFar(0);
 
-	return TRUE;
+	return true;
 }
 
 /* UD 0 command, reinitilized scenario loader */
-boolean sl_reinit(void) {
+bool sl_reinit(void) {
 	free(stack_buf);
 	return sl_init();
 }
@@ -174,27 +174,27 @@ void sl_jmpNear(int address) {
    #page
    page = 0~
 */
-boolean sl_jmpFar(int page) {
+bool sl_jmpFar(int page) {
 	if (dfile) {
 		ald_freedata(dfile);
 	}
 	
 	dfile = ald_getdata(DRIFILE_SCO, page);
 	if (dfile == NULL) {
-		return FALSE;
+		return false;
 	}
 		
 	sl_sco   = dfile->data;
 	sl_page  = page;
 	sl_index = LittleEndian_getDW(sl_sco, 4);
-	return TRUE;
+	return true;
 }
 
 /*
   ~page,address
    page = 1~
 */
-boolean sl_jmpFar2(int page, int address) {
+bool sl_jmpFar2(int page, int address) {
 	if (dfile) {
 		ald_freedata(dfile);
 	}
@@ -202,12 +202,12 @@ boolean sl_jmpFar2(int page, int address) {
 	dfile = ald_getdata(DRIFILE_SCO, page);
 	if (dfile == NULL) {
 		TRACE_MESSAGE("ald_getdata fail\n");
-		return FALSE;
+		return false;
 	}
 	sl_sco   = dfile->data;
 	sl_page  = page;
 	sl_index = address;
-	return TRUE;
+	return true;
 }
 
 void sl_callNear(int address) {

@@ -46,8 +46,8 @@ extern char* codeconv(CharacterEncoding tocode,
 
 extern uint8_t* sjis2utf(const uint8_t *src);
 extern uint8_t* utf2sjis(const uint8_t *src);
-extern boolean sjis_has_hankaku(const uint8_t *src);
-extern boolean sjis_has_zenkaku(const uint8_t *src);
+extern bool sjis_has_hankaku(const uint8_t *src);
+extern bool sjis_has_zenkaku(const uint8_t *src);
 extern int     utf8_next_codepoint(const char **msg);
 
 extern char *advance_char(const char *s, CharacterEncoding e);

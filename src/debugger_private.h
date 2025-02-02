@@ -66,15 +66,15 @@ extern DebuggerImpl dbg_cui_impl;
 extern DebuggerImpl dbg_dap_impl;
 extern DebuggerImpl *dbg_impl;
 
-Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal);
-boolean dbg_delete_breakpoint(int no);
+Breakpoint *dbg_set_breakpoint(int page, int addr, bool is_internal);
+bool dbg_delete_breakpoint(int no);
 void dbg_delete_breakpoints_in_page(int page);
-boolean dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char *err, size_t errsize);
+bool dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char *err, size_t errsize);
 void dbg_stepin(void);
 void dbg_stepout(void);
 void dbg_next(void);
 int dbg_lookup_var(const char *name);
-boolean dbg_evaluate(const char *expr, char *result, size_t result_size);
+bool dbg_evaluate(const char *expr, char *result, size_t result_size);
 StackTrace *dbg_stack_trace(void);
 
 #endif // __DEBUGGER_PRIVATE_H__

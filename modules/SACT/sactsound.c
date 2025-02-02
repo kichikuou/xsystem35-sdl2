@@ -101,7 +101,7 @@ int ssnd_stop(int no, int fadetime) {
 	int slot = slt_find(no);
 
 	if (slot != -1) {
-		mus_wav_fadeout_start(slot, fadetime, 0, TRUE);
+		mus_wav_fadeout_start(slot, fadetime, 0, true);
 		cache[slot - SLOTOFFSET] = 0;
 	}
 
@@ -177,7 +177,7 @@ int ssnd_stopall(int time) {
 	
 	for (i = 0; i < CACHEMAX; i++) {
 		if (cache[i] > 0) {
-			mus_wav_fadeout_start(i + SLOTOFFSET, time, 0, TRUE);
+			mus_wav_fadeout_start(i + SLOTOFFSET, time, 0, true);
 			cache[i] = 0;
 		}
 	}

@@ -44,12 +44,12 @@
 #include "image.h"
 #include "debugger.h"
 
-static boolean need_update = TRUE;
-static boolean fade_outed = FALSE;
+static bool need_update = true;
+static bool fade_outed = false;
 static int cursor_move_time = 50; /* カーソル移動にかかる時間(ms) */
 
 static void palette_changed(void) {
-	nact->ags.pal_changed = TRUE;
+	nact->ags.pal_changed = true;
 	dbg_on_palette_change();
 }
 
@@ -82,14 +82,14 @@ static void initPal(void) {
 	palette_changed();
 }
 
-boolean ags_check_param(int *x, int *y, int *w, int *h) {
+bool ags_check_param(int *x, int *y, int *w, int *h) {
 	if (*x >= nact->ags.world_size.width) {
 		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)", *x, nact->ags.world_size.width, sl_getPage(), sl_getIndex());
-		return FALSE;
+		return false;
 	}
 	if (*y >= nact->ags.world_size.height) {
 		WARNING("Illegal Param y = %d (max=%d)", *y, nact->ags.world_size.height);
-		return FALSE;
+		return false;
 	}
 	
 	if (*x < 0) { *w += *x; *x = 0; }
@@ -98,26 +98,26 @@ boolean ags_check_param(int *x, int *y, int *w, int *h) {
 	if ((*x + *w) > nact->ags.world_size.width)  { *w = nact->ags.world_size.width  - *x;}
 	if ((*y + *h) > nact->ags.world_size.height) { *h = nact->ags.world_size.height - *y;}
 	
-	if (*w <= 0) return FALSE;
-	if (*h <= 0) return FALSE;
+	if (*w <= 0) return false;
+	if (*h <= 0) return false;
 	
-	return TRUE;
+	return true;
 }
 
-boolean ags_check_param_xy(int *x, int *y) {
+bool ags_check_param_xy(int *x, int *y) {
 	if (*x >= nact->ags.world_size.width) {
 		WARNING("Illegal Param x = %d", *x);
-		return FALSE;
+		return false;
 	}
 	if (*y >= nact->ags.world_size.height) {
 		WARNING("Illegal Param y = %d", *y);
-		return FALSE;
+		return false;
 	}
 	
 	if (*x < 0) { *x = 0; }
 	if (*y < 0) { *y = 0; }
 	
-	return TRUE;
+	return true;
 }
 
 void ags_init(const char *render_driver, bool enable_zb) {
@@ -141,7 +141,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 }
 
 void ags_remove(void) {
-	ags_autorepeat(TRUE);
+	ags_autorepeat(true);
 	sdl_Remove();
 }
 
@@ -172,7 +172,7 @@ void ags_setWorldSize(int width, int height, int depth) {
 		memset(nact->ags.dib->alpha, 255, width * height);
 	}
 	
-	fade_outed = FALSE;  /* thanx tajiri@wizard */
+	fade_outed = false;  /* thanx tajiri@wizard */
 	
 	palette_changed();
 }
@@ -207,7 +207,7 @@ void ags_getWindowInfo(DispInfo *info) {
 	sdl_getWindowInfo(info);
 }
 
-void ags_setExposeSwitch(boolean expose) {
+void ags_setExposeSwitch(bool expose) {
 	need_update = expose;
 }
 
@@ -539,7 +539,7 @@ void ags_alpha_setPixel(int x, int y, int w, int h, uint8_t *b) {
 	alpha_set_pixels(nact->ags.dib, x, y, w, h, b + offset, savew);
 }
 
-void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step, void *arg) {
+void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, void *arg) {
 	unsigned wflags = cancelable ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE;
 	int start = sdl_getTicks();
 	for (int t = 0; t < duration_ms; t = sdl_getTicks() - start) {
@@ -553,7 +553,7 @@ void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step,
 	step(arg, 1.0);
 }
 
-static void fade(int duration, boolean cancelable, enum sdl_effect_type type) {
+static void fade(int duration, bool cancelable, enum sdl_effect_type type) {
 	nact->waitcancel_key = 0;
 
 	SDL_Rect rect = {0, 0, nact->ags.view_area.w, nact->ags.view_area.h};
@@ -565,8 +565,8 @@ static void fade(int duration, boolean cancelable, enum sdl_effect_type type) {
 	sdl_effect_finish(eff);
 }
 
-void ags_fadeIn(int rate, boolean flag) {
-	fade_outed = FALSE;
+void ags_fadeIn(int rate, bool flag) {
+	fade_outed = false;
 	if (nact->ags.world_depth == 8)
 		sdl_setPalette(nact->ags.pal, 0, 256);
 
@@ -579,12 +579,12 @@ void ags_fadeIn(int rate, boolean flag) {
 	sdl_updateAll(&nact->ags.view_area);
 }
 
-void ags_fadeOut(int rate, boolean flag) {
+void ags_fadeOut(int rate, bool flag) {
 	if (need_update && !fade_outed) {
 		int duration = rate * 16 * 1000 / 60;
 		fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEOUT : EFFECT_DITHERING_FADEOUT);
 	}
-	fade_outed = TRUE;
+	fade_outed = true;
 
 	if (nact->ags.world_depth == 8) {
 		Color pal[256];
@@ -593,8 +593,8 @@ void ags_fadeOut(int rate, boolean flag) {
 	}
 }
 
-void ags_whiteIn(int rate, boolean flag) {	
-	fade_outed = FALSE;
+void ags_whiteIn(int rate, bool flag) {	
+	fade_outed = false;
 	if (nact->ags.world_depth == 8)
 		sdl_setPalette(nact->ags.pal, 0, 256);
 
@@ -607,12 +607,12 @@ void ags_whiteIn(int rate, boolean flag) {
 	sdl_updateAll(&nact->ags.view_area);
 }
 
-void ags_whiteOut(int rate, boolean flag) {
+void ags_whiteOut(int rate, bool flag) {
 	if (need_update && !fade_outed) {
 		int duration = rate * 16 * 1000 / 60;
 		fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEOUT);
 	}
-	fade_outed = TRUE;
+	fade_outed = true;
 
 	if (nact->ags.world_depth == 8) {
 		Color pal[256];
@@ -679,13 +679,13 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 }
 
 EMSCRIPTEN_KEEPALIVE
-void ags_setAntialiasedStringMode(boolean on) {
+void ags_setAntialiasedStringMode(bool on) {
 	if (!nact->ags.noantialias) {
 		font_set_antialias(on);
 	}
 }
 
-boolean ags_getAntialiasedStringMode() {
+bool ags_getAntialiasedStringMode() {
 	return font_get_antialias();
 }
 
@@ -712,6 +712,6 @@ agsurface_t *ags_getDIB() {
 	return nact->ags.dib;
 }
 
-void ags_autorepeat(boolean enable) {
+void ags_autorepeat(bool enable) {
 	sdl_setAutoRepeat(enable);
 }

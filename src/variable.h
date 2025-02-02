@@ -29,7 +29,7 @@
 
 struct VarPage {
 	int size;
-	boolean saveflag;
+	bool saveflag;
 	int *value;
 };
 

@@ -109,7 +109,7 @@ int sp_init() {
 		sact.sp[i] = calloc(1, sizeof(sprite_t));
 		sact.sp[i]->no   = i;
 		sact.sp[i]->type = SPRITE_NONE;
-		sact.sp[i]->show = FALSE;
+		sact.sp[i]->show = false;
 	}
 	
 	// 壁紙(スプライト番号０)はデフォルトへ
@@ -161,7 +161,7 @@ int sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	//初期のcurcgはcg1
 	sp->curcg = sp->cg1;
 	
-	sp->show = TRUE; // 初期状態は表示
+	sp->show = true; // 初期状態は表示
 	sp->blendrate = 255; // ブレンド無し
 	sp->loc.x = 0;   // 初期表示位置は(0,0)
 	sp->loc.y = 0;
@@ -220,7 +220,7 @@ int sp_new_msg(int no, int x, int y, int width, int height) {
 	
 	sp->type = SPRITE_MSG;
 	sp->no   = no;
-	sp->show = TRUE; // 初期状態は表示
+	sp->show = true; // 初期状態は表示
 	sp->blendrate = 255; // ブレンド無し
 	sp->freezed_state = 0; // 状態固定無し
 	sp->loc.x = x - sact.origin.x; // 初期表示位置
@@ -261,7 +261,7 @@ int sp_set_wall_paper(int no) {
 	}
 	
 	sp->type = SPRITE_WP;
-	sp->show = TRUE;
+	sp->show = true;
 	sp->blendrate = 255;
 	sp->cur.x = 0;
 	sp->cur.y = 0;
@@ -321,7 +321,7 @@ int sp_free(int no) {
 		memset(sp, 0, sizeof(sprite_t));
 		sp->type = SPRITE_NONE;
 		sp->no = no;
-		sp->show = FALSE;
+		sp->show = false;
 		memcpy(&(sp->numeral), &(back.numeral), sizeof(sp->numeral));
 	}
 	return OK;
@@ -330,7 +330,7 @@ int sp_free(int no) {
 // 表示状態の変更
 int sp_set_show(int wNum, int wCount, int sShow) {
 	int i;
-	boolean oldstate;
+	bool oldstate;
 	sprite_t *sp;
 	
 	sp_assert_no(wNum);
@@ -726,12 +726,12 @@ int sp_sound_ob(int wNumWave) {
  * 指定の座標が現在のスプライトの位置の範囲に入っているか？
  * @param sp: 調べる対象のスプライト
  * @param x,y: 座標
- * @return: TRUE:入っている, FALSE: 入っていない
+ * @return: true:入っている, false: 入っていない
  */
-boolean sp_is_insprite(sprite_t *sp, int x, int y) {
+bool sp_is_insprite(sprite_t *sp, int x, int y) {
 	uint8_t *dp;
 	
-	if (x < 0 || y < 0 || x >= sf0->width || y >= sf0->height) return FALSE;
+	if (x < 0 || y < 0 || x >= sf0->width || y >= sf0->height) return false;
 	
 	dp = GETOFFSET_PIXEL(sact.dmap, x, y);
 	return (*(uint16_t *)dp == sp->no);

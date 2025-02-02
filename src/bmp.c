@@ -141,20 +141,20 @@ static void extract_24bit(bmp_header *bmp, uint16_t *pic, uint8_t *b) {
 /*
  * Check data is 8bit bmp format cg or not
  *   data: raw data (pointer to data top)
- *   return: TRUE if data is bmp
+ *   return: true if data is bmp
 */
-boolean bmp256_checkfmt(uint8_t *data) {
+bool bmp256_checkfmt(uint8_t *data) {
 	int w, h, bpp;
-	if (data[0] != 'B' || data[1] != 'M') return FALSE;
+	if (data[0] != 'B' || data[1] != 'M') return false;
 	
 	w = LittleEndian_getDW(data, 18);
 	h = LittleEndian_getDW(data, 22);
 	bpp = LittleEndian_getW(data, 28);
 	
-	if (bpp != 8) return FALSE;
-	if (w < 0 || h < 0) return FALSE;
+	if (bpp != 8) return false;
+	if (w < 0 || h < 0) return false;
 	
-	return TRUE;
+	return true;
 }
 
 /*
@@ -188,21 +188,21 @@ cgdata *bmp256_extract(uint8_t *data) {
 /*
  * Check data is 24bit bmp format cg or not
  *   data: raw data (pointer to data top)
- *   return: TRUE if data is pms
+ *   return: true if data is pms
 */
-boolean bmp16m_checkfmt(uint8_t *data) {
+bool bmp16m_checkfmt(uint8_t *data) {
 	int w, h, bpp;
 	
-	if (data[0] != 'B' || data[1] != 'M') return FALSE;
+	if (data[0] != 'B' || data[1] != 'M') return false;
 	
 	w = LittleEndian_getDW(data, 18);
 	h = LittleEndian_getDW(data, 22);
 	bpp = LittleEndian_getW(data, 28);
 	
-	if (bpp != 24) return FALSE;
-	if (w < 0 || h < 0) return FALSE;
+	if (bpp != 24) return false;
+	if (w < 0 || h < 0) return false;
 	
-	return TRUE;
+	return true;
 }
 
 /*

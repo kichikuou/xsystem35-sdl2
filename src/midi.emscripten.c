@@ -61,11 +61,11 @@ EM_JS(int, midi_unpause, (void), {
 static int midi_get_playing_info(midiplaystate *st) {
 	int pos = EM_ASM_INT_V( return xsystem35.midiPlayer.getPosition(); );
 	if (pos >= 0) {
-		st->in_play = TRUE;
+		st->in_play = true;
 		st->loc_ms = pos;
 		return OK;
 	}
-	st->in_play = FALSE;
+	st->in_play = false;
 	st->loc_ms  = 0;
 	return OK;
 }
@@ -91,7 +91,7 @@ EM_JS(int, midi_fadestart, (int time, int volume, int stop), {
 	return xsystem35.midiPlayer.fadeStart(time, volume, stop);
 });
 
-EM_JS(boolean, midi_fading, (), {
+EM_JS(bool, midi_fading, (), {
 	return xsystem35.midiPlayer.isFading();
 });
 

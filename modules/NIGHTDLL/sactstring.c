@@ -151,7 +151,7 @@ static void replacestr_cb(void* data, void* userdata) {
 	start = replacesrc;
 	out   = replacedst;
 	
-	while (TRUE) {
+	while (true) {
 		next = strstr(start, ex->src);
 		if (next == NULL) break;
 		strncat(out, start, (size_t)(next - start));

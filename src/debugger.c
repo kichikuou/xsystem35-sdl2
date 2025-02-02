@@ -46,7 +46,7 @@ static struct {
 	int line;
 } step_exec_state;
 
-void dbg_init(const char *symbols_path, boolean use_dap) {
+void dbg_init(const char *symbols_path, bool use_dap) {
 	dbg_impl = use_dap ? &dbg_dap_impl : &dbg_cui_impl;
 	dbg_impl->init(symbols_path);
 }
@@ -91,7 +91,7 @@ static char next_char(void) {
 	return *eval_input;
 }
 
-static boolean consume(char c) {
+static bool consume(char c) {
 	if (next_char() != c)
 		return false;
 	eval_input++;
@@ -110,7 +110,7 @@ static int clamp(int val) {
 		: val;
 }
 
-static boolean is_identifier(uint8_t c) {
+static bool is_identifier(uint8_t c) {
 	return isalnum(c) || !isascii(c) || c == '_' || c == '.';
 }
 
@@ -258,7 +258,7 @@ static int eval_condition(const char *expr) {
 	}
 }
 
-boolean dbg_evaluate(const char *expr, char *result, size_t result_size) {
+bool dbg_evaluate(const char *expr, char *result, size_t result_size) {
 	eval_input = expr;
 	eval_result = result;
 	eval_result_size = result_size;
@@ -280,7 +280,7 @@ static PhysicalBreakpoint *find_physical_breakpoint(int page, int addr) {
 	return NULL;
 }
 
-Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal) {
+Breakpoint *dbg_set_breakpoint(int page, int addr, bool is_internal) {
 	dridata *dfile = ald_getdata(DRIFILE_SCO, page);
 	if (!dfile)
 		return NULL;
@@ -315,7 +315,7 @@ Breakpoint *dbg_set_breakpoint(int page, int addr, boolean is_internal) {
 	return bp;
 }
 
-boolean dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char *err, size_t errsize) {
+bool dbg_set_breakpoint_condition(Breakpoint *bp, const char *condition, char *err, size_t errsize) {
 	if (!dbg_evaluate(condition, err, errsize))
 		return false;
 	if (bp->condition)
@@ -339,7 +339,7 @@ static Breakpoint *breakpoint_free(Breakpoint *bp) {
 	return next;
 }
 
-boolean dbg_delete_breakpoint(int no) {
+bool dbg_delete_breakpoint(int no) {
 	for (Breakpoint **p = &breakpoints; *p; p = &(*p)->next) {
 		if ((*p)->no == no) {
 			*p = breakpoint_free(*p);
@@ -379,7 +379,7 @@ uint8_t dbg_handle_breakpoint(int page, int addr) {
 	return restore_op;
 }
 
-static void set_stack_frame(StackFrame *frame, int page, int addr, boolean is_return_addr) {
+static void set_stack_frame(StackFrame *frame, int page, int addr, bool is_return_addr) {
 	frame->page = page;
 	frame->addr = addr;
 	frame->src = dsym_page2src(symbols, page);
@@ -420,7 +420,7 @@ void dbg_stepin(void) {
 	dbg_state = DBG_STOPPED_STEP;
 }
 
-static boolean should_continue_step(void) {
+static bool should_continue_step(void) {
 	if (step_exec_state.line < 0)
 		return false;  // line info was not available
 	return step_exec_state.page == nact->current_page
@@ -497,7 +497,7 @@ void dbg_next(void) {
 	do_next();
 }
 
-static boolean should_continue_next(void) {
+static bool should_continue_next(void) {
 	if (!should_continue_step())
 		return false;
 	do_next();
@@ -535,7 +535,7 @@ void dbg_on_palette_change(void) {
 		dbg_impl->on_palette_change();
 }
 
-boolean dbg_console_vprintf(int lv, const char *format, va_list ap) {
+bool dbg_console_vprintf(int lv, const char *format, va_list ap) {
 	if (!dbg_impl || !dbg_impl->console_output)
 		return false;
 	char buf[1024];

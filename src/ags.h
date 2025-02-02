@@ -102,7 +102,7 @@ enum agsevent_button {
 
 struct _ags {
 	Color pal[256];             /* system palette */
-	boolean   pal_changed;      /* system palette has changed */
+	bool   pal_changed;      /* system palette has changed */
 	
 	MyDimension world_size;     /* size of off-screen */
 
@@ -117,8 +117,8 @@ struct _ags {
 
 	bool mouse_warp_enabled;
 	bool enable_zb;
-	boolean noantialias; /* antialias を使用しない */
-	boolean noimagecursor; /* リソースファイルのカーソルを読みこまない */
+	bool noantialias; /* antialias を使用しない */
+	bool noimagecursor; /* リソースファイルのカーソルを読みこまない */
 };
 typedef struct _ags ags_t;
 
@@ -136,12 +136,12 @@ extern void ags_setWindowTitle(const char *title_utf8);
 extern void ags_getDIBInfo(DispInfo *info);
 extern void ags_getWindowInfo(DispInfo *info);
 extern void ags_getViewAreaInfo(DispInfo *info);
-extern boolean ags_check_param(int *x, int *y, int *w, int *h);
-extern boolean ags_check_param_xy(int *x, int *y);
+extern bool ags_check_param(int *x, int *y, int *w, int *h);
+extern bool ags_check_param_xy(int *x, int *y);
 extern agsurface_t *ags_getDIB();
 
 /* 画面更新 */
-extern void ags_setExposeSwitch(boolean expose);
+extern void ags_setExposeSwitch(bool expose);
 extern void ags_updateFull(void);
 extern void ags_updateArea(int x, int y, int width, int height);
 
@@ -191,10 +191,10 @@ extern void ags_alpha_getPixel(int x, int y, int *pic);
 extern void ags_alpha_setPixel(int x, int y, int w, int h, uint8_t *b);
 
 /* fader */
-extern void ags_fadeIn(int rate, boolean flg);
-extern void ags_fadeOut(int rate, boolean flg);
-extern void ags_whiteIn(int rate, boolean flg);
-extern void ags_whiteOut(int rate, boolean flg);
+extern void ags_fadeIn(int rate, bool flg);
+extern void ags_fadeOut(int rate, bool flg);
+extern void ags_whiteIn(int rate, bool flg);
+extern void ags_whiteOut(int rate, bool flg);
 
 /* フォント関連 */
 enum FontType {
@@ -213,12 +213,12 @@ extern void ags_setCursorMoveTime(int msec);
 extern int  ags_getCursorMoveTime();
 
 /* misc */
-extern void    ags_setAntialiasedStringMode(boolean mode);
-extern boolean ags_getAntialiasedStringMode();
-extern void    ags_autorepeat(boolean enable);
+extern void    ags_setAntialiasedStringMode(bool mode);
+extern bool ags_getAntialiasedStringMode();
+extern void    ags_autorepeat(bool enable);
 
 typedef void (*ags_EffectStepFunc)(void *, float);
-void ags_runEffect(int duration_ms, boolean cancelable, ags_EffectStepFunc step, void *arg);
+void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, void *arg);
 
 #define RMASK16 0xf800
 #define GMASK16 0x07e0

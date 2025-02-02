@@ -78,7 +78,7 @@ struct _sprite {
 	cginfo_t *curcg;
 	cginfo_t *cg1, *cg2, *cg3;
 	
-	boolean show;
+	bool show;
 	
 	int blendrate;
 	
@@ -110,13 +110,13 @@ typedef struct _sprite sprite_t;
 extern sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type);
 extern sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height);
 extern void nt_sp_free(sprite_t *sp);
-extern void nt_sp_set_show(sprite_t *sp, boolean show);
+extern void nt_sp_set_show(sprite_t *sp, bool show);
 // extern void nt_sp_set_cg(sprite_t *sp, int no);
 extern void nt_sp_set_loc(sprite_t *sp, int x, int y);
 
 /* in nt_sprite_update.c */
 extern int nt_sp_update_clipped();
-extern int nt_sp_update_all(boolean syncscreen);
+extern int nt_sp_update_all(bool syncscreen);
 extern int nt_sp_updateme(sprite_t *sp);
 extern int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
 extern void nt_sp_add_updatelist(sprite_t *sp);

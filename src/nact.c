@@ -141,11 +141,11 @@ static void nact_callback() {
 }
 
 void nact_init() {
-	nact->is_quit = FALSE;
-	nact->restart = FALSE;
+	nact->is_quit = false;
+	nact->restart = false;
 	nact->callback = nact_callback;
-	nact->is_va_animation = FALSE;
-	nact->is_cursor_animation = FALSE;
+	nact->is_va_animation = false;
+	nact->is_cursor_animation = false;
 	nact->encoding = SHIFT_JIS;
 
 	free(nact->game_title_utf8);
@@ -155,13 +155,13 @@ void nact_init() {
 	nact->datatbl_addr = NULL;
 	nact->fnc_return_value = 0;
 
-	nact->messagewait_enable = FALSE;
-	nact->messagewait_cancelled = FALSE;
+	nact->messagewait_enable = false;
+	nact->messagewait_cancelled = false;
 	nact->messagewait_time = 0;
-	nact->messagewait_cancel = FALSE;
+	nact->messagewait_cancel = false;
 
 	msg_init();
-	nact->is_msg_out = TRUE;
+	nact->is_msg_out = true;
 	nact->msgout = NULL;
 
 	sel_init();
@@ -182,8 +182,8 @@ void nact_reset(void) {
 	cmd2F_reset();
 }
 
-void nact_quit(boolean restart) {
-	nact->is_quit = TRUE;
+void nact_quit(bool restart) {
+	nact->is_quit = true;
 	nact->restart = restart;
 	request_yield();
 }

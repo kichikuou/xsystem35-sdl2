@@ -36,9 +36,9 @@ void commandB0() {
 	
 	switch(num) {
 	case 0:
-		msg_nextPage(TRUE); break;
+		msg_nextPage(true); break;
 	case 1:
-		msg_nextPage(FALSE); break;
+		msg_nextPage(false); break;
 	default:
 		break;
 	}

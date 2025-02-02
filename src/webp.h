@@ -22,7 +22,7 @@
 
 #include "cg.h"
 
-boolean webp_checkfmt(uint8_t *data);
+bool webp_checkfmt(uint8_t *data);
 cgdata *webp_extract(uint8_t *data, size_t size);
 
 #endif // __WEBP_H__

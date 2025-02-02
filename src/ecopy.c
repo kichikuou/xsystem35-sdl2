@@ -34,7 +34,7 @@
 #include "nact.h"
 #include "effect.h"
 
-static boolean ecp_cancel;
+static bool ecp_cancel;
 
 #define EC_WAIT \
 	if ((key |= sys_getInputInfo()) && ecp_cancel) break; \

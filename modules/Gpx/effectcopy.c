@@ -33,7 +33,7 @@ void gpx_effect(int no,
 	struct sdl_effect *eff = sdl_effect_init(&rect, dst, dx, dy, src, sx, sy, type);
 	if (!time)
 		time = (no == SACT_EFFECT_CROSSFADE_DOWN || no == SACT_EFFECT_CROSSFADE_UP) ? 1150 : 2700;
-	ags_runEffect(time, FALSE, (ags_EffectStepFunc)sdl_effect_step, eff);
+	ags_runEffect(time, false, (ags_EffectStepFunc)sdl_effect_step, eff);
 	sdl_effect_finish(eff);
 
 	switch (no) {

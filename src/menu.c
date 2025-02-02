@@ -32,11 +32,11 @@
 #include "input.h"
 #include "msgskip.h"
 
-static boolean menu_initilized = FALSE;
+static bool menu_initilized = false;
 
 static int menu_callback() {
 	sys_getInputInfo();
-	return TRUE;
+	return true;
 }
 
 
@@ -48,22 +48,22 @@ void menu_open(void) {
 	// gtk_menu_popup_at_pointer() cannot be used because there's no GdkEvent here.
 	gtk_menu_popup(GTK_MENU(menu_window_popup), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 	gtk_widget_show(menu_window_popup);
-	nact->popupmenu_opened = TRUE;
+	nact->popupmenu_opened = true;
 }
 
 void menu_quitmenu_open(void) {
 	if (!menu_initilized) return;
 	
 	gtk_widget_show(menu_window_exit);
-	nact->popupmenu_opened = TRUE;
+	nact->popupmenu_opened = true;
 }
 
-boolean menu_inputstring(INPUTSTRING_PARAM *p) {
+bool menu_inputstring(INPUTSTRING_PARAM *p) {
 	char s[256];
 
-	if (!menu_initilized) return FALSE;
+	if (!menu_initilized) return false;
 	
-	menu_ok_input = FALSE;
+	menu_ok_input = false;
 	gtk_label_set_text(GTK_LABEL(menu_label_inputstring_title), p->title);
 	
 	sprintf(s, _("MAX %d charater"), p->max);
@@ -83,13 +83,13 @@ boolean menu_inputstring(INPUTSTRING_PARAM *p) {
 	} else {
 		p->newstring = p->oldstring;
 	}
-	return TRUE;
+	return true;
 }
 
-boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
-	if (!menu_initilized) return FALSE;
+bool menu_inputstring2(INPUTSTRING_PARAM *p) {
+	if (!menu_initilized) return false;
 	
-	menu_ok_input = FALSE;
+	menu_ok_input = false;
 	gtk_entry_set_max_length(GTK_ENTRY(menu_textentry2), p->max *2);
 	gtk_entry_set_text(GTK_ENTRY(menu_textentry2), p->oldstring);
 	gtk_widget_set_size_request(menu_textentry2, p->h * p->max + 8, p->h + 4);
@@ -105,16 +105,16 @@ boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
 	} else {
 		p->newstring = p->oldstring;
 	}
-	return TRUE;
+	return true;
 }
 
-boolean menu_inputnumber(INPUTNUM_PARAM *p) {
+bool menu_inputnumber(INPUTNUM_PARAM *p) {
 	GtkAdjustment *adj;
 	char s[256];
 	
-	if (!menu_initilized) return FALSE;
+	if (!menu_initilized) return false;
 	
-	menu_ok_input = FALSE;
+	menu_ok_input = false;
 	
 	gtk_window_set_title (GTK_WINDOW(menu_window_in), p->title);
 	sprintf(s, "%d ", p->max);
@@ -140,11 +140,11 @@ boolean menu_inputnumber(INPUTNUM_PARAM *p) {
 	} else {
 		p->value = -1;
 	}
-	return TRUE;
+	return true;
 }
 
 void menu_init() {
-	menu_initilized = TRUE;
+	menu_initilized = true;
 	menu_window_popup = create_menu1();
 	menu_window_in    = create_window1();
 	menu_window_is    = create_window2();
@@ -162,5 +162,5 @@ void menu_gtkmainiteration() {
 	}
 }
 
-void menu_setSkipState(boolean enabled, boolean activated) {
+void menu_setSkipState(bool enabled, bool activated) {
 }

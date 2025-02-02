@@ -39,11 +39,11 @@
 */
 int nt_sp_eupdate(int no, int time, int cancel) {
 	if (no == 1013) {
-		nt_sp_update_all(TRUE);
+		nt_sp_update_all(true);
 		return OK;
 	}
 
-	nt_sp_update_all(FALSE);
+	nt_sp_update_all(false);
 	
 	enum sdl_effect_type type = from_sact_effect(no - 100);
 	if (type == EFFECT_INVALID) {

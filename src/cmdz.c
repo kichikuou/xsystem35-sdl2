@@ -127,7 +127,7 @@ void commandZW() {
 	
 	if (sw < 256) {
 		nact->messagewait_enable = ((sw & 0xff) > 1);
-		nact->messagewait_cancelled = FALSE;
+		nact->messagewait_cancelled = false;
 	} else {
 		nact->messagewait_time = sw & 0xff;
 		nact->messagewait_cancel = !!(sw & 0x200);
@@ -160,13 +160,13 @@ void commandZF() {
 	
 	switch(sw) {
 	case 0:
-		nact->sel.WinResizeHeight = TRUE;  break;
+		nact->sel.WinResizeHeight = true;  break;
 	case 1:
-		nact->sel.WinResizeHeight = FALSE; break;
+		nact->sel.WinResizeHeight = false; break;
 	case 2:
-		nact->sel.WinResizeWidth  = FALSE; break;
+		nact->sel.WinResizeWidth  = false; break;
 	case 3:
-		nact->sel.WinResizeWidth =  TRUE;  break;
+		nact->sel.WinResizeWidth =  true;  break;
 	}
 	
 	TRACE("ZF %d:", sw);
@@ -336,7 +336,7 @@ void commandZZ0() {
 	
 	if (sw == 0) {
 #ifdef __EMSCRIPTEN__
-		nact_quit(TRUE);
+		nact_quit(true);
 #else
 		sys_exit(sysVar[0]);
 #endif

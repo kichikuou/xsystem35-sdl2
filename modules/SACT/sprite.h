@@ -48,7 +48,7 @@ extern int sp_thaw_sprite(int wNum);
 extern int sp_add_quakesprite(int wNum);
 extern int sp_clear_quakesprite_all();
 extern int sp_set_animeinterval(int wNum, int wTime);
-extern boolean sp_is_insprite(sprite_t *sp, int x, int y);
+extern bool sp_is_insprite(sprite_t *sp, int x, int y);
 extern int sp_set_blendrate(int wNum, int wCount, int rate);
 extern int sp_query_isexist(int wNum, int *ret);
 extern int sp_query_info(int wNum, int *vtype, int *vcg1, int *vcg2, int *vcg3);
@@ -71,7 +71,7 @@ extern int sp_sound_ob(int wNumWave);
 
 
 // in sprite_update.c
-extern int sp_update_all(boolean syncscreen);
+extern int sp_update_all(bool syncscreen);
 extern int sp_update_clipped();
 extern int sp_updateme(sprite_t *sp);
 extern int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);

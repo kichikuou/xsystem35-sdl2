@@ -172,19 +172,19 @@ static void extract(vsp_header *vsp, uint8_t *pic, uint8_t *b) {
 /*
  * Check data is vsp format cg or not
  *   data: raw data (pointer to data top)
- *   return: TRUE if data is vsp
+ *   return: true if data is vsp
 */
-boolean vsp_checkfmt(uint8_t *data) {
+bool vsp_checkfmt(uint8_t *data) {
 	int x0 = LittleEndian_getW(data, 0);
 	int y0 = LittleEndian_getW(data, 2);
 	int w  = LittleEndian_getW(data, 4) - x0;
 	int h  = LittleEndian_getW(data, 6) - y0;
 	
-	if (x0 < 0 || x0 > 80 || y0 < 0 || y0 > 400) return FALSE;
+	if (x0 < 0 || x0 > 80 || y0 < 0 || y0 > 400) return false;
 	/* 401: for dalk's broken cg */
-	if (w  < 0 || w  > 80 || h  < 0 || h  > 401) return FALSE;
+	if (w  < 0 || w  > 80 || h  < 0 || h  > 401) return false;
 	
-	return TRUE;
+	return true;
 }
 
 /*

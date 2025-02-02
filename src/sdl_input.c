@@ -35,7 +35,7 @@ struct EditorState {
 	char *text;
 	char composingText[SDL_TEXTEDITINGEVENT_TEXT_SIZE];
 	int cursor;
-	boolean done;
+	bool done;
 };
 static struct EditorState *input;
 
@@ -75,7 +75,7 @@ static void redraw() {
 	ags_updateArea(input->rect.x, input->rect.y, input->rect.w, input->rect.h);
 }
 
-static boolean handle_event(const SDL_Event *e) {
+static bool handle_event(const SDL_Event *e) {
 	switch (e->type) {
 	case SDL_KEYDOWN:
 		if (*input->composingText)
@@ -83,12 +83,12 @@ static boolean handle_event(const SDL_Event *e) {
 		switch (e->key.keysym.sym) {
 		case SDLK_RETURN:
 			input->params->newstring = input->text;
-			input->done = TRUE;
-			return TRUE;
+			input->done = true;
+			return true;
 		case SDLK_ESCAPE:
 			input->params->newstring = NULL;
-			input->done = TRUE;
-			return TRUE;
+			input->done = true;
+			return true;
 		case SDLK_BACKSPACE:
 			{
 				char *p = input->text + strlen(input->text) - 1;
@@ -98,7 +98,7 @@ static boolean handle_event(const SDL_Event *e) {
 					*p = '\0';
 				redraw();
 			}
-			return TRUE;
+			return true;
 		}
 		break;
 
@@ -118,18 +118,18 @@ static boolean handle_event(const SDL_Event *e) {
 			input->cursor = 0;
 			redraw();
 		}
-		return TRUE;
+		return true;
 
 	case SDL_TEXTEDITING:
 		strncpy(input->composingText, e->edit.text, SDL_TEXTEDITINGEVENT_TEXT_SIZE);
 		input->cursor = e->edit.start;
 		redraw();
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-boolean sdl_inputString(INPUTSTRING_PARAM *p) {
+bool sdl_inputString(INPUTSTRING_PARAM *p) {
 	static char *buf;
 	free(buf);
 	buf = malloc(p->max * MAX_UTF8_BYTES_PAR_CHAR + 1);
@@ -167,5 +167,5 @@ boolean sdl_inputString(INPUTSTRING_PARAM *p) {
 
 	input = NULL;
 
-	return TRUE;
+	return true;
 }

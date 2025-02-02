@@ -136,27 +136,27 @@ uint8_t *utf2sjis(const uint8_t *src) {
 }
 
 /* src 内に半角カナもしくはASCII文字があるかどうか */
-boolean sjis_has_hankaku(const uint8_t *src) {
+bool sjis_has_hankaku(const uint8_t *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
 			src++;
 		} else {
-			return TRUE;
+			return true;
 		}
 		src++;
 	}
-	return FALSE;
+	return false;
 }
 
 /* src 内に 全角文字があるかどうか */
-boolean sjis_has_zenkaku(const uint8_t *src) {
+bool sjis_has_zenkaku(const uint8_t *src) {
 	while(*src) {
 		if (CHECKSJIS1BYTE(*src)) {
-			return TRUE;
+			return true;
 		}
 		src++;
 	}
-	return FALSE;
+	return false;
 }
 
 int utf8_next_codepoint(const char **msg) {

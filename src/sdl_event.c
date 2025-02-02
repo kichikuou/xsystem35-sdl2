@@ -44,7 +44,7 @@
 #include "hacks.h"
 
 static void sdl_getEvent(void);
-static void keyEventProsess(SDL_KeyboardEvent *e, boolean pressed);
+static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed);
 
 static uint32_t custom_event_type = (uint32_t)-1;
 
@@ -56,7 +56,7 @@ enum CustomEventCode {
 /* pointer の状態 */
 static int mousex, mousey, mouseb;
 static int mouse_wheel_up, mouse_wheel_down;
-boolean RawKeyInfo[256];
+bool RawKeyInfo[256];
 
 /* SDL Joystick */
 static int joyinfo=0;
@@ -262,7 +262,7 @@ void sdl_handle_event(SDL_Event *e) {
 	case SDL_WINDOWEVENT:
 		switch (e->window.event) {
 		case SDL_WINDOWEVENT_EXPOSED:
-			sdl_dirty = TRUE;
+			sdl_dirty = true;
 			break;
 		}
 		break;
@@ -272,13 +272,13 @@ void sdl_handle_event(SDL_Event *e) {
 		break;
 #endif
 	case SDL_APP_DIDENTERFOREGROUND:
-		sdl_dirty = TRUE;
+		sdl_dirty = true;
 		break;
 	case SDL_KEYDOWN:
-		keyEventProsess(&e->key, TRUE);
+		keyEventProsess(&e->key, true);
 		break;
 	case SDL_KEYUP:
-		keyEventProsess(&e->key, FALSE);
+		keyEventProsess(&e->key, false);
 		switch (e->key.keysym.sym) {
 		case SDLK_F1:
 			msgskip_activate(!msgskip_isActivated());
@@ -308,13 +308,13 @@ void sdl_handle_event(SDL_Event *e) {
 
 	case SDL_MOUSEBUTTONDOWN:
 		mouseb |= (1 << e->button.button);
-		RawKeyInfo[mouse_to_rawkey(e->button.button)] = TRUE;
+		RawKeyInfo[mouse_to_rawkey(e->button.button)] = true;
 		send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(e->button.button));
 		break;
 
 	case SDL_MOUSEBUTTONUP:
 		mouseb &= (0xffffffff ^ (1 << e->button.button));
-		RawKeyInfo[mouse_to_rawkey(e->button.button)] = FALSE;
+		RawKeyInfo[mouse_to_rawkey(e->button.button)] = false;
 		send_agsevent(AGSEVENT_BUTTON_RELEASE, mouse_to_agsevent(e->button.button));
 		if (e->button.button == 2) {
 			menu_open();
@@ -325,8 +325,8 @@ void sdl_handle_event(SDL_Event *e) {
 		if (SDL_GetNumTouchFingers(e->tfinger.touchId) >= 2) {
 			mouseb &= ~(1 << SDL_BUTTON_LEFT);
 			mouseb |= 1 << SDL_BUTTON_RIGHT;
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = TRUE;
+			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
+			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = true;
 			send_agsevent(AGSEVENT_BUTTON_PRESS, AGSEVENT_BUTTON_RIGHT);
 		} else {
 			// SDL_RendererEventWatch clamps touch locations outside of the
@@ -341,7 +341,7 @@ void sdl_handle_event(SDL_Event *e) {
 				send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 			}
 			mouseb |= 1 << button;
-			RawKeyInfo[mouse_to_rawkey(button)] = TRUE;
+			RawKeyInfo[mouse_to_rawkey(button)] = true;
 			send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(button));
 		}
 		break;
@@ -350,8 +350,8 @@ void sdl_handle_event(SDL_Event *e) {
 		if (SDL_GetNumTouchFingers(e->tfinger.touchId) == 0) {
 			int ags_button = (mouseb & 1 << SDL_BUTTON_LEFT) ? AGSEVENT_BUTTON_LEFT : AGSEVENT_BUTTON_RIGHT;
 			mouseb &= ~(1 << SDL_BUTTON_LEFT | 1 << SDL_BUTTON_RIGHT);
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = FALSE;
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = FALSE;
+			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
+			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = false;
 			mousex = e->tfinger.x * view_w;
 			mousey = e->tfinger.y * view_h;
 			send_agsevent(AGSEVENT_BUTTON_RELEASE, ags_button);
@@ -426,11 +426,11 @@ void sdl_handle_event(SDL_Event *e) {
 			case SIMULATE_RIGHT_BUTTON:
 				if ((intptr_t)e->user.data1) {
 					mouseb |= 1 << SDL_BUTTON_RIGHT;
-					RawKeyInfo[KEY_MOUSE_RIGHT] = TRUE;
+					RawKeyInfo[KEY_MOUSE_RIGHT] = true;
 					send_agsevent(AGSEVENT_BUTTON_PRESS, AGSEVENT_BUTTON_RIGHT);
 				} else {
 					mouseb &= ~(1 << SDL_BUTTON_RIGHT);
-					RawKeyInfo[KEY_MOUSE_RIGHT] = FALSE;
+					RawKeyInfo[KEY_MOUSE_RIGHT] = false;
 					send_agsevent(AGSEVENT_BUTTON_RELEASE, AGSEVENT_BUTTON_RIGHT);
 				}
 				break;
@@ -458,7 +458,7 @@ static void sdl_getEvent(void) {
 }
 
 /* キー情報の取得 */
-static void keyEventProsess(SDL_KeyboardEvent *e, boolean pressed) {
+static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed) {
 	int code = sdl_keytable[e->keysym.scancode];
 	RawKeyInfo[code] = pressed;
 	send_agsevent(pressed ? AGSEVENT_KEY_PRESS : AGSEVENT_KEY_RELEASE, code);

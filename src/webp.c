@@ -25,12 +25,12 @@
 #include "ald_manager.h"
 #include "LittleEndian.h"
 
-boolean webp_checkfmt(uint8_t *data) {
+bool webp_checkfmt(uint8_t *data) {
 	if (data[0] != 'R' || data[1] != 'I' || data[2] != 'F' || data[3] != 'F')
-		return FALSE;
+		return false;
 	if (data[8] != 'W' || data[9] != 'E' || data[10] != 'B' || data[11] != 'P')
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 static int get_base_cg(uint8_t *data, size_t size) {

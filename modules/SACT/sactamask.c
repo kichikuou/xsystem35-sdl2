@@ -124,13 +124,13 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 	
 	mask = smask_get(index);
 	if (mask == NULL) {
-		sp_update_all(TRUE);
+		sp_update_all(true);
 		return OK;
 	}
 	
 	// 現在の sf0 をセーブ
 	sfsrc = sf_dup(sf0);
-	sp_update_all(FALSE);
+	sp_update_all(false);
 	sfdst = sf_dup(sf0);
 	sf_copyall(sf0, sfsrc);
 	

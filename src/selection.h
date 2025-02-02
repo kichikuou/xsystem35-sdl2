@@ -66,11 +66,11 @@ struct _selection {
 	int EncloseType;
 	
 	/* 選択したあとメッセージ領域を初期化するか */
-	boolean ClearMsgWindow;
+	bool ClearMsgWindow;
 	
 	/* 選択Windowの大きさの変更 */
-	boolean WinResizeWidth;
-	boolean WinResizeHeight;
+	bool WinResizeWidth;
+	bool WinResizeHeight;
 	
 	/* 選択肢 Window */
 	int              winno;  
@@ -78,7 +78,7 @@ struct _selection {
 	Bcom_WindowInfo  wininfo[SELWINMAX];
 	
         /* 選択肢を登録中 */
-	boolean in_setting;
+	bool in_setting;
 };
 typedef struct _selection sel_t;
 

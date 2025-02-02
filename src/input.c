@@ -51,7 +51,7 @@ void set_hak_keymode(int key, int mode) {
 	}
 }
 
-int sys_getMouseInfo(MyPoint *p, boolean is_dibgeo) {
+int sys_getMouseInfo(MyPoint *p, bool is_dibgeo) {
 	MyPoint _p;
 	int key = sdl_getMouseInfo(&_p);
 	
@@ -93,7 +93,7 @@ int sys_keywait(int msec, unsigned flags) {
 		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK) {
 			int key = sys_getInputInfo();
 			if (key)
-				msgskip_activate(FALSE);
+				msgskip_activate(false);
 			return key;
 		}
 		return 0;
@@ -121,7 +121,7 @@ void sys_hit_any_key() {
 	int key=0;
 	if (msgskip_isSkipping()) {
 		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK && sys_getInputInfo())
-			msgskip_activate(FALSE);
+			msgskip_activate(false);
 		sdl_sleep(30);
 		return;
 	}
@@ -130,7 +130,7 @@ void sys_hit_any_key() {
 	
 	/* message wait flag restore */
 	if (nact->messagewait_cancelled) {
-		nact->messagewait_cancelled = FALSE;
+		nact->messagewait_cancelled = false;
 		/* consume the input that cancelled message wait */
 		while (!nact->is_quit && !(key & hak_ignore_mask)) {
 			key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE);
@@ -149,7 +149,7 @@ void sys_hit_any_key() {
 	}
 }
 
-void sys_key_releasewait(int key, boolean zi_mask_enabled) {
+void sys_key_releasewait(int key, bool zi_mask_enabled) {
 	int mask;
 	
 	if (zi_mask_enabled) {

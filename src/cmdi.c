@@ -61,7 +61,7 @@ void commandIK() {
 			sys_keywait(REPEAT_RATE_SLOW, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
-		sys_key_releasewait(key, TRUE);
+		sys_key_releasewait(key, true);
 		sysVar[0] = ik_key = key;
 		break;
 	case 1: 
@@ -75,11 +75,11 @@ void commandIK() {
 			sys_keywait(REPEAT_RATE_FAST, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
-		sys_key_releasewait(key, TRUE);
+		sys_key_releasewait(key, true);
 		sysVar[0] = ik_key = key;
 		break;
 	case 2:
-		sysVar[0] = sys_getMouseInfo(NULL, TRUE);
+		sysVar[0] = sys_getMouseInfo(NULL, true);
 		break;
 	case 3:
 		sysVar[0] = sys_getKeyInfo();
@@ -104,7 +104,7 @@ void commandIM() {
 	int *y_var = getCaliVariable();
 	MyPoint p;
 	
-	sysVar[0] = sys_getMouseInfo(&p, FALSE);
+	sysVar[0] = sys_getMouseInfo(&p, false);
 	*x_var = p.x;
 	*y_var = p.y;
 	TRACE("IM %d,%d:", *x_var, *y_var);
@@ -143,9 +143,9 @@ void commandIY() {
 	int p1 = getCaliValue();
 	
 	if (p1 == 0) {
-		msgskip_activate(FALSE);
+		msgskip_activate(false);
 	} else if (p1 == 1) {
-		msgskip_activate(TRUE);
+		msgskip_activate(true);
 	} else if (p1 == 2) {
 		msgskip_setFlags(MSGSKIP_STOP_ON_MENU, MSGSKIP_STOP_ON_MENU);
 	} else if (p1 == 3) {

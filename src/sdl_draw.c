@@ -45,7 +45,7 @@
 
 static void sdl_pal_check(void) {
 	if (nact->ags.pal_changed) {
-		nact->ags.pal_changed = FALSE;
+		nact->ags.pal_changed = false;
 		sdl_setPalette(nact->ags.pal, 0, 256);
 	}
 }
@@ -109,7 +109,7 @@ void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
 	
 	SDL_BlitSurface(sdl_dib, src, sdl_display, &rect_d);
 	
-	sdl_dirty = TRUE;
+	sdl_dirty = true;
 }
 
 /* 全画面更新 */
@@ -118,7 +118,7 @@ void sdl_updateAll(MyRectangle *view_rect) {
 	
 	SDL_BlitSurface(sdl_dib, view_rect, sdl_display, &rect);
 
-	sdl_dirty = TRUE;
+	sdl_dirty = true;
 }
 
 /* Color の複数個指定 */

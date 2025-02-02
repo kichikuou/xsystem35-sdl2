@@ -92,7 +92,7 @@ static void do_update_each(void* data, void* userdata) {
   画面全体の更新
   @param syncscreen: surface0 に描画したものを Screen に反映させるかどうか
  */
-int nt_sp_update_all(boolean syncscreen) {
+int nt_sp_update_all(bool syncscreen) {
 	// 画面全体を更新領域に
 	MyRectangle r = {0, 0, sf0->width, sf0->height };
 	

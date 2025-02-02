@@ -46,7 +46,7 @@ extern void sys_setCharacterEncoding(CharacterEncoding encoding);
 extern void nact_main();
 extern void nact_init();
 extern void nact_reset(void);
-extern void nact_quit(boolean restart);
+extern void nact_quit(bool restart);
 
 // cali.c
 struct VarRef;
@@ -68,12 +68,12 @@ void cmd2F_reset(void);
 
 typedef struct {
 	/* general */
-	boolean   is_quit;             /* quit command */
-	boolean   restart;
+	bool   is_quit;             /* quit command */
+	bool   restart;
 	void     (*callback)(void);    /* main の callback */
-	boolean   is_va_animation;     /* VA command working */
-	boolean   is_cursor_animation; /* animation cursor working */
-	boolean   popupmenu_opened;    /* popup menu が 開いているか */
+	bool   is_va_animation;     /* VA command working */
+	bool   is_cursor_animation; /* animation cursor working */
+	bool   popupmenu_opened;    /* popup menu が 開いているか */
 	CharacterEncoding encoding;
 	
 	char      *game_title_utf8;
@@ -88,10 +88,10 @@ typedef struct {
 	int     waitcancel_key;  // TODO: remove this
 	
 	/* message wait */
-	boolean messagewait_enable;
-	boolean messagewait_cancelled;
+	bool messagewait_enable;
+	bool messagewait_cancelled;
 	int     messagewait_time;
-	boolean messagewait_cancel;
+	bool messagewait_cancel;
 	
 	
 	/* ags */
@@ -99,7 +99,7 @@ typedef struct {
 	
 	/* メッセージ関連 */
 	msg_t msg;
- 	boolean   is_msg_out;          /* 通常メッセージを表示するか */
+ 	bool   is_msg_out;          /* 通常メッセージを表示するか */
 	void (*msgout)(const char *msg);     // 通常以外(DLL等)のメッセージ表示関数
 
 	/* 選択肢関連 */

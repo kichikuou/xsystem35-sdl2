@@ -46,7 +46,7 @@ struct markinfo {
 	int interval;
 };
 
-static boolean is_messagesprite(int wNum);
+static bool is_messagesprite(int wNum);
 static void replacestr_cb(void* data, void* userdata);
 static char *replacestr(char *msg);
 static void update_mark(sprite_t *sp, cginfo_t *cg);
@@ -65,17 +65,17 @@ static char *replacesrc;
 static char *replacedst;
 
 // 指定の番号のスプライトがメッセージスプライトかどうかをチェック
-static boolean is_messagesprite(int wNum) {
+static bool is_messagesprite(int wNum) {
 	// check sprite number is sane
-	if (wNum >= (SPRITEMAX -1) || wNum <= 0) return FALSE;
+	if (wNum >= (SPRITEMAX -1) || wNum <= 0) return false;
 	
 	// check sprite is set
-	if (sact.sp[wNum] == NULL) return FALSE;
+	if (sact.sp[wNum] == NULL) return false;
 	
 	// check sprite is message sprite
-	if (sact.sp[wNum]->type != SPRITE_MSG) return FALSE;
+	if (sact.sp[wNum]->type != SPRITE_MSG) return false;
 	
-	return TRUE;
+	return true;
 }
 
 // 文字列の置き換え処理
@@ -88,7 +88,7 @@ static void replacestr_cb(void* data, void* userdata) {
 	start = replacesrc;
 	out   = replacedst;
 	
-	while (TRUE) {
+	while (true) {
 		next = strstr(start, ex->src);
 		if (next == NULL) break;
 		strncat(out, start, (size_t)(next - start));
@@ -118,10 +118,10 @@ static char *replacestr(char *msg) {
 
 // アニメパターンの描画
 static void update_mark(sprite_t *sp, cginfo_t *cg) {
-	boolean show = sp->show;
+	bool show = sp->show;
 	cginfo_t *curcg = sp->curcg;
 
-	sp->show = TRUE;
+	sp->show = true;
 	sp->curcg = cg;
 	
 	sp_updateme(sp);
@@ -241,7 +241,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	char *msg;
 	sprite_t *sp;
 	int len = 0; // 処理した文字数?
-	boolean needupdate = FALSE;
+	bool needupdate = false;
 	MyRectangle uparea = {0,0,0,0};
 	
 	// wRSize == 0 -> ルビ無し(SACT.MessageOutputからの呼出)
@@ -303,7 +303,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 				     mbuf,
 				     wColorR, wColorG, wColorB);
 		
-		needupdate = TRUE;
+		needupdate = true;
 		
 		append_to_log(mbuf);
 		
@@ -314,7 +314,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 					 cw,
 					 wSize + wRSize + wRLineSpace);
 			sp_update_clipped();
-			needupdate = FALSE;
+			needupdate = false;
 			
 			// keywait
 			delta = sdl_getTicks() - wcnt;

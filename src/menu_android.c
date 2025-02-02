@@ -37,12 +37,12 @@ void menu_quitmenu_open(void) {
 	return;
 }
 
-boolean menu_inputstring(INPUTSTRING_PARAM *p) {
+bool menu_inputstring(INPUTSTRING_PARAM *p) {
 	static char buf[256];
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
-		return FALSE;
+		return false;
 	}
 
 	jstring msg = (*env)->NewStringUTF(env, p->title);
@@ -50,7 +50,7 @@ boolean menu_inputstring(INPUTSTRING_PARAM *p) {
 	if (!msg || !oldstring) {
 		WARNING("Failed to allocate a string");
 		(*env)->PopLocalFrame(env, NULL);
-		return FALSE;
+		return false;
 	}
 
 	jobject context = SDL_AndroidGetActivity();
@@ -63,31 +63,31 @@ boolean menu_inputstring(INPUTSTRING_PARAM *p) {
 		(*env)->ReleaseStringUTFChars(env, newstring, newstr_utf8);
 		(*env)->PopLocalFrame(env, NULL);
 		p->newstring = buf;
-		return TRUE;
+		return true;
 	}
 
 	(*env)->PopLocalFrame(env, NULL);
 	p->newstring = p->oldstring;
-	return FALSE;
+	return false;
 }
 
-boolean menu_inputstring2(INPUTSTRING_PARAM *p) {
+bool menu_inputstring2(INPUTSTRING_PARAM *p) {
 	p->newstring = p->oldstring;
-	return TRUE;
+	return true;
 }
 
-boolean menu_inputnumber(INPUTNUM_PARAM *p) {
+bool menu_inputnumber(INPUTNUM_PARAM *p) {
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
-		return FALSE;
+		return false;
 	}
 
 	jstring msg = (*env)->NewStringUTF(env, p->title);
 	if (!msg) {
 		WARNING("Failed to allocate a string");
 		(*env)->PopLocalFrame(env, NULL);
-		return FALSE;
+		return false;
 	}
 
 	jobject context = SDL_AndroidGetActivity();
@@ -96,7 +96,7 @@ boolean menu_inputnumber(INPUTNUM_PARAM *p) {
 	p->value = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);
 
 	(*env)->PopLocalFrame(env, NULL);
-	return TRUE;
+	return true;
 }
 
 void menu_init(void) {
@@ -107,5 +107,5 @@ void menu_gtkmainiteration() {
 	return;
 }
 
-void menu_setSkipState(boolean enabled, boolean activated) {
+void menu_setSkipState(bool enabled, bool activated) {
 }

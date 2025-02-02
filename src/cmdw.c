@@ -60,7 +60,7 @@ void commandWZ() {
 		ags_setExposeSwitch(sw != 0);
 		if (sw == 1) {
 			/* う〜ん こんな処理いれなあかんのかぁ〜 (T_T) */
-			if (nact->ags.world_depth == 8) nact->ags.pal_changed = TRUE;
+			if (nact->ags.world_depth == 8) nact->ags.pal_changed = true;
 			ags_updateFull();
 		}
 		break;
@@ -80,7 +80,7 @@ void commandWX() {
 	cx = getCaliValue();
 	cy = getCaliValue();
 	
-	ags_setExposeSwitch(TRUE);
+	ags_setExposeSwitch(true);
 	ags_updateArea(x0, y0, cx, cy);
 	
 	TRACE("WX %d,%d,%d,%d:", x0, y0, cx, cy);

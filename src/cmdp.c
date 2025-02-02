@@ -38,12 +38,12 @@ void commandPN() {
 void commandPF() {
 	int p1  = sl_getc();
 	int num = getCaliValue();
-	boolean cancel_enabled;
+	bool cancel_enabled;
 
 	if (p1 == 2 || p1 == 3) {
 		cancel_enabled = getCaliValue() != 0;
 	} else {
-		cancel_enabled = FALSE;
+		cancel_enabled = false;
 	}
 	switch(p1) {
 	case 0:
@@ -66,12 +66,12 @@ void commandPF() {
 void commandPW() {
 	int p1  = sl_getc();
 	int num = getCaliValue();
-	boolean cancel_enabled;
+	bool cancel_enabled;
 	
 	if (p1 == 2 || p1 == 3) {
 		cancel_enabled = getCaliValue() != 0;
 	} else {
-		cancel_enabled = FALSE;
+		cancel_enabled = false;
 	}
 	switch(p1) {
 	case 0:

@@ -31,20 +31,8 @@
 #define OK		0
 #define NG	      (-1)
 
-#ifndef FALSE
-#define FALSE false
-#undef  TRUE
-#define TRUE  true
-#endif
-
 #define min(x,y) ((x) < (y) ? (x) : (y))
 #define max(x,y) ((x) > (y) ? (x) : (y))
-
-typedef bool     ___boolean;
-
-#ifndef boolean
-#define boolean ___boolean
-#endif
 
 /*
  * Standard gettext macros.

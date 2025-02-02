@@ -150,17 +150,17 @@ static void Init() {
 	sact.dmap = sf_create_pixel(sf0->width, sf0->height, 16);
 	
 	// その他 System35 のデフォルト動作の変更
-	ags_setAntialiasedStringMode(TRUE);
+	ags_setAntialiasedStringMode(true);
 	sys_setHankakuMode(2); // 全角半角変換無し
-	ags_autorepeat(FALSE); // key auto repeat off
+	ags_autorepeat(false); // key auto repeat off
 	
 	if (sact.version >= 120) {
-		sact.logging = TRUE;
+		sact.logging = true;
 #ifdef __EMSCRIPTEN__
 		EM_ASM( xsystem35.texthook.disableWheelEvent(0xffffffff) );
 #endif
 	} else {
-		sact.logging = FALSE;
+		sact.logging = false;
 	}
 	
 	TRACE("SACT.Init %d:", p1);
@@ -267,7 +267,7 @@ static void SpriteDeleteCount() {
  *   現在設定されているスプライト状態を画面に反映(~SP_UPDATE)
  */
 static void Draw() {
-	sp_update_all(TRUE);
+	sp_update_all(true);
 
 	TRACE("SACT.Draw:");
 }
@@ -1027,7 +1027,7 @@ static void WaitKeySimple() {
 	TRACE("SACT.WaitKeySimple %d:", vKey);
 
 	// とりあえず全更新
-	sp_update_all(TRUE);
+	sp_update_all(true);
 	
 	sact.waittype = KEYWAIT_SIMPLE;
 	sact.waitkey = -1;
@@ -1339,7 +1339,7 @@ static void MessagePeek() {
  *   ログ採取停止
  */
 static void Log_Stop() {
-	sact.logging = FALSE;
+	sact.logging = false;
 	TRACE("SACT.Log_Stop:");
 }
 
@@ -1348,7 +1348,7 @@ static void Log_Stop() {
  *   ログ採取開始
  */
 static void Log_Start() {
-	sact.logging = TRUE;
+	sact.logging = true;
 	TRACE("SACT.Log_Start:");
 }
 

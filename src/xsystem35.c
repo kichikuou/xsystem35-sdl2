@@ -75,7 +75,7 @@
 #include "texthook.h"
 
 static char *gameResourceFile = "xsystem35.gr";
-static void    sys35_usage(boolean verbose);
+static void    sys35_usage(bool verbose);
 static void    sys35_init();
 static void    sys35_remove();
 static void    sys35_ParseOption(int *argc, char **argv);
@@ -98,13 +98,13 @@ static const char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCH
 static char fontface[FONTTYPEMAX];
 
 static const char *savedir;
-static boolean font_noantialias;
+static bool font_noantialias;
 static bool enable_zb = false;
 static bool integer_scaling = false;
 /* fullscreen on from command line */
-static boolean fs_on;
+static bool fs_on;
 
-static void sys35_usage(boolean verbose) {
+static void sys35_usage(bool verbose) {
 	if (verbose) {
 		puts("System35 for X Window System [proj. Rainy Moon]");
 		puts("             (C) Masaki Chikama(Wren) 1997-2002");
@@ -262,28 +262,28 @@ static void sys35_ParseOption(int *argc, char **argv) {
 	FILE *fp;
 	for (i = 1; i < *argc; i++) {
 		if (!strcmp(argv[i], "-h")) {
-			sys35_usage(TRUE);
+			sys35_usage(true);
 		}
 		if (!strcmp(argv[i], "--help")) {
-			sys35_usage(TRUE);
+			sys35_usage(true);
 		}
 	}
 	for (i = 1; i < *argc; i++) {
 		if (0 == strcmp(argv[i], "-savedir")) {
 			if (i == *argc - 1) {
 				fprintf(stderr, "xsystem35: The -savedir option requires directory name\n\n");
-				sys35_usage(FALSE);
+				sys35_usage(false);
 			}
 			savedir = argv[++i];
 		}
 		if (0 == strcmp(argv[i], "-gamefile")) {
 			if (i == *argc - 1) {
 				fprintf(stderr, "xsystem35: The -gamefile option requires file value\n\n");
-				sys35_usage(FALSE);
+				sys35_usage(false);
 			}
 			if (NULL == (fp = fopen(argv[i + 1],"r"))) {
 				fprintf(stderr, "xsystem35: gamefile '%s' not found\n\n", argv[i + 1]);
-				sys35_usage(FALSE);
+				sys35_usage(false);
 			}
 			fclose(fp);
 			gameResourceFile = argv[i + 1];
@@ -301,7 +301,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			if (argv[i + 1] != NULL) {
 				if (!set_texthook_mode(argv[i + 1])) {
 					fprintf(stderr, "xsystem35: Invalid texthook mode '%s'\n\n", argv[i + 1]);
-					sys35_usage(FALSE);
+					sys35_usage(false);
 				}
 			}
 		} else if (0 == strcmp(argv[i], "-texthook_suppress")) {
@@ -319,11 +319,11 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				sdl_setJoyDeviceIndex(atoi(argv[i + 1]));
 			}
 		} else if (0 == strcmp(argv[i], "-fullscreen")) {
-			fs_on = TRUE;
+			fs_on = true;
 		} else if (0 == strcmp(argv[i], "-noantialias")) {
-			font_noantialias = TRUE;
+			font_noantialias = true;
 		} else if (0 == strcmp(argv[i], "-enable_zb")) {
-			enable_zb = TRUE;
+			enable_zb = true;
 		} else if (0 == strcmp(argv[i], "-ttfont_gothic")) {
 			if (argv[i + 1] != NULL) {
 				fontname_tt[FONT_GOTHIC] = argv[i + 1];
@@ -333,7 +333,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				fontname_tt[FONT_MINCHO] = argv[i + 1];
 			}
 		} else if (0 == strcmp(argv[i], "-noimagecursor")) {
-			nact->ags.noimagecursor = TRUE;
+			nact->ags.noimagecursor = true;
 		} else if (0 == strcmp(argv[i], "-debuglv")) {
 			if (argv[i + 1] != NULL) {
 				debuglv = argv[i + 1][0] - '0';
@@ -494,7 +494,7 @@ static void registerGameFiles(void) {
 	if (nact->files.cnt[DRIFILE_SCO] == 0)
 		SYSERROR("No Scenario data available");
 	for (int type = 0; type < DRIFILETYPEMAX; type++) {
-		boolean use_mmap = true;
+		bool use_mmap = true;
 		if (debugger_mode != DEBUGGER_DISABLED && type == DRIFILE_SCO) {
 			// Do not mmap scenario files so that BREAKPOINT instructions can be inserted.
 			use_mmap = false;
@@ -525,7 +525,7 @@ int main(int argc, char **argv) {
 		sdl_showMessageBox(MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)");
 		exit(1);
 #else
-		sys35_usage(TRUE);
+		sys35_usage(true);
 #endif
 	}
 	registerGameFiles();
@@ -579,7 +579,7 @@ int main(int argc, char **argv) {
 
 EMSCRIPTEN_KEEPALIVE
 void sys_restart(void) {
-	nact_quit(TRUE);
+	nact_quit(true);
 }
 
 #endif

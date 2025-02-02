@@ -92,10 +92,10 @@ void commandY() {
 	case 1:
 		if (p2 == 0) {
 			/* メッセージ領域の初期化と、文字の表示位置を左上端にセットする */
-			msg_nextPage(TRUE);
+			msg_nextPage(true);
 		} else if (p2 == 1) {
 			/* メッセージ領域の文字の表示位置を左上端にセットする */
-			msg_nextPage(FALSE);
+			msg_nextPage(false);
 		}
 		break;
 	case 2:
@@ -127,7 +127,7 @@ void commandY() {
 			break;
 		default:
 			if (p1 == 1003) {
-				sys_key_releasewait(SYS35KEY_RET, FALSE);
+				sys_key_releasewait(SYS35KEY_RET, false);
 			} else if (game_id == GAME_RANCE4_V2 && p2 == 1) {
 				// Return immediately if any key is pressed.
 				sysVar[0] = sys_getInputInfo();

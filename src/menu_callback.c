@@ -30,8 +30,8 @@
 #include "msgskip.h"
 #include "s39init.h"
 
-boolean menu_ok_exit;   /* exit window で OK が押されたかどうか */
-boolean menu_ok_input;  /* 文字列/数値入力 window で OK が... */
+bool menu_ok_exit;   /* exit window で OK が押されたかどうか */
+bool menu_ok_input;  /* 文字列/数値入力 window で OK が... */
 
 GtkWidget *menu_item_msgskip_on;
 GtkWidget *menu_item_msgskip_off;
@@ -65,7 +65,7 @@ void
 on_item2_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	msgskip_activate(TRUE);
+	msgskip_activate(true);
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 }
 
@@ -74,7 +74,7 @@ void
 on_item3_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	msgskip_activate(FALSE);
+	msgskip_activate(false);
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
 }
 
@@ -111,7 +111,7 @@ void
 on_item16_activate                     (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	nact->popupmenu_opened = TRUE;
+	nact->popupmenu_opened = true;
 	gtk_widget_show(menu_window_about);
 }
 
@@ -120,7 +120,7 @@ void
 on_item17_activate                     (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-	nact->popupmenu_opened = TRUE;
+	nact->popupmenu_opened = true;
 	gtk_widget_show(menu_window_exit);
 }
 
@@ -129,7 +129,7 @@ void
 on_button1_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
-	menu_ok_input = TRUE;
+	menu_ok_input = true;
 	gtk_widget_hide(menu_window_in);
 	gtk_main_quit();
 }
@@ -140,7 +140,7 @@ void
 on_button2_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
-	menu_ok_input = FALSE;
+	menu_ok_input = false;
 	gtk_widget_hide(menu_window_in);
 	gtk_main_quit();
 }
@@ -151,7 +151,7 @@ void
 on_button4_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
-	menu_ok_input = FALSE;
+	menu_ok_input = false;
 	gtk_widget_hide(menu_window_is);
 	gtk_main_quit();
 }
@@ -163,7 +163,7 @@ on_button3_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
 	menu_textentry_string = gtk_entry_get_text(GTK_ENTRY(menu_textentry));
-	menu_ok_input = TRUE;
+	menu_ok_input = true;
 	gtk_widget_hide(menu_window_is);
 	gtk_main_quit();
 }
@@ -173,9 +173,9 @@ void
 on_button5_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
-	menu_ok_exit = TRUE;
-	nact_quit(FALSE);
-	nact->popupmenu_opened = FALSE;
+	menu_ok_exit = true;
+	nact_quit(false);
+	nact->popupmenu_opened = false;
 }
 
 
@@ -184,8 +184,8 @@ void
 on_button6_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
-	nact->popupmenu_opened = FALSE;
-	menu_ok_exit = FALSE;
+	nact->popupmenu_opened = false;
+	menu_ok_exit = false;
 	gtk_widget_hide(menu_window_exit);
 }
 
@@ -195,7 +195,7 @@ on_button11_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
 	gtk_widget_hide(menu_window_about);
-	nact->popupmenu_opened = FALSE;
+	nact->popupmenu_opened = false;
 }
 
 /* menu canceld */
@@ -204,7 +204,7 @@ on_menu1_deactivate                    (GtkMenuShell    *menushell,
                                         gpointer         user_data)
 {
 	gtk_menu_popdown(GTK_MENU(menu_window_popup));
-	nact->popupmenu_opened = FALSE;
+	nact->popupmenu_opened = false;
 }
 
 /* get enter in text entry */
@@ -213,7 +213,7 @@ on_entry1_activate                     (GtkEditable     *editable,
                                         gpointer         user_data)
 {
 	menu_textentry_string = gtk_entry_get_text(GTK_ENTRY(editable));
-	menu_ok_input = TRUE;
+	menu_ok_input = true;
 	gtk_widget_hide(menu_window_is);
 	gtk_main_quit();
 }
@@ -226,7 +226,7 @@ on_spinbutton1_activate                (GtkEditable     *editable,
 	GtkAdjustment *adj;
 	adj = gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(menu_spinbutton));
 	if (gtk_adjustment_get_value(adj) >= gtk_adjustment_get_lower(adj) && gtk_adjustment_get_value(adj) <= gtk_adjustment_get_upper(adj)) {
-		menu_ok_input = TRUE;
+		menu_ok_input = true;
 		gtk_widget_hide(menu_window_in);
 		gtk_main_quit();
 	}
@@ -238,7 +238,7 @@ on_entry2_activate                     (GtkEditable     *editable,
                                         gpointer         user_data)
 {
 	menu_textentry_string = gtk_entry_get_text(GTK_ENTRY(editable));
-	menu_ok_input = TRUE;
+	menu_ok_input = true;
 	gtk_widget_hide(menu_window_is2);
 	gtk_main_quit();
 }

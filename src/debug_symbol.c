@@ -45,7 +45,7 @@ typedef struct {
 	char *name;
 	int page;
 	int addr;
-	boolean is_local;
+	bool is_local;
 } FuncInfo;
 
 struct debug_symbols {
@@ -76,7 +76,7 @@ int fgetdw(FILE *fp) {
 	return LittleEndian_getDW(buf, 0);
 }
 
-static boolean ensure_srcs(struct debug_symbols *dsym, int nr_srcs) {
+static bool ensure_srcs(struct debug_symbols *dsym, int nr_srcs) {
 	if (!dsym->srcs) {
 		dsym->nr_srcs = nr_srcs;
 		dsym->srcs = calloc(nr_srcs, sizeof(SrcInfo));
@@ -87,7 +87,7 @@ static boolean ensure_srcs(struct debug_symbols *dsym, int nr_srcs) {
 	return true;
 }
 
-static boolean load_srcs(struct debug_symbols *dsym, char *buf) {
+static bool load_srcs(struct debug_symbols *dsym, char *buf) {
 	int nr_srcs = LittleEndian_getDW(buf, 0);
 	if (!ensure_srcs(dsym, nr_srcs))
 		return false;
@@ -125,7 +125,7 @@ static void store_src_lines(SrcInfo *info, char *src) {
 	info->lines = lines;
 }
 
-static boolean load_scnt(struct debug_symbols *dsym, char *buf) {
+static bool load_scnt(struct debug_symbols *dsym, char *buf) {
 	int nr_srcs = LittleEndian_getDW(buf, 0);
 	if (!ensure_srcs(dsym, nr_srcs))
 		return false;
@@ -139,7 +139,7 @@ static boolean load_scnt(struct debug_symbols *dsym, char *buf) {
 	return true;
 }
 
-static boolean load_line(struct debug_symbols *dsym, unsigned char *buf) {
+static bool load_line(struct debug_symbols *dsym, unsigned char *buf) {
 	int nr_srcs = LittleEndian_getDW(buf, 0);
 	if (!ensure_srcs(dsym, nr_srcs))
 		return false;
@@ -159,7 +159,7 @@ static boolean load_line(struct debug_symbols *dsym, unsigned char *buf) {
 	return true;
 }
 
-static boolean load_vari(struct debug_symbols *dsym, char *buf) {
+static bool load_vari(struct debug_symbols *dsym, char *buf) {
 	dsym->nr_vars = LittleEndian_getDW(buf, 0);
 	dsym->variables = calloc(dsym->nr_vars, sizeof(char *));
 	char *p = buf + 4;
@@ -170,7 +170,7 @@ static boolean load_vari(struct debug_symbols *dsym, char *buf) {
 	return true;
 }
 
-static boolean load_func(struct debug_symbols *dsym, char *buf) {
+static bool load_func(struct debug_symbols *dsym, char *buf) {
 	dsym->nr_funcs = LittleEndian_getDW(buf, 0);
 	dsym->functions = calloc(dsym->nr_funcs, sizeof(FuncInfo));
 	char *p = buf + 4;
@@ -221,7 +221,7 @@ struct debug_symbols *dsym_load(const char *path) {
 			return NULL;
 		}
 
-		boolean ok = true;
+		bool ok = true;
 		if (!strcmp(tag, "SRCS")) {
 			ok = load_srcs(dsym, section_content);
 		} else if (!strcmp(tag, "SCNT")) {
@@ -369,7 +369,7 @@ const char *dsym_addr2func(struct debug_symbols *dsym, int page, int addr) {
 	return f->name;
 }
 
-boolean dsym_func2addr(struct debug_symbols *dsym, const char *name, int *inout_page, int *out_addr) {
+bool dsym_func2addr(struct debug_symbols *dsym, const char *name, int *inout_page, int *out_addr) {
 	if (!dsym)
 		return false;
 

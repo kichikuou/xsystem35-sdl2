@@ -319,9 +319,9 @@ int muspcm_getwavelen(int slot) {
 }
 
 // 指定のスロットが現在演奏中かどうかを取得
-boolean muspcm_isplaying(int slot) {
+bool muspcm_isplaying(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
-		return FALSE;
+		return false;
 
 	return Mix_Playing(slot);
 }

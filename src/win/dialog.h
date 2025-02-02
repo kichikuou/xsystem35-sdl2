@@ -24,7 +24,7 @@
 struct inputstring_param;
 struct inputnum_param;
 
-boolean input_string(struct inputstring_param *p);
-boolean input_number(struct inputnum_param *p);
+bool input_string(struct inputstring_param *p);
+bool input_number(struct inputnum_param *p);
 
 #endif  // __DIALOG_H__

@@ -76,18 +76,18 @@ static INT_PTR CALLBACK text_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPA
 	return TRUE;
 }
 
-boolean input_string(INPUTSTRING_PARAM *p) {
+bool input_string(INPUTSTRING_PARAM *p) {
 	p->newstring = p->oldstring;
 	DialogBoxParam(GetModuleHandle(NULL),
 				   MAKEINTRESOURCE(IDD_DIALOG1),
 				   get_hwnd(sdl_window),
 				   text_dialog_proc,
 				   (LPARAM)p);
-	return TRUE;
+	return true;
 }
 
-boolean input_number(INPUTNUM_PARAM *p) {
+bool input_number(INPUTNUM_PARAM *p) {
 	// TODO: Implement
 	p->value = p->def;
-	return TRUE;
+	return true;
 }

@@ -91,11 +91,11 @@ static void cb_waitkey_selection(agsevent_t *e);
 static void cb_focused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
 	SACT_DEBUG("show up spex %d", sp->no);
 
-	sp->show = TRUE;
+	sp->show = true;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -109,11 +109,11 @@ static void cb_focused_swsp(void* s, void* data) {
 static void cb_defocused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
 	SACT_DEBUG("hide spex %d", sp->no);
 	
-	sp->show = FALSE;
+	sp->show = false;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -124,7 +124,7 @@ static void cb_defocused_swsp(void* s, void* data) {
 static void cb_focused_zkey(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
 	sp->show = sp->show_save;
 	if (oldstate != sp->show) {
@@ -137,9 +137,9 @@ static void cb_focused_zkey(void* s, void* data) {
 static void cb_defocused_zkey(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
-	sp->show = FALSE;
+	sp->show = false;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -174,7 +174,7 @@ static int cb_focused(sprite_t *sp) {
 			sp->curcg = sp->cg2;
 			update++;
 		}
-		sp->focused = TRUE;
+		sp->focused = true;
 		SACT_DEBUG("get forcused %d, type %d", sp->no, sp->type);
 		if (sp->numsound1) {
 			ssnd_play(sp->numsound1);
@@ -197,7 +197,7 @@ static int cb_defocused(sprite_t *sp) {
 		}
 		sp->curcg = sp->cg1;
 		update++;
-		sp->focused = FALSE;
+		sp->focused = false;
 		SACT_DEBUG("lost forcused %d", sp->no);
 	}
 	
@@ -216,11 +216,11 @@ static void cb_waitkey_simple(agsevent_t *e) {
 			cur = sdl_getTicks();
 			if (!sact.zhiding) {
 				slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
-				sact.zhiding = TRUE;
-				sact.zdooff = TRUE;
+				sact.zhiding = true;
+				sact.zdooff = true;
 				sact.zofftime = cur;
 			} else {
-				sact.zdooff = FALSE;
+				sact.zdooff = false;
 			}
 		}
 		break;
@@ -236,7 +236,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	case AGSEVENT_BUTTON_RELEASE:
 		if (sact.zhiding) {
 			slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
-			sact.zhiding = FALSE;
+			sact.zhiding = false;
 		}
 		// fall through
 		
@@ -246,7 +246,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 			cur = sdl_getTicks();
 			if (500 < (cur - sact.zofftime) || !sact.zdooff) {
 				slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
-				sact.zhiding = FALSE;
+				sact.zhiding = false;
 			}
 			break;
 		case KEY_PAGEUP:

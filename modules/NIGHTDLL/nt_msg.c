@@ -95,7 +95,7 @@ void ntmsg_init() {
 	sp->u.anime.interval = HAKANIM_INTERVAL;
 	nt_sp_add_updatelist(sp);
 	nt_sp_set_loc(sp, HAKANIM_LOC_X, HAKANIM_LOC_Y);
-	nt_sp_set_show(sp, FALSE);
+	nt_sp_set_show(sp, false);
 	sp->update = nt_sp_draw_scg;
 
 	
@@ -131,14 +131,14 @@ void ntmsg_set_frame(int type) {
 	
 	switch(type) {
 	case 0:
-		nt_sp_set_show(night.sp[SPNO_MSGBG], FALSE);
-		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], FALSE);
-		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], FALSE);
+		nt_sp_set_show(night.sp[SPNO_MSGBG], false);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], false);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], false);
 		break;
 	case 1:
-		nt_sp_set_show(night.sp[SPNO_MSGBG], TRUE);
-		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], TRUE);
-		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], TRUE);
+		nt_sp_set_show(night.sp[SPNO_MSGBG], true);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], true);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], true);
 		
 		gr_fill(sf, MSGFRAME_0_X, MSGFRAME_0_Y,
 			MSGFRAME_0_WIDTH, MSGFRAME_0_HEIGHT,
@@ -146,12 +146,12 @@ void ntmsg_set_frame(int type) {
 		gr_fill_alpha_map(sf, MSGFRAME_0_X, MSGFRAME_0_Y,
 				  MSGFRAME_0_WIDTH, MSGFRAME_0_HEIGHT, 192);
 		ntmsg_clear(SPNO_MSGFRAME_FG);
-		nt_sp_update_all(TRUE);
+		nt_sp_update_all(true);
 		break;
 	case 2:
-		nt_sp_set_show(night.sp[SPNO_MSGBG], TRUE);
-		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], FALSE);
-		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], TRUE);
+		nt_sp_set_show(night.sp[SPNO_MSGBG], true);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], false);
+		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], true);
 		
 		gr_fill(sf, MSGFRAME_1_X, MSGFRAME_1_Y,
 			MSGFRAME_1_WIDTH, MSGFRAME_1_HEIGHT,
@@ -159,7 +159,7 @@ void ntmsg_set_frame(int type) {
 		gr_fill_alpha_map(sf, MSGFRAME_1_X, MSGFRAME_1_Y,
 				  MSGFRAME_1_WIDTH, MSGFRAME_1_HEIGHT, 128);
 		ntmsg_clear(SPNO_MSGFRAME_FG);
-		nt_sp_update_all(TRUE);
+		nt_sp_update_all(true);
 	
 		break;
 	}
@@ -221,7 +221,7 @@ int ntmsg_ana(void) {
 static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace) {
 	char *msg;
 	sprite_t *sp;
-	boolean needupdate = FALSE;
+	bool needupdate = false;
 	MyRectangle uparea = {0,0,0,0};
 	int savex;
 	
@@ -260,7 +260,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 				     mbuf,
 				     wColorR, wColorG, wColorB);
 		
-		needupdate = TRUE;
+		needupdate = true;
 		
 		if (wSpeed > 0) {
 			nt_sp_updateme_part(sp,
@@ -269,7 +269,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 					 cw,
 					 wSize);
 			nt_sp_update_clipped();
-			needupdate = FALSE;
+			needupdate = false;
 			
 			// keywait
 			delta = sdl_getTicks() - wcnt;
@@ -424,7 +424,7 @@ static void setup_hakanim() {
 // メッセージ表示時のキー入力を促すアニメーション
 static void hakanim(int i) {
 	sprite_t *sp;
-	boolean show;
+	bool show;
 	
 	sp = night.sp[SPNO_MSG_KEYANIM];
 	if (sp == NULL) return;
@@ -434,7 +434,7 @@ static void hakanim(int i) {
 	} else {
 		sp->curcg = sp->cg2;
 	}
-	sp->show = TRUE;
+	sp->show = true;
 	nt_sp_updateme(sp);
 	nt_sp_update_clipped();
 	

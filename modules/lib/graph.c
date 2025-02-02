@@ -36,48 +36,48 @@
  * @param ds: 転送先surface
  * @param dx: 転送先Ｘ座標
  * @param dy: 転送先Ｙ座標
- * @return TRUE -> 描画領域がある
- *         FALSE-> 転送領域の高さや幅が０以下になったり、転送元、転送先の座標が
+ * @return true -> 描画領域がある
+ *         false-> 転送領域の高さや幅が０以下になったり、転送元、転送先の座標が
  *                 surfaceの範囲外になり、描画領域がなくなった。
  *         それぞれの引数は適宜変更されている
  */
-boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy) {
+bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy) {
 	int w, h;
 	
 	if (ss == NULL) {
 		WARNING("ss surface is null");
-		return FALSE;
+		return false;
 	}
 	if (ss == NULL) {
 		WARNING("ss surface is null");
-		return FALSE;
+		return false;
 	}
 	
 	if (*sx > ss->width) {
 		WARNING("sx is too large (sx=%d,width=%d)", *sx, ss->width);
-		return FALSE;
+		return false;
 	}
 	if (*sy > ss->height) {
 		WARNING("sy is too large (sy=%d,height=%d)", *sy, ss->height);
-		return FALSE;
+		return false;
 	}
 	
 	if (*sx < 0) {
 		WARNING("sx is too small (sx=%d)", *sx);
-		return FALSE;
+		return false;
 	}
 	if (*sy < 0) {
 		WARNING("sy is too small (sy=%d)", *sy);
-		return FALSE;
+		return false;
 	}
 	
 	if (*dx > ds->width) {
 		WARNING("dx is too large (dx=%d,width=%d)", *dx, ds->width);
-		return FALSE;
+		return false;
 	}
 	if (*dy > ds->height) {
 		WARNING("dy is too large (dy=%d,height=%d)", *dy, ds->height);
-		return FALSE;
+		return false;
 	}
 	
 	w = *sw;
@@ -95,11 +95,11 @@ boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds
 
 	if (*sw <= 0) {
 		WARNING("sw become <=0");
-		return FALSE;
+		return false;
 	}
 	if (*sh <= 0) {
 		WARNING("sh become <=0");
-		return FALSE;
+		return false;
 	}
 	
 	if (*sw != w) {
@@ -109,7 +109,7 @@ boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds
 		NOTICE("height change %d -> %d", h, *sh);
 	}
 	
-	return TRUE;
+	return true;
 }
 
 /**
@@ -120,26 +120,26 @@ boolean gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds
  * @param sy: 描画開始Ｙ座標
  * @param sw: 描画幅
  * @param sh: 描画高さ
- * @return TRUE -> 描画領域がある
- *         FALSE-> 描画領域の高さや幅が０以下になったり、描画開始座標が
+ * @return true -> 描画領域がある
+ *         false-> 描画領域の高さや幅が０以下になったり、描画開始座標が
  *                 surfaceの範囲外になり、描画領域がなくなった。
  *         それぞれの引数は適宜変更されている
  */
-boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
+bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
 	int w, h;
 	
 	if (ss == NULL) {
 		WARNING("ss surface is null");
-		return FALSE;
+		return false;
 	}
 	
 	if (*sx > ss->width) {
 		WARNING("sx is too large (sx=%d,width=%d)", *sx, ss->width);
-		return FALSE;
+		return false;
 	}
 	if (*sy > ss->height) {
 		WARNING("sy is too large (sy=%d,height=%d)", *sy, ss->height);
-		return FALSE;
+		return false;
 	}
 	
 	w = *sw;
@@ -157,11 +157,11 @@ boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
 	
 	if (*sw <= 0) {
 		WARNING("sw become <=0");
-		return FALSE;
+		return false;
 	}
 	if (*sh <= 0) {
 		WARNING("sh become <=0");
-		return FALSE;
+		return false;
 	}
 	
 	if (*sw != w) {
@@ -171,7 +171,7 @@ boolean gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
 		NOTICE("height change %d -> %d", h, *sh);
 	}
 	
-	return TRUE;
+	return true;
 }
 
 void gr_init() {

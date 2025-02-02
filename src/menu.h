@@ -32,7 +32,7 @@ typedef struct inputstring_param {
 	const char *newstring;
 	int   max;
 	/* for MJ cmd */
-	boolean need_window;
+	bool need_window;
 	int     x, y, h;
 } INPUTSTRING_PARAM;
 
@@ -48,13 +48,13 @@ typedef struct inputnum_param {
 extern void menu_open(void);
 extern void menu_quitmenu_open(void);
 extern void menu_resetmenu_open(void);
-extern boolean menu_inputstring(INPUTSTRING_PARAM *);
-extern boolean menu_inputstring2(INPUTSTRING_PARAM *);
-extern boolean menu_inputnumber(INPUTNUM_PARAM *);
+extern bool menu_inputstring(INPUTSTRING_PARAM *);
+extern bool menu_inputstring2(INPUTSTRING_PARAM *);
+extern bool menu_inputnumber(INPUTNUM_PARAM *);
 extern void menu_widgetinit(void);
 extern void menu_init();
 extern void menu_gtkmainiteration();
-extern void menu_setSkipState(boolean enabled, boolean activated);
+extern void menu_setSkipState(bool enabled, bool activated);
 
 #ifdef _WIN32
 struct SDL_SysWMmsg;

@@ -104,11 +104,11 @@ void sel_init() {
 	sel.EncloseType              = 0;
 	
 	/* 選択したあとメッセージ領域を初期化するか */
-	sel.ClearMsgWindow  = TRUE;
+	sel.ClearMsgWindow  = true;
 	
 	/* 選択Windowの大きさの変更 */
-	sel.WinResizeWidth  = FALSE;
-	sel.WinResizeHeight = TRUE;
+	sel.WinResizeWidth  = false;
+	sel.WinResizeHeight = true;
 
 	for (int i = 0; i < SELWINMAX; i++) {
 		if (sel.wininfo[i].savedimg)
@@ -124,10 +124,10 @@ void sel_init() {
 	}
 	sel.winno = 1;
 	sel.win = &sel.wininfo[1];
-	sel.wininfo[1].save = TRUE;
+	sel.wininfo[1].save = true;
 	
 	/* 選択肢を登録中 */
-	sel.in_setting = FALSE;
+	sel.in_setting = false;
 
 	// Private variables
 	memset(elm, 0, sizeof(elm));
@@ -173,7 +173,7 @@ void sel_goto(int no, int flag) {
 	sl_jmpNear(elmv[no -1]);
 	
 	if (flag) {
-		sel.in_setting = FALSE;
+		sel.in_setting = false;
 		regnum = 0;
 		maxElementLength = 0;
 	}
@@ -187,7 +187,7 @@ void sel_returengoto(int no, int flag) {
 	sl_returnGoto(elmv[no -1]);
 	
 	if (flag) {
-		sel.in_setting = FALSE;
+		sel.in_setting = false;
 		regnum = 0;
 		maxElementLength = 0;
 	}
@@ -312,7 +312,7 @@ static void init_selwindow() {
 	int x = r.x + r.w * MOUSE_INIT_X_RATIO/100;
 	if (default_element == 0) {
 		MyPoint p;
-		sys_getMouseInfo(&p, TRUE);
+		sys_getMouseInfo(&p, true);
 		if (p.y < r.y) {
 			int y = r.y + (sel.MsgFontSize +2) * MOUSE_INIT_Y_RATIO/100;
 			ags_setCursorLocation(x, y, true, true);
@@ -346,7 +346,7 @@ static int whereElement(void) {
 	MyRectangle *r = workR;
 	static int mpx, mpy;
 	
-	sys_getMouseInfo(&p, TRUE);
+	sys_getMouseInfo(&p, true);
 	if (keymode) {
 		if (abs(mpx - p.x) > 2 || abs(mpy - p.y) > 2) {
 			keymode = 0;
@@ -367,7 +367,7 @@ static int whereElement(void) {
 	return -1;
 }
 
-static void lineEncloseElement(MyRectangle *r, int col, boolean thick) {
+static void lineEncloseElement(MyRectangle *r, int col, bool thick) {
 	ags_drawRectangle(r->x, r->y, r->w + 2, r->h + 2, col);
 	if (thick)
 		ags_drawRectangle(r->x + 1, r->y + 1, r->w, r->h, col);
@@ -385,9 +385,9 @@ static void encloseElement(int sw, int no) {
 		} else {
 			switch(sel.EncloseType) {
 			case 0:
-				lineEncloseElement(r, sel.WinBackgroundColor, TRUE); break;
+				lineEncloseElement(r, sel.WinBackgroundColor, true); break;
 			case 1:
-				lineEncloseElement(r, sel.WinBackgroundColor, FALSE); break;
+				lineEncloseElement(r, sel.WinBackgroundColor, false); break;
 			case 2:
 				ags_fillRectangle(r->x, r->y, r->w +2, r->h +2, sel.WinBackgroundColor);
 				ags_drawString(r->x +2, r->y +1, elm[no], sel.MsgFontColor);
@@ -404,9 +404,9 @@ static void encloseElement(int sw, int no) {
 		}
 		switch(sel.EncloseType) {
 		case 0:
-			lineEncloseElement(r, sel.WinFrameColor, TRUE); break;
+			lineEncloseElement(r, sel.WinFrameColor, true); break;
 		case 1:
-			lineEncloseElement(r, 255, FALSE); break;
+			lineEncloseElement(r, 255, false); break;
 		case 2:
 			ags_fillRectangle(r->x, r->y, r->w +2, r->h +2, sel.MsgFontColor);
 			ags_drawString(r->x +2, r->y +1, elm[no], sel.WinBackgroundColor);
@@ -436,7 +436,7 @@ void sel_select() {
 	int key, prevkey = 0, i;
 	
 	if (msgskip_getFlags() & MSGSKIP_STOP_ON_MENU)
-		msgskip_activate(FALSE);
+		msgskip_activate(false);
 
 	saveimg2 = NULL;
 	keymode = 0;
@@ -456,7 +456,7 @@ void sel_select() {
 		workR[i].h = 2 + sel.MsgFontSize;
 	}
 	
-	sys_key_releasewait(SYS35KEY_RET, FALSE);
+	sys_key_releasewait(SYS35KEY_RET, false);
 	while (!nact->is_quit) {
 		key = sys_keywait(25, KEYWAIT_CANCELABLE);
 
@@ -496,7 +496,7 @@ void sel_select() {
 				if (preElement >= 0) {
 					encloseElement(0, preElement);
 				}
-				sys_key_releasewait(key, FALSE);
+				sys_key_releasewait(key, false);
 				encloseElement(1, curElement);
 				preElement = curElement;
 			}
@@ -536,7 +536,7 @@ void sel_select() {
 	remove_selwindow();
 	
 	if (sel.ClearMsgWindow) {
-		msg_nextPage(TRUE);
+		msg_nextPage(true);
 	}
 	
 	if (curElement != -1) {

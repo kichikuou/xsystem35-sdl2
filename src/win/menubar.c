@@ -104,11 +104,11 @@ void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 			menu_quitmenu_open();
 			break;
 		case ID_SCREEN_WINDOW:
-			sdl_setFullscreen(FALSE);
+			sdl_setFullscreen(false);
 			SetMenu(get_hwnd(sdl_window), hmenu);
 			break;
 		case ID_SCREEN_FULL:
-			sdl_setFullscreen(TRUE);
+			sdl_setFullscreen(true);
 			SetMenu(get_hwnd(sdl_window), NULL);
 			break;
 		case ID_SCREEN_INTEGER_SCALING:
@@ -137,7 +137,7 @@ void win_menu_onMouseMotion(int x, int y) {
 	SetMenu(get_hwnd(sdl_window), y > 0 ? NULL : hmenu);
 }
 
-void menu_setSkipState(boolean enabled, boolean activated) {
+void menu_setSkipState(bool enabled, bool activated) {
 	HWND hwnd = get_hwnd(sdl_window);
 
 	EnableMenuItem(hmenu, ID_MSGSKIP, enabled ? MF_ENABLED : MF_GRAYED);
