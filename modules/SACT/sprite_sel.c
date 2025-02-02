@@ -86,7 +86,7 @@ static void cb_select_move(agsevent_t *e) {
 	newindex = (y - (sp->cur.y + sact.sel.frame_dot)) / (sact.sel.font_size + sact.sel.linespace);
 	
 	if (newstate == oldstate) {
-		if ((newstate == FALSE) || (newindex == oldindex)) {
+		if (!newstate || newindex == oldindex) {
 			// 前と状態が同じでかつ、新しい状態がspriteの外か、
 			// indexが変わらない場合はなにもしない。
 			return;
@@ -125,7 +125,7 @@ static void cb_select_release(agsevent_t *e) {
 		iy = (y - (sp->cur.y + sact.sel.frame_dot)) / (sact.sel.font_size + sact.sel.linespace);
 
 		// カーソルが sprite の外の場合は無視
-		if (st == FALSE) {
+		if (!st) {
 			return;
 		}
 		

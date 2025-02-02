@@ -104,7 +104,7 @@ static boolean waitcond(int endtime) {
 	}
 	
 	// その他キー入力があれば終了
-	return sact.waitkey == -1 ? FALSE : TRUE;
+	return sact.waitkey != -1;
 }
 
 /*

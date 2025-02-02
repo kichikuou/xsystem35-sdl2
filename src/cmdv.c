@@ -416,12 +416,12 @@ void commandVF() { /* from Panyo */
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
 		
-		if (img->fEnable == FALSE) continue;
+		if (!img->fEnable) continue;
 		
 		for (y = 0; y < cyMap; y++) {
 			for (x = 0; x < cxMap; x++) {
 				unit = *UNITMAP_UNITNUMBER(i, x, y);
-				if (img->useTTP == TRUE && img->TTPunit == unit) continue;
+				if (img->useTTP && img->TTPunit == unit) continue;
 				// printf("i = %d, x = %d, y = %d, unit no = %d\n", i, x, y,unit);
 				unit_x = unit % img->nxUnit;
 				unit_y = unit / img->nxUnit;
@@ -452,7 +452,7 @@ void commandVV() { /* from T2 */
 	
 	TRACE("VV %d,%d:",nPage, fEnable);
 	
-	srcimg[nPage].fEnable = (fEnable == 1 ? TRUE : FALSE);
+	srcimg[nPage].fEnable = fEnable == 1;
 }
 
 void commandVR() { /* from Rance4 */
@@ -534,7 +534,7 @@ void commandVE() { /* from T2 */
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
 		/* VV による */
-		if (img->fEnable == FALSE) continue;
+		if (!img->fEnable) continue;
 		
 		for (yy = y; yy < (y+height); yy++) {
 			for (xx = x; xx < (x+width); xx++) {
@@ -544,7 +544,7 @@ void commandVE() { /* from T2 */
 					unit = *UNITMAP_UNITNUMBER(i, xx, yy);
 				}
 
-				if (img->useTTP == TRUE && img->TTPunit == unit) continue;
+				if (img->useTTP && img->TTPunit == unit) continue;
 				//printf("i = %d, xx = %d, yy = %d, unit no = %d\n", i, xx, yy,unit);
 				unit_x = unit % img->nxUnit;
 				unit_y = unit / img->nxUnit;
@@ -679,11 +679,11 @@ void commandVIC() { /* from Panyo */
 	
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
-		if (img->fEnable == FALSE) continue;
+		if (!img->fEnable) continue;
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < width; x++) {
 				unit = *UNITMAP_UNITNUMBER(i, sx + x, sy + y);
-				if (img->useTTP == TRUE && img->TTPunit == unit) continue;
+				if (img->useTTP && img->TTPunit == unit) continue;
 				//printf("i = %d, xx = %d, yy = %d, unit no = %d\n", i, xx, yy, unit);
 				unit_x = unit % img->nxUnit;
 				unit_y = unit / img->nxUnit;

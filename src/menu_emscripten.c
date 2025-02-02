@@ -48,7 +48,7 @@ boolean menu_inputstring(INPUTSTRING_PARAM *p) {
 		p->newstring = buf;
 	else
 		p->newstring = p->oldstring;
-	return ok ? TRUE : FALSE;
+	return ok;
 }
 
 boolean menu_inputstring2(INPUTSTRING_PARAM *p) {

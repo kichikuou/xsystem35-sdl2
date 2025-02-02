@@ -41,7 +41,7 @@ void commandPF() {
 	boolean cancel_enabled;
 
 	if (p1 == 2 || p1 == 3) {
-		cancel_enabled = getCaliValue() == 0 ? FALSE : TRUE;
+		cancel_enabled = getCaliValue() != 0;
 	} else {
 		cancel_enabled = FALSE;
 	}
@@ -69,7 +69,7 @@ void commandPW() {
 	boolean cancel_enabled;
 	
 	if (p1 == 2 || p1 == 3) {
-		cancel_enabled = getCaliValue() == 0 ? FALSE : TRUE;
+		cancel_enabled = getCaliValue() != 0;
 	} else {
 		cancel_enabled = FALSE;
 	}

@@ -57,7 +57,7 @@ void commandWZ() {
 
 	switch(p1) {
 	case 0:
-		ags_setExposeSwitch(sw == 0 ? FALSE : TRUE);
+		ags_setExposeSwitch(sw != 0);
 		if (sw == 1) {
 			/* う〜ん こんな処理いれなあかんのかぁ〜 (T_T) */
 			if (nact->ags.world_depth == 8) nact->ags.pal_changed = TRUE;
@@ -65,7 +65,7 @@ void commandWZ() {
 		}
 		break;
 	case 1:
-		ags_setExposeSwitch(sw == 0 ? FALSE : TRUE);
+		ags_setExposeSwitch(sw != 0);
 		break;
 	default:
 		break;

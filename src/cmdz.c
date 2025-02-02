@@ -126,11 +126,11 @@ void commandZW() {
 	int sw = getCaliValue();
 	
 	if (sw < 256) {
-		nact->messagewait_enable    = ((sw & 0xff) <= 1) ? FALSE : TRUE;
+		nact->messagewait_enable = ((sw & 0xff) > 1);
 		nact->messagewait_cancelled = FALSE;
 	} else {
-		nact->messagewait_time   = sw & 0xff;
-		nact->messagewait_cancel = (sw & 0x200) ? TRUE : FALSE;
+		nact->messagewait_time = sw & 0xff;
+		nact->messagewait_cancel = !!(sw & 0x200);
 	}
 	
 	TRACE("ZW %d:", sw);
@@ -149,7 +149,7 @@ void commandZE() {
 	/* 選択肢を選んだらメッセージ領域を初期化するかどうかを指定する */
 	int sw = getCaliValue();
 	
-	nact->sel.ClearMsgWindow = sw == 0 ? FALSE : TRUE;
+	nact->sel.ClearMsgWindow = sw != 0;
 	
 	TRACE("ZE %d:", sw);
 }
@@ -524,7 +524,7 @@ void commandZA() { /* T2 */
 		msg_setStringDecorationColor(p2); break;
 	case 2:
 	case 3:
-		nact->msg.AutoPageChange = (p2 == 0 ? FALSE : TRUE); break;
+		nact->msg.AutoPageChange = p2 != 0; break;
 	default:
 		WARNING("Unknown ZA comannd %d, %d", p1, p2);
 	}

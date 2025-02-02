@@ -340,7 +340,7 @@ int sp_set_show(int wNum, int wCount, int sShow) {
 		sp = sact.sp[i];
 		oldstate = sp->show;
 		
-		sp->show = (sShow == 1 ? TRUE : FALSE);
+		sp->show = sShow == 1;
 	}
 	return OK;
 }

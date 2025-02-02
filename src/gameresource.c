@@ -152,7 +152,7 @@ boolean initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir,
 	}
 	free(basename);
 
-	return (gr->cnt[DRIFILE_SCO] > 0) ? TRUE : FALSE;
+	return gr->cnt[DRIFILE_SCO] > 0;
 }
 
 static void trimRight(char *str) {

@@ -108,7 +108,7 @@ void commandB3() {
 	nact->msg.wininfo[num].y = Y1;
 	nact->msg.wininfo[num].width = X2;
 	nact->msg.wininfo[num].height = Y2;
-	nact->msg.wininfo[num].save = (V == 0) ? FALSE : TRUE;
+	nact->msg.wininfo[num].save = V != 0;
 	
 	TRACE("B3 %d,%d,%d,%d,%d,%d:", num, X1, Y1, X2, Y2, V);
 }

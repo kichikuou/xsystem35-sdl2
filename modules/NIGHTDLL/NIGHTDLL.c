@@ -400,7 +400,7 @@ static void CDStop(void) { /* 39 */
 static void CDMute(void) { /* 40 */
 	int p1 = getCaliValue(); // 0: mute off, 1: mute on
 	
-	nt_cd_mute(p1 == 0 ? FALSE : TRUE);
+	nt_cd_mute(p1 != 0);
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.CDMute %d:", p1);
 }
@@ -440,7 +440,7 @@ static void SoundEffectSetSyncFlag(void) { /* 44 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // 0: 終るまで待たない, 1: 待つ
 	
-	nt_snd_waitend(p1, p2 == 0 ? FALSE : TRUE);
+	nt_snd_waitend(p1, p2 != 0);
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectSetSyncFlag %d,%d:", p1, p2);
 }

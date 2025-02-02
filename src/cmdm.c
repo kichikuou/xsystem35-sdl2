@@ -265,7 +265,7 @@ void commandMG() {
 	switch(no) {
 	case 0:
 		sw = getCaliValue();
-		nact->msg.mg_getString = sw == 1 ? TRUE : FALSE;
+		nact->msg.mg_getString = sw == 1;
 		break;
 	case 1:
 		sw = getCaliValue();
@@ -298,7 +298,7 @@ void commandMG() {
 		break;
 	case 100:
 		sw = getCaliValue();
-		nact->msg.mg_dspMsg = sw == 1 ? TRUE : FALSE;
+		nact->msg.mg_dspMsg = sw == 1;
 		break;
 	default:
 		sw = getCaliValue();

@@ -321,7 +321,7 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	default:
 		break;
 	}
-	if (M == 0) msg_nextPage(N == 0 ? TRUE : FALSE);
+	if (M == 0) msg_nextPage(N == 0);
 }
 
 void msg_setMessageLocation(int x, int y) {

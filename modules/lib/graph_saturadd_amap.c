@@ -12,7 +12,7 @@ int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx
 	uint8_t *sp, *dp;
 	int x, y;
 	
-	if (FALSE == gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) {
+	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) {
 		return NG;
 	}
 	

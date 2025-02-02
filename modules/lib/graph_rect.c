@@ -10,7 +10,7 @@ int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b)
 	int i;
 	int col = 0;
 	
-	if (FALSE == gr_clip_xywh(dst, &x, &y, &w, &h)) {
+	if (!gr_clip_xywh(dst, &x, &y, &w, &h)) {
 		return NG;
 	}
 

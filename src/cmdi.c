@@ -135,7 +135,7 @@ void commandIX() {
 	/* 「次の選択肢まで進む」の状態取得 */
 	int *var = getCaliVariable();
 	
-	*var = msgskip_isSkipping() == TRUE ? 1 : 0;
+	*var = msgskip_isSkipping() ? 1 : 0;
 	TRACE("IX %p:",var);
 }
 

@@ -130,9 +130,9 @@ void commandSI() {
 	int *var = getCaliVariable();
 	
 	if (type == 0) {        /* MIDI */
-		*var = mus_midi_get_state()  == TRUE ? 1 : 0;
+		*var = mus_midi_get_state() ? 1 : 0;
 	} else if (type == 1) { /* PCM */
-		*var = mus_pcm_get_state()   == TRUE ? 1 : 0;
+		*var = mus_pcm_get_state() ? 1 : 0;
 	} else if (type == 2) { /* CD */
 		*var = muscd_is_available() ? 1 : 0;
 	}
@@ -268,8 +268,8 @@ void commandSU() {
 		*var1 = *var2 ? 1 : 0;
 		/* XXX for panyon_new */
 		if (*var2 == 0){
-			*var1 = dummy_pcm_in_play ? TRUE : FALSE;
-			dummy_pcm_in_play = dummy_pcm_in_play ? FALSE : TRUE;
+			*var1 = dummy_pcm_in_play;
+			dummy_pcm_in_play = !dummy_pcm_in_play;
 		}
 	}
 	/* 闘神都市II 異常シナリオ対策 */

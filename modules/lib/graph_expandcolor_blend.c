@@ -11,7 +11,7 @@ int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx,
 	int x, y;
 	int col;
 	
-	if (FALSE == gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) {
+	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) {
 		return NG;
 	}
 	

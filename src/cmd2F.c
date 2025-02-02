@@ -1185,7 +1185,7 @@ void commands2F6B() {
 void commands2F6C() {
 	int eFlag = getCaliValue();
 	
-	nact->is_msg_out = eFlag != 0 ? TRUE : FALSE;
+	nact->is_msg_out = eFlag != 0;
 	
 	TRACE("msgSetOutputFlag %d:", eFlag);
 }

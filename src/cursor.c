@@ -263,7 +263,7 @@ static boolean cursor_load_mono(uint8_t *d, int no) {
 	int pos = 6, p1;
 	
 	/* check header information */
-	if (check_iconheader(d) == FALSE) {
+	if (!check_iconheader(d)) {
 		WARNING("check_iconhdader fail");
 		return FALSE;
 	}
@@ -293,7 +293,7 @@ static boolean cursor_load_mono(uint8_t *d, int no) {
 	pos += p1;
 	
 	/* read pixedl data */
-	if (sdl_cursorNew(d + pos, no, &cursorImage, &cursordirentry) == FALSE) {
+	if (!sdl_cursorNew(d + pos, no, &cursorImage, &cursordirentry)) {
 		WARNING("unable to read pixel data");
 		return FALSE;
 	}
