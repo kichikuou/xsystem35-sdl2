@@ -53,7 +53,7 @@ void commandSC() {
 	int *var = getCaliVariable();
 	int t, m, s, f;
 	
-	if (muscd_getpos(&t, &m, &s, &f) == OK) {
+	if (muscd_getpos(&t, &m, &s, &f)) {
 		*var++ = t - 1;
 		*var++ = m;
 		*var++ = s;
@@ -96,7 +96,7 @@ void commandSR() {
 	
 	if (num == 0) {
 		int t, m, s, f;
-		if (muscd_getpos(&t, &m, &s, &f) == OK) {
+		if (muscd_getpos(&t, &m, &s, &f)) {
 			// System3.5 returns the music number (track_no - 1),
 			// while System3.6 and later return the track number.
 			if (!memcmp(sl_sco, "S350", 4))
@@ -323,20 +323,7 @@ void commandSW() {
 	int Srate   = getCaliValue();
 	int bit     = getCaliValue();
 	
-	if (mus_pcm_get_state()) {
-		int rate = Srate == 11 ? 11025 : Srate == 22 ? 22050 : Srate == 44 ? 44100 : 8000;
-		bool able;
-		int ret;
-		
-		ret = mus_pcm_check_ability(bit, rate, channel, &able);
-		if (ret < 0) {
-			*var = 0;
-		} else {
-			*var = (able ? 2 : 1);
-		}
-	} else {
-		*var = 0;
-	}
+	*var = mus_pcm_get_state() ? 2 : 0;
 	
 	TRACE("SW %p,%d,%d,%d:",var, channel, Srate, bit);
 }

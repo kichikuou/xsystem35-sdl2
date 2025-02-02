@@ -37,52 +37,51 @@ enum MixDevice {
 };
 
 /* init and exit */
-extern int mus_init(int audio_buffer_size);
-extern void mus_exit(void);
-extern void mus_reset(void);
+bool mus_init(int audio_buffer_size);
+void mus_exit(void);
+void mus_reset(void);
 
 /* midi related function */
-extern int mus_midi_start(int no, int loop);
-extern int mus_midi_stop(void);
-extern int mus_midi_pause(void);
-extern int mus_midi_unpause(void);
-extern int mus_midi_get_playposition(midiplaystate *state);
-extern int mus_midi_set_flag(int mode, int index, int val);
-extern int mus_midi_get_flag(int mode, int index);
-extern bool mus_midi_get_state(void);
+bool mus_midi_start(int no, int loop);
+void mus_midi_stop(void);
+void mus_midi_pause(void);
+void mus_midi_unpause(void);
+void mus_midi_get_playposition(midiplaystate *state);
+bool mus_midi_set_flag(int mode, int index, int val);
+int mus_midi_get_flag(int mode, int index);
+bool mus_midi_get_state(void);
 
 /* pcm (Scommand) related function */
-extern int mus_pcm_start(int no, int loop);
-extern int mus_pcm_mix(int noL, int noR, int loop);
-extern int mus_pcm_stop(int msec);
-extern int mus_pcm_load(int no);
-extern int mus_pcm_get_playposition(int *pos);
-extern int mus_pcm_check_ability(int bit, int rate, int ch, bool *able);
-extern bool mus_pcm_get_state(void);
+bool mus_pcm_start(int no, int loop);
+bool mus_pcm_mix(int noL, int noR, int loop);
+void mus_pcm_stop(int msec);
+bool mus_pcm_load(int no);
+bool mus_pcm_get_playposition(int *pos);
+bool mus_pcm_get_state(void);
 
 /* fader/mixer related function */
-extern int mus_mixer_fadeout_start(int device, int time, int volume, int stop);
-extern bool mus_mixer_fadeout_get_state(int device);
-extern int mus_mixer_fadeout_stop(int device);
-extern int mus_mixer_get_level(int device);
-extern bool mus_mixer_set_level(int device, int level);
+bool mus_mixer_fadeout_start(int device, int time, int volume, int stop);
+bool mus_mixer_fadeout_get_state(int device);
+void mus_mixer_fadeout_stop(int device);
+int mus_mixer_get_level(int device);
+bool mus_mixer_set_level(int device, int level);
 
 /* wav (command2F) / ShSound related function */
-extern int mus_wav_load(int ch, int num);
-extern int mus_wav_load_data(int ch, uint8_t *buf, uint32_t len);
-extern int mus_wav_unload(int ch);
-extern int mus_wav_play(int ch, int loop);
-extern int mus_wav_stop(int ch);
-extern int mus_wav_get_playposition(int ch);
-extern int mus_wav_fadeout_start(int ch, int time, int volume, int stop);
-extern int mus_wav_fadeout_stop(int ch);
-extern bool mus_wav_fadeout_get_state(int ch);
-extern int mus_wav_waitend(int ch);
-extern int mus_wav_waittime(int ch, int time);
-extern int mus_wav_wavtime(int ch);
-extern int mus_wav_load_lrsw(int ch, int num);
+bool mus_wav_load(int ch, int num);
+bool mus_wav_load_data(int ch, uint8_t *buf, uint32_t len);
+void mus_wav_unload(int ch);
+bool mus_wav_play(int ch, int loop);
+void mus_wav_stop(int ch);
+int mus_wav_get_playposition(int ch);
+bool mus_wav_fadeout_start(int ch, int time, int volume, int stop);
+void mus_wav_fadeout_stop(int ch);
+bool mus_wav_fadeout_get_state(int ch);
+void mus_wav_waitend(int ch);
+void mus_wav_waittime(int ch, int time);
+int mus_wav_wavtime(int ch);
+bool mus_wav_load_lrsw(int ch, int num);
 
 /* volume valaner */
-extern int mus_vol_set_valance(int *vols, int num);
+bool mus_vol_set_valance(int *vols, int num);
 
 #endif /* MUSIC_CLIENT_H__ */

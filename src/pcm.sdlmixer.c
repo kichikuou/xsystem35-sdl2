@@ -52,7 +52,7 @@ static struct {
 	uint32_t start_time;
 } slots[PCM_SLOTS];
 
-static int load_wai();
+static bool load_wai();
 static mmap_t *wai_map;
 
 // Volume mixer channel
@@ -316,23 +316,23 @@ void muspcm_waitend(int slot) {
 	WARNING("not implemented");
 }
 
-static int load_wai() {
+static bool load_wai() {
 	if (wai_map) {
 		unmap_file(wai_map);
 		wai_map = NULL;
 	}
 	if (nact->files.wai == NULL)
-		return NG;
+		return false;
 	wai_map = map_file(nact->files.wai);
 	if (!wai_map)
-		return NG;
+		return false;
 
 	char *adr = wai_map->addr;
 	if (*adr != 'X' || *(adr+1) != 'I' || *(adr+2) != '2') {
 		WARNING("not WAI file");
 		unmap_file(wai_map);
 		wai_map = NULL;
-		return NG;
+		return false;
 	}
-	return OK;
+	return true;
 }

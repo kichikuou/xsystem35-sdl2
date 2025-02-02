@@ -59,7 +59,7 @@ EM_JS(void, musbgm_fade, (int no, int time, int vol), {
 int musbgm_getpos(int no) {
 	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
 	if (!t || (t & 0xff) != no)
-		return NG;
+		return 0;
 	return (t >> 8) * 100 / 75;  // frame -> 10ms
 }
 

@@ -29,43 +29,41 @@
 #include "midi.h"
 #include "ald_manager.h"
 
-int musmidi_init(void) {
+bool musmidi_init(void) {
 	if (!midi_init(&prv.mididev)) {
 		prv.midi_valid = false;
-		return NG;
+		return false;
 	} else {
 		prv.midi_valid = true;
-		return OK;
+		return true;
 	}
 }
 
-int musmidi_exit(void) {
+void musmidi_exit(void) {
 	if (prv.midi_valid) {
 		prv.mididev.exit();
 	}
-	return OK;
 }
 
-int musmidi_reset(void) {
+void musmidi_reset(void) {
 	if (prv.midi_valid) {
 		prv.mididev.reset();
 		prv.midi_current_track = 0;
 	}
-	return OK;
 }
 
-int musmidi_start(int no, int loop) {
-	if (!prv.midi_valid) return NG;
+bool musmidi_start(int no, int loop) {
+	if (!prv.midi_valid) return false;
 	if (prv.midi_current_track == no)
-		return OK;
+		return true;
 
 	dridata *dfile = ald_getdata(DRIFILE_MIDI, no -1);
 	if (dfile == NULL)
-		return NG;
+		return false;
 	
 	if (!prv.mididev.start(no, loop, dfile->data, dfile->size)) {
 		ald_freedata(dfile);
-		return NG;
+		return false;
 	}
 
 	if (prv.midi_dfile)
@@ -73,11 +71,11 @@ int musmidi_start(int no, int loop) {
 	prv.midi_dfile = dfile;
 	prv.midi_current_track = no;
 
-	return OK;
+	return true;
 }
 
-int musmidi_stop(void) {
-	if (!prv.midi_valid) return NG;
+void musmidi_stop(void) {
+	if (!prv.midi_valid) return;
 
 	prv.mididev.stop();
 
@@ -86,21 +84,16 @@ int musmidi_stop(void) {
 		prv.midi_dfile = NULL;
 	}
 	prv.midi_current_track = 0;
-	return OK;
 }
 
-int musmidi_pause(void) {
-	if (!prv.midi_valid) return NG;
-
+void musmidi_pause(void) {
+	if (!prv.midi_valid) return;
 	prv.mididev.pause();
-	return OK;
 }
 
-int musmidi_unpause(void) {
-	if (!prv.midi_valid) return NG;
-
+void musmidi_unpause(void) {
+	if (!prv.midi_valid) return;
 	prv.mididev.unpause();
-	return OK;
 }
 
 midiplaystate musmidi_getpos(void) {
@@ -115,10 +108,10 @@ midiplaystate musmidi_getpos(void) {
 	return st;
 }
 
-int musmidi_setflag(int mode, int index, int val) {
-	if (!prv.midi_valid) return NG;
+bool musmidi_setflag(int mode, int index, int val) {
+	if (!prv.midi_valid) return false;
 
-	return prv.mididev.setflag(mode, index, val) ? OK : NG;
+	return prv.mididev.setflag(mode, index, val);
 }
 
 int musmidi_getflag(int mode, int index) {
@@ -127,12 +120,12 @@ int musmidi_getflag(int mode, int index) {
 	return prv.mididev.getflag(mode, index);
 }
 
-int musmidi_fadestart(int time, int volume, int stop) {
-	if (!prv.midi_valid) return NG;
+bool musmidi_fadestart(int time, int volume, int stop) {
+	if (!prv.midi_valid) return false;
 
 	if (!prv.mididev.fadestart)
-		return NG;
-	return prv.mididev.fadestart(time, volume, stop) ? OK : NG;
+		return false;
+	return prv.mididev.fadestart(time, volume, stop);
 }
 
 bool musmidi_fading(void) {

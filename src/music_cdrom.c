@@ -44,7 +44,7 @@ void muscd_set_playlist(const char *name) {
 	playlist = strdup(name);
 }
 
-int muscd_init(void) {
+bool muscd_init(void) {
 	// In the download edition of Daiakuji, SS command plays music from *BA.ald.
 	if (ald_get_maxno(DRIFILE_BGM) > 0) {
 		prv.cddev = &cdrom_bgm;
@@ -52,61 +52,58 @@ int muscd_init(void) {
 		prv.cddev = NATIVE_CD_DEVICE;
 	}
 	prv.cd_current_track = 0;
-	return prv.cddev->init(playlist) ? OK : NG;
+	return prv.cddev->init(playlist);
 }
 
-int muscd_init_bgm(DRIFILETYPE type, int base_no) {
+bool muscd_init_bgm(DRIFILETYPE type, int base_no) {
 	muscd_exit();
 	prv.cddev = &cdrom_bgm;
-	return musbgm_init(type, base_no) ? OK : NG;
+	return musbgm_init(type, base_no);
 }
 
-int muscd_exit(void) {
+void muscd_exit(void) {
 	if (prv.cddev) {
 		prv.cddev->exit();
 		prv.cddev = NULL;
 	}
-	return OK;
 }
 
-int muscd_reset(void) {
+void muscd_reset(void) {
 	if (prv.cddev) {
 		prv.cddev->reset();
 		prv.cd_current_track = 0;
 	}
-	return OK;
 }
 
-int muscd_start(int trk, int loop) {
+bool muscd_start(int trk, int loop) {
 	if (!prv.cddev)
-		return NG;
+		return false;
 	if (trk == prv.cd_current_track)
-		return OK;
+		return true;
 	prv.cddev->stop();
 
 	prv.cd_current_track = trk;
-	return prv.cddev->start(trk, loop) ? OK : NG;
+	return prv.cddev->start(trk, loop);
 }
 
-int muscd_stop(void) {
+void muscd_stop(void) {
 	if (!prv.cddev)
-		return NG;
+		return;
 	prv.cddev->stop();
 	prv.cd_current_track = 0;
-	return OK;
 }
 
-int muscd_getpos(int *t, int *m, int *s, int *f) {
+bool muscd_getpos(int *t, int *m, int *s, int *f) {
 	if (!prv.cddev)
-		return NG;
+		return false;
 	cd_time info;
 	if (!prv.cddev->getpos(&info))
-		return NG;
+		return false;
 	*t = info.t;
 	*m = info.m;
 	*s = info.s;
 	*f = info.f;
-	return OK;
+	return true;
 }
 
 int muscd_get_maxtrack(void) {

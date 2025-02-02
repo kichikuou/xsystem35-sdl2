@@ -28,13 +28,13 @@
 #include "ald_manager.h"
 
 void muscd_set_playlist(const char *);
-int muscd_init(void);
-int muscd_init_bgm(DRIFILETYPE type, int base_no);
-int muscd_exit(void);
-int muscd_reset(void);
-int muscd_start(int trk, int loop);
-int muscd_stop(void);
-int muscd_getpos(int *t, int *m, int *s, int *f);
+bool muscd_init(void);
+bool muscd_init_bgm(DRIFILETYPE type, int base_no);
+void muscd_exit(void);
+void muscd_reset(void);
+bool muscd_start(int trk, int loop);
+void muscd_stop(void);
+bool muscd_getpos(int *t, int *m, int *s, int *f);
 int muscd_get_maxtrack(void);
 bool muscd_is_available(void);
 
