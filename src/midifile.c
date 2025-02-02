@@ -47,8 +47,8 @@
 #define META_SET_TEMPO 0x51
 
 struct stream {
-	uint8_t *p;
-	uint8_t *end;
+	const uint8_t *p;
+	const uint8_t *end;
 };
 
 static inline uint8_t read8(struct stream *input) {
@@ -269,7 +269,7 @@ static bool read_header(struct midiinfo *midi, struct stream *input) {
 	return true;
 }
 
-struct midiinfo *mf_read_midifile(uint8_t *data, size_t len) {
+struct midiinfo *mf_read_midifile(const uint8_t *data, size_t len) {
 	struct stream input = { .p = data, .end = data + len };
 	struct midiinfo *midi = calloc(1, sizeof(struct midiinfo));
 

@@ -47,8 +47,8 @@ extern mididevice_t midi_sdlmixer;
 extern mididevice_t midi_portmidi;
 #endif
 
-int midi_init(mididevice_t *midi) {
-	int ret = NG;
+bool midi_init(mididevice_t *midi) {
+	bool ret = false;
 
 	switch(default_mode) {
 	case 'e':

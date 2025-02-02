@@ -30,9 +30,7 @@
 #include "ald_manager.h"
 
 int musmidi_init(void) {
-	int st = midi_init(&prv.mididev);
-
-	if (st == -1) {
+	if (!midi_init(&prv.mididev)) {
 		prv.midi_valid = false;
 		return NG;
 	} else {
@@ -65,7 +63,10 @@ int musmidi_start(int no, int loop) {
 	if (dfile == NULL)
 		return NG;
 	
-	prv.mididev.start(no, loop, dfile->data, dfile->size);
+	if (!prv.mididev.start(no, loop, dfile->data, dfile->size)) {
+		ald_freedata(dfile);
+		return NG;
+	}
 
 	if (prv.midi_dfile)
 		ald_freedata(prv.midi_dfile);
@@ -117,8 +118,7 @@ midiplaystate musmidi_getpos(void) {
 int musmidi_setflag(int mode, int index, int val) {
 	if (!prv.midi_valid) return NG;
 
-	prv.mididev.setflag(mode, index, val);
-	return OK;
+	return prv.mididev.setflag(mode, index, val) ? OK : NG;
 }
 
 int musmidi_getflag(int mode, int index) {
@@ -132,7 +132,7 @@ int musmidi_fadestart(int time, int volume, int stop) {
 
 	if (!prv.mididev.fadestart)
 		return NG;
-	return prv.mididev.fadestart(time, volume, stop);
+	return prv.mididev.fadestart(time, volume, stop) ? OK : NG;
 }
 
 bool musmidi_fading(void) {

@@ -23,58 +23,25 @@
 #include "portab.h"
 #include "midi.h"
 
-static int midi_initialize(int subdev);
-static int midi_exit(void);
-static int midi_reset(void);
-static int midi_start(int no, int loop, char *data, int datalen);
-static int midi_stop();
-static int midi_pause(void);
-static int midi_unpause(void);
-static int midi_get_playing_info(midiplaystate *st);
-static int midi_getflag(int mode, int index);
-static int midi_setflag(int mode, int index, int val);
-static int midi_setvol(int vol);
-static int midi_getvol();
-static int midi_fadestart(int time, int volume, int stop);
-static bool midi_fading();
+static void midi_stop(void);
 
-#define midi midi_android
-mididevice_t midi = {
-	midi_initialize,
-	midi_exit,
-	midi_reset,
-	midi_start,
-	midi_stop,
-	midi_pause,
-	midi_unpause,
-	midi_get_playing_info,
-	midi_getflag,
-	midi_setflag,
-	midi_setvol,
-	midi_getvol,
-	midi_fadestart,
-	midi_fading
-};
-
-static int midi_initialize(int subdev) {
-	return OK;
+static bool midi_initialize(int subdev) {
+	return true;
 }
 
-static int midi_exit(void) {
+static void midi_exit(void) {
 	midi_stop();
-	return OK;
 }
 
-static int midi_reset(void) {
+static void midi_reset(void) {
 	midi_stop();
-	return OK;
 }
 
-static int midi_start(int no, int loop, char *data, int datalen) {
+static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
-		return NG;
+		return false;
 	}
 
 	char path[PATH_MAX];
@@ -83,7 +50,7 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	if (!fp) {
 		WARNING("Failed to create temporary file");
 		(*env)->PopLocalFrame(env, NULL);
-		return NG;
+		return false;
 	}
 	fwrite(data, datalen, 1, fp);
 	fclose(fp);
@@ -92,7 +59,7 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	if (!path_str) {
 		WARNING("Failed to allocate a string");
 		(*env)->PopLocalFrame(env, NULL);
-		return NG;
+		return false;
 	}
 
 	jobject context = SDL_AndroidGetActivity();
@@ -101,40 +68,38 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	(*env)->CallVoidMethod(env, context, mid, path_str, loop == 0);
 	(*env)->PopLocalFrame(env, NULL);
 
-	return OK;
+	return true;
 }
 
-static int midi_stop() {
+static void midi_stop(void) {
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
-		return NG;
+		return;
 	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"midiStop", "()V");
 	(*env)->CallVoidMethod(env, context, mid);
 	(*env)->PopLocalFrame(env, NULL);
-
-	return OK;
 }
 
-static int midi_pause(void) {
-	return NG; // FIXME
+static void midi_pause(void) {
+	// FIXME
 }
 
-static int midi_unpause(void) {
-	return NG; // FIXME
+static void midi_unpause(void) {
+	// FIXME
 }
 
-static int midi_get_playing_info(midiplaystate *st) {
+static bool midi_get_playing_info(midiplaystate *st) {
 	st->in_play = false;
 	st->loc_ms  = 0;
 
 	JNIEnv *env = SDL_AndroidGetJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
-		return NG;
+		return false;
 	}
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
@@ -146,29 +111,36 @@ static int midi_get_playing_info(midiplaystate *st) {
 		st->in_play = true;
 		st->loc_ms = pos;
 	}
-	return OK;
+	return true;
 }
 
 static int midi_getflag(int mode, int index) {
 	return 0;
 }
 
-static int midi_setflag(int mode, int index, int val) {
-	return NG;
+static bool midi_setflag(int mode, int index, int val) {
+	return false;
 }
 
-static int midi_setvol(int vol) {
-	return NG; // FIXME
-}
-
-static int midi_getvol() {
-	return 100; // FIXME
-}
-
-static int midi_fadestart(int time, int volume, int stop) {
-	return NG; // FIXME
-}
-
-static bool midi_fading() {
+static bool midi_fadestart(int time, int volume, int stop) {
 	return false; // FIXME
 }
+
+static bool midi_fading(void) {
+	return false; // FIXME
+}
+
+mididevice_t midi_android = {
+	.init = midi_initialize,
+	.exit = midi_exit,
+	.reset = midi_reset,
+	.start = midi_start,
+	.stop = midi_stop,
+	.pause = midi_pause,
+	.unpause = midi_unpause,
+	.getpos = midi_get_playing_info,
+	.getflag = midi_getflag,
+	.setflag = midi_setflag,
+	.fadestart = midi_fadestart,
+	.fading = midi_fading,
+};

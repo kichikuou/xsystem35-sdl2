@@ -31,146 +31,116 @@
 #define MIX_INIT_MID MIX_INIT_FLUIDSYNTH
 #endif
 
-static int midi_initialize(int subdev);
-static int midi_exit(void);
-static int midi_reset(void);
-static int midi_start(int no, int loop, char *data, int datalen);
-static int midi_stop();
-static int midi_pause(void);
-static int midi_unpause(void);
-static int midi_get_playing_info(midiplaystate *st);
-static int midi_getflag(int mode, int index);
-static int midi_setflag(int mode, int index, int val);
-static int midi_setvol(int vol);
-static int midi_getvol();
-static int midi_fadestart(int time, int volume, int stop);
-static bool midi_fading();
-
-#define midi midi_sdlmixer
-mididevice_t midi = {
-	midi_initialize,
-	midi_exit,
-	midi_reset,
-	midi_start,
-	midi_stop,
-	midi_pause,
-	midi_unpause,
-	midi_get_playing_info,
-	midi_getflag,
-	midi_setflag,
-	midi_setvol,
-	midi_getvol,
-	midi_fadestart,
-	midi_fading
-};
+static void midi_stop(void);
 
 static Mix_Music *mix_music;
 static int start_time;
 static uint32_t fade_tick;
 
-static int midi_initialize(int subdev) {
+static bool midi_initialize(int subdev) {
 	if (Mix_Init(MIX_INIT_MID) != MIX_INIT_MID)
-		return NG;
-	return OK;
+		return false;
+	return true;
 }
 
-static int midi_exit(void) {
+static void midi_exit(void) {
 	Mix_Quit();
-	return OK;
 }
 
-static int midi_reset(void) {
+static void midi_reset(void) {
 	midi_stop();
-	return OK;
 }
 
-static int midi_start(int no, int loop, char *data, int datalen) {
+static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 	midi_stop();
 
 	SDL_RWops *rwops = SDL_RWFromConstMem(data, datalen);
 	mix_music = Mix_LoadMUSType_RW(rwops, MUS_MID, SDL_TRUE /* freesrc */);
 	if (!mix_music) {
 		WARNING("Cannot load MIDI: %s", SDL_GetError());
-		return NG;
+		return false;
 	}
 
 	if (Mix_PlayMusic(mix_music, loop ? loop : -1) != 0) {
 		WARNING("Cannot play MIDI: %s", SDL_GetError());
 		Mix_FreeMusic(mix_music);
 		mix_music = NULL;
-		return NG;
+		return false;
 	}
 
 	start_time = SDL_GetTicks();
-	return OK;
+	return true;
 }
 
-static int midi_stop() {
+static void midi_stop() {
 	if (!mix_music)
-		return OK;
+		return;
 	Mix_FreeMusic(mix_music);
 	mix_music = NULL;
-	return OK;
 }
 
-static int midi_pause(void) {
+static void midi_pause(void) {
 	// FIXME: adjust start_time
 	Mix_PauseMusic();
-	return OK;
 }
 
-static int midi_unpause(void) {
+static void midi_unpause(void) {
 	// FIXME: adjust start_time
 	Mix_ResumeMusic();
-	return OK;
 }
 
-static int midi_get_playing_info(midiplaystate *st) {
+static bool midi_get_playing_info(midiplaystate *st) {
 	if (!mix_music || !Mix_PlayingMusic()) {
 		st->in_play = false;
 		st->loc_ms  = 0;
-		return OK;
+		return true;
 	}
 
 	st->in_play = true;
 	st->loc_ms = SDL_GetTicks() - start_time;
-	return OK;
+	return true;
 }
 
 static int midi_getflag(int mode, int index) {
 	return 0;
 }
 
-static int midi_setflag(int mode, int index, int val) {
-	return NG;
+static bool midi_setflag(int mode, int index, int val) {
+	return false;
 }
 
-static int midi_setvol(int vol) {
-	Mix_VolumeMusic(vol * MIX_MAX_VOLUME / 100);
-	return OK;
-}
-
-static int midi_getvol() {
-	return Mix_VolumeMusic(-1) * 100 / MIX_MAX_VOLUME;
-}
-
-static int midi_fadestart(int time, int volume, int stop) {
+static bool midi_fadestart(int time, int volume, int stop) {
 	if (time == 0) {
-		midi_setvol(volume);
+		Mix_VolumeMusic(volume * MIX_MAX_VOLUME / 100);
 		if (stop)
 			midi_stop();
-		return OK;
+		return true;
 	}
 
 	if (volume == 0) {
 		Mix_FadeOutMusic(time);  // FIXME: this always stops the music
 		fade_tick = SDL_GetTicks() + time;
-		return OK;
+		return true;
 	}
 	WARNING("(time=%d, volume=%d, stop=%d) unsupported", time, volume, stop);
-	return NG;
+	return false;
 }
 
-static bool midi_fading() {
+static bool midi_fading(void) {
 	return SDL_GetTicks() < fade_tick;
 }
+
+mididevice_t midi_sdlmixer = {
+	.init = midi_initialize,
+	.exit = midi_exit,
+	.reset = midi_reset,
+	.start = midi_start,
+	.stop = midi_stop,
+	.pause = midi_pause,
+	.unpause = midi_unpause,
+	.getpos = midi_get_playing_info,
+	.getflag = midi_getflag,
+	.setflag = midi_setflag,
+	.fadestart = midi_fadestart,
+	.fading = midi_fading,
+};

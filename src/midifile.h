@@ -60,7 +60,7 @@ struct midiinfo {
 	int sys35_label[128]; /* system35 jump info */
 };
 
-extern struct midiinfo *mf_read_midifile(uint8_t *stream, size_t len);
+extern struct midiinfo *mf_read_midifile(const uint8_t *stream, size_t len);
 extern void mf_remove_midifile(struct midiinfo *m);
 
 #endif /* __MIDIFILE_H__ */

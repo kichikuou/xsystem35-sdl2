@@ -42,33 +42,7 @@ static struct {
 	char midi_flag[128];
 } flags;
 
-static int midi_initialize(int subdev);
-static int midi_exit(void);
-static int midi_reset(void);
-static int midi_start(int no, int loop, char *data, int datalen);
-static int midi_stop(void);
-static int midi_pause(void);
-static int midi_unpause(void);
-static int midi_getpos(midiplaystate *st);
-static int midi_getflag(int mode, int index);
-static int midi_setflag(int mode, int index, int val);
-
-mididevice_t midi_portmidi = {
-	midi_initialize,
-	midi_exit,
-	midi_reset,
-	midi_start,
-	midi_stop,
-	midi_pause,
-	midi_unpause,
-	midi_getpos,
-	midi_getflag,
-	midi_setflag,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+static void midi_stop(void);
 
 enum midi_command {
 	CMD_PLAY,
@@ -233,7 +207,7 @@ static void midi_playloop(PortMidiStream *stream, struct midiinfo *midi) {
 	}
 }
 
-static int midi_thread(void*) {
+static int midi_thread(void* unused) {
 	PortMidiStream *stream;
 	PmError err = Pm_OpenOutput(&stream, device_id, NULL, 0, midi_time_proc, NULL, MIDI_LATENCY);
 	if (err != pmNoError) {
@@ -272,11 +246,11 @@ static int midi_thread(void*) {
 	}
 }
 
-static int midi_initialize(int subdev) {
+static bool midi_initialize(int subdev) {
 	PmError err = Pm_Initialize();
 	if (err != pmNoError) {
 		WARNING("%s", Pm_GetErrorText(err));
-		return NG;
+		return false;
 	}
 
 	int ndevices = Pm_CountDevices();
@@ -287,14 +261,14 @@ static int midi_initialize(int subdev) {
 	}
 	if (subdev < 0 || subdev >= ndevices) {
 		WARNING("invalid midi device number");
-		return NG;
+		return false;
 	}
 
 	device_id = subdev;
-	return OK;
+	return true;
 }
 
-static int midi_exit(void) {
+static void midi_exit(void) {
 	if (queue) {
 		ENQUEUE(CMD_STOP);
 		ENQUEUE(CMD_QUIT);
@@ -304,16 +278,14 @@ static int midi_exit(void) {
 		queue = NULL;
 	}
 	Pm_Terminate();
-	return OK;
 }
 
-static int midi_reset(void) {
+static void midi_reset(void) {
 	midi_stop();
-	return OK;
 }
 
 /* no = 0~ */
-static int midi_start(int no, int loop, char *data, int datalen) {
+static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 	static int seq = 0;
 
 	if (queue) {
@@ -326,47 +298,44 @@ static int midi_start(int no, int loop, char *data, int datalen) {
 	struct midiinfo *midi = mf_read_midifile(data, datalen);
 	if (!midi) {
 		WARNING("error reading midi file");
-		return NG;
+		return false;
 	}
 	SDL_AtomicSet(&atomic_seq, ++seq);
 	ENQUEUE(CMD_PLAY, seq, midi);
 
 	start_time = SDL_GetTicks();
 
-	return OK;
+	return true;
 }
 
-static int midi_stop(void) {
+static void midi_stop(void) {
 	if (queue) {
 		SDL_AtomicSet(&atomic_seq, 0);
 		ENQUEUE(CMD_STOP);
 	}
-	return OK;
 }
 
-static int midi_pause(void) {
+static void midi_pause(void) {
 	if (queue)
 		ENQUEUE(CMD_PAUSE);
-	return OK;
 }
 
-static int midi_unpause(void) {
+static void midi_unpause(void) {
 	if (queue)
 		ENQUEUE(CMD_UNPAUSE);
-	return OK;
 }
 
-static int midi_getpos(midiplaystate *st) {
+static bool midi_get_playing_info(midiplaystate *st) {
 	if (SDL_AtomicGet(&atomic_seq) == 0) {
 		st->in_play = false;
 		st->loc_ms  = 0;
-		return OK;
+		return true;
 	}
 
 	st->in_play = true;
 	st->loc_ms = SDL_GetTicks() - start_time;
 
-	return OK;
+	return true;
 }
 
 static int midi_getflag(int mode, int index) {
@@ -379,7 +348,7 @@ static int midi_getflag(int mode, int index) {
 	}
 }
 
-static int midi_setflag(int mode, int index, int val) {
+static bool midi_setflag(int mode, int index, int val) {
 	if (mode == 0) {
 		/* flag */
 		flags.midi_flag[index] = val;
@@ -387,5 +356,20 @@ static int midi_setflag(int mode, int index, int val) {
 		/* variable */
 		flags.midi_variable[index] = val;
 	}
-	return OK;
+	return true;
 }
+
+mididevice_t midi_portmidi = {
+	.init = midi_initialize,
+	.exit = midi_exit,
+	.reset = midi_reset,
+	.start = midi_start,
+	.stop = midi_stop,
+	.pause = midi_pause,
+	.unpause = midi_unpause,
+	.getpos = midi_get_playing_info,
+	.getflag = midi_getflag,
+	.setflag = midi_setflag,
+	.fadestart = NULL,
+	.fading = NULL,
+};

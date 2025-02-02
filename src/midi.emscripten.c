@@ -24,90 +24,75 @@
 #include "portab.h"
 #include "midi.h"
 
-static int midi_initialize(int subdev) {
-	return OK;
+static bool midi_initialize(int subdev) {
+	return true;
 }
 
-EM_JS(int, midi_stop, (void), {
+EM_JS(void, midi_stop, (void), {
 	xsystem35.midiPlayer.stop();
-	return xsystem35.Status.OK;
 });
 
-static int midi_exit(void) {
+static void midi_exit(void) {
 	midi_stop();
-	return OK;
 }
 
-static int midi_reset(void) {
+static void midi_reset(void) {
 	midi_stop();
-	return OK;
 }
 
-static int midi_start(int no, int loop, char *data, int datalen) {
+static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 	EM_ASM_ARGS({ xsystem35.midiPlayer.play($0, $1, $2); }, loop, data, datalen);
-	return OK;
+	return true;
 }
 
-EM_JS(int, midi_pause, (void), {
+EM_JS(void, midi_pause, (void), {
 	xsystem35.midiPlayer.pause();
-	return xsystem35.Status.OK;
 });
 
-EM_JS(int, midi_unpause, (void), {
+EM_JS(void, midi_unpause, (void), {
 	xsystem35.midiPlayer.resume();
-	return xsystem35.Status.OK;
 });
 
-static int midi_get_playing_info(midiplaystate *st) {
+static bool midi_get_playing_info(midiplaystate *st) {
 	int pos = EM_ASM_INT_V( return xsystem35.midiPlayer.getPosition(); );
 	if (pos >= 0) {
 		st->in_play = true;
 		st->loc_ms = pos;
-		return OK;
+		return true;
 	}
 	st->in_play = false;
 	st->loc_ms  = 0;
-	return OK;
+	return true;
 }
 
 static int midi_getflag(int mode, int index) {
 	return 0;
 }
 
-static int midi_setflag(int mode, int index, int val) {
-	return NG;
+static bool midi_setflag(int mode, int index, int val) {
+	return false;
 }
 
-EM_JS(int, midi_setvol, (int vol), {
-	xsystem35.midiPlayer.setVolume(vol);
-	return xsystem35.Status.OK;
+EM_JS(bool, midi_fadestart, (int time, int volume, int stop), {
+	xsystem35.midiPlayer.fadeStart(time, volume, stop);
+	return 1;
 });
 
-EM_JS(int, midi_getvol,(), {
-	return xsystem35.midiPlayer.getVolume();
-});
-
-EM_JS(int, midi_fadestart, (int time, int volume, int stop), {
-	return xsystem35.midiPlayer.fadeStart(time, volume, stop);
-});
-
-EM_JS(bool, midi_fading, (), {
+EM_JS(bool, midi_fading, (void), {
 	return xsystem35.midiPlayer.isFading();
 });
 
 mididevice_t midi_emscripten = {
-	midi_initialize,
-	midi_exit,
-	midi_reset,
-	midi_start,
-	midi_stop,
-	midi_pause,
-	midi_unpause,
-	midi_get_playing_info,
-	midi_getflag,
-	midi_setflag,
-	midi_setvol,
-	midi_getvol,
-	midi_fadestart,
-	midi_fading
+	.init = midi_initialize,
+	.exit = midi_exit,
+	.reset = midi_reset,
+	.start = midi_start,
+	.stop = midi_stop,
+	.pause = midi_pause,
+	.unpause = midi_unpause,
+	.getpos = midi_get_playing_info,
+	.getflag = midi_getflag,
+	.setflag = midi_setflag,
+	.fadestart = midi_fadestart,
+	.fading = midi_fading,
 };
