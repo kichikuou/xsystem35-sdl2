@@ -62,7 +62,7 @@ typedef struct {
 	char **msg;           /* MSGI に関する情報 */
 } S39AIN;
 
-int s39ain_init(const char *path, S39AIN *ain);
-int s39ain_reset(S39AIN *ain);
+bool s39ain_init(const char *path, S39AIN *ain);
+void s39ain_reset(S39AIN *ain);
 
 #endif /* __S39AIN_H__ */

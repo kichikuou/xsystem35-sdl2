@@ -48,15 +48,15 @@ static GtkWidget *vval_win;
 #include "menu_gui_volval.c"
 
 // 初期化
-int s39ini_init(void) {
+bool s39ini_init(void) {
 	FILE *fp;
 	char s[256], s1[256];
 	int i, vol[MAXVOLCH] = {0};
 	char fn[256];
 	
-	if (nact->files.init == NULL) return NG;
+	if (nact->files.init == NULL) return false;
 	
-	if (NULL == (fp = fopen(nact->files.init, "r"))) return NG;
+	if (NULL == (fp = fopen(nact->files.init, "r"))) return false;
 	
 	while (fgets(s, 255, fp) != NULL) {
 		s1[0] = '\0';
@@ -69,7 +69,7 @@ int s39ini_init(void) {
 		//WARNING("VolumeValancer[%d] = %s", i, vval[i].label);
 	}
 	
-	if (vval_max <= 0) return NG;
+	if (vval_max <= 0) return false;
 	
 	// Volume.sav があればそれを読み込む
 	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
@@ -93,64 +93,57 @@ int s39ini_init(void) {
 		vval_win = vval_win_open(vval, vval_max);
 	}
 	
-	return OK;
+	return true;
 }
 
 // PopupMenuから呼ばれる
-int s39ini_winopen() {
+void s39ini_winopen(void) {
 	if (vval_win) {
 		gtk_widget_show(vval_win);
 		nact->popupmenu_opened = true;
 	}
-	return OK;
 }
 
 // ボリューム設定Windowが閉じられたときに呼ばれる
-int s39ini_winclose() {
+void s39ini_winclose(void) {
 	if (vval_win) {
 		gtk_widget_hide(vval_win);
 		nact->popupmenu_opened = false;
 	}
-	return OK;
 }
 
 // ボリューム設定でスケールを動かすたびに呼ばれる
-int s39ini_setvol() {
+void s39ini_setvol(void) {
 	int vol[MAXVOLCH] = {0};
 	int i;
 	
-	if (vval_win == NULL) return OK;
+	if (vval_win == NULL) return;
 	
 	for (i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].mute ? 0 : vval[i].vol;
 	}
 	
 	mus_vol_set_valance(vol, MAXVOLCH);
-	return OK;
 }
 
 // Volume Valance をセーブ
-int s39ini_remove() {
+void s39ini_remove(void) {
 	int vol[MAXVOLCH] = {0};
-	FILE *fp;
 	char fn[256];
-	int i;
 	
-	if (vval_win == NULL) return OK;
+	if (vval_win == NULL) return;
 	
-	for (i = 0; i < MAXVOLCH; i++) {
+	for (int i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].vol;
 	}
 	
 	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
-	if (NULL == (fp = fopen(fn, "wb"))) {
-		WARNING("Fail to save Volume.save");
-		return NG;
+	FILE *fp = fopen(fn, "wb");
+	if (!fp) {
+		WARNING("Failed to save Volume.sav");
+		return;
 	}
 	
 	fwrite(vol, sizeof(int), MAXVOLCH, fp);
 	fclose(fp);
-	
-	return OK;
-	
 }

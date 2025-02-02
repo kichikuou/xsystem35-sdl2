@@ -328,7 +328,7 @@ static int saveGameData(int no, char *buf, int size) {
 	return status;
 }
 
-int save_setFormat(const char *format_name) {
+bool save_setFormat(const char *format_name) {
 	if (!strcmp(format_name, "xsystem35"))
 		save_format = SAVEFMT_XSYS35;
 	else if (!strcmp(format_name, "system36"))
@@ -339,9 +339,9 @@ int save_setFormat(const char *format_name) {
 		save_format = SAVEFMT_SYS38;
 	else {
 		WARNING("unknown save format %s", format_name);
-		return NG;
+		return false;
 	}
-	return OK;
+	return true;
 }
 
 /* savefile を参照 */
