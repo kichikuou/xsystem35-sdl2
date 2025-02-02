@@ -78,30 +78,28 @@ static Mix_Music *bgm_load(int no) {
 	return mix_music;
 }
 
-int musbgm_init(DRIFILETYPE type, int base) {
+bool musbgm_init(DRIFILETYPE type, int base) {
 	dri_type = type;
 	base_no = base;
 	if (type == DRIFILE_BGM)
 		return bgi_read(nact->files.bgi);
-	return OK;
+	return true;
 }
 
-int musbgm_exit(void) {
+void musbgm_exit(void) {
 	free_music();
-	return OK;
 }
 
-int musbgm_reset(void) {
+void musbgm_reset(void) {
 	free_music();
-	return OK;
 }
 
-int musbgm_play(int no, int time, int vol, int loop_count) {
+bool musbgm_play(int no, int time, int vol, int loop_count) {
 	if (current_no)
 		musbgm_stop(current_no, 0);
 
 	if (!bgm_load(no))
-		return NG;
+		return false;
 
 	// We don't use the loop information in the BGI file, but SDL_mixer
 	// understands loop info in the WAVE's "smpl" chunk.
@@ -109,26 +107,24 @@ int musbgm_play(int no, int time, int vol, int loop_count) {
 	Mix_VolumeMusic(vol * MIX_MAX_VOLUME / 100);
 	if (Mix_FadeInMusic(mix_music, loop_count == 0 ? -1 : loop_count, time * 10) != 0) {
 		free_music();
-		return NG;
+		return false;
 	}
 	start_time = SDL_GetTicks();
 
-	return OK;
+	return true;
 }
 
-int musbgm_stop(int no, int time) {
+void musbgm_stop(int no, int time) {
 	if (no == current_no)
 		Mix_FadeOutMusic(time * 10);
-	return OK;
 }
 
-int musbgm_fade(int no, int time, int vol) {
+void musbgm_fade(int no, int time, int vol) {
 	if (no != current_no)
-		return NG;
+		return;
 
 	// SDL_mixer doesn't provide arbitrary fading, so just set the volume immediately.
 	Mix_VolumeMusic(vol * MIX_MAX_VOLUME / 100);
-	return OK;
 }
 
 int musbgm_getpos(int no) {
@@ -147,16 +143,15 @@ int musbgm_getlen(int no) {
 	return bgi->len / 441;
 }
 
-int musbgm_isplaying(int no) {
+bool musbgm_isplaying(int no) {
 	return no == current_no && Mix_PlayingMusic();
 }
 
-int musbgm_stopall(int time) {
-	return musbgm_stop(current_no, time);
+void musbgm_stopall(int time) {
+	musbgm_stop(current_no, time);
 }
 
-int musbgm_wait(int no, int timeout) {
+void musbgm_wait(int no, int timeout) {
 	while (timeout-- > 0 && musbgm_isplaying(no))
 		SDL_Delay(10);
-	return OK;
 }

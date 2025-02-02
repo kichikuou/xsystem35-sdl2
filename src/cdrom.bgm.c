@@ -42,7 +42,7 @@ static void cdrom_bgm_reset(void) {
 }
 
 static bool cdrom_bgm_start(int trk, int loop) {
-	if (musbgm_play(trk, 0, 100, loop) != OK)
+	if (!musbgm_play(trk, 0, 100, loop))
 		return false;
 	current_track = trk;
 	return true;

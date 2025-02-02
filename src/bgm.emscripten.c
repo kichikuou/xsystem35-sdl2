@@ -26,38 +26,34 @@
 #include "bgi.h"
 #include "sdl_core.h"
 
-int musbgm_init(DRIFILETYPE type, int base_no) {
+bool musbgm_init(DRIFILETYPE type, int base_no) {
 	if (type == DRIFILE_BGM)
 		return bgi_read(nact->files.bgi);
 	else
 		EM_ASM({ xsystem35.cdPlayer.setBGMLoader($0, $1); }, type, base_no);
-	return OK;
+	return true;
 }
 
-int musbgm_exit(void) {
+void musbgm_exit(void) {
 	musbgm_stopall(0);
-	return OK;
 }
 
-int musbgm_reset(void) {
+void musbgm_reset(void) {
 	musbgm_stopall(0);
-	return OK;
 }
 
-EM_JS(int, musbgm_play, (int no, int time, int vol, int loop_count), {
+EM_JS(bool, musbgm_play, (int no, int time, int vol, int loop_count), {
 	xsystem35.cdPlayer.fade(time * 10, vol / 100);
 	xsystem35.cdPlayer.play(no, loop_count == 0);
-	return xsystem35.Status.OK;
+	return 1;
 });
 
-EM_JS(int, musbgm_stop, (int no, int time), {
+EM_JS(void, musbgm_stop, (int no, int time), {
 	xsystem35.cdPlayer.stop(time * 10);
-	return xsystem35.Status.OK;
 });
 
-EM_JS(int, musbgm_fade, (int no, int time, int vol), {
+EM_JS(void, musbgm_fade, (int no, int time, int vol), {
 	xsystem35.cdPlayer.fade(time * 10, vol / 100);
-	return xsystem35.Status.OK;
 });
 
 int musbgm_getpos(int no) {
@@ -75,20 +71,19 @@ int musbgm_getlen(int no) {
 	return bgi->len / 441;
 }
 
-int musbgm_isplaying(int no) {
+bool musbgm_isplaying(int no) {
 	int t = EM_ASM_INT_V( return xsystem35.cdPlayer.getPosition(); );
 	return ((t & 0xff) == no);
 }
 
-int musbgm_stopall(int time) {
-	return musbgm_stop(0, time);
+void musbgm_stopall(int time) {
+	musbgm_stop(0, time);
 }
 
-int musbgm_wait(int no, int timeout) {
+void musbgm_wait(int no, int timeout) {
 	for (int i = 0; i * 16 < timeout * 10; i++) {
 		if (!musbgm_isplaying(no))
 			break;
 		sdl_wait_vsync();
 	}
-	return OK;
 }

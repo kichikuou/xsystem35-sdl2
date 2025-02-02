@@ -19,18 +19,19 @@
 #ifndef __BGM_H__
 #define __BGM_H__
 
+#include <stdbool.h>
 #include "ald_manager.h"
 
-int musbgm_init(DRIFILETYPE type, int base_no);
-int musbgm_exit(void);
-int musbgm_reset(void);
-int musbgm_play(int no, int time, int vol, int loop_count);
-int musbgm_stop(int no, int time);
-int musbgm_fade(int no, int time, int vol);
+bool musbgm_init(DRIFILETYPE type, int base_no);
+void musbgm_exit(void);
+void musbgm_reset(void);
+bool musbgm_play(int no, int time, int vol, int loop_count);
+void musbgm_stop(int no, int time);
+void musbgm_fade(int no, int time, int vol);
 int musbgm_getpos(int no);
 int musbgm_getlen(int no);
-int musbgm_isplaying(int no);
-int musbgm_stopall(int time);
-int musbgm_wait(int no, int timeout);
+bool musbgm_isplaying(int no);
+void musbgm_stopall(int time);
+void musbgm_wait(int no, int timeout);
 
 #endif /* __BGM_H__ */

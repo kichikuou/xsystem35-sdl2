@@ -23,6 +23,8 @@
 #ifndef _BGI_H__
 #define _BGI_H__
 
+#include <stdbool.h>
+
 typedef struct {
 	int no;      // シナリオ上での曲番号
 	int loopno;  // ループ回数 (０の場合は無限)
@@ -30,7 +32,7 @@ typedef struct {
 	int len;     // 曲長さ (サンプル数)
 } bgi_t;
 
-extern int bgi_read(const char *path);
+extern bool bgi_read(const char *path);
 extern bgi_t *bgi_find(int no);
 
 #endif /* _BGI_H__ */

@@ -48,14 +48,14 @@ static char *bgi_gets(char *buf, int n, FILE *fp) {
 	return buf;
 }
 
-int bgi_read(const char *path) {
+bool bgi_read(const char *path) {
 	if (!path)
-		return NG;
+		return false;
 
 	FILE *fp = fopen(path, "rb");
 	if (!fp) {
 		WARNING("Could not open %s", path);
-		return NG;
+		return false;
 	}
 
 	char buf[100];
@@ -72,7 +72,7 @@ int bgi_read(const char *path) {
 		}
 		bgi_nfile++;
 	}
-	return OK;
+	return true;
 }
 
 bgi_t *bgi_find(int no) {
