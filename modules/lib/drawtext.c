@@ -45,7 +45,7 @@ static int fsize;  // フォントの大きさ
 int dt_setfont(int type, int size) {
 #ifdef __EMSCRIPTEN__
 	if (type == FONT_MINCHO) {
-		if (load_mincho_font() != OK)
+		if (!load_mincho_font())
 			type = FONT_GOTHIC;
 	}
 #endif

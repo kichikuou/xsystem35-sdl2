@@ -43,7 +43,7 @@ extern struct SDL_Surface *font_get_glyph(const char *str_utf8);
 extern SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t col);
 
 #ifdef __EMSCRIPTEN__
-extern int load_mincho_font(void);
+extern bool load_mincho_font(void);
 #endif
 
 #endif  /* __FONT_H__ */

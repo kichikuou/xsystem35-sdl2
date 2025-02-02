@@ -468,7 +468,7 @@ void commandZZ13() {
 	int num = getCaliValue();
 #ifdef __EMSCRIPTEN__
 	if (num == FONT_MINCHO) {
-		if (load_mincho_font() != OK)
+		if (!load_mincho_font())
 			num = FONT_GOTHIC;
 	}
 #endif

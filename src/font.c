@@ -235,7 +235,7 @@ bool font_get_antialias(void) {
 }
 
 #ifdef __EMSCRIPTEN__
-EM_ASYNC_JS(int, load_mincho_font, (void), {
-	await xsystem35.load_mincho_font();
+EM_ASYNC_JS(bool, load_mincho_font, (void), {
+	return await xsystem35.load_mincho_font();
 });
 #endif
