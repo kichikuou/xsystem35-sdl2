@@ -25,13 +25,12 @@
 #include "portab.h"
 
 // グラフ用チャート作成
-int schart_pos(int *pos, int pos1, int pos2, int val1, int val2, int val) {
+void schart_pos(int *pos, int pos1, int pos2, int val1, int val2, int val) {
 	if (val1 == val2) {
 		*pos = 0;
 	} else {
 		*pos = (((pos2 - pos1) * (val - val1)) / (val2 - val1)) + pos1;
 	}
-	return OK;
 }
 
 /*

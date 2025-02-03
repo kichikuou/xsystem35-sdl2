@@ -31,23 +31,19 @@
   適当でいいとおもう
 */
 
-int scryp_encrypt_word(int *array, int num, int key) {
+void scryp_encrypt_word(int *array, int num, int key) {
 	WARNING("NOT IMPLEMENTED");
-	return OK;
 }
 
-int scryp_decrypt_word(int *array, int num, int key) {
+void scryp_decrypt_word(int *array, int num, int key) {
 	WARNING("NOT IMPLEMENTED");
-	return OK;
 }
 
-int scryp_encrypt_str(int strno, int key) {
+void scryp_encrypt_str(int strno, int key) {
 	WARNING("NOT IMPLEMENTED");
-	return OK;
 }
 
-int scryp_decrypt_str(int strno, int key) {
+void scryp_decrypt_str(int strno, int key) {
 	WARNING("str = '%s'", svar_get(strno));
 	WARNING("NOT IMPLEMENTED");
-	return OK;
 }

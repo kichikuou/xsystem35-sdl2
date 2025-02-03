@@ -8,22 +8,22 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
+void gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
 	uint8_t *sp, *dp;
 	int x, y;
 	
 	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) {
-		return NG;
+		return;
 	}
 	
 	if (src->alpha == NULL) {
 		WARNING("src alpha NULL");
-		return NG;
+		return;
 	}
 	
 	if (dst->alpha == NULL) {
 		WARNING("dst alpha NULL");
-		return NG;
+		return;
 	}
 	
 	sp = GETOFFSET_ALPHA(src, sx, sy);
@@ -38,6 +38,4 @@ int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx
 			yls++; yld++;
 		}
 	}
-	
-	return OK;
 }

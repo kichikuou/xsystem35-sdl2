@@ -93,8 +93,7 @@ static void cb_remove(sprite_t *sp) {
   sp_new の時にスプライトの種類毎の初期化
   @param sp: 初期化するスプライト
 */
-int sp_sw_setup(sprite_t *sp) {
+void sp_sw_setup(sprite_t *sp) {
 	spev_add_eventlistener(sp, eventCB_switch);
 	sp->remove = cb_remove;
-	return OK;
 }

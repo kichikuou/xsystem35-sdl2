@@ -28,9 +28,6 @@
 #include <stdint.h>
 #include "config.h"
 
-#define OK		0
-#define NG	      (-1)
-
 #define min(x,y) ((x) < (y) ? (x) : (y))
 #define max(x,y) ((x) > (y) ? (x) : (y))
 

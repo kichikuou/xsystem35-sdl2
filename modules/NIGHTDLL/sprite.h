@@ -86,7 +86,7 @@ struct _sprite {
 	
 	MyPoint cur;
 
-	int (* update)(struct _sprite *sp, MyRectangle *updatearea);
+	void (* update)(struct _sprite *sp, MyRectangle *updatearea);
 	
 	union {
 		struct {
@@ -107,31 +107,31 @@ typedef struct _sprite sprite_t;
 
 
 /* in nt_sprite.c */
-extern sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type);
-extern sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height);
-extern void nt_sp_free(sprite_t *sp);
-extern void nt_sp_set_show(sprite_t *sp, bool show);
-// extern void nt_sp_set_cg(sprite_t *sp, int no);
-extern void nt_sp_set_loc(sprite_t *sp, int x, int y);
+sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type);
+sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height);
+void nt_sp_free(sprite_t *sp);
+void nt_sp_set_show(sprite_t *sp, bool show);
+// void nt_sp_set_cg(sprite_t *sp, int no);
+void nt_sp_set_loc(sprite_t *sp, int x, int y);
 
 /* in nt_sprite_update.c */
-extern int nt_sp_update_clipped();
-extern int nt_sp_update_all(bool syncscreen);
-extern int nt_sp_updateme(sprite_t *sp);
-extern int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
-extern void nt_sp_add_updatelist(sprite_t *sp);
-extern void nt_sp_remove_updatelist(sprite_t *sp);
-extern int nt_sp_draw_wall(sprite_t *sp, MyRectangle *r);
-extern void nt_sp_clear_updatelist(void);
+void nt_sp_update_clipped();
+void nt_sp_update_all(bool syncscreen);
+void nt_sp_updateme(sprite_t *sp);
+void nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
+void nt_sp_add_updatelist(sprite_t *sp);
+void nt_sp_remove_updatelist(sprite_t *sp);
+void nt_sp_draw_wall(sprite_t *sp, MyRectangle *r);
+void nt_sp_clear_updatelist(void);
 
 /* in nt_sprite_draw.c */
-extern int nt_sp_draw(sprite_t *sp, MyRectangle *r);
-extern int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r);
-extern void nt_sp_draw_dmap(void* data, void* userdata);
-extern int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r);
+void nt_sp_draw(sprite_t *sp, MyRectangle *r);
+void nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r);
+void nt_sp_draw_dmap(void* data, void* userdata);
+void nt_sp_draw_scg(sprite_t *sp, MyRectangle *r);
 
 /* in nt_sprite_eupdate.c */
-extern int nt_sp_eupdate(int type, int time, int cancel);
+void nt_sp_eupdate(int type, int time, int cancel);
 
 
 #endif /* __SPRITE_H__ */

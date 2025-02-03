@@ -39,10 +39,10 @@
 #include "sactcg_stretch.c"
 #include "sactcg_blend.c"
 
-#define spcg_assert_no(no) \
+#define SPCG_ASSERT_NO(no) \
   if ((no) > (CGMAX -1)) { \
     WARNING("no is too large (should be %d < %d)", (no), CGMAX); \
-    return NG; \
+    return; \
   } \
 
 static cginfo_t *scg_new(enum cgtype type, int no, surface_t *sf) {
@@ -100,65 +100,61 @@ void scg_deref(cginfo_t *cg) {
 }
 
 //  指定の大きさ、色の矩形の CG を作成
-int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
-	spcg_assert_no(wNumCG);
+void scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
+	SPCG_ASSERT_NO(wNumCG);
 
 	surface_t *sf = sf_create_surface(wWidth, wHeight, sf0->depth);
 	gr_fill(sf, 0, 0, wWidth, wHeight, wR, wG, wB);
 	gr_fill_alpha_map(sf, 0, 0, wWidth, wHeight, wBlendRate);
 	scg_new(CG_SET, wNumCG, sf);
-	return OK;
 }
 
 // 指定のCGを反転させたCGを作成
-int scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) {
-	spcg_assert_no(wNumCG);
-	spcg_assert_no(wNumSrcCG);
+void scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY) {
+	SPCG_ASSERT_NO(wNumCG);
+	SPCG_ASSERT_NO(wNumSrcCG);
 	
 	cginfo_t *src = scg_get(wNumSrcCG);
 	if (!src)
-		return NG;
+		return;
 
 	surface_t *sf = stretch(src->sf, src->sf->width, src->sf->height, (wReverseX << 1) | wReverseY);
 	scg_new(CG_REVERSE, wNumCG, sf);
-	return OK;
 }
 
 // 指定のCGを拡大/縮小したCGを作成
-int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
-	spcg_assert_no(wNumCG);
-	spcg_assert_no(wNumSrcCG);
+void scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
+	SPCG_ASSERT_NO(wNumCG);
+	SPCG_ASSERT_NO(wNumSrcCG);
 	
 	cginfo_t *src = scg_get(wNumSrcCG);
 	if (!src)
-		return NG;
+		return;
 	
 	surface_t *sf = stretch(src->sf, wWidth, wHeight, 0);
 	scg_new(CG_STRETCH, wNumCG, sf);
-	return OK;
 }
 
 // ベースCGの上にブレンドCGを重ねた CG を作成
-int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode) {
-	spcg_assert_no(wNumDstCG);
-	spcg_assert_no(wNumBaseCG);
-	spcg_assert_no(wNumBlendCG);
+void scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode) {
+	SPCG_ASSERT_NO(wNumDstCG);
+	SPCG_ASSERT_NO(wNumBaseCG);
+	SPCG_ASSERT_NO(wNumBlendCG);
 
 	cginfo_t *basecg  = scg_get(wNumBaseCG);
 	cginfo_t *blendcg = scg_get(wNumBlendCG);
-	if (!basecg || !blendcg) return NG;
+	if (!basecg || !blendcg) return;
 
 	surface_t *sf = blend(basecg->sf, wX, wY, blendcg->sf, wAlphaMapMode);
 	scg_new(CG_SET, wNumDstCG, sf);
-	return OK;
 }
 
 // 指定の文字列のCGを作成
-int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
-	spcg_assert_no(wNumCG);
+void scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
+	SPCG_ASSERT_NO(wNumCG);
 	
 	// 勝手に出ていいのかな？
-	if (svar_length(wText) == 0) return OK;
+	if (svar_length(wText) == 0) return;
 
 	ags_setFont(FONT_GOTHIC, wSize);
 	agsurface_t *glyph = ags_drawStringToSurface(svar_get(wText));
@@ -168,12 +164,11 @@ int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
 	gr_draw_amap(sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
 
 	scg_new(CG_SET, wNumCG, sf);
-	return OK;
 }
 
 // 数字文字列のCGを作成
-int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue) {
-	spcg_assert_no(wNumCG);
+void scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue) {
+	SPCG_ASSERT_NO(wNumCG);
 
 	char s[256], ss[256];
 	if (wZeroPadding) {
@@ -193,30 +188,28 @@ int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs,
 	gr_draw_amap(sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
 
 	scg_new(CG_SET, wNumCG, sf);
-	return OK;
 }
 
 // CGを複製
-int scg_copy(int wNumDstCG, int wNumSrcCG) {
-	spcg_assert_no(wNumDstCG);
-	spcg_assert_no(wNumSrcCG);
+void scg_copy(int wNumDstCG, int wNumSrcCG) {
+	SPCG_ASSERT_NO(wNumDstCG);
+	SPCG_ASSERT_NO(wNumSrcCG);
 
 	cginfo_t *src = scg_get(wNumSrcCG);
 	if (!src)
-		return NG;
+		return;
 
 	scg_new(CG_SET, wNumDstCG, sf_dup(src->sf));
-	return OK;
 }
 
 // CGの一部を切りぬいたCGを作成
-int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
-	spcg_assert_no(wNumDstCG);
-	spcg_assert_no(wNumSrcCG);
+void scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
+	SPCG_ASSERT_NO(wNumDstCG);
+	SPCG_ASSERT_NO(wNumSrcCG);
 
 	cginfo_t *src = scg_get(wNumSrcCG);
 	if (!src)
-		return NG;
+		return;
 
 	surface_t *sf = src->sf->alpha
 		? sf_create_surface(wWidth, wHeight, src->sf->depth)
@@ -228,17 +221,16 @@ int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeigh
 		gr_copy_alpha_map(sf, 0, 0, src->sf, wX, wY, wWidth, wHeight);
 
 	scg_new(CG_SET, wNumDstCG, sf);
-	return OK;
 }
 
 // 元のCGの一部を切りぬいたCGを作成
-int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
-	spcg_assert_no(wNumDstCG);
-	spcg_assert_no(wNumSrcCG);
+void scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight) {
+	SPCG_ASSERT_NO(wNumDstCG);
+	SPCG_ASSERT_NO(wNumSrcCG);
 
 	cginfo_t *src = scg_get(wNumSrcCG);
 	if (!src)
-		return NG;
+		return;
 
 	surface_t *sf;
 	if (src->sf->alpha) {
@@ -254,51 +246,40 @@ int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int w
 		gr_copy_alpha_map(sf, wX, wY, src->sf, wX, wY, wWidth, wHeight);
 
 	scg_new(CG_SET, wNumDstCG, sf);
-	return OK;
 }
 
 // 全てのCGの開放
-int scg_freeall() {
+void scg_freeall(void) {
 	int i;
 	
 	for (i = 1; i < CGMAX; i++) {
 		scg_free(i);
 	}
-	return OK;
 }
 
 /**
  * 指定の番号の CG をオブジェクトリストから消し、オブジェクトがどこからも参照
  * されていない(参照数が0の)場合のみ、オブジェクトを削除
  */
-int scg_free(int no) {
-	spcg_assert_no(no);
+void scg_free(int no) {
+	SPCG_ASSERT_NO(no);
 	
 	cginfo_t *cg = sact.cg[no];
-	if (!cg) return NG;
+	if (!cg) return;
 	
 	scg_deref(cg);
 	sact.cg[no] = NULL;
-	
-	return OK;
 }
 
 // CGの種類を取得
-int scg_querytype(int wNumCG, int *ret) {
-	if (wNumCG >= (CGMAX -1)) goto errexit;
-	if (sact.cg[wNumCG] == NULL) goto errexit;
-
-	*ret = sact.cg[wNumCG]->type;
-	
-	return OK;
-
- errexit:
-	*ret = CG_NOTUSED;
-	return NG;
+int scg_querytype(int wNumCG) {
+	if (wNumCG >= (CGMAX -1)) return CG_NOTUSED;
+	if (sact.cg[wNumCG] == NULL) return CG_NOTUSED;
+	return sact.cg[wNumCG]->type;
 }
 
 // CGの大きさを取得
-int scg_querysize(int wNumCG, int *w, int *h) {
+bool scg_querysize(int wNumCG, int *w, int *h) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (sact.cg[wNumCG] == NULL) goto errexit;
 	if (sact.cg[wNumCG]->sf == NULL) goto errexit;
@@ -306,37 +287,27 @@ int scg_querysize(int wNumCG, int *w, int *h) {
 	*w = sact.cg[wNumCG]->sf->width;
 	*h = sact.cg[wNumCG]->sf->height;
 	
-	return OK;
+	return true;
 
  errexit:
 	*w = *h = 0;
-	return NG;
+	return false;
 }
 
 // CGのBPPを取得
-int scg_querybpp(int wNumCG, int *ret) {
-	if (wNumCG >= (CGMAX -1)) goto errexit;
-	if (sact.cg[wNumCG] == NULL) goto errexit;
-	if (sact.cg[wNumCG]->sf == NULL) goto errexit;
+int scg_querybpp(int wNumCG) {
+	if (wNumCG >= (CGMAX -1)) return 0;
+	if (sact.cg[wNumCG] == NULL) return 0;
+	if (sact.cg[wNumCG]->sf == NULL) return 0;
 	
-	*ret = sact.cg[wNumCG]->sf->depth;
-
-	return OK;
-
- errexit:
-	*ret = 0;
-	return NG;
+	return sact.cg[wNumCG]->sf->depth;
 }
 
 // CGの alphamap が存在するかを取得
-int scg_existalphamap(int wNumCG, int *ret) {
-	if (wNumCG >= (CGMAX -1)) goto errexit;
-	if (sact.cg[wNumCG] == NULL) goto errexit;
-	if (sact.cg[wNumCG]->sf == NULL) goto errexit;
+bool scg_existalphamap(int wNumCG) {
+	if (wNumCG >= (CGMAX -1)) return false;
+	if (sact.cg[wNumCG] == NULL) return false;
+	if (sact.cg[wNumCG]->sf == NULL) return false;
 	
-	*ret = sact.cg[wNumCG]->sf->alpha ? 1 : 0;
-	
- errexit:
-	*ret = 0;
-	return NG;
+	return sact.cg[wNumCG]->sf->alpha;
 }

@@ -24,13 +24,10 @@
 #ifndef __SACTSTRING_H__
 #define __SACTSTRING_H__
 
-extern int nt_sstr_init();
-extern int nt_sstr_reset(void);
-extern int nt_sstr_push(char *str);
-extern int nt_sstr_pop(char *str, int maxlen);
-extern int nt_sstr_regist_replace(char *sstr, char *dstr);
-extern int nt_sstr_num2str(int strno, int fig, int nzeropad, int num);
-extern char *nt_sstr_replacestr(char *msg);
+void nt_sstr_init(void);
+void nt_sstr_reset(void);
+void nt_sstr_regist_replace(char *sstr, char *dstr);
+char *nt_sstr_replacestr(char *msg);
 
 
 #endif /* __SACTSTRING_H__ */

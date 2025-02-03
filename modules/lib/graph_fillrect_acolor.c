@@ -7,12 +7,12 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv) {
+void gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv) {
 	int x, y;
 	uint8_t *dp;
 	
 	if (!gr_clip_xywh(dst, &dx, &dy, &dw, &dh)) {
-		return NG;
+		return;
 	}
 	
 	dp = GETOFFSET_PIXEL(dst, dx, dy);
@@ -48,6 +48,4 @@ int gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, i
 		break;
 	}
 	}
-	
-	return OK;
 }

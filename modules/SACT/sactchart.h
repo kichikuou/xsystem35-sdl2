@@ -24,6 +24,6 @@
 #ifndef __SACTCHART_H__
 #define __SACTCHART_H__
 
-extern int schart_pos(int *pos, int pos1, int pos2, int val1, int val2, int val);
+void schart_pos(int *pos, int pos1, int pos2, int val1, int val2, int val);
 
 #endif

@@ -24,12 +24,12 @@
 #ifndef __SACTSTRING_H__
 #define __SACTSTRING_H__
 
-extern int sstr_init();
-extern int sstr_reset(void);
-extern int sstr_push(int strno);
-extern int sstr_pop(int strno);
-extern int sstr_regist_replace(int sstrtno, int dstrno);
-extern int sstr_num2str(int strno, int fig, int nzeropad, int num);
+void sstr_init(void);
+void sstr_reset(void);
+void sstr_push(int strno);
+void sstr_pop(int strno);
+void sstr_regist_replace(int sstrtno, int dstrno);
+void sstr_num2str(int strno, int fig, int nzeropad, int num);
 
 
 #endif /* __SACTSTRING_H__ */

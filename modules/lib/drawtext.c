@@ -42,7 +42,7 @@ static int fsize;  // フォントの大きさ
  * @param type: フォント種類 (FONT_MINCHO, FONT_GOTHIC)
  * @param size: フォントサイズ
  */
-int dt_setfont(int type, int size) {
+void dt_setfont(int type, int size) {
 #ifdef __EMSCRIPTEN__
 	if (type == FONT_MINCHO) {
 		if (!load_mincho_font())
@@ -52,7 +52,6 @@ int dt_setfont(int type, int size) {
 
 	ftype = type;
 	fsize = size;
-	return OK;
 }
 
 /**

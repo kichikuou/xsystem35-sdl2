@@ -6,7 +6,7 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int height, int scanline) {
+void gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int height, int scanline) {
 	int y;
 	uint8_t *sp, *dp;
 	
@@ -18,7 +18,5 @@ int gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int he
 		sp += scanline;
 		dp += dst->width;
 	}
-	
-	return OK;
 }
 

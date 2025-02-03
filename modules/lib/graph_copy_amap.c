@@ -41,22 +41,22 @@
  * @param sw:  転送幅
  * @param sh:  転送高さ
  */
-int gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
+void gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
 	uint8_t *sp, *dp;
 	
-	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return NG;
+	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return;
 	
 	sp = GETOFFSET_ALPHA(src, sx, sy);
 	dp = GETOFFSET_ALPHA(dst, dx, dy);
 
 	if (sp == NULL) {
 		WARNING("src alpha NULL");
-		return NG;
+		return;
 	}
 	
 	if (dp == NULL) {
 		WARNING("dst alpha NULL");
-		return NG;
+		return;
 	}
 	
 	if (src == dst) {
@@ -82,6 +82,4 @@ int gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, in
 			dp += dst->width;
 		}
 	}
-	
-	return OK;
 }

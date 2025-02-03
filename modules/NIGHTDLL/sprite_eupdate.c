@@ -37,10 +37,10 @@
   @param time: 実行時間(msec)
   @param cancel: キー抜け(0:なし, 1:あり)
 */
-int nt_sp_eupdate(int no, int time, int cancel) {
+void nt_sp_eupdate(int no, int time, int cancel) {
 	if (no == 1013) {
 		nt_sp_update_all(true);
-		return OK;
+		return;
 	}
 
 	nt_sp_update_all(false);
@@ -66,5 +66,4 @@ int nt_sp_eupdate(int no, int time, int cancel) {
 	}
 	sdl_effect_finish(eff);
 	ags_updateFull();
-	return OK;
 }

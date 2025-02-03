@@ -116,7 +116,7 @@ static bool waitcond(int endtime) {
   @param vD03: タイムアウトした場合=1, しない場合=0
   @param wTime: タイムアウト時間 (1/100sec)
 */
-int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout) {
+void sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout) {
 	int curtime, endtime;
 	
 	// とりあえず全更新
@@ -172,8 +172,6 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	*vD02 = sact.sp_result_put;
 	
 	sact.waittype = KEYWAIT_NONE;
-	
-	return OK;
 }
 
 

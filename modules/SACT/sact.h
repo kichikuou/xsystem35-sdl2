@@ -137,7 +137,7 @@ struct _sprite {
         // sprite削除時の callback
 	void (* remove)(struct _sprite *sp);
 	// spriteを再描画するときの callback
-	int  (* update)(struct _sprite *sp);
+	void (* update)(struct _sprite *sp);
 	
 	bool focused; // forcusを得ているか
 	bool pressed; // このsprite上でマウスが押されているか

@@ -39,14 +39,13 @@ static int idxmax;     // stack pointerの最大
 /**
  * 文字列変数スタックの初期化
  */
-int sstr_init() {
+void sstr_init(void) {
 	stack = malloc(sizeof(char *) * DEFSTACKSIZE);
 	idx = 0;
 	idxmax = DEFSTACKSIZE;
-	return OK;
 }
 
-int sstr_reset(void) {
+void sstr_reset(void) {
 	for (int i = 0; i < idx; i++)
 		free(stack[i]);
 	idx = 0;
@@ -61,35 +60,30 @@ int sstr_reset(void) {
 	}
 	slist_free(sact.strreplace);
 	sact.strreplace = NULL;
-	return OK;
 }
 
 /**
  * 文字列変数スタックに文字列を積む
  * @param strno: シナリオ上での文字列変数番号
  */
-int sstr_push(int strno) {
+void sstr_push(int strno) {
 	if (idx >= idxmax) {
 		stack = realloc(stack, sizeof(char *) * idx*2);
 		idxmax = idx*2;
 	}
 	
 	stack[idx++] = strdup(svar_get(strno));
-	
-	return OK;
 }
 
 /**
  * 文字列変数スタックから文字列を取り出す
  * @param strno: スタックから戻した文字列を格納する文字列変数番号
  */
-int sstr_pop(int strno) {
-	if (idx == 0) return NG;
+void sstr_pop(int strno) {
+	if (idx == 0) return;
 	
 	svar_set(strno, stack[--idx]);
 	free(stack[idx]);
-	
-	return OK;
 }
 
 /**
@@ -97,22 +91,21 @@ int sstr_pop(int strno) {
  * @param sstrno: 変換元文字列変数番号
  * @param dstrno: 変換先文字列変数番号
  */
-int sstr_regist_replace(int sstrno, int dstrno) {
+void sstr_regist_replace(int sstrno, int dstrno) {
 	strexchange_t *ex;
 	
-	if (sstrno == dstrno) return NG;
+	if (sstrno == dstrno) return;
 	
 	ex = malloc(sizeof(strexchange_t));
 	ex->src = strdup(svar_get(sstrno));
 	ex->dst = strdup(svar_get(dstrno));
 	sact.strreplace = slist_append(sact.strreplace, ex);
-	return OK;
 }
 
 /**
  * 数値 -> 文字列化
  */
-int sstr_num2str(int strno, int fig, int nzeropad, int num) {
+void sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	char s[256], ss[256];
 	
 	if (nzeropad) {
@@ -125,6 +118,4 @@ int sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	
 	sprintf(s, ss, num);
 	svar_set(strno, s);
-	
-	return OK;
 }

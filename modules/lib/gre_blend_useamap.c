@@ -8,7 +8,7 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, surface_t *alpha, int ax, int ay, int lv) {
+void gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, surface_t *alpha, int ax, int ay, int lv) {
 	uint8_t *sp, *dp, *wp, *ap;
 	int x, y;
 	
@@ -99,6 +99,4 @@ int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, i
 		}
 		}
 	}
-	
-	return OK;
 }

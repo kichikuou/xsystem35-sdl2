@@ -441,13 +441,13 @@ static void hakanim(int i) {
 	sp->show = show;
 }
 
-int ntmsg_update(sprite_t *sp, MyRectangle *r) {
+void ntmsg_update(sprite_t *sp, MyRectangle *r) {
 	int sx, sy, w, h, dx, dy;
 	surface_t update;
 	
 	// canvas が clean のときはなにもしない
 	//  -> 説明スプライトのように、SetShowされたときに対応できないからだめ 
-	//if (sact.msgbufempty) return OK;
+	//if (sact.msgbufempty) return;
 	
 	update.width  = r->w;
 	update.height = r->h;
@@ -461,7 +461,7 @@ int ntmsg_update(sprite_t *sp, MyRectangle *r) {
 	sx = 0; sy = 0;
 	
 	if (!gr_clip(sp->u.msg.canvas, &sx, &sy, &w, &h, &update, &dx, &dy)) {
-		return NG;
+		return;
 	}
 	
 	dx += r->x;
@@ -471,8 +471,6 @@ int ntmsg_update(sprite_t *sp, MyRectangle *r) {
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
-	
-	return OK;
 }
 
 static void ntmsg_clear(int wNum) {

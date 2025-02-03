@@ -41,16 +41,16 @@
  * @param sw: 転送幅
  * @param sh: 転送高さ
  */
-int gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
+void gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
 	uint8_t *sp, *dp;
 	
-	if (src == NULL || dst == NULL) return NG;
-	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return NG;
+	if (src == NULL || dst == NULL) return;
+	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return;
 	
 	sp = GETOFFSET_PIXEL(src, sx, sy);
 	dp = GETOFFSET_PIXEL(dst, dx, dy);
 	
-	if (sp == NULL || dp == NULL) return NG;
+	if (sp == NULL || dp == NULL) return;
 
 	if (src == dst) {
 		if (sy <= dy && dy < (sy + sh)) {
@@ -75,6 +75,4 @@ int gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int 
 			dp += dst->bytes_per_line;
 		}	
 	}
-	
-	return OK;
 }

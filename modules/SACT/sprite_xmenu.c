@@ -40,7 +40,7 @@ struct _xm {
 
 static struct _xm xmenu;
 
-int spxm_clear(void) {
+void spxm_clear(void) {
 	int i;
 	
 	free(xmenu.title); xmenu.title = NULL;
@@ -48,16 +48,14 @@ int spxm_clear(void) {
 		free(xmenu.item[i]); xmenu.item[i] = NULL;
 		xmenu.ret[i] = 0;
 	}
-	return OK;
 }
 
-int spxm_register(int reginum, int menuid) {
-	if (reginum > SEL_ELEMENT_MAX) return NG;
+void spxm_register(int reginum, int menuid) {
+	if (reginum > SEL_ELEMENT_MAX) return;
 
 	xmenu.ret[reginum] = menuid;
 	xmenu.item[reginum] = strdup(sact.msgbuf);
 	sact.msgbuf[0] = '\0';
-	return OK;
 }
 
 int spxm_getnum(int reginum) {
@@ -65,19 +63,16 @@ int spxm_getnum(int reginum) {
 	return xmenu.ret[reginum];
 }
 
-int spxm_gettext(int reginum, int strno) {
-	if (reginum > SEL_ELEMENT_MAX) return NG;
+void spxm_gettext(int reginum, int strno) {
+	if (reginum > SEL_ELEMENT_MAX) return;
 	svar_set(strno, xmenu.item[reginum]);
-	return OK;
 }
 
-int spxm_titlereg(void) {
+void spxm_titlereg(void) {
 	xmenu.title = strdup(sact.msgbuf);
 	sact.msgbuf[0] = '\0';
-	return OK;
 }
 
-int spxm_titleget(int strno) {
+void spxm_titleget(int strno) {
 	svar_set(strno, xmenu.title);
-	return OK;
 }

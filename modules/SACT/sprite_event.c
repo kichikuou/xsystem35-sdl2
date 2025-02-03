@@ -229,7 +229,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 		// back log view mode に移行
 		// MessageKey 待ちのときのみ
 		if (sact.waittype != KEYWAIT_MESSAGE) break;
-		if (sblog_start() == OK)
+		if (sblog_start())
 			sact.waittype = KEYWAIT_BACKLOG;
 		break;
 
@@ -253,7 +253,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 		case KEY_PAGEDOWN:
 			// MessageKey 待ちのときのみ
 			if (sact.waittype != KEYWAIT_MESSAGE) break;
-			if (sblog_start() == OK)
+			if (sblog_start())
 				sact.waittype = KEYWAIT_BACKLOG;
 			break;
 		default:

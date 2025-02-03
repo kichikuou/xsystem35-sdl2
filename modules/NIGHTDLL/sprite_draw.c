@@ -39,10 +39,9 @@
  @param sp: 描画するスプライト
  @param r : 再描画する領域
 */
-int nt_sp_draw(sprite_t *sp, MyRectangle *r) {
-	if (sp == NULL) return NG;
-	
-	return nt_sp_draw2(sp, sp->curcg, r);
+void nt_sp_draw(sprite_t *sp, MyRectangle *r) {
+	if (sp == NULL) return;
+	nt_sp_draw2(sp, sp->curcg, r);
 }
 
 /*
@@ -53,12 +52,12 @@ int nt_sp_draw(sprite_t *sp, MyRectangle *r) {
   @param cg: 描画するCG
  @param r : 再描画する領域
 */
-int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
+void nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	surface_t update;
 	int sx, sy, w, h, dx, dy;
 	
-	if (cg == NULL) return NG;
-	if (cg->sf == NULL) return NG;
+	if (cg == NULL) return;
+	if (cg->sf == NULL) return;
 
 	// 更新領域の確定
 	update.width  = r->w;
@@ -71,7 +70,7 @@ int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	h = cg->sf->height;
 	
 	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
-		return NG;
+		return;
 	}
 		
 	dx += r->x;
@@ -96,22 +95,20 @@ int nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
-	
-	return OK;
 }
 
 // BlendScreenによる描画
-int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
+void nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	surface_t update;
 	cginfo_t *cg;
 	int sx, sy, w, h, dx, dy;
 	
-	if (sp == NULL) return NG;
+	if (sp == NULL) return;
 	
 	cg = sp->curcg;
 	
-	if (cg == NULL) return NG;
-	if (cg->sf == NULL) return NG;
+	if (cg == NULL) return;
+	if (cg->sf == NULL) return;
 	
 	// 更新領域の確定
 	update.width  = r->w;
@@ -124,7 +121,7 @@ int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	h = cg->sf->height;
 	
 	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
-		return NG;
+		return;
 	}
 		
 	dx += r->x;
@@ -134,6 +131,4 @@ int nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
-	
-	return OK;
 }

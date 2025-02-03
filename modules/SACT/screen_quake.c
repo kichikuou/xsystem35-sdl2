@@ -73,12 +73,12 @@ static void quake1(float curstep, int diam, int round, int *adjx, int *adjy) {
    @param wCount: 時間(1/100秒)
    @param nfKeyEnable: キー抜け (1で有効)
 */
-int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
+void sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	int sttime, edtime, curtime;
 	int key;
 	entrypoint *cb[2] = {quake0, quake1};
 	
-	if (type > 1) return OK;
+	if (type > 1) return;
 	
 	sttime = sdl_getTicks();
 	edtime = time * 10 + sttime;
@@ -95,7 +95,5 @@ int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	
 	ags_setViewArea(0, 0, sf0->width, sf0->height);
 	ags_updateFull();
-	
-	return OK;
 }
 

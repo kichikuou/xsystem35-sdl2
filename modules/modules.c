@@ -69,18 +69,18 @@ static void resolve_func(S39AIN_DLLFN *func, const Module *mod) {
 		WARNING("Cannot resolve DLL function %s.%s", mod->name, func->name);
 }
 
-int resolve_module(S39AIN_DLLINF *dll) {
+bool resolve_module(S39AIN_DLLINF *dll) {
 	if (dll->function_num == 0)
-		return OK;
+		return true;
 
 	for (const Module **mod = modules; *mod; mod++) {
 		if (strcasecmp((*mod)->name, dll->name) == 0) {
 			for (int i = 0; i < dll->function_num; i++)
 				resolve_func(&dll->function[i], *mod);
 			dll->reset = (*mod)->reset;
-			return OK;
+			return true;
 		}
 	}
 	WARNING("Cannot resolve DLL: %s", dll->name);
-	return NG;
+	return false;
 }

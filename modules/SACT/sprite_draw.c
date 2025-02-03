@@ -81,10 +81,10 @@ static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w
  指定の sprite (の現在のCG)を surface0 に書く
  @param sp: 描画するスプライト
 */
-int sp_draw(sprite_t *sp) {
-	if (sp == NULL) return NG;
+void sp_draw(sprite_t *sp) {
+	if (sp == NULL) return;
 	
-	return sp_draw2(sp, sp->curcg);
+	sp_draw2(sp, sp->curcg);
 }
 
 /*
@@ -94,12 +94,12 @@ int sp_draw(sprite_t *sp) {
   @param sp: 描画するスプライト
   @param cg: 描画するCG
 */
-int sp_draw2(sprite_t *sp, cginfo_t *cg) {
+void sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	surface_t update;
 	int sx, sy, w, h, dx, dy;
 	
-	if (cg == NULL) return NG;
-	if (cg->sf == NULL) return NG;
+	if (cg == NULL) return;
+	if (cg->sf == NULL) return;
 
 	// 更新領域の確定
 	update.width  = sact.updaterect.w;
@@ -112,7 +112,7 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	h = cg->sf->height;
 	
 	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
-		return NG;
+		return;
 	}
 		
 	dx += sact.updaterect.x;
@@ -136,8 +136,6 @@ int sp_draw2(sprite_t *sp, cginfo_t *cg) {
 	}
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d", sp->no, sx, sy, w, h, dx, dy);
-	
-	return OK;
 }
 
 /*

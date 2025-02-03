@@ -5,13 +5,13 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b) {
+void gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b) {
 	uint8_t *dp;
 	int i;
 	int col = 0;
 	
 	if (!gr_clip_xywh(dst, &x, &y, &w, &h)) {
-		return NG;
+		return;
 	}
 
 	dp = GETOFFSET_PIXEL(dst, x, y);
@@ -91,6 +91,4 @@ int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b)
 		
 		break;
 	}
-	
-	return OK;
 }

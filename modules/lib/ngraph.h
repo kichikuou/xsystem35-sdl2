@@ -11,67 +11,67 @@
 // DLL 用 graphic 関連関数 
 
 /* in graph.c */
-extern bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy);
-extern bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
+bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy);
+bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
 
 
 /* in graph_expandcolor_blend.c */
 // 8bppのモノクロをcolでブレンド
-extern int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int r, int g, int b);
+void gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int r, int g, int b);
 
 /* in graph_fillrect.c */
-extern int gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b);
+void gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b);
 
 /* in graph_fillrect_amap.c */
-extern int gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv);
+void gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv);
 
 /* in graph_fillrect_acolor.c */
-extern int gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv);
+void gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv);
 
 /* in graph_rect.c */
 // 矩形枠描画
-extern int gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b);
+void gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b);
 
 /* in graph_copy.c */
-extern int gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
+void gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
 /* in graph_copy_bright.c */
 void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv);
 
 /* in graph_copy_amap.c */
-extern int gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
+void gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
 /* in graph_blend_amap.c */
-extern int gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
+void gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
 /* in graph_saturadd_amap.c */
 // alpha map の飽和加算
-extern int gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
+void gr_saturadd_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
 /* in graph_draw_amap.c */
-extern int gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int height, int scanline);
+void gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int height, int scanline);
 
 // /* in graph_bright_dst_only.c */
 #define gr_bright_dst_only(dst,dx,dy,w,h,lv) gr_copy_bright(dst,dx,dy,dst,dx,dy,w,h,lv)
-// extern void gr_bright_dst_only(surface_t *dst, int dx, int dy, int w, int h, int lv);
+// void gr_bright_dst_only(surface_t *dst, int dx, int dy, int w, int h, int lv);
 
 /* in gre_blend_useamap.c */
-extern int gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, surface_t *alpha, int ax, int ay, int lv);
+void gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, surface_t *alpha, int ax, int ay, int lv);
 
 /* in graph_stretch.c */
-extern void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh);
+void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh);
 
 
 /* in graph_cg.c */
-extern void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y);
-extern void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y);
+void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y);
+void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y);
 
 
 
 
 /* defined in cg.c */
-extern surface_t *sf_getcg(void *buf, size_t size);
-extern surface_t *sf_loadcg_no(int no);
+surface_t *sf_getcg(void *buf, size_t size);
+surface_t *sf_loadcg_no(int no);
 
 
 #endif /* __GRAPH_H__ */

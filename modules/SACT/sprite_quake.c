@@ -46,7 +46,7 @@
    @param wCount: 時間(1/100秒)
    @param cancel: キーキャンセルあり(=1)
 */
-int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int cancel) {
+void sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int cancel) {
 	int edtime, curtime;
 	int i = 0, key;
 	SList *node;
@@ -97,5 +97,4 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 		sp_updateme(sp);
 	}
 	sp_update_clipped();
-	return OK;
 }

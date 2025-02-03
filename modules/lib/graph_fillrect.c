@@ -6,12 +6,12 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b) {
+void gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b) {
 	uint8_t *dp, *dp_;
 	int x, y;
 	
 	if (!gr_clip_xywh(dst, &dx, &dy, &dw, &dh)) {
-		return NG;
+		return;
 	}
 	
 	dp = dp_ = GETOFFSET_PIXEL(dst, dx, dy);
@@ -49,6 +49,4 @@ int gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b)
 		memcpy(dp, dp_, dw * dst->bytes_per_pixel);
 		dp += dst->bytes_per_line;
 	}
-
-	return OK;
 }

@@ -24,6 +24,6 @@
 #ifndef __SACTAMASK_H__
 #define __SACTAMASK_H__
 
-extern int smask_init(const char *path);
+bool smask_init(const char *path);
 
 #endif

@@ -27,23 +27,11 @@
 #include "portab.h"
 #include "night.h"
 
-extern cginfo_t *nt_scg_addref(int no);
-extern void nt_scg_deref(cginfo_t *cg);
-extern int nt_scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate);
-extern int nt_scg_create_reverse(int NumCG, int wNumSrcCG, int wReverseX, int wReverseY);
-extern int nt_scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG);
-extern int nt_scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode);
-extern int nt_scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, char *cText);
-extern int nt_scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue);
-extern int nt_scg_copy(int wNumDstCG, int wNumSrcCG);
-extern int nt_scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
-extern int nt_scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
-extern int nt_scg_freeall();
-extern int nt_scg_free(int cg);
-extern int nt_scg_querytype(int wNumCG, int *ret);
-extern int nt_scg_querysize(int wNumCG, int *w, int *h);
-extern int nt_scg_querybpp(int wNumCG, int *ret);
-extern int nt_scg_existalphamap(int wNumCG, int *ret);
-extern int nt_scg_linkcgfree(int no);
+cginfo_t *nt_scg_addref(int no);
+void nt_scg_deref(cginfo_t *cg);
+void nt_scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate);
+void nt_scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
+void nt_scg_freeall(void);
+void nt_scg_free(int cg);
 
 #endif

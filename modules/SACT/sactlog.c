@@ -107,9 +107,9 @@ static void draw_log() {
 
 
 
-int sblog_start(void) {
+bool sblog_start(void) {
 	if (sact.version < 120)
-		return NG;
+		return false;
 
 	static char *logmsg[LOGMSG_LINES];
 	if (!logmsg[0]) {
@@ -125,10 +125,10 @@ int sblog_start(void) {
 	chr  = sf_create_surface(sf0->width, sf0->height, 8);
 	curline = 6;
 	draw_log();
-	return OK;
+	return true;
 }
 
-int sblog_end(void) {
+void sblog_end(void) {
 	List *node;
 	int i;
 	
@@ -143,30 +143,24 @@ int sblog_end(void) {
 		node = list_last(sact.log);
 		sact.log = list_remove(sact.log, node->data);
 	}
-	
-	return OK;
 }
 
-int sblog_pageup(void) {
+void sblog_pageup(void) {
 	curline = min(list_length(sact.log), curline + (LOGLINENUM -1));
 	draw_log();
-	return OK;
 }
 
-int sblog_pagedown(void) {
+void sblog_pagedown(void) {
 	curline = max(1, curline - (LOGLINENUM -1));
 	draw_log();
-	return OK;
 }
 
-int sblog_pagepre(void) {
+void sblog_pagepre(void) {
 	curline = max(1, curline - 1);
 	draw_log();
-	return OK;
 }
 
-int sblog_pagenext(void) {
+void sblog_pagenext(void) {
 	curline = min(list_length(sact.log), curline + 1);
 	draw_log();
-	return OK;
 }

@@ -32,16 +32,14 @@
 /*
   sact timer subsystem 初期化
 */
-int stimer_init() {
+void stimer_init(void) {
 	stimer_reset(0, 0);
-	return OK;
 }
 
 // 指定IDのタイマーのリセット
-int stimer_reset(int id, int val) {
+void stimer_reset(int id, int val) {
 	gettimeofday(&(sact.timer[id].tv_base), NULL);
 	sact.timer[id].val = val;
-	return OK;
 }
 
 // 指定IDのタイマーの取得

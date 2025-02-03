@@ -51,7 +51,6 @@ static int oldindex; // 何番目の要素か(0~)
 static bool sp_is_insprite2(sprite_t *sp, int x, int y, int margin);
 static void cb_select_move(agsevent_t *e);
 static void cb_select_release(agsevent_t *e);
-static int update_selwindow(sprite_t *sp);
 static void setup_selwindow();
 static void remove_selwindow();
 static int sel_main();
@@ -143,7 +142,7 @@ static void cb_select_release(agsevent_t *e) {
 }
 
 // 選択ウィンドを更新するときの callback
-static int update_selwindow(sprite_t *sp) {
+static void update_selwindow(sprite_t *sp) {
 	int selno = selected_item_cur;
 	int x0, y0;
 
@@ -166,8 +165,6 @@ static int update_selwindow(sprite_t *sp) {
 	gr_expandcolor_blend(sf0, x0, y0, 
 			     sact.sel.charcanvas, 0, 0,
 			     selcanvas->width, selcanvas->height, 255, 255, 255);
-	
-	return OK;
 }
 
 // 選択ウィンドの準備

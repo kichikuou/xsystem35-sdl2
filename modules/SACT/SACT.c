@@ -639,7 +639,7 @@ static void QuerySpriteIsExist() {
 	int wNum = getCaliValue();
 	int *var = getCaliVariable();
 
-	sp_query_isexist(wNum, var);
+	*var = sp_exists(wNum) ? 1 : 0;
 	
 	TRACE("SACT.QuerySpriteIsExist %d,%p:", wNum, var);
 }
@@ -765,7 +765,7 @@ static void CG_QueryType() {
 	int wNumCG = getCaliValue();
 	int *vType = getCaliVariable();
 	
-	scg_querytype(wNumCG, vType);
+	*vType = scg_querytype(wNumCG);
 	
 	TRACE("SACT.CG_QueryType %d,%p:", wNumCG, vType);
 }
@@ -797,7 +797,7 @@ static void CG_QueryBpp() {
 	int wNumCG = getCaliValue();
 	int *vBpp  = getCaliVariable();
 	
-	scg_querybpp(wNumCG, vBpp);
+	*vBpp = scg_querybpp(wNumCG);
 	
 	TRACE("SACT.CG_QueryBpp %d,%p:", wNumCG, vBpp);
 }
@@ -812,7 +812,7 @@ static void CG_ExistAlphaMap() {
 	int wNumCG = getCaliValue();
 	int *vMask = getCaliVariable();
 	
-	scg_existalphamap(wNumCG, vMask);
+	*vMask = scg_existalphamap(wNumCG) ? 1 : 0;
 	
 	TRACE("SACT.CG_ExistAlphaMap %d,%p:", wNumCG, vMask);
 }
@@ -1314,7 +1314,7 @@ static void MessageClear() {
 static void MessageIsEmpty() {
 	int *wResult = getCaliVariable();
 
-	*wResult = smsg_is_empty();
+	*wResult = smsg_is_empty() ? 1 : 0;
 	
 	TRACE("SACT.MessageIsEmpty %p:", wResult);
 }

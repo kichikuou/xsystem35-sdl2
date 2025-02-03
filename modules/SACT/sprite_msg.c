@@ -381,7 +381,7 @@ void smsg_clear(int wNum) {
   出力中の文字列があるかチェック
   @return: なし(1) , あり(0)
  */
-int smsg_is_empty() {
+bool smsg_is_empty() {
 	return (sact.msgbuf[0] == '\0');
 }
 
@@ -452,13 +452,13 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
   スプライト再描画のコールバック
   @param sp: 再描画するスプライト
  */
-int smsg_update(sprite_t *sp) {
+void smsg_update(sprite_t *sp) {
 	int sx, sy, w, h, dx, dy;
 	surface_t update;
 	
 	// canvas が clean のときはなにもしない
 	//  -> 説明スプライトのように、SetShowされたときに対応できないからだめ 
-	//if (sact.msgbufempty) return OK;
+	//if (sact.msgbufempty) return;
 	
 	update.width  = sact.updaterect.w;
 	update.height = sact.updaterect.h;
@@ -472,7 +472,7 @@ int smsg_update(sprite_t *sp) {
 	sx = 0; sy = 0;
 	
 	if (!gr_clip(sp->u.msg.canvas, &sx, &sy, &w, &h, &update, &dx, &dy)) {
-		return NG;
+		return;
 	}
 	
 	dx += sact.updaterect.x;
@@ -482,8 +482,6 @@ int smsg_update(sprite_t *sp) {
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
-	
-	return OK;
 }
 
 // 改行を含む文字列バッファ中から、改行までの文字列の長さを取り出す

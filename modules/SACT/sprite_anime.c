@@ -81,7 +81,7 @@ static void cb_remove(sprite_t *sp) {
   sp_new の時にスプライトの種類毎の初期化
   @param sp: 初期化するスプライト
 */
-int sp_anime_setup(sprite_t *sp) {
+void sp_anime_setup(sprite_t *sp) {
 	int n = 0;
 	
 	sp->u.anime.interval = 500; // デフォルトの間隔 0.5秒
@@ -96,6 +96,4 @@ int sp_anime_setup(sprite_t *sp) {
 	
 	spev_add_teventlistener(sp, eventCB_ANIM);
 	sp->remove = cb_remove;
-	
-	return OK;
 }

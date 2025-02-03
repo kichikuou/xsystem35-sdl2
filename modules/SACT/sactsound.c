@@ -64,27 +64,24 @@ static int slt_find(int no) {
 /*
  SACT 効果音 subsystem 初期化
 */
-int ssnd_init() {
+void ssnd_init(void) {
 	// ch 1-8 をキャッシュとして使おう
 	cachei = 0;
 	memset(cache, 0, sizeof(cache));
-	return OK;
 }
 
 // 指定の番号の効果音をメモリに読み込み
-int ssnd_prepare(int no) {
+void ssnd_prepare(int no) {
 	int slot = slt_find(no);
 	
 	if (slot == -1) {
 		slot = slt_getnext(no);
 		mus_wav_load(slot, no);
 	}
-	
-	return OK;
 }
 
 // 指定の番号の効果音を再生
-int ssnd_play(int no) {
+void ssnd_play(int no) {
 	int slot = slt_find(no);
 	
 	if (slot == -1) {
@@ -92,45 +89,40 @@ int ssnd_play(int no) {
 		mus_wav_load(slot, no);
 	}
 	mus_wav_play(slot, 1);
-	
-	return OK;
 }
 
 // 指定の番号の効果音を再生停止
-int ssnd_stop(int no, int fadetime) {
+void ssnd_stop(int no, int fadetime) {
 	int slot = slt_find(no);
 
 	if (slot != -1) {
 		mus_wav_fadeout_start(slot, fadetime, 0, true);
 		cache[slot - SLOTOFFSET] = 0;
 	}
-
-	return OK;
 }
 
 // 指定の番号の効果音が再生終了するのを待つ
-int ssnd_wait(int no) {
+void ssnd_wait(int no) {
 	int slot = slt_find(no);
 
 	if (slot != -1) {
 		mus_wav_waitend(slot);
 		cache[slot - SLOTOFFSET] = 0;
 	}
-	return OK;
 }
 
 // 指定の効果音が終了するか、キーが押されるまで待つ
-int ssnd_waitkey(int no, int *res) {
+void ssnd_waitkey(int no, int *res) {
 	int slot = slt_find(no);
 	
 	if (slot == -1) {
 		*res = 0;
-		return OK;
+		return;
 	}
 
 	if (sact.waitskiplv > 1) {
 		*res = SYS35KEY_RET;
-		return OK;
+		return;
 	}
 
 	sact.waittype = KEYWAIT_SIMPLE;
@@ -147,32 +139,27 @@ int ssnd_waitkey(int no, int *res) {
 		*res = sact.waitkey;
 	}
 	sact.waittype = KEYWAIT_NONE;
-
-	return OK;
 }
 
 // 左右チャンネルの反転した効果音をメモリに読み込む
-int ssnd_prepareLRrev(int no) {
+void ssnd_prepareLRrev(int no) {
 	mus_wav_load_lrsw(30, no); // slot は 30固定でいい？
-	return OK;
 }
 
 // 左右チャンネルの反転した効果音を再生
-int ssnd_playLRrev(int no) {
+void ssnd_playLRrev(int no) {
 	mus_wav_load_lrsw(30, no);
 	mus_wav_play(30, 1);
-	
-	return OK;
 }
 
 // 指定の番号の効果音が存在するかどうかをチェック
 int ssnd_getlinknum(int no) {
 	WARNING("NOT IMPLEMENTED");
-	return OK;
+	return 0;
 }
 
 // すべての再生中の効果音が再生を終了するのを待つ
-int ssnd_stopall(int time) {
+void ssnd_stopall(int time) {
 	int i;
 	
 	for (i = 0; i < CACHEMAX; i++) {
@@ -181,5 +168,4 @@ int ssnd_stopall(int time) {
 			cache[i] = 0;
 		}
 	}
-	return OK;
 }

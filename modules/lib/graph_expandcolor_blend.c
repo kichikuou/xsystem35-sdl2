@@ -6,13 +6,13 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int r, int g, int b) {
+void gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int r, int g, int b) {
 	uint8_t *sp, *dp;
 	int x, y;
 	int col;
 	
 	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) {
-		return NG;
+		return;
 	}
 	
 	sp = GETOFFSET_PIXEL(src, sx, sy);
@@ -53,6 +53,4 @@ int gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx,
 		}
 		break;
 	}}
-	
-	return OK;
 }

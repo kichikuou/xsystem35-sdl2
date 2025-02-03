@@ -60,6 +60,6 @@ extern const Module module_oujimisc;
 extern const Module module_tDemo;
 
 struct S39AIN_DLLINF;
-int resolve_module(struct S39AIN_DLLINF *dll);
+bool resolve_module(struct S39AIN_DLLINF *dll);
 
 #endif /* __MODULES_H__ */

@@ -27,23 +27,22 @@
 #include "portab.h"
 #include "sact.h"
 
-extern cginfo_t *scg_addref(int no);
-extern void scg_deref(cginfo_t *cg);
-extern int scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate);
-extern int scg_create_reverse(int NumCG, int wNumSrcCG, int wReverseX, int wReverseY);
-extern int scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG);
-extern int scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode);
-extern int scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText);
-extern int scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue);
-extern int scg_copy(int wNumDstCG, int wNumSrcCG);
-extern int scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
-extern int scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
-extern int scg_freeall();
-extern int scg_free(int cg);
-extern int scg_querytype(int wNumCG, int *ret);
-extern int scg_querysize(int wNumCG, int *w, int *h);
-extern int scg_querybpp(int wNumCG, int *ret);
-extern int scg_existalphamap(int wNumCG, int *ret);
-extern int scg_linkcgfree(int no);
+cginfo_t *scg_addref(int no);
+void scg_deref(cginfo_t *cg);
+void scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate);
+void scg_create_reverse(int NumCG, int wNumSrcCG, int wReverseX, int wReverseY);
+void scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG);
+void scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBlendCG, int wAlphaMapMode);
+void scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText);
+void scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs, int wZeroPadding, int wValue);
+void scg_copy(int wNumDstCG, int wNumSrcCG);
+void scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
+void scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeight);
+void scg_freeall(void);
+void scg_free(int cg);
+int scg_querytype(int wNumCG);
+bool scg_querysize(int wNumCG, int *w, int *h);
+int scg_querybpp(int wNumCG);
+bool scg_existalphamap(int wNumCG);
 
 #endif

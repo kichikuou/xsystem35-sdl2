@@ -38,10 +38,10 @@
   @param time: 実行時間
   @param cancel: キー抜け(0:なし, 1:あり)
 */
-int sp_eupdate(int type, int time, int cancel) {
+void sp_eupdate(int type, int time, int cancel) {
 	if (sact.waitskiplv > 1) {
 		sp_update_all(true);
-		return OK;
+		return;
 	}
 
 	sp_update_all(false);
@@ -67,5 +67,4 @@ int sp_eupdate(int type, int time, int cancel) {
 	}
 	sdl_effect_finish(eff);
 	ags_updateFull();
-	return OK;
 }

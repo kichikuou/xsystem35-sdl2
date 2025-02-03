@@ -90,7 +90,7 @@ static void do_update_each(void* data, void* userdata) {
   画面全体の更新
   @param syncscreen: surface0 に描画したものを Screen に反映させるかどうか
  */
-int sp_update_all(bool syncscreen) {
+void sp_update_all(bool syncscreen) {
 
 	// スプライト移動がある場合は移動開始
 	if (sact.movelist) {
@@ -121,20 +121,18 @@ int sp_update_all(bool syncscreen) {
 	// 移動中のすべてのスプライトが移動終了するまで待つ
 	// こうしないと動きが同期しない 
 	spev_wait4moving_sp();
-	
-	return OK;
 }
 
 /*
   画面の一部を更新
    updateme(_part)で登録した更新が必要なspriteの和の領域をupdate
 */
-int sp_update_clipped() {
+void sp_update_clipped() {
 	// 更新領域の確定
 	get_updatearea();
 	
 	if (SDL_RectEmpty(&sact.updaterect))
-		return OK;
+		return;
 
 	// 更新領域に入っているスプライトの再描画
 	slist_foreach(sact.updatelist, do_update_each, NULL);
@@ -146,19 +144,17 @@ int sp_update_clipped() {
 	
 	// 更新領域を Window に転送
 	ags_updateArea(sact.updaterect.x, sact.updaterect.y, sact.updaterect.w, sact.updaterect.h);
-	
-	return OK;
 }
 
 /*
   sprite全体の更新を登録
   @param sp: 更新するスプライト
 */
-int sp_updateme(sprite_t *sp) {
+void sp_updateme(sprite_t *sp) {
 	MyRectangle *r;
 	
-	if (sp == NULL) return NG;
-	if (sp->cursize.width == 0 || sp->cursize.height == 0) return NG;
+	if (sp == NULL) return;
+	if (sp->cursize.width == 0 || sp->cursize.height == 0) return;
 	
 	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x;
@@ -170,8 +166,6 @@ int sp_updateme(sprite_t *sp) {
 	
 	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d",
 		r->x, r->y, sp->no, r->w, r->h);
-	
-	return OK;
 }
 
 /*
@@ -182,11 +176,11 @@ int sp_updateme(sprite_t *sp) {
   @param w: 更新領域幅
   @param h: 更新領域高さ
 */
-int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
+void sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	MyRectangle *r;
 	
-	if (sp == NULL) return NG;
-	if (w == 0 || h == 0) return NG;
+	if (sp == NULL) return;
+	if (w == 0 || h == 0) return;
 	
 	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x + x;
@@ -198,7 +192,5 @@ int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	
 	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d",
 		r->x, r->y, sp->no, r->w, r->h);
-	
-	return OK;
 }
 

@@ -92,7 +92,7 @@ static void do_update_each(void* data, void* userdata) {
   画面全体の更新
   @param syncscreen: surface0 に描画したものを Screen に反映させるかどうか
  */
-int nt_sp_update_all(bool syncscreen) {
+void nt_sp_update_all(bool syncscreen) {
 	// 画面全体を更新領域に
 	MyRectangle r = {0, 0, sf0->width, sf0->height };
 	
@@ -106,41 +106,37 @@ int nt_sp_update_all(bool syncscreen) {
 	if (syncscreen) {
 		ags_updateFull();
 	}
-	
-	return OK;
 }
 
 /*
   画面の一部を更新
    updateme(_part)で登録した更新が必要なspriteの和の領域をupdate
 */
-int nt_sp_update_clipped() {
+void nt_sp_update_clipped() {
 	MyRectangle r;
 	
 	// 更新領域の確定
 	r = get_updatearea();
 	
 	if (SDL_RectEmpty(&r))
-		return OK;
+		return;
 
 	// 更新領域に入っているスプライトの再描画
 	slist_foreach(updatelist, do_update_each, &r);
 	
 	// 更新領域を Window に転送
 	ags_updateArea(r.x, r.y, r.w, r.h);
-	
-	return OK;
 }
 
 /*
   sprite全体の更新を登録
   @param sp: 更新するスプライト
 */
-int nt_sp_updateme(sprite_t *sp) {
+void nt_sp_updateme(sprite_t *sp) {
 	MyRectangle *r;
 	
-	if (sp == NULL) return NG;
-	if (sp->cursize.width == 0 || sp->cursize.height == 0) return NG;
+	if (sp == NULL) return;
+	if (sp->cursize.width == 0 || sp->cursize.height == 0) return;
 	
 	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x;
@@ -152,8 +148,6 @@ int nt_sp_updateme(sprite_t *sp) {
 	
 	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d",
 		r->x, r->y, sp->no, r->w, r->h);
-	
-	return OK;
 }
 
 /*
@@ -164,11 +158,11 @@ int nt_sp_updateme(sprite_t *sp) {
   @param w: 更新領域幅
   @param h: 更新領域高さ
 */
-int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
+void nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	MyRectangle *r;
 	
-	if (sp == NULL) return NG;
-	if (w == 0 || h == 0) return NG;
+	if (sp == NULL) return;
+	if (w == 0 || h == 0) return;
 	
 	r = malloc(sizeof(MyRectangle));
 	r->x = sp->cur.x + x;
@@ -180,8 +174,6 @@ int nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
 	
 	SACT_DEBUG("x = %d, y = %d, spno = %d w=%d,h=%d",
 		r->x, r->y, sp->no, r->w, r->h);
-	
-	return OK;
 }
 
 // スプライトの番号順に更新するためにリストに順番に要れるためのcallbck
@@ -214,7 +206,7 @@ void nt_sp_clear_updatelist(void) {
 }
 
 // デフォルトの壁紙update
-int nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
+void nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
 	int sx, sy, w, h;
 	
 	sx = area->x;
@@ -225,7 +217,5 @@ int nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d",
 		sp->no, sx, sy, w, h);
-	
-	return OK;
 }
 

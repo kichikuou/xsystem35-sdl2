@@ -63,13 +63,13 @@ typedef struct ecopyparam ecopyparam_t;
 static ecopyparam_t ecp;
 
 // SACTEFAM.KLD の読み込み
-int smask_init(char *path) {
+bool smask_init(char *path) {
 	if (am.mmap)
-		return OK;  // already loaded
+		return true;  // already loaded
 
 	mmap_t *m = map_file(path);
 	if (!m)
-		return NG;
+		return false;
 	am.mmap = m;
 	am.datanum = LittleEndian_getDW(m->addr, 0);
 	am.no = malloc(sizeof(int) * am.datanum);
@@ -80,7 +80,7 @@ int smask_init(char *path) {
 		am.offset[i] = LittleEndian_getDW(m->addr, 16 + i * 16 + 8);
 	}
 	
-	return OK;
+	return true;
 }
 
 // 指定番号の alphamask ファイルをよみだす
@@ -117,7 +117,7 @@ static surface_t *smask_mul(surface_t *sf, int val) {
 /**
  * マスクつき画面更新
  */
-int sp_eupdate_amap(int index, int time, int cancel) {
+void sp_eupdate_amap(int index, int time, int cancel) {
 	surface_t *mask, *mask2;
 	surface_t *sfsrc, *sfdst;
 	int key;
@@ -125,7 +125,7 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 	mask = smask_get(index);
 	if (mask == NULL) {
 		sp_update_all(true);
-		return OK;
+		return;
 	}
 	
 	// 現在の sf0 をセーブ
@@ -159,5 +159,4 @@ int sp_eupdate_amap(int index, int time, int cancel) {
 	sf_free(sfdst);
 	
 	sf_free(mask);
-	return OK;
 }

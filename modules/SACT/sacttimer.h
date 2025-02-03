@@ -34,8 +34,8 @@ struct _stimer {
 typedef struct _stimer stimer_t;
 
 
-extern int stimer_init();
-extern int stimer_reset(int id, int val);
-extern int stimer_get(int id);
+void stimer_init(void);
+void stimer_reset(int id, int val);
+int stimer_get(int id);
 
 #endif

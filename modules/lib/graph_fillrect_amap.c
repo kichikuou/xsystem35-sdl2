@@ -6,11 +6,11 @@
 #include "ngraph.h"
 #include "ags.h"
 
-int gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv) {
+void gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv) {
 	uint8_t *a;
 	
 	if (!gr_clip_xywh(dst, &dx, &dy, &dw, &dh)) {
-		return NG;
+		return;
 	}
 	
 	a = GETOFFSET_ALPHA(dst, dx, dy);
@@ -19,6 +19,4 @@ int gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv) {
 		memset(a, lv, dw);
 		a += dst->width;
 	}
-	
-	return OK;
 }
