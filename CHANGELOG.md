@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.14.1 - 2024-02-07
+- Fixed font selection and text decoration not working in selection menus.
+- Fixed a graphic issue in DALK intro.
+
 ## 2.14.0 - 2024-01-09
 - New supported games: 俺の下であがけ and 楽園行.
 - Windows: On Windows 10 version 1903 or above, now xsystem35 can handle
