@@ -301,7 +301,7 @@ static void init_selwindow() {
 		NOTICE("frameType is Default");
 		break;
 	}
-	ags_setFontWithWeight(FONT_GOTHIC, sel.MsgFontSize, nact->ags.font_weight);
+	ags_setFontWithWeight(nact->ags.font_type, sel.MsgFontSize, nact->ags.font_weight);
 	for (i = 0; i < regnum; i++) {
 		TRACE_MESSAGE("%d:%s\n", i +1, elm[i]);
 		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +1, elm[i], sel.MsgFontColor);

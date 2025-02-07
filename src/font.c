@@ -40,7 +40,7 @@
 
 typedef struct {
 	int      size;
-	int      type;
+	FontType type;
 	TTF_Font *id;
 } FontTable;
 
@@ -56,7 +56,7 @@ static struct {
 	int face[FONTTYPEMAX];
 } this;
 
-static void font_insert(int size, int type, TTF_Font *font) {
+static void font_insert(int size, FontType type, TTF_Font *font) {
 	fonttbl[fontcnt].size = size;
 	fonttbl[fontcnt].type = type;
 	fonttbl[fontcnt].id   = font;
@@ -68,7 +68,7 @@ static void font_insert(int size, int type, TTF_Font *font) {
 	}
 }
 
-static FontTable *font_lookup(int size, int type) {
+static FontTable *font_lookup(int size, FontType type) {
 	int i;
 	
 	for (i = 0; i < fontcnt; i++) {
@@ -79,9 +79,13 @@ static FontTable *font_lookup(int size, int type) {
 	return NULL;
 }
 
-void font_select(int type, int size, int weight) {
-	FontTable *tbl;
+void font_select(FontType type, int size, int weight) {
+	if (type >= FONTTYPEMAX) {
+		WARNING("Invalid font type %d", type);
+		return;
+	}
 
+	FontTable *tbl;
 	if (NULL == (tbl = font_lookup(size, type))) {
 		TTF_Font *fs = TTF_OpenFontIndex(this.name[type], size, this.face[type]);
 #ifdef __ANDROID__
@@ -221,7 +225,11 @@ void font_init(void) {
 		SYSERROR("Failed to intialize SDL_ttf: %s", TTF_GetError());
 }
 
-void font_set_name_and_index(int type, const char *name, int index) {
+void font_set_name_and_index(FontType type, const char *name, int index) {
+	if (type >= FONTTYPEMAX) {
+		WARNING("Invalid font type %d", type);
+		return;
+	}
 	this.name[type] = name;
 	this.face[type] = index;
 }

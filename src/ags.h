@@ -113,6 +113,7 @@ struct _ags {
 	agsurface_t *dib;           /* main surface */
 	void (*eventcb)(agsevent_t *e); /* deliver event */
 
+	FontType font_type;
 	int font_weight;
 
 	bool mouse_warp_enabled;
@@ -197,12 +198,8 @@ extern void ags_whiteIn(int rate, bool flg);
 extern void ags_whiteOut(int rate, bool flg);
 
 /* フォント関連 */
-enum FontType {
-	FONT_GOTHIC,
-	FONT_MINCHO,
-};
-extern void ags_setFont(int type, int size);
-extern void ags_setFontWithWeight(int type, int size, int weight);
+extern void ags_setFont(FontType type, int size);
+extern void ags_setFontWithWeight(FontType type, int size, int weight);
 extern agsurface_t *ags_drawStringToSurface(const char *str);
 
 /* カーソル関係 */

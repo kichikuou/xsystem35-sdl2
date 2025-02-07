@@ -33,7 +33,7 @@
 #include "surface.h"
 #include "ngraph.h"
 
-static int ftype;  // フォントの種類
+static FontType ftype;
 static int fsize;  // フォントの大きさ
 
 /**
@@ -42,7 +42,7 @@ static int fsize;  // フォントの大きさ
  * @param type: フォント種類 (FONT_MINCHO, FONT_GOTHIC)
  * @param size: フォントサイズ
  */
-void dt_setfont(int type, int size) {
+void dt_setfont(FontType type, int size) {
 #ifdef __EMSCRIPTEN__
 	if (type == FONT_MINCHO) {
 		if (!load_mincho_font())

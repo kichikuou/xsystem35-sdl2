@@ -45,7 +45,7 @@ struct _night {
 
 	MyRectangle updaterect;
 
-	int fonttype;
+	FontType fonttype;
 	int fontsize;
 
 	sprite_t *sp[SPRITEMAX];

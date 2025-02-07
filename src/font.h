@@ -27,18 +27,16 @@
 #include <SDL_surface.h>
 #include "config.h"
 #include "portab.h"
-
-/* font の種類 */
-#define FONTTYPEMAX 2
+#include "graphics.h"
 
 #define FONT_WEIGHT_NORMAL 4
 #define FONT_WEIGHT_BOLD 7
 
 extern void font_init(void);
-extern void font_set_name_and_index(int type, const char *name, int index);
+extern void font_set_name_and_index(FontType type, const char *name, int index);
 extern void font_set_antialias(bool enable);
 extern bool font_get_antialias(void);
-extern void font_select(int type, int size, int weight);
+extern void font_select(FontType type, int size, int weight);
 extern struct SDL_Surface *font_get_glyph(const char *str_utf8);
 extern SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t col);
 

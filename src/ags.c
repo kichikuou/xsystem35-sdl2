@@ -130,6 +130,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.view_area.w = SYS35_DEFAULT_WIDTH;
 	nact->ags.view_area.h = SYS35_DEFAULT_HEIGHT;
 
+	nact->ags.font_type = FONT_GOTHIC;
 	nact->ags.enable_zb = enable_zb;
 	nact->ags.font_weight = enable_zb ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 	
@@ -621,11 +622,11 @@ void ags_whiteOut(int rate, bool flag) {
 	}
 }
 
-void ags_setFont(int type, int size) {
+void ags_setFont(FontType type, int size) {
 	font_select(type, size, FONT_WEIGHT_NORMAL);
 }
 
-void ags_setFontWithWeight(int type, int size, int weight) {
+void ags_setFontWithWeight(FontType type, int size, int weight) {
 	font_select(type, size, weight);
 }
 

@@ -53,4 +53,10 @@ typedef struct {
         int depth;
 } DispInfo;
 
+typedef enum {
+	FONT_GOTHIC,
+	FONT_MINCHO,
+} FontType;
+#define FONTTYPEMAX 2
+
 #endif /* !__GRAPHICS__ */

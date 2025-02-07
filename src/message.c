@@ -65,7 +65,6 @@ static void msgget_at_a();
 void msg_init() {
 	/* メッセージフォントの大きさ */
 	msg.MsgFontSize = 16;
-	msg.MsgFont     = FONT_GOTHIC;
 	
 	/* 各種色 */
 	msg.MsgFontColor             = 255;
@@ -140,7 +139,7 @@ void msg_putMessage(const char *m) {
 	// fprintf(stdout, "x=%d, y = %d, msg=%s\n", msgcur.x,msgcur.y,msg);
 	if (!msg.mg_dspMsg) return;
 	
-	ags_setFontWithWeight(msg.MsgFont, msg.MsgFontSize, nact->ags.font_weight);
+	ags_setFontWithWeight(nact->ags.font_type, msg.MsgFontSize, nact->ags.font_weight);
 
 	switch(msgDecorateType) {
 	case 0:

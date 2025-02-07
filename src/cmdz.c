@@ -472,7 +472,8 @@ void commandZZ13() {
 			num = FONT_GOTHIC;
 	}
 #endif
-	nact->msg.MsgFont = num;
+	if (num < FONTTYPEMAX)
+		nact->ags.font_type = num;
 	
 	TRACE("ZZ13 %d:",num);
 }
