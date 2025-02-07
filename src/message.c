@@ -48,9 +48,6 @@
 /* Window枠の種類 */
 static int frameType;
 static int frameDot;
-/* 文字飾りの設定 */
-static int msgDecorateColor;
-static int msgDecorateType;
 /* 現在の文字表示位置 */
 static MyPoint msgcur;
 static bool nextLineIsAfterKaigyou = false;
@@ -102,8 +99,6 @@ void msg_init() {
 	msg.wininfo[1].save = true;
 
 	// Private variables
-	msgDecorateColor = 0;
-	msgDecorateType = 0;
 	msgcur.x = 0;
 	msgcur.y = 0;
 	nextLineIsAfterKaigyou = false;
@@ -113,17 +108,7 @@ void msg_setFontSize(int size) {
 	msg.MsgFontSize = size;
 }
 
-void msg_setStringDecorationColor(int col) {
-	msgDecorateColor = col;
-}
-
-void msg_setStringDecorationType(int type) {
-	msgDecorateType = type;
-}
-
 void msg_putMessage(const char *m) {
-	MyRectangle adj;
-	
 	if (nextLineIsAfterKaigyou) {
 		sys_hit_any_key();
 		msg_nextPage(true);
@@ -141,58 +126,8 @@ void msg_putMessage(const char *m) {
 	
 	ags_setFontWithWeight(nact->ags.font_type, msg.MsgFontSize, nact->ags.font_weight);
 
-	switch(msgDecorateType) {
-	case 0:
-	default:
-		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 0;
-		break;
-	case 1:
-		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
-		break;
-	case 2:
-		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
-		break;
-	case 3:
-		ags_drawString(msgcur.x +1, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
-		break;
-	case 4:
-		ags_drawString(msgcur.x -1, msgcur.y, m, msgDecorateColor);
-		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
-		ags_drawString(msgcur.x, msgcur.y -1, m, msgDecorateColor);
-		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
-		adj.x = -1; adj.y = -1; adj.w = 2; adj.h = 2;
-		break;
-	case 6:
-		ags_drawString(msgcur.x +1, msgcur.y, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
-		break;
-	case 7:
-		ags_drawString(msgcur.x, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
-		break;
-	case 8:
-		ags_drawString(msgcur.x +1, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
-		break;
-	case 10:
-		ags_drawString(msgcur.x -1, msgcur.y   , m, msgDecorateColor);
-		ags_drawString(msgcur.x +1, msgcur.y   , m, msgDecorateColor);
-		ags_drawString(msgcur.x   , msgcur.y -1, m, msgDecorateColor);
-		ags_drawString(msgcur.x   , msgcur.y +1, m, msgDecorateColor);
-		ags_drawString(msgcur.x +2, msgcur.y +2, m, msgDecorateColor);
-		adj.x = -1; adj.y = -1; adj.w = 3; adj.h = 3;
-		break;
-	}
-	
-	MyRectangle drawn = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
-	msgcur.x += drawn.w;
-	drawn.x += adj.x;
-	drawn.y += adj.y;
-	drawn.w += adj.w;
-	drawn.h += adj.h;
+	MyRectangle drawn;
+	msgcur.x += ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor, &drawn);
 
 	if (nact->messagewait_enable && !nact->messagewait_cancelled && !msgskip_isSkipping()) {
 		int x;
@@ -341,9 +276,10 @@ void msg_hitAnyKey() {
 		[UTF8] = "▼",
 	};
 	
-	MyRectangle r = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
-								   msg.win->y + msg.win->height - msg.MsgFontSize,
-								   prompt[nact->encoding], msg.HitAnyKeyMsgColor);
+	MyRectangle r;
+	int x = msg.win->x + msg.win->width - msg.MsgFontSize;
+	int y = msg.win->y + msg.win->height - msg.MsgFontSize;
+	ags_drawString(x, y, prompt[nact->encoding], msg.HitAnyKeyMsgColor, &r);
 	ags_updateArea(r.x, r.y, r.w, r.h);
 }
 

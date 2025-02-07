@@ -30,8 +30,6 @@
 
 extern void msg_init();
 extern void msg_setFontSize(int size);
-extern void msg_setStringDecorationColor(int col);
-extern void msg_setStringDecorationType(int type);
 extern void msg_putMessage(const char *msg);
 extern void msg_nextLine();
 extern void msg_nextPage(bool clear);

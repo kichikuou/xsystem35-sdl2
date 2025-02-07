@@ -100,6 +100,19 @@ enum agsevent_button {
 	AGSEVENT_BUTTON_RIGHT,
 };
 
+typedef enum {
+	TEXT_DECORATION_NONE = 0,
+	TEXT_DECORATION_DROP_SHADOW_BOTTOM = 1,
+	TEXT_DECORATION_DROP_SHADOW_RIGHT = 2,
+	TEXT_DECORATION_DROP_SHADOW_BOTTOM_RIGHT = 3,
+	TEXT_DECORATION_OUTLINE = 4,
+	TEXT_DECORATION_BOLD_HORIZONTAL = 6,
+	TEXT_DECORATION_BOLD_VERTICAL = 7,
+	TEXT_DECORATION_BOLD_HORIZONTAL_VERTICAL = 8,
+	TEXT_DECORATION_UNDERLINE = 9,
+	TEXT_DECORATION_DROP_SHADOW_OUTLINE = 10,
+} TextDecorationType;
+
 struct _ags {
 	Color pal[256];             /* system palette */
 	bool   pal_changed;      /* system palette has changed */
@@ -115,6 +128,8 @@ struct _ags {
 
 	FontType font_type;
 	int font_weight;
+	TextDecorationType text_decoration_type;
+	int text_decoration_color;
 
 	bool mouse_warp_enabled;
 	bool enable_zb;
@@ -170,7 +185,7 @@ extern void ags_restoreRegion(void *region, int x, int y);
 extern void ags_putRegion(void *region, int x, int y);
 extern void ags_delRegion(void *region);
 
-extern MyRectangle ags_drawString(int x, int y, const char *src, int col);
+extern int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out);
 extern void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend);
 
 extern void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy);
@@ -200,6 +215,8 @@ extern void ags_whiteOut(int rate, bool flg);
 /* フォント関連 */
 extern void ags_setFont(FontType type, int size);
 extern void ags_setFontWithWeight(FontType type, int size, int weight);
+extern void ags_setTextDecorationType(TextDecorationType type);
+extern void ags_setTextDecorationColor(int color);
 extern agsurface_t *ags_drawStringToSurface(const char *str);
 
 /* カーソル関係 */

@@ -520,9 +520,9 @@ void commandZA() { /* T2 */
 	
 	switch(p1) {
 	case 0:
-		msg_setStringDecorationType(p2); break;
+		ags_setTextDecorationType(p2); break;
 	case 1:
-		msg_setStringDecorationColor(p2); break;
+		ags_setTextDecorationColor(p2); break;
 	case 2:
 	case 3:
 		nact->msg.AutoPageChange = p2 != 0; break;

@@ -131,6 +131,8 @@ void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.view_area.h = SYS35_DEFAULT_HEIGHT;
 
 	nact->ags.font_type = FONT_GOTHIC;
+	nact->ags.text_decoration_type = 0;
+	nact->ags.text_decoration_color = 0;
 	nact->ags.enable_zb = enable_zb;
 	nact->ags.font_weight = enable_zb ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 	
@@ -377,14 +379,73 @@ void ags_delRegion(void *region) {
 	sdl_delRegion(region);
 }
 
-MyRectangle ags_drawString(int x, int y, const char *src, int col) {
-	if (!ags_check_param_xy(&x, &y)) return (MyRectangle){};
+int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out) {
+	if (!ags_check_param_xy(&x, &y)) {
+		if (rect_out) {
+			rect_out->x = x;
+			rect_out->y = y;
+			rect_out->w = 0;
+			rect_out->h = 0;
+		}
+		return 0;
+	}
 	
+	MyRectangle adj;
 	char *utf8 = toUTF8(src);
+	switch(nact->ags.text_decoration_type) {
+	case TEXT_DECORATION_NONE:
+	default:
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 0;
+		break;
+	case TEXT_DECORATION_DROP_SHADOW_BOTTOM:
+		sdl_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
+		break;
+	case TEXT_DECORATION_DROP_SHADOW_RIGHT:
+		sdl_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
+		break;
+	case TEXT_DECORATION_DROP_SHADOW_BOTTOM_RIGHT:
+		sdl_drawString(x +1, y +1, utf8, nact->ags.text_decoration_color);
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
+		break;
+	case TEXT_DECORATION_OUTLINE:
+		sdl_drawString(x -1, y, utf8, nact->ags.text_decoration_color);
+		sdl_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
+		sdl_drawString(x, y -1, utf8, nact->ags.text_decoration_color);
+		sdl_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
+		adj.x = -1; adj.y = -1; adj.w = 2; adj.h = 2;
+		break;
+	case TEXT_DECORATION_BOLD_HORIZONTAL:
+		sdl_drawString(x +1, y, utf8, col);
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
+		break;
+	case TEXT_DECORATION_BOLD_VERTICAL:
+		sdl_drawString(x, y +1, utf8, col);
+		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
+		break;
+	case TEXT_DECORATION_BOLD_HORIZONTAL_VERTICAL:
+		sdl_drawString(x +1, y +1, utf8, col);
+		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
+		break;
+	case TEXT_DECORATION_DROP_SHADOW_OUTLINE:
+		sdl_drawString(x -1, y   , utf8, nact->ags.text_decoration_color);
+		sdl_drawString(x +1, y   , utf8, nact->ags.text_decoration_color);
+		sdl_drawString(x   , y -1, utf8, nact->ags.text_decoration_color);
+		sdl_drawString(x   , y +1, utf8, nact->ags.text_decoration_color);
+		sdl_drawString(x +2, y +2, utf8, nact->ags.text_decoration_color);
+		adj.x = -1; adj.y = -1; adj.w = 3; adj.h = 3;
+		break;
+	}
 	SDL_Rect r = sdl_drawString(x, y, utf8, col);
+	if (rect_out) {
+		rect_out->x = r.x + adj.x;
+		rect_out->y = r.y + adj.y;
+		rect_out->w = r.w + adj.w;
+		rect_out->h = r.h + adj.h;
+	}
 	free(utf8);
-
-	return (MyRectangle){r.x, r.y, r.w, r.h};
+	return r.w;
 }
 
 agsurface_t *ags_drawStringToSurface(const char *str) {
@@ -628,6 +689,14 @@ void ags_setFont(FontType type, int size) {
 
 void ags_setFontWithWeight(FontType type, int size, int weight) {
 	font_select(type, size, weight);
+}
+
+void ags_setTextDecorationType(TextDecorationType type) {
+	nact->ags.text_decoration_type = type;
+}
+
+void ags_setTextDecorationColor(int col) {
+	nact->ags.text_decoration_color = col;
 }
 
 void ags_setCursorType(int type) {
