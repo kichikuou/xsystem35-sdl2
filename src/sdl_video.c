@@ -291,10 +291,8 @@ void sdl_setIntegerScaling(bool enable) {
 
 #ifdef __EMSCRIPTEN__
 
-void* EMSCRIPTEN_KEEPALIVE sdl_getDisplaySurface() {
-	if (SDL_MUSTLOCK(sdl_display))
-		return NULL;
-	return sdl_display->pixels;
+bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
+	return SDL_SaveBMP(sdl_display, path) == 0;
 }
 
 #endif
