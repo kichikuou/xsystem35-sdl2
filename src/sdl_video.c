@@ -39,7 +39,6 @@
 SDL_Window *sdl_window;
 SDL_Renderer *sdl_renderer;
 SDL_Texture *sdl_texture;
-SDL_Surface *sdl_display; // toplevel surface
 SDL_Surface *sdl_dib; // offscreen surface
 SDL_Color sdl_col[256]; // color palette
 agsurface_t *sdl_dibinfo;
@@ -105,12 +104,13 @@ int sdl_Initialize(const char *render_driver) {
 }
 
 void sdl_Remove(void) {
-	if (sdl_display) {
+	if (sdl_dib)
 		SDL_FreeSurface(sdl_dib);
+	if (sdl_renderer)
 		SDL_DestroyRenderer(sdl_renderer);
+	if (js)
 		SDL_JoystickClose(js);
-		SDL_Quit();
-	}
+	SDL_Quit();
 }
 
 /* name is UTF-8 */
@@ -258,13 +258,10 @@ void sdl_setWindowSize(int w, int h) {
 	SDL_SetWindowSize(sdl_window, w, h);
 #endif
 	SDL_RenderSetLogicalSize(sdl_renderer, w, h);
-	if (sdl_display)
-		SDL_FreeSurface(sdl_display);
 	if (sdl_texture)
 		SDL_DestroyTexture(sdl_texture);
-	sdl_display = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
-	sdl_texture = SDL_CreateTexture(sdl_renderer, sdl_display->format->format,
-									SDL_TEXTUREACCESS_STATIC, w, h);
+	sdl_texture = SDL_CreateTexture(
+		sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, w, h);
 
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.windowSizeChanged(); );
@@ -292,7 +289,7 @@ void sdl_setIntegerScaling(bool enable) {
 #ifdef __EMSCRIPTEN__
 
 bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
-	return SDL_SaveBMP(sdl_display, path) == 0;
+	return SDL_SaveBMP(sdl_dib, path) == 0;
 }
 
 #endif
