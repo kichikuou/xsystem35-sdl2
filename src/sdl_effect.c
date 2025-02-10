@@ -139,7 +139,7 @@ static void effect_init(struct sdl_effect *eff, SDL_Rect *rect, SDL_Surface *old
 	eff->type = type;
 	eff->dst_rect = *rect;
 	eff->is_fullscreen = rect->x == 0 && rect->y == 0
-		&& rect->w == sdl_display->w && rect->h == sdl_display->h;
+		&& rect->w == view_w && rect->h == view_h;
 	if (old) {
 		eff->tx_old = SDL_CreateTextureFromSurface(sdl_renderer, old);
 		SDL_FreeSurface(old);
@@ -570,10 +570,13 @@ static void dithering_fade_step(struct sdl_effect *eff, float progress) {
 }
 
 static void dithering_fade_free(struct sdl_effect *eff) {
-	if (eff->type == EFFECT_DITHERING_FADEOUT)
-		SDL_FillRect(sdl_display, &eff->dst_rect, SDL_MapRGB(sdl_display->format, 0, 0, 0));
-	else if (eff->type == EFFECT_DITHERING_WHITEOUT)
-		SDL_FillRect(sdl_display, &eff->dst_rect, SDL_MapRGB(sdl_display->format, 255, 255, 255));
+	if (eff->type == EFFECT_DITHERING_FADEOUT) {
+		SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+		SDL_RenderFillRect(sdl_renderer, &eff->dst_rect);
+	} else if (eff->type == EFFECT_DITHERING_WHITEOUT) {
+		SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, 255);
+		SDL_RenderFillRect(sdl_renderer, &eff->dst_rect);
+	}
 	effect_finish(eff, false);
 	free(eff);
 }
@@ -1683,7 +1686,7 @@ static SDL_Surface *create_surface(agsurface_t *as, int x, int y, int w, int h) 
 	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
 	SDL_Rect rect = { x, y, w, h };
 	if (!as) {
-		SDL_BlitSurface(sdl_display, &rect, sf, NULL);
+		SDL_BlitSurface(sdl_dib /* FIXME */, &rect, sf, NULL);
 	} else if (as == sdl_dibinfo) {
 		SDL_BlitSurface(sdl_dib, &rect, sf, NULL);
 	} else {
