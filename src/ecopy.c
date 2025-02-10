@@ -329,7 +329,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	enum sdl_effect_type sdl_effect = from_nact_effect(sw);
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
-		// Note that we specify NULL (which means sdl_display) for the old
+		// Note that we specify NULL (which means sdl_texture) for the old
 		// surface rather than sdl_getDIB(). This is to use the current display
 		// contents, not reflecting uncommitted palette changes.
 		struct sdl_effect *eff = sdl_effect_init(&rect, NULL, rect.x, rect.y, sdl_getDIB(), sx, sy, sdl_effect);

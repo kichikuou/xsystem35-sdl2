@@ -33,7 +33,6 @@
 extern SDL_Window *sdl_window;
 extern SDL_Renderer *sdl_renderer;
 extern SDL_Texture *sdl_texture;
-extern SDL_Surface *sdl_display; // toplevel surface
 extern SDL_Surface *sdl_dib; // offscreen surface
 extern SDL_Color sdl_col[256]; // color palette
 extern agsurface_t *sdl_dibinfo;

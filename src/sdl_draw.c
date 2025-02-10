@@ -59,7 +59,6 @@ static Uint32 palette_color(uint8_t c) {
 void sdl_updateScreen(void) {
 	if (!sdl_dirty)
 		return;
-	SDL_UpdateTexture(sdl_texture, NULL, sdl_display->pixels, sdl_display->pitch);
 	SDL_RenderClear(sdl_renderer);
 	SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 	SDL_RenderPresent(sdl_renderer);
@@ -104,21 +103,31 @@ void sdl_wait_vsync() {
 }
 
 /* off-screen の指定領域を Main Window へ転送 */
-void sdl_updateArea(MyRectangle *src, MyPoint *dst) {
-	SDL_Rect rect_d = {dst->x, dst->y, src->w, src->h};
-	
-	SDL_BlitSurface(sdl_dib, src, sdl_display, &rect_d);
-	
+void sdl_updateArea(MyRectangle *rect, MyPoint *dst) {
+	SDL_Rect rs = {0, 0, sdl_dib->w, sdl_dib->h};
+	if (!SDL_IntersectRect(rect, &rs, &rs))
+		return;
+	int dx = dst->x + (rs.x - rect->x);
+	int dy = dst->y + (rs.y - rect->y);
+	SDL_Rect rd = {dx, dy, rs.w, rs.h};
+	if (!SDL_IntersectRect(&rd, &(SDL_Rect){0, 0, view_w, view_h}, &rd))
+		return;
+	rs.x += rd.x - dx;
+	rs.y += rd.y - dy;
+	rs.w = rd.w;
+	rs.h = rd.h;
+
+	SDL_Surface *sf;
+	SDL_LockTextureToSurface(sdl_texture, &rd, &sf);
+	SDL_BlitSurface(sdl_dib, &rs, sf, NULL);
+	SDL_UnlockTexture(sdl_texture);
+
 	sdl_dirty = true;
 }
 
 /* 全画面更新 */
 void sdl_updateAll(MyRectangle *view_rect) {
-	SDL_Rect rect = {0, 0, view_w, view_h};
-	
-	SDL_BlitSurface(sdl_dib, view_rect, sdl_display, &rect);
-
-	sdl_dirty = true;
+	sdl_updateArea(view_rect, &(MyPoint){0, 0});
 }
 
 /* Color の複数個指定 */
@@ -297,9 +306,9 @@ SDL_Rect sdl_floodFill(int x, int y, int c) {
 	}
 }
 
-SDL_Surface *com2surface(agsurface_t *s) {
-	return SDL_CreateRGBSurfaceFrom(
-		s->pixel, s->width, s->height, s->depth, s->bytes_per_line, 0, 0, 0, 0);
+SDL_Surface *com2surface(agsurface_t *s, int x, int y, int w, int h) {
+	uint8_t *pixels = s->pixel + y * s->bytes_per_line + x * s->bytes_per_pixel;
+	return SDL_CreateRGBSurfaceFrom(pixels, w, h, s->depth, s->bytes_per_line, 0, 0, 0, 0);
 }
 
 int sdl_nearest_color(int r, int g, int b) {
