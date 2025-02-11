@@ -104,22 +104,18 @@ void sdl_wait_vsync() {
 
 /* off-screen の指定領域を Main Window へ転送 */
 void sdl_updateArea(MyRectangle *rect, MyPoint *dst) {
-	SDL_Rect rs = {0, 0, sdl_dib->w, sdl_dib->h};
-	if (!SDL_IntersectRect(rect, &rs, &rs))
+	SDL_Rect sw = {0, 0, sdl_dib->w, sdl_dib->h};
+	SDL_Rect dw = {0, 0, view_w, view_h};
+	SDL_Rect sr = {rect->x, rect->y, rect->w, rect->h};
+	SDL_Rect dr = {dst->x, dst->y, rect->w, rect->h};
+	if (!ags_clipCopyRect(&sw, &dw, &sr.x, &sr.y, &dr.x, &dr.y, &sr.w, &sr.h))
 		return;
-	int dx = dst->x + (rs.x - rect->x);
-	int dy = dst->y + (rs.y - rect->y);
-	SDL_Rect rd = {dx, dy, rs.w, rs.h};
-	if (!SDL_IntersectRect(&rd, &(SDL_Rect){0, 0, view_w, view_h}, &rd))
-		return;
-	rs.x += rd.x - dx;
-	rs.y += rd.y - dy;
-	rs.w = rd.w;
-	rs.h = rd.h;
+	dr.w = sr.w;
+	dr.h = sr.h;
 
 	SDL_Surface *sf;
-	SDL_LockTextureToSurface(sdl_texture, &rd, &sf);
-	SDL_BlitSurface(sdl_dib, &rs, sf, NULL);
+	SDL_LockTextureToSurface(sdl_texture, &dr, &sf);
+	SDL_BlitSurface(sdl_dib, &sr, sf, NULL);
 	SDL_UnlockTexture(sdl_texture);
 
 	sdl_dirty = true;

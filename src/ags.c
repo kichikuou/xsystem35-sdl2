@@ -785,3 +785,31 @@ agsurface_t *ags_getDIB() {
 void ags_autorepeat(bool enable) {
 	sdl_setAutoRepeat(enable);
 }
+
+bool ags_clipCopyRect(const MyRectangle *sw, const MyRectangle *dw, int *sx, int *sy, int *dx, int *dy, int *w, int *h) {
+	// Clip source rectangle to source window
+	SDL_Rect sr = {*sx, *sy, *w, *h};
+	if (!SDL_IntersectRect(&sr, sw, &sr))
+		return false;
+
+	// Shift destination rectangle if source origin has changed
+	int dx_ = *dx + (sr.x - *sx);
+	int dy_ = *dy + (sr.y - *sy);
+
+	// Clip destination rectangle to destination window
+	SDL_Rect dr = {dx_, dy_, sr.w, sr.h};
+	if (!SDL_IntersectRect(&dr, dw, &dr))
+		return false;
+
+	// Shift source rectangle if destination origin has changed
+	sr.x += dr.x - dx_;
+	sr.y += dr.y - dy_;
+
+	*sx = sr.x;
+	*sy = sr.y;
+	*w = dr.w;
+	*h = dr.h;
+	*dx = dr.x;
+	*dy = dr.y;
+	return true;
+}

@@ -9,19 +9,12 @@
 #include "surface.h"
 #include "graph.h"
 #include "ngraph.h"
-#include "nact.h"
+#include "ags.h"
 
 /*
   gr_xxxx はクリッピングあり
   gre_xxxx はクリッピングなし
 */
-
-#undef WARNING
-#define WARNING(...)
-
-#undef NOTICE
-#define NOTICE(...)
-
 
 /**
  * surface から surface にコピーなどをする際に、転送元と転送先のsurface
@@ -42,74 +35,10 @@
  *         それぞれの引数は適宜変更されている
  */
 bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy) {
-	int w, h;
-	
-	if (ss == NULL) {
-		WARNING("ss surface is null");
-		return false;
-	}
-	if (ss == NULL) {
-		WARNING("ss surface is null");
-		return false;
-	}
-	
-	if (*sx > ss->width) {
-		WARNING("sx is too large (sx=%d,width=%d)", *sx, ss->width);
-		return false;
-	}
-	if (*sy > ss->height) {
-		WARNING("sy is too large (sy=%d,height=%d)", *sy, ss->height);
-		return false;
-	}
-	
-	if (*sx < 0) {
-		WARNING("sx is too small (sx=%d)", *sx);
-		return false;
-	}
-	if (*sy < 0) {
-		WARNING("sy is too small (sy=%d)", *sy);
-		return false;
-	}
-	
-	if (*dx > ds->width) {
-		WARNING("dx is too large (dx=%d,width=%d)", *dx, ds->width);
-		return false;
-	}
-	if (*dy > ds->height) {
-		WARNING("dy is too large (dy=%d,height=%d)", *dy, ds->height);
-		return false;
-	}
-	
-	w = *sw;
-	h = *sh;
-	
-	if (*dx < 0) {
-		*sx -= *dx; *sw += *dx; *dx = 0;
-	}
-	if (*dy < 0) {
-		*sy -= *dy; *sh += *dy; *dy = 0;
-	}
-	
-	*sw = min(ss->width  - *sx, min(ds->width  - *dx, *sw));
-	*sh = min(ss->height - *sy, min(ds->height - *dy, *sh));
-
-	if (*sw <= 0) {
-		WARNING("sw become <=0");
-		return false;
-	}
-	if (*sh <= 0) {
-		WARNING("sh become <=0");
-		return false;
-	}
-	
-	if (*sw != w) {
-		NOTICE("width change %d -> %d", w, *sw);
-	}
-	if (*sh != h) {
-		NOTICE("height change %d -> %d", h, *sh);
-	}
-	
-	return true;
+	if (!ss || !ds) return false;
+	MyRectangle src_window = { 0, 0, ss->width, ss->height };
+	MyRectangle dst_window = { 0, 0, ds->width, ds->height };
+	return ags_clipCopyRect(&src_window, &dst_window, sx, sy, dx, dy, sw, sh);
 }
 
 /**
@@ -126,51 +55,14 @@ bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, i
  *         それぞれの引数は適宜変更されている
  */
 bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
-	int w, h;
-	
-	if (ss == NULL) {
-		WARNING("ss surface is null");
+	if (!ss) return false;
+	SDL_Rect rect = {*sx, *sy, *sw, *sh};
+	if (!SDL_IntersectRect(&rect, &(SDL_Rect){ 0, 0, ss->width, ss->height }, &rect))
 		return false;
-	}
-	
-	if (*sx > ss->width) {
-		WARNING("sx is too large (sx=%d,width=%d)", *sx, ss->width);
-		return false;
-	}
-	if (*sy > ss->height) {
-		WARNING("sy is too large (sy=%d,height=%d)", *sy, ss->height);
-		return false;
-	}
-	
-	w = *sw;
-	h = *sh;
-	
-	if (*sx < 0) {
-		*sw += *sx; *sx = 0;
-	}
-	if (*sy < 0) {
-		*sh += *sy; *sy = 0;
-	}
-	
-	*sw = min(ss->width  - *sx, *sw);
-	*sh = min(ss->height - *sy, *sh);
-	
-	if (*sw <= 0) {
-		WARNING("sw become <=0");
-		return false;
-	}
-	if (*sh <= 0) {
-		WARNING("sh become <=0");
-		return false;
-	}
-	
-	if (*sw != w) {
-		NOTICE("width change %d -> %d", w, *sw);
-	}
-	if (*sh != h) {
-		NOTICE("height change %d -> %d", h, *sh);
-	}
-	
+	*sx = rect.x;
+	*sy = rect.y;
+	*sw = rect.w;
+	*sh = rect.h;
 	return true;
 }
 

@@ -230,6 +230,7 @@ extern int  ags_getCursorMoveTime();
 extern void    ags_setAntialiasedStringMode(bool mode);
 extern bool ags_getAntialiasedStringMode();
 extern void    ags_autorepeat(bool enable);
+extern bool ags_clipCopyRect(const MyRectangle *sr, const MyRectangle *dr, int *sx, int *sy, int *dx, int *dy, int *w, int *h);
 
 typedef void (*ags_EffectStepFunc)(void *, float);
 void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, void *arg);
