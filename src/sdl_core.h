@@ -48,6 +48,7 @@ extern bool sdl_isFullscreen(void);
 extern void sdl_raiseWindow(void);
 extern agsurface_t *sdl_getDIB(void);
 extern void sdl_setIntegerScaling(bool enable);
+extern SDL_Surface *sdl_createSurfaceView(agsurface_t *s, int x, int y, int w, int h);
 
 /* 画面更新 */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);
@@ -118,5 +119,7 @@ extern void sdl_showMessageBox(enum messagebox_type type, const char* title_utf8
 extern bool sdl_inputString(struct inputstring_param *);
 extern void sdl_post_debugger_command(void *data);
 extern void sdl_handle_event(SDL_Event *e);
+
+extern bool save_screenshot(const char* path);
 
 #endif /* !__SDL_CORE__ */

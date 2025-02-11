@@ -126,21 +126,6 @@ enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
 	}
 }
 
-static SDL_Surface *create_surface_view(agsurface_t *s, int x, int y, int w, int h) {
-	if (s == sdl_dibinfo) {
-		uint8_t *pixels = sdl_dib->pixels;
-		pixels += y * sdl_dib->pitch + x * sdl_dib->format->BytesPerPixel;
-		SDL_Surface *view = SDL_CreateRGBSurfaceWithFormatFrom(
-			pixels, w, h, sdl_dib->format->BitsPerPixel, sdl_dib->pitch, sdl_dib->format->format);
-		if (sdl_dib->format->palette)
-			SDL_SetSurfacePalette(view, sdl_dib->format->palette);
-		return view;
-	} else {
-		uint8_t *pixels = s->pixel + y * s->bytes_per_line + x * s->bytes_per_pixel;
-		return SDL_CreateRGBSurfaceFrom(pixels, w, h, s->depth, s->bytes_per_line, 0, 0, 0, 0);
-	}
-}
-
 typedef struct {
 	SDL_Texture *tx;
 	SDL_Rect rect;
@@ -152,7 +137,7 @@ static EffectTexture *create_effect_texture(agsurface_t *as, int x, int y, int w
 		t->tx = sdl_texture;
 		t->rect = (SDL_Rect){ x, y, w, h };
 	} else {
-		SDL_Surface *sf = create_surface_view(as, x, y, w, h);
+		SDL_Surface *sf = sdl_createSurfaceView(as, x, y, w, h);
 		t->tx = SDL_CreateTextureFromSurface(sdl_renderer, sf);
 		SDL_FreeSurface(sf);
 		t->rect = (SDL_Rect){ 0, 0, w, h };
