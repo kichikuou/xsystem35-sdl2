@@ -306,11 +306,6 @@ SDL_Rect sdl_floodFill(int x, int y, int c) {
 	}
 }
 
-SDL_Surface *com2surface(agsurface_t *s, int x, int y, int w, int h) {
-	uint8_t *pixels = s->pixel + y * s->bytes_per_line + x * s->bytes_per_pixel;
-	return SDL_CreateRGBSurfaceFrom(pixels, w, h, s->depth, s->bytes_per_line, 0, 0, 0, 0);
-}
-
 int sdl_nearest_color(int r, int g, int b) {
 	int i, col, mind = INT_MAX;
 	for (i = 0; i < 256; i++) {

@@ -82,7 +82,6 @@ extern void sdl_putRegion(void *src, int x, int y);
 extern void sdl_restoreRegion(void *src, int x, int y);
 extern void* sdl_saveRegion(int x, int y, int w, int h);
 extern void sdl_delRegion(void *src);
-extern SDL_Surface *com2surface(agsurface_t *s, int x, int y, int w, int h);
 
 /* Effects */
 struct sdl_effect;
