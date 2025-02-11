@@ -5,6 +5,7 @@ arith.adv
 array.adv
 strvar.adv
 stack.adv
+math.adv
 
 #DLLHeader
 ShString.HEL

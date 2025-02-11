@@ -1,0 +1,42 @@
+	MS FILE, "arith.adv":
+
+	WW 640, 400, 8:
+	mathSetClipWindow 10, 10, 100, 100:
+
+	; Fully inside window
+	! dx:20 !! dy:20 !! sx:30 !! sy:30 !! w:40 !! h:40 !
+	mathClip dx, dy, sx, sy, w, h:
+	~AssertEquals dx, 20, __LINE__:
+	~AssertEquals dy, 20, __LINE__:
+	~AssertEquals sx, 30, __LINE__:
+	~AssertEquals sy, 30, __LINE__:
+	~AssertEquals w, 40, __LINE__:
+	~AssertEquals h, 40, __LINE__:
+
+	; Destination partially outside window
+	! dx:5 !! dy:5 !! sx:15 !! sy:15 !! w:20 !! h:20 !
+	mathClip dx, dy, sx, sy, w, h:
+	~AssertEquals dx, 10, __LINE__:
+	~AssertEquals dy, 10, __LINE__:
+	~AssertEquals sx, 20, __LINE__:
+	~AssertEquals sy, 20, __LINE__:
+	~AssertEquals w, 15, __LINE__:
+	~AssertEquals h, 15, __LINE__:
+
+	; Destination completely outside window
+	! dx:120 !! dy:120 !! sx:50 !! sy:50 !! w:20 !! h:20 !
+	mathClip dx, dy, sx, sy, w, h:
+	~AssertEquals w, 0, __LINE__:
+	~AssertEquals h, 0, __LINE__:
+
+	; Source rectangle should not be clipped by window
+	! dx:50 !! dy:50 !! sx:200 !! sy:50 !! w:20 !! h:20 !
+	mathClip dx, dy, sx, sy, w, h:
+	~AssertEquals dx, 50, __LINE__:
+	~AssertEquals dy, 50, __LINE__:
+	~AssertEquals sx, 200, __LINE__:
+	~AssertEquals sy, 50, __LINE__:
+	~AssertEquals w, 20, __LINE__:
+	~AssertEquals h, 20, __LINE__:
+
+	%0:
