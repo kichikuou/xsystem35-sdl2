@@ -41,8 +41,6 @@
 
 #define SLOT 40
 
-static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, int r, int g, int b);
-
 static MyRectangle maprect;  /* アニメーション表示領域 */
 static MyRectangle mapback;  /* 背景セーブ領域 */
 static int mapback_p5;       /* 背景転送先 X */
@@ -89,6 +87,14 @@ static struct _s2 s2[SLOT];
 
 static int* add_p5[SLOT]; /* どこまでアニメーションのコマが進んだか */
 
+static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, int r, int g, int b) {
+	SDL_Surface *sf = nact->ags.dib->sdl_surface;
+	SDL_SetColorKey(sf, SDL_TRUE, SDL_MapRGB(sf->format, r, g, b));
+	SDL_Rect src_rect = { sx, sy, width, height };
+	SDL_Rect dst_rect = { dx, dy, width, height };
+	SDL_BlitSurface(sf, &src_rect, sf, &dst_rect);
+	SDL_SetColorKey(sf, SDL_FALSE, 0);
+}
 
 static void Init() {
 	/*
@@ -550,60 +556,6 @@ static void PlayAnimeData() {
 		if (now - cnt < interval) {
 			sdl_sleep(interval - (now-cnt));
 		}
-	}
-}
-
-static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, int r, int g, int b) {
-	int x, y;
-	uint8_t *sp, *dp;
-	agsurface_t *dib;
-	
-	if (dx < 0 || dy < 0) return;
-	
-	ags_check_param(&sx, &sy, &width, &height);
-	ags_check_param(&dx, &dy, &width, &height);
-	
-	dib = nact->ags.dib;
-	
-	sp = GETOFFSET_PIXEL(dib, sx, sy);
-	dp = GETOFFSET_PIXEL(dib, dx, dy);
-	
-	switch(dib->depth) {
-	case 16:
-	{
-		uint16_t pic16 = PIX16(r, g, b);
-		uint16_t *yls, *yld;
-		
-		for (y = 0; y < height; y++) {
-			yls = (uint16_t *)(sp + y * dib->bytes_per_line);
-			yld = (uint16_t *)(dp + y * dib->bytes_per_line);
-			for (x = 0; x < width; x++) {
-				if (*yls != pic16) {
-					*yld = *yls;
-				}
-				yls++; yld++;
-			}
-		}
-		break;
-	}
-	case 24:
-	case 32:
-	{
-		uint32_t pic24 = PIX24(r, g, b);
-		uint32_t *yls, *yld;
-		
-		for (y = 0; y < height; y++) {
-			yls = (uint32_t *)(sp + y * dib->bytes_per_line);
-			yld = (uint32_t *)(dp + y * dib->bytes_per_line);
-			for (x = 0; x < width; x++) {
-				if (*yls != pic24) {
-					*yld = *yls;
-				}
-				yls++; yld++;
-			}
-		}
-		break;
-	}
 	}
 }
 

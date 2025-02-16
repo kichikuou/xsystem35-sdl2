@@ -66,18 +66,11 @@ add_library(modules STATIC
   lib/surface.c
   lib/cg.c
   lib/graph_expandcolor_blend.c
-  lib/graph_fillrect.c
   lib/graph_fillrect_amap.c
-  lib/graph_fillrect_acolor.c
-  lib/graph_rect.c
-  lib/graph_copy.c
   lib/graph_copy_amap.c
-  lib/graph_copy_bright.c
   lib/graph_blend_amap.c
-  lib/graph_blend_screen.c
   lib/graph_saturadd_amap.c
   lib/graph_draw_amap.c
-  lib/graph_stretch.c
   lib/graph_cg.c
   lib/gre_blend_useamap.c
   nDEMO/nDEMO.c

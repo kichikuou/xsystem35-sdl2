@@ -260,19 +260,11 @@ void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, vo
                                       (((PIXG16((f)) - PIXG16((b))) * (a)) >> 8)+ PIXG16((b)),\
                                       (((PIXB16((f)) - PIXB16((b))) * (a)) >> 8)+ PIXB16((b))))
 
-#define ALPHALEVEL16(p, lv) PIX16(((PIXR16(p) * (lv)) >> 8),\
-								  ((PIXG16(p) * (lv)) >> 8),\
-								  ((PIXB16(p) * (lv)) >> 8))
-
 #define WHITELEVEL16(p, lv) ALPHABLEND16(0xffff,p,lv)
 
 #define ALPHABLEND24(f, b, a)  (PIX24((((PIXR24((f)) - PIXR24((b))) * (a)) >> 8) + PIXR24((b)),\
                                       (((PIXG24((f)) - PIXG24((b))) * (a)) >> 8) + PIXG24((b)),\
                                       (((PIXB24((f)) - PIXB24((b))) * (a)) >> 8) + PIXB24((b))))
-
-#define ALPHALEVEL24(p, lv) (PIX24(((PIXR24(p) * (lv)) >> 8),\
-                                   ((PIXG24(p) * (lv)) >> 8),\
-                                   ((PIXB24(p) * (lv)) >> 8)))
 
 #define WHITELEVEL24(p, lv) ALPHABLEND24(0xffffffff, p, lv)
 

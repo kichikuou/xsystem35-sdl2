@@ -5,6 +5,7 @@
 #include "nact.h"
 #include "ags.h"
 #include "surface.h"
+#include "graph.h"
 
 #define sf0 nact->ags.dib
 
@@ -19,24 +20,8 @@ bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
 // 8bppのモノクロをcolでブレンド
 void gr_expandcolor_blend(surface_t *dst, int dx, int dy, struct SDL_Surface *src, int sx, int sy, int sw, int sh, int r, int g, int b);
 
-/* in graph_fillrect.c */
-void gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b);
-
 /* in graph_fillrect_amap.c */
 void gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv);
-
-/* in graph_fillrect_acolor.c */
-void gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv);
-
-/* in graph_rect.c */
-// 矩形枠描画
-void gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b);
-
-/* in graph_copy.c */
-void gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
-
-/* in graph_copy_bright.c */
-void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv);
 
 /* in graph_copy_amap.c */
 void gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
@@ -57,10 +42,6 @@ void gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int h
 
 /* in gre_blend_useamap.c */
 void gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, surface_t *alpha, int ax, int ay, int lv);
-
-/* in graph_stretch.c */
-void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh);
-
 
 /* in graph_cg.c */
 void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y);
