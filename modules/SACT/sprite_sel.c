@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "nact.h"
@@ -176,7 +177,7 @@ static void setup_selwindow() {
 	selcanvas = sf_dup(sp->cg1->sf);
 	
 	// 選択肢文字用 canvas
-	sact.sel.charcanvas = sf_create_pixel(selcanvas->width, selcanvas->height, 8);
+	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, selcanvas->width, selcanvas->height, 8, SDL_PIXELFORMAT_INDEX8);
 	
 	dt_setfont(sact.sel.font_type, sact.sel.font_size);
 	
@@ -224,7 +225,8 @@ static void remove_selwindow() {
 	// 作業用 surface の削除
 	sf_free(selcanvas);
 	selcanvas = NULL;
-	sf_free(sact.sel.charcanvas);
+	if (sact.sel.charcanvas)
+		SDL_FreeSurface(sact.sel.charcanvas);
 	sact.sel.charcanvas = NULL;
 }
 
@@ -266,7 +268,7 @@ void ssel_reset(void) {
 		selcanvas = NULL;
 	}
 	if (sact.sel.charcanvas) {
-		sf_free(sact.sel.charcanvas);
+		SDL_FreeSurface(sact.sel.charcanvas);
 		sact.sel.charcanvas = NULL;
 	}
 }

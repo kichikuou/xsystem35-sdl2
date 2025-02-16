@@ -158,11 +158,12 @@ void scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
 	if (svar_length(wText) == 0) return;
 
 	ags_setFont(FONT_GOTHIC, wSize);
-	agsurface_t *glyph = ags_drawStringToSurface(svar_get(wText));
+	SDL_Surface *glyph = ags_drawStringToSurface(svar_get(wText));
 
-	surface_t *sf = sf_create_surface(glyph->width, wSize, nact->ags.dib->depth);
-	gr_fill(sf, 0, 0, glyph->width, wSize, wR, wG, wB);
-	gr_draw_amap(sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
+	surface_t *sf = sf_create_surface(glyph->w, wSize, nact->ags.dib->depth);
+	gr_fill(sf, 0, 0, glyph->w, wSize, wR, wG, wB);
+	gr_draw_amap(sf, 0, 0, glyph->pixels, glyph->w, wSize, glyph->pitch);
+	SDL_FreeSurface(glyph);
 
 	scg_new(CG_SET, wNumCG, sf);
 }
@@ -182,11 +183,12 @@ void scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs
 	sprintf(s, ss, wValue);
 
 	ags_setFont(FONT_GOTHIC, wSize);
-	agsurface_t *glyph = ags_drawStringToSurface(s);
+	SDL_Surface *glyph = ags_drawStringToSurface(s);
 
-	surface_t *sf = sf_create_surface(glyph->width, wSize, nact->ags.dib->depth);
-	gr_fill(sf, 0, 0, glyph->width, wSize, wR, wG, wB);
-	gr_draw_amap(sf, 0, 0, glyph->pixel, glyph->width, wSize, glyph->bytes_per_line);
+	surface_t *sf = sf_create_surface(glyph->w, wSize, nact->ags.dib->depth);
+	gr_fill(sf, 0, 0, glyph->w, wSize, wR, wG, wB);
+	gr_draw_amap(sf, 0, 0, glyph->pixels, glyph->w, wSize, glyph->pitch);
+	SDL_FreeSurface(glyph);
 
 	scg_new(CG_SET, wNumCG, sf);
 }

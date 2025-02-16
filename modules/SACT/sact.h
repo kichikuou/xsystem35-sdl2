@@ -234,7 +234,7 @@ struct _sact {
 		int align; // 行そろえ
 		void (* cbmove)(agsevent_t *);
 		void (* cbrelease)(agsevent_t *);
-		surface_t   *charcanvas;
+		struct SDL_Surface *charcanvas;
 	} sel;
 	
 	// event listener

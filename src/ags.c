@@ -448,25 +448,11 @@ int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out
 	return r.w;
 }
 
-agsurface_t *ags_drawStringToSurface(const char *str) {
-	static SDL_Surface *fs;
-	static agsurface_t result;
-	if (fs) {
-		SDL_FreeSurface(fs);
-		fs = NULL;
-	}
-
+SDL_Surface *ags_drawStringToSurface(const char *str) {
 	char *utf8 = toUTF8(str);
-	fs = font_get_glyph(utf8);
+	SDL_Surface *sf = font_get_glyph(utf8);
 	free(utf8);
-
-	result.depth = fs->format->BitsPerPixel;
-	result.bytes_per_pixel = fs->format->BytesPerPixel;
-	result.bytes_per_line = fs->pitch;
-	result.pixel = fs->pixels;
-	result.width = fs->w;
-	result.height = fs->h;
-	return &result;
+	return sf;
 }
 
 void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend) {

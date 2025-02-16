@@ -64,21 +64,15 @@ void dt_setfont(FontType type, int size) {
  * @param buf: 描画文字列 (SJIS)
  * @return: 実際に描画した幅
 */
-int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
-	int sx, sy, sw, sh;
-
+int dt_drawtext(SDL_Surface *sf, int x, int y, char *buf) {
 	ags_setFont(ftype, fsize);
-	agsurface_t *glyph = ags_drawStringToSurface(buf);
+	SDL_Surface *glyph = ags_drawStringToSurface(buf);
 	if (glyph == NULL) return 0;
-	
-	sx = x;	sy = y;
-	sw = glyph->width;
-	sh = glyph->height;
-	if (!gr_clip_xywh(sf, &sx, &sy, &sw, &sh)) return 0;
-	
-	gr_copy(sf, sx, sy, glyph, 0, 0, sw, sh);
-	
-	return sw;
+
+	SDL_Rect r = {x, y, glyph->w, glyph->h};
+	SDL_BlitSurface(glyph, NULL, sf, &r);
+	SDL_FreeSurface(glyph);
+	return glyph->w;
 }
 
 /**
@@ -98,19 +92,20 @@ int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b)
 	int sx, sy, sw, sh;
 
 	ags_setFont(ftype, fsize);
-	agsurface_t *glyph = ags_drawStringToSurface(buf);
+	SDL_Surface *glyph = ags_drawStringToSurface(buf);
 	if (glyph == NULL) return 0;
 
 	sx = x;	sy = y;
-	sw = glyph->width;
-	sh = glyph->height;
+	sw = glyph->w;
+	sh = glyph->h;
 	if (!gr_clip_xywh(sf, &sx, &sy, &sw, &sh)) return 0;
 	
 	// alpha map に文字そのものを描く
-	gr_draw_amap(sf, sx, sy, glyph->pixel, sw, sh, glyph->bytes_per_line);
-	
+	gr_draw_amap(sf, sx, sy, glyph->pixels, sw, sh, glyph->pitch);
+
 	// pixel map には色情報を矩形で描く
 	gr_fill(sf, sx, sy, sw, sh, r, g, b);
-	
+
+	SDL_FreeSurface(glyph);
 	return sw;
 }

@@ -17,7 +17,7 @@ bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
 
 /* in graph_expandcolor_blend.c */
 // 8bppのモノクロをcolでブレンド
-void gr_expandcolor_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh, int r, int g, int b);
+void gr_expandcolor_blend(surface_t *dst, int dx, int dy, struct SDL_Surface *src, int sx, int sy, int sw, int sh, int r, int g, int b);
 
 /* in graph_fillrect.c */
 void gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b);

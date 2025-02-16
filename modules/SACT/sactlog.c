@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -61,7 +62,7 @@ static const char *logmsg_utf8[LOGMSG_LINES] = {
 #define LOGLINENUM (sf0->height / FONTSIZE)
 static int curline;
 static surface_t *back;
-static surface_t *chr;
+static SDL_Surface *chr;
 
 static void draw_log() {
 	int i, y = 0, len;
@@ -69,8 +70,7 @@ static void draw_log() {
 	char pinfo[256];
 	List *node;
 
-	// canvas clear
-	memset(chr->pixel, 0, chr->bytes_per_line * chr->height);
+	SDL_FillRect(chr, NULL, 0);
 	
 	// ページ位置情報
 	len = snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, list_length(sact.log));
@@ -85,7 +85,7 @@ static void draw_log() {
 		
 		char *str = (char *)(node->data);
 		if (0 == strcmp(str, "\n")) {
-			gr_fill(chr, 0, y + FONTSIZE/2, sf0->width, 3, 128, 0, 0);
+			SDL_FillRect(chr, &(SDL_Rect){0, y + FONTSIZE/2, sf0->width, 3}, 128);
 		} else {
 			if (cur < 6) {
 				dt_setfont(FONT_MINCHO, FONTSIZE);
@@ -122,7 +122,7 @@ bool sblog_start(void) {
 		sact.log = list_append(sact.log, logmsg[i]);
 	
 	back = sf_dup(sf0);
-	chr  = sf_create_surface(sf0->width, sf0->height, 8);
+	chr = SDL_CreateRGBSurfaceWithFormat(0, sf0->width, sf0->height, 8, SDL_PIXELFORMAT_INDEX8);
 	curline = 6;
 	draw_log();
 	return true;
@@ -136,7 +136,7 @@ void sblog_end(void) {
 	ags_updateFull();
 	
 	sf_free(back);
-	sf_free(chr);
+	if (chr) SDL_FreeSurface(chr);
 	
 	// 説明文章を削除
 	for (i = 0; i < LOGMSG_LINES; i++) {

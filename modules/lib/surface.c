@@ -22,9 +22,6 @@ static surface_t *create(int width, int height, int depth, bool has_pixel, bool 
 	if (has_pixel) {
 		uint32_t format = 0;
 		switch (s->depth) {
-		case 8:
-			format = SDL_PIXELFORMAT_INDEX8;
-			break;
 		case 16:
 			format = SDL_PIXELFORMAT_RGB565;
 			break;

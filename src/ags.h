@@ -221,7 +221,7 @@ extern void ags_setFont(FontType type, int size);
 extern void ags_setFontWithWeight(FontType type, int size, int weight);
 extern void ags_setTextDecorationType(TextDecorationType type);
 extern void ags_setTextDecorationColor(int color);
-extern agsurface_t *ags_drawStringToSurface(const char *str);
+extern struct SDL_Surface *ags_drawStringToSurface(const char *str);
 
 /* カーソル関係 */
 extern void ags_setCursorType(int type);
