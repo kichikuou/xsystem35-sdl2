@@ -122,7 +122,7 @@ void gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b
 void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh) {
 	SDL_Rect srcrect = {sx, sy, sw, sh};
 	SDL_Rect dstrect = {dx, dy, dw, dh};
-	SDL_SoftStretch(src->sdl_surface, &srcrect, dst->sdl_surface, &dstrect);
+	SDL_BlitScaled(src->sdl_surface, &srcrect, dst->sdl_surface, &dstrect);
 }
 
 void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv) {

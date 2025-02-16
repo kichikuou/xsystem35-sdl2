@@ -83,6 +83,8 @@ extern void sdl_putRegion(void *src, int x, int y);
 extern void sdl_restoreRegion(void *src, int x, int y);
 extern void* sdl_saveRegion(int x, int y, int w, int h);
 extern void sdl_delRegion(void *src);
+void sdl_FlipSurfaceHorizontal(SDL_Surface *s);
+void sdl_FlipSurfaceVertical(SDL_Surface *s);
 
 /* Effects */
 struct sdl_effect;

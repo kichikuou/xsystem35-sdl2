@@ -28,108 +28,67 @@
 
 #include "portab.h"
 #include "system.h"
+#include "sdl_core.h"
 #include "sdl_private.h"
 #include "cg.h"
 #include "nact.h"
 #include "alpha_plane.h"
 #include "image.h"
 
-/*
- * dib内での拡大・縮小コピー
- */
-void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
-	float    a1, a2, xd, yd;
-	int      *row, *col;
-	int      x, y;
-	SDL_Surface *ss;
-	SDL_Surface *src = sdl_dib;
-	SDL_Surface *dst = sdl_dib;
-	
-	ss = SDL_CreateRGBSurfaceWithFormat(0, dw, dh, dst->format->BitsPerPixel, dst->format->format);
-	
-	if (dst->format->BitsPerPixel == 8) {
-		memcpy(ss->format->palette->colors, dst->format->palette->colors,
-		       sizeof(SDL_Color) * 256);
+void sdl_FlipSurfaceHorizontal(SDL_Surface *s) {
+#if SDL_VERSION_ATLEAST(3, 2, 0)
+	SDL_FlipSurface(s, SDL_FLIP_HORIZONTAL);
+#else
+	uint8_t *p = s->pixels;
+	int bpp = s->format->BytesPerPixel;
+	uint8_t tmp[4];
+	for (int y = 0; y < s->h; y++) {
+		uint8_t *p1 = p;
+		uint8_t *p2 = p + (s->w - 1) * bpp;
+		for (int x = 0; x < s->w / 2; x++) {
+			memcpy(tmp, p1, bpp);
+			memcpy(p1, p2, bpp);
+			memcpy(p2, tmp, bpp);
+			p1 += bpp;
+			p2 -= bpp;
+		}
+		p += s->pitch;
 	}
-	
-	a1  = (float)sw / (float)dw;
-	a2  = (float)sh / (float)dh;
-	// src width と dst width が同じときに問題があるので+1
-	row = calloc(dw+1, sizeof(int));
-	// 1おおきくして初期化しないと col[dw-1]とcol[dw]が同じになる
-	// 可能性がある。
-	col = calloc(dh+1, sizeof(int));
-	
-	if(mirror & 1){
-		/*上下反転 added by  tajiri@wizard*/
-		for (yd = sh-a2, y = 0; y<dh; y++) {
-			col[y] = yd; yd -= a2;
-		}
-	} else {
-		for (yd = 0.0, y = 0; y < dh; y++) {
-			col[y] = yd; yd += a2;
-		}
-	}
-	if(mirror & 2){
-		/*左右反転 added by  tajiri@wizard*/
-		for (xd = sw-a1, x = 0; x <dw; x++) {
-			row[x] = xd; xd -= a1;
-		}
-	} else {
-		for (xd = 0.0, x = 0; x < dw; x++) {
-			row[x] = xd; xd += a1;
-		}
-	}
-
-#define sccp(type) \
-{ \
-	type *p_ss = src->pixels + sx * src->format->BytesPerPixel + sy * src->pitch;\
-	type *p_dd = ss->pixels, *p_src, *p_dst;\
-	int l=src->pitch/src->format->BytesPerPixel; \
-	int m=ss->pitch/ss->format->BytesPerPixel; \
-	for (y = 0; y < dh; y++) { \
-		p_src = p_ss + col[y] * l; \
-		p_dst = p_dd + y * m; \
-		for (x = 0; x < dw ; x++) { \
-			*(p_dst++) = *(p_src + *(row + x)); \
-		} \
-	} \
+#endif
 }
-	switch(dst->format->BytesPerPixel) {
-	case 1:
-		sccp(uint8_t);
-		break;
-	case 2:
-		sccp(uint16_t);
-		break;
-	case 3: {
-		uint8_t *p_ss=(uint8_t *)(src->pixels+sx*src->format->BytesPerPixel+sy*src->pitch);
-		uint8_t *p_src=p_ss,*p_dd=ss->pixels, *p_dst;
-		for (y = 0; y < dh; y++) {
-			p_src = p_ss + col[y] * src->pitch;
-			p_dst = p_dd + y      * ss->pitch;
-			for (x = 0; x < dw ; x++) {
-				*(p_dst)   = *(p_src + (*(row + x))*3    );
-				*(p_dst+1) = *(p_src + (*(row + x))*3 + 1);
-				*(p_dst+2) = *(p_src + (*(row + x))*3 + 2);
-				p_dst+=3;
-			}
-		}
-		break;
+
+void sdl_FlipSurfaceVertical(SDL_Surface *s) {
+#if SDL_VERSION_ATLEAST(3, 2, 0)
+	SDL_FlipSurface(s, SDL_FLIP_VERTICAL);
+#else
+	uint8_t *p1 = s->pixels;
+	uint8_t *p2 = s->pixels + (s->h - 1) * s->pitch;
+	uint8_t *tmp = malloc(s->pitch);
+	for (int y = 0; y < s->h / 2; y++) {
+		memcpy(tmp, p1, s->pitch);
+		memcpy(p1, p2, s->pitch);
+		memcpy(p2, tmp, s->pitch);
+		p1 += s->pitch;
+		p2 -= s->pitch;
 	}
-	case 4:
-		sccp(Uint32);
-		break;
+	free(tmp);
+#endif
+}
+
+// Scaled copy in sdl_dib
+void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
+	SDL_Rect src_rect = {sx, sy, sw, sh};
+	SDL_Rect dst_rect = {dx, dy, dw, dh};
+	SDL_BlitScaled(sdl_dib, &src_rect, sdl_dib, &dst_rect);
+	if (mirror) {
+		SDL_IntersectRect(&dst_rect, &(SDL_Rect){0, 0, sdl_dib->w, sdl_dib->h}, &dst_rect);
+		SDL_Surface *view = sdl_createSurfaceView(sdl_dib, dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h);
+		if (mirror & 1)
+			sdl_FlipSurfaceVertical(view);
+		if (mirror & 2)
+			sdl_FlipSurfaceHorizontal(view);
+		SDL_FreeSurface(view);
 	}
-	
-	SDL_Rect r_src = { 0,  0, dw, dh};
-	SDL_Rect r_dst = {dx, dy, dw, dh};
-	SDL_BlitSurface(ss, &r_src, dst, &r_dst);
-	
-	SDL_FreeSurface(ss);
-	
-	free(row);
-	free(col);
 }
 
 
