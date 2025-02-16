@@ -79,7 +79,6 @@ void sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
 
 // in sprite_draw.c
 void sp_draw(sprite_t *sf);
-void sp_draw2(sprite_t *sf, cginfo_t *cg);
 void sp_draw_dmap(void* data, void* userdata);
 
 

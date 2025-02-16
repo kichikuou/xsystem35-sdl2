@@ -41,33 +41,20 @@
 */
 void nt_sp_draw(sprite_t *sp, MyRectangle *r) {
 	if (sp == NULL) return;
-	nt_sp_draw2(sp, sp->curcg, r);
-}
-
-/*
-  指定の spriteの指定のCGを surface0 に書く
-  (このインターフェイスはもう不要?)
-
-  @param sp: 描画するスプライト
-  @param cg: 描画するCG
- @param r : 再描画する領域
-*/
-void nt_sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
-	surface_t update;
-	int sx, sy, w, h, dx, dy;
-	
+	cginfo_t *cg = sp->curcg;
 	if (cg == NULL) return;
 	if (cg->sf == NULL) return;
 
 	// 更新領域の確定
+	surface_t update;
 	update.width  = r->w;
 	update.height = r->h;
-	sx = 0;
-	sy = 0;
-	dx = sp->cur.x - r->x;
-	dy = sp->cur.y - r->y;
-	w = cg->sf->width;
-	h = cg->sf->height;
+	int sx = 0;
+	int sy = 0;
+	int dx = sp->cur.x - r->x;
+	int dy = sp->cur.y - r->y;
+	int w = cg->sf->width;
+	int h = cg->sf->height;
 	
 	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
 		return;

@@ -83,33 +83,20 @@ static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w
 */
 void sp_draw(sprite_t *sp) {
 	if (sp == NULL) return;
-	
-	sp_draw2(sp, sp->curcg);
-}
-
-/*
-  指定の spriteの指定のCGを surface0 に書く
-  (このインターフェイスはもう不要?)
-
-  @param sp: 描画するスプライト
-  @param cg: 描画するCG
-*/
-void sp_draw2(sprite_t *sp, cginfo_t *cg) {
-	surface_t update;
-	int sx, sy, w, h, dx, dy;
-	
+	cginfo_t *cg = sp->curcg;
 	if (cg == NULL) return;
 	if (cg->sf == NULL) return;
 
 	// 更新領域の確定
+	surface_t update;
 	update.width  = sact.updaterect.w;
 	update.height = sact.updaterect.h;
-	sx = 0;
-	sy = 0;
-	dx = sp->cur.x - sact.updaterect.x;
-	dy = sp->cur.y - sact.updaterect.y;
-	w = cg->sf->width;
-	h = cg->sf->height;
+	int sx = 0;
+	int sy = 0;
+	int dx = sp->cur.x - sact.updaterect.x;
+	int dy = sp->cur.y - sact.updaterect.y;
+	int w = cg->sf->width;
+	int h = cg->sf->height;
 	
 	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
 		return;
