@@ -69,33 +69,17 @@ static int find_null_surface() {
 }
 
 static void sf_free_one(int no) {
-	surface_t *s;
-	if (no == 0) return;
-	
-	s = suf[no];
-	if (s == NULL) return;
-	
-	if (s->pixel) free(s->pixel);
-	if (s->alpha) free(s->alpha);
-	free(s);
-	
+	if (no == 0 || !suf[no]) return;
+	sf_free(suf[no]);
 	suf[no] = NULL;
 	pre_freesurfno = no;
 }
 
 static void sf_free_all() {
-	int i;
-	surface_t *s;
-	
-	for (i = 1; i < MAX_SURFACE; i++) {
-		if (suf[i] == NULL) continue;
-		s = suf[i];
-		if (s->pixel) free(s->pixel);
-		if (s->alpha) free(s->alpha);
-		free(s);
+	for (int i = 1; i < MAX_SURFACE; i++) {
+		sf_free(suf[i]);
 		suf[i] = NULL;
 	}
-	
 	pre_freesurfno = 1;
 }
 

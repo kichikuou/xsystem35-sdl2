@@ -137,7 +137,7 @@ static EffectTexture *create_effect_texture(agsurface_t *as, int x, int y, int w
 		t->tx = sdl_texture;
 		t->rect = (SDL_Rect){ x, y, w, h };
 	} else {
-		SDL_Surface *sf = sdl_createSurfaceView(as, x, y, w, h);
+		SDL_Surface *sf = sdl_createSurfaceView(as->sdl_surface, x, y, w, h);
 		t->tx = SDL_CreateTextureFromSurface(sdl_renderer, sf);
 		SDL_FreeSurface(sf);
 		t->rect = (SDL_Rect){ 0, 0, w, h };

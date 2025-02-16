@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "surface.h"
@@ -19,26 +20,26 @@ static surface_t *create(int width, int height, int depth, bool has_pixel, bool 
 	s->depth = depth;
 	
 	if (has_pixel) {
+		uint32_t format = 0;
 		switch (s->depth) {
 		case 8:
-			s->pixel = calloc(width * (height +1), sizeof(uint8_t));
-			s->bytes_per_line = width;
-			s->bytes_per_pixel = 1;
+			format = SDL_PIXELFORMAT_INDEX8;
 			break;
 		case 16:
-			s->pixel = calloc(width * (height +1) * 2, sizeof(uint8_t));
-			s->bytes_per_line = width * 2;
-			s->bytes_per_pixel = 2;
+			format = SDL_PIXELFORMAT_RGB565;
 			break;
 		case 24:
 		case 32:
-			s->pixel = calloc(width * (height +1) * 4, sizeof(uint8_t));
-			s->bytes_per_line = width * 4;
-			s->bytes_per_pixel = 4;
+			format = SDL_PIXELFORMAT_RGB888;
+			depth = 32;
 			break;
 		default:
-			WARNING("depth %d is not supported", s->depth);
+			SYSERROR("depth %d is not supported", s->depth);
 		}
+		s->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
+		s->pixel = s->sdl_surface->pixels;
+		s->bytes_per_line = s->sdl_surface->pitch;
+		s->bytes_per_pixel = s->sdl_surface->format->BytesPerPixel;
 	}
 	
 	if (has_alpha) {
@@ -87,7 +88,7 @@ surface_t *sf_create_pixel(int width, int height, int depth) {
  */
 void sf_free(surface_t *s) {
 	if (s == NULL) return;
-	if (s->pixel) free(s->pixel);
+	if (s->sdl_surface) SDL_FreeSurface(s->sdl_surface);
 	if (s->alpha) free(s->alpha);
 	free(s);
 }
@@ -107,9 +108,10 @@ surface_t *sf_dup(surface_t *in) {
 	memcpy(sf, in, sizeof(surface_t));
 	
 	if (in->pixel) {
-		len = sf->bytes_per_line * sf->height;
-		sf->pixel = malloc(sizeof(uint8_t) * (len + sf->bytes_per_line));
-		memcpy(sf->pixel, in->pixel, len);
+		sf->sdl_surface = SDL_ConvertSurface(in->sdl_surface, in->sdl_surface->format, 0);
+		sf->pixel = sf->sdl_surface->pixels;
+		sf->bytes_per_line = sf->sdl_surface->pitch;
+		sf->bytes_per_pixel = sf->sdl_surface->format->BytesPerPixel;
 	}
 	
 	if (in->alpha) {
@@ -148,39 +150,3 @@ void sf_copyall(surface_t *dst, surface_t *src) {
 		memcpy(dst->pixel, src->pixel, len);
 	}
 }
-
-/**
- * surface の複製
- * @param in: 複製もと
- * @param copypixel: pixelをコピーするか
- * @param copyalpha: alpha pixel をコピーするか
- * @return: 複製した surface
- */
-surface_t *sf_dup2(surface_t *in, bool copypixel, bool copyalpha) {
-	surface_t *sf;
-	int len;
-	
-	if (in == NULL) return NULL;
-	
-	sf = malloc(sizeof(surface_t));
-	memcpy(sf, in, sizeof(surface_t));
-	
-	if (in->pixel) {
-		len = sf->bytes_per_line * sf->height;
-		sf->pixel = malloc(sizeof(uint8_t) * (len + sf->bytes_per_line));
-		if (copypixel) {
-			memcpy(sf->pixel, in->pixel, len);
-		}
-	}
-	
-	if (in->alpha) {
-		len = sf->width * sf->height;
-		sf->alpha = malloc(sizeof(uint8_t) * (len + sf->width));
-		if (copyalpha) {
-			memcpy(sf->alpha, in->alpha, len);
-		}
-	}
-	
-	return sf;
-}
-

@@ -14,7 +14,10 @@ static surface_t *stretch(surface_t *src, int dw, int dh, int mirror) {
 	dst->bytes_per_pixel = src->bytes_per_pixel;
 	
 	if (src->pixel) {
-		dst->pixel = malloc(dh * dst->bytes_per_line);
+		dst->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, dw, dh, src->depth, src->sdl_surface->format->format);
+		dst->pixel = dst->sdl_surface->pixels;
+		dst->bytes_per_line = dst->sdl_surface->pitch;
+		dst->bytes_per_pixel = dst->sdl_surface->format->BytesPerPixel;
 	}
 	if (src->alpha) {
 		dst->alpha = malloc(dw * dh);

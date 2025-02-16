@@ -48,7 +48,7 @@ extern bool sdl_isFullscreen(void);
 extern void sdl_raiseWindow(void);
 extern agsurface_t *sdl_getDIB(void);
 extern void sdl_setIntegerScaling(bool enable);
-extern SDL_Surface *sdl_createSurfaceView(agsurface_t *s, int x, int y, int w, int h);
+extern SDL_Surface *sdl_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h);
 
 /* 画面更新 */
 extern void sdl_updateArea(MyRectangle *src, MyPoint *dst);

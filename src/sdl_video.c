@@ -198,6 +198,7 @@ static void makeDIB(int width, int height, int depth) {
 	sdl_dibinfo->width  = width;
 	sdl_dibinfo->height = height;
 	sdl_dibinfo->alpha  = NULL;
+	sdl_dibinfo->sdl_surface = sdl_dib;
 	
 	image_setdepth(sdl_dibinfo->depth);
 }
@@ -222,19 +223,14 @@ agsurface_t *sdl_getDIB(void) {
 	return sdl_dibinfo;
 }
 
-SDL_Surface *sdl_createSurfaceView(agsurface_t *s, int x, int y, int w, int h) {
-	if (s == sdl_dibinfo) {
-		uint8_t *pixels = sdl_dib->pixels;
-		pixels += y * sdl_dib->pitch + x * sdl_dib->format->BytesPerPixel;
-		SDL_Surface *view = SDL_CreateRGBSurfaceWithFormatFrom(
-			pixels, w, h, sdl_dib->format->BitsPerPixel, sdl_dib->pitch, sdl_dib->format->format);
-		if (sdl_dib->format->palette)
-			SDL_SetSurfacePalette(view, sdl_dib->format->palette);
-		return view;
-	} else {
-		uint8_t *pixels = s->pixel + y * s->bytes_per_line + x * s->bytes_per_pixel;
-		return SDL_CreateRGBSurfaceFrom(pixels, w, h, s->depth, s->bytes_per_line, 0, 0, 0, 0);
-	}
+SDL_Surface *sdl_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) {
+	uint8_t *pixels = sf->pixels;
+	pixels += y * sf->pitch + x * sf->format->BytesPerPixel;
+	SDL_Surface *view = SDL_CreateRGBSurfaceWithFormatFrom(
+		pixels, w, h, sf->format->BitsPerPixel, sf->pitch, sf->format->format);
+	if (sf->format->palette)
+		SDL_SetSurfacePalette(view, sf->format->palette);
+	return view;
 }
 
 /* AutoRepeat の設定 */
@@ -303,7 +299,7 @@ void sdl_setIntegerScaling(bool enable) {
 
 bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
 	SDL_Rect *r = &nact->ags.view_area;
-	SDL_Surface *view = sdl_createSurfaceView(sdl_dibinfo, r->x, r->y, r->w, r->h);
+	SDL_Surface *view = sdl_createSurfaceView(sdl_dib, r->x, r->y, r->w, r->h);
 	bool ok = SDL_SaveBMP(view, path) == 0;
 	SDL_FreeSurface(view);
 	return ok;

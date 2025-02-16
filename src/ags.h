@@ -45,6 +45,8 @@
 #define CURSOR_UPARROW  12
 #define CURSOR_WAIT     13
 
+struct SDL_Surface;
+
 /* RGB <-> alpha plane copy type */
 typedef enum {
 	FROM_16H,
@@ -69,6 +71,8 @@ struct agsurface {
 	
 	uint8_t *pixel; /* pixel data (can be NULL) */
 	uint8_t *alpha; /* alpha pixel data (can be NULL) */
+
+	struct SDL_Surface *sdl_surface;
 };
 typedef struct agsurface agsurface_t;
 
