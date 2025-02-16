@@ -41,9 +41,6 @@
 static int selected_item;
 static int selected_item_cur;
 
-// 選択肢を描画するsurface
-static surface_t *selcanvas;
-
 // 前のカーソルの状態
 static bool oldstate; // spriteの中か外か
 static int oldindex; // 何番目の要素か(0~)
@@ -154,7 +151,7 @@ static void update_selwindow(sprite_t *sp) {
 	
 	// 選択されている要素
 	if (selno && sact.sel.elem[selno] != NULL) {
-		int w = selcanvas->width - 2 * sact.sel.frame_dot;
+		int w = sact.sel.charcanvas->w - 2 * sact.sel.frame_dot;
 		int h = sact.sel.font_size + sact.sel.linespace;
 		int x = x0 + sact.sel.frame_dot;
 		int y = y0 + sact.sel.frame_dot + (selno -1) * h;
@@ -165,7 +162,7 @@ static void update_selwindow(sprite_t *sp) {
 	// 選択肢文字列
 	gr_expandcolor_blend(sf0, x0, y0, 
 			     sact.sel.charcanvas, 0, 0,
-			     selcanvas->width, selcanvas->height, 255, 255, 255);
+			     sact.sel.charcanvas->w, sact.sel.charcanvas->h, 255, 255, 255);
 }
 
 // 選択ウィンドの準備
@@ -173,11 +170,8 @@ static void setup_selwindow() {
 	sprite_t *sp = sact.sp[sact.sel.spno];
 	int i;
 	
-	//選択ウィンド作業 surfaceの生成
-	selcanvas = sf_dup(sp->cg1->sf);
-	
 	// 選択肢文字用 canvas
-	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, selcanvas->width, selcanvas->height, 8, SDL_PIXELFORMAT_INDEX8);
+	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, sp->cg1->sf->width, sp->cg1->sf->height, 8, SDL_PIXELFORMAT_INDEX8);
 	
 	dt_setfont(sact.sel.font_type, sact.sel.font_size);
 	
@@ -223,8 +217,6 @@ static void remove_selwindow() {
 	sp_update_clipped();
 	
 	// 作業用 surface の削除
-	sf_free(selcanvas);
-	selcanvas = NULL;
 	if (sact.sel.charcanvas)
 		SDL_FreeSurface(sact.sel.charcanvas);
 	sact.sel.charcanvas = NULL;
@@ -263,10 +255,6 @@ void ssel_init() {
 
 void ssel_reset(void) {
 	ssel_clear();
-	if (selcanvas) {
-		sf_free(selcanvas);
-		selcanvas = NULL;
-	}
 	if (sact.sel.charcanvas) {
 		SDL_FreeSurface(sact.sel.charcanvas);
 		sact.sel.charcanvas = NULL;
