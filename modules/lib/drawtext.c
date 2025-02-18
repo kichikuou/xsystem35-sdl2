@@ -69,10 +69,10 @@ int dt_drawtext(SDL_Surface *sf, int x, int y, char *buf) {
 	SDL_Surface *glyph = ags_drawStringToSurface(buf);
 	if (glyph == NULL) return 0;
 
-	SDL_Rect r = {x, y, glyph->w, glyph->h};
-	SDL_BlitSurface(glyph, NULL, sf, &r);
+	SDL_Rect rect = {x, y, glyph->w, glyph->h};
+	SDL_BlitSurface(glyph, NULL, sf, &rect);
 	SDL_FreeSurface(glyph);
-	return glyph->w;
+	return rect.w;
 }
 
 /**
@@ -88,24 +88,13 @@ int dt_drawtext(SDL_Surface *sf, int x, int y, char *buf) {
  * @param b: 文字色青
  * @return: 実際に描画した幅
  */ 
-int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b) {
-	int sx, sy, sw, sh;
-
+int dt_drawtext_col(SDL_Surface *sf, int x, int y, char *buf, int r, int g, int b) {
 	ags_setFont(ftype, fsize);
-	SDL_Surface *glyph = ags_drawStringToSurface(buf);
+	SDL_Surface *glyph = ags_drawStringToRGBASurface(buf, r, g, b);
 	if (glyph == NULL) return 0;
 
-	sx = x;	sy = y;
-	sw = glyph->w;
-	sh = glyph->h;
-	if (!gr_clip_xywh(sf, &sx, &sy, &sw, &sh)) return 0;
-	
-	// alpha map に文字そのものを描く
-	gr_draw_amap(sf, sx, sy, glyph->pixels, sw, sh, glyph->pitch);
-
-	// pixel map には色情報を矩形で描く
-	gr_fill(sf, sx, sy, sw, sh, r, g, b);
-
+	SDL_Rect rect = {x, y, glyph->w, glyph->h};
+	SDL_BlitSurface(glyph, NULL, sf, &rect);
 	SDL_FreeSurface(glyph);
-	return sw;
+	return rect.w;
 }

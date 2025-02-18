@@ -190,7 +190,7 @@ struct _sprite {
 		// メッセージスプライト
 		struct {
 			SList    *buf;       // 表示する文字のリスト
-			surface_t *canvas;    // 文字を描画するsurface
+			struct SDL_Surface *canvas;
 			MyPoint    dspcur;    // 現在の表示位置
 		} msg;
 	} u;

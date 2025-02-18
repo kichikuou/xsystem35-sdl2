@@ -216,10 +216,10 @@ void sp_new_msg(int no, int x, int y, int width, int height) {
 	sp->cursize.height = height;
 	sp->cur = sp->loc;
 	sp->u.msg.buf = NULL;
-	
-	// 文字描画用キャンバス
-	sp->u.msg.canvas = sf_create_surface(width, height, sf0->depth);
-	
+
+	// canvas for drawing text
+	sp->u.msg.canvas = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
+
 	// スプライト再描画用コールバック
 	sp->update = smsg_update;
 }
@@ -290,7 +290,7 @@ void sp_free(int no) {
 	
 	if (sp->type == SPRITE_MSG) {
 		slist_free(sp->u.msg.buf);
-		sf_free(sp->u.msg.canvas);
+		SDL_FreeSurface(sp->u.msg.canvas);
 	}
 	sact.updatelist = slist_remove(sact.updatelist, sp);
 	

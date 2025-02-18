@@ -3,7 +3,6 @@
 #define __SPRITE_H__
 
 #include "portab.h"
-#include "surface.h"
 #include "graphics.h"
 
 #define DEFAULT_UPDATE nt_sp_draw
@@ -97,7 +96,7 @@ struct _sprite {
 		} anime;
 		
 		struct {
-			surface_t *canvas;
+			struct SDL_Surface *canvas;
 			MyPoint dspcur;
 		} msg;
 	} u;

@@ -352,24 +352,19 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
   @param wNum: クリアするスプライト番号
  */
 void smsg_clear(int wNum) {
-	sprite_t *sp;
-	surface_t *sf;
-	
 	if (!is_messagesprite(wNum)) return;
 	
 	// 表示位置の初期化
-	sp = sact.sp[wNum];
+	sprite_t *sp = sact.sp[wNum];
 	sp->u.msg.dspcur.x = 0;
 	sp->u.msg.dspcur.y = 0;
 	
 	sact.msgbuf[0]  = '\0';
 	sact.msgbuf2[0] = '\0';
-	
-	// キャンバスのクリア
-	sf = sp->u.msg.canvas;
-	memset(sf->pixel, 0, sf->bytes_per_line * sf->height);
-	memset(sf->alpha, 0, sf->width * sf->height);
-	
+
+	// Clear the canvas
+	SDL_FillRect(sp->u.msg.canvas, NULL, 0);
+
 	sp_updateme(sp);
 	
 	if (sact.logging) {
@@ -453,32 +448,19 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
   @param sp: 再描画するスプライト
  */
 void smsg_update(sprite_t *sp) {
-	int sx, sy, w, h, dx, dy;
-	surface_t update;
-	
-	// canvas が clean のときはなにもしない
-	//  -> 説明スプライトのように、SetShowされたときに対応できないからだめ 
-	//if (sact.msgbufempty) return;
-	
-	update.width  = sact.updaterect.w;
-	update.height = sact.updaterect.h;
-	
-	dx = sp->cur.x - sact.updaterect.x;
-	dy = sp->cur.y - sact.updaterect.y;
-	
-	w = sp->cursize.width;
-	h = sp->cursize.height;
-	
-	sx = 0; sy = 0;
-	
-	if (!gr_clip(sp->u.msg.canvas, &sx, &sy, &w, &h, &update, &dx, &dy)) {
+	SDL_Rect sp_rect = {0, 0, sp->cursize.width, sp->cursize.height};
+	int sx = 0;
+	int sy = 0;
+	int dx = sp->cur.x;
+	int dy = sp->cur.y;
+	int w = sp->cursize.width;
+	int h = sp->cursize.height;
+	if (!ags_clipCopyRect(&sp_rect, &sact.updaterect, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}
-	
-	dx += sact.updaterect.x;
-	dy += sact.updaterect.y;
-	
-	gre_BlendUseAMap(sf0, dx, dy, sf0, dx, dy, sp->u.msg.canvas, sx, sy, w, h, sp->u.msg.canvas, sx, sy, sp->blendrate);
+	SDL_SetSurfaceBlendMode(sp->u.msg.canvas, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceAlphaMod(sp->u.msg.canvas, sp->blendrate);
+	SDL_BlitSurface(sp->u.msg.canvas, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);

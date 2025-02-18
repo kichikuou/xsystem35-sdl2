@@ -30,6 +30,6 @@ struct SDL_Surface;
 
 void dt_setfont(FontType type, int size);
 int dt_drawtext(struct SDL_Surface *sf, int x, int y, char *buf);
-int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b);
+int dt_drawtext_col(struct SDL_Surface *sf, int x, int y, char *buf, int r, int g, int b);
 
 #endif /* __DRAWTEXT_H__ */

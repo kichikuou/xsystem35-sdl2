@@ -64,7 +64,7 @@ sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height) {
 	sp->cursize.height = height;
 	sp->u.msg.dspcur.x = 0;
 	sp->u.msg.dspcur.y = 0;
-	sp->u.msg.canvas = sf_create_surface(width, height, sf0->depth);
+	sp->u.msg.canvas = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
 	sp->update = ntmsg_update;
 	
 	return sp;
@@ -78,7 +78,7 @@ void nt_sp_free(sprite_t *sp) {
 	if (sp->cg3) nt_scg_deref(sp->cg3);
 
 	if (sp->type == SPRITE_MSG) {
-		sf_free(sp->u.msg.canvas);
+		SDL_FreeSurface(sp->u.msg.canvas);
 	}
 	
 	free(sp);
