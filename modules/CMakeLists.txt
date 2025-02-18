@@ -65,7 +65,6 @@ add_library(modules STATIC
   lib/list.c
   lib/surface.c
   lib/cg.c
-  lib/graph_expandcolor_blend.c
   lib/graph_fillrect_amap.c
   lib/graph_copy_amap.c
   lib/graph_blend_amap.c

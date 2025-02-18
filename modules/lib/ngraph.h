@@ -17,11 +17,6 @@ struct SDL_Surface;
 bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy);
 bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh);
 
-
-/* in graph_expandcolor_blend.c */
-// 8bppのモノクロをcolでブレンド
-void gr_expandcolor_blend(surface_t *dst, int dx, int dy, struct SDL_Surface *src, int sx, int sy, int sw, int sh, int r, int g, int b);
-
 /* in graph_fillrect_amap.c */
 void gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv);
 

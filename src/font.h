@@ -37,8 +37,7 @@ extern void font_set_name_and_index(FontType type, const char *name, int index);
 extern void font_set_antialias(bool enable);
 extern bool font_get_antialias(void);
 extern void font_select(FontType type, int size, int weight);
-extern struct SDL_Surface *font_get_glyph(const char *str_utf8);
-extern struct SDL_Surface *font_get_glyph_rgb(const char *str_utf8, int r, int g, int b);
+extern struct SDL_Surface *font_get_glyph(const char *str_utf8, int r, int g, int b);
 extern SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t col);
 
 #ifdef __EMSCRIPTEN__

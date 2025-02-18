@@ -116,24 +116,7 @@ void font_select(FontType type, int size, int weight) {
 	TTF_SetFontStyle(fontset->id, weight > 5 ? TTF_STYLE_BOLD : TTF_STYLE_NORMAL);
 }
 
-SDL_Surface *font_get_glyph(const char *str_utf8) {
-	if (!fontset)
-		return NULL;
-
-	SDL_Surface *fs;
-	SDL_Color color = {255, 255, 255, 0};
-	if (this.antialiase_on) {
-		fs = TTF_RenderUTF8_Shaded(fontset->id, str_utf8, color, color);
-	} else {
-		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
-	}
-	if (!fs)
-		WARNING("Text rendering failed: %s", TTF_GetError());
-
-	return fs;
-}
-
-SDL_Surface *font_get_glyph_rgb(const char *str_utf8, int r, int g, int b) {
+SDL_Surface *font_get_glyph(const char *str_utf8, int r, int g, int b) {
 	if (!fontset)
 		return NULL;
 

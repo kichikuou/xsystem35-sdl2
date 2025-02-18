@@ -160,9 +160,8 @@ static void update_selwindow(sprite_t *sp) {
 	}
 	
 	// 選択肢文字列
-	gr_expandcolor_blend(sf0, x0, y0, 
-			     sact.sel.charcanvas, 0, 0,
-			     sact.sel.charcanvas->w, sact.sel.charcanvas->h, 255, 255, 255);
+	SDL_BlitSurface(sact.sel.charcanvas, NULL, sf0->sdl_surface,
+		&(SDL_Rect){x0, y0, sact.sel.charcanvas->w, sact.sel.charcanvas->h});
 }
 
 // 選択ウィンドの準備
@@ -171,7 +170,8 @@ static void setup_selwindow() {
 	int i;
 	
 	// 選択肢文字用 canvas
-	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, sp->cg1->sf->w, sp->cg1->sf->h, 8, SDL_PIXELFORMAT_INDEX8);
+	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, sp->cg1->sf->w, sp->cg1->sf->h, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_SetSurfaceBlendMode(sact.sel.charcanvas, SDL_BLENDMODE_BLEND);
 	
 	dt_setfont(sact.sel.font_type, sact.sel.font_size);
 	
@@ -182,9 +182,9 @@ static void setup_selwindow() {
 		// 文字の場所計算
 		x = 0; // 行そろえは無し
 		y = (i - 1) * (sact.sel.font_size + sact.sel.linespace);
-		dt_drawtext(sact.sel.charcanvas,
+		dt_drawtext_col(sact.sel.charcanvas,
 			    x + sact.sel.frame_dot, y + sact.sel.frame_dot,
-			    sact.sel.elem[i]);
+			    sact.sel.elem[i], 255, 255, 255);
 	}
 	
 	// デフォルトで選択される選択肢がある場合、そこへカーソルを移動

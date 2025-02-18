@@ -55,27 +55,6 @@ void dt_setfont(FontType type, int size) {
 }
 
 /**
- * surface にモノクロ文字を描画。アンチエイリアスされており256階調
- * 書き出すsurfaceは8ビットである必要あり
- *
- * @param sf: 描画する surface
- * @param x: 描画位置Ｘ座標
- * @param y: 描画位置Ｙ座標
- * @param buf: 描画文字列 (SJIS)
- * @return: 実際に描画した幅
-*/
-int dt_drawtext(SDL_Surface *sf, int x, int y, char *buf) {
-	ags_setFont(ftype, fsize);
-	SDL_Surface *glyph = ags_drawStringToSurface(buf);
-	if (glyph == NULL) return 0;
-
-	SDL_Rect rect = {x, y, glyph->w, glyph->h};
-	SDL_BlitSurface(glyph, NULL, sf, &rect);
-	SDL_FreeSurface(glyph);
-	return rect.w;
-}
-
-/**
  * surface にカラー文字を描画。alphamap に256階調のアンチエイリアスされた
  * 文字を描き、pixelmap には、色情報を矩形で描く
  * 
@@ -90,7 +69,7 @@ int dt_drawtext(SDL_Surface *sf, int x, int y, char *buf) {
  */ 
 int dt_drawtext_col(SDL_Surface *sf, int x, int y, char *buf, int r, int g, int b) {
 	ags_setFont(ftype, fsize);
-	SDL_Surface *glyph = ags_drawStringToRGBASurface(buf, r, g, b);
+	SDL_Surface *glyph = ags_drawStringToSurface(buf, r, g, b);
 	if (glyph == NULL) return 0;
 
 	SDL_Rect rect = {x, y, glyph->w, glyph->h};
