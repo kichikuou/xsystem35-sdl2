@@ -61,8 +61,7 @@ static const char *logmsg_utf8[LOGMSG_LINES] = {
 #define FONTSIZE 20
 #define LOGLINENUM (sf0->height / FONTSIZE)
 static int curline;
-static surface_t *back;
-static SDL_Surface *chr;
+static SDL_Surface *back;
 
 static void draw_log() {
 	int i, y = 0, len;
@@ -70,13 +69,20 @@ static void draw_log() {
 	char pinfo[256];
 	List *node;
 
-	SDL_FillRect(chr, NULL, 0);
-	
+	SDL_Surface *hline = SDL_CreateRGBSurfaceWithFormat(0, sf0->width, 3, 32, SDL_PIXELFORMAT_RGB888);
+	SDL_FillRect(hline, NULL, SDL_MapRGB(hline->format, 255, 255, 255));
+	SDL_SetSurfaceBlendMode(hline, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceAlphaMod(hline, 128);
+
+	SDL_SetSurfaceColorMod(back, 128, 128, 128);
+	SDL_BlitSurface(back, NULL, sf0->sdl_surface, NULL);
+	SDL_SetSurfaceColorMod(back, 255, 255, 255);
+
 	// ページ位置情報
 	len = snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, list_length(sact.log));
 	
 	dt_setfont(FONT_GOTHIC, FONTSIZEINDEX);
-	dt_drawtext(chr, sf0->width - FONTSIZEINDEX *len /2, 0, pinfo);
+	dt_drawtext_col(sf0->sdl_surface, sf0->width - FONTSIZEINDEX *len /2, 0, pinfo, 255, 255, 255);
 	
 	// 表示始め位置
 	node = list_nth(sact.log, list_length(sact.log) - curline);
@@ -85,23 +91,20 @@ static void draw_log() {
 		
 		char *str = (char *)(node->data);
 		if (0 == strcmp(str, "\n")) {
-			SDL_FillRect(chr, &(SDL_Rect){0, y + FONTSIZE/2, sf0->width, 3}, 128);
+			SDL_BlitSurface(hline, NULL, sf0->sdl_surface, &(SDL_Rect){0, y + FONTSIZE/2, sf0->width, 3});
 		} else {
 			if (cur < 6) {
 				dt_setfont(FONT_MINCHO, FONTSIZE);
 			} else {
 				dt_setfont(FONT_GOTHIC, FONTSIZE);
 			}
-			dt_drawtext(chr, 0, y, str);
+			dt_drawtext_col(sf0->sdl_surface, 0, y, str, 255, 255, 255);
 		}
 		y += FONTSIZE;
 		cur--;
 		node = list_next(node);
 	}
-	
-	gr_copy_bright(sf0, 0, 0, back, 0, 0, sf0->width, sf0->height, 128);
-	gr_expandcolor_blend(sf0, 0, 0, chr, 0, 0, sf0->width, sf0->height,
-			     255, 255, 255);
+
 	ags_updateFull();
 }
 
@@ -121,8 +124,7 @@ bool sblog_start(void) {
 	for (int i = 0; i < LOGMSG_LINES; i++)
 		sact.log = list_append(sact.log, logmsg[i]);
 	
-	back = sf_dup(sf0);
-	chr = SDL_CreateRGBSurfaceWithFormat(0, sf0->width, sf0->height, 8, SDL_PIXELFORMAT_INDEX8);
+	back = SDL_ConvertSurface(sf0->sdl_surface, sf0->sdl_surface->format, 0);
 	curline = 6;
 	draw_log();
 	return true;
@@ -132,12 +134,11 @@ void sblog_end(void) {
 	List *node;
 	int i;
 	
-	sf_copyall(sf0, back);
+	SDL_BlitSurface(back, NULL, sf0->sdl_surface, NULL);
 	ags_updateFull();
 	
-	sf_free(back);
-	if (chr) SDL_FreeSurface(chr);
-	
+	SDL_FreeSurface(back);
+
 	// 説明文章を削除
 	for (i = 0; i < LOGMSG_LINES; i++) {
 		node = list_last(sact.log);
