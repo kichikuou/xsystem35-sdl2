@@ -29,7 +29,7 @@
 #include "portab.h"
 #include "list.h"
 #include "graphics.h"
-#include "surface.h"
+#include "ags.h"
 #include "sacttimer.h"
 #include "variable.h"
 
@@ -273,7 +273,7 @@ struct _sact {
 	int numsoundob;
 	
 	// depth map
-	surface_t *dmap;
+	struct SDL_Surface *dmap;
 	
 	bool zhiding;  // Zkeyによる隠し中
 	int     zofftime;

@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <SDL.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -47,7 +48,6 @@
 #include "sactcrypto.h"
 #include "sactchart.h"
 #include "ngraph.h"
-#include "surface.h"
 #include "sactamask.h"
 
 /*
@@ -147,7 +147,7 @@ static void Init() {
 	}
 	
 	// create depth map
-	sact.dmap = sf_create_pixel(sf0->width, sf0->height, 16);
+	sact.dmap = SDL_CreateRGBSurface(0, sf0->width, sf0->height, 16, 0, 0, 0, 0);
 	
 	// その他 System35 のデフォルト動作の変更
 	ags_setAntialiasedStringMode(true);
@@ -2146,7 +2146,7 @@ static void SACT_reset(void) {
 	sp_reset();
 
 	scg_freeall();
-	sf_free(sact.dmap);
+	SDL_FreeSurface(sact.dmap);
 	memset(&sact, 0, sizeof(sact));
 }
 

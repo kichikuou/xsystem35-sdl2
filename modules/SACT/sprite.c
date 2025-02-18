@@ -36,7 +36,6 @@
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
-#include "surface.h"
 #include "sactcg.h"
 #include "sactsound.h"
 
@@ -666,6 +665,6 @@ bool sp_is_insprite(sprite_t *sp, int x, int y) {
 	
 	if (x < 0 || y < 0 || x >= sf0->width || y >= sf0->height) return false;
 	
-	dp = GETOFFSET_PIXEL(sact.dmap, x, y);
+	dp = PIXEL_AT(sact.dmap, x, y);
 	return (*(uint16_t *)dp == sp->no);
 }

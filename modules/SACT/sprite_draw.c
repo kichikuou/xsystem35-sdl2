@@ -33,40 +33,21 @@
 #include "ags.h"
 #include "graphics.h"
 #include "sact.h"
-#include "surface.h"
 #include "graph.h"
 #include "ngraph.h"
 #include "sprite.h"
-
-// 矩形の depthmap を描画
-static void fill_dmap(int dx ,int dy, int w, int h, uint16_t val) {
-	uint8_t *dp, *dp_;
-	int x, y;
-	
-	dp = dp_ = (GETOFFSET_PIXEL(sact.dmap, dx, dy));
-	
-	for (x = 0; x < w; x++) {
-		*((uint16_t *)dp + x) = val;
-	}
-	dp += sact.dmap->bytes_per_line;
-	
-	for (y = 1; y < h; y++) {
-		memcpy(dp, dp_, w * 2);
-		dp += sact.dmap->bytes_per_line;
-	}
-}
 
 // alphamapにしたがって、alpha値が0より大きいところを指定のdepthとする
 static void fill_dmap_mask(SDL_Surface *src, int sx, int sy, int dx ,int dy, int w, int h, uint16_t val) {
 	uint8_t *sp, *dp;
 	int x, y;
 	assert(src->format->Amask == 0xff000000);
-	dp = GETOFFSET_PIXEL(sact.dmap, dx, dy);
+	dp = PIXEL_AT(sact.dmap, dx, dy);
 	sp = src->pixels + sy * src->pitch + sx * 4 + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0);
 	
 	for (y = 0; y < h; y++) {
 		uint8_t *yls = sp + y * src->pitch;
-		uint16_t *yld = (uint16_t *)(dp + y * sact.dmap->bytes_per_line);
+		uint16_t *yld = (uint16_t *)(dp + y * sact.dmap->pitch);
 		for (x = 0; x < w; x++) {
 			if (*yls > 0) *yld = val;
 			yls += 4; yld++;
@@ -141,7 +122,7 @@ void sp_draw_dmap(void* data, void* userdata) {
 	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format)) {
 		fill_dmap_mask(cg->sf, sx, sy, dx, dy, w, h, sp->no);
 	} else {
-		fill_dmap(dx, dy, w, h, sp->no);
+		SDL_FillRect(sact.dmap, &(SDL_Rect){dx, dy, w, h}, sp->no);
 	}
 	
 	return;

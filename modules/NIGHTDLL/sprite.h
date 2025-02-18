@@ -125,7 +125,6 @@ void nt_sp_clear_updatelist(void);
 
 /* in nt_sprite_draw.c */
 void nt_sp_draw(sprite_t *sp, MyRectangle *r);
-void nt_sp_draw_dmap(void* data, void* userdata);
 void nt_sp_draw_scg(sprite_t *sp, MyRectangle *r);
 
 /* in nt_sprite_eupdate.c */
