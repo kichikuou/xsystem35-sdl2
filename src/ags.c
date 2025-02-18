@@ -455,6 +455,13 @@ SDL_Surface *ags_drawStringToSurface(const char *str) {
 	return sf;
 }
 
+SDL_Surface *ags_drawStringToRGBASurface(const char *str, int r, int g, int b) {
+	char *utf8 = toUTF8(str);
+	SDL_Surface *sf = font_get_glyph_rgb(utf8, r, g, b);
+	free(utf8);
+	return sf;
+}
+
 void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend) {
 	switch (cg->depth) {
 	case 8:

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -25,23 +26,29 @@ extern int ntsel_dosel(void);
 #define SNAME_RYO "亮　　　　"
 #define SNAME_RYO_DEF "亮"
 
-// 通常メッセージ表示位置と大きさ
-#define MSGFRAME_0_X 6
-#define MSGFRAME_0_Y 347
-#define MSGFRAME_0_WIDTH 628
-#define MSGFRAME_0_HEIGHT 125
+// Normal message window
+static const SDL_Rect msgframe_0 = {
+	.x = 6,
+	.y = 347,
+	.w = 628,
+	.h = 125
+};
 
-// 画面全体メッセージ表示位置と大きさ
-#define MSGFRAME_1_X 0
-#define MSGFRAME_1_Y 0
-#define MSGFRAME_1_WIDTH 640
-#define MSGFRAME_1_HEIGHT 480
+// Full screen message window
+static const SDL_Rect msgframe_1 = {
+	.x = 0,
+	.y = 0,
+	.w = 640,
+	.h = 480
+};
 
-// 通常メッセージ(顔つき)表示位置と大きさ
-#define MSGFRAME_2_X (6+160)
-#define MSGFRAME_2_Y 347
-#define MSGFRAME_2_WIDTH (628-160)
-#define MSGFRAME_2_HEIGHT 125
+// Normal message (with face) window
+static const SDL_Rect msgframe_2 = {
+	.x = 6 + 160,
+	.y = 347,
+	.w = 628 - 160,
+	.h = 125
+};
 
 // キー入力アニメーション位置
 #define HAKANIM_LOC_X 620
@@ -121,13 +128,10 @@ void ntmsg_init() {
 //   type=1 枠あり
 //   type=2 中央
 void ntmsg_set_frame(int type) {
-	surface_t *sf;
-	
 	night.msgframe = type;
 
-	sf = night.sp[SPNO_MSGBG]->curcg->sf;
-	memset(sf->pixel, 0, sf->bytes_per_line * sf->height);
-	memset(sf->alpha, 0, sf->width * sf->height);
+	SDL_Surface *sf = night.sp[SPNO_MSGBG]->curcg->sf;
+	SDL_FillRect(sf, NULL, 0);
 	
 	switch(type) {
 	case 0:
@@ -140,11 +144,7 @@ void ntmsg_set_frame(int type) {
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], true);
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], true);
 		
-		gr_fill(sf, MSGFRAME_0_X, MSGFRAME_0_Y,
-			MSGFRAME_0_WIDTH, MSGFRAME_0_HEIGHT,
-			16, 32, 64);
-		gr_fill_alpha_map(sf, MSGFRAME_0_X, MSGFRAME_0_Y,
-				  MSGFRAME_0_WIDTH, MSGFRAME_0_HEIGHT, 192);
+		SDL_FillRect(sf, &msgframe_0, SDL_MapRGBA(sf->format, 16, 32, 64, 192));
 		ntmsg_clear(SPNO_MSGFRAME_FG);
 		nt_sp_update_all(true);
 		break;
@@ -153,11 +153,7 @@ void ntmsg_set_frame(int type) {
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], false);
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], true);
 		
-		gr_fill(sf, MSGFRAME_1_X, MSGFRAME_1_Y,
-			MSGFRAME_1_WIDTH, MSGFRAME_1_HEIGHT,
-			32, 32, 32);
-		gr_fill_alpha_map(sf, MSGFRAME_1_X, MSGFRAME_1_Y,
-				  MSGFRAME_1_WIDTH, MSGFRAME_1_HEIGHT, 128);
+		SDL_FillRect(sf, &msgframe_1, SDL_MapRGBA(sf->format, 32, 32, 32, 128));
 		ntmsg_clear(SPNO_MSGFRAME_FG);
 		nt_sp_update_all(true);
 	
@@ -337,8 +333,8 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 	
 	switch(night.msgplace) {
 	case 0:
-		sp->u.msg.dspcur.x = MSGFRAME_0_X;
-		sp->u.msg.dspcur.y = MSGFRAME_0_Y + 8;
+		sp->u.msg.dspcur.x = msgframe_0.x;
+		sp->u.msg.dspcur.y = msgframe_0.y + 8;
 		break;
 		
 	case 1:
@@ -364,8 +360,8 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 		sp->u.msg.dspcur.y = (sp->cursize.height - (line * (wSize+2))) /2;
 		break;
 	case 2:
-		sp->u.msg.dspcur.x = MSGFRAME_2_X;
-		sp->u.msg.dspcur.y = MSGFRAME_2_Y + 8;
+		sp->u.msg.dspcur.x = msgframe_2.x;
+		sp->u.msg.dspcur.y = msgframe_2.y + 8;
 		break;
 	}
 	

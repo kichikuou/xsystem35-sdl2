@@ -54,7 +54,7 @@ enum cgtype {
 struct _cginfo {
 	enum cgtype type;  // CGの種類, 0: 未使用, 1:リンクされている, ...
 	int no;            // CGの番号
-	surface_t *sf;     // CG本体
+	struct SDL_Surface *sf;
 	int refcnt;        // 参照カウンタ。０になったら開放してもよい。
 };
 typedef struct _cginfo cginfo_t;

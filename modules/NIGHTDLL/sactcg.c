@@ -39,17 +39,13 @@
 #define CGMAX 65536
 static cginfo_t *cgs[CGMAX];
 
-#include "sactcg_stretch.c"
-#include "sactcg_blend.c"
-
-
 #define SPCG_ASSERT_NO(no) \
   if ((no) > (CGMAX -1)) { \
     WARNING("no is too large (should be %d < %d)", (no), CGMAX); \
     return; \
   } \
 
-static cginfo_t *nt_scg_new(enum cgtype type, int no, surface_t *sf) {
+static cginfo_t *nt_scg_new(enum cgtype type, int no, SDL_Surface *sf) {
 	cginfo_t *info = calloc(1, sizeof(cginfo_t));
 	info->type = type;
 	info->no = no;
@@ -79,7 +75,7 @@ static cginfo_t *nt_scg_get(int no) {
 	if (cgs[no] != NULL)
 		return cgs[no];
 
-	surface_t *sf = sf_loadcg_no(no - 1);
+	SDL_Surface *sf = load_cg_to_sdlsurface(no - 1);
 	if (!sf) {
 		WARNING("load fail (%d)", no -1);
 		return NULL;
@@ -99,7 +95,7 @@ void nt_scg_deref(cginfo_t *cg) {
 		return;
 
 	if (cg->sf)
-		sf_free(cg->sf);
+		SDL_FreeSurface(cg->sf);
 	free(cg);
 }
 
@@ -107,9 +103,8 @@ void nt_scg_deref(cginfo_t *cg) {
 void nt_scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
 	SPCG_ASSERT_NO(wNumCG);
 
-	surface_t *sf = sf_create_surface(wWidth, wHeight, sf0->depth);
-	gr_fill(sf, 0, 0, wWidth, wHeight, wR, wG, wB);
-	gr_fill_alpha_map(sf, 0, 0, wWidth, wHeight, wBlendRate);
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_FillRect(sf, NULL, SDL_MapRGBA(sf->format, wR, wG, wB, wBlendRate));
 	nt_scg_new(CG_SET, wNumCG, sf);
 }
 
@@ -122,14 +117,8 @@ void nt_scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wH
 	if (!src)
 		return;
 
-	surface_t *sf = src->sf->alpha
-		? sf_create_surface(wWidth, wHeight, src->sf->depth)
-		: sf_create_pixel(wWidth, wHeight, src->sf->depth);
-
-	if (src->sf->pixel)
-		gr_copy(sf, 0, 0, src->sf, wX, wY, wWidth, wHeight);
-	if (src->sf->alpha)
-		gr_copy_alpha_map(sf, 0, 0, src->sf, wX, wY, wWidth, wHeight);
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, src->sf->format->BitsPerPixel, src->sf->format->format);
+	SDL_BlitSurface(src->sf, &(SDL_Rect){wX, wY, wWidth, wHeight}, sf, NULL);
 
 	nt_scg_new(CG_SET, wNumDstCG, sf);
 }

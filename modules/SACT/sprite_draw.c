@@ -23,8 +23,10 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -35,11 +37,6 @@
 #include "graph.h"
 #include "ngraph.h"
 #include "sprite.h"
-
-static void fill_dmap(int dx ,int dy, int w, int h, uint16_t val);
-static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w, int h, uint16_t val);
-
-
 
 // 矩形の depthmap を描画
 static void fill_dmap(int dx ,int dy, int w, int h, uint16_t val) {
@@ -60,19 +57,19 @@ static void fill_dmap(int dx ,int dy, int w, int h, uint16_t val) {
 }
 
 // alphamapにしたがって、alpha値が0より大きいところを指定のdepthとする
-static void fill_dmap_mask(surface_t *src, int sx, int sy, int dx ,int dy, int w, int h, uint16_t val) {
+static void fill_dmap_mask(SDL_Surface *src, int sx, int sy, int dx ,int dy, int w, int h, uint16_t val) {
 	uint8_t *sp, *dp;
 	int x, y;
-	
+	assert(src->format->Amask == 0xff000000);
 	dp = GETOFFSET_PIXEL(sact.dmap, dx, dy);
-	sp = GETOFFSET_ALPHA(src, sx, sy);
+	sp = src->pixels + sy * src->pitch + sx * 4 + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0);
 	
 	for (y = 0; y < h; y++) {
-		uint8_t *yls = (uint8_t *)(sp + y * src->width);
+		uint8_t *yls = sp + y * src->pitch;
 		uint16_t *yld = (uint16_t *)(dp + y * sact.dmap->bytes_per_line);
 		for (x = 0; x < w; x++) {
 			if (*yls > 0) *yld = val;
-			yls++; yld++;
+			yls += 4; yld++;
 		}
 	}
 }
@@ -88,39 +85,25 @@ void sp_draw(sprite_t *sp) {
 	if (cg->sf == NULL) return;
 
 	// 更新領域の確定
-	surface_t update;
-	update.width  = sact.updaterect.w;
-	update.height = sact.updaterect.h;
+	SDL_Rect cg_rect = {0, 0, cg->sf->w, cg->sf->h};
 	int sx = 0;
 	int sy = 0;
-	int dx = sp->cur.x - sact.updaterect.x;
-	int dy = sp->cur.y - sact.updaterect.y;
-	int w = cg->sf->width;
-	int h = cg->sf->height;
-	
-	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
+	int dx = sp->cur.x;
+	int dy = sp->cur.y;
+	int w = cg->sf->w;
+	int h = cg->sf->h;
+
+	if (!ags_clipCopyRect(&cg_rect, &sact.updaterect, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}
-		
-	dx += sact.updaterect.x;
-	dy += sact.updaterect.y;
-	
-	if (cg->sf->alpha) {
-		// alpha map がある場合
-		gre_BlendUseAMap(sf0, dx, dy,
-				 sf0, dx, dy,
-				 cg->sf, sx, sy, w, h,
-				 cg->sf, sx, sy,
-				 sp->blendrate);
+
+	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format) || sp->blendrate < 255) {
+		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_BLEND);
+		SDL_SetSurfaceAlphaMod(cg->sf, sp->blendrate);
 	} else {
-		if (sp->blendrate == 255) {
-			// alpha値指定が無い場合
-			gr_copy(sf0, dx, dy, cg->sf, sx, sy, w, h);
-		} else if (sp->blendrate > 0) {
-			// alpha値指定がある場合
-			gr_blend(sf0, dx, dy, cg->sf, sx, sy, w, h, sp->blendrate);
-		}
+		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_NONE);
 	}
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d", sp->no, sx, sy, w, h, dx, dy);
 }
@@ -130,35 +113,32 @@ void sp_draw(sprite_t *sp) {
 */
 void sp_draw_dmap(void* data, void* userdata) {
 	sprite_t *sp = (sprite_t *)data;
-	cginfo_t *cg;
-	surface_t update;
-	int sx, sy, w, h, dx, dy;
-	
+
 	// 非表示状態の時は無視
 	if (!sp->show) return;
 	
 	// ドラッグ中のスプライトは無視
 	if (sp == sact.draggedsp) return;
 	
-	cg = sp->curcg;
+	cginfo_t *cg = sp->curcg;
 	if (cg == NULL) return;
 	if (cg->sf == NULL) return;
 	
 	// depth map を書く領域を確定
-	update.width  = sf0->width;
-	update.height = sf0->height;
-	sx = 0;
-	sy = 0;
-	dx = sp->cur.x;
-	dy = sp->cur.y;
-	w = cg->sf->width;
-	h = cg->sf->height;
-	
-	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
+	SDL_Rect cg_rect = {0, 0, cg->sf->w, cg->sf->h};
+	SDL_Rect sf0_rect = {0, 0, sf0->width, sf0->height};
+	int sx = 0;
+	int sy = 0;
+	int dx = sp->cur.x;
+	int dy = sp->cur.y;
+	int w = cg->sf->w;
+	int h = cg->sf->h;
+
+	if (!ags_clipCopyRect(&cg_rect, &sf0_rect, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}
 	
-	if (cg->sf->alpha) {
+	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format)) {
 		fill_dmap_mask(cg->sf, sx, sy, dx, dy, w, h, sp->no);
 	} else {
 		fill_dmap(dx, dy, w, h, sp->no);

@@ -69,7 +69,6 @@ add_library(modules STATIC
   lib/graph_fillrect_amap.c
   lib/graph_copy_amap.c
   lib/graph_blend_amap.c
-  lib/graph_saturadd_amap.c
   lib/graph_draw_amap.c
   lib/graph_cg.c
   lib/gre_blend_useamap.c

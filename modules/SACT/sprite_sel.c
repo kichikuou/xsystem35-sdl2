@@ -65,8 +65,8 @@ static bool sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
 	MyRectangle r = {
 		sp->cur.x + margin,
 		sp->cur.y + margin,
-		sp->curcg->sf->width - 2 * margin,
-		sp->curcg->sf->height - 2 * margin
+		sp->curcg->sf->w - 2 * margin,
+		sp->curcg->sf->h - 2 * margin
 	};
 	return SDL_PointInRect(&p, &r);
 }
@@ -171,7 +171,7 @@ static void setup_selwindow() {
 	int i;
 	
 	// 選択肢文字用 canvas
-	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, sp->cg1->sf->width, sp->cg1->sf->height, 8, SDL_PIXELFORMAT_INDEX8);
+	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, sp->cg1->sf->w, sp->cg1->sf->h, 8, SDL_PIXELFORMAT_INDEX8);
 	
 	dt_setfont(sact.sel.font_type, sact.sel.font_size);
 	

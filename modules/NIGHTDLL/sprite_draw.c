@@ -24,6 +24,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -46,39 +47,25 @@ void nt_sp_draw(sprite_t *sp, MyRectangle *r) {
 	if (cg->sf == NULL) return;
 
 	// 更新領域の確定
-	surface_t update;
-	update.width  = r->w;
-	update.height = r->h;
+	SDL_Rect cg_rect = {0, 0, cg->sf->w, cg->sf->h};
 	int sx = 0;
 	int sy = 0;
-	int dx = sp->cur.x - r->x;
-	int dy = sp->cur.y - r->y;
-	int w = cg->sf->width;
-	int h = cg->sf->height;
+	int dx = sp->cur.x;
+	int dy = sp->cur.y;
+	int w = cg->sf->w;
+	int h = cg->sf->h;
 	
-	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
+	if (!ags_clipCopyRect(&cg_rect, r, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}
-		
-	dx += r->x;
-	dy += r->y;
-	
-	if (cg->sf->alpha) {
-		// alpha map がある場合
-		gre_BlendUseAMap(sf0, dx, dy,
-				 sf0, dx, dy,
-				 cg->sf, sx, sy, w, h,
-				 cg->sf, sx, sy,
-				 sp->blendrate);
+
+	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format) || sp->blendrate < 255) {
+		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_BLEND);
+		SDL_SetSurfaceAlphaMod(cg->sf, sp->blendrate);
 	} else {
-		if (sp->blendrate == 255) {
-			// alpha値指定が無い場合
-			gr_copy(sf0, dx, dy, cg->sf, sx, sy, w, h);
-		} else if (sp->blendrate > 0) {
-			// alpha値指定がある場合
-			gr_blend(sf0, dx, dy, cg->sf, sx, sy, w, h, sp->blendrate);
-		}
+		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_NONE);
 	}
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
@@ -86,35 +73,26 @@ void nt_sp_draw(sprite_t *sp, MyRectangle *r) {
 
 // BlendScreenによる描画
 void nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
-	surface_t update;
-	cginfo_t *cg;
-	int sx, sy, w, h, dx, dy;
-	
 	if (sp == NULL) return;
-	
-	cg = sp->curcg;
-	
+	cginfo_t *cg = sp->curcg;
 	if (cg == NULL) return;
 	if (cg->sf == NULL) return;
 	
 	// 更新領域の確定
-	update.width  = r->w;
-	update.height = r->h;
-	sx = 0;
-	sy = 0;
-	dx = sp->cur.x - r->x;
-	dy = sp->cur.y - r->y;
-	w = cg->sf->width;
-	h = cg->sf->height;
+	SDL_Rect cg_rect = {0, 0, cg->sf->w, cg->sf->h};
+	int sx = 0;
+	int sy = 0;
+	int dx = sp->cur.x;
+	int dy = sp->cur.y;
+	int w = cg->sf->w;
+	int h = cg->sf->h;
 	
-	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
+	if (!ags_clipCopyRect(&cg_rect, r, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}
-		
-	dx += r->x;
-	dy += r->y;
 	
-	gr_blend_screen(sf0, dx, dy, cg->sf, sx, sy, w, h);
+	SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_ADD);
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);

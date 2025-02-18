@@ -1,6 +1,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "sprite.h"
@@ -32,8 +33,8 @@ sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type) {
 		sp->cursize.width  = 0;
 		sp->cursize.height = 0;
 	} else {
-		sp->cursize.width  = sp->curcg->sf->width;
-		sp->cursize.height = sp->curcg->sf->height;
+		sp->cursize.width  = sp->curcg->sf->w;
+		sp->cursize.height = sp->curcg->sf->h;
 	}
 	sp->update = DEFAULT_UPDATE;
 	
@@ -111,8 +112,8 @@ void nt_sp_set_cg(sprite_t *sp, int no) {
 		sp->cursize.width  = 0;
 		sp->cursize.height = 0;
 	} else {
-		sp->cursize.width  = cg->sf->width;
-		sp->cursize.height = cg->sf->height;
+		sp->cursize.width  = cg->sf->w;
+		sp->cursize.height = cg->sf->h;
 	}
 
 	sp->curcg = cg;

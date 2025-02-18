@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,9 +37,7 @@
 #include "sactcg.h"
 #include "surface.h"
 #include "ngraph.h"
-
-#include "sactcg_stretch.c"
-#include "sactcg_blend.c"
+#include "sdl_core.h"
 
 #define SPCG_ASSERT_NO(no) \
   if ((no) > (CGMAX -1)) { \
@@ -46,7 +45,7 @@
     return; \
   } \
 
-static cginfo_t *scg_new(enum cgtype type, int no, surface_t *sf) {
+static cginfo_t *scg_new(enum cgtype type, int no, SDL_Surface *sf) {
 	cginfo_t *info = calloc(1, sizeof(cginfo_t));
 	info->type = type;
 	info->no = no;
@@ -76,7 +75,7 @@ static cginfo_t *scg_get(int no) {
 	if (sact.cg[no] != NULL)
 		return sact.cg[no];
 
-	surface_t *sf = sf_loadcg_no(no - 1);
+	SDL_Surface *sf = load_cg_to_sdlsurface(no - 1);
 	if (!sf) {
 		WARNING("load fail (%d)", no -1);
 		return NULL;
@@ -96,7 +95,7 @@ void scg_deref(cginfo_t *cg) {
 		return;
 
 	if (cg->sf)
-		sf_free(cg->sf);
+		SDL_FreeSurface(cg->sf);
 	free(cg);
 }
 
@@ -104,9 +103,8 @@ void scg_deref(cginfo_t *cg) {
 void scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
 	SPCG_ASSERT_NO(wNumCG);
 
-	surface_t *sf = sf_create_surface(wWidth, wHeight, sf0->depth);
-	gr_fill(sf, 0, 0, wWidth, wHeight, wR, wG, wB);
-	gr_fill_alpha_map(sf, 0, 0, wWidth, wHeight, wBlendRate);
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_FillRect(sf, NULL, SDL_MapRGBA(sf->format, wR, wG, wB, wBlendRate));
 	scg_new(CG_SET, wNumCG, sf);
 }
 
@@ -119,7 +117,11 @@ void scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY)
 	if (!src)
 		return;
 
-	surface_t *sf = stretch(src->sf, src->sf->width, src->sf->height, (wReverseX << 1) | wReverseY);
+	SDL_Surface *sf = SDL_ConvertSurface(src->sf, src->sf->format, 0);
+	if (wReverseX)
+		sdl_FlipSurfaceHorizontal(sf);
+	if (wReverseY)
+		sdl_FlipSurfaceVertical(sf);
 	scg_new(CG_REVERSE, wNumCG, sf);
 }
 
@@ -131,9 +133,62 @@ void scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	cginfo_t *src = scg_get(wNumSrcCG);
 	if (!src)
 		return;
-	
-	surface_t *sf = stretch(src->sf, wWidth, wHeight, 0);
+
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, src->sf->format->BitsPerPixel, src->sf->format->format);
+	SDL_BlitScaled(src->sf, NULL, sf, NULL);
 	scg_new(CG_STRETCH, wNumCG, sf);
+}
+
+static SDL_Surface *blend(SDL_Surface *base, int x, int y, SDL_Surface *blend, int mode) {
+	assert(blend->format->format == SDL_PIXELFORMAT_ARGB8888 || blend->format->format == SDL_PIXELFORMAT_XRGB8888);
+	bool src_has_alpha = SDL_ISPIXELFORMAT_ALPHA(blend->format->format);
+	SDL_Surface *dst = SDL_ConvertSurfaceFormat(base, SDL_PIXELFORMAT_ARGB8888, 0);
+	SDL_Rect rect = {x, y, blend->w, blend->h};
+	SDL_IntersectRect(&(SDL_Rect){0, 0, dst->w, dst->h}, &rect, &rect);
+
+	for (int i = 0; i < rect.h; i++) {
+		uint8_t *dstp = (uint8_t *)dst->pixels + (i + rect.y) * dst->pitch + rect.x * 4;
+		uint8_t *srcp = (uint8_t *)blend->pixels + i * blend->pitch;
+		for (int j = 0; j < rect.w; j++) {
+			uint8_t *dstpp = dstp + j * 4;
+			uint8_t *srcpp = srcp + j * 4;
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+			// Use base's alpha map if blend has no alpha map
+			uint8_t alpha = src_has_alpha ? srcpp[3] : dstpp[3];
+			if (alpha == 0) {
+				// do nothing
+			} else if (alpha == 255) {
+				memcpy(dstpp, srcpp, 3);
+			} else {
+				for (int k = 0; k < 3; k++) {
+					dstpp[k] = (dstpp[k] * (255 - alpha) + srcpp[k] * alpha) / 255;
+				}
+			}
+			if (mode) {
+				int dsta = dstpp[3] + srcpp[3];
+				dstpp[3] = dsta > 255 ? 255 : dsta;
+			}
+#else
+			// Use base's alpha map if blend has no alpha map
+			uint8_t alpha = src_has_alpha ? srcpp[0] : dstpp[0];
+			if (alpha == 0) {
+				// do nothing
+			} else if (alpha == 255) {
+				memcpy(dstpp + 1, srcpp + 1, 3);
+			} else {
+				for (int 1 = 0; k < 4; k++) {
+					dstpp[k] = (dstpp[k] * (255 - alpha) + srcpp[k] * alpha) / 255;
+				}
+			}
+			if (mode) {
+				int dsta = dstpp[0] + srcpp[0];
+				dstpp[0] = dsta > 255 ? 255 : dsta;
+			}
+#endif
+		}
+	}
+
+	return dst;
 }
 
 // ベースCGの上にブレンドCGを重ねた CG を作成
@@ -146,7 +201,7 @@ void scg_create_blend(int wNumDstCG, int wNumBaseCG, int wX, int wY, int wNumBle
 	cginfo_t *blendcg = scg_get(wNumBlendCG);
 	if (!basecg || !blendcg) return;
 
-	surface_t *sf = blend(basecg->sf, wX, wY, blendcg->sf, wAlphaMapMode);
+	SDL_Surface *sf = blend(basecg->sf, wX, wY, blendcg->sf, wAlphaMapMode);
 	scg_new(CG_SET, wNumDstCG, sf);
 }
 
@@ -158,11 +213,11 @@ void scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
 	if (svar_length(wText) == 0) return;
 
 	ags_setFont(FONT_GOTHIC, wSize);
-	SDL_Surface *glyph = ags_drawStringToSurface(svar_get(wText));
+	SDL_Surface *glyph = ags_drawStringToRGBASurface(svar_get(wText), wR, wG, wB);
 
-	surface_t *sf = sf_create_surface(glyph->w, wSize, nact->ags.dib->depth);
-	gr_fill(sf, 0, 0, glyph->w, wSize, wR, wG, wB);
-	gr_draw_amap(sf, 0, 0, glyph->pixels, glyph->w, wSize, glyph->pitch);
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, glyph->w, wSize, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
+	SDL_BlitSurface(glyph, NULL, sf, NULL);
 	SDL_FreeSurface(glyph);
 
 	scg_new(CG_SET, wNumCG, sf);
@@ -183,11 +238,11 @@ void scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs
 	sprintf(s, ss, wValue);
 
 	ags_setFont(FONT_GOTHIC, wSize);
-	SDL_Surface *glyph = ags_drawStringToSurface(s);
+	SDL_Surface *glyph = ags_drawStringToRGBASurface(s, wR, wG, wB);
 
-	surface_t *sf = sf_create_surface(glyph->w, wSize, nact->ags.dib->depth);
-	gr_fill(sf, 0, 0, glyph->w, wSize, wR, wG, wB);
-	gr_draw_amap(sf, 0, 0, glyph->pixels, glyph->w, wSize, glyph->pitch);
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, glyph->w, wSize, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
+	SDL_BlitSurface(glyph, NULL, sf, NULL);
 	SDL_FreeSurface(glyph);
 
 	scg_new(CG_SET, wNumCG, sf);
@@ -202,7 +257,7 @@ void scg_copy(int wNumDstCG, int wNumSrcCG) {
 	if (!src)
 		return;
 
-	scg_new(CG_SET, wNumDstCG, sf_dup(src->sf));
+	scg_new(CG_SET, wNumDstCG, SDL_ConvertSurface(src->sf, src->sf->format, 0));
 }
 
 // CGの一部を切りぬいたCGを作成
@@ -214,14 +269,8 @@ void scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeig
 	if (!src)
 		return;
 
-	surface_t *sf = src->sf->alpha
-		? sf_create_surface(wWidth, wHeight, src->sf->depth)
-		: sf_create_pixel(wWidth, wHeight, src->sf->depth);
-
-	if (src->sf->pixel)
-		gr_copy(sf, 0, 0, src->sf, wX, wY, wWidth, wHeight);
-	if (src->sf->alpha)
-		gr_copy_alpha_map(sf, 0, 0, src->sf, wX, wY, wWidth, wHeight);
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, src->sf->format->BitsPerPixel, src->sf->format->format);
+	SDL_BlitSurface(src->sf, &(SDL_Rect){wX, wY, wWidth, wHeight}, sf, NULL);
 
 	scg_new(CG_SET, wNumDstCG, sf);
 }
@@ -235,18 +284,9 @@ void scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int 
 	if (!src)
 		return;
 
-	surface_t *sf;
-	if (src->sf->alpha) {
-		sf = sf_create_surface(src->sf->width, src->sf->height, src->sf->depth);
-		gr_fill_alpha_map(sf, 0, 0, src->sf->width, src->sf->height, 255);
-	} else {
-		sf = sf_create_pixel(src->sf->width, src->sf->height, src->sf->depth);
-	}
-	
-	if (src->sf->pixel)
-		gr_copy(sf, wX, wY, src->sf, wX, wY, wWidth, wHeight);
-	if (src->sf->alpha)
-		gr_copy_alpha_map(sf, wX, wY, src->sf, wX, wY, wWidth, wHeight);
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, src->sf->w, src->sf->h, src->sf->format->BitsPerPixel, src->sf->format->format);
+	SDL_FillRect(sf, NULL, SDL_MapRGBA(sf->format, 0, 0, 0, 255));
+	SDL_BlitSurface(src->sf, &(SDL_Rect){wX, wY, wWidth, wHeight}, sf, &(SDL_Rect){wX, wY, wWidth, wHeight});
 
 	scg_new(CG_SET, wNumDstCG, sf);
 }
@@ -287,8 +327,8 @@ bool scg_querysize(int wNumCG, int *w, int *h) {
 	if (sact.cg[wNumCG] == NULL) goto errexit;
 	if (sact.cg[wNumCG]->sf == NULL) goto errexit;
 
-	*w = sact.cg[wNumCG]->sf->width;
-	*h = sact.cg[wNumCG]->sf->height;
+	*w = sact.cg[wNumCG]->sf->w;
+	*h = sact.cg[wNumCG]->sf->h;
 	
 	return true;
 
@@ -302,8 +342,7 @@ int scg_querybpp(int wNumCG) {
 	if (wNumCG >= (CGMAX -1)) return 0;
 	if (sact.cg[wNumCG] == NULL) return 0;
 	if (sact.cg[wNumCG]->sf == NULL) return 0;
-	
-	return sact.cg[wNumCG]->sf->depth;
+	return sact.cg[wNumCG]->sf->format->BitsPerPixel;
 }
 
 // CGの alphamap が存在するかを取得
@@ -311,6 +350,5 @@ bool scg_existalphamap(int wNumCG) {
 	if (wNumCG >= (CGMAX -1)) return false;
 	if (sact.cg[wNumCG] == NULL) return false;
 	if (sact.cg[wNumCG]->sf == NULL) return false;
-	
-	return sact.cg[wNumCG]->sf->alpha;
+	return SDL_ISPIXELFORMAT_ALPHA(sact.cg[wNumCG]->sf->format->format);
 }

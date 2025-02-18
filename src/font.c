@@ -133,6 +133,19 @@ SDL_Surface *font_get_glyph(const char *str_utf8) {
 	return fs;
 }
 
+SDL_Surface *font_get_glyph_rgb(const char *str_utf8, int r, int g, int b) {
+	if (!fontset)
+		return NULL;
+
+	SDL_Surface *fs;
+	SDL_Color color = {r, g, b, 255};
+	fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, color);
+	if (!fs)
+		WARNING("Text rendering failed: %s", TTF_GetError());
+
+	return fs;
+}
+
 // SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
 static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col)
 {

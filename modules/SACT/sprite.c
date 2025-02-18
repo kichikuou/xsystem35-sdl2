@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -158,8 +159,8 @@ void sp_new(int no, int cg1, int cg2, int cg3, int type) {
 		sp->cursize.width = 0;
 		sp->cursize.height = 0;
 	} else {
-		sp->cursize.width = sp->curcg->sf->width;
-		sp->cursize.height = sp->curcg->sf->height;
+		sp->cursize.width = sp->curcg->sf->w;
+		sp->cursize.height = sp->curcg->sf->h;
 	}
 	
 	sp->freezed_state = 0; // 状態固定は無し
@@ -234,8 +235,8 @@ void sp_set_wall_paper(int no) {
 
 	if (sp->curcg) { // display specified CG
 		sp->update = DEFAULT_UPDATE;
-		sp->cursize.width  = sp->curcg->sf->width;
-		sp->cursize.height = sp->curcg->sf->height;
+		sp->cursize.width  = sp->curcg->sf->w;
+		sp->cursize.height = sp->curcg->sf->h;
 	} else { // Black
 		sp->cursize.height = sf0->height;
 		sp->curcg = NULL;

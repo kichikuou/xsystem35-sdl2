@@ -307,7 +307,7 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 
 // Fill the rectangle with the specified color (rgb) and blend rate (lv)
 void gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv) {
-	SDL_Surface *src = SDL_CreateRGBSurfaceWithFormat(0, dw, dh, 32, SDL_PIXELFORMAT_RGBA32);
+	SDL_Surface *src = SDL_CreateRGBSurfaceWithFormat(0, dw, dh, 32, SDL_PIXELFORMAT_ARGB8888);
 	SDL_FillRect(src, NULL, SDL_MapRGBA(src->format, r, g, b, lv));
 	SDL_SetSurfaceBlendMode(src, SDL_BLENDMODE_BLEND);
 	SDL_Rect dstrect = {dx, dy, dw, dh};
