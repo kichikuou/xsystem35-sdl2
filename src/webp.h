@@ -20,9 +20,12 @@
 #ifndef __WEBP_H__
 #define __WEBP_H__
 
-#include "cg.h"
+#include <stdint.h>
+#include <stdbool.h>
+
+struct SDL_Surface;
 
 bool webp_checkfmt(uint8_t *data);
-cgdata *webp_extract(uint8_t *data, size_t size);
+struct SDL_Surface *webp_extract(uint8_t *data, size_t size);
 
 #endif // __WEBP_H__

@@ -34,9 +34,6 @@
 #include "pms.h"
 #include "qnt.h"
 #include "sdl_core.h"
-#ifdef HAVE_WEBP
-#include "webp.h"
-#endif
 #include "ngraph.h"
 #include "dri.h"
 #include "ald_manager.h"
@@ -54,10 +51,6 @@ static CG_TYPE check_cgformat(uint8_t *data) {
 		return ALCG_PMS8;
 	} else if (pms64k_checkfmt(data)) {
 		return ALCG_PMS16;
-#ifdef HAVE_WEBP
-	} else if (webp_checkfmt(data)) {
-		return ALCG_WEBP;
-#endif
 	}
 	return ALCG_UNKNOWN;
 }
@@ -96,15 +89,6 @@ static surface_t *sf_getcg(void *b, size_t size) {
 			: sf_create_pixel(cg->width, cg->height);
 		sdl_drawImage24(cg, sf, 0, 0, 255);
 		break;
-#ifdef HAVE_WEBP
-	case ALCG_WEBP:
-		cg = webp_extract(b, size);
-		sf = cg->alpha
-			? sf_create_surface(cg->width, cg->height)
-			: sf_create_pixel(cg->width, cg->height);
-		sdl_drawImage24(cg, sf, 0, 0, 255);
-		break;
-#endif
 	default:
 		WARNING("Unknown Cg Type");
 		return NULL;

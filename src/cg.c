@@ -513,8 +513,16 @@ SDL_Surface *cg_load_as_sdlsurface(int no) {
 	dridata *dfile = ald_getdata(DRIFILE_CG, no);
 	if (!dfile) return NULL;
 
-	cgdata *cg = NULL;
 	CG_TYPE type = check_cgformat(dfile->data);
+#ifdef HAVE_WEBP
+	if (type == ALCG_WEBP) {
+		SDL_Surface *sf = webp_extract(dfile->data, dfile->size);
+		ald_freedata(dfile);
+		return sf;
+	}
+#endif
+
+	cgdata *cg = NULL;
 	switch (type) {
 	case ALCG_PMS16:
 		cg = pms64k_extract(dfile->data);
@@ -522,11 +530,6 @@ SDL_Surface *cg_load_as_sdlsurface(int no) {
 	case ALCG_QNT:
 		cg = qnt_extract(dfile->data);
 		break;
-#ifdef HAVE_WEBP
-	case ALCG_WEBP:
-		cg = webp_extract(dfile->data, dfile->size);
-		break;
-#endif
 	default:
 		WARNING("Invalid CG type");
 		break;

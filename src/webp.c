@@ -17,6 +17,7 @@
  *
 */
 
+#include <SDL.h>
 #include <webp/decode.h>
 
 #include "system.h"
@@ -55,87 +56,56 @@ static int get_base_cg(uint8_t *data, size_t size) {
 	return 0;
 }
 
-static uint8_t *webp_load(uint8_t *data, size_t size, int *width, int *height, int *has_alpha) {
-	uint8_t *pixels = WebPDecodeRGBA(data, size, width, height);
-	if (!pixels) {
-		return NULL;
-	}
-
+SDL_Surface *webp_extract(uint8_t *data, size_t size) {
 	WebPBitstreamFeatures features;
-	WebPGetFeatures(data, size, &features);
-	*has_alpha = features.has_alpha;
-
-	int base = get_base_cg(data, size);
-	if (!base)
-		return pixels;
-
-	dridata *dfile = ald_getdata(DRIFILE_CG, base - 1);
-	if (!dfile) {
-		WARNING("Cannot load base CG %d", base - 1);
-		return pixels;
+	if (WebPGetFeatures(data, size, &features) != VP8_STATUS_OK) {
+		return NULL;
 	}
-
-	int base_width, base_height, base_has_alpha;
-	uint8_t *base_pixels = webp_load(dfile->data, dfile->size, &base_width, &base_height, &base_has_alpha);
-	ald_freedata(dfile);
-	if (!base_pixels) {
-		WARNING("Cannot decode base CG %d", base - 1);
-		return pixels;
-	}
-	if (*width != base_width || *height != base_height) {
-		WARNING("webp base CG dimensions don't match: (%d,%d) / (%d,%d)",
-				base_width, base_height, *width, *height);
-		WebPFree(base_pixels);
-		return pixels;
-	}
-	*has_alpha |= base_has_alpha;
-
-	uint8_t *p = pixels;
-	uint8_t *bp = base_pixels;
-	for (int n = base_width * base_height; n > 0; n--) {
-		if (p[0] == 255 && p[1] == 0 && p[2] == 255) {
-			p[0] = bp[0];
-			p[1] = bp[1];
-			p[2] = bp[2];
-			p[3] = bp[3];
-		}
-		p += 4;
-		bp += 4;
-	}
-	WebPFree(base_pixels);
-	return pixels;
-}
-
-static void rgba_to_rgb_and_alpha(uint8_t *rgba, uint8_t *rgb, uint8_t *alpha, int nr_pixels) {
-	for (int i = 0; i < nr_pixels; i++) {
-		*rgb++ = *rgba++;
-		*rgb++ = *rgba++;
-		*rgb++ = *rgba++;
-		*alpha++ = *rgba++;
-	}
-}
-
-cgdata *webp_extract(uint8_t *data, size_t size) {
-	int width, height, has_alpha;
-	uint8_t *rgba = webp_load(data, size, &width, &height, &has_alpha);
-	if (!rgba) {
-		WARNING("webp image decode failed");
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(
+		0, features.width, features.height, 32,
+		features.has_alpha ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_XRGB8888);
+	if (!WebPDecodeBGRAInto(data, size, sf->pixels, features.height * sf->pitch, sf->pitch)) {
+		SDL_FreeSurface(sf);
 		return NULL;
 	}
 
-	cgdata *cg = calloc(1, sizeof(cgdata));
-	cg->type = ALCG_WEBP;
-	cg->width = width;
-	cg->height = height;
-	cg->depth = 24;
-	cg->pic = malloc(cg->width * cg->height * 3);
-	cg->alpha = malloc(cg->width * cg->height);
-	rgba_to_rgb_and_alpha(rgba, cg->pic, cg->alpha, cg->width * cg->height);
-	if (!has_alpha) {
-		free(cg->alpha);
-		cg->alpha = NULL;
-	}
-	WebPFree(rgba);
+	int base_no = get_base_cg(data, size);
+	if (!base_no)
+		return sf;
 
-	return cg;
+	dridata *dfile = ald_getdata(DRIFILE_CG, base_no - 1);
+	if (!dfile) {
+		WARNING("Cannot load base CG %d", base_no - 1);
+		return sf;
+	}
+
+	SDL_Surface *base = webp_extract(dfile->data, dfile->size);
+	ald_freedata(dfile);
+	if (!base) {
+		WARNING("Cannot decode base CG %d", base_no - 1);
+		return sf;
+	}
+	if (sf->w != base->w || sf->h != base->h) {
+		WARNING("webp base CG dimensions don't match: (%d,%d) / (%d,%d)",
+			base->w, base->h, sf->w, sf->h);
+		SDL_FreeSurface(base);
+		return sf;
+	}
+
+	for (int y = 0; y < sf->h; y++) {
+		uint8_t *p = sf->pixels + y * sf->pitch;
+		uint8_t *bp = base->pixels + y * base->pitch;
+		for (int x = 0; x < sf->w; x++) {
+			if (p[0] == 255 && p[1] == 0 && p[2] == 255) {
+				p[0] = bp[0];
+				p[1] = bp[1];
+				p[2] = bp[2];
+				p[3] = bp[3];
+			}
+			p += 4;
+			bp += 4;
+		}
+	}
+	SDL_FreeSurface(base);
+	return sf;
 }
