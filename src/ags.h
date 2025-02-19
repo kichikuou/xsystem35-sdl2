@@ -255,16 +255,10 @@ void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, vo
                                       (((PIXG16((f)) - PIXG16((b))) * (a)) >> 8)+ PIXG16((b)),\
                                       (((PIXB16((f)) - PIXB16((b))) * (a)) >> 8)+ PIXB16((b))))
 
-#define WHITELEVEL16(p, lv) ALPHABLEND16(0xffff,p,lv)
-
 #define ALPHABLEND24(f, b, a)  (PIX24((((PIXR24((f)) - PIXR24((b))) * (a)) >> 8) + PIXR24((b)),\
                                       (((PIXG24((f)) - PIXG24((b))) * (a)) >> 8) + PIXG24((b)),\
                                       (((PIXB24((f)) - PIXB24((b))) * (a)) >> 8) + PIXB24((b))))
 
-#define WHITELEVEL24(p, lv) ALPHABLEND24(0xffffffff, p, lv)
-
-#define SUTURADD16(pa, pb) PIX16(min(255,PIXR16(pa)+PIXR16(pb)), min(255, PIXG16(pa)+PIXG16(pb)), min(255, PIXB16(pa)+PIXB16(pb)));
-//#define SUTURADD16(pa, pb) PIX16(min(255,(int)(PIXR16(pa))+(int)(PIXR16(pb))), min(255, (int)(PIXG16(pa))+(int)(PIXG16(pb))), min(255, (int)(PIXB16(pa))+(int)(PIXB16(pb))));
 #define SUTURADD24(pa, pb) PIX24(min(255,PIXR24(pa)+PIXR24(pb)), min(255, PIXG24(pa)+PIXG24(pb)), min(255, PIXB24(pa)+PIXB24(pb)));
 
 #endif /* !__AGS_H__ */

@@ -9,29 +9,15 @@
 #include "surface.h"
 #include "system.h"
 
-static surface_t *create(int width, int height, int depth, bool has_pixel, bool has_alpha) {
+static surface_t *create(int width, int height, bool has_pixel, bool has_alpha) {
 	surface_t *s = calloc(1, sizeof(surface_t));
 	
 	s->width = width;
 	s->height = height;
-	
-	s->depth = depth;
+	s->depth = 24;
 	
 	if (has_pixel) {
-		uint32_t format = 0;
-		switch (s->depth) {
-		case 16:
-			format = SDL_PIXELFORMAT_RGB565;
-			break;
-		case 24:
-		case 32:
-			format = SDL_PIXELFORMAT_RGB888;
-			depth = 32;
-			break;
-		default:
-			SYSERROR("depth %d is not supported", s->depth);
-		}
-		s->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
+		s->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGB888);
 	}
 	
 	if (has_alpha) {
@@ -41,36 +27,19 @@ static surface_t *create(int width, int height, int depth, bool has_pixel, bool 
 	return s;
 }
 
-/**
- * surfaceの生成 (pixel + alpha)
- * @param width:  surfaceの幅
- * @param height: surfaceの高さ
- * @param depth:  surfaceのpixelのBPP (8|16|24|32), alphaは8固定
- * @return 生成した surface オブジェクト
- */
-surface_t *sf_create_surface(int width, int height, int depth) {
-	return create(width, height, depth, true, true);
+// Create a surface with pixel and alpha data
+surface_t *sf_create_surface(int width, int height) {
+	return create(width, height, true, true);
 }
 
-/**
- * surfaceの生成 (alphaのみ)
- * @param width:  surfaceの幅
- * @param height: surfaceの高さ
- * @return 生成した surface オブジェクト
- */
+// Create a surface with alpha data only
 surface_t *sf_create_alpha(int width, int height) {
-	return create(width, height, 8, false, true);
+	return create(width, height, false, true);
 }
 
-/**
- * surfaceの生成 (pixelのみ)
- * @param width:  surfaceの幅
- * @param height: surfaceの高さ
- * @param depth:  surfaceのBPP(8|16|24|32)
- * @return 生成した surface オブジェクト
- */
-surface_t *sf_create_pixel(int width, int height, int depth) {
-	return create(width, height, depth, true, false);
+// Create a surface with pixel data only
+surface_t *sf_create_pixel(int width, int height) {
+	return create(width, height, true, false);
 }
 
 /**

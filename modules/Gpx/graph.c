@@ -110,35 +110,11 @@ void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *
 }
 
 void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv) {
-	if (!gr_clip(src, &sx, &sy, &width, &height, dst, &dx, &dy)) return;
-
-	uint8_t *sp = GETOFFSET_PIXEL(src,   sx, sy);
-	uint8_t *dp = GETOFFSET_PIXEL(dst,   dx, dy);
-
-	switch(dst->depth) {
-	case 16:
-		for (int y = 0; y < height; y++) {
-			uint16_t *yls = (uint16_t *)(sp + y * src->sdl_surface->pitch);
-			uint16_t *yld = (uint16_t *)(dp + y * dst->sdl_surface->pitch);
-			for (int x = 0; x < width; x++) {
-				*yld = ALPHABLEND16(*yls, *yld, lv);
-				yls++; yld++;
-			}
-		}
-		break;
-
-	case 24:
-	case 32:
-		for (int y = 0; y < height; y++) {
-			uint32_t *yls = (uint32_t *)(sp + y * src->sdl_surface->pitch);
-			uint32_t *yld = (uint32_t *)(dp + y * dst->sdl_surface->pitch);
-			for (int x = 0; x < width; x++) {
-				*yld = ALPHABLEND24(*yls, *yld, lv);
-				yls++; yld++;
-			}
-		}
-		break;
-	}
+	SDL_SetSurfaceBlendMode(src->sdl_surface, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceAlphaMod(src->sdl_surface, lv);
+	SDL_BlitSurface(src->sdl_surface, &(SDL_Rect){sx, sy, width, height}, dst->sdl_surface, &(SDL_Rect){dx, dy, width, height});
+	SDL_SetSurfaceAlphaMod(src->sdl_surface, 255);
+	SDL_SetSurfaceBlendMode(src->sdl_surface, SDL_BLENDMODE_NONE);
 }
 
 void gr_blend_src_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int alpha, int rate) {
@@ -229,52 +205,20 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 		row[x] = xd; xd += a1;
 	}
 
-	switch(dst->depth) {
-	case 16:
-	{
-		uint16_t *yls, *yld;
-		uint8_t *yla;
-		
-		for (y = 0; y < dh; y++) {
-			yls = (uint16_t *)(sp + *(y + col) * src->sdl_surface->pitch);
-			yld = (uint16_t *)(dp +   y        * dst->sdl_surface->pitch);
-			yla = (uint8_t *)(sa + *(y + col) * src->width);
-			for (x = 0; x < dw; x++) {
-				*(yld + x) = ALPHABLEND16(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
-			}
-			while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
-				yld += dst->width;
-				for (x = 0; x < dw; x++) {
-					*(yld + x) = ALPHABLEND16(*(yls+ *(row+x)), *(yld+x), *(yla+*(row+x)));
-				}
-				y++;
-			}
+	for (y = 0; y < dh; y++) {
+		uint32_t *yls = (uint32_t *)(sp + *(y + col) * src->sdl_surface->pitch);
+		uint32_t *yld = (uint32_t *)(dp +   y        * dst->sdl_surface->pitch);
+		uint8_t  *yla = (uint8_t  *)(sa + *(y + col) * src->width);
+		for (x = 0; x < dw; x++) {
+			*(yld + x) = ALPHABLEND24(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
 		}
-		break;
-	}
-	case 24:
-	case 32:
-	{
-		uint32_t *yls, *yld;
-		uint8_t  *yla;
-		
-		for (y = 0; y < dh; y++) {
-			yls = (uint32_t *)(sp + *(y + col) * src->sdl_surface->pitch);
-			yld = (uint32_t *)(dp +   y        * dst->sdl_surface->pitch);
-			yla = (uint8_t  *)(sa + *(y + col) * src->width);
+		while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
+			yld += dst->width;
 			for (x = 0; x < dw; x++) {
-				*(yld + x) = ALPHABLEND24(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
+				*(yld + x) = ALPHABLEND24(*(yls+ *(row+x)), *(yld+x), *(yla+*(row+x)));
 			}
-			while (y < dh - 1 && *(col + y) == *(col + y + 1)) {
-				yld += dst->width;
-				for (x = 0; x < dw; x++) {
-					*(yld + x) = ALPHABLEND24(*(yls+ *(row+x)), *(yld+x), *(yla+*(row+x)));
-				}
-				y++;
-			}
+			y++;
 		}
-		break;
-	}
 	}
 	
 	free(row);

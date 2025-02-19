@@ -56,43 +56,17 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 	sp = (uint8_t *)(cg->pic + data_offset);
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
-	switch(ds->depth) {
-	case 16:
-	{
-		uint16_t *yl;
-		
-		for (y = 0; y < dh; y++) {
-			yl = (uint16_t *)(dp + y * ds->sdl_surface->pitch);
-			for (x = 0; x < dw; x++) {
-				r = *sp;
-				g = *(sp +1);
-				b = *(sp +2);
-				*yl = PIX16(r, g, b);
-				yl++; sp += 3;
-			}
-			sp += ((cg->width - dw) * 3);
+	for (y = 0; y < dh; y++) {
+		uint32_t *yl = (uint32_t *)(dp + y * ds->sdl_surface->pitch);
+		for (x = 0; x < dw; x++) {
+			r = *sp;
+			g = *(sp +1);
+			b = *(sp +2);
+			*yl = PIX24(r, g, b);
+			yl++; sp += 3;
 		}
-		break;
-		
+		sp += ((cg->width - dw) * 3);
 	}
-	case 24:
-	case 32:
-	{
-		uint32_t *yl;
-		
-		for (y = 0; y < dh; y++) {
-			yl = (uint32_t *)(dp + y * ds->sdl_surface->pitch);
-			for (x = 0; x < dw; x++) {
-				r = *sp;
-				g = *(sp +1);
-				b = *(sp +2);
-				*yl = PIX24(r, g, b);
-				yl++; sp += 3;
-			}
-			sp += ((cg->width - dw) * 3);
-		}
-		break;
-	}}
 }
 
 /**
@@ -120,31 +94,13 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 	sp = (uint16_t *)(cg->pic + data_offset);
 	dp = GETOFFSET_PIXEL(ds, dx, dy);
 	
-	switch(ds->depth) {
-	case 16:
-	{
-		for (y = 0; y < dh; y++) {
-			memcpy(dp, sp, dw * 2);
-			sp += cg->width;
-			dp += ds->sdl_surface->pitch;
+	for (y = 0; y < dh; y++) {
+		uint32_t *yl = (uint32_t *)(dp + y * ds->sdl_surface->pitch);
+		for (x = 0; x < dw; x++) {
+			pic16 = *sp;
+			*yl = rgb565_to_rgb888(pic16);
+			yl++; sp++;
 		}
-		break;
-		
+		sp += (cg->width - dw);
 	}
-	case 24:
-	case 32:
-	{
-		uint32_t *yl;
-		
-		for (y = 0; y < dh; y++) {
-			yl = (uint32_t *)(dp + y * ds->sdl_surface->pitch);
-			for (x = 0; x < dw; x++) {
-				pic16 = *sp;
-				*yl = rgb565_to_rgb888(pic16);
-				yl++; sp++;
-			}
-			sp += (cg->width - dw);
-		}
-		break;
-	}}
 }

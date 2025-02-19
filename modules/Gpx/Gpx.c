@@ -133,18 +133,15 @@ static void Create() {
 	           作成に失敗した場合は 0 を返す
 	   width : surface の幅
 	   height: surface の高さ
-	   bpp   : surface の深さ(オリジナルでは24bppのみサポート,
-	                          xsystem35 では display の depth と同じ)
+	   bpp   : surface の深さ(24bppのみサポート)
 	*/
 	int *var   = getCaliVariable();
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	int bpp    = getCaliValue();
-	surface_t *s;
-	
-	//get_surface0();
-	s = sf_create_surface(width, height, sf_get(0)->depth);
-	
+
+	surface_t *s = sf_create_surface(width, height);
+
 	if (s == NULL) {
 		*var = 0;
 	} else {
@@ -169,10 +166,9 @@ static void CreatePixelOnly() {
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	int bpp    = getCaliValue();
-	surface_t *s;
-	
-	s = sf_create_pixel(width, height, sf_get(0)->depth);
-	
+
+	surface_t *s = sf_create_pixel(width, height);
+
 	if (s == NULL) {
 		*var = 0;
 	} else {

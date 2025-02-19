@@ -75,7 +75,7 @@ void gr_copy_alpha_map_sprite(surface_t *dst, int dx, int dy, surface_t *src, in
 }
 
 void gr_blend_alpha_wds_stretch2x2(surface_t *src1, int sx1, int sy1, surface_t *src2, int sx2, int sy2, int sw, int sh, surface_t *dst, int dx, int dy) {
-	surface_t *t = sf_create_surface(sw * 2, sh * 2, dst->depth);
+	surface_t *t = sf_create_surface(sw * 2, sh * 2);
 	
 	gr_copy_stretch(t, 0, 0, sw * 2, sh * 2, src2, sx2, sy2, sw, sh);
 	gr_blend_alpha_wds(t, 0, 0, src1, sx1, sy1, sw * 2, sh * 2, dst, dx, dy);
@@ -93,45 +93,16 @@ void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int 
 	sa   = GETOFFSET_ALPHA(src1, sx1, sy1);
 	dp   = GETOFFSET_PIXEL(dst, dx, dy);
 	
-	switch(dst->depth) {
-	case 16:
-		{
-			uint16_t *yls1, *yls2, *yld;
-			uint8_t *yla;
-			
-			for (y = 0; y < sh; y++) {
-				yls1 = (uint16_t *)(sp1  + y * src1->sdl_surface->pitch);
-				yls2 = (uint16_t *)(sp2  + y * src2->sdl_surface->pitch);
-				yld  = (uint16_t *)(dp   + y * dst->sdl_surface->pitch);
-				yla  = (uint8_t *)(sa   + y * src1->width);
-				
-				for (x = 0; x < sw; x++) {
-					*yld = SUTURADD16(*yls1, ALPHABLEND16(*yls1, *yls2, *yla));
-					//*yld = SUTURADD16(*yls1, ALPHALEVEL16(*yls2, *yla));
-					yls1++; yls2++; yld++; yla++;
-				}
-			}
-		}
-		break;
-	case 24:
-	case 32:
-	{
-		uint32_t *yls1, *yls2, *yld;
-		uint8_t *yla;
+	for (y = 0; y < sh; y++) {
+		uint32_t *yls1 = (uint32_t *)(sp1  + y * src1->sdl_surface->pitch);
+		uint32_t *yls2 = (uint32_t *)(sp2  + y * src2->sdl_surface->pitch);
+		uint32_t *yld  = (uint32_t *)(dp   + y * dst->sdl_surface->pitch);
+		uint8_t  *yla  = (uint8_t  *)(sa   + y * src1->width);
 		
-		for (y = 0; y < sh; y++) {
-			yls1 = (uint32_t *)(sp1  + y * src1->sdl_surface->pitch);
-			yls2 = (uint32_t *)(sp2  + y * src2->sdl_surface->pitch);
-			yld  = (uint32_t *)(dp   + y * dst->sdl_surface->pitch);
-			yla  = (uint8_t  *)(sa   + y * src1->width);
-			
-			for (x = 0; x < sw; x++) {
-				*yld = SUTURADD24(*yls1, ALPHABLEND24(*yls1, *yls2, *yla));
-				yls1++; yls2++; yld++; yla++;
-			}
+		for (x = 0; x < sw; x++) {
+			*yld = SUTURADD24(*yls1, ALPHABLEND24(*yls1, *yls2, *yla));
+			yls1++; yls2++; yld++; yla++;
 		}
-		break;
-	}
 	}
 }
 

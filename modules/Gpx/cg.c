@@ -107,11 +107,11 @@ static surface_t *sf_getcg(void *b, size_t size) {
 		
 	case ALCG_PMS16:
 		if (cg->alpha) {
-			sf = sf_create_surface(cg->width, cg->height, sf0->depth);
+			sf = sf_create_surface(cg->width, cg->height);
 			gr_drawimage16(sf, cg, cg->x, cg->y);
 			gr_draw_amap(sf, cg->x, cg->y, cg->alpha, cg->width, cg->height, cg->width);
 		} else {
-			sf = sf_create_pixel(cg->width, cg->height, sf0->depth);
+			sf = sf_create_pixel(cg->width, cg->height);
 			gr_drawimage16(sf, cg, cg->x, cg->y);
 		}
 		break;
@@ -119,11 +119,11 @@ static surface_t *sf_getcg(void *b, size_t size) {
 	case ALCG_QNT:
 	case ALCG_WEBP:
 		if (cg->alpha) {
-			sf = sf_create_surface(cg->width, cg->height, sf0->depth);
+			sf = sf_create_surface(cg->width, cg->height);
 			gr_drawimage24(sf, cg, cg->x, cg->y);
 			gr_draw_amap(sf, cg->x, cg->y, cg->alpha, cg->width, cg->height, cg->width);
 		} else {
-			sf = sf_create_pixel(cg->width, cg->height, sf0->depth);
+			sf = sf_create_pixel(cg->width, cg->height);
 			gr_drawimage24(sf, cg, cg->x, cg->y);
 		}
 		break;

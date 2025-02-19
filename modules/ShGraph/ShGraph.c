@@ -152,42 +152,18 @@ static void ChangeNotColor() {
 	dib = nact->ags.dib;
 	dp = GETOFFSET_PIXEL(dib, x0, y0);
 	
-	switch(dib->depth) {
-	case 16:
-	{
-		uint16_t pic16s = PIX16(*src, *(src+1), *(src+2));
-		uint16_t pic16d = PIX16(*dst, *(dst+1), *(dst+2));
-		uint16_t *yl;
-		
-		for (y = 0; y < height; y++) {
-			yl = (uint16_t *)(dp + y * dib->sdl_surface->pitch);
-			for (x = 0; x < width; x++) {
-				if (*yl != pic16s) {
-					*yl = pic16d;
-				}
-				yl++;
+	uint32_t pic24s = PIX24(*src, *(src+1), *(src+2));
+	uint32_t pic24d = PIX24(*dst, *(dst+1), *(dst+2));
+	uint32_t *yl;
+
+	for (y = 0; y < height; y++) {
+		yl = (uint32_t *)(dp + y * dib->sdl_surface->pitch);
+		for (x = 0; x < width; x++) {
+			if (*yl != pic24s) {
+				*yl = pic24d;
 			}
+			yl++;
 		}
-		break;
-	}
-	case 24:
-	case 32:
-	{
-		uint32_t pic24s = PIX24(*src, *(src+1), *(src+2));
-		uint32_t pic24d = PIX24(*dst, *(dst+1), *(dst+2));
-		uint32_t *yl;
-		
-		for (y = 0; y < height; y++) {
-			yl = (uint32_t *)(dp + y * dib->sdl_surface->pitch);
-			for (x = 0; x < width; x++) {
-				if (*yl != pic24s) {
-					*yl = pic24d;
-				}
-				yl++;
-			}
-		}
-		break;
-	}
 	}
 	// The CX command after ChangeNotColor (in FIGHT.ADV) must use a precise
 	// calculation.
