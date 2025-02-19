@@ -13,11 +13,6 @@
 #include "ags.h"
 #include "sdl_core.h"
 
-/*
-  gr_xxxx はクリッピングあり
-  gre_xxxx はクリッピングなし
-*/
-
 /**
  * surface から surface にコピーなどをする際に、転送元と転送先のsurface
  * の大きさや、転送元・転送先座標、転送する領域の大きさなどから、実際に

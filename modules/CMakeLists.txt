@@ -70,7 +70,6 @@ add_library(modules STATIC
   lib/graph_blend_amap.c
   lib/graph_draw_amap.c
   lib/graph_cg.c
-  lib/gre_blend_useamap.c
   nDEMO/nDEMO.c
   nDEMOE/nDEMOE.c
   oDEMO/oDEMO.c

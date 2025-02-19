@@ -33,9 +33,6 @@ void gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int h
 #define gr_bright_dst_only(dst,dx,dy,w,h,lv) gr_copy_bright(dst,dx,dy,dst,dx,dy,w,h,lv)
 // void gr_bright_dst_only(surface_t *dst, int dx, int dy, int w, int h, int lv);
 
-/* in gre_blend_useamap.c */
-void gre_BlendUseAMap(surface_t *write, int wx, int wy, surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, surface_t *alpha, int ax, int ay, int lv);
-
 /* in graph_cg.c */
 void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y);
 void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y);
