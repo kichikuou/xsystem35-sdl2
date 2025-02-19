@@ -31,7 +31,6 @@
 #include "input.h"
 #include "bgm.h"
 #include "sdl_core.h"
-#include "ngraph.h"
 #include "cg.h"
 #include "jpeg.h"
 
@@ -81,8 +80,10 @@ static void Run() {
 
 		cgdata *cg = jpeg_extract(alk->entries[i].data, alk->entries[i].size);
 		if (cg) {
-			gr_drawimage24(sf0, cg, 0, 0);
+			SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+			SDL_BlitSurface(sf, NULL, main_surface, NULL);
 			ags_updateFull();
+			SDL_FreeSurface(sf);
 			cgdata_free(cg);
 		} else {
 			WARNING("Cannot decode CG %d", i);
