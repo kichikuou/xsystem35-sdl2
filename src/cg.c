@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL.h>
 #include "portab.h"
 #include "system.h"
 #include "graphics.h"
@@ -34,6 +35,9 @@
 #include "bmp.h"
 #include "qnt.h"
 #include "jpeg.h"
+#ifdef HAVE_WEBP
+#include "webp.h"
+#endif
 #include "ald_manager.h"
 #include "filecheck.h"
 #include "cache.h"
@@ -87,6 +91,10 @@ static CG_TYPE check_cgformat(uint8_t *data) {
 		return ALCG_VSP;
 	} else if (jpeg_checkfmt(data) && nact->ags.world_depth >= 15) {
 		return ALCG_JPEG;
+#ifdef HAVE_WEBP
+	} else if (webp_checkfmt(data)) {
+		return ALCG_WEBP;
+#endif
 	}
 	WARNING("Unknown Cg Type");
 	return ALCG_UNKNOWN;
@@ -499,4 +507,56 @@ void cg_get_info(int no, MyRectangle *info) {
 
 void cg_clear_display_loc() {
 	clear_display_loc();
+}
+
+SDL_Surface *cg_load_as_sdlsurface(int no) {
+	dridata *dfile = ald_getdata(DRIFILE_CG, no);
+	if (!dfile) return NULL;
+
+	cgdata *cg = NULL;
+	CG_TYPE type = check_cgformat(dfile->data);
+	switch (type) {
+	case ALCG_PMS16:
+		cg = pms64k_extract(dfile->data);
+		break;
+	case ALCG_QNT:
+		cg = qnt_extract(dfile->data);
+		break;
+#ifdef HAVE_WEBP
+	case ALCG_WEBP:
+		cg = webp_extract(dfile->data, dfile->size);
+		break;
+#endif
+	default:
+		WARNING("Invalid CG type");
+		break;
+	}
+	ald_freedata(dfile);
+	if (!cg) return NULL;
+
+	SDL_Surface *pic = type == ALCG_PMS16
+		? SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565)
+		: SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, cg->width, cg->height, 32,
+		cg->alpha ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_XRGB8888);
+	SDL_BlitSurface(pic, NULL, sf, NULL);
+
+	if (cg->alpha) {
+		// Copy alpha values from cg->alpha to sf->pixels.
+		uint8_t *p_ds = sf->pixels + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0);
+		uint8_t *adata = cg->alpha;
+		for (int y = 0; y < cg->height; y++) {
+			uint8_t *p_dst = p_ds;
+			for (int x = 0; x < cg->width; x++) {
+				*p_dst = *adata++;
+				p_dst += 4;
+			}
+			p_ds += sf->pitch;
+		}
+	}
+
+	SDL_FreeSurface(pic);
+	cgdata_free(cg);
+	return sf;
 }

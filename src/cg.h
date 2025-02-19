@@ -27,6 +27,8 @@
 #include "portab.h"
 #include "graphics.h"
 
+struct SDL_Surface;
+
 /*
  * available cg format id
 */
@@ -81,6 +83,7 @@ extern int  cg_load_with_filename(char *fname_utf8, int x, int y);
 extern void cg_get_info(int no, MyRectangle *info);
 extern void cg_clear_display_loc();
 extern void cgdata_free(cgdata *cg);
+extern struct SDL_Surface *cg_load_as_sdlsurface(int no);
 
 extern int cg_vspPB;
 extern int cg_fflg;

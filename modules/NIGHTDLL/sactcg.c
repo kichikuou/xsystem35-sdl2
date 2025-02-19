@@ -33,7 +33,7 @@
 #include "system.h"
 #include "ags.h"
 #include "surface.h"
-#include "ngraph.h"
+#include "cg.h"
 #include "sactcg.h"
 
 #define CGMAX 65536
@@ -75,7 +75,7 @@ static cginfo_t *nt_scg_get(int no) {
 	if (cgs[no] != NULL)
 		return cgs[no];
 
-	SDL_Surface *sf = load_cg_to_sdlsurface(no - 1);
+	SDL_Surface *sf = cg_load_as_sdlsurface(no - 1);
 	if (!sf) {
 		WARNING("load fail (%d)", no -1);
 		return NULL;

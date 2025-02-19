@@ -191,7 +191,7 @@ void nt_gr_draw(int effectno) {
 }
 
 void nt_gr_screencg(int no, int x, int y) {
-	SDL_Surface *sf = load_cg_to_sdlsurface(no - 1);
+	SDL_Surface *sf = cg_load_as_sdlsurface(no - 1);
 	SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_ADD);
 	SDL_BlitSurface(sf, NULL, main_surface, &(SDL_Rect){x, y, sf->w, sf->h});
 	ags_updateArea(x, y, sf->w, sf->h);

@@ -36,7 +36,7 @@
 #include "sact.h"
 #include "sactcg.h"
 #include "surface.h"
-#include "ngraph.h"
+#include "cg.h"
 #include "sdl_core.h"
 
 #define SPCG_ASSERT_NO(no) \
@@ -75,7 +75,7 @@ static cginfo_t *scg_get(int no) {
 	if (sact.cg[no] != NULL)
 		return sact.cg[no];
 
-	SDL_Surface *sf = load_cg_to_sdlsurface(no - 1);
+	SDL_Surface *sf = cg_load_as_sdlsurface(no - 1);
 	if (!sf) {
 		WARNING("load fail (%d)", no -1);
 		return NULL;
