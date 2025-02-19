@@ -26,6 +26,7 @@
 
 #include "config.h"
 
+#include <SDL_surface.h>
 #include "portab.h"
 #include "cg.h"
 #include "graphics.h"
@@ -44,8 +45,6 @@
 #define CURSOR_SIZEWE   11
 #define CURSOR_UPARROW  12
 #define CURSOR_WAIT     13
-
-struct SDL_Surface;
 
 /* RGB <-> alpha plane copy type */
 typedef enum {
@@ -66,18 +65,13 @@ struct agsurface {
 	int height;  /* height of surface */
 	int depth;   /* depth of surface, 8/16/24/32 is available */
 	
-	int bytes_per_line;   /* bytes per line  */
-	int bytes_per_pixel;  /* bytes per pixel */
-	
-	uint8_t *pixel; /* pixel data (can be NULL) */
+	SDL_Surface *sdl_surface; /* pixel data (can be NULL) */
 	uint8_t *alpha; /* alpha pixel data (can be NULL) */
-
-	struct SDL_Surface *sdl_surface;
 };
 typedef struct agsurface surface_t;
 
 // for surface_t
-#define GETOFFSET_PIXEL(suf, x, y) ((suf)->pixel + (y) * (suf)->bytes_per_line + (x) * (suf)->bytes_per_pixel)
+#define GETOFFSET_PIXEL(suf, x, y) PIXEL_AT((suf)->sdl_surface, x, y)
 #define GETOFFSET_ALPHA(suf, x, y) ((suf)->alpha + (y) * (suf)->width + (x))
 // for SDL_surface
 #define PIXEL_AT(suf, x, y) ((suf)->pixels + (y) * (suf)->pitch + (x) * (suf)->format->BytesPerPixel)
@@ -143,7 +137,7 @@ struct _ags {
 };
 typedef struct _ags ags_t;
 
-extern struct SDL_Surface *main_surface;
+extern SDL_Surface *main_surface;
 
 /* 初期化関係 */
 void ags_init(const char *render_driver, bool enable_zb);
@@ -222,7 +216,7 @@ extern void ags_setFont(FontType type, int size);
 extern void ags_setFontWithWeight(FontType type, int size, int weight);
 extern void ags_setTextDecorationType(TextDecorationType type);
 extern void ags_setTextDecorationColor(int color);
-extern struct SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b);
+extern SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b);
 
 /* カーソル関係 */
 extern void ags_setCursorType(int type);

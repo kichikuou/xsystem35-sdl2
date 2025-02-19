@@ -100,9 +100,9 @@ void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int 
 			uint8_t *yla;
 			
 			for (y = 0; y < sh; y++) {
-				yls1 = (uint16_t *)(sp1  + y * src1->bytes_per_line);
-				yls2 = (uint16_t *)(sp2  + y * src2->bytes_per_line);
-				yld  = (uint16_t *)(dp   + y * dst->bytes_per_line);
+				yls1 = (uint16_t *)(sp1  + y * src1->sdl_surface->pitch);
+				yls2 = (uint16_t *)(sp2  + y * src2->sdl_surface->pitch);
+				yld  = (uint16_t *)(dp   + y * dst->sdl_surface->pitch);
 				yla  = (uint8_t *)(sa   + y * src1->width);
 				
 				for (x = 0; x < sw; x++) {
@@ -120,9 +120,9 @@ void gr_blend_alpha_wds(surface_t *src1, int sx1, int sy1, surface_t *src2, int 
 		uint8_t *yla;
 		
 		for (y = 0; y < sh; y++) {
-			yls1 = (uint32_t *)(sp1  + y * src1->bytes_per_line);
-			yls2 = (uint32_t *)(sp2  + y * src2->bytes_per_line);
-			yld  = (uint32_t *)(dp   + y * dst->bytes_per_line);
+			yls1 = (uint32_t *)(sp1  + y * src1->sdl_surface->pitch);
+			yls2 = (uint32_t *)(sp2  + y * src2->sdl_surface->pitch);
+			yld  = (uint32_t *)(dp   + y * dst->sdl_surface->pitch);
 			yla  = (uint8_t  *)(sa   + y * src1->width);
 			
 			for (x = 0; x < sw; x++) {

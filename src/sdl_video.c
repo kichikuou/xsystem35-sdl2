@@ -192,9 +192,6 @@ static void makeDIB(int width, int height, int depth) {
 	
 	sdl_dibinfo = calloc(1, sizeof(surface_t));
 	sdl_dibinfo->depth           = main_surface->format->BitsPerPixel;
-	sdl_dibinfo->bytes_per_pixel = main_surface->format->BytesPerPixel;
-	sdl_dibinfo->bytes_per_line  = main_surface->pitch;
-	sdl_dibinfo->pixel  = main_surface->pixels;
 	sdl_dibinfo->width  = width;
 	sdl_dibinfo->height = height;
 	sdl_dibinfo->alpha  = NULL;

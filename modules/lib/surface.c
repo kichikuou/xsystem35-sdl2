@@ -15,8 +15,6 @@ static surface_t *create(int width, int height, int depth, bool has_pixel, bool 
 	s->width = width;
 	s->height = height;
 	
-	s->bytes_per_line = width;
-	s->bytes_per_pixel = 1;
 	s->depth = depth;
 	
 	if (has_pixel) {
@@ -34,9 +32,6 @@ static surface_t *create(int width, int height, int depth, bool has_pixel, bool 
 			SYSERROR("depth %d is not supported", s->depth);
 		}
 		s->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
-		s->pixel = s->sdl_surface->pixels;
-		s->bytes_per_line = s->sdl_surface->pitch;
-		s->bytes_per_pixel = s->sdl_surface->format->BytesPerPixel;
 	}
 	
 	if (has_alpha) {
@@ -104,11 +99,8 @@ surface_t *sf_dup(surface_t *in) {
 	sf = malloc(sizeof(surface_t));
 	memcpy(sf, in, sizeof(surface_t));
 	
-	if (in->pixel) {
+	if (in->sdl_surface) {
 		sf->sdl_surface = SDL_ConvertSurface(in->sdl_surface, in->sdl_surface->format, 0);
-		sf->pixel = sf->sdl_surface->pixels;
-		sf->bytes_per_line = sf->sdl_surface->pitch;
-		sf->bytes_per_pixel = sf->sdl_surface->format->BytesPerPixel;
 	}
 	
 	if (in->alpha) {
@@ -118,32 +110,4 @@ surface_t *sf_dup(surface_t *in) {
 	}
 	
 	return sf;
-}
-
-/**
- * surface全体のコピー
- * @param dst: コピー先 surface
- * @param src: コピー元 surface
- * @return なし
- */
-void sf_copyall(surface_t *dst, surface_t *src) {
-	int len;
-	
-	if (src == NULL || dst == NULL) return;
-	
-	if (src->width != dst->width) return;
-	
-	if (src->height != dst->height) return;
-	
-	if (src->bytes_per_pixel != dst->bytes_per_pixel) return;
-	
-	if (src->alpha && dst->alpha) {
-		len = src->width * src->height;
-		memcpy(dst->alpha, src->alpha, len);
-	}
-	
-	if (src->pixel && dst->pixel) {
-		len = src->bytes_per_line * src->height;
-		memcpy(dst->pixel, src->pixel, len);
-	}
 }

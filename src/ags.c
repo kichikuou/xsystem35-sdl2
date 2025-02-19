@@ -342,7 +342,7 @@ void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt
 		uint8_t *sdata = GETOFFSET_PIXEL(dib, sx, sy);
 		
 		for (y = 0; y < h; y++) {
-			yl = sdata + y * dib->bytes_per_line;
+			yl = sdata + y * dib->sdl_surface->pitch;
 			for (x = 0; x < w; x++) {
 				if (*yl >= src && *yl < src_last) *yl += dif;
 				yl++;

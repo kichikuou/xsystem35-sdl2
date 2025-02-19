@@ -118,8 +118,8 @@ void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 	switch(dst->depth) {
 	case 16:
 		for (int y = 0; y < height; y++) {
-			uint16_t *yls = (uint16_t *)(sp + y * src->bytes_per_line);
-			uint16_t *yld = (uint16_t *)(dp + y * dst->bytes_per_line);
+			uint16_t *yls = (uint16_t *)(sp + y * src->sdl_surface->pitch);
+			uint16_t *yld = (uint16_t *)(dp + y * dst->sdl_surface->pitch);
 			for (int x = 0; x < width; x++) {
 				*yld = ALPHABLEND16(*yls, *yld, lv);
 				yls++; yld++;
@@ -130,8 +130,8 @@ void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 	case 24:
 	case 32:
 		for (int y = 0; y < height; y++) {
-			uint32_t *yls = (uint32_t *)(sp + y * src->bytes_per_line);
-			uint32_t *yld = (uint32_t *)(dp + y * dst->bytes_per_line);
+			uint32_t *yls = (uint32_t *)(sp + y * src->sdl_surface->pitch);
+			uint32_t *yld = (uint32_t *)(dp + y * dst->sdl_surface->pitch);
 			for (int x = 0; x < width; x++) {
 				*yld = ALPHABLEND24(*yls, *yld, lv);
 				yls++; yld++;
@@ -236,8 +236,8 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 		uint8_t *yla;
 		
 		for (y = 0; y < dh; y++) {
-			yls = (uint16_t *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (uint16_t *)(dp +   y        * dst->bytes_per_line);
+			yls = (uint16_t *)(sp + *(y + col) * src->sdl_surface->pitch);
+			yld = (uint16_t *)(dp +   y        * dst->sdl_surface->pitch);
 			yla = (uint8_t *)(sa + *(y + col) * src->width);
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = ALPHABLEND16(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));
@@ -259,8 +259,8 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 		uint8_t  *yla;
 		
 		for (y = 0; y < dh; y++) {
-			yls = (uint32_t *)(sp + *(y + col) * src->bytes_per_line);
-			yld = (uint32_t *)(dp +   y        * dst->bytes_per_line);
+			yls = (uint32_t *)(sp + *(y + col) * src->sdl_surface->pitch);
+			yld = (uint32_t *)(dp +   y        * dst->sdl_surface->pitch);
 			yla = (uint8_t  *)(sa + *(y + col) * src->width);
 			for (x = 0; x < dw; x++) {
 				*(yld + x) = ALPHABLEND24(*(yls+ *(row + x)), *(yld+x), *(yla+*(row+x)));

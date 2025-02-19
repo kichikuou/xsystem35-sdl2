@@ -49,7 +49,7 @@ static void image_copy_from_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_16H:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint16_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint16_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = (uint16_t)(*yls << 8) | (*yld & 0xff);
 				yld++; yls++;
@@ -59,7 +59,7 @@ static void image_copy_from_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_16L:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint16_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint16_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = (uint16_t)(*yls) | (*yld & 0xff00);
 				yld++; yls++;
@@ -69,7 +69,7 @@ static void image_copy_from_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_24R:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint16_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint16_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = PIX16(*yls, PIXG16(*yld), PIXB16(*yld));
 				yld++; yls++;
@@ -79,7 +79,7 @@ static void image_copy_from_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_24G:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint16_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint16_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = PIX16(PIXR16(*yls), *yls, PIXB16(*yld));
 				yld++; yls++;
@@ -89,7 +89,7 @@ static void image_copy_from_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_24B:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint16_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint16_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = PIX16(PIXR16(*yld), PIXG16(*yld), *yls);
 				yld++; yls++;
@@ -109,7 +109,7 @@ static void image_copy_to_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 	switch(flag) {
 	case FROM_16H:
 		for (y = 0; y < h; y++) {
-			yls = (uint16_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint16_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = (uint8_t)(*yls >> 8);
@@ -119,7 +119,7 @@ static void image_copy_to_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_16L:
 		for (y = 0; y < h; y++) {
-			yls = (uint16_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint16_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = (uint8_t)(*yls);
@@ -129,7 +129,7 @@ static void image_copy_to_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_24R:
 		for (y = 0; y < h; y++) {
-			yls = (uint16_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint16_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = PIXR16(*yls);
@@ -139,7 +139,7 @@ static void image_copy_to_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_24G:
 		for (y = 0; y < h; y++) {
-			yls = (uint16_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint16_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = PIXG16(*yls);
@@ -149,7 +149,7 @@ static void image_copy_to_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_24B:
 		for (y = 0; y < h; y++) {
-			yls = (uint16_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint16_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = PIXB16(*yls);
@@ -175,7 +175,7 @@ static void image_copy_from_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_16H:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint32_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint32_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				/*  *yld = */ 
 				yld++; yls++;
@@ -185,7 +185,7 @@ static void image_copy_from_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_16L:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint32_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint32_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				/* *yld = (uint16_t)(*yls) | (*yld & 0xff00); */
 				yld++; yls++;
@@ -195,7 +195,7 @@ static void image_copy_from_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_24R:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint32_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint32_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = PIX24(*yls, PIXG24(*yld), PIXB24(*yld));
 				yld++; yls++;
@@ -205,7 +205,7 @@ static void image_copy_from_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_24G:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint32_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint32_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = PIX24(PIXR24(*yls), *yls, PIXB24(*yld));
 				yld++; yls++;
@@ -215,7 +215,7 @@ static void image_copy_from_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *dda
 	case TO_24B:
 		for (y = 0; y < h; y++) {
 			yls = (uint8_t *)(sdata + y * dib->width);
-			yld = (uint32_t *)(ddata + y * dib->bytes_per_line);
+			yld = (uint32_t *)(ddata + y * dib->sdl_surface->pitch);
 			for (x = 0; x < w; x++) {
 				*yld = PIX24(PIXR24(*yld), PIXG24(*yld), *yls);
 				yld++; yls++;
@@ -235,7 +235,7 @@ static void image_copy_to_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 	switch(flag) {
 	case FROM_16H:
 		for (y = 0; y < h; y++) {
-			yls = (uint32_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint32_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t  *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = (uint8_t)(PIX16(PIXR24(*yls), PIXG24(*yls), PIXB24(*yls)) >> 8);
@@ -245,7 +245,7 @@ static void image_copy_to_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_16L:
 		for (y = 0; y < h; y++) {
-			yls = (uint32_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint32_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t  *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = (uint8_t)(PIX16(PIXR24(*yls), PIXG24(*yls), PIXB24(*yls)));
@@ -255,7 +255,7 @@ static void image_copy_to_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_24R:
 		for (y = 0; y < h; y++) {
-			yls = (uint32_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint32_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t  *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = (uint8_t)PIXR24(*yls);
@@ -265,7 +265,7 @@ static void image_copy_to_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_24G:
 		for (y = 0; y < h; y++) {
-			yls = (uint32_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint32_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t  *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = (uint8_t)PIXG24(*yls);
@@ -275,7 +275,7 @@ static void image_copy_to_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *ddata
 		break;
 	case FROM_24B:
 		for (y = 0; y < h; y++) {
-			yls = (uint32_t *)(sdata + y * dib->bytes_per_line);
+			yls = (uint32_t *)(sdata + y * dib->sdl_surface->pitch);
 			yld = (uint8_t  *)(ddata + y * dib->width);
 			for (x = 0; x < w; x++) {
 				*yld = (uint8_t)PIXB24(*yls);

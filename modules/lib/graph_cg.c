@@ -62,7 +62,7 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 		uint16_t *yl;
 		
 		for (y = 0; y < dh; y++) {
-			yl = (uint16_t *)(dp + y * ds->bytes_per_line);
+			yl = (uint16_t *)(dp + y * ds->sdl_surface->pitch);
 			for (x = 0; x < dw; x++) {
 				r = *sp;
 				g = *(sp +1);
@@ -81,7 +81,7 @@ void gr_drawimage24(surface_t *ds, cgdata *cg, int x, int y) {
 		uint32_t *yl;
 		
 		for (y = 0; y < dh; y++) {
-			yl = (uint32_t *)(dp + y * ds->bytes_per_line);
+			yl = (uint32_t *)(dp + y * ds->sdl_surface->pitch);
 			for (x = 0; x < dw; x++) {
 				r = *sp;
 				g = *(sp +1);
@@ -126,7 +126,7 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 		for (y = 0; y < dh; y++) {
 			memcpy(dp, sp, dw * 2);
 			sp += cg->width;
-			dp += ds->bytes_per_line;
+			dp += ds->sdl_surface->pitch;
 		}
 		break;
 		
@@ -137,7 +137,7 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y) {
 		uint32_t *yl;
 		
 		for (y = 0; y < dh; y++) {
-			yl = (uint32_t *)(dp + y * ds->bytes_per_line);
+			yl = (uint32_t *)(dp + y * ds->sdl_surface->pitch);
 			for (x = 0; x < dw; x++) {
 				pic16 = *sp;
 				*yl = rgb565_to_rgb888(pic16);

@@ -160,7 +160,7 @@ static void ChangeNotColor() {
 		uint16_t *yl;
 		
 		for (y = 0; y < height; y++) {
-			yl = (uint16_t *)(dp + y * dib->bytes_per_line);
+			yl = (uint16_t *)(dp + y * dib->sdl_surface->pitch);
 			for (x = 0; x < width; x++) {
 				if (*yl != pic16s) {
 					*yl = pic16d;
@@ -178,7 +178,7 @@ static void ChangeNotColor() {
 		uint32_t *yl;
 		
 		for (y = 0; y < height; y++) {
-			yl = (uint32_t *)(dp + y * dib->bytes_per_line);
+			yl = (uint32_t *)(dp + y * dib->sdl_surface->pitch);
 			for (x = 0; x < width; x++) {
 				if (*yl != pic24s) {
 					*yl = pic24d;

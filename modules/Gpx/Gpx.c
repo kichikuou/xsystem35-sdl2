@@ -241,7 +241,7 @@ static void IsPixel() {
 	if (s == NULL) {
 		*var = 0;
 	} else {
-		*var = s->pixel ? 1 : 0;
+		*var = s->sdl_surface ? 1 : 0;
 	}
 	
 	TRACE("Gpx.IsPixel %d,%p:", p1, var);

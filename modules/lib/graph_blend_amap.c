@@ -17,8 +17,8 @@ static void gre_BlendUseAMap(surface_t *dst, int dx, int dy, surface_t *src, int
 	switch(dst->depth) {
 	case 16:
 		for (int y = 0; y < height; y++) {
-			uint16_t *yls = (uint16_t *)(sp + y * src->bytes_per_line);
-			uint16_t *yld = (uint16_t *)(dp + y * dst->bytes_per_line);
+			uint16_t *yls = (uint16_t *)(sp + y * src->sdl_surface->pitch);
+			uint16_t *yld = (uint16_t *)(dp + y * dst->sdl_surface->pitch);
 			uint8_t *yla = (uint8_t *)(ap + y * src->width);
 
 			for (int x = 0; x < width; x++) {
@@ -30,8 +30,8 @@ static void gre_BlendUseAMap(surface_t *dst, int dx, int dy, surface_t *src, int
 	case 24:
 	case 32:
 		for (int y = 0; y < height; y++) {
-			uint32_t *yls = (uint32_t *)(sp + y * src->bytes_per_line);
-			uint32_t *yld = (uint32_t *)(dp + y * dst->bytes_per_line);
+			uint32_t *yls = (uint32_t *)(sp + y * src->sdl_surface->pitch);
+			uint32_t *yld = (uint32_t *)(dp + y * dst->sdl_surface->pitch);
 			uint8_t *yla = (uint8_t  *)(ap + y * src->width);
 
 			for (int x = 0; x < width; x++) {
