@@ -86,14 +86,14 @@ void sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 		int adjx, adjy;
 		
 		cb[type]((float)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);
-		ags_setViewArea(adjx, adjy, sf0->width, sf0->height);
+		ags_setViewArea(adjx, adjy, main_surface->w, main_surface->h);
 		ags_updateFull();
 		
 		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
 	}
 	
-	ags_setViewArea(0, 0, sf0->width, sf0->height);
+	ags_setViewArea(0, 0, main_surface->w, main_surface->h);
 	ags_updateFull();
 }
 

@@ -54,8 +54,8 @@ void nt_gr_set_wallpaper(int no) {
 	sp = nt_sp_new(SPNO_WALL, no, 0, 0, SPRITE_WP);
 	nt_sp_add_updatelist(sp);
 	if (no == 0) {
-		sp->cursize.width  = sf0->width;
-		sp->cursize.height = sf0->height;
+		sp->cursize.width  = main_surface->w;
+		sp->cursize.height = main_surface->h;
 		sp->update = nt_sp_draw_wall;
 	}
 	
@@ -193,7 +193,7 @@ void nt_gr_draw(int effectno) {
 void nt_gr_screencg(int no, int x, int y) {
 	SDL_Surface *sf = load_cg_to_sdlsurface(no - 1);
 	SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_ADD);
-	SDL_BlitSurface(sf, NULL, sf0->sdl_surface, &(SDL_Rect){x, y, sf->w, sf->h});
+	SDL_BlitSurface(sf, NULL, main_surface, &(SDL_Rect){x, y, sf->w, sf->h});
 	ags_updateArea(x, y, sf->w, sf->h);
 	SDL_FreeSurface(sf);
 }

@@ -76,7 +76,7 @@ void ntmsg_init() {
 	sprite_t *sp;
 
 	// メッセージスプライト
-	sp = night.sp[SPNO_MSGFRAME_FG] = nt_sp_msg_new(SPNO_MSGFRAME_FG, 0, 0, sf0->width, sf0->height);
+	sp = night.sp[SPNO_MSGFRAME_FG] = nt_sp_msg_new(SPNO_MSGFRAME_FG, 0, 0, main_surface->w, main_surface->h);
 	nt_sp_add_updatelist(sp);
 	
 	// メッセージ背景用CG
@@ -85,7 +85,7 @@ void ntmsg_init() {
 	
 	// 文字背景CG作成
 	nt_scg_create(CGNO_MSGFR_BG,
-		   sf0->width, sf0->height,
+		   main_surface->w, main_surface->h,
 		   0, 0, 0, 255);
 	// night.cg[CGNO_MSGFR_BG]->refcnt++;
 	
@@ -451,7 +451,7 @@ void ntmsg_update(sprite_t *sp, MyRectangle *r) {
 
 	SDL_SetSurfaceBlendMode(sp->u.msg.canvas, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(sp->u.msg.canvas, sp->blendrate);
-	SDL_BlitSurface(sp->u.msg.canvas, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
+	SDL_BlitSurface(sp->u.msg.canvas, &(SDL_Rect){sx, sy, w, h}, main_surface, &(SDL_Rect){dx, dy, w, h});
 
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);

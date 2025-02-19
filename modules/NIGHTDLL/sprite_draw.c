@@ -65,7 +65,7 @@ void nt_sp_draw(sprite_t *sp, MyRectangle *r) {
 	} else {
 		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_NONE);
 	}
-	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, main_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
@@ -92,7 +92,7 @@ void nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
 	}
 	
 	SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_ADD);
-	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, main_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);

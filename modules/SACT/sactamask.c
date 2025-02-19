@@ -117,11 +117,11 @@ void sp_eupdate_amap(int index, int time, int cancel) {
 		return;
 	}
 
-	SDL_Surface *sf_old = SDL_ConvertSurface(sf0->sdl_surface, sf0->sdl_surface->format, 0);
+	SDL_Surface *sf_old = SDL_ConvertSurface(main_surface, main_surface->format, 0);
 	sp_update_all(false);
-	SDL_Surface *sf_new = SDL_ConvertSurfaceFormat(sf0->sdl_surface, SDL_PIXELFORMAT_ARGB8888, 0);
+	SDL_Surface *sf_new = SDL_ConvertSurfaceFormat(main_surface, SDL_PIXELFORMAT_ARGB8888, 0);
 	SDL_SetSurfaceBlendMode(sf_new, SDL_BLENDMODE_BLEND);
-	SDL_BlitSurface(sf_old, NULL, sf0->sdl_surface, NULL);
+	SDL_BlitSurface(sf_old, NULL, main_surface, NULL);
 
 	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time*10;
@@ -131,15 +131,15 @@ void sp_eupdate_amap(int index, int time, int cancel) {
 		int curstep = 255 * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
 		smask_update_alpha(sf_new, mask, curstep);
 
-		SDL_BlitSurface(sf_old, NULL, sf0->sdl_surface, NULL);
-		SDL_BlitSurface(sf_new, NULL, sf0->sdl_surface, NULL);
+		SDL_BlitSurface(sf_old, NULL, main_surface, NULL);
+		SDL_BlitSurface(sf_new, NULL, main_surface, NULL);
 		ags_updateFull();
 
 		int key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
 	}
 	SDL_SetSurfaceBlendMode(sf_new, SDL_BLENDMODE_NONE);
-	SDL_BlitSurface(sf_new, NULL, sf0->sdl_surface, NULL);
+	SDL_BlitSurface(sf_new, NULL, main_surface, NULL);
 	ags_updateFull();
 	SDL_FreeSurface(sf_new);
 	SDL_FreeSurface(sf_old);

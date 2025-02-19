@@ -166,11 +166,11 @@ static void update_selwindow(sprite_t *sp) {
 		int h = sact.sel.font_size + sact.sel.linespace;
 		int x = x0 + sact.sel.frame_dot;
 		int y = y0 + sact.sel.frame_dot + (selno -1) * h;
-		draw_box(sf0->sdl_surface, x, y, w, h);
+		draw_box(main_surface, x, y, w, h);
 	}
 	
 	// 選択肢文字列
-	SDL_BlitSurface(sact.sel.charcanvas, NULL, sf0->sdl_surface,
+	SDL_BlitSurface(sact.sel.charcanvas, NULL, main_surface,
 		&(SDL_Rect){x0, y0, sact.sel.charcanvas->w, sact.sel.charcanvas->h});
 }
 

@@ -56,7 +56,7 @@ static void disjunction(void* region, void* data) {
 // 更新の必要なスプライトの領域の和をとってクリッピングする
 static MyRectangle get_updatearea() {
 	MyRectangle clip = {0, 0, 0, 0};
-	MyRectangle rsf0 = {0, 0, sf0->width, sf0->height};
+	MyRectangle screen = {0, 0, main_surface->w, main_surface->h};
 	MyRectangle result;
 	
 	slist_foreach(updatearea, disjunction, &clip);
@@ -65,7 +65,7 @@ static MyRectangle get_updatearea() {
 	updatearea = NULL;
 	
 	// surface0との領域の積をとる
-	SDL_IntersectRect(&rsf0, &clip, &result);
+	SDL_IntersectRect(&screen, &clip, &result);
 	
 	SACT_DEBUG("clipped area x=%d y=%d w=%d h=%d",
 		result.x, result.y, result.w, result.h);
@@ -93,7 +93,7 @@ static void do_update_each(void* data, void* userdata) {
  */
 void nt_sp_update_all(bool syncscreen) {
 	// 画面全体を更新領域に
-	MyRectangle r = {0, 0, sf0->width, sf0->height };
+	MyRectangle r = {0, 0, main_surface->w, main_surface->h };
 	
 	// updatelistに登録してあるスプライトを再描画
 	// updatelistはスプライトの番号順に並んでいる
@@ -206,5 +206,5 @@ void nt_sp_clear_updatelist(void) {
 
 // デフォルトの壁紙update
 void nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
-	SDL_FillRect(sf0->sdl_surface, area, SDL_MapRGB(sf0->sdl_surface->format, 0, 0, 0));
+	SDL_FillRect(main_surface, area, SDL_MapRGB(main_surface->format, 0, 0, 0));
 }

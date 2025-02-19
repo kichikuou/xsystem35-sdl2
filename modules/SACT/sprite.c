@@ -66,7 +66,7 @@ static int compare_spriteno_smallfirst(const void *a, const void *b) {
 
 // デフォルトの壁紙update
 static void sp_draw_wall(sprite_t *sp) {
-	SDL_FillRect(sf0->sdl_surface, &sact.updaterect, SDL_MapRGB(sf0->sdl_surface->format, 0, 0, 0));
+	SDL_FillRect(main_surface, &sact.updaterect, SDL_MapRGB(main_surface->format, 0, 0, 0));
 }
 
 /**
@@ -228,7 +228,7 @@ void sp_set_wall_paper(int no) {
 		sp->cursize.width  = sp->curcg->sf->w;
 		sp->cursize.height = sp->curcg->sf->h;
 	} else { // Black
-		sp->cursize.height = sf0->height;
+		sp->cursize.height = main_surface->h;
 		sp->curcg = NULL;
 		sp->update = sp_draw_wall;
 	}
@@ -654,7 +654,7 @@ void sp_sound_ob(int wNumWave) {
 bool sp_is_insprite(sprite_t *sp, int x, int y) {
 	uint8_t *dp;
 	
-	if (x < 0 || y < 0 || x >= sf0->width || y >= sf0->height) return false;
+	if (x < 0 || y < 0 || x >= main_surface->w || y >= main_surface->h) return false;
 	
 	dp = PIXEL_AT(sact.dmap, x, y);
 	return (*(uint16_t *)dp == sp->no);

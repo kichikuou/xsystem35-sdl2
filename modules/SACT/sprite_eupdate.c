@@ -51,7 +51,7 @@ void sp_eupdate(int type, int time, int cancel) {
 		WARNING("Unimplemented effect %d", type);
 		type = EFFECT_CROSSFADE;
 	}
-	SDL_Rect rect = { 0, 0, sf0->width, sf0->height };
+	SDL_Rect rect = { 0, 0, main_surface->w, main_surface->h };
 	struct sdl_effect *eff = sdl_effect_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
 
 	int sttime, curtime;

@@ -147,7 +147,7 @@ static void Init() {
 	}
 	
 	// create depth map
-	sact.dmap = SDL_CreateRGBSurface(0, sf0->width, sf0->height, 16, 0, 0, 0, 0);
+	sact.dmap = SDL_CreateRGBSurface(0, main_surface->w, main_surface->h, 16, 0, 0, 0, 0);
 	
 	// その他 System35 のデフォルト動作の変更
 	ags_setAntialiasedStringMode(true);

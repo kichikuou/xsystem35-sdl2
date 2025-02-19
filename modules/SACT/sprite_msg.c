@@ -460,7 +460,7 @@ void smsg_update(sprite_t *sp) {
 	}
 	SDL_SetSurfaceBlendMode(sp->u.msg.canvas, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(sp->u.msg.canvas, sp->blendrate);
-	SDL_BlitSurface(sp->u.msg.canvas, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
+	SDL_BlitSurface(sp->u.msg.canvas, &(SDL_Rect){sx, sy, w, h}, main_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);

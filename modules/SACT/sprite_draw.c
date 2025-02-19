@@ -84,7 +84,7 @@ void sp_draw(sprite_t *sp) {
 	} else {
 		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_NONE);
 	}
-	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, sf0->sdl_surface, &(SDL_Rect){dx, dy, w, h});
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, main_surface, &(SDL_Rect){dx, dy, w, h});
 	
 	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d", sp->no, sx, sy, w, h, dx, dy);
 }
@@ -107,7 +107,7 @@ void sp_draw_dmap(void* data, void* userdata) {
 	
 	// depth map を書く領域を確定
 	SDL_Rect cg_rect = {0, 0, cg->sf->w, cg->sf->h};
-	SDL_Rect sf0_rect = {0, 0, sf0->width, sf0->height};
+	SDL_Rect screen_rect = {0, 0, main_surface->w, main_surface->h};
 	int sx = 0;
 	int sy = 0;
 	int dx = sp->cur.x;
@@ -115,7 +115,7 @@ void sp_draw_dmap(void* data, void* userdata) {
 	int w = cg->sf->w;
 	int h = cg->sf->h;
 
-	if (!ags_clipCopyRect(&cg_rect, &sf0_rect, &sx, &sy, &dx, &dy, &w, &h)) {
+	if (!ags_clipCopyRect(&cg_rect, &screen_rect, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}
 	

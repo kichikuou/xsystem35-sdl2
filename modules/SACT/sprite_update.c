@@ -54,7 +54,7 @@ static void disjunction(void* region, void* data) {
 // 更新の必要なスプライトの領域の和をとってクリッピングする
 static void get_updatearea() {
 	MyRectangle clip = {0, 0, 0, 0};
-	MyRectangle rsf0 = {0, 0, sf0->width, sf0->height};
+	MyRectangle screen = {0, 0, main_surface->w, main_surface->h};
 	
 	slist_foreach(updatearea, disjunction, &clip);
 	
@@ -62,7 +62,7 @@ static void get_updatearea() {
 	updatearea = NULL;
 	
 	// surface0との領域の積をとる
-	SDL_IntersectRect(&rsf0, &clip, &sact.updaterect);
+	SDL_IntersectRect(&screen, &clip, &sact.updaterect);
 	
 	SACT_DEBUG("clipped area x=%d y=%d w=%d h=%d",
 		sact.updaterect.x, sact.updaterect.y,
@@ -104,8 +104,8 @@ void sp_update_all(bool syncscreen) {
 	// 画面全体を更新領域に
 	sact.updaterect.x = 0;
 	sact.updaterect.y = 0;
-	sact.updaterect.w = sf0->width;
-	sact.updaterect.h = sf0->height;
+	sact.updaterect.w = main_surface->w;
+	sact.updaterect.h = main_surface->h;
 	
 	// updatelistに登録してあるスプライトを再描画
 	// updatelistはスプライトの番号順に並んでいる
