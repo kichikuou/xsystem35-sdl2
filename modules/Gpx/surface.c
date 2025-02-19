@@ -11,11 +11,9 @@
 
 static surface_t *create(int width, int height, bool has_pixel, bool has_alpha) {
 	surface_t *s = calloc(1, sizeof(surface_t));
-	
 	s->width = width;
 	s->height = height;
-	s->depth = 24;
-	
+
 	if (has_pixel) {
 		s->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGB888);
 	}

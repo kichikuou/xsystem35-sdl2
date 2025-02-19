@@ -13,7 +13,7 @@ static void gre_BlendUseAMap(surface_t *dst, int dx, int dy, surface_t *src, int
 	uint8_t *dp = GETOFFSET_PIXEL(dst, dx, dy);
 	uint8_t *ap = GETOFFSET_ALPHA(src, sx, sy);
 
-	switch(dst->depth) {
+	switch (dst->sdl_surface->format->BitsPerPixel) {
 	case 16:
 		for (int y = 0; y < height; y++) {
 			uint16_t *yls = (uint16_t *)(sp + y * src->sdl_surface->pitch);

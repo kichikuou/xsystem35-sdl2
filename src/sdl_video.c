@@ -191,13 +191,12 @@ static void makeDIB(int width, int height, int depth) {
 	}
 	
 	sdl_dibinfo = calloc(1, sizeof(surface_t));
-	sdl_dibinfo->depth           = main_surface->format->BitsPerPixel;
 	sdl_dibinfo->width  = width;
 	sdl_dibinfo->height = height;
 	sdl_dibinfo->alpha  = NULL;
 	sdl_dibinfo->sdl_surface = main_surface;
 	
-	image_setdepth(sdl_dibinfo->depth);
+	image_setdepth(main_surface->format->BitsPerPixel);
 }
 
 /* offscreen の設定 */

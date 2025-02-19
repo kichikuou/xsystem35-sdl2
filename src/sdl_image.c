@@ -110,7 +110,7 @@ void sdl_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, 
 				*dst++ = rgb565_to_rgb888(*p_src++) | *a_src++ << 24;
 			}
 		}
-	} else if (sf->depth > 16) {
+	} else if (sf->sdl_surface->format->BitsPerPixel > 16) {
 		// Convert to RGB888 by ourselves. SDL blit functions use a slightly
 		// different mapping, so the color expanded by SDL may not match the
 		// color key specified in the CX command.

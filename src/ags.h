@@ -61,12 +61,11 @@ typedef enum {
 } ALPHA_DIB_COPY_TYPE;
 
 struct agsurface {
-	int width;   /* width of surface  */
-	int height;  /* height of surface */
-	int depth;   /* depth of surface, 8/16/24/32 is available */
+	int width;
+	int height;
 	
-	SDL_Surface *sdl_surface; /* pixel data (can be NULL) */
-	uint8_t *alpha; /* alpha pixel data (can be NULL) */
+	SDL_Surface *sdl_surface; // pixel data (can be NULL)
+	uint8_t *alpha; // alpha data (can be NULL)
 };
 typedef struct agsurface surface_t;
 
