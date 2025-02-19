@@ -69,7 +69,7 @@ static CG_TYPE check_cgformat(uint8_t *data) {
  * @return CG が展開された surface
  *         未知の形式のときは NULL が返る
  */
-surface_t *sf_getcg(void *b, size_t size) {
+static surface_t *sf_getcg(void *b, size_t size) {
 	surface_t *sf = NULL;
 	int type;
 	cgdata *cg = NULL;

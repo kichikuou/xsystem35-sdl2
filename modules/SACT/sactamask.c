@@ -33,14 +33,11 @@
 #include "LittleEndian.h"
 #include "input.h"
 #include "sact.h"
-#include "surface.h"
+#include "pms.h"
 #include "ngraph.h"
 #include "sprite.h"
 #include "sdl_core.h"
 #include "mmap.h"
-
-static surface_t *smask_get(int no);
-static surface_t *smask_mul(surface_t *sf, int val);
 
 // SACTEFAM を使ったマスク
 typedef struct {
@@ -84,7 +81,7 @@ bool smask_init(char *path) {
 }
 
 // 指定番号の alphamask ファイルをよみだす
-static surface_t *smask_get(int no) {
+static cgdata *smask_get(int no) {
 	int i;
 	
 	for (i = 0; i < am.datanum; i++) {
@@ -93,70 +90,59 @@ static surface_t *smask_get(int no) {
 
 	if (i == am.datanum) return NULL;
 	
-	return sf_getcg(am.mmap->addr + am.offset[i], 0 /*FIXME*/);
+	return pms256_extract(am.mmap->addr + am.offset[i]);
 }
 
-// ベースになるマスクの alpha 値を拡大して取り出す
-static surface_t *smask_mul(surface_t *sf, int val) {
-	surface_t *out = sf_create_alpha(sf->width, sf->height);
-	uint8_t *src = sf->alpha;
-	uint8_t *dst = out->alpha;
-	int pix = sf->width * sf->height;
+// Scale the alpha value in `mask` and write it to the alpha channel of `out`
+static void smask_update_alpha(SDL_Surface *out, cgdata *mask, int val) {
+	uint8_t *src = mask->pic;
 
-	while(pix--) {
-		int i = (*src - val) * 16;
-		if (i < 0)        *dst = 255; // 指定値よりも大きいのはコピー
-		else if (i > 255) *dst = 0;   // 指定値よりも小さいのは無視
-		else              *dst = 255-i; // それ以外は値を16倍
-		src++; dst++;
+	for (int y = 0; y < mask->height; y++) {
+		uint8_t *dst = (uint8_t*)out->pixels + y * out->pitch + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0);
+		for (int x = 0; x < mask->width; x++) {
+			int i = 255 - (*src - val) * 16;
+			*dst = min(255, max(0, i));
+			src++; dst += 4;
+		}
 	}
-	
-	return out;
 }
 
 /**
  * マスクつき画面更新
  */
 void sp_eupdate_amap(int index, int time, int cancel) {
-	surface_t *mask, *mask2;
-	surface_t *sfsrc, *sfdst;
-	int key;
-	
-	mask = smask_get(index);
+	cgdata *mask = smask_get(index);
 	if (mask == NULL) {
 		sp_update_all(true);
 		return;
 	}
-	
-	// 現在の sf0 をセーブ
-	sfsrc = sf_dup(sf0);
+
+	SDL_Surface *sf_old = SDL_ConvertSurface(sf0->sdl_surface, sf0->sdl_surface->format, 0);
 	sp_update_all(false);
-	sfdst = sf_dup(sf0);
-	sf_copyall(sf0, sfsrc);
-	
+	SDL_Surface *sf_new = SDL_ConvertSurfaceFormat(sf0->sdl_surface, SDL_PIXELFORMAT_ARGB8888, 0);
+	SDL_SetSurfaceBlendMode(sf_new, SDL_BLENDMODE_BLEND);
+	SDL_BlitSurface(sf_old, NULL, sf0->sdl_surface, NULL);
+
 	ecp.sttime = ecp.curtime = sdl_getTicks();
 	ecp.edtime = ecp.curtime + time*10;
 	ecp.oldstep = 0;
-	
+
 	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
 		int curstep = 255 * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-		// 元になるマスクのalpha値を16倍して欲しいところだけ取り出す
-		mask2 = smask_mul(mask, curstep);
-		
-		gre_BlendUseAMap(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, mask2, 0, 0, 255);
+		smask_update_alpha(sf_new, mask, curstep);
+
+		SDL_BlitSurface(sf_old, NULL, sf0->sdl_surface, NULL);
+		SDL_BlitSurface(sf_new, NULL, sf0->sdl_surface, NULL);
 		ags_updateFull();
-		
-		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
+
+		int key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
-		
-		// 一時マスクを削除
-		sf_free(mask2);
 	}
-	
-	sf_copyall(sf0, sfdst);
+	SDL_SetSurfaceBlendMode(sf_new, SDL_BLENDMODE_NONE);
+	SDL_BlitSurface(sf_new, NULL, sf0->sdl_surface, NULL);
 	ags_updateFull();
-	sf_free(sfsrc);
-	sf_free(sfdst);
-	
-	sf_free(mask);
+	SDL_FreeSurface(sf_new);
+	SDL_FreeSurface(sf_old);
+
+	cgdata_free(mask);
 }

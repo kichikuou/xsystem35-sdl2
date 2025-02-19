@@ -44,7 +44,6 @@ void gr_drawimage16(surface_t *ds, cgdata *cg, int x, int y);
 
 
 /* defined in cg.c */
-surface_t *sf_getcg(void *buf, size_t size);
 surface_t *sf_loadcg_no(int no);
 struct SDL_Surface *load_cg_to_sdlsurface(int no);
 
