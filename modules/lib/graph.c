@@ -103,17 +103,6 @@ void gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b
 	SDL_FillRect(dst->sdl_surface, &rect, color);
 }
 
-void gr_drawrect(surface_t *dst, int x, int y, int w, int h, int r, int g, int b) {
-	SDL_Rect rects[4] = {
-		{x, y, w, 1},
-		{x, y + h - 1, w, 1},
-		{x, y, 1, h},
-		{x + w - 1, y, 1, h}
-	};
-	uint32_t color = SDL_MapRGB(dst->sdl_surface->format, r, g, b);
-	SDL_FillRects(dst->sdl_surface, rects, 4, color);
-}
-
 void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh) {
 	SDL_Rect srcrect = {sx, sy, sw, sh};
 	SDL_Rect dstrect = {dx, dy, dw, dh};
@@ -150,14 +139,6 @@ void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, in
 		}
 		break;
 	}
-}
-
-void gr_blend_screen(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height) {
-	SDL_Rect src_rect = { sx, sy, width, height };
-	SDL_Rect dst_rect = { dx, dy, width, height };
-	SDL_SetSurfaceBlendMode(src->sdl_surface, SDL_BLENDMODE_ADD);
-	SDL_BlitSurface(src->sdl_surface, &src_rect, dst->sdl_surface, &dst_rect);
-	SDL_SetSurfaceBlendMode(src->sdl_surface, SDL_BLENDMODE_NONE);
 }
 
 void gr_blend_src_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int alpha, int rate) {

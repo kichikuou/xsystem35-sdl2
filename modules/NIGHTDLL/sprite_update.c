@@ -25,14 +25,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
 #include "list.h"
 #include "ags.h"
 #include "graphics.h"
-// #include "sact.h"
-#include "surface.h"
 #include "ngraph.h"
 #include "sprite.h"
 
@@ -207,15 +206,5 @@ void nt_sp_clear_updatelist(void) {
 
 // デフォルトの壁紙update
 void nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
-	int sx, sy, w, h;
-	
-	sx = area->x;
-	sy = area->y;
-	w  = area->w;
-	h  = area->h;
-	gr_fill(sf0, sx, sy, w, h, 0, 0, 0);
-	
-	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d",
-		sp->no, sx, sy, w, h);
+	SDL_FillRect(sf0->sdl_surface, area, SDL_MapRGB(sf0->sdl_surface->format, 0, 0, 0));
 }
-

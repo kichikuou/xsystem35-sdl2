@@ -139,6 +139,17 @@ static void cb_select_release(agsevent_t *e) {
 	}
 }
 
+static void draw_box(SDL_Surface *dst, int x, int y, int w, int h) {
+	SDL_FillRect(dst, &(SDL_Rect){x, y, w, h}, SDL_MapRGB(dst->format, 0, 0, 0));
+	SDL_Rect border_rects[4] = {
+		{x, y, w, 1},
+		{x, y + h - 1, w, 1},
+		{x, y, 1, h},
+		{x + w - 1, y, 1, h}
+	};
+	SDL_FillRects(dst, border_rects, 4, SDL_MapRGB(dst->format, 255, 255, 255));
+}
+
 // 選択ウィンドを更新するときの callback
 static void update_selwindow(sprite_t *sp) {
 	int selno = selected_item_cur;
@@ -155,8 +166,7 @@ static void update_selwindow(sprite_t *sp) {
 		int h = sact.sel.font_size + sact.sel.linespace;
 		int x = x0 + sact.sel.frame_dot;
 		int y = y0 + sact.sel.frame_dot + (selno -1) * h;
-		gr_fill(sf0, x, y, w, h, 0, 0, 0);
-		gr_drawrect(sf0, x, y, w, h, 255, 255, 255);
+		draw_box(sf0->sdl_surface, x, y, w, h);
 	}
 	
 	// 選択肢文字列

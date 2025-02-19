@@ -66,16 +66,7 @@ static int compare_spriteno_smallfirst(const void *a, const void *b) {
 
 // デフォルトの壁紙update
 static void sp_draw_wall(sprite_t *sp) {
-	int sx, sy, w, h;
-	
-	sx = sact.updaterect.x;
-	sy = sact.updaterect.y;
-	w = sact.updaterect.w;
-	h = sact.updaterect.h;
-	gr_fill(sf0, sx, sy, w, h, 0, 0, 0);
-	
-	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d",
-		sp->no, sx, sy, w, h);
+	SDL_FillRect(sf0->sdl_surface, &sact.updaterect, SDL_MapRGB(sf0->sdl_surface->format, 0, 0, 0));
 }
 
 /**

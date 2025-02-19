@@ -1,11 +1,10 @@
 #include <stdio.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
 #include "cg.h"
 #include "ags.h"
-#include "surface.h"
-#include "graph.h"
 #include "ngraph.h"
 #include "night.h"
 #include "sprite.h"
@@ -192,15 +191,9 @@ void nt_gr_draw(int effectno) {
 }
 
 void nt_gr_screencg(int no, int x, int y) {
-	surface_t *sf;
-	
-	sf = sf_loadcg_no(no -1);
-	
-	gr_blend_screen(sf0, x, y, sf, 0, 0, sf->width, sf->height);
-	
-	ags_updateArea(x, y, sf->width, sf->height);
-	
-	sf_free(sf);
+	SDL_Surface *sf = load_cg_to_sdlsurface(no - 1);
+	SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_ADD);
+	SDL_BlitSurface(sf, NULL, sf0->sdl_surface, &(SDL_Rect){x, y, sf->w, sf->h});
+	ags_updateArea(x, y, sf->w, sf->h);
+	SDL_FreeSurface(sf);
 }
-
-
