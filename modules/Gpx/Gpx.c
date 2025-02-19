@@ -42,7 +42,7 @@
 // #include "alpha_plane.h"
 #include "surface.h"
 #include "graph.h"
-// #include "graph2.h"
+#include "graph_blend_amap.h"
 
 #include "effectcopy.h"
 #include "ngraph.h"

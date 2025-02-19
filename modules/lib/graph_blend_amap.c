@@ -5,8 +5,7 @@
 
 #include "portab.h"
 #include "system.h"
-#include "surface.h"
-#include "ngraph.h"
+#include "graph_blend_amap.h"
 #include "ags.h"
 
 static void gre_BlendUseAMap(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height) {
@@ -45,7 +44,9 @@ static void gre_BlendUseAMap(surface_t *dst, int dx, int dy, surface_t *src, int
 
 void gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
 	if (src == NULL || dst == NULL) return;
-	if (!gr_clip(src, &sx, &sy, &sw, &sh, dst, &dx, &dy)) return;
+	MyRectangle src_window = { 0, 0, src->width, src->height };
+	MyRectangle dst_window = { 0, 0, dst->width, dst->height };
+	if (!ags_clipCopyRect(&src_window, &dst_window, &sx, &sy, &dx, &dy, &sw, &sh)) return;
 	
 	if (src->alpha == NULL) {
 		WARNING("src alpha NULL");

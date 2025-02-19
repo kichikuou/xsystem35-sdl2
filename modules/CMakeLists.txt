@@ -5,7 +5,14 @@ add_library(modules STATIC
   AliceLogo/AliceLogo.c
   Confirm/Confirm.c
   Gpx/Gpx.c
+  Gpx/cg.c
   Gpx/effectcopy.c
+  Gpx/graph_cg.c
+  Gpx/graph_copy_amap.c
+  Gpx/graph_draw_amap.c
+  Gpx/graph_fillrect_amap.c
+  Gpx/graph.c
+  Gpx/surface.c
   Math/Math.c
   MsgSkip/MsgSkip.c
   NIGHTDLL/NIGHTDLL.c
@@ -61,15 +68,8 @@ add_library(modules STATIC
   eeDemo/eeDemo.c
   lib/alk.c
   lib/drawtext.c
-  lib/graph.c
   lib/list.c
-  lib/surface.c
-  lib/cg.c
-  lib/graph_fillrect_amap.c
-  lib/graph_copy_amap.c
   lib/graph_blend_amap.c
-  lib/graph_draw_amap.c
-  lib/graph_cg.c
   nDEMO/nDEMO.c
   nDEMOE/nDEMOE.c
   oDEMO/oDEMO.c

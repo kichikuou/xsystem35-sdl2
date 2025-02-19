@@ -23,9 +23,6 @@ void gr_fill_alpha_map(surface_t *dst, int dx, int dy, int dw, int dh, int lv);
 /* in graph_copy_amap.c */
 void gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
 
-/* in graph_blend_amap.c */
-void gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh);
-
 /* in graph_draw_amap.c */
 void gr_draw_amap(surface_t *dst, int dx, int dy, uint8_t *src, int width, int height, int scanline);
 

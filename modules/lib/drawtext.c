@@ -30,8 +30,6 @@
 #include "nact.h"
 #include "ags.h"
 #include "font.h"
-#include "surface.h"
-#include "ngraph.h"
 
 static FontType ftype;
 static int fsize;  // フォントの大きさ

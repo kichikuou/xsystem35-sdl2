@@ -9,7 +9,7 @@
 #include "filecheck.h"
 #include "modules.h"
 #include "nact.h"
-#include "ngraph.h"
+#include "graph_blend_amap.h"
 
 #define NUM_MAPS 16
 #define NUM_LAYERS 3
