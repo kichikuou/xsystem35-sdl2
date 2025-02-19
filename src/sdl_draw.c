@@ -51,9 +51,9 @@ static void sdl_pal_check(void) {
 }
 
 static Uint32 palette_color(uint8_t c) {
-	if (sdl_dib->format->BitsPerPixel == 8)
+	if (main_surface->format->BitsPerPixel == 8)
 		return c;
-	return SDL_MapRGB(sdl_dib->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+	return SDL_MapRGB(main_surface->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
 }
 
 void sdl_updateScreen(void) {
@@ -104,7 +104,7 @@ void sdl_wait_vsync() {
 
 /* off-screen の指定領域を Main Window へ転送 */
 void sdl_updateArea(MyRectangle *rect, MyPoint *dst) {
-	SDL_Rect sw = {0, 0, sdl_dib->w, sdl_dib->h};
+	SDL_Rect sw = {0, 0, main_surface->w, main_surface->h};
 	SDL_Rect dw = {0, 0, view_w, view_h};
 	SDL_Rect sr = {rect->x, rect->y, rect->w, rect->h};
 	SDL_Rect dr = {dst->x, dst->y, rect->w, rect->h};
@@ -115,7 +115,7 @@ void sdl_updateArea(MyRectangle *rect, MyPoint *dst) {
 
 	SDL_Surface *sf;
 	SDL_LockTextureToSurface(sdl_texture, &dr, &sf);
-	SDL_BlitSurface(sdl_dib, &sr, sf, NULL);
+	SDL_BlitSurface(main_surface, &sr, sf, NULL);
 	SDL_UnlockTexture(sdl_texture);
 
 	sdl_dirty = true;
@@ -133,8 +133,8 @@ void sdl_setPalette(Color *pal, int first, int count) {
 		sdl_col[first + i].g = pal[first + i].g;
 		sdl_col[first + i].b = pal[first + i].b;
 	}
-	if (sdl_dib->format->BitsPerPixel == 8)
-		SDL_SetPaletteColors(sdl_dib->format->palette, &sdl_col[first], first, count);
+	if (main_surface->format->BitsPerPixel == 8)
+		SDL_SetPaletteColors(main_surface->format->palette, &sdl_col[first], first, count);
 }
 
 /* 矩形の描画 */
@@ -143,16 +143,16 @@ void sdl_drawRectangle(int x, int y, int w, int h, uint8_t c) {
 	Uint32 col = palette_color(c);
 
 	SDL_Rect rect = {x, y, w, 1};
-	SDL_FillRect(sdl_dib, &rect, col);
+	SDL_FillRect(main_surface, &rect, col);
 	
 	rect = (SDL_Rect){x, y, 1, h};
-	SDL_FillRect(sdl_dib, &rect, col);
+	SDL_FillRect(main_surface, &rect, col);
 	
 	rect = (SDL_Rect){x, y + h - 1, w, 1};
-	SDL_FillRect(sdl_dib, &rect, col);
+	SDL_FillRect(main_surface, &rect, col);
 	
 	rect = (SDL_Rect){x + w - 1, y, 1, h};
-	SDL_FillRect(sdl_dib, &rect, col);
+	SDL_FillRect(main_surface, &rect, col);
 }
 
 /* 矩形塗りつぶし */
@@ -160,15 +160,15 @@ void sdl_fillRectangle(int x, int y, int w, int h, uint8_t c) {
 	sdl_pal_check();
 	
 	SDL_Rect rect = {x, y, w, h};
-	SDL_FillRect(sdl_dib, &rect, palette_color(c));
+	SDL_FillRect(main_surface, &rect, palette_color(c));
 }
 
 void sdl_fillRectangleRGB(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b) {
-	if (sdl_dib->format->BitsPerPixel == 8)
+	if (main_surface->format->BitsPerPixel == 8)
 		return;
 
 	SDL_Rect rect = {x, y, w, h};
-	SDL_FillRect(sdl_dib, &rect, SDL_MapRGB(sdl_dib->format, r, g, b));
+	SDL_FillRect(main_surface, &rect, SDL_MapRGB(main_surface->format, r, g, b));
 }
 
 void sdl_fillCircle(int left, int top, int diameter, uint8_t c) {
@@ -185,7 +185,7 @@ void sdl_fillCircle(int left, int top, int diameter, uint8_t c) {
 		for (int x = 0; 2*x < diameter; x++) {
 			if (dy*dy + dx*dx <= diameter*diameter) {
 				SDL_Rect rect = {left + x, top + y, diameter - 2*x, 1};
-				SDL_FillRect(sdl_dib, &rect, col);
+				SDL_FillRect(main_surface, &rect, col);
 				break;
 			}
 			dx -= 2;
@@ -206,7 +206,7 @@ void sdl_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 		void* region = sdl_saveRegion(sx, sy, w, h);
 		sdl_restoreRegion(region, dx, dy);
 	} else {
-		SDL_BlitSurface(sdl_dib, &r_src, sdl_dib, &r_dst);
+		SDL_BlitSurface(main_surface, &r_src, main_surface, &r_dst);
 	}
 }
 
@@ -214,20 +214,20 @@ static void sdl_dib_sprite_copy(SDL_Surface *dst, int sx, int sy, int w, int h, 
 	sdl_pal_check();
 
 	Uint32 col = palette_color(sp);
-	SDL_SetColorKey(sdl_dib, SDL_TRUE, col);
+	SDL_SetColorKey(main_surface, SDL_TRUE, col);
 	
 	SDL_Rect r_src = {sx, sy, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
-	SDL_BlitSurface(sdl_dib, &r_src, dst, &r_dst);
-	SDL_SetColorKey(sdl_dib, SDL_FALSE, 0);
+	SDL_BlitSurface(main_surface, &r_src, dst, &r_dst);
+	SDL_SetColorKey(main_surface, SDL_FALSE, 0);
 }
 
 /*
  * dib に指定のパレット sp を抜いてコピー
  */
 void sdl_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
-	sdl_dib_sprite_copy(sdl_dib, sx, sy, w, h, dx, dy, sp);
+	sdl_dib_sprite_copy(main_surface, sx, sy, w, h, dx, dy, sp);
 }
 
 SDL_Surface *sdl_dib_to_surface_colorkey(int x, int y, int w, int h, int sp) {
@@ -245,7 +245,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 	
 	sdl_pal_check();
 	
-	if (sdl_dib->format->BitsPerPixel > 8 && cg->pal) {
+	if (main_surface->format->BitsPerPixel > 8 && cg->pal) {
 		SDL_Color *c = s->format->palette->colors;
 		for (int i = 0; i < 256; i++) {
 			c->r = cg->pal[i].r;
@@ -262,7 +262,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 	
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
-	SDL_BlitSurface(s, NULL, sdl_dib, &r_dst);
+	SDL_BlitSurface(s, NULL, main_surface, &r_dst);
 	SDL_FreeSurface(s);
 }
 
@@ -270,7 +270,7 @@ void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
 void sdl_drawLine(int x1, int y1, int x2, int y2, uint8_t c) {
 	sdl_pal_check();
 	
-	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(sdl_dib);
+	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(main_surface);
 	SDL_SetRenderDrawColor(renderer, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b, SDL_ALPHA_OPAQUE);
 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 	SDL_DestroyRenderer(renderer);
@@ -289,7 +289,7 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, uint8_t c) {
 SDL_Rect sdl_floodFill(int x, int y, int c) {
 	Uint32 col = palette_color(c);
 
-	switch (sdl_dib->format->BytesPerPixel) {
+	switch (main_surface->format->BytesPerPixel) {
 	case 1:
 		return sdl_floodFill_uint8_t(x, y, col);
 	case 2:
@@ -326,7 +326,7 @@ SDL_Rect sdl_drawString(int x, int y, const char *str_utf8, uint8_t col) {
  * 指定範囲にパレット col を rate の割合で重ねる CK1
  */
 void sdl_wrapColor(int sx, int sy, int w, int h, uint8_t c, int rate) {
-	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, sdl_dib->format->BitsPerPixel, sdl_dib->format->format);
+	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, main_surface->format->BitsPerPixel, main_surface->format->format);
 	assert(s->format->BitsPerPixel > 8);
 
 	SDL_Rect r_src = {0, 0, w, h};
@@ -335,6 +335,6 @@ void sdl_wrapColor(int sx, int sy, int w, int h, uint8_t c, int rate) {
 	SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(s, rate);
 	SDL_Rect r_dst = {sx, sy, w, h};
-	SDL_BlitSurface(s, &r_src, sdl_dib, &r_dst);
+	SDL_BlitSurface(s, &r_src, main_surface, &r_dst);
 	SDL_FreeSurface(s);
 }

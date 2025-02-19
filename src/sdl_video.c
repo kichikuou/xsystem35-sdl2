@@ -39,7 +39,7 @@
 SDL_Window *sdl_window;
 SDL_Renderer *sdl_renderer;
 SDL_Texture *sdl_texture;
-SDL_Surface *sdl_dib; // offscreen surface
+SDL_Surface *main_surface; // offscreen surface
 SDL_Color sdl_col[256]; // color palette
 agsurface_t *sdl_dibinfo;
 int view_w;
@@ -104,8 +104,8 @@ int sdl_Initialize(const char *render_driver) {
 }
 
 void sdl_Remove(void) {
-	if (sdl_dib)
-		SDL_FreeSurface(sdl_dib);
+	if (main_surface)
+		SDL_FreeSurface(main_surface);
 	if (sdl_renderer)
 		SDL_DestroyRenderer(sdl_renderer);
 	if (js)
@@ -159,8 +159,8 @@ static void window_init(const char *render_driver) {
 
 static void makeDIB(int width, int height, int depth) {
 	
-	if (sdl_dib) {
-		SDL_FreeSurface(sdl_dib);
+	if (main_surface) {
+		SDL_FreeSurface(main_surface);
 	}
 
 	uint32_t format = 0;
@@ -180,10 +180,10 @@ static void makeDIB(int width, int height, int depth) {
 		SYSERROR("invalid pixel depth %d", depth);
 	}
 
-	sdl_dib = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
+	main_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
 	
-	if (sdl_dib->format->BitsPerPixel == 8) {
-		memset(sdl_dib->format->palette->colors, 0, sizeof(SDL_Color)*256);
+	if (main_surface->format->BitsPerPixel == 8) {
+		memset(main_surface->format->palette->colors, 0, sizeof(SDL_Color)*256);
 	}
 
 	if (sdl_dibinfo) {
@@ -191,14 +191,14 @@ static void makeDIB(int width, int height, int depth) {
 	}
 	
 	sdl_dibinfo = calloc(1, sizeof(agsurface_t));
-	sdl_dibinfo->depth           = sdl_dib->format->BitsPerPixel;
-	sdl_dibinfo->bytes_per_pixel = sdl_dib->format->BytesPerPixel;
-	sdl_dibinfo->bytes_per_line  = sdl_dib->pitch;
-	sdl_dibinfo->pixel  = sdl_dib->pixels;
+	sdl_dibinfo->depth           = main_surface->format->BitsPerPixel;
+	sdl_dibinfo->bytes_per_pixel = main_surface->format->BytesPerPixel;
+	sdl_dibinfo->bytes_per_line  = main_surface->pitch;
+	sdl_dibinfo->pixel  = main_surface->pixels;
 	sdl_dibinfo->width  = width;
 	sdl_dibinfo->height = height;
 	sdl_dibinfo->alpha  = NULL;
-	sdl_dibinfo->sdl_surface = sdl_dib;
+	sdl_dibinfo->sdl_surface = main_surface;
 	
 	image_setdepth(sdl_dibinfo->depth);
 }
@@ -206,7 +206,7 @@ static void makeDIB(int width, int height, int depth) {
 /* offscreen の設定 */
 void sdl_setWorldSize(int width, int height, int depth) {
 	makeDIB(width, height, depth);
-	SDL_FillRect(sdl_dib, NULL, 0);
+	SDL_FillRect(main_surface, NULL, 0);
 }
 
 /* display の size と depth の取得 */
@@ -299,7 +299,7 @@ void sdl_setIntegerScaling(bool enable) {
 
 bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
 	SDL_Rect *r = &nact->ags.view_area;
-	SDL_Surface *view = sdl_createSurfaceView(sdl_dib, r->x, r->y, r->w, r->h);
+	SDL_Surface *view = sdl_createSurfaceView(main_surface, r->x, r->y, r->w, r->h);
 	bool ok = SDL_SaveBMP(view, path) == 0;
 	SDL_FreeSurface(view);
 	return ok;

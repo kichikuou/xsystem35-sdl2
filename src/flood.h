@@ -20,7 +20,7 @@
 #define CONCAT(x, y) CONCATENATE(x, y)
 
 static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
-	int old_color = *(TYPE *)PIXEL_AT(sdl_dib, x, y);
+	int old_color = *(TYPE *)PIXEL_AT(main_surface, x, y);
 	if (old_color == col)
 		return (SDL_Rect){};
 
@@ -36,15 +36,15 @@ static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
 		y = stack[top].y;
 		top--;
 
-		TYPE *line = PIXEL_AT(sdl_dib, 0, y);
-		TYPE *prev_line = (TYPE *)((uint8_t *)line - sdl_dib->pitch);
-		TYPE *next_line = (TYPE *)((uint8_t *)line + sdl_dib->pitch);
+		TYPE *line = PIXEL_AT(main_surface, 0, y);
+		TYPE *prev_line = (TYPE *)((uint8_t *)line - main_surface->pitch);
+		TYPE *next_line = (TYPE *)((uint8_t *)line + main_surface->pitch);
 		while (x >= 0 && line[x] == old_color) x--;
 		x++;
 		minx = min(x, minx);
 
 		bool span_above = false, span_below = false;
-		for (; x < sdl_dib->w && line[x] == old_color; x++) {
+		for (; x < main_surface->w && line[x] == old_color; x++) {
 			line[x] = col;
 			if (y > 0) {
 				if (!span_above && prev_line[x] == old_color) {
@@ -58,7 +58,7 @@ static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
 					span_above = false;
 				}
 			}
-			if (y < sdl_dib->h - 1) {
+			if (y < main_surface->h - 1) {
 				if (!span_below && next_line[x] == old_color) {
 					if (++top >= stack_size) {
 						stack_size *= 2;

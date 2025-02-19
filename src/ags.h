@@ -142,7 +142,7 @@ struct _ags {
 };
 typedef struct _ags ags_t;
 
-
+extern struct SDL_Surface *main_surface;
 
 /* 初期化関係 */
 void ags_init(const char *render_driver, bool enable_zb);

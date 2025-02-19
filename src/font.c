@@ -135,12 +135,12 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t
 	Uint8 cache[256*7];
 	memset(cache, 0, 256);
 
-	for (int y = 0; y < src->h && dsty + y < sdl_dib->h; y++) {
+	for (int y = 0; y < src->h && dsty + y < main_surface->h; y++) {
 		if (dsty + y < 0)
 			continue;
 		uint8_t *sp = (uint8_t*)src->pixels + y * src->pitch;
-		uint8_t *dp = (uint8_t*)sdl_dib->pixels + (dsty + y) * sdl_dib->pitch + dstx;
-		for (int x = 0; x < src->w && dstx + x < sdl_dib->w; x++) {
+		uint8_t *dp = (uint8_t*)main_surface->pixels + (dsty + y) * main_surface->pitch + dstx;
+		for (int x = 0; x < src->w && dstx + x < main_surface->w; x++) {
 			Uint8 r, g, b, alpha;
 			SDL_GetRGBA(*((Uint32*)sp), src->format, &r, &g, &b, &alpha);
 			alpha = alpha >> 5; // reduce bit depth
@@ -199,11 +199,11 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
 	y -= (TTF_FontHeight(fontset->id) - fontset->size) / 2;
 	r_dst = (SDL_Rect){x, y, w, h};
 	
-	if (sdl_dib->format->BitsPerPixel == 8 && antialias) {
+	if (main_surface->format->BitsPerPixel == 8 && antialias) {
 		sdl_drawAntiAlias_8bpp(x, y, fs, cl);
 	} else {
 		r_src = (SDL_Rect){0, 0, w, h};
-		SDL_BlitSurface(fs, &r_src, sdl_dib, &r_dst);
+		SDL_BlitSurface(fs, &r_src, main_surface, &r_dst);
 	}
 
 	SDL_FreeSurface(fs);
