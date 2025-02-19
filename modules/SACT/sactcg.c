@@ -35,7 +35,6 @@
 #include "ags.h"
 #include "sact.h"
 #include "sactcg.h"
-#include "surface.h"
 #include "cg.h"
 #include "sdl_core.h"
 

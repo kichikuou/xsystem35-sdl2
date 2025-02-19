@@ -34,7 +34,6 @@
 #include "input.h"
 #include "sact.h"
 #include "sprite.h"
-#include "ngraph.h"
 #include "drawtext.h"
 
 // 選択された要素(1~) キャンセルの場合は0、初期状態は -1

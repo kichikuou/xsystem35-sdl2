@@ -5,7 +5,6 @@
 #include "system.h"
 #include "cg.h"
 #include "ags.h"
-#include "ngraph.h"
 #include "night.h"
 #include "sprite.h"
 #include "nt_scenario.h"

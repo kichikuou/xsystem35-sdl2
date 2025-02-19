@@ -33,8 +33,6 @@
 #include "ags.h"
 #include "input.h"
 #include "sact.h"
-#include "surface.h"
-#include "ngraph.h"
 #include "sprite.h"
 #include "sdl_core.h"
 #include "randMT.h"

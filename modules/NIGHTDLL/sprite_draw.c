@@ -30,9 +30,6 @@
 #include "system.h"
 #include "ags.h"
 #include "graphics.h"
-#include "surface.h"
-#include "graph.h"
-#include "ngraph.h"
 #include "sprite.h"
 
 /*

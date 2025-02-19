@@ -4,7 +4,6 @@
 #include "config.h"
 #include "portab.h"
 #include "graphics.h"
-#include "surface.h"
 #include "ags.h"
 #include "sprite.h"
 

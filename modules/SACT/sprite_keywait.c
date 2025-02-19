@@ -33,8 +33,6 @@
 #include "ags.h"
 #include "nact.h"
 #include "input.h"
-#include "ngraph.h"
-#include "surface.h"
 #include "sact.h"
 #include "sprite.h"
 #include "sactsound.h"

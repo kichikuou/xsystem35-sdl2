@@ -36,7 +36,6 @@
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
-#include "ngraph.h"
 #include "drawtext.h"
 #include "utfsjis.h"
 

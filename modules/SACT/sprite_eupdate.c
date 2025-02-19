@@ -25,7 +25,6 @@
 
 #include "portab.h"
 #include "system.h"
-#include "ngraph.h"
 #include "ags.h"
 #include "input.h"
 #include "sact.h"

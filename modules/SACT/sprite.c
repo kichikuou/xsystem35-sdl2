@@ -31,7 +31,6 @@
 #include "portab.h"
 #include "system.h"
 #include "list.h"
-#include "ngraph.h"
 #include "ags.h"
 #include "nact.h"
 #include "sact.h"

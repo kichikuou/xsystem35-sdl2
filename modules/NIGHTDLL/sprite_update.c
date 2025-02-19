@@ -32,7 +32,6 @@
 #include "list.h"
 #include "ags.h"
 #include "graphics.h"
-#include "ngraph.h"
 #include "sprite.h"
 
 // スプライト再描画間の間に変更のあったスプライトの領域の和

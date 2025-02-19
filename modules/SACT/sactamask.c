@@ -34,7 +34,6 @@
 #include "input.h"
 #include "sact.h"
 #include "pms.h"
-#include "ngraph.h"
 #include "sprite.h"
 #include "sdl_core.h"
 #include "mmap.h"

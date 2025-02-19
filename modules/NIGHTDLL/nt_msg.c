@@ -12,7 +12,6 @@
 #include "ags.h"
 #include "nact.h"
 #include "input.h"
-#include "ngraph.h"
 #include "drawtext.h"
 #include "night.h"
 #include "nt_msg.h"

@@ -6,8 +6,6 @@
 #include "portab.h"
 #include "sprite.h"
 #include "sactcg.h"
-#include "surface.h"
-#include "ngraph.h"
 #include "nt_msg.h"
 
 sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type) {

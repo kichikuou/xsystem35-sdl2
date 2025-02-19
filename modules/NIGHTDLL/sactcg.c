@@ -32,7 +32,6 @@
 #include "nact.h"
 #include "system.h"
 #include "ags.h"
-#include "surface.h"
 #include "cg.h"
 #include "sactcg.h"
 

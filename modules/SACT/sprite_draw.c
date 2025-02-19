@@ -33,8 +33,6 @@
 #include "ags.h"
 #include "graphics.h"
 #include "sact.h"
-#include "graph.h"
-#include "ngraph.h"
 #include "sprite.h"
 
 // alphamapにしたがって、alpha値が0より大きいところを指定のdepthとする

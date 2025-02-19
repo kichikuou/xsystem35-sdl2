@@ -47,7 +47,6 @@
 #include "sactsound.h"
 #include "sactcrypto.h"
 #include "sactchart.h"
-#include "ngraph.h"
 #include "sactamask.h"
 
 /*

@@ -35,7 +35,6 @@
 #include "input.h"
 #include "sact.h"
 #include "sprite.h"
-#include "ngraph.h"
 #include "drawtext.h"
 #include "sactlog.h"
 
