@@ -46,7 +46,7 @@ extern void sdl_getWindowInfo(DispInfo *info);
 extern void sdl_setFullscreen(bool on);
 extern bool sdl_isFullscreen(void);
 extern void sdl_raiseWindow(void);
-extern agsurface_t *sdl_getDIB(void);
+extern surface_t *sdl_getDIB(void);
 extern void sdl_setIntegerScaling(bool enable);
 extern SDL_Surface *sdl_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h);
 
@@ -88,9 +88,9 @@ void sdl_FlipSurfaceVertical(SDL_Surface *s);
 
 /* Effects */
 struct sdl_effect;
-struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type effect);
+struct sdl_effect *sdl_effect_init(SDL_Rect *rect, surface_t *old, int ox, int oy, surface_t *new, int nx, int ny, enum sdl_effect_type effect);
 struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx, int sy, int col, enum sdl_effect_type type);
-struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect);
+struct sdl_effect *sdl_effect_magnify_init(surface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect);
 void sdl_effect_step(struct sdl_effect *eff, float progress);
 void sdl_effect_finish(struct sdl_effect *eff);
 

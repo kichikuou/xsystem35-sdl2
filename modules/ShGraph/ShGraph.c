@@ -141,7 +141,7 @@ static void ChangeNotColor() {
 	int *src = getCaliVariable(); /* r, g, b */
 	int *dst = getCaliVariable(); /* r, g, b */
 	int p7 = getCaliValue(); /* ISurface */
-	agsurface_t *dib;
+	surface_t *dib;
 	int x, y;
 	uint8_t *dp;
 	
@@ -459,7 +459,7 @@ static void PlayAnimeData() {
 	int interval, loop;
 	int i;
 	bool is_backcopied;
-	agsurface_t *dib;
+	surface_t *dib;
 	
 	TRACE("ShGraph.PlayAnimeData %d,%d,%d,%d,%d,%d:", p1, p2, p3, p4, p5, p6);
 	

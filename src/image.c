@@ -33,14 +33,14 @@
 #include "alpha_plane.h"
 #include "ags.h"
 
-static void (*copy_from_alpha)(agsurface_t *, uint8_t *, uint8_t *, int, int, ALPHA_DIB_COPY_TYPE);
-static void (*copy_to_alpha)(agsurface_t *, uint8_t *, uint8_t *, int, int, ALPHA_DIB_COPY_TYPE);
+static void (*copy_from_alpha)(surface_t *, uint8_t *, uint8_t *, int, int, ALPHA_DIB_COPY_TYPE);
+static void (*copy_to_alpha)(surface_t *, uint8_t *, uint8_t *, int, int, ALPHA_DIB_COPY_TYPE);
 
 /******************************************************************************/
 /* private methods  image操作 16bpp                                           */
 /******************************************************************************/
 
-static void image_copy_from_alpha16(agsurface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
+static void image_copy_from_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
 	uint8_t *yls;
 	uint16_t *yld;
@@ -101,7 +101,7 @@ static void image_copy_from_alpha16(agsurface_t *dib, uint8_t *sdata, uint8_t *d
 	}
 }
 
-static void image_copy_to_alpha16(agsurface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
+static void image_copy_to_alpha16(surface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
 	uint8_t *yld;
 	uint16_t *yls;
@@ -166,7 +166,7 @@ static void image_copy_to_alpha16(agsurface_t *dib, uint8_t *sdata, uint8_t *dda
 /* private methods  image操作 24/32bpp                                        */
 /******************************************************************************/
 
-static void image_copy_from_alpha24(agsurface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
+static void image_copy_from_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
 	uint8_t *yls;
 	uint32_t *yld;
@@ -227,7 +227,7 @@ static void image_copy_from_alpha24(agsurface_t *dib, uint8_t *sdata, uint8_t *d
 	}
 }
 
-static void image_copy_to_alpha24(agsurface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
+static void image_copy_to_alpha24(surface_t *dib, uint8_t *sdata, uint8_t *ddata, int w, int h, ALPHA_DIB_COPY_TYPE flag) {
 	int x, y;
 	uint8_t *yld;
 	uint32_t *yls;
@@ -311,14 +311,14 @@ void image_setdepth(int depth) {
 	}
 }
 
-void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
+void image_copy_from_alpha(surface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	uint8_t *sdata = GETOFFSET_ALPHA(dib, sx, sy);
 	uint8_t *ddata = GETOFFSET_PIXEL(dib, dx, dy);
 	
 	copy_from_alpha(dib, sdata, ddata, w, h, flag);
 }
 
-void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
+void image_copy_to_alpha(surface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	uint8_t *sdata = GETOFFSET_PIXEL(dib, sx, sy);
 	uint8_t *ddata = GETOFFSET_ALPHA(dib, dx, dy);
 	

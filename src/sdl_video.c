@@ -41,7 +41,7 @@ SDL_Renderer *sdl_renderer;
 SDL_Texture *sdl_texture;
 SDL_Surface *main_surface; // offscreen surface
 SDL_Color sdl_col[256]; // color palette
-agsurface_t *sdl_dibinfo;
+surface_t *sdl_dibinfo;
 int view_w;
 int view_h;
 bool sdl_dirty;
@@ -190,7 +190,7 @@ static void makeDIB(int width, int height, int depth) {
 		free(sdl_dibinfo);
 	}
 	
-	sdl_dibinfo = calloc(1, sizeof(agsurface_t));
+	sdl_dibinfo = calloc(1, sizeof(surface_t));
 	sdl_dibinfo->depth           = main_surface->format->BitsPerPixel;
 	sdl_dibinfo->bytes_per_pixel = main_surface->format->BytesPerPixel;
 	sdl_dibinfo->bytes_per_line  = main_surface->pitch;
@@ -219,7 +219,7 @@ void sdl_getWindowInfo(DispInfo *info) {
 }
 
 /*  DIBの取得 */
-agsurface_t *sdl_getDIB(void) {
+surface_t *sdl_getDIB(void) {
 	return sdl_dibinfo;
 }
 

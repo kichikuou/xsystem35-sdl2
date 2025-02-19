@@ -4,8 +4,6 @@
 #include "portab.h"
 #include "ags.h"
 
-#define surface_t agsurface_t
-
 extern surface_t *sf_create_surface(int width, int height, int depth);
 extern surface_t *sf_create_alpha(int width, int height);
 extern surface_t *sf_create_pixel(int width, int height, int depth);

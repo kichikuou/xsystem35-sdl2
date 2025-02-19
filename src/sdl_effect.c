@@ -131,7 +131,7 @@ typedef struct {
 	SDL_Rect rect;
 } EffectTexture;
 
-static EffectTexture *create_effect_texture(agsurface_t *as, int x, int y, int w, int h) {
+static EffectTexture *create_effect_texture(surface_t *as, int x, int y, int w, int h) {
 	EffectTexture *t = calloc(1, sizeof(EffectTexture));
 	if (!as) {
 		t->tx = sdl_texture;
@@ -1731,7 +1731,7 @@ static void raster_blend_free(struct sdl_effect *eff) {
 
 // -----------------
 
-struct sdl_effect *sdl_effect_init(SDL_Rect *rect, agsurface_t *old, int ox, int oy, agsurface_t *new, int nx, int ny, enum sdl_effect_type type) {
+struct sdl_effect *sdl_effect_init(SDL_Rect *rect, surface_t *old, int ox, int oy, surface_t *new, int nx, int ny, enum sdl_effect_type type) {
 	EffectTexture *tx_old = create_effect_texture(old, ox, oy, rect->w, rect->h);
 	EffectTexture *tx_new = create_effect_texture(new, nx, ny, rect->w, rect->h);
 
@@ -1843,7 +1843,7 @@ struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx
 	}
 }
 
-struct sdl_effect *sdl_effect_magnify_init(agsurface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
+struct sdl_effect *sdl_effect_magnify_init(surface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
 	EffectTexture *tx = create_effect_texture(surface, view_rect->x, view_rect->y, view_rect->w, view_rect->h);
 	return magnify_new(tx, view_rect, target_rect);
 }

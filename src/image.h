@@ -28,8 +28,8 @@
 #include "cg.h"
 #include "ags.h"
 
-extern void image_setdepth(int);
-extern void image_copy_from_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
-extern void image_copy_to_alpha(agsurface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
+void image_setdepth(int);
+void image_copy_from_alpha(surface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
+void image_copy_to_alpha(surface_t *dib, int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag);
 
 #endif  /* __IMAGE__ */

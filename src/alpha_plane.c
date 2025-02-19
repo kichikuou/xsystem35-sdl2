@@ -37,7 +37,7 @@
  *   src : source alpha plane pixel
  *   src_pitch: soruce alpha plane pitch
 */
-void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, uint8_t *src, int src_pitch) {
+void alpha_set_pixels(surface_t *dst, int dx, int dy, int w, int h, uint8_t *src, int src_pitch) {
 	uint8_t *ad = GETOFFSET_ALPHA(dst, dx, dy);
 	uint8_t *as = src;
 	int i;
@@ -56,7 +56,7 @@ void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, uint8_t *s
  *   y  : location y
  *   pic: acired alpha pixel
 */
-void alpha_get_pixel(agsurface_t *suf, int x, int y, uint8_t *pic) {
+void alpha_get_pixel(surface_t *suf, int x, int y, uint8_t *pic) {
 	*pic = *GETOFFSET_ALPHA(suf, x, y);
 }
 
@@ -70,7 +70,7 @@ void alpha_get_pixel(agsurface_t *suf, int x, int y, uint8_t *pic) {
  *   s  : top level to be cut
  *   d  : setteled level
 */
-void alpha_lowercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d) {
+void alpha_lowercut(surface_t *suf, int sx, int sy, int w, int h, int s, int d) {
 	uint8_t *a = GETOFFSET_ALPHA(suf, sx, sy), *b;
 	int x, y;
 	
@@ -93,7 +93,7 @@ void alpha_lowercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d
  *   s  : bottom level to be cut
  *   d  : setteled level
 */
-void alpha_uppercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d) {
+void alpha_uppercut(surface_t *suf, int sx, int sy, int w, int h, int s, int d) {
 	uint8_t *dp = GETOFFSET_ALPHA(suf, sx, sy);
 	int x, y;
 	
@@ -116,7 +116,7 @@ void alpha_uppercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d
  *   h  : region height
  *   lv : level to be set
 */
-void alpha_set_level(agsurface_t *suf, int sx, int sy, int w, int h, int lv) {
+void alpha_set_level(surface_t *suf, int sx, int sy, int w, int h, int lv) {
 	uint8_t *a = GETOFFSET_ALPHA(suf, sx, sy);
 	
 	while(h--){
@@ -135,7 +135,7 @@ void alpha_set_level(agsurface_t *suf, int sx, int sy, int w, int h, int lv) {
  *   dx : destination x
  *   dy : destination y
 */
-void alpha_copy_area(agsurface_t *suf, int sx, int sy, int w, int h, int dx, int dy) {
+void alpha_copy_area(surface_t *suf, int sx, int sy, int w, int h, int dx, int dy) {
 	uint8_t *src = GETOFFSET_ALPHA(suf, sx, sy);
 	uint8_t *dst = GETOFFSET_ALPHA(suf, dx, dy);
 	

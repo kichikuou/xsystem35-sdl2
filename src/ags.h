@@ -74,9 +74,9 @@ struct agsurface {
 
 	struct SDL_Surface *sdl_surface;
 };
-typedef struct agsurface agsurface_t;
+typedef struct agsurface surface_t;
 
-// for agsurface_t
+// for surface_t
 #define GETOFFSET_PIXEL(suf, x, y) ((suf)->pixel + (y) * (suf)->bytes_per_line + (x) * (suf)->bytes_per_pixel)
 #define GETOFFSET_ALPHA(suf, x, y) ((suf)->alpha + (y) * (suf)->width + (x))
 // for SDL_surface
@@ -127,7 +127,7 @@ struct _ags {
 	
 	int world_depth;            /* depth of off-screen (bits per pixel) */
 
-	agsurface_t *dib;           /* main surface */
+	surface_t *dib;           /* main surface */
 	void (*eventcb)(agsevent_t *e); /* deliver event */
 
 	FontType font_type;
@@ -158,7 +158,7 @@ extern void ags_getWindowInfo(DispInfo *info);
 extern void ags_getViewAreaInfo(DispInfo *info);
 extern bool ags_check_param(int *x, int *y, int *w, int *h);
 extern bool ags_check_param_xy(int *x, int *y);
-extern agsurface_t *ags_getDIB();
+extern surface_t *ags_getDIB();
 
 /* 画面更新 */
 extern void ags_setExposeSwitch(bool expose);

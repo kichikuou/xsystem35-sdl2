@@ -27,11 +27,11 @@
 #include "portab.h"
 #include "ags.h"
 
-extern void alpha_set_pixels(agsurface_t *dst, int dx, int dy, int w, int h, uint8_t *src, int src_pitch);
-extern void alpha_get_pixel(agsurface_t *suf, int x, int y, uint8_t *pic);
-extern void alpha_lowercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d);
-extern void alpha_uppercut(agsurface_t *suf, int sx, int sy, int w, int h, int s, int d);
-extern void alpha_set_level(agsurface_t *suf, int sx, int sy, int w, int h, int lv);
-extern void alpha_copy_area(agsurface_t *suf, int sx, int sy, int w, int h, int dx, int dy);
+void alpha_set_pixels(surface_t *dst, int dx, int dy, int w, int h, uint8_t *src, int src_pitch);
+void alpha_get_pixel(surface_t *suf, int x, int y, uint8_t *pic);
+void alpha_lowercut(surface_t *suf, int sx, int sy, int w, int h, int s, int d);
+void alpha_uppercut(surface_t *suf, int sx, int sy, int w, int h, int s, int d);
+void alpha_set_level(surface_t *suf, int sx, int sy, int w, int h, int lv);
+void alpha_copy_area(surface_t *suf, int sx, int sy, int w, int h, int dx, int dy);
 
 #endif /* !__ALPHA_PLANE__ */

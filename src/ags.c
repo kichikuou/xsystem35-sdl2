@@ -335,7 +335,7 @@ void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	
 	{
-		agsurface_t *dib = nact->ags.dib;
+		surface_t *dib = nact->ags.dib;
 		int   x, y;
 		int   src_last = src + cnt,dif = dst - src;
 		uint8_t *yl;
@@ -764,7 +764,7 @@ int ags_getCursorMoveTime() {
 	 return cursor_move_time;
 }
 
-agsurface_t *ags_getDIB() {
+surface_t *ags_getDIB() {
 	return nact->ags.dib;
 }
 
