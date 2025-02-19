@@ -544,7 +544,7 @@ SDL_Surface *cg_load_as_sdlsurface(int no) {
 
 	if (cg->alpha) {
 		// Copy alpha values from cg->alpha to sf->pixels.
-		uint8_t *p_ds = sf->pixels + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0);
+		uint8_t *p_ds = ALPHA_AT(sf, 0, 0);
 		uint8_t *adata = cg->alpha;
 		for (int y = 0; y < cg->height; y++) {
 			uint8_t *p_dst = p_ds;

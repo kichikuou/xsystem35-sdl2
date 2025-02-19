@@ -97,7 +97,7 @@ static void smask_update_alpha(SDL_Surface *out, cgdata *mask, int val) {
 	uint8_t *src = mask->pic;
 
 	for (int y = 0; y < mask->height; y++) {
-		uint8_t *dst = (uint8_t*)out->pixels + y * out->pitch + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0);
+		uint8_t *dst = ALPHA_AT(out, 0, y);
 		for (int x = 0; x < mask->width; x++) {
 			int i = 255 - (*src - val) * 16;
 			*dst = min(255, max(0, i));

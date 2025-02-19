@@ -169,11 +169,7 @@ SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h) {
 	SDL_Rect r_src = {x, y, w, h};
 	SDL_BlitSurface(main_surface, &r_src, s, NULL);
 
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	uint8_t *p_ds = s->pixels + 3;
-#else
-	uint8_t *p_ds = s->pixels;
-#endif
+	uint8_t *p_ds = ALPHA_AT(s, 0, 0);
 	uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, x, y);
 	for (int y = 0; y < h; y++) {
 		uint8_t *p_src = adata;

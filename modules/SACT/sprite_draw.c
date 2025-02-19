@@ -41,7 +41,7 @@ static void fill_dmap_mask(SDL_Surface *src, int sx, int sy, int dx ,int dy, int
 	int x, y;
 	assert(src->format->Amask == 0xff000000);
 	dp = PIXEL_AT(sact.dmap, dx, dy);
-	sp = src->pixels + sy * src->pitch + sx * 4 + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0);
+	sp = ALPHA_AT(src, sx, sy);
 	
 	for (y = 0; y < h; y++) {
 		uint8_t *yls = sp + y * src->pitch;
