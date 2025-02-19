@@ -91,23 +91,12 @@ void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 	}
 }
 
-
-/*
- * dibに16bitCGの描画
- */
-void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool alpha_blend) {
+void sdl_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, bool alpha_blend) {
 	int w = cg->width;
 	int h = cg->height;
 
-	if (cg->alpha) {
-		uint8_t *a_src = cg->alpha;
-		uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, dx, dy);
-
-		for (int i = 0; i < h; i++) {
-			memcpy(adata, a_src, w);
-			adata += sdl_dibinfo->width;
-			a_src += cg->width;
-		}
+	if (cg->alpha && !alpha_blend) {
+		sdl_drawImageAlphaMap(cg, sf, dx, dy);
 	}
 
 	SDL_Surface *s;
@@ -121,7 +110,7 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool a
 				*dst++ = rgb565_to_rgb888(*p_src++) | *a_src++ << 24;
 			}
 		}
-	} else if (sdl_dibinfo->depth > 16) {
+	} else if (sf->depth > 16) {
 		// Convert to RGB888 by ourselves. SDL blit functions use a slightly
 		// different mapping, so the color expanded by SDL may not match the
 		// color key specified in the CX command.
@@ -142,15 +131,13 @@ void sdl_drawImage16_fromData(cgdata *cg, int dx, int dy, int brightness, bool a
 		SDL_SetSurfaceColorMod(s, brightness, brightness, brightness);
 
 	SDL_Rect r_dst = {dx, dy, w, h};
-	SDL_BlitSurface(s, NULL, main_surface, &r_dst);
+	SDL_BlitSurface(s, NULL, sf->sdl_surface, &r_dst);
 	SDL_FreeSurface(s);
 }
 
-void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int brightness) {
+void sdl_drawImage24(cgdata *cg, surface_t *sf, int x, int y, int brightness) {
 	if (cg->alpha) {
-		// This function is called only for JPEG images, so this shouldn't happen.
-		WARNING("sdl_drawImage24_fromData: unsupported format");
-		return;
+		sdl_drawImageAlphaMap(cg, sf, x, y);
 	}
 
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
@@ -159,8 +146,21 @@ void sdl_drawImage24_fromData(cgdata *cg, int x, int y, int brightness) {
 		SDL_SetSurfaceColorMod(s, brightness, brightness, brightness);
 
 	SDL_Rect r_dst = {x, y, cg->width, cg->height};
-	SDL_BlitSurface(s, NULL, main_surface, &r_dst);
+	SDL_BlitSurface(s, NULL, sf->sdl_surface, &r_dst);
 	SDL_FreeSurface(s);
+}
+
+void sdl_drawImageAlphaMap(cgdata *cg, surface_t *sf, int x, int y) {
+	if (!cg->alpha || !sf->alpha) return;
+
+	uint8_t *a_src = cg->alpha;
+	uint8_t *adata = GETOFFSET_ALPHA(sf, x, y);
+
+	for (int i = 0; i < cg->height; i++) {
+		memcpy(adata, a_src, cg->width);
+		adata += sf->width;
+		a_src += cg->width;
+	}
 }
 
 SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h) {

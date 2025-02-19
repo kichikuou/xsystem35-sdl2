@@ -7,9 +7,7 @@ add_library(modules STATIC
   Gpx/Gpx.c
   Gpx/cg.c
   Gpx/effectcopy.c
-  Gpx/graph_cg.c
   Gpx/graph_copy_amap.c
-  Gpx/graph_draw_amap.c
   Gpx/graph_fillrect_amap.c
   Gpx/graph.c
   Gpx/surface.c

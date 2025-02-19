@@ -237,7 +237,7 @@ SDL_Surface *sdl_dib_to_surface_colorkey(int x, int y, int w, int h, int sp) {
 	return s;
 }
 
-void sdl_drawImage8_fromData(cgdata *cg, int dx, int dy, int sprite_color) {
+void sdl_drawImage8(cgdata *cg, int dx, int dy, int sprite_color) {
 	int w = cg->width;
 	int h = cg->height;
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(

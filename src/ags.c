@@ -458,13 +458,13 @@ SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b) {
 void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend) {
 	switch (cg->depth) {
 	case 8:
-		sdl_drawImage8_fromData(cg, x, y, sprite_color);
+		sdl_drawImage8(cg, x, y, sprite_color);
 		break;
 	case 16:
-		sdl_drawImage16_fromData(cg, x, y, brightness, alpha_blend);
+		sdl_drawImage16(cg, nact->ags.dib, x, y, brightness, alpha_blend);
 		break;
 	case 24:
-		sdl_drawImage24_fromData(cg, x, y, brightness);
+		sdl_drawImage24(cg, nact->ags.dib, x, y, brightness);
 		break;
 	}
 }

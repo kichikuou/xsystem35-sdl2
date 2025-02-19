@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
@@ -34,6 +33,7 @@
 #include "ags.h"
 #include "pms.h"
 #include "qnt.h"
+#include "sdl_core.h"
 #ifdef HAVE_WEBP
 #include "webp.h"
 #endif
@@ -70,64 +70,46 @@ static CG_TYPE check_cgformat(uint8_t *data) {
  *         未知の形式のときは NULL が返る
  */
 static surface_t *sf_getcg(void *b, size_t size) {
-	surface_t *sf = NULL;
-	int type;
-	cgdata *cg = NULL;
-	
-	type = check_cgformat(b);
-	switch(type) {
+	surface_t *sf;
+	cgdata *cg;
+
+	switch(check_cgformat(b)) {
 	case ALCG_PMS8:
+		// Load as an alpha map
 		cg = pms256_extract(b);
+		cg->alpha = cg->pic;
+		cg->pic = NULL;
+		sf = sf_create_alpha(cg->width, cg->height);
+		sdl_drawImageAlphaMap(cg, sf, 0, 0);
 		break;
 	case ALCG_PMS16:
 		cg = pms64k_extract(b);
+		sf = cg->alpha
+			? sf_create_surface(cg->width, cg->height)
+			: sf_create_pixel(cg->width, cg->height);
+		sdl_drawImage16(cg, sf, 0, 0, 255, false);
 		break;
 	case ALCG_QNT:
 		cg = qnt_extract(b);
+		sf = cg->alpha
+			? sf_create_surface(cg->width, cg->height)
+			: sf_create_pixel(cg->width, cg->height);
+		sdl_drawImage24(cg, sf, 0, 0, 255);
 		break;
 #ifdef HAVE_WEBP
 	case ALCG_WEBP:
 		cg = webp_extract(b, size);
+		sf = cg->alpha
+			? sf_create_surface(cg->width, cg->height)
+			: sf_create_pixel(cg->width, cg->height);
+		sdl_drawImage24(cg, sf, 0, 0, 255);
 		break;
 #endif
 	default:
-		break;
-	}
-	
-	if (cg == NULL) {
 		WARNING("Unknown Cg Type");
 		return NULL;
 	}
-	
-	switch(type) {
-	case ALCG_PMS8:
-		sf = sf_create_alpha(cg->width, cg->height);
-		gr_draw_amap(sf, cg->x, cg->y, cg->pic, cg->width, cg->height, cg->width);
-		break;
-		
-	case ALCG_PMS16:
-		if (cg->alpha) {
-			sf = sf_create_surface(cg->width, cg->height);
-			gr_drawimage16(sf, cg, cg->x, cg->y);
-			gr_draw_amap(sf, cg->x, cg->y, cg->alpha, cg->width, cg->height, cg->width);
-		} else {
-			sf = sf_create_pixel(cg->width, cg->height);
-			gr_drawimage16(sf, cg, cg->x, cg->y);
-		}
-		break;
-                
-	case ALCG_QNT:
-	case ALCG_WEBP:
-		if (cg->alpha) {
-			sf = sf_create_surface(cg->width, cg->height);
-			gr_drawimage24(sf, cg, cg->x, cg->y);
-			gr_draw_amap(sf, cg->x, cg->y, cg->alpha, cg->width, cg->height, cg->width);
-		} else {
-			sf = sf_create_pixel(cg->width, cg->height);
-			gr_drawimage24(sf, cg, cg->x, cg->y);
-		}
-		break;
-	}
+
 	cgdata_free(cg);
 	return sf;
 }
