@@ -1729,6 +1729,66 @@ static void raster_blend_free(struct sdl_effect *eff) {
 	free(eff);
 }
 
+// SACTAMASK
+
+struct sactamask_effect {
+	struct sdl_effect eff;
+	SDL_Surface *sf_new;
+	SDL_Surface *mask;
+};
+
+static void sactamask_step(struct sdl_effect *eff, float progress);
+static void sactamask_free(struct sdl_effect *eff);
+
+static struct sdl_effect *sactamask_new(EffectTexture *tx_old, SDL_Surface *sf_new, SDL_Surface *mask) {
+	struct sactamask_effect *eff = calloc(1, sizeof(struct sactamask_effect));
+	if (!eff)
+		NOMEMERR();
+
+	EffectTexture *tx_new = calloc(1, sizeof(EffectTexture));
+	tx_new->tx = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, sf_new->w, sf_new->h);
+	tx_new->rect = (SDL_Rect){ 0, 0, sf_new->w, sf_new->h };
+	SDL_SetTextureBlendMode(tx_new->tx, SDL_BLENDMODE_BLEND);
+
+	SDL_Rect rect = {0, 0, mask->w, mask->h};
+	effect_init(&eff->eff, &rect, tx_old, tx_new, EFFECT_SACTAMASK);
+	eff->sf_new = sf_new;
+	eff->mask = mask;
+	eff->eff.step = sactamask_step;
+	eff->eff.finish = sactamask_free;
+	return &eff->eff;
+}
+
+static void sactamask_step(struct sdl_effect *eff, float progress) {
+	struct sactamask_effect *this = (struct sactamask_effect *)eff;
+
+	SDL_Surface *sf;
+	SDL_LockTextureToSurface(eff->tx_new->tx, NULL, &sf);
+	SDL_BlitSurface(this->sf_new, NULL, sf, NULL);
+
+	// Scale the alpha value in mask and write it to the alpha channel of sf.
+	int val = 255 * progress;
+	for (int y = 0; y < this->mask->h; y++) {
+		uint8_t *src = PIXEL_AT(this->mask, 0, y);
+		uint8_t *dst = ALPHA_AT(sf, 0, y);
+		for (int x = 0; x < this->mask->w; x++) {
+			int i = 255 - (*src - val) * 16;
+			*dst = min(255, max(0, i));
+			src++; dst += 4;
+		}
+	}
+
+	SDL_UnlockTexture(eff->tx_new->tx);
+	render_effect_texture(eff->tx_old, NULL, &eff->dst_rect);
+	render_effect_texture(eff->tx_new, NULL, &eff->dst_rect);
+	SDL_RenderPresent(sdl_renderer);
+}
+
+static void sactamask_free(struct sdl_effect *eff) {
+	effect_finish(eff, true);
+	free(eff);
+}
+
 // -----------------
 
 struct sdl_effect *sdl_effect_init(SDL_Rect *rect, surface_t *old, int ox, int oy, surface_t *new, int nx, int ny, enum sdl_effect_type type) {
@@ -1846,6 +1906,11 @@ struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx
 struct sdl_effect *sdl_effect_magnify_init(surface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
 	EffectTexture *tx = create_effect_texture(surface, view_rect->x, view_rect->y, view_rect->w, view_rect->h);
 	return magnify_new(tx, view_rect, target_rect);
+}
+
+struct sdl_effect *sdl_effect_sactamask_init(SDL_Surface *mask) {
+	EffectTexture *tx_old = create_effect_texture(NULL, 0, 0, main_surface->w, main_surface->h);
+	return sactamask_new(tx_old, main_surface, mask);
 }
 
 void sdl_effect_step(struct sdl_effect *eff, float progress) {

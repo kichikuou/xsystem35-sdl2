@@ -138,9 +138,6 @@ void sp_keywait(int *vOK, int *vRND, int *vRsv1, int *vRsv2, int *vRsv3, int tim
 // in screen_quake.c
 void sp_quake_screen(int type, int p1, int p2, int time, int cancel);
 
-// in sactamask.c
-void sp_eupdate_amap(int type, int time, int key);
-
 // in sprite_xmenu.c
 void spxm_clear(void);
 void spxm_register(int reginum, int menuid);

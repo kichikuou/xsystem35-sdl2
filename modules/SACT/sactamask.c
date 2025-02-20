@@ -25,13 +25,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
 #include "LittleEndian.h"
-#include "input.h"
+#include "ags.h"
 #include "sact.h"
 #include "pms.h"
 #include "sprite.h"
@@ -47,16 +46,6 @@ typedef struct {
 } SACTEFAM_t;
 
 static SACTEFAM_t am;
-
-struct ecopyparam {
-	int sttime;
-	int curtime;
-	int edtime;
-	int curstep;
-	int oldstep;
-};
-typedef struct ecopyparam ecopyparam_t;
-static ecopyparam_t ecp;
 
 // SACTEFAM.KLD の読み込み
 bool smask_init(char *path) {
@@ -92,20 +81,6 @@ static cgdata *smask_get(int no) {
 	return pms256_extract(am.mmap->addr + am.offset[i]);
 }
 
-// Scale the alpha value in `mask` and write it to the alpha channel of `out`
-static void smask_update_alpha(SDL_Surface *out, cgdata *mask, int val) {
-	uint8_t *src = mask->pic;
-
-	for (int y = 0; y < mask->height; y++) {
-		uint8_t *dst = ALPHA_AT(out, 0, y);
-		for (int x = 0; x < mask->width; x++) {
-			int i = 255 - (*src - val) * 16;
-			*dst = min(255, max(0, i));
-			src++; dst += 4;
-		}
-	}
-}
-
 /**
  * マスクつき画面更新
  */
@@ -115,33 +90,13 @@ void sp_eupdate_amap(int index, int time, int cancel) {
 		sp_update_all(true);
 		return;
 	}
-
-	SDL_Surface *sf_old = SDL_ConvertSurface(main_surface, main_surface->format, 0);
-	sp_update_all(false);
-	SDL_Surface *sf_new = SDL_ConvertSurfaceFormat(main_surface, SDL_PIXELFORMAT_ARGB8888, 0);
-	SDL_SetSurfaceBlendMode(sf_new, SDL_BLENDMODE_BLEND);
-	SDL_BlitSurface(sf_old, NULL, main_surface, NULL);
-
-	ecp.sttime = ecp.curtime = sdl_getTicks();
-	ecp.edtime = ecp.curtime + time*10;
-	ecp.oldstep = 0;
-
-	while ((ecp.curtime = sdl_getTicks()) < ecp.edtime) {
-		int curstep = 255 * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-		smask_update_alpha(sf_new, mask, curstep);
-
-		SDL_BlitSurface(sf_old, NULL, main_surface, NULL);
-		SDL_BlitSurface(sf_new, NULL, main_surface, NULL);
-		ags_updateFull();
-
-		int key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
-		if (cancel && key) break;
-	}
-	SDL_SetSurfaceBlendMode(sf_new, SDL_BLENDMODE_NONE);
-	SDL_BlitSurface(sf_new, NULL, main_surface, NULL);
+	SDL_Surface *mask_sf = SDL_CreateRGBSurfaceFrom(mask->pic, mask->width, mask->height, 8, mask->width, 0, 0, 0, 0);
+	sp_update_all(false);  // old = sdl_texture, new = main_surface
+	struct sdl_effect *eff = sdl_effect_sactamask_init(mask_sf);
+	ags_runEffect(time * 10, cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
+	sdl_effect_finish(eff);
 	ags_updateFull();
-	SDL_FreeSurface(sf_new);
-	SDL_FreeSurface(sf_old);
 
+	SDL_FreeSurface(mask_sf);
 	cgdata_free(mask);
 }
