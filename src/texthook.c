@@ -28,6 +28,7 @@
 #include <emscripten.h>
 #endif
 
+#ifndef __EMSCRIPTEN__
 static struct {
 	int newlines;
 } print;
@@ -99,6 +100,7 @@ static void texthook_copy_keywait(void) {
 	if (copy.pos > 0)
 		texthook_copy_to_clipboard();
 }
+#endif  // !__EMSCRIPTEN__
 
 static enum texthook_mode mode = TEXTHOOK_NONE;
 static int *suppression_list = NULL;
