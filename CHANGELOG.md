@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Android: Back button to exit the game (#50)
+
 ## 2.14.1 - 2024-02-07
 - Fixed font selection and text decoration not working in selection menus.
 - Fixed a graphic issue in DALK intro.

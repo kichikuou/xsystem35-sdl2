@@ -287,6 +287,11 @@ void sdl_handle_event(SDL_Event *e) {
 			sdl_setFullscreen(!sdl_fs_on);
 			break;
 		}
+#ifdef __ANDROID__
+		if (e->key.keysym.scancode == SDL_SCANCODE_AC_BACK) {
+			menu_quitmenu_open();
+		}
+#endif
 		break;
 	case SDL_MOUSEMOTION:
 		sdl_setCursorInternalLocation(e->motion.x, e->motion.y);

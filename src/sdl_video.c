@@ -144,6 +144,7 @@ static void window_init(const char *render_driver) {
 #endif
 
 #ifdef __ANDROID__
+	SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 	Uint32 flags = SDL_WINDOW_FULLSCREEN;

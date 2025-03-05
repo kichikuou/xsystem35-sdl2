@@ -34,7 +34,26 @@ void menu_open(void) {
 }
 
 void menu_quitmenu_open(void) {
-	return;
+	const SDL_MessageBoxButtonData buttons[] = {
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Quit" },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "Cancel" },
+	};
+	const SDL_MessageBoxData messagebox_data = {
+		.flags = SDL_MESSAGEBOX_INFORMATION,
+		.window = NULL,
+		.title = "Quit game?",
+		.message = "Any unsaved progress will be lost.",
+		.numbuttons = SDL_arraysize(buttons),
+		.buttons = buttons,
+	};
+	int buttonid = 0;
+	if (SDL_ShowMessageBox(&messagebox_data, &buttonid) < 0) {
+		WARNING("error displaying message box");
+		return;
+	}
+	if (buttonid == 1) {
+		nact_quit(false);
+	}
 }
 
 bool menu_inputstring(INPUTSTRING_PARAM *p) {
