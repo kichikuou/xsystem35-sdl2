@@ -111,8 +111,10 @@ void nact_main() {
 	while (!nact->is_quit) {
 		nact->current_page = sl_getPage();
 		nact->current_addr = sl_getIndex();
-		if (dbg_trapped())
+		if (dbg_trapped()) {
+			sdl_updateScreen();
 			dbg_main(0);
+		}
 
 		exec_command();
 		scheduler_on_command();

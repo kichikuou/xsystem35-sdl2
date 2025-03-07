@@ -32,6 +32,7 @@
 #include "selection.h"
 #include "message.h"
 #include "input.h"
+#include "sdl_core.h"
 
 static void undeferr();
 
@@ -179,8 +180,10 @@ void exec_command(void) {
 	int page, index;
 	int c0 = sl_getc();
 
-	if (c0 == BREAKPOINT)
+	if (c0 == BREAKPOINT) {
+		sdl_updateScreen();
 		c0 = dbg_handle_breakpoint(sl_getPage(), sl_getIndex() - 1);
+	}
 
 	if (c0 == 0x20 || c0 >= 0x80) {
 		message(c0);
