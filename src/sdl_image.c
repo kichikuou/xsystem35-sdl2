@@ -79,7 +79,8 @@ void sdl_FlipSurfaceVertical(SDL_Surface *s) {
 void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
 	SDL_Rect src_rect = {sx, sy, sw, sh};
 	SDL_Rect dst_rect = {dx, dy, dw, dh};
-	SDL_BlitScaled(main_surface, &src_rect, main_surface, &dst_rect);
+	// NOTE: SDL_BlitScaled() does not support 8-bit surfaces.
+	SDL_SoftStretch(main_surface, &src_rect, main_surface, &dst_rect);
 	if (mirror) {
 		SDL_IntersectRect(&dst_rect, &(SDL_Rect){0, 0, main_surface->w, main_surface->h}, &dst_rect);
 		SDL_Surface *view = sdl_createSurfaceView(main_surface, dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h);
