@@ -238,6 +238,37 @@ void sdl_setCursorInternalLocation(int x, int y) {
 	send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 }
 
+// Stores a deferred touch event (valid if .timestamp != 0) to add a delay
+// between mouse pointer movement and mouse button state change caused by a
+// touch event. This prevents the game from processing a button down event
+// before reading the pointer position.
+static SDL_TouchFingerEvent deferred_touch_event;
+#define TOUCH_EVENT_DELAY 20
+
+static void defer_touch_event(SDL_TouchFingerEvent *e) {
+	switch (deferred_touch_event.type) {
+	case SDL_FINGERDOWN:
+		mouseb |= 1 << SDL_BUTTON_LEFT;
+		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = true;
+		break;
+	case SDL_FINGERUP:
+		mouseb &= ~(1 << SDL_BUTTON_LEFT | 1 << SDL_BUTTON_RIGHT);
+		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
+		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = false;
+		break;
+	}
+	if (e)
+		deferred_touch_event = *e;
+	else
+		deferred_touch_event.timestamp = 0;
+}
+
+static void fire_deferred_touch_event(void) {
+	if (deferred_touch_event.timestamp && deferred_touch_event.timestamp + TOUCH_EVENT_DELAY < SDL_GetTicks()) {
+		defer_touch_event(NULL);
+	}
+}
+
 // Improves map navigation of Rance4 v2. See also the function comment of
 // rance4_Y3_IM_hack() in cmdy.c.
 static void rance4v2_hack(void) {
@@ -339,14 +370,15 @@ void sdl_handle_event(SDL_Event *e) {
 			int button;
 			if  (e->tfinger.x == 0.0f || e->tfinger.x == 1.0f || e->tfinger.y == 0.0f || e->tfinger.y == 1.0f) {
 				button = SDL_BUTTON_RIGHT;
+				mouseb |= 1 << SDL_BUTTON_RIGHT;
+				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = true;
 			} else {
 				button = SDL_BUTTON_LEFT;
 				mousex = e->tfinger.x * view_w;
 				mousey = e->tfinger.y * view_h;
 				send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+				defer_touch_event(&e->tfinger);
 			}
-			mouseb |= 1 << button;
-			RawKeyInfo[mouse_to_rawkey(button)] = true;
 			send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(button));
 		}
 		break;
@@ -354,12 +386,10 @@ void sdl_handle_event(SDL_Event *e) {
 	case SDL_FINGERUP:
 		if (SDL_GetNumTouchFingers(e->tfinger.touchId) == 0) {
 			int ags_button = (mouseb & 1 << SDL_BUTTON_LEFT) ? AGSEVENT_BUTTON_LEFT : AGSEVENT_BUTTON_RIGHT;
-			mouseb &= ~(1 << SDL_BUTTON_LEFT | 1 << SDL_BUTTON_RIGHT);
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
-			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = false;
 			mousex = e->tfinger.x * view_w;
 			mousey = e->tfinger.y * view_h;
 			send_agsevent(AGSEVENT_BUTTON_RELEASE, ags_button);
+			defer_touch_event(&e->tfinger);
 		}
 		break;
 
@@ -451,6 +481,8 @@ void sdl_handle_event(SDL_Event *e) {
 /* Event処理 */
 static void sdl_getEvent(void) {
 	enum scheduler_event scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_MISS;
+
+	fire_deferred_touch_event();
 
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {
