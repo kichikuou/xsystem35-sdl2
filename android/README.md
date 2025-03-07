@@ -1,13 +1,12 @@
 # xsystem35 for Android
 
+Minimum supported Android version: 5.0
+
 ## Download
 You can download prebuilt APKs
 [here](https://github.com/kichikuou/xsystem35-sdl2/releases).
 
 ## Build
-Prerequisites:
-- Android SDK >=28
-- Android NDK >=r15c
 
 ### Using Android Studio
 Open this directory as an Android Studio project.
@@ -23,8 +22,8 @@ sudo apt install git wget unzip default-jdk-headless ninja-build
 # Install Android SDK / NDK
 export ANDROID_SDK_ROOT=$HOME/android-sdk
 mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
-unzip commandlinetools-linux-10406996_latest.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+unzip commandlinetools-linux-11076708_latest.zip -d $ANDROID_SDK_ROOT/cmdline-tools
 mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/tools
 yes | $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager --licenses
 $ANDROID_SDK_ROOT/cmdline-tools/tools/bin/sdkmanager ndk-bundle 'cmake;3.22.1'
