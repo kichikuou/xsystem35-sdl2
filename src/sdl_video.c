@@ -40,7 +40,7 @@ SDL_Window *sdl_window;
 SDL_Renderer *sdl_renderer;
 SDL_Texture *sdl_texture;
 SDL_Surface *main_surface; // offscreen surface
-SDL_Color sdl_col[256]; // color palette
+SDL_Palette *sdl_palette;
 surface_t *sdl_dibinfo;
 int view_w;
 int view_h;
@@ -104,6 +104,8 @@ int sdl_Initialize(const char *render_driver) {
 }
 
 void sdl_Remove(void) {
+	if (sdl_palette)
+		SDL_FreePalette(sdl_palette);
 	if (main_surface)
 		SDL_FreeSurface(main_surface);
 	if (sdl_renderer)
@@ -156,6 +158,7 @@ static void window_init(const char *render_driver) {
 		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, flags);
 	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	sdl_palette = SDL_AllocPalette(256);
 }
 
 static void makeDIB(int width, int height, int depth) {
@@ -184,7 +187,7 @@ static void makeDIB(int width, int height, int depth) {
 	main_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
 	
 	if (main_surface->format->BitsPerPixel == 8) {
-		memset(main_surface->format->palette->colors, 0, sizeof(SDL_Color)*256);
+		SDL_SetSurfacePalette(main_surface, sdl_palette);
 	}
 
 	if (sdl_dibinfo) {

@@ -33,7 +33,7 @@
 extern SDL_Window *sdl_window;
 extern SDL_Renderer *sdl_renderer;
 extern SDL_Texture *sdl_texture;
-extern SDL_Color sdl_col[256]; // color palette
+extern SDL_Palette *sdl_palette;
 extern surface_t *sdl_dibinfo;
 extern int view_w;
 extern int view_h;

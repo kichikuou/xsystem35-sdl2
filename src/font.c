@@ -132,6 +132,7 @@ SDL_Surface *font_get_glyph(const char *str_utf8, int r, int g, int b) {
 // SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
 static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col)
 {
+	const SDL_Color* palette = sdl_palette->colors;
 	Uint8 cache[256*7];
 	memset(cache, 0, 256);
 
@@ -154,9 +155,9 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t
 				// find nearest color in palette
 				cache[*dp] |= 1 << alpha;
 				int c = sdl_nearest_color(
-					(sdl_col[col].r * alpha + sdl_col[*dp].r * (7 - alpha)) / 7,
-					(sdl_col[col].g * alpha + sdl_col[*dp].g * (7 - alpha)) / 7,
-					(sdl_col[col].b * alpha + sdl_col[*dp].b * (7 - alpha)) / 7);
+					(palette[col].r * alpha + palette[*dp].r * (7 - alpha)) / 7,
+					(palette[col].g * alpha + palette[*dp].g * (7 - alpha)) / 7,
+					(palette[col].b * alpha + palette[*dp].b * (7 - alpha)) / 7);
 				cache[alpha << 8 | *dp] = c;
 				*dp = c;
 			}
@@ -185,9 +186,9 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
 		antialias = false;
 
 	if (antialias) {
-		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, sdl_col[cl]);
+		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, sdl_palette->colors[cl]);
 	} else {
-		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, sdl_col[cl]);
+		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, sdl_palette->colors[cl]);
 	}
 	if (!fs) {
 		WARNING("Text rendering failed: %s", TTF_GetError());

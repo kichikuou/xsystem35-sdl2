@@ -53,7 +53,7 @@ static void sdl_pal_check(void) {
 static Uint32 palette_color(uint8_t c) {
 	if (main_surface->format->BitsPerPixel == 8)
 		return c;
-	return SDL_MapRGB(main_surface->format, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b);
+	return SDL_MapRGB(main_surface->format, sdl_palette->colors[c].r, sdl_palette->colors[c].g, sdl_palette->colors[c].b);
 }
 
 void sdl_updateScreen(void) {
@@ -128,13 +128,14 @@ void sdl_updateAll(MyRectangle *view_rect) {
 
 /* Color の複数個指定 */
 void sdl_setPalette(Color *pal, int first, int count) {
+	SDL_Color colors[256];
 	for (int i = 0; i < count; i++) {
-		sdl_col[first + i].r = pal[first + i].r;
-		sdl_col[first + i].g = pal[first + i].g;
-		sdl_col[first + i].b = pal[first + i].b;
+		colors[i].r = pal[first + i].r;
+		colors[i].g = pal[first + i].g;
+		colors[i].b = pal[first + i].b;
+		colors[i].a = 255;
 	}
-	if (main_surface->format->BitsPerPixel == 8)
-		SDL_SetPaletteColors(main_surface->format->palette, &sdl_col[first], first, count);
+	SDL_SetPaletteColors(sdl_palette, colors, first, count);
 }
 
 /* 矩形の描画 */
@@ -254,7 +255,7 @@ void sdl_drawImage8(cgdata *cg, int dx, int dy, int sprite_color) {
 			c++;
 		}
 	} else {
-		memcpy(s->format->palette->colors, sdl_col, sizeof(SDL_Color) * 256);
+		SDL_SetSurfacePalette(s, sdl_palette);
 	}
 	
 	if (sprite_color != -1)
@@ -271,7 +272,7 @@ void sdl_drawLine(int x1, int y1, int x2, int y2, uint8_t c) {
 	sdl_pal_check();
 	
 	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(main_surface);
-	SDL_SetRenderDrawColor(renderer, sdl_col[c].r, sdl_col[c].g, sdl_col[c].b, SDL_ALPHA_OPAQUE);
+	SDL_SetRenderDrawColor(renderer, sdl_palette->colors[c].r, sdl_palette->colors[c].g, sdl_palette->colors[c].b, SDL_ALPHA_OPAQUE);
 	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 	SDL_DestroyRenderer(renderer);
 }
@@ -305,9 +306,9 @@ SDL_Rect sdl_floodFill(int x, int y, int c) {
 int sdl_nearest_color(int r, int g, int b) {
 	int i, col, mind = INT_MAX;
 	for (i = 0; i < 256; i++) {
-		int dr = r - sdl_col[i].r;
-		int dg = g - sdl_col[i].g;
-		int db = b - sdl_col[i].b;
+		int dr = r - sdl_palette->colors[i].r;
+		int dg = g - sdl_palette->colors[i].g;
+		int db = b - sdl_palette->colors[i].b;
 		int d = dr*dr*30 + dg*dg*59 + db*db*11;
 		if (d < mind) {
 			mind = d;
