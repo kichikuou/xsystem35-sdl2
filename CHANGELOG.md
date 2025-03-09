@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 2.14.2 - 2024-03-09
 - Android: Back button to exit the game (#50)
+- Improved touch input usability in ママトト (#64)
 
 ## 2.14.1 - 2024-02-07
 - Fixed font selection and text decoration not working in selection menus.
