@@ -54,7 +54,7 @@ static void palette_changed(void) {
 }
 
 static void initPal(void) {
-	static const Color initial_palette[256] = {
+	static const SDL_Color initial_palette[256] = {
 		[  0] = {  0,   0,   0},
 		[  1] = {128,   0,   0},
 		[  2] = {  0, 128,   0},
@@ -78,6 +78,9 @@ static void initPal(void) {
 		[255] = {255, 255, 255},
 	};
 	memcpy(nact->ags.pal, initial_palette, sizeof(initial_palette));
+	for (int i = 0; i < 256; i++) {
+		nact->ags.pal[i].a = 255;
+	}
 	sdl_setPalette(nact->ags.pal, 0, 256);
 	palette_changed();
 }
@@ -242,7 +245,7 @@ void ags_updateFull() {
 	sdl_updateArea(&r, &p);
 }
 
-void ags_setPalettes(Color *src, int dst, int cnt) {
+void ags_setPalettes(SDL_Color *src, int dst, int cnt) {
 	for (int i = 0; i < cnt; i++) {
 		nact->ags.pal[dst + i] = src[i];
 	}
@@ -635,8 +638,10 @@ void ags_fadeOut(int rate, bool flag) {
 	fade_outed = true;
 
 	if (nact->ags.world_depth == 8) {
-		Color pal[256];
-		memset(&pal, 0, sizeof(pal));
+		SDL_Color pal[256];
+		for (int i = 0; i < 256; i++) {
+			pal[i] = (SDL_Color){0, 0, 0, 255};
+		}
 		sdl_setPalette(pal, 0, 256);
 	}
 }
@@ -663,7 +668,7 @@ void ags_whiteOut(int rate, bool flag) {
 	fade_outed = true;
 
 	if (nact->ags.world_depth == 8) {
-		Color pal[256];
+		SDL_Color pal[256];
 		memset(&pal, 255, sizeof(pal));
 		sdl_setPalette(pal, 0, 256);
 	}

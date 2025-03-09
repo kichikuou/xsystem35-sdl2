@@ -76,12 +76,13 @@ static pms_header *extract_header(uint8_t *b) {
  * Get palette from raw data
  *   b  : raw data (pointer to palette)
 */
-static Color *getpal(uint8_t *b) {
-	Color *pal = malloc(sizeof(Color) * 256);
+static SDL_Color *getpal(uint8_t *b) {
+	SDL_Color *pal = malloc(sizeof(SDL_Color) * 256);
 	for (int i = 0; i < 256; i++) {
 		pal[i].r = *b++;
 		pal[i].g = *b++;
 		pal[i].b = *b++;
+		pal[i].a = 255;
 	}
 	return pal;
 }

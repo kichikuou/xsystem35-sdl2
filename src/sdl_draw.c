@@ -127,15 +127,8 @@ void sdl_updateAll(MyRectangle *view_rect) {
 }
 
 /* Color の複数個指定 */
-void sdl_setPalette(Color *pal, int first, int count) {
-	SDL_Color colors[256];
-	for (int i = 0; i < count; i++) {
-		colors[i].r = pal[first + i].r;
-		colors[i].g = pal[first + i].g;
-		colors[i].b = pal[first + i].b;
-		colors[i].a = 255;
-	}
-	SDL_SetPaletteColors(sdl_palette, colors, first, count);
+void sdl_setPalette(SDL_Color *pal, int first, int count) {
+	SDL_SetPaletteColors(sdl_palette, pal, first, count);
 }
 
 /* 矩形の描画 */
@@ -247,13 +240,7 @@ void sdl_drawImage8(cgdata *cg, int dx, int dy, int sprite_color) {
 	sdl_pal_check();
 	
 	if (main_surface->format->BitsPerPixel > 8 && cg->pal) {
-		SDL_Color *c = s->format->palette->colors;
-		for (int i = 0; i < 256; i++) {
-			c->r = cg->pal[i].r;
-			c->g = cg->pal[i].g;
-			c->b = cg->pal[i].b;
-			c++;
-		}
+		SDL_SetPaletteColors(s->format->palette, cg->pal, 0, 256);
 	} else {
 		SDL_SetSurfacePalette(s, sdl_palette);
 	}

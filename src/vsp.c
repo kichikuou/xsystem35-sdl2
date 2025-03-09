@@ -67,12 +67,13 @@ static vsp_header *extract_header(uint8_t *b) {
  * Get palette from raw data
  *   b  : raw data (pointer to palette)
 */
-static Color *getpal(uint8_t *b) {
-	Color *pal = malloc(sizeof(Color) * 256);
+static SDL_Color *getpal(uint8_t *b) {
+	SDL_Color *pal = malloc(sizeof(SDL_Color) * 256);
 	for (int i = 0; i < 16; i++) {
 		pal[i].b = b[i * 3 + 0] * 17;
 		pal[i].r = b[i * 3 + 1] * 17;
 		pal[i].g = b[i * 3 + 2] * 17;
+		pal[i].a = 255;
 	}
 	return pal;
 }

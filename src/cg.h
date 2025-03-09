@@ -57,7 +57,7 @@ typedef struct {
 	
 	uint8_t *pic;    // extracted pixel data
 	uint8_t *alpha;  // extracted alpha data if exists
-	Color *pal;      // 256-color palette if exists
+	SDL_Color *pal;  // 256-color palette if exists
 	
 	int vsp_bank;    // palette bank for vsp
 	int pms_bank;    // palette bank for pms

@@ -26,12 +26,7 @@
 
 #include "portab.h"
 #include <SDL_rect.h>
-
-typedef struct {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-} Color;
+#include <SDL_pixels.h>
 
 typedef struct {
         uint8_t r,g,b;
