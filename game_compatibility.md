@@ -58,6 +58,8 @@ Game Compatibility
 | 妻みぐい２                                  | Supported   |       |
 | シェル・クレイル                            | Supported   |       |
 | ナイトデーモン                              | Supported   |       |
+| Nor                                         | Unsupported |       |
+| 翡翠の眸                                    | Unsupported |       |
 | 学園KING                                    | Supported   | From アリスCD |
 | 学園KING 番外編                             | Supported   | From アリスCD |
 | 蒼海に墜ちて                                | Supported   | From アリスCD |
