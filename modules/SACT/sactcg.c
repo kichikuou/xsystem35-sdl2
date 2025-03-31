@@ -175,7 +175,7 @@ static SDL_Surface *blend(SDL_Surface *base, int x, int y, SDL_Surface *blend, i
 			} else if (alpha == 255) {
 				memcpy(dstpp + 1, srcpp + 1, 3);
 			} else {
-				for (int 1 = 0; k < 4; k++) {
+				for (int k = 1; k < 4; k++) {
 					dstpp[k] = (dstpp[k] * (255 - alpha) + srcpp[k] * alpha) / 255;
 				}
 			}
