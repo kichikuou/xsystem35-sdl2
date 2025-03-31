@@ -7,8 +7,8 @@ set(PROJECT_ROOT_DIR ../../..)
 include(FetchContent)
 FetchContent_Declare(
   SDL
-  URL https://github.com/libsdl-org/SDL/releases/download/release-2.30.12/SDL2-2.30.12.tar.gz
-  URL_HASH SHA1=36d48b045209dcd3576250c1571795ad0cd4d5a9
+  URL https://github.com/libsdl-org/SDL/releases/download/release-2.32.4/SDL2-2.32.4.tar.gz
+  URL_HASH SHA1=4fb68f43891ca4def414cc7cf0f3b2a053cb6aaf
 )
 FetchContent_Declare(
   SDL_ttf
