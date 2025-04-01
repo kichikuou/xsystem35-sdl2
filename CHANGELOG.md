@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.14.3 - 2024-04-01
+- Fixed build for big endian architectures.
+
 ## 2.14.2 - 2024-03-09
 - Android: Back button to exit the game (#50)
 - Improved touch input usability in ママトト (#64)
