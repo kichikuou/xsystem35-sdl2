@@ -37,8 +37,8 @@ endfunction()
 function(fetch_webp)
   FetchContent_Declare(
     libwebp
-    URL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.4.0.tar.gz
-    URL_HASH SHA1=0b1c8bea200caaa010182609dbaaa91aec69b64d
+    URL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.5.0.tar.gz
+    URL_HASH SHA1=b21aa842136dc59a72a38776a5aa73f4d0b00ac5
     )
   set(WEBP_BUILD_ANIM_UTILS OFF CACHE BOOL "Build animation utilities." FORCE)
   set(WEBP_BUILD_CWEBP OFF CACHE BOOL "Build the cwebp command line tool." FORCE)
