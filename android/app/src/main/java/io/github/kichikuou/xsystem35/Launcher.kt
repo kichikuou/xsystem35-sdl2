@@ -219,16 +219,17 @@ class Launcher private constructor(private val rootDir: File) {
         var gameDir: String? = null
             private set
         private val aldRegex = """.*?s[a-z]\.ald""".toRegex(RegexOption.IGNORE_CASE)
-        private val audioRegex = """.*?(\d+)\.(wav|mp3|ogg)""".toRegex(RegexOption.IGNORE_CASE)
+        private val audioRegex = """((\d+).*|.*?(\d+))\.(wav|mp3|ogg)""".toRegex(RegexOption.IGNORE_CASE)
         private val audioFiles: Array<String?> = arrayOfNulls(100)
 
         fun maybeAdd(path: String) {
-            aldRegex.matchEntire(path)?.let {
+            val name = File(path).name
+            aldRegex.matchEntire(name)?.let {
                 gameDir = File(path).parent
                 ready = true
             }
-            audioRegex.matchEntire(path)?.let {
-                val track = it.groupValues[1].toInt()
+            audioRegex.matchEntire(name)?.let {
+                val track = it.groupValues[2].toIntOrNull() ?: it.groupValues[3].toInt()
                 if (0 < track && track <= audioFiles.size)
                     audioFiles[track - 1] = path
             }
