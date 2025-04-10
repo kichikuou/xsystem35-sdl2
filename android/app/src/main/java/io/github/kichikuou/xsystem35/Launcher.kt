@@ -127,6 +127,7 @@ class Launcher private constructor(private val rootDir: File) {
         if (!saveDirFound) {
             File(rootDir, SAVE_DIR).mkdir()
         }
+        observer?.onGameListChange()
     }
 
     private fun createDirForGame(): File {

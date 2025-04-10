@@ -22,6 +22,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.Html
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -53,6 +54,8 @@ class LauncherActivity : Activity(), LauncherObserver {
 
         onGameListChange()
         val listView = findViewById<ListView>(R.id.list)
+        listView.emptyView = findViewById(R.id.empty)
+        findViewById<TextView>(R.id.usage).text = Html.fromHtml(getString(R.string.usage))
         listView.setOnItemClickListener { _, _, position, _ ->
             onListItemClick(position)
         }
@@ -75,23 +78,15 @@ class LauncherActivity : Activity(), LauncherObserver {
     }
 
     private fun onListItemClick(position: Int) {
-        if (position < launcher.games.size) {
-            startGame(launcher.games[position].path, null)
-        } else {
-            val i = Intent(Intent.ACTION_GET_CONTENT)
-            i.type = CONTENT_TYPE_ZIP
-            startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)), INSTALL_REQUEST)
-        }
+        startGame(launcher.games[position].path, null)
     }
 
     private fun onItemLongClick(position: Int): Boolean {
-        if (position < launcher.games.size) {
-            AlertDialog.Builder(this).setTitle(R.string.uninstall_dialog_title)
-                    .setMessage(getString(R.string.uninstall_dialog_message, launcher.games[position].title))
-                    .setPositiveButton(R.string.ok) {_, _ -> uninstall(position)}
-                    .setNegativeButton(R.string.cancel) {_, _ -> }
-                    .show()
-        }
+        AlertDialog.Builder(this).setTitle(R.string.uninstall_dialog_title)
+                .setMessage(getString(R.string.uninstall_dialog_message, launcher.games[position].title))
+                .setPositiveButton(R.string.ok) {_, _ -> uninstall(position)}
+                .setNegativeButton(R.string.cancel) {_, _ -> }
+                .show()
         return true
     }
 
@@ -102,6 +97,12 @@ class LauncherActivity : Activity(), LauncherObserver {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.install_from_zip -> {
+                val i = Intent(Intent.ACTION_GET_CONTENT)
+                i.type = CONTENT_TYPE_ZIP
+                startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)), INSTALL_REQUEST)
+                true
+            }
             R.id.export_savedata -> {
                 val i = Intent(Intent.ACTION_CREATE_DOCUMENT)
                 i.type = CONTENT_TYPE_ZIP
@@ -114,6 +115,12 @@ class LauncherActivity : Activity(), LauncherObserver {
                 i.type = CONTENT_TYPE_ZIP
                 startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)),
                                        SAVEDATA_IMPORT_REQUEST)
+                true
+            }
+            R.id.help -> {
+                AlertDialog.Builder(this)
+                    .setMessage(Html.fromHtml(getString(R.string.usage)))
+                    .show()
                 true
             }
             R.id.licenses -> {
@@ -157,7 +164,6 @@ class LauncherActivity : Activity(), LauncherObserver {
 
     override fun onGameListChange() {
         val items = launcher.titles.toMutableList()
-        items.add(getString(R.string.install_from_zip))
         val listView = findViewById<ListView>(R.id.list)
         listView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
     }

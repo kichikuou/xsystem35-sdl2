@@ -1,14 +1,15 @@
 <resources>
     <string name="app_name">xsystem35</string>
     <string name="action_export_save_data">Export Save Files</string>
+    <string name="action_help">Help</string>
     <string name="action_import_save_data">Import Save Files</string>
+    <string name="action_install_from_zip">Install from ZIP</string>
     <string name="action_licenses">Open source licenses</string>
     <string name="cancel">Cancel</string>
     <string name="cannot_find_ald">Cannot find System 3.x game files (*.ald).</string>
     <string name="choose_a_file">Choose a file</string>
     <string name="error_dialog_title">Error</string>
     <string name="install_dialog_title">Installing…</string>
-    <string name="install_from_zip">Install from ZIP</string>
     <string name="install_progress">Extracting %s</string>
     <string name="no_data_to_import">No save/ folder in the ZIP archive.</string>
     <string name="ok">OK</string>
@@ -19,4 +20,22 @@
     <string name="uninstall_dialog_title">Confirm</string>
     <string name="unsupported_zip">This type of ZIP is not supported.</string>
     <string name="zip_extraction_error">Failed to extract ZIP.</string>
+    <string name="usage">
+        <![CDATA[
+            <h1>How to install a game</h1>
+            <p>1. On your PC, prepare a ZIP containing the game files. For example, it should contain the following files:</p>
+            <div>
+                * KICHIKUSA.ALD<br>
+                * KICHIKUGA.ALD<br>
+                * KICHIKUGB.ALD<br>
+                * KICHIKUWA.ALD<br>
+                * System39.ain<br>
+                * 02.mp3<br>
+                * 03.mp3<br>
+                * …<br>
+            </div>
+            <p>2. Transfer the ZIP file from your PC to the device (e.g. via USB).</p>
+            <p>3. Tap the menu button at the upper-right of this screen, select &quot;Install from ZIP,&quot; and choose the ZIP you transferred.</p>
+        ]]>
+    </string>
 </resources>

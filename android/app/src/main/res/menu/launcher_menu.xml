@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/install_from_zip"
+        android:title="@string/action_install_from_zip" />
+    <item
         android:id="@+id/export_savedata"
         android:title="@string/action_export_save_data" />
     <item
         android:id="@+id/import_savedata"
         android:title="@string/action_import_save_data" />
+    <item
+        android:id="@+id/help"
+        android:title="@string/action_help" />
     <item
         android:id="@+id/licenses"
         android:title="@string/action_licenses" />
