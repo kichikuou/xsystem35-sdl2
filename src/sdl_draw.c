@@ -128,7 +128,7 @@ void sdl_updateAll(MyRectangle *view_rect) {
 
 /* Color の複数個指定 */
 void sdl_setPalette(SDL_Color *pal, int first, int count) {
-	SDL_SetPaletteColors(sdl_palette, pal, first, count);
+	SDL_SetPaletteColors(sdl_palette, pal + first, first, count);
 }
 
 /* 矩形の描画 */
