@@ -129,18 +129,18 @@ void msg_putMessage(const char *m) {
 	MyRectangle drawn;
 	msgcur.x += ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor, &drawn);
 
-	if (nact->messagewait_enable && !nact->messagewait_cancelled && !msgskip_isSkipping()) {
+	if (nact->messagewait_enable && nact->messagewait_time > 0 &&
+		!nact->messagewait_cancelled && !msgskip_isSkipping()) {
 		int x;
 		for (x = 0; x < drawn.w; x+=16) {
 			ags_updateArea(drawn.x + x, drawn.y, 16, drawn.h);
-			if (nact->messagewait_cancel) {
-				if (sys_getInputInfo()) {
-					nact->messagewait_cancelled = true;
-					ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
-					break;
-				}
-				sdl_sleep(nact->messagewait_time * 10);
+			int key = sys_getInputInfo();
+			if (nact->messagewait_cancel && key) {
+				nact->messagewait_cancelled = true;
+				ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
+				break;
 			}
+			sdl_sleep(nact->messagewait_time * 10);
 			nact->callback();
 		}
 	} else {
