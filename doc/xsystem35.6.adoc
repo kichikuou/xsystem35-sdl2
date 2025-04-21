@@ -30,7 +30,8 @@ finds System 3.x game files (*.ALD) from the current directory.
 *-game* _game_::
   Enables game-specific hacks. Usually auto-detected, but must be specified for
   games with modified / translated titles. Possible values are: `toushin2`,
-  `rance3_eng`, `rance4_eng`, `rance4_v2`, `persiom`, `agake`.
+  `rance2`, `rance3`, `rance3_eng`, `rance4_eng`, `rance4_v2`, `persiom`,
+  `agake`.
 
 *-savedir* _dir_::
   Directory to save game state files. If _dir_ begins with '~', it is expanded

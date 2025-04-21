@@ -126,6 +126,10 @@ void commandZW() {
 	int sw = getCaliValue();
 	
 	if (sw < 256) {
+		// System 3.5 has a bug in which ZW 1 does not disable message waiting,
+		// and Rance 2 depends on it.
+		if (game_id == GAME_RANCE2)
+			sw = 2;
 		nact->messagewait_enable = ((sw & 0xff) > 1);
 		nact->messagewait_cancelled = false;
 	} else {

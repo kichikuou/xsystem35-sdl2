@@ -27,6 +27,7 @@
 #define GT_TOSHIN2 "闘神都市Ⅱ　ｆｏｒ　Ｗｉｎ９５　"
 #define GT_RANCE4 "Ｒａｎｃｅ４　－教団の遺産－　Ｆｏｒ　Ｗｉｎ９５　"
 #define GT_RANCE4_V2 "RanceⅣ　－教団の遺産－　for Windows　"
+#define GT_RANCE2 "ＲＡＮＣＥ２"
 #define GT_RANCE3 "Ｒａｎｃｅ３"
 #define GT_RANCE3_ENG "Rance3"
 #define GT_RANCE4_ENG "Rance4 -Legacy of the Sect- For Win95 "
@@ -42,6 +43,8 @@ bool daiakuji_cx_hack;
 void enable_hack_by_gameid(const char *gameid) {
 	if (!strcmp(gameid, "toushin2"))
 		game_id = GAME_TT2;
+	else if (!strcmp(gameid, "rance2"))
+		game_id = GAME_RANCE2;
 	else if (!strcmp(gameid, "rance3"))
 		game_id = GAME_RANCE3;
 	else if (!strcmp(gameid, "rance3_eng"))
@@ -69,6 +72,8 @@ void enable_hack_by_title(const char *title_utf8) {
 		game_id = GAME_TT2;
 	else if (!strcmp(title_utf8, GT_RANCE4_V2))
 		game_id = GAME_RANCE4_V2;
+	else if (!strcmp(title_utf8, GT_RANCE2))
+		game_id = GAME_RANCE2;
 	else if (!strcmp(title_utf8, GT_RANCE3))
 		game_id = GAME_RANCE3;
 	else if (!strcmp(title_utf8, GT_RANCE3_ENG))
