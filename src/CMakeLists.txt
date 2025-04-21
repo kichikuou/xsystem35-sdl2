@@ -170,7 +170,7 @@ if (EMSCRIPTEN)
     -sALLOW_MEMORY_GROWTH=1
     -sNO_EXIT_RUNTIME=1
     -sEXPORTED_FUNCTIONS=_main,_malloc
-    -sEXPORTED_RUNTIME_METHODS=FS,IDBFS,getValue,addRunDependency,removeRunDependency,stringToUTF8OnStack
+    -sEXPORTED_RUNTIME_METHODS=FS,IDBFS,HEAPU8,HEAP16,getValue,addRunDependency,removeRunDependency,stringToUTF8OnStack
     --emit-tsd=xsystem35.d.ts
     )
 
