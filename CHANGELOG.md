@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.15.0 - 2024-04-21
+- Fixed color palette bug introduced in v2.14.2.
+- Fixed uncancellable message waiting mode.
+- Android: "Install from ZIP" button is moved to the top-right option menu.
+- Android: Improved extraction logic of track numbers from audio file names.
+
 ## 2.14.3 - 2024-04-01
 - Fixed build for big endian architectures.
 
