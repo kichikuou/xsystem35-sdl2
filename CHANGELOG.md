@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.15.1 - 2024-05-14
+- Fixed a text rendering issue in Rance 5D (#66)
+
 ## 2.15.0 - 2024-04-21
 - Fixed color palette bug introduced in v2.14.2.
 - Fixed uncancellable message waiting mode.
