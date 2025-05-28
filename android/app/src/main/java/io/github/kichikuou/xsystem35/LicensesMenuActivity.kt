@@ -13,6 +13,7 @@ class LicensesMenuActivity : Activity() {
         Entry("SDL", "SDL", "https://www.libsdl.org/"),
         Entry("SDL_mixer", "SDL_mixer", "https://github.com/libsdl-org/SDL_mixer"),
         Entry("SDL_ttf", "SDL_ttf", "https://github.com/libsdl-org/SDL_ttf"),
+        Entry("NanoJPEG", "nanojpeg", "https://keyj.emphy.de/nanojpeg/"),
         Entry("FreeType", "freetype", "https://freetype.org/"),
         Entry("HarfBuzz", "harfbuzz", "https://harfbuzz.github.io/"),
         Entry("MotoyaLCedar W3 mono", "MTLc3m", "https://github.com/aosp-mirror/platform_frameworks_base/tree/lollipop-release/data/fonts"),

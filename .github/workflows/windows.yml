@@ -42,6 +42,7 @@ jobs:
         ls /${{ matrix.sys }}/share/licenses
         mkdir dist
         cp -r /${{ matrix.sys }}/share/licenses dist/
+        cp licenses/* dist/licenses/
         cp fonts/*.license dist/licenses/
 
     - name: Install dev dependencies
