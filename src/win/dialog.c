@@ -66,6 +66,9 @@ static INT_PTR CALLBACK text_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPA
 			p->newstring = utf8string;
 			EndDialog(hDlg, IDOK);
 			break;
+		case IDCANCEL:
+			EndDialog(hDlg, IDCANCEL);
+			break;
 		default:
 			return FALSE;
 		}
@@ -118,6 +121,9 @@ static INT_PTR CALLBACK num_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			if (val > p->max) val = p->max;
 			p->value = val;
 			EndDialog(hDlg, IDOK);
+			break;
+		case IDCANCEL:
+			EndDialog(hDlg, IDCANCEL);
 			break;
 		default:
 			return FALSE;
