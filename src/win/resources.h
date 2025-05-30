@@ -20,9 +20,14 @@
 #define __RESOURCES_H__
 
 #define IDR_MENU1              101
-#define IDD_DIALOG1            103
-#define IDC_TEXT               104
-#define IDC_EDITBOX            105
+#define IDD_TEXTINPUT          103
+#define IDC_TEXTLABEL          104
+#define IDC_TEXTEDIT           105
+
+#define IDD_NUMINPUT           106
+#define IDC_NUMLABEL           107
+#define IDC_NUMEDIT            108
+#define IDC_NUMSPIN            109
 
 #define IDS_CHOOSE_GAME_FOLDER 1001
 
