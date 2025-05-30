@@ -43,7 +43,6 @@ jobs:
         mkdir dist
         cp -r /${{ matrix.sys }}/share/licenses dist/
         cp licenses/* dist/licenses/
-        cp fonts/*.license dist/licenses/
 
     - name: Install dev dependencies
       run: pacboy --noconfirm -S --needed gcc:p cmake:p ninja:p asciidoctor:p

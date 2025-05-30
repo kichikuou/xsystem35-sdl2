@@ -1,8 +1,6 @@
 install(FILES
   MTLc3m.ttf
-  MTLc3m.ttf.license
   mincho.otf
-  mincho.otf.license
   DESTINATION share/xsystem35/fonts)
 
 # pyftsubset is included in fonttools.
