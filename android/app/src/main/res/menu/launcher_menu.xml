@@ -10,6 +10,9 @@
         android:id="@+id/import_savedata"
         android:title="@string/action_import_save_data" />
     <item
+        android:id="@+id/clear_savedata"
+        android:title="@string/action_clear_save_data" />
+    <item
         android:id="@+id/help"
         android:title="@string/action_help" />
     <item

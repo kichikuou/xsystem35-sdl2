@@ -6,9 +6,12 @@
     <string name="action_import_save_data">セーブデータをインポート</string>
     <string name="action_install_from_zip">ZIPからインストール</string>
     <string name="action_licenses">オープンソースライセンス</string>
+    <string name="action_clear_save_data">セーブデータをクリア</string>
     <string name="cancel">キャンセル</string>
     <string name="cannot_find_ald">System 3.x のファイル (*.ald) が見つかりません。</string>
     <string name="choose_a_file">ファイルを選択</string>
+    <string name="clear_save_data_confirm">セーブデータをすべて削除します。元には戻せません。本当によろしいですか？</string>
+    <string name="confirm">確認</string>
     <string name="error_dialog_title">エラー</string>
     <string name="install_dialog_title">インストール中…</string>
     <string name="install_progress">%s を展開中</string>
@@ -16,8 +19,9 @@
     <string name="save_data_export_error">セーブデータのエクスポートに失敗しました。</string>
     <string name="save_data_export_success">エクスポートに成功しました。</string>
     <string name="save_data_import_success">インポートに成功しました。</string>
+    <string name="save_data_clear_success">セーブデータをクリアしました。</string>
+    <string name="save_data_clear_error">セーブデータのクリアに失敗しました。</string>
     <string name="uninstall_dialog_message">「%s」をアンインストールしますか？</string>
-    <string name="uninstall_dialog_title">確認</string>
     <string name="unsupported_zip">この形式の ZIP はサポートしていません。</string>
     <string name="zip_extraction_error">ZIP の展開に失敗しました。</string>
     <string name="usage">

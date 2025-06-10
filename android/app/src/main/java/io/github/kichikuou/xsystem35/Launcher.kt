@@ -253,6 +253,14 @@ class Launcher private constructor(private val rootDir: File) {
             }
         }
     }
+
+    fun clearSaveData(): Boolean {
+        var success = true
+        File(rootDir, SAVE_DIR).listFiles()?.forEach { file ->
+            if (!file.deleteRecursively()) success = false
+        }
+        return success
+    }
 }
 
 private fun forEachZipEntry(input: InputStream, action: (ZipEntry, ZipInputStream) -> Unit): Boolean {

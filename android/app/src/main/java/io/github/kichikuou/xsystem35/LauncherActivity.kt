@@ -82,7 +82,7 @@ class LauncherActivity : Activity(), LauncherObserver {
     }
 
     private fun onItemLongClick(position: Int): Boolean {
-        AlertDialog.Builder(this).setTitle(R.string.uninstall_dialog_title)
+        AlertDialog.Builder(this).setTitle(R.string.confirm)
                 .setMessage(getString(R.string.uninstall_dialog_message, launcher.games[position].title))
                 .setPositiveButton(R.string.ok) {_, _ -> uninstall(position)}
                 .setNegativeButton(R.string.cancel) {_, _ -> }
@@ -115,6 +115,21 @@ class LauncherActivity : Activity(), LauncherObserver {
                 i.type = CONTENT_TYPE_ZIP
                 startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)),
                                        SAVEDATA_IMPORT_REQUEST)
+                true
+            }
+            R.id.clear_savedata -> {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.confirm)
+                    .setMessage(R.string.clear_save_data_confirm)
+                    .setPositiveButton(R.string.ok) { _, _ ->
+                        if (launcher.clearSaveData()) {
+                            Toast.makeText(this, R.string.save_data_clear_success, Toast.LENGTH_SHORT).show()
+                        } else {
+                            errorDialog(R.string.save_data_clear_error)
+                        }
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
                 true
             }
             R.id.help -> {
