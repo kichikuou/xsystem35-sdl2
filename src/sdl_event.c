@@ -277,6 +277,33 @@ void send_agsevent(enum agsevent_type type, int code) {
 #endif
 }
 
+void sdl_setCursorLocation(int x, int y) {
+	// scale mouse x and y
+	float scalex, scaley;
+	SDL_RenderGetScale(gfx_renderer, &scalex, &scaley);
+	x *= scalex;
+	y *= scaley;
+
+	// calculate window borders
+	int logw, logh;
+	SDL_RenderGetLogicalSize(gfx_renderer, &logw, &logh);
+
+	float scalew, scaleh;
+	scalew = logw * scalex;
+	scaleh = logh * scaley;
+
+	int winw, winh;
+	SDL_GetWindowSize(gfx_window, &winw, &winh);
+
+	float border_left = (winw - scalew) / 2;
+	float border_top  = (winh - scaleh) / 2;
+
+	// offset x and y by window borders
+	x += border_left;
+	y += border_top;
+	SDL_WarpMouseInWindow(gfx_window, x, y);
+}
+
 void sdl_setCursorInternalLocation(int x, int y) {
 	mousex = x;
 	mousey = y;

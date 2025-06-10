@@ -142,6 +142,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.font_weight = enable_zb ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 	
 	gfx_Initialize(render_driver);
+	cursor_init();
 	font_init();
 
 	initPal();
@@ -699,7 +700,7 @@ void ags_setTextDecorationColor(int col) {
 
 void ags_setCursorType(int type) {
 	if (nact->ags.noimagecursor && type >= 100) return;
-	sdl_setCursorType(type);
+	cursor_set_type(type);
 }
 
 void ags_loadCursor(int p1,int p2) {

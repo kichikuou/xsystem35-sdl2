@@ -86,7 +86,6 @@ target_sources(xsystem35 PRIVATE
   savedata.c
   scenario.c
   scheduler.c
-  sdl_cursor.c
   sdl_event.c
   selection.c
   system.c

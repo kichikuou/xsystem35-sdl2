@@ -31,21 +31,6 @@
 #include "cg.h"
 #include "font.h"
 
-/* マウスカーソルの種類 */
-#define CURSOR_ARROW     1
-#define CURSOR_CROSS     2
-#define CURSOR_IBEAM     3
-#define CURSOR_ICON      4
-#define CURSOR_NO        5
-#define CURSOR_SIZE      6
-#define CURSOR_SIZEALL   7
-#define CURSOR_SIZENESW  8
-#define CURSOR_SIZENS    9
-#define CURSOR_SIZENWSE 10
-#define CURSOR_SIZEWE   11
-#define CURSOR_UPARROW  12
-#define CURSOR_WAIT     13
-
 /* RGB <-> alpha plane copy type */
 typedef enum {
 	FROM_16H,

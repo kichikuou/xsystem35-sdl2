@@ -27,7 +27,6 @@
 #include <sys/types.h>
 #include <SDL_events.h>
 #include "portab.h"
-#include "cursor.h"
 
 struct inputstring_param;
 
@@ -35,15 +34,12 @@ struct inputstring_param;
 extern void sdl_setJoyDeviceIndex(int index);
 extern void sdl_setCursorLocation(int x, int y);
 extern void sdl_setCursorInternalLocation(int x, int y);
-extern void sdl_setCursorType(int type);
-extern bool sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage,  TCursorDirEntry *cursordirentry);
 extern int  sdl_getKeyInfo();
 extern int  sdl_getMouseInfo(SDL_Point *p);
 extern void sdl_getWheelInfo(int *forward, int *back);
 extern void sdl_clearWheelInfo(void);
 extern int  sdl_getJoyInfo(void);
 extern void sdl_setAutoRepeat(bool enable);
-extern SDL_Point sdl_translateMouseCoords(int x, int y);
 
 /* misc */
 extern bool sdl_inputString(struct inputstring_param *);

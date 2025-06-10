@@ -58,10 +58,9 @@ int gfx_Initialize(const char *render_driver) {
 	
 	/* offscreen Pixmap */
 	makeDIB(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SYS35_DEFAULT_DEPTH);
-	
+
 	sdl_event_init();
-	sdl_cursor_init();
-	
+
 	gfx_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 
 #ifdef __EMSCRIPTEN__
