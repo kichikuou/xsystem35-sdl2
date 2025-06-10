@@ -27,6 +27,7 @@
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "scheduler.h"
 #include "ags.h"

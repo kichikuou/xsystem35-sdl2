@@ -28,7 +28,7 @@
 
 #include "portab.h"
 #include "system.h"
-#include "sdl_core.h"
+#include "gfx.h"
 #include "gfx_private.h"
 #include "cg.h"
 #include "nact.h"

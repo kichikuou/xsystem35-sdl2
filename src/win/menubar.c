@@ -25,6 +25,7 @@
 #include "menu.h"
 #include "nact.h"
 #include "sdl_core.h"
+#include "gfx.h"
 #include "gfx_private.h"
 #include "resources.h"
 #include "msgskip.h"

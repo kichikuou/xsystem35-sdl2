@@ -27,6 +27,7 @@
 #include <math.h>
 
 #include "portab.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "input.h"
 #include "ags.h"

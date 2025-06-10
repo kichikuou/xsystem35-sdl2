@@ -8,7 +8,6 @@
 #include "portab.h"
 #include "system.h"
 #include "input.h"
-#include "sdl_core.h"
 #include "scheduler.h"
 #include "xsystem35.h"
 #include "nact.h"

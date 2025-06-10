@@ -11,7 +11,7 @@
 #include "graph.h"
 #include "ngraph.h"
 #include "ags.h"
-#include "sdl_core.h"
+#include "gfx.h"
 
 /**
  * surface から surface にコピーなどをする際に、転送元と転送先のsurface

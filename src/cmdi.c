@@ -28,7 +28,6 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "ags.h"
-#include "sdl_core.h"
 #include "input.h"
 #include "msgskip.h"
 

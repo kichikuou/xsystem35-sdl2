@@ -28,6 +28,7 @@
 #include "ags.h"
 #include "input.h"
 #include "sprite.h"
+#include "gfx.h"
 #include "sdl_core.h"
 
 /*

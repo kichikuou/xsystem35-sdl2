@@ -29,6 +29,7 @@
 #include "input.h"
 #include "sact.h"
 #include "sprite.h"
+#include "gfx.h"
 #include "sdl_core.h"
 
 /*

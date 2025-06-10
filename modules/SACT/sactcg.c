@@ -36,7 +36,7 @@
 #include "sact.h"
 #include "sactcg.h"
 #include "cg.h"
-#include "sdl_core.h"
+#include "gfx.h"
 
 #define SPCG_ASSERT_NO(no) \
   if ((no) > (CGMAX -1)) { \

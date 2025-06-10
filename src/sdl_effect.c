@@ -24,6 +24,7 @@
 #include <SDL.h>
 
 #include "system.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "gfx_private.h"
 

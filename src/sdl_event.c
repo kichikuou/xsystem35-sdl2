@@ -35,6 +35,7 @@
 #include "system.h"
 #include "debugger.h"
 #include "nact.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "gfx_private.h"
 #include "scheduler.h"

@@ -38,6 +38,7 @@
 #include "utfsjis.h"
 #include "hankaku.h"
 #include "ags.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"

@@ -34,8 +34,9 @@
 
 #include "portab.h"
 #include "system.h"
-#include "sdl_core.h"
+#include "gfx.h"
 #include "gfx_private.h"
+#include "sdl_core.h"
 #include "scheduler.h"
 #include "font.h"
 #include "ags.h"

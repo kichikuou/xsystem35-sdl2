@@ -31,6 +31,7 @@
 #include "debugger_private.h"
 #include "debug_symbol.h"
 #include "msgqueue.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "system.h"
 #include "nact.h"

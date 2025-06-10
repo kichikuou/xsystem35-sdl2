@@ -22,6 +22,7 @@
 #include <SDL.h>
 
 #include "sdl_core.h"
+#include "gfx.h"
 #include "gfx_private.h"
 #include "menu.h"
 #include "nact.h"

@@ -35,6 +35,7 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "ags.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "alpha_plane.h"
 #include "utfsjis.h"

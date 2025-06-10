@@ -31,7 +31,7 @@
 #include "portab.h"
 #include "scenario.h"
 #include "xsystem35.h"
-#include "sdl_core.h"
+#include "gfx.h"
 #include "scheduler.h"
 #include "ags.h"
 #include "nact.h"

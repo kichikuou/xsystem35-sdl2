@@ -33,7 +33,7 @@
 #include "ags.h"
 #include "pms.h"
 #include "qnt.h"
-#include "sdl_core.h"
+#include "gfx.h"
 #include "ngraph.h"
 #include "dri.h"
 #include "ald_manager.h"

@@ -32,7 +32,7 @@
 #include "selection.h"
 #include "message.h"
 #include "input.h"
-#include "sdl_core.h"
+#include "gfx.h"
 
 static void undeferr();
 

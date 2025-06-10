@@ -30,6 +30,7 @@
 #include "alk.h"
 #include "input.h"
 #include "bgm.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "cg.h"
 #include "jpeg.h"

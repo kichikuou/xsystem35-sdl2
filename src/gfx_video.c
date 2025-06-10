@@ -31,8 +31,9 @@
 
 #include "portab.h"
 #include "system.h"
-#include "sdl_core.h"
+#include "gfx.h"
 #include "gfx_private.h"
+#include "sdl_core.h"
 #include "xsystem35.h"
 #include "image.h"
 

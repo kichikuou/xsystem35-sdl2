@@ -32,6 +32,7 @@
 #include "nact.h"
 #include "alk.h"
 #include "music.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "input.h"
 #include "cg.h"

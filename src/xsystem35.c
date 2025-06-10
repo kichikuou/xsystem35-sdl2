@@ -60,6 +60,7 @@
 #include "randMT.h"
 #include "ags.h"
 #include "font.h"
+#include "gfx.h"
 #include "sdl_core.h"
 #include "menu.h"
 #include "music.h"
