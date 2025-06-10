@@ -31,7 +31,6 @@
 #include "input.h"
 #include "scenario.h"
 #include "cmd_check.h"
-#include "sdl_core.h"
 #include "scheduler.h"
 #include "music_cdrom.h"
 #include "hacks.h"
@@ -75,7 +74,7 @@ static void rance4_Y3_IM_hack() {
 
 	int button_pressed = sys_getInputInfo();
 	if (!button_pressed) {
-		sdl_wait_vsync();
+		sys_wait_vsync();
 		count = 0;
 	}
 	commandIM();

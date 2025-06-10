@@ -30,7 +30,6 @@
 
 #include "portab.h"
 #include "system.h"
-#include "sdl_core.h"
 #include "menu.h"
 #include "input.h"
 #include "nact.h"
@@ -213,7 +212,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	switch (e->type) {
 	case AGSEVENT_KEY_PRESS:
 		if (e->code == KEY_Z) {
-			cur = sdl_getTicks();
+			cur = sys_get_ticks();
 			if (!sact.zhiding) {
 				slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
 				sact.zhiding = true;
@@ -243,7 +242,7 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	case AGSEVENT_KEY_RELEASE:
 		switch(e->code) {
 		case KEY_Z:
-			cur = sdl_getTicks();
+			cur = sys_get_ticks();
 			if (500 < (cur - sact.zofftime) || !sact.zdooff) {
 				slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
 				sact.zhiding = false;

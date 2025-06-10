@@ -26,6 +26,7 @@
 #include "gfx_private.h"
 #include "menu.h"
 #include "nact.h"
+#include "system.h"
 
 #define XMARGIN 3
 #define YMARGIN 2
@@ -158,7 +159,7 @@ bool sdl_inputString(INPUTSTRING_PARAM *p) {
 	while (!input->done) {
 		sdl_getKeyInfo();  // message pump
 		nact->callback();
-		sdl_wait_vsync();
+		sys_wait_vsync();
 	}
 	SDL_StopTextInput();
 	sdl_custom_event_handler = NULL;

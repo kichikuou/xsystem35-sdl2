@@ -34,7 +34,6 @@
 #include "input.h"
 #include "sact.h"
 #include "sprite.h"
-#include "sdl_core.h"
 #include "randMT.h"
 
 #define M_PIf ((float)M_PI)
@@ -78,9 +77,9 @@ void sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	
 	if (type > 1) return;
 	
-	sttime = sdl_getTicks();
+	sttime = sys_get_ticks();
 	edtime = time * 10 + sttime;
-	while ((curtime = sdl_getTicks()) < edtime) {
+	while ((curtime = sys_get_ticks()) < edtime) {
 		int adjx, adjy;
 		
 		cb[type]((float)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);

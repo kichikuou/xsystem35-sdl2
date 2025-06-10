@@ -36,8 +36,6 @@
 #include "system.h"
 #include "gfx.h"
 #include "gfx_private.h"
-#include "sdl_core.h"
-#include "scheduler.h"
 #include "font.h"
 #include "ags.h"
 #include "image.h"
@@ -64,43 +62,6 @@ void gfx_updateScreen(void) {
 	SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
-}
-
-uint32_t sdl_getTicks(void) {
-	return SDL_GetTicks();
-}
-
-void sdl_sleep(int msec) {
-	gfx_updateScreen();
-	dbg_onsleep();
-#ifdef __EMSCRIPTEN__
-	emscripten_sleep(msec);
-#else
-	SDL_Delay(msec);
-#endif
-	scheduler_on_event(SCHEDULER_EVENT_SLEEP);
-}
-
-#ifdef __EMSCRIPTEN__
-EM_JS(void, wait_vsync, (void), {
-	// We need a `return` here for JSPI support (ASYNCIFY=2).
-	return Asyncify.handleSleep(function(wakeUp) {
-		window.requestAnimationFrame(function() {
-			wakeUp();
-		});
-	});
-});
-#endif
-
-void sdl_wait_vsync() {
-	gfx_updateScreen();
-	dbg_onsleep();
-#ifdef __EMSCRIPTEN__
-	wait_vsync();
-#else
-	SDL_Delay(16);
-#endif
-	scheduler_on_event(SCHEDULER_EVENT_SLEEP);
 }
 
 /* off-screen の指定領域を Main Window へ転送 */

@@ -33,7 +33,6 @@
 #include "alk.h"
 #include "music.h"
 #include "gfx.h"
-#include "sdl_core.h"
 #include "input.h"
 #include "cg.h"
 #include "jpeg.h"
@@ -53,9 +52,9 @@ static void ndd_run(int demonum) {
 	if (mus)
 		musbgm_play(mus, 0, 100, 0);
 
-	uint32_t start = sdl_getTicks();
+	uint32_t start = sys_get_ticks();
 	while (!nact->is_quit) {
-		int i = (sdl_getTicks() - start) / (1000 / FPS);
+		int i = (sys_get_ticks() - start) / (1000 / FPS);
 		if (i >= alk->datanum)
 			break;
 
@@ -70,7 +69,7 @@ static void ndd_run(int demonum) {
 			WARNING("Cannot decode CG %d in %s", i, alk_path);
 		}
 
-		int wait_ms = (i + 1) * (1000 / FPS) - (sdl_getTicks() - start);
+		int wait_ms = (i + 1) * (1000 / FPS) - (sys_get_ticks() - start);
 		if (wait_ms > 0) {
 			if (sys_keywait(wait_ms, KEYWAIT_CANCELABLE))
 				break;

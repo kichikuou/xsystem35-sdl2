@@ -24,12 +24,25 @@
 #ifndef __SYSTEM__
 #define __SYSTEM__
 
+#include <stdint.h>
 #include "config.h"
 
-/* should define in somewhere */ 
-extern void sys_error(char *format, ...);    /* show nessafe and exit system */
-extern void sys_exit(int code);              /* exit system with code */
-extern void sys_message(int lv, char *format, ...);  /* show various message */
+void sys_error(char *format, ...);    /* show message and exit system */
+void sys_exit(int code);              /* exit system with code */
+void sys_message(int lv, char *format, ...);  /* show various message */
+
+uint32_t sys_get_ticks(void);
+void sys_sleep(int msec);
+void sys_wait_vsync(void);
+
+enum messagebox_type {
+	MESSAGEBOX_ERROR,
+	MESSAGEBOX_WARNING,
+	MESSAGEBOX_INFO,
+};
+void sys_show_message_box(enum messagebox_type type, const char* title_utf8, const char* message_utf8);
+
+void sys35_remove(void);
 
 /*
  DEBUGLEVEL
@@ -38,12 +51,7 @@ extern void sys_message(int lv, char *format, ...);  /* show various message */
   1: warning only(output to terminal)
   2+: more message [devel relase default]
 */
-
-#ifdef DEBUG
-#define DEBUGLEVEL 2
-#else
-#define DEBUGLEVEL 0
-#endif /* DEBUG */
+void sys_set_debug_level(int level);
 
 #define NOMEMERR()        sys_error("Out of memory at %s()\n", __func__)
 

@@ -29,7 +29,6 @@
 
 #include "portab.h"
 #include "system.h"
-#include "sdl_core.h"
 #include "ags.h"
 #include "nact.h"
 #include "input.h"
@@ -268,7 +267,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 		char mbuf[20], rbuf[20];
 		int cw, delta, wcnt;
 		
-		wcnt = sdl_getTicks();
+		wcnt = sys_get_ticks();
 		
 		mbuf[0] = rbuf[0] = '\0';
 		msg = get_char(msg, mbuf, rbuf, sizeof(mbuf) -1); 
@@ -316,7 +315,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 			needupdate = false;
 			
 			// keywait
-			delta = sdl_getTicks() - wcnt;
+			delta = sys_get_ticks() - wcnt;
 			if (delta < wSpeed) {
 				if (sys_keywait(wSpeed - delta, KEYWAIT_NONCANCELABLE)) {
 					
@@ -420,7 +419,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	sact.waitkey = -1;
 	
 	while (sact.waitkey == -1 && !nact->is_quit) {
-		int st = sdl_getTicks();
+		int st = sys_get_ticks();
 		int interval = 25;
 		
 		// アニメパターンがある場合、その更新
@@ -434,7 +433,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 			update_mark(minfo[j].sp, minfo[j].cg);
 			i++;
 		} 
-		sys_keywait(interval - (sdl_getTicks() - st), KEYWAIT_NONCANCELABLE);
+		sys_keywait(interval - (sys_get_ticks() - st), KEYWAIT_NONCANCELABLE);
 	}
 	
 	sact.waittype = KEYWAIT_NONE;

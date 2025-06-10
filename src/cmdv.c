@@ -27,7 +27,6 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include "portab.h"
-#include "sdl_core.h"
 #include "scheduler.h"
 #include "xsystem35.h"
 #include "scenario.h"
@@ -760,7 +759,7 @@ void commandVA() { /* from Panyo */
 			/* 開始 (p3=コマ数,0:無限(開始位置==終了位置のとき))*/
 			inAnimation = true;
 			VAcmd[p1].elaspCut  = 0;
-			VAcmd[p1].startTime = sdl_getTicks();
+			VAcmd[p1].startTime = sys_get_ticks();
 			VAcmd[p1].totalCut  = p3;
 			
 			if (p3 == 0) {
@@ -784,7 +783,7 @@ void commandVA() { /* from Panyo */
 				/* キー抜け無し ,p3=0は指定不可 */
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
-					sdl_sleep(10);
+					sys_sleep(10);
 				}
 				va_drawUnit(p1);
 				va_updateUnit(p1);
@@ -794,7 +793,7 @@ void commandVA() { /* from Panyo */
 				VAcmd[p1].rewrite = true;
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
-					sdl_sleep(10);
+					sys_sleep(10);
 					key = sys_getInputInfo();
 					if (key != 0) {
 						sysVar[0] = key;
@@ -1003,7 +1002,7 @@ static void va_animationAlone(int i) {
 static void va_update() {
 	bool proceeding = false;
 	int i;
-	int curTime = sdl_getTicks();
+	int curTime = sys_get_ticks();
 	
 	for (i = 0; i < VACMD_MAX; i++) {
 		if (VAcmd[i].state == VA_RUNNING) {

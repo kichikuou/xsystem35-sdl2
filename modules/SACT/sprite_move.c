@@ -32,7 +32,6 @@
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
-#include "sdl_core.h"
 
 /*
 
@@ -161,14 +160,14 @@ void spev_move_waitend(sprite_t *sp, int dx, int dy, int time) {
 	sp->move.time = 0;
 	
 	sact.movelist = slist_append(sact.movelist, sp);
-	sact.movestarttime = sdl_getTicks();
+	sact.movestarttime = sys_get_ticks();
 	slist_foreach(sact.movelist, spev_move_setup, NULL);
 	slist_free(sact.movelist);
 	sact.movelist = NULL;
 	
 	while (sp->move.moving) {
 		nact->callback();
-		sdl_wait_vsync();
+		sys_wait_vsync();
 	}
 }
 
@@ -187,7 +186,7 @@ void spev_wait4moving_sp() {
 		
 		while (sp->move.moving) {
 			nact->callback();
-			sdl_wait_vsync();
+			sys_wait_vsync();
 		}
 	}
 }

@@ -34,7 +34,6 @@
 #include "dri.h"
 #include "music_pcm.h"
 #include "music_private.h"
-#include "sdl_core.h"
 #include "nact.h"
 #include "LittleEndian.h"
 #include "mmap.h"
@@ -237,7 +236,7 @@ bool muspcm_start(int slot, int loop) {
 	if (Mix_PlayChannel(slot, slots[slot].chunk, loop - 1) < 0)
 		return false;
 
-	slots[slot].start_time = sdl_getTicks();
+	slots[slot].start_time = sys_get_ticks();
 	return true;
 }
 
@@ -277,7 +276,7 @@ int muspcm_getpos(int slot) {
 	if (!Mix_Playing(slot))
 		return 0;
 
-	int pos = sdl_getTicks() - slots[slot].start_time;
+	int pos = sys_get_ticks() - slots[slot].start_time;
 	if (pos == 0)
 		pos = 1;  // because 0 means "not playing"
 

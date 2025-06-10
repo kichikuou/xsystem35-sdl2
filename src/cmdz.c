@@ -28,7 +28,6 @@
 #include "portab.h"
 #include "xsystem35.h"
 #include "gfx.h"
-#include "sdl_core.h"
 #include "scheduler.h"
 #include "ags.h"
 #include "scenario.h"
@@ -45,13 +44,13 @@ static struct {
 } counters[257];  // [0] for ZT 1-5, [1..256] for ZT 10-11
 
 static void reset_counter(int num, int divisor, int offset) {
-	counters[num].base = sdl_getTicks() - offset;
+	counters[num].base = sys_get_ticks() - offset;
 	counters[num].divisor = divisor;
 }
 
 static uint32_t get_counter(int num) {
 	scheduler_on_event(SCHEDULER_EVENT_TIMER_CHECK);
-	return sdl_getTicks() - counters[num].base;
+	return sys_get_ticks() - counters[num].base;
 }
 
 void commandZC() {

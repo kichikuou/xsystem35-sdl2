@@ -36,7 +36,6 @@
 #include "nact.h"
 #include "ags.h"
 #include "music.h"
-#include "sdl_core.h"
 #include "hacks.h"
 
 #define SLOT 40
@@ -451,7 +450,7 @@ static void PlayAnimeData() {
 	dib = ags_getDIB();
 	
 	for (loop = 0; loop < p1; loop++) {
-		int cnt = sdl_getTicks();
+		int cnt = sys_get_ticks();
 		is_backcopied = false;
 		
 		for (i = 0; i < SLOT; i++) {
@@ -528,9 +527,9 @@ static void PlayAnimeData() {
 		if (is_backcopied && !SDL_RectEmpty(&maprect))
 			ags_updateArea(maprect.x, maprect.y, maprect.w, maprect.h);
 
-		int now = sdl_getTicks();
+		int now = sys_get_ticks();
 		if (now - cnt < interval) {
-			sdl_sleep(interval - (now-cnt));
+			sys_sleep(interval - (now-cnt));
 		}
 	}
 }

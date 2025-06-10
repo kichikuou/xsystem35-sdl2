@@ -24,6 +24,7 @@
 #include "portab.h"
 #include "cdrom.h"
 #include "scheduler.h"
+#include "system.h"
 
 static bool cdrom_init(char *playlist) {
 	return true;

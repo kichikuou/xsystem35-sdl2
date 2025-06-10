@@ -43,10 +43,6 @@
 #include <emscripten.h>
 #endif
 
-#ifdef __ANDROID__
-#include <android/log.h>
-#endif
-
 #ifdef _WIN32
 #include "win/dialog.h"
 #endif
@@ -78,14 +74,11 @@
 static char *gameResourceFile = "xsystem35.gr";
 static void    sys35_usage(bool verbose);
 static void    sys35_init();
-static void    sys35_remove();
 static void    sys35_ParseOption(int *argc, char **argv);
 static void    check_profile();
 
 static const char *render_driver = NULL;
 
-/* for debugging */
-static int debuglv = DEBUGLEVEL;
 enum {
 	DEBUGGER_DISABLED,
 	DEBUGGER_CUI,
@@ -156,54 +149,6 @@ static void sys35_usage(bool verbose) {
 	exit(1);
 }
 
-void sys_message(int lv, char *format, ...) {
-	if (debuglv < lv)
-		return;
-
-	va_list args;
-	va_start(args, format);
-
-#ifdef __ANDROID__
-	const int prio_table[] = {
-		ANDROID_LOG_FATAL,
-		ANDROID_LOG_ERROR,
-		ANDROID_LOG_WARN,
-		ANDROID_LOG_INFO,
-		ANDROID_LOG_INFO,
-		ANDROID_LOG_VERBOSE,
-	};
-	int prio = prio_table[min(lv, 5)];
-	__android_log_vprint(prio, "xsystem35", format, args);
-#else
-	if (!dbg_console_vprintf(lv, format, args))
-		vfprintf(stderr, format, args);
-#endif
-	va_end(args);
-}
-
-void sys_error(char *format, ...) {
-	char buf[512];
-	va_list args;
-	
-	va_start(args, format);
-	vsnprintf(buf, sizeof buf, format, args);
-	va_end(args);
-	sdl_showMessageBox(MESSAGEBOX_ERROR, "xsystem35", buf);
-
-	sys35_remove();
-	exit(1);
-}
-
-void sys_exit(int code) {
-	sys35_remove();
-#ifdef __EMSCRIPTEN__
-	EM_ASM( xsystem35.shell.quit(); );
-	sdl_sleep(1000000000);
-#else
-	exit(code);
-#endif
-}
-
 static void sys35_init() {
 	int i;
 	
@@ -229,7 +174,7 @@ static void sys35_init() {
 	msgskip_init(nact->files.msgskip);
 }
 
-static void sys35_remove() {
+void sys35_remove(void) {
 	dbg_quit();
 	mus_exit(); 
 	ags_remove();
@@ -337,7 +282,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			nact->ags.noimagecursor = true;
 		} else if (0 == strcmp(argv[i], "-debuglv")) {
 			if (argv[i + 1] != NULL) {
-				debuglv = argv[i + 1][0] - '0';
+				sys_set_debug_level(argv[i + 1][0] - '0');
 			}
 		} else if (0 == strcmp(argv[i], "-version")) {
 			puts(VERSION);
@@ -523,7 +468,7 @@ int main(int argc, char **argv) {
 	
 	if (!initGameResource(&nact->files, gameResourceFile, savedir)) {
 #ifdef _WIN32
-		sdl_showMessageBox(MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)");
+		sys_show_message_box(MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)");
 		exit(1);
 #else
 		sys35_usage(true);

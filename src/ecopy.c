@@ -28,7 +28,6 @@
 
 #include "portab.h"
 #include "gfx.h"
-#include "sdl_core.h"
 #include "input.h"
 #include "ags.h"
 #include "system.h"
@@ -40,7 +39,7 @@ static bool ecp_cancel;
 #define EC_WAIT \
 	if ((key |= sys_getInputInfo()) && ecp_cancel) break; \
 	do {												  \
-		int wait_ms = cnt - sdl_getTicks();				  \
+		int wait_ms = cnt - sys_get_ticks();				  \
 		if (wait_ms >= 16)								  \
 			key = sys_keywait(wait_ms, ecp_cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE); \
 	} while (0)
@@ -61,7 +60,7 @@ static int eCopyArea5(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	static int hx[16]={ 0,32,16,48, 0,32,16,48,16,48, 0,32,16,48, 0,32};
 	static int hy[16]={ 0, 0,16,16,32,32,48,48, 0, 0,16,16,32,32,48,48};
 	
-	cnt = sdl_getTicks();
+	cnt = sys_get_ticks();
 	for (i = 0; i < 16; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -63); y += 64) {
@@ -82,7 +81,7 @@ static int eCopyArea6(int dx, int dy, int w, int h, int opt) {
 	int i, x, y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 
-	cnt = sdl_getTicks();
+	cnt = sys_get_ticks();
 	for (i = 0; i < 7; i++) {
 		cnt += waitcnt;
 		for (x = 0; x < (w -63); x += 64) {
@@ -106,7 +105,7 @@ static int eCopyArea9(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	static int hintY[4] = {0,8,8,0};
 
 	
-	cnt = sdl_getTicks();
+	cnt = sys_get_ticks();
 	for (i = 0; i < 4; i++) {
 		cnt+=waitcnt;
 		for (y = 0; y < h -15; y+=16) {
@@ -126,7 +125,7 @@ static int eCopyArea16(int dx, int dy, int w, int h, int opt) {
 	int i, x, key = 0, cnt;
 	int waitcnt = opt == 0 ? 30 : opt;
 	
-	cnt = sdl_getTicks();
+	cnt = sys_get_ticks();
 	for (i = 0; i < 8; i++) {
 		cnt += waitcnt;
 		for (x = 0; x < (w -15); x += 16) {
@@ -144,7 +143,7 @@ static int eCopyArea17(int dx, int dy, int w, int h, int opt) {
 	int waitcnt = opt == 0 ? 30 : opt;
 
 #define E17X 18
-	cnt = sdl_getTicks();
+	cnt = sys_get_ticks();
 	for (i = 0; i < E17X; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h - E17X + 1); y += E17X) {
@@ -160,7 +159,7 @@ static int eCopyArea22(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	int i, x, y, key = 0, cnt;
 	int waitcnt = opt == 0 ? 80 : opt;
 	
-	cnt = sdl_getTicks();
+	cnt = sys_get_ticks();
 	for (i = 0; i < 2; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -3); y+=4) {
@@ -185,7 +184,7 @@ static int eCopyArea23(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 	static int hintX[4] = {0,2,2,0};
 	static int hintY[4] = {0,2,0,2};
 	
-	cnt = sdl_getTicks();
+	cnt = sys_get_ticks();
 	for (i = 0; i < 4; i++) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -3); y+=4) {

@@ -31,7 +31,6 @@
 #include "input.h"
 #include "sact.h"
 #include "sprite.h"
-#include "sdl_core.h"
 #include "randMT.h"
 
 /*
@@ -49,9 +48,9 @@ void sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, in
 	int i = 0, key;
 	SList *node;
 	
-	edtime = wCount * 10 + sdl_getTicks();
+	edtime = wCount * 10 + sys_get_ticks();
 	
-	while ((curtime = sdl_getTicks()) < edtime) {
+	while ((curtime = sys_get_ticks()) < edtime) {
 		if (wType == 0) { // 全てのスプライトを同じように動かす
 			int adjx = (int)(genrand() * wAmplitudeX/2);
 			int adjy = (int)(genrand() * wAmplitudeY/2);

@@ -33,7 +33,6 @@
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
-#include "sdl_core.h"
 
 /*
 
@@ -63,7 +62,7 @@ static void tevent_callback(agsevent_t *e) {
 	int update = 0;
 	
 	// SP_MOVE の同期移動のためのカウンタの読み込み
-	sact.movecurtime = sdl_getTicks();
+	sact.movecurtime = sys_get_ticks();
 	
 	for (node = sact.teventlisteners; node; node = node->next) {
 		sprite_t *sp = (sprite_t *)node->data;

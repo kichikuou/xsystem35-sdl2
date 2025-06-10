@@ -29,7 +29,6 @@
 #include "system.h"
 #include "LittleEndian.h"
 #include "dri.h"
-#include "sdl_core.h"
 
 static bool read_index(int volume, drifiles *d, FILE *fp) {
 	fseek(fp, 0L, SEEK_END);
@@ -142,7 +141,7 @@ static void warn_missing_ald(drifiles *d, int no) {
 	} else {
 		snprintf(msgbuf, sizeof(msgbuf), "Cannot read resource #%d.", no);
 	}
-	sdl_showMessageBox(MESSAGEBOX_WARNING, "xsystem35", msgbuf);
+	sys_show_message_box(MESSAGEBOX_WARNING, "xsystem35", msgbuf);
 }
 
 dridata *dri_getdata(drifiles *d, int no) {

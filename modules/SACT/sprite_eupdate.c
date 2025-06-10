@@ -31,7 +31,6 @@
 #include "sprite.h"
 #include "gfx.h"
 #include "effect.h"
-#include "sdl_core.h"
 
 /*
   効果つき画面更新
@@ -56,12 +55,12 @@ void sp_eupdate(int type, int time, int cancel) {
 	struct effect *eff = effect_init(&rect, NULL, 0, 0, gfx_getDIB(), 0, 0, effect);
 
 	int sttime, curtime;
-	sttime = curtime = sdl_getTicks();
+	sttime = curtime = sys_get_ticks();
 	int edtime = curtime + time * 10;
 
-	while ((curtime = sdl_getTicks()) < edtime) {
+	while ((curtime = sys_get_ticks()) < edtime) {
 		effect_step(eff, (float)(curtime - sttime) / (edtime - sttime));
-		int rest = 16 - (sdl_getTicks() - curtime);
+		int rest = 16 - (sys_get_ticks() - curtime);
 		int key = sys_keywait(rest, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key)
 			break;

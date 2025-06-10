@@ -89,6 +89,7 @@ target_sources(xsystem35 PRIVATE
   sdl_cursor.c
   sdl_event.c
   selection.c
+  system.c
   texthook.c
   variable.c
   vsp.c

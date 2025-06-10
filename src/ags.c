@@ -599,10 +599,10 @@ void ags_alpha_setPixel(int x, int y, int w, int h, uint8_t *b) {
 
 void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, void *arg) {
 	unsigned wflags = cancelable ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE;
-	int start = sdl_getTicks();
-	for (int t = 0; t < duration_ms; t = sdl_getTicks() - start) {
+	int start = sys_get_ticks();
+	for (int t = 0; t < duration_ms; t = sys_get_ticks() - start) {
 		step(arg, (float)t / duration_ms);
-		int key = sys_keywait(start + t + 16 - sdl_getTicks(), wflags);
+		int key = sys_keywait(start + t + 16 - sys_get_ticks(), wflags);
 		if (cancelable && key) {
 			nact->waitcancel_key = key;
 			break;
@@ -724,7 +724,7 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 		// navigation.
 		sdl_setCursorInternalLocation(x, y);
 		EM_ASM({ xsystem35.shell.showMouseMoveEffect($0, $1); }, x, y);
-		sdl_sleep(cursor_move_time);
+		sys_sleep(cursor_move_time);
 	}
 #else
 	if (nact->ags.mouse_warp_enabled) {
@@ -736,12 +736,12 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 			int xi = ((dx*i*i*i) >> 9) - ((3*dx*i*i)>> 6) + ((3*dx*i) >> 3) + p.x;
 			int yi = ((dy*i*i*i) >> 9) - ((3*dy*i*i)>> 6) + ((3*dy*i) >> 3) + p.y;
 			sdl_setCursorLocation(xi, yi);
-			sdl_sleep(cursor_move_time / 7);
+			sys_sleep(cursor_move_time / 7);
 		}
 		sdl_setCursorLocation(x, y);
 	} else if (!for_selection) {
 		sdl_setCursorInternalLocation(x, y);
-		sdl_sleep(cursor_move_time);
+		sys_sleep(cursor_move_time);
 	}
 #endif
 }

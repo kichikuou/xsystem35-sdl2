@@ -18,7 +18,6 @@
 */
 #include "scheduler.h"
 #include "scenario.h"
-#include "sdl_core.h"
 #include "nact.h"
 #include "hacks.h"
 
@@ -87,13 +86,13 @@ void scheduler_on_event(enum scheduler_event event) {
 void scheduler_yield(void) {
 	switch (game_id) {
 	case GAME_AGAKE:
-		sdl_sleep(6);  // The slot game runs in a 6ms-cycle loop.
+		sys_sleep(6);  // The slot game runs in a 6ms-cycle loop.
 		break;
 	case GAME_PERSIOM:
-		sdl_sleep(10);  // The slot game runs in a 10ms-cycle loop.
+		sys_sleep(10);  // The slot game runs in a 10ms-cycle loop.
 		break;
 	default:
-		sdl_wait_vsync();
+		sys_wait_vsync();
 		break;
 	}
 }

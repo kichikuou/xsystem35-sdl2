@@ -31,7 +31,6 @@
 #include "input.h"
 #include "bgm.h"
 #include "gfx.h"
-#include "sdl_core.h"
 #include "cg.h"
 #include "jpeg.h"
 
@@ -73,9 +72,9 @@ static void Run() {
 
 	musbgm_play(TDEMO_MUSIC_NO, 0, 100, 0);
 
-	uint32_t start = sdl_getTicks();
+	uint32_t start = sys_get_ticks();
 	while (!nact->is_quit) {
-		int i = (sdl_getTicks() - start) / (1000 / FPS);
+		int i = (sys_get_ticks() - start) / (1000 / FPS);
 		if (i >= alk->datanum)
 			break;
 
@@ -90,7 +89,7 @@ static void Run() {
 			WARNING("Cannot decode CG %d", i);
 		}
 
-		int wait_ms = (i + 1) * (1000 / FPS) - (sdl_getTicks() - start);
+		int wait_ms = (i + 1) * (1000 / FPS) - (sys_get_ticks() - start);
 		if (wait_ms > 0) {
 			if (sys_keywait(wait_ms, KEYWAIT_CANCELABLE))
 				break;

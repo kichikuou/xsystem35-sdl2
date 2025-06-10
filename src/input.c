@@ -100,14 +100,14 @@ int sys_keywait(int msec, unsigned flags) {
 	}
 
 	int key=0, n;
-	int end = msec == INT_MAX ? INT_MAX : sdl_getTicks() + msec;
+	int end = msec == INT_MAX ? INT_MAX : sys_get_ticks() + msec;
 	while (!nact->is_quit &&
 		   !((flags & KEYWAIT_SKIPPABLE) && msgskip_isSkipping()) &&
-		   (n = end - sdl_getTicks()) > 0) {
+		   (n = end - sys_get_ticks()) > 0) {
 		if (n <= 16)
-			sdl_sleep(n);
+			sys_sleep(n);
 		else
-			sdl_wait_vsync();
+			sys_wait_vsync();
 		nact->callback();
 		key = sys_getInputInfo();
 		cancel_yield();  // We just yielded!
@@ -122,7 +122,7 @@ void sys_hit_any_key() {
 	if (msgskip_isSkipping()) {
 		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK && sys_getInputInfo())
 			msgskip_activate(false);
-		sdl_sleep(30);
+		sys_sleep(30);
 		return;
 	}
 

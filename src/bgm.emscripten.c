@@ -24,7 +24,7 @@
 #include "nact.h"
 #include "bgm.h"
 #include "bgi.h"
-#include "sdl_core.h"
+#include "system.h"
 
 bool musbgm_init(DRIFILETYPE type, int base_no) {
 	if (type == DRIFILE_BGM)
@@ -84,6 +84,6 @@ void musbgm_wait(int no, int timeout) {
 	for (int i = 0; i * 16 < timeout * 10; i++) {
 		if (!musbgm_isplaying(no))
 			break;
-		sdl_wait_vsync();
+		sys_wait_vsync();
 	}
 }

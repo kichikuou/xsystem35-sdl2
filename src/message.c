@@ -29,7 +29,6 @@
 
 #include "portab.h"
 #include "windowframe.h"
-#include "sdl_core.h"
 #include "xsystem35.h"
 #include "message.h"
 #include "variable.h"
@@ -140,7 +139,7 @@ void msg_putMessage(const char *m) {
 				ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
 				break;
 			}
-			sdl_sleep(nact->messagewait_time * 10);
+			sys_sleep(nact->messagewait_time * 10);
 			nact->callback();
 		}
 	} else {

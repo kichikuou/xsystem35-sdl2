@@ -39,7 +39,6 @@
 #include "hankaku.h"
 #include "ags.h"
 #include "gfx.h"
-#include "sdl_core.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
 #include "hacks.h"
@@ -944,7 +943,7 @@ void commands2F5A() {
 	char *t1;
 	
 	t1 = toUTF8(sText);
-	sdl_showMessageBox(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
+	sys_show_message_box(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
 	free(t1);
 	
 	TRACE("strMessageBox %s:", sText);
@@ -955,7 +954,7 @@ void commands2F5B() {
 	char *t1;
 	
 	t1 = toUTF8(svar_get(eNum));
-	sdl_showMessageBox(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
+	sys_show_message_box(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
 	free(t1);
 	
 	TRACE("strMessageBoxStr %d:", eNum);
