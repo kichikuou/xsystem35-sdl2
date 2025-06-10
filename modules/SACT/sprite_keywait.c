@@ -133,7 +133,7 @@ void sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeou
 	{
 		// とりあえず、現在のマウス位置を送って、switch sprite の
 		// 状態を更新しておく
-		MyPoint p;
+		SDL_Point p;
 		sys_getMouseInfo(&p, false);
 		agsevent_t agse = {
 			.type = AGSEVENT_MOUSE_MOTION,

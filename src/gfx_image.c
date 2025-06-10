@@ -227,35 +227,24 @@ void gfx_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 /*
  * dib のピクセル情報を取得
  */
-void gfx_getPixel(int x, int y, Palette *cell) {
+uint32_t gfx_getPixel(int x, int y) {
 	uint8_t *p = PIXEL_AT(main_surface, x, y);
-	if (main_surface->format->BitsPerPixel == 8) {
-		cell->pixel = *p;
-	} else {
-		Uint32 cl=0;
-		
-		switch (main_surface->format->BytesPerPixel) {
-		case 2:
-			{
-				unsigned short *pp = (unsigned short *)p;
-				cl = *pp;
-			}
-			break;
-		case 3:
+
+	switch (main_surface->format->BytesPerPixel) {
+	case 1:
+		return *p;
+	case 2:
+		return *(unsigned short *)p;
+	case 3:
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-			cl = (p[2]<<16)+(p[1]<<8) + p[0];
+		return (p[2]<<16)+(p[1]<<8) + p[0];
 #else
-			cl = (p[0]<<16)+(p[1]<<8) + p[2];
+		return (p[0]<<16)+(p[1]<<8) + p[2];
 #endif
-			break;
-		case 4:
-			{
-				Uint32 *pp = (Uint32 *)p;
-				cl = *pp;
-			}
-			break;
-		}
-		SDL_GetRGB(cl, main_surface->format, &cell->r, &cell->g, &cell->b);
+	case 4:
+		return *(Uint32 *)p;
+	default:
+		return 0; // cannot happen
 	}
 }
 

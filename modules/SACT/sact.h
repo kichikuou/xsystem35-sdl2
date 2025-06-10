@@ -25,10 +25,9 @@
 #define __SACT_H__
 
 #include "config.h"
-
+#include <SDL_rect.h>
 #include "portab.h"
 #include "list.h"
-#include "graphics.h"
 #include "ags.h"
 #include "sacttimer.h"
 #include "variable.h"
@@ -107,7 +106,8 @@ struct _sprite {
 	int numsound1, numsound2, numsound3;
 	
 	// 初期 sprite の大きさ(cg1の大きさ)
-	MyDimension cursize;
+	int width;
+	int height;
 	
 	// それぞれの状態で表示する CG
 	cginfo_t *cg1, *cg2, *cg3;
@@ -126,10 +126,10 @@ struct _sprite {
 	int freezed_state;
 	
 	// 表示位置 (SetPos)
-	MyPoint loc;
+	SDL_Point loc;
 	
 	// 現在のスプライトの表示位置
-	MyPoint cur;
+	SDL_Point cur;
 	
 	// event callback
 	int (* eventcb)(struct _sprite *sp, agsevent_t *e);  // for key/mouse
@@ -146,7 +146,7 @@ struct _sprite {
 	
 	// move command 用パラメータ
 	struct {
-		MyPoint to;     // 移動先
+		SDL_Point to;     // 移動先
 		int time;       // 移動完了時間
 		int speed;      // 移動速度
 		int starttime;  // 移動開始時刻
@@ -157,7 +157,7 @@ struct _sprite {
 	// SACT.Numeral用パラメータ
 	struct {
 		int cg[10];
-		MyPoint pos;
+		SDL_Point pos;
 		int span;
 	} numeral;
 	
@@ -171,7 +171,7 @@ struct _sprite {
 		// ゲットスプライト
 		struct {
 			bool dragging;  // ドラッグ中
-			MyPoint dragstart; // ドラッグ開始位置
+			SDL_Point dragstart; // ドラッグ開始位置
 		} get;
 
 		// プットスプライト
@@ -191,7 +191,7 @@ struct _sprite {
 		struct {
 			SList    *buf;       // 表示する文字のリスト
 			struct SDL_Surface *canvas;
-			MyPoint    dspcur;    // 現在の表示位置
+			SDL_Point    dspcur;    // 現在の表示位置
 		} msg;
 	} u;
 };
@@ -213,7 +213,7 @@ struct _sact {
 	cginfo_t *cg[CGMAX]; // cgまたはCG_xxで作った CG
 	
 	// 座標系の原点
-	MyPoint origin;
+	SDL_Point origin;
 	
 	// 文字列 replce 用
 	SList *strreplace;
@@ -247,7 +247,7 @@ struct _sact {
 	int movestarttime; // 一斉に移動を開始するための開始時間
 	int movecurtime;
 	
-	MyRectangle updaterect; // 更新が必要なspriteの領域の和
+	SDL_Rect updaterect; // 更新が必要なspriteの領域の和
 	
 	// sact timer
 	stimer_t timer[65536];

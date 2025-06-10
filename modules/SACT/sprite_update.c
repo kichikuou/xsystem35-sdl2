@@ -30,7 +30,6 @@
 #include "system.h"
 #include "sdl_core.h"
 #include "ags.h"
-#include "graphics.h"
 #include "sact.h"
 #include "sprite.h"
 
@@ -43,16 +42,16 @@ static void do_update_each(void* data, void* userdata);
 
 // 領域１と領域２をすべて含む矩形領域を計算
 static void disjunction(void* region, void* data) {
-	MyRectangle *r1 = (MyRectangle *)region;
-	MyRectangle *r2 = (MyRectangle *)data;
+	SDL_Rect *r1 = (SDL_Rect *)region;
+	SDL_Rect *r2 = (SDL_Rect *)data;
 	SDL_UnionRect(r1, r2, r2);
 	free(r1);
 }
 
 // 更新の必要なスプライトの領域の和をとってクリッピングする
 static void get_updatearea() {
-	MyRectangle clip = {0, 0, 0, 0};
-	MyRectangle screen = {0, 0, main_surface->w, main_surface->h};
+	SDL_Rect clip = {0, 0, 0, 0};
+	SDL_Rect screen = {0, 0, main_surface->w, main_surface->h};
 	
 	slist_foreach(updatearea, disjunction, &clip);
 	
@@ -149,16 +148,16 @@ void sp_update_clipped() {
   @param sp: 更新するスプライト
 */
 void sp_updateme(sprite_t *sp) {
-	MyRectangle *r;
+	SDL_Rect *r;
 	
 	if (sp == NULL) return;
-	if (sp->cursize.width == 0 || sp->cursize.height == 0) return;
+	if (sp->width == 0 || sp->height == 0) return;
 	
-	r = malloc(sizeof(MyRectangle));
+	r = malloc(sizeof(SDL_Rect));
 	r->x = sp->cur.x;
 	r->y = sp->cur.y;
-	r->w = sp->cursize.width;
-	r->h = sp->cursize.height;
+	r->w = sp->width;
+	r->h = sp->height;
 	
 	updatearea = slist_append(updatearea, r);
 	
@@ -175,12 +174,12 @@ void sp_updateme(sprite_t *sp) {
   @param h: 更新領域高さ
 */
 void sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
-	MyRectangle *r;
+	SDL_Rect *r;
 	
 	if (sp == NULL) return;
 	if (w == 0 || h == 0) return;
 	
-	r = malloc(sizeof(MyRectangle));
+	r = malloc(sizeof(SDL_Rect));
 	r->x = sp->cur.x + x;
 	r->y = sp->cur.y + y;
 	r->w = w;

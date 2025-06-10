@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include "portab.h"
 #include "LittleEndian.h"
-#include "graphics.h"
 #include "cg.h"
 #include "bmp.h"
 

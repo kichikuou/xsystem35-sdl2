@@ -145,11 +145,11 @@ void sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	
 	// cg1の大きさをスプライトの大きさとする
 	if (sp->curcg == NULL) {
-		sp->cursize.width = 0;
-		sp->cursize.height = 0;
+		sp->width = 0;
+		sp->height = 0;
 	} else {
-		sp->cursize.width = sp->curcg->sf->w;
-		sp->cursize.height = sp->curcg->sf->h;
+		sp->width = sp->curcg->sf->w;
+		sp->height = sp->curcg->sf->h;
 	}
 	
 	sp->freezed_state = 0; // 状態固定は無し
@@ -201,8 +201,8 @@ void sp_new_msg(int no, int x, int y, int width, int height) {
 	sp->loc.y = y - sact.origin.y;
 	sp->u.msg.dspcur.x = 0; // 文字描画開始位置
 	sp->u.msg.dspcur.y = 0;
-	sp->cursize.width = width;  // スプライトの大きさ
-	sp->cursize.height = height;
+	sp->width = width;  // スプライトの大きさ
+	sp->height = height;
 	sp->cur = sp->loc;
 	sp->u.msg.buf = NULL;
 
@@ -224,10 +224,10 @@ void sp_set_wall_paper(int no) {
 
 	if (sp->curcg) { // display specified CG
 		sp->update = DEFAULT_UPDATE;
-		sp->cursize.width  = sp->curcg->sf->w;
-		sp->cursize.height = sp->curcg->sf->h;
+		sp->width  = sp->curcg->sf->w;
+		sp->height = sp->curcg->sf->h;
 	} else { // Black
-		sp->cursize.height = main_surface->h;
+		sp->height = main_surface->h;
 		sp->curcg = NULL;
 		sp->update = sp_draw_wall;
 	}
@@ -516,8 +516,8 @@ bool sp_query_size(int wNum, int *vw, int *vh) {
 
 	if (sp->type == SPRITE_NONE) goto errexit;
 
-	*vw = sp->cursize.width;
-	*vh = sp->cursize.height;
+	*vw = sp->width;
+	*vh = sp->height;
 	
 	return true;
 	

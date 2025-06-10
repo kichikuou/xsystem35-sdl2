@@ -101,7 +101,7 @@ void commandIM() {
 	/* マウスカーソルの座標取得 */
 	int *x_var = getCaliVariable();
 	int *y_var = getCaliVariable();
-	MyPoint p;
+	SDL_Point p;
 	
 	sysVar[0] = sys_getMouseInfo(&p, false);
 	*x_var = p.x;

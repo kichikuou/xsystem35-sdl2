@@ -29,7 +29,7 @@
 #include <SDL_surface.h>
 #include "portab.h"
 #include "cg.h"
-#include "graphics.h"
+#include "font.h"
 
 /* マウスカーソルの種類 */
 #define CURSOR_ARROW     1
@@ -111,13 +111,26 @@ typedef enum {
 	TEXT_DECORATION_DROP_SHADOW_OUTLINE = 10,
 } TextDecorationType;
 
+
+typedef struct {
+	uint8_t r, g, b;
+	uint32_t index;
+} PixelColor;
+
+typedef struct {
+	int width;
+	int height;
+	int depth;
+} DispInfo;
+
 struct _ags {
 	SDL_Color pal[256];         /* system palette */
 	bool   pal_changed;      /* system palette has changed */
-	
-	MyDimension world_size;     /* size of off-screen */
 
-	MyRectangle view_area;      /* view region in off-screen */
+	int world_width;
+	int world_height;
+
+	SDL_Rect view_area;      /* view region in off-screen */
 	
 	int world_depth;            /* depth of off-screen (bits per pixel) */
 
@@ -174,7 +187,7 @@ extern void ags_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int col
 extern void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, int lv);
 
 extern void ags_wrapColor(int x, int y, int w, int h, int p1, int p2);
-extern void ags_getPixel(int x, int y, Palette *cell);
+extern void ags_getPixel(int x, int y, PixelColor *cell);
 extern void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, uint8_t sprite);
 extern void ags_changeColorArea(int x, int y, int w, int h, int dst, int src, int cnt);
 
@@ -183,14 +196,14 @@ extern void ags_restoreRegion(void *region, int x, int y);
 extern void ags_putRegion(void *region, int x, int y);
 extern void ags_delRegion(void *region);
 
-extern int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out);
+extern int ags_drawString(int x, int y, const char *src, int col, SDL_Rect *rect_out);
 extern void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend);
 
 extern void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy);
 extern void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int col);
 extern void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv);
 extern void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv);
-extern MyRectangle ags_floodFill(int x, int y, int col);
+extern SDL_Rect ags_floodFill(int x, int y, int col);
 extern void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, bool cancel);
 extern void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt, bool cancel, int spCol);
 
@@ -228,7 +241,7 @@ extern int  ags_getCursorMoveTime();
 extern void    ags_setAntialiasedStringMode(bool mode);
 extern bool ags_getAntialiasedStringMode();
 extern void    ags_autorepeat(bool enable);
-extern bool ags_clipCopyRect(const MyRectangle *sr, const MyRectangle *dr, int *sx, int *sy, int *dx, int *dy, int *w, int *h);
+extern bool ags_clipCopyRect(const SDL_Rect *sr, const SDL_Rect *dr, int *sx, int *sy, int *dx, int *dy, int *w, int *h);
 
 typedef void (*ags_EffectStepFunc)(void *, float);
 void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, void *arg);

@@ -44,8 +44,8 @@ static void gre_BlendUseAMap(surface_t *dst, int dx, int dy, surface_t *src, int
 
 void gr_blend_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int sw, int sh) {
 	if (src == NULL || dst == NULL) return;
-	MyRectangle src_window = { 0, 0, src->width, src->height };
-	MyRectangle dst_window = { 0, 0, dst->width, dst->height };
+	SDL_Rect src_window = { 0, 0, src->width, src->height };
+	SDL_Rect dst_window = { 0, 0, dst->width, dst->height };
 	if (!ags_clipCopyRect(&src_window, &dst_window, &sx, &sy, &dx, &dy, &sw, &sh)) return;
 	
 	if (src->alpha == NULL) {

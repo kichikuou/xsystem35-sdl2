@@ -41,8 +41,8 @@
 
 #define SLOT 40
 
-static MyRectangle maprect;  /* アニメーション表示領域 */
-static MyRectangle mapback;  /* 背景セーブ領域 */
+static SDL_Rect maprect;  /* アニメーション表示領域 */
+static SDL_Rect mapback;  /* 背景セーブ領域 */
 static int mapback_p5;       /* 背景転送先 X */
 static int mapback_p6;       /* 背景転送先 Y */
 

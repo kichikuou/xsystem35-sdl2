@@ -3,7 +3,7 @@
 #define __SPRITE_H__
 
 #include "portab.h"
-#include "graphics.h"
+#include <SDL_rect.h>
 
 #define DEFAULT_UPDATE nt_sp_draw
 
@@ -72,7 +72,8 @@ struct _sprite {
 	
 	int no;
 	
-	MyDimension cursize;
+	int width;
+	int height;
 	
 	cginfo_t *curcg;
 	cginfo_t *cg1, *cg2, *cg3;
@@ -81,11 +82,11 @@ struct _sprite {
 	
 	int blendrate;
 	
-	MyPoint loc;
+	SDL_Point loc;
 	
-	MyPoint cur;
+	SDL_Point cur;
 
-	void (* update)(struct _sprite *sp, MyRectangle *updatearea);
+	void (* update)(struct _sprite *sp, SDL_Rect *updatearea);
 	
 	union {
 		struct {
@@ -97,7 +98,7 @@ struct _sprite {
 		
 		struct {
 			struct SDL_Surface *canvas;
-			MyPoint dspcur;
+			SDL_Point dspcur;
 		} msg;
 	} u;
 };
@@ -120,12 +121,12 @@ void nt_sp_updateme(sprite_t *sp);
 void nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
 void nt_sp_add_updatelist(sprite_t *sp);
 void nt_sp_remove_updatelist(sprite_t *sp);
-void nt_sp_draw_wall(sprite_t *sp, MyRectangle *r);
+void nt_sp_draw_wall(sprite_t *sp, SDL_Rect *r);
 void nt_sp_clear_updatelist(void);
 
 /* in nt_sprite_draw.c */
-void nt_sp_draw(sprite_t *sp, MyRectangle *r);
-void nt_sp_draw_scg(sprite_t *sp, MyRectangle *r);
+void nt_sp_draw(sprite_t *sp, SDL_Rect *r);
+void nt_sp_draw_scg(sprite_t *sp, SDL_Rect *r);
 
 /* in nt_sprite_eupdate.c */
 void nt_sp_eupdate(int type, int time, int cancel);

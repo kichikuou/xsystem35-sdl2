@@ -25,7 +25,8 @@
 #define __INPUT__
 
 #include "portab.h"
-#include "graphics.h"
+
+struct SDL_Point;
 
 #define SYS35KEY_NULL  0
 #define SYS35KEY_UP    1
@@ -159,7 +160,7 @@ enum keycode {
 extern bool RawKeyInfo[NUM_KEYCODES];
 
 extern int sys_keywait(int msec, unsigned flags);
-extern int sys_getMouseInfo(MyPoint *p, bool is_dibgeo);
+extern int sys_getMouseInfo(struct SDL_Point *p, bool is_dibgeo);
 extern int sys_getInputInfo(void);
 extern int sys_getKeyInfo(void);
 extern int sys_getJoyInfo(void);

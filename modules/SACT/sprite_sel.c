@@ -60,8 +60,8 @@ static int sel_main();
  *  マージン内はsprite内部とは判断しない
  */
 static bool sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
-	MyPoint p = {x, y};
-	MyRectangle r = {
+	SDL_Point p = {x, y};
+	SDL_Rect r = {
 		sp->cur.x + margin,
 		sp->cur.y + margin,
 		sp->curcg->sf->w - 2 * margin,

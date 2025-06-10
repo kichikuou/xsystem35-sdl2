@@ -87,20 +87,20 @@ static void initPal(void) {
 }
 
 bool ags_check_param(int *x, int *y, int *w, int *h) {
-	if (*x >= nact->ags.world_size.width) {
-		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)", *x, nact->ags.world_size.width, sl_getPage(), sl_getIndex());
+	if (*x >= nact->ags.world_width) {
+		WARNING("Illegal Param x = %d (max=%d)(@%03x:%05x)", *x, nact->ags.world_width, sl_getPage(), sl_getIndex());
 		return false;
 	}
-	if (*y >= nact->ags.world_size.height) {
-		WARNING("Illegal Param y = %d (max=%d)", *y, nact->ags.world_size.height);
+	if (*y >= nact->ags.world_height) {
+		WARNING("Illegal Param y = %d (max=%d)", *y, nact->ags.world_height);
 		return false;
 	}
 	
 	if (*x < 0) { *w += *x; *x = 0; }
 	if (*y < 0) { *h += *y; *y = 0; }
 	
-	if ((*x + *w) > nact->ags.world_size.width)  { *w = nact->ags.world_size.width  - *x;}
-	if ((*y + *h) > nact->ags.world_size.height) { *h = nact->ags.world_size.height - *y;}
+	if ((*x + *w) > nact->ags.world_width)  { *w = nact->ags.world_width  - *x;}
+	if ((*y + *h) > nact->ags.world_height) { *h = nact->ags.world_height - *y;}
 	
 	if (*w <= 0) return false;
 	if (*h <= 0) return false;
@@ -109,11 +109,11 @@ bool ags_check_param(int *x, int *y, int *w, int *h) {
 }
 
 bool ags_check_param_xy(int *x, int *y) {
-	if (*x >= nact->ags.world_size.width) {
+	if (*x >= nact->ags.world_width) {
 		WARNING("Illegal Param x = %d", *x);
 		return false;
 	}
-	if (*y >= nact->ags.world_size.height) {
+	if (*y >= nact->ags.world_height) {
 		WARNING("Illegal Param y = %d", *y);
 		return false;
 	}
@@ -126,8 +126,8 @@ bool ags_check_param_xy(int *x, int *y) {
 
 void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.mouse_warp_enabled = true;
-	nact->ags.world_size.width  =  SYS35_DEFAULT_WIDTH;
-	nact->ags.world_size.height =  SYS35_DEFAULT_HEIGHT;
+	nact->ags.world_width  =  SYS35_DEFAULT_WIDTH;
+	nact->ags.world_height =  SYS35_DEFAULT_HEIGHT;
 	nact->ags.world_depth =  SYS35_DEFAULT_DEPTH;
 	nact->ags.view_area.x = 0;
 	nact->ags.view_area.y = 0;
@@ -160,8 +160,8 @@ void ags_reset(void) {
 }
 
 void ags_setWorldSize(int width, int height, int depth) {
-	nact->ags.world_size.width  = width;
-	nact->ags.world_size.height = height;
+	nact->ags.world_width  = width;
+	nact->ags.world_height = height;
 	nact->ags.world_depth       = depth;
 
 	if (nact->ags.dib && nact->ags.dib->alpha) {
@@ -199,19 +199,19 @@ void ags_setWindowTitle(const char *title_utf8) {
 }
 
 void ags_getDIBInfo(DispInfo *info) {
-	info->width  = nact->ags.world_size.width;
-	info->height = nact->ags.world_size.height;
+	info->width  = nact->ags.world_width;
+	info->height = nact->ags.world_height;
 	info->depth  = nact->ags.world_depth;
 }
 
 void ags_getViewAreaInfo(DispInfo *info) {
-	gfx_getWindowInfo(info);
+	gfx_getWindowInfo(NULL, NULL, &info->depth);
 	info->width  = nact->ags.view_area.w;
 	info->height = nact->ags.view_area.h;
 }
 
 void ags_getWindowInfo(DispInfo *info) {
-	gfx_getWindowInfo(info);
+	gfx_getWindowInfo(&info->width, &info->height, &info->depth);
 }
 
 void ags_setExposeSwitch(bool expose) {
@@ -222,9 +222,9 @@ void ags_updateArea(int x, int y, int w, int h) {
 	if (fade_outed || !need_update)
 		return;
 
-	MyRectangle r = {x, y, w, h}, update;
+	SDL_Rect r = {x, y, w, h}, update;
 	if (SDL_IntersectRect(&nact->ags.view_area, &r, &update)) {
-		MyPoint p = {
+		SDL_Point p = {
 			update.x - nact->ags.view_area.x,
 			update.y - nact->ags.view_area.y
 		};
@@ -236,13 +236,13 @@ void ags_updateFull() {
 	if (fade_outed || !need_update)
 		return;
 
-	MyRectangle r = {
+	SDL_Rect r = {
 		nact->ags.view_area.x,
 		nact->ags.view_area.y,
-		min(nact->ags.view_area.w, nact->ags.world_size.width),
-		min(nact->ags.view_area.h, nact->ags.world_size.height)
+		min(nact->ags.view_area.w, nact->ags.world_width),
+		min(nact->ags.view_area.h, nact->ags.world_height)
 	};
-	MyPoint p = {0, 0};
+	SDL_Point p = {0, 0};
 	gfx_updateArea(&r, &p);
 }
 
@@ -313,10 +313,15 @@ void ags_wrapColor(int x, int y, int w, int h, int p1, int p2) {
 	gfx_wrapColor(x, y, w, h, p1, p2);
 }
 
-void ags_getPixel(int x, int y, Palette *cell) {
+void ags_getPixel(int x, int y, PixelColor *cell) {
 	if (!ags_check_param_xy(&x, &y)) return;
 
-	gfx_getPixel(x, y, cell);
+	uint32_t pixel = gfx_getPixel(x, y);
+	if (main_surface->format->BitsPerPixel == 8) {
+		cell->index = pixel;
+	} else {
+		SDL_GetRGB(pixel, main_surface->format, &cell->r, &cell->g, &cell->b);
+	}
 }
 
 void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, uint8_t sprite) {
@@ -383,7 +388,7 @@ void ags_delRegion(void *region) {
 	gfx_delRegion(region);
 }
 
-int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out) {
+int ags_drawString(int x, int y, const char *src, int col, SDL_Rect *rect_out) {
 	if (!ags_check_param_xy(&x, &y)) {
 		if (rect_out) {
 			rect_out->x = x;
@@ -394,7 +399,7 @@ int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out
 		return 0;
 	}
 	
-	MyRectangle adj;
+	SDL_Rect adj;
 	char *utf8 = toUTF8(src);
 	switch(nact->ags.text_decoration_type) {
 	case TEXT_DECORATION_NONE:
@@ -509,9 +514,9 @@ void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int l
 	gfx_copyAreaSP16_alphaBlend(sx, sy, w, h, dx, dy, lv);
 }
 
-MyRectangle ags_floodFill(int x, int y, int col) {
+SDL_Rect ags_floodFill(int x, int y, int col) {
 	if (!ags_check_param_xy(&x, &y))
-		return (MyRectangle){};
+		return (SDL_Rect){};
 
 	return gfx_floodFill(x, y, col);
 }
@@ -722,7 +727,7 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 	}
 #else
 	if (nact->ags.mouse_warp_enabled) {
-		MyPoint p;
+		SDL_Point p;
 		sys_getMouseInfo(&p, is_dibgeo);
 		int dx = x - p.x;
 		int dy = y - p.y;
@@ -778,7 +783,7 @@ void ags_autorepeat(bool enable) {
 	sdl_setAutoRepeat(enable);
 }
 
-bool ags_clipCopyRect(const MyRectangle *sw, const MyRectangle *dw, int *sx, int *sy, int *dx, int *dy, int *w, int *h) {
+bool ags_clipCopyRect(const SDL_Rect *sw, const SDL_Rect *dw, int *sx, int *sy, int *dx, int *dy, int *w, int *h) {
 	// Clip source rectangle to source window
 	SDL_Rect sr = {*sx, *sy, *w, *h};
 	if (!SDL_IntersectRect(&sr, sw, &sr))

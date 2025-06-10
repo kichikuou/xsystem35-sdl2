@@ -22,7 +22,7 @@ typedef struct {
 
 static void *mapdata[NUM_MAPS];
 static int setChipParam_index;
-static MyRectangle chip_params[NUM_LAYERS];
+static SDL_Rect chip_params[NUM_LAYERS];
 static int window_width;
 static int window_height;
 static int map_width;
@@ -68,7 +68,7 @@ static void MakeMapSetChipParam() {
 		WARNING("unexpected MakeMapSeChipParam call");
 		return;
 	}
-	MyRectangle *r = &chip_params[setChipParam_index++];
+	SDL_Rect *r = &chip_params[setChipParam_index++];
 	r->x = p1;
 	r->y = p2;
 	r->w = p3;
@@ -93,9 +93,9 @@ static void MakeMapDraw() {
 			int c1 = a1[index];
 			int c2 = a2[index];
 			int c3 = a3[index];
-			MyRectangle *r1 = &chip_params[0];
-			MyRectangle *r2 = &chip_params[1];
-			MyRectangle *r3 = &chip_params[2];
+			SDL_Rect *r1 = &chip_params[0];
+			SDL_Rect *r2 = &chip_params[1];
+			SDL_Rect *r3 = &chip_params[2];
 			surface_t *dib = ags_getDIB();
 			if (c3) {
 				ags_copyArea(r3->x + c3 * r3->w, r3->y, r3->w, r3->h, dstX + x * r3->w, dstY + y * r3->h);

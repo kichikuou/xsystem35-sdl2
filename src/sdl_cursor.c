@@ -138,7 +138,7 @@ bool sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEn
 	return true;
 }
 
-MyPoint sdl_translateMouseCoords(int x, int y) {
+SDL_Point sdl_translateMouseCoords(int x, int y) {
 	// scale mouse x and y
 	float scalex, scaley;
 	SDL_RenderGetScale(gfx_renderer, &scalex, &scaley);
@@ -163,13 +163,13 @@ MyPoint sdl_translateMouseCoords(int x, int y) {
 	x += border_left;
 	y += border_top;
 
-	MyPoint p = { x, y };
+	SDL_Point p = { x, y };
 	return p;
 }
 
 /* マウスの位置の移動 */
 void sdl_setCursorLocation(int x, int y) {
-	MyPoint t = sdl_translateMouseCoords(x, y);
+	SDL_Point t = sdl_translateMouseCoords(x, y);
 	SDL_WarpMouseInWindow(gfx_window, t.x, t.y);
 }
 

@@ -57,7 +57,7 @@ void commandG1() {
 
 void commandGS() {
         /* num 番にリンクされているＣＧの座標とサイズを取得する */
-	MyRectangle r;
+	SDL_Rect r;
 	int num = getCaliValue();
 	int *var = getCaliVariable();
 

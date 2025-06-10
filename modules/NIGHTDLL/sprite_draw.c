@@ -29,7 +29,6 @@
 #include "portab.h"
 #include "system.h"
 #include "ags.h"
-#include "graphics.h"
 #include "sprite.h"
 
 /*
@@ -37,7 +36,7 @@
  @param sp: 描画するスプライト
  @param r : 再描画する領域
 */
-void nt_sp_draw(sprite_t *sp, MyRectangle *r) {
+void nt_sp_draw(sprite_t *sp, SDL_Rect *r) {
 	if (sp == NULL) return;
 	cginfo_t *cg = sp->curcg;
 	if (cg == NULL) return;
@@ -69,7 +68,7 @@ void nt_sp_draw(sprite_t *sp, MyRectangle *r) {
 }
 
 // BlendScreenによる描画
-void nt_sp_draw_scg(sprite_t *sp, MyRectangle *r) {
+void nt_sp_draw_scg(sprite_t *sp, SDL_Rect *r) {
 	if (sp == NULL) return;
 	cginfo_t *cg = sp->curcg;
 	if (cg == NULL) return;

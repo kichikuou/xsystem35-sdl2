@@ -3,7 +3,6 @@
 
 #include "config.h"
 #include "portab.h"
-#include "graphics.h"
 #include "ags.h"
 #include "sprite.h"
 
@@ -42,7 +41,7 @@ struct _night {
 	// graph
 	// cginfo_t *cg[CGMAX];
 
-	MyRectangle updaterect;
+	SDL_Rect updaterect;
 
 	FontType fonttype;
 	int fontsize;

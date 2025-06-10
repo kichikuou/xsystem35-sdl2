@@ -26,7 +26,8 @@
 
 #include "portab.h"
 #include "windowframe.h"
-#include "graphics.h"
+
+struct SDL_Point;
 
 extern void msg_init();
 extern void msg_setFontSize(int size);
@@ -36,7 +37,7 @@ extern void msg_nextPage(bool clear);
 extern void msg_hitAnyKey();
 extern void msg_openWindow(int W, int C1, int C2, int N, int M);
 extern void msg_setMessageLocation(int x, int y);
-extern void msg_getMessageLocation(MyPoint *loc);
+extern void msg_getMessageLocation(struct SDL_Point *loc);
 extern void msg_mg6_command(int cmd);
 
 struct __message {

@@ -211,12 +211,12 @@ void gfx_setWorldSize(int width, int height, int depth) {
 }
 
 /* display の size と depth の取得 */
-void gfx_getWindowInfo(DispInfo *info) {
+void gfx_getWindowInfo(int *width, int *height, int *depth) {
 	SDL_DisplayMode dm;
 	SDL_GetCurrentDisplayMode(0, &dm);
-	info->width  = dm.w;
-	info->height = dm.h;
-	info->depth  = SDL_BITSPERPIXEL(dm.format);
+	if (width)  *width  = dm.w;
+	if (height) *height = dm.h;
+	if (depth)  *depth  = SDL_BITSPERPIXEL(dm.format);
 }
 
 /*  DIBの取得 */

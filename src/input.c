@@ -51,8 +51,8 @@ void set_hak_keymode(int key, int mode) {
 	}
 }
 
-int sys_getMouseInfo(MyPoint *p, bool is_dibgeo) {
-	MyPoint _p;
+int sys_getMouseInfo(SDL_Point *p, bool is_dibgeo) {
+	SDL_Point _p;
 	int key = sdl_getMouseInfo(&_p);
 	
 	if (p) {

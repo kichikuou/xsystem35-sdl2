@@ -26,7 +26,6 @@
 #include <SDL.h>
 #include "portab.h"
 #include "system.h"
-#include "graphics.h"
 #include "nact.h"
 #include "ags.h"
 #include "cg.h"
@@ -57,7 +56,7 @@ int cg_brightness;
 
 /* CG表示位置に関する情報 */
 static CG_WHERETODISP loc_policy, loc_policy0;
-static MyPoint        loc_where, loc_where0;
+static SDL_Point        loc_where, loc_where0;
 
 /* extracted cg data cache control object */
 static cacher *cacheid;
@@ -65,7 +64,7 @@ static cacher *cacheid;
 /* static methods */
 static CG_TYPE check_cgformat(uint8_t *data);
 static void set_vspbank(uint8_t *pic, int bank, int width, int height);
-static MyPoint set_display_loc(cgdata *cg);
+static SDL_Point set_display_loc(cgdata *cg);
 static void clear_display_loc();
 static void display_cg(cgdata *cg, int x, int y, int sprite_color, bool alpha_blend);
 static cgdata *loader(int no);
@@ -131,8 +130,8 @@ void cgdata_free(cgdata *cg) {
  *  cg: cg information
  *  return: x and y for display location
 */
-static MyPoint set_display_loc(cgdata *cg) {
-	MyPoint p;
+static SDL_Point set_display_loc(cgdata *cg) {
+	SDL_Point p;
 	
 	switch(loc_policy) {
 	case OFFSET_ABSOLUTE_GC:
@@ -288,7 +287,7 @@ void cg_set_display_location(int x, int y, CG_WHERETODISP policy) {
 */
 void cg_load(int no, int flg) {
 	cgdata *cg;
-	MyPoint p;
+	SDL_Point p;
 	int i, bank = cg_vspPB;
 	
 	/* load and extract cg */
@@ -361,7 +360,7 @@ void cg_load(int no, int flg) {
 */
 void cg_load_with_alpha(int cgno, int shadowno) {
 	cgdata *cg = NULL, *scg;
-	MyPoint p;
+	SDL_Point p;
 	
 	/* load pixel */
 	if (cgno >= 0) {
@@ -441,7 +440,7 @@ int cg_load_with_filename(char *fname_utf8, int x, int y) {
 	long filesize;
 	uint8_t *data;
 	cgdata *cg = NULL;
-	MyPoint p;
+	SDL_Point p;
 	
 	data = load_cg_from_file(fname_utf8, &status, &filesize);
 	if (data == NULL) return status;
@@ -490,9 +489,9 @@ int cg_load_with_filename(char *fname_utf8, int x, int y) {
  *   no  : file no for cg ( >= 0 )
  *   info: information to be retored
 */
-void cg_get_info(int no, MyRectangle *info) {
+void cg_get_info(int no, SDL_Rect *info) {
 	cgdata *cg = loader(no);
-	MyPoint p;
+	SDL_Point p;
 	
 	if (cg == NULL) {
 		info->x = info->y = info->w = info->h = 0;

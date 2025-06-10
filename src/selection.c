@@ -57,12 +57,12 @@ static int regnum;
 /* 選択肢の要素の最大長さ */
 static int maxElementLength;
 /* 選択肢ウィンド退避 */
-static MyRectangle saveArea;
+static SDL_Rect saveArea;
 /* 選択ウィンドの退避用 */
 static void *saveimg;
 static void *saveimg2;
 /* 選択時のワーク */
-static MyRectangle *workR;
+static SDL_Rect *workR;
 /* callback functions 初期化/選択/キャンセル時に呼ばれるシナリオ内関数*/
 static int cb_select_page;
 static int cb_select_address;
@@ -265,7 +265,7 @@ void sel_fixElement() {
 /* 選択肢ウィンドを開く為の準備 */
 static void init_selwindow() {
 	int i;
-	MyRectangle r;
+	SDL_Rect r;
 	
 	r.x = sel.win->x;
 	r.y = sel.win->y;
@@ -311,7 +311,7 @@ static void init_selwindow() {
 	/* マウスカーソルの自動移動 */
 	int x = r.x + r.w * MOUSE_INIT_X_RATIO/100;
 	if (default_element == 0) {
-		MyPoint p;
+		SDL_Point p;
 		sys_getMouseInfo(&p, true);
 		if (p.y < r.y) {
 			int y = r.y + (sel.MsgFontSize +2) * MOUSE_INIT_Y_RATIO/100;
@@ -342,8 +342,8 @@ static void remove_selwindow() {
 
 static int whereElement(void) {
 	int i;
-	MyPoint p;
-	MyRectangle *r = workR;
+	SDL_Point p;
+	SDL_Rect *r = workR;
 	static int mpx, mpy;
 	
 	sys_getMouseInfo(&p, true);
@@ -367,7 +367,7 @@ static int whereElement(void) {
 	return -1;
 }
 
-static void lineEncloseElement(MyRectangle *r, int col, bool thick) {
+static void lineEncloseElement(SDL_Rect *r, int col, bool thick) {
 	ags_drawRectangle(r->x, r->y, r->w + 2, r->h + 2, col);
 	if (thick)
 		ags_drawRectangle(r->x + 1, r->y + 1, r->w, r->h, col);
@@ -375,7 +375,7 @@ static void lineEncloseElement(MyRectangle *r, int col, bool thick) {
 }
 
 static void encloseElement(int sw, int no) {
-	MyRectangle *r = &workR[no];
+	SDL_Rect *r = &workR[no];
 	
 	if (sw == 0) { /* off */
 		if (sel.WinBackgroundTransparent != 255) {
@@ -445,7 +445,7 @@ void sel_select() {
 	init_selwindow();
 
 	/* マウス領域の初期化 */
-	if (NULL == (workR = malloc(sizeof(MyRectangle) * regnum))) {
+	if (NULL == (workR = malloc(sizeof(SDL_Rect) * regnum))) {
 		NOMEMERR();
 	}
 

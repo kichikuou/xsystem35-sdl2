@@ -156,10 +156,10 @@ void commandPT0() {
 	int *var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Palette cell;
+	PixelColor cell;
 	
 	ags_getPixel(x, y, &cell);
-	*var = cell.pixel;
+	*var = cell.index;
 	
 	TRACE("PT0 %p,%d,%d:", var, x, y);
 }
@@ -171,7 +171,7 @@ void commandPT1() {
 	int *b_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Palette cell;
+	PixelColor cell;
 	
 	ags_getPixel(x, y, &cell);
 	*r_var = cell.r;
@@ -187,7 +187,7 @@ void commandPT2() {
 	int *low_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Palette cell;
+	PixelColor cell;
 	int r, g, b, pic;
 	
 	ags_getPixel(x, y, &cell);

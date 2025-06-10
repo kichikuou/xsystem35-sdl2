@@ -104,7 +104,7 @@ void sdl_wait_vsync() {
 }
 
 /* off-screen の指定領域を Main Window へ転送 */
-void gfx_updateArea(MyRectangle *rect, MyPoint *dst) {
+void gfx_updateArea(SDL_Rect *rect, SDL_Point *dst) {
 	SDL_Rect sw = {0, 0, main_surface->w, main_surface->h};
 	SDL_Rect dw = {0, 0, view_w, view_h};
 	SDL_Rect sr = {rect->x, rect->y, rect->w, rect->h};
@@ -123,8 +123,8 @@ void gfx_updateArea(MyRectangle *rect, MyPoint *dst) {
 }
 
 /* 全画面更新 */
-void gfx_updateAll(MyRectangle *view_rect) {
-	gfx_updateArea(view_rect, &(MyPoint){0, 0});
+void gfx_updateAll(SDL_Rect *view_rect) {
+	gfx_updateArea(view_rect, &(SDL_Point){0, 0});
 }
 
 /* Color の複数個指定 */

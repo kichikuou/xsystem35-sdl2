@@ -36,7 +36,6 @@
 #include <string.h>
 #include "portab.h"
 #include "LittleEndian.h"
-#include "graphics.h"
 #include "cg.h"
 #include "pms.h"
 

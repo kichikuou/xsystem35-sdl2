@@ -25,7 +25,6 @@
 #define __NACT_H__
 
 #include "portab.h"
-#include "graphics.h"
 #include "s39ain.h"
 #include "gameresource.h"
 #include "selection.h"

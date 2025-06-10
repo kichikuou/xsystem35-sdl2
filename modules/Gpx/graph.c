@@ -33,8 +33,8 @@
  */
 bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, int *dx, int *dy) {
 	if (!ss || !ds) return false;
-	MyRectangle src_window = { 0, 0, ss->width, ss->height };
-	MyRectangle dst_window = { 0, 0, ds->width, ds->height };
+	SDL_Rect src_window = { 0, 0, ss->width, ss->height };
+	SDL_Rect dst_window = { 0, 0, ds->width, ds->height };
 	return ags_clipCopyRect(&src_window, &dst_window, sx, sy, dx, dy, sw, sh);
 }
 

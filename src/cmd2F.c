@@ -108,7 +108,7 @@ void commands2F04() {
 
 void commands2F05() {
 	/* 現在のテキスト表示位置をスタックにプッシュする */
-	MyPoint loc;
+	SDL_Point loc;
 	msg_getMessageLocation(&loc);
 	sl_pushTextLoc(loc.x, loc.y);
 	TRACE("TPP:");
@@ -782,8 +782,8 @@ void commands2F4C() {
 	int eWidth  = getCaliValue();
 	int eHeight = getCaliValue();
 
-	MyRectangle r = {eSrcX, eSrcY, eWidth, eHeight};
-	MyPoint p = {eX, eY};
+	SDL_Rect r = {eSrcX, eSrcY, eWidth, eHeight};
+	SDL_Point p = {eX, eY};
 	
 	gfx_updateArea(&r, &p);
 	

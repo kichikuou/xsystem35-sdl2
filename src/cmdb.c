@@ -134,7 +134,7 @@ void commandB4() {
 }
 
 void commandB10() {
-	MyPoint p;
+	SDL_Point p;
 	int *x_var = getCaliVariable();
 	int *y_var = getCaliVariable();
 	

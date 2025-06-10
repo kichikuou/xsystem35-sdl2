@@ -24,7 +24,7 @@
 #ifndef __DRAWTEXT_H__
 #define __DRAWTEXT_H__
 
-#include "graphics.h"
+#include "font.h"
 
 struct SDL_Surface;
 

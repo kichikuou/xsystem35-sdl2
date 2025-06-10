@@ -217,7 +217,7 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 	char *msg;
 	sprite_t *sp;
 	bool needupdate = false;
-	MyRectangle uparea = {0,0,0,0};
+	SDL_Rect uparea = {0,0,0,0};
 	int savex;
 	
 	if (night.msgbuf[0] == '\0') return;
@@ -284,8 +284,8 @@ static void ntmsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB
 	
 	// Waitなしの出力は最後にupdate
 	if (needupdate) {
-		uparea.w = sp->cursize.width;
-		uparea.h = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace);
+		uparea.w = sp->width;
+		uparea.h = min(sp->height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace);
 		nt_sp_updateme_part(sp, uparea.x, uparea.y, uparea.w, uparea.h);
 	}
 	
@@ -355,8 +355,8 @@ static void set_align(char *msg, sprite_t *sp, int wSize) {
 		
 		maxchar = max(maxchar, c);
 		line++;
-		sp->u.msg.dspcur.x = (sp->cursize.width - (maxchar * wSize/2)) /2;
-		sp->u.msg.dspcur.y = (sp->cursize.height - (line * (wSize+2))) /2;
+		sp->u.msg.dspcur.x = (sp->width - (maxchar * wSize/2)) /2;
+		sp->u.msg.dspcur.y = (sp->height - (line * (wSize+2))) /2;
 		break;
 	case 2:
 		sp->u.msg.dspcur.x = msgframe_2.x;
@@ -436,14 +436,14 @@ static void hakanim(int i) {
 	sp->show = show;
 }
 
-void ntmsg_update(sprite_t *sp, MyRectangle *r) {
-	SDL_Rect sp_rect = {0, 0, sp->cursize.width, sp->cursize.height};
+void ntmsg_update(sprite_t *sp, SDL_Rect *r) {
+	SDL_Rect sp_rect = {0, 0, sp->width, sp->height};
 	int sx = 0;
 	int sy = 0;
 	int dx = sp->cur.x;
 	int dy = sp->cur.y;
-	int w = sp->cursize.width;
-	int h = sp->cursize.height;
+	int w = sp->width;
+	int h = sp->height;
 	if (!ags_clipCopyRect(&sp_rect, r, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}

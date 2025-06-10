@@ -53,8 +53,8 @@ void nt_gr_set_wallpaper(int no) {
 	sp = nt_sp_new(SPNO_WALL, no, 0, 0, SPRITE_WP);
 	nt_sp_add_updatelist(sp);
 	if (no == 0) {
-		sp->cursize.width  = main_surface->w;
-		sp->cursize.height = main_surface->h;
+		sp->width  = main_surface->w;
+		sp->height = main_surface->h;
 		sp->update = nt_sp_draw_wall;
 	}
 	

@@ -26,10 +26,9 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "ags.h"
-#include "graphics.h"
 
 typedef struct {
-	MyRectangle r;
+	SDL_Rect r;
 	int pal;
 } Ecomtbl;
 
@@ -55,7 +54,7 @@ void commandES() {
 void commandEC() {
 	int num = getCaliValue();
 	Ecomtbl *e;
-	MyRectangle *r;
+	SDL_Rect *r;
 	
 	if (num == 0) {
 		r = &nact->ags.view_area;
@@ -91,8 +90,8 @@ void commandEM() {
 	int x    = getCaliValue();
 	int y    = getCaliValue();
 
-	MyPoint p = {x, y};
-	MyRectangle r = tbl[num - 1].r;
+	SDL_Point p = {x, y};
+	SDL_Rect r = tbl[num - 1].r;
 	if (nact->patch_emen == 0) {
 		r.w -= 1;
 		r.h -= 1;
@@ -108,11 +107,11 @@ void commandEN() {
 	int x    = getCaliValue();
 	int y    = getCaliValue();
 	
-	MyPoint p = {x, y};
+	SDL_Point p = {x, y};
 	*var = 0;
 	
 	for (int i = min; i <= max; i++) {
-		MyRectangle r = tbl[i - 1].r;
+		SDL_Rect r = tbl[i - 1].r;
 		if (nact->patch_emen == 0) {
 			r.w -= 1;
 			r.h -= 1;

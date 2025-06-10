@@ -241,7 +241,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	sprite_t *sp;
 	int len = 0; // 処理した文字数?
 	bool needupdate = false;
-	MyRectangle uparea = {0,0,0,0};
+	SDL_Rect uparea = {0,0,0,0};
 	
 	// wRSize == 0 -> ルビ無し(SACT.MessageOutputからの呼出)
 
@@ -335,8 +335,8 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	
 	// Waitなしの出力は最後にupdate
 	if (needupdate) {
-		uparea.w = sp->cursize.width;
-		uparea.h = min(sp->cursize.height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
+		uparea.w = sp->width;
+		uparea.h = min(sp->height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
 		sp_updateme_part(sp, uparea.x, uparea.y, uparea.w, uparea.h);
 	}
 	
@@ -447,13 +447,13 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
   @param sp: 再描画するスプライト
  */
 void smsg_update(sprite_t *sp) {
-	SDL_Rect sp_rect = {0, 0, sp->cursize.width, sp->cursize.height};
+	SDL_Rect sp_rect = {0, 0, sp->width, sp->height};
 	int sx = 0;
 	int sy = 0;
 	int dx = sp->cur.x;
 	int dy = sp->cur.y;
-	int w = sp->cursize.width;
-	int h = sp->cursize.height;
+	int w = sp->width;
+	int h = sp->height;
 	if (!ags_clipCopyRect(&sp_rect, &sact.updaterect, &sx, &sy, &dx, &dy, &w, &h)) {
 		return;
 	}
@@ -547,10 +547,10 @@ static void set_align(char *msg, sprite_t *sp, int wSize, int wAlign) {
 		
 		switch (wAlign) {
 		case 1: // センタリング
-			adjx = (sp->cursize.width - mlen) / 2;
+			adjx = (sp->width - mlen) / 2;
 			break;
 		case 2: // 右寄せ
-			adjx = (sp->cursize.width - mlen);
+			adjx = (sp->width - mlen);
 			break;
 		}
 		sp->u.msg.dspcur.x = max(0, adjx);

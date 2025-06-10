@@ -265,7 +265,7 @@ void commandCP() {
 	int y     = getCaliValue();
 	int color = getCaliValue();
 
-	MyRectangle rec = ags_floodFill(x, y, color);
+	SDL_Rect rec = ags_floodFill(x, y, color);
 	if (!SDL_RectEmpty(&rec))
 		ags_updateArea(rec.x, rec.y, rec.w, rec.h);
 

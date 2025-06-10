@@ -31,7 +31,6 @@
 #include "system.h"
 #include "list.h"
 #include "ags.h"
-#include "graphics.h"
 #include "sprite.h"
 
 // スプライト再描画間の間に変更のあったスプライトの領域の和
@@ -41,22 +40,22 @@ static SList *updatearea;
 static SList *updatelist;
 
 static void disjunction(void* region, void* data);
-static MyRectangle get_updatearea();
+static SDL_Rect get_updatearea();
 static void do_update_each(void* data, void* userdata);
 
 // 領域１と領域２をすべて含む矩形領域を計算
 static void disjunction(void* region, void* data) {
-	MyRectangle *r1 = (MyRectangle *)region;
-	MyRectangle *r2 = (MyRectangle *)data;
+	SDL_Rect *r1 = (SDL_Rect *)region;
+	SDL_Rect *r2 = (SDL_Rect *)data;
 	SDL_UnionRect(r1, r2, r2);
 	free(r1);
 }
 
 // 更新の必要なスプライトの領域の和をとってクリッピングする
-static MyRectangle get_updatearea() {
-	MyRectangle clip = {0, 0, 0, 0};
-	MyRectangle screen = {0, 0, main_surface->w, main_surface->h};
-	MyRectangle result;
+static SDL_Rect get_updatearea() {
+	SDL_Rect clip = {0, 0, 0, 0};
+	SDL_Rect screen = {0, 0, main_surface->w, main_surface->h};
+	SDL_Rect result;
 	
 	slist_foreach(updatearea, disjunction, &clip);
 	
@@ -75,7 +74,7 @@ static MyRectangle get_updatearea() {
 // updatelist に登録してあるすべてのスプライトを更新
 static void do_update_each(void* data, void* userdata) {
 	sprite_t *sp = (sprite_t *)data;
-	MyRectangle *r = (MyRectangle *)userdata;
+	SDL_Rect *r = (SDL_Rect *)userdata;
 	
 	// 非表示の場合はなにもしない
 	if (!sp->show) return;
@@ -92,7 +91,7 @@ static void do_update_each(void* data, void* userdata) {
  */
 void nt_sp_update_all(bool syncscreen) {
 	// 画面全体を更新領域に
-	MyRectangle r = {0, 0, main_surface->w, main_surface->h };
+	SDL_Rect r = {0, 0, main_surface->w, main_surface->h };
 	
 	// updatelistに登録してあるスプライトを再描画
 	// updatelistはスプライトの番号順に並んでいる
@@ -111,7 +110,7 @@ void nt_sp_update_all(bool syncscreen) {
    updateme(_part)で登録した更新が必要なspriteの和の領域をupdate
 */
 void nt_sp_update_clipped() {
-	MyRectangle r;
+	SDL_Rect r;
 	
 	// 更新領域の確定
 	r = get_updatearea();
@@ -131,16 +130,16 @@ void nt_sp_update_clipped() {
   @param sp: 更新するスプライト
 */
 void nt_sp_updateme(sprite_t *sp) {
-	MyRectangle *r;
+	SDL_Rect *r;
 	
 	if (sp == NULL) return;
-	if (sp->cursize.width == 0 || sp->cursize.height == 0) return;
+	if (sp->width == 0 || sp->height == 0) return;
 	
-	r = malloc(sizeof(MyRectangle));
+	r = malloc(sizeof(SDL_Rect));
 	r->x = sp->cur.x;
 	r->y = sp->cur.y;
-	r->w = sp->cursize.width;
-	r->h = sp->cursize.height;
+	r->w = sp->width;
+	r->h = sp->height;
 	
 	updatearea = slist_append(updatearea, r);
 	
@@ -157,12 +156,12 @@ void nt_sp_updateme(sprite_t *sp) {
   @param h: 更新領域高さ
 */
 void nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h) {
-	MyRectangle *r;
+	SDL_Rect *r;
 	
 	if (sp == NULL) return;
 	if (w == 0 || h == 0) return;
 	
-	r = malloc(sizeof(MyRectangle));
+	r = malloc(sizeof(SDL_Rect));
 	r->x = sp->cur.x + x;
 	r->y = sp->cur.y + y;
 	r->w = w;
@@ -204,6 +203,6 @@ void nt_sp_clear_updatelist(void) {
 }
 
 // デフォルトの壁紙update
-void nt_sp_draw_wall(sprite_t *sp, MyRectangle *area) {
+void nt_sp_draw_wall(sprite_t *sp, SDL_Rect *area) {
 	SDL_FillRect(main_surface, area, SDL_MapRGB(main_surface->format, 0, 0, 0));
 }

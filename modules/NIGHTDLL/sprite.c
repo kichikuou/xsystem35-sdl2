@@ -28,11 +28,11 @@ sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	sp->cur = sp->loc;
 	
 	if (sp->curcg == NULL) {
-		sp->cursize.width  = 0;
-		sp->cursize.height = 0;
+		sp->width  = 0;
+		sp->height = 0;
 	} else {
-		sp->cursize.width  = sp->curcg->sf->w;
-		sp->cursize.height = sp->curcg->sf->h;
+		sp->width  = sp->curcg->sf->w;
+		sp->height = sp->curcg->sf->h;
 	}
 	sp->update = DEFAULT_UPDATE;
 	
@@ -58,8 +58,8 @@ sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height) {
 	sp->loc.x = x;
 	sp->loc.y = y;
 	sp->cur = sp->loc;
-	sp->cursize.width  = width;
-	sp->cursize.height = height;
+	sp->width  = width;
+	sp->height = height;
 	sp->u.msg.dspcur.x = 0;
 	sp->u.msg.dspcur.y = 0;
 	sp->u.msg.canvas = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
@@ -107,11 +107,11 @@ void nt_sp_set_cg(sprite_t *sp, int no) {
 	cg = no ? nt_scg_addref(no) : NULL;
 	
 	if (cg == NULL) {
-		sp->cursize.width  = 0;
-		sp->cursize.height = 0;
+		sp->width  = 0;
+		sp->height = 0;
 	} else {
-		sp->cursize.width  = cg->sf->w;
-		sp->cursize.height = cg->sf->h;
+		sp->width  = cg->sf->w;
+		sp->height = cg->sf->h;
 	}
 
 	sp->curcg = cg;

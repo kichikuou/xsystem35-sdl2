@@ -27,7 +27,12 @@
 #include <SDL_surface.h>
 #include "config.h"
 #include "portab.h"
-#include "graphics.h"
+
+typedef enum {
+	FONT_GOTHIC,
+	FONT_MINCHO,
+} FontType;
+#define FONTTYPEMAX 2
 
 #define FONT_WEIGHT_NORMAL 4
 #define FONT_WEIGHT_BOLD 7

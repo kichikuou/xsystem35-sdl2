@@ -49,7 +49,7 @@
 static int frameType;
 static int frameDot;
 /* 現在の文字表示位置 */
-static MyPoint msgcur;
+static SDL_Point msgcur;
 static bool nextLineIsAfterKaigyou = false;
 
 /* Private Methods */
@@ -126,7 +126,7 @@ void msg_putMessage(const char *m) {
 	
 	ags_setFontWithWeight(nact->ags.font_type, msg.MsgFontSize, nact->ags.font_weight);
 
-	MyRectangle drawn;
+	SDL_Rect drawn;
 	msgcur.x += ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor, &drawn);
 
 	if (nact->messagewait_enable && nact->messagewait_time > 0 &&
@@ -265,7 +265,7 @@ void msg_setMessageLocation(int x, int y) {
 	nextLineIsAfterKaigyou = false;
 }
 
-void msg_getMessageLocation(MyPoint *loc) {
+void msg_getMessageLocation(SDL_Point *loc) {
 	loc->x = msgcur.x;
 	loc->y = msgcur.y;
 }
@@ -276,7 +276,7 @@ void msg_hitAnyKey() {
 		[UTF8] = "▼",
 	};
 	
-	MyRectangle r;
+	SDL_Rect r;
 	int x = msg.win->x + msg.win->width - msg.MsgFontSize;
 	int y = msg.win->y + msg.win->height - msg.MsgFontSize;
 	ags_drawString(x, y, prompt[nact->encoding], msg.HitAnyKeyMsgColor, &r);

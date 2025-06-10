@@ -519,7 +519,7 @@ int sdl_getKeyInfo() {
 	return rt;
 }
 
-int sdl_getMouseInfo(MyPoint *p) {
+int sdl_getMouseInfo(SDL_Point *p) {
 	sdl_getEvent();
 	
 	if (p) {

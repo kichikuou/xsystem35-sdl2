@@ -24,8 +24,8 @@
 #ifndef __CG__
 #define __CG__
 
+#include <SDL_rect.h>
 #include "portab.h"
-#include "graphics.h"
 
 struct SDL_Surface;
 
@@ -80,7 +80,7 @@ extern void cg_set_display_location(int x, int y, CG_WHERETODISP policy);
 extern void cg_load(int no, int flg);
 extern void cg_load_with_alpha(int cgno, int shadowno);
 extern int  cg_load_with_filename(char *fname_utf8, int x, int y);
-extern void cg_get_info(int no, MyRectangle *info);
+extern void cg_get_info(int no, SDL_Rect *info);
 extern void cg_clear_display_loc();
 extern void cgdata_free(cgdata *cg);
 extern struct SDL_Surface *cg_load_as_sdlsurface(int no);
