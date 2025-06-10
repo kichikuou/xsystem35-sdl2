@@ -184,9 +184,53 @@ static int sdl_keytable[SDL_NUM_SCANCODES] = {
 	[SDL_SCANCODE_RALT] = KEY_ALT,
 };
 
+static int joy_device_index = -1;
+static SDL_Joystick *js;
+
+static bool sdl_joy_open(int index) {
+	if (js)
+		return false;
+
+	js = SDL_JoystickOpen(index);
+	if (!js)
+		return false;
+
+	const char *name = SDL_JoystickName(js);
+	int axes = SDL_JoystickNumAxes(js);
+	int buttons = SDL_JoystickNumButtons(js);
+	SDL_JoystickEventState(SDL_ENABLE);
+	NOTICE("SDL joystick '%s' %d axes %d buttons", name, axes, buttons);
+	return true;
+}
+
+static bool joy_open(void) {
+	SDL_Init(SDL_INIT_JOYSTICK);
+
+	if (joy_device_index >= 0)
+		return sdl_joy_open(joy_device_index);
+
+	for (int i = 0; i < SDL_NumJoysticks(); i++) {
+		if (sdl_joy_open(i))
+			return true;
+	}
+	return false;
+}
+
 void sdl_event_init(void) {
 	if (custom_event_type == (uint32_t)-1)
 		custom_event_type = SDL_RegisterEvents(1);
+	joy_open();
+}
+
+void sdl_event_remove(void) {
+	if (js) {
+		SDL_JoystickClose(js);
+		js = NULL;
+	}
+}
+
+void sdl_setJoyDeviceIndex(int index) {
+	joy_device_index = index;
 }
 
 static int mouse_to_rawkey(int button) {

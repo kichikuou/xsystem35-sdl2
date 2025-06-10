@@ -52,37 +52,6 @@ bool (*sdl_custom_event_handler)(const SDL_Event *);
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
 
-static int joy_device_index = -1;
-
-static SDL_Joystick *js;
-
-bool sdl_joy_open(int index) {
-	if (js)
-		return false;
-
-	js = SDL_JoystickOpen(index);
-	if (!js)
-		return false;
-
-	const char *name = SDL_JoystickName(js);
-	int axes = SDL_JoystickNumAxes(js);
-	int buttons = SDL_JoystickNumButtons(js);
-	SDL_JoystickEventState(SDL_ENABLE);
-	NOTICE("SDL joystick '%s' %d axes %d buttons", name, axes, buttons);
-	return true;
-}
-
-static bool joy_open(void) {
-	if (joy_device_index >= 0)
-		return sdl_joy_open(joy_device_index);
-
-	for (int i = 0; i < SDL_NumJoysticks(); i++) {
-		if (sdl_joy_open(i))
-			return true;
-	}
-	return false;
-}
-
 /* SDL の初期化 */
 int gfx_Initialize(const char *render_driver) {
 	window_init(render_driver);
@@ -100,7 +69,6 @@ int gfx_Initialize(const char *render_driver) {
 	emscripten_set_visibilitychange_callback(NULL, 0, NULL);
 #endif
 
-	joy_open();
 	return 0;
 }
 
@@ -111,8 +79,7 @@ void gfx_Remove(void) {
 		SDL_FreeSurface(main_surface);
 	if (gfx_renderer)
 		SDL_DestroyRenderer(gfx_renderer);
-	if (js)
-		SDL_JoystickClose(js);
+	sdl_event_remove();
 	SDL_Quit();
 }
 
@@ -133,7 +100,7 @@ static void window_init(const char *render_driver) {
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
+	SDL_Init(SDL_INIT_VIDEO);
 	
 #ifdef __EMSCRIPTEN__
 	// Stop SDL from calling emscripten_sleep() in functions that are called
@@ -288,10 +255,6 @@ void sdl_showMessageBox(enum messagebox_type type, const char* title_utf8, const
 	case MESSAGEBOX_INFO: flags = SDL_MESSAGEBOX_INFORMATION; break;
 	}
 	SDL_ShowSimpleMessageBox(flags, title_utf8, message_utf8, gfx_window);
-}
-
-void sdl_setJoyDeviceIndex(int index) {
-	joy_device_index = index;
 }
 
 void gfx_setIntegerScaling(bool enable) {
