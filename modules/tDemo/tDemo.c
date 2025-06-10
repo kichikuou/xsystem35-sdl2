@@ -94,7 +94,7 @@ static void Run() {
 			if (sys_keywait(wait_ms, KEYWAIT_CANCELABLE))
 				break;
 		} else {
-			sdl_updateScreen();
+			gfx_updateScreen();
 			if (sys_getInputInfo())
 				break;
 		}

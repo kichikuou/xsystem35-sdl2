@@ -217,7 +217,7 @@ static void sys35_init() {
 	for (i = 0; i < FONTTYPEMAX; i++)
 		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
 	
-	sdl_setFullscreen(fs_on);
+	gfx_setFullscreen(fs_on);
 	nact->ags.noantialias = font_noantialias;
 	ags_setAntialiasedStringMode(!font_noantialias);
 
@@ -543,7 +543,7 @@ int main(int argc, char **argv) {
 
 	sys35_init();
 	if (integer_scaling)
-		sdl_setIntegerScaling(true);
+		gfx_setIntegerScaling(true);
 
 #ifdef ENABLE_GTK
 	gtk_init(&argc, &argv);

@@ -35,7 +35,7 @@
 #include "portab.h"
 #include "system.h"
 #include "font.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #include "hacks.h"
 
 typedef struct {
@@ -130,9 +130,9 @@ SDL_Surface *font_get_glyph(const char *str_utf8, int r, int g, int b) {
 }
 
 // SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
-static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col)
+static void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col)
 {
-	const SDL_Color* palette = sdl_palette->colors;
+	const SDL_Color* palette = gfx_palette->colors;
 	Uint8 cache[256*7];
 	memset(cache, 0, 256);
 
@@ -154,7 +154,7 @@ static void sdl_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t
 			} else {
 				// find nearest color in palette
 				cache[*dp] |= 1 << alpha;
-				int c = sdl_nearest_color(
+				int c = gfx_nearest_color(
 					(palette[col].r * alpha + palette[*dp].r * (7 - alpha)) / 7,
 					(palette[col].g * alpha + palette[*dp].g * (7 - alpha)) / 7,
 					(palette[col].b * alpha + palette[*dp].b * (7 - alpha)) / 7);
@@ -186,9 +186,9 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
 		antialias = false;
 
 	if (antialias) {
-		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, sdl_palette->colors[cl]);
+		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, gfx_palette->colors[cl]);
 	} else {
-		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, sdl_palette->colors[cl]);
+		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, gfx_palette->colors[cl]);
 	}
 	if (!fs) {
 		WARNING("Text rendering failed: %s", TTF_GetError());
@@ -201,7 +201,7 @@ SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
 	r_dst = (SDL_Rect){x, y, w, h};
 	
 	if (main_surface->format->BitsPerPixel == 8 && antialias) {
-		sdl_drawAntiAlias_8bpp(x, y, fs, cl);
+		gfx_drawAntiAlias_8bpp(x, y, fs, cl);
 	} else {
 		r_src = (SDL_Rect){0, 0, w, h};
 		SDL_BlitSurface(fs, &r_src, main_surface, &r_dst);

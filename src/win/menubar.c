@@ -25,7 +25,7 @@
 #include "menu.h"
 #include "nact.h"
 #include "sdl_core.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #include "resources.h"
 #include "msgskip.h"
 #include "texthook.h"
@@ -47,7 +47,7 @@ static void saveScreenshot(void) {
 
 	OPENFILENAME ofn = {
 		.lStructSize = sizeof(OPENFILENAME),
-		.hwndOwner = get_hwnd(sdl_window),
+		.hwndOwner = get_hwnd(gfx_window),
 		.lpstrFilter = "Bitmap files (*.bmp)\0*.bmp\0All files (*.*)\0*.*\0",
 		.lpstrFile = pathbuf,
 		.nMaxFile = MAX_PATH,
@@ -82,10 +82,10 @@ static bool toggle_menu_item(UINT id, bool *checked_out) {
 void win_menu_init(void) {
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
-	SetMenu(get_hwnd(sdl_window), hmenu);
+	SetMenu(get_hwnd(gfx_window), hmenu);
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 	// Let SDL recalc the window size, taking menu height into account.
-	SDL_SetWindowSize(sdl_window, view_w, view_h);
+	SDL_SetWindowSize(gfx_window, view_w, view_h);
 	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
 }
 
@@ -104,16 +104,16 @@ void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 			menu_quitmenu_open();
 			break;
 		case ID_SCREEN_WINDOW:
-			sdl_setFullscreen(false);
-			SetMenu(get_hwnd(sdl_window), hmenu);
+			gfx_setFullscreen(false);
+			SetMenu(get_hwnd(gfx_window), hmenu);
 			break;
 		case ID_SCREEN_FULL:
-			sdl_setFullscreen(true);
-			SetMenu(get_hwnd(sdl_window), NULL);
+			gfx_setFullscreen(true);
+			SetMenu(get_hwnd(gfx_window), NULL);
 			break;
 		case ID_SCREEN_INTEGER_SCALING:
 			if (toggle_menu_item(ID_SCREEN_INTEGER_SCALING, &checked))
-				sdl_setIntegerScaling(checked);
+				gfx_setIntegerScaling(checked);
 			break;
 		case ID_OPTION_MOUSE_MOVE:
 			if (toggle_menu_item(ID_OPTION_MOUSE_MOVE, &checked))
@@ -132,13 +132,13 @@ void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 }
 
 void win_menu_onMouseMotion(int x, int y) {
-	if (!sdl_isFullscreen())
+	if (!gfx_isFullscreen())
 		return;
-	SetMenu(get_hwnd(sdl_window), y > 0 ? NULL : hmenu);
+	SetMenu(get_hwnd(gfx_window), y > 0 ? NULL : hmenu);
 }
 
 void menu_setSkipState(bool enabled, bool activated) {
-	HWND hwnd = get_hwnd(sdl_window);
+	HWND hwnd = get_hwnd(gfx_window);
 
 	EnableMenuItem(hmenu, ID_MSGSKIP, enabled ? MF_ENABLED : MF_GRAYED);
 

@@ -36,7 +36,7 @@
 #include "debugger.h"
 #include "nact.h"
 #include "sdl_core.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #include "scheduler.h"
 #include "menu.h"
 #include "input.h"
@@ -293,7 +293,7 @@ void sdl_handle_event(SDL_Event *e) {
 	case SDL_WINDOWEVENT:
 		switch (e->window.event) {
 		case SDL_WINDOWEVENT_EXPOSED:
-			sdl_dirty = true;
+			gfx_dirty = true;
 			break;
 		}
 		break;
@@ -303,7 +303,7 @@ void sdl_handle_event(SDL_Event *e) {
 		break;
 #endif
 	case SDL_APP_DIDENTERFOREGROUND:
-		sdl_dirty = true;
+		gfx_dirty = true;
 		break;
 	case SDL_KEYDOWN:
 		keyEventProsess(&e->key, true);
@@ -315,7 +315,7 @@ void sdl_handle_event(SDL_Event *e) {
 			msgskip_activate(!msgskip_isActivated());
 			break;
 		case SDLK_F4:
-			sdl_setFullscreen(!sdl_fs_on);
+			gfx_setFullscreen(!gfx_fullscreen);
 			break;
 		}
 #ifdef __ANDROID__

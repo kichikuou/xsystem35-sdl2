@@ -181,7 +181,7 @@ void exec_command(void) {
 	int c0 = sl_getc();
 
 	if (c0 == BREAKPOINT) {
-		sdl_updateScreen();
+		gfx_updateScreen();
 		c0 = dbg_handle_breakpoint(sl_getPage(), sl_getIndex() - 1);
 	}
 

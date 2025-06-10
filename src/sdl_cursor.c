@@ -27,7 +27,7 @@
 #include "portab.h"
 #include "system.h"
 #include "cursor.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 
 /* マウスカーソルフォントイメージ*/
 #include "bitmaps/cursor_uparrow.xpm"
@@ -141,20 +141,20 @@ bool sdl_cursorNew(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEn
 MyPoint sdl_translateMouseCoords(int x, int y) {
 	// scale mouse x and y
 	float scalex, scaley;
-	SDL_RenderGetScale(sdl_renderer, &scalex, &scaley);
+	SDL_RenderGetScale(gfx_renderer, &scalex, &scaley);
 	x *= scalex;
 	y *= scaley;
 
 	// calculate window borders
 	int logw, logh;
-	SDL_RenderGetLogicalSize(sdl_renderer, &logw, &logh);
+	SDL_RenderGetLogicalSize(gfx_renderer, &logw, &logh);
 
 	float scalew, scaleh;
 	scalew = logw * scalex;
 	scaleh = logh * scaley;
 
 	int winw, winh;
-	SDL_GetWindowSize(sdl_window, &winw, &winh);
+	SDL_GetWindowSize(gfx_window, &winw, &winh);
 
 	float border_left = (winw - scalew) / 2;
 	float border_top  = (winh - scaleh) / 2;
@@ -170,7 +170,7 @@ MyPoint sdl_translateMouseCoords(int x, int y) {
 /* マウスの位置の移動 */
 void sdl_setCursorLocation(int x, int y) {
 	MyPoint t = sdl_translateMouseCoords(x, y);
-	SDL_WarpMouseInWindow(sdl_window, t.x, t.y);
+	SDL_WarpMouseInWindow(gfx_window, t.x, t.y);
 }
 
 /* マウスカーソルの形状の設定 */

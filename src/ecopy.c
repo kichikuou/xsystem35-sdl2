@@ -51,7 +51,7 @@ static void eCopyUpdateArea(int sx, int sy, int w, int h, int dx, int dy) {
 		dx - nact->ags.view_area.x,
 		dy - nact->ags.view_area.y
 	};
-	sdl_updateArea(&src, &dst);
+	gfx_updateArea(&src, &dst);
 }
 
 static int eCopyArea5(int sx, int sy, int w, int h, int dx, int dy, int opt) {
@@ -110,13 +110,13 @@ static int eCopyArea9(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 		cnt+=waitcnt;
 		for (y = 0; y < h -15; y+=16) {
 			for (x = 0; x < (w -7); x+=16) {
-				sdl_copyArea(sx + x + hintX[i],sy + y + hintY[i], 8, 8, dx + x + hintX[i], dy + y + hintY[i]);
+				gfx_copyArea(sx + x + hintX[i],sy + y + hintY[i], 8, 8, dx + x + hintX[i], dy + y + hintY[i]);
 			}
 		}
 		ags_updateArea(dx, dy, w, h);
 		EC_WAIT;
 	}
-	sdl_copyArea(sx, sy, w, h, dx, dy);
+	gfx_copyArea(sx, sy, w, h, dx, dy);
 	ags_updateArea(dx, dy, w, h);
 	return key;
 }
@@ -189,7 +189,7 @@ static int eCopyArea23(int sx, int sy, int w, int h, int dx, int dy, int opt) {
 		cnt += waitcnt;
 		for (y = 0; y < (h -3); y+=4) {
 			for (x = 0; x < (w -3); x+=4) {
-				sdl_copyArea(sx + x + hintX[i], sy + y + hintY[i], 2, 2,
+				gfx_copyArea(sx + x + hintX[i], sy + y + hintY[i], 2, 2,
 					 dx + x + hintX[i], dy + y + hintY[i]);
 			}
 		}
@@ -207,7 +207,7 @@ static int eCopyArea1000(int sx, int sy, int w, int h, int dx, int dy, int opt) 
 }
 
 static int eCopyArea2000(int sx, int sy, int w, int h, int dx, int dy, int opt) {
-	sdl_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
+	gfx_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
 	ags_copyArea_alphaLevel(sx, sy, w, h, dx, dy, opt);
 	ags_updateArea(dx, dy, w, h);
 	return sys_getInputInfo();
@@ -315,7 +315,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 
 	if (sw == NACT_EFFECT_MAGNIFY) {
 		SDL_Rect target_rect = { sx, sy, w, h };
-		struct sdl_effect *eff = sdl_effect_magnify_init(sdl_getDIB(), &nact->ags.view_area, &target_rect);
+		struct sdl_effect *eff = sdl_effect_magnify_init(gfx_getDIB(), &nact->ags.view_area, &target_rect);
 		ags_runEffect(duration(sw, opt, NULL), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
 		sdl_effect_finish(eff);
 		// Actual copy.
@@ -329,21 +329,21 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 	enum sdl_effect_type sdl_effect = from_nact_effect(sw);
 	if (sdl_effect != EFFECT_INVALID) {
 		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
-		// Note that we specify NULL (which means sdl_texture) for the old
-		// surface rather than sdl_getDIB(). This is to use the current display
+		// Note that we specify NULL (which means gfx_texture) for the old
+		// surface rather than gfx_getDIB(). This is to use the current display
 		// contents, not reflecting uncommitted palette changes.
-		struct sdl_effect *eff = sdl_effect_init(&rect, NULL, rect.x, rect.y, sdl_getDIB(), sx, sy, sdl_effect);
+		struct sdl_effect *eff = sdl_effect_init(&rect, NULL, rect.x, rect.y, gfx_getDIB(), sx, sy, sdl_effect);
 		ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
 		sdl_effect_finish(eff);
 
 		// Actual copy.
 		switch (sw) {
 		case NACT_EFFECT_FADEOUT:
-			sdl_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
+			gfx_fillRectangleRGB(dx, dy, w, h, 0, 0, 0);
 			ags_updateArea(dx, dy, w, h);
 			break;
 		case NACT_EFFECT_WHITEOUT:
-			sdl_fillRectangleRGB(dx, dy, w, h, 255, 255, 255);
+			gfx_fillRectangleRGB(dx, dy, w, h, 255, 255, 255);
 			ags_updateArea(dx, dy, w, h);
 			break;
 		default:

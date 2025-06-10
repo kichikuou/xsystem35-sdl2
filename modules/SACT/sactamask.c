@@ -91,7 +91,7 @@ void sp_eupdate_amap(int index, int time, int cancel) {
 		return;
 	}
 	SDL_Surface *mask_sf = SDL_CreateRGBSurfaceFrom(mask->pic, mask->width, mask->height, 8, mask->width, 0, 0, 0, 0);
-	sp_update_all(false);  // old = sdl_texture, new = main_surface
+	sp_update_all(false);  // old = gfx_texture, new = main_surface
 	struct sdl_effect *eff = sdl_effect_sactamask_init(mask_sf);
 	ags_runEffect(time * 10, cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
 	sdl_effect_finish(eff);

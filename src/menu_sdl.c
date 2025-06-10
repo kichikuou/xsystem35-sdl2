@@ -28,7 +28,7 @@
 #include "nact.h"
 #include "menu.h"
 #include "sdl_core.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #ifdef _WIN32
 #include "win/dialog.h"
 #endif
@@ -44,7 +44,7 @@ void menu_quitmenu_open(void) {
 	};
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
-		.window = sdl_window,
+		.window = gfx_window,
 		.title = "Confirm",
 		.message = "Quit xsystem35?",
 		.numbuttons = SDL_arraysize(buttons),
@@ -67,7 +67,7 @@ void menu_resetmenu_open(void) {
 	};
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
-		.window = sdl_window,
+		.window = gfx_window,
 		.title = "Confirm",
 		.message = "Restart the game?",
 		.numbuttons = SDL_arraysize(buttons),

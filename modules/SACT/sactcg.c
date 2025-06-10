@@ -118,9 +118,9 @@ void scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY)
 
 	SDL_Surface *sf = SDL_ConvertSurface(src->sf, src->sf->format, 0);
 	if (wReverseX)
-		sdl_FlipSurfaceHorizontal(sf);
+		gfx_FlipSurfaceHorizontal(sf);
 	if (wReverseY)
-		sdl_FlipSurfaceVertical(sf);
+		gfx_FlipSurfaceVertical(sf);
 	scg_new(CG_REVERSE, wNumCG, sf);
 }
 

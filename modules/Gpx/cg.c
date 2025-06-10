@@ -73,21 +73,21 @@ static surface_t *sf_getcg(void *b, size_t size) {
 		cg->alpha = cg->pic;
 		cg->pic = NULL;
 		sf = sf_create_alpha(cg->width, cg->height);
-		sdl_drawImageAlphaMap(cg, sf, 0, 0);
+		gfx_drawImageAlphaMap(cg, sf, 0, 0);
 		break;
 	case ALCG_PMS16:
 		cg = pms64k_extract(b);
 		sf = cg->alpha
 			? sf_create_surface(cg->width, cg->height)
 			: sf_create_pixel(cg->width, cg->height);
-		sdl_drawImage16(cg, sf, 0, 0, 255, false);
+		gfx_drawImage16(cg, sf, 0, 0, 255, false);
 		break;
 	case ALCG_QNT:
 		cg = qnt_extract(b);
 		sf = cg->alpha
 			? sf_create_surface(cg->width, cg->height)
 			: sf_create_pixel(cg->width, cg->height);
-		sdl_drawImage24(cg, sf, 0, 0, 255);
+		gfx_drawImage24(cg, sf, 0, 0, 255);
 		break;
 	default:
 		WARNING("Unknown Cg Type");

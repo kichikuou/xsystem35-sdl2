@@ -75,7 +75,7 @@ void gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int
 	if (dst == src) {
 		SDL_Rect r;
 		if (SDL_IntersectRect(&src_rect, &dst_rect, &r)) {
-			SDL_Surface *view = sdl_createSurfaceView(src->sdl_surface, sx, sy, sw, sh);
+			SDL_Surface *view = gfx_createSurfaceView(src->sdl_surface, sx, sy, sw, sh);
 			SDL_Surface *tmp = SDL_ConvertSurface(view, dst->sdl_surface->format, 0);
 			src_rect.x = 0;
 			src_rect.y = 0;

@@ -22,7 +22,7 @@
 #include <SDL.h>
 
 #include "sdl_core.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #include "menu.h"
 #include "nact.h"
 
@@ -53,13 +53,13 @@ static void redraw() {
 	};
 
 	if (*input->text) {
-		int w = sdl_drawString(r.x, r.y, input->text, fgcolor).w;
+		int w = gfx_drawString(r.x, r.y, input->text, fgcolor).w;
 		r.x += w;
 		r.w -= w;
 	}
 
 	if (*input->composingText) {
-		int w = sdl_drawString(r.x, r.y, input->composingText, fgcolor).w;
+		int w = gfx_drawString(r.x, r.y, input->composingText, fgcolor).w;
 		ags_fillRectangle(r.x, r.y + r.h, w, 2, fgcolor);  // underline
 	}
 

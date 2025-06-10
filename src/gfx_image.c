@@ -1,5 +1,5 @@
 /*
- * sdl_image.c  image操作 for SDL
+ * gfx_image.c  image操作 for SDL
  *
  * Copyright (C) 2000-   Fumihiko Murata <fmurata@p1.tcnet.ne.jp>
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: sdl_image.c,v 1.23 2003/07/20 19:30:16 chikama Exp $ */
+/* $Id: gfx_image.c,v 1.23 2003/07/20 19:30:16 chikama Exp $ */
 
 #include "config.h"
 
@@ -29,13 +29,13 @@
 #include "portab.h"
 #include "system.h"
 #include "sdl_core.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #include "cg.h"
 #include "nact.h"
 #include "alpha_plane.h"
 #include "image.h"
 
-void sdl_FlipSurfaceHorizontal(SDL_Surface *s) {
+void gfx_FlipSurfaceHorizontal(SDL_Surface *s) {
 #if SDL_VERSION_ATLEAST(3, 2, 0)
 	SDL_FlipSurface(s, SDL_FLIP_HORIZONTAL);
 #else
@@ -57,7 +57,7 @@ void sdl_FlipSurfaceHorizontal(SDL_Surface *s) {
 #endif
 }
 
-void sdl_FlipSurfaceVertical(SDL_Surface *s) {
+void gfx_FlipSurfaceVertical(SDL_Surface *s) {
 #if SDL_VERSION_ATLEAST(3, 2, 0)
 	SDL_FlipSurface(s, SDL_FLIP_VERTICAL);
 #else
@@ -76,28 +76,28 @@ void sdl_FlipSurfaceVertical(SDL_Surface *s) {
 }
 
 // Scaled copy in main_surface
-void sdl_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
+void gfx_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror) {
 	SDL_Rect src_rect = {sx, sy, sw, sh};
 	SDL_Rect dst_rect = {dx, dy, dw, dh};
 	// NOTE: SDL_BlitScaled() does not support 8-bit surfaces.
 	SDL_SoftStretch(main_surface, &src_rect, main_surface, &dst_rect);
 	if (mirror) {
 		SDL_IntersectRect(&dst_rect, &(SDL_Rect){0, 0, main_surface->w, main_surface->h}, &dst_rect);
-		SDL_Surface *view = sdl_createSurfaceView(main_surface, dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h);
+		SDL_Surface *view = gfx_createSurfaceView(main_surface, dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h);
 		if (mirror & 1)
-			sdl_FlipSurfaceVertical(view);
+			gfx_FlipSurfaceVertical(view);
 		if (mirror & 2)
-			sdl_FlipSurfaceHorizontal(view);
+			gfx_FlipSurfaceHorizontal(view);
 		SDL_FreeSurface(view);
 	}
 }
 
-void sdl_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, bool alpha_blend) {
+void gfx_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, bool alpha_blend) {
 	int w = cg->width;
 	int h = cg->height;
 
 	if (cg->alpha && !alpha_blend) {
-		sdl_drawImageAlphaMap(cg, sf, dx, dy);
+		gfx_drawImageAlphaMap(cg, sf, dx, dy);
 	}
 
 	SDL_Surface *s;
@@ -136,9 +136,9 @@ void sdl_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, 
 	SDL_FreeSurface(s);
 }
 
-void sdl_drawImage24(cgdata *cg, surface_t *sf, int x, int y, int brightness) {
+void gfx_drawImage24(cgdata *cg, surface_t *sf, int x, int y, int brightness) {
 	if (cg->alpha) {
-		sdl_drawImageAlphaMap(cg, sf, x, y);
+		gfx_drawImageAlphaMap(cg, sf, x, y);
 	}
 
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
@@ -151,7 +151,7 @@ void sdl_drawImage24(cgdata *cg, surface_t *sf, int x, int y, int brightness) {
 	SDL_FreeSurface(s);
 }
 
-void sdl_drawImageAlphaMap(cgdata *cg, surface_t *sf, int x, int y) {
+void gfx_drawImageAlphaMap(cgdata *cg, surface_t *sf, int x, int y) {
 	if (!cg->alpha || !sf->alpha) return;
 
 	uint8_t *a_src = cg->alpha;
@@ -164,14 +164,14 @@ void sdl_drawImageAlphaMap(cgdata *cg, surface_t *sf, int x, int y) {
 	}
 }
 
-SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h) {
+SDL_Surface *gfx_dib_to_surface_with_alpha(int x, int y, int w, int h) {
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
 
 	SDL_Rect r_src = {x, y, w, h};
 	SDL_BlitSurface(main_surface, &r_src, s, NULL);
 
 	uint8_t *p_ds = ALPHA_AT(s, 0, 0);
-	uint8_t *adata = GETOFFSET_ALPHA(sdl_dibinfo, x, y);
+	uint8_t *adata = GETOFFSET_ALPHA(gfx_dibinfo, x, y);
 	for (int y = 0; y < h; y++) {
 		uint8_t *p_src = adata;
 		uint8_t *p_dst = p_ds;
@@ -179,14 +179,14 @@ SDL_Surface *sdl_dib_to_surface_with_alpha(int x, int y, int w, int h) {
 			*p_dst = *(p_src++);
 			p_dst += 4;
 		}
-		adata += sdl_dibinfo->width;
+		adata += gfx_dibinfo->width;
 		p_ds  += s->pitch;
 	}
 	return s;
 }
 
-void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv) {
-	SDL_Surface *s = sdl_dib_to_surface_with_alpha(sx, sy, w, h);
+void gfx_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int lv) {
+	SDL_Surface *s = gfx_dib_to_surface_with_alpha(sx, sy, w, h);
 	if (lv < 255)
 		SDL_SetSurfaceAlphaMod(s, lv);
 
@@ -195,7 +195,7 @@ void sdl_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 	SDL_FreeSurface(s);
 }
 
-void sdl_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv) {
+void gfx_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv) {
 	SDL_Rect r_src = {sx, sy, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_SetSurfaceBlendMode(main_surface, SDL_BLENDMODE_BLEND);
@@ -205,7 +205,7 @@ void sdl_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, i
 	SDL_SetSurfaceBlendMode(main_surface, SDL_BLENDMODE_NONE);
 }
 
-void sdl_copyAreaSP16_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
+void gfx_copyAreaSP16_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
 	SDL_Rect r_src = {sx, sy, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_SetSurfaceBlendMode(main_surface, SDL_BLENDMODE_BLEND);
@@ -216,18 +216,18 @@ void sdl_copyAreaSP16_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, i
 	SDL_SetSurfaceBlendMode(main_surface, SDL_BLENDMODE_NONE);
 }
 
-void sdl_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
+void gfx_copy_from_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	image_copy_from_alpha(nact->ags.dib, sx, sy, w, h, dx, dy, flag);
 }
 
-void sdl_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
+void gfx_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flag) {
 	image_copy_to_alpha(nact->ags.dib, sx, sy, w, h, dx, dy, flag);
 }
 
 /*
  * dib のピクセル情報を取得
  */
-void sdl_getPixel(int x, int y, Palette *cell) {
+void gfx_getPixel(int x, int y, Palette *cell) {
 	uint8_t *p = PIXEL_AT(main_surface, x, y);
 	if (main_surface->format->BitsPerPixel == 8) {
 		cell->pixel = *p;
@@ -262,7 +262,7 @@ void sdl_getPixel(int x, int y, Palette *cell) {
 /*
  * dib から領域の切り出し
  */
-void* sdl_saveRegion(int x, int y, int w, int h) {
+void* gfx_saveRegion(int x, int y, int w, int h) {
 	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, main_surface->format->BitsPerPixel, main_surface->format->format);
 	if (main_surface->format->BitsPerPixel == 8)
 		memcpy(s->format->palette->colors, main_surface->format->palette->colors,
@@ -276,14 +276,14 @@ void* sdl_saveRegion(int x, int y, int w, int h) {
 /*
  * セーブした領域を破棄
  */
-void sdl_delRegion(void *psrc) {
+void gfx_delRegion(void *psrc) {
 	SDL_FreeSurface((SDL_Surface *)psrc);
 }
 
 /*
  * dib にセーブした領域を回復
  */
-void sdl_putRegion(void *psrc, int x, int y) {
+void gfx_putRegion(void *psrc, int x, int y) {
 	SDL_Surface *src = (SDL_Surface *)psrc;
 	
 	SDL_Rect r_src = {0, 0, src->w, src->h};
@@ -295,8 +295,8 @@ void sdl_putRegion(void *psrc, int x, int y) {
 /*
  * dib に dstを描画後、後始末
  */
-void sdl_restoreRegion(void *psrc, int x, int y) {
+void gfx_restoreRegion(void *psrc, int x, int y) {
 	SDL_Surface *src = (SDL_Surface *)psrc;
-	sdl_putRegion(src, x ,y);
+	gfx_putRegion(src, x ,y);
 	SDL_FreeSurface(src);
 }

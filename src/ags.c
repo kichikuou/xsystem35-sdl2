@@ -81,7 +81,7 @@ static void initPal(void) {
 	for (int i = 0; i < 256; i++) {
 		nact->ags.pal[i].a = 255;
 	}
-	sdl_setPalette(nact->ags.pal, 0, 256);
+	gfx_setPalette(nact->ags.pal, 0, 256);
 	palette_changed();
 }
 
@@ -139,7 +139,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.enable_zb = enable_zb;
 	nact->ags.font_weight = enable_zb ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 	
-	sdl_Initialize(render_driver);
+	gfx_Initialize(render_driver);
 	font_init();
 
 	initPal();
@@ -148,7 +148,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 
 void ags_remove(void) {
 	ags_autorepeat(true);
-	sdl_Remove();
+	gfx_Remove();
 }
 
 void ags_reset(void) {
@@ -168,9 +168,9 @@ void ags_setWorldSize(int width, int height, int depth) {
 		nact->ags.dib->alpha = NULL;
 	}
 
-	sdl_setWorldSize(width, height, depth);
+	gfx_setWorldSize(width, height, depth);
 	
-	nact->ags.dib = sdl_getDIB();
+	nact->ags.dib = gfx_getDIB();
 	
 	/* DIBが8以上の場合は、alpha plane を用意 */
 	if (depth > 8) {
@@ -188,13 +188,13 @@ void ags_setViewArea(int x, int y, int width, int height) {
 	nact->ags.view_area.y = y;
 	nact->ags.view_area.w = width;
 	nact->ags.view_area.h = height;
-	sdl_setWindowSize(width, height);
+	gfx_setWindowSize(width, height);
 }
 
 void ags_setWindowTitle(const char *title_utf8) {
 	char buf[256];
 	snprintf(buf, sizeof(buf), "XSystem35 Version %s: %s", VERSION, title_utf8);
-	sdl_setWindowTitle(buf);
+	gfx_setWindowTitle(buf);
 }
 
 void ags_getDIBInfo(DispInfo *info) {
@@ -204,13 +204,13 @@ void ags_getDIBInfo(DispInfo *info) {
 }
 
 void ags_getViewAreaInfo(DispInfo *info) {
-	sdl_getWindowInfo(info);
+	gfx_getWindowInfo(info);
 	info->width  = nact->ags.view_area.w;
 	info->height = nact->ags.view_area.h;
 }
 
 void ags_getWindowInfo(DispInfo *info) {
-	sdl_getWindowInfo(info);
+	gfx_getWindowInfo(info);
 }
 
 void ags_setExposeSwitch(bool expose) {
@@ -227,7 +227,7 @@ void ags_updateArea(int x, int y, int w, int h) {
 			update.x - nact->ags.view_area.x,
 			update.y - nact->ags.view_area.y
 		};
-		sdl_updateArea(&update, &p);
+		gfx_updateArea(&update, &p);
 	}
 }
 
@@ -242,7 +242,7 @@ void ags_updateFull() {
 		min(nact->ags.view_area.h, nact->ags.world_size.height)
 	};
 	MyPoint p = {0, 0};
-	sdl_updateArea(&r, &p);
+	gfx_updateArea(&r, &p);
 }
 
 void ags_setPalettes(SDL_Color *src, int dst, int cnt) {
@@ -261,47 +261,47 @@ void ags_setPalette(int no, int red, int green, int blue) {
 
 void ags_setPaletteToSystem(int src, int cnt) {
 	if (!fade_outed) 
-		sdl_setPalette(nact->ags.pal, src, cnt);
+		gfx_setPalette(nact->ags.pal, src, cnt);
 }
 
 void ags_drawRectangle(int x, int y, int w, int h, int col) {
 	if (!ags_check_param(&x, &y, &w, &h)) return;
 	
-	sdl_drawRectangle(x, y, w, h, col);
+	gfx_drawRectangle(x, y, w, h, col);
 }
 
 void ags_fillRectangle(int x, int y, int w, int h, int col) {
 	if (!ags_check_param(&x, &y, &w, &h)) return;
 
-	sdl_fillRectangle(x, y, w, h, col);
+	gfx_fillRectangle(x, y, w, h, col);
 }
 
 void ags_drawLine(int x0, int y0, int x1, int y1, int col) {
 	if (!ags_check_param_xy(&x0, &y0)) return;
 	if (!ags_check_param_xy(&x1, &y1)) return;
 
-	sdl_drawLine(x0, y0, x1, y1, col);
+	gfx_drawLine(x0, y0, x1, y1, col);
 }
 
 void ags_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copyArea(sx, sy, w, h, dx, dy);
+	gfx_copyArea(sx, sy, w, h, dx, dy);
 }
 
 void ags_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, int dh, int mirror_sw) {
 	if (!ags_check_param(&sx, &sy, &sw, &sh)) return;
 	if (!ags_check_param(&dx, &dy, &dw, &dh)) return;
 	
-	sdl_scaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw);
+	gfx_scaledCopyArea(sx, sy, sw, sh, dx, dy, dw, dh, mirror_sw);
 }
 
 void ags_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, int col) {
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 
-	sdl_copyAreaSP(sx, sy, w, h, dx, dy, col);
+	gfx_copyAreaSP(sx, sy, w, h, dx, dy, col);
 }
 
 void ags_wrapColor(int x, int y, int w, int h, int p1, int p2) {
@@ -309,13 +309,13 @@ void ags_wrapColor(int x, int y, int w, int h, int p1, int p2) {
 	
 	if (!ags_check_param(&x, &y, &w, &h)) return;
 	
-	sdl_wrapColor(x, y, w, h, p1, p2);
+	gfx_wrapColor(x, y, w, h, p1, p2);
 }
 
 void ags_getPixel(int x, int y, Palette *cell) {
 	if (!ags_check_param_xy(&x, &y)) return;
 
-	sdl_getPixel(x, y, cell);
+	gfx_getPixel(x, y, cell);
 }
 
 void ags_copyPaletteShift(int sx, int sy, int w, int h, int dx, int dy, uint8_t sprite) {
@@ -357,7 +357,7 @@ void ags_changeColorArea(int sx, int sy, int w, int h, int dst, int src, int cnt
 void* ags_saveRegion(int x, int y, int w, int h) {
 	if (!ags_check_param(&x, &y, &w, &h)) return NULL;
 
-	return (void *)sdl_saveRegion(x, y, w, h);
+	return (void *)gfx_saveRegion(x, y, w, h);
 }
 
 void ags_restoreRegion(void *region, int x, int y) {
@@ -365,7 +365,7 @@ void ags_restoreRegion(void *region, int x, int y) {
 	
 	if (!ags_check_param_xy(&x, &y)) return;
 	
-	sdl_restoreRegion(region, x, y);
+	gfx_restoreRegion(region, x, y);
 }
 
 void ags_putRegion(void *region, int x, int y) {
@@ -373,13 +373,13 @@ void ags_putRegion(void *region, int x, int y) {
 	
 	if (!ags_check_param_xy(&x, &y)) return;
 	
-	sdl_putRegion(region, x, y);
+	gfx_putRegion(region, x, y);
 }
 
 void ags_delRegion(void *region) {
 	if (region == NULL) return;
 	
-	sdl_delRegion(region);
+	gfx_delRegion(region);
 }
 
 int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out) {
@@ -401,46 +401,46 @@ int ags_drawString(int x, int y, const char *src, int col, MyRectangle *rect_out
 		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 0;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_BOTTOM:
-		sdl_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
 		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_RIGHT:
-		sdl_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_BOTTOM_RIGHT:
-		sdl_drawString(x +1, y +1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x +1, y +1, utf8, nact->ags.text_decoration_color);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
 	case TEXT_DECORATION_OUTLINE:
-		sdl_drawString(x -1, y, utf8, nact->ags.text_decoration_color);
-		sdl_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
-		sdl_drawString(x, y -1, utf8, nact->ags.text_decoration_color);
-		sdl_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x -1, y, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x, y -1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
 		adj.x = -1; adj.y = -1; adj.w = 2; adj.h = 2;
 		break;
 	case TEXT_DECORATION_BOLD_HORIZONTAL:
-		sdl_drawString(x +1, y, utf8, col);
+		gfx_drawString(x +1, y, utf8, col);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case TEXT_DECORATION_BOLD_VERTICAL:
-		sdl_drawString(x, y +1, utf8, col);
+		gfx_drawString(x, y +1, utf8, col);
 		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case TEXT_DECORATION_BOLD_HORIZONTAL_VERTICAL:
-		sdl_drawString(x +1, y +1, utf8, col);
+		gfx_drawString(x +1, y +1, utf8, col);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_OUTLINE:
-		sdl_drawString(x -1, y   , utf8, nact->ags.text_decoration_color);
-		sdl_drawString(x +1, y   , utf8, nact->ags.text_decoration_color);
-		sdl_drawString(x   , y -1, utf8, nact->ags.text_decoration_color);
-		sdl_drawString(x   , y +1, utf8, nact->ags.text_decoration_color);
-		sdl_drawString(x +2, y +2, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x -1, y   , utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x +1, y   , utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x   , y -1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x   , y +1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x +2, y +2, utf8, nact->ags.text_decoration_color);
 		adj.x = -1; adj.y = -1; adj.w = 3; adj.h = 3;
 		break;
 	}
-	SDL_Rect r = sdl_drawString(x, y, utf8, col);
+	SDL_Rect r = gfx_drawString(x, y, utf8, col);
 	if (rect_out) {
 		rect_out->x = r.x + adj.x;
 		rect_out->y = r.y + adj.y;
@@ -461,13 +461,13 @@ SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b) {
 void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend) {
 	switch (cg->depth) {
 	case 8:
-		sdl_drawImage8(cg, x, y, sprite_color);
+		gfx_drawImage8(cg, x, y, sprite_color);
 		break;
 	case 16:
-		sdl_drawImage16(cg, nact->ags.dib, x, y, brightness, alpha_blend);
+		gfx_drawImage16(cg, nact->ags.dib, x, y, brightness, alpha_blend);
 		break;
 	case 24:
-		sdl_drawImage24(cg, nact->ags.dib, x, y, brightness);
+		gfx_drawImage24(cg, nact->ags.dib, x, y, brightness);
 		break;
 	}
 }
@@ -478,7 +478,7 @@ void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy) {
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copyAreaSP16_shadow(sx, sy, w, h, dx, dy, 255);
+	gfx_copyAreaSP16_shadow(sx, sy, w, h, dx, dy, 255);
 }
 
 void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int col) {
@@ -487,7 +487,7 @@ void ags_copyArea_transparent(int sx, int sy, int w, int h, int dx, int dy, int 
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copyAreaSP(sx, sy, w, h, dx, dy, col);
+	gfx_copyAreaSP(sx, sy, w, h, dx, dy, col);
 }
 
 void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int lv) {
@@ -496,7 +496,7 @@ void ags_copyArea_alphaLevel(int sx, int sy, int w, int h, int dx, int dy, int l
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copyAreaSP16_alphaLevel(sx, sy, w, h, dx, dy, lv);
+	gfx_copyAreaSP16_alphaLevel(sx, sy, w, h, dx, dy, lv);
 }
 
 void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv) {
@@ -505,14 +505,14 @@ void ags_copyArea_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int l
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copyAreaSP16_alphaBlend(sx, sy, w, h, dx, dy, lv);
+	gfx_copyAreaSP16_alphaBlend(sx, sy, w, h, dx, dy, lv);
 }
 
 MyRectangle ags_floodFill(int x, int y, int col) {
 	if (!ags_check_param_xy(&x, &y))
 		return (MyRectangle){};
 
-	return sdl_floodFill(x, y, col);
+	return gfx_floodFill(x, y, col);
 }
 
 void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg) {
@@ -521,7 +521,7 @@ void ags_copyFromAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copy_from_alpha(sx, sy, w, h, dx, dy, flg);
+	gfx_copy_from_alpha(sx, sy, w, h, dx, dy, flg);
 }
 
 void ags_copyToAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COPY_TYPE flg) {
@@ -530,7 +530,7 @@ void ags_copyToAlpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_COP
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copy_to_alpha(sx, sy, w, h, dx, dy, flg);
+	gfx_copy_to_alpha(sx, sy, w, h, dx, dy, flg);
 }
 
 void ags_alpha_uppercut(int sx, int sy, int w, int h, int s, int d) {
@@ -610,7 +610,7 @@ static void fade(int duration, bool cancelable, enum sdl_effect_type type) {
 	SDL_Rect rect = {0, 0, nact->ags.view_area.w, nact->ags.view_area.h};
 	struct sdl_effect *eff = sdl_effect_init(
 		&rect, NULL, 0, 0,
-		sdl_getDIB(), nact->ags.view_area.x, nact->ags.view_area.y,
+		gfx_getDIB(), nact->ags.view_area.x, nact->ags.view_area.y,
 		type);
 	ags_runEffect(duration, cancelable, (ags_EffectStepFunc)sdl_effect_step, eff);
 	sdl_effect_finish(eff);
@@ -619,7 +619,7 @@ static void fade(int duration, bool cancelable, enum sdl_effect_type type) {
 void ags_fadeIn(int rate, bool flag) {
 	fade_outed = false;
 	if (nact->ags.world_depth == 8)
-		sdl_setPalette(nact->ags.pal, 0, 256);
+		gfx_setPalette(nact->ags.pal, 0, 256);
 
 	if (!need_update)
 		return;
@@ -627,7 +627,7 @@ void ags_fadeIn(int rate, bool flag) {
 	int duration = rate * 16 * 1000 / 60;
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_FADEIN : EFFECT_DITHERING_FADEIN);
 
-	sdl_updateAll(&nact->ags.view_area);
+	gfx_updateAll(&nact->ags.view_area);
 }
 
 void ags_fadeOut(int rate, bool flag) {
@@ -642,14 +642,14 @@ void ags_fadeOut(int rate, bool flag) {
 		for (int i = 0; i < 256; i++) {
 			pal[i] = (SDL_Color){0, 0, 0, 255};
 		}
-		sdl_setPalette(pal, 0, 256);
+		gfx_setPalette(pal, 0, 256);
 	}
 }
 
 void ags_whiteIn(int rate, bool flag) {	
 	fade_outed = false;
 	if (nact->ags.world_depth == 8)
-		sdl_setPalette(nact->ags.pal, 0, 256);
+		gfx_setPalette(nact->ags.pal, 0, 256);
 
 	if (!need_update)
 		return;
@@ -657,7 +657,7 @@ void ags_whiteIn(int rate, bool flag) {
 	int duration = rate * 16 * 1000 / 60;
 	fade(duration, flag, nact->ags.world_depth == 8 ? EFFECT_WHITEIN : EFFECT_DITHERING_WHITEIN);
 
-	sdl_updateAll(&nact->ags.view_area);
+	gfx_updateAll(&nact->ags.view_area);
 }
 
 void ags_whiteOut(int rate, bool flag) {
@@ -670,7 +670,7 @@ void ags_whiteOut(int rate, bool flag) {
 	if (nact->ags.world_depth == 8) {
 		SDL_Color pal[256];
 		memset(&pal, 255, sizeof(pal));
-		sdl_setPalette(pal, 0, 256);
+		gfx_setPalette(pal, 0, 256);
 	}
 }
 
@@ -758,7 +758,7 @@ void ags_copyArea_shadow_withrate(int sx, int sy, int w, int h, int dx, int dy, 
 	if (!ags_check_param(&sx, &sy, &w, &h)) return;
 	if (!ags_check_param(&dx, &dy, &w, &h)) return;
 	
-	sdl_copyAreaSP16_shadow(sx, sy, w, h, dx, dy, lv);
+	gfx_copyAreaSP16_shadow(sx, sy, w, h, dx, dy, lv);
 } 
 
 void ags_setCursorMoveTime(int msec) {

@@ -1,5 +1,5 @@
 /*
- * sdl_video.c  SDL video init
+ * gfx_video.c  SDL video init
  *
  * Copyright (C) 2000-     Fumihiko Murata       <fmurata@p1.tcnet.ne.jp>
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: sdl_video.c,v 1.11 2003/01/04 17:01:02 chikama Exp $ */
+/* $Id: gfx_video.c,v 1.11 2003/01/04 17:01:02 chikama Exp $ */
 
 #include "config.h"
 
@@ -32,20 +32,20 @@
 #include "portab.h"
 #include "system.h"
 #include "sdl_core.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #include "xsystem35.h"
 #include "image.h"
 
-SDL_Window *sdl_window;
-SDL_Renderer *sdl_renderer;
-SDL_Texture *sdl_texture;
+SDL_Window *gfx_window;
+SDL_Renderer *gfx_renderer;
+SDL_Texture *gfx_texture;
 SDL_Surface *main_surface; // offscreen surface
-SDL_Palette *sdl_palette;
-surface_t *sdl_dibinfo;
+SDL_Palette *gfx_palette;
+surface_t *gfx_dibinfo;
 int view_w;
 int view_h;
-bool sdl_dirty;
-bool sdl_fs_on;
+bool gfx_dirty;
+bool gfx_fullscreen;
 bool (*sdl_custom_event_handler)(const SDL_Event *);
 
 static void window_init(const char *render_driver);
@@ -83,7 +83,7 @@ static bool joy_open(void) {
 }
 
 /* SDL の初期化 */
-int sdl_Initialize(const char *render_driver) {
+int gfx_Initialize(const char *render_driver) {
 	window_init(render_driver);
 	
 	/* offscreen Pixmap */
@@ -92,7 +92,7 @@ int sdl_Initialize(const char *render_driver) {
 	sdl_event_init();
 	sdl_cursor_init();
 	
-	sdl_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
+	gfx_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 
 #ifdef __EMSCRIPTEN__
 	// Prevent SDL from calling emscripten_exit_fullscreen on visibilitychange
@@ -103,13 +103,13 @@ int sdl_Initialize(const char *render_driver) {
 	return 0;
 }
 
-void sdl_Remove(void) {
-	if (sdl_palette)
-		SDL_FreePalette(sdl_palette);
+void gfx_Remove(void) {
+	if (gfx_palette)
+		SDL_FreePalette(gfx_palette);
 	if (main_surface)
 		SDL_FreeSurface(main_surface);
-	if (sdl_renderer)
-		SDL_DestroyRenderer(sdl_renderer);
+	if (gfx_renderer)
+		SDL_DestroyRenderer(gfx_renderer);
 	if (js)
 		SDL_JoystickClose(js);
 	SDL_Quit();
@@ -117,12 +117,12 @@ void sdl_Remove(void) {
 
 /* name is UTF-8 */
 #ifdef __EMSCRIPTEN__
-EM_JS(void, sdl_setWindowTitle, (char *name), {
+EM_JS(void, gfx_setWindowTitle, (char *name), {
 	xsystem35.shell.setWindowTitle(UTF8ToString(name));
 });
 #else
-void sdl_setWindowTitle(char *name) {
-	SDL_SetWindowTitle(sdl_window, name);
+void gfx_setWindowTitle(char *name) {
+	SDL_SetWindowTitle(gfx_window, name);
 }
 #endif
 
@@ -153,12 +153,12 @@ static void window_init(const char *render_driver) {
 #else
 	Uint32 flags = SDL_WINDOW_RESIZABLE;
 #endif
-	sdl_window = SDL_CreateWindow(
+	gfx_window = SDL_CreateWindow(
 		title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, flags);
-	sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
-	SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	sdl_palette = SDL_AllocPalette(256);
+	gfx_renderer = SDL_CreateRenderer(gfx_window, -1, 0);
+	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	gfx_palette = SDL_AllocPalette(256);
 }
 
 static void makeDIB(int width, int height, int depth) {
@@ -187,30 +187,30 @@ static void makeDIB(int width, int height, int depth) {
 	main_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
 	
 	if (main_surface->format->BitsPerPixel == 8) {
-		SDL_SetSurfacePalette(main_surface, sdl_palette);
+		SDL_SetSurfacePalette(main_surface, gfx_palette);
 	}
 
-	if (sdl_dibinfo) {
-		free(sdl_dibinfo);
+	if (gfx_dibinfo) {
+		free(gfx_dibinfo);
 	}
 	
-	sdl_dibinfo = calloc(1, sizeof(surface_t));
-	sdl_dibinfo->width  = width;
-	sdl_dibinfo->height = height;
-	sdl_dibinfo->alpha  = NULL;
-	sdl_dibinfo->sdl_surface = main_surface;
+	gfx_dibinfo = calloc(1, sizeof(surface_t));
+	gfx_dibinfo->width  = width;
+	gfx_dibinfo->height = height;
+	gfx_dibinfo->alpha  = NULL;
+	gfx_dibinfo->sdl_surface = main_surface;
 	
 	image_setdepth(main_surface->format->BitsPerPixel);
 }
 
 /* offscreen の設定 */
-void sdl_setWorldSize(int width, int height, int depth) {
+void gfx_setWorldSize(int width, int height, int depth) {
 	makeDIB(width, height, depth);
 	SDL_FillRect(main_surface, NULL, 0);
 }
 
 /* display の size と depth の取得 */
-void sdl_getWindowInfo(DispInfo *info) {
+void gfx_getWindowInfo(DispInfo *info) {
 	SDL_DisplayMode dm;
 	SDL_GetCurrentDisplayMode(0, &dm);
 	info->width  = dm.w;
@@ -219,11 +219,11 @@ void sdl_getWindowInfo(DispInfo *info) {
 }
 
 /*  DIBの取得 */
-surface_t *sdl_getDIB(void) {
-	return sdl_dibinfo;
+surface_t *gfx_getDIB(void) {
+	return gfx_dibinfo;
 }
 
-SDL_Surface *sdl_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) {
+SDL_Surface *gfx_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) {
 	uint8_t *pixels = sf->pixels;
 	pixels += y * sf->pitch + x * sf->format->BytesPerPixel;
 	SDL_Surface *view = SDL_CreateRGBSurfaceWithFormatFrom(
@@ -242,37 +242,37 @@ void sdl_setAutoRepeat(bool enable) {
 	}
 }
 
-void sdl_setFullscreen(bool on) {
+void gfx_setFullscreen(bool on) {
 #ifndef __EMSCRIPTEN__
-	if (on == sdl_fs_on)
+	if (on == gfx_fullscreen)
 		return;
-	SDL_SetWindowFullscreen(sdl_window, on ? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
-	sdl_fs_on = on;
+	SDL_SetWindowFullscreen(gfx_window, on ? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+	gfx_fullscreen = on;
 #endif
 }
 
-bool sdl_isFullscreen(void) {
-	return sdl_fs_on;
+bool gfx_isFullscreen(void) {
+	return gfx_fullscreen;
 }
 
-void sdl_raiseWindow(void) {
-	SDL_RaiseWindow(sdl_window);
+void gfx_raiseWindow(void) {
+	SDL_RaiseWindow(gfx_window);
 }
 
-void sdl_setWindowSize(int w, int h) {
+void gfx_setWindowSize(int w, int h) {
 	if (w == view_w && h == view_h) return;
 
 	view_w = w;
 	view_h = h;
 
 #ifndef __ANDROID__
-	SDL_SetWindowSize(sdl_window, w, h);
+	SDL_SetWindowSize(gfx_window, w, h);
 #endif
-	SDL_RenderSetLogicalSize(sdl_renderer, w, h);
-	if (sdl_texture)
-		SDL_DestroyTexture(sdl_texture);
-	sdl_texture = SDL_CreateTexture(
-		sdl_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, w, h);
+	SDL_RenderSetLogicalSize(gfx_renderer, w, h);
+	if (gfx_texture)
+		SDL_DestroyTexture(gfx_texture);
+	gfx_texture = SDL_CreateTexture(
+		gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, w, h);
 
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.windowSizeChanged(); );
@@ -286,20 +286,20 @@ void sdl_showMessageBox(enum messagebox_type type, const char* title_utf8, const
 	case MESSAGEBOX_WARNING: flags = SDL_MESSAGEBOX_WARNING; break;
 	case MESSAGEBOX_INFO: flags = SDL_MESSAGEBOX_INFORMATION; break;
 	}
-	SDL_ShowSimpleMessageBox(flags, title_utf8, message_utf8, sdl_window);
+	SDL_ShowSimpleMessageBox(flags, title_utf8, message_utf8, gfx_window);
 }
 
 void sdl_setJoyDeviceIndex(int index) {
 	joy_device_index = index;
 }
 
-void sdl_setIntegerScaling(bool enable) {
-	SDL_RenderSetIntegerScale(sdl_renderer, enable);
+void gfx_setIntegerScaling(bool enable) {
+	SDL_RenderSetIntegerScale(gfx_renderer, enable);
 }
 
 bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
 	SDL_Rect *r = &nact->ags.view_area;
-	SDL_Surface *view = sdl_createSurfaceView(main_surface, r->x, r->y, r->w, r->h);
+	SDL_Surface *view = gfx_createSurfaceView(main_surface, r->x, r->y, r->w, r->h);
 	bool ok = SDL_SaveBMP(view, path) == 0;
 	SDL_FreeSurface(view);
 	return ok;

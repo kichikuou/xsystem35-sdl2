@@ -296,7 +296,7 @@ static void cmd_evaluate(cJSON *args, cJSON *resp) {
 }
 
 static void cmd_continue(cJSON *args, cJSON *resp) {
-	sdl_raiseWindow();
+	gfx_raiseWindow();
 	cJSON_AddBoolToObject(resp, "success", true);
 }
 

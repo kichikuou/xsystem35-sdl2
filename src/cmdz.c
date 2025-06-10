@@ -462,7 +462,7 @@ void commandZZ10() {
 	/* スクリーンモードを取得する */
 	int *var = getCaliVariable();
 
-	*var = sdl_isFullscreen() ? 1 : 0;
+	*var = gfx_isFullscreen() ? 1 : 0;
 	
 	TRACE("ZZ10 %d:",*var);
 }

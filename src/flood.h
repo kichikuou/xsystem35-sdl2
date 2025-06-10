@@ -19,7 +19,7 @@
 #define CONCATENATE(x, y) x ## y
 #define CONCAT(x, y) CONCATENATE(x, y)
 
-static SDL_Rect CONCAT(sdl_floodFill_, TYPE)(int x, int y, Uint32 col) {
+static SDL_Rect CONCAT(gfx_floodFill_, TYPE)(int x, int y, Uint32 col) {
 	int old_color = *(TYPE *)PIXEL_AT(main_surface, x, y);
 	if (old_color == col)
 		return (SDL_Rect){};

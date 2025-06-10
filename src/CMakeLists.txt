@@ -62,6 +62,9 @@ target_sources(xsystem35 PRIVATE
   filecheck.c
   font.c
   hacks.c
+  gfx_draw.c
+  gfx_image.c
+  gfx_video.c
   image.c
   input.c
   jpeg.c
@@ -83,11 +86,8 @@ target_sources(xsystem35 PRIVATE
   scenario.c
   scheduler.c
   sdl_cursor.c
-  sdl_draw.c
   sdl_effect.c
   sdl_event.c
-  sdl_image.c
-  sdl_video.c
   selection.c
   texthook.c
   variable.c

@@ -706,7 +706,7 @@ void commands2F43() {
 	int eLength = getCaliValue();
 	int eColor  = getCaliValue();
 
-	sdl_fillCircle(eX, eY, eLength, eColor);
+	gfx_fillCircle(eX, eY, eLength, eColor);
 	ags_updateArea(eX, eY, eLength, eLength);
 
 	TRACE("grDrawFillCircle %d, %d, %d, %d:", eX, eY, eLength, eColor);
@@ -784,7 +784,7 @@ void commands2F4C() {
 	MyRectangle r = {eSrcX, eSrcY, eWidth, eHeight};
 	MyPoint p = {eX, eY};
 	
-	sdl_updateArea(&r, &p);
+	gfx_updateArea(&r, &p);
 	
 	TRACE("grBlt %d, %d, %d, %d, %d, %d:",
 		      eX, eY, eSrcX, eSrcY, eWidth, eHeight);

@@ -22,7 +22,7 @@
 #undef max
 #include <SDL_syswm.h>
 #include "menu.h"
-#include "sdl_private.h"
+#include "gfx_private.h"
 #include "resources.h"
 
 static HWND get_hwnd(SDL_Window *window) {
@@ -141,7 +141,7 @@ bool input_string(INPUTSTRING_PARAM *p) {
 	DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_TEXTINPUT),
-		get_hwnd(sdl_window),
+		get_hwnd(gfx_window),
 		text_dialog_proc,
 		(LPARAM)p);
 	return true;
@@ -152,7 +152,7 @@ bool input_number(INPUTNUM_PARAM *p) {
 	INT_PTR ret = DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_NUMINPUT),
-		get_hwnd(sdl_window),
+		get_hwnd(gfx_window),
 		num_dialog_proc,
 		(LPARAM)p);
 	return ret == IDOK;

@@ -51,7 +51,7 @@ void sp_eupdate(int type, int time, int cancel) {
 		type = EFFECT_CROSSFADE;
 	}
 	SDL_Rect rect = { 0, 0, main_surface->w, main_surface->h };
-	struct sdl_effect *eff = sdl_effect_init(&rect, NULL, 0, 0, sdl_getDIB(), 0, 0, sdl_effect);
+	struct sdl_effect *eff = sdl_effect_init(&rect, NULL, 0, 0, gfx_getDIB(), 0, 0, sdl_effect);
 
 	int sttime, curtime;
 	sttime = curtime = sdl_getTicks();
