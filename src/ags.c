@@ -36,6 +36,7 @@
 #include "scenario.h"
 #include "ags.h"
 #include "gfx.h"
+#include "effect.h"
 #include "sdl_core.h"
 #include "alpha_plane.h"
 #include "utfsjis.h"
@@ -610,16 +611,16 @@ void ags_runEffect(int duration_ms, bool cancelable, ags_EffectStepFunc step, vo
 	step(arg, 1.0);
 }
 
-static void fade(int duration, bool cancelable, enum sdl_effect_type type) {
+static void fade(int duration, bool cancelable, enum effect_type type) {
 	nact->waitcancel_key = 0;
 
 	SDL_Rect rect = {0, 0, nact->ags.view_area.w, nact->ags.view_area.h};
-	struct sdl_effect *eff = sdl_effect_init(
+	struct effect *eff = effect_init(
 		&rect, NULL, 0, 0,
 		gfx_getDIB(), nact->ags.view_area.x, nact->ags.view_area.y,
 		type);
-	ags_runEffect(duration, cancelable, (ags_EffectStepFunc)sdl_effect_step, eff);
-	sdl_effect_finish(eff);
+	ags_runEffect(duration, cancelable, (ags_EffectStepFunc)effect_step, eff);
+	effect_finish(eff);
 }
 
 void ags_fadeIn(int rate, bool flag) {

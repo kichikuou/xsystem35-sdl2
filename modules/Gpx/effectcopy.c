@@ -5,7 +5,7 @@
 #include "portab.h"
 #include "system.h"
 #include "surface.h"
-#include "sdl_core.h"
+#include "effect.h"
 #include "ags.h"
 #include "input.h"
 #include "graph.h"
@@ -24,17 +24,17 @@ void gpx_effect(int no,
 
 	*endtype = 0;
 
-	enum sdl_effect_type type = from_sact_effect(no);
+	enum effect_type type = from_sact_effect(no);
 	if (type == EFFECT_INVALID) {
 		WARNING("Unimplemented effect %d", no);
 		type = EFFECT_CROSSFADE;
 	}
 	SDL_Rect rect = { wx, wy, width, height };
-	struct sdl_effect *eff = sdl_effect_init(&rect, dst, dx, dy, src, sx, sy, type);
+	struct effect *eff = effect_init(&rect, dst, dx, dy, src, sx, sy, type);
 	if (!time)
 		time = (no == SACT_EFFECT_CROSSFADE_DOWN || no == SACT_EFFECT_CROSSFADE_UP) ? 1150 : 2700;
-	ags_runEffect(time, false, (ags_EffectStepFunc)sdl_effect_step, eff);
-	sdl_effect_finish(eff);
+	ags_runEffect(time, false, (ags_EffectStepFunc)effect_step, eff);
+	effect_finish(eff);
 
 	switch (no) {
 	case SACT_EFFECT_FADEOUT:

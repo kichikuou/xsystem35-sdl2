@@ -30,6 +30,7 @@
 #include "sact.h"
 #include "sprite.h"
 #include "gfx.h"
+#include "effect.h"
 #include "sdl_core.h"
 
 /*
@@ -46,25 +47,25 @@ void sp_eupdate(int type, int time, int cancel) {
 
 	sp_update_all(false);
 
-	enum sdl_effect_type sdl_effect = from_sact_effect(type);
-	if (sdl_effect == EFFECT_INVALID) {
+	enum effect_type effect = from_sact_effect(type);
+	if (effect == EFFECT_INVALID) {
 		WARNING("Unimplemented effect %d", type);
 		type = EFFECT_CROSSFADE;
 	}
 	SDL_Rect rect = { 0, 0, main_surface->w, main_surface->h };
-	struct sdl_effect *eff = sdl_effect_init(&rect, NULL, 0, 0, gfx_getDIB(), 0, 0, sdl_effect);
+	struct effect *eff = effect_init(&rect, NULL, 0, 0, gfx_getDIB(), 0, 0, effect);
 
 	int sttime, curtime;
 	sttime = curtime = sdl_getTicks();
 	int edtime = curtime + time * 10;
 
 	while ((curtime = sdl_getTicks()) < edtime) {
-		sdl_effect_step(eff, (float)(curtime - sttime) / (edtime - sttime));
+		effect_step(eff, (float)(curtime - sttime) / (edtime - sttime));
 		int rest = 16 - (sdl_getTicks() - curtime);
 		int key = sys_keywait(rest, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key)
 			break;
 	}
-	sdl_effect_finish(eff);
+	effect_finish(eff);
 	ags_updateFull();
 }

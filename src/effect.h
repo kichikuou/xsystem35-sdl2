@@ -20,6 +20,9 @@
 #ifndef __EFFECT_H__
 #define __EFFECT_H__
 
+#include <SDL_surface.h>
+#include "ags.h"
+
 // Effect types of the CE/CD command.
 enum nact_effect {
 	NACT_EFFECT_PAN_IN_DOWN       = 1,
@@ -116,7 +119,7 @@ enum sact_effect {
 };
 
 // Internal effect numbers.
-enum sdl_effect_type {
+enum effect_type {
 	EFFECT_INVALID,
 	EFFECT_CROSSFADE,
 	EFFECT_FADEOUT,
@@ -186,8 +189,16 @@ enum sdl_effect_type {
 	EFFECT_SACTAMASK,
 };
 
-enum sdl_effect_type from_nact_effect(enum nact_effect effect);
-enum sdl_effect_type from_nact_sprite_effect(enum nact_effect effect);
-enum sdl_effect_type from_sact_effect(enum sact_effect effect);
+enum effect_type from_nact_effect(enum nact_effect effect);
+enum effect_type from_nact_sprite_effect(enum nact_effect effect);
+enum effect_type from_sact_effect(enum sact_effect effect);
+
+struct effect;
+struct effect *effect_init(SDL_Rect *rect, surface_t *old, int ox, int oy, surface_t *new, int nx, int ny, enum effect_type effect);
+struct effect *sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx, int sy, int col, enum effect_type type);
+struct effect *effect_magnify_init(surface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect);
+struct effect *effect_sactamask_init(SDL_Surface *mask);
+void effect_step(struct effect *eff, float progress);
+void effect_finish(struct effect *eff);
 
 #endif /* __EFFECT_H__ */

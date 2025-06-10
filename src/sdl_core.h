@@ -26,22 +26,10 @@
 #include "config.h"
 #include <sys/types.h>
 #include <SDL_events.h>
-#include <SDL_surface.h>
 #include "portab.h"
-#include "ags.h"
 #include "cursor.h"
-#include "effect.h"
 
 struct inputstring_param;
-
-/* Effects */
-struct sdl_effect;
-struct sdl_effect *sdl_effect_init(SDL_Rect *rect, surface_t *old, int ox, int oy, surface_t *new, int nx, int ny, enum sdl_effect_type effect);
-struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx, int sy, int col, enum sdl_effect_type type);
-struct sdl_effect *sdl_effect_magnify_init(surface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect);
-struct sdl_effect *sdl_effect_sactamask_init(SDL_Surface *mask);
-void sdl_effect_step(struct sdl_effect *eff, float progress);
-void sdl_effect_finish(struct sdl_effect *eff);
 
 /* key/pointer 関係 */
 extern void sdl_setJoyDeviceIndex(int index);

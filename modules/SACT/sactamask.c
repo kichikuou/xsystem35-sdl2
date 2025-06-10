@@ -34,7 +34,7 @@
 #include "sact.h"
 #include "pms.h"
 #include "sprite.h"
-#include "sdl_core.h"
+#include "effect.h"
 #include "mmap.h"
 
 // SACTEFAM を使ったマスク
@@ -92,9 +92,9 @@ void sp_eupdate_amap(int index, int time, int cancel) {
 	}
 	SDL_Surface *mask_sf = SDL_CreateRGBSurfaceFrom(mask->pic, mask->width, mask->height, 8, mask->width, 0, 0, 0, 0);
 	sp_update_all(false);  // old = gfx_texture, new = main_surface
-	struct sdl_effect *eff = sdl_effect_sactamask_init(mask_sf);
-	ags_runEffect(time * 10, cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
-	sdl_effect_finish(eff);
+	struct effect *eff = effect_sactamask_init(mask_sf);
+	ags_runEffect(time * 10, cancel, (ags_EffectStepFunc)effect_step, eff);
+	effect_finish(eff);
 	ags_updateFull();
 
 	SDL_FreeSurface(mask_sf);

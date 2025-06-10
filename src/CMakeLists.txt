@@ -59,6 +59,7 @@ target_sources(xsystem35 PRIVATE
   cursor.c
   dri.c
   ecopy.c
+  effect.c
   filecheck.c
   font.c
   hacks.c
@@ -86,7 +87,6 @@ target_sources(xsystem35 PRIVATE
   scenario.c
   scheduler.c
   sdl_cursor.c
-  sdl_effect.c
   sdl_event.c
   selection.c
   texthook.c

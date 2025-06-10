@@ -316,9 +316,9 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 
 	if (sw == NACT_EFFECT_MAGNIFY) {
 		SDL_Rect target_rect = { sx, sy, w, h };
-		struct sdl_effect *eff = sdl_effect_magnify_init(gfx_getDIB(), &nact->ags.view_area, &target_rect);
-		ags_runEffect(duration(sw, opt, NULL), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
-		sdl_effect_finish(eff);
+		struct effect *eff = effect_magnify_init(gfx_getDIB(), &nact->ags.view_area, &target_rect);
+		ags_runEffect(duration(sw, opt, NULL), cancel, (ags_EffectStepFunc)effect_step, eff);
+		effect_finish(eff);
 		// Actual copy.
 		ags_scaledCopyArea(
 			sx, sy, w, h,
@@ -327,15 +327,15 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		return;
 	}
 
-	enum sdl_effect_type sdl_effect = from_nact_effect(sw);
-	if (sdl_effect != EFFECT_INVALID) {
+	enum effect_type effect = from_nact_effect(sw);
+	if (effect != EFFECT_INVALID) {
 		SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
 		// Note that we specify NULL (which means gfx_texture) for the old
 		// surface rather than gfx_getDIB(). This is to use the current display
 		// contents, not reflecting uncommitted palette changes.
-		struct sdl_effect *eff = sdl_effect_init(&rect, NULL, rect.x, rect.y, gfx_getDIB(), sx, sy, sdl_effect);
-		ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
-		sdl_effect_finish(eff);
+		struct effect *eff = effect_init(&rect, NULL, rect.x, rect.y, gfx_getDIB(), sx, sy, effect);
+		ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)effect_step, eff);
+		effect_finish(eff);
 
 		// Actual copy.
 		switch (sw) {
@@ -432,15 +432,15 @@ void ags_eSpriteCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, i
 		return;
 	}
 
-	enum sdl_effect_type type = from_nact_sprite_effect(sw);
+	enum effect_type type = from_nact_sprite_effect(sw);
 	if (type == EFFECT_INVALID) {
 		WARNING("Invalid effect: %d", sw);
 		return;
 	}
 	SDL_Rect rect = { dx - nact->ags.view_area.x, dy - nact->ags.view_area.y, w, h };
-	struct sdl_effect *eff = sdl_sprite_effect_init(&rect, dx, dy, sx, sy, spCol, type);
-	ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)sdl_effect_step, eff);
-	sdl_effect_finish(eff);
+	struct effect *eff = sprite_effect_init(&rect, dx, dy, sx, sy, spCol, type);
+	ags_runEffect(duration(sw, opt, &rect), cancel, (ags_EffectStepFunc)effect_step, eff);
+	effect_finish(eff);
 	// Actual copy.
 	if (sw == 5) {
 		ags_copyArea_shadow(sx, sy, w, h, dx, dy);

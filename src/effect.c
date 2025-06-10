@@ -25,13 +25,13 @@
 
 #include "system.h"
 #include "gfx.h"
-#include "sdl_core.h"
+#include "effect.h"
 #include "gfx_private.h"
 
 #define M_PIf ((float)M_PI)
 #define HAS_SDL_RenderGeometry SDL_VERSION_ATLEAST(2, 0, 18)
 
-enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
+enum effect_type from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
 	case NACT_EFFECT_PAN_IN_DOWN:       return EFFECT_PAN_IN_DOWN;
 	case NACT_EFFECT_PAN_IN_UP:         return EFFECT_PAN_IN_UP;
@@ -83,7 +83,7 @@ enum sdl_effect_type from_nact_effect(enum nact_effect effect) {
 	}
 }
 
-enum sdl_effect_type from_nact_sprite_effect(enum nact_effect effect) {
+enum effect_type from_nact_sprite_effect(enum nact_effect effect) {
 	switch (effect) {
 	case NACT_EFFECT_PAN_IN_DOWN:       return EFFECT_PAN_IN_DOWN;
 	case NACT_EFFECT_PAN_IN_UP:         return EFFECT_PAN_IN_UP;
@@ -94,7 +94,7 @@ enum sdl_effect_type from_nact_sprite_effect(enum nact_effect effect) {
 	}
 }
 
-enum sdl_effect_type from_sact_effect(enum sact_effect effect) {
+enum effect_type from_sact_effect(enum sact_effect effect) {
 	switch (effect) {
 	case SACT_EFFECT_CROSSFADE:           return EFFECT_CROSSFADE;
 	case SACT_EFFECT_FADEOUT:             return EFFECT_FADEOUT;
@@ -173,16 +173,16 @@ static int render_effect_texture(EffectTexture *t, const SDL_Rect* srcrect, cons
 	return SDL_RenderCopy(gfx_renderer, t->tx, &real_srcrect, dstrect);
 }
 
-struct sdl_effect {
-	void (*step)(struct sdl_effect *this, float progress);
-	void (*finish)(struct sdl_effect *this);
-	enum sdl_effect_type type;
+struct effect {
+	void (*step)(struct effect *this, float progress);
+	void (*finish)(struct effect *this);
+	enum effect_type type;
 	SDL_Rect dst_rect;
 	bool is_fullscreen;
 	EffectTexture *tx_old, *tx_new;
 };
 
-static void effect_init(struct sdl_effect *eff, SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
+static void eff_init(struct effect *eff, SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
 	eff->type = type;
 	eff->dst_rect = *rect;
 	eff->is_fullscreen = rect->x == 0 && rect->y == 0
@@ -194,7 +194,7 @@ static void effect_init(struct sdl_effect *eff, SDL_Rect *rect, EffectTexture *o
 		gfx_updateScreen();  // Flush pending display changes.
 }
 
-static void effect_finish(struct sdl_effect *eff, bool present) {
+static void eff_finish(struct effect *eff, bool present) {
 	if (present) {
 		SDL_RenderClear(gfx_renderer);
 		if (!eff->is_fullscreen)
@@ -230,20 +230,20 @@ static inline void move_rect(SDL_Rect *r, int off_x, int off_y) {
 
 // EFFECT_CROSSFADE
 
-static void crossfade_step(struct sdl_effect *eff, float progress);
-static void crossfade_free(struct sdl_effect *eff);
+static void crossfade_step(struct effect *eff, float progress);
+static void crossfade_free(struct effect *eff);
 
-static struct sdl_effect *crossfade_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *crossfade_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, EFFECT_CROSSFADE);
+	eff_init(eff, rect, old, new, EFFECT_CROSSFADE);
 	eff->step = crossfade_step;
 	eff->finish = crossfade_free;
 	return eff;
 }
 
-static void crossfade_step(struct sdl_effect *eff, float progress) {
+static void crossfade_step(struct effect *eff, float progress) {
 	render_effect_texture(eff->tx_old, NULL, &eff->dst_rect);
 	SDL_SetTextureBlendMode(eff->tx_new->tx, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(eff->tx_new->tx, progress * 255);
@@ -253,26 +253,26 @@ static void crossfade_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void crossfade_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void crossfade_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
-static struct sdl_effect *fallback_effect_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
+static struct effect *fallback_effect_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
 	WARNING("Effect %d is not supported in this system. Falling back to crossfade.", type);
 	return crossfade_new(rect, old, new);
 }
 
 // EFFECT_CROSSFADE_{UP,DOWN,LR,RL}
 
-static void crossfade_animation_step(struct sdl_effect *eff, float progress);
-static void crossfade_animation_free(struct sdl_effect *eff);
+static void crossfade_animation_step(struct effect *eff, float progress);
+static void crossfade_animation_free(struct effect *eff);
 
-static struct sdl_effect *crossfade_animation_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *crossfade_animation_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = crossfade_animation_step;
 	eff->finish = crossfade_animation_free;
 	return eff;
@@ -324,7 +324,7 @@ static void crossfade_animation_step_sub(SDL_Rect *rect, EffectTexture *tx, int 
 	SDL_SetTextureBlendMode(tx->tx, SDL_BLENDMODE_NONE);
 }
 
-static void crossfade_animation_step(struct sdl_effect *eff, float progress) {
+static void crossfade_animation_step(struct effect *eff, float progress) {
 	render_effect_texture(eff->tx_old, NULL, &eff->dst_rect);
 
 	switch (eff->type) {
@@ -369,29 +369,29 @@ static void crossfade_animation_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void crossfade_animation_free(struct sdl_effect *eff) {
-	effect_finish(eff, false);
+static void crossfade_animation_free(struct effect *eff) {
+	eff_finish(eff, false);
 	free(eff);
 }
 
 // EFFECT_MOSAIC, EFFECT_CROSSFADE_MOSAIC
 
 struct mosaic_effect {
-	struct sdl_effect eff;
+	struct effect eff;
 	SDL_Texture *tmp_old, *tmp_new, *tx_mosaic;
 };
 
-static void mosaic_step(struct sdl_effect *eff, float progress);
-static void mosaic_free(struct sdl_effect *eff);
+static void mosaic_step(struct effect *eff, float progress);
+static void mosaic_free(struct effect *eff);
 
-static struct sdl_effect *mosaic_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
+static struct effect *mosaic_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
 	if (!SDL_RenderTargetSupported(gfx_renderer))
 		return fallback_effect_new(rect, old, new, type);
 
 	struct mosaic_effect *eff = calloc(1, sizeof(struct mosaic_effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(&eff->eff, rect, old, new, type);
+	eff_init(&eff->eff, rect, old, new, type);
 	eff->tmp_old = SDL_CreateTexture(gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
 	eff->tmp_new = SDL_CreateTexture(gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
 	eff->tx_mosaic = SDL_CreateTexture(gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
@@ -429,7 +429,7 @@ static void mosaic(EffectTexture *src, SDL_Texture *tmp, SDL_Texture *dst, int w
 	SDL_SetRenderTarget(gfx_renderer, NULL);
 }
 
-static void mosaic_step(struct sdl_effect *eff, float progress) {
+static void mosaic_step(struct effect *eff, float progress) {
 	struct mosaic_effect *this = (struct mosaic_effect *)eff;
 
 	if (eff->type == EFFECT_MOSAIC) {
@@ -454,31 +454,31 @@ static void mosaic_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void mosaic_free(struct sdl_effect *eff) {
+static void mosaic_free(struct effect *eff) {
 	struct mosaic_effect *this = (struct mosaic_effect *)eff;
 	SDL_DestroyTexture(this->tmp_old);
 	SDL_DestroyTexture(this->tmp_new);
 	SDL_DestroyTexture(this->tx_mosaic);
-	effect_finish(&this->eff, true);
+	eff_finish(&this->eff, true);
 	free(this);
 }
 
 // EFFECT_{FADE,WHITE}{OUT,IN}
 
-static void brightness_step(struct sdl_effect *eff, float progress);
-static void brightness_free(struct sdl_effect *eff);
+static void brightness_step(struct effect *eff, float progress);
+static void brightness_free(struct effect *eff);
 
-static struct sdl_effect *brightness_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *brightness_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = brightness_step;
 	eff->finish = brightness_free;
 	return eff;
 }
 
-static void brightness_step(struct sdl_effect *eff, float progress) {
+static void brightness_step(struct effect *eff, float progress) {
 	EffectTexture *texture;
 	int color;
 	int alpha;
@@ -525,15 +525,15 @@ static void brightness_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void brightness_free(struct sdl_effect *eff) {
-	effect_finish(eff, false);
+static void brightness_free(struct effect *eff) {
+	eff_finish(eff, false);
 	free(eff);
 }
 
 // EFFECT_DITHERING_{FADE,WHITE}{OUT,IN}
 
-static void dithering_fade_step(struct sdl_effect *eff, float progress);
-static void dithering_fade_free(struct sdl_effect *eff);
+static void dithering_fade_step(struct effect *eff, float progress);
+static void dithering_fade_free(struct effect *eff);
 
 static EffectTexture *create_dither_pattern_texture(int w, int h, int val) {
 	SDL_PixelFormat *fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
@@ -558,29 +558,29 @@ static EffectTexture *create_dither_pattern_texture(int w, int h, int val) {
 	return t;
 }
 
-static struct sdl_effect *dithering_fade_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *dithering_fade_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
 	switch (type) {
 	case EFFECT_DITHERING_FADEOUT:
 		destroy_effect_texture(new);
-		effect_init(eff, rect, old, NULL, type);
+		eff_init(eff, rect, old, NULL, type);
 		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 0);
 		break;
 	case EFFECT_DITHERING_FADEIN:
 		destroy_effect_texture(old);
-		effect_init(eff, rect, new, NULL, type);
+		eff_init(eff, rect, new, NULL, type);
 		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 0);
 		break;
 	case EFFECT_DITHERING_WHITEOUT:
 		destroy_effect_texture(new);
-		effect_init(eff, rect, old, NULL, type);
+		eff_init(eff, rect, old, NULL, type);
 		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 255);
 		break;
 	case EFFECT_DITHERING_WHITEIN:
 		destroy_effect_texture(old);
-		effect_init(eff, rect, new, NULL, type);
+		eff_init(eff, rect, new, NULL, type);
 		eff->tx_new = create_dither_pattern_texture(rect->w, rect->h, 255);
 		break;
 	default:
@@ -591,7 +591,7 @@ static struct sdl_effect *dithering_fade_new(SDL_Rect *rect, EffectTexture *old,
 	return eff;
 }
 
-static void dithering_fade_step(struct sdl_effect *eff, float progress) {
+static void dithering_fade_step(struct effect *eff, float progress) {
 	static const int dither_x[16] = {0,2,2,0,1,3,3,1,1,3,3,1,0,2,2,0};
 	static const int dither_y[16] = {0,2,0,2,1,3,1,3,0,2,0,2,1,3,1,3};
 
@@ -612,7 +612,7 @@ static void dithering_fade_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void dithering_fade_free(struct sdl_effect *eff) {
+static void dithering_fade_free(struct effect *eff) {
 	if (eff->type == EFFECT_DITHERING_FADEOUT) {
 		SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 255);
 		SDL_RenderFillRect(gfx_renderer, &eff->dst_rect);
@@ -620,26 +620,26 @@ static void dithering_fade_free(struct sdl_effect *eff) {
 		SDL_SetRenderDrawColor(gfx_renderer, 255, 255, 255, 255);
 		SDL_RenderFillRect(gfx_renderer, &eff->dst_rect);
 	}
-	effect_finish(eff, false);
+	eff_finish(eff, false);
 	free(eff);
 }
 
 // EFFECT_PAN_IN_*
 
-static void pan_in_step(struct sdl_effect *eff, float progress);
-static void pan_in_free(struct sdl_effect *eff);
+static void pan_in_step(struct effect *eff, float progress);
+static void pan_in_free(struct effect *eff);
 
-static struct sdl_effect *pan_in_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *pan_in_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = pan_in_step;
 	eff->finish = pan_in_free;
 	return eff;
 }
 
-static void pan_in_step(struct sdl_effect *eff, float progress) {
+static void pan_in_step(struct effect *eff, float progress) {
 	render_effect_texture(eff->tx_old, NULL, &eff->dst_rect);
 
 	int h = eff->dst_rect.h * progress;
@@ -656,27 +656,27 @@ static void pan_in_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void pan_in_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void pan_in_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
 // EFFECT_SKIP_LINE_*
 
-static void skip_line_step(struct sdl_effect *eff, float progress);
-static void skip_line_free(struct sdl_effect *eff);
+static void skip_line_step(struct effect *eff, float progress);
+static void skip_line_free(struct effect *eff);
 
-static struct sdl_effect *skip_line_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *skip_line_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = skip_line_step;
 	eff->finish = skip_line_free;
 	return eff;
 }
 
-static void skip_line_step(struct sdl_effect *eff, float progress) {
+static void skip_line_step(struct effect *eff, float progress) {
 	render_effect_texture(eff->tx_old, NULL, &eff->dst_rect);
 
 	if (eff->type == EFFECT_SKIP_LINE_UP_DOWN) {
@@ -720,27 +720,27 @@ static void skip_line_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void skip_line_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void skip_line_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
 // EFFECT_WIPE_*
 
-static void wipe_step(struct sdl_effect *eff, float progress);
-static void wipe_free(struct sdl_effect *eff);
+static void wipe_step(struct effect *eff, float progress);
+static void wipe_free(struct effect *eff);
 
-static struct sdl_effect *wipe_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *wipe_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = wipe_step;
 	eff->finish = wipe_free;
 	return eff;
 }
 
-static void wipe_step(struct sdl_effect *eff, float progress) {
+static void wipe_step(struct effect *eff, float progress) {
 	EffectTexture *bg = eff->tx_old;
 	EffectTexture *fg = eff->tx_new;
 	if (eff->type == EFFECT_WIPE_RL ||
@@ -794,27 +794,27 @@ static void wipe_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void wipe_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void wipe_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
 // EFFECT_CIRCLE_WIPE_*
 
-static void circle_wipe_step(struct sdl_effect *eff, float progress);
-static void circle_wipe_free(struct sdl_effect *eff);
+static void circle_wipe_step(struct effect *eff, float progress);
+static void circle_wipe_free(struct effect *eff);
 
-static struct sdl_effect *circle_wipe_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *circle_wipe_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = circle_wipe_step;
 	eff->finish = circle_wipe_free;
 	return eff;
 }
 
-static void circle_wipe_step(struct sdl_effect *eff, float progress) {
+static void circle_wipe_step(struct effect *eff, float progress) {
 	EffectTexture *bg = eff->tx_old;
 	EffectTexture *fg = eff->tx_new;
 	if (eff->type == EFFECT_CIRCLE_WIPE_IN) {
@@ -844,21 +844,21 @@ static void circle_wipe_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void circle_wipe_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void circle_wipe_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
 // EFFECT_BLIND_*
 
-static void blind_step(struct sdl_effect *eff, float progress);
-static void blind_free(struct sdl_effect *eff);
+static void blind_step(struct effect *eff, float progress);
+static void blind_free(struct effect *eff);
 
-static struct sdl_effect *blind_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *blind_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = blind_step;
 	eff->finish = blind_free;
 	return eff;
@@ -896,7 +896,7 @@ static void blind_vstep(float progress, SDL_Rect *rect, EffectTexture *tx_new, i
 	}
 }
 
-static void blind_step(struct sdl_effect *eff, float progress) {
+static void blind_step(struct effect *eff, float progress) {
 	const int N = 16;
 
 	render_effect_texture(eff->tx_old, NULL, &eff->dst_rect);
@@ -946,27 +946,27 @@ static void blind_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void blind_free(struct sdl_effect *eff) {
-	effect_finish(eff, false);
+static void blind_free(struct effect *eff) {
+	eff_finish(eff, false);
 	free(eff);
 }
 
 // EFFECT_BLEND_*
 
-static void blend_animation_step(struct sdl_effect *eff, float progress);
-static void blend_animation_free(struct sdl_effect *eff);
+static void blend_animation_step(struct effect *eff, float progress);
+static void blend_animation_free(struct effect *eff);
 
-static struct sdl_effect *blend_animation_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *blend_animation_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = blend_animation_step;
 	eff->finish = blend_animation_free;
 	return eff;
 }
 
-static void blend_animation_step(struct sdl_effect *eff, float progress) {
+static void blend_animation_step(struct effect *eff, float progress) {
 	const bool lr = eff->type == EFFECT_BLEND_LR_RL;
 
 	EffectTexture *bg, *fg;
@@ -1006,8 +1006,8 @@ static void blend_animation_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void blend_animation_free(struct sdl_effect *eff) {
-	effect_finish(eff, false);
+static void blend_animation_free(struct effect *eff) {
+	eff_finish(eff, false);
 	free(eff);
 }
 
@@ -1016,28 +1016,28 @@ static void blend_animation_free(struct sdl_effect *eff) {
 #define ZOOM_BLEND_BLUR_STEPS 6
 
 struct zoom_blend_blur_effect {
-	struct sdl_effect eff;
+	struct effect eff;
 	SDL_Texture *tx[ZOOM_BLEND_BLUR_STEPS];
 	int index;
 };
 
-static void zoom_blend_blur_step(struct sdl_effect *eff, float progress);
-static void zoom_blend_blur_free(struct sdl_effect *eff);
+static void zoom_blend_blur_step(struct effect *eff, float progress);
+static void zoom_blend_blur_free(struct effect *eff);
 
-static struct sdl_effect *zoom_blend_blur_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new) {
+static struct effect *zoom_blend_blur_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new) {
 	if (!SDL_RenderTargetSupported(gfx_renderer))
 		return fallback_effect_new(rect, old, new, EFFECT_ZOOM_BLEND_BLUR);
 
 	struct zoom_blend_blur_effect *eff = calloc(1, sizeof(struct zoom_blend_blur_effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(&eff->eff, rect, old, new, EFFECT_ZOOM_BLEND_BLUR);
+	eff_init(&eff->eff, rect, old, new, EFFECT_ZOOM_BLEND_BLUR);
 	eff->eff.step = zoom_blend_blur_step;
 	eff->eff.finish = zoom_blend_blur_free;
 	return &eff->eff;
 }
 
-static void zoom_blend_blur_step(struct sdl_effect *eff, float progress) {
+static void zoom_blend_blur_step(struct effect *eff, float progress) {
 	struct zoom_blend_blur_effect *this = (struct zoom_blend_blur_effect *)eff;
 
 	if (!this->tx[this->index]) {
@@ -1073,13 +1073,13 @@ static void zoom_blend_blur_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void zoom_blend_blur_free(struct sdl_effect *eff) {
+static void zoom_blend_blur_free(struct effect *eff) {
 	struct zoom_blend_blur_effect *this = (struct zoom_blend_blur_effect *)eff;
 	for (int i = 0; i < ZOOM_BLEND_BLUR_STEPS; i++) {
 		if (this->tx[i])
 			SDL_DestroyTexture(this->tx[i]);
 	}
-	effect_finish(&this->eff, true);
+	eff_finish(&this->eff, true);
 	free(this);
 }
 
@@ -1088,22 +1088,22 @@ static void zoom_blend_blur_free(struct sdl_effect *eff) {
 #define LINEAR_BLUR_STEPS 10
 
 struct linear_blur_effect {
-	struct sdl_effect eff;
+	struct effect eff;
 	EffectTexture *blurred_old[LINEAR_BLUR_STEPS];
 	EffectTexture *blurred_new[LINEAR_BLUR_STEPS];
 };
 
-static void linear_blur_step(struct sdl_effect *eff, float progress);
-static void linear_blur_free(struct sdl_effect *eff);
+static void linear_blur_step(struct effect *eff, float progress);
+static void linear_blur_free(struct effect *eff);
 
-static struct sdl_effect *linear_blur_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
+static struct effect *linear_blur_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
 	if (!SDL_RenderTargetSupported(gfx_renderer))
 		return fallback_effect_new(rect, old, new, type);
 
 	struct linear_blur_effect *lbe = calloc(1, sizeof(struct linear_blur_effect));
 	if (!lbe)
 		NOMEMERR();
-	effect_init(&lbe->eff, rect, old, new, type);
+	eff_init(&lbe->eff, rect, old, new, type);
 	lbe->eff.step = linear_blur_step;
 	lbe->eff.finish = linear_blur_free;
 	return &lbe->eff;
@@ -1151,7 +1151,7 @@ static EffectTexture *blur(struct linear_blur_effect *this, EffectTexture *src, 
 	return dst;
 }
 
-static void linear_blur_step(struct sdl_effect *eff, float progress) {
+static void linear_blur_step(struct effect *eff, float progress) {
 	struct linear_blur_effect *this = (struct linear_blur_effect *)eff;
 
 	int step = progress * LINEAR_BLUR_STEPS * 2;
@@ -1178,7 +1178,7 @@ static void linear_blur_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void linear_blur_free(struct sdl_effect *eff) {
+static void linear_blur_free(struct effect *eff) {
 	struct linear_blur_effect *this = (struct linear_blur_effect *)eff;
 	for (int i = 0; i < LINEAR_BLUR_STEPS; i++) {
 		if (this->blurred_old[i])
@@ -1186,27 +1186,27 @@ static void linear_blur_free(struct sdl_effect *eff) {
 		if (this->blurred_new[i])
 			destroy_effect_texture(this->blurred_new[i]);
 	}
-	effect_finish(&this->eff, true);
+	eff_finish(&this->eff, true);
 	free(this);
 }
 
 // EFFECT_PENTAGRAM_*, EFFECT_HEXAGRAM_*, EFFECT_WINDMILL*
 
 struct polygon_mask_effect {
-	struct sdl_effect f;
+	struct effect f;
 	SDL_Texture *tx_tmp;
 };
 
-static void polygon_mask_step(struct sdl_effect *eff, float progress);
-static void polygon_mask_free(struct sdl_effect *eff);
+static void polygon_mask_step(struct effect *eff, float progress);
+static void polygon_mask_free(struct effect *eff);
 
-static struct sdl_effect *polygon_mask_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
+static struct effect *polygon_mask_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
 #if HAS_SDL_RenderGeometry
 	if (SDL_RenderTargetSupported(gfx_renderer)) {
 		struct polygon_mask_effect *pmf = calloc(1, sizeof(struct polygon_mask_effect));
 		if (!pmf)
 			NOMEMERR();
-		effect_init(&pmf->f, rect, old, new, type);
+		eff_init(&pmf->f, rect, old, new, type);
 		pmf->tx_tmp = SDL_CreateTexture(gfx_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
 		pmf->f.step = polygon_mask_step;
 		pmf->f.finish = polygon_mask_free;
@@ -1403,7 +1403,7 @@ static void draw_windmill_360(int w, int h, float theta) {
 	SDL_RenderGeometry(gfx_renderer, NULL, v, 10, indices, i);
 }
 
-static void polygon_mask_step(struct sdl_effect *eff, float progress) {
+static void polygon_mask_step(struct effect *eff, float progress) {
 	struct polygon_mask_effect *this = (struct polygon_mask_effect *)eff;
 	int w = eff->dst_rect.w;
 	int h = eff->dst_rect.h;
@@ -1441,10 +1441,10 @@ static void polygon_mask_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void polygon_mask_free(struct sdl_effect *eff) {
+static void polygon_mask_free(struct effect *eff) {
 	struct polygon_mask_effect *this = (struct polygon_mask_effect *)eff;
 	SDL_DestroyTexture(this->tx_tmp);
-	effect_finish(&this->f, true);
+	eff_finish(&this->f, true);
 	free(this);
 }
 
@@ -1452,20 +1452,20 @@ static void polygon_mask_free(struct sdl_effect *eff) {
 
 // EFFECT_ROTATE_*
 
-static void rotate_step(struct sdl_effect *eff, float progress);
-static void rotate_free(struct sdl_effect *eff);
+static void rotate_step(struct effect *eff, float progress);
+static void rotate_free(struct effect *eff);
 
-static struct sdl_effect *rotate_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *rotate_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = rotate_step;
 	eff->finish = rotate_free;
 	return eff;
 }
 
-static void rotate_step(struct sdl_effect *eff, float progress) {
+static void rotate_step(struct effect *eff, float progress) {
 	EffectTexture *bg_texture, *fg_texture;
 	float angle = progress * 360;
 	float scale = progress;
@@ -1508,27 +1508,27 @@ static void rotate_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void rotate_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void rotate_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
 // EFFECT_POLYGON_ROTATE_*
 
-static void polygon_rotate_step(struct sdl_effect *eff, float progress);
-static void polygon_rotate_free(struct sdl_effect *eff);
+static void polygon_rotate_step(struct effect *eff, float progress);
+static void polygon_rotate_free(struct effect *eff);
 
-static struct sdl_effect *polygon_rotate_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum sdl_effect_type type) {
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+static struct effect *polygon_rotate_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, old, new, type);
+	eff_init(eff, rect, old, new, type);
 	eff->step = polygon_rotate_step;
 	eff->finish = polygon_rotate_free;
 	return eff;
 }
 
-static void polygon_rotate_step(struct sdl_effect *eff, float progress) {
+static void polygon_rotate_step(struct effect *eff, float progress) {
 	bool vertical = eff->type == EFFECT_POLYGON_ROTATE_Y || eff->type == EFFECT_POLYGON_ROTATE_Y_CW;
 	EffectTexture *texture = progress < 0.5f ? eff->tx_old : eff->tx_new;
 	float angle = progress < 0.5f ? progress * M_PIf : (progress - 1.f) * M_PIf;
@@ -1568,29 +1568,29 @@ static void polygon_rotate_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void polygon_rotate_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void polygon_rotate_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
 // EFFECT_ZIGZAG_CROSSFADE
 
 struct zigzag_crossfade_effect {
-	struct sdl_effect eff;
+	struct effect eff;
 	SDL_Texture *tmp1, *tmp2;
 };
 
-static void zigzag_crossfade_step(struct sdl_effect *eff, float progress);
-static void zigzag_crossfade_free(struct sdl_effect *eff);
+static void zigzag_crossfade_step(struct effect *eff, float progress);
+static void zigzag_crossfade_free(struct effect *eff);
 
-static struct sdl_effect *zigzag_crossfade_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new) {
+static struct effect *zigzag_crossfade_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new) {
 	if (!SDL_RenderTargetSupported(gfx_renderer))
 		return fallback_effect_new(rect, old, new, EFFECT_ZIGZAG_CROSSFADE);
 
 	struct zigzag_crossfade_effect *eff = calloc(1, sizeof(struct zigzag_crossfade_effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(&eff->eff, rect, old, new, EFFECT_ZIGZAG_CROSSFADE);
+	eff_init(&eff->eff, rect, old, new, EFFECT_ZIGZAG_CROSSFADE);
 	eff->tmp1 = SDL_CreateTexture(gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
 	eff->tmp2 = SDL_CreateTexture(gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, rect->w, rect->h);
 	eff->eff.step = zigzag_crossfade_step;
@@ -1624,7 +1624,7 @@ static void wave_warp_v(SDL_Texture *src, SDL_Texture *dst, int w, int h, float 
 	SDL_SetRenderTarget(gfx_renderer, NULL);
 }
 
-static void zigzag_crossfade_step(struct sdl_effect *eff, float progress) {
+static void zigzag_crossfade_step(struct effect *eff, float progress) {
 	struct zigzag_crossfade_effect *this = (struct zigzag_crossfade_effect *)eff;
 
 	float amp = (progress < 0.5f ? progress : 1.f - progress) * 80;
@@ -1645,36 +1645,36 @@ static void zigzag_crossfade_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void zigzag_crossfade_free(struct sdl_effect *eff) {
+static void zigzag_crossfade_free(struct effect *eff) {
 	struct zigzag_crossfade_effect *this = (struct zigzag_crossfade_effect *)eff;
 	SDL_DestroyTexture(this->tmp1);
 	SDL_DestroyTexture(this->tmp2);
-	effect_finish(&this->eff, true);
+	eff_finish(&this->eff, true);
 	free(this);
 }
 
 // EFFECT_MAGNIFY
 
 struct magnify_effect {
-	struct sdl_effect eff;
+	struct effect eff;
 	SDL_Rect new_rect;
 };
 
-static void magnify_step(struct sdl_effect *eff, float progress);
-static void magnify_free(struct sdl_effect *eff);
+static void magnify_step(struct effect *eff, float progress);
+static void magnify_free(struct effect *eff);
 
-static struct sdl_effect *magnify_new(EffectTexture *tx, SDL_Rect *old_rect, SDL_Rect *new_rect) {
+static struct effect *magnify_new(EffectTexture *tx, SDL_Rect *old_rect, SDL_Rect *new_rect) {
 	struct magnify_effect *eff = calloc(1, sizeof(struct magnify_effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(&eff->eff, old_rect, tx, NULL, EFFECT_MAGNIFY);
+	eff_init(&eff->eff, old_rect, tx, NULL, EFFECT_MAGNIFY);
 	eff->new_rect = *new_rect;
 	eff->eff.step = magnify_step;
 	eff->eff.finish = magnify_free;
 	return &eff->eff;
 }
 
-static void magnify_step(struct sdl_effect *eff, float progress) {
+static void magnify_step(struct effect *eff, float progress) {
 	struct magnify_effect *this = (struct magnify_effect *)eff;
 	SDL_Rect *or = &eff->dst_rect;
 	SDL_Rect *nr = &this->new_rect;
@@ -1688,30 +1688,30 @@ static void magnify_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void magnify_free(struct sdl_effect *eff) {
-	effect_finish(eff, false);
+static void magnify_free(struct effect *eff) {
+	eff_finish(eff, false);
 	free(eff);
 }
 
 // EFFECT_RASTER_BLEND
 
-static void raster_blend_step(struct sdl_effect *eff, float progress);
-static void raster_blend_free(struct sdl_effect *eff);
+static void raster_blend_step(struct effect *eff, float progress);
+static void raster_blend_free(struct effect *eff);
 
-static struct sdl_effect *raster_blend_new(SDL_Rect *rect, int sx, int sy) {
+static struct effect *raster_blend_new(SDL_Rect *rect, int sx, int sy) {
 	SDL_Surface *sprite = gfx_dib_to_surface_with_alpha(sx, sy, rect->w, rect->h);
 	EffectTexture *texture = create_effect_texture_from_surface(sprite);
 	SDL_FreeSurface(sprite);
-	struct sdl_effect *eff = calloc(1, sizeof(struct sdl_effect));
+	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
-	effect_init(eff, rect, NULL, texture, EFFECT_RASTER_BLEND);
+	eff_init(eff, rect, NULL, texture, EFFECT_RASTER_BLEND);
 	eff->step = raster_blend_step;
 	eff->finish = raster_blend_free;
 	return eff;
 }
 
-static void raster_blend_step(struct sdl_effect *eff, float progress) {
+static void raster_blend_step(struct effect *eff, float progress) {
 	SDL_Rect s_rect = { 0, 0, eff->dst_rect.w, 1 };
 	SDL_Rect d_rect = eff->dst_rect;
 	d_rect.h = 1;
@@ -1725,23 +1725,23 @@ static void raster_blend_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void raster_blend_free(struct sdl_effect *eff) {
-	effect_finish(eff, false);
+static void raster_blend_free(struct effect *eff) {
+	eff_finish(eff, false);
 	free(eff);
 }
 
 // SACTAMASK
 
 struct sactamask_effect {
-	struct sdl_effect eff;
+	struct effect eff;
 	SDL_Surface *sf_new;
 	SDL_Surface *mask;
 };
 
-static void sactamask_step(struct sdl_effect *eff, float progress);
-static void sactamask_free(struct sdl_effect *eff);
+static void sactamask_step(struct effect *eff, float progress);
+static void sactamask_free(struct effect *eff);
 
-static struct sdl_effect *sactamask_new(EffectTexture *tx_old, SDL_Surface *sf_new, SDL_Surface *mask) {
+static struct effect *sactamask_new(EffectTexture *tx_old, SDL_Surface *sf_new, SDL_Surface *mask) {
 	struct sactamask_effect *eff = calloc(1, sizeof(struct sactamask_effect));
 	if (!eff)
 		NOMEMERR();
@@ -1752,7 +1752,7 @@ static struct sdl_effect *sactamask_new(EffectTexture *tx_old, SDL_Surface *sf_n
 	SDL_SetTextureBlendMode(tx_new->tx, SDL_BLENDMODE_BLEND);
 
 	SDL_Rect rect = {0, 0, mask->w, mask->h};
-	effect_init(&eff->eff, &rect, tx_old, tx_new, EFFECT_SACTAMASK);
+	eff_init(&eff->eff, &rect, tx_old, tx_new, EFFECT_SACTAMASK);
 	eff->sf_new = sf_new;
 	eff->mask = mask;
 	eff->eff.step = sactamask_step;
@@ -1760,7 +1760,7 @@ static struct sdl_effect *sactamask_new(EffectTexture *tx_old, SDL_Surface *sf_n
 	return &eff->eff;
 }
 
-static void sactamask_step(struct sdl_effect *eff, float progress) {
+static void sactamask_step(struct effect *eff, float progress) {
 	struct sactamask_effect *this = (struct sactamask_effect *)eff;
 
 	SDL_Surface *sf;
@@ -1785,14 +1785,14 @@ static void sactamask_step(struct sdl_effect *eff, float progress) {
 	SDL_RenderPresent(gfx_renderer);
 }
 
-static void sactamask_free(struct sdl_effect *eff) {
-	effect_finish(eff, true);
+static void sactamask_free(struct effect *eff) {
+	eff_finish(eff, true);
 	free(eff);
 }
 
 // -----------------
 
-struct sdl_effect *sdl_effect_init(SDL_Rect *rect, surface_t *old, int ox, int oy, surface_t *new, int nx, int ny, enum sdl_effect_type type) {
+struct effect *effect_init(SDL_Rect *rect, surface_t *old, int ox, int oy, surface_t *new, int nx, int ny, enum effect_type type) {
 	EffectTexture *tx_old = create_effect_texture(old, ox, oy, rect->w, rect->h);
 	EffectTexture *tx_new = create_effect_texture(new, nx, ny, rect->w, rect->h);
 
@@ -1883,7 +1883,7 @@ struct sdl_effect *sdl_effect_init(SDL_Rect *rect, surface_t *old, int ox, int o
 	}
 }
 
-struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx, int sy, int col, enum sdl_effect_type type) {
+struct effect *sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx, int sy, int col, enum effect_type type) {
 	EffectTexture *tx_old = create_effect_texture(gfx_dibinfo, dx, dy, rect->w, rect->h);
 	SDL_Surface *sprite = gfx_dib_to_surface_colorkey(sx, sy, rect->w, rect->h, col);
 	EffectTexture *tx_new = create_effect_texture_from_surface(sprite);
@@ -1904,23 +1904,23 @@ struct sdl_effect *sdl_sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx
 	}
 }
 
-struct sdl_effect *sdl_effect_magnify_init(surface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
+struct effect *effect_magnify_init(surface_t *surface, SDL_Rect *view_rect, SDL_Rect *target_rect) {
 	EffectTexture *tx = create_effect_texture(surface, view_rect->x, view_rect->y, view_rect->w, view_rect->h);
 	return magnify_new(tx, view_rect, target_rect);
 }
 
-struct sdl_effect *sdl_effect_sactamask_init(SDL_Surface *mask) {
+struct effect *effect_sactamask_init(SDL_Surface *mask) {
 	EffectTexture *tx_old = create_effect_texture(NULL, 0, 0, main_surface->w, main_surface->h);
 	return sactamask_new(tx_old, main_surface, mask);
 }
 
-void sdl_effect_step(struct sdl_effect *eff, float progress) {
+void effect_step(struct effect *eff, float progress) {
 	SDL_RenderClear(gfx_renderer);
 	if (!eff->is_fullscreen)
 		SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
 	eff->step(eff, progress);
 }
 
-void sdl_effect_finish(struct sdl_effect *eff) {
+void effect_finish(struct effect *eff) {
 	eff->finish(eff);
 }
