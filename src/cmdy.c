@@ -67,7 +67,7 @@ unsigned Y3waitFlags = KEYWAIT_CANCELABLE;
  * delay, when a button is pressed.
  *
  * For Rance4 v2, this does not work because the UI loop also checks keyboard
- * status, so we use a different hack. See rance4v2_hack() in sdl_event.c.
+ * status, so we use a different hack. See rance4v2_hack() in event.c.
  */
 static void rance4_Y3_IM_hack() {
 	static int count;

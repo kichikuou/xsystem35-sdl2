@@ -1,6 +1,4 @@
 /*
- * sdl_darw.c  SDL event handler
- *
  * Copyright (C) 2000-     Fumihiko Murata       <fmurata@p1.tcnet.ne.jp>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: sdl_event.c,v 1.5 2001/12/16 17:12:56 chikama Exp $ */
 
 #include "config.h"
 
@@ -31,12 +28,12 @@
 #include <emscripten.h>
 #endif
 
+#include "event.h"
 #include "portab.h"
 #include "system.h"
 #include "debugger.h"
 #include "nact.h"
 #include "gfx.h"
-#include "sdl_core.h"
 #include "gfx_private.h"
 #include "scheduler.h"
 #include "menu.h"
@@ -44,8 +41,10 @@
 #include "msgskip.h"
 #include "hacks.h"
 
-static void sdl_getEvent(void);
+static void get_event(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed);
+
+bool (*event_custom_handler)(const SDL_Event *);
 
 static uint32_t custom_event_type = (uint32_t)-1;
 
@@ -62,7 +61,7 @@ bool RawKeyInfo[256];
 /* SDL Joystick */
 static int joyinfo=0;
 
-static int sdl_keytable[SDL_NUM_SCANCODES] = {
+static int keytable[SDL_NUM_SCANCODES] = {
 	[SDL_SCANCODE_A] = KEY_A,
 	[SDL_SCANCODE_B] = KEY_B,
 	[SDL_SCANCODE_C] = KEY_C,
@@ -187,7 +186,7 @@ static int sdl_keytable[SDL_NUM_SCANCODES] = {
 static int joy_device_index = -1;
 static SDL_Joystick *js;
 
-static bool sdl_joy_open(int index) {
+static bool joy_open(int index) {
 	if (js)
 		return false;
 
@@ -203,33 +202,33 @@ static bool sdl_joy_open(int index) {
 	return true;
 }
 
-static bool joy_open(void) {
+static bool joy_init(void) {
 	SDL_Init(SDL_INIT_JOYSTICK);
 
 	if (joy_device_index >= 0)
-		return sdl_joy_open(joy_device_index);
+		return joy_open(joy_device_index);
 
 	for (int i = 0; i < SDL_NumJoysticks(); i++) {
-		if (sdl_joy_open(i))
+		if (joy_open(i))
 			return true;
 	}
 	return false;
 }
 
-void sdl_event_init(void) {
+void event_init(void) {
 	if (custom_event_type == (uint32_t)-1)
 		custom_event_type = SDL_RegisterEvents(1);
-	joy_open();
+	joy_init();
 }
 
-void sdl_event_remove(void) {
+void event_remove(void) {
 	if (js) {
 		SDL_JoystickClose(js);
 		js = NULL;
 	}
 }
 
-void sdl_setJoyDeviceIndex(int index) {
+void event_set_joy_device_index(int index) {
 	joy_device_index = index;
 }
 
@@ -277,7 +276,7 @@ void send_agsevent(enum agsevent_type type, int code) {
 #endif
 }
 
-void sdl_setCursorLocation(int x, int y) {
+void event_set_mouse_location(int x, int y) {
 	// scale mouse x and y
 	float scalex, scaley;
 	SDL_RenderGetScale(gfx_renderer, &scalex, &scaley);
@@ -304,7 +303,7 @@ void sdl_setCursorLocation(int x, int y) {
 	SDL_WarpMouseInWindow(gfx_window, x, y);
 }
 
-void sdl_setCursorInternalLocation(int x, int y) {
+void event_set_mouse_internal_location(int x, int y) {
 	mousex = x;
 	mousey = y;
 	send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
@@ -353,8 +352,8 @@ static void rance4v2_hack(void) {
 		cancel_yield();
 }
 
-void sdl_handle_event(SDL_Event *e) {
-	if (sdl_custom_event_handler && sdl_custom_event_handler(e))
+void event_handle_event(SDL_Event *e) {
+	if (event_custom_handler && event_custom_handler(e))
 		return;
 
 	switch (e->type) {
@@ -397,7 +396,7 @@ void sdl_handle_event(SDL_Event *e) {
 #endif
 		break;
 	case SDL_MOUSEMOTION:
-		sdl_setCursorInternalLocation(e->motion.x, e->motion.y);
+		event_set_mouse_internal_location(e->motion.x, e->motion.y);
 #ifdef _WIN32
 		win_menu_onMouseMotion(e->motion.x, e->motion.y);
 #endif
@@ -472,7 +471,7 @@ void sdl_handle_event(SDL_Event *e) {
 		break;
 
 	case SDL_JOYDEVICEADDED:
-		sdl_joy_open(e->jdevice.which);
+		joy_open(e->jdevice.which);
 		break;
 
 	case SDL_JOYAXISMOTION:
@@ -551,7 +550,7 @@ void sdl_handle_event(SDL_Event *e) {
 }
 
 /* Event処理 */
-static void sdl_getEvent(void) {
+static void get_event(void) {
 	enum scheduler_event scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_MISS;
 
 	fire_deferred_touch_event();
@@ -559,7 +558,7 @@ static void sdl_getEvent(void) {
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {
 		scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_HIT;
-		sdl_handle_event(&e);
+		event_handle_event(&e);
 	}
 	scheduler_on_event(scheduler_event);
 	if (game_id == GAME_RANCE4_V2)
@@ -568,15 +567,15 @@ static void sdl_getEvent(void) {
 
 /* キー情報の取得 */
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed) {
-	int code = sdl_keytable[e->keysym.scancode];
+	int code = keytable[e->keysym.scancode];
 	RawKeyInfo[code] = pressed;
 	send_agsevent(pressed ? AGSEVENT_KEY_PRESS : AGSEVENT_KEY_RELEASE, code);
 }
 
-int sdl_getKeyInfo() {
+int event_get_key(void) {
 	int rt;
 	
-	sdl_getEvent();
+	get_event();
 	
 	rt = ((RawKeyInfo[KEY_UP]     || RawKeyInfo[KEY_PAD_8])       |
 	      ((RawKeyInfo[KEY_DOWN]  || RawKeyInfo[KEY_PAD_2]) << 1) |
@@ -590,8 +589,8 @@ int sdl_getKeyInfo() {
 	return rt;
 }
 
-int sdl_getMouseInfo(SDL_Point *p) {
-	sdl_getEvent();
+int event_get_mouse(SDL_Point *p) {
+	get_event();
 	
 	if (p) {
 		p->x = mousex;
@@ -603,7 +602,7 @@ int sdl_getMouseInfo(SDL_Point *p) {
 	return m1 | m2;
 }
 
-void sdl_getWheelInfo(int *forward, int *back) {
+void event_get_wheel(int *forward, int *back) {
 	*forward = mouse_wheel_up;
 	*back = mouse_wheel_down;
 
@@ -612,16 +611,16 @@ void sdl_getWheelInfo(int *forward, int *back) {
 #endif
 }
 
-void sdl_clearWheelInfo(void) {
+void event_clear_wheel(void) {
 	mouse_wheel_up = mouse_wheel_down = 0;
 }
 
-int sdl_getJoyInfo(void) {
-	sdl_getEvent();
+int event_get_joy(void) {
+	get_event();
 	return joyinfo;
 }
 
-void sdl_post_debugger_command(void *data) {
+void event_post_debugger_command(void *data) {
 	SDL_Event event = {
 		.user = {
 			.type = custom_event_type,

@@ -57,7 +57,7 @@
 #include "ags.h"
 #include "font.h"
 #include "gfx.h"
-#include "sdl_core.h"
+#include "event.h"
 #include "menu.h"
 #include "music.h"
 #include "music_cdrom.h"
@@ -262,7 +262,7 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			midi_set_output_device(argv[i][2] | subdev);
 		} else if (0 == strcmp(argv[i], "-devjoy")) {
 			if (argv[i + 1] != NULL) {
-				sdl_setJoyDeviceIndex(atoi(argv[i + 1]));
+				event_set_joy_device_index(atoi(argv[i + 1]));
 			}
 		} else if (0 == strcmp(argv[i], "-fullscreen")) {
 			fs_on = true;
@@ -360,7 +360,7 @@ static void check_profile() {
 	/* joystick device name の設定 */
 	param = get_profile("joy_device");
 	if (param) {
-		sdl_setJoyDeviceIndex(atoi(param));
+		event_set_joy_device_index(atoi(param));
 	}
 	/* MIDI output device の設定 */
 	param = get_profile("midi_output_device");

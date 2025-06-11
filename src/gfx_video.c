@@ -33,7 +33,6 @@
 #include "system.h"
 #include "gfx.h"
 #include "gfx_private.h"
-#include "sdl_core.h"
 #include "xsystem35.h"
 #include "image.h"
 
@@ -47,7 +46,6 @@ int view_w;
 int view_h;
 bool gfx_dirty;
 bool gfx_fullscreen;
-bool (*sdl_custom_event_handler)(const SDL_Event *);
 
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
@@ -58,8 +56,6 @@ int gfx_Initialize(const char *render_driver) {
 	
 	/* offscreen Pixmap */
 	makeDIB(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SYS35_DEFAULT_DEPTH);
-
-	sdl_event_init();
 
 	gfx_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 
@@ -78,7 +74,6 @@ void gfx_Remove(void) {
 		SDL_FreeSurface(main_surface);
 	if (gfx_renderer)
 		SDL_DestroyRenderer(gfx_renderer);
-	sdl_event_remove();
 	SDL_Quit();
 }
 
@@ -198,15 +193,6 @@ SDL_Surface *gfx_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) 
 	if (sf->format->palette)
 		SDL_SetSurfacePalette(view, sf->format->palette);
 	return view;
-}
-
-/* AutoRepeat の設定 */
-void sdl_setAutoRepeat(bool enable) {
-	if (enable) {
-		// SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	} else {
-		// SDL_EnableKeyRepeat(0, 0);
-	}
 }
 
 void gfx_setFullscreen(bool on) {

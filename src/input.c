@@ -25,7 +25,7 @@
 #include <limits.h>
 #include "config.h"
 #include "input.h"
-#include "sdl_core.h"
+#include "event.h"
 #include "scheduler.h"
 #include "xsystem35.h"
 #include "message.h"
@@ -53,7 +53,7 @@ void set_hak_keymode(int key, int mode) {
 
 int sys_getMouseInfo(SDL_Point *p, bool is_dibgeo) {
 	SDL_Point _p;
-	int key = sdl_getMouseInfo(&_p);
+	int key = event_get_mouse(&_p);
 	
 	if (p) {
 		p->x = _p.x;
@@ -67,23 +67,23 @@ int sys_getMouseInfo(SDL_Point *p, bool is_dibgeo) {
 }
 
 void sys_getWheelInfo(int *forward, int *back) {
-	sdl_getWheelInfo(forward, back);
+	event_get_wheel(forward, back);
 }
 
 void sys_clearWheelInfo(void) {
-	sdl_clearWheelInfo();
+	event_clear_wheel();
 }
 
 int sys_getKeyInfo() {
-	return sdl_getKeyInfo();
+	return event_get_key();
 }
 
 int sys_getJoyInfo() {
-	return sdl_getJoyInfo();
+	return event_get_joy();
 }
 
 int sys_getInputInfo() {
-	return sdl_getMouseInfo(NULL) | sdl_getKeyInfo() | sdl_getJoyInfo();
+	return event_get_mouse(NULL) | event_get_key() | event_get_joy();
 }
 
 int sys_keywait(int msec, unsigned flags) {

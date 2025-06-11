@@ -32,7 +32,7 @@
 #include "debug_symbol.h"
 #include "msgqueue.h"
 #include "gfx.h"
-#include "sdl_core.h"
+#include "event.h"
 #include "system.h"
 #include "nact.h"
 #include "variable.h"
@@ -594,13 +594,13 @@ static int read_command_thread(void *data) {
 				free(buf);
 				break;
 			}
-			sdl_post_debugger_command(buf);
+			event_post_debugger_command(buf);
 			content_length = -1;
 		} else {
 			fprintf(stderr, "Unknown Debug Adapter Protocol header: %s", header);
 		}
 	}
-	sdl_post_debugger_command(NULL);  // end of messages
+	event_post_debugger_command(NULL);  // end of messages
 	return 0;
 }
 
@@ -618,7 +618,7 @@ static void dbg_dap_init(const char *path) {
 	while (!initialized && !nact->is_quit) {
 		SDL_Event e;
 		SDL_WaitEvent(&e);
-		sdl_handle_event(&e);
+		event_handle_event(&e);
 		while (!msgq_isempty(queue)) {
 			char *msg = msgq_dequeue(queue);
 			if (!msg)
@@ -640,7 +640,7 @@ static void dbg_dap_repl(int bp_no) {
 	while (continue_repl && !nact->is_quit) {
 		SDL_Event e;
 		SDL_WaitEvent(&e);
-		sdl_handle_event(&e);
+		event_handle_event(&e);
 		while (!msgq_isempty(queue)) {
 			char *msg = msgq_dequeue(queue);
 			if (!msg)

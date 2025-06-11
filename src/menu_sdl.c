@@ -27,7 +27,7 @@
 #include "system.h"
 #include "nact.h"
 #include "menu.h"
-#include "sdl_core.h"
+#include "editor.h"
 #include "gfx_private.h"
 #ifdef _WIN32
 #include "win/dialog.h"
@@ -93,7 +93,7 @@ bool menu_inputstring(INPUTSTRING_PARAM *p) {
 }
 
 bool menu_inputstring2(INPUTSTRING_PARAM *p) {
-	return sdl_inputString(p);
+	return edit_string(p);
 }
 
 bool menu_inputnumber(INPUTNUM_PARAM *p) {

@@ -23,7 +23,6 @@
 #include "gfx.h"
 #include "gfx_private.h"
 #include "scheduler.h"
-#include "sdl_core.h"
 
 #ifdef __ANDROID__
 #include <android/log.h>

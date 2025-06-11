@@ -21,9 +21,9 @@
 #include <string.h>
 #include <SDL.h>
 
-#include "sdl_core.h"
+#include "editor.h"
+#include "event.h"
 #include "gfx.h"
-#include "gfx_private.h"
 #include "menu.h"
 #include "nact.h"
 #include "system.h"
@@ -131,7 +131,7 @@ static bool handle_event(const SDL_Event *e) {
 	return false;
 }
 
-bool sdl_inputString(INPUTSTRING_PARAM *p) {
+bool edit_string(INPUTSTRING_PARAM *p) {
 	static char *buf;
 	free(buf);
 	buf = malloc(p->max * MAX_UTF8_BYTES_PAR_CHAR + 1);
@@ -155,14 +155,14 @@ bool sdl_inputString(INPUTSTRING_PARAM *p) {
 	ags_setFont(FONT_GOTHIC, p->h);
 	redraw();
 
-	sdl_custom_event_handler = handle_event;
+	event_custom_handler = handle_event;
 	while (!input->done) {
-		sdl_getKeyInfo();  // message pump
+		event_get_key();  // message pump
 		nact->callback();
 		sys_wait_vsync();
 	}
 	SDL_StopTextInput();
-	sdl_custom_event_handler = NULL;
+	event_custom_handler = NULL;
 
 	ags_restoreRegion(saved_region, s.rect.x, s.rect.y);
 	ags_updateArea(s.rect.x, s.rect.y, s.rect.w, s.rect.h);

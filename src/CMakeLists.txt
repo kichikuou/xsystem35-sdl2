@@ -60,6 +60,7 @@ target_sources(xsystem35 PRIVATE
   dri.c
   ecopy.c
   effect.c
+  event.c
   filecheck.c
   font.c
   hacks.c
@@ -86,7 +87,6 @@ target_sources(xsystem35 PRIVATE
   savedata.c
   scenario.c
   scheduler.c
-  sdl_event.c
   selection.c
   system.c
   texthook.c
@@ -125,7 +125,7 @@ elseif (ANDROID)
 elseif (ENABLE_GTK)
   target_sources(xsystem35 PRIVATE menu.c menu_callback.c menu_gui.c s39init.c)
 else ()
-  target_sources(xsystem35 PRIVATE menu_sdl.c sdl_input.c)
+  target_sources(xsystem35 PRIVATE menu_sdl.c editor.c)
 endif()
 
 if (HAVE_WEBP)

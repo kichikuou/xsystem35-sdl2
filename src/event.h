@@ -1,6 +1,4 @@
 /*
- * sdl_core.h  SDL acess wrapper
- *
  * Copyright (C) 2000-     Fumihiko Murata       <fmurata@p1.tcnet.ne.jp>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,34 +16,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: sdl_core.h,v 1.18 2003/01/04 17:01:02 chikama Exp $ */
 
-#ifndef __SDL_CORE__
-#define __SDL_CORE__
+#ifndef __EVENT_H__
+#define __EVENT_H__
 
 #include "config.h"
-#include <sys/types.h>
 #include <SDL_events.h>
 #include "portab.h"
 
-struct inputstring_param;
+extern bool (*event_custom_handler)(const SDL_Event *);
 
-/* key/pointer 関係 */
-extern void sdl_setJoyDeviceIndex(int index);
-extern void sdl_setCursorLocation(int x, int y);
-extern void sdl_setCursorInternalLocation(int x, int y);
-extern int  sdl_getKeyInfo();
-extern int  sdl_getMouseInfo(SDL_Point *p);
-extern void sdl_getWheelInfo(int *forward, int *back);
-extern void sdl_clearWheelInfo(void);
-extern int  sdl_getJoyInfo(void);
-extern void sdl_setAutoRepeat(bool enable);
+void event_init(void);
+void event_remove(void);
+void event_set_joy_device_index(int index);
+void event_set_mouse_location(int x, int y);
+void event_set_mouse_internal_location(int x, int y);
+int event_get_key(void);
+int event_get_mouse(SDL_Point *p);
+void event_get_wheel(int *forward, int *back);
+void event_clear_wheel(void);
+int event_get_joy(void);
+void event_post_debugger_command(void *data);
+void event_handle_event(SDL_Event *e);
 
-/* misc */
-extern bool sdl_inputString(struct inputstring_param *);
-extern void sdl_post_debugger_command(void *data);
-extern void sdl_handle_event(SDL_Event *e);
-
-extern bool save_screenshot(const char* path);
-
-#endif /* !__SDL_CORE__ */
+#endif // __EVENT_H__

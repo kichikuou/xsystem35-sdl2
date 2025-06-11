@@ -39,10 +39,7 @@ extern int view_w;
 extern int view_h;
 extern bool gfx_dirty;
 extern bool gfx_fullscreen;
-extern bool (*sdl_custom_event_handler)(const SDL_Event *);
 
-void sdl_event_init(void);
-void sdl_event_remove(void);
 int gfx_nearest_color(int r, int g, int b);
 SDL_Surface *gfx_dib_to_surface_with_alpha(int x, int y, int w, int h);
 SDL_Surface *gfx_dib_to_surface_colorkey(int x, int y, int w, int h, int col);

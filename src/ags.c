@@ -37,7 +37,7 @@
 #include "ags.h"
 #include "gfx.h"
 #include "effect.h"
-#include "sdl_core.h"
+#include "event.h"
 #include "alpha_plane.h"
 #include "utfsjis.h"
 #include "input.h"
@@ -142,6 +142,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.font_weight = enable_zb ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 	
 	gfx_Initialize(render_driver);
+	event_init();
 	cursor_init();
 	font_init();
 
@@ -151,6 +152,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 
 void ags_remove(void) {
 	ags_autorepeat(true);
+	event_remove();
 	gfx_Remove();
 }
 
@@ -723,7 +725,7 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 		// We can't move the actual cursor in the browser, but can change the
 		// internal mouse coordinates. This can help with keyboard/gamepad
 		// navigation.
-		sdl_setCursorInternalLocation(x, y);
+		event_set_mouse_internal_location(x, y);
 		EM_ASM({ xsystem35.shell.showMouseMoveEffect($0, $1); }, x, y);
 		sys_sleep(cursor_move_time);
 	}
@@ -736,12 +738,12 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 		for (int i = 1; i < 8; i++) {
 			int xi = ((dx*i*i*i) >> 9) - ((3*dx*i*i)>> 6) + ((3*dx*i) >> 3) + p.x;
 			int yi = ((dy*i*i*i) >> 9) - ((3*dy*i*i)>> 6) + ((3*dy*i) >> 3) + p.y;
-			sdl_setCursorLocation(xi, yi);
+			event_set_mouse_location(xi, yi);
 			sys_sleep(cursor_move_time / 7);
 		}
-		sdl_setCursorLocation(x, y);
+		event_set_mouse_location(x, y);
 	} else if (!for_selection) {
-		sdl_setCursorInternalLocation(x, y);
+		event_set_mouse_internal_location(x, y);
 		sys_sleep(cursor_move_time);
 	}
 #endif
@@ -782,7 +784,11 @@ surface_t *ags_getDIB() {
 }
 
 void ags_autorepeat(bool enable) {
-	sdl_setAutoRepeat(enable);
+	if (enable) {
+		// SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	} else {
+		// SDL_EnableKeyRepeat(0, 0);
+	}
 }
 
 bool ags_clipCopyRect(const SDL_Rect *sw, const SDL_Rect *dw, int *sx, int *sy, int *dx, int *dy, int *w, int *h) {

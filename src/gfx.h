@@ -78,4 +78,6 @@ void gfx_delRegion(void *src);
 void gfx_FlipSurfaceHorizontal(SDL_Surface *s);
 void gfx_FlipSurfaceVertical(SDL_Surface *s);
 
+bool save_screenshot(const char* path);
+
 #endif /* __GFX_H__ */
