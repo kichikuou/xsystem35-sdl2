@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 99)
 enable_testing()
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-set(XSYSTEM35_VERSION "2.15.1")
+set(XSYSTEM35_VERSION "2.16.0")
 
 include(CheckSymbolExists)
 include(FetchContent)

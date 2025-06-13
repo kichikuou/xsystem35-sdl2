@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.16.0 - 2024-06-13
+- Fixed map tile color issue in Graymerca (#67)
+- Windows: Implemented number input dialog for the `NI` command (#68)
+- Android: Added "Clear Save Files" launcher menu command
+
 ## 2.15.1 - 2024-05-14
 - Fixed a text rendering issue in Rance 5D (#66)
 
