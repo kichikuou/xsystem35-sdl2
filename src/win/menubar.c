@@ -17,8 +17,6 @@
  *
  */
 #include <windows.h>
-#undef min
-#undef max
 #include <time.h>
 #include <SDL_syswm.h>
 #include "system.h"

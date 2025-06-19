@@ -17,8 +17,6 @@
  *
  */
 #include <windows.h>
-#undef min
-#undef max
 #include <stdio.h>
 #include <signal.h>
 #include "win/console.h"

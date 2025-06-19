@@ -21,8 +21,6 @@
 #include <stdlib.h>
 #ifdef _WIN32
 #include <windows.h>
-#undef max
-#undef min
 #else // _WIN32
 #include <errno.h>
 #include <fcntl.h>

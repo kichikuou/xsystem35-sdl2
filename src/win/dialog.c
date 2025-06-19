@@ -18,8 +18,6 @@
  */
 #include <windows.h>
 #include <commctrl.h>
-#undef min
-#undef max
 #include <SDL_syswm.h>
 #include "menu.h"
 #include "gfx_private.h"
