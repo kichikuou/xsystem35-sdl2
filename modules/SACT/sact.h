@@ -281,7 +281,7 @@ struct _sact {
 	
 	// バックログ
 	bool logging;
-	List  *log;
+	List *log;  // UTF-8 strings
 };
 typedef struct _sact sact_t;
 

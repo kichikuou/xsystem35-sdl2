@@ -39,11 +39,10 @@
 #include "gfx.h"
 #include "ags.h"
 #include "font.h"
-#include "utfsjis.h"
 
 #define LOGMSG_LINES 6
 
-static const char *logmsg_utf8[LOGMSG_LINES] = {
+static char *logmsg[LOGMSG_LINES] = {
 	"\n",
 	"※バックログ操作方法※",
 	"[ESC]またはマウス右クリックでゲームに戻る",
@@ -103,9 +102,7 @@ static void draw_log() {
 			} else {
 				ags_setFont(FONT_GOTHIC, FONTSIZE);
 			}
-			char *utf8 = toUTF8(str);
-			gfx_drawString(0, y, utf8, 255);
-			free(utf8);
+			gfx_drawString(0, y, str, 255);
 		}
 		y += FONTSIZE;
 		cur--;
@@ -121,13 +118,7 @@ bool sblog_start(void) {
 	if (sact.version < 120)
 		return false;
 
-	static char *logmsg[LOGMSG_LINES];
-	if (!logmsg[0]) {
-		for (int i = 0; i < LOGMSG_LINES; i++)
-			logmsg[i] = fromUTF8(logmsg_utf8[i]);
-	}
-
-	// 説明文章を追加
+	// Append instruction text
 	for (int i = 0; i < LOGMSG_LINES; i++)
 		sact.log = list_append(sact.log, logmsg[i]);
 	
@@ -146,10 +137,9 @@ void sblog_end(void) {
 	
 	SDL_FreeSurface(back);
 
-	// 説明文章を削除
+	// Remove instruction text
 	for (i = 0; i < LOGMSG_LINES; i++) {
-		node = list_last(sact.log);
-		sact.log = list_remove(sact.log, node->data);
+		sact.log = list_remove(sact.log, logmsg[i]);
 	}
 }
 

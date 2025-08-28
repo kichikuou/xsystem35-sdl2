@@ -533,7 +533,7 @@ static void append_to_log(char *msg) {
 static void sactlog_newline() {
 	if (sact.logging) {
 		if (sact.msgbuf2[0] == '\0') return;
-		sact.log = list_append(sact.log, strdup(sact.msgbuf2));
+		sact.log = list_append(sact.log, toUTF8(sact.msgbuf2));
 		sact.msgbuf2[0] = '\0';
 	}
 }
