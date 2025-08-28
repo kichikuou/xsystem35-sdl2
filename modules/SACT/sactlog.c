@@ -36,7 +36,9 @@
 #include "nact.h"
 #include "sact.h"
 #include "sprite.h"
-#include "drawtext.h"
+#include "gfx.h"
+#include "ags.h"
+#include "font.h"
 #include "utfsjis.h"
 
 #define LOGMSG_LINES 6
@@ -56,7 +58,7 @@ static const char *logmsg_utf8[LOGMSG_LINES] = {
   PageUP/Downで１ページ送り
 */
 
-#define FONTSIZEINDEX 10
+#define INDEX_FONTSIZE 10
 #define FONTSIZE 20
 #define LOGLINENUM (main_surface->h / FONTSIZE)
 static int curline;
@@ -67,6 +69,10 @@ static void draw_log() {
 	int cur = curline;
 	char pinfo[256];
 	List *node;
+
+#ifdef __EMSCRIPTEN__
+	load_mincho_font();
+#endif
 
 	SDL_Surface *hline = SDL_CreateRGBSurfaceWithFormat(0, main_surface->w, 3, 32, SDL_PIXELFORMAT_RGB888);
 	SDL_FillRect(hline, NULL, SDL_MapRGB(hline->format, 255, 255, 255));
@@ -80,8 +86,8 @@ static void draw_log() {
 	// ページ位置情報
 	len = snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, list_length(sact.log));
 	
-	dt_setfont(FONT_GOTHIC, FONTSIZEINDEX);
-	dt_drawtext_col(main_surface, main_surface->w - FONTSIZEINDEX *len /2, 0, pinfo, 255, 255, 255);
+	ags_setFont(FONT_GOTHIC, INDEX_FONTSIZE);
+	gfx_drawString(main_surface->w - INDEX_FONTSIZE * len / 2, 0, pinfo, 255);
 	
 	// 表示始め位置
 	node = list_nth(sact.log, list_length(sact.log) - curline);
@@ -93,11 +99,13 @@ static void draw_log() {
 			SDL_BlitSurface(hline, NULL, main_surface, &(SDL_Rect){0, y + FONTSIZE/2, main_surface->w, 3});
 		} else {
 			if (cur < 6) {
-				dt_setfont(FONT_MINCHO, FONTSIZE);
+				ags_setFont(FONT_MINCHO, FONTSIZE);
 			} else {
-				dt_setfont(FONT_GOTHIC, FONTSIZE);
+				ags_setFont(FONT_GOTHIC, FONTSIZE);
 			}
-			dt_drawtext_col(main_surface, 0, y, str, 255, 255, 255);
+			char *utf8 = toUTF8(str);
+			gfx_drawString(0, y, utf8, 255);
+			free(utf8);
 		}
 		y += FONTSIZE;
 		cur--;
