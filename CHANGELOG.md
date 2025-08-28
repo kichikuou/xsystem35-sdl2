@@ -1,31 +1,35 @@
 # Changelog
 
-## 2.16.0 - 2024-06-13
+## 2.16.1 - 2025-08-28
+- Fixed text rendering issue in SACT log (#71)
+- Windows: The 32-bit version no longer supports the portmidi MIDI backend
+
+## 2.16.0 - 2025-06-13
 - Fixed map tile color issue in Graymerca (#67)
 - Windows: Implemented number input dialog for the `NI` command (#68)
 - Android: Added "Clear Save Files" launcher menu command
 
-## 2.15.1 - 2024-05-14
+## 2.15.1 - 2025-05-14
 - Fixed a text rendering issue in Rance 5D (#66)
 
-## 2.15.0 - 2024-04-21
+## 2.15.0 - 2025-04-21
 - Fixed color palette bug introduced in v2.14.2.
 - Fixed uncancellable message waiting mode.
 - Android: "Install from ZIP" button is moved to the top-right option menu.
 - Android: Improved extraction logic of track numbers from audio file names.
 
-## 2.14.3 - 2024-04-01
+## 2.14.3 - 2025-04-01
 - Fixed build for big endian architectures.
 
-## 2.14.2 - 2024-03-09
+## 2.14.2 - 2025-03-09
 - Android: Back button to exit the game (#50)
 - Improved touch input usability in ママトト (#64)
 
-## 2.14.1 - 2024-02-07
+## 2.14.1 - 2025-02-07
 - Fixed font selection and text decoration not working in selection menus.
 - Fixed a graphic issue in DALK intro.
 
-## 2.14.0 - 2024-01-09
+## 2.14.0 - 2025-01-09
 - New supported games: 俺の下であがけ and 楽園行.
 - Windows: On Windows 10 version 1903 or above, now xsystem35 can handle
   Japanese filenames correctly even if the system locale is not Japanese.
