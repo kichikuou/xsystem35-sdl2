@@ -122,3 +122,11 @@ void commandUP3() {
 	
 	TRACE_UNIMPLEMENTED("UP3 %s,%s:",str1,str2);
 }
+
+void commandUP() {
+	int type = sl_getc();
+	const char *work_dir = sl_getString(0);
+	const char *file_name = sl_getString(0);
+
+	TRACE_UNIMPLEMENTED("UP(new) %d, %s, %s:", type, work_dir, file_name);
+}

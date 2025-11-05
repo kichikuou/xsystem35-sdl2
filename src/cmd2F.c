@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include "portab.h"
 #include "xsystem35.h"
 #include "scenario.h"
@@ -33,7 +32,6 @@
 #include "input.h"
 #include "msgskip.h"
 #include "selection.h"
-#include "message.h"
 #include "music.h"
 #include "utfsjis.h"
 #include "hankaku.h"
@@ -41,8 +39,8 @@
 #include "gfx.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
-#include "hacks.h"
 #include "filecheck.h"
+#include "cmd_check.h"
 
 /* 選択 Window OPEN 時 callback */
 static int cb_sel_init_page = 0;
@@ -52,11 +50,6 @@ static const char REGREADSTRING_RESULT[] = "*regReadString*";
 
 static SDL_Rect clip_window;
 
-extern INPUTSTRING_PARAM mi_param;
-
-extern void commandH();
-extern void commandHH();
-
 typedef struct {
 	int page;
 	int index;
@@ -64,72 +57,6 @@ typedef struct {
 
 #define FCTBL_MAX 1024
 static fncall_table fnctbl[FCTBL_MAX];
-
-void commands2F00() {
-	/* テキストカラーをスタックからポップして設定する */
-	sl_popState(STACK_TEXTCOLOR);
-	TRACE("TOC:");
-}
-
-void commands2F01() {
-	/* テキストフォントサイズをスタックからポップして設定する */
-	sl_popState(STACK_TEXTSIZE);
-	TRACE("TOS:");
-}
-
-void commands2F02() {
-	/* 現在のテキストカラーをスタックにプッシュする */
-	int type = getCaliValue();
-	switch (type) {
-	case 0: sl_pushTextColor(type, nact->msg.MsgFontColor); break;
-	case 1: sl_pushTextColor(type, nact->sel.MsgFontColor); break;
-	default: WARNING("TPC: unknown type %d", type); break;
-	}
-	TRACE("TPC %d", exp);
-}
-
-void commands2F03() {
-	/* 現在のテキストフォントサイズをスタックにプッシュする */
-	int type = getCaliValue();
-	switch (type) {
-	case 0: sl_pushTextSize(type, nact->msg.MsgFontSize); break;
-	case 1: sl_pushTextSize(type, nact->sel.MsgFontSize); break;
-	default: WARNING("TPS: unknown type %d", type); break;
-	}
-	TRACE("TPS %d", exp);
-}
-
-void commands2F04() {
-	/* テキスト表示位置をスタックからポップして設定する */
-	sl_popState(STACK_TEXTLOC);
-	TRACE("TOP:");
-}
-
-void commands2F05() {
-	/* 現在のテキスト表示位置をスタックにプッシュする */
-	SDL_Point loc;
-	msg_getMessageLocation(&loc);
-	sl_pushTextLoc(loc.x, loc.y);
-	TRACE("TPP:");
-}
-
-void commands2F08() {
-	/* アンチエイリアシング付きテキスト描画のフラグ設定 */
-	int exp = getCaliValue();
-	
-	ags_setAntialiasedStringMode(exp == 1);
-	
-	TRACE("TAA %d:", exp);
-}
-
-void commands2F09() {
-	/* アンチエイリアシング付きテキスト描画のフラグ取得 */
-	int *var = getCaliVariable();
-
-	*var = ags_getAntialiasedStringMode() ? 1 : 0;
-	
-	TRACE("TAB %d:", *var);
-}
 
 void commands2F0A() {
 	/* Wavデータを読み込む */
@@ -329,162 +256,6 @@ void commands2F21() {
 	const char *str = sl_getString(0);
 	
 	sys_addMsg(str);
-}
-
-void commands2F23() {
-	int x = getCaliValue();
-	int y = getCaliValue();
-	const char *vFileName = sl_getString(0);
-	
-	char *fname_utf8 = toUTF8(vFileName);
-	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
-	free(fname_utf8);
-	
-	TRACE("LC(new) %d, %d, %s:", x, y, vFileName);
-}
-
-void commands2F24() {
-	int type = sl_getc();
-	const char *file_name = sl_getString(0);
-	int var, cnt;
-	struct VarRef vref;
-
-	char *fname_utf8 = toUTF8(file_name);
-	switch (type) {
-	case 0:
-		getCaliArray(&vref);
-		var = vref.var;
-		cnt = getCaliValue();
-		sysVar[0] = load_vars_from_file(fname_utf8, &vref, cnt);
-		break;
-	case 1:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		sysVar[0] = load_strs_from_file(fname_utf8, var, cnt);
-		break;
-	default:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		WARNING("Unknown LE command type %d", type);
-		break;
-	}
-	free(fname_utf8);
-	
-	TRACE("LE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
-}
-
-void commands2F25() {
-	int file_name = getCaliValue();
-	const char *title = sl_getString(0);
-	const char *filter = sl_getString(0);
-
-	TRACE_UNIMPLEMENTED("LXG %d, %s, %s:", file_name, title, filter);
-}
-
-void commands2F26() {
-	int dst_no  = getCaliValue();
-	int max_len = getCaliValue();
-	const char *title  = sl_getString(0);
-	char *t1, *t2, *t3;
-	
-	t1 = toUTF8(title);
-	t2 = toUTF8(svar_get(dst_no));
-	
-	mi_param.title = t1;
-	mi_param.oldstring = t2;
-	mi_param.max = max_len;
-	
-	menu_inputstring(&mi_param);
-	if (mi_param.newstring == NULL) {
-		svar_set(dst_no, NULL);
-		free(t1); free(t2);
-		return;
-	}
-	
-	t3 = fromUTF8(mi_param.newstring);
-	
-	svar_set(dst_no, t3);
-
-	free(t1);
-	free(t2);
-	free(t3);
-	
-	TRACE("MI(new) %d, %d, %s:", dst_no, max_len, title);
-}
-
-void commands2F27() {
-	int num = getCaliValue();
-	const char *string = sl_getString(0);
-
-	svar_set(num, string);
-	TRACE("MS(new) %d, %s:", num, string);
-}
-
-void commands2F28() {
-	const char *title = sl_getString(0);
-	
-	if (nact->game_title_utf8)
-		free(nact->game_title_utf8);
-	nact->game_title_utf8 = toUTF8(title);
-
-	ags_setWindowTitle(nact->game_title_utf8);
-
-	enable_hack_by_title(nact->game_title_utf8);
-
-	TRACE("MT(new) %s:",title);
-}
-
-/* defined in cmdn.c */
-extern INPUTNUM_PARAM ni_param;
-void commands2F29() {
-	const char *title = sl_getString(0);
-	char *t;
-	
-	if (ni_param.title != NULL) {
-		free(ni_param.title);
-	}
-	t = toUTF8(title);
-	ni_param.title = t;
-	
-	TRACE("NT(new) %s:", title);
-}
-
-void commands2F2A() {
-	int type = sl_getc();
-	const char *file_name = sl_getString(0);
-	int var, cnt;
-	struct VarRef vref;
-
-	char *fname_utf8 = toUTF8(file_name);
-	switch(type) {
-	case 0:
-		getCaliArray(&vref);
-		var = vref.var;
-		cnt = getCaliValue();
-		sysVar[0] = save_vars_to_file(fname_utf8, &vref, cnt);
-		break;
-	case 1:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		sysVar[0] = save_strs_to_file(fname_utf8, var, cnt);
-		break;
-	default:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		WARNING("Unknown QE command");
-		break;
-	}
-	free(fname_utf8);
-
-	TRACE("QE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
-}
-
-void commands2F2B() {
-	int type = sl_getc();
-	const char *work_dir = sl_getString(0);
-	const char *file_name = sl_getString(0);
-
-	TRACE_UNIMPLEMENTED("UP(new) %d, %s, %s:", type, work_dir, file_name);
 }
 
 void commands2F2D() {
@@ -712,17 +483,6 @@ void commands2F43() {
 	TRACE("grDrawFillCircle %d, %d, %d, %d:", eX, eY, eLength, eColor);
 }
 
-void commands2F44() {
-	int num1 = getCaliValue();
-	int fig  = getCaliValue();
-	int num2 = getCaliValue();
-	char buf[256];
-
-	svar_set(num1, format_number(num2, fig, buf));
-	
-	TRACE("MHH %d, %d, %d:", num1, fig, num2);
-}
-
 void commands2F45() {
 	int fPage = sl_getw();
 	int fIndex = sl_getaddr();
@@ -790,43 +550,6 @@ void commands2F4C() {
 		      eX, eY, eSrcX, eSrcY, eWidth, eHeight);
 }
 
-void commands2F4D() {
-	int eNum = getCaliValue();
-	const char *sText = sl_getString(0);
-
-	TRACE_UNIMPLEMENTED("LXWT %d, %s:", eNum, sText);
-}
-
-void commands2F4E() {
-	int eNum = getCaliValue();
-	int eTextNum = getCaliValue();
-
-	TRACE_UNIMPLEMENTED("LXWS %d, %d:", eNum, eTextNum);
-}
-
-void commands2F4F() {
-	int eNum = getCaliValue();
-	int eType = getCaliValue();
-
-	TRACE_UNIMPLEMENTED("LXWE %d, %d:", eNum, eType);
-}
-
-void commands2F50() {
-	int eFile = getCaliValue();
-	int nFlg = sl_getc();
-	int eNum = getCaliValue();
-
-	TRACE_UNIMPLEMENTED("LXWH %d, %d, %d:", eFile, nFlg, eNum);
-}
-
-void commands2F51() {
-	int eFile = getCaliValue();
-	int nFlg  = sl_getc();
-	int eNum  = getCaliValue();
-
-	TRACE_UNIMPLEMENTED("LXWHH %d, %d, %d:", eFile, nFlg, eNum);
-}
-
 void commands2F52() {
 	int eNum = getCaliValue();
 	if (eNum <= 0) return;
@@ -880,14 +603,6 @@ void commands2F55() {
 		*vWidth = 0;
 		*vHeight = 0;
 	}
-}
-
-void commands2F56() {
-	int file_name = getCaliValue();
-	const char *title = sl_getString(0);
-	const char *folder = sl_getString(0);
-
-	TRACE_UNIMPLEMENTED("LXF %d, %s, %s:", file_name, title, folder);
 }
 
 void commands2F57() {

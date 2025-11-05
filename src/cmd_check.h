@@ -117,8 +117,10 @@ extern void commandKW();
 
 /* defined by cmdl.c */
 extern void commandLC();
+extern void commands2F23();  // new LC
 extern void commandLD();
 extern void commandLE();
+extern void commands2F24();  // new LE
 extern void commandLHD();
 extern void commandLHG();
 extern void commandLHM();
@@ -128,6 +130,7 @@ extern void commandLL();
 extern void commandLP();
 extern void commandLT();
 extern void commandLXG();
+extern void commands2F25();  // new LXG
 extern void commandLXO();
 extern void commandLXC();
 extern void commandLXL();
@@ -136,6 +139,12 @@ extern void commandLXP();
 extern void commandLXR();
 extern void commandLXW();
 extern void commandLXX();
+extern void commandLXWT();
+extern void commandLXWS();
+extern void commandLXWE();
+extern void commandLXWH();
+extern void commandLXWHH();
+extern void commandLXF();
 
 /* defined by cmdm.c */
 extern void commandMA();
@@ -145,14 +154,18 @@ extern void commandME();
 extern void commandMF();
 extern void commandMG();
 extern void commandMH();
+extern void commandMHH();
 extern void commandMI();
+extern void commands2F26();  // new MI
 extern void commandMJ();
 extern void commandML();
 extern void commandMM();
 extern void commandMN();
 extern void commandMP();
 extern void commandMS();
+extern void commands2F27();  // new MS
 extern void commandMT();
+extern void commands2F28();  // new MT
 extern void commandMV();
 extern void commandMZ0();
 
@@ -176,6 +189,7 @@ extern void commandNP();
 extern void commandNR();
 extern void commandNO();
 extern void commandNT();
+extern void commands2F29();  // new NT
 extern void commandND_ADD();
 extern void commandND_SUB();
 extern void commandND_MUL();
@@ -206,6 +220,7 @@ extern void commandPW();
 extern void commandQC();
 extern void commandQD();
 extern void commandQE();
+extern void commands2F2A();  // new QE
 extern void commandQP();
 
 /* defined by cmds.c */
@@ -227,6 +242,14 @@ extern void commandSI();
 
 /* defined by cmdt.c */
 extern void commandT();
+extern void commandTOC();
+extern void commandTOS();
+extern void commandTPC();
+extern void commandTPS();
+extern void commandTOP();
+extern void commandTPP();
+extern void commandTAA();
+extern void commandTAB();
 
 /* defined by cmdu.c */
 extern void commandUC();
@@ -237,6 +260,7 @@ extern void commandUG();
 extern void commandUP0();
 extern void commandUP1();
 extern void commandUP3();
+extern void commandUP();
 
 /* defined by cmdv.c */
 extern void commandVC();
@@ -308,14 +332,6 @@ extern void commandZR();
 extern void commandZU();
 
 /* define in cmd2F.c */
-extern void commands2F00();
-extern void commands2F01();
-extern void commands2F02();
-extern void commands2F03();
-extern void commands2F04();
-extern void commands2F05();
-extern void commands2F08();
-extern void commands2F09();
 extern void commands2F0A();
 extern void commands2F0B();
 extern void commands2F0C();
@@ -340,15 +356,6 @@ extern void commands2F1E();
 extern void commands2F1F();
 extern void commands2F20();
 extern void commands2F21();
-extern void commands2F23();
-extern void commands2F24();
-extern void commands2F25();
-extern void commands2F26();
-extern void commands2F27();
-extern void commands2F28();
-extern void commands2F29();
-extern void commands2F2A();
-extern void commands2F2B();
 extern void commands2F2D();
 extern void commands2F2E();
 extern void commands2F2F();
@@ -372,7 +379,6 @@ extern void commands2F40();
 extern void commands2F41();
 extern void commands2F42();
 extern void commands2F43();
-extern void commands2F44();
 extern void commands2F45();
 extern void commands2F46();
 extern void commands2F47();
@@ -381,16 +387,10 @@ extern void commands2F49();
 extern void commands2F4A();
 extern void commands2F4B();
 extern void commands2F4C();
-extern void commands2F4D();
-extern void commands2F4E();
-extern void commands2F4F();
-extern void commands2F50();
-extern void commands2F51();
 extern void commands2F52();
 extern void commands2F53();
 extern void commands2F54();
 extern void commands2F55();
-extern void commands2F56();
 extern void commands2F57();
 extern void commands2F58();
 extern void commands2F59();

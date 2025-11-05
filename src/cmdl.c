@@ -136,6 +136,36 @@ void commandLE() {
 	TRACE("LE %d,%s,%d,%d:",type, filename, var, cnt);
 }
 
+void commands2F24() {
+	int type = sl_getc();
+	const char *file_name = sl_getString(0);
+	int var, cnt;
+	struct VarRef vref;
+
+	char *fname_utf8 = toUTF8(file_name);
+	switch (type) {
+	case 0:
+		getCaliArray(&vref);
+		var = vref.var;
+		cnt = getCaliValue();
+		sysVar[0] = load_vars_from_file(fname_utf8, &vref, cnt);
+		break;
+	case 1:
+		var = getCaliValue();
+		cnt = getCaliValue();
+		sysVar[0] = load_strs_from_file(fname_utf8, var, cnt);
+		break;
+	default:
+		var = getCaliValue();
+		cnt = getCaliValue();
+		WARNING("Unknown LE command type %d", type);
+		break;
+	}
+	free(fname_utf8);
+
+	TRACE("LE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
+}
+
 void commandLL() {
 	int type = sl_getc();
 	int link_no = getCaliValue();
@@ -266,6 +296,18 @@ void commandLC() {
 	TRACE("LC %d,%d,%s:", x, y, filename);
 }
 
+void commands2F23() {
+	int x = getCaliValue();
+	int y = getCaliValue();
+	const char *vFileName = sl_getString(0);
+
+	char *fname_utf8 = toUTF8(vFileName);
+	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
+	free(fname_utf8);
+
+	TRACE("LC(new) %d, %d, %s:", x, y, vFileName);
+}
+
 void commandLXG() {
 	/* ファイルを選択する */
 	int file_name = getCaliValue();
@@ -273,6 +315,14 @@ void commandLXG() {
 	const char *filter = sl_getString(':');
 
 	TRACE_UNIMPLEMENTED("LXG %d,%s,%s:", file_name, title, filter);
+}
+
+void commands2F25() {
+	int file_name = getCaliValue();
+	const char *title = sl_getString(0);
+	const char *filter = sl_getString(0);
+
+	TRACE_UNIMPLEMENTED("LXG %d, %s, %s:", file_name, title, filter);
 }
 
 void commandLXO() {
@@ -375,4 +425,49 @@ void commandLXX() {
 	}
 
 	TRACE("LXX %d,%d,%d:", type, num, *var);
+}
+
+void commandLXWT() {
+	int eNum = getCaliValue();
+	const char *sText = sl_getString(0);
+
+	TRACE_UNIMPLEMENTED("LXWT %d, %s:", eNum, sText);
+}
+
+void commandLXWS() {
+	int eNum = getCaliValue();
+	int eTextNum = getCaliValue();
+
+	TRACE_UNIMPLEMENTED("LXWS %d, %d:", eNum, eTextNum);
+}
+
+void commandLXWE() {
+	int eNum = getCaliValue();
+	int eType = getCaliValue();
+
+	TRACE_UNIMPLEMENTED("LXWE %d, %d:", eNum, eType);
+}
+
+void commandLXWH() {
+	int eFile = getCaliValue();
+	int nFlg = sl_getc();
+	int eNum = getCaliValue();
+
+	TRACE_UNIMPLEMENTED("LXWH %d, %d, %d:", eFile, nFlg, eNum);
+}
+
+void commandLXWHH() {
+	int eFile = getCaliValue();
+	int nFlg  = sl_getc();
+	int eNum  = getCaliValue();
+
+	TRACE_UNIMPLEMENTED("LXWHH %d, %d, %d:", eFile, nFlg, eNum);
+}
+
+void commandLXF() {
+	int file_name = getCaliValue();
+	const char *title = sl_getString(0);
+	const char *folder = sl_getString(0);
+
+	TRACE_UNIMPLEMENTED("LXF %d, %s, %s:", file_name, title, folder);
 }

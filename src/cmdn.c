@@ -32,7 +32,7 @@
 #include "menu.h"
 
 /* NI/NT 用パラメータ */
-INPUTNUM_PARAM ni_param;
+static INPUTNUM_PARAM ni_param;
 
 void commandNB() {
 	/* var1 から始まるcount個の変数へ
@@ -384,6 +384,19 @@ void commandNT() { /* From Panyo */
 	ni_param.title = toUTF8(str);
 	
 	TRACE("NT %p:", str);
+}
+
+void commands2F29() {
+	const char *title = sl_getString(0);
+	char *t;
+
+	if (ni_param.title != NULL) {
+		free(ni_param.title);
+	}
+	t = toUTF8(title);
+	ni_param.title = t;
+
+	TRACE("NT(new) %s:", title);
 }
 
 void commandNP() {

@@ -249,25 +249,25 @@ void exec_command(void) {
 		/* 小文字コマンド */
 		switch(sl_getc()) {
 		case 0x00:
-			commands2F00(); break;
+			commandTOC(); break;
 		case 0x01:
-			commands2F01(); break;
+			commandTOS(); break;
 		case 0x02:
-			commands2F02(); break;
+			commandTPC(); break;
 		case 0x03:
-			commands2F03(); break;
+			commandTPS(); break;
 		case 0x04:
-			commands2F04(); break;
+			commandTOP(); break;
 		case 0x05:
-			commands2F05(); break;
+			commandTPP(); break;
 		case 0x06:
 			commandsINC(); break;
 		case 0x07:
 			commandsDEC(); break;
 		case 0x08:
-			commands2F08(); break;
+			commandTAA(); break;
 		case 0x09:
-			commands2F09(); break;
+			commandTAB(); break;
 		case 0x0a:
 			commands2F0A(); break;
 		case 0x0b:
@@ -335,7 +335,7 @@ void exec_command(void) {
 		case 0x2a:
 			commands2F2A(); break;
 		case 0x2b:
-			commands2F2B(); break;
+			commandUP(); break;
 		case 0x2c:
 			commandF(); break;
  		case 0x2d:
@@ -385,7 +385,7 @@ void exec_command(void) {
 		case 0x43:
 			commands2F43(); break;
 		case 0x44:
-			commands2F44(); break;
+			commandMHH(); break;
 		case 0x45:
 			commands2F45(); break;
 		case 0x46:
@@ -403,15 +403,15 @@ void exec_command(void) {
 		case 0x4c:
 			commands2F4C(); break;
 		case 0x4d:
-			commands2F4D(); break;
+			commandLXWT(); break;
 		case 0x4e:
-			commands2F4E(); break;
+			commandLXWS(); break;
 		case 0x4f:
-			commands2F4F(); break;
+			commandLXWE(); break;
 		case 0x50:
-			commands2F50(); break;
+			commandLXWH(); break;
 		case 0x51:
-			commands2F51(); break;
+			commandLXWHH(); break;
 		case 0x52:
 			commands2F52(); break;
 		case 0x53:
@@ -421,7 +421,7 @@ void exec_command(void) {
 		case 0x55:
 			commands2F55(); break;
 		case 0x56:
-			commands2F56(); break;
+			commandLXF(); break;
 		case 0x57:
 			commands2F57(); break;
 		case 0x58:

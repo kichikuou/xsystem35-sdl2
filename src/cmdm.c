@@ -36,7 +36,7 @@
 #include "hacks.h"
 
 /* MI 用パラメータ */
-INPUTSTRING_PARAM mi_param;
+static INPUTSTRING_PARAM mi_param;
 
 void commandMS() {
 	/* Xコマンドで表示される文字列領域に文字列を入れる */
@@ -45,6 +45,14 @@ void commandMS() {
 	
 	svar_set(num, str);
 	TRACE("MS %d,%s:",num,str);
+}
+
+void commands2F27() {
+	int num = getCaliValue();
+	const char *string = sl_getString(0);
+
+	svar_set(num, string);
+	TRACE("MS(new) %d, %s:", num, string);
 }
 
 void commandMP() {
@@ -121,6 +129,37 @@ void commandMI() { /* T2 */
 	TRACE("MI %d,%d,%s:",dst_no,max_len, title);
 }
 
+void commands2F26() {
+	int dst_no  = getCaliValue();
+	int max_len = getCaliValue();
+	const char *title  = sl_getString(0);
+	char *t1, *t2, *t3;
+
+	t1 = toUTF8(title);
+	t2 = toUTF8(svar_get(dst_no));
+
+	mi_param.title = t1;
+	mi_param.oldstring = t2;
+	mi_param.max = max_len;
+
+	menu_inputstring(&mi_param);
+	if (mi_param.newstring == NULL) {
+		svar_set(dst_no, NULL);
+		free(t1); free(t2);
+		return;
+	}
+
+	t3 = fromUTF8(mi_param.newstring);
+
+	svar_set(dst_no, t3);
+
+	free(t1);
+	free(t2);
+	free(t3);
+
+	TRACE("MI(new) %d, %d, %s:", dst_no, max_len, title);
+}
+
 void commandMA() {
 	/* num1 の文字列の後ろに num2 をつなげる */
 	int num1 = getCaliValue();
@@ -161,6 +200,20 @@ void commandMT() {
 	TRACE("MT %s:",str);
 }
 
+void commands2F28() {
+	const char *title = sl_getString(0);
+
+	if (nact->game_title_utf8)
+		free(nact->game_title_utf8);
+	nact->game_title_utf8 = toUTF8(title);
+
+	ags_setWindowTitle(nact->game_title_utf8);
+
+	enable_hack_by_title(nact->game_title_utf8);
+
+	TRACE("MT(new) %s:",title);
+}
+
 void commandMM() {
 	/* num1 の文字列に num2 をコピーする */
 	int num1 = getCaliValue();
@@ -184,6 +237,17 @@ void commandMH() {
 	free(s);
 
 	TRACE("MH %d,%d,%d:",num1,fig,num2);
+}
+
+void commandMHH() {
+	int num1 = getCaliValue();
+	int fig  = getCaliValue();
+	int num2 = getCaliValue();
+	char buf[256];
+
+	svar_set(num1, format_number(num2, fig, buf));
+
+	TRACE("MHH %d, %d, %d:", num1, fig, num2);
 }
 
 void commandMV() {
