@@ -319,21 +319,21 @@ void exec_command(void) {
 		case 0x22:
 			commandHH(); break;
 		case 0x23:
-			commands2F23(); break;
+			commandLC(0); break;
 		case 0x24:
-			commands2F24(); break;
+			commandLE(0); break;
 		case 0x25:
-			commands2F25(); break;
+			commandLXG(0); break;
 		case 0x26:
-			commands2F26(); break;
+			commandMI(0); break;
 		case 0x27:
-			commands2F27(); break;
+			commandMS(0); break;
 		case 0x28:
-			commands2F28(); break;
+			commandMT(0); break;
 		case 0x29:
-			commands2F29(); break;
+			commandNT(0); break;
 		case 0x2a:
-			commands2F2A(); break;
+			commandQE(0); break;
 		case 0x2b:
 			commandUP(); break;
 		case 0x2c:
@@ -731,7 +731,7 @@ void exec_command(void) {
 	case 'L':
 		switch(sl_getc()) {
 		case 'C':
-			commandLC(); break;
+			commandLC(':'); break;
 		case 'D':
 			commandLD(); break;
 		case 'P':
@@ -739,7 +739,7 @@ void exec_command(void) {
 		case 'T':
 			commandLT(); break;
 		case 'E':
-			commandLE(); break;
+			commandLE(':'); break;
 		case 'L':
 			commandLL(); break;
 		case 'H':
@@ -761,7 +761,7 @@ void exec_command(void) {
 		case 'X':
 			switch(sl_getc()) {
 			case 'G':
-				commandLXG(); break;
+				commandLXG(':'); break;
 			case 'O':
 				commandLXO(); break;
 			case 'C':
@@ -803,7 +803,7 @@ void exec_command(void) {
 		case 'H':
 			commandMH(); break;
 		case 'I':
-			commandMI(); break;
+			commandMI(':'); break;
 		case 'J':
 			commandMJ(); break;
 		case 'L':
@@ -815,9 +815,9 @@ void exec_command(void) {
 		case 'P':
 			commandMP(); break;
 		case 'S':
-			commandMS(); break;
+			commandMS(':'); break;
 		case 'T':
-			commandMT(); break;
+			commandMT(':'); break;
 		case 'V':
 			commandMV(); break;
 		case 'Z':
@@ -871,7 +871,7 @@ void exec_command(void) {
 		case 'O':
 			commandNO(); break;
 		case 'T':
-			commandNT(); break;
+			commandNT(':'); break;
 		case 'D':
 			switch(sl_getc()) {
 			case 'C':
@@ -943,7 +943,7 @@ void exec_command(void) {
 		case 'D':
 			commandQD(); break;
 		case 'E':
-			commandQE(); break;
+			commandQE(':'); break;
 		case 'P':
 			commandQP(); break;
 		default:

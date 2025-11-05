@@ -36,6 +36,7 @@
 #include "savedata.h"
 #include "utfsjis.h"
 #include "cg.h"
+#include "cmd_check.h"
 
 void commandLD() {
 	/* 変数領域などのデータをロードする。（全ロード）*/
@@ -106,9 +107,9 @@ void commandLT() {
 	TRACE("LT %d,%p",num, var);
 }
 
-void commandLE() {
+void commandLE(char terminator) {
 	int type = sl_getc();
-	const char *filename = sl_getString(':');
+	const char *filename = sl_getString(terminator);
 	int var, cnt;
 	struct VarRef vref;
 
@@ -134,36 +135,6 @@ void commandLE() {
 	free(fname_utf8);
 	
 	TRACE("LE %d,%s,%d,%d:",type, filename, var, cnt);
-}
-
-void commands2F24() {
-	int type = sl_getc();
-	const char *file_name = sl_getString(0);
-	int var, cnt;
-	struct VarRef vref;
-
-	char *fname_utf8 = toUTF8(file_name);
-	switch (type) {
-	case 0:
-		getCaliArray(&vref);
-		var = vref.var;
-		cnt = getCaliValue();
-		sysVar[0] = load_vars_from_file(fname_utf8, &vref, cnt);
-		break;
-	case 1:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		sysVar[0] = load_strs_from_file(fname_utf8, var, cnt);
-		break;
-	default:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		WARNING("Unknown LE command type %d", type);
-		break;
-	}
-	free(fname_utf8);
-
-	TRACE("LE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
 }
 
 void commandLL() {
@@ -284,11 +255,11 @@ void commandLHW() {
 	TRACE("LHW %d,%d:",p1,no);
 }
 
-void commandLC() {
+void commandLC(char terminator) {
 	int x = getCaliValue();
 	int y = getCaliValue();
-	const char *filename = sl_getString(':');
-	
+	const char *filename = sl_getString(terminator);
+
 	char *fname_utf8 = toUTF8(filename);
 	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
 	free(fname_utf8);
@@ -296,33 +267,13 @@ void commandLC() {
 	TRACE("LC %d,%d,%s:", x, y, filename);
 }
 
-void commands2F23() {
-	int x = getCaliValue();
-	int y = getCaliValue();
-	const char *vFileName = sl_getString(0);
-
-	char *fname_utf8 = toUTF8(vFileName);
-	sysVar[0] = cg_load_with_filename(fname_utf8, x, y);
-	free(fname_utf8);
-
-	TRACE("LC(new) %d, %d, %s:", x, y, vFileName);
-}
-
-void commandLXG() {
+void commandLXG(char terminator) {
 	/* ファイルを選択する */
 	int file_name = getCaliValue();
-	const char *title = sl_getString(':');
-	const char *filter = sl_getString(':');
+	const char *title = sl_getString(terminator);
+	const char *filter = sl_getString(terminator);
 
 	TRACE_UNIMPLEMENTED("LXG %d,%s,%s:", file_name, title, filter);
-}
-
-void commands2F25() {
-	int file_name = getCaliValue();
-	const char *title = sl_getString(0);
-	const char *filter = sl_getString(0);
-
-	TRACE_UNIMPLEMENTED("LXG %d, %s, %s:", file_name, title, filter);
 }
 
 void commandLXO() {

@@ -34,25 +34,18 @@
 #include "message.h"
 #include "hankaku.h"
 #include "hacks.h"
+#include "cmd_check.h"
 
 /* MI 用パラメータ */
 static INPUTSTRING_PARAM mi_param;
 
-void commandMS() {
+void commandMS(char terminator) {
 	/* Xコマンドで表示される文字列領域に文字列を入れる */
 	int num = getCaliValue();
-	const char *str = sl_getString(':');
-	
+	const char *str = sl_getString(terminator);
+
 	svar_set(num, str);
 	TRACE("MS %d,%s:",num,str);
-}
-
-void commands2F27() {
-	int num = getCaliValue();
-	const char *string = sl_getString(0);
-
-	svar_set(num, string);
-	TRACE("MS(new) %d, %s:", num, string);
 }
 
 void commandMP() {
@@ -98,11 +91,11 @@ void commandMP() {
 	free(str);
 }
 
-void commandMI() { /* T2 */
+void commandMI(char terminator) {
 	/* ユーザーによる文字列の入力 */
 	int dst_no  = getCaliValue();
 	int max_len = getCaliValue();
-	const char *title = sl_getString(':');
+	const char *title = sl_getString(terminator);
 	char *t1, *t2, *t3;
 	
 	t1 = toUTF8(title);
@@ -127,37 +120,6 @@ void commandMI() { /* T2 */
 	free(t2);
 	free(t3);
 	TRACE("MI %d,%d,%s:",dst_no,max_len, title);
-}
-
-void commands2F26() {
-	int dst_no  = getCaliValue();
-	int max_len = getCaliValue();
-	const char *title  = sl_getString(0);
-	char *t1, *t2, *t3;
-
-	t1 = toUTF8(title);
-	t2 = toUTF8(svar_get(dst_no));
-
-	mi_param.title = t1;
-	mi_param.oldstring = t2;
-	mi_param.max = max_len;
-
-	menu_inputstring(&mi_param);
-	if (mi_param.newstring == NULL) {
-		svar_set(dst_no, NULL);
-		free(t1); free(t2);
-		return;
-	}
-
-	t3 = fromUTF8(mi_param.newstring);
-
-	svar_set(dst_no, t3);
-
-	free(t1);
-	free(t2);
-	free(t3);
-
-	TRACE("MI(new) %d, %d, %s:", dst_no, max_len, title);
 }
 
 void commandMA() {
@@ -186,9 +148,9 @@ void commandMC() {
 	TRACE("MC %d,%d:",num1,num2);
 }
 
-void commandMT() {
+void commandMT(char terminator) {
 	/* ウインドウのタイトル文字列を設定する */
-	const char *str = sl_getString(':');
+	const char *str = sl_getString(terminator);
 	
 	if (nact->game_title_utf8)
 		free(nact->game_title_utf8);
@@ -198,20 +160,6 @@ void commandMT() {
 	enable_hack_by_title(nact->game_title_utf8);
 
 	TRACE("MT %s:",str);
-}
-
-void commands2F28() {
-	const char *title = sl_getString(0);
-
-	if (nact->game_title_utf8)
-		free(nact->game_title_utf8);
-	nact->game_title_utf8 = toUTF8(title);
-
-	ags_setWindowTitle(nact->game_title_utf8);
-
-	enable_hack_by_title(nact->game_title_utf8);
-
-	TRACE("MT(new) %s:",title);
 }
 
 void commandMM() {

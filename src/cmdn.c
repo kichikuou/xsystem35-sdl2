@@ -30,6 +30,7 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "menu.h"
+#include "cmd_check.h"
 
 /* NI/NT 用パラメータ */
 static INPUTNUM_PARAM ni_param;
@@ -376,27 +377,14 @@ void commandNI() { /* From Panyo */
 	TRACE("NI %p,%d,%d,%d:", var, def, _min, _max);
 }
 
-void commandNT() { /* From Panyo */
+void commandNT(char terminator) {
 	/* NIコマンドで表示するタイトルを設定する。*/
-	const char *str = sl_getString(':');
+	const char *str = sl_getString(terminator);
 
 	free(ni_param.title);
 	ni_param.title = toUTF8(str);
 	
 	TRACE("NT %p:", str);
-}
-
-void commands2F29() {
-	const char *title = sl_getString(0);
-	char *t;
-
-	if (ni_param.title != NULL) {
-		free(ni_param.title);
-	}
-	t = toUTF8(title);
-	ni_param.title = t;
-
-	TRACE("NT(new) %s:", title);
 }
 
 void commandNP() {

@@ -29,6 +29,7 @@
 #include "scenario.h"
 #include "savedata.h"
 #include "utfsjis.h"
+#include "cmd_check.h"
 
 void commandQD() {
 	/* 変数領域などのデータをセーブする。（全セーブ）*/
@@ -79,9 +80,9 @@ void commandQC() {
 	TRACE("QC %d,%d:",num1,num2);
 }
 
-void commandQE() {
+void commandQE(char terminator) {
 	int type = sl_getc();
-	const char *filename = sl_getString(':');
+	const char *filename = sl_getString(terminator);
 	int var, cnt;
 	struct VarRef vref;
 
@@ -108,34 +109,4 @@ void commandQE() {
 	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
 	TRACE("QE %d,%s,%d,%d:", type, filename, var, cnt);
-}
-
-void commands2F2A() {
-	int type = sl_getc();
-	const char *file_name = sl_getString(0);
-	int var, cnt;
-	struct VarRef vref;
-
-	char *fname_utf8 = toUTF8(file_name);
-	switch(type) {
-	case 0:
-		getCaliArray(&vref);
-		var = vref.var;
-		cnt = getCaliValue();
-		sysVar[0] = save_vars_to_file(fname_utf8, &vref, cnt);
-		break;
-	case 1:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		sysVar[0] = save_strs_to_file(fname_utf8, var, cnt);
-		break;
-	default:
-		var = getCaliValue();
-		cnt = getCaliValue();
-		WARNING("Unknown QE command");
-		break;
-	}
-	free(fname_utf8);
-
-	TRACE("QE(new) %d, %s, %d, %d:", type, file_name, var, cnt);
 }

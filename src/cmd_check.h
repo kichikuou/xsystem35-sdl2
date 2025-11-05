@@ -116,11 +116,9 @@ extern void commandKR();
 extern void commandKW();
 
 /* defined by cmdl.c */
-extern void commandLC();
-extern void commands2F23();  // new LC
+extern void commandLC(char terminator);
 extern void commandLD();
-extern void commandLE();
-extern void commands2F24();  // new LE
+extern void commandLE(char terminator);
 extern void commandLHD();
 extern void commandLHG();
 extern void commandLHM();
@@ -129,8 +127,7 @@ extern void commandLHW();
 extern void commandLL();
 extern void commandLP();
 extern void commandLT();
-extern void commandLXG();
-extern void commands2F25();  // new LXG
+extern void commandLXG(char terminator);
 extern void commandLXO();
 extern void commandLXC();
 extern void commandLXL();
@@ -155,17 +152,14 @@ extern void commandMF();
 extern void commandMG();
 extern void commandMH();
 extern void commandMHH();
-extern void commandMI();
-extern void commands2F26();  // new MI
+extern void commandMI(char terminator);
 extern void commandMJ();
 extern void commandML();
 extern void commandMM();
 extern void commandMN();
 extern void commandMP();
-extern void commandMS();
-extern void commands2F27();  // new MS
-extern void commandMT();
-extern void commands2F28();  // new MT
+extern void commandMS(char terminator);
+extern void commandMT(char terminator);
 extern void commandMV();
 extern void commandMZ0();
 
@@ -188,8 +182,7 @@ extern void commandNI();
 extern void commandNP();
 extern void commandNR();
 extern void commandNO();
-extern void commandNT();
-extern void commands2F29();  // new NT
+extern void commandNT(char terminator);
 extern void commandND_ADD();
 extern void commandND_SUB();
 extern void commandND_MUL();
@@ -219,8 +212,7 @@ extern void commandPW();
 /* defined by cmdq.c */
 extern void commandQC();
 extern void commandQD();
-extern void commandQE();
-extern void commands2F2A();  // new QE
+extern void commandQE(char terminator);
 extern void commandQP();
 
 /* defined by cmds.c */
