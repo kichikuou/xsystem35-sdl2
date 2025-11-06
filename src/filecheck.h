@@ -31,5 +31,6 @@ char *fc_get_path(const char *fname_utf8);
 bool fc_exists(const char *fname_utf8);
 FILE *fc_open(const char *fname_utf8, char type);
 void fc_backup_oldfile(const char *filename);
+int mkdir_p(const char *path_utf8);
 
 #endif /* !__FILECHECK_H__ */

@@ -67,28 +67,28 @@ static int make_dir(const char *path)
 #endif
 
 // Adapted from http://stackoverflow.com/a/2336245/119527
-static int mkdir_p(const char *path)
+int mkdir_p(const char *path_utf8)
 {
-	const size_t len = strlen(path);
-	char _path[PATH_MAX];
+	const size_t len = strlen(path_utf8);
+	char path[PATH_MAX];
 	char *p;
 
 	errno = 0;
 
 	// Copy string so its mutable
-	if (len > sizeof(_path)-1) {
+	if (len > sizeof(path)-1) {
 		errno = ENAMETOOLONG;
 		return -1;
 	}
-	strcpy(_path, path);
+	strcpy(path, path_utf8);
 
 	// Iterate the string
-	for (p = _path + 1; *p; p++) {
+	for (p = path + 1; *p; p++) {
 		if (*p == '/') {
 			// Temporarily truncate
 			*p = '\0';
 
-			if (make_dir(_path) != 0) {
+			if (make_dir(path) != 0) {
 				if (errno != EEXIST)
 					return -1;
 			}
@@ -97,7 +97,7 @@ static int mkdir_p(const char *path)
 		}
 	}
 
-	if (make_dir(_path) != 0) {
+	if (make_dir(path) != 0) {
 		if (errno != EEXIST)
 			return -1;
 	}

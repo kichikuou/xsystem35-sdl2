@@ -110,21 +110,35 @@ void commandLT() {
 void commandLE(char terminator) {
 	int type = sl_getc();
 	const char *filename = sl_getString(terminator);
+	char *fname_utf8 = toUTF8(filename);
+	char *fallback_fname = NULL;
+	if (strchr(fname_utf8, '\\')) {
+		fallback_fname = strdup(fname_utf8);
+		for (char *p = fname_utf8; *p; p++) {
+			if (*p == '\\')
+				*p = '/';
+		}
+	}
+
 	int var, cnt;
 	struct VarRef vref;
-
-	char *fname_utf8 = toUTF8(filename);
 	switch (type) {
 	case 0:
 		getCaliArray(&vref);
 		var = vref.var;
 		cnt = getCaliValue();
 		sysVar[0] = load_vars_from_file(fname_utf8, &vref, cnt);
+		// For compatibility; the QE command in v2.16.1 and earlier did not
+		// convert backslashes to slashes.
+		if (sysVar[0] == SAVE_LOADERR && fallback_fname)
+			sysVar[0] = load_vars_from_file(fallback_fname, &vref, cnt);
 		break;
 	case 1:
 		var = getCaliValue();
 		cnt = getCaliValue();
 		sysVar[0] = load_strs_from_file(fname_utf8, var, cnt);
+		if (sysVar[0] == SAVE_LOADERR && fallback_fname)
+			sysVar[0] = load_strs_from_file(fallback_fname, var, cnt);
 		break;
 	default:
 		var = getCaliValue();
@@ -132,6 +146,8 @@ void commandLE(char terminator) {
 		WARNING("Unknown LE command %d", type);
 		break;
 	}
+	if (fallback_fname)
+		free(fallback_fname);
 	free(fname_utf8);
 	
 	TRACE("LE %d,%s,%d,%d:",type, filename, var, cnt);
