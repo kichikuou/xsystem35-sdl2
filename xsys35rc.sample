@@ -105,6 +105,13 @@
 
 #texthook_suppress: 7,11,15,16,17,18,23,24,32,33,197
 
+# Censor list for Streamer Mode.
+# This mosaics images listed in the specified file, making them safe for
+# streaming or public viewing. The file should contain one image number
+# per line, with '#' treated as comments.
+
+#censor: censor_list.txt
+
 # Enables the ZB command (change the font weight). It is disabled by default
 # because it makes the text too bold with our default fonts.
 # This option is experimental and may be removed in the future. See

@@ -46,5 +46,6 @@ typedef struct _cacher cacher;
 extern cacher *cache_new(void *delcallback);
 extern void    cache_insert(cacher *id, int key, void *data, int size, int *in_use);
 extern void   *cache_foreach(cacher *id, int key);
+extern void    cache_clear(cacher *id);
 
 #endif /* !__CASHE__ */

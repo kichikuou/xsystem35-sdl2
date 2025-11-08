@@ -21,9 +21,14 @@
 */
 /* $Id: cg.c,v 1.12 2001/09/16 15:59:11 chikama Exp $ */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
@@ -41,6 +46,9 @@
 #include "filecheck.h"
 #include "cache.h"
 
+static int *censor_list;  // sorted list of cg numbers
+static int censor_list_size;
+
 /* VSPのパレット展開バンク */
 int cg_vspPB;
 /* cg,palette 展開フラグ (funciotn flag) */
@@ -49,6 +57,8 @@ int cg_fflg;
 int *cg_loadCountVar;
 /* Brightness (PD command) */
 int cg_brightness;
+
+#define MOSAIC_SIZE 16
 
 #define GCMD_EXTRACTCG(c)    ((c) & 0x01)
 #define GCMD_SET_PALETTE(c)  ((c) & 0x02)
@@ -69,6 +79,46 @@ static void clear_display_loc();
 static void display_cg(cgdata *cg, int x, int y, int sprite_color, bool alpha_blend);
 static cgdata *loader(int no);
 
+static int compare_integers(const void *a, const void *b) {
+	int int_a = *(const int *)a;
+	int int_b = *(const int *)b;
+	return (int_a > int_b) - (int_a < int_b);
+}
+
+static bool is_censored_cg(int no) {
+	no += 1;  // CG numbers are 1-based.
+	if (!censor_list)
+		return false;
+	return bsearch(&no, censor_list, censor_list_size, sizeof(int), compare_integers) != NULL;
+}
+
+static void cg_mosaic(cgdata *cg) {
+	Uint32 format;
+	switch (cg->depth) {
+	case 8:
+		format = SDL_PIXELFORMAT_INDEX8;
+		break;
+	case 16:
+		format = SDL_PIXELFORMAT_RGB565;
+		break;
+	case 24:
+		format = SDL_PIXELFORMAT_RGB24;
+		break;
+	default:
+		SYSERROR("Unsupported cg depth %d", cg->depth);
+	}
+	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormatFrom(
+		cg->pic, cg->width, cg->height, cg->depth, cg->width * (cg->depth / 8), format);
+	SDL_Surface *tmp = SDL_CreateRGBSurfaceWithFormat(
+		0, (cg->width + MOSAIC_SIZE - 1) / MOSAIC_SIZE, (cg->height + MOSAIC_SIZE - 1) / MOSAIC_SIZE, cg->depth, format);
+	if (sf->format->palette)
+		SDL_SetSurfacePalette(tmp, sf->format->palette);
+	// NOTE: SDL_BlitScaled() does not support 8-bit surfaces.
+	SDL_SoftStretch(sf, NULL, tmp, NULL);
+	SDL_SoftStretch(tmp, NULL, sf, NULL);
+	SDL_FreeSurface(tmp);
+	SDL_FreeSurface(sf);
+}
 
 /*
  * Identify cg format
@@ -230,8 +280,12 @@ static cgdata *loader(int no) {
 	default:
 		break;
 	}
-	/* insert to cache */
+
 	if (cg) {
+		if (is_censored_cg(no)) {
+			cg_mosaic(cg);
+		}
+		/* insert to cache */
 		int size = cg->width * cg->height * (cg->depth / 8);
 		cache_insert(cacheid, no, cg, size, NULL);
 	}
@@ -536,6 +590,10 @@ SDL_Surface *cg_load_as_sdlsurface(int no) {
 	ald_freedata(dfile);
 	if (!cg) return NULL;
 
+	if (is_censored_cg(no)) {
+		cg_mosaic(cg);
+	}
+
 	SDL_Surface *pic = type == ALCG_PMS16
 		? SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565)
 		: SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
@@ -561,4 +619,61 @@ SDL_Surface *cg_load_as_sdlsurface(int no) {
 	SDL_FreeSurface(pic);
 	cgdata_free(cg);
 	return sf;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void load_censor_list(const char *path) {
+	if (cacheid)
+		cache_clear(cacheid);
+	if (censor_list) {
+		free(censor_list);
+		censor_list = NULL;
+		censor_list_size = 0;
+	}
+	if (!path || !*path)
+		return;
+
+	FILE *fp = fopen(path, "r");
+	if (!fp) {
+		SYSERROR("failed to open censor list file %s", path);
+		return;
+	}
+
+	char line[256];
+	int count = 0, cap = 256;
+	censor_list = malloc(cap * sizeof(int));
+	int line_no = 0;
+	while (fgets(line, sizeof(line), fp)) {
+		line_no++;
+		char *p = line;
+		char *comment = strchr(p, '#');
+		if (comment)
+			*comment = '\0';
+		while (*p && isspace((unsigned char)*p))
+			p++;
+		if (*p == '\0')
+			continue;
+
+		if (count >= cap) {
+			cap *= 2;
+			censor_list = realloc(censor_list, cap * sizeof(int));
+		}
+		char *endptr;
+		censor_list[count++] = (int)strtol(p, &endptr, 10);
+
+		while (*endptr && isspace((unsigned char)*endptr))
+			endptr++;
+		if (*endptr != '\0')
+			WARNING("invalid line %d in %s", line_no, path);
+	}
+	censor_list_size = count;
+
+	fclose(fp);
+
+	if (censor_list_size > 0) {
+		qsort(censor_list, censor_list_size, sizeof(int), compare_integers);
+	} else {
+		free(censor_list);
+		censor_list = NULL;
+	}
 }

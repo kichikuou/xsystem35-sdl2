@@ -49,6 +49,11 @@ finds System 3.x game files (*.ALD) from the current directory.
   Suppress text hook on specified scenario pages. _list_ is a comma-separated
   list of page numbers. Used to suppress system messages, etc.
 
+*-censor* _file_::
+  Enable Streamer Mode, which mosaics specific images to make them safe for
+  streaming. The _file_ is a text file containing a list of image numbers
+  to censor, one per line. Lines starting with '#' are treated as comments.
+
 *-renderer* _name_::
   Use the SDL rendering driver named _name_.
 

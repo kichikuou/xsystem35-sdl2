@@ -56,6 +56,7 @@
 #include "randMT.h"
 #include "ags.h"
 #include "font.h"
+#include "cg.h"
 #include "gfx.h"
 #include "event.h"
 #include "menu.h"
@@ -114,6 +115,7 @@ static void sys35_usage(bool verbose) {
 	puts(" -playlist file          : load CD playlist from 'file'");
 	puts(" -texthook mode          : text hook mode. 'none' (default), 'print' or 'copy'");
 	puts(" -texthook_suppress list : suppress text hook on specified pages");
+	puts(" -censor file            : mosaic images listed in 'file'");
 	
 	puts(" -M?                     : select output midi methos");
 #ifdef ENABLE_MIDI_SDLMIXER
@@ -253,6 +255,10 @@ static void sys35_ParseOption(int *argc, char **argv) {
 		} else if (0 == strcmp(argv[i], "-texthook_suppress")) {
 			if (argv[i + 1] != NULL) {
 				texthook_set_suppression_list(argv[i + 1]);
+			}
+		} else if (0 == strcmp(argv[i], "-censor")) {
+			if (argv[i + 1] != NULL) {
+				load_censor_list(argv[i + 1]);
 			}
 		} else if (0 == strncmp(argv[i], "-M", 2)) {
 			int subdev = 0;
@@ -398,6 +404,12 @@ static void check_profile() {
 	param = get_profile("texthook_suppress");
 	if (param) {
 		texthook_set_suppression_list(param);
+	}
+
+	/* Censor list for streamer mode */
+	param = get_profile("censor");
+	if (param) {
+		load_censor_list(param);
 	}
 }
 

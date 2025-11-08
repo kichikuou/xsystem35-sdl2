@@ -60,6 +60,14 @@ and examine or modify game variables. There are two ways to use the debugger:
   launch the debugger with a console interface. Type `help` to see a list of
   available commands.
 
+### Streamer Mode
+
+xsystem35 introduces a "Streamer Mode" to make playing games with NSFW content
+safer for streaming or public viewing. When enabled with the `-censor <file>`
+option, images specified in the provided file will be automatically mosaiced.
+
+The `misc/censor/` directory contains example censor list files for some games.
+
 ## Installation
 
 Prebuilt packages for Windows and Android can be downloaded from the

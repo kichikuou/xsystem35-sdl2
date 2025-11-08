@@ -84,6 +84,7 @@ extern void cg_get_info(int no, SDL_Rect *info);
 extern void cg_clear_display_loc();
 extern void cgdata_free(cgdata *cg);
 extern struct SDL_Surface *cg_load_as_sdlsurface(int no);
+extern void load_censor_list(const char *path);
 
 extern int cg_vspPB;
 extern int cg_fflg;

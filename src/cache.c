@@ -130,3 +130,19 @@ void *cache_foreach(cacher *id, int key) {
 	}
 	return NULL;
 }
+
+void cache_clear(cacher *id) {
+	cacheinfo *ic = id->top->next;
+	cacheinfo *next;
+
+	while (ic != NULL) {
+		next = ic->next;
+		if (ic->data) {
+			totalsize -= ic->size;
+			id->free_(ic->data);
+		}
+		free(ic);
+		ic = next;
+	}
+	id->top->next = NULL;
+}
