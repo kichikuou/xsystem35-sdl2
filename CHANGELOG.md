@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.17.0 - 2025-11-09
+- Added "Streamer Mode" to mosaic specified (NSFW) images. This is enabled via the `-censor <file>` command-line option.
+- Windows: Fixed an issue where Rance 5D could not save files if the `Save` directory did not exist.
+
 ## 2.16.1 - 2025-08-28
 - Fixed text rendering issue in SACT log (#71)
 - Windows: The 32-bit version no longer supports the portmidi MIDI backend
