@@ -113,5 +113,5 @@ int muscd_get_maxtrack(void) {
 }
 
 bool muscd_is_available(void) {
-	return prv.cddev;
+	return prv.cddev && prv.cddev->is_available();
 }

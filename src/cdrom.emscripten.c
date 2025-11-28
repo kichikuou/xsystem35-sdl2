@@ -62,6 +62,10 @@ static bool cdrom_getPlayingInfo(cd_time *info) {
 	return true;
 }
 
+static bool cdrom_is_available(void) {
+	return EM_ASM_INT({ return xsystem35.cdPlayer.hasAudioTrack(); });
+}
+
 cdromdevice_t cdrom_emscripten = {
 	.init = cdrom_init,
 	.exit = cdrom_exit,
@@ -69,4 +73,5 @@ cdromdevice_t cdrom_emscripten = {
 	.start = cdrom_start,
 	.stop = cdrom_stop,
 	.getpos = cdrom_getPlayingInfo,
+	.is_available = cdrom_is_available,
 };

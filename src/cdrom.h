@@ -38,6 +38,7 @@ typedef struct {
 	bool (*start)(int trk, int loop);
 	void (*stop)(void);
 	bool (*getpos)(cd_time *);
+	bool (*is_available)(void);
 } cdromdevice_t;
 
 extern cdromdevice_t cdrom_bgm;

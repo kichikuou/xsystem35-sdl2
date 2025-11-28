@@ -63,6 +63,10 @@ static bool cdrom_bgm_getPlayingInfo(cd_time *info) {
 	return true;
 }
 
+static bool cdrom_bgm_is_available(void) {
+	return true;
+}
+
 cdromdevice_t cdrom_bgm = {
 	.init = cdrom_bgm_init,
 	.exit = cdrom_bgm_exit,
@@ -70,4 +74,5 @@ cdromdevice_t cdrom_bgm = {
 	.start = cdrom_bgm_start,
 	.stop = cdrom_bgm_stop,
 	.getpos = cdrom_bgm_getPlayingInfo,
+	.is_available = cdrom_bgm_is_available,
 };

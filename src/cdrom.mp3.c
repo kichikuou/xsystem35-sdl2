@@ -164,6 +164,10 @@ static bool cdrom_getPlayingInfo (cd_time *inf) {
 	return true;
 }
 
+static bool cdrom_is_available(void) {
+	return enabled;
+}
+
 cdromdevice_t cdrom_mp3 = {
 	.init = cdrom_init,
 	.exit = cdrom_exit,
@@ -171,4 +175,5 @@ cdromdevice_t cdrom_mp3 = {
 	.start = cdrom_start,
 	.stop = cdrom_stop,
 	.getpos = cdrom_getPlayingInfo,
+	.is_available = cdrom_is_available,
 };
