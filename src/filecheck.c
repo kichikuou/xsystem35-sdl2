@@ -139,6 +139,15 @@ bool fc_exists(const char *fname_utf8)
 
 FILE *fc_open(const char *fname_utf8, char type) {
 	char *path = fc_get_path(fname_utf8);
+	if (type == 'w') {
+		// Ensure the directory exists
+		char *p = strrchr(path, '/');
+		if (p) {
+			*p = '\0';
+			mkdir_p(path);
+			*p = '/';
+		}
+	}
 	FILE *fp = fopen_utf8(path, type);
 	if (!fp && type == 'r') {
 		fp = fopen_utf8(fname_utf8, type);
@@ -150,20 +159,32 @@ FILE *fc_open(const char *fname_utf8, char type) {
 #else // !_WIN32
 
 static char *fc_search(const char *fname_utf8, const char *dir) {
-	DIR *d = opendir(dir);
-	if (d == NULL)
-		return NULL;
+	// If path contains no directory separator, do case-insensitive search.
+	if (strchr(fname_utf8, '/') == NULL) {
+		DIR *d = opendir(dir);
+		if (d == NULL)
+			return NULL;
 
-	char *found = NULL;
-	struct dirent *entry;
-	while ((entry = readdir(d)) != NULL) {
-		if (strcasecmp(fname_utf8, entry->d_name) == 0) {
-			found = get_fullpath(dir, entry->d_name);
-			break;
+		char *found = NULL;
+		struct dirent *entry;
+		while ((entry = readdir(d)) != NULL) {
+			if (strcasecmp(fname_utf8, entry->d_name) == 0) {
+				found = get_fullpath(dir, entry->d_name);
+				break;
+			}
+		}
+		closedir(d);
+		return found;
+	} else {
+		// If path contains directory separator, do case-sensitive existence check.
+		char *fullpath = get_fullpath(dir, fname_utf8);
+		if (access(fullpath, F_OK) == 0) {
+			return fullpath;
+		} else {
+			free(fullpath);
+			return NULL;
 		}
 	}
-	closedir(d);
-	return found;
 }
 
 char *fc_get_path(const char *fname_utf8) {
@@ -195,7 +216,13 @@ FILE *fc_open(const char *fname_utf8, char type) {
 
 	FILE *fp;
 	if (type == 'w') {
-		fc_backup_oldfile(fullpath);
+		// Ensure the directory exists
+		char *p = strrchr(fullpath, '/');
+		if (p) {
+			*p = '\0';
+			mkdir_p(fullpath);
+			*p = '/';
+		}
 		fp = fopen(fullpath, "wb");
 	} else {
 		fp = fopen(fullpath, "rb");

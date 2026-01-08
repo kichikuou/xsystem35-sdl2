@@ -85,17 +85,10 @@ void commandQE(char terminator) {
 	int type = sl_getc();
 	const char *filename = sl_getString(terminator);
 	char *fname_utf8 = toUTF8(filename);
-	char *last_slash = NULL;
 	for (char *p = fname_utf8; *p; p++) {
 		if (*p == '\\') {
 			*p = '/';
-			last_slash = p;
 		}
-	}
-	if (last_slash) {
-		*last_slash = '\0';
-		mkdir_p(fname_utf8);
-		*last_slash = '/';
 	}
 
 	int var, cnt;
