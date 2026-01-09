@@ -112,6 +112,7 @@ int sys_keywait(int msec, unsigned flags) {
 		key = sys_getInputInfo();
 		cancel_yield();  // We just yielded!
 		if ((flags & KEYWAIT_CANCELABLE) && key) break;
+		if ((flags & KEYWAIT_CTRL_CANCELABLE) && RawKeyInfo[KEY_CTRL]) break;
 	}
 
 	return key;

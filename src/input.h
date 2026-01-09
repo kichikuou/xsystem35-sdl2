@@ -38,9 +38,10 @@ struct SDL_Point;
 #define SYS35KEY_ESC  64
 #define SYS35KEY_TAB 128
 
-#define KEYWAIT_NONCANCELABLE 0
-#define KEYWAIT_CANCELABLE    1
-#define KEYWAIT_SKIPPABLE     2
+#define KEYWAIT_NONCANCELABLE   0
+#define KEYWAIT_CANCELABLE      1
+#define KEYWAIT_SKIPPABLE       2
+#define KEYWAIT_CTRL_CANCELABLE 4
 
 // System3.x key codes (IG command, etc.)
 // These are originated from Windows virtual key codes (VK_*).

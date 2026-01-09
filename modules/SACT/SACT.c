@@ -1613,10 +1613,10 @@ static void TimerWait() {
 	int wTimerID = getCaliValue();
 	int wCount = getCaliValue();
 
-	while (wCount > stimer_get(wTimerID) && !nact->is_quit) {
-		sys_keywait(10, KEYWAIT_NONCANCELABLE);
-	}
-	
+	int msec = (wCount - stimer_get(wTimerID)) * 10;
+	if (msec > 0)
+		sys_keywait(msec, KEYWAIT_CTRL_CANCELABLE);
+
 	TRACE("SACT.TimerWait %d,%d:", wTimerID, wCount);
 }
 
@@ -1627,9 +1627,9 @@ static void TimerWait() {
  */
 static void Wait() {
 	int wCount = getCaliValue();
-	
-	sys_keywait(wCount*10, KEYWAIT_NONCANCELABLE);
-	
+
+	sys_keywait(wCount * 10, KEYWAIT_CTRL_CANCELABLE);
+
 	TRACE("SACT.Wait %d:", wCount);
 }
 
