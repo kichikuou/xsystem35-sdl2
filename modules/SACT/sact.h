@@ -249,9 +249,6 @@ struct _sact {
 	
 	SDL_Rect updaterect; // 更新が必要なspriteの領域の和
 	
-	// sact timer
-	stimer_t timer[65536];
-	
 	// DnDに関するもの
 	sprite_t *draggedsp;  // drag中のスプライト
 	bool dropped;      // スプライトがドロップされたかどうか

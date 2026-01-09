@@ -24,16 +24,6 @@
 #ifndef __SACTTIMER_H__
 #define __SACTTIMER_H__
 
-#include <sys/time.h>
-#include <unistd.h>
-
-struct _stimer {
-	int val;
-	struct timeval tv_base;
-};
-typedef struct _stimer stimer_t;
-
-
 void stimer_init(void);
 void stimer_reset(int id, int val);
 int stimer_get(int id);

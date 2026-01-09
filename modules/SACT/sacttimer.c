@@ -22,36 +22,35 @@
 /* $Id: sacttimer.c,v 1.1 2003/04/22 16:29:52 chikama Exp $ */
 
 #include <stdlib.h>
-#include <sys/time.h>
-#include <unistd.h>
+#include <string.h>
 
 #include "portab.h"
-#include "sact.h"
 #include "sacttimer.h"
+#include "system.h"
 
-/*
-  sact timer subsystem 初期化
-*/
+#define MAX_TIMER 10
+#define TICKS_PER_CENTISECOND 10
+
+uint32_t ticks_base[MAX_TIMER];
+
 void stimer_init(void) {
-	stimer_reset(0, 0);
+	memset(ticks_base, 0, sizeof(ticks_base));
 }
 
-// 指定IDのタイマーのリセット
 void stimer_reset(int id, int val) {
-	gettimeofday(&(sact.timer[id].tv_base), NULL);
-	sact.timer[id].val = val;
+	if (id < 0 || id >= MAX_TIMER) {
+		WARNING("Invalid timer ID: %d", id);
+		return;
+	}
+	ticks_base[id] = sys_get_ticks() - (val * TICKS_PER_CENTISECOND);
 }
 
-// 指定IDのタイマーの取得
 int stimer_get(int id) {
-	long sec, usec, usec2;
-	struct timeval tv;
-	struct timeval tv_base = sact.timer[id].tv_base;
-	int division = 10;
-	
-	gettimeofday(&tv, NULL);
-	sec  = tv.tv_sec - tv_base.tv_sec;
-	usec = tv.tv_usec - tv_base.tv_usec;
-	usec2 = sec * (1000l/division)+ usec / 1000l /division;
-	return sact.timer[id].val + usec2;
+	if (id < 0 || id >= MAX_TIMER) {
+		WARNING("Invalid timer ID: %d", id);
+		return 0;
+	}
+	uint32_t ticks = sys_get_ticks();
+	uint32_t diff = ticks - ticks_base[id];
+	return diff / TICKS_PER_CENTISECOND;
 }

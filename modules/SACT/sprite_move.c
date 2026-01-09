@@ -98,8 +98,6 @@ static int move_cb(sprite_t *sp, agsevent_t *e) {
 		// 新しい場所のupdate
 		sp_updateme(sp);
 		update++;
-	} else {
-		usleep(1);
 	}
 	
 	return update;
