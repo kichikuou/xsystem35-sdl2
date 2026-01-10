@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.17.1 - 2026-01-10
+- Fixed an issue where Rance 5D could not save files on non-Windows systems.
+- Improved fast-forward behavior using the Ctrl key in Rance 5D.
+- The `SI 2` command now returns 0 if a playlist file is not provided.
+
 ## 2.17.0 - 2025-11-09
 - Added "Streamer Mode" to mosaic specified (NSFW) images. This is enabled via the `-censor <file>` command-line option.
 - Windows: Fixed an issue where Rance 5D could not save files if the `Save` directory did not exist.
