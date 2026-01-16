@@ -16,9 +16,10 @@ the following features:
 ### Playing Audio Files as Virtual CD Music
 
 Many System 3.x games feature music as audio tracks on the CD-ROM. xsystem35
-can play music from audio files, eliminating the need to insert CDs. To use
-ripped audio files, create a file named `playlist.txt` in the game directory
-and list the paths to your tracks, one per line. For example:
+can play music from audio files, eliminating the need to insert CDs. Supported
+audio file formats are MP3 and Ogg. To use ripped audio files, create a file
+named `playlist.txt` in the game directory and list the paths to your tracks,
+one per line. For example:
 
 ```
 # The first line is not used
