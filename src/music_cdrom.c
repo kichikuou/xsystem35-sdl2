@@ -25,102 +25,93 @@
 #include <string.h>
 
 #include "portab.h"
-#include "music_server.h"
+#include "ald_manager.h"
+#include "music_private.h"
 #include "music_cdrom.h"
 #include "cdrom.h"
 
-enum {
-	CDROM_START,
-	CDROM_STOPCHECK,
-	CDROM_LOOPCHECK,
-	CDROM_STOP,
-	CDROM_NOP
-};
+#ifdef __EMSCRIPTEN__
+extern cdromdevice_t cdrom_emscripten;
+#define NATIVE_CD_DEVICE &cdrom_emscripten
+#else
+extern cdromdevice_t cdrom_mp3;
+#define NATIVE_CD_DEVICE &cdrom_mp3
+#endif
 
-int muscd_init() {
-	int st = cd_init(&prv.cddev);
-	int ret;
-	
-	if (st == -1) {
-		prv.cd_valid = FALSE;
-		ret = NG;
+static char *playlist = DEFAULT_PLAYLIST_PATH;
+
+void muscd_set_playlist(const char *name) {
+	playlist = strdup(name);
+}
+
+bool muscd_init(void) {
+	// In the download edition of Daiakuji, SS command plays music from *BA.ald.
+	if (ald_get_maxno(DRIFILE_BGM) > 0) {
+		prv.cddev = &cdrom_bgm;
 	} else {
-		prv.cd_valid = TRUE;
-		prv.cdrom.dev = &prv.cddev;
-		prv.cdrom.st = CDROM_NOP;
-		prv.cdrom.in_play = FALSE;
-		ret = OK;
+		prv.cddev = NATIVE_CD_DEVICE;
 	}
-	
-	return ret;
+	prv.cd_current_track = 0;
+	return prv.cddev->init(playlist);
 }
 
-int muscd_exit() {
-	if (prv.cd_valid) {
-		prv.cddev.exit();
+bool muscd_init_bgm(DRIFILETYPE type, int base_no) {
+	muscd_exit();
+	prv.cddev = &cdrom_bgm;
+	return musbgm_init(type, base_no);
+}
+
+void muscd_exit(void) {
+	if (prv.cddev) {
+		prv.cddev->exit();
+		prv.cddev = NULL;
 	}
-	return OK;
 }
 
-int muscd_start(int trk, int loop) {
-	prv.cdrom.track = trk;
-	prv.cdrom.loop = loop;
-	prv.cdrom.cnt = 0;
-	
-	prv.cdrom.st = CDROM_START;
-	prv.cdrom.in_play = FALSE;
-	
-	memset(&prv.cdrom.time, 0, sizeof(cd_time));
-	
-	return OK;
-}
-
-int muscd_stop() {
-	prv.cdrom.st = CDROM_STOP;
-	return OK;
-}
-
-cd_time muscd_getpos() {
-	cd_time tm;
-	prv.cddev.getpos(&tm);
-	return tm;
-}
-
-int muscd_cb() {
-	cdobj_t *obj = &prv.cdrom;
-	
-	switch(obj->st) {
-	case CDROM_START:
-		obj->in_play = TRUE;
-		obj->dev->start(obj->track);
-		obj->st = CDROM_STOPCHECK;
-		break;
-	case CDROM_STOPCHECK:
-		if (NG == obj->dev->getpos(&(obj->time))) {
-                        obj->st = CDROM_LOOPCHECK;
-                }
-		break;
-	case CDROM_LOOPCHECK:
-		obj->cnt++;
-		if (obj->loop == 0) {
-			obj->st = CDROM_START;
-			break;
-		}
-		if (--obj->loop == 0) {
-			obj->st = CDROM_STOP;
-		} else {
-			obj->st = CDROM_START;
-		}
-                break;
-	case CDROM_STOP:
-                obj->dev->stop();
-                
-                obj->in_play = FALSE;
-                obj->st = CDROM_NOP;
-                break;
-        case CDROM_NOP:
-                break;
+void muscd_reset(void) {
+	if (prv.cddev) {
+		prv.cddev->reset();
+		prv.cd_current_track = 0;
 	}
-	
-	return OK;
+}
+
+bool muscd_start(int trk, int loop) {
+	if (!prv.cddev)
+		return false;
+	if (trk == prv.cd_current_track)
+		return true;
+	prv.cddev->stop();
+
+	prv.cd_current_track = trk;
+	return prv.cddev->start(trk, loop);
+}
+
+void muscd_stop(void) {
+	if (!prv.cddev)
+		return;
+	prv.cddev->stop();
+	prv.cd_current_track = 0;
+}
+
+bool muscd_getpos(int *t, int *m, int *s, int *f) {
+	if (!prv.cddev)
+		return false;
+	cd_time info;
+	if (!prv.cddev->getpos(&info))
+		return false;
+	*t = info.t;
+	*m = info.m;
+	*s = info.s;
+	*f = info.f;
+	return true;
+}
+
+int muscd_get_maxtrack(void) {
+	if (!prv.cddev)
+		return 0;
+	return prv.cd_maxtrk;
+}
+
+bool muscd_is_available(void) {
+	return prv.cddev && prv.cddev->is_available();
 }

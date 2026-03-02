@@ -24,41 +24,25 @@
 #ifndef __CDROM_H__
 #define __CDROM_H__
 
-/*
- * CD-ROM へのアクセスが不安定な場合は次の定数を増やしてみて下さい
- */
-/* ioctrole retry times */
-#define CDROM_IOCTL_RETRY_TIME 3
-/* ioctrole retry interval (100ms unit) */
-#define CDROM_IOCTL_RETRY_INTERVAL 1
+#include <stdbool.h>
 
 typedef struct {
         int t,m,s,f;
 } cd_time;
 
-struct _cdromdevice {
-	int  (* init)(char *);
-	int  (* exit)(void);
-	int  (* start)(int trk);
-	int  (* stop)(void);
-	int  (* getpos)(cd_time *);
-	int  (* setvol)(int);
-	int  (* getvol)(void);
-};
-typedef struct _cdromdevice cdromdevice_t;
+typedef struct {
+	bool (*init)(char *playlist);
+	void (*exit)(void);
+	void (*reset)(void);
+	// Play through the track loop times. If loop == 0, loops forever.
+	bool (*start)(int trk, int loop);
+	void (*stop)(void);
+	bool (*getpos)(cd_time *);
+	bool (*is_available)(void);
+} cdromdevice_t;
 
-extern int  cd_init(cdromdevice_t *);
-extern void cd_set_devicename(char *);
+extern cdromdevice_t cdrom_bgm;
 
 #define CD_FPS 75
-#define FRAMES_TO_MSF(f, M,S,F) {                                       \
-        int value = f;                                                  \
-        *(F) = value%CD_FPS;                                            \
-        value /= CD_FPS;                                                \
-        *(S) = value%60;                                                \
-        value /= 60;                                                    \
-        *(M) = value;                                                   \
-}
-#define MSF_TO_FRAMES(M, S, F)  ((M)*60*CD_FPS+(S)*CD_FPS+(F))
 
 #endif /* __CDROM_H__ */

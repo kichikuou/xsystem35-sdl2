@@ -24,34 +24,30 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
+#include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "nact.h"
 #include "ags.h"
-#include "imput.h"
-#include "key.h"
+#include "input.h"
 #include "sact.h"
 #include "sprite.h"
-#include "ngraph.h"
 #include "drawtext.h"
 
 // 選択された要素(1~) キャンセルの場合は0、初期状態は -1
 static int selected_item;
 static int selected_item_cur;
 
-// 選択肢を描画するsurface
-static surface_t *selcanvas;
-
 // 前のカーソルの状態
-static boolean oldstate; // spriteの中か外か
+static bool oldstate; // spriteの中か外か
 static int oldindex; // 何番目の要素か(0~)
 
 
-static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin);
+static bool sp_is_insprite2(sprite_t *sp, int x, int y, int margin);
 static void cb_select_move(agsevent_t *e);
 static void cb_select_release(agsevent_t *e);
-static int update_selwindow(sprite_t *sp);
 static void setup_selwindow();
 static void remove_selwindow();
 static int sel_main();
@@ -63,22 +59,22 @@ static int sel_main();
  *  内側にマージンを含む sprite内領域チェック
  *  マージン内はsprite内部とは判断しない
  */
-static boolean sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
-	MyRectangle r;
-	cginfo_t *curcg = sp->curcg;
-	
-	r.x = sp->cur.x + margin;
-	r.y = sp->cur.y + margin;
-	r.width = curcg->sf->width   - 2 * margin;
-	r.height = curcg->sf->height - 2 * margin;
-	return ags_regionContains(&r, x, y);
+static bool sp_is_insprite2(sprite_t *sp, int x, int y, int margin) {
+	SDL_Point p = {x, y};
+	SDL_Rect r = {
+		sp->cur.x + margin,
+		sp->cur.y + margin,
+		sp->curcg->sf->w - 2 * margin,
+		sp->curcg->sf->h - 2 * margin
+	};
+	return SDL_PointInRect(&p, &r);
 }
 
 // マウスが移動したときの callback
 static void cb_select_move(agsevent_t *e) {
-	int x = e->d1, y = e->d2;
+	int x = e->mousex, y = e->mousey;
 	sprite_t *sp = sact.sp[sact.sel.spno];
-	boolean newstate;
+	bool newstate;
 	int newindex;
 	
 	// sprite内か？
@@ -86,7 +82,7 @@ static void cb_select_move(agsevent_t *e) {
 	newindex = (y - (sp->cur.y + sact.sel.frame_dot)) / (sact.sel.font_size + sact.sel.linespace);
 	
 	if (newstate == oldstate) {
-		if ((newstate == FALSE) || (newindex == oldindex)) {
+		if (!newstate || newindex == oldindex) {
 			// 前と状態が同じでかつ、新しい状態がspriteの外か、
 			// indexが変わらない場合はなにもしない。
 			return;
@@ -114,18 +110,18 @@ static void cb_select_move(agsevent_t *e) {
 
 // ボタンがリリースされたときの callback
 static void cb_select_release(agsevent_t *e) {
-	int x = e->d1, y = e->d2;
+	int x = e->mousex, y = e->mousey;
 	sprite_t *sp = sact.sp[sact.sel.spno];
-	boolean st;
+	bool st;
 	int iy;
 	
-	switch (e->d3) {
+	switch (e->code) {
 	case AGSEVENT_BUTTON_LEFT:
 		st = sp_is_insprite2(sp, x, y, sact.sel.frame_dot);
 		iy = (y - (sp->cur.y + sact.sel.frame_dot)) / (sact.sel.font_size + sact.sel.linespace);
 
 		// カーソルが sprite の外の場合は無視
-		if (st == FALSE) {
+		if (!st) {
 			return;
 		}
 		
@@ -142,8 +138,19 @@ static void cb_select_release(agsevent_t *e) {
 	}
 }
 
+static void draw_box(SDL_Surface *dst, int x, int y, int w, int h) {
+	SDL_FillRect(dst, &(SDL_Rect){x, y, w, h}, SDL_MapRGB(dst->format, 0, 0, 0));
+	SDL_Rect border_rects[4] = {
+		{x, y, w, 1},
+		{x, y + h - 1, w, 1},
+		{x, y, 1, h},
+		{x + w - 1, y, 1, h}
+	};
+	SDL_FillRects(dst, border_rects, 4, SDL_MapRGB(dst->format, 255, 255, 255));
+}
+
 // 選択ウィンドを更新するときの callback
-static int update_selwindow(sprite_t *sp) {
+static void update_selwindow(sprite_t *sp) {
 	int selno = selected_item_cur;
 	int x0, y0;
 
@@ -154,20 +161,16 @@ static int update_selwindow(sprite_t *sp) {
 	
 	// 選択されている要素
 	if (selno && sact.sel.elem[selno] != NULL) {
-		int w = selcanvas->width - 2 * sact.sel.frame_dot;
+		int w = sact.sel.charcanvas->w - 2 * sact.sel.frame_dot;
 		int h = sact.sel.font_size + sact.sel.linespace;
 		int x = x0 + sact.sel.frame_dot;
 		int y = y0 + sact.sel.frame_dot + (selno -1) * h;
-		gr_fill(sf0, x, y, w, h, 0, 0, 0);
-		gr_drawrect(sf0, x, y, w, h, 255, 255, 255);
+		draw_box(main_surface, x, y, w, h);
 	}
 	
 	// 選択肢文字列
-	gr_expandcolor_blend(sf0, x0, y0, 
-			     sact.sel.charcanvas, 0, 0,
-			     selcanvas->width, selcanvas->height, 255, 255, 255);
-	
-	return OK;
+	SDL_BlitSurface(sact.sel.charcanvas, NULL, main_surface,
+		&(SDL_Rect){x0, y0, sact.sel.charcanvas->w, sact.sel.charcanvas->h});
 }
 
 // 選択ウィンドの準備
@@ -175,11 +178,9 @@ static void setup_selwindow() {
 	sprite_t *sp = sact.sp[sact.sel.spno];
 	int i;
 	
-	//選択ウィンド作業 surfaceの生成
-	selcanvas = sf_dup(sp->cg1->sf);
-	
 	// 選択肢文字用 canvas
-	sact.sel.charcanvas = sf_create_pixel(selcanvas->width, selcanvas->height, 8);
+	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, sp->cg1->sf->w, sp->cg1->sf->h, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_SetSurfaceBlendMode(sact.sel.charcanvas, SDL_BLENDMODE_BLEND);
 	
 	dt_setfont(sact.sel.font_type, sact.sel.font_size);
 	
@@ -190,17 +191,19 @@ static void setup_selwindow() {
 		// 文字の場所計算
 		x = 0; // 行そろえは無し
 		y = (i - 1) * (sact.sel.font_size + sact.sel.linespace);
-		dt_drawtext(sact.sel.charcanvas,
+		dt_drawtext_col(sact.sel.charcanvas,
 			    x + sact.sel.frame_dot, y + sact.sel.frame_dot,
-			    sact.sel.elem[i]);
+			    sact.sel.elem[i], 255, 255, 255);
 	}
 	
 	// デフォルトで選択される選択肢がある場合、そこへカーソルを移動
 	if (sact.sel.movecursor) {
-		ags_setCursorLocation(sp->cur.x + sact.sel.frame_dot + 2,
-				      sp->cur.y + sact.sel.frame_dot + 2 + (sact.sel.font_size + sact.sel.linespace)*(sact.sel.movecursor -1), TRUE);
+		int x = sp->cur.x + sact.sel.frame_dot + 2;
+		int y = sp->cur.y + sact.sel.frame_dot + 2 +
+			(sact.sel.font_size + sact.sel.linespace) * (sact.sel.movecursor - 1);
+		ags_setCursorLocation(x, y, true, true);
 		selected_item = (sact.sel.movecursor -1);
-		oldstate = TRUE;
+		oldstate = true;
 		oldindex = selected_item -1;
 	}
 
@@ -223,8 +226,9 @@ static void remove_selwindow() {
 	sp_update_clipped();
 	
 	// 作業用 surface の削除
-	sf_free(selcanvas);
-	sf_free(sact.sel.charcanvas);
+	if (sact.sel.charcanvas)
+		SDL_FreeSurface(sact.sel.charcanvas);
+	sact.sel.charcanvas = NULL;
 }
 
 
@@ -236,7 +240,9 @@ static int sel_main() {
 	selected_item = -1;
 	
 	while(selected_item == -1) {
-		sys_keywait(25, TRUE);
+		sys_keywait(25, KEYWAIT_CANCELABLE);
+		if (nact->is_quit)
+			selected_item = 0;
 	}
 	
 	sact.waittype = KEYWAIT_NONE;
@@ -256,6 +262,13 @@ void ssel_init() {
 	sact.sel.font_type = FONT_GOTHIC;
 }
 
+void ssel_reset(void) {
+	ssel_clear();
+	if (sact.sel.charcanvas) {
+		SDL_FreeSurface(sact.sel.charcanvas);
+		sact.sel.charcanvas = NULL;
+	}
+}
 
 /*
   内部の選択肢情報をクリア
@@ -264,7 +277,7 @@ void ssel_clear() {
 	int i;
 	
 	for (i = 0; i < SEL_ELEMENT_MAX; i++) {
-		g_free(sact.sel.elem[i]);
+		free(sact.sel.elem[i]);
 		sact.sel.elem[i] = NULL;
 	}
 }
@@ -280,10 +293,10 @@ void ssel_add(int nString, int wI) {
 		return;
 	}
 	if (sact.sel.elem[wI] != NULL) {
-		g_free(sact.sel.elem[wI]);
+		free(sact.sel.elem[wI]);
 	}
 	
-	sact.sel.elem[wI] = g_strdup(v_str(nString -1));
+	sact.sel.elem[wI] = strdup(svar_get(nString));
 }
 
 /*
@@ -298,7 +311,7 @@ void ssel_add(int nString, int wI) {
 */
 int ssel_select(int wNum, int wChoiceSize, int wMenuOutSpc, int wChoiceLineSpace, int wChoiceAutoMoveCursor, int nAlign) {
 	int ret = 0;
-	boolean saveflag;
+	bool saveflag;
 	
 	// check sprite number is sane
 	if (wNum >= (SPRITEMAX-1) || wNum <= 0) return ret;
@@ -318,7 +331,7 @@ int ssel_select(int wNum, int wChoiceSize, int wMenuOutSpc, int wChoiceLineSpace
 
 	// 古い sprite の表示フラグを保存
 	saveflag = sact.sp[wNum]->show;
-	sact.sp[wNum]->show = TRUE;
+	sact.sp[wNum]->show = true;
 	setup_selwindow();
 	
 	ret = sel_main();

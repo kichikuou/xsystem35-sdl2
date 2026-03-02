@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "ags.h"
@@ -42,7 +41,7 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 	
 	switch(e->type) {
 	case AGSEVENT_BUTTON_PRESS:
-		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
+		if (e->code != AGSEVENT_BUTTON_LEFT) return 0;
 		
 		// ボタン押下時のスプライトがあれば、それを表示
 		if (sp->cg3) {
@@ -50,11 +49,11 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 			update++;
 		}
 		
-		sp->pressed = TRUE;
+		sp->pressed = true;
 		break;
 		
 	case AGSEVENT_BUTTON_RELEASE:
-		if (e->d3 != AGSEVENT_BUTTON_LEFT) return 0;
+		if (e->code != AGSEVENT_BUTTON_LEFT) return 0;
 		
 		// ここにくるときは forcusが当たっているときしかこないので、
 		// curcg は cg2 に戻せばよい
@@ -72,7 +71,7 @@ static int eventCB_switch(sprite_t *sp, agsevent_t *e) {
 				ssnd_play(sp->numsound2);
 			}
 		}
-		sp->pressed = FALSE;
+		sp->pressed = false;
 		break;
 	}
 	
@@ -94,8 +93,7 @@ static void cb_remove(sprite_t *sp) {
   sp_new の時にスプライトの種類毎の初期化
   @param sp: 初期化するスプライト
 */
-int sp_sw_setup(sprite_t *sp) {
+void sp_sw_setup(sprite_t *sp) {
 	spev_add_eventlistener(sp, eventCB_switch);
 	sp->remove = cb_remove;
-	return OK;
 }

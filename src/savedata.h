@@ -25,104 +25,36 @@
 #define __SAVEDATA__
 
 #include "portab.h"
-#include "cg.h"
-#include "windowframe.h"
 
-#define SAVE_MAXNUMBER    (26)
+#define SAVE_MAXNUMBER    26
 
-#define SAVE_SAVEERR      (255)
-#define SAVE_LOADERR      (255)
-#define SAVE_LOADSHORTAGE (254)
-#define SAVE_OTHERERR     (201)
-#define SAVE_LOADOK       (0)
-#define SAVE_SAVEOK1      (1)
-#define SAVE_SAVEOK0      (0)
+#define SAVE_SAVEERR      255
+#define SAVE_LOADERR      255
+#define SAVE_LOADSHORTAGE 254
+#define SAVE_OTHERERR     201
+#define SAVE_LOADOK       0
+#define SAVE_SAVEOK1      1
+#define SAVE_SAVEOK0      0
 
-#define SAVE_DATAID "System3.5 SavaData(c)ALICE-SOFT"
-#define SAVE_DATAVERSION 0x350200
+enum save_format {
+	SAVEFMT_XSYS35,
+	SAVEFMT_SYS36,  // System3.5 v2.x - System3.6
+	SAVEFMT_SYS38,  // System3.8 - System3.9
+};
 
-typedef struct {
-        WORD x;
-        WORD y;
-        WORD width;
-        WORD height;
-} RectangleW;
+struct VarRef;
 
-typedef struct {
-        char ID[32];
-	int version;
-	char gameName[28];
-	BYTE selMsgSize;
-	BYTE selMsgColor;
-	BYTE selBackColor;
-	BYTE selFrameColor;
-	BYTE msgMsgSize;
-	BYTE msgMsgColor;
-	BYTE msgBackColor;
-	BYTE msgFrameColor;
-	BYTE rsvB1;
-	BYTE rsvB2;
-	BYTE rsvB3;
-	BYTE rsvB4;
-	BYTE rsvB5;
-	BYTE rsvB6;
-	BYTE rsvB7;
-	BYTE rsvB8;
-	int  scoPage;
-	int  scoIndex;
-	int  rsvI1;
-	int  rsvI2;
-	RectangleW selWinInfo[SELWINMAX];
-	RectangleW msgWinInfo[MSGWINMAX];
-	int  stackinfo;
-	int  varStr;
-	int  rsvI3;
-	int  rsvI4;
-	int  varSys[256];
-	int  rsvI[228];
-} Ald_baseHdr;
-
-typedef struct {
-	int size;
-	int count;
-	int maxlen;
-	int rsv1;
-} Ald_strVarHdr;
-
-typedef struct {
-	int size;
-	int rsv1;
-	int rsv2;
-	int rsv3;
-} Ald_stackHdr;
-
-typedef struct {
-	int size;
-	int pageNo;
-	int rsv1;
-	int rsv2;
-} Ald_sysVarHdr;
-
-/* defined by cmdb.c */
-extern Bcom_WindowInfo msgWinInfo[];
-extern Bcom_WindowInfo selWinInfo[];
-/* defined by variable.c */
-extern int  strvar_cnt;
-extern int  strvar_len;
-
-extern int save_loadAll(int no);
-extern int save_saveAll(int no);
-extern int save_loadPartial(int no, int page, int offset, int cnt);
-extern int save_savePartial(int no, int page, int offset, int cnt);
-extern int save_copyAll(int dstno, int srcno);
-extern int save_save_var_with_file(char *filename, int *start, int cnt);
-extern int save_load_var_with_file(char *filename, int *start, int cnt);
-extern int save_save_str_with_file(char *filename, int start, int cnt);
-extern int save_load_str_with_file(char *filename, int start, int cnt);
-extern BYTE* load_cg_with_file(char *file,int *status);
-extern void save_set_path(char *path);
-extern void save_register_file(char *name, int index);
-extern char* save_get_file(int index);
-extern int save_delete_file(int index);
+bool save_setFormat(const char *format_name);
+int save_loadAll(int no);
+int save_saveAll(int no);
+int save_loadPartial(int no, struct VarRef *vref, int cnt);
+int save_savePartial(int no, struct VarRef *vref, int cnt);
+int save_copyAll(int dstno, int srcno);
+int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt);
+int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt);
+int save_strs_to_file(char *fname_utf8, int start, int cnt);
+int load_strs_from_file(char *fname_utf8, int start, int cnt);
+const char *save_get_file(int index);
+int save_delete_file(int index);
 
 #endif /* __SAVEDATA__ */

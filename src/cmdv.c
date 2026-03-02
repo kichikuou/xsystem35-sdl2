@@ -25,14 +25,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
 #include <sys/time.h>
 #include "portab.h"
+#include "scheduler.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
-#include "imput.h"
-
-extern void sys_set_signalhandler(int SIG, void (*handler)(int));
+#include "input.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 typedef struct {
 	int x0Unit;
@@ -40,8 +42,8 @@ typedef struct {
 	int nxUnit;
 	int nyUnit;
 	int bSpCol;
-	boolean fEnable;
-	boolean useTTP;
+	bool fEnable;
+	bool useTTP;
 	int TTPunit;
 } UnitMapSrcImg;
 
@@ -49,7 +51,7 @@ typedef struct {
 	int unitWidth;     /* Unitの大きさ */
 	int unitHeight;
 	int patternNum;    /* パターン数 */
-	int intervaltime;  /* 書換え間隔 */
+	int intervaltime;  /* 書換え間隔(ms) */
 	int srcX;          /* 取得位置 */
 	int srcY;
 	int startX;        /* 表示位置 */
@@ -62,15 +64,15 @@ typedef struct {
 	int spCol;         /* スプライト色 */
 	int state;         /* 現在の状態  0:停止 1:動 */
 	int elaspCut;      /* 経過コマ数 */
-	int quantmsec;     /* 経過秒数 */
+	int startTime;     /* 開始時刻(ms) */
 	int totalCut;      /* 全コマ数 */
 	int preX;          /* 前回の位置 */
 	int preY;
 	int curX;          /* 現在位置 */
 	int curY;
-	boolean draw;      /* UNITを描く？ */
-	boolean nomove;    /* 移動あり・なし */
-	boolean rewrite;   /* 画面更新の必要あり */
+	bool draw;      /* UNITを描く？ */
+	bool nomove;    /* 移動あり・なし */
+	bool rewrite;   /* 画面更新の必要あり */
 } VaParam;
 
 typedef struct {
@@ -107,7 +109,7 @@ static UnitMapSrcImg *srcimg;
 #define VA_RUNNING     1
 #define VACMD_MAX 20                      /* Panyoで18まで */
 static  VaParam VAcmd[VACMD_MAX];         
-static  boolean inAnimation      = FALSE; /* 画面更新中 */
+static  bool inAnimation      = false; /* 画面更新中 */
 
 /* UnitMap 各種マクロ */
 #define MAPSIZE_PER_ATTRIB (cxMap * cyMap)
@@ -123,7 +125,7 @@ static  boolean inAnimation      = FALSE; /* 画面更新中 */
 #define UNITMAP_WALKPAINT_PAGETOP(page)  UNITMAP_WALKPAINT((page),0,0)
 #define UNITMAP_WALKRESULT_PAGETOP(page) UNITMAP_WALKRESULT((page),0,0)
 
-static boolean vh_checkImmovableArea(int page, int x, int y, int w, int h);
+static bool vh_checkImmovableArea(int page, int x, int y, int w, int h);
 static void    vh_append_pos(int x, int y);
 static void    vh_copy_to_src();
 static void    vh_check_udlr(int n, int nPage, int x, int y);
@@ -132,11 +134,7 @@ static void    va_restoreUnit(int no);
 static void    va_updateUnit(int i);
 static void    va_updatePreArea(int i);
 static void    va_animationAlone(int i);
-static void    va_interval_process();
-static void    va_init_itimer();
-static void    va_pause_itimer();
-static void    va_unpause_itimer();
-static void    alarmHandler();
+static void    va_update();
 
 void commandVC() { /* from Rance4 */
 	nPageNum = getCaliValue();
@@ -147,7 +145,7 @@ void commandVC() { /* from Rance4 */
 	cxUnit   = getCaliValue();
 	cyUnit   = getCaliValue();
 	
-	DEBUG_COMMAND("VC %d,%d,%d,%d,%d,%d,%d:\n",nPageNum, x0Map, y0Map, cxMap, cyMap, cxUnit, cyUnit);
+	TRACE("VC %d,%d,%d,%d,%d,%d,%d:",nPageNum, x0Map, y0Map, cxMap, cyMap, cxUnit, cyUnit);
 	
 	if (NULL != UnitMap ) {
 		free(UnitMap);
@@ -157,7 +155,7 @@ void commandVC() { /* from Rance4 */
 	}
 	
 	if (nPageNum > UNITMAP_DISPLAY_PAGE_MAX) {
-		WARNING("VC nPageNum too big %d\n", nPageNum);
+		WARNING("VC nPageNum too big %d", nPageNum);
 		sysVar[0] = 0;
 		return;
 	}
@@ -185,10 +183,10 @@ void commandVP() { /* from T2 */
 	int nyUnit = getCaliValue();
 	int bSpCol = getCaliValue();
 	
-	DEBUG_COMMAND("VP %d,%d,%d,%d,%d,%d:\n",nPage, x0Unit, y0Unit, nxUnit, nyUnit, bSpCol);
+	TRACE("VP %d,%d,%d,%d,%d,%d:",nPage, x0Unit, y0Unit, nxUnit, nyUnit, bSpCol);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VP nPage too large %d\n", nPage);
+		WARNING("VP nPage too large %d", nPage);
 		return;
 	}
 	
@@ -197,8 +195,8 @@ void commandVP() { /* from T2 */
 	srcimg[nPage].nxUnit = nxUnit;
 	srcimg[nPage].nyUnit = nyUnit;
 	srcimg[nPage].bSpCol = bSpCol;
-	srcimg[nPage].useTTP = FALSE;
-	srcimg[nPage].fEnable = TRUE;
+	srcimg[nPage].useTTP = false;
+	srcimg[nPage].fEnable = true;
 }
 
 void commandVS() { /* from Rance4 */
@@ -208,24 +206,24 @@ void commandVS() { /* from Rance4 */
 	int y     = getCaliValue();
 	int wData = getCaliValue();
 	
-	DEBUG_COMMAND("VS %d,%d,%d,%d,%d:\n",nPage, nType, x, y, wData);
+	TRACE("VS %d,%d,%d,%d,%d:",nPage, nType, x, y, wData);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VS nPage too large %d\n", nPage);
+		WARNING("VS nPage too large %d", nPage);
 		return;
 	}
 	
 	if (x >= cxMap || x < 0) {
-		WARNING("VS x out of range %d\n", x);
+		WARNING("VS x out of range %d", x);
 		return;
 	}
 	
 	if (y >= cyMap || y < 0) {
-		WARNING("VS y out of range %d\n", y);
+		WARNING("VS y out of range %d", y);
 		return;
 	}
 	if (wData < 0) {
-		WARNING("VS wData illegal value %d\n", wData);
+		WARNING("VS wData illegal value %d", wData);
 		return;
 	}
 
@@ -248,7 +246,7 @@ void commandVS() { /* from Rance4 */
 		*UNITMAP_WALKRESULT(nPage, x, y) = wData;
 		break;
 	default:
-		WARNING("VS unknown type %d\n", nType);
+		WARNING("VS unknown type %d", nType);
 	}
 }
 
@@ -258,21 +256,21 @@ void commandVG() { /* from Rance4 */
 	int x = getCaliValue();
 	int y = getCaliValue();
 	
-	DEBUG_COMMAND("VG %d,%d,%d,%d:\n",nPage, nType, x, y);
+	TRACE("VG %d,%d,%d,%d:",nPage, nType, x, y);
 
 	if (nPage >= nPageNum) {
-		WARNING("VG nPage too large %d\n", nPage);
+		WARNING("VG nPage too large %d", nPage);
 		return;
 	}
 	
 	if (x >= cxMap || x < 0) {
-		NOTICE("VG x out of range %d\n", x);
+		NOTICE("VG x out of range %d", x);
 		sysVar[0] = UNITMAP_VARIABLE_OUTOFRANGE;
 		return;
 	}
 	
 	if (y >= cyMap || y < 0) {
-		NOTICE("VG y out of range %d\n", y);
+		NOTICE("VG y out of range %d", y);
 		sysVar[0] = UNITMAP_VARIABLE_OUTOFRANGE;
 		return;
 	}
@@ -288,7 +286,7 @@ void commandVG() { /* from Rance4 */
 	case 4:
 		sysVar[0] = *UNITMAP_WALKRESULT(nPage, x, y); break;
 	default:
-		WARNING("VG unknown type %d\n", nType);
+		WARNING("VG unknown type %d", nType);
 	}
 }
 
@@ -302,19 +300,19 @@ void commandVH() { /* from Rance4 */
 	int xx, yy, i, n;
 	int maxfoot, lmtx, lmty, lmtw, lmth;
 	
-	DEBUG_COMMAND("VH %d,%d,%d,%d,%d,%d:\n",nPage, x, y, width, height, _max);
+	TRACE("VH %d,%d,%d,%d,%d,%d:",nPage, x, y, width, height, _max);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VH nPage too large %d\n", nPage);
+		WARNING("VH nPage too large %d", nPage);
 		return;
 	}
 	if (x >= cxMap || x < 0) {
-		WARNING("VH x out of range %d\n", x);
+		WARNING("VH x out of range %d", x);
 		return;
 	}
 	
 	if (y >= cyMap || y < 0) {
-		WARNING("VH y out of range %d\n", y);
+		WARNING("VH y out of range %d", y);
 		return;
 	}
 
@@ -377,7 +375,7 @@ void commandVH() { /* from Rance4 */
 	vh_cnt_src = n = 1;
 	vh_cnt_dst = 0;
 	
-	while(TRUE) {
+	while(true) {
 		for (i = 0; i < vh_cnt_src; i++) {
 			vh_check_udlr(n, nPage, (vh_src + i)->x, (vh_src + i)->y);
 		}
@@ -417,12 +415,12 @@ void commandVF() { /* from Panyo */
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
 		
-		if (img->fEnable == FALSE) continue;
+		if (!img->fEnable) continue;
 		
 		for (y = 0; y < cyMap; y++) {
 			for (x = 0; x < cxMap; x++) {
 				unit = *UNITMAP_UNITNUMBER(i, x, y);
-				if (img->useTTP == TRUE && img->TTPunit == unit) continue;
+				if (img->useTTP && img->TTPunit == unit) continue;
 				// printf("i = %d, x = %d, y = %d, unit no = %d\n", i, x, y,unit);
 				unit_x = unit % img->nxUnit;
 				unit_y = unit / img->nxUnit;
@@ -444,16 +442,16 @@ void commandVF() { /* from Panyo */
 	}
 	
 	ags_updateArea(x0Map, y0Map, cxMap * cxUnit, cyMap * cyUnit);
-	DEBUG_COMMAND("VF:\n");
+	TRACE("VF:");
 }
 
 void commandVV() { /* from T2 */
 	int nPage   = getCaliValue();
 	int fEnable = getCaliValue();
 	
-	DEBUG_COMMAND("VV %d,%d:\n",nPage, fEnable);
+	TRACE("VV %d,%d:",nPage, fEnable);
 	
-	srcimg[nPage].fEnable = (fEnable == 1 ? TRUE : FALSE);
+	srcimg[nPage].fEnable = fEnable == 1;
 }
 
 void commandVR() { /* from Rance4 */
@@ -462,10 +460,10 @@ void commandVR() { /* from Rance4 */
 	int *var  = getCaliVariable();
 	int *dst;
 	
-	DEBUG_COMMAND("VR %d,%d,%p:\n",nPage, nType, var);
+	TRACE("VR %d,%d,%p:",nPage, nType, var);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VR nPage too large %d\n", nPage);
+		WARNING("VR nPage too large %d", nPage);
 		return;
 	}
 	
@@ -479,7 +477,7 @@ void commandVR() { /* from Rance4 */
 	case 4:
 		dst = UNITMAP_WALKRESULT_PAGETOP(nPage); break;
 	default:
-		WARNING("VR unknown type %d\n", nType);
+		WARNING("VR unknown type %d", nType);
 		return;
 	}
 	
@@ -492,10 +490,10 @@ void commandVW() { /* from Rance4 */
 	int *var  = getCaliVariable();
 	int *src;
 	
-	DEBUG_COMMAND("VW %d,%d,%p:\n",nPage, nType, var);
+	TRACE("VW %d,%d,%p:",nPage, nType, var);
 	
 	if (nPage >= nPageNum) {
-		WARNING("VW nPage too large %d\n", nPage);
+		WARNING("VW nPage too large %d", nPage);
 		return;
 	}
 	
@@ -509,7 +507,7 @@ void commandVW() { /* from Rance4 */
 	case 4:
 		src = UNITMAP_WALKRESULT_PAGETOP(nPage); break;
 	default:
-		WARNING("VW unknown type %d\n", nType);
+		WARNING("VW unknown type %d", nType);
 		return;
 	}
 	
@@ -527,15 +525,15 @@ void commandVE() { /* from T2 */
 	int unit, unit_x, unit_y;
 	UnitMapSrcImg *img;
 	
-	DEBUG_COMMAND("VE %d,%d,%d,%d,%d,%d:\n", x, y, width, height, out_ptn, flag);
+	TRACE("VE %d,%d,%d,%d,%d,%d:", x, y, width, height, out_ptn, flag);
 	if (flag == 1) {
-		WARNING("VE flag1 is not yet\n");
+		WARNING("VE flag1 is not yet");
 	}
 	
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
 		/* VV による */
-		if (img->fEnable == FALSE) continue;
+		if (!img->fEnable) continue;
 		
 		for (yy = y; yy < (y+height); yy++) {
 			for (xx = x; xx < (x+width); xx++) {
@@ -545,7 +543,7 @@ void commandVE() { /* from T2 */
 					unit = *UNITMAP_UNITNUMBER(i, xx, yy);
 				}
 
-				if (img->useTTP == TRUE && img->TTPunit == unit) continue;
+				if (img->useTTP && img->TTPunit == unit) continue;
 				//printf("i = %d, xx = %d, yy = %d, unit no = %d\n", i, xx, yy,unit);
 				unit_x = unit % img->nxUnit;
 				unit_y = unit / img->nxUnit;
@@ -562,17 +560,17 @@ void commandVE() { /* from T2 */
 }
 
 void commandVZ() { /* from T2 */
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	
-	DEBUG_COMMAND("VZ %d,%d,%d:\n", p1, p2, p3);
+	TRACE("VZ %d,%d,%d:", p1, p2, p3);
 	
 	switch(p1) {
 	case 0:
-		srcimg[p2].useTTP = FALSE; break;
+		srcimg[p2].useTTP = false; break;
 	case 1:
-		srcimg[p2].useTTP = TRUE;
+		srcimg[p2].useTTP = true;
 		srcimg[p2].TTPunit = p3;
 		break;
 	case 2:
@@ -582,7 +580,7 @@ void commandVZ() { /* from T2 */
 		cxUnit = p2; cyUnit = p3;
 		break;
 	default:
-		WARNING("unknown VZ %d:\n", p1);
+		WARNING("unknown VZ %d:", p1);
 	}
 }
 
@@ -592,7 +590,7 @@ void commandVX() { /* from T2 */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	
-	DEBUG_COMMAND("VX %d,%d,%d,%d:\n", p1, p2, p3, p4);
+	TRACE("VX %d,%d,%d,%d:", p1, p2, p3, p4);
 	
 	switch(p1) {
 	case 0:
@@ -608,7 +606,7 @@ void commandVX() { /* from T2 */
 		// commandVF();
 		break;
 	default:
-		WARNING("VX unknown command %d:\n", p1);
+		WARNING("VX unknown command %d:", p1);
 	}
 }
 
@@ -637,7 +635,7 @@ void commandVT() { /* from Panyo */
 			case 4:
 				u = *UNITMAP_WALKRESULT(sp, sx + x, sy + y); break;
 			default:
-				WARNING("VT unknown type %d\n", sa); u = 0;
+				WARNING("VT unknown type %d", sa); u = 0;
 			}
 			switch(da) {
 			case 1:
@@ -652,7 +650,7 @@ void commandVT() { /* from Panyo */
 		}
 	}
 	
-	DEBUG_COMMAND("VT %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:\n", sp, sa, sx, sy, width, height, dp, da, dx, dy);
+	TRACE("VT %d,%d,%d,%d,%d,%d,%d,%d,%d,%d:", sp, sa, sx, sy, width, height, dp, da, dx, dy);
 }
 
 void commandVB() {
@@ -664,7 +662,7 @@ void commandVB() {
 	int y_size = getCaliValue();
 	int data   = getCaliValue();
 	
-	DEBUG_COMMAND_YET("VB %d,%d,%d,%d,%d,%d,%d:\n", page, type, x_pos, y_pos, x_size, y_size, data);
+	TRACE_UNIMPLEMENTED("VB %d,%d,%d,%d,%d,%d,%d:", page, type, x_pos, y_pos, x_size, y_size, data);
 }
 
 void commandVIC() { /* from Panyo */
@@ -676,15 +674,15 @@ void commandVIC() { /* from Panyo */
 	int x, y, i;
 	UnitMapSrcImg *img;
 
-	DEBUG_COMMAND("VIC %d,%d,%d,%d:\n", sx, sy, width, height);
+	TRACE("VIC %d,%d,%d,%d:", sx, sy, width, height);
 	
 	for (i = 0; i < nPageNum; i++) {
 		img = &srcimg[i];
-		if (img->fEnable == FALSE) continue;
+		if (!img->fEnable) continue;
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < width; x++) {
 				unit = *UNITMAP_UNITNUMBER(i, sx + x, sy + y);
-				if (img->useTTP == TRUE && img->TTPunit == unit) continue;
+				if (img->useTTP && img->TTPunit == unit) continue;
 				//printf("i = %d, xx = %d, yy = %d, unit no = %d\n", i, xx, yy, unit);
 				unit_x = unit % img->nxUnit;
 				unit_y = unit / img->nxUnit;
@@ -705,7 +703,7 @@ void commandVIP() {
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	
-	DEBUG_COMMAND_YET("VIP %d,%d,%d,%d:\n", x, y, width, height);
+	TRACE_UNIMPLEMENTED("VIP %d,%d,%d,%d:", x, y, width, height);
 }
 
 void commandVJ() {
@@ -715,12 +713,11 @@ void commandVJ() {
 	int y     = getCaliValue();
 	int max   = getCaliValue();
 	
-	DEBUG_COMMAND_YET("VJ %d,%d,%d,%d:\n", page, x, y, max);
+	TRACE_UNIMPLEMENTED("VJ %d,%d,%d,%d:", page, x, y, max);
 }
 
 void commandVA() { /* from Panyo */
-	static boolean startedItimer = FALSE;
-	int no = sys_getc();
+	int no = sl_getc();
 	int p1 = getCaliValue();
 	int p2, p3;
 	int *var1, *var2;
@@ -728,15 +725,15 @@ void commandVA() { /* from Panyo */
 	if (no >= 10) {
 		var1 = getCaliVariable();
 		var2 = getCaliVariable();
-		DEBUG_COMMAND("VA %d,%d,%p,%p:\n", no, p1, var1, var2);
+		TRACE("VA %d,%d,%p,%p:", no, p1, var1, var2);
 	} else {
 		p2 = getCaliValue();
 		p3 = getCaliValue();
-		DEBUG_COMMAND("VA %d,%d,%d,%d:\n", no, p1, p2, p3);
+		TRACE("VA %d,%d,%d,%d:", no, p1, p2, p3);
 	}
 	
 	if (p1 > VACMD_MAX) {
-		WARNING("VA p1 is too lagrge %d\n", p1);
+		WARNING("VA p1 is too lagrge %d", p1);
 		return;
 	}
 	
@@ -745,9 +742,9 @@ void commandVA() { /* from Panyo */
 	case 0:
 		if (p2 == 0) {
 			/* 停止 */
-			inAnimation = TRUE;
+			inAnimation = true;
 			VAcmd[p1].state = VA_STOPPED;
-			VAcmd[p1].draw  = TRUE;
+			VAcmd[p1].draw  = true;
 			if (p3 == 0) {
 				/* ユニット消し */
 				va_restoreUnit(p1);
@@ -757,51 +754,46 @@ void commandVA() { /* from Panyo */
 				va_drawUnit(p1);
 				va_updateUnit(p1);
 			}
-			VAcmd[p1].draw  = FALSE;
+			VAcmd[p1].draw  = false;
 		} else {
 			/* 開始 (p3=コマ数,0:無限(開始位置==終了位置のとき))*/
-			inAnimation = TRUE;
+			inAnimation = true;
 			VAcmd[p1].elaspCut  = 0;
-			VAcmd[p1].quantmsec = 0;
+			VAcmd[p1].startTime = sys_get_ticks();
 			VAcmd[p1].totalCut  = p3;
 			
 			if (p3 == 0) {
-				VAcmd[p1].nomove = TRUE;
+				VAcmd[p1].nomove = true;
 			} else {
 				if (VAcmd[p1].startX == VAcmd[p1].endX && VAcmd[p1].startY == VAcmd[p1].endY) {
-					VAcmd[p1].nomove = TRUE;
+					VAcmd[p1].nomove = true;
 				} else {
-					VAcmd[p1].nomove = FALSE;
+					VAcmd[p1].nomove = false;
 				}
 			}
 			/* animation start */
-			if (startedItimer) {
-				va_unpause_itimer();
-			} else {
-				startedItimer = TRUE;
-				va_init_itimer();
-			}
+			nact->is_va_animation = true;
 	
 			VAcmd[p1].state   = VA_RUNNING;
-			VAcmd[p1].draw    = TRUE;
+			VAcmd[p1].draw    = true;
 			va_drawUnit(p1);
 			va_updateUnit(p1);
 			if (p2 == 2) {
-				VAcmd[p1].rewrite = TRUE;
+				VAcmd[p1].rewrite = true;
 				/* キー抜け無し ,p3=0は指定不可 */
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
-					usleep(10*1000);
+					sys_sleep(10);
 				}
 				va_drawUnit(p1);
 				va_updateUnit(p1);
 			} else if (p2 == 3) {
 				/* キー抜けあり ,p3=0は指定不可*/
 				int key = 0;
-				VAcmd[p1].rewrite = TRUE;
+				VAcmd[p1].rewrite = true;
 				while(VAcmd[p1].state == VA_RUNNING) {
 					va_animationAlone(p1);
-					usleep(10*1000);
+					sys_sleep(10);
 					key = sys_getInputInfo();
 					if (key != 0) {
 						sysVar[0] = key;
@@ -831,7 +823,7 @@ void commandVA() { /* from Panyo */
 	case 4:
 		/* パターン数・描替間隔(1/100sec) */
 		VAcmd[p1].patternNum   = p2;
-		VAcmd[p1].intervaltime = p3; break;
+		VAcmd[p1].intervaltime = p3 * 10; break;
 	case 5:
 		/* 取得位置 */
 		VAcmd[p1].srcX = p2;
@@ -847,30 +839,34 @@ void commandVA() { /* from Panyo */
 	case 10:
 		/* 状態取得(var1=0:停止1:動,var2=番号) */
 		*var1 = VAcmd[p1].state == 0 ? 0 : 1;
-		*var2 = VAcmd[p1].elaspCut; break;
+		*var2 = VAcmd[p1].elaspCut;
+		scheduler_on_event(SCHEDULER_EVENT_VA_STATUS_CHECK);
+		break;
 	case 11:
 		/* 位置取得 */
 		*var1 = VAcmd[p1].curX;
-		*var2 = VAcmd[p1].curY; break;
+		*var2 = VAcmd[p1].curY;
+		scheduler_on_event(SCHEDULER_EVENT_VA_STATUS_CHECK);
+		break;
 	default:
-		WARNING("Unknown VA command %d\n", no);
+		WARNING("Unknown VA command %d", no);
 	}
 }
 	
-static boolean vh_checkImmovableArea(int page, int x, int y, int w, int h) {
+static bool vh_checkImmovableArea(int page, int x, int y, int w, int h) {
 	int _x, _y;
 	
-	if (x + w > cxMap) return TRUE; 
+	if (x + w > cxMap) return true; 
 	
-	if (y + h > cyMap) return TRUE; 
+	if (y + h > cyMap) return true; 
 
 	for (_y = y; _y < (y+h); _y++) {
 		for (_x = x; _x < (x+w); _x++) {
-			if (*UNITMAP_WALKRESULT(page, _x, _y) == 255) return TRUE;
+			if (*UNITMAP_WALKRESULT(page, _x, _y) == 255) return true;
 		}
 	}
 	
-	return FALSE;
+	return false;
 }
 
 static void vh_append_pos(int x, int y) {
@@ -956,11 +952,13 @@ static void va_updatePreArea(int i) {
 	ags_updateArea(VAcmd[i].preX, VAcmd[i].preY, VAcmd[i].unitWidth, VAcmd[i].unitHeight);
 }
 
-void va_animation() {
+void va_animation(void) {
 	int i;
 	int x, y, w, h;
-	
-	inAnimation = TRUE;
+
+	va_update();
+
+	inAnimation = true;
 	
 	for (i = 0; i < VACMD_MAX; i++) {
 		if (VAcmd[i].state == VA_STOPPED) continue;
@@ -973,18 +971,20 @@ void va_animation() {
 		h = max(VAcmd[i].curY + VAcmd[i].unitHeight, VAcmd[i].preY + VAcmd[i].unitHeight) - y; 
 		ags_updateArea(x, y, w, h);
 		// printf("x = %d, y = %d, w = %d, h = %d\n", x, y, w, h);
-		VAcmd[i].rewrite = FALSE;
+		VAcmd[i].rewrite = false;
 	}
 	
-	inAnimation = FALSE;
+	inAnimation = false;
 }
 	
 static void va_animationAlone(int i) {
 	int x, y, w, h; /* update region */
-	
+
+	va_update();
+
 	if (!VAcmd[i].rewrite) return;
 
-	inAnimation = TRUE;
+	inAnimation = true;
 	
 	va_restoreUnit(i);
 	va_drawUnit(i);
@@ -995,25 +995,25 @@ static void va_animationAlone(int i) {
 	h = max(VAcmd[i].curY + VAcmd[i].unitHeight, VAcmd[i].preY + VAcmd[i].unitHeight) - y; 
 	ags_updateArea(x, y, w, h);
 	
-	VAcmd[i].rewrite = FALSE;
-	inAnimation = FALSE;
+	VAcmd[i].rewrite = false;
+	inAnimation = false;
 }
 
-static void va_interval_process() {
-	boolean proceeding = FALSE;
+static void va_update() {
+	bool proceeding = false;
 	int i;
+	int curTime = sys_get_ticks();
 	
 	for (i = 0; i < VACMD_MAX; i++) {
 		if (VAcmd[i].state == VA_RUNNING) {
-			proceeding = TRUE;
-			VAcmd[i].quantmsec++;
+			proceeding = true;
+			int cut = (curTime - VAcmd[i].startTime) / VAcmd[i].intervaltime;
 			
-			if (VAcmd[i].quantmsec >= VAcmd[i].intervaltime) {
+			if (cut > VAcmd[i].elaspCut) {
 				/* まだ更新していない場合はskip */
 				if (VAcmd[i].rewrite) continue;
-				VAcmd[i].rewrite = TRUE;
-				VAcmd[i].quantmsec = 0;
- 				VAcmd[i].elaspCut++;
+				VAcmd[i].rewrite = true;
+				VAcmd[i].elaspCut++;
 				/* 古い場所 */
 				VAcmd[i].preX = VAcmd[i].curX;
 				VAcmd[i].preY = VAcmd[i].curY;
@@ -1032,39 +1032,32 @@ static void va_interval_process() {
 	}
 	/* 更新するものが無い場合は、タイマーを止めて、アニメーションストップ */
 	if (!proceeding) {
-		va_pause_itimer();
-		nact->is_va_animation = FALSE;
+		nact->is_va_animation = false;
 	}
 }
 
-static void alarmHandler() {
-	if (!inAnimation) {
-		va_interval_process();
-	}
-}
+void va_reset(void) {
+	free(UnitMap);
+	UnitMap = NULL;
 
-static void va_init_itimer() {
-	sys_set_signalhandler(SIGALRM, alarmHandler);
-	va_unpause_itimer();
-}
+	nPageNum = 0;
+	x0Map = 0;
+	y0Map = 0;
+	cxMap = 0;
+	cyMap = 0;
+	cxUnit = 0;
+	cyUnit = 0;
 
-static void va_pause_itimer() {
-	struct itimerval value;
+	free(_vh_src);
+	free(_vh_dst);
+	_vh_src = vh_src = NULL;
+	_vh_dst = vh_dst = NULL;
+	vh_cnt_src = 0;
+	vh_cnt_dst = 0;
 
-	value.it_interval.tv_sec  = 0;
-	value.it_interval.tv_usec = 0;
-	value.it_value.tv_sec  = 0;
-	value.it_value.tv_usec = 0;
-	setitimer(ITIMER_REAL, &value, NULL);
-}
+	free(srcimg);
+	srcimg = NULL;
 
-static void va_unpause_itimer() {
-	struct itimerval value;
-	
-	value.it_interval.tv_sec  = 0;
-	value.it_interval.tv_usec = 10 * 1000;
-	value.it_value.tv_sec  = 0;
-	value.it_value.tv_usec = 10 * 1000;
-	setitimer(ITIMER_REAL, &value, NULL);
-	nact->is_va_animation = TRUE;
+	memset(VAcmd, 0, sizeof(VAcmd));
+	inAnimation = false;
 }

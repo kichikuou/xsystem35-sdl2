@@ -1,0 +1,170 @@
+# Changelog
+
+## 2.17.1 - 2026-01-10
+- Fixed an issue where Rance 5D could not save files on non-Windows systems.
+- Improved fast-forward behavior using the Ctrl key in Rance 5D.
+- The `SI 2` command now returns 0 if a playlist file is not provided.
+
+## 2.17.0 - 2025-11-09
+- Added "Streamer Mode" to mosaic specified (NSFW) images. This is enabled via the `-censor <file>` command-line option.
+- Windows: Fixed an issue where Rance 5D could not save files if the `Save` directory did not exist.
+
+## 2.16.1 - 2025-08-28
+- Fixed text rendering issue in SACT log (#71)
+- Windows: The 32-bit version no longer supports the portmidi MIDI backend
+
+## 2.16.0 - 2025-06-13
+- Fixed map tile color issue in Graymerca (#67)
+- Windows: Implemented number input dialog for the `NI` command (#68)
+- Android: Added "Clear Save Files" launcher menu command
+
+## 2.15.1 - 2025-05-14
+- Fixed a text rendering issue in Rance 5D (#66)
+
+## 2.15.0 - 2025-04-21
+- Fixed color palette bug introduced in v2.14.2.
+- Fixed uncancellable message waiting mode.
+- Android: "Install from ZIP" button is moved to the top-right option menu.
+- Android: Improved extraction logic of track numbers from audio file names.
+
+## 2.14.3 - 2025-04-01
+- Fixed build for big endian architectures.
+
+## 2.14.2 - 2025-03-09
+- Android: Back button to exit the game (#50)
+- Improved touch input usability in ママトト (#64)
+
+## 2.14.1 - 2025-02-07
+- Fixed font selection and text decoration not working in selection menus.
+- Fixed a graphic issue in DALK intro.
+
+## 2.14.0 - 2025-01-09
+- New supported games: 俺の下であがけ and 楽園行.
+- Windows: On Windows 10 version 1903 or above, now xsystem35 can handle
+  Japanese filenames correctly even if the system locale is not Japanese.
+
+## 2.13.0 - 2024-12-07
+- Windows: `Option` -> `Auto Copy Text to Clipboard` menu command has been added.
+  When enabled, in-game text will be copied to the clipboard automatically. This
+  can be used with text hooker tools that support clipboard monitoring.
+
+## 2.12.1 - 2024-12-02
+- Windows: Fixed missing DLL error (#60)
+
+## 2.12.0 - 2024-11-26
+- Implemented playback of the opening movie for 妻みぐい２.
+
+## 2.11.7 - 2024-11-12
+- Fixed crash when canceling menu with two-finger touch (#58)
+- Fixed screen artifact in Rance 3 immediately after selecting "Game Start"
+
+## 2.11.6 - 2024-07-22
+- Fixed strange behavior when canceling the battle selection menu in Kichikuou Rance. (#56)
+- Use system mouse cursors whenever possible. They look better on high dpi displays.
+- Added manual page for the xsystem35 command.
+
+## 2.11.5 - 2024-06-10
+- Android: Fixed a black screen issue in the MangaGamer version of Rance 5D.
+- Fixed `fileCheckExist` command. (#55)
+
+## 2.11.4 - 2024-05-22
+- Windows: In full-screen mode, the menu bar now appears only when the mouse pointer is at the top of the screen. (#53)
+- Fixed text rendering issue in Rance 3 intro. (#54)
+
+## 2.11.3 - 2024-04-11
+- Android: Fixed a bug where save files from older versions could not be loaded in version 2.11.2.
+
+## 2.11.2 - 2024-04-10
+- Added `-savedir` option to specify save directory.
+- Android: Fixed a bug where .xsys35rc in a subdirectory of ZIP was not loaded. (#51)
+
+## 2.11.1 - 2024-02-18
+- Windows: Fixed a black screen issue in the MangaGamer version of Rance 5D (#45).
+- Fixed a crash bug in command-line debugger.
+
+## 2.11.0 - 2024-01-20
+- Windows: Now `xsystem35.exe` is a standalone executable. You can just copy it to the game folder and run it.
+- Windows: The installer is no longer provided. If you have an earlier version installed, please uninstall it.
+- Windows: The debugger is no longer available in the 32-bit version. Please use the 64-bit version if you need it.
+- Added experimental `enable_zb` option (#44). See `xsys35rc.sample` for details.
+
+## 2.10.1 - 2024-01-01
+- Windows: Added "Integer Scaling" menu option
+- Fixed initial palette colors (to match System3.9)
+- Fixed a bug where palette 246 to 249 were unintentionally changed after loading 256-color CGs
+
+## 2.10.0 - 2023-12-09
+- Breaking change: A [bug](https://github.com/kichikuou/xsystem35-sdl2/issues/41) has been fixed in which save format for 大悪司 and かえるにょ国にょアリス was not compatible with System3.9. As a result, save files for these games created with older versions of xsystem35 are no longer usable. (Loading will not fail, but wrong values will be loaded.)
+- Now the 64-bit executable supports Windows 10 or later. For older Windows, please use the 32-bit version.
+- Fixed a problem with the download edition of Daiakuji requiring insertion of Disk 2. (#43)
+- Debugger: Added debug commands for monitoring the color palette.
+- Minor bug fixes.
+
+## 2.9.1 - 2023-06-22
+- Fixed a bug where the `CX 1` command (copy with transparent color) did not work in some games (e.g. Daiakuji)
+- Debugger: Now breakpoints do not make the window completely unresponsive
+- Debugger: Fixed a conditional breakpoint crash bug
+
+## 2.9.0 - 2023-05-04
+- Now xsystem35 uses the System3.9 save file format (unless `-saveformat` command line flag is specified). Old save files can still be loaded.
+- Changed the default naming convention for save files from `[a-z]sleep.asd` to `<gamename>s[a-z].asd`.
+- Fixed a bug where SACT games (e.g. Rance 5D) were not responding to touch.
+- Fixed memory leaks in debugger.
+
+## 2.8.0 - 2023-02-12
+- Added support for Rance 4.1/4.2 ver1.05
+- Fixed movement animation in rooms in Rance 4 v2.05 (#35)
+- Added `-game` option which can be used to enable game-specific hacks in translated games
+
+## 2.7.0 - 2023-01-28
+- Added support for Rance4 ver.2.05
+- Now supports BGM playback for the download edition of Daiakuji
+- Bug fixes
+
+## 2.6.0 - 2023-01-01
+- Android: Introduced a new way to simulate right-click; tapping on the black bars at the left/right or top/bottom of the screen is treated as a right click. (Two-finger touch, the old way to simulate a right click, still works.)
+- Windows: Added a menu command to enable/disable automatic mouse movements.
+
+## 2.5.1 - 2022-07-31
+- Implemented "palette shift" graphic effect (used in 闘神都市II).
+- Implemented `grDrawFillCircle` command (used in グレイメルカ).
+- Fixed color update bug in 256-color games.
+- Fixed crash by out-of-bounds variable access in debugger.
+
+## 2.5.0 - 2022-07-17
+- Supported JPEG image format on Android.
+
+## 2.4.0 - 2022-07-02
+- Windows: Added "Restart" menu command.
+- Fixed a bug where wrong music is played in Kichikuou Rance (System3.9 version). #32
+- Supported mouse wheel input.
+- Fixed a bug in `MF` command.
+- Implemented `grEffectMoveView` command.
+
+## 2.3.0 - 2022-04-08
+- Code for screen transition effects have been substantially rewritten (but you probably wouldn't notice any difference).
+- Fixed bugs in System3.9 games.
+- Android: Enabled joystick input.
+- Debugger improvements.
+
+## 2.2.0 - 2021-12-03
+From now on, the Android and Windows versions will use a common version number.
+
+- Android: Use custom fonts specified in `.xsys35c`. (#20)
+- Supported "王子さまLv1".
+- Debugger improvements.
+- Fixed some bugs and compatibility issues.
+
+## 2.1.0 - 2021-11-07
+- Fixed issues with MangaGamer version of Rance 5D.
+- Fixed garbled text in some System3.9 games with Unicode mode.
+- Display a message box on fatal errors.
+- Various debugger improvements.
+
+## 2.0.1 - 2021-10-24
+- Fixed crash during shutdown.
+
+## 2.0.0 - 2021-10-23
+- Added window menubar from which you can save screenshots, change fullscreen mode, and enable message skipping.
+- Added debugger support that can be used from Visual Studio Code. See [vscode-system3x](https://github.com/kichikuou/vscode-system3x) for details.
+- Many bug fixes and compatibility fixes.

@@ -27,40 +27,66 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "nact.h"
 #include "system.h"
 #include "xsystem35.h"
-#include "graphicsdevice.h"
+#include "modules.h"
+#include "input.h"
+#include "menu.h"
 
 // キー変換テーブル
 #define KEYMAP_MAX 8
-static BYTE *keymap[KEYMAP_MAX];
+static uint8_t *keymap[KEYMAP_MAX];
 
-void OutputMessageBox(void) { /* 0 */
+static void OutputMessageBox(void) { /* 0 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
-	int p3 = getCaliValue();
-	int p4 = getCaliValue();
-	int p5 = getCaliValue();
-	int p6 = getCaliValue();
+	int title = getCaliValue();
+	int msg = getCaliValue();
+	int *res = getCaliVariable();
+	int ISys3xSystem = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.OutputMessageBox: %d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6);
+	char *title_utf8 = toUTF8(svar_get(title));
+	char *msg_utf8 = toUTF8(svar_get(msg));
+
+	sys_show_message_box(MESSAGEBOX_INFO, title_utf8, msg_utf8);
+
+	free(title_utf8);
+	free(msg_utf8);
+
+	TRACE("ShPort.OutputMessageBox: %d,%d,%d,%d,%p,%d:", p1, p2, title, msg, res, ISys3xSystem);
 }
 
-void InputListNum(void) { /* 1 */
-	int p1 = getCaliValue();
-	int p2 = getCaliValue();
-	int p3 = getCaliValue();
-	int p4 = getCaliValue();
-	int p5 = getCaliValue();
-	int p6 = getCaliValue();
-	int p7 = getCaliValue();
+static void InputListNum(void) { /* 1 */
+	int flags = getCaliValue();
+	int title = getCaliValue();
+	int *val = getCaliVariable();
+	int minval = getCaliValue();
+	int maxval = getCaliValue();
+	int *res = getCaliVariable();
+	int ISys3xSystem = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPortInputListNum: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
+	INPUTNUM_PARAM ni_param = {
+		.def = minval,
+		.min = minval,
+		.max = maxval,
+		.title = toUTF8(svar_get(title)),
+	};
+
+	menu_inputnumber(&ni_param);
+	if (ni_param.value < 0) {
+		*res = 0;
+	} else {
+		*val = (uint16_t)ni_param.value;
+		*res = 1;
+	}
+
+	free(ni_param.title);
+	TRACE("ShPort.InputListNum: %d,%d,%p,%d,%d,%p,%d:", flags, title, val, minval, maxval, res, ISys3xSystem);
 }
 
 /**
@@ -68,10 +94,10 @@ void InputListNum(void) { /* 1 */
  *   ShPortサブシステム全体の初期化
  *   @param p1: ISys3x
  */
-void Init(void) {
+static void Init(void) {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShPort.Init: %d:\n", p1);
+	TRACE_UNIMPLEMENTED("ShPort.Init: %d:", p1);
 }
 
 /**
@@ -79,21 +105,21 @@ void Init(void) {
  *   指定のキーコードマップの初期化
  *   @param no: キーコードマップの番号(1~)
  */
-void InitKeyStatus(void) {
+static void InitKeyStatus(void) {
 	int no = getCaliValue();
 	
 	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)\n", no);
+		WARNING("Overflow keymap table(p1)", no);
 		return;
 	}
 	
 	if (keymap[no -1] == NULL) {
-		keymap[no -1] = g_new0(BYTE, 256);
+		keymap[no -1] = calloc(256, sizeof(uint8_t));
 	} else {
 		memset(keymap[no -1], 0, 256);
 	}
 	
-	DEBUG_COMMAND("ShPort.InitKeyStatus: %d:\n", no);
+	TRACE("ShPort.InitKeyStatus: %d:", no);
 }
 
 /**
@@ -103,19 +129,19 @@ void InitKeyStatus(void) {
  *   @param key: キーコード
  *   @param func: 機能キーコード
  */
-void SetKeyStatus(void) {
+static void SetKeyStatus(void) {
 	int no   = getCaliValue();
 	int key  = getCaliValue();
 	int func = getCaliValue();
 	
 	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)\n", no);
+		WARNING("Overflow keymap table(p1)", no);
 		return;
 	}
 	
 	keymap[no -1][key] = func;
 	
-	DEBUG_COMMAND("ShPort.SetKeyStatus: %d,%d,%d:\n", no, key, func);
+	TRACE("ShPort.SetKeyStatus: %d,%d,%d:", no, key, func);
 }
 
 /**
@@ -124,25 +150,25 @@ void SetKeyStatus(void) {
  *   @param no:  マップ番号
  *   @param var: 押下キーに対応する機能コードを返す変数
  */
-void GetKeyStatus(void) {
+static void GetKeyStatus(void) {
 	int no   = getCaliValue();
 	int *var = getCaliVariable();
 	int i;
 	
 	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)\n", no);
+		WARNING("Overflow keymap table(p1)", no);
 		return;
 	}
 	
 	*var = 0;
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < NUM_KEYCODES; i++) {
 		*var |= (keymap[no -1][i] * RawKeyInfo[i]);
 	}
 	
-	DEBUG_COMMAND("ShPort.GetKeyStatus: %d,%p:\n", no, var);
+	TRACE("ShPort.GetKeyStatus: %d,%p:", no, var);
 }
 
-void InputListString(void) {
+static void InputListString(void) {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -151,10 +177,10 @@ void InputListString(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputListString: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShPort.InputListString: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
-void InputOpenFile(void) {
+static void InputOpenFile(void) {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -163,10 +189,10 @@ void InputOpenFile(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputOpenFile: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShPort.InputOpenFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
-void InputSaveFile(void) {
+static void InputSaveFile(void) {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
@@ -175,6 +201,19 @@ void InputSaveFile(void) {
 	int p6 = getCaliValue();
 	int p7 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShPort.InputSaveFile: %d,%d,%d,%d,%d,%d,%d:\n", p1, p2, p3, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("ShPort.InputSaveFile: %d,%d,%d,%d,%d,%d,%d:", p1, p2, p3, p3, p4, p5, p6, p7);
 }
 
+static const ModuleFunc functions[] = {
+	{"GetKeyStatus", GetKeyStatus},
+	{"Init", Init},
+	{"InitKeyStatus", InitKeyStatus},
+	{"InputListNum", InputListNum},
+	{"InputListString", InputListString},
+	{"InputOpenFile", InputOpenFile},
+	{"InputSaveFile", InputSaveFile},
+	{"OutputMessageBox", OutputMessageBox},
+	{"SetKeyStatus", SetKeyStatus},
+};
+
+const Module module_ShPort = {"ShPort", functions, sizeof(functions) / sizeof(ModuleFunc)};

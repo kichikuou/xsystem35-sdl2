@@ -2,13 +2,10 @@
 #ifndef __SPRITE_H__
 #define __SPRITE_H__
 
-#include <glib.h>
-
 #include "portab.h"
-#include "surface.h"
-#include "graphics.h"
+#include <SDL_rect.h>
 
-#define DEFAULT_UPDATE sp_draw
+#define DEFAULT_UPDATE nt_sp_draw
 
 
 #define SPRITEMAX 20
@@ -56,7 +53,7 @@ enum cgtype {
 struct _cginfo {
 	enum cgtype type;  // CGの種類, 0: 未使用, 1:リンクされている, ...
 	int no;            // CGの番号
-	surface_t *sf;     // CG本体
+	struct SDL_Surface *sf;
 	int refcnt;        // 参照カウンタ。０になったら開放してもよい。
 };
 typedef struct _cginfo cginfo_t;
@@ -75,20 +72,21 @@ struct _sprite {
 	
 	int no;
 	
-	MyDimension cursize;
+	int width;
+	int height;
 	
 	cginfo_t *curcg;
 	cginfo_t *cg1, *cg2, *cg3;
 	
-	boolean show;
+	bool show;
 	
 	int blendrate;
 	
-	MyPoint loc;
+	SDL_Point loc;
 	
-	MyPoint cur;
+	SDL_Point cur;
 
-	int (* update)(struct _sprite *sp, MyRectangle *updatearea);
+	void (* update)(struct _sprite *sp, SDL_Rect *updatearea);
 	
 	union {
 		struct {
@@ -99,8 +97,8 @@ struct _sprite {
 		} anime;
 		
 		struct {
-			surface_t *canvas;
-			MyPoint dspcur;
+			struct SDL_Surface *canvas;
+			SDL_Point dspcur;
 		} msg;
 	} u;
 };
@@ -109,30 +107,29 @@ typedef struct _sprite sprite_t;
 
 
 /* in nt_sprite.c */
-extern sprite_t *sp_new(int no, int cg1, int cg2, int cg3, int type);
-extern sprite_t *sp_msg_new(int no, int x, int y, int width, int height);
-extern void sp_free(sprite_t *sp);
-extern void sp_set_show(sprite_t *sp, boolean show);
-// extern void sp_set_cg(sprite_t *sp, int no);
-extern void sp_set_loc(sprite_t *sp, int x, int y);
+sprite_t *nt_sp_new(int no, int cg1, int cg2, int cg3, int type);
+sprite_t *nt_sp_msg_new(int no, int x, int y, int width, int height);
+void nt_sp_free(sprite_t *sp);
+void nt_sp_set_show(sprite_t *sp, bool show);
+// void nt_sp_set_cg(sprite_t *sp, int no);
+void nt_sp_set_loc(sprite_t *sp, int x, int y);
 
 /* in nt_sprite_update.c */
-extern int sp_update_clipped();
-extern int sp_update_all(boolean syncscreen);
-extern int sp_updateme(sprite_t *sp);
-extern int sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
-extern void sp_add_updatelist(sprite_t *sp);
-extern void sp_remove_updatelist(sprite_t *sp);
-extern int sp_draw_wall(sprite_t *sp, MyRectangle *r);
+void nt_sp_update_clipped();
+void nt_sp_update_all(bool syncscreen);
+void nt_sp_updateme(sprite_t *sp);
+void nt_sp_updateme_part(sprite_t *sp, int x, int y, int w, int h);
+void nt_sp_add_updatelist(sprite_t *sp);
+void nt_sp_remove_updatelist(sprite_t *sp);
+void nt_sp_draw_wall(sprite_t *sp, SDL_Rect *r);
+void nt_sp_clear_updatelist(void);
 
 /* in nt_sprite_draw.c */
-extern int sp_draw(sprite_t *sp, MyRectangle *r);
-extern int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r);
-extern void sp_draw_dmap(gpointer data, gpointer userdata);
-extern int sp_draw_scg(sprite_t *sp, MyRectangle *r);
+void nt_sp_draw(sprite_t *sp, SDL_Rect *r);
+void nt_sp_draw_scg(sprite_t *sp, SDL_Rect *r);
 
 /* in nt_sprite_eupdate.c */
-extern int sp_eupdate(int type, int time, int cancel);
+void nt_sp_eupdate(int type, int time, int cancel);
 
 
 #endif /* __SPRITE_H__ */

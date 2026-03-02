@@ -25,26 +25,21 @@
 
 #include <gtk/gtk.h>
 
-extern boolean menu_ok_exit;
-extern boolean menu_ok_input;
+extern bool menu_ok_exit;
+extern bool menu_ok_input;
 
-extern GtkWidget *menu_item_pcm;
-extern GtkWidget *menu_item_cdrom;
-extern GtkWidget *menu_item_midi;
 extern GtkWidget *menu_item_msgskip_on;
 extern GtkWidget *menu_item_msgskip_off;
 
 extern GtkWidget *menu_label_inputstring_title;
 extern GtkWidget *menu_label_inputstring_maxchar;
-extern GtkWidget *menu_label_inputnum_title;
 extern GtkWidget *menu_label_inputnum_max;
 extern GtkWidget *menu_label_inputnum_min;
 extern GtkWidget *menu_label_inputnum_def;
-extern GtkWidget *menu_label_msgbox;
 extern GtkWidget *menu_spinbutton;
 extern GtkWidget *menu_textentry;
 extern GtkWidget *menu_textentry2;
-extern gchar     *menu_textentry_string;
+extern const gchar *menu_textentry_string;
 
 extern GtkWidget *menu_window_popup; /* popup menu */
 extern GtkWidget *menu_window_exit;  /* exit window */
@@ -52,11 +47,10 @@ extern GtkWidget *menu_window_is;    /* input string window */
 extern GtkWidget *menu_window_is2;   /* input string window no 2*/
 extern GtkWidget *menu_window_in;    /* input number window */
 extern GtkWidget *menu_window_about; /* about xsystem35 window */
-extern GtkWidget *menu_window_msgbox;/* message box window */
 
 
 void
-on_window3_destroy                     (GtkObject       *object,
+on_window3_destroy                     (GObject       *object,
                                         gpointer         user_data);
 
 void
@@ -65,10 +59,6 @@ on_item2_activate                      (GtkMenuItem     *menuitem,
 
 void
 on_item3_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item4_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
@@ -81,34 +71,6 @@ on_item6_activate                      (GtkMenuItem     *menuitem,
 
 void
 on_item7_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item8_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item9_activate                      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item10_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item11_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item12_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item14_activate                     (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_item15_activate                     (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
@@ -161,9 +123,5 @@ on_spinbutton1_activate                (GtkEditable     *editable,
 
 void
 on_entry2_activate                     (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-on_button16_clicked                    (GtkButton       *button,
                                         gpointer         user_data);
 #endif /* !__MENU_CALLBACK__ */

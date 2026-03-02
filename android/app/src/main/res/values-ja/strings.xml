@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">xsystem35</string>
+    <string name="action_export_save_data">セーブデータをエクスポート</string>
+    <string name="action_help">使い方</string>
+    <string name="action_import_save_data">セーブデータをインポート</string>
+    <string name="action_install_from_zip">ZIPからインストール</string>
+    <string name="action_licenses">オープンソースライセンス</string>
+    <string name="action_clear_save_data">セーブデータをクリア</string>
+    <string name="cancel">キャンセル</string>
+    <string name="cannot_find_ald">System 3.x のファイル (*.ald) が見つかりません。</string>
+    <string name="choose_a_file">ファイルを選択</string>
+    <string name="clear_save_data_confirm">セーブデータをすべて削除します。元には戻せません。本当によろしいですか？</string>
+    <string name="confirm">確認</string>
+    <string name="error_dialog_title">エラー</string>
+    <string name="install_dialog_title">インストール中…</string>
+    <string name="install_progress">%s を展開中</string>
+    <string name="no_data_to_import">ZIP アーカイブ中に save/ フォルダが見つかりません。</string>
+    <string name="save_data_export_error">セーブデータのエクスポートに失敗しました。</string>
+    <string name="save_data_export_success">エクスポートに成功しました。</string>
+    <string name="save_data_import_success">インポートに成功しました。</string>
+    <string name="save_data_clear_success">セーブデータをクリアしました。</string>
+    <string name="save_data_clear_error">セーブデータのクリアに失敗しました。</string>
+    <string name="uninstall_dialog_message">「%s」をアンインストールしますか？</string>
+    <string name="unsupported_zip">この形式の ZIP はサポートしていません。</string>
+    <string name="zip_extraction_error">ZIP の展開に失敗しました。</string>
+    <string name="usage">
+        <![CDATA[
+            <h1>ゲームのインストール方法</h1>
+            <p>1. PC上で、ゲームのファイルが入ったZIPを用意します。例えば以下のようなファイルを含めます:</p>
+            <div>
+                ・鬼畜王SA.ALD<br>
+                ・鬼畜王GA.ALD<br>
+                ・鬼畜王GB.ALD<br>
+                ・鬼畜王WA.ALD<br>
+                ・02.mp3<br>
+                ・03.mp3<br>
+                ・…<br>
+            </div>
+            <p>2. ZIPファイルを (例えばUSB経由で) PCからデバイスに転送します。</p>
+            <p>3. この画面の右上のメニューボタンをタップして「ZIPからインストール」を選択し、転送したZIPを選びます。</p>
+        ]]>
+    </string>
+</resources>

@@ -21,113 +21,228 @@
 */
 /* $Id: filecheck.c,v 1.5 2006/04/21 16:40:48 chikama Exp $ */
 
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <unistd.h>
+#ifdef _WIN32
+#include <direct.h>
+#include <windows.h>
+#endif
 
-#include "utfsjis.h"
+#include "filecheck.h"
 
-struct fnametable {
-	char *realname;
-	char *transname;
-};
+static char *saveDataPath;
 
-#define FILEMAX 100 /* ???? */
-static struct fnametable tbl[FILEMAX];
-static int fnametable_cnt;
-static boolean initilized = FALSE;
-static boolean newfile_kanjicode_utf8 = TRUE;
+static char *get_fullpath(const char* dir, const char *filename) {
+	char *fn = malloc(strlen(filename) + strlen(dir) + 3);
+	if (fn == NULL) {
+		return NULL;
+	}
+	strcpy(fn, dir);
+	strcat(fn, "/");
+	strcat(fn, filename);
+	return fn;
+}
+
+#ifdef _WIN32
+
+static int make_dir(const char *path)
+{
+	wchar_t wpath[PATH_MAX + 1];
+	if (!MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, wpath, PATH_MAX + 1)) {
+		errno = EILSEQ;
+		return -1;
+	}
+	return _wmkdir(wpath);
+}
+
+#else
+#define make_dir(path) mkdir(path, S_IRWXU)
+#endif
+
+// Adapted from http://stackoverflow.com/a/2336245/119527
+int mkdir_p(const char *path_utf8)
+{
+	const size_t len = strlen(path_utf8);
+	char path[PATH_MAX];
+	char *p;
+
+	errno = 0;
+
+	// Copy string so its mutable
+	if (len > sizeof(path)-1) {
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+	strcpy(path, path_utf8);
+
+	// Iterate the string
+	for (p = path + 1; *p; p++) {
+		if (*p == '/') {
+			// Temporarily truncate
+			*p = '\0';
+
+			if (make_dir(path) != 0) {
+				if (errno != EEXIST)
+					return -1;
+			}
+
+			*p = '/';
+		}
+	}
+
+	if (make_dir(path) != 0) {
+		if (errno != EEXIST)
+			return -1;
+	}
+
+	return 0;
+}
 
 /* list up file in current directory */
 /*   name : save/load directory      */
-void fc_init(char *name) {
-	DIR *dir;
-	struct dirent *entry;
-	int c = 0;
-	
-	initilized = FALSE;
-	
-	if (NULL == (dir = opendir(name))) {
-		return;
+void fc_init(const char *name) {
+	mkdir_p(name);
+	saveDataPath = strdup(name);
+}
+
+#ifdef _WIN32
+
+FILE *fopen_utf8(const char *path_utf8, char type) {
+	wchar_t wpath[PATH_MAX + 1];
+	if (!MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path_utf8, -1, wpath, PATH_MAX + 1))
+		return NULL;
+	return _wfopen(wpath, type == 'r' ? L"rb" : L"wb");
+}
+
+char *fc_get_path(const char *fname_utf8) {
+	return get_fullpath(saveDataPath, fname_utf8);
+}
+
+bool fc_exists(const char *fname_utf8)
+{
+	char *path = fc_get_path(fname_utf8);
+	wchar_t wpath[PATH_MAX + 1];
+	bool result = false;
+	if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, wpath, PATH_MAX + 1)) {
+		result = _waccess(wpath, F_OK) != -1;
 	}
-	
-	while(0 < (entry = readdir(dir))) {
-		if (c >= FILEMAX) {
-			fprintf(stderr, "Over " "FILEMAX" "files in savefile directry\n");
-			break;
+	free(path);
+	return result;
+}
+
+FILE *fc_open(const char *fname_utf8, char type) {
+	char *path = fc_get_path(fname_utf8);
+	if (type == 'w') {
+		// Ensure the directory exists
+		char *p = strrchr(path, '/');
+		if (p) {
+			*p = '\0';
+			mkdir_p(path);
+			*p = '/';
 		}
-		tbl[c].realname = strdup(entry->d_name);
-		tbl[c].transname = strdup(entry->d_name);
-		sjis_toupper(tbl[c].transname);
-		c++;
 	}
-	fnametable_cnt = c;
-	closedir(dir);
-	initilized = TRUE;
+	FILE *fp = fopen_utf8(path, type);
+	if (!fp && type == 'r') {
+		fp = fopen_utf8(fname_utf8, type);
+	}
+	free(path);
+	return fp;
 }
 
-/* req must sjis */
-char *fc_search(char *req) {
-	int i;
-	BYTE *b;
-	
-	if (!initilized) return req;
-	
-	for (i = 0; i < fnametable_cnt; i++) {
-		/* match exeactly */
-		if (0 == strcmp(req, tbl[i].realname)) return req;
+#else // !_WIN32
 
-		/* capital match */
-		b = sjis_toupper2(req);
-		if (0 == strcmp(b, tbl[i].transname)) {
-			free(b);
-			return tbl[i].realname;
+static char *fc_search(const char *fname_utf8, const char *dir) {
+	// If path contains no directory separator, do case-insensitive search.
+	if (strchr(fname_utf8, '/') == NULL) {
+		DIR *d = opendir(dir);
+		if (d == NULL)
+			return NULL;
+
+		char *found = NULL;
+		struct dirent *entry;
+		while ((entry = readdir(d)) != NULL) {
+			if (strcasecmp(fname_utf8, entry->d_name) == 0) {
+				found = get_fullpath(dir, entry->d_name);
+				break;
+			}
 		}
-		
-		/* utf-8 match */
-		b = sjis2lang(req);
-		sjis_toupper(b);
-		if (0 == strcmp(b, tbl[i].transname)) {
-			free(b);
-			return tbl[i].realname;
-		} 
-		free(b);
+		closedir(d);
+		return found;
+	} else {
+		// If path contains directory separator, do case-sensitive existence check.
+		char *fullpath = get_fullpath(dir, fname_utf8);
+		if (access(fullpath, F_OK) == 0) {
+			return fullpath;
+		} else {
+			free(fullpath);
+			return NULL;
+		}
 	}
-	return NULL;
 }
 
-/* add new file to entry */
-char *fc_add(char *req) {
-	BYTE *b;
-	
-	if (!initilized) return req;
-	
-	if (fnametable_cnt >= FILEMAX) {
-		fprintf(stderr, "Over " "FILEMAX" "files in savefile directry\n");
-		return req;
-	}
-
-	if (newfile_kanjicode_utf8) {
-		tbl[fnametable_cnt].realname = sjis2lang(req);
-	} else {
-		tbl[fnametable_cnt].realname = strdup(req);
-	}
-
-	b = sjis_toupper2(req);
-	tbl[fnametable_cnt].transname = b;
-	
-	b = tbl[fnametable_cnt].realname;
-	fnametable_cnt++;
-	return b;
+char *fc_get_path(const char *fname_utf8) {
+	char *path = fc_search(fname_utf8, saveDataPath);
+	if (path)
+		return path;
+	return get_fullpath(saveDataPath, fname_utf8);
 }
 
-/* QE で新規ファイルをセーブする時のファイル名の漢字コード */
-void fc_set_default_kanjicode(int c) {
-	if (c == 0) {
-		newfile_kanjicode_utf8 = TRUE;
-	} else {
-		newfile_kanjicode_utf8 = FALSE;
+bool fc_exists(const char *fname_utf8)
+{
+	char *path = fc_get_path(fname_utf8);
+	bool result = access(path, F_OK) != -1;
+	free(path);
+	return result;
+}
+
+FILE *fc_open(const char *fname_utf8, char type) {
+	char *fullpath = fc_search(fname_utf8, saveDataPath);
+	if (!fullpath) {
+		if (type == 'r') {
+			fullpath = fc_search(fname_utf8, ".");
+			if (!fullpath)
+				return NULL;
+		} else {
+			fullpath = get_fullpath(saveDataPath, fname_utf8);
+		}
 	}
-}		
+
+	FILE *fp;
+	if (type == 'w') {
+		// Ensure the directory exists
+		char *p = strrchr(fullpath, '/');
+		if (p) {
+			*p = '\0';
+			mkdir_p(fullpath);
+			*p = '/';
+		}
+		fp = fopen(fullpath, "wb");
+	} else {
+		fp = fopen(fullpath, "rb");
+	}
+	free(fullpath);
+	return fp;
+}
+#endif // _WIN32
+
+void fc_backup_oldfile(const char *filename) {
+#ifndef __EMSCRIPTEN__
+	char *newname;
+	
+	if (!filename) return;
+	newname = malloc(strlen(filename) + 3);
+	
+	strcpy(newname, filename);
+	strcat(newname, ".");
+	rename(filename, newname);
+	
+	free(newname);
+#endif
+}

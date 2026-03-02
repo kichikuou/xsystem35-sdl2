@@ -24,15 +24,15 @@
 #ifndef __SACTSOUND_H__
 #define __SACTSOUND_H__
 
-extern int ssnd_init();
-extern int ssnd_play(int no);
-extern int ssnd_stop(int no, int fadetime);
-extern int ssnd_wait(int no);
-extern int ssnd_waitkey(int no, int *res);
-extern int ssnd_prepare(int no);
-extern int ssnd_prepareLRrev(int no);
-extern int ssnd_playLRrev(int no);
-extern int ssnd_getlinknum(int no);
-extern int ssnd_stopall(int time);
+void ssnd_init(void);
+void ssnd_play(int no);
+void ssnd_stop(int no, int fadetime);
+void ssnd_wait(int no);
+void ssnd_waitkey(int no, int *res);
+void ssnd_prepare(int no);
+void ssnd_prepareLRrev(int no);
+void ssnd_playLRrev(int no);
+int ssnd_getlinknum(int no);
+void ssnd_stopall(int time);
 
 #endif /* __SACTSOUND_H__ */

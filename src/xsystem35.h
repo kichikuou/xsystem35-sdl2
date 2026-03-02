@@ -26,46 +26,10 @@
 
 #include "config.h"
 #include "portab.h"
-#include "scenario.h"
 #include "system.h"
 #include "nact.h"
 #include "variable.h"
 #include "ald_manager.h"
-#include "gametitle.h"
-
-/* logfile when debug level >= 5 */
-#define DEBUGLOGFILE "./xsystem35.log"
-
-/* 
- debug level in xsystem35
-  0: critical error message only (output to terminal or message box)
-  1: warning only(output to terminal) [stable release default]
-  2: add not inplement message (output to terminal) [devel relase default]
-  5: add command message (output to terminal or FILE)
-  6: add message(output to terminal or FILE)
-*/
-
-#define DEBUG_SHOWSCOADR  sys_message("%d,%x: ", sl_getPage(), sl_getIndex())
-#ifdef DEBUG
-#define DEBUG_COMMAND_YET sys_nextdebuglv = 2, DEBUG_SHOWSCOADR, sys_message
-#define DEBUG_COMMAND     sys_nextdebuglv = 5, DEBUG_SHOWSCOADR, sys_message
-#define DEBUG_MESSAGE     sys_nextdebuglv = 6, sys_message
-#else
-#define DEBUG_MESSAGE
-#define DEBUG_COMMAND
-#define DEBUG_COMMAND_YET
-#endif
-
-/* 配列外参照チェック/cali異常値検出 */
-#define DEBUG_CHECKALING
-
-/* defined in cali.c */
-extern int preVarPage;      /* 直前にアクセスした変数のページ */
-extern int preVarIndex;     /* 直前にアクセスした変数のINDEX */
-extern int preVarNo;        /* 直前にアクセスした変数の番号 */
-
-#define System_idle(msec) usleep(1000l * (msec));
-// extern void System_idle(int msec);
 
 /* system35 画面デフォルト */
 #define SYS35_DEFAULT_WIDTH 640

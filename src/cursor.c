@@ -21,15 +21,219 @@
 /* $Id: cursor.c,v 1.6 2001/04/04 21:55:39 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <glib.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
 #include "cursor.h"
 #include "LittleEndian.h"
 #include "ald_manager.h"
-#include "graphicsdevice.h"
+
+#include "bitmaps/cursor_uparrow.xpm"
+
+#define CURSOR_ARROW     1
+#define CURSOR_CROSS     2
+#define CURSOR_IBEAM     3
+#define CURSOR_ICON      4
+#define CURSOR_NO        5
+#define CURSOR_SIZE      6
+#define CURSOR_SIZEALL   7
+#define CURSOR_SIZENESW  8
+#define CURSOR_SIZENS    9
+#define CURSOR_SIZENWSE 10
+#define CURSOR_SIZEWE   11
+#define CURSOR_UPARROW  12
+#define CURSOR_WAIT     13
+
+typedef struct {
+	short idReserved;  /* always set to 0 */
+	short idType;      /* always set to 1 */
+	short idCount;     /* number of cursor images,always set to 1 */
+	/* immediately followed by idCount TCursorDirEntries */
+} CursorHeader;
+
+typedef struct {
+	unsigned char  bWidth;       /* Width */
+	unsigned char  bHeight;	     /* Height */
+	unsigned char  bColorCount;
+	unsigned char  bReserved;
+	unsigned short wxHotspot;
+	unsigned short wyHotspot;
+	unsigned long  dwBytesInRes; /* total number of bytes in image */
+	unsigned long  dwImageOffset;
+} TCursorDirEntry;
+
+typedef struct {
+	long biSize;           /* sizeof(TBitmapInfoHeader) */
+	long biWidth;          /* width of bitmap */
+	long biHeight;	       /* height of bitmap, see notes */
+	short biPlanes;	       /* planes, always 1 */
+	short biBitCount;      /* number of color bits */
+	long biCompression;    /* compression used, 0 */
+	long biSizeImage;      /* size of the pixel data, see notes */
+	long biXPelsPerMeter;  /* not used, 0 */
+	long biYPelsPerMeter;  /* not used, 0 */
+	long biClrUsed;	       /* # of colors used, set to 0 */
+	long biClrImportant;   /* important colors, set to 0 */
+	short hotX;
+	short hotY;
+} TBitmapInfoHeader;
+
+/*
+   biHeight=2*TIconDirEntry.bHeight;
+   biSizeImage=ANDmask + XORmask;
+
+   XORmask=(TIconDirEntry.bWidth * TIconDirEntry.bHeight * biBitCount)/8;
+   ANDmask=(TIconDirEntry.bWidth * TIconDirEntry.bHeight)/8;
+ */
+
+typedef struct {
+	unsigned char rgbBlue;     /* blue component of color */
+	unsigned char rgbGreen;    /* green component of color */
+	unsigned char rgbRed;      /* red component of color */
+	unsigned char rgbReserved; /* reserved, 0 */
+} TRGBQuad;
+
+typedef struct {
+	TBitmapInfoHeader icHeader; /* image header info */
+	TRGBQuad *icColors;	    /* image palette */
+	int xormasklen;
+	int andmasklen;
+} CursorImage;
+
+typedef struct {
+	int cbSizeof;
+	int cFrames;
+	int cSteps;
+	int cx;
+	int cy;
+	int cBitCount;
+	int cPlanes;
+	int jiffRate;
+	int fl;
+
+	int *rate;
+	int *seq;
+} AnimationCursorHeader ;
+
+typedef struct {
+	AnimationCursorHeader *header;
+	CursorImage *images;
+} AniCursorImage;
+
+static SDL_Cursor *cursor[256];
+
+/* Stolen from the SDL mailing list */
+/* Creates a new mouse cursor from an XPM */
+
+static SDL_Cursor *init_system_cursor(const char *image[]) {
+	int i, row, col;
+	Uint8 data[4*32];
+	Uint8 mask[4*32];
+	int hot_x, hot_y;
+
+	i = -1;
+	for (row = 0; row < 32; row++) {
+		for (col = 0; col < 32; col++) {
+			if (col % 8) {
+				data[i] <<= 1;
+				mask[i] <<= 1;
+			} else {
+				i++;
+				data[i] = mask[i] = 0;
+			}
+			switch (image[4 + row][col]) {
+			case 'X':
+				data[i] |= 0x01;
+				mask[i] |= 0x01;
+				break;
+			case '.':
+				mask[i] |= 0x01;
+				break;
+			case ' ':
+				break;
+			}
+		}
+	}
+	sscanf(image[4 + row], "%d,%d", &hot_x, &hot_y);
+	return SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
+}
+
+void cursor_init(void) {
+	cursor[CURSOR_ARROW]    = SDL_GetDefaultCursor();
+	cursor[CURSOR_CROSS]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
+	cursor[CURSOR_IBEAM]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+	cursor[CURSOR_ICON]     = SDL_GetDefaultCursor();
+	cursor[CURSOR_NO]       = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
+	cursor[CURSOR_SIZE]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	cursor[CURSOR_SIZEALL]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	cursor[CURSOR_SIZENESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
+	cursor[CURSOR_SIZENS]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+	cursor[CURSOR_SIZENWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
+	cursor[CURSOR_SIZEWE]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
+	cursor[CURSOR_UPARROW]  = init_system_cursor(cursor_uparrow);
+	cursor[CURSOR_WAIT]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
+}
+
+static bool cursor_new(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
+	int    xormasklen, andmasklen, xornum;
+	int    i, j;
+	int    h = 0;
+
+	uint8_t   *buf1, *buf2, *buf3, *buf4;
+
+	xornum = (cursordirentry->bWidth * cursordirentry->bHeight);
+	xormasklen = (xornum * cursorImage->icHeader.biBitCount) / 8;
+	NOTICE("Cursor:  xormasklen==%d,  xornum==%d", xormasklen, xornum);
+
+	andmasklen = xornum / 8;
+	cursorImage->xormasklen = xormasklen;
+	cursorImage->andmasklen = andmasklen;
+
+	buf1 = malloc(sizeof(uint8_t) * xornum);
+	buf2 = malloc(sizeof(uint8_t) * xornum);
+	buf3 = malloc(sizeof(uint8_t) * xornum);
+	buf4 = malloc(sizeof(uint8_t) * xornum);
+
+	memcpy(buf1, data, min(xormasklen, xornum));
+	data += xormasklen;
+
+	memcpy(buf2, data, min(andmasklen, xornum));
+	data += andmasklen;
+
+#define height cursordirentry->bHeight
+#define width  cursordirentry->bWidth
+
+	for (j = 0; j < height; j++) {
+		for (i = 0; i < width * cursorImage->icHeader.biBitCount /8; i++) {
+			buf3[h] = buf1[(height-j-1)*height*cursorImage->icHeader.biBitCount/8+i];
+			buf4[h] = 0xff ^ buf2[(height-j-1)*height*cursorImage->icHeader.biBitCount/8+i];
+			h++;
+		}
+	}
+
+	if (cursor[no])
+		SDL_FreeCursor(cursor[no]);
+	cursor[no] = SDL_CreateCursor(buf3, buf4, 32, 32, cursordirentry->wxHotspot, cursordirentry->wyHotspot);
+
+	free(buf1);
+	free(buf2);
+	free(buf3);
+	free(buf4);
+
+#undef height
+#undef width
+
+	return true;
+}
+
+void cursor_set_type(int type) {
+	if (cursor[type] != NULL) {
+		SDL_SetCursor(cursor[type]);
+	}
+}
 
 static CursorHeader    cursorHeader;
 static TCursorDirEntry cursordirentry;
@@ -42,35 +246,35 @@ typedef struct RIFFchunk {
 	char *data;
 } RIFFchunk_t;
 
-static boolean search_chunk(BYTE *src, char *key1, char *key2, RIFFchunk_t *c) {
+static bool search_chunk(uint8_t *src, char *key1, char *key2, RIFFchunk_t *c) {
 	if (0 == strncmp(src, key1, 4)) {
 		c->size = LittleEndian_getW(src, 4);
 		if (key2) {
 			if (0 == strncmp(src+8, key2, 4)) {
 				c->data = src + 12;
-				return TRUE;
+				return true;
 			}
-			return FALSE;
+			return false;
 		}
 		c->data = src + 8;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-static boolean is_riff(BYTE *data) {
+static bool is_riff(uint8_t *data) {
 	if (0 == strncmp(data, "RIFF", 4)) {
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-static boolean check_iconheader(BYTE *data) {
+static bool check_iconheader(uint8_t *data) {
 	
 	/* read Reserved bit, abort if not 0 */
 	cursorHeader.idReserved = LittleEndian_getW(data, 0);
 	if (cursorHeader.idReserved != 0) {
-		return FALSE;
+		return false;
 	}
 	
 	data += 2;
@@ -78,7 +282,7 @@ static boolean check_iconheader(BYTE *data) {
 	/* read Resource Type, 2 is for cursors, abort if different */
 	cursorHeader.idType = LittleEndian_getW(data, 0);
 	if (cursorHeader.idType != 2) {
-		return FALSE;
+		return false;
 	}
 	
 	data += 2;
@@ -90,18 +294,18 @@ static boolean check_iconheader(BYTE *data) {
 	
 	/* Number of images (>0) */
 	if (cursorHeader.idCount == 0) {
-		WARNING("Cursor: no images in file!\n");
-		return FALSE;
+		WARNING("Cursor: no images in file!");
+		return false;
 	}
 	
 	if (cursorHeader.idCount > 1) {
-		WARNING("Cursor:  warning:  too much images in file!\n"); 
+		WARNING("Cursor:  warning:  too much images in file!"); 
 	}
-	return TRUE;
+	return true;
 }
 
-static int read_direntries(BYTE* data) {
-	BYTE *p = data;
+static int read_direntries(uint8_t* data) {
+	uint8_t *p = data;
 	
 	/* read Width, in pixels */
 	cursordirentry.bWidth = *data;
@@ -112,7 +316,7 @@ static int read_direntries(BYTE* data) {
 	data++;
 	
 	/* and validate data */
-	NOTICE("Cursor:  bWidth==%d  bHeight==%d\n",
+	NOTICE("Cursor:  bWidth==%d  bHeight==%d",
 	       (int)cursordirentry.bWidth,
 	       (int)cursordirentry.bHeight);
 	
@@ -142,21 +346,21 @@ static int read_direntries(BYTE* data) {
 		return 0;
 	}
 	
-	NOTICE("Cursor:  x==%d  y==%d\n",
+	NOTICE("Cursor:  x==%d  y==%d",
 	       (int)cursordirentry.wxHotspot,
 	       (int)cursordirentry.wyHotspot);
 	
 	
-	NOTICE("Width: %d\n", (int)(cursordirentry.bWidth));
-	NOTICE("Height: %d\n", (int)(cursordirentry.bHeight));
-	NOTICE("Bit Count (unused): %d\n", (int)(cursordirentry.dwBytesInRes));
-	NOTICE("Total bytes: %ld\n", (long)(cursordirentry.dwBytesInRes));
+	NOTICE("Width: %d", (int)(cursordirentry.bWidth));
+	NOTICE("Height: %d", (int)(cursordirentry.bHeight));
+	NOTICE("Bit Count (unused): %d", (int)(cursordirentry.dwBytesInRes));
+	NOTICE("Total bytes: %ld", (long)(cursordirentry.dwBytesInRes));
 	
 	return (int)(data - p);
 }
 
-static int read_bitmapinfo(BYTE* data) {
-	BYTE* p = data;
+static int read_bitmapinfo(uint8_t* data) {
+	uint8_t* p = data;
 	
 #define ih cursorImage.icHeader
 	/* read bitmap info an perform some primitive sanity checks */
@@ -173,7 +377,7 @@ static int read_bitmapinfo(BYTE* data) {
 	ih.biHeight=LittleEndian_getDW(data,0);
 	data += 4;
 	
-	NOTICE("Cursor:  biWidth==%d  biHeight==%d\n", (int)ih.biWidth, (int)ih.biHeight);
+	NOTICE("Cursor:  biWidth==%d  biHeight==%d", (int)ih.biWidth, (int)ih.biHeight);
 
 	if (ih.biWidth == 0 || ih.biHeight == 0) {
 		return 0;
@@ -186,7 +390,7 @@ static int read_bitmapinfo(BYTE* data) {
 	/* number of color bits (2,4,8) */
 	ih.biBitCount = LittleEndian_getW(data, 0);
 	if (ih.biBitCount != 1) {
-		WARNING("Cursor: %d not supported color bit\n", ih.biBitCount);
+		WARNING("Cursor: %d not supported color bit", ih.biBitCount);
 		return 0;
 	}
 	data += 2;
@@ -196,7 +400,7 @@ static int read_bitmapinfo(BYTE* data) {
 	data += 4;
 	
 	if (ih.biCompression != 0) {
-		WARNING("Cursor:  invalid compression value of %d\n", (int)ih.biCompression);
+		WARNING("Cursor:  invalid compression value of %d", (int)ih.biCompression);
 		return 0;
 	}
 	
@@ -204,7 +408,7 @@ static int read_bitmapinfo(BYTE* data) {
 	ih.biSizeImage = LittleEndian_getDW(data, 0);
 	data += 4;
 	
-	NOTICE("Cursor:  biSizeImage==%d\n", (int)ih.biSizeImage);
+	NOTICE("Cursor:  biSizeImage==%d", (int)ih.biSizeImage);
 	
 	ih.biXPelsPerMeter = LittleEndian_getDW(data, 0);
 	data += 4;
@@ -226,12 +430,13 @@ static int read_bitmapinfo(BYTE* data) {
 	return (int)(data - p);
 }
 
-static int read_rgbquad(BYTE* data) {
+static int read_rgbquad(uint8_t* data) {
 	int j;
-	int colors=2;
-	BYTE* p = data;
+	const int colors=2;
+	uint8_t* p = data;
 	
-	cursorImage.icColors = g_new(TRGBQuad, colors);
+	free(cursorImage.icColors);
+	cursorImage.icColors = malloc(sizeof(TRGBQuad) * colors);
 	
 	if (cursorImage.icColors == NULL) {  /* shouldn't happen */
 		NOMEMERR();
@@ -248,7 +453,7 @@ static int read_rgbquad(BYTE* data) {
 		data++;
 		cc[j].rgbReserved = *data;
 		data++;
-		NOTICE("#%d:  Red: %d  Green: %d  Blue: %d\n", j, 
+		NOTICE("#%d:  Red: %d  Green: %d  Blue: %d", j, 
 		       cc[j].rgbRed,
 		       cc[j].rgbGreen,
 		       cc[j].rgbBlue);
@@ -258,26 +463,26 @@ static int read_rgbquad(BYTE* data) {
 	return (int)(data - p);
 }
 
-static boolean cursor_load_mono(BYTE *d, int no) {
+static bool cursor_load_mono(uint8_t *d, int no) {
 	int pos = 6, p1;
 	
 	/* check header information */
-	if (check_iconheader(d) == FALSE) {
-		WARNING("check_iconhdader fail\n");
-		return FALSE;
+	if (!check_iconheader(d)) {
+		WARNING("check_iconhdader fail");
+		return false;
 	}
 	
 	/* read dentries */
 	if ((pos += read_direntries(d + pos)) <= 6) {
-		WARNING("read dentries fail\n");
-		return FALSE;
+		WARNING("read dentries fail");
+		return false;
 	}
 	
 	/* read bitmap info */
 	p1 = read_bitmapinfo(d + pos);
 	if (p1 == 0) {
-		WARNING("unable to read bitmap info\n");
-		return FALSE;
+		WARNING("unable to read bitmap info");
+		return false;
 	}
 	
 	pos += p1;
@@ -285,28 +490,28 @@ static boolean cursor_load_mono(BYTE *d, int no) {
 	/* read rgb quad */
 	p1 = read_rgbquad(d + pos);
 	if (p1 == 0) {
-		WARNING("unable to read palette table\n");
-		return FALSE;
+		WARNING("unable to read palette table");
+		return false;
 	}
 	
 	pos += p1;
 	
 	/* read pixedl data */
-	if (CursorNew(d + pos, no, &cursorImage, &cursordirentry) == FALSE) {
-		WARNING("unable to read pixel data\n");
-		return FALSE;
+	if (!cursor_new(d + pos, no, &cursorImage, &cursordirentry)) {
+		WARNING("unable to read pixel data");
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
-static boolean cursor_load_anim(BYTE *data, int no) {
-	BYTE *b = data;
+static bool cursor_load_anim(uint8_t *data, int no) {
+	uint8_t *b = data;
 	int riffsize;
 	RIFFchunk_t c;
 	
 	if (!search_chunk(b, "RIFF", "ACON", &c)) {
 		WARNING("Not animation icon format");
-		return FALSE;
+		return false;
 	}
 	
 	riffsize = c.size;
@@ -315,11 +520,11 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 	
 	while (b < (data + riffsize)) {
 		if (search_chunk(b, "LIST", "INFO", &c)) {
-			NOTICE("LIST(INFO) ignore size = %d\n", c.size);
+			NOTICE("LIST(INFO) ignore size = %d", c.size);
 			b += c.size + 8;
 		} else if (search_chunk(b, "anih", NULL, &c)) {
-			BYTE *src = c.data;
-			NOTICE("anih size = %d\n", c.size);
+			uint8_t *src = c.data;
+			NOTICE("anih size = %d", c.size);
 			anicurHeader.cbSizeof  = LittleEndian_getW(src, 0);
 			anicurHeader.cFrames   = LittleEndian_getW(src, 4);
 			anicurHeader.cSteps    = LittleEndian_getW(src, 8);
@@ -334,11 +539,11 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 			
 			b += c.size + 8;
 		} else if (search_chunk(b, "rate", NULL, &c)) {
-			BYTE *src = c.data;
-			NOTICE("rate size = %d\n", c.size);
+			uint8_t *src = c.data;
+			NOTICE("rate size = %d", c.size);
 			if (anicurHeader.fl & 0x01) {
 				int i;
-				anicurHeader.rate = g_new(int, anicurHeader.cSteps);
+				anicurHeader.rate = malloc(sizeof(int) * anicurHeader.cSteps);
 				for (i = 0; i < anicurHeader.cSteps; i++) {
 					anicurHeader.rate[i] = LittleEndian_getW(src, i*4);
 					// printf("rate %d, %d\n", i, anicurHeader.rate[i]);
@@ -346,18 +551,18 @@ static boolean cursor_load_anim(BYTE *data, int no) {
 			}
 			b += c.size + 8;
 		} else if (search_chunk(b, "icon", NULL, &c)) {
-			NOTICE("icon size = %d\n", c.size);
+			NOTICE("icon size = %d", c.size);
 			cursor_load_mono(c.data, no); /* last pattern is uesd */
 			b += c.size + 8;
 		} else if (search_chunk(b, "LIST", "frame", &c)) {
-			NOTICE("LIST(frame) size = %d\n", c.size);
+			NOTICE("LIST(frame) size = %d", c.size);
 			b += 12;
 		} else {
 			WARNING("UnKnown chunk");
 			b += c.size + 8;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 void cursor_load(int no, int linkno) {
@@ -365,12 +570,12 @@ void cursor_load(int no, int linkno) {
 
 	/* no must be from 100 to 255 */
 	if (no < 100 || no > 256){
-		WARNING("wrong cursor number(%d)\n", no);
+		WARNING("wrong cursor number(%d)", no);
 	}
 	
 	/* load data */
 	if (NULL == (dfile = ald_getdata(DRIFILE_RSC, linkno -1))) {
-		WARNING("ald_getdata fail\n");
+		WARNING("ald_getdata fail");
 		return;
 	}
 	

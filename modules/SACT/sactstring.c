@@ -23,10 +23,11 @@
 
 #include "config.h"
 #include <stdio.h>
-#include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 #include "portab.h"
 #include "system.h"
+#include "list.h"
 #include "variable.h"
 #include "sact.h"
 
@@ -38,39 +39,51 @@ static int idxmax;     // stack pointerの最大
 /**
  * 文字列変数スタックの初期化
  */
-int sstr_init() {
-	stack = g_new(char *, DEFSTACKSIZE);
+void sstr_init(void) {
+	stack = malloc(sizeof(char *) * DEFSTACKSIZE);
 	idx = 0;
 	idxmax = DEFSTACKSIZE;
-	return OK;
+}
+
+void sstr_reset(void) {
+	for (int i = 0; i < idx; i++)
+		free(stack[i]);
+	idx = 0;
+	free(stack);
+	stack = NULL;
+
+	for (SList *l = sact.strreplace; l; l = l->next) {
+		strexchange_t *ex = l->data;
+		free(ex->src);
+		free(ex->dst);
+		free(ex);
+	}
+	slist_free(sact.strreplace);
+	sact.strreplace = NULL;
 }
 
 /**
  * 文字列変数スタックに文字列を積む
  * @param strno: シナリオ上での文字列変数番号
  */
-int sstr_push(int strno) {
+void sstr_push(int strno) {
 	if (idx >= idxmax) {
-		stack = g_renew(char *, stack, idx*2);
+		stack = realloc(stack, sizeof(char *) * idx*2);
 		idxmax = idx*2;
 	}
 	
-	stack[idx++] = g_strdup(v_str(strno -1));
-	
-	return OK;
+	stack[idx++] = strdup(svar_get(strno));
 }
 
 /**
  * 文字列変数スタックから文字列を取り出す
  * @param strno: スタックから戻した文字列を格納する文字列変数番号
  */
-int sstr_pop(int strno) {
-	if (idx == 0) return NG;
+void sstr_pop(int strno) {
+	if (idx == 0) return;
 	
-	v_strcpy(strno -1, stack[--idx]);
-	g_free(stack[idx]);
-	
-	return OK;
+	svar_set(strno, stack[--idx]);
+	free(stack[idx]);
 }
 
 /**
@@ -78,22 +91,21 @@ int sstr_pop(int strno) {
  * @param sstrno: 変換元文字列変数番号
  * @param dstrno: 変換先文字列変数番号
  */
-int sstr_regist_replace(int sstrno, int dstrno) {
+void sstr_regist_replace(int sstrno, int dstrno) {
 	strexchange_t *ex;
 	
-	if (sstrno == dstrno) return NG;
+	if (sstrno == dstrno) return;
 	
-	ex = g_new(strexchange_t, 1);
-	ex->src = strdup(v_str(sstrno -1));
-	ex->dst = strdup(v_str(dstrno -1));
-	sact.strreplace = g_slist_append(sact.strreplace, ex);
-	return OK;
+	ex = malloc(sizeof(strexchange_t));
+	ex->src = strdup(svar_get(sstrno));
+	ex->dst = strdup(svar_get(dstrno));
+	sact.strreplace = slist_append(sact.strreplace, ex);
 }
 
 /**
  * 数値 -> 文字列化
  */
-int sstr_num2str(int strno, int fig, int nzeropad, int num) {
+void sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	char s[256], ss[256];
 	
 	if (nzeropad) {
@@ -105,7 +117,5 @@ int sstr_num2str(int strno, int fig, int nzeropad, int num) {
 	}
 	
 	sprintf(s, ss, num);
-	v_strcpy(strno -1, s);
-	
-	return OK;
+	svar_set(strno, s);
 }

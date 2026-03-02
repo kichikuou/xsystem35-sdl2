@@ -41,7 +41,7 @@ typedef struct {
 	int y;
 	int width;
 	int height;
-	boolean save;
+	bool save;
 	void *savedimg;
 } Bcom_WindowInfo;
 

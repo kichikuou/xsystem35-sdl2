@@ -22,7 +22,6 @@
 /* $Id: sactcrypto.c,v 1.1 2003/04/22 16:29:52 chikama Exp $ */
 
 #include <stdio.h>
-#include <glib.h>
 #include "portab.h"
 #include "system.h"
 #include "variable.h"
@@ -32,23 +31,19 @@
   適当でいいとおもう
 */
 
-int scryp_encrypt_word(int *array, int num, int key) {
-	WARNING("NOT IMPLEMENTED\n");
-	return OK;
+void scryp_encrypt_word(int *array, int num, int key) {
+	WARNING("NOT IMPLEMENTED");
 }
 
-int scryp_decrypt_word(int *array, int num, int key) {
-	WARNING("NOT IMPLEMENTED\n");
-	return OK;
+void scryp_decrypt_word(int *array, int num, int key) {
+	WARNING("NOT IMPLEMENTED");
 }
 
-int scryp_encrypt_str(int strno, int key) {
-	WARNING("NOT IMPLEMENTED\n");
-	return OK;
+void scryp_encrypt_str(int strno, int key) {
+	WARNING("NOT IMPLEMENTED");
 }
 
-int scryp_decrypt_str(int strno, int key) {
-	WARNING("str = '%s'\n", v_str(strno -1));
-	WARNING("NOT IMPLEMENTED\n");
-	return OK;
+void scryp_decrypt_str(int strno, int key) {
+	WARNING("str = '%s'", svar_get(strno));
+	WARNING("NOT IMPLEMENTED");
 }

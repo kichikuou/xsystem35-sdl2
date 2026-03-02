@@ -28,28 +28,87 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
+#include "alk.h"
+#include "music.h"
+#include "gfx.h"
+#include "input.h"
+#include "cg.h"
+#include "jpeg.h"
 
-extern void ndd_init(char *files[], int n);
-extern void ndd_run(int demonum);
+#define FPS 30
 
-void Init() {
+static const int ndemo_mus[3] = {0, 1, 85};
+
+static void ndd_run(int demonum) {
+	const char *alk_path = nact->files.alk[demonum + 1];
+	alk_t *alk = alk_new(alk_path);
+	if (alk == NULL) return;
+
+	while (sys_getInputInfo());  // wait for key up
+
+	int mus = ndemo_mus[demonum];
+	if (mus)
+		musbgm_play(mus, 0, 100, 0);
+
+	uint32_t start = sys_get_ticks();
+	while (!nact->is_quit) {
+		int i = (sys_get_ticks() - start) / (1000 / FPS);
+		if (i >= alk->datanum)
+			break;
+
+		cgdata *cg = jpeg_extract(alk->entries[i].data, alk->entries[i].size);
+		if (cg) {
+			SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+			SDL_BlitSurface(sf, NULL, main_surface, NULL);
+			ags_updateFull();
+			SDL_FreeSurface(sf);
+			cgdata_free(cg);
+		} else {
+			WARNING("Cannot decode CG %d in %s", i, alk_path);
+		}
+
+		int wait_ms = (i + 1) * (1000 / FPS) - (sys_get_ticks() - start);
+		if (wait_ms > 0) {
+			if (sys_keywait(wait_ms, KEYWAIT_CANCELABLE))
+				break;
+		} else {
+			gfx_updateScreen();
+			if (sys_getInputInfo())
+				break;
+		}
+	}
+
+	if (mus)
+		musbgm_stop(ndemo_mus[demonum], 0);
+
+	alk_free(alk);
+}
+
+static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
 	int p2 = getCaliValue(); /* IWinMsg */
 	int p3 = getCaliValue(); /* ITimer */
 	int *var = getCaliVariable();
 	
-	ndd_init(nact->files.alk, 4);
 	*var = 1;
 	
-	DEBUG_COMMAND("NightDemonDemo.Init %d,%d,%d,%p:\n", p1, p2, p3, var);
+	TRACE("NightDemonDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }
 
-void Run() {
+static void Run() {
 	int p1 = getCaliValue(); // デモ番号 0,1,2
 	int p2 = getCaliValue();
 	
 	ndd_run(p1);
 	
-	DEBUG_COMMAND("NightDemonDemo.Run %d,%d:\n", p1, p2);
+	TRACE("NightDemonDemo.Run %d,%d:", p1, p2);
 }
+
+static const ModuleFunc functions[] = {
+	{"Init", Init},
+	{"Run", Run},
+};
+
+const Module module_NightDemonDemo = {"NightDemonDemo", functions, sizeof(functions) / sizeof(ModuleFunc)};

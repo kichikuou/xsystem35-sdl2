@@ -1,0 +1,71 @@
+name: Windows Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - sys: mingw32
+            package: "xsystem35-32bit"
+            cmake_args: "-DENABLE_DEBUGGER=no"
+            deps: ""
+          - sys: ucrt64
+            package: "xsystem35-64bit"
+            cmake_args: ""
+            deps: >-
+              cjson:p
+              portmidi:p
+    defaults:
+      run:
+        shell: msys2 {0}
+    name: MSYS2 ${{ matrix.sys }}
+    steps:
+
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.sys }}
+        pacboy: >-
+          SDL2:p
+          SDL2_ttf:p
+          SDL2_mixer:p
+          libwebp:p
+          ${{ matrix.deps }}
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Copy licenses
+      run: |
+        ls /${{ matrix.sys }}/share/licenses
+        mkdir dist
+        cp -r /${{ matrix.sys }}/share/licenses dist/
+        cp licenses/* dist/licenses/
+
+    - name: Install dev dependencies
+      run: pacboy --noconfirm -S --needed gcc:p cmake:p ninja:p asciidoctor:p
+
+    - name: Build
+      run: |
+        mkdir -p out/release
+        cd out/release
+        cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_COMPILE_WARNING_AS_ERROR=YES ${{ matrix.cmake_args }} ../../
+        ninja
+
+    - name: Test
+      run: ctest --output-on-failure
+      working-directory: out/release
+
+    - name: Package
+      run: |
+        cp out/release/src/xsystem35.exe out/release/doc/*.html *.md COPYING xsys35rc.sample dist/
+
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.package }}
+        path: dist
+        compression-level: 9  # because we use it for releases

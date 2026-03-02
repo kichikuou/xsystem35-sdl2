@@ -25,14 +25,13 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 #include <gtk/gtk.h>
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
 #include "s39init.h"
 #include "utfsjis.h"
-#include "music_client.h"
+#include "music.h"
 
 // Volume Valancer で扱う最大チャンネル数
 #define MAXVOLCH 16
@@ -41,7 +40,7 @@ static int vval_max;  // 最大チャンネル番号
 struct _volval {
 	char *label;
 	int vol;
-	boolean mute;
+	bool mute;
 };
 static struct _volval vval[MAXVOLCH];
 static GtkWidget *vval_win;
@@ -49,15 +48,15 @@ static GtkWidget *vval_win;
 #include "menu_gui_volval.c"
 
 // 初期化
-int s39ini_init(void) {
+bool s39ini_init(void) {
 	FILE *fp;
 	char s[256], s1[256];
 	int i, vol[MAXVOLCH] = {0};
 	char fn[256];
 	
-	if (nact->files.init == NULL) return NG;
+	if (nact->files.init == NULL) return false;
 	
-	if (NULL == (fp = fopen(nact->files.init, "r"))) return NG;
+	if (NULL == (fp = fopen(nact->files.init, "r"))) return false;
 	
 	while (fgets(s, 255, fp) != NULL) {
 		s1[0] = '\0';
@@ -65,24 +64,24 @@ int s39ini_init(void) {
 		if (s1[0] == '\0') continue;
 		if (i >= MAXVOLCH || i < 0) continue;
 		s1[strlen(s1)-1] = '\0'; // remove last '"'
-		vval[i].label = sjis2lang(s1);
-		vval_max = MAX(vval_max, i);
-		//WARNING("VolumeValancer[%d] = %s\n", i, vval[i].label);
+		vval[i].label = sjis2utf(s1);
+		vval_max = max(vval_max, i);
+		//WARNING("VolumeValancer[%d] = %s", i, vval[i].label);
 	}
 	
-	if (vval_max <= 0) return NG;
+	if (vval_max <= 0) return false;
 	
 	// Volume.sav があればそれを読み込む
-	g_snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
-	if (NULL == (fp = fopen(fn, "r"))) {
+	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
+	if (NULL == (fp = fopen(fn, "rb"))) {
 		// とりあえず、初期ボリュームは 100
 		for (i = 0; i < MAXVOLCH; i++) {
 			vol[i] = vval[i].vol = 100;
 		}
 	} else {
-		fread(vol, sizeof(int), MAXVOLCH, fp);
+		int n = fread(vol, sizeof(int), MAXVOLCH, fp);
 		fclose(fp);
-		for (i = 0; i < MAXVOLCH; i++) {
+		for (i = 0; i < n; i++) {
 			vval[i].vol = vol[i];
 		}
 	}
@@ -94,64 +93,57 @@ int s39ini_init(void) {
 		vval_win = vval_win_open(vval, vval_max);
 	}
 	
-	return OK;
+	return true;
 }
 
 // PopupMenuから呼ばれる
-int s39ini_winopen() {
+void s39ini_winopen(void) {
 	if (vval_win) {
 		gtk_widget_show(vval_win);
-		nact->popupmenu_opened = TRUE;
+		nact->popupmenu_opened = true;
 	}
-	return OK;
 }
 
 // ボリューム設定Windowが閉じられたときに呼ばれる
-int s39ini_winclose() {
+void s39ini_winclose(void) {
 	if (vval_win) {
 		gtk_widget_hide(vval_win);
-		nact->popupmenu_opened = FALSE;
+		nact->popupmenu_opened = false;
 	}
-	return OK;
 }
 
 // ボリューム設定でスケールを動かすたびに呼ばれる
-int s39ini_setvol() {
+void s39ini_setvol(void) {
 	int vol[MAXVOLCH] = {0};
 	int i;
 	
-	if (vval_win == NULL) return OK;
+	if (vval_win == NULL) return;
 	
 	for (i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].mute ? 0 : vval[i].vol;
 	}
 	
 	mus_vol_set_valance(vol, MAXVOLCH);
-	return OK;
 }
 
 // Volume Valance をセーブ
-int s39ini_remove() {
+void s39ini_remove(void) {
 	int vol[MAXVOLCH] = {0};
-	FILE *fp;
 	char fn[256];
-	int i;
 	
-	if (vval_win == NULL) return OK;
+	if (vval_win == NULL) return;
 	
-	for (i = 0; i < MAXVOLCH; i++) {
+	for (int i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].vol;
 	}
 	
-	g_snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.savedir);
-	if (NULL == (fp = fopen(fn, "w"))) {
-		WARNING("Fail to save Volume.save\n");
-		return NG;
+	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
+	FILE *fp = fopen(fn, "wb");
+	if (!fp) {
+		WARNING("Failed to save Volume.sav");
+		return;
 	}
 	
 	fwrite(vol, sizeof(int), MAXVOLCH, fp);
 	fclose(fp);
-	
-	return OK;
-	
 }

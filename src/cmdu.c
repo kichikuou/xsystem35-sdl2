@@ -28,20 +28,24 @@
 
 void commandUC() { /* 王道勇者 */
 	/* ラベル・シナリオコールのスタックフレームを削除する。*/
-	int mode = sys_getc();
+	int mode = sl_getc();
 	int num  = getCaliValue();
 	
 	switch(mode) {
 	case 0:
-		 sl_stackClear_allCall(); break;
+		sl_clearStack(true);
+		break;
 	case 1:
-		 sl_stackClear_labelCall(num); break;
+		sl_dropLabelCalls(num);
+		break;
 	case 2:
-		 sl_stackClear_pageCall(num); break;
-	default:
+		sl_dropPageCalls(num);
+		break;
+	case 3:
+		sl_clearStack(false);
 		break;
 	}
-	DEBUG_COMMAND("UC %d,%d:\n",mode,num);
+	TRACE("UC %d,%d:",mode,num);
 }
 
 void commandUD() {
@@ -51,37 +55,48 @@ void commandUD() {
 	case 0:
 		sl_reinit(); break;
 	case 1:
-		sl_retFar2(); break;
+		sl_retFar(); break;
 	default:
-		WARNING("UnKnown UD command %d\n", mode);
+		WARNING("UnKnown UD command %d", mode);
 	}
 	
-	DEBUG_COMMAND("UD %d:\n",mode);
+	TRACE("UD %d:",mode);
 }
 
 void commandUR() {
 	/* 最後に積まれたスタックの属性をリード */
 	int *var = getCaliVariable();
+
+	struct stack_info info;
+	sl_getStackInfo(&info);
+	var[0] = info.top_attr;
+	var[1] = info.page_calls;
+	var[2] = info.label_calls;
+	var[3] = info.var_pushes;
+	var[4] = info.label_calls_after_page_call;
+	var[5] = info.var_pushes_after_call;
 	
-	DEBUG_COMMAND_YET("UR %p:\n",var);
+	TRACE("UR %p:",var);
 }
 
 void commandUS() {
 	/* ローカル変数指定(変数 PUSH) */
-	int *var = getCaliVariable();
+	struct VarRef vref;
+	getCaliArray(&vref);
 	int cnt = getCaliValue();
 	
-	sl_pushVar(var, cnt);
-	DEBUG_COMMAND("US %p,%d:\n",var,cnt);
+	sl_pushVar(&vref, cnt);
+	TRACE("US %d,%d:", vref.var, cnt);
 }
 
 void commandUG() {
 	/* ローカル変数指定(変数 POP) */
-	int *var = getCaliVariable();
+	struct VarRef vref;
+	getCaliArray(&vref);
 	int cnt = getCaliValue();
 	
-	sl_popVar(var, cnt);
-	DEBUG_COMMAND("UG %p,%d:\n",var,cnt);
+	sl_popVar(&vref, cnt);
+	TRACE("UG %p,%d:", vref.var, cnt);
 }
 
 void commandUP0() {
@@ -89,21 +104,29 @@ void commandUP0() {
 	int no = getCaliValue();
 	int mode = getCaliValue();
 	
-	DEBUG_COMMAND_YET("UP0 %d,%d:\n",no,mode);
+	TRACE_UNIMPLEMENTED("UP0 %d,%d:",no,mode);
 }
 
 void commandUP1() {
 	/* 子プロセスを起動する */
-	char *str = sys_getString(':');
+	const char *str = sl_getString(':');
 	int mode = getCaliValue();
 	
-	DEBUG_COMMAND_YET("UP1 %s,%d:\n",str,mode);
+	TRACE_UNIMPLEMENTED("UP1 %s,%d:",str,mode);
 }
 
 void commandUP3() {
 	/* 外部プログラム起動後SYSTEM3.6終了*/
-	char *str1 = sys_getString(':');
-	char *str2 = sys_getString(':');
+	const char *str1 = sl_getString(':');
+	const char *str2 = sl_getString(':');
 	
-	DEBUG_COMMAND_YET("UP3 %s,%s:\n",str1,str2);
+	TRACE_UNIMPLEMENTED("UP3 %s,%s:",str1,str2);
+}
+
+void commandUP() {
+	int type = sl_getc();
+	const char *work_dir = sl_getString(0);
+	const char *file_name = sl_getString(0);
+
+	TRACE_UNIMPLEMENTED("UP(new) %d, %s, %s:", type, work_dir, file_name);
 }

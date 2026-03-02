@@ -24,11 +24,11 @@
 #ifndef __SACTLOG_H__
 #define __SACTLOG_H__
 
-extern int sblog_start(void);
-extern int sblog_end(void);
-extern int sblog_pageup(void);
-extern int sblog_pagedown(void);
-extern int sblog_pagepre(void);
-extern int sblog_pagenext(void);
+bool sblog_start(void);
+void sblog_end(void);
+void sblog_pageup(void);
+void sblog_pagedown(void);
+void sblog_pagepre(void);
+void sblog_pagenext(void);
 
 #endif

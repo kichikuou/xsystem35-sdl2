@@ -32,9 +32,11 @@
 #include "xsystem35.h"
 #include "message.h"
 #include "variable.h"
-#include "imput.h"
+#include "input.h"
+#include "msgskip.h"
 #include "ags.h"
 #include "nact.h"
+#include "texthook.h"
 
 /* ショートカット */
 #define msg nact->msg
@@ -44,29 +46,21 @@
 // static Bcom_WindowInfo winInfo = {8,311,616,80,0};
 /* Window枠の種類 */
 static int frameType;
-static int frameCgNoTop;
-static int frameCgNoMid;
-static int frameCgNoBot;
 static int frameDot;
-/* 文字飾りの設定 */
-static int msgDecorateColor   = 0;
-static int msgDecorateType    = 0;
 /* 現在の文字表示位置 */
-static MyPoint msgcur;
-static boolean nextLineIsAfterKaigyou = FALSE;
+static SDL_Point msgcur;
+static bool nextLineIsAfterKaigyou = false;
 
 /* Private Methods */
 static void drawLineFrame(Bcom_WindowInfo *info);
-static void copyMsgToStrVar(char *m);
+static void copyMsgToStrVar(const char *m);
 static void msgget_at_r();
 static void msgget_at_a();
 
 
 void msg_init() {
 	/* メッセージフォントの大きさ */
-	msg.MsgFontSize     = 16;
-	msg.MsgFontBoldSize = 0;
-	msg.MsgFont         = FONT_GOTHIC;
+	msg.MsgFontSize = 16;
 	
 	/* 各種色 */
 	msg.MsgFontColor             = 255;
@@ -75,40 +69,52 @@ void msg_init() {
 	msg.HitAnyKeyMsgColor        = 255;
 	msg.WinBackgroundTransparent = 255;
 	
-	msg.AutoPageChange = TRUE;  /* 自動改ページ */
+	msg.AutoPageChange = true;  /* 自動改ページ */
 	msg.LineIncrement  = 2;     /* 改行幅 */
 	msg.WinBackgroundTransparentColor = -1; /* Window背景の透過色 -1:指定無し*/
 	
 	/* MG コマンドによるメッセージの文字列変数への取り込み */
-	msg.mg_getString     = FALSE;
-	msg.mg_dspMsg        = TRUE;
+	msg.mg_getString     = false;
+	msg.mg_dspMsg        = true;
 	msg.mg_startStrVarNo = 1;
 	msg.mg_curStrVarNo   = 1;
 	msg.mg_policyR       = 0;
 	msg.mg_policyA       = 0;
+
+	for (int i = 0; i < MSGWINMAX; i++) {
+		if (msg.wininfo[i].savedimg)
+			ags_delRegion(msg.wininfo[i].savedimg);
+	}
+	memset(msg.wininfo, 0, sizeof(msg.wininfo));
+
+	for (int i = 0; i < MSGWINMAX; i++) {
+		msg.wininfo[i].x = 100;
+		msg.wininfo[i].y = 300;
+		msg.wininfo[i].width = 400;
+		msg.wininfo[i].height = 90;
+	}
+	msg.winno = 1;
+	msg.win = &msg.wininfo[1];
+	msg.wininfo[1].save = true;
+
+	// Private variables
+	msgcur.x = 0;
+	msgcur.y = 0;
+	nextLineIsAfterKaigyou = false;
 }
 
 void msg_setFontSize(int size) {
 	msg.MsgFontSize = size;
 }
 
-void msg_setStringDecorationColor(int col) {
-	msgDecorateColor = col;
-}
-
-void msg_setStringDecorationType(int type) {
-	msgDecorateType = type;
-}
-
-void msg_putMessage(char *m) {
-	int         w;
-	MyRectangle adj;
-	
+void msg_putMessage(const char *m) {
 	if (nextLineIsAfterKaigyou) {
 		sys_hit_any_key();
-		msg_nextPage(TRUE);
+		msg_nextPage(true);
 	}
 	
+	texthook_message(m);
+
 	/* 表示文字列を文字列変数にコピーする */
 	if (msg.mg_getString) {
 		copyMsgToStrVar(m);
@@ -117,71 +123,33 @@ void msg_putMessage(char *m) {
 	// fprintf(stdout, "x=%d, y = %d, msg=%s\n", msgcur.x,msgcur.y,msg);
 	if (!msg.mg_dspMsg) return;
 	
-	ags_setFont(msg.MsgFont, msg.MsgFontSize);
-	switch(msgDecorateType) {
-	case 0:
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 0;
-		break;
-	case 1:
-		ags_drawString(msgcur.x, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 1;
-		break;
-	case 2:
-		ags_drawString(msgcur.x +1, msgcur.y, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 0;
-		break;
-	case 3:
-		ags_drawString(msgcur.x +1, msgcur.y +1, m, msgDecorateColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
-		break;
-	case 4:
-	case 6:
-		ags_drawString(msgcur.x +1, msgcur.y, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 0;
-		break;
-	case 7:
-		ags_drawString(msgcur.x, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 1;
-		break;
-	case 8:
-		ags_drawString(msgcur.x +1, msgcur.y +1, m, msg.MsgFontColor);
-		adj.x = 0; adj.y = 0; adj.width = 1; adj.height = 1;
-		break;
-	case 9:
-	case 10:
-		adj.x = 0; adj.y = 0; adj.width = 0; adj.height = 0;
-		break;
-	default:
-		break;
-	}
-	
-	w = ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor);
+	ags_setFontWithWeight(nact->ags.font_type, msg.MsgFontSize, nact->ags.font_weight);
 
-	if (nact->messagewait_enable) {
+	SDL_Rect drawn;
+	msgcur.x += ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor, &drawn);
+
+	if (nact->messagewait_enable && nact->messagewait_time > 0 &&
+		!nact->messagewait_cancelled && !msgskip_isSkipping()) {
 		int x;
-		for (x = 0; x < w + adj.width; x+=16) {
-			ags_updateArea(msgcur.x + adj.x + x, msgcur.y + adj.y,
-				       16, msg.MsgFontSize + adj.height);
-			if (nact->messagewait_cancel) {
-				if (sys_getInputInfo()) {
-					nact->messagewait_enable_save = nact->messagewait_enable ;
-					nact->messagewait_enable = FALSE;
-					ags_updateArea(msgcur.x + adj.x, msgcur.y + adj.y,
-						       w + adj.width, msg.MsgFontSize + adj.height);
-					break;
-				}
-				usleep(nact->messagewait_time * 10000);
+		for (x = 0; x < drawn.w; x+=16) {
+			ags_updateArea(drawn.x + x, drawn.y, 16, drawn.h);
+			int key = sys_getInputInfo();
+			if (nact->messagewait_cancel && key) {
+				nact->messagewait_cancelled = true;
+				ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
+				break;
 			}
+			sys_sleep(nact->messagewait_time * 10);
 			nact->callback();
 		}
 	} else {
-		ags_updateArea(msgcur.x + adj.x, msgcur.y + adj.y,
-			       w + adj.width, msg.MsgFontSize + adj.height);
+		ags_updateArea(drawn.x, drawn.y, drawn.w, drawn.h);
 	}
-	msgcur.x += w;
 }
 
 void msg_nextLine() {
+	texthook_newline();
+
 	// puts("next Line");
 	if (msg.mg_getString) {
 		msgget_at_r();
@@ -192,11 +160,13 @@ void msg_nextLine() {
 	msgcur.y += (msg.MsgFontSize + msg.LineIncrement);
 	
 	if ((msgcur.y + msg.MsgFontSize) > (msg.win->y + msg.win->height)) {
-		nextLineIsAfterKaigyou = TRUE;
+		nextLineIsAfterKaigyou = true;
 	}
 }
 
-void msg_nextPage(boolean innerclear) {
+void msg_nextPage(bool innerclear) {
+	texthook_nextpage();
+
 	// puts("next Page");
 	if (innerclear) {
 		if (msg.WinBackgroundTransparent == 255) {
@@ -230,7 +200,7 @@ void msg_nextPage(boolean innerclear) {
 		if (msg.mg_getString) msgget_at_a();
 	}
 	
-	nextLineIsAfterKaigyou = FALSE;
+	nextLineIsAfterKaigyou = false;
 }
 
 void msg_openWindow(int W, int C1, int C2, int N, int M) {
@@ -241,10 +211,10 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	case WINDOW_FRAME_EMPTY:
 		if (M == 0) {
 			/* show window */
+			if (msg.win->savedimg != NULL) {
+				ags_delRegion(msg.win->savedimg);
+			}
 			if (msg.win->save) {
-				if (msg.win->savedimg != NULL) {
-					ags_delRegion(msg.win->savedimg);
-				}
 				msg.win->savedimg = ags_saveRegion(msg.win->x, msg.win->y, msg.win->width, msg.win->height);
 			} else {
 				msg.win->savedimg = NULL;
@@ -261,10 +231,10 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 	case WINDOW_FRAME_LINE:
 		if (M == 0) {
 			/* show window*/
+			if (msg.win->savedimg != NULL) {
+				ags_delRegion(msg.win->savedimg);
+			}
 			if (msg.win->save) {
-				if (msg.win->savedimg != NULL) {
-					ags_delRegion(msg.win->savedimg);
-				}
 				msg.win->savedimg = ags_saveRegion(msg.win->x -8, msg.win->y -8, msg.win->width +16, msg.win->height +16);
 			} else {
 				msg.win->savedimg = NULL;
@@ -279,37 +249,37 @@ void msg_openWindow(int W, int C1, int C2, int N, int M) {
 		frameDot = 8;
 		break;
 	case WINDOW_FRAME_CG:
-		frameCgNoTop = C1;
-		frameCgNoMid = C2;
-		frameCgNoBot = N;
 		frameDot     = M;
 		break;
 	default:
 		break;
 	}
-	if (M == 0) msg_nextPage(N == 0 ? TRUE : FALSE);
+	if (M == 0) msg_nextPage(N == 0);
 }
 
 void msg_setMessageLocation(int x, int y) {
+	texthook_newline();
 	msgcur.x = x;
 	msgcur.y = y;
+	nextLineIsAfterKaigyou = false;
 }
 
-void msg_getMessageLocation(MyPoint *loc) {
+void msg_getMessageLocation(SDL_Point *loc) {
 	loc->x = msgcur.x;
 	loc->y = msgcur.y;
 }
 
 void msg_hitAnyKey() {
-	int w;
-	static BYTE hak[] = {0x81, 0xa5, 0x00}; /* ▼ */
+	const char *prompt[CHARACTER_ENCODING_MAX + 1] = {
+		[SHIFT_JIS] = "\x81\xa5",
+		[UTF8] = "▼",
+	};
 	
-	w = ags_drawString(msg.win->x + msg.win->width - msg.MsgFontSize,
-			   msg.win->y + msg.win->height - msg.MsgFontSize,
-			   hak, msg.HitAnyKeyMsgColor);
-	ags_updateArea(msg.win->x + msg.win->width  - msg.MsgFontSize,
-		       msg.win->y + msg.win->height - msg.MsgFontSize,
-		       w, msg.MsgFontSize);
+	SDL_Rect r;
+	int x = msg.win->x + msg.win->width - msg.MsgFontSize;
+	int y = msg.win->y + msg.win->height - msg.MsgFontSize;
+	ags_drawString(x, y, prompt[nact->encoding], msg.HitAnyKeyMsgColor, &r);
+	ags_updateArea(r.x, r.y, r.w, r.h);
 }
 
 static void drawLineFrame(Bcom_WindowInfo *i) {
@@ -324,18 +294,18 @@ static void drawLineFrame(Bcom_WindowInfo *i) {
 	ags_updateArea(i->x -8, i->y -8, i->width +16, i->height +16);
 }
 
-static void copyMsgToStrVar(char *m) {
-	if (v_strlen(msg.mg_curStrVarNo -1) == 0) {
-		v_strcpy(msg.mg_curStrVarNo -1, m);
+static void copyMsgToStrVar(const char *m) {
+	if (svar_length(msg.mg_curStrVarNo) == 0) {
+		svar_set(msg.mg_curStrVarNo, m);
 	} else {
-		v_strcat(msg.mg_curStrVarNo -1, m);
+		svar_append(msg.mg_curStrVarNo, m);
 	}
 }
 
 static void msgget_at_r() {
 	if (msg.mg_policyR == 1) return;
 	msg.mg_curStrVarNo++;
-	// v_strcpy(msg.mg_curStrVarNo -1, NULL);
+	// svar_set(msg.mg_curStrVarNo, NULL);
 }
 
 static void msgget_at_a() {
@@ -345,10 +315,10 @@ static void msgget_at_a() {
 		break;
 	case 1:
 		msg.mg_curStrVarNo++;
-		v_strcpy(msg.mg_curStrVarNo -1, "");
+		svar_set(msg.mg_curStrVarNo, "");
 		break;
 	case 2:
-		v_strcpy(msg.mg_curStrVarNo -1, "");
+		svar_set(msg.mg_curStrVarNo, "");
 		msg.mg_curStrVarNo++;
 		break;
 	case 3:

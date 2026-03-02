@@ -28,10 +28,11 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "randMT.h"
 
-void Init() {
+static void Init() {
 	/*
 	  乱数初期化
 
@@ -39,10 +40,10 @@ void Init() {
 	*/
 	int p1 = getCaliValue(); /* ITimer */
 	
-	DEBUG_COMMAND_YET("RandMT.Init %p:\n", p1);
+	TRACE_UNIMPLEMENTED("RandMT.Init %p:", p1);
 }
 
-void Get() {
+static void Get() {
 	/*
 	  1 から num までの乱数を生成
 	  
@@ -58,13 +59,23 @@ void Get() {
 		*var = (int)(genrand() * num) + 1;
 	}
 	
-	DEBUG_COMMAND_YET("RandMT.Get %d,%p:\n", num, var);
+	TRACE("RandMT.Get %d,%p:", num, var);
 }
 
-void GetNoOverlap() { /* not used ? */
-	int p1    = getCaliValue();
-	int p2    = getCaliValue();
-	int *var1 = getCaliVariable();
-	
-	DEBUG_COMMAND_YET("RandMT.GetNoOverlap %p:\n", p1);
+static void GetNoOverlap() {
+	int min  = getCaliValue();
+	int n    = getCaliValue();
+	int *var = getCaliVariable();
+
+	*var = (int)(genrand() * n) + min;
+
+	TRACE("RandMT.GetNoOverlap %d,%d,%p:", min, n, var);
 }
+
+static const ModuleFunc functions[] = {
+	{"Get", Get},
+	{"GetNoOverlap", GetNoOverlap},
+	{"Init", Init},
+};
+
+const Module module_RandMT = {"RandMT", functions, sizeof(functions) / sizeof(ModuleFunc)};

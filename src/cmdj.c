@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "cg.h"
 
 void commandJ0() {
@@ -31,7 +32,7 @@ void commandJ0() {
 	int y = getCaliValue();
 	
 	cg_set_display_location(x, y, OFFSET_ABSOLUTE_GC);
-	DEBUG_COMMAND("J0 %d,%d:\n", x, y);
+	TRACE("J0 %d,%d:", x, y);
 }
 
 void commandJ1() {
@@ -39,7 +40,7 @@ void commandJ1() {
 	int y = getCaliValue();
 	
 	cg_set_display_location(x, y, OFFSET_RELATIVE_GC);
-	DEBUG_COMMAND("J1 %d,%d:\n", x, y);
+	TRACE("J1 %d,%d:", x, y);
 }
 
 void commandJ2() {
@@ -47,7 +48,7 @@ void commandJ2() {
 	int y = getCaliValue();
 
 	cg_set_display_location(x, y, OFFSET_ABSOLUTE_JC);
-	DEBUG_COMMAND("J2:%d,%d\n", x, y);
+	TRACE("J2:%d,%d", x, y);
 }
 
 void commandJ3() {
@@ -55,10 +56,10 @@ void commandJ3() {
 	int y = getCaliValue();
 	
 	cg_set_display_location(x, y, OFFSET_RELATIVE_JC);
-	DEBUG_COMMAND("J3:%d,%d\n", x, y);
+	TRACE("J3:%d,%d", x, y);
 }
 
 void commandJ4() {
 	cg_set_display_location(0, 0, OFFSET_NOMOVE);
-	DEBUG_COMMAND("J4 :\n");
+	TRACE("J4 :");
 }

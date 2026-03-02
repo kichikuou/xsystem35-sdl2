@@ -24,32 +24,32 @@
 #ifndef __MIDI_H__
 #define __MIDI_H__
 
-#include "portab.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
-	boolean in_play; /* now playing ? */
+	bool in_play; /* now playing ? */
 	int loc_ms;      /* playing posion in ms */
 	int play_no;     /* current playing no */
 } midiplaystate;
 
-typedef struct mididevice mididevice_t;
-struct mididevice {
-	int  (* init)(char *, int);
-	int  (* exit)(void);
-	int  (* start)(int, char*, int);
-	int  (* stop)(void);
-	int  (* pause)(void);
-	int  (* unpause)(void);
-	int  (* getpos)(midiplaystate *);
-	int  (* getflag)(int mode, int index);
-	int  (* setflag)(int mode, int index, int val);
-	int  (* setvol)(int);
-	int  (* getvol)(int);
-};
+typedef struct {
+	bool (*init)(int);
+	void (*exit)(void);
+	void (*reset)(void);
+	// Play through the music loop times. If loop == 0, loops forever.
+	bool (*start)(int no, int loop, const uint8_t *data, int datalen);
+	void (*stop)(void);
+	void (*pause)(void);
+	void (*unpause)(void);
+	bool (*getpos)(midiplaystate *);
+	int (*getflag)(int mode, int index);
+	bool (*setflag)(int mode, int index, int val);
+	bool (*fadestart)(int time, int volume, int stop);
+	bool (*fading)(void);
+} mididevice_t;
 
-extern int  midi_init(mididevice_t *);
-extern void midi_set_playername(char *);
-extern void midi_set_devicename(char *);
-extern void midi_set_output_device(int mode);
+bool midi_init(mididevice_t *);
+void midi_set_output_device(int mode);
 
 #endif /* __MIDI_H__ */

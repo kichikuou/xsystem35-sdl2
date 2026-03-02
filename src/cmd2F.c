@@ -24,29 +24,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/utsname.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "savedata.h"
 #include "menu.h"
+#include "input.h"
+#include "msgskip.h"
 #include "selection.h"
-#include "message.h"
-#include "music_client.h"
+#include "music.h"
 #include "utfsjis.h"
+#include "hankaku.h"
 #include "ags.h"
-#include "graphicsdevice.h"
+#include "gfx.h"
 #include "ald_manager.h"
 #include "LittleEndian.h"
+#include "filecheck.h"
+#include "cmd_check.h"
 
 /* 選択 Window OPEN 時 callback */
 static int cb_sel_init_page = 0;
 static int cb_sel_init_address = 0;
 
-extern INPUTSTRING_PARAM mi_param;
+static const char REGREADSTRING_RESULT[] = "*regReadString*";
 
-extern void commandH();
-extern void commandHH();
+static SDL_Rect clip_window;
 
 typedef struct {
 	int page;
@@ -56,105 +58,6 @@ typedef struct {
 #define FCTBL_MAX 1024
 static fncall_table fnctbl[FCTBL_MAX];
 
-void commands2F00() {
-	/* テキストカラーをスタックからポップして設定する */
-	int data[3];
-	
-	sl_popData(data, 3);
-	if (data[0] == TxxTEXTCOLOR) {
-		if (data[1] == 0) {
-			nact->msg.MsgFontColor = data[2];
-		} else {
-			nact->sel.MsgFontColor = data[2];
-		}
-	}
-	
-	DEBUG_COMMAND("TOC:\n");
-}
-
-void commands2F01() {
-	/* テキストフォントサイズをスタックからポップして設定する */
-	int data[3];
-	
-	sl_popData(data, 3);
-	if (data[0] == TxxTEXTSIZE) {
-		if (data[1] == 0) {
-			nact->msg.MsgFontSize = data[2];
-		} else {
-			nact->sel.MsgFontSize = data[2];
-		}
-	}
-	
-	DEBUG_COMMAND("TOS:\n");
-}
-
-void commands2F02() {
-	/* 現在のテキストカラーをスタックにプッシュする */
-	int exp = getCaliValue();
-	int data[] = {TxxTEXTCOLOR,0,0};
-	
-	data[1] = exp;
-	data[2] = (exp == 0 ? nact->msg.MsgFontColor : nact->sel.MsgFontColor);
-	sl_pushData(data, 3);
-	
-	DEBUG_COMMAND("TPC %d\n", exp);
-}
-
-void commands2F03() {
-	/* 現在のテキストフォントサイズをスタックにプッシュする */
-	int exp = getCaliValue();
-	int data[] = {TxxTEXTSIZE, 0, 0};
-	
-	data[1] = exp;
-	data[2] = (exp == 0 ? nact->msg.MsgFontSize : nact->sel.MsgFontSize);
-	sl_pushData(data, 3);
-	
-	DEBUG_COMMAND("TPS %d:%s\n", exp, "");
-}
-
-void commands2F04() {
-	/* テキスト表示位置をスタックからポップして設定する */
-	int data[3];
-	
-	sl_popData(data, 3);
-	if (data[0] == TxxTEXTLOC) {
-		msg_setMessageLocation(data[1], data[2]);
-	}
-	
-	DEBUG_COMMAND("TOP:\n");
-}
-
-void commands2F05() {
-	/* 現在のテキスト表示位置をスタックにプッシュする */
-	int data[] = {TxxTEXTLOC, 0, 0};
-	MyPoint loc;
-	
-	msg_getMessageLocation(&loc);
-	data[1] = loc.x;
-	data[2] = loc.y;
-	sl_pushData(data, 3);
-	
-	DEBUG_COMMAND("TPP:\n");
-}
-
-void commands2F08() {
-	/* アンチエイリアシング付きテキスト描画のフラグ設定 */
-	int exp = getCaliValue();
-	
-	ags_setAntialiasedStringMode(exp == 1);
-	
-	DEBUG_COMMAND("TAA %d:\n", exp);
-}
-
-void commands2F09() {
-	/* アンチエイリアシング付きテキスト描画のフラグ取得 */
-	int *var = getCaliVariable();
-
-	*var = ags_getAntialiasedStringMode() ? 1 : 0;
-	
-	DEBUG_COMMAND("TAB %d:\n", *var);
-}
-
 void commands2F0A() {
 	/* Wavデータを読み込む */
 	int eCh = getCaliValue();
@@ -162,7 +65,7 @@ void commands2F0A() {
 
 	mus_wav_load(eCh, eLinkNum);
 	
-	DEBUG_COMMAND("wavLoad %d, %d:\n", eCh, eLinkNum);
+	TRACE("wavLoad %d, %d:", eCh, eLinkNum);
 }
 
 void commands2F0B() {
@@ -172,7 +75,7 @@ void commands2F0B() {
 
 	mus_wav_play(eCh, eLoopFlag);
 	
-	DEBUG_COMMAND("wavPlay %d, %d\n", eCh, eLoopFlag);
+	TRACE("wavPlay %d, %d", eCh, eLoopFlag);
 }
 
 void commands2F0C() {
@@ -180,7 +83,7 @@ void commands2F0C() {
 	
 	mus_wav_stop(eCh);
 	
-	DEBUG_COMMAND("wavStop %d\n", eCh);
+	TRACE("wavStop %d", eCh);
 }
 
 void commands2F0D() {
@@ -188,7 +91,7 @@ void commands2F0D() {
 	
 	mus_wav_unload(eCh);
 	
-	DEBUG_COMMAND("wavUnload %d:\n", eCh);
+	TRACE("wavUnload %d:", eCh);
 }
 
 void commands2F0E() {
@@ -198,7 +101,7 @@ void commands2F0E() {
 	
 	*vResult = ((pos == 0 || pos == 65535) ? 0 : 1);
 	
-	DEBUG_COMMAND("wavIsPlay %d, %d:\n", eCh, *vResult);
+	TRACE("wavIsPlay %d, %d:", eCh, *vResult);
 }
 
 void commands2F0F() {
@@ -209,7 +112,7 @@ void commands2F0F() {
 
 	mus_wav_fadeout_start(eCh, eTime, eVolume, eStopFlag);
 	
-	DEBUG_COMMAND("wavFade %d, %d, %d, %d:\n", eCh, eTime, eVolume, eStopFlag);
+	TRACE("wavFade %d, %d, %d, %d:", eCh, eTime, eVolume, eStopFlag);
 }
 
 void commands2F10() {
@@ -218,7 +121,7 @@ void commands2F10() {
 	
 	*vResult = (mus_wav_fadeout_get_state(eCh) ? 1 : 0);
 	
-	DEBUG_COMMAND("wavIsFade %d, %d:\n", eCh, *vResult);
+	TRACE("wavIsFade %d, %d:", eCh, *vResult);
 }
 
 void commands2F11() {
@@ -226,13 +129,13 @@ void commands2F11() {
 
 	mus_wav_fadeout_stop(eCh);
 	
-	DEBUG_COMMAND("wavStopFade %d:\n", eCh);
+	TRACE("wavStopFade %d:", eCh);
 }
 
 void commands2F12() {
-	char *sText = sys_getString(0);
+	const char *sText = sl_getString(0);
 	
-	DEBUG_COMMAND("trace %s:\n", sText);
+	TRACE("trace %s:", sText);
 
 }
 
@@ -242,11 +145,11 @@ void commands2F13() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DSetPos %d, %d, %d, %d:\n", eCh, eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DSetPos %d, %d, %d, %d:", eCh, eX, eY, eZ);
 }
 
 void commands2F14() {
-	DEBUG_COMMAND_YET("wav3DCommit:\n");
+	TRACE_UNIMPLEMENTED("wav3DCommit:");
 }
 
 void commands2F15() {
@@ -258,7 +161,7 @@ void commands2F15() {
 	*eX = 0;
 	*eY = 0;
 	*eZ = 0;
-	DEBUG_COMMAND_YET("wav3DGetPos %d, %d, %d, %d:\n", eCh, *eX, *eY, *eZ);
+	TRACE_UNIMPLEMENTED("wav3DGetPos %d, %d, %d, %d:", eCh, *eX, *eY, *eZ);
 }
 
 void commands2F16() {
@@ -266,7 +169,7 @@ void commands2F16() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 	
-	DEBUG_COMMAND_YET("wav3DSetPosL %d, %d, %d:\n", eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DSetPosL %d, %d, %d:", eX, eY, eZ);
 }
 
 void commands2F17() {
@@ -277,7 +180,7 @@ void commands2F17() {
 	*vX = 0;
 	*vY = 0;
 	*vZ = 0;
-	DEBUG_COMMAND_YET("wav3DGetPosL %d, %d, %d:%s\n", *vX, *vY, *vZ);
+	TRACE_UNIMPLEMENTED("wav3DGetPosL %d, %d, %d:%s", *vX, *vY, *vZ);
 }
 
 void commands2F18() {
@@ -287,7 +190,7 @@ void commands2F18() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DFadePos %d, %d, %d, %d, %d:\n", eCh, eTime, eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DFadePos %d, %d, %d, %d, %d:", eCh, eTime, eX, eY, eZ);
 }
 
 void commands2F19() {
@@ -295,13 +198,13 @@ void commands2F19() {
 	int *vResult = getCaliVariable();
 
 	*vResult = 0;
-	DEBUG_COMMAND_YET("wav3DIsFadePos %d, %d:\n", eCh, *vResult);
+	TRACE_UNIMPLEMENTED("wav3DIsFadePos %d, %d:", eCh, *vResult);
 }
 
 void commands2F1A() {
 	int eCh = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DStopFadePos %d:\n", eCh);
+	TRACE_UNIMPLEMENTED("wav3DStopFadePos %d:", eCh);
 }
 
 void commands2F1B() {
@@ -310,18 +213,18 @@ void commands2F1B() {
 	int eY = getCaliValue();
 	int eZ = getCaliValue();
 
-	DEBUG_COMMAND_YET("wav3DFadePosL %d, %d, %d, %d:\n", eTime, eX, eY, eZ);
+	TRACE_UNIMPLEMENTED("wav3DFadePosL %d, %d, %d, %d:", eTime, eX, eY, eZ);
 }
 
 void commands2F1C() {
 	int *vResult = getCaliVariable();
 	
 	*vResult = 0;
-	DEBUG_COMMAND_YET("wav3DIsFadePosL %d:\n", *vResult);
+	TRACE_UNIMPLEMENTED("wav3DIsFadePosL %d:", *vResult);
 }
 
 void commands2F1D() {
-	DEBUG_COMMAND_YET("wav3DStopFadePosL");
+	TRACE_UNIMPLEMENTED("wav3DStopFadePosL");
 }
 
 void commands2F1E() {
@@ -332,13 +235,13 @@ void commands2F1E() {
 		mus_pcm_start(eLinkNum , eLoop);
 	}
 	
-	DEBUG_COMMAND("sndPlay %d, %d:\n", eLinkNum, eLoop);
+	TRACE("sndPlay %d, %d:", eLinkNum, eLoop);
 }
 
 void commands2F1F() {
 	mus_pcm_stop(0);
 	
-	DEBUG_COMMAND("sndStop:\n");
+	TRACE("sndStop:");
 }
 
 void commands2F20() {
@@ -346,154 +249,13 @@ void commands2F20() {
 	
 	mus_pcm_get_playposition(vResult);
 	
-	DEBUG_COMMAND("sndIsPlay %d:\n", *vResult);
+	TRACE("sndIsPlay %d:", *vResult);
 }
 
 void commands2F21() {
-	char *str = sys_getString(0);
+	const char *str = sl_getString(0);
 	
 	sys_addMsg(str);
-}
-
-void commands2F23() {
-	int x = getCaliValue();
-	int y = getCaliValue();
-	char *vFileName = sys_getString(0);
-	
-	sysVar[0] = cg_load_with_filename(vFileName, x, y);
-	
-	DEBUG_COMMAND("LC(new) %d, %d, %s:\n", x, y, vFileName);
-}
-
-void commands2F24() {
-	int type       = sys_getc();
-	char *file_name = sys_getString(0);
-	int *var = NULL, _var = 0;
-	int num = 0;
-
-	switch(type) {
-	case 0:
-		var = getCaliVariable();
-		num  = getCaliValue();
-		sysVar[0] = save_load_var_with_file(file_name, var, num);        
-		break;
-	case 1:
-		_var = getCaliValue();
-		num  = getCaliValue();
-		sysVar[0] = save_load_str_with_file(file_name, _var, num);
-		break;
-	}
-	
-	DEBUG_COMMAND("LE(new) %d, %s, %d, %d:\n", type, file_name, var, num);
-}
-
-void commands2F25() {
-	int file_name = getCaliValue();
-	char *title = sys_getString(0);
-	char *filter = sys_getString(0);
-
-	DEBUG_COMMAND_YET("LXG %d, %s, %s:\n", file_name, title, filter);
-}
-
-void commands2F26() {
-	int dst_no  = getCaliValue();
-	int max_len = getCaliValue();
-	char *title  = sys_getString(0);
-	char *t1, *t2, *t3;
-	
-	t1 = sjis2lang(title);
-	t2 = sjis2lang(v_str(dst_no -1));
-	
-	mi_param.title = t1;
-	mi_param.oldstring = t2;
-	mi_param.max = max_len;
-	
-	menu_inputstring(&mi_param);
-	if (mi_param.newstring == NULL) {
-		v_strcpy(dst_no -1, NULL);
-		free(t1); free(t2);
-		return;
-	}
-	
-	t3 = lang2sjis(mi_param.newstring);
-	
-	/* 全角文字以外は不可 */
-	if (!sjis_has_hankaku(t3)) {
-		v_strcpy(dst_no -1, t3);
-	}
-	free(t1);
-	free(t2);
-	free(t3);
-	
-	DEBUG_COMMAND("MI(new) %d, %d, %s:\n", dst_no, max_len, title);
-}
-
-void commands2F27() {
-	int   num    = getCaliValue();
-	char *string = sys_getString(0);
-
-	if (num > 0) {
-	        v_strcpy(num - 1, string);
-	} else {
-        	WARNING("MS: num <= 0\n");
-	}
-	
-	DEBUG_COMMAND("MS(new) %d, %s:\n", num, string);
-}
-
-void commands2F28() {
-	char *title = sys_getString(0);
-	
-	strncpy(nact->game_title_name, title, 30);
-	ags_setWindowTitle(title);
-	
-	DEBUG_COMMAND("MT(new) %s:\n",title);
-}
-
-/* defined in cmdn.c */
-extern INPUTNUM_PARAM ni_param;
-void commands2F29() {
-	char *title = sys_getString(0);
-	char *t;
-	
-	if (ni_param.title != NULL) {
-		free(ni_param.title);
-	}
-	t = sjis2lang(title);
-	ni_param.title = t;
-	
-	DEBUG_COMMAND("NT(new) %s:\n", title);
-}
-
-void commands2F2A() {
-	int type = sys_getc();
-	char *file_name = sys_getString(0);
-	int *var, _var = 0, cnt;
-
-	switch(type) {
-	case 0:
-		var = getCaliVariable();
-		cnt = getCaliValue();
-		sysVar[0] = save_save_var_with_file(file_name, var, cnt);
-		break;
-	case 1:
-		_var = getCaliValue();
-		cnt  = getCaliValue();
-		sysVar[0] = save_save_str_with_file(file_name, _var, cnt);
-		break;
-	default:
-		WARNING("Unknown QE command\n"); return;
-	}
-
-	DEBUG_COMMAND("QE(new) %d, %s, %d, %d:\n", type, file_name, _var, cnt);
-}
-
-void commands2F2B() {
-	int type = sys_getc();
-	char *work_dir = sys_getString(0);
-	char *file_name = sys_getString(0);
-
-	DEBUG_COMMAND_YET("UP(new) %d, %s, %s:\n", type, work_dir, file_name);
 }
 
 void commands2F2D() {
@@ -503,7 +265,7 @@ void commands2F2D() {
 	/* 該当する eCh が演奏中の場合 eTime だけ wait をいれる */
 	mus_wav_waittime(eCh, eTime);
 	
-	DEBUG_COMMAND("wavWaitTime %d, %d:\n", eCh, eTime);
+	TRACE("wavWaitTime %d, %d:", eCh, eTime);
 }
 
 void commands2F2E() {
@@ -512,7 +274,7 @@ void commands2F2E() {
 	
 	*vTime = mus_wav_get_playposition(eCh);
 	
-	DEBUG_COMMAND("wavGetPlayPos %d, %d:\n", eCh, *vTime);
+	TRACE("wavGetPlayPos %d, %d:", eCh, *vTime);
 }
 
 void commands2F2F() {
@@ -522,7 +284,7 @@ void commands2F2F() {
 	/* ただし、無限ループの場合は１回目終了時まで */
 	mus_wav_waitend(eCh);
 	
-	DEBUG_COMMAND("wavWaitEnd %d:\n", eCh);
+	TRACE("wavWaitEnd %d:", eCh);
 }
 
 void commands2F30() {
@@ -531,40 +293,40 @@ void commands2F30() {
 	
 	*vTime = mus_wav_wavtime(eCh);
 	
-	DEBUG_COMMAND("wavGetWavTime %d, %d:\n", eCh, *vTime);
+	TRACE("wavGetWavTime %d, %d:", eCh, *vTime);
 }
 
 void commands2F31() {
-	int fPage = sys_getw();
-	int fIndex = sys_getaddress();
+	int fPage = sl_getw();
+	int fIndex = sl_getaddr();
 	
 	sel_setCallback(1, fPage, fIndex);
-	DEBUG_COMMAND("menuSetCbkSelect page=%d, index=%x:\n", fPage, fIndex);
+	TRACE("menuSetCbkSelect page=%d, index=%x:", fPage, fIndex);
 }
 
 void commands2F32() {
-	int fPage = sys_getw();
-	int fIndex = sys_getaddress();
+	int fPage = sl_getw();
+	int fIndex = sl_getaddr();
 	
 	sel_setCallback(2, fPage, fIndex);
-	DEBUG_COMMAND("menuSetCbkCancel page=%d, index=%x:\n", fPage, fIndex);
+	TRACE("menuSetCbkCancel page=%d, index=%x:", fPage, fIndex);
 }
 
 void commands2F33() {
 	sel_setCallback(1, 0, 0);
-	DEBUG_COMMAND("menuClearCbkSelect:\n");
+	TRACE("menuClearCbkSelect:");
 }
 
 void commands2F34() {
 	sel_setCallback(2, 0, 0);
-	DEBUG_COMMAND("menuClearCbkCancel:\n");
+	TRACE("menuClearCbkCancel:");
 }
 
 void commands2F35() {
 	int eCh = getCaliValue();
 	int eMode = getCaliValue();
 	
-	DEBUG_COMMAND_YET("wav3DSetMode %d, %d:\n", eCh, eMode);
+	TRACE_UNIMPLEMENTED("wav3DSetMode %d, %d:", eCh, eMode);
 }
 
 void commands2F36() {
@@ -582,7 +344,7 @@ void commands2F36() {
 			   eDestX, eDestY, eDestWidth, eDestHeight, 0);
 	ags_updateArea(eDestX, eDestY, eDestWidth, eDestHeight);
 	
-	DEBUG_COMMAND("grCopyStrerch %d, %d, %d, %d, %d, %d, %d, %d, %d:\n",
+	TRACE("grCopyStrerch %d, %d, %d, %d, %d, %d, %d, %d, %d:",
 		      eDestX, eDestY, eDestWidth, eDestHeight,
 		      eSrcX, eSrcY, eSrcWidth, eSrcHeight, eMode);
 }
@@ -594,35 +356,35 @@ void commands2F37() {
 	int eHeight = getCaliValue();
 	int eType   = getCaliValue();
 	
-	DEBUG_COMMAND_YET("grFilterRect %d, %d, %d, %d, %d:\n",
+	TRACE_UNIMPLEMENTED("grFilterRect %d, %d, %d, %d, %d:",
 			  eX, eY, eWidth, eHeight, eType);
 }
 
 void commands2F38() {
-	DEBUG_COMMAND("iptClearWheelCount:\n");
+	sys_clearWheelInfo();
+	TRACE("iptClearWheelCount:");
 }
 
 void commands2F39() {
 	int *vForward = getCaliVariable();
 	int *vBack = getCaliVariable();
 	
-	*vForward = 0;
-	*vBack = 0;
-	DEBUG_COMMAND("iptGetWheelCount %d, %d:\n", *vForward, *vBack);
+	sys_getWheelInfo(vForward, vBack);
+	TRACE("iptGetWheelCount %d, %d:", *vForward, *vBack);
 }
 
 void commands2F3A() {
 	int *vSize = getCaliVariable();
 
 	*vSize = nact->sel.MsgFontSize;
-	DEBUG_COMMAND("menuGetFontSize %d:\n", *vSize);
+	TRACE("menuGetFontSize %d:", *vSize);
 }
 
 void commands2F3B() {
 	int *vSize = getCaliVariable();
 	
 	*vSize = nact->msg.MsgFontSize;
-	DEBUG_COMMAND("msgGetFontSize %d:\n", *vSize);
+	TRACE("msgGetFontSize %d:", *vSize);
 }	
 
 void commands2F3C() {
@@ -630,43 +392,28 @@ void commands2F3C() {
 	int ePos = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	if (eNum <= 0 || v_strlen(eNum -1) < ePos) {
-		*vResult = 0;
-	} else {
-		BYTE b1, b2 = 0;
-		b1 = *(v_str(eNum - 1) + ePos);
-		if (ePos == 0) {
-			*vResult = CHECKSJIS1BYTE(b1) ? 2 : 1;
-		} else {
-			b2 = *(v_str(eNum - 1) + ePos -1);
-			if (CHECKSJIS1BYTE(b1)) {
-				*vResult = 2;
-			} else {
-				*vResult = CHECKSJIS1BYTE(b2) ? 2 : 1;
-			}
-		}
-	}
+	*vResult = svar_getCharType(eNum, ePos);
 	
-	DEBUG_COMMAND("strGetCharType %d, %d, %d:\n", eNum, ePos, *vResult);
+	TRACE("strGetCharType %d, %d, %d:", eNum, ePos, *vResult);
 }
 
 void commands2F3D() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = v_strlen(eNum -1);
+	*vResult = svar_width(eNum);
 
-	DEBUG_COMMAND("strGetLengthASCII %d, %d:\n", eNum, *vResult);
+	TRACE("strGetLengthASCII %d, %d:", eNum, *vResult);
 }
 
 void commands2F3E() {
-	nact->is_message_locked = TRUE;
-	DEBUG_COMMAND("sysWinMsgLock:\n");
+	// no-op
+	TRACE("sysWinMsgLock:");
 }
 
 void commands2F3F() {
-	nact->is_message_locked = FALSE;
-	DEBUG_COMMAND("sysWinMsgUnlock:\n");
+	// no-op
+	TRACE("sysWinMsgUnlock:");
 }
 
 void commands2F40() {
@@ -676,7 +423,7 @@ void commands2F40() {
 	int *vResult = getCaliVariable();
 	int cnt = 0;
 	
-	DEBUG_COMMAND("aryCmpCount %d, %d, %d, %d:\n", *vAry, eCount, eNum, *vResult);
+	TRACE("aryCmpCount %d, %d, %d, %d:", *vAry, eCount, eNum, *vResult);
 	
 	while(eCount--) {
 		if (*vAry == eNum) cnt++;
@@ -694,7 +441,7 @@ void commands2F41() {
 	int *vResult = getCaliVariable();
 	int cnt = 0;
 	
-	DEBUG_COMMAND("aryCmpTrans %d, %d, %d, %d, %d, %d:\n", 
+	TRACE("aryCmpTrans %d, %d, %d, %d, %d, %d:", 
 		      *vAry, eNumof, eNum, eTransNum, eMaxTrans, *vResult);
 	
 	while(eNumof--) {
@@ -719,7 +466,7 @@ void commands2F42() {
 	int eSrcRate  = getCaliValue();
 	int eType     = getCaliValue();
 
-	DEBUG_COMMAND_YET("grBlendColorRect %d, %d, %d, %d, %d, %d, %d, %d, %d:\n",
+	TRACE_UNIMPLEMENTED("grBlendColorRect %d, %d, %d, %d, %d, %d, %d, %d, %d:",
 			  eDestX, eDestY, eWidth, eHeight, eDestRate,
 			  eSrcX, eSrcY, eSrcRate, eType);
 }
@@ -730,41 +477,25 @@ void commands2F43() {
 	int eLength = getCaliValue();
 	int eColor  = getCaliValue();
 
-	DEBUG_COMMAND_YET("grDrawFillCircle %d, %d, %d, %d:\n", eX, eY, eLength, eColor);
-}
+	gfx_fillCircle(eX, eY, eLength, eColor);
+	ags_updateArea(eX, eY, eLength, eLength);
 
-void commands2F44() {
-	int num1 = getCaliValue();
-	int fig  = getCaliValue();
-	int num2 = getCaliValue();
-	char s[256];
-
-	if (fig) {
-		char *ss="%%%dd";
-		char sss[256];
-		sprintf(sss, ss, fig);
-		sprintf(s, sss, num2);
-	} else {
-		sprintf(s, "%d", num2);
-	}
-	v_strcpy(num1 - 1, s);
-	
-	DEBUG_COMMAND("MHH %d, %d, %d:\n", num1, fig, num2);
+	TRACE("grDrawFillCircle %d, %d, %d, %d:", eX, eY, eLength, eColor);
 }
 
 void commands2F45() {
-	int fPage = sys_getw();
-	int fIndex = sys_getaddress();
+	int fPage = sl_getw();
+	int fIndex = sl_getaddr();
 	
 	cb_sel_init_page    = fPage;
 	cb_sel_init_address = fIndex;
 	
-	DEBUG_COMMAND("menuSetCbkInit page=%d, index=%x:\n", fPage, fIndex);
+	TRACE("menuSetCbkInit page=%d, index=%x:", fPage, fIndex);
 }
 
 void commands2F46() {
 	cb_sel_init_page = 0;
-	DEBUG_COMMAND("menuClearCbkInit:\n");
+	TRACE("menuClearCbkInit:");
 }
 
 void commands2F47() {
@@ -772,34 +503,34 @@ void commands2F47() {
 		sl_jmpNear(sl_getIndex());
 		sl_callFar2(cb_sel_init_page -1, cb_sel_init_address);
 	}
-	DEBUG_COMMAND("new ]:\n");
+	TRACE("new ]:");
 }
 
 void commands2F48() {
-	char *sText = sys_getString(0);
+	const char *sText = sl_getString(0);
 	
-	DEBUG_COMMAND_YET("sysOpenShell %s:\n", sText);
+	TRACE_UNIMPLEMENTED("sysOpenShell %s:", sText);
 }
 
 void commands2F49() {
-	char *sTitle = sys_getString(0);
-	char *sUrl = sys_getString(0);
+	const char *sTitle = sl_getString(0);
+	const char *sUrl = sl_getString(0);
 	
-	DEBUG_COMMAND_YET("sysAddWebMenu %s, %s:\n", sTitle, sUrl);
+	TRACE_UNIMPLEMENTED("sysAddWebMenu %s, %s:", sTitle, sUrl);
 }
 
 void commands2F4A() {
 	int eTime = getCaliValue();
 	
 	ags_setCursorMoveTime(eTime);
-	DEBUG_COMMAND("iptSetMoveCursorTime %d:\n", eTime);
+	TRACE("iptSetMoveCursorTime %d:", eTime);
 }
 
 void commands2F4B() {
 	int *vTime = getCaliVariable();
 	
 	*vTime = ags_getCursorMoveTime();
-	DEBUG_COMMAND("iptGetMoveCursorTime %d:\n", *vTime);
+	TRACE("iptGetMoveCursorTime %d:", *vTime);
 }
 
 void commands2F4C() {
@@ -810,69 +541,22 @@ void commands2F4C() {
 	int eWidth  = getCaliValue();
 	int eHeight = getCaliValue();
 
-	MyRectangle r;
-	MyPoint p;
-
-	r.x = eSrcX; r.y = eSrcY; r.width = eWidth; r.height = eHeight;
-	p.x = eX, p.y = eY;
+	SDL_Rect r = {eSrcX, eSrcY, eWidth, eHeight};
+	SDL_Point p = {eX, eY};
 	
-	UpdateArea(&r, &p);
+	gfx_updateArea(&r, &p);
 	
-	DEBUG_COMMAND("grBlt %d, %d, %d, %d, %d, %d:\n",
+	TRACE("grBlt %d, %d, %d, %d, %d, %d:",
 		      eX, eY, eSrcX, eSrcY, eWidth, eHeight);
-}
-
-void commands2F4D() {
-	int eNum = getCaliValue();
-	char *sText = sys_getString(0);
-
-	DEBUG_COMMAND_YET("LXWT %d, %s:\n", eNum, sText);
-}
-
-void commands2F4E() {
-	int eNum = getCaliValue();
-	int eTextNum = getCaliValue();
-
-	DEBUG_COMMAND_YET("LXWS %d, %d:\n", eNum, eTextNum);
-}
-
-void commands2F4F() {
-	int eNum = getCaliValue();
-	int eType = getCaliValue();
-
-	DEBUG_COMMAND_YET("LXWE %d, %d:\n", eNum, eType);
-}
-
-void commands2F50() {
-	int eFile = getCaliValue();
-	int nFlg = sys_getc();
-	int eNum = getCaliValue();
-
-	DEBUG_COMMAND_YET("LXWH %d, %d, %d:\n", eFile, nFlg, eNum);
-}
-
-void commands2F51() {
-	int eFile = getCaliValue();
-	int nFlg  = sys_getc();
-	int eNum  = getCaliValue();
-
-	DEBUG_COMMAND_YET("LXWHH %d, %d, %d:\n", eFile, nFlg, eNum);
 }
 
 void commands2F52() {
 	int eNum = getCaliValue();
-	struct utsname un;
-	char s[256];
-	
 	if (eNum <= 0) return;
-	if (uname(&un) < 0) return;
-	NOTICE("sysname %s nodename %s release %s version %s machine %s\n",
-	       un.sysname, un.nodename, un.release, un.version, un.machine);
-	sprintf(s,"%s %s %s",
-		un.sysname, un.release, un.machine);
-	v_strcpy(eNum -1, s);
-	
-	DEBUG_COMMAND("sysGetOsName %d: %s\n", eNum, s);
+
+	const char *s = SDL_GetPlatform();
+	svar_set(eNum, s);
+	TRACE("sysGetOSName %d: %s", eNum, s);
 }
 
 void commands2F53() {
@@ -880,7 +564,7 @@ void commands2F53() {
 	
 	nact->patch_ec = eFlag;
 	
-	DEBUG_COMMAND("patchEC %d:\n", eFlag);
+	TRACE("patchEC %d:", eFlag);
 }
 
 void commands2F54() {
@@ -888,8 +572,13 @@ void commands2F54() {
 	int eY = getCaliValue();
 	int eWidth = getCaliValue();
 	int eHeight = getCaliValue();
+
+	clip_window.x = eX;
+	clip_window.y = eY;
+	clip_window.w = eWidth;
+	clip_window.h = eHeight;
 	
-	DEBUG_COMMAND_YET("mathSetClipWindow %d, %d, %d, %d:\n", eX, eY, eWidth, eHeight);
+	TRACE("mathSetClipWindow %d, %d, %d, %d:", eX, eY, eWidth, eHeight);
 }
 
 void commands2F55() {
@@ -899,21 +588,25 @@ void commands2F55() {
 	int *vSy = getCaliVariable();
 	int *vWidth  = getCaliVariable();
 	int *vHeight = getCaliVariable();
-	
-	DEBUG_COMMAND_YET("mathClip %d, %d, %d, %d, %d, %d:\n",
-			  *vDx, *vDy, *vSx, *vSy, *vWidth, *vHeight);
-}
 
-void commands2F56() {
-	int file_name = getCaliValue();
-	char *title = sys_getString(0);
-	char *folder = sys_getString(0);
+	TRACE("mathClip %d, %d, %d, %d, %d, %d:", *vDx, *vDy, *vSx, *vSy, *vWidth, *vHeight);
 
-	DEBUG_COMMAND_YET("LXF %d, %s, %s:\n", file_name, title, folder);
+	SDL_Rect r = { *vDx, *vDy, *vWidth, *vHeight };
+	if (SDL_IntersectRect(&r, &clip_window, &r)) {
+		*vSx += r.x - *vDx;
+		*vSy += r.y - *vDy;
+		*vDx = r.x;
+		*vDy = r.y;
+		*vWidth = r.w;
+		*vHeight = r.h;
+	} else {
+		*vWidth = 0;
+		*vHeight = 0;
+	}
 }
 
 void commands2F57() {
-	char *sTitle = sys_getString(0);
+	const char *sTitle = sl_getString(0);
 	int eStrVar = getCaliValue();
 	int eLength = getCaliValue();
 	int *vResult = getCaliVariable();
@@ -921,8 +614,8 @@ void commands2F57() {
 	char *t1, *t2, *t3;
 	INPUTSTRING_PARAM p;
 	
-	t1 = sjis2lang(sTitle);
-	t2 = sjis2lang(v_str(eStrVar -1));
+	t1 = toUTF8(sTitle);
+	t2 = toUTF8(svar_get(eStrVar));
 	p.title = t1;
 	p.oldstring = t2;
 	p.max = eLength;
@@ -931,18 +624,14 @@ void commands2F57() {
 	if (p.newstring == NULL) {
 		*vResult = 65535;
 	} else {
-		t3 = lang2sjis(p.newstring);
-		if (!sjis_has_hankaku(t3)) {
-			v_strcpy(eStrVar -1, t3);
-			*vResult = sjis_count_char(t3);
-		} else {
-			*vResult = 65535;
-		}
+		t3 = fromUTF8(p.newstring);
+		svar_set(eStrVar, t3);
+		*vResult = svar_length(eStrVar);
 		free(t3);
 	}
 	free(t1);
 	free(t2);
-	DEBUG_COMMAND("strInputDlg %s, %d, %d, %d:\n",
+	TRACE("strInputDlg %s, %d, %d, %d:",
 		      sTitle, eStrVar, eLength, *vResult);
 }
 
@@ -950,40 +639,40 @@ void commands2F58() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_hankaku(v_str(eNum) -1) ? 1 : 0;
+	*vResult = sjis_has_hankaku(svar_get(eNum)) ? 1 : 0;
 	
-	DEBUG_COMMAND("strCheckASCII %d, %d:\n", eNum, *vResult);
+	TRACE("strCheckASCII %d, %d:", eNum, *vResult);
 }
 
 void commands2F59() {
 	int eNum = getCaliValue();
 	int *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_zenkaku(v_str(eNum) -1) ? 1 : 0;
+	*vResult = sjis_has_zenkaku(svar_get(eNum)) ? 1 : 0;
 	
-	DEBUG_COMMAND("strCheckSJIS %d, %d:\n", eNum, *vResult);
+	TRACE("strCheckSJIS %d, %d:", eNum, *vResult);
 }
 
 void commands2F5A() {
-	char *sText = sys_getString(0);
+	const char *sText = sl_getString(0);
 	char *t1;
 	
-	t1 = sjis2lang(sText);
-	menu_msgbox_open(t1);
+	t1 = toUTF8(sText);
+	sys_show_message_box(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
 	free(t1);
 	
-	DEBUG_COMMAND("strMessageBox %s:\n", sText);
+	TRACE("strMessageBox %s:", sText);
 }
 
 void commands2F5B() {
 	int eNum = getCaliValue();
 	char *t1;
 	
-	t1 = sjis2lang(v_str(eNum) - 1);
-	menu_msgbox_open(t1);
+	t1 = toUTF8(svar_get(eNum));
+	sys_show_message_box(MESSAGEBOX_INFO, nact->game_title_utf8, t1);
 	free(t1);
 	
-	DEBUG_COMMAND("strMessageBoxStr %d:\n", eNum);
+	TRACE("strMessageBoxStr %d:", eNum);
 }
 
 void commands2F5C() {
@@ -996,7 +685,7 @@ void commands2F5C() {
 	int eAlpha = getCaliValue();
 	
 	ags_copyArea_shadow_withrate(eSrcX, eSrcY, eWidth, eHeight, eDestX, eDestY, eAlpha);
-	DEBUG_COMMAND("grCopyUseAMapUseA %d, %d, %d, %d, %d, %d, %d:\n",
+	TRACE("grCopyUseAMapUseA %d, %d, %d, %d, %d, %d, %d:",
 		      eDestX, eDestY, eSrcX, eSrcY, eWidth, eHeight, eAlpha);
 }
 
@@ -1004,7 +693,22 @@ void commands2F5D() {
 	int eNum = getCaliValue();
 	int eData = getCaliValue();
 	
-	DEBUG_COMMAND_YET("grSetCEParam %d, %d:\n", eNum, eData);
+	TRACE_UNIMPLEMENTED("grSetCEParam %d, %d:", eNum, eData);
+}
+
+struct grEffectMoveView_data {
+	int origin_x;
+	int origin_y;
+	int target_x;
+	int target_y;
+};
+
+static void grEffectMoveView_step(void *data, float progress) {
+	struct grEffectMoveView_data *d = data;
+	int x = d->origin_x + (d->target_x - d->origin_x) * progress;
+	int y = d->origin_y + (d->target_y - d->origin_y) * progress;
+	ags_setViewArea(x, y, nact->ags.view_area.w, nact->ags.view_area.h);
+	ags_updateFull();
 }
 
 void commands2F5E() {
@@ -1012,25 +716,32 @@ void commands2F5E() {
 	int eY = getCaliValue();
 	int eTime = getCaliValue();
 	int eFlag = getCaliValue();
-	
-	DEBUG_COMMAND_YET("grEffectMoveView %d, %d, %d, %d:\n", eX, eY, eTime, eFlag);
+
+	struct grEffectMoveView_data data = {
+		.origin_x = nact->ags.view_area.x,
+		.origin_y = nact->ags.view_area.y,
+		.target_x = eX,
+		.target_y = eY
+	};
+	ags_runEffect(eTime, eFlag, grEffectMoveView_step, &data);
+	TRACE("grEffectMoveView %d, %d, %d, %d:", eX, eY, eTime, eFlag);
 }
 
 void commands2F5F() {
 	int eSize = getCaliValue();
 	
-	DEBUG_COMMAND_YET("cgSetCacheSize %d:\n", eSize);
+	TRACE_UNIMPLEMENTED("cgSetCacheSize %d:", eSize);
 }
 
 void commands2F61() {
 	int eChar = getCaliValue();
 	int eCGNum = getCaliValue();
 	
-	DEBUG_COMMAND_YET("gaijiSet %d, %d:\n", eChar, eCGNum);
+	TRACE_UNIMPLEMENTED("gaijiSet %d, %d:", eChar, eCGNum);
 }
 
 void commands2F62() {
-	DEBUG_COMMAND_YET("gaijiClearAll:\n");
+	TRACE_UNIMPLEMENTED("gaijiClearAll:");
 }
 
 void commands2F63() {
@@ -1038,7 +749,7 @@ void commands2F63() {
 	
 	*vSelect = sel_getLastElement();
 
-	DEBUG_COMMAND("menuGetLatestSelect %d:\n", *vSelect);
+	TRACE("menuGetLatestSelect %d:", *vSelect);
 }
 
 void commands2F64() {
@@ -1046,8 +757,7 @@ void commands2F64() {
 	int eNum  = getCaliValue();
 	int *vResult = getCaliVariable();
 	DRIFILETYPE t = DRIFILE_DATA;
-	dridata *dfile;
-	
+
 	switch(eType) {
 	case 0:
 		t = DRIFILE_DATA;
@@ -1068,17 +778,10 @@ void commands2F64() {
 		t = DRIFILE_RSC;
 		break;
 	}
-	
-	dfile = ald_getdata(t, eNum -1);
-	if (dfile == NULL) {
-		*vResult = 0;
-	} else {
-		*vResult = 1;
-	}
-	
-	ald_freedata(dfile);
-	
-	DEBUG_COMMAND("lnkIsLink %d, %d, %d:\n", eType, eNum, *vResult);
+
+	*vResult = ald_is_linked(t, eNum - 1) ? 1 : 0;
+
+	TRACE("lnkIsLink %d, %d, %d:", eType, eNum, *vResult);
 }
 
 void commands2F65() {
@@ -1087,8 +790,7 @@ void commands2F65() {
 	int *vResult = getCaliVariable();
 	
 	DRIFILETYPE t = DRIFILE_DATA;
-	dridata *dfile;
-	
+
 	switch(eType) {
 	case 0:
 		t = DRIFILE_DATA;
@@ -1109,28 +811,21 @@ void commands2F65() {
 		t = DRIFILE_RSC;
 		break;
 	}
-	
-	dfile = ald_getdata(t, eNum -1);
-	if (dfile == NULL) {
-		*vResult = 0;
-	} else {
-		*vResult = 1;
-	}
-	
-	ald_freedata(dfile);
-	
-	DEBUG_COMMAND("lnkIsData %d, %d, %d:\n", eType, eNum, *vResult);
+
+	*vResult = ald_exists(t, eNum - 1) ? 1 : 0;
+
+	TRACE("lnkIsData %d, %d, %d:", eType, eNum, *vResult);
 }
 
 void commands2F66() {
 	int eNum = getCaliValue();
-	int page  = sys_getw();
-	int index = sys_getdw();
+	int page  = sl_getw();
+	int index = sl_getdw();
 	
-	DEBUG_COMMAND("fncSetTable %d, %d,%d:\n", eNum, page, index);
+	TRACE("fncSetTable %d, %d,%d:", eNum, page, index);
 
 	if (eNum >= FCTBL_MAX) {
-		WARNING("fncSetTable: too many table number %d\n", eNum);
+		WARNING("fncSetTable: too many table number %d", eNum);
 		return;
 	}
 	
@@ -1145,7 +840,7 @@ void commands2F67() {
 	int i;
 
 	for (i = 0; i < nact->ain.fncnum; i++) {
-		if (0 == strcmp(nact->ain.fnc[i].name, v_str(eStrNum -1))) {
+		if (0 == strcmp(nact->ain.fnc[i].name, svar_get(eStrNum))) {
 			fnctbl[eNum].page  = nact->ain.fnc[i].page;
 			fnctbl[eNum].index = nact->ain.fnc[i].index;
 			break;
@@ -1154,16 +849,16 @@ void commands2F67() {
 	
 	*vResult = (i == nact->ain.fncnum) ? 0 : !0;
 	
-	DEBUG_COMMAND("fncSetTableFromStr %d, %d, %d:\n", eNum, eStrNum, *vResult);
+	TRACE("fncSetTableFromStr %d, %d, %d:", eNum, eStrNum, *vResult);
 }
 
 void commands2F68() {
 	int eNum = getCaliValue();
 	
-	DEBUG_COMMAND("fncClearTable %d:\n", eNum);
+	TRACE("fncClearTable %d:", eNum);
 	
 	if (eNum >= FCTBL_MAX) {
-		WARNING("fncClearTable: too many table number %d\n", eNum);
+		WARNING("fncClearTable: too many table number %d", eNum);
 		return;
 	}
 	
@@ -1174,10 +869,10 @@ void commands2F68() {
 void commands2F69() {
 	int eNum = getCaliValue();
 	
-	DEBUG_COMMAND("fncCall %d:\n", eNum);
+	TRACE("fncCall %d:", eNum);
 	
 	if (eNum >= FCTBL_MAX) {
-		WARNING("fncClearTable: too many table number %d\n", eNum);
+		WARNING("fncClearTable: too many table number %d", eNum);
 		return;
 	}
 	
@@ -1193,7 +888,7 @@ void commands2F6A() {
 
 	nact->fnc_return_value = eNum;
 	
-	DEBUG_COMMAND("fncSetReturnCode %d:\n", eNum);
+	TRACE("fncSetReturnCode %d:", eNum);
 }
 
 void commands2F6B() {
@@ -1201,15 +896,15 @@ void commands2F6B() {
 	
 	*vNum = nact->fnc_return_value;
 	
-	DEBUG_COMMAND("fncGetReturnCode %d:\n", *vNum);
+	TRACE("fncGetReturnCode %d:", *vNum);
 }
 
 void commands2F6C() {
 	int eFlag = getCaliValue();
 	
-	nact->is_msg_out = eFlag != 0 ? TRUE : FALSE;
+	nact->is_msg_out = eFlag != 0;
 	
-	DEBUG_COMMAND("msgSetOutputFlag %d:\n", eFlag);
+	TRACE("msgSetOutputFlag %d:", eFlag);
 }
 
 void commands2F6D() {
@@ -1218,13 +913,13 @@ void commands2F6D() {
 
 	*vResult = save_delete_file(eNum -1);
 	
-	DEBUG_COMMAND("saveDeleteFile %d, %d:\n", eNum, *vResult);
+	TRACE("saveDeleteFile %d, %d:", eNum, *vResult);
 }
 
 void commands2F6E() {
 	int eFlag = getCaliValue();
 	
-	DEBUG_COMMAND_YET("wav3DSetUseFlag %d:\n", eFlag);
+	TRACE_UNIMPLEMENTED("wav3DSetUseFlag %d:", eFlag);
 }
 
 void commands2F6F() {
@@ -1235,7 +930,7 @@ void commands2F6F() {
 	
 	mus_wav_fadeout_start(eCh, eTime, eVolume, eStopFlag);
 	
-	DEBUG_COMMAND("wavFadeVolume %d, %d, %d, %d:\n", eCh, eTime, eVolume, eStopFlag);
+	TRACE("wavFadeVolume %d, %d, %d, %d:", eCh, eTime, eVolume, eStopFlag);
 }
 
 void commands2F70() {
@@ -1243,34 +938,36 @@ void commands2F70() {
 	
 	nact->patch_emen = eFlag;
 	
-	DEBUG_COMMAND("patchEMEN %d:\n", eFlag);
+	TRACE("patchEMEN %d:", eFlag);
 }
 
 void commands2F71() {
 	int eFlag = getCaliValue();
-	
-	DEBUG_COMMAND_YET("wmenuEnableMsgSkip %d:\n", eFlag);
+
+	msgskip_enableMenu(eFlag);
+
+	TRACE("wmenuEnableMsgSkip %d:", eFlag);
 }
 
 void commands2F72() {
 	int *vFlag = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("winGetFlipFlag %p:\n", vFlag);
+	TRACE_UNIMPLEMENTED("winGetFlipFlag %p:", vFlag);
 }
 
 void commands2F73() {
 	int *vTrack = getCaliVariable();
 	
-	*vTrack = mus_cdrom_get_maxtrack();
+	*vTrack = muscd_get_maxtrack();
 	
-	DEBUG_COMMAND("cdGetMaxTrack %d:\n", *vTrack);
+	TRACE("cdGetMaxTrack %d:", *vTrack);
 }
 
 void commands2F74() {
-	char *str1 = sys_getString(0);
+	const char *str1 = sl_getString(0);
 	int *var   = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("dlgErrorOkCancel %s,%d:\n", str1, *var);
+	TRACE_UNIMPLEMENTED("dlgErrorOkCancel %s,%d:", str1, *var);
 }
 
 void commands2F75() {
@@ -1278,7 +975,7 @@ void commands2F75() {
 	
 	sel_reduce(eNumof);
 	
-	DEBUG_COMMAND("menuReduce %d:\n", eNumof);
+	TRACE("menuReduce %d:", eNumof);
 }
 
 void commands2F76() {
@@ -1286,17 +983,17 @@ void commands2F76() {
 
 	*var = sel_getnumberof();
 	
-	//DEBUG_COMMAND("menuGetNumof %p:\n", var);
-	DEBUG_COMMAND("menuGetNumof %d:\n", *var);
+	//TRACE("menuGetNumof %p:", var);
+	TRACE("menuGetNumof %d:", *var);
 }
 
 void commands2F77() {
 	int eStrNum    = getCaliValue();
 	int eSelectNum = getCaliValue();
 	
-	v_strcpy(eStrNum -1, sel_gettext(eSelectNum));
+	svar_set(eStrNum, sel_gettext(eSelectNum));
 	
-	DEBUG_COMMAND("menuGetText %d,%d:\n", eStrNum, eSelectNum);
+	TRACE("menuGetText %d,%d:", eStrNum, eSelectNum);
 }
 
 void commands2F78() {
@@ -1305,7 +1002,7 @@ void commands2F78() {
 
 	sel_goto(eSelectNum, eClearFlag);
 	
-	DEBUG_COMMAND("menuGoto %d,%d:\n", eSelectNum, eClearFlag);
+	TRACE("menuGoto %d,%d:", eSelectNum, eClearFlag);
 }
 
 void commands2F79() {
@@ -1314,93 +1011,105 @@ void commands2F79() {
 	
 	sel_returengoto(eSelectNum, eClearFlag);
 	
-	DEBUG_COMMAND("menuReturnGoto %d,%d:\n", eSelectNum, eClearFlag);
+	TRACE("menuReturnGoto %d,%d:", eSelectNum, eClearFlag);
 }
 
 void commands2F7A() {
-	DEBUG_COMMAND_YET("menuFreeShelterDIB:\n");
+	// no-op
+	TRACE("menuFreeShelterDIB:");
 }
 
 void commands2F7B() {
-	DEBUG_COMMAND_YET("msgFreeShelterDIB:\n");
+	// no-op
+	TRACE("msgFreeShelterDIB:");
 }
 
 void commands2F7C() {
-	int index = sys_getdw();
-	
+	if (!nact->files.ain) {
+		if (nact->files.gr_fname) {
+			sys_error("System39.ain is needed to run this game. Make sure you have an \"Ain\" line in %s.", nact->files.gr_fname);
+		} else {
+			sys_error("Ain file is needed to run this game. Make sure you have System39.ain file in the game directory.");
+		}
+	}
+
+	int index = sl_getdw();
+	if (index >= nact->ain.msgnum) {
+		WARNING("message id out of bounds (%d)", index);
+		return;
+	}
 	sys_addMsg(nact->ain.msg[index]);
-	
-	DEBUG_COMMAND("2F7C %d:\n", index);
+	msgskip_onAinMessage(index);
+
+	TRACE("2F7C %d:", index);
 }
 
 void commands2F7D() {
-	int index = sys_getdw();
+	int index = sl_getdw();
 	
 	commandH();
-	sys_addMsg(nact->ain.msg[index]);
-	
-	// DEBUG_COMMAND_YET("2F7D %d, %d, %d:\n", index, page, p1);
-	DEBUG_COMMAND("2F7D %d:\n", index);
+	msgskip_onAinMessage(index);
+
+	TRACE("2F7D %d:", index);
 }
 
 void commands2F7E() {
-	int index = sys_getdw();
+	int index = sl_getdw();
 	
 	commandHH();
-	sys_addMsg(nact->ain.msg[index]);
-	
-	//DEBUG_COMMAND_YET("2F7E %d, %d, %d:\n", index, p1, p2);
-	DEBUG_COMMAND("2F7E %d:\n", index);
+	msgskip_onAinMessage(index);
+
+	TRACE("2F7E %d:", index);
 }
 
 void commands2F7F() {
-	int index = sys_getdw();
-	int p1    = sys_getCaliValue();
+	int index = sl_getdw();
+	int p1    = getCaliValue();
 	
-	sys_addMsg(v_str(p1 -1));
-	sys_addMsg(nact->ain.msg[index]);
-	
-	DEBUG_COMMAND("2F7F %d, %d(%s,%s):\n", index, p1, nact->ain.msg[index], v_str(p1 -1));
+	sys_addMsg(svar_get(p1));
+	msgskip_onAinMessage(index);
+
+	TRACE("2F7F %d, %d(%s):", index, p1, svar_get(p1));
 }
 
 void commands2F80() {
-	int page  = sys_getw();
-	int index = sys_getdw();
+	int page  = sl_getw();
+	int index = sl_getdw();
 	
 	if (NULL == (nact->datatbl_addr = sl_setDataTable(page -1, index))) {
-		WARNING("dataSetPointer set failed\n");
+		WARNING("dataSetPointer set failed");
 	}
 	
-	DEBUG_COMMAND("dataSetPointer %d,%x\n", page, index);
+	TRACE("dataSetPointer %d,%x", page, index);
 }
 
 void commands2F81() {
-	int *vData = sys_getCaliVariable();
-	int eNumof = sys_getCaliValue();
+	int *vData = getCaliVariable();
+	int eNumof = getCaliValue();
 	int i;
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 
 	for (i = 0; i < eNumof; i++) {
-		*vData = LittleEndian_getW((BYTE *)p, 0);
+		*vData = LittleEndian_getW((uint8_t *)p, 0);
 		p++;
 		vData++;
 	}
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("dataGetWORD %p,%d(%p):\n", vData, eNumof, nact->datatbl_addr);
+	TRACE("dataGetWORD %p,%d(%p):", vData, eNumof, nact->datatbl_addr);
 }
 
 void commands2F82() {
-	int eStrNum = sys_getCaliValue();
-	int eNumof  = sys_getCaliValue();
+	int eStrNum = getCaliValue();
+	int eNumof  = getCaliValue();
 	int i;
 	char *p = (char *)nact->datatbl_addr;
 	
-	DEBUG_COMMAND("dataGetString %d,%d:\n", eStrNum, eNumof);
+	TRACE("dataGetString %d,%d:", eStrNum, eNumof);
 	
 	for (i = 0; i < eNumof; i++) {
-		v_strcpy(eStrNum + i -1, p);
+		svar_set(eStrNum + i, p);
 		p += (strlen(p) + 1);
 	}
 
@@ -1408,18 +1117,18 @@ void commands2F82() {
 }
 
 void commands2F83() {
-	int eNumof  = sys_getCaliValue();
-	WORD *p = (WORD *)nact->datatbl_addr;
+	int eNumof  = getCaliValue();
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 
 	p += eNumof;
 
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("dataSkipWORD %d:\n", eNumof);
+	TRACE("dataSkipWORD %d:", eNumof);
 }
 
 void commands2F84() {
-	int eNumof  = sys_getCaliValue();
+	int eNumof  = getCaliValue();
 	int i;
 	char *p = (char *)nact->datatbl_addr;
 	
@@ -1429,75 +1138,93 @@ void commands2F84() {
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("dataSkipString %d:\n", eNumof);
+	TRACE("dataSkipString %d:", eNumof);
 }
 
 void commands2F85() {
-	int *vResult = sys_getCaliVariable();
+	int *vResult = getCaliVariable();
 	
-	*vResult = SYSVAR_MAX;
+	*vResult = nact->ain.varnum;
 	
-	DEBUG_COMMAND("varGetNumof %p:\n", vResult);
+	TRACE("varGetNumof %p:", vResult);
 }
 
 void commands2F86() {
-	int eFlag = sys_getCaliValue();
+	int eFlag = getCaliValue();
 	
 	nact->patch_g0 = eFlag;
 	
-	DEBUG_COMMAND("patchG0 %d:\n", eFlag);
+	TRACE("patchG0 %d:", eFlag);
 }
 
 void commands2F87() {
-	int eSubKeyStrNum = sys_getCaliValue();
-	int eBaneStrNum   = sys_getCaliValue();
-	int eResultStrNum = sys_getCaliValue();
-	int *vResult      = sys_getCaliVariable();
-	
+	int eSubKeyStrNum = getCaliValue();
+	int eBaneStrNum   = getCaliValue();
+	int eResultStrNum = getCaliValue();
+	int *vResult      = getCaliVariable();
+
+	// This command is used to check if the game is installed, so we always
+	// return 1 with the dummy string REGREADSTRING_RESULT.
+	svar_set(eResultStrNum, REGREADSTRING_RESULT);
 	*vResult = 1;
 	
-	DEBUG_COMMAND("regReadString %d,%d,%d,%d:\n",
+	TRACE("regReadString %d,%d,%d,%d:",
 		      eSubKeyStrNum, eBaneStrNum, eResultStrNum, *vResult);
 }
 
 void commands2F88() {
-	int eFileNameStrNum = sys_getCaliValue();
-	int *vResult        = sys_getCaliVariable();
+	int eFileNameStrNum = getCaliValue();
+	int *vResult        = getCaliVariable();
+
+	const char *fname = svar_get(eFileNameStrNum);
+	if (strcmp(fname, REGREADSTRING_RESULT) == 0) {
+		// If this command is called with the result of regReadString, the game
+		// is checking if the game CD is inserted. We return 1 in this case.
+		*vResult = 1;
+	} else {
+		char *fname_utf8 = sjis2utf(fname);
+		*vResult = fc_exists(fname_utf8) ? 1 : 0;
+		free(fname_utf8);
+	}
 	
-	*vResult = 1;
-	
-	DEBUG_COMMAND("fileCheckExist %d,%d:\n", eFileNameStrNum, *vResult);
+	TRACE("fileCheckExist %d,%d:", eFileNameStrNum, *vResult);
 }
 
 void commands2F89() {
-	int eYear = sys_getCaliValue();
-	int eMonth = sys_getCaliValue();
-	int eData = sys_getCaliValue();
-	int *vResult = sys_getCaliVariable();
+	int eYear = getCaliValue();
+	int eMonth = getCaliValue();
+	int eData = getCaliValue();
+	int *vResult = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("timeCheckCurDate %d,%d,%d,%p:\n", eYear, eMonth, eData, vResult);
+	TRACE_UNIMPLEMENTED("timeCheckCurDate %d,%d,%d,%p:", eYear, eMonth, eData, vResult);
 }
 
 void commands2F8A() {
-	char *s2 = sys_getConstString();
-	char *s3 = sys_getConstString();
+	const char *s2 = sl_getConstString();
+	const char *s3 = sl_getConstString();
 
-	DEBUG_COMMAND_YET("dlgManualProtect %s,%s:\n", s2, s3);
+	TRACE_UNIMPLEMENTED("dlgManualProtect %s,%s:", s2, s3);
 }
 
 void commands2F8B() {
-	char *s2 = sys_getConstString();
-	int c3 = sys_getCaliValue();
-	int c4 = sys_getCaliValue();
-	char *s6 = sys_getConstString();
-	int *c7 = sys_getCaliVariable();
+	const char *s2 = sl_getConstString();
+	int c3 = getCaliValue();
+	int c4 = getCaliValue();
+	const char *s6 = sl_getConstString();
+	int *c7 = getCaliVariable();
 
 	*c7 = 1;
 	
-	DEBUG_COMMAND_YET("fileCheckDVD %s,%d,%d,%s,%p:\n", s2, c3, c4, s6, c7);
+	TRACE_UNIMPLEMENTED("fileCheckDVD %s,%d,%d,%s,%p:", s2, c3, c4, s6, c7);
 }
 
 void commands2F8C() {
-	DEBUG_COMMAND("sysReset:\n");
-	sys_reset();
+	TRACE("sysReset:");
+	nact_quit(true);
+}
+
+void cmd2F_reset(void) {
+	cb_sel_init_page = 0;
+	cb_sel_init_address = 0;
+	memset(fnctbl, 0, sizeof(fnctbl));
 }

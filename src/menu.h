@@ -26,18 +26,18 @@
 #include "portab.h"
 
 /* 文字列入力のパラメータ */
-typedef struct {
+typedef struct inputstring_param {
 	char *title;
 	char *oldstring;
-	char *newstring;
+	const char *newstring;
 	int   max;
 	/* for MJ cmd */
-	boolean need_window;
+	bool need_window;
 	int     x, y, h;
 } INPUTSTRING_PARAM;
 
 /* 数値入力のパラメータ */
-typedef struct {
+typedef struct inputnum_param {
 	char *title;
 	int value;
 	int def;
@@ -47,12 +47,20 @@ typedef struct {
 
 extern void menu_open(void);
 extern void menu_quitmenu_open(void);
-extern boolean menu_inputstring(INPUTSTRING_PARAM *);
-extern boolean menu_inputstring2(INPUTSTRING_PARAM *);
-extern boolean menu_inputnumber(INPUTNUM_PARAM *);
-extern void menu_msgbox_open(char *);
+extern void menu_resetmenu_open(void);
+extern bool menu_inputstring(INPUTSTRING_PARAM *);
+extern bool menu_inputstring2(INPUTSTRING_PARAM *);
+extern bool menu_inputnumber(INPUTNUM_PARAM *);
 extern void menu_widgetinit(void);
 extern void menu_init();
 extern void menu_gtkmainiteration();
+extern void menu_setSkipState(bool enabled, bool activated);
+
+#ifdef _WIN32
+struct SDL_SysWMmsg;
+void win_menu_init(void);
+void win_menu_onSysWMEvent(struct SDL_SysWMmsg* msg);
+void win_menu_onMouseMotion(int x, int y);
+#endif
 
 #endif /* !__MENULL */

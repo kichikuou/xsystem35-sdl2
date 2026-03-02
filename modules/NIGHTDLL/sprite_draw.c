@@ -24,14 +24,11 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
 #include "ags.h"
-#include "graphics.h"
-#include "surface.h"
-#include "ngraph.h"
 #include "sprite.h"
 
 /*
@@ -39,105 +36,60 @@
  @param sp: 描画するスプライト
  @param r : 再描画する領域
 */
-int sp_draw(sprite_t *sp, MyRectangle *r) {
-	if (sp == NULL) return NG;
-	
-	return sp_draw2(sp, sp->curcg, r);
-}
-
-/*
-  指定の spriteの指定のCGを surface0 に書く
-  (このインターフェイスはもう不要?)
-
-  @param sp: 描画するスプライト
-  @param cg: 描画するCG
- @param r : 再描画する領域
-*/
-int sp_draw2(sprite_t *sp, cginfo_t *cg, MyRectangle *r) {
-	surface_t update;
-	int sx, sy, w, h, dx, dy;
-	
-	if (cg == NULL) return NG;
-	if (cg->sf == NULL) return NG;
+void nt_sp_draw(sprite_t *sp, SDL_Rect *r) {
+	if (sp == NULL) return;
+	cginfo_t *cg = sp->curcg;
+	if (cg == NULL) return;
+	if (cg->sf == NULL) return;
 
 	// 更新領域の確定
-	update.width  = r->width;
-	update.height = r->height;
-	sx = 0;
-	sy = 0;
-	dx = sp->cur.x - r->x;
-	dy = sp->cur.y - r->y;
-	w = cg->sf->width;
-	h = cg->sf->height;
+	SDL_Rect cg_rect = {0, 0, cg->sf->w, cg->sf->h};
+	int sx = 0;
+	int sy = 0;
+	int dx = sp->cur.x;
+	int dy = sp->cur.y;
+	int w = cg->sf->w;
+	int h = cg->sf->h;
 	
-	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
-		return NG;
+	if (!ags_clipCopyRect(&cg_rect, r, &sx, &sy, &dx, &dy, &w, &h)) {
+		return;
 	}
-		
-	dx += r->x;
-	dy += r->y;
-	
-	if (cg->sf->has_alpha) {
-		// alpha map がある場合
-		gre_BlendUseAMap(sf0, dx, dy,
-				 sf0, dx, dy,
-				 cg->sf, sx, sy, w, h,
-				 cg->sf, sx, sy,
-				 sp->blendrate);
+
+	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format) || sp->blendrate < 255) {
+		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_BLEND);
+		SDL_SetSurfaceAlphaMod(cg->sf, sp->blendrate);
 	} else {
-		if (sp->blendrate == 255) {
-			// alpha値指定が無い場合
-			gr_copy(sf0, dx, dy, cg->sf, sx, sy, w, h);
-		} else if (sp->blendrate > 0) {
-			// alpha値指定がある場合
-			gre_Blend(sf0, dx, dy,
-				  sf0, dx, dy,
-				  cg->sf, sx, sy, w, h,
-				  sp->blendrate);
-		}
+		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_NONE);
 	}
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, main_surface, &(SDL_Rect){dx, dy, w, h});
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
-	
-	return OK;
 }
 
 // BlendScreenによる描画
-int sp_draw_scg(sprite_t *sp, MyRectangle *r) {
-	surface_t update;
-	cginfo_t *cg;
-	int sx, sy, w, h, dx, dy;
-	
-	if (sp == NULL) return NG;
-	
-	cg = sp->curcg;
-	
-	if (cg == NULL) return NG;
-	if (cg->sf == NULL) return NG;
+void nt_sp_draw_scg(sprite_t *sp, SDL_Rect *r) {
+	if (sp == NULL) return;
+	cginfo_t *cg = sp->curcg;
+	if (cg == NULL) return;
+	if (cg->sf == NULL) return;
 	
 	// 更新領域の確定
-	update.width  = r->width;
-	update.height = r->height;
-	sx = 0;
-	sy = 0;
-	dx = sp->cur.x - r->x;
-	dy = sp->cur.y - r->y;
-	w = cg->sf->width;
-	h = cg->sf->height;
+	SDL_Rect cg_rect = {0, 0, cg->sf->w, cg->sf->h};
+	int sx = 0;
+	int sy = 0;
+	int dx = sp->cur.x;
+	int dy = sp->cur.y;
+	int w = cg->sf->w;
+	int h = cg->sf->h;
 	
-	if (!gr_clip(cg->sf, &sx, &sy, &w, &h, &update, &dx, &dy)) {
-		return NG;
+	if (!ags_clipCopyRect(&cg_rect, r, &sx, &sy, &dx, &dy, &w, &h)) {
+		return;
 	}
-		
-	dx += r->x;
-	dy += r->y;
 	
-	gre_BlendScreen(sf0, dx, dy,
-			sf0, dx, dy,
-			cg->sf, sx, sy, w, h);
+	SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_ADD);
+	SDL_BlitSurface(cg->sf, &(SDL_Rect){sx, sy, w, h}, main_surface, &(SDL_Rect){dx, dy, w, h});
 	
-	WARNING("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d\n",
+	SACT_DEBUG("do update no=%d, sx=%d, sy=%d, w=%d, h=%d, dx=%d, dy=%d",
 		sp->no, sx, sy, w, h, dx, dy);
-	
 }

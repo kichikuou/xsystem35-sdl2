@@ -24,61 +24,29 @@
 #ifndef __FONT_H__
 #define __FONT_H__
 
+#include <SDL_surface.h>
 #include "config.h"
 #include "portab.h"
 
-/* font の種類 */
+typedef enum {
+	FONT_GOTHIC,
+	FONT_MINCHO,
+} FontType;
 #define FONTTYPEMAX 2
 
-/* fontの名前 */
-#define FONT_GOTHIC (0)
-#define FONT_MINCHO (1)
+#define FONT_WEIGHT_NORMAL 4
+#define FONT_WEIGHT_BOLD 7
 
-struct _FONT {
-	
-	boolean antialiase_on;
-	
-	char *name[FONTTYPEMAX];
-	boolean isJISX0213[FONTTYPEMAX];
-	char face[FONTTYPEMAX];
-	
-	void (*sel_font)(int type, int size);
-	
-	void *(*get_glyph)(unsigned char *str);
-	
-	int (*draw_glyph)(int x, int y, unsigned char *str, int col);
-	
-	boolean (*self_drawable)();
-	
-	int (*codeconv[FONTTYPEMAX])(unsigned char **msg);
-};
+extern void font_init(void);
+extern void font_set_name_and_index(FontType type, const char *name, int index);
+extern void font_set_antialias(bool enable);
+extern bool font_get_antialias(void);
+extern void font_select(FontType type, int size, int weight);
+extern struct SDL_Surface *font_get_glyph(const char *str_utf8, int r, int g, int b);
+extern SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t col);
 
-typedef struct _FONT FONT;
-
-extern void font_init(int dev);
-
-#ifdef ENABLE_FT2
-extern FONT *font_ft2_new();
+#ifdef __EMSCRIPTEN__
+extern bool load_mincho_font(void);
 #endif
-
-#ifdef ENABLE_SDLTTF
-extern FONT *font_sdlttf_new();
-#endif
-
-#ifdef ENABLE_X11FONT
-extern FONT *font_x11_new();
-#endif
-
-/* デフォルトのフォント名 */
-#define FONT_DEFAULTNAME_X "-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0208.1983-0,-*-*-medium-r-normal--%d-*-*-*-c-*-jisx0201.1976-0,*"
-
-#define FONT_DEFAULTNAME_TTF "/usr/share/fonts/TrueType/mincho.ttc"
-
-//
-typedef enum {
-	FONT_X11,
-	FONT_FT2,
-	FONT_SDLTTF
-} fontdev_t;
 
 #endif  /* __FONT_H__ */

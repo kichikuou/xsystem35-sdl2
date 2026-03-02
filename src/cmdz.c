@@ -27,14 +27,31 @@
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "gfx.h"
+#include "scheduler.h"
 #include "ags.h"
 #include "scenario.h"
-#include "counter.h"
 #include "randMT.h"
 #include "selection.h"
 #include "message.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
+#include "font.h"
+
+static struct {
+	uint32_t base;
+	int divisor;
+} counters[257];  // [0] for ZT 1-5, [1..256] for ZT 10-11
+
+static void reset_counter(int num, int divisor, int offset) {
+	counters[num].base = sys_get_ticks() - offset;
+	counters[num].divisor = divisor;
+}
+
+static uint32_t get_counter(int num) {
+	scheduler_on_event(SCHEDULER_EVENT_TIMER_CHECK);
+	return sys_get_ticks() - counters[num].base;
+}
 
 void commandZC() {
 	/* システムの使用環境を変更する */
@@ -59,7 +76,7 @@ void commandZC() {
 		WARNING("commandZC(): Unknown Command (%d)", m); break;
 	}
 	
-	DEBUG_COMMAND("ZC %d,%d:\n",m,n);
+	TRACE("ZC %d,%d:",m,n);
 }
 
 void commandZM() {
@@ -67,13 +84,13 @@ void commandZM() {
 	int size = getCaliValue();
 
 	if (size > 100) {
-		WARNING("msg font size force to 100 from %d\n", size);
+		WARNING("msg font size force to 100 from %d", size);
 		size = 100;
 	}
 	
 	nact->msg.MsgFontSize = size;
 
-	DEBUG_COMMAND("ZM %d:\n",size);
+	TRACE("ZM %d:",size);
 }
 
 void commandZS() {
@@ -82,16 +99,17 @@ void commandZS() {
 	
 	nact->sel.MsgFontSize = size;
 	
-	DEBUG_COMMAND("ZS %d:\n",size);
+	TRACE("ZS %d:",size);
 }
 
 void commandZB() {
 	/* メッセージ文字を太さを設定 */
-	int size = getCaliValue();
-	
-	nact->msg.MsgFontBoldSize = size;
-	
-	DEBUG_COMMAND("ZB %d:\n",size);
+	int weight = getCaliValue();
+
+	if (nact->ags.enable_zb)
+		nact->ags.font_weight = weight;
+
+	TRACE("ZB %d:", weight);
 }
 
 void commandZH() {
@@ -100,7 +118,7 @@ void commandZH() {
 	
 	sys_setHankakuMode(sw);
 	
-	DEBUG_COMMAND("ZH %d:\n",sw);
+	TRACE("ZH %d:",sw);
 }
 
 void commandZW() {
@@ -108,14 +126,18 @@ void commandZW() {
 	int sw = getCaliValue();
 	
 	if (sw < 256) {
-		nact->messagewait_enable_save = 
-		nact->messagewait_enable      = ((sw & 0xff) <= 1) ? FALSE : TRUE;
+		// System 3.5 has a bug in which ZW 1 does not disable message waiting,
+		// and Rance 2 depends on it.
+		if (game_id == GAME_RANCE2)
+			sw = 2;
+		nact->messagewait_enable = ((sw & 0xff) > 1);
+		nact->messagewait_cancelled = false;
 	} else {
-		nact->messagewait_time   = sw & 0xff;
-		nact->messagewait_cancel = (sw & 0x200) ? TRUE : FALSE;
+		nact->messagewait_time = sw & 0xff;
+		nact->messagewait_cancel = !!(sw & 0x200);
 	}
 	
-	DEBUG_COMMAND("ZW %d:\n", sw);
+	TRACE("ZW %d:", sw);
 }
 
 void commandZL() {
@@ -124,16 +146,16 @@ void commandZL() {
 	
 	nact->msg.LineIncrement = line;
 	
-	DEBUG_COMMAND("ZL %d:\n",line);
+	TRACE("ZL %d:",line);
 }
 
 void commandZE() {
 	/* 選択肢を選んだらメッセージ領域を初期化するかどうかを指定する */
 	int sw = getCaliValue();
 	
-	nact->sel.ClearMsgWindow = sw == 0 ? FALSE : TRUE;
+	nact->sel.ClearMsgWindow = sw != 0;
 	
-	DEBUG_COMMAND("ZE %d:\n", sw);
+	TRACE("ZE %d:", sw);
 }
 
 void commandZF() {
@@ -142,22 +164,22 @@ void commandZF() {
 	
 	switch(sw) {
 	case 0:
-		nact->sel.WinResizeHeight = TRUE;  break;
+		nact->sel.WinResizeHeight = true;  break;
 	case 1:
-		nact->sel.WinResizeHeight = FALSE; break;
+		nact->sel.WinResizeHeight = false; break;
 	case 2:
-		nact->sel.WinResizeWidth  = FALSE; break;
+		nact->sel.WinResizeWidth  = false; break;
 	case 3:
-		nact->sel.WinResizeWidth =  TRUE;  break;
+		nact->sel.WinResizeWidth =  true;  break;
 	}
 	
-	DEBUG_COMMAND("ZF %d:\n", sw);
+	TRACE("ZF %d:", sw);
 }
 
 void commandZD() {
-	/* デバッグモード時のデバッグメッセージの出力 ON/OFF/PAUSE */
-	int c0 = sys_getc();
+	int c0 = sl_getc();
 	int sw = 0, *var;
+	char *msg;
 	
 	switch(c0) {
 	case 0:
@@ -166,15 +188,19 @@ void commandZD() {
 		break;
 	case 2:
 		sw = getCaliValue();
-		DEBUG_MESSAGE("(ZD2)%s\n", v_str(sw -1));
+		msg = toUTF8(svar_get(sw));
+		sys_message(2, "[DEBUG] %s\n", msg);
+		free(msg);
 		break;
 	case 3:
-		sw = getCaliValue(); break;
+		sw = getCaliValue();
+		sys_message(2, "[DEBUG] %d\n", sw);
+		break;
 	case 4:
 		var = getCaliVariable(); *var = 0; break;
 	}
 	
-	DEBUG_COMMAND("ZD %d,%d:\n", c0, sw);
+	TRACE("ZD %d,%d:", c0, sw);
 }
 
 void commandZT0() {
@@ -189,7 +215,7 @@ void commandZT0() {
 	c1 = sl_getc();
 	c2 = sl_getc();
 	if (c1 == 0x41 && c2 == 0x7f) {
-		reset_counter(0);
+		reset_counter(0, 1, 0);
 		return;
 	} else {
 		sl_jmpNear(sv);
@@ -205,60 +231,56 @@ void commandZT0() {
 	*(var + 5) =        lc->tm_sec;
 	*(var + 6) = 1    + lc->tm_wday;
 	
-	DEBUG_COMMAND("ZT0 %p:\n", var);
+	TRACE("ZT0 %p:", var);
 }
 
 void commandZT1() {
 	/* タイマーを n の数値でクリアする */
 	int n = getCaliValue();
 	
-	reset_counter(n);
+	reset_counter(0, 1, n);
 	
-	DEBUG_COMMAND("ZT1 %d:\n", n);
+	TRACE("ZT1 %d:", n);
 }
 
 void commandZT2() {
 	/* タイマーを var に取得する 1/10 sec */
 	int *var = getCaliVariable();
-	int val = get_counter(100);
+	int val = get_counter(0) / 100;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT2 %p:\n", var);
+	TRACE("ZT2 %p:", var);
 }
 
 void commandZT3() {
 	/* タイマーを var に取得する 1/30 sec */
 	int *var = getCaliVariable();
-	int val = get_counter(33);
+	int val = get_counter(0) * 3 / 100;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT3 %p:\n", var);
+	TRACE("ZT3 %p:", var);
 }
 
 void commandZT4() {
 	/* タイマーを var に取得する 1/60 sec */
 	int *var = getCaliVariable();
-	int val = get_counter(17);
+	int val = get_counter(0) * 3 / 50;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT4 %p:\n", var);
+	TRACE("ZT4 %p:", var);
 }
 
 void commandZT5() {
 	/* タイマーを var に取得する */
 	int *var = getCaliVariable();
-	int val = get_counter(10);
+	int val = get_counter(0) / 10;
 	
-	if (val > 65535) val = 65535;
-	*var = val;
+	*var = val & 0xffff;
 	
-	DEBUG_COMMAND("ZT5 %d:\n", val);
+	TRACE("ZT5 %d:", val);
 }
 
 void commandZT10() {
@@ -267,52 +289,64 @@ void commandZT10() {
 	int base  = getCaliValue();
 	int count = getCaliValue();
 	
-	reset_counter_high(num, base ? base : 1, count);
+	if (num > 256) {
+		WARNING("invalid timer id %d", num);
+	} else if (num == 0) {
+		for (int i = 1; i <= 256; i++)
+			reset_counter(i, base, count);
+	} else {
+		reset_counter(num, base, count);
+	}
 	
-	DEBUG_COMMAND("ZT10 %d,%d,%d:\n", num, base, count);
+	TRACE("ZT10 %d,%d,%d:", num, base, count);
 }
 
 void commandZT11() {
 	/* 高精度タイマー取得 */
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
-	int val  = get_high_counter(num);
-	
-	*var = val;
-	
-	DEBUG_COMMAND("ZT11 %d,%d,%d:\n", num, val, *var);
+
+	int divisor = counters[num].divisor ? counters[num].divisor : 1;
+	if (num > 256)
+		WARNING("invalid timer id %d", num);
+	else
+		*var = (get_counter(num) / divisor) & 0xffff;
+
+	TRACE("ZT11 %d,%d:", num, *var);
 }
 
 void commandZT20() {
 	/* ??? wait? */
 	int p1  = getCaliValue();
 	
-	sysVar[0] = sys_keywait(p1, FALSE);
-	DEBUG_COMMAND("ZT20 %d:\n",p1);
+	sysVar[0] = sys_keywait(p1, KEYWAIT_NONCANCELABLE);
+	TRACE("ZT20 %d:",p1);
 }
 
 void commandZT21() {
 	/* ??? wait? */
 	int p1  = getCaliValue();
 	
-	sysVar[0] =  sys_keywait(p1, TRUE);
+	sysVar[0] = sys_keywait(p1, KEYWAIT_CANCELABLE);
 	
-	DEBUG_COMMAND("ZT21 %d:\n",p1);
+	TRACE("ZT21 %d:",p1);
 }
 
 void commandZZ0() {
 	/* ＳＹＳＴＥＭ３．５を終了する */
 	int sw = getCaliValue();
 	
-	DEBUG_COMMAND("ZZ0 %d:\n",sw);
+	TRACE("ZZ0 %d:",sw);
 	
 	if (sw == 0) {
+#ifdef __EMSCRIPTEN__
+		nact_quit(true);
+#else
 		sys_exit(sysVar[0]);
+#endif
 	} else if (sw == 1) {
-		while (TRUE) {
-			usleep(1000*1000);
-			sys_getInputInfo();
-		}
+		while (!nact->is_quit)
+			sys_keywait(1000, 0);
 	}
 }
 
@@ -328,32 +362,32 @@ void commandZZ1() {
 	*var = 6;
 #endif
 #endif
-	DEBUG_COMMAND("ZZ1 %p:",var);
+	TRACE("ZZ1 %p:",var);
 }
 
 void commandZZ2() {
 	/* 機種文字列を文字列領域 num に返す（ＭＡＸ１２文字）*/
 	int num = getCaliValue();
 #if defined(linux)
-	static BYTE str[] = {0x82, 0x6B, 0x82, 0x89, 0x82, 0x8E, 0x82, 0x95, 0x82, 0x98, 0};
+	static uint8_t str[] = {0x82, 0x6B, 0x82, 0x89, 0x82, 0x8E, 0x82, 0x95, 0x82, 0x98, 0};
 #elif defined(__FreeBSD__) 
-	static BYTE str[] = {0x82, 0x65, 0x82, 0x92, 0x82, 0x85, 0x82, 0x85, 0x82, 0x61, 0x82, 0x72, 0x82, 0x63, 0};
+	static uint8_t str[] = {0x82, 0x65, 0x82, 0x92, 0x82, 0x85, 0x82, 0x85, 0x82, 0x61, 0x82, 0x72, 0x82, 0x63, 0};
 #elif defined(__OpenBSD__)
-	static BYTE str[] = {0x82, 0x6E, 0x82, 0x90, 0x82, 0x85, 0x82, 0x8E, 0x82, 0x61, 0x82, 0x72, 0x82, 0x63, 0};
+	static uint8_t str[] = {0x82, 0x6E, 0x82, 0x90, 0x82, 0x85, 0x82, 0x8E, 0x82, 0x61, 0x82, 0x72, 0x82, 0x63, 0};
 #elif defined(__NetBSD__)
-	static BYTE str[] = {0x82, 0x6D, 0x82, 0x85, 0x82, 0x94, 0x82, 0x61, 0x82, 0x72, 0x82, 0x63, 0};
+	static uint8_t str[] = {0x82, 0x6D, 0x82, 0x85, 0x82, 0x94, 0x82, 0x61, 0x82, 0x72, 0x82, 0x63, 0};
 #elif defined(sun)
-	static BYTE str[] = {0x82, 0x72, 0x82, 0x95, 0x82, 0x8E, 0x82, 0x6E, 0x82, 0x72, 0};
+	static uint8_t str[] = {0x82, 0x72, 0x82, 0x95, 0x82, 0x8E, 0x82, 0x6E, 0x82, 0x72, 0};
 #elif defined(__osf__)
-	static BYTE str[] = {0x82, 0x63, 0x82, 0x89, 0x82, 0x87, 0x82, 0x89, 0x82, 0x94, 0x82, 0x81, 0x82, 0x8C, 0x82, 0x74, 0x82, 0x6D, 0x82, 0x68, 0x82, 0x77, 0};
+	static uint8_t str[] = {0x82, 0x63, 0x82, 0x89, 0x82, 0x87, 0x82, 0x89, 0x82, 0x94, 0x82, 0x81, 0x82, 0x8C, 0x82, 0x74, 0x82, 0x6D, 0x82, 0x68, 0x82, 0x77, 0};
 #elif defined(sgi)
-	static BYTE str[] = {0x82, 0x68, 0x82, 0x71, 0x82, 0x68, 0x82, 0x77, 0};
+	static uint8_t str[] = {0x82, 0x68, 0x82, 0x71, 0x82, 0x68, 0x82, 0x77, 0};
 #else
-	static BYTE str[] = {0x82, 0x74, 0x82, 0x8e, 0x82, 0x8b, 0x82, 0x8e, 0x82, 0x8f, 0x82, 0x97, 0x82, 0x8e, 0};
+	static uint8_t str[] = {0x82, 0x74, 0x82, 0x8e, 0x82, 0x8b, 0x82, 0x8e, 0x82, 0x8f, 0x82, 0x97, 0x82, 0x8e, 0};
 #endif
-	v_strcpy(num -1, str);
+	svar_set(num, str);
 
-	DEBUG_COMMAND("ZZ2 %d:\n",num);
+	TRACE("ZZ2 %d:",num);
 }
 
 void commandZZ3() {
@@ -366,7 +400,7 @@ void commandZZ3() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ3 %p:\n",var);
+	TRACE("ZZ3 %p:",var);
 }
 
 void commandZZ4() {
@@ -379,7 +413,7 @@ void commandZZ4() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ4 %p:\n",var);
+	TRACE("ZZ4 %p:",var);
 }
 
 void commandZZ5() {
@@ -392,7 +426,7 @@ void commandZZ5() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ5 %p:\n",var);
+	TRACE("ZZ5 %p:",var);
 }
 
 void commandZZ7() {
@@ -401,14 +435,14 @@ void commandZZ7() {
 	
 	*var = 65535;
 	
-	DEBUG_COMMAND("ZZ7 %p:\n",var);
+	TRACE("ZZ7 %p:",var);
 }
 
 void commandZZ8() {
 	// メモリオンバッファの残り容量を得る
 	int *var = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("ZZ8 %p:\n",var);
+	TRACE_UNIMPLEMENTED("ZZ8 %p:",var);
 }
 
 void commandZZ9() {
@@ -421,41 +455,47 @@ void commandZZ9() {
 	*(var + 1) = info.height;
 	*(var + 2) = info.depth;
 	
-	DEBUG_COMMAND("ZZ9 %p:\n",var);
+	TRACE("ZZ9 %p:",var);
 }
 
 void commandZZ10() {
 	/* スクリーンモードを取得する */
 	int *var = getCaliVariable();
 
-	*var = nact->sys_fullscreen_on ? 1 : 0;
+	*var = gfx_isFullscreen() ? 1 : 0;
 	
-	DEBUG_COMMAND("ZZ10 %d:\n",*var);
+	TRACE("ZZ10 %d:",*var);
 }
 
 void commandZZ13() {
 	/* 表示フォントを設定する */
 	int num = getCaliValue();
+#ifdef __EMSCRIPTEN__
+	if (num == FONT_MINCHO) {
+		if (!load_mincho_font())
+			num = FONT_GOTHIC;
+	}
+#endif
+	if (num < FONTTYPEMAX)
+		nact->ags.font_type = num;
 	
-	nact->msg.MsgFont = num;
-	
-	DEBUG_COMMAND("ZZ13 %d:\n",num);
+	TRACE("ZZ13 %d:",num);
 }
 
 void commandZZ14() {
 	int no = getCaliValue();
+	char *s = "xsys35_user";
+
+#ifdef HAVE_GETLOGIN
 	char *lname=getlogin();
+	if (lname)
+		s = lname;
+#endif
 	
 	if (no <= 0) return;
-	if (lname) {
-		v_strcpy(no -1, lname);
-	} else {
-		char s[256];
-		sprintf(s, "%d", getuid());
-		v_strcpy(no -1, s);
-	}
+	svar_set(no, s);
 	
-	DEBUG_COMMAND("ZZ14 %d:\n", no);
+	TRACE("ZZ14 %d:", no);
 }
 
 void commandZG() {
@@ -464,7 +504,7 @@ void commandZG() {
 	
 	cg_loadCountVar = var;
 	
-	DEBUG_COMMAND("ZG %p:\n",var);
+	TRACE("ZG %p:",var);
 }
 
 void commandZI() { /* T2 */
@@ -474,36 +514,36 @@ void commandZI() { /* T2 */
 	
 	set_hak_keymode(key, mode);
 	
-	DEBUG_COMMAND("ZI %d,%d:\n", key, mode);
+	TRACE("ZI %d,%d:", key, mode);
 }
 
 void commandZA() { /* T2 */
 	/* 文字飾りの種類を指定する */
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int p2 = getCaliValue();
 	
 	switch(p1) {
 	case 0:
-		msg_setStringDecorationType(p2); break;
+		ags_setTextDecorationType(p2); break;
 	case 1:
-		msg_setStringDecorationColor(p2); break;
+		ags_setTextDecorationColor(p2); break;
 	case 2:
 	case 3:
-		nact->msg.AutoPageChange = (p2 == 0 ? FALSE : TRUE); break;
+		nact->msg.AutoPageChange = p2 != 0; break;
 	default:
-		WARNING("Unknown ZA comannd %d, %d\n", p1, p2);
+		WARNING("Unknown ZA comannd %d, %d", p1, p2);
 	}
 	
-	DEBUG_COMMAND("ZA %d,%d:\n", p1, p2);
+	TRACE("ZA %d,%d:", p1, p2);
 }
 
 void commandZK() {
 	// ディスクの入れ替えを促す
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
-	char *str = sys_getString(':');
+	const char *str = sl_getString(':');
 	
-	DEBUG_COMMAND("ZK %d,%d,%s:\n", p1, p2, str);
+	TRACE("ZK %d,%d,%s:", p1, p2, str);
 }
 
 void commandZR() {
@@ -517,5 +557,19 @@ void commandZR() {
 		*var = (int)(genrand() * num) +1;
 	}
 	
-	DEBUG_COMMAND("ZR %d,%d:\n", num, *var);
+	TRACE("ZR %d,%d:", num, *var);
+}
+
+void commandZU() {
+	/* xsystem35 extension: sets unicode mode */
+	int sw = getCaliValue();
+
+	if (sw <= CHARACTER_ENCODING_MAX)
+		sys_setCharacterEncoding(sw);
+
+	TRACE("ZU %d:",sw);
+}
+
+void cmdz_reset(void) {
+	memset(counters, 0, sizeof(counters));
 }

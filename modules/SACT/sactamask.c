@@ -24,157 +24,79 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <glib.h>
+#include <stdlib.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
 #include "LittleEndian.h"
-#include "imput.h"
+#include "ags.h"
 #include "sact.h"
-#include "surface.h"
-#include "ngraph.h"
+#include "pms.h"
 #include "sprite.h"
-#include "counter.h"
+#include "effect.h"
+#include "mmap.h"
 
-static surface_t *smask_get(int no);
-static surface_t *smask_mul(surface_t *sf, int val);
+// SACTEFAM を使ったマスク
+typedef struct {
+	mmap_t *mmap;
+	int datanum;  // SACTEFAM.KLD 中のマスクファイルの数
+	int *no;      // シナリオ側での番号
+	int *offset;  // データへのオフセット
+} SACTEFAM_t;
 
-
-
-struct ecopyparam {
-	int sttime;
-	int curtime;
-	int edtime;
-	int curstep;
-	int oldstep;
-};
-typedef struct ecopyparam ecopyparam_t;
-static ecopyparam_t ecp;
+static SACTEFAM_t am;
 
 // SACTEFAM.KLD の読み込み
-int smask_init(char *path) {
-	struct stat sbuf;
-	int i, fd;
-	char *adr;
-	SACTEFAM_t *am;
+bool smask_init(char *path) {
+	if (am.mmap)
+		return true;  // already loaded
 
-	if (0 > (fd = open(path, O_RDONLY))) {
-		WARNING("open: %s\n", strerror(errno));
-		return NG;
+	mmap_t *m = map_file(path);
+	if (!m)
+		return false;
+	am.mmap = m;
+	am.datanum = LittleEndian_getDW(m->addr, 0);
+	am.no = malloc(sizeof(int) * am.datanum);
+	am.offset = malloc(sizeof(int) * am.datanum);
+	
+	for (int i = 0; i < am.datanum; i++) {
+		am.no[i] = LittleEndian_getDW(m->addr, 16 + i * 16);
+		am.offset[i] = LittleEndian_getDW(m->addr, 16 + i * 16 + 8);
 	}
 	
-	if (0 > fstat(fd, &sbuf)) {
-		WARNING("fstat: %s\n", strerror(errno));
-		close(fd);
-		return NG;
-	}
-
-	if (MAP_FAILED == (adr = mmap(0, sbuf.st_size, PROT_READ, MAP_SHARED, fd, 0))) {
-		WARNING("mmap: %s\n", strerror(errno));
-		close(fd);
-		return NG;
-	}
-	
-	am = &sact.am;
-	am->mapadr = adr;
-	am->size = sbuf.st_size;
-	am->fd = fd;
-	
-	am->datanum = LittleEndian_getDW(adr, 0);
-	am->no = g_new(int, am->datanum);
-	am->offset = g_new(int, am->datanum);
-	
-	for (i = 0; i < am->datanum; i++) {
-		am->no[i] = LittleEndian_getDW(adr, 16 + i * 16);
-		am->offset[i] = LittleEndian_getDW(adr, 16 + i * 16 + 8);
-	}
-	
-	return OK;
+	return true;
 }
 
 // 指定番号の alphamask ファイルをよみだす
-static surface_t *smask_get(int no) {
+static cgdata *smask_get(int no) {
 	int i;
-	SACTEFAM_t *am = &sact.am;
 	
-	for (i = 0; i < am->datanum; i++) {
-		if (am->no[i] == no) break;
+	for (i = 0; i < am.datanum; i++) {
+		if (am.no[i] == no) break;
 	}
 
-	if (i == am->datanum) return NULL;
+	if (i == am.datanum) return NULL;
 	
-	return sf_getcg(am->mapadr + am->offset[i]);
-}
-
-// ベースになるマスクの alpha 値を拡大して取り出す
-static surface_t *smask_mul(surface_t *sf, int val) {
-	surface_t *out = sf_create_alpha(sf->width, sf->height);
-	BYTE *src = sf->alpha;
-	BYTE *dst = out->alpha;
-	int pix = sf->width * sf->height;
-
-	while(pix--) {
-		int i = (*src - val) * 16;
-		if (i < 0)        *dst = 255; // 指定値よりも大きいのはコピー
-		else if (i > 255) *dst = 0;   // 指定値よりも小さいのは無視
-		else              *dst = 255-i; // それ以外は値を16倍
-		src++; dst++;
-	}
-	
-	return out;
+	return pms256_extract(am.mmap->addr + am.offset[i]);
 }
 
 /**
  * マスクつき画面更新
  */
-int sp_eupdate_amap(int index, int time, int cancel) {
-	surface_t *mask, *mask2;
-	surface_t *sfsrc, *sfdst;
-	int key;
-	
-	mask = smask_get(index);
+void sp_eupdate_amap(int index, int time, int cancel) {
+	cgdata *mask = smask_get(index);
 	if (mask == NULL) {
-		sp_update_all(TRUE);
-		return OK;
+		sp_update_all(true);
+		return;
 	}
-	
-	// 現在の sf0 をセーブ
-	sfsrc = sf_dup(sf0);
-	sp_update_all(FALSE);
-	sfdst = sf_dup(sf0);
-	sf_copyall(sf0, sfsrc);
-	
-	ecp.sttime = ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
-	ecp.edtime = ecp.curtime + time*10;
-	ecp.oldstep = 0;
-	
-	while ((ecp.curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < ecp.edtime) {
-		int curstep = 255 * (ecp.curtime - ecp.sttime)/ (ecp.edtime - ecp.sttime);
-		// 元になるマスクのalpha値を16倍して欲しいところだけ取り出す
-		mask2 = smask_mul(mask, curstep);
-		
-		gre_BlendUseAMap(sf0, 0, 0, sfsrc, 0, 0, sfdst, 0, 0, sfsrc->width, sfsrc->height, mask2, 0, 0, 255);
-		ags_updateFull();
-		
-		key = sys_keywait(10, cancel);
-		if (cancel && key) break;
-		
-		// 一時マスクを削除
-		sf_free(mask2);
-	}
-	
-	sf_copyall(sf0, sfdst);
+	SDL_Surface *mask_sf = SDL_CreateRGBSurfaceFrom(mask->pic, mask->width, mask->height, 8, mask->width, 0, 0, 0, 0);
+	sp_update_all(false);  // old = gfx_texture, new = main_surface
+	struct effect *eff = effect_sactamask_init(mask_sf);
+	ags_runEffect(time * 10, cancel, (ags_EffectStepFunc)effect_step, eff);
+	effect_finish(eff);
 	ags_updateFull();
-	sf_free(sfsrc);
-	sf_free(sfdst);
-	
-	sf_free(mask);
-	return OK;
+
+	SDL_FreeSurface(mask_sf);
+	cgdata_free(mask);
 }

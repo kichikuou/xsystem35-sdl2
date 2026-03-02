@@ -23,14 +23,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include "portab.h"
 #include "utfsjis.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "menu.h"
+#include "cmd_check.h"
 
 /* NI/NT 用パラメータ */
-INPUTNUM_PARAM ni_param;
+static INPUTNUM_PARAM ni_param;
 
 void commandNB() {
 	/* var1 から始まるcount個の変数へ
@@ -40,16 +43,16 @@ void commandNB() {
 	int cnt   = getCaliValue();
 	
 	if (var1 == NULL) {
-		WARNING("NB dst variable(var1) is NULL\n");
+		WARNING("NB dst variable(var1) is NULL");
 		return;
 	}
 	
 	if (var2 == NULL) {
-		WARNING("NB src variable(var2) is NULL\n");
+		WARNING("NB src variable(var2) is NULL");
 		return;
 	}
 	
-	DEBUG_COMMAND("NB %d,%d,%d:\n", *var1, *var2, cnt);
+	TRACE("NB %d,%d,%d:", *var1, *var2, cnt);
 	while(cnt--) {
 		*var1 = *var2; var1++; var2++;
 	}
@@ -60,7 +63,7 @@ void commandNC() {
 	int *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	
-	DEBUG_COMMAND("NC %d,%d:\n", *var1, cnt);
+	TRACE("NC %d,%d:", *var1, cnt);
 	
 	while(cnt--) {
 		*var1++ = 0;
@@ -73,8 +76,8 @@ void commandNR() {
 	int var1  = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	*var2 = (int)sqrt(var1);
-	DEBUG_COMMAND("NR %d,%d:\n", var1, *var2);
+	*var2 = (int)sqrtf(var1);
+	TRACE("NR %d,%d:", var1, *var2);
 }
 
 void commandN_ADD() {
@@ -83,9 +86,9 @@ void commandN_ADD() {
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
 	
-	DEBUG_COMMAND("N+ %d,%d,%d:\n", *var1, num, cnt);
+	TRACE("N+ %d,%d,%d:", *var1, num, cnt);
 	while(cnt--) {
-		*var1 = (int)((WORD)(*var1 + num)) ; var1++;
+		*var1 = (uint16_t)(*var1 + num); var1++;
 		// *var1 += num; var1++;
 	}
 }
@@ -96,7 +99,7 @@ void commandN_SUB() {
 	int num  = getCaliValue();
 	int cnt  = getCaliValue();
 	
-	DEBUG_COMMAND("N- %d,%d,%d:\n", *var1, num, cnt);
+	TRACE("N- %d,%d,%d:", *var1, num, cnt);
 	while(cnt--) {
 		*var1 = max(0, *var1 - num); var1++;
 		// *var1 -= num; var1++;
@@ -109,9 +112,9 @@ void commandN_MUL() {
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
 	
-	DEBUG_COMMAND("N* %d,%d,%d:\n", *var1, num, cnt);
+	TRACE("N* %d,%d,%d:", *var1, num, cnt);
 	while(cnt--) {
-		*var1 = (int)((WORD)(*var1 * num)); var1++;
+		*var1 = (uint16_t)(*var1 * num); var1++;
 		// *var1 *= num; var1++;
 	}
 }
@@ -122,7 +125,7 @@ void commandN_DIV() {
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
 	
-	DEBUG_COMMAND("N/ %d,%d,%d:\n", *var1, num, cnt);
+	TRACE("N/ %d,%d,%d:", *var1, num, cnt);
 	while(cnt--) {
 		// *var1 = (unsigned short)(*var1)/num; var1++;
 		*var1 /= num; var1++;
@@ -138,7 +141,7 @@ void commandN_GT() {
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	DEBUG_COMMAND("N> %d,%d,%d,%d:\n", *var1, num, cnt, *var2);
+	TRACE("N> %d,%d,%d,%d:", *var1, num, cnt, *var2);
 	while (cnt--) {
 		*var2 = *var1 > num ? 1 : 0; var1++; var2++;
 	}
@@ -153,7 +156,7 @@ void commandN_LT() {
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	DEBUG_COMMAND("N< %p,%d,%d,%p:\n", var1, num, cnt, var2);
+	TRACE("N< %p,%d,%d,%p:", var1, num, cnt, var2);
 	while(cnt--) {
 		*var2 = *var1 < num ? 1 : 0; var1++; var2++;
 	}
@@ -168,7 +171,7 @@ void commandN_EQ() {
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	DEBUG_COMMAND("N= %p,%d,%d,%p:\n", var1, num, cnt, var2);
+	TRACE("N= %p,%d,%d,%p:", var1, num, cnt, var2);
 	while(cnt--) {
 		*var2 = *var1 == num ? 1 : 0; var1++; var2++;
 	}
@@ -179,7 +182,7 @@ void commandN_NE() {
 	int *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	
-	DEBUG_COMMAND("N\\ %p,%d:\n", var1, cnt);
+	TRACE("N\\ %p,%d:", var1, cnt);
 	while(cnt--) {
 		*var1 ^= 1; var1++;
 	}
@@ -191,7 +194,7 @@ void commandN_AND() {
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	DEBUG_COMMAND("N& %p,%d,%p:\n", var1, cnt, var2);
+	TRACE("N& %p,%d,%p:", var1, cnt, var2);
 	while(cnt--) {
 		*var2 &= *var1; var1++; var2++;
 	}
@@ -203,7 +206,7 @@ void commandN_OR() {
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	DEBUG_COMMAND("N| %p,%d,%p:\n", var1, cnt, var2);
+	TRACE("N| %p,%d,%p:", var1, cnt, var2);
 	while(cnt--) {
 		*var2 |= *var1; var1++; var2++;
 	}
@@ -215,7 +218,7 @@ void commandN_XOR() {
 	int cnt   = getCaliValue();
 	int *var2 = getCaliVariable();
 	
-	DEBUG_COMMAND("N^ %p,%d,%p:\n", var1, cnt, var2);
+	TRACE("N^ %p,%d,%p:", var1, cnt, var2);
 	while(cnt--) {
 		*var2 ^= *var1; var1++; var2++;
 	}
@@ -226,14 +229,14 @@ void commandN_NOT() {
 	int *var = getCaliVariable();
 	int cnt  = getCaliValue();
 	
-	DEBUG_COMMAND("N~ %p,%d\n", var, cnt);
+	TRACE("N~ %p,%d", var, cnt);
 	while(cnt--) {
 		*var ^= 0xffff; var++;
 	}
 }
 
 void commandNO() { /* T2 */
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int *dst_var = getCaliVariable();
 	int *src_var = getCaliVariable();
 	int cnt      = getCaliValue();
@@ -257,10 +260,10 @@ void commandNO() { /* T2 */
 			*dst_var = (tmp & (1 << (15 - (i%16)))) ? 1 : 0; dst_var++;
 		}
 	} else {
-		WARNING("Unknown NO %d command\n", p1);
+		WARNING("Unknown NO %d command", p1);
 	}
 	
-	DEBUG_COMMAND("NO %d,%p,%p,%d:\n", p1, src_var, dst_var, cnt);
+	TRACE("NO %d,%p,%p,%d:", p1, src_var, dst_var, cnt);
 }
 
 void commandNDC() {
@@ -269,7 +272,7 @@ void commandNDC() {
 	int num  = getCaliValue();
 	longVar[w64n] = num;
 	
-	DEBUG_COMMAND("NDC %d,%d:\n", w64n, num);
+	TRACE("NDC %d,%d:", w64n, num);
 }
 
 void commandNDD() {
@@ -278,7 +281,7 @@ void commandNDD() {
 	int w64n = getCaliValue();
 	*var = (int)longVar[w64n];
 	
-	DEBUG_COMMAND("NDD %p,%d:\n", var, w64n);
+	TRACE("NDD %p,%d:", var, w64n);
 }
 
 void commandNDM() {
@@ -286,7 +289,7 @@ void commandNDM() {
 	int str  = getCaliValue();
 	int w64n = getCaliValue();
 	
-	DEBUG_COMMAND_YET("NDM %d,%d:\n", str, w64n);
+	TRACE_UNIMPLEMENTED("NDM %d,%d:", str, w64n);
 }
 
 void commandNDA() { 
@@ -294,7 +297,7 @@ void commandNDA() {
 	int str  = getCaliValue();
 	int w64n = getCaliValue();
 	
-	DEBUG_COMMAND_YET("NDA %d,%d:\n", str, w64n);
+	TRACE_UNIMPLEMENTED("NDA %d,%d:", str, w64n);
 }
 
 void commandNDH() {
@@ -302,7 +305,7 @@ void commandNDH() {
 	int str  = getCaliValue();
 	int w64n = getCaliValue();
 	
-	DEBUG_COMMAND_YET("NDH %d,%d:\n", str, w64n);
+	TRACE_UNIMPLEMENTED("NDH %d,%d:", str, w64n);
 }
 
 void commandND_ADD() {
@@ -313,7 +316,7 @@ void commandND_ADD() {
 	
 	longVar[w64n1] = longVar[w64n2] + longVar[w64n3];
 	
-	DEBUG_COMMAND("ND+ %d,%d,%d:\n", w64n1, w64n2);
+	TRACE("ND+ %d,%d,%d:", w64n1, w64n2);
 }
 
 void commandND_SUB() {
@@ -324,7 +327,7 @@ void commandND_SUB() {
 	
 	longVar[w64n1] = longVar[w64n2] - longVar[w64n3];
 	
-	DEBUG_COMMAND("ND- %d,%d,%d:\n", w64n1, w64n2, w64n3);
+	TRACE("ND- %d,%d,%d:", w64n1, w64n2, w64n3);
 }
 
 void commandND_MUL() {
@@ -335,7 +338,7 @@ void commandND_MUL() {
 	
 	longVar[w64n1] = longVar[w64n2] * longVar[w64n3];
 	
-	DEBUG_COMMAND("ND* %d,%d,%d:\n", w64n1, w64n2, w64n3);
+	TRACE("ND* %d,%d,%d:", w64n1, w64n2, w64n3);
 }
 
 void commandND_DIV() {
@@ -346,7 +349,7 @@ void commandND_DIV() {
 	
 	longVar[w64n1] = longVar[w64n2] / longVar[w64n3];
 	
-	DEBUG_COMMAND("ND/ %d,%d,%d:\n", w64n1, w64n2, w64n3);
+	TRACE("ND/ %d,%d,%d:", w64n1, w64n2, w64n3);
 }
 
 void commandNI() { /* From Panyo */
@@ -359,6 +362,8 @@ void commandNI() { /* From Panyo */
 	ni_param.def = def;
 	ni_param.max = _max;
 	ni_param.min = _min;
+	if (!ni_param.title)
+		ni_param.title = strdup("");
 	
 	menu_inputnumber(&ni_param);
 	
@@ -369,21 +374,17 @@ void commandNI() { /* From Panyo */
 		sysVar[0] = 0;
 	}
 	
-	DEBUG_COMMAND("NI %p,%d,%d,%d:\n", var, def, _min, _max);
+	TRACE("NI %p,%d,%d,%d:", var, def, _min, _max);
 }
 
-void commandNT() { /* From Panyo */
+void commandNT(char terminator) {
 	/* NIコマンドで表示するタイトルを設定する。*/
-	char *str = sys_getString(':');
-	char *t;
+	const char *str = sl_getString(terminator);
 
-	if (ni_param.title != NULL) {
-		free(ni_param.title);
-	}
-	t = sjis2lang(str);
-	ni_param.title = t;
+	free(ni_param.title);
+	ni_param.title = toUTF8(str);
 	
-	DEBUG_COMMAND("NT %p:\n", str);
+	TRACE("NT %p:", str);
 }
 
 void commandNP() {
@@ -393,7 +394,7 @@ void commandNP() {
 	int count   = getCaliValue();
 	int *result = getCaliVariable();
 	
-	DEBUG_COMMAND("NP %d,%d,%d,%d:\n", *var1, *var2, count, *result);
+	TRACE("NP %d,%d,%d,%d:", *var1, *var2, count, *result);
 
 	while(count--) {
 		if (*var1 != *var2) {

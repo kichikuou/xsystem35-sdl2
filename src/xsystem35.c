@@ -28,91 +28,78 @@
 #include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
+
+#ifdef HAVE_SIGACTION
 #include <signal.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <ctype.h>
+#endif
 
 #ifdef ENABLE_GTK
-#  define GTK_RC_NAME ".gtk/gtkrc"
-#  include <gtk/gtk.h>
+#include <gtk/gtk.h>
 #endif
 
-#ifdef HAVE_MKDTEMP
-#include <stdlib.h>
-#else
-extern char *mkdtemp (char *template);
+#include <SDL.h>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 #endif
 
+#ifdef _WIN32
+#include "win/dialog.h"
+#endif
 
 #include "nact.h"
+#include "debugger.h"
 #include "portab.h"
 #include "xsystem35.h"
 #include "nact.h"
 #include "profile.h"
 #include "randMT.h"
-#include "counter.h"
 #include "ags.h"
-#include "graphicsdevice.h"
+#include "font.h"
+#include "cg.h"
+#include "gfx.h"
+#include "event.h"
 #include "menu.h"
 #include "music.h"
-#include "music_client.h"
+#include "music_cdrom.h"
 #include "savedata.h"
 #include "scenario.h"
 #include "variable.h"
-#include "dri.h"
 #include "ald_manager.h"
+#include "gameresource.h"
 #include "filecheck.h"
-#include "joystick.h"
 #include "s39init.h"
+#include "msgskip.h"
+#include "texthook.h"
 
-#ifdef ENABLE_MMX
-#include "haveunit.h"
-#endif
-
-static char *gameResorceFile = "xsystem35.gr";
-static void    sys35_usage(boolean verbose);
+static char *gameResourceFile = "xsystem35.gr";
+static void    sys35_usage(bool verbose);
 static void    sys35_init();
-static void    sys35_remove();
-static boolean sys35_initGameDataResorce();
 static void    sys35_ParseOption(int *argc, char **argv);
-static void    signal_handler(int sig_num);
-static void    signal_handler_segv(int sig_num);
 static void    check_profile();
-static void    init_signalhandler();
 
-/* for debugging */
-static FILE *fpdebuglog;
-static int debuglv = DEBUGLEVEL;
-int sys_nextdebuglv;
+static const char *render_driver = NULL;
 
-/* game data file name */
-static char *gamefname[DRIFILETYPEMAX][DRIFILEMAX];
+enum {
+	DEBUGGER_DISABLED,
+	DEBUGGER_CUI,
+	DEBUGGER_DAP,
+} debugger_mode = DEBUGGER_DISABLED;
+
+static int audio_buffer_size = 0;
 
 /* font name from rcfile */
-static char *fontname[FONTTYPEMAX];
-static char *fontname_tt[FONTTYPEMAX];
-static boolean isjix0213_tt[FONTTYPEMAX];
+static const char *fontname_tt[FONTTYPEMAX] = {DEFAULT_GOTHIC_TTF, DEFAULT_MINCHO_TTF};
 static char fontface[FONTTYPEMAX];
 
-#ifdef ENABLE_EDL
-static fontdev_t fontdev = FONT_FT2;
-#else
-static fontdev_t fontdev = FONT_X11;
-#endif
-
-/* antialias on from command line */
-static boolean font_antialias;
-static boolean font_noantialias;
-
+static const char *savedir;
+static bool font_noantialias;
+static bool enable_zb = false;
+static bool integer_scaling = false;
 /* fullscreen on from command line */
-static boolean fs_on;
+static bool fs_on;
 
-// for reboot
-static int saved_argc;
-static char **saved_argv;
-
-static void sys35_usage(boolean verbose) {
+static void sys35_usage(bool verbose) {
 	if (verbose) {
 		puts("System35 for X Window System [proj. Rainy Moon]");
 		puts("             (C) Masaki Chikama(Wren) 1997-2002");
@@ -120,360 +107,48 @@ static void sys35_usage(boolean verbose) {
 	}
 	puts("Usage: xsystem35 [OPTIONS]\n");
 	puts("OPTIONS");
-	puts(" -gamefile file : set game resouce file to 'file'");
-	puts(" -no-shm        : don't use MIT-SHM (use in another display)");
-	puts(" -devcd device  : set cdrom device name to 'device'");
-	puts(" -devmidi device: set midi device name to 'device'");
-	puts(" -devdsp device : set audio device name to 'device'");
+	puts(" -gamefile file          : set game resource file to 'file'");
+	puts(" -game game              : enable game-specific hacks");
+	puts(" -savedir dir            : directory to save game state files");
+	puts(" -saveformat fmt         : save file format. 'xsystem35', 'system36' or 'system39' (default)");
+	puts(" -renderer name          : set rendering driver name to 'name'");
+	puts(" -playlist file          : load CD playlist from 'file'");
+	puts(" -texthook mode          : text hook mode. 'none' (default), 'print' or 'copy'");
+	puts(" -texthook_suppress list : suppress text hook on specified pages");
+	puts(" -censor file            : mosaic images listed in 'file'");
 	
-#ifdef ENABLE_OSS
-	puts("                :  /dev/dsp : oss type (device name)");
+	puts(" -M?                     : select output midi methos");
+#ifdef ENABLE_MIDI_SDLMIXER
+	puts(" -Me                     : SDL_mixer midi player");
 #endif
-#ifdef ENABLE_ALSA
-	puts("                :  hw:0,0   : alsa hardware");
+#ifdef ENABLE_MIDI_PORTMIDI
+	puts(" -Mp?                    : ALSA (via PortMidi) (?:devicenumber)");
 #endif
+	puts(" -M0                     : Disable MIDI output");
 	
-	puts(" -O?            : select output audio device");
-#ifdef ENABLE_OSS
-	puts(" -Oo            : OSS mode");
-#endif
-#ifdef ENABLE_ALSA
-	puts(" -Os            : ALSA mode");
-#endif
-#ifdef ENABLE_ESD
-	puts(" -Oe            : Enlightened Sound Daemon mode");
-#endif
-	puts(" -O0            : Disable Audio output");
+	puts(" -devjoy device          : joystick device index (0-)");
+
+	puts(" -ttfont_mincho          : set TrueType font for mincho");
+	puts(" -ttfont_gothic          : set TrueType font for mincho");
 	
-	puts(" -M?            : select output midi methos");
-#ifdef ENABLE_MIDI_EXTPLAYER
-	puts(" -Me            : External midi player");
-#endif
-#ifdef ENABLE_MIDI_RAWMIDI
-	puts(" -Mr            : Raw Midi device");
-#endif
-#ifdef ENABLE_MIDI_SEQMIDI
-	puts(" -Ms?           : Sequenceer device (?:devicenumber)");
-#endif
-	puts(" -M0            : Disable MIDI output");
-	puts(" -midiplayer cmd: set external midi player to 'cmd'");
-	
-	puts(" -devmix device : set mixer device name to 'device' (effective only for oss)");
-	puts(" -devjoy device : set joystic device name to 'device'");
-	puts("                    if 'device' is set to 'none', don't use the device");
-	puts(" -savekanji #   : kanji code of filename (0 or 1 ... 0:utf-8, 1:sjis)");
 #ifdef DEBUG
-
-	puts(" -devfont device: select font device");
-#ifdef ENABLE_FT2
-	puts(" -devfont ttf   : FreerType (True Type Font)");
+	puts(" -debuglv #              : logging level");
+	puts("                         :  1: warings");
+	puts("                         :  2: unimplemented commands");
+	puts("                         :  5: command trace");
+	puts("                         :  6: message trace");
 #endif
-#ifdef ENABLE_X11FONT
-	puts(" -devfont x11   : x11");
+#ifdef ENABLE_DEBUGGER
+	puts(" -debug                  : start with debugger");
 #endif
-
-#ifdef ENABLE_EDL
-#ifdef ENABLE_GTK
-	puts("                : default is gtk");
-#else
-	puts("                : default is ttf");
-#endif
-#else
-	puts("                : default is x11");
-#endif
-
-#if defined(ENABLE_SDLTTF) || defined(ENABLE_FT2)
-	puts(" -ttfont_mincho: set TrueType font for mincho");
-	puts(" -ttfont_gothic: set TrueType font for mincho");
-#endif
-	puts(" -font_mincho  : set X11(gtk) font for mincho");
-	puts(" -font_gothic  : set X11(gtk) font for mincho");
-	
-	puts(" -debuglv #     : debug level");
-	puts("                :  0: critical error message only ");
-	puts("                :  1: + waring message");
-	puts("                :  2: + not implemented command message");
-	puts("                :  5: + implemented command (write to logfile)");
-	puts("                :  6: + message (write to logfile)");
-#endif  
-	puts(" -antialias     : always draw antialiased string (for !256 colors game)");
-	puts(" -noantialias   : nevser use antialiased string (for !256 colors game)");
-	puts(" -fullscreen    : start with fullscreen");
-	puts(" -noimagecursor : disable image cursor");
-	puts(" -version       : show version");
-	puts(" -h             : show this message");
-	puts(" --help         : show this message");
+	puts(" -noantialias            : never use antialiased string");
+	puts(" -fullscreen             : start with fullscreen");
+	puts(" -integerscale           : use integer scaling when resizing");
+	puts(" -noimagecursor          : disable image cursor");
+	puts(" -version                : show version");
+	puts(" -h                      : show this message");
+	puts(" --help                  : show this message");
 	exit(1);
-}
-
-void sys_message(char *format, ...) {
-	va_list args;
-	
-	va_start(args, format);
-#ifdef DEBUG
-	if (debuglv >= sys_nextdebuglv) {
-		if (sys_nextdebuglv >= 5) {
-			vfprintf(fpdebuglog, format, args);
-			fflush(fpdebuglog);
-		} else {
-			vfprintf(stderr, format, args);
-		}
-	}
-#else
-	if (debuglv >= sys_nextdebuglv) {
-		vfprintf(stderr, format, args);
-	}
-#endif
-	va_end(args);
-
-}
-
-void sys_error(char *format, ...) {
-	va_list args;
-	
-	va_start(args, format);
-	vfprintf(stderr, format, args);
-	va_end(args);
-	sys35_remove();
-	exit(1);
-}
-
-void sys_exit(int code) {
-	sys35_remove();
-	exit(code);
-}
-
-static int check_fontdev(char *devname) {
-#ifdef ENABLE_FT2
-	if (0 == strcmp(devname, "ft2")) {
-		return FONT_FT2;
-	}
-	if (0 == strcmp(devname, "ttf")) {
-		return FONT_FT2;
-	}
-#endif
-
-#ifdef ENABLE_X11FONT
-	if (0 == strcmp(devname, "x11")) {
-		return FONT_X11;
-	}
-#endif
-
-#ifdef ENABLE_SDL
-	return FONT_FT2;
-#else
-	return FONT_X11;
-#endif
-}
-
-static void storeDataName(int type, int no, char *src) {
-	gamefname[type][no] = strdup(src);
-}
-
-static void storeSaveName(int no, char *src) {
-	char *home_dir = "";
-	char *path = NULL;
-	
-	if (*src == '~') {
-		home_dir = getenv("HOME");
-		if (NULL == (path = malloc(strlen(home_dir) + strlen(src) + 1))) {
-			NOMEMERR();
-		}
-		sprintf(path, "%s%s", home_dir, src+1);
-		save_register_file(path, no);
-		src = path;
-	} else {
-		save_register_file(src, no);
-	}
-	
-	if (no == 0) {
-		char *b = strrchr(src, '/');
-		if (b == NULL) {
-			SYSERROR("Illigal save filename %s\n", src);
-		}
-		*b = '\0';
-		save_set_path(src);
-	}
-	if (path) free(path);
-}
-
-/* ゲームのデータファイルの情報をディレクトリから作成 thanx tajiri@wizard*/
-static boolean sys35_initGameDataDir(int* cnt)
-{
-    DIR* dir;
-    struct dirent* d;
-    char s1[256], s2[256];
-    int dno;
-    int i;
-    
-    getcwd(s1,255);
-    if(NULL == (dir= opendir(".")))
-    {
-        SYSERROR("Game Resouce File open failed\n");
-    }
-    while(NULL != (d = readdir(dir))){
-        char *filename = d->d_name;
-        int len = strlen(filename);
-        sprintf(s2,"%s%c%s",s1,'/',filename);
-        if(strcasecmp(filename,"adisk.ald")==0){
-            storeDataName(DRIFILE_SCO, 0, s2);
-            cnt[0] = max(1, cnt[0]);
-        } else if (strcasecmp(filename, "system39.ain") == 0) {
-		nact->ain.path_to_ain = strdup(filename);
-	}
-        else if(strcasecmp(filename+len-4,".ald")==0){
-            dno = toupper(*(filename+len-5)) - 'A';
-            if (dno < 0 || dno >= DRIFILEMAX) continue;
-            switch(*(filename+len-6)){
-                case 'S':
-                case 's':
-                    storeDataName(DRIFILE_SCO, dno, s2);
-                    cnt[0] = max(dno + 1, cnt[0]);
-                    break;
-                case 'g':
-                case 'G':
-                    storeDataName(DRIFILE_CG, dno, s2);
-                    cnt[1] = max(dno + 1, cnt[1]);
-                    break;
-                case 'W':
-                case 'w':
-                    storeDataName(DRIFILE_WAVE, dno, s2);
-                    cnt[2] = max(dno + 1, cnt[2]);
-                    break;
-                case 'M':
-                case 'm':
-                    storeDataName(DRIFILE_MIDI, dno, s2);
-                    cnt[3] = max(dno + 1, cnt[3]);
-                    break;
-                case 'D':
-                case 'd':
-                    storeDataName(DRIFILE_DATA, dno, s2);
-                    cnt[4] = max(dno + 1, cnt[4]);
-                    break;
-                case 'R':
-                case 'r':
-                    storeDataName(DRIFILE_RSC, dno, s2);
-                    cnt[5] = max(dno + 1, cnt[5]);
-                    break;
-                    
-            }
-        }
-    }
-    for(i=0;i<SAVE_MAXNUMBER;i++){
-        sprintf(s2,"%s/%c%s",s1,'a'+i,"sleep.asd");
-        storeSaveName(i, s2);
-    }
-
-    if(cnt[0]>0)
-        return TRUE;
-    else
-        return FALSE;
-}
-
-    
-/* ゲームのデータファイルの情報を読み込む */
-static boolean sys35_initGameDataResorce() {
-	int cnt[] = {0, 0, 0, 0, 0, 0, 0};
-	int linecnt = 0, dno;
-	FILE *fp;
-	char s[256];
-	char s1[256], s2[256];
-	
-	if (NULL == (fp = fopen(gameResorceFile, "r"))) {
-		if(sys35_initGameDataDir(cnt)==TRUE) {
-			goto initdata;
-		}
-		sys35_usage(TRUE);
-	}
-	while(fgets(s, 255, fp) != NULL ) {
-		linecnt++;
-		if (s[0] == '#') continue;
-		s2[0] = '\0';
-		sscanf(s,"%s %s", s1, s2);
-		if (s2[0] == '\0') continue;
-		if (0 == strncmp(s1, "Scenario", 8)) {
-			dno = s1[8] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_SCO, dno, s2);
-			cnt[0] = max(dno + 1, cnt[0]);
-		} else if (0 == strncmp(s1, "Graphics", 8)) {
-			dno = s1[8] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_CG, dno, s2);
-			cnt[1] = max(dno + 1, cnt[1]);
-		} else if (0 == strncmp(s1, "Wave", 4)) {
-			dno = s1[4] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_WAVE, dno, s2);
-			cnt[2] = max(dno + 1, cnt[2]);
-		} else if (0 == strncmp(s1, "Midi", 4)) {
-			dno = s1[4] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_MIDI, dno, s2);
-			cnt[3] = max(dno + 1, cnt[3]);
-		} else if (0 == strncmp(s1, "Data", 4)) {
-			dno = s1[4] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_DATA, dno, s2);
-			cnt[4] = max(dno + 1, cnt[4]);
-		} else if (0 == strncmp(s1, "Resource", 8)) {
-			dno = s1[8] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_RSC, dno, s2);
-			cnt[5] = max(dno + 1, cnt[5]);
-		} else if (0 == strncmp(s1, "BGM", 3)) {
-			dno = s1[3] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeDataName(DRIFILE_BGM, dno, s2);
-			cnt[6] = max(dno + 1, cnt[6]);
-		} else if (0 == strncmp(s1, "Save", 4)) {
-			dno = s1[4] - 'A';
-			if (dno < 0 || dno >= DRIFILEMAX) goto errexit;
-			storeSaveName(dno, s2);
-		} else if (0 == strncmp(s1, "Ain", 3)) {
-			nact->ain.path_to_ain = strdup(s2);
-		} else if (0 == strncmp(s1, "WAIA", 4)) {
-			nact->files.wai = strdup(s2);
-		} else if (0 == strncmp(s1, "BGIA", 4)) {
-			nact->files.bgi = strdup(s2);
-		} else if (0 == strncmp(s1, "SACT01", 6)) {
-			nact->files.sact01 = strdup(s2);
-		} else if (0 == strncmp(s1, "Init", 4)) {
-			nact->files.init = strdup(s2);
-		} else if (0 == strncmp(s1, "ALK", 3)) {
-			dno = s1[4] - '0';
-			if (dno < 0 || dno >= 10) goto errexit;
-			nact->files.alk[dno] = strdup(s2);
-		} else {
-			goto errexit;
-		}
-	}
-	fclose(fp);
-initdata:
-	if (cnt[0] == 0) {
-		SYSERROR("No Scenario data available\n");
-	}
-	
-	if (cnt[0] > 0)
-		ald_init(DRIFILE_SCO, gamefname[DRIFILE_SCO], cnt[0], TRUE);
-	if (cnt[1] > 0)
-		ald_init(DRIFILE_CG,  gamefname[DRIFILE_CG], cnt[1], TRUE);
-	if (cnt[2] > 0)
-		ald_init(DRIFILE_WAVE, gamefname[DRIFILE_WAVE], cnt[2], TRUE);
-	if (cnt[3] > 0)
-		ald_init(DRIFILE_MIDI, gamefname[DRIFILE_MIDI], cnt[3], TRUE);
-	if (cnt[4] > 0)
-		ald_init(DRIFILE_DATA, gamefname[DRIFILE_DATA], cnt[4], TRUE);
-	if (cnt[5] > 0)
-		ald_init(DRIFILE_RSC, gamefname[DRIFILE_RSC], cnt[5], TRUE);
-	if (cnt[6] > 0)
-		ald_init(DRIFILE_BGM, gamefname[DRIFILE_BGM], cnt[6], TRUE);
-
-	return 0;
-
- errexit:
-	SYSERROR("Illigal resouce at line(%d) file<%s>\n",linecnt, gameResorceFile);
-	return 0;
 }
 
 static void sys35_init() {
@@ -483,138 +158,107 @@ static void sys35_init() {
 	
 	sl_init();
 
-	v_initVars();
+	v_init();
 	
-	nact->fontdev = fontdev;
-	
-	ags_init();
+	ags_init(render_driver, enable_zb);
 
-	for (i = 0; i < FONTTYPEMAX; i++) {
-		switch(fontdev) {
-		case FONT_FT2:
-		case FONT_SDLTTF:
-			if (fontname_tt[i] == NULL) {
-				nact->ags.font->name[i] = strdup(FONT_DEFAULTNAME_TTF);
-			} else {
-				nact->ags.font->name[i] = fontname_tt[i];
-			}
-			nact->ags.font->isJISX0213[i] = isjix0213_tt[i];
-			nact->ags.font->face[i] = fontface[i];
-			break;
-			
-		case FONT_X11:
-			if (fontname[i] == NULL) {
-				nact->ags.font->name[i] = strdup(FONT_DEFAULTNAME_X);
-			} else {
-				nact->ags.font->name[i] = fontname[i];
-			}
-			break;
-		default:
-			break;
-		}
-	}
+	for (i = 0; i < FONTTYPEMAX; i++)
+		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
 	
-	ags_fullscreen(fs_on);
-	nact->noantialias = font_noantialias;
-	ags_setAntialiasedStringMode(font_antialias);
-	
-	
-	reset_counter(0);
+	gfx_setFullscreen(fs_on);
+	nact->ags.noantialias = font_noantialias;
+	ags_setAntialiasedStringMode(!font_noantialias);
 
 	sgenrand(getpid());
 
-#ifdef ENABLE_MMX
-	nact->mmx_is_ok = ((haveUNIT() & tMMX) ? TRUE : FALSE);
-#endif
-
-	msg_init();
-	sel_init();
-
-	s39ain_init();
-#ifdef ENABLE_GTK
-	s39ini_init();
-#endif
+	if (nact->files.ain)
+		s39ain_init(nact->files.ain, &nact->ain);
+	msgskip_init(nact->files.msgskip);
 }
 
-static void sys35_remove() {
+void sys35_remove(void) {
+	dbg_quit();
 	mus_exit(); 
 	ags_remove();
 #ifdef ENABLE_GTK
 	s39ini_remove();
 #endif
-	/* joy_close(); */
-#if DEBUG
-	if (debuglv >= 3) {
-		fclose(fpdebuglog);
-	}
-#endif
-	if (0 != strcmp(nact->tmpdir, "/tmp")) {
-		rmdir(nact->tmpdir);
-	}
 }
 
-void sys_reset() {
-	mus_exit();
-	ags_remove();
-#ifdef ENABLE_GTK
-	s39ini_remove();
-#endif
-	
-	if (0 != strcmp(nact->tmpdir, "/tmp")) {
-		rmdir(nact->tmpdir);
-	}
-	
-	execvp(saved_argv[0], saved_argv);
-	sys_error("exec fail");
+static void sys_reset(void) {
+	nact_reset();
+	ags_reset();
+	mus_reset();
+	s39ain_reset(&nact->ain);
 }
 
-static void signal_handler(int sig_num) {
-	sys35_remove();
-	exit(1);
-}	
-
-static void signal_handler_segv(int sig_num) {
-	fprintf(stderr, "PID(%d), sigsegv caught @ %03d, %05x\n", (int)getpid(), sl_getPage(), sl_getIndex());
-	sys35_remove();
-	exit(1);
-}	
+static bool set_texthook_mode(const char *mode) {
+	if (!strcasecmp(mode, "none")) {
+		texthook_set_mode(TEXTHOOK_NONE);
+	} else if (!strcasecmp(mode, "print")) {
+		texthook_set_mode(TEXTHOOK_PRINT);
+	} else if (!strcasecmp(mode, "copy")) {
+		texthook_set_mode(TEXTHOOK_COPY);
+	} else {
+		return false;
+	}
+	return true;
+}
 
 static void sys35_ParseOption(int *argc, char **argv) {
 	int i;
 	FILE *fp;
 	for (i = 1; i < *argc; i++) {
 		if (!strcmp(argv[i], "-h")) {
-			sys35_usage(TRUE);
+			sys35_usage(true);
 		}
 		if (!strcmp(argv[i], "--help")) {
-			sys35_usage(TRUE);
+			sys35_usage(true);
 		}
 	}
 	for (i = 1; i < *argc; i++) {
+		if (0 == strcmp(argv[i], "-savedir")) {
+			if (i == *argc - 1) {
+				fprintf(stderr, "xsystem35: The -savedir option requires directory name\n\n");
+				sys35_usage(false);
+			}
+			savedir = argv[++i];
+		}
 		if (0 == strcmp(argv[i], "-gamefile")) {
 			if (i == *argc - 1) {
 				fprintf(stderr, "xsystem35: The -gamefile option requires file value\n\n");
-				sys35_usage(FALSE);
+				sys35_usage(false);
 			}
 			if (NULL == (fp = fopen(argv[i + 1],"r"))) {
 				fprintf(stderr, "xsystem35: gamefile '%s' not found\n\n", argv[i + 1]);
-				sys35_usage(FALSE);
+				sys35_usage(false);
 			}
 			fclose(fp);
-			gameResorceFile = argv[i + 1];
-		} else if (0 == strcmp(argv[i], "-no-shm")) {
-			SetNoShmMode();
-		} else if (0 == strcmp(argv[i], "-devcd")) {
+			gameResourceFile = argv[i + 1];
+		} else if (0 == strcmp(argv[i], "-debug")) {
+			debugger_mode = DEBUGGER_CUI;
+		} else if (0 == strcmp(argv[i], "-debug_dap")) {
+			debugger_mode = DEBUGGER_DAP;
+		} else if (0 == strcmp(argv[i], "-renderer")) {
+			render_driver = argv[i + 1];
+		} else if (0 == strcmp(argv[i], "-playlist") || 0 == strcmp(argv[i], "-devcd")) {
 			if (argv[i + 1] != NULL) {
-				cd_set_devicename(argv[i + 1]);
+				muscd_set_playlist(argv[i + 1]);
 			}
-		} else if (0 == strcmp(argv[i], "-devmidi")) {
+		} else if (0 == strcmp(argv[i], "-texthook")) {
 			if (argv[i + 1] != NULL) {
-				midi_set_devicename(argv[i + 1]);
+				if (!set_texthook_mode(argv[i + 1])) {
+					fprintf(stderr, "xsystem35: Invalid texthook mode '%s'\n\n", argv[i + 1]);
+					sys35_usage(false);
+				}
 			}
-		} else if (0 == strcmp(argv[i], "-midiplayer")) {
+		} else if (0 == strcmp(argv[i], "-texthook_suppress")) {
 			if (argv[i + 1] != NULL) {
-				midi_set_playername(argv[i + 1]);
+				texthook_set_suppression_list(argv[i + 1]);
+			}
+		} else if (0 == strcmp(argv[i], "-censor")) {
+			if (argv[i + 1] != NULL) {
+				load_censor_list(argv[i + 1]);
 			}
 		} else if (0 == strncmp(argv[i], "-M", 2)) {
 			int subdev = 0;
@@ -622,42 +266,16 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				subdev = (argv[i][3] - '0') << 8;
 			}
 			midi_set_output_device(argv[i][2] | subdev);
-		} else if (0 == strcmp(argv[i], "-devdsp")) {
-			if (argv[i + 1] != NULL) {
-				audio_set_pcm_devicename(argv[i + 1]);
-			}
-		} else if (0 == strncmp(argv[i], "-O", 2)) {
-			audio_set_output_device(argv[i][2]);
-		} else if (0 == strcmp(argv[i], "-devmix")) {
-			if (argv[i + 1] != NULL) {
-				audio_set_mixer_devicename(argv[i + 1]);
-			}
 		} else if (0 == strcmp(argv[i], "-devjoy")) {
 			if (argv[i + 1] != NULL) {
-				joy_set_devicename(argv[i + 1]);
-			}
-		} else if (0 == strcmp(argv[i], "-savekanji")) {
-			if (argv[i + 1] != NULL) {
-				fc_set_default_kanjicode(argv[i + 1][0] - '0');
+				event_set_joy_device_index(atoi(argv[i + 1]));
 			}
 		} else if (0 == strcmp(argv[i], "-fullscreen")) {
-			fs_on = TRUE;
-		} else if (0 == strcmp(argv[i], "-antialias")) {
-			font_antialias = TRUE;
+			fs_on = true;
 		} else if (0 == strcmp(argv[i], "-noantialias")) {
-			font_noantialias = TRUE;
-		} else if (0 == strcmp(argv[i], "-devfont")) {
-			if (argv[i + 1] != NULL) {
-				fontdev = check_fontdev(argv[i + 1]);
-			}
-		} else if (0 == strcmp(argv[i], "-font_gothic")) {
-			if (argv[i + 1] != NULL) {
-				fontname[FONT_GOTHIC] = argv[i + 1];
-			}
-		} else if (0 == strcmp(argv[i], "-font_mincho")) {
-			if (argv[i + 1] != NULL) {
-				fontname[FONT_MINCHO] = argv[i + 1];
-			}
+			font_noantialias = true;
+		} else if (0 == strcmp(argv[i], "-enable_zb")) {
+			enable_zb = true;
 		} else if (0 == strcmp(argv[i], "-ttfont_gothic")) {
 			if (argv[i + 1] != NULL) {
 				fontname_tt[FONT_GOTHIC] = argv[i + 1];
@@ -667,35 +285,34 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				fontname_tt[FONT_MINCHO] = argv[i + 1];
 			}
 		} else if (0 == strcmp(argv[i], "-noimagecursor")) {
-			nact->noimagecursor = TRUE;
+			nact->ags.noimagecursor = true;
 		} else if (0 == strcmp(argv[i], "-debuglv")) {
 			if (argv[i + 1] != NULL) {
-				debuglv = argv[i + 1][0] - '0';
+				sys_set_debug_level(argv[i + 1][0] - '0');
 			}
 		} else if (0 == strcmp(argv[i], "-version")) {
 			puts(VERSION);
 			exit(0);
+		} else if (0 == strcmp(argv[i], "-integerscale")) {
+			integer_scaling = true;
+		} else if (0 == strcmp(argv[i], "-game")) {
+			if (argv[i + 1] != NULL) {
+				enable_hack_by_gameid(argv[i + 1]);
+			}
+		} else if (0 == strcmp(argv[i], "-saveformat")) {
+			if (argv[i + 1] != NULL) {
+				save_setFormat(argv[i + 1]);
+			}
 		}
 	}
 }
 
 static void check_profile() {
-	char *param;
+	const char *param;
 	
-	/* フォントデバイスの選択 */
-	param = get_profile("font_device");
+	param = get_profile("savedir");
 	if (param) {
-		fontdev = check_fontdev(param);
-	}
-	/* ゴシックフォントの設定 */
-	param = get_profile("font_gothic");
-	if (param) {
-		fontname[FONT_GOTHIC] = param;
-	}
-	/* 明朝フォントの設定 */
-	param = get_profile("font_mincho");
-	if (param) {
-		fontname[FONT_MINCHO] = param;
+		savedir = param;
 	}
 	/* ゴシックフォント(TT)の設定 */
 	param = get_profile("ttfont_gothic");
@@ -707,16 +324,6 @@ static void check_profile() {
 	if (param) {
 		fontname_tt[FONT_MINCHO] = param;
 	}
-	/* ゴシックフォント(TT)のコード設定 */
-	param = get_profile("ttfont_gothic_code");
-	if (param) {
-		isjix0213_tt[FONT_GOTHIC] = (strcmp("jisx0213",param) == 0 ? TRUE : FALSE);
-	}
-	/* 明朝フォント(TT)のコード設定 */
-	param = get_profile("ttfont_mincho_code");
-	if (param) {
-		isjix0213_tt[FONT_MINCHO] = (strcmp("jisx0213",param) == 0 ? TRUE : FALSE);
-	}
 	/* ゴシックフォント(TT)のフェイス指定 */
 	param = get_profile("ttfont_gothic_face");
 	if (param) {
@@ -727,40 +334,39 @@ static void check_profile() {
 	if (param) {
 		fontface[FONT_MINCHO] = *param - '0';
 	}
-	/* CD-ROM device name の設定 */
-	param = get_profile("cdrom_device");
-	if (param) {
-		cd_set_devicename(param);
+	/* Font antialiasing */
+	bool antialias;
+	if (get_boolean_profile("antialias", &antialias)) {
+		font_noantialias = !antialias;
 	}
-	/* DSP device name の設定 */
-	param = get_profile("dsp_device");
+
+	/* Enable ZB command (font weight) */
+	get_boolean_profile("enable_zb", &enable_zb);
+
+	/* Audio buffer size */
+	param = get_profile("audio_buffer_size");
 	if (param) {
-		audio_set_pcm_devicename(param);
+		audio_buffer_size = atoi(param);
 	}
-	/* mixer device name の設定 */
-	param = get_profile("mixer_device");
+
+	/* Rendering driver */
+	param = get_profile("render_driver");
 	if (param) {
-		audio_set_mixer_devicename(param);
+		render_driver = param;
 	}
-	/* audio output device の設定 */
-	param = get_profile("audio_output_device");
+
+	/* CD-ROM playlist */
+	param = get_profile("playlist");
+	if (!param)
+		param = get_profile("cdrom_device");  // For backwards compatibility
 	if (param) {
-		audio_set_output_device(*param);
+		muscd_set_playlist(param);
 	}
+
 	/* joystick device name の設定 */
 	param = get_profile("joy_device");
 	if (param) {
-		joy_set_devicename(param);
-	}
-	/* 外部MIDIプレーヤーの設定 */
-	param = get_profile("midi_player");
-	if (param) {
-		midi_set_playername(param);
-	}
-	/* Raw MIDI device name の設定 */
-	param = get_profile("midi_device");
-	if (param) {
-		midi_set_devicename(param);
+		event_set_joy_device_index(atoi(param));
 	}
 	/* MIDI output device の設定 */
 	param = get_profile("midi_output_device");
@@ -771,25 +377,52 @@ static void check_profile() {
 		}
 		midi_set_output_device(*param | subdev);
 	}
-	/* no-shm flag */
-	param = get_profile("no_shm");
-	if (param) {
-		if (0 == strcmp(param, "Yes")) {
-			SetNoShmMode();
-		}
-	}
-	/* qe-kanjicode flag */
-	param = get_profile("qe-kanjicode");
-	if (param) {
-		fc_set_default_kanjicode(*param - '0');
-	}
 	/* disable image cursor */
-	param = get_profile("no_imagecursor");
+	get_boolean_profile("no_imagecursor", &nact->ags.noimagecursor);
+
+	/* enable integer scaling */
+	get_boolean_profile("integerscale", &integer_scaling);
+
+	/* enable game-specific hacks */
+	param = get_profile("game");
 	if (param) {
-		if (0 == strcmp(param, "Yes")) {
-			nact->noimagecursor = TRUE;
+		enable_hack_by_gameid(param);
+	}
+	/* Save file format */
+	param = get_profile("saveformat");
+	if (param) {
+		save_setFormat(param);
+	}
+
+	/* text hook */
+	param = get_profile("texthook");
+	if (param) {
+		if (!set_texthook_mode(param)) {
+			sys_error("Invalid texthook mode '%s'", param);
 		}
 	}
+	param = get_profile("texthook_suppress");
+	if (param) {
+		texthook_set_suppression_list(param);
+	}
+
+	/* Censor list for streamer mode */
+	param = get_profile("censor");
+	if (param) {
+		load_censor_list(param);
+	}
+}
+
+#ifdef HAVE_SIGACTION
+static void signal_handler(int sig_num) {
+	sys35_remove();
+	exit(1);
+}
+
+static void signal_handler_segv(int sig_num) {
+	fprintf(stderr, "PID(%d), sigsegv caught @ %03d, %05x\n", (int)getpid(), sl_getPage(), sl_getIndex());
+	sys35_remove();
+	exit(1);
 }
 
 void sys_set_signalhandler(int SIG, void (*handler)(int)) {
@@ -806,73 +439,105 @@ void sys_set_signalhandler(int SIG, void (*handler)(int)) {
 	sigaction(SIG, &act, NULL);
 }
 
-void init_signalhandler() {
+static void init_signalhandler() {
 	sys_set_signalhandler(SIGINT, signal_handler);
 	sys_set_signalhandler(SIGTERM, signal_handler);
 	sys_set_signalhandler(SIGPIPE, SIG_IGN);
 	sys_set_signalhandler(SIGABRT, signal_handler);
 	sys_set_signalhandler(SIGSEGV, signal_handler_segv);
 }
+#endif
+
+static void registerGameFiles(void) {
+	if (nact->files.cnt[DRIFILE_SCO] == 0)
+		SYSERROR("No Scenario data available");
+	for (int type = 0; type < DRIFILETYPEMAX; type++) {
+		bool use_mmap = true;
+		if (debugger_mode != DEBUGGER_DISABLED && type == DRIFILE_SCO) {
+			// Do not mmap scenario files so that BREAKPOINT instructions can be inserted.
+			use_mmap = false;
+		}
+		ald_init(type, nact->files.game_fname[type], nact->files.cnt[type], use_mmap);
+	}
+	if (nact->files.save_path)
+		fc_init(nact->files.save_path);
+}
 
 int main(int argc, char **argv) {
-	char *homedir = getenv("HOME"), *rc_name, *rc_path;
+#ifdef HAVE_SIGACTION
 	sys_set_signalhandler(SIGINT, SIG_IGN);
+#endif
 	
-	saved_argc = argc;
-	saved_argv = argv;
+#ifdef __ANDROID__
+	// Handle -gamedir option here so that .xsys35rc is loaded from that directory.
+	if (strcmp(argv[1], "-gamedir") == 0)
+		chdir(argv[2]);
+#endif
 	
-	load_profile(NULL);
+	load_profile();
 	check_profile();
 	sys35_ParseOption(&argc, argv);
 	
-#if DEBUG
-	if (debuglv >= 5) {
-		if (NULL == (fpdebuglog = fopen(DEBUGLOGFILE, "w"))) {
-			fpdebuglog = stderr;
-		}
-	}
+	if (!initGameResource(&nact->files, gameResourceFile, savedir)) {
+#ifdef _WIN32
+		sys_show_message_box(MESSAGEBOX_ERROR, "xsystem35", "Cannot find scenario file (*SA.ALD)");
+		exit(1);
+#else
+		sys35_usage(true);
 #endif
-	sys35_initGameDataResorce();
-	
-	init_signalhandler();
-
-	nact->tmpdir = strdup("/tmp/xsystem35-XXXXXX");
-	if (NULL == mkdtemp(nact->tmpdir)) {
-		free(nact->tmpdir);
-		nact->tmpdir = strdup("/tmp");
 	}
+	registerGameFiles();
 	
-	mus_init();
+#ifdef HAVE_SIGACTION
+	init_signalhandler();
+#endif
+
+	mus_init(audio_buffer_size);
 
 #ifdef ENABLE_NLS
         bindtextdomain (PACKAGE, LOCALEDIR);
         textdomain(PACKAGE);
 #endif
 
-#ifdef ENABLE_GTK
-	gtk_set_locale();
-	gtk_init(&argc, &argv);
-#endif
+	sys35_init();
+	if (integer_scaling)
+		gfx_setIntegerScaling(true);
 
-	sys35_init();	
-	
 #ifdef ENABLE_GTK
-	rc_name = get_profile("gtkrc_path");
-	if (!rc_name) {
-		rc_name = GTK_RC_NAME;
-	}
-	rc_path = (char *)g_malloc(sizeof(char) * (strlen(homedir) + strlen(rc_name)) + 2);
-	strcpy(rc_path, homedir);
-	strcat(rc_path, "/");
-	strcat(rc_path, rc_name);
-	
-	gtk_rc_parse(rc_path);
-	g_free(rc_path);
-	menu_init();
+	gtk_init(&argc, &argv);
+	s39ini_init();
 #endif
+	menu_init();
 	
-	nact_main();
+	if (debugger_mode != DEBUGGER_DISABLED) {
+#ifdef ENABLE_DEBUGGER
+		char symbols_path[500];
+		snprintf(symbols_path, sizeof(symbols_path), "%s.symbols", nact->files.game_fname[DRIFILE_SCO][0]);
+		dbg_init(symbols_path, debugger_mode == DEBUGGER_DAP);
+#else
+		sys_error("Debugging is not supported in this build.");
+#endif
+	}
+
+	for (;;) {
+		nact_main();
+#ifndef __EMSCRIPTEN__
+		if (!nact->restart)
+			break;
+#endif
+		sys_reset();
+	}
+
 	sys35_remove();
 	
 	return 0;
 }
+
+#ifdef __EMSCRIPTEN__
+
+EMSCRIPTEN_KEEPALIVE
+void sys_restart(void) {
+	nact_quit(true);
+}
+
+#endif

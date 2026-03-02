@@ -24,147 +24,114 @@
 #include <stdio.h>
 
 #include "portab.h"
-#include "music_server.h"
+#include "music_private.h"
 #include "music_midi.h"
 #include "midi.h"
 #include "ald_manager.h"
 
-enum {
-	MIDI_START,
-	MIDI_STOPCHECK,
-	MIDI_LOOPCHECK,
-	MIDI_STOP,
-	MIDI_PAUSE,
-	MIDI_UNPAUSE,
-	MIDI_NOP
-};
-
-int musmidi_init() {
-	int st = midi_init(&prv.mididev);
-
-	if (st == -1) {
-		prv.midi_valid = FALSE;
-		return NG;
+bool musmidi_init(void) {
+	if (!midi_init(&prv.mididev)) {
+		prv.midi_valid = false;
+		return false;
 	} else {
-		prv.midi_valid = TRUE;
-		prv.midi.dev = &prv.mididev;
-		prv.midi.st = MIDI_NOP;
-		return OK;
+		prv.midi_valid = true;
+		return true;
 	}
 }
 
-int musmidi_exit() {
+void musmidi_exit(void) {
 	if (prv.midi_valid) {
 		prv.mididev.exit();
 	}
-	return OK;
 }
 
-int musmidi_start(int no, int loop) {
-	dridata *dfile;
-	
-	dfile = ald_getdata(DRIFILE_MIDI, no -1);
-	if (dfile == NULL) {
-		prv.midi.dfile = NULL;
-		return NG;
+void musmidi_reset(void) {
+	if (prv.midi_valid) {
+		prv.mididev.reset();
+		prv.midi_current_track = 0;
 	}
-	
-	prv.midi.no = no;
-	prv.midi.loop = loop;
-	prv.midi.cnt = 0;
-	
-	prv.midi.st = MIDI_START;
-	prv.midi.in_play = FALSE;
-	
-	prv.midi.dfile = dfile;
-	
-	return OK;
 }
 
-int musmidi_stop() {
-	prv.midi.st = MIDI_STOP;
-	return OK;
+bool musmidi_start(int no, int loop) {
+	if (!prv.midi_valid) return false;
+	if (prv.midi_current_track == no)
+		return true;
+
+	dridata *dfile = ald_getdata(DRIFILE_MIDI, no -1);
+	if (dfile == NULL)
+		return false;
+	
+	if (!prv.mididev.start(no, loop, dfile->data, dfile->size)) {
+		ald_freedata(dfile);
+		return false;
+	}
+
+	if (prv.midi_dfile)
+		ald_freedata(prv.midi_dfile);
+	prv.midi_dfile = dfile;
+	prv.midi_current_track = no;
+
+	return true;
 }
 
-int musmidi_pause() {
-	prv.midi.st = MIDI_PAUSE;
-	return OK;
+void musmidi_stop(void) {
+	if (!prv.midi_valid) return;
+
+	prv.mididev.stop();
+
+	if (prv.midi_dfile) {
+		ald_freedata(prv.midi_dfile);
+		prv.midi_dfile = NULL;
+	}
+	prv.midi_current_track = 0;
 }
 
-int musmidi_unpause() {
-	prv.midi.st = MIDI_UNPAUSE;
-	return OK;
+void musmidi_pause(void) {
+	if (!prv.midi_valid) return;
+	prv.mididev.pause();
 }
 
-midiplaystate musmidi_getpos() {
-	midiplaystate st;
-	prv.midi.dev->getpos(&st);
+void musmidi_unpause(void) {
+	if (!prv.midi_valid) return;
+	prv.mididev.unpause();
+}
+
+midiplaystate musmidi_getpos(void) {
+	midiplaystate st = {false, 0, 0};
+	if (!prv.midi_valid || !prv.midi_current_track) return st;
+
+	prv.mididev.getpos(&st);
+	if (st.in_play)
+		st.play_no = prv.midi_current_track;
+	else
+		prv.midi_current_track = 0;
 	return st;
 }
 
-int musmidi_setflag(int mode, int index, int val) {
-	prv.midi.dev->setflag(mode, index, val);
-	return OK;
+bool musmidi_setflag(int mode, int index, int val) {
+	if (!prv.midi_valid) return false;
+
+	return prv.mididev.setflag(mode, index, val);
 }
 
 int musmidi_getflag(int mode, int index) {
-	return prv.midi.dev->getflag(mode, index);
+	if (!prv.midi_valid) return 0;
+
+	return prv.mididev.getflag(mode, index);
 }
 
-int musmidi_cb() {
-	midiobj_t *obj = &prv.midi;
-	
-	switch(obj->st) {
-	case MIDI_START:
-		obj->in_play = TRUE;
-		obj->dev->start(obj->no, obj->dfile->data, obj->dfile->size);
-		obj->st = MIDI_STOPCHECK;
-		break;
-		
-	case MIDI_STOPCHECK: {
-		midiplaystate st;
-		if (NG == obj->dev->getpos(&st)) {
-			obj->st = MIDI_LOOPCHECK;
-		}
-		break;
-	}
-	case MIDI_LOOPCHECK:
-		obj->cnt++;
-		if (obj->loop == 0) {
-			// infinity loop
-			obj->st = MIDI_START;
-			break;
-		}
-		if (--obj->loop == 0) {
-			obj->st = MIDI_STOP;
-		} else {
-			obj->st = MIDI_START;
-		}
-		break;
-		
-	case MIDI_STOP:
-		obj->dev->stop();
-		obj->in_play = FALSE;
-		obj->st = MIDI_NOP;
-		if (obj->dfile) {
-			ald_freedata(obj->dfile);
-			obj->dfile = NULL;
-		}
-		break;
+bool musmidi_fadestart(int time, int volume, int stop) {
+	if (!prv.midi_valid) return false;
 
-	case MIDI_PAUSE:
-		obj->dev->pause();
-		obj->st = MIDI_NOP;
-		break;
-		
-	case MIDI_UNPAUSE:
-		obj->dev->unpause();
-		obj->st = MIDI_STOPCHECK;
-		break;
-		
-	case MIDI_NOP:
-		break;
-	}
+	if (!prv.mididev.fadestart)
+		return false;
+	return prv.mididev.fadestart(time, volume, stop);
+}
 
-	return OK;
+bool musmidi_fading(void) {
+	if (!prv.midi_valid) return false;
+
+	if (!prv.mididev.fading)
+		return false;
+	return prv.mididev.fading();
 }

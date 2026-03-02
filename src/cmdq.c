@@ -23,12 +23,14 @@
 /* $Id: cmdq.c,v 1.12 2003/01/25 01:34:50 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "savedata.h"
-
-#define WARN_SAVEERR(cmd, st) \
-if (st > 200) fprintf(stderr, "WARNING: Fail to save (cmd=%s, stat=%d)\n", cmd, st)
+#include "utfsjis.h"
+#include "filecheck.h"
+#include "cmd_check.h"
 
 void commandQD() {
 	/* 変数領域などのデータをセーブする。（全セーブ）*/
@@ -40,28 +42,27 @@ void commandQD() {
 		sysVar[0] = save_saveAll(num - 1);
 	}
 	
-	WARN_SAVEERR("QD", sysVar[0]);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	DEBUG_COMMAND("QD %d:\n",num);
+	TRACE("QD %d:",num);
 }
 
 void commandQP() {
 	/* 変数領域などのデータを一部セーブする。(数値変数部) */
-	int num    = getCaliValue();
-	int *point = getCaliVariable();
-	int page   = preVarPage;
-	int index  = preVarIndex;
-	int cnt    = getCaliValue();
+	struct VarRef point;
+	int num = getCaliValue();
+	getCaliArray(&point);
+	int cnt = getCaliValue();
 	
 	if (num <= 0) {
 		sysVar[0] = 255;
 	} else {
-		sysVar[0] = save_savePartial(num - 1, page, index, cnt);
+		sysVar[0] = save_savePartial(num - 1, &point, cnt);
 	}
 	
-	WARN_SAVEERR("QP", sysVar[0]);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	DEBUG_COMMAND("QP %d,%p,%d:\n", num, point, cnt);
+	TRACE("QP %d,%d,%d:", num, point.var, cnt);
 }
 
 void commandQC() {
@@ -75,32 +76,43 @@ void commandQC() {
 		sysVar[0] = save_copyAll(num1 - 1, num2 - 1);
 	}
 	
-	WARN_SAVEERR("QC", sysVar[0]);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	DEBUG_COMMAND("QC %d,%d:\n",num1,num2);
+	TRACE("QC %d,%d:",num1,num2);
 }
 
-void commandQE() {
-	int type       = sys_getc();
-	char *filename = sys_getString(':');
-	int *var, _var = 0, cnt;
+void commandQE(char terminator) {
+	int type = sl_getc();
+	const char *filename = sl_getString(terminator);
+	char *fname_utf8 = toUTF8(filename);
+	for (char *p = fname_utf8; *p; p++) {
+		if (*p == '\\') {
+			*p = '/';
+		}
+	}
 
-	switch(type) {
+	int var, cnt;
+	struct VarRef vref;
+	switch (type) {
 	case 0:
-		var = getCaliVariable();
+		getCaliArray(&vref);
+		var = vref.var;
 		cnt = getCaliValue();
-		sysVar[0] = save_save_var_with_file(filename, var, cnt);
+		sysVar[0] = save_vars_to_file(fname_utf8, &vref, cnt);
 		break;
 	case 1:
-		_var = getCaliValue();
-		cnt  = getCaliValue();
-		sysVar[0] = save_save_str_with_file(filename, _var, cnt);
+		var = getCaliValue();
+		cnt = getCaliValue();
+		sysVar[0] = save_strs_to_file(fname_utf8, var, cnt);
 		break;
 	default:
-		WARNING("Unknown QE command %d\n", type); return;
+		var = getCaliValue();
+		cnt = getCaliValue();
+		WARNING("Unknown QE command %d", type);
+		break;
 	}
+	free(fname_utf8);
+	if (sysVar[0] > 200) WARNING("Failed to save (%d)", sysVar[0]);
 	
-	WARN_SAVEERR("QE", sysVar[0]);
-	
-	DEBUG_COMMAND("QE %d,%s,%d,%d:\n", type, filename, _var, cnt);
+	TRACE("QE %d,%s,%d,%d:", type, filename, var, cnt);
 }

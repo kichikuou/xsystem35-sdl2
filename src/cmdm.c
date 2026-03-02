@@ -27,69 +27,79 @@
 
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "utfsjis.h"
 #include "menu.h"
 #include "ags.h"
 #include "message.h"
-
-/* defined by cmds.c */
-extern boolean dummy_pcm_su_flag;
-/* defined by hankan2sjis.c */
-extern char *num2sjis(int num);
-/* defined by cmds.c */
-extern boolean Y3waitCancel;
-
+#include "hankaku.h"
+#include "hacks.h"
+#include "cmd_check.h"
 
 /* MI 用パラメータ */
-INPUTSTRING_PARAM mi_param;
+static INPUTSTRING_PARAM mi_param;
 
-void commandMS() {
+void commandMS(char terminator) {
 	/* Xコマンドで表示される文字列領域に文字列を入れる */
 	int num = getCaliValue();
-	char *str = sys_getString(':');
-	
-	if (num > 0) { /* thanx tajiri@wizard */
-	        v_strcpy(num - 1, str);
-	} else {
-        	WARNING("MS: num(%d) <= 0\n", num);
-	}
-	DEBUG_COMMAND("MS %d,%s:\n",num,str);
+	const char *str = sl_getString(terminator);
+
+	svar_set(num, str);
+	TRACE("MS %d,%s:",num,str);
 }
 
 void commandMP() {
 	/* 指定の文字列を指定文字数だけ表示する（Ｘコマンドの桁数指定） */
 	int    num1 = getCaliValue();
 	int    num2 = getCaliValue();
-	unsigned char bstr[3] = { 0x81,0x40,0x00 }; // white blank
-	int    len  = min(num2 * 2, v_strlen(num1 - 1));
-	int    blen = num2 * 2 - len;
-	char   *str = malloc(num2 * 2 + 1);
+	const char *fullwidth_blank[CHARACTER_ENCODING_MAX + 1] = {
+		[SHIFT_JIS] = "\x81\x40",
+		[UTF8] = "　",
+	};
+	const char *src = svar_get(num1);
+	int chars = num2;
+	char *str;
 
-	if (NULL == str) {
-		NOMEMERR();
+	/* Patched English executable appends num2 spaces instead of truncating */
+	if (game_id == GAME_RANCE3_ENG || game_id == GAME_RANCE4_ENG) {
+		str = calloc(strlen(src) + num2 * strlen(fullwidth_blank[nact->encoding]) + 1, 1);
+		if (NULL == str) {
+			NOMEMERR();
+		}
+		strcpy(str, src);
 	}
-	
-	memset(str, 0, num2 * 2 + 1);
-	strncpy(str, v_str(num1 - 1), len);
-	while(blen) {
-		strcat(str, bstr);
-		blen -= 2;
+	else {
+		str = calloc(num2 * MAX_BYTES_PAR_CHAR(nact->encoding) + 1, 1);
+		if (NULL == str) {
+			NOMEMERR();
+		}
+
+		const char *p = src;
+		while (*p && chars > 0) {
+			p = advance_char(p, nact->encoding);
+			chars--;
+		}
+		strncpy(str, src, p - src);
 	}
+	while (chars-- > 0) {
+		strcat(str, fullwidth_blank[nact->encoding]);
+	}
+
 	sys_addMsg(str);
-	DEBUG_COMMAND("MP %d,%d:\n",num1,num2);
+	TRACE("MP %d,%d:",num1,num2);
 	
 	free(str);
 }
 
-void commandMI() { /* T2 */
+void commandMI(char terminator) {
 	/* ユーザーによる文字列の入力 */
 	int dst_no  = getCaliValue();
 	int max_len = getCaliValue();
-	char *title = sys_getString(':');
+	const char *title = sl_getString(terminator);
 	char *t1, *t2, *t3;
 	
-	t1 = sjis2lang(title);
-	t2 = sjis2lang(v_str(dst_no -1));
+	t1 = toUTF8(title);
+	t2 = toUTF8(svar_get(dst_no));
 	
 	mi_param.title = t1;
 	mi_param.oldstring = t2;
@@ -97,31 +107,35 @@ void commandMI() { /* T2 */
 	
 	menu_inputstring(&mi_param);
 	if (mi_param.newstring == NULL) {
-		v_strcpy(dst_no -1, NULL);
+		svar_set(dst_no, NULL);
 		free(t1); free(t2);
 		return;
 	}
 	
-	t3 = lang2sjis(mi_param.newstring);
+	t3 = fromUTF8(mi_param.newstring);
 	
-	/* 全角文字以外は不可 */
-	if (!sjis_has_hankaku(t3)) {
-		v_strcpy(dst_no -1, t3);
-	}
+	svar_set(dst_no, t3);
+
 	free(t1);
 	free(t2);
 	free(t3);
-	DEBUG_COMMAND("MI %d,%d,%s:\n",dst_no,max_len, title);
+	TRACE("MI %d,%d,%s:",dst_no,max_len, title);
 }
 
 void commandMA() {
 	/* num1 の文字列の後ろに num2 をつなげる */
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
+
+	if (num1 == num2) {
+		char *buf = strdup(svar_get(num2));
+		svar_append(num1, buf);
+		free(buf);
+	} else {
+		svar_append(num1, svar_get(num2));
+	}
 	
-	v_strcat(num1 - 1, v_str(num2 - 1));
-	
-	DEBUG_COMMAND("MA %d,%d:\n",num1,num2);
+	TRACE("MA %d,%d:",num1,num2);
 }
 
 void commandMC() {
@@ -129,29 +143,23 @@ void commandMC() {
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
-	sysVar[0] = strcmp(v_str(num1 - 1), v_str(num2 - 1)) == 0 ? 1 : 0;
+	sysVar[0] = strcmp(svar_get(num1), svar_get(num2)) == 0 ? 1 : 0;
 	
-	DEBUG_COMMAND("MC %d,%d:\n",num1,num2);
+	TRACE("MC %d,%d:",num1,num2);
 }
 
-void commandMT() {
+void commandMT(char terminator) {
 	/* ウインドウのタイトル文字列を設定する */
-	char *str = sys_getString(':');
+	const char *str = sl_getString(terminator);
 	
-	strncpy(nact->game_title_name, str, sizeof(nact->game_title_name) -1);
-	ags_setWindowTitle(str);
+	if (nact->game_title_utf8)
+		free(nact->game_title_utf8);
+	nact->game_title_utf8 = toUTF8(str);
+	ags_setWindowTitle(nact->game_title_utf8);
 	
-	/* 闘神都市II 対策 */
-	if (0 == strcmp(str, GT_TOSHIN2)) {
-		dummy_pcm_su_flag = TRUE;
-	}
-	
-	/* Rance4 対策？ */
-	if (0 == strcmp(str, GT_RANCE4)) {
-		Y3waitCancel = FALSE;
-	}
+	enable_hack_by_title(nact->game_title_utf8);
 
-	DEBUG_COMMAND("MT %s:\n",str);
+	TRACE("MT %s:",str);
 }
 
 void commandMM() {
@@ -159,9 +167,10 @@ void commandMM() {
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	
-	v_strcpy(num1 - 1, v_str(num2 - 1));
+	if (num1 != num2)
+		svar_set(num1, svar_get(num2));
 	
-	DEBUG_COMMAND("MM %d,%d:\n",num1, num2);
+	TRACE("MM %d,%d:",num1, num2);
 }
 
 void commandMH() {
@@ -169,30 +178,24 @@ void commandMH() {
 	int num1 = getCaliValue();
 	int fig  = getCaliValue();
 	int num2 = getCaliValue();
-	char _work1[10],_work2[200];
-	char *work1 = _work1, *work2 = _work2;
-	int len;
-	
-	*work2 = 0;
-	sprintf(work1,"%d",num2);
-	if (fig != 0) {
-		len = strlen(work1);
-		if (fig > len) {
-			/* 空白でうめる */
-			len = fig - len;
-			while(len--) {
-				strcat(work2, num2sjis(10));
-			}
-		} else {
-			work1 += (len - fig);
-		}
-	}
-	while(*work1) {
-		strcat(work2, num2sjis((*work1) - '0')); work1++;
-	}
-	v_strcpy(num1 - 1, work2);
-	
-	DEBUG_COMMAND("MH %d,%d,%d:\n",num1,fig,num2);
+
+	char buf[512];
+	char *s = fromSJIS(format_number_zenkaku(num2, fig, buf));
+	svar_set(num1, s);
+	free(s);
+
+	TRACE("MH %d,%d,%d:",num1,fig,num2);
+}
+
+void commandMHH() {
+	int num1 = getCaliValue();
+	int fig  = getCaliValue();
+	int num2 = getCaliValue();
+	char buf[256];
+
+	svar_set(num1, format_number(num2, fig, buf));
+
+	TRACE("MHH %d, %d, %d:", num1, fig, num2);
 }
 
 void commandMV() {
@@ -200,7 +203,7 @@ void commandMV() {
 	int version = getCaliValue();
 
 	nact->scenario_version = version;
-	DEBUG_COMMAND("MV %d:\n",version);
+	TRACE("MV %d:",version);
 }
 
 void commandML() {
@@ -208,9 +211,9 @@ void commandML() {
 	int *var   = getCaliVariable();
 	int str_no = getCaliValue();
 	
-	*var = sjis_count_char(v_str(str_no -1));
+	*var = svar_length(str_no);
 	
-	DEBUG_COMMAND("ML %p,%d:\n",var, str_no);
+	TRACE("ML %p,%d:",var, str_no);
 }
 
 void commandMD() {
@@ -219,10 +222,9 @@ void commandMD() {
 	int src_str_no = getCaliValue();
 	int len        = getCaliValue();
 	
-	strncpy(v_str(dst_str_no - 1), v_str(src_str_no - 1), len * 2);
-	*(v_str(dst_str_no - 1) + len*2) = '\0';
+	svar_copy(dst_str_no, 0, src_str_no, 0, len);
 	
-	DEBUG_COMMAND("MD %d,%d,%d:\n",dst_str_no, src_str_no, len);
+	TRACE("MD %d,%d,%d:",dst_str_no, src_str_no, len);
 }
 
 void commandME() {
@@ -233,10 +235,9 @@ void commandME() {
 	int src_pos    = getCaliValue();
 	int len        = getCaliValue();
 	
-	strncpy(v_str(dst_str_no - 1) + dst_pos * 2, v_str(src_str_no - 1) + src_pos * 2, len*2);
-	*(v_str(dst_str_no - 1) + dst_pos * 2 + len*2) = '\0';
+	svar_copy(dst_str_no, dst_pos, src_str_no, src_pos, len);
 	
-	DEBUG_COMMAND("ME %d,%d,%d,%d,%d:\n",dst_str_no, dst_pos, src_str_no, src_pos, len);
+	TRACE("ME %d,%d,%d,%d,%d:",dst_str_no, dst_pos, src_str_no, src_pos, len);
 }
 
 void commandMF() {
@@ -245,42 +246,38 @@ void commandMF() {
 	int dst_no    = getCaliValue();
 	int key_no    = getCaliValue();
 	int start_pos = getCaliValue();
-	char *start = v_str(dst_no - 1) + start_pos * 2;
 	
-	char *pos = strstr(start, v_str(key_no - 1));
+	int pos = svar_find(dst_no, start_pos, svar_get(key_no));
 	
-	if (pos == NULL) {
+	if (pos < 0) {
 		sysVar[0] = 255;
 	} else {
-		*var = (pos - start) / 2;
+		*var = pos;
 		sysVar[0] = 0;
 	}
 	
-	DEBUG_COMMAND("MF %p,%d,%d,%d:\n",var, dst_no, key_no, start_pos);
+	TRACE("MF %p,%d,%d,%d:",var, dst_no, key_no, start_pos);
 }
 
 void commandMZ0() {
 	/* 文字列変数の文字数・個数の設定の変更 */
-	int max_len = getCaliValue();
+	int max_len = getCaliValue();  // deprecated in System3.9
 	int max_num = getCaliValue();
 	int rsv     = getCaliValue();
 	
-	DEBUG_COMMAND("MZ0 %d,%d,%d:\n",max_len, max_num, rsv);
+	TRACE("MZ0 %d,%d,%d:",max_len, max_num, rsv);
 	
-	/* いつからか、文字列変数の最大長さは∞になったようだ */
-	if (max_len == 0) max_len = STRVAR_LEN * 2;
-	
-	v_initStringVars(max_num,max_len * 2 + 1);
+	svar_init(max_num);
 }
 
 void commandMG() {
-	int no = sys_getc();
+	int no = sl_getc();
 	int sw = 0, *var;
 	
 	switch(no) {
 	case 0:
 		sw = getCaliValue();
-		nact->msg.mg_getString = sw == 1 ? TRUE : FALSE;
+		nact->msg.mg_getString = sw == 1;
 		break;
 	case 1:
 		sw = getCaliValue();
@@ -297,7 +294,7 @@ void commandMG() {
 	case 4:
 		sw = getCaliValue();
 		nact->msg.mg_curStrVarNo = nact->msg.mg_startStrVarNo + sw;
-		v_strcpy(nact->msg.mg_curStrVarNo -1, "");
+		svar_set(nact->msg.mg_curStrVarNo, "");
 		break;
 	case 5:
 		var = getCaliVariable();
@@ -309,19 +306,19 @@ void commandMG() {
 		break;
 	case 7:
 		var = getCaliVariable();
-		*var = v_strlen(nact->msg.mg_curStrVarNo -1) / 2;
+		*var = svar_length(nact->msg.mg_curStrVarNo);
 		break;
 	case 100:
 		sw = getCaliValue();
-		nact->msg.mg_dspMsg = sw == 1 ? TRUE : FALSE;
+		nact->msg.mg_dspMsg = sw == 1;
 		break;
 	default:
 		sw = getCaliValue();
-		WARNING("Unknown MG command %d,%d\n", no, sw);
+		WARNING("Unknown MG command %d,%d", no, sw);
 		break;
 	}
 
-	DEBUG_COMMAND("MG %d,%d:\n",no, sw);
+	TRACE("MG %d,%d:",no, sw);
 }
 
 void commandMJ() {
@@ -334,54 +331,41 @@ void commandMJ() {
 	INPUTSTRING_PARAM mj_param;
 	char *t1, *t2;
 	
-	t1 = sjis2lang(v_str(num -1));
+	t1 = toUTF8(svar_get(num));
 	mj_param.max = max_len;
 	mj_param.x = x;
 	mj_param.y = y;
 	mj_param.h = h;
 	mj_param.oldstring = t1;
 	
-	ags_setCursorLocation(x, y, FALSE); /* XXX */
+	ags_setCursorLocation(x, y, false, false);
 	menu_inputstring2(&mj_param);
 	if (mj_param.newstring == NULL) return;
 	
-	t2 = lang2sjis(mj_param.newstring);
-	if (!sjis_has_hankaku(t2)) {
-		v_strcpy(num -1, t2);
-	}
+	t2 = fromUTF8(mj_param.newstring);
+	svar_set(num, t2);
+
 	free(t1);
 	free(t2);
-	DEBUG_COMMAND("MJ %d,%d,%d,%d,%d:\n", num, x, y, h, max_len);
+	TRACE("MJ %d,%d,%d,%d,%d:", num, x, y, h, max_len);
 }
 
 void commandMN() {
-	int no   = sys_getc();
+	int no   = sl_getc();
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
-	int i, len;
-	char *b;
 	
 	switch(no) {
 	case 0:
 		/* 文字列を配列に変換する */
-		len = v_strlen(num -1);
-		b = v_str(num -1);
-		for (i = 0; i < len; i++) {
-			*var = *b;
-			var++; b++;
-		}
-		*var = 0;
+		sysVar[0] = svar_toVars(num, var);
 		break;
 	case 1:
 		/* 配列を文字列に変換する */
-		b = v_str(num -1);
-		while(*var) {
-			*b = *var; b++; var++;
-		}
-		*b = '\0';
+		svar_fromVars(num, var);
 		break;
 	default:
-		WARNING("UnKnown MN command(%d)\n", no);
+		WARNING("UnKnown MN command(%d)", no);
 	}
-	DEBUG_COMMAND("MN %d,%d,%d:\n",no, num, *var);
+	TRACE("MN %d,%d,%d:",no, num, *var);
 }

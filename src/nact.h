@@ -25,46 +25,57 @@
 #define __NACT_H__
 
 #include "portab.h"
-#include "graphics.h"
-#include "scenario.h"
-#include "font.h"
 #include "s39ain.h"
+#include "gameresource.h"
 #include "selection.h"
 #include "message.h"
 #include "ags.h"
+#include "utfsjis.h"
+#include "hacks.h"
 
-/* コマンド解析時に参照する */
-#define sys_getc            sl_getc
-#define sys_getw            sl_getw
-#define sys_getdw           sl_getdw
-#define sys_getaddress      sl_getadr
-#define sys_getCaliValue    getCaliValue
-#define sys_getCaliVariable getCaliVariable
-extern int getCaliValue();
-extern int *getCaliVariable();
-extern int *getVariable();
-extern char *sys_getString(char term);
-extern char *sys_getConvString(char term);
-extern void sys_addMsg(char *str);
+#define toUTF8(s)   codeconv(UTF8, nact->encoding, s)
+#define toSJIS(s)   codeconv(SHIFT_JIS, nact->encoding, s)
+#define fromUTF8(s) codeconv(nact->encoding, UTF8, s)
+#define fromSJIS(s) codeconv(nact->encoding, SHIFT_JIS, s)
+
+extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
-extern char *sys_getConstString();
+extern void sys_setCharacterEncoding(CharacterEncoding encoding);
 
-// extern boolean sys_nact_engine();
 extern void nact_main();
 extern void nact_init();
+extern void nact_reset(void);
+extern void nact_quit(bool restart);
+
+// cali.c
+struct VarRef;
+int getCaliValue(void);
+int *getCaliVariable(void);
+bool getCaliArray(struct VarRef *ref);
+int *getVariable(void);
+
+// cmd_check.c
+extern void exec_command(void);
+
+// cmdv.c
+void va_animation(void);
+void va_reset(void);
+// cmdz.c
+void cmdz_reset(void);
+// cmd2F.c
+void cmd2F_reset(void);
 
 typedef struct {
 	/* general */
-	boolean   is_quit;             /* quit command */
+	bool   is_quit;             /* quit command */
+	bool   restart;
 	void     (*callback)(void);    /* main の callback */
-	boolean   is_va_animation;     /* VA command working */
-	boolean   is_cursor_animation; /* animation cursor working */
-	boolean   is_message_locked;   /* pointer 等の event handler を呼び出さない */
-	boolean   popupmenu_opened;    /* popup menu が 開いているか */
-	boolean   mmx_is_ok;           /* MMX が有効かどうか */
+	bool   is_va_animation;     /* VA command working */
+	bool   is_cursor_animation; /* animation cursor working */
+	bool   popupmenu_opened;    /* popup menu が 開いているか */
+	CharacterEncoding encoding;
 	
-	char      *tmpdir;
-	char       game_title_name[31];
+	char      *game_title_utf8;
 	int        scenario_version;
 
 	
@@ -72,47 +83,24 @@ typedef struct {
 	void *datatbl_addr; /* データテーブルのアドレス */
 	int fnc_return_value; /* 関数の戻り値として返す値 (~0,cali:で渡す値) */
 	
-#if 1
-	/* ags info */
-	Pallet256  *sys_pal;
-	boolean     sys_pal_changed;
-	MyRectangle sys_view_area;
-	MyDimension sys_world_size;
-	int         sys_world_depth;
-	int         sys_mouse_movesw; /* 0:IZを無視, 1: 直接指定場所へ, 2: スムーズに指定場所に */
-	boolean     sys_fullscreen_capable;
-	boolean     sys_fullscreen_on;
-	
-#endif
-
-	/* for fader/ecopy */
-	int     effect_rate;
-	int     effect_step; /* 0 to 255 , 0 と 255 は必ず通る*/
-
 	/* key wait */
-	int     waittime;
-	int     waitcancel_key;
-	int     waitcancel_key_mask;
-	boolean waitcancel_enabled;
+	int     waitcancel_key;  // TODO: remove this
 	
 	/* message wait */
-	boolean messagewait_enable;
-	boolean messagewait_enable_save;
+	bool messagewait_enable;
+	bool messagewait_cancelled;
 	int     messagewait_time;
-	boolean messagewait_cancel;
+	bool messagewait_cancel;
 	
 	
 	/* ags */
 	ags_t ags;
-	boolean noantialias; /* antialias を使用しない */
-	boolean noimagecursor; /* リソースファイルのカーソルを読みこまない */
-	fontdev_t fontdev; // 選択された fontdevice
 	
 	/* メッセージ関連 */
 	msg_t msg;
- 	boolean   is_msg_out;          /* 通常メッセージを表示するか */
-	void (*msgout)(char *msg);     // 通常以外(DLL等)のメッセージ表示関数
-	
+ 	bool   is_msg_out;          /* 通常メッセージを表示するか */
+	void (*msgout)(const char *msg);     // 通常以外(DLL等)のメッセージ表示関数
+
 	/* 選択肢関連 */
 	sel_t sel;
 	
@@ -120,28 +108,17 @@ typedef struct {
 	int patch_ec;   /* see patch_ec command   */
 	int patch_emen; /* see patch_emen command */
 	int patch_g0;   /* see patch g0 command */
-	
+
 	/* ain 関連 */
 	S39AIN ain;
 
-	/* データのファイル名 */
-	struct {
-		char *scenario[2];
-		char *graphics[2];
-		char *wav[2];
-		char *midi[2];
-		char *data[2];
-		char *resource[2];
-		char *bgm[2];
-		char *save[27];
-		char *savedir;
-		char *init;
-		char *bgi;
-		char *wai;
-		char *sact01;
-		char *alk[10];
-	} files;
-	
+	/* data file names */
+	GameResource files;
+
+	/* start address of the command currently being executed */
+	int current_page;
+	int current_addr;
+
 } NACTINFO;
 
 extern NACTINFO *nact;

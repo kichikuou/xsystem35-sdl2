@@ -28,30 +28,33 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <glib.h>
+#include <stdint.h>
 
 #include "portab.h"
 #include "nact.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "randMT.h"
 
 static int numbase;
-static gint64  l_1000A0C8;
-static gint64  l_1000A0D0;
-static gint64  l_1000A0D8;
+static int64_t  accumulator;
 
-static gint64 mul64(gint64 a1, gint64 a2) {
+static int64_t mul64(int64_t a1, int64_t a2) {
 	return a1 * a2;
 }
 
-static gint64 div64(gint64 a1, gint64 a2) {
+static int64_t div64(int64_t a1, int64_t a2) {
 	if (a1 == 0 || a2 == 0) return 0;
 	
 	return a1 / a2;
 }
 
-void SetIntNumBase(void) { /* 0 */
+static int64_t get32(int *var) {
+	return var[0] + mul64(var[1], 0x10000);
+}
+
+static void SetIntNumBase(void) { /* 0 */
 	/*
 	  64 bit 演算のための倍数をセット
 	  
@@ -61,11 +64,11 @@ void SetIntNumBase(void) { /* 0 */
 	
 	numbase = base;
 	
-	DEBUG_COMMAND("ShCalc.SetIntNumBase %d:\n", base);
+	TRACE("ShCalc.SetIntNumBase %d:", base);
 	
 }
 
-void SetIntNum16(void) { /* 1 */
+static void SetIntNum16(void) { /* 1 */
 	/*
 	  64 bit 演算のための数値をセット
 
@@ -73,44 +76,51 @@ void SetIntNum16(void) { /* 1 */
 	*/
 	int *var = getCaliVariable();
 	
-	l_1000A0D8 = mul64(*var, numbase);
+	accumulator = mul64(*var, numbase);
 	
-	DEBUG_COMMAND("ShCalc.SetIntNum16 %p:\n", var);
+	TRACE("ShCalc.SetIntNum16 %p:", var);
 }
 
-void SetIntNum32(void) { /* 2 */
-	int p1 = getCaliValue();
+static void SetIntNum32(void) { /* 2 */
+	int *var = getCaliVariable();
+
+	accumulator = mul64(get32(var), numbase);
 	
-	DEBUG_COMMAND_YET("ShCalc.SetIntNum32: %d:\n", p1);
+	TRACE("ShCalc.SetIntNum32: %p:", var);
 }
 
-void GetIntNum16(void) { /* 3 */
+static void GetIntNum16(void) { /* 3 */
 	/*
 	  64 bit 演算した結果を得る
 
 	  var: 数値をいれる変数
 	 */
 	int *var = getCaliVariable();
-	gint64 i;
+	int64_t i;
 	
-	i = div64(l_1000A0D8, numbase);
+	i = div64(accumulator, numbase);
 	
 	if (i > 65535) {
-		i = l_1000A0C8 = 65535;
+		i = 65535;
 	}
 	
 	*var = i;
 	
-	DEBUG_COMMAND("ShCalc.GetIntNum16 %d:\n", var);
+	TRACE("ShCalc.GetIntNum16 %d:", var);
 }
 
-void GetIntNum32(void) { /* 4 */
-	int p1 = getCaliValue();
+static void GetIntNum32(void) { /* 4 */
+	int *var = getCaliVariable();
+	int64_t i = div64(accumulator, numbase);
 	
-	DEBUG_COMMAND_YET("ShCalc.GetIntNum32: %d:\n", p1);
+	var[0] = i & 0xFFFF;
+	i >>= 16;
+	var[1] = i > 0xFFFF ? 0xFFFF : i;
+
+	TRACE("ShCalc.GetIntNum32: %p:", var);
 }
 
-void AddIntNum16(void) { /* 5 */
+static void AddIntNum16(void) { /* 5 */
 	/*
 	  64 bit 加算
 
@@ -118,30 +128,34 @@ void AddIntNum16(void) { /* 5 */
 	 */
 	int *var = getCaliVariable();
 	
-	l_1000A0D8 += mul64(*var, numbase);
+	accumulator += mul64(*var, numbase);
 	
-	DEBUG_COMMAND("ShCalc.AddIntNum16 %p:\n", var);
+	TRACE("ShCalc.AddIntNum16 %p:", var);
 }
 
-void AddIntNum32(void) { /* 6 */
+static void AddIntNum32(void) { /* 6 */
+	int *var = getCaliVariable();
+
+	accumulator += mul64(get32(var), numbase);
+
+	TRACE("ShCalc.AddIntNum32: %p:", var);
+}
+
+static void SubIntNum16(void) { /* 7 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.AddIntNum32: %d:\n", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.SubIntNum16: %d:", p1);
 }
 
-void SubIntNum16(void) { /* 7 */
-	int p1 = getCaliValue();
-	
-	DEBUG_COMMAND_YET("ShCalc.SubIntNum16: %d:\n", p1);
+static void SubIntNum32(void) { /* 8 */
+	int *var = getCaliVariable();
+
+	accumulator -= mul64(get32(var), numbase);
+
+	TRACE("ShCalc.SubIntNum32: %p:", var);
 }
 
-void SubIntNum32(void) { /* 8 */
-	int p1 = getCaliValue();
-	
-	DEBUG_COMMAND_YET("ShCalc.SubIntNum32: %d:\n", p1);
-}
-
-void MulIntNum16(void) {  /* 9 */
+static void MulIntNum16(void) {  /* 9 */
 	/*
 	  64 bit 乗算
 	  
@@ -149,57 +163,68 @@ void MulIntNum16(void) {  /* 9 */
 	 */
 	int *var = getCaliVariable();
 	
-	l_1000A0D8 *= mul64(*var, numbase);
+	accumulator *= mul64(*var, numbase);
 	
-	DEBUG_COMMAND("ShCalc.MulIntNum16: %p:\n", var);
+	TRACE("ShCalc.MulIntNum16: %p:", var);
 }
 
-void MulIntNum32(void) {  /* 10 */
+static void MulIntNum32(void) {  /* 10 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.MulIntNum32: %d:\n", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.MulIntNum32: %d:", p1);
 }
 
-void DivIntNum16(void) { /* 11 */
+static void DivIntNum16(void) { /* 11 */
 	/*
 	  64 bit 除算
 
 	   var: 足す数の入った変数
 	 */
 	int *var = getCaliVariable();
-	gint64 i;
+	int64_t i;
 	
-	l_1000A0C8 = *var;
+	i = mul64(*var, numbase);
+	accumulator = div64(accumulator, i);
 	
-	i = mul64(l_1000A0C8, numbase);
-	l_1000A0D8 = div64(l_1000A0D8, i);
-	
-	DEBUG_COMMAND("ShCalc.DivIntNum16 %p:\n", var);
+	TRACE("ShCalc.DivIntNum16 %p:", var);
 }
 
-void DivIntNum32(void) { /* 12 */ 
+static void DivIntNum32(void) { /* 12 */
 	int p1 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShCalc.DivIntNum32: %d:\n", p1);
+	TRACE_UNIMPLEMENTED("ShCalc.DivIntNum32: %d:", p1);
 }
 
-void CmpIntNum16(void) { /* 13 */
+static void CmpIntNum16(void) { /* 13 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 
-	DEBUG_COMMAND_YET("ShCalc.CmpIntNum16: %d,%d,%d:\n", p1, p2, p3);
+	TRACE_UNIMPLEMENTED("ShCalc.CmpIntNum16: %d,%d,%d:", p1, p2, p3);
 }
 
-void CmpIntNum32(void) { /* 14 */
-	int p1 = getCaliValue();
-	int p2 = getCaliValue();
-	int p3 = getCaliValue();
+static void CmpIntNum32(void) { /* 14 */
+	int *var = getCaliVariable();
+	int op = getCaliValue();
+	int *result = getCaliVariable();
 
-	DEBUG_COMMAND_YET("ShCalc.CmpIntNum32: %d,%d,%d:\n", p1, p2, p3);
+	int64_t val = mul64(get32(var), numbase);
+
+	switch (op) {
+	case 1: *result = val == accumulator; break;
+	case 2: *result = val > accumulator; break;
+	case 3: *result = val < accumulator; break;
+	case 4: *result = val >= accumulator; break;
+	case 5: *result = val <= accumulator; break;
+	default:
+		WARNING("ShCalc.CmpIntNum32: unknown operator %d", op);
+		break;
+	}
+
+	TRACE("ShCalc.CmpIntNum32: %p,%d,%p:", var, op, result);
 }
 	
-void GetLengthNum16(void) { /* 15 */
+static void GetLengthNum16(void) { /* 15 */
 	/*
 	  数値の桁数を返す
 	   var: 数値
@@ -220,17 +245,17 @@ void GetLengthNum16(void) { /* 15 */
 		*vResult = 1;
 	}
 	
-	DEBUG_COMMAND("ShCalc.GetLengthNum16 %p,%p:\n", var, vResult);
+	TRACE("ShCalc.GetLengthNum16 %p,%p:", var, vResult);
 }
 
-void GetLengthNum32(void) { /* 16 */
+static void GetLengthNum32(void) { /* 16 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("ShCalc.GetLengthNum32: %d,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("ShCalc.GetLengthNum32: %d,%d:", p1, p2);
 }
 
-void NumToRate(void) { /* 17 */
+static void NumToRate(void) { /* 17 */
 	/*
 	  p1 * (p3/p2) の演算結果を返す。
 
@@ -258,11 +283,11 @@ void NumToRate(void) { /* 17 */
 	
 	*vResult = i;
 	
-	DEBUG_COMMAND("ShCalc.NumToRate %d,%d,%d,%d,%p:\n", p1, p2, p3, flag, vResult);
+	TRACE("ShCalc.NumToRate %d,%d,%d,%d,%p:", p1, p2, p3, flag, vResult);
 	
 }
 
-void NumToRateNum(void) { /* 18 */
+static void NumToRateNum(void) { /* 18 */
 	/*
 	  p1 * (p2/p3) の演算結果を返す。
 
@@ -290,10 +315,10 @@ void NumToRateNum(void) { /* 18 */
 	
 	*vResult = i;
 	
-	DEBUG_COMMAND("ShCalc.NumToRateNum %d,%d,%d,%d,%p:\n", p1, p2, p3, flag, vResult);
+	TRACE("ShCalc.NumToRateNum %d,%d,%d,%d,%p:", p1, p2, p3, flag, vResult);
 }
 
-void SetRandomSeed() {
+static void SetRandomSeed() {
 	/*
 	  乱数の種の設定
 	  
@@ -303,10 +328,10 @@ void SetRandomSeed() {
 
 	sgenrand(seed);
 	
-	DEBUG_COMMAND("ShCalc.SetRandomSeed %d:\n", seed);
+	TRACE("ShCalc.SetRandomSeed %d:", seed);
 }
 
-void GetRandomNumA() {
+static void GetRandomNumA() {
 	int num  = getCaliValue();
 	int *var = getCaliVariable();
 
@@ -316,10 +341,10 @@ void GetRandomNumA() {
 		*var = (int)(genrand() * num) + 1;
 	}
 	
-	DEBUG_COMMAND("ShCalc.GetRandomNumA %d,%p:\n", num, var);
+	TRACE("ShCalc.GetRandomNumA %d,%p:", num, var);
 }
 
-void NumToBit() {
+static void NumToBit() {
 	/*
 	  2^(beki-1)
 	  
@@ -338,10 +363,10 @@ void NumToBit() {
 		*var = 0;
 	}
 
-	DEBUG_COMMAND("ShCalc.NumToBit %d,%p:\n", beki, var);
+	TRACE("ShCalc.NumToBit %d,%p:", beki, var);
 }
 
-void BitToNum() {
+static void BitToNum() {
 	/*
 	  val -> var
 	  1   -> 1
@@ -357,7 +382,7 @@ void BitToNum() {
 	int *var = getCaliVariable();
 	int i;
 	
-	DEBUG_COMMAND("ShCalc.BitToNum %d,%p:\n", val, var);
+	TRACE("ShCalc.BitToNum %d,%p:", val, var);
 	
 	if (val == 0) {
 		*var = 0;
@@ -374,3 +399,31 @@ void BitToNum() {
 		(*var)++;
 	}
 }
+
+static const ModuleFunc functions[] = {
+	{"AddIntNum16", AddIntNum16},
+	{"AddIntNum32", AddIntNum32},
+	{"BitToNum", BitToNum},
+	{"CmpIntNum16", CmpIntNum16},
+	{"CmpIntNum32", CmpIntNum32},
+	{"DivIntNum16", DivIntNum16},
+	{"DivIntNum32", DivIntNum32},
+	{"GetIntNum16", GetIntNum16},
+	{"GetIntNum32", GetIntNum32},
+	{"GetLengthNum16", GetLengthNum16},
+	{"GetLengthNum32", GetLengthNum32},
+	{"GetRandomNumA", GetRandomNumA},
+	{"MulIntNum16", MulIntNum16},
+	{"MulIntNum32", MulIntNum32},
+	{"NumToBit", NumToBit},
+	{"NumToRate", NumToRate},
+	{"NumToRateNum", NumToRateNum},
+	{"SetIntNum16", SetIntNum16},
+	{"SetIntNum32", SetIntNum32},
+	{"SetIntNumBase", SetIntNumBase},
+	{"SetRandomSeed", SetRandomSeed},
+	{"SubIntNum16", SubIntNum16},
+	{"SubIntNum32", SubIntNum32},
+};
+
+const Module module_ShCalc = {"ShCalc", functions, sizeof(functions) / sizeof(ModuleFunc)};

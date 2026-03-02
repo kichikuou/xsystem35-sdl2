@@ -24,7 +24,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "ags.h"
@@ -32,7 +31,7 @@
 #include "sprite.h"
 #include "sactsound.h"
 
-static void cb_defocused_swsp(gpointer s, gpointer data);
+static void cb_defocused_swsp(void* s, void* data);
 static int eventCB_GET(sprite_t *sp, agsevent_t *e);
 static void cb_remove(sprite_t *sp);
 
@@ -40,12 +39,12 @@ static void cb_remove(sprite_t *sp);
   説明スプライトの消去
     dragが始まったら説明スプライトは消去する
 */
-static void cb_defocused_swsp(gpointer s, gpointer data) {
+static void cb_defocused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
-	sp->show = FALSE;
+	sp->show = false;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -59,12 +58,12 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 	
 	switch(e->type) {
 	case AGSEVENT_BUTTON_PRESS:
-		if (e->d3 != AGSEVENT_BUTTON_LEFT) break;
+		if (e->code != AGSEVENT_BUTTON_LEFT) break;
 		
 		// drag開始時のマウスの位置記録
-		sp->u.get.dragging = TRUE;
-		sp->u.get.dragstart.x = e->d1;
-		sp->u.get.dragstart.y = e->d2;
+		sp->u.get.dragging = true;
+		sp->u.get.dragstart.x = e->mousex;
+		sp->u.get.dragstart.y = e->mousey;
 		
 		if (sp->cg3) {
 			sp->curcg = sp->cg3;
@@ -74,11 +73,11 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		
 		// スプライトの表示を一番前に持って来る
 		sact.draggedsp = sp;
-		sact.dropped = FALSE;
+		sact.dropped = false;
 		
 		// 説明スプライトがある場合は、それを非表示にする
 		if (sp->expsp) {
-			g_slist_foreach(sp->expsp, cb_defocused_swsp, &update);
+			slist_foreach(sp->expsp, cb_defocused_swsp, &update);
 		}
 		
 		// SpriteSoundがあれば、それを鳴らす
@@ -93,7 +92,7 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		
 		if (!sp->u.get.dragging) break;
 		
-		sact.dropped = TRUE;
+		sact.dropped = true;
 		break;
 
 	case AGSEVENT_MOUSE_MOTION:
@@ -105,8 +104,8 @@ static int eventCB_GET(sprite_t *sp, agsevent_t *e) {
 		// if (!sp->u.get.dragging) break;
 		
 		// マウスの現在位置により新しい場所を計算
-		newx = sp->loc.x + (e->d1 - sp->u.get.dragstart.x);
-		newy = sp->loc.y + (e->d2 - sp->u.get.dragstart.y);
+		newx = sp->loc.x + (e->mousex - sp->u.get.dragstart.x);
+		newy = sp->loc.y + (e->mousey - sp->u.get.dragstart.y);
 		if (newx != sp->cur.x || newy != sp->cur.y) {
 			sp_updateme(sp);
 			sp->cur.x = newx;
@@ -129,10 +128,8 @@ static void cb_remove(sprite_t *sp) {
   sp_new の時にスプライトの種類毎の初期化
   @param sp: 初期化するスプライト
 */
-int sp_get_setup(sprite_t *sp) {
+void sp_get_setup(sprite_t *sp) {
 	spev_add_eventlistener(sp, eventCB_GET);
 	sp->remove = cb_remove;
-	
-	return OK;
 }
 

@@ -1,0 +1,120 @@
+#pragma code_page(65001)
+#include <afxres.h>
+#include "resources.h"
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "xsystem35.exe.manifest"
+100 ICON DISCARDABLE "xsystem35.ico"
+
+// Note for game translators:
+// Rather than replacing these, use the "ttfont_gothic" and "ttfont_mincho"
+// options in .xsys35rc.  That will allow your translated game run on other
+// other platforms, such as Android and Web.
+MTLc3m.ttf  FONTS  DISCARDABLE  "../../fonts/MTLc3m.ttf"
+mincho.otf  FONTS  DISCARDABLE  "../../fonts/mincho.otf"
+
+
+////////////////////////////////////////////////////////////////////////
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+
+IDR_MENU1 MENU DISCARDABLE
+{
+    POPUP "File"
+    {
+        MENUITEM "Save Screenshot",             ID_SCREENSHOT
+        MENUITEM "Restart",                     ID_RESTART
+        MENUITEM "Exit",                        ID_EXIT
+    }
+    POPUP "Screen"
+    {
+        MENUITEM "Window",                      ID_SCREEN_WINDOW
+        MENUITEM "Fullscreen",                  ID_SCREEN_FULL
+        MENUITEM "Integer Scaling",             ID_SCREEN_INTEGER_SCALING
+    }
+    POPUP "Option"
+    {
+        MENUITEM "Mouse Movement",              ID_OPTION_MOUSE_MOVE
+        MENUITEM "Auto Copy Text to Clipboard", ID_OPTION_AUTO_COPY
+    }
+    MENUITEM "MsgSkip[off]",                    ID_MSGSKIP
+}
+
+STRINGTABLE
+{
+	IDS_CHOOSE_GAME_FOLDER "Choose a game folder:"
+}
+
+IDD_TEXTINPUT DIALOG DISCARDABLE  0, 0, 122, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Text input"
+FONT 9, "MS Shell Dlg"
+{
+    EDITTEXT        IDC_TEXTEDIT,7,15,112,12
+    LTEXT           "Enter a string (up to 8 letters)",IDC_TEXTLABEL,7,3,112,8
+    DEFPUSHBUTTON   "OK",IDOK,18,36,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,63,36,40,14
+}
+
+IDD_NUMINPUT DIALOG DISCARDABLE  0, 0, 122, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Number input"
+FONT 9, "MS Shell Dlg"
+{
+    EDITTEXT        IDC_NUMEDIT,7,15,98,12, ES_NUMBER
+    CONTROL         "",IDC_NUMSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_SETBUDDYINT | UDS_ARROWKEYS | UDS_NOTHOUSANDS | WS_BORDER | WS_TABSTOP,105,15,14,12
+    LTEXT           "Enter a number",IDC_NUMLABEL,7,3,112,8
+    DEFPUSHBUTTON   "OK",IDOK,18,36,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,63,36,40,14
+}
+
+////////////////////////////////////////////////////////////////////////
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+IDR_MENU1 MENU DISCARDABLE
+{
+    POPUP "ファイル"
+    {
+        MENUITEM "画面保存",                      ID_SCREENSHOT
+        MENUITEM "再起動",                        ID_RESTART
+        MENUITEM "閉じる",                        ID_EXIT
+    }
+    POPUP "画面"
+    {
+        MENUITEM "ウィンドウ",                    ID_SCREEN_WINDOW
+        MENUITEM "フルスクリーン",                ID_SCREEN_FULL
+        MENUITEM "整数倍スケーリング",            ID_SCREEN_INTEGER_SCALING
+    }
+    POPUP "オプション"
+    {
+        MENUITEM "マウスカーソル移動",            ID_OPTION_MOUSE_MOVE
+        MENUITEM "テキストを自動コピー",          ID_OPTION_AUTO_COPY
+    }
+    MENUITEM "文字送り[off]",                     ID_MSGSKIP
+}
+
+STRINGTABLE
+{
+	IDS_CHOOSE_GAME_FOLDER "ゲームフォルダを選んでください:"
+}
+
+IDD_TEXTINPUT DIALOG DISCARDABLE  0, 0, 122, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "文字列の入力"
+FONT 9, "ＭＳ Ｐゴシック"
+{
+    EDITTEXT        IDC_TEXTEDIT,7,15,112,12
+    LTEXT           "文字を入力してください（最大8文字）",IDC_TEXTLABEL,7,3,112,8
+    DEFPUSHBUTTON   "OK",IDOK,18,36,40,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,63,36,40,14
+}
+
+IDD_NUMINPUT DIALOG DISCARDABLE  0, 0, 122, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "数値入力"
+FONT 9, "ＭＳ Ｐゴシック"
+{
+    EDITTEXT        IDC_NUMEDIT,7,15,98,12, ES_NUMBER
+    CONTROL         "",IDC_NUMSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_SETBUDDYINT | UDS_ARROWKEYS | UDS_NOTHOUSANDS | WS_BORDER | WS_TABSTOP,105,15,14,12
+    LTEXT           "数値を入力してください",IDC_NUMLABEL,7,3,112,8
+    DEFPUSHBUTTON   "OK",IDOK,18,36,40,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,63,36,40,14
+}

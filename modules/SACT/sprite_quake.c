@@ -24,16 +24,13 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
-#include "imput.h"
+#include "list.h"
+#include "input.h"
 #include "sact.h"
-#include "surface.h"
-#include "ngraph.h"
 #include "sprite.h"
-#include "counter.h"
 #include "randMT.h"
 
 /*
@@ -46,14 +43,14 @@
    @param wCount: 時間(1/100秒)
    @param cancel: キーキャンセルあり(=1)
 */
-int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int cancel) {
+void sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int cancel) {
 	int edtime, curtime;
 	int i = 0, key;
-	GSList *node;
+	SList *node;
 	
-	edtime = wCount * 10 + get_high_counter(SYSTEMCOUNTER_MSEC);
+	edtime = wCount * 10 + sys_get_ticks();
 	
-	while ((curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < edtime) {
+	while ((curtime = sys_get_ticks()) < edtime) {
 		if (wType == 0) { // 全てのスプライトを同じように動かす
 			int adjx = (int)(genrand() * wAmplitudeX/2);
 			int adjy = (int)(genrand() * wAmplitudeY/2);
@@ -85,7 +82,7 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 		i++;
 		
 		// ウェイトとキャンセルチェック
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key != 0) break;
 	}
 	
@@ -97,5 +94,4 @@ int sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitudeY, int wCount, int
 		sp_updateme(sp);
 	}
 	sp_update_clipped();
-	return OK;
 }

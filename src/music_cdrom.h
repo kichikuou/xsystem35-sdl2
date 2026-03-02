@@ -25,28 +25,17 @@
 #define __MUSIC_CDROM_H__
 
 #include "portab.h"
-#include "cdrom.h"
+#include "ald_manager.h"
 
-struct _cdobj {
-	int st; // オブジェクトの遷移状態
-
-	int track; // 演奏トラック
-	int loop;  // くりかえし数 (0の場合は無限)
-	int cnt;   // 実際に繰り返した数
-	
-	boolean in_play; // 演奏中？
-        
-	cd_time time; // 演奏位置
-	
-	cdromdevice_t *dev;
-};
-typedef struct _cdobj cdobj_t;
-
-extern int muscd_init();
-extern int muscd_exit();
-extern int muscd_start(int trk, int loop);
-extern int muscd_stop();
-extern cd_time muscd_getpos();
-extern int muscd_cb();
+void muscd_set_playlist(const char *);
+bool muscd_init(void);
+bool muscd_init_bgm(DRIFILETYPE type, int base_no);
+void muscd_exit(void);
+void muscd_reset(void);
+bool muscd_start(int trk, int loop);
+void muscd_stop(void);
+bool muscd_getpos(int *t, int *m, int *s, int *f);
+int muscd_get_maxtrack(void);
+bool muscd_is_available(void);
 
 #endif /* __MUSIC_CDROM_H__ */

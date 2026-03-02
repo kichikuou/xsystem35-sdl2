@@ -23,59 +23,58 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "portab.h"
 #include "midi.h"
 
-static char *dev;
-static char *player;
 static char default_mode = 'e';
 static int subdev = -1;
 
-#ifdef ENABLE_MIDI_EXTPLAYER
-extern mididevice_t midi_extplayer;
+#ifdef __EMSCRIPTEN__
+extern mididevice_t midi_emscripten;
 #endif
 
-#if defined(ENABLE_MIDI_RAWMIDI) || defined(ENABLE_MIDI_SEQMIDI)
-extern mididevice_t midi_rawmidi;
+#ifdef __ANDROID__
+extern mididevice_t midi_android;
 #endif
 
-int midi_init(mididevice_t *midi) {
-	int ret = NG;
+#ifdef ENABLE_MIDI_SDLMIXER
+extern mididevice_t midi_sdlmixer;
+#endif
+
+#ifdef ENABLE_MIDI_PORTMIDI
+extern mididevice_t midi_portmidi;
+#endif
+
+bool midi_init(mididevice_t *midi) {
+	bool ret = false;
 
 	switch(default_mode) {
-	case 'r':
-	case 's':
-#if defined(ENABLE_MIDI_RAWMIDI) || defined(ENABLE_MIDI_SEQMIDI)
-		memcpy(midi, &midi_rawmidi, sizeof(mididevice_t));
-		ret = midi->init(dev, subdev);
-#endif
-		break;
 	case 'e':
-#ifdef ENABLE_MIDI_EXTPLAYER
-		ret = midi_extplayer.init(player, 0);
-		memcpy(midi, &midi_extplayer, sizeof(mididevice_t));
+#ifdef __EMSCRIPTEN__
+		ret = midi_emscripten.init(0);
+		memcpy(midi, &midi_emscripten, sizeof(mididevice_t));
+#endif
+#ifdef __ANDROID__
+		ret = midi_android.init(0);
+		memcpy(midi, &midi_android, sizeof(mididevice_t));
+#endif
+#ifdef ENABLE_MIDI_SDLMIXER
+		ret = midi_sdlmixer.init(0);
+		memcpy(midi, &midi_sdlmixer, sizeof(mididevice_t));
 #endif
 		break;
+	case 'p':
+#ifdef ENABLE_MIDI_PORTMIDI
+		ret = midi_portmidi.init(subdev);
+		memcpy(midi, &midi_portmidi, sizeof(mididevice_t));
+#endif
 	case '0':
 		break;
 	}
 	
 	return ret;
-}
-
-void midi_set_playername(char *name) {
-	if (player) free(player);
-	if (0 == strcmp("none", name)) player = NULL;
-	else                           player = strdup(name);
-}
-
-void midi_set_devicename(char *name) {
-	if (dev) free(dev);
-	if (0 == strcmp("none", name)) dev = NULL;
-	else                           dev = strdup(name);
 }
 
 void midi_set_output_device(int mode) {
@@ -84,13 +83,9 @@ void midi_set_output_device(int mode) {
 		/* external player */
 		default_mode = 'e';
 		break;
-	case 'r':
-		/* raw midi mode */
-		default_mode = 'r';
-		break;
-	case 's':
-		/* sequencer midi mode */
-		default_mode = 's';
+	case 'p':
+		/* portmidi midi mode */
+		default_mode = 'p';
 		subdev = mode >> 8;
 		break;
 	case '0':

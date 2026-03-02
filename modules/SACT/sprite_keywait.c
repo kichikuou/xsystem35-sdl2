@@ -24,23 +24,21 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#include <limits.h>
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
+#include "list.h"
 #include "ags.h"
 #include "nact.h"
-#include "imput.h"
-#include "ngraph.h"
-#include "surface.h"
+#include "input.h"
 #include "sact.h"
 #include "sprite.h"
 #include "sactsound.h"
 
 
 static void hidesprite(sprite_t *sp);
-static boolean waitcond(int endtime);
+static bool waitcond(int endtime);
 
 
 
@@ -52,27 +50,27 @@ static void hidesprite(sprite_t *sp) {
 		sp->blendrate = i;
 		sp_updateme(sp);
 		sp_update_clipped();
-		sys_keywait(10, FALSE);
+		sys_keywait(10, KEYWAIT_NONCANCELABLE);
 	}
 	
 	sp_updateme(sp);
-	sp->show = FALSE;
+	sp->show = false;
 	sp_update_clipped();
 }
 
 /*
   キー待ち終了の条件チェック
    @param endtime: 終了時間
-   @return: 終了なら TRUE、継続なら FALSE
+   @return: 終了なら true、継続なら false
    
    スプライトがドロップされた時の各種処理を含む
 */
-static boolean waitcond(int endtime) {
-	int curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
-	if (curtime >= endtime) return TRUE;
+static bool waitcond(int endtime) {
+	int curtime = sys_get_ticks();
+	if (curtime >= endtime) return true;
 	
 	if (sact.dropped) {
-		sact.draggedsp->u.get.dragging = FALSE;
+		sact.draggedsp->u.get.dragging = false;
 		if (sact.waitkey != -1) {
 			// dropしたスプライトをじわじわ消す 
 			hidesprite(sact.draggedsp);
@@ -80,8 +78,8 @@ static boolean waitcond(int endtime) {
 			sact.sp_result_put = sact.waitkey;
 			sp_free(sact.draggedsp->no);
 			sact.draggedsp = NULL;
-			sact.dropped = FALSE;
-			return TRUE;
+			sact.dropped = false;
+			return true;
 		} else {
 			// PUT/SWPUTスプライト以外のところにdropした場合
 			sprite_t *sp = sact.draggedsp;
@@ -98,12 +96,12 @@ static boolean waitcond(int endtime) {
 				ssnd_play(sact.draggedsp->numsound3);
 			}
 			sact.draggedsp = NULL;
-			sact.dropped = FALSE;
+			sact.dropped = false;
 		}
 	}
 	
 	// その他キー入力があれば終了
-	return sact.waitkey == -1 ? FALSE : TRUE;
+	return sact.waitkey != -1;
 }
 
 /*
@@ -115,14 +113,14 @@ static boolean waitcond(int endtime) {
   @param vD03: タイムアウトした場合=1, しない場合=0
   @param wTime: タイムアウト時間 (1/100sec)
 */
-int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout) {
+void sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout) {
 	int curtime, endtime;
 	
 	// とりあえず全更新
-	sp_update_all(TRUE);
+	sp_update_all(true);
 	
 	// depthmap を準備
-	g_slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
+	slist_foreach(sact.updatelist, sp_draw_dmap, NULL);
 	
 	sact.waittype = KEYWAIT_SPRITE;
 	sact.waitkey = -1;
@@ -134,23 +132,23 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	{
 		// とりあえず、現在のマウス位置を送って、switch sprite の
 		// 状態を更新しておく
-		agsevent_t agse;
-		MyPoint p;
-		sys_getMouseInfo(&p, FALSE);
-		agse.type = AGSEVENT_MOUSE_MOTION;
-		agse.d1 = p.x;
-		agse.d2 = p.y;
-		agse.d3 = 0;
-		nact->ags.eventcb(&agse);
+		SDL_Point p;
+		sys_getMouseInfo(&p, false);
+		agsevent_t agse = {
+			.type = AGSEVENT_MOUSE_MOTION,
+			.mousex = p.x,
+			.mousey = p.y
+		};
+		spev_callback(&agse);
 	}
 	
 	// 終了時間の計算
-	curtime = get_high_counter(SYSTEMCOUNTER_MSEC);
-	endtime = timeout < 0 ? G_MAXINT: (curtime + timeout * 10);
+	curtime = sys_get_ticks();
+	endtime = timeout < 0 ? INT_MAX : (curtime + timeout * 10);
 	
 	// スプライトキー待ちメイン
-	while (!waitcond(endtime)) {
-		sys_keywait(25, TRUE);
+	while (!waitcond(endtime) && !nact->is_quit) {
+		sys_keywait(25, KEYWAIT_CANCELABLE);
 	}
 	
 	if (sact.waitkey == 0) {
@@ -171,8 +169,6 @@ int sp_keywait(int *vOK, int *vRND, int *vD01, int *vD02, int *vD03, int timeout
 	*vD02 = sact.sp_result_put;
 	
 	sact.waittype = KEYWAIT_NONE;
-	
-	return OK;
 }
 
 

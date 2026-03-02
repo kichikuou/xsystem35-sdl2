@@ -24,12 +24,13 @@
 #ifndef __FILECHECK_H__
 #define __FILECHECK_H__
 
-#define FILENAME_KANJI_CODE_UTF8 0
-#define FILENAME_KANJI_CODE_SJIS 1
+#include <stdbool.h>
 
-extern void fc_init(char *name);
-extern char *fc_search(char *req);
-extern char *fc_add(char *req);
-extern void fc_set_default_kanjicode(int c);
+void fc_init(const char *name);
+char *fc_get_path(const char *fname_utf8);
+bool fc_exists(const char *fname_utf8);
+FILE *fc_open(const char *fname_utf8, char type);
+void fc_backup_oldfile(const char *filename);
+int mkdir_p(const char *path_utf8);
 
 #endif /* !__FILECHECK_H__ */

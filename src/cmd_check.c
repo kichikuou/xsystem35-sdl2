@@ -26,11 +26,13 @@
 
 #include "portab.h"
 #include "cmd_check.h"
+#include "debugger.h"
 #include "scenario.h"
 #include "xsystem35.h"
 #include "selection.h"
 #include "message.h"
-#include "imput.h"
+#include "input.h"
+#include "gfx.h"
 
 static void undeferr();
 
@@ -50,7 +52,7 @@ static void letVar(int type) {
 	int val    = getCaliValue();
 
 	if (varno == NULL) {
-		WARNING("varno is NULL\n");
+		WARNING("varno is NULL");
 		return;
 	}
 	
@@ -58,11 +60,11 @@ static void letVar(int type) {
 	case '!':
 		*varno = val; break;
 	case 0x10: /* += */
-		*varno = (int)(WORD)(*varno + val); break;
+		*varno = (uint16_t)(*varno + val); break;
 	case 0x11: /* -= */
 		*varno = max(0, *varno - val); break;
 	case 0x12: /* *= */
-		*varno = (int)(WORD)(*varno * val); break;
+		*varno = (uint16_t)(*varno * val); break;
 	case 0x13: /* /= */
 		if (val == 0) *varno  = 0;
 		else          *varno /= val;
@@ -84,32 +86,32 @@ static void letVar(int type) {
 
 /* データテーブルの設定 */
 static void getDataTableAdr() {
-	int index  = sys_getaddress();
-	int offset = sys_getCaliValue();
+	int index  = sl_getaddr();
+	int offset = getCaliValue();
 	
 	if (offset) {
 		index = sl_getdAt(index + 4 * (offset - 1));
 	}
 	
 	if (NULL == (nact->datatbl_addr = sl_setDataTable(sl_getPage(), index))) {
-		WARNING("data table address set failed\n");
+		WARNING("data table address set failed");
 	}
 }
 
 /* < ループ開始 */
 static void loopStart() {
-	int p1 = sys_getc();
+	int p1 = sl_getc();
 	int exitadr, limit, direction, step;
 	int *var;
 	
 	if (p1 == 0) {
-		sys_getc();
-		sys_getc();
+		sl_getc();
+		sl_getc();
 	} else if (p1 != 1) {
 		undeferr();
 	}
 	
-	exitadr   = sys_getaddress();
+	exitadr   = sl_getaddr();
 	var       = getCaliVariable();
 	limit     = getCaliValue();
 	direction = getCaliValue();
@@ -144,13 +146,50 @@ static void loopStart() {
 }
 
 static void undeferr() {
-	SYSERROR("Undefined Command:@ %03d,%05x\n", sl_getPage(), sl_getIndex());
+	SYSERROR("Undefined Command:@ %03d,%05x", sl_getPage(), sl_getIndex());
 }
 
-void check_command(int c0) {
+static void message(int c0) {
+	char buf[512];
+	char *p = buf;
+
+	while (c0 == 0x20 || c0 >= 0x80) {
+		if (nact->encoding == UTF8) {
+			*p++ = (char)c0;
+		} else if (c0 == 0x20) {
+			*p++ = (char)c0;
+		} else if (c0 >= 0xe0) {
+			*p++ = (char)c0; *p++ = (char)sl_getc();
+		} else if (c0 >= 0xa0) {
+			*p++ = (char)c0;
+		} else {
+			*p++ = (char)c0; *p++ = (char)sl_getc();
+		}
+		c0 = sl_getc();
+	}
+	sl_ungetc();
+	if (p != buf) {
+		*p = '\0';
+		sys_addMsg(buf);
+	}
+}
+
+void exec_command(void) {
+	TRACE_MESSAGE("%d:%x\n", sl_getPage(), sl_getIndex());
+
 	int page, index;
-	int bool;
-	
+	int c0 = sl_getc();
+
+	if (c0 == BREAKPOINT) {
+		gfx_updateScreen();
+		c0 = dbg_handle_breakpoint(sl_getPage(), sl_getIndex() - 1);
+	}
+
+	if (c0 == 0x20 || c0 >= 0x80) {
+		message(c0);
+		return;
+	}
+
 	switch(c0) {
 	case 0:
 		/* メッセージのゴミ？ */
@@ -175,10 +214,10 @@ void check_command(int c0) {
 		/* 選択肢の登録 */
 		if (nact->sel.in_setting) {
 			sel_fixElement();
-			nact->sel.in_setting = FALSE;
+			nact->sel.in_setting = false;
 		} else {
-			sel_addRetValue(sys_getaddress());
-			nact->sel.in_setting = TRUE;
+			sel_addRetValue(sl_getaddr());
+			nact->sel.in_setting = true;
 		}
 		break;
 	case '%':
@@ -196,7 +235,7 @@ void check_command(int c0) {
 		break;
 	case '@':
 		/* puts("ラベルジャンプ") */
-		sl_jmpNear(sys_getaddress());
+		sl_jmpNear(sl_getaddr());
 		break;
 	case '<':
 		/* for loop */
@@ -204,31 +243,31 @@ void check_command(int c0) {
 		break;
 	case '>':
 		/* loop end */
-		sl_jmpNear(sys_getaddress());
+		sl_jmpNear(sl_getaddr());
 		break;
 	case '/':
 		/* 小文字コマンド */
 		switch(sl_getc()) {
 		case 0x00:
-			commands2F00(); break;
+			commandTOC(); break;
 		case 0x01:
-			commands2F01(); break;
+			commandTOS(); break;
 		case 0x02:
-			commands2F02(); break;
+			commandTPC(); break;
 		case 0x03:
-			commands2F03(); break;
+			commandTPS(); break;
 		case 0x04:
-			commands2F04(); break;
+			commandTOP(); break;
 		case 0x05:
-			commands2F05(); break;
+			commandTPP(); break;
 		case 0x06:
 			commandsINC(); break;
 		case 0x07:
 			commandsDEC(); break;
 		case 0x08:
-			commands2F08(); break;
+			commandTAA(); break;
 		case 0x09:
-			commands2F09(); break;
+			commandTAB(); break;
 		case 0x0a:
 			commands2F0A(); break;
 		case 0x0b:
@@ -280,23 +319,23 @@ void check_command(int c0) {
 		case 0x22:
 			commandHH(); break;
 		case 0x23:
-			commands2F23(); break;
+			commandLC(0); break;
 		case 0x24:
-			commands2F24(); break;
+			commandLE(0); break;
 		case 0x25:
-			commands2F25(); break;
+			commandLXG(0); break;
 		case 0x26:
-			commands2F26(); break;
+			commandMI(0); break;
 		case 0x27:
-			commands2F27(); break;
+			commandMS(0); break;
 		case 0x28:
-			commands2F28(); break;
+			commandMT(0); break;
 		case 0x29:
-			commands2F29(); break;
+			commandNT(0); break;
 		case 0x2a:
-			commands2F2A(); break;
+			commandQE(0); break;
 		case 0x2b:
-			commands2F2B(); break;
+			commandUP(); break;
 		case 0x2c:
 			commandF(); break;
  		case 0x2d:
@@ -346,7 +385,7 @@ void check_command(int c0) {
 		case 0x43:
 			commands2F43(); break;
 		case 0x44:
-			commands2F44(); break;
+			commandMHH(); break;
 		case 0x45:
 			commands2F45(); break;
 		case 0x46:
@@ -364,15 +403,15 @@ void check_command(int c0) {
 		case 0x4c:
 			commands2F4C(); break;
 		case 0x4d:
-			commands2F4D(); break;
+			commandLXWT(); break;
 		case 0x4e:
-			commands2F4E(); break;
+			commandLXWS(); break;
 		case 0x4f:
-			commands2F4F(); break;
+			commandLXWE(); break;
 		case 0x50:
-			commands2F50(); break;
+			commandLXWH(); break;
 		case 0x51:
-			commands2F51(); break;
+			commandLXWHH(); break;
 		case 0x52:
 			commands2F52(); break;
 		case 0x53:
@@ -382,7 +421,7 @@ void check_command(int c0) {
 		case 0x55:
 			commands2F55(); break;
 		case 0x56:
-			commands2F56(); break;
+			commandLXF(); break;
 		case 0x57:
 			commands2F57(); break;
 		case 0x58:
@@ -498,8 +537,8 @@ void check_command(int c0) {
 	case 'A':
 		/* hit Any Key */
 		sys_hit_any_key();
-		msg_nextPage(TRUE);
-		DEBUG_COMMAND("A\n");
+		msg_nextPage(true);
+		TRACE("A");
 		break;
 	case 'B':
 		switch(sl_getc()) {
@@ -692,7 +731,7 @@ void check_command(int c0) {
 	case 'L':
 		switch(sl_getc()) {
 		case 'C':
-			commandLC(); break;
+			commandLC(':'); break;
 		case 'D':
 			commandLD(); break;
 		case 'P':
@@ -700,7 +739,7 @@ void check_command(int c0) {
 		case 'T':
 			commandLT(); break;
 		case 'E':
-			commandLE(); break;
+			commandLE(':'); break;
 		case 'L':
 			commandLL(); break;
 		case 'H':
@@ -722,7 +761,7 @@ void check_command(int c0) {
 		case 'X':
 			switch(sl_getc()) {
 			case 'G':
-				commandLXG(); break;
+				commandLXG(':'); break;
 			case 'O':
 				commandLXO(); break;
 			case 'C':
@@ -737,6 +776,8 @@ void check_command(int c0) {
 				commandLXR(); break;
 			case 'W':
 				commandLXW(); break;
+			case 'X':
+				commandLXX(); break;
 			default:
 				undeferr();
 			}
@@ -762,7 +803,7 @@ void check_command(int c0) {
 		case 'H':
 			commandMH(); break;
 		case 'I':
-			commandMI(); break;
+			commandMI(':'); break;
 		case 'J':
 			commandMJ(); break;
 		case 'L':
@@ -774,9 +815,9 @@ void check_command(int c0) {
 		case 'P':
 			commandMP(); break;
 		case 'S':
-			commandMS(); break;
+			commandMS(':'); break;
 		case 'T':
-			commandMT(); break;
+			commandMT(':'); break;
 		case 'V':
 			commandMV(); break;
 		case 'Z':
@@ -830,7 +871,7 @@ void check_command(int c0) {
 		case 'O':
 			commandNO(); break;
 		case 'T':
-			commandNT(); break;
+			commandNT(':'); break;
 		case 'D':
 			switch(sl_getc()) {
 			case 'C':
@@ -902,7 +943,7 @@ void check_command(int c0) {
 		case 'D':
 			commandQD(); break;
 		case 'E':
-			commandQE(); break;
+			commandQE(':'); break;
 		case 'P':
 			commandQP(); break;
 		default:
@@ -911,7 +952,7 @@ void check_command(int c0) {
 		break;
 	case 'R':
 		/* 改行 */
-		DEBUG_MESSAGE("\n");
+		TRACE_MESSAGE("\n");
 		msg_nextLine();
 		break;
 	case 'S':
@@ -938,6 +979,8 @@ void check_command(int c0) {
 			commandST(); break;
 		case 'U':
 			commandSU(); break;
+		case 'V':
+			commandSV(); break;
 		case 'W':
 			commandSW(); break;
 		case 'X':
@@ -1044,8 +1087,8 @@ void check_command(int c0) {
 	case 'X':
 	{
 		int num=getCaliValue();
-		sys_addMsg(v_str(num - 1));
-		DEBUG_COMMAND("X %d:\n", num);
+		sys_addMsg(svar_get(num));
+		TRACE("X %d:", num);
 	}
 		break;
 	case 'Y':
@@ -1098,6 +1141,8 @@ void check_command(int c0) {
 				undeferr();
 			}
 			 break;
+		case 'U':
+			commandZU(); break;
 		case 'Z':
 			switch(sl_getc()) {
 			case 0:
@@ -1144,7 +1189,7 @@ void check_command(int c0) {
 		break;
 	case '\\':
 		/* label call */
-		index = sys_getaddress();
+		index = sl_getaddr();
 		if (index == 0) {
 			sl_retNear();
 		} else {
@@ -1155,17 +1200,17 @@ void check_command(int c0) {
 		/* puts("選択"); */
 		sel_select();
 		break;
-	case '{':
-		/* puts("条件文"); */
-		bool = getCaliValue();
-		index = sys_getaddress();
-		if (bool == 0) {
-			sl_jmpNear(index);
-		} 
+	case '{':  // conditional statement
+		{
+			int cond = getCaliValue();
+			index = sl_getaddr();
+			if (!cond)
+				sl_jmpNear(index);
+		}
 		break;
 	case '~':
 		/* label far call */
-		page = sys_getw();
+		page = sl_getw();
 		if (page == 0x0000) {
 			// puts("~ cali:");
 			nact->fnc_return_value = getCaliValue();
@@ -1174,7 +1219,7 @@ void check_command(int c0) {
 			// puts("~~ cali:");
 			*getCaliVariable() = nact->fnc_return_value;
 		} else {
-			sl_callFar2(page - 1, sys_getaddress());
+			sl_callFar2(page - 1, sl_getaddr());
 		}
 		break;
 	default:

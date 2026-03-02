@@ -5,24 +5,32 @@
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 
-void Init() {
+static void Init() {
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	int *var = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("nDEMOE.Init %p:\n", var);
+	TRACE_UNIMPLEMENTED("nDEMOE.Init %p:", var);
 }
 
-void SetKeyCancelFlag() {
+static void SetKeyCancelFlag() {
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("nDEMOE.SetKeyCancelFlag %d:\n", p1);
+	TRACE_UNIMPLEMENTED("nDEMOE.SetKeyCancelFlag %d:", p1);
 }
 
-void Run() {
-	DEBUG_COMMAND_YET("nDEMOE.Run:\n");
+static void Run() {
+	TRACE_UNIMPLEMENTED("nDEMOE.Run:");
 }
 
+static const ModuleFunc functions[] = {
+	{"Init", Init},
+	{"Run", Run},
+	{"SetKeyCancelFlag", SetKeyCancelFlag},
+};
+
+const Module module_nDEMOE = {"nDEMOE", functions, sizeof(functions) / sizeof(ModuleFunc)};

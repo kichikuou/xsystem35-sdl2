@@ -2,10 +2,7 @@
 #define __NIGHT_H__
 
 #include "config.h"
-#include <glib.h>
 #include "portab.h"
-#include "graphics.h"
-#include "surface.h"
 #include "ags.h"
 #include "sprite.h"
 
@@ -44,9 +41,9 @@ struct _night {
 	// graph
 	// cginfo_t *cg[CGMAX];
 
-	MyRectangle updaterect;
+	SDL_Rect updaterect;
 
-	int fonttype;
+	FontType fonttype;
 	int fontsize;
 
 	sprite_t *sp[SPRITEMAX];
@@ -56,12 +53,12 @@ struct _night {
 
 	// msg
 	char msgbuf[MSGBUFMAX];
-	boolean zhiding;
+	bool zhiding;
 	struct {
 		void (* cbmove)(agsevent_t *);
 		void (* cbrelease)(agsevent_t *);
 	} msg;
-	//GSList *strreplace;
+	//SList *strreplace;
 
 	// sel
 	int selmode;

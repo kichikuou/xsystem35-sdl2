@@ -24,15 +24,15 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
 #include "menu.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
-#include "key.h"
 #include "sact.h"
 #include "sprite.h"
 #include "sactsound.h"
@@ -76,26 +76,25 @@
 */
 
 
-static void cb_focused_swsp(gpointer s, gpointer data);
-static void cb_defocused_swsp(gpointer s, gpointer data);
+static void cb_focused_swsp(void* s, void* data);
+static void cb_defocused_swsp(void* s, void* data);
 static int  cb_focused(sprite_t *sp);
 static int  cb_defocused(sprite_t *sp);
 static void cb_waitkey_simple(agsevent_t *e);
-static void cb_waitkey_sprite(agsevent_t *e);
 static void cb_waitkey_selection(agsevent_t *e);
 
 /*
  フォーカスを得たスプライトに説明スプライトが登録されていた場合の
  説明スプライトの表示ON
 */
-static void cb_focused_swsp(gpointer s, gpointer data) {
+static void cb_focused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
-	WARNING("show up spex %d\n", sp->no);
+	SACT_DEBUG("show up spex %d", sp->no);
 
-	sp->show = TRUE;
+	sp->show = true;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -106,14 +105,14 @@ static void cb_focused_swsp(gpointer s, gpointer data) {
  フォーカスを得たスプライトに説明スプライトが登録されていた場合の
  説明スプライトの表示OFF
 */
-static void cb_defocused_swsp(gpointer s, gpointer data) {
+static void cb_defocused_swsp(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
-	WARNING("hide spex %d\n", sp->no);
+	SACT_DEBUG("hide spex %d", sp->no);
 	
-	sp->show = FALSE;
+	sp->show = false;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -121,10 +120,10 @@ static void cb_defocused_swsp(gpointer s, gpointer data) {
 }
 
 // zkey hide off
-static void cb_focused_zkey(gpointer s, gpointer data) {
+static void cb_focused_zkey(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
 	sp->show = sp->show_save;
 	if (oldstate != sp->show) {
@@ -134,12 +133,12 @@ static void cb_focused_zkey(gpointer s, gpointer data) {
 }
 
 // zkey hide on
-static void cb_defocused_zkey(gpointer s, gpointer data) {
+static void cb_defocused_zkey(void* s, void* data) {
 	sprite_t *sp = (sprite_t *)s;
 	int *update  = (int *)data;
-	boolean oldstate = sp->show;
+	bool oldstate = sp->show;
 	
-	sp->show = FALSE;
+	sp->show = false;
 	if (oldstate != sp->show) {
 		(*update)++;
 		sp_updateme(sp);
@@ -174,8 +173,8 @@ static int cb_focused(sprite_t *sp) {
 			sp->curcg = sp->cg2;
 			update++;
 		}
-		sp->focused = TRUE;
-		WARNING("get forcused %d, type %d\n", sp->no, sp->type);
+		sp->focused = true;
+		SACT_DEBUG("get forcused %d, type %d", sp->no, sp->type);
 		if (sp->numsound1) {
 			ssnd_play(sp->numsound1);
 		}
@@ -197,8 +196,8 @@ static int cb_defocused(sprite_t *sp) {
 		}
 		sp->curcg = sp->cg1;
 		update++;
-		sp->focused = FALSE;
-		WARNING("lost forcused %d\n", sp->no);
+		sp->focused = false;
+		SACT_DEBUG("lost forcused %d", sp->no);
 	}
 	
 	return update;
@@ -212,53 +211,52 @@ static void cb_waitkey_simple(agsevent_t *e) {
 	
 	switch (e->type) {
 	case AGSEVENT_KEY_PRESS:
-		if (e->d3 == KEY_Z) {
-			cur = get_high_counter(SYSTEMCOUNTER_MSEC);
+		if (e->code == KEY_Z) {
+			cur = sys_get_ticks();
 			if (!sact.zhiding) {
-				g_slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
-				sact.zhiding = TRUE;
-				sact.zdooff = TRUE;
+				slist_foreach(sact.sp_zhide, cb_defocused_zkey, &update);
+				sact.zhiding = true;
+				sact.zdooff = true;
 				sact.zofftime = cur;
 			} else {
-				sact.zdooff = FALSE;
+				sact.zdooff = false;
 			}
 		}
 		break;
 		
-	case AGSEVENT_BUTTON_RELEASE:
+	case AGSEVENT_MOUSE_WHEEL:
 		// back log view mode に移行
-		if (e->d3 == AGSEVENT_WHEEL_UP ||
-		    e->d3 == AGSEVENT_WHEEL_DN) {
-			// MessageKey 待ちのときのみ
-			if (sact.waittype != KEYWAIT_MESSAGE) break;
-			sblog_start();
+		// MessageKey 待ちのときのみ
+		if (sact.waittype != KEYWAIT_MESSAGE) break;
+		if (sblog_start())
 			sact.waittype = KEYWAIT_BACKLOG;
-			break;
-		}
+		break;
+
+	case AGSEVENT_BUTTON_RELEASE:
 		if (sact.zhiding) {
-			g_slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
-			sact.zhiding = FALSE;
+			slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
+			sact.zhiding = false;
 		}
 		// fall through
 		
 	case AGSEVENT_KEY_RELEASE:
-		switch(e->d3) {
+		switch(e->code) {
 		case KEY_Z:
-			cur = get_high_counter(SYSTEMCOUNTER_MSEC);
+			cur = sys_get_ticks();
 			if (500 < (cur - sact.zofftime) || !sact.zdooff) {
-				g_slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
-				sact.zhiding = FALSE;
+				slist_foreach(sact.sp_zhide, cb_focused_zkey, &update);
+				sact.zhiding = false;
 			}
 			break;
 		case KEY_PAGEUP:
 		case KEY_PAGEDOWN:
 			// MessageKey 待ちのときのみ
 			if (sact.waittype != KEYWAIT_MESSAGE) break;
-			sblog_start();
-			sact.waittype = KEYWAIT_BACKLOG;
+			if (sblog_start())
+				sact.waittype = KEYWAIT_BACKLOG;
 			break;
 		default:
-			sact.waitkey = e->d3;
+			sact.waitkey = e->code;
 			break;
 		}
 	}
@@ -271,8 +269,9 @@ static void cb_waitkey_simple(agsevent_t *e) {
 /*
   WaitKeySpriteのcallback
 */
-static void cb_waitkey_sprite(agsevent_t *e) {
-	GSList *node;
+EMSCRIPTEN_KEEPALIVE
+void cb_waitkey_sprite(agsevent_t *e) {
+	SList *node;
 	sprite_t *focused_sp = NULL;   // focus を得ている sprite
 	sprite_t *defocused_sp = NULL; // focus を失った sprite
 	int update = 0;
@@ -286,12 +285,12 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 	
 	if (sact.draggedsp) {
 		// 先に drag中のspriteにイベントを送る
-		update = sact.draggedsp->eventcb(sact.draggedsp, e);
+		update = sact.draggedsp->eventcb(sact.draggedsp, e);  // Async in emscripten
 	} else {
 		// 右クリックキャンセル
 		// drag中でない時のみ、キャンセルを受け付ける
 		if (e->type == AGSEVENT_BUTTON_RELEASE &&
-		    e->d3   == AGSEVENT_BUTTON_RIGHT) {
+		    e->code == AGSEVENT_BUTTON_RIGHT) {
 			sact.waitkey = 0;
 			return;
 		}
@@ -310,7 +309,7 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		// dragg中の sprite は無視する
 		if (sp == sact.draggedsp) continue;
 		
-		if (focused_sp == NULL && sp_is_insprite(sp, e->d1, e->d2)) {
+		if (focused_sp == NULL && sp_is_insprite(sp, e->mousex, e->mousey)) {
 			/*
 			  focusを得ている sprite
 			*/
@@ -347,7 +346,7 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		if (defocused_sp) {
 			sprite_t *sp = defocused_sp;
 			if (sp->expsp) {
-				g_slist_foreach(sp->expsp, cb_defocused_swsp, &update);
+				slist_foreach(sp->expsp, cb_defocused_swsp, &update);
 			}
 		}
 		
@@ -355,7 +354,7 @@ static void cb_waitkey_sprite(agsevent_t *e) {
 		if (focused_sp) {
 			sprite_t *sp = focused_sp;
 			if (sp->expsp) {
-				g_slist_foreach(sp->expsp, cb_focused_swsp, &update);
+				slist_foreach(sp->expsp, cb_focused_swsp, &update);
 			}
 		}
 	}
@@ -387,8 +386,8 @@ static void cb_waitkey_selection(agsevent_t *e) {
 static void cb_waitkey_backlog(agsevent_t *e) {
 	switch (e->type) {
 	case AGSEVENT_KEY_RELEASE:
-		switch (e->d3) {
-		case KEY_ESC:
+		switch (e->code) {
+		case KEY_ESCAPE:
 			sblog_end();
 			sact.waittype = KEYWAIT_MESSAGE;
 			break;
@@ -408,18 +407,17 @@ static void cb_waitkey_backlog(agsevent_t *e) {
 		break;
 		
 	case AGSEVENT_BUTTON_RELEASE:
-		switch(e->d3) {
-		case AGSEVENT_WHEEL_UP:
-			sblog_pagenext();
-			break;
-		case AGSEVENT_WHEEL_DN:
-			sblog_pagepre();
-			break;
-		case AGSEVENT_BUTTON_RIGHT:
+		if (e->code == AGSEVENT_BUTTON_RIGHT) {
 			sblog_end();
 			sact.waittype = KEYWAIT_MESSAGE;
-			break;
 		}
+		break;
+
+	case AGSEVENT_MOUSE_WHEEL:
+		if (e->code > 0)
+			sblog_pagenext();
+		else
+			sblog_pagepre();
 		break;
 	}
 }
@@ -434,15 +432,15 @@ void spev_callback(agsevent_t *e) {
 	}
 	
 	if (sact.waittype != KEYWAIT_BACKLOG) {
-		if (e->type == AGSEVENT_KEY_PRESS && e->d3 == KEY_CTRL) {
+		if (e->type == AGSEVENT_KEY_PRESS && e->code == KEY_CTRL) {
 			sact.waitskiplv = 2;
-			sact.waitkey = e->d3;
+			sact.waitkey = e->code;
 			return;
 		}
 		
-		if (e->type == AGSEVENT_KEY_RELEASE && e->d3 == KEY_CTRL) {
+		if (e->type == AGSEVENT_KEY_RELEASE && e->code == KEY_CTRL) {
 			sact.waitskiplv = 0;
-			sact.waitkey = e->d3;
+			sact.waitkey = e->code;
 			return;
 		}
 	}
@@ -475,13 +473,13 @@ void spev_callback(agsevent_t *e) {
 */
 void spev_add_eventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) {
 	sp->eventcb = cb;
-	sact.eventlisteners = g_slist_append(sact.eventlisteners, sp);
+	sact.eventlisteners = slist_append(sact.eventlisteners, sp);
 }
 
 /*
   上で登録した callback の削除
 */
 void spev_remove_eventlistener(sprite_t *sp) {
-	sact.eventlisteners = g_slist_remove(sact.eventlisteners, sp);
+	sact.eventlisteners = slist_remove(sact.eventlisteners, sp);
 }
 

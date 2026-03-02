@@ -46,7 +46,7 @@ static void commandF11();
 static int *F6Index[256];
 
 void commandF() {
-	switch (sys_getc()) {
+	switch (sl_getc()) {
 	case 1:
 		commandF1(); break;
 	case 2:
@@ -75,67 +75,67 @@ void commandF() {
 }
 
 static void commandF1() {
-	int str_number = sys_getCaliValue();
-	int skip       = sys_getCaliValue();
+	int str_number = getCaliValue();
+	int skip       = getCaliValue();
 	int i;
 	char *p;
 	
-	DEBUG_COMMAND("F1 %d,%d:\n", str_number, skip);
+	TRACE("F1 %d,%d:", str_number, skip);
 	
 	p = (char *)nact->datatbl_addr;
 	for (i = 0; i < skip; i++) {
 		p += (strlen(p) + 1);
 	}
 	
-	v_strcpy(str_number - 1 , p);
+	svar_set(str_number, p);
 	p += (strlen(p) + 1);
 	nact->datatbl_addr = (void *)p;
 }
 
 static void commandF2() {
-	int *read_var = sys_getCaliVariable();
-	int skip      = sys_getCaliValue();
-	WORD *p = (WORD *)nact->datatbl_addr;
+	int *read_var = getCaliVariable();
+	int skip      = getCaliValue();
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 	
 	p += skip;
 	
-	*read_var = LittleEndian_getW((BYTE *)p, 0);
+	*read_var = LittleEndian_getW((uint8_t *)p, 0);
 	
 	p++;
 	nact->datatbl_addr = (void *)p;
 	
-	DEBUG_COMMAND("F2 %d,%d:\n", *read_var, skip);
+	TRACE("F2 %d,%d:", *read_var, skip);
 }
 
 static void commandF3() {
-	int *read_var = sys_getCaliVariable();
-	int skip      = sys_getCaliValue();
+	int *read_var = getCaliVariable();
+	int skip      = getCaliValue();
 	
 	*read_var = LittleEndian_getW(nact->datatbl_addr, skip *2);
 	
-	DEBUG_COMMAND("F3 %d,%d:\n", *read_var, skip);
+	TRACE("F3 %d,%d:", *read_var, skip);
 }
 
 static void commandF4() {
-	int *read_var = sys_getCaliVariable();
-	int count     = sys_getCaliValue();
+	int *read_var = getCaliVariable();
+	int count     = getCaliValue();
 	int i;
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 	
 	for (i = 0; i < count; i++) {
-		*read_var = LittleEndian_getW((BYTE *)p, 0);
+		*read_var = LittleEndian_getW((uint8_t *)p, 0);
 		p++;
 		read_var++;
 	}
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("F4 %d,%d:\n", *read_var, count);
+	TRACE("F4 %d,%d:", *read_var, count);
 }
 
 static void commandF5() {
-	int *read_var = sys_getCaliVariable();
-	int count     = sys_getCaliValue();
+	int *read_var = getCaliVariable();
+	int count     = getCaliValue();
 	int i;
 	
 	for (i = 0; i < count; i++) {
@@ -143,56 +143,56 @@ static void commandF5() {
 		read_var++;
 	}
 	
-	DEBUG_COMMAND("F5 %d,%d:\n", *read_var, count);
+	TRACE("F5 %d,%d:", *read_var, count);
 }
 
 static void commandF6() {
-	int *var  = sys_getCaliVariable();
-	int index = sys_getCaliValue();
+	int *var  = getCaliVariable();
+	int index = getCaliValue();
 	
 	F6Index[index] = var;
 	
-	DEBUG_COMMAND("F6 %d,%d:\n", *var, index);
+	TRACE("F6 %d,%d:", *var, index);
 }
 
 static void commandF7() {
-	int data_width = sys_getCaliValue();
-	int count      = sys_getCaliValue();
+	int data_width = getCaliValue();
+	int count      = getCaliValue();
 	int i, j;
-	WORD *p = (WORD *)nact->datatbl_addr;
+	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 	
 	for (i = 0; i < count; i++) {
 		for (j = 0; j < data_width; j++) {
-			*(F6Index[j] + i) = LittleEndian_getW((BYTE *)p, 0);
+			*(F6Index[j] + i) = LittleEndian_getW((uint8_t *)p, 0);
 			p++;
 		}
 	}
 	
 	nact->datatbl_addr = p;
 	
-	DEBUG_COMMAND("F7 %d,%d\n", data_width, count);
+	TRACE("F7 %d,%d", data_width, count);
 }
 
 static void commandF8() {
-	int snum = sys_getCaliValue();
-	int scnt = sys_getCaliValue();
-	DEBUG_COMMAND_YET("F8 %d,%d:\n", snum, scnt);
+	int snum = getCaliValue();
+	int scnt = getCaliValue();
+	TRACE_UNIMPLEMENTED("F8 %d,%d:", snum, scnt);
 }
 
 static void commandF9() {
-	int snum = sys_getCaliValue();
-	int scnt = sys_getCaliValue();
-	DEBUG_COMMAND_YET("F9 %d,%d:\n", snum, scnt);
+	int snum = getCaliValue();
+	int scnt = getCaliValue();
+	TRACE_UNIMPLEMENTED("F9 %d,%d:", snum, scnt);
 }
 
 static void commandF10() {
-	int snum = sys_getCaliValue();
-	int scnt = sys_getCaliValue();
-	DEBUG_COMMAND_YET("F10 %d,%d:\n", snum, scnt);
+	int snum = getCaliValue();
+	int scnt = getCaliValue();
+	TRACE_UNIMPLEMENTED("F10 %d,%d:", snum, scnt);
 }
 
 static void commandF11() {
-	int snum = sys_getCaliValue();
-	int ends = sys_getCaliValue();
-	DEBUG_COMMAND_YET("F11 %d,%d:\n", snum, ends);
+	int snum = getCaliValue();
+	int ends = getCaliValue();
+	TRACE_UNIMPLEMENTED("F11 %d,%d:", snum, ends);
 }

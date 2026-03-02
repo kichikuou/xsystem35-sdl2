@@ -26,9 +26,10 @@
 #include "config.h"
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
-#include "graphicsdevice.h"
-#include "imput.h"
+#include "input.h"
+#include "msgskip.h"
 
 #define REPEAT_RATE_FAST 60 
 #define REPEAT_RATE_SLOW 600
@@ -38,10 +39,10 @@ static int ik_key = 0;
 
 void commandIK() {
 	/* キー入力関連のコマンド */
-	int num = sys_getc();
+	int num = sl_getc();
 	int key;
 
-	DEBUG_COMMAND("IK %d:\n",num);
+	TRACE("IK %d:",num);
 	
 	/* to be fix
 	 *   IK0/1 is affected by ZI
@@ -52,32 +53,32 @@ void commandIK() {
 		sysVar[0] = 0;
 		key = sys_getInputInfo();
 		if (ik_key != key) repeating = 0;
-		if (get_skipMode()) break;
-		key = sys_keywait(INT_MAX, TRUE);
+		key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
+		if (msgskip_isSkipping()) break;
 		
 		if (repeating == 1) {
-			sys_keywait(REPEAT_RATE_SLOW, FALSE);
+			sys_keywait(REPEAT_RATE_SLOW, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
-		sys_key_releasewait(key, TRUE);
+		sys_key_releasewait(key, true);
 		sysVar[0] = ik_key = key;
 		break;
 	case 1: 
 		sysVar[0] = 0;
 		key = sys_getInputInfo();
 		if (ik_key != key) repeating = 0;
-		if (get_skipMode()) break;
-		key = sys_keywait(INT_MAX, TRUE);
+		key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
+		if (msgskip_isSkipping()) break;
 		
 		if (repeating == 1) {
-			sys_keywait(REPEAT_RATE_FAST, FALSE);
+			sys_keywait(REPEAT_RATE_FAST, KEYWAIT_NONCANCELABLE);
 		}
 		repeating++;
-		sys_key_releasewait(key, TRUE);
+		sys_key_releasewait(key, true);
 		sysVar[0] = ik_key = key;
 		break;
 	case 2:
-		sysVar[0] = sys_getMouseInfo(NULL, TRUE);
+		sysVar[0] = sys_getMouseInfo(NULL, true);
 		break;
 	case 3:
 		sysVar[0] = sys_getKeyInfo();
@@ -92,7 +93,7 @@ void commandIK() {
 		sysVar[0] = sys_getInputInfo();
 		break;
 	default:
-		WARNING("commandIK(): Unknown Command %d\n", num);
+		WARNING("commandIK(): Unknown Command %d", num);
 	}
 }
 
@@ -100,12 +101,12 @@ void commandIM() {
 	/* マウスカーソルの座標取得 */
 	int *x_var = getCaliVariable();
 	int *y_var = getCaliVariable();
-	MyPoint p;
+	SDL_Point p;
 	
-	sysVar[0] = sys_getMouseInfo(&p, FALSE);
+	sysVar[0] = sys_getMouseInfo(&p, false);
 	*x_var = p.x;
 	*y_var = p.y;
-	DEBUG_COMMAND("IM %d,%d:\n", *x_var, *y_var);
+	TRACE("IM %d,%d:", *x_var, *y_var);
 }
 
 void commandIC() {
@@ -117,7 +118,7 @@ void commandIC() {
 	pre = cursor_num;
 	
 	ags_setCursorType(cursor_num);
-	DEBUG_COMMAND("IC %d,%p:\n", cursor_num, oldcursor);
+	TRACE("IC %d,%p:", cursor_num, oldcursor);
 }
 
 void commandIZ() {
@@ -125,32 +126,32 @@ void commandIZ() {
 	int x = getCaliValue();
 	int y = getCaliValue();
 	
-	ags_setCursorLocation(x, y, TRUE);
-	DEBUG_COMMAND("IZ %d,%d:\n", x, y);
+	ags_setCursorLocation(x, y, true, false);
+	TRACE("IZ %d,%d:", x, y);
 }
 
 void commandIX() {
 	/* 「次の選択肢まで進む」の状態取得 */
 	int *var = getCaliVariable();
 	
-	*var = get_skipMode() == TRUE ? 1 : 0;
-	DEBUG_COMMAND("IX %p:\n",var);
+	*var = msgskip_isSkipping() ? 1 : 0;
+	TRACE("IX %p:",var);
 }
 
 void commandIY() {
 	int p1 = getCaliValue();
 	
 	if (p1 == 0) {
-		set_skipMode(FALSE);
+		msgskip_activate(false);
 	} else if (p1 == 1) {
-		set_skipMode(TRUE);
+		msgskip_activate(true);
 	} else if (p1 == 2) {
-		set_skipMode2(TRUE);
+		msgskip_setFlags(MSGSKIP_STOP_ON_MENU, MSGSKIP_STOP_ON_MENU);
 	} else if (p1 == 3) {
-		set_skipMode2(FALSE);
+		msgskip_setFlags(0, MSGSKIP_STOP_ON_MENU);
 	}
 	
-	DEBUG_COMMAND("IY %d:\n",p1);
+	TRACE("IY %d:",p1);
 }
 
 void commandIG() { /* T2 */
@@ -165,7 +166,7 @@ void commandIG() { /* T2 */
 		var++;
 	}
 	
-	DEBUG_COMMAND("IG %p,%d,%d,%d\n", var, code, cnt, rsv);
+	TRACE("IG %p,%d,%d,%d", var, code, cnt, rsv);
 }
 
 void commandIE() {
@@ -173,5 +174,5 @@ void commandIE() {
 	int p2 = getCaliValue();
 	
 	ags_loadCursor(p1, p2);
-	DEBUG_COMMAND("IE %d,%d\n", p1, p2);
+	TRACE("IE %d,%d", p1, p2);
 }

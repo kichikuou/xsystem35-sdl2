@@ -30,7 +30,8 @@
 #include "ags.h"
 #include "scenario.h"
 #include "windowframe.h"
-#include "imput.h"
+#include "input.h"
+#include "msgskip.h"
 #include "message.h"
 #include "selection.h"
 
@@ -52,23 +53,23 @@ static char elm[ELEMENT_MAX][ELEMENT_LENGTH];
 /* 選択したときに返す値 */
 static int elmv[ELEMENT_MAX];
 /* 現在登録中の選択肢の番号 */
-static int regnum = 0;
+static int regnum;
 /* 選択肢の要素の最大長さ */
-static int maxElementLength = 0;
+static int maxElementLength;
 /* 選択肢ウィンド退避 */
-static MyRectangle saveArea;
+static SDL_Rect saveArea;
 /* 選択ウィンドの退避用 */
 static void *saveimg;
 static void *saveimg2;
 /* 選択時のワーク */
-static MyRectangle *workR;
+static SDL_Rect *workR;
 /* callback functions 初期化/選択/キャンセル時に呼ばれるシナリオ内関数*/
 static int cb_select_page;
 static int cb_select_address;
 static int cb_cancel_page;
 static int cb_cancel_address;
 /* 選択肢 window を開いた時のマウスカーソルの動作 */
-static int default_element = 1;
+static int default_element;
 /* 最後に選んだ選択肢の要素番号 */
 static int last_selected_element;
 /* キーボードによる選択操作用 */
@@ -103,23 +104,51 @@ void sel_init() {
 	sel.EncloseType              = 0;
 	
 	/* 選択したあとメッセージ領域を初期化するか */
-	sel.ClearMsgWindow  = TRUE;
+	sel.ClearMsgWindow  = true;
 	
 	/* 選択Windowの大きさの変更 */
-	sel.WinResizeWidth  = FALSE;
-	sel.WinResizeHeight = TRUE;
+	sel.WinResizeWidth  = false;
+	sel.WinResizeHeight = true;
 
-#if 0
-	sel.WinInfo.x = 464;
-	sel.WinInfo.y = 80;
-	sel.WinInfo.width  = 160;
-	sel.WinInfo.height = 160;
-	sel.WinInfo.save = TRUE;
-	sel.savedImage = NULL;
-#endif
+	for (int i = 0; i < SELWINMAX; i++) {
+		if (sel.wininfo[i].savedimg)
+			ags_delRegion(sel.wininfo[i].savedimg);
+	}
+	memset(sel.wininfo, 0, sizeof(sel.wininfo));
+
+	for (int i = 0; i < SELWINMAX; i++) {
+		sel.wininfo[i].x = 450;
+		sel.wininfo[i].y = 100;
+		sel.wininfo[i].width  = 150;
+		sel.wininfo[i].height = 100;
+	}
+	sel.winno = 1;
+	sel.win = &sel.wininfo[1];
+	sel.wininfo[1].save = true;
 	
 	/* 選択肢を登録中 */
-	sel.in_setting = FALSE;
+	sel.in_setting = false;
+
+	// Private variables
+	memset(elm, 0, sizeof(elm));
+	memset(elmv, 0, sizeof(elmv));
+	regnum = 0;
+	maxElementLength = 0;
+
+	if (saveimg) {
+		ags_delRegion(saveimg);
+		saveimg = NULL;
+	}
+	if (saveimg2) {
+		ags_delRegion(saveimg2);
+		saveimg2 = NULL;
+	}
+	cb_select_page = 0;
+	cb_select_address = 0;
+	cb_cancel_page = 0;
+	cb_cancel_address = 0;
+	default_element = 1;
+	last_selected_element = 0;
 }
 
 /* 登録された選択肢の個数を削減する */
@@ -144,7 +173,7 @@ void sel_goto(int no, int flag) {
 	sl_jmpNear(elmv[no -1]);
 	
 	if (flag) {
-		sel.in_setting = FALSE;
+		sel.in_setting = false;
 		regnum = 0;
 		maxElementLength = 0;
 	}
@@ -158,7 +187,7 @@ void sel_returengoto(int no, int flag) {
 	sl_returnGoto(elmv[no -1]);
 	
 	if (flag) {
-		sel.in_setting = FALSE;
+		sel.in_setting = false;
 		regnum = 0;
 		maxElementLength = 0;
 	}
@@ -236,90 +265,88 @@ void sel_fixElement() {
 /* 選択肢ウィンドを開く為の準備 */
 static void init_selwindow() {
 	int i;
-	MyRectangle r;
+	SDL_Rect r;
 	
-	r.x      = sel.win->x;
-	r.y      = sel.win->y;
-	r.width  = 4 + (sel.WinResizeWidth  ? sel.MsgFontSize * maxElementLength : sel.win->width);
-	r.height = 2 + (sel.WinResizeHeight ? (sel.MsgFontSize +2) * regnum     : max((sel.MsgFontSize +2) * regnum, sel.win->height));
+	r.x = sel.win->x;
+	r.y = sel.win->y;
+	r.w = 4 + (sel.WinResizeWidth  ? sel.MsgFontSize * maxElementLength : sel.win->width);
+	r.h = 2 + (sel.WinResizeHeight ? (sel.MsgFontSize +2) * regnum     : max((sel.MsgFontSize +2) * regnum, sel.win->height));
 	
 	if (sel.win->save) {
 		saveArea.x = r.x - sel.Framedot;
 		saveArea.y = r.y - sel.Framedot;
-		saveArea.width  = r.width  + 2 * sel.Framedot;
-		saveArea.height = r.height + 2 * sel.Framedot;
-		saveimg = ags_saveRegion(saveArea.x, saveArea.y, saveArea.width, saveArea.height);
+		saveArea.w = r.w + 2 * sel.Framedot;
+		saveArea.h = r.h + 2 * sel.Framedot;
+		saveimg = ags_saveRegion(saveArea.x, saveArea.y, saveArea.w, saveArea.h);
 	} else {
 		saveArea = r;
 	}
 	
 	if (sel.WinBackgroundTransparent == 255) {
-		ags_fillRectangle(r.x, r.y, r.width, r.height, sel.WinBackgroundColor);
+		ags_fillRectangle(r.x, r.y, r.w, r.h, sel.WinBackgroundColor);
 	} else {
-		ags_wrapColor(r.x, r.y, r.width, r.height, sel.WinBackgroundColor, sel.WinBackgroundTransparent);
+		ags_wrapColor(r.x, r.y, r.w, r.h, sel.WinBackgroundColor, sel.WinBackgroundTransparent);
 	}
 	
 	switch(sel.WindowFrameType) {
 	case WINDOW_FRAME_EMPTY:
 		break;
 	case WINDOW_FRAME_LINE:
-		drawLineFrame(r.x, r.y, r.width, r.height);
+		drawLineFrame(r.x, r.y, r.w, r.h);
 		break;
 	case WINDOW_FRAME_CG:
-		printf("frameType is CG %d,%d,%d\n",sel.FrameCgNoTop, sel.FrameCgNoMid, sel.FrameCgNoBot);
+		NOTICE("frameType is CG %d,%d,%d",sel.FrameCgNoTop, sel.FrameCgNoMid, sel.FrameCgNoBot);
 		break;
 	default:
-		printf("frameType is Default");
+		NOTICE("frameType is Default");
 		break;
 	}
-	ags_setFont(FONT_GOTHIC, sel.MsgFontSize);
+	ags_setFontWithWeight(nact->ags.font_type, sel.MsgFontSize, nact->ags.font_weight);
 	for (i = 0; i < regnum; i++) {
-		DEBUG_MESSAGE("%d:%s\n", i +1, elm[i]);
-		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +2, elm[i], sel.MsgFontColor);
+		TRACE_MESSAGE("%d:%s\n", i +1, elm[i]);
+		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +1, elm[i], sel.MsgFontColor, NULL);
 	}
-	ags_updateArea(saveArea.x, saveArea.y, saveArea.width, saveArea.height);
+	ags_updateArea(saveArea.x, saveArea.y, saveArea.w, saveArea.h);
 	
 	/* マウスカーソルの自動移動 */
+	int x = r.x + r.w * MOUSE_INIT_X_RATIO/100;
 	if (default_element == 0) {
-		MyPoint p;
-		sys_getMouseInfo(&p, TRUE);
+		SDL_Point p;
+		sys_getMouseInfo(&p, true);
 		if (p.y < r.y) {
-			ags_setCursorLocation(r.x + r.width * MOUSE_INIT_X_RATIO/100,
-					      r.y + (sel.MsgFontSize +2) * MOUSE_INIT_Y_RATIO/100,
-					      TRUE);
-		} else if (p.y > (r.y + r.height)) {
-			ags_setCursorLocation(r.x + r.width * MOUSE_INIT_X_RATIO/100,
-					      r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100,
-					      TRUE);
+			int y = r.y + (sel.MsgFontSize +2) * MOUSE_INIT_Y_RATIO/100;
+			ags_setCursorLocation(x, y, true, true);
+		} else if (p.y > (r.y + r.h)) {
+			int y = r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100;
+			ags_setCursorLocation(x, y, true, true);
 		} else {
-			ags_setCursorLocation(r.x + r.width * MOUSE_INIT_X_RATIO/100,
-					      p.y * MOUSE_INIT_Y_RATIO/100, 
-					      TRUE);
+			int y = p.y * MOUSE_INIT_Y_RATIO/100;
+			ags_setCursorLocation(x, y, true, true);
 		}
 	} else if (default_element < regnum) {
-		ags_setCursorLocation(r.x + r.width * MOUSE_INIT_X_RATIO/100,
-				      r.y + (sel.MsgFontSize +2) * default_element * MOUSE_INIT_Y_RATIO/100, TRUE);
+		int y = r.y + (sel.MsgFontSize +2) * default_element * MOUSE_INIT_Y_RATIO/100;
+		ags_setCursorLocation(x, y, true, true);
 	} else if (default_element < 1000) {
-		ags_setCursorLocation(r.x + r.width * MOUSE_INIT_X_RATIO/100,
-				      r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100, TRUE);
+		int y = r.y + (sel.MsgFontSize +2) * regnum * MOUSE_INIT_Y_RATIO/100;
+		ags_setCursorLocation(x, y, true, true);
 	}
 }
 
 static void remove_selwindow() {
 	if (sel.win->save) {
 		ags_restoreRegion(saveimg, saveArea.x, saveArea.y);
-		ags_updateArea(saveArea.x, saveArea.y, saveArea.width, saveArea.height);
+		ags_updateArea(saveArea.x, saveArea.y, saveArea.w, saveArea.h);
 		saveimg = NULL;
 	}
 }
 
 static int whereElement(void) {
 	int i;
-	MyPoint p;
-	MyRectangle *r = workR;
+	SDL_Point p;
+	SDL_Rect *r = workR;
 	static int mpx, mpy;
 	
-	sys_getMouseInfo(&p, TRUE);
+	sys_getMouseInfo(&p, true);
 	if (keymode) {
 		if (abs(mpx - p.x) > 2 || abs(mpy - p.y) > 2) {
 			keymode = 0;
@@ -332,37 +359,39 @@ static int whereElement(void) {
 	mpy = p.y;
 	
 	for (i = 0; i < regnum; i++) {
-		if (p.x >= r[i].x && p.x < r[i].x + r[i].width &&
-		    p.y >= r[i].y && p.y < r[i].y + r[i].height) {
+		if (p.x >= r[i].x && p.x < r[i].x + r[i].w &&
+		    p.y >= r[i].y && p.y < r[i].y + r[i].h) {
 			return i;
 		}
 	}
 	return -1;
 }
 
-static void lineEncloseElement(MyRectangle *r, int col) {
-	ags_drawRectangle(r->x   , r->y  , r->width +2, r->height +2, col);
-	ags_drawRectangle(r->x +1, r->y+1, r->width   , r->height   , col);
-	ags_updateArea   (r->x   , r->y  , r->width +2, r->height +2);
+static void lineEncloseElement(SDL_Rect *r, int col, bool thick) {
+	ags_drawRectangle(r->x, r->y, r->w + 2, r->h + 2, col);
+	if (thick)
+		ags_drawRectangle(r->x + 1, r->y + 1, r->w, r->h, col);
+	ags_updateArea(r->x, r->y, r->w + 2, r->h + 2);
 }
 
 static void encloseElement(int sw, int no) {
-	MyRectangle *r = &workR[no];
+	SDL_Rect *r = &workR[no];
 	
 	if (sw == 0) { /* off */
 		if (sel.WinBackgroundTransparent != 255) {
 			ags_restoreRegion(saveimg2, r->x, r->y);
-			ags_updateArea(r->x, r->y, r->width +2, r->height +2);
+			ags_updateArea(r->x, r->y, r->w +2, r->h +2);
 			saveimg2 = NULL;
 		} else {
 			switch(sel.EncloseType) {
 			case 0:
-				lineEncloseElement(r, sel.WinBackgroundColor); break;
+				lineEncloseElement(r, sel.WinBackgroundColor, true); break;
 			case 1:
+				lineEncloseElement(r, sel.WinBackgroundColor, false); break;
 			case 2:
-				ags_fillRectangle(r->x, r->y, r->width +2, r->height +2, sel.WinBackgroundColor);
-				ags_drawString(r->x +2, r->y +2, elm[no], sel.MsgFontColor);
-				ags_updateArea(r->x, r->y, r->width +2, r->height +2);
+				ags_fillRectangle(r->x, r->y, r->w +2, r->h +2, sel.WinBackgroundColor);
+				ags_drawString(r->x +2, r->y +1, elm[no], sel.MsgFontColor, NULL);
+				ags_updateArea(r->x, r->y, r->w +2, r->h +2);
 				break;
 			default:
 				break;
@@ -371,16 +400,17 @@ static void encloseElement(int sw, int no) {
 		
 	} else {       /* on */
 		if (sel.WinBackgroundTransparent != 255) {
-			saveimg2 = ags_saveRegion(r->x, r->y, r->width +2, r->height +2); 
+			saveimg2 = ags_saveRegion(r->x, r->y, r->w +2, r->h +2);
 		}
 		switch(sel.EncloseType) {
 		case 0:
-			lineEncloseElement(r, sel.MsgFontColor); break;
+			lineEncloseElement(r, sel.WinFrameColor, true); break;
 		case 1:
+			lineEncloseElement(r, 255, false); break;
 		case 2:
-			ags_fillRectangleNeg(r->x, r->y, r->width +2, r->height +2, sel.SelectedElementColor);
-			ags_drawString(r->x +2, r->y +2, elm[no], sel.SelectedElementColor);
-			ags_updateArea(r->x, r->y, r->width +2, r->height +2);
+			ags_fillRectangle(r->x, r->y, r->w +2, r->h +2, sel.MsgFontColor);
+			ags_drawString(r->x +2, r->y +1, elm[no], sel.WinBackgroundColor, NULL);
+			ags_updateArea(r->x, r->y, r->w +2, r->h +2);
 			break;
 		default:
 			break;
@@ -403,8 +433,11 @@ static void drawLineFrame(int x, int y, int width, int height) {
 void sel_select() {
 	int curElement = -1;
 	int preElement = -1;
-	int key, i;
+	int key, prevkey = 0, i;
 	
+	if (msgskip_getFlags() & MSGSKIP_STOP_ON_MENU)
+		msgskip_activate(false);
+
 	saveimg2 = NULL;
 	keymode = 0;
 	
@@ -412,37 +445,58 @@ void sel_select() {
 	init_selwindow();
 
 	/* マウス領域の初期化 */
-	if (NULL == (workR = malloc(sizeof(MyRectangle) * regnum))) {
+	if (NULL == (workR = malloc(sizeof(SDL_Rect) * regnum))) {
 		NOMEMERR();
 	}
 
 	for (i = 0; i < regnum; i++) {
-		workR[i].x      = sel.win->x;
-		workR[i].y      = sel.win->y + i * (sel.MsgFontSize +2);
-		workR[i].width  = 2 + (sel.WinResizeWidth ? sel.MsgFontSize * maxElementLength : sel.win->width);
-		workR[i].height = 2 + sel.MsgFontSize;
+		workR[i].x = sel.win->x;
+		workR[i].y = sel.win->y + i * (sel.MsgFontSize +2);
+		workR[i].w = 2 + (sel.WinResizeWidth ? sel.MsgFontSize * maxElementLength : sel.win->width);
+		workR[i].h = 2 + sel.MsgFontSize;
 	}
 	
-	sys_key_releasewait(SYS35KEY_RET, FALSE);
-	while (1) {
-		key = sys_keywait(25, TRUE);
-		if (key == SYS35KEY_SPC) break;
-		if (key == SYS35KEY_RET && curElement != -1) break;
-		if (key & 3) {
+	sys_key_releasewait(SYS35KEY_RET, false);
+	while (!nact->is_quit) {
+		key = sys_keywait(25, KEYWAIT_CANCELABLE);
+
+		// Right-click exits the menu without waiting for button up.
+		if (key == SYS35KEY_SPC) {
+			curElement = -1;
+			break;
+		}
+
+		if (!key && prevkey == SYS35KEY_RET && curElement != -1) break;
+		prevkey = key;
+
+		if (key & 0xF) { /* arrow keys */
 			curElement = -1;
 			if ((key & 1)) {
+				/* up */
 				if (preElement > 0) curElement = preElement-1;
 				if (preElement < 0) curElement = 0;
 			}
 			
 			if ((key & 2) && preElement < (regnum-1)) {
+				/* down */
 				curElement = preElement+1;
 			}
+
+			if (key & 4) {
+				/* left */
+				curElement = 0;
+			}
+
+			if (key & 8) {
+				/* right */
+				curElement = regnum - 1;
+			}
+
 			if (curElement >= 0) {
 				if (preElement >= 0) {
 					encloseElement(0, preElement);
 				}
-				sys_key_releasewait(key, FALSE);
+				sys_key_releasewait(key, false);
 				encloseElement(1, curElement);
 				preElement = curElement;
 			}
@@ -467,7 +521,6 @@ void sel_select() {
 			}
 		}
 	}
-	sys_key_releasewait(SYS35KEY_RET, FALSE);
 	
 	if (saveimg2 != NULL) {
 		ags_delRegion(saveimg2);
@@ -483,10 +536,10 @@ void sel_select() {
 	remove_selwindow();
 	
 	if (sel.ClearMsgWindow) {
-		msg_nextPage(TRUE);
+		msg_nextPage(true);
 	}
 	
-	if (key == SYS35KEY_RET) {
+	if (curElement != -1) {
 		sl_jmpNear(elmv[curElement]);
 		if (cb_select_page != 0) {
 			sl_callFar2(cb_select_page -1, cb_select_address);
@@ -499,6 +552,4 @@ void sel_select() {
 		}
 		last_selected_element = 0;
 	}
-	
-	if (get_skipMode2()) set_skipMode(FALSE);
 }

@@ -25,28 +25,26 @@
 */
 /* $Id: bmp.c,v 1.3 2000/11/25 13:08:59 chikama Exp $ */
 
-#include <glib.h>
+#include <stdlib.h>
 #include "portab.h"
 #include "LittleEndian.h"
-#include "graphics.h"
 #include "cg.h"
 #include "bmp.h"
 
 /*
  * static methods
 */
-static bmp_header *extract_header(BYTE *b);
-static void getpal(Pallet256 *pal, BYTE *b);
-static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b);
-static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b);
+static bmp_header *extract_header(uint8_t *b);
+static void extract_8bit(bmp_header *bmp, uint8_t *pic, uint8_t *b);
+static void extract_24bit(bmp_header *bmp, uint16_t *pic, uint8_t *b);
 
 /*
  * Get information from cg header
  *   b: raw data (pointer to header)
  *   return: acquired bmp information object
 */
-static bmp_header *extract_header(BYTE *b) {
-	bmp_header *bmp = g_new(bmp_header, 1);
+static bmp_header *extract_header(uint8_t *b) {
+	bmp_header *bmp = malloc(sizeof(bmp_header));
 	
 	bmp->bmpSize    = LittleEndian_getDW(b, 2);
 	/*data[4]-data[7]reserv*/
@@ -64,18 +62,18 @@ static bmp_header *extract_header(BYTE *b) {
 }
 
 /*
- * Get pallet from raw data
- *   pal: pallet to be stored 
- *   b  : raw data (pointer to pallet)
+ * Get palette from raw data
+ *   b  : raw data (pointer to palette)
 */
-static void getpal(Pallet256 *pal, BYTE *b) {
-	int i;
-	
-	for (i = 0; i < 256; i++) {
-		pal->blue[i]  = *b++;
-		pal->red[i]   = *b++;
-		pal->green[i] = *b++;
+static SDL_Color *getpal(uint8_t *b) {
+	SDL_Color *pal = malloc(sizeof(SDL_Color) * 256);
+	for (int i = 0; i < 256; i++) {
+		pal[i].b = *b++;
+		pal[i].r = *b++;
+		pal[i].g = *b++;
+		pal[i].a = 255;
 	}
+	return pal;
 }
 
 /*
@@ -84,7 +82,7 @@ static void getpal(Pallet256 *pal, BYTE *b) {
  *   pic: pixel to be stored
  *   b  : raw data (pointer to pixel)
 */
-static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b) {
+static void extract_8bit(bmp_header *bmp, uint8_t *pic, uint8_t *b) {
 	int i, j;
 	int pos;
 	int LineNeed = (bmp->bmpXW * bmp->bmpBpp) / 8;
@@ -94,7 +92,7 @@ static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b) {
 	
 	pos = LineNeed * (bmp->bmpYW);           /* 最上行の位置 */
 	for (i = 0; i < bmp->bmpYW; i++) {
-		const BYTE* p;
+		const uint8_t* p;
 		pos -= LineNeed;
 		p = b + pos;
 		for (j = 0; j < bmp->bmpXW; j++)
@@ -108,7 +106,7 @@ static void extract_8bit(bmp_header *bmp, BYTE *pic, BYTE *b) {
  *   pic: pixel to be stored (16 bit converted)
  *   b  : raw data (pointer to pixel)
 */
-static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
+static void extract_24bit(bmp_header *bmp, uint16_t *pic, uint8_t *b) {
 	int i, j;
 	int pos;
 	int LineNeed = (bmp->bmpXW * bmp->bmpBpp) / 8;
@@ -118,12 +116,12 @@ static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
 	
 	pos = LineNeed * (bmp->bmpYW); /* 最上行の位置 */
 	for (i = 0; i < bmp->bmpYW; i++) {
-		const BYTE* p;
+		const uint8_t* p;
 		pos -= LineNeed;
 		p = b + pos;
 		
 		for (j = 0; j < bmp->bmpXW; j++) {
-			WORD r,g,b;
+			uint16_t r,g,b;
 			b = (*p++);
 			g = (*p++);
 			r = (*p++);
@@ -143,36 +141,35 @@ static void extract_24bit(bmp_header *bmp, WORD *pic, BYTE *b) {
 /*
  * Check data is 8bit bmp format cg or not
  *   data: raw data (pointer to data top)
- *   return: TRUE if data is bmp
+ *   return: true if data is bmp
 */
-boolean bmp256_checkfmt(BYTE *data) {
+bool bmp256_checkfmt(uint8_t *data) {
 	int w, h, bpp;
-	if (data[0] != 'B' || data[1] != 'M') return FALSE;
+	if (data[0] != 'B' || data[1] != 'M') return false;
 	
 	w = LittleEndian_getDW(data, 18);
 	h = LittleEndian_getDW(data, 22);
 	bpp = LittleEndian_getW(data, 28);
 	
-	if (bpp != 8) return FALSE;
-	if (w < 0 || h < 0) return FALSE;
+	if (bpp != 8) return false;
+	if (w < 0 || h < 0) return false;
 	
-	return TRUE;
+	return true;
 }
 
 /*
- * Extract 8bit bmp, header, pallet and pixel
+ * Extract 8bit bmp, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
-cgdata *bmp256_extract(BYTE *data) {
+cgdata *bmp256_extract(uint8_t *data) {
 	bmp_header *bmp = extract_header(data);
-	cgdata *cg = g_new0(cgdata, 1);
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	
-	cg->pal = g_new(Pallet256, 1);
-	getpal(cg->pal, data + bmp->bmpPp);
+	cg->pal = getpal(data + bmp->bmpPp);
 	
 	/* +10: margin for broken cg */
-	cg->pic = g_new(BYTE, (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
+	cg->pic = malloc(sizeof(uint8_t) * ((bmp->bmpXW + 10) * (bmp->bmpYW + 10)));
 	extract_8bit(bmp, cg->pic, data + bmp->bmpDp);
 	
 	cg->type = ALCG_BMP8;
@@ -180,9 +177,10 @@ cgdata *bmp256_extract(BYTE *data) {
 	cg->y = 0;
 	cg->width  = bmp->bmpXW;
 	cg->height = bmp->bmpYW;
+	cg->depth = 8;
 	cg->alpha  = NULL;
 	
-	g_free(bmp);
+	free(bmp);
 	
 	return cg;
 }
@@ -190,66 +188,46 @@ cgdata *bmp256_extract(BYTE *data) {
 /*
  * Check data is 24bit bmp format cg or not
  *   data: raw data (pointer to data top)
- *   return: TRUE if data is pms
+ *   return: true if data is pms
 */
-boolean bmp16m_checkfmt(BYTE *data) {
+bool bmp16m_checkfmt(uint8_t *data) {
 	int w, h, bpp;
 	
-	if (data[0] != 'B' || data[1] != 'M') return FALSE;
+	if (data[0] != 'B' || data[1] != 'M') return false;
 	
 	w = LittleEndian_getDW(data, 18);
 	h = LittleEndian_getDW(data, 22);
 	bpp = LittleEndian_getW(data, 28);
 	
-	if (bpp != 24) return FALSE;
-	if (w < 0 || h < 0) return FALSE;
+	if (bpp != 24) return false;
+	if (w < 0 || h < 0) return false;
 	
-	return TRUE;
+	return true;
 }
 
 /*
- * Extract 24bit bmp, header, pallet and pixel
+ * Extract 24bit bmp, header, palette and pixel
  *   data: raw data (pointer to data top)
  *   return: extracted image data and information
 */
-cgdata *bmp16m_extract(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
+cgdata *bmp16m_extract(uint8_t *data) {
+	cgdata *cg = calloc(1, sizeof(cgdata));
 	bmp_header *bmp = extract_header(data);
 	
 	/* +10: margin for broken cg */
-	cg->pic = (BYTE *)g_new(WORD, (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
-	extract_24bit(bmp, (WORD *)cg->pic, data + bmp->bmpDp);
+	cg->pic = (uint8_t *)malloc(sizeof(uint16_t) * (bmp->bmpXW + 10) * (bmp->bmpYW + 10));
+	extract_24bit(bmp, (uint16_t *)cg->pic, data + bmp->bmpDp);
 	
 	cg->type = ALCG_BMP24;
 	cg->x = 0;
 	cg->y = 0;
 	cg->width  = bmp->bmpXW;
 	cg->height = bmp->bmpYW;
+	cg->depth = 16;
 	cg->alpha = NULL;
 	cg->pal   = NULL;
 	
-	g_free(bmp);
-	
-	return cg;
-}
-
-/*
- * Extract bmp pallet only
- *   data: raw data (pointer to data top)
- *   return: extracted pallet data
-*/
-cgdata *bmp_getpal(BYTE *data) {
-	cgdata *cg = g_new0(cgdata, 1);
-	bmp_header *bmp = extract_header(data);
-	
-	cg->pal = g_new(Pallet256, 1);
-	getpal(cg->pal, data + bmp->bmpPp);
-	
-	cg->type  = ALCG_BMP8;
-	cg->pic   = NULL;
-	cg->alpha = NULL;
-	
-	g_free(bmp);
+	free(bmp);
 	
 	return cg;
 }

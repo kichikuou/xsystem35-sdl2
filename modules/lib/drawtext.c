@@ -30,10 +30,8 @@
 #include "nact.h"
 #include "ags.h"
 #include "font.h"
-#include "surface.h"
-#include "ngraph.h"
 
-static int ftype;  // フォントの種類
+static FontType ftype;
 static int fsize;  // フォントの大きさ
 
 /**
@@ -42,40 +40,16 @@ static int fsize;  // フォントの大きさ
  * @param type: フォント種類 (FONT_MINCHO, FONT_GOTHIC)
  * @param size: フォントサイズ
  */
-int dt_setfont(int type, int size) {
+void dt_setfont(FontType type, int size) {
+#ifdef __EMSCRIPTEN__
+	if (type == FONT_MINCHO) {
+		if (!load_mincho_font())
+			type = FONT_GOTHIC;
+	}
+#endif
+
 	ftype = type;
 	fsize = size;
-	return OK;
-}
-
-/**
- * surface にモノクロ文字を描画。アンチエイリアスされており256階調
- * 書き出すsurfaceは8ビットである必要あり
- *
- * @param sf: 描画する surface
- * @param x: 描画位置Ｘ座標
- * @param y: 描画位置Ｙ座標
- * @param buf: 描画文字列 (SJIS)
- * @return: 実際に描画した幅
-*/
-int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
-	agsurface_t *glyph;
-	int sx, sy, sw, sh;
-	FONT *font = nact->ags.font;
-	
-	font->sel_font(ftype, fsize);
-	
-	glyph = font->get_glyph(buf);
-	if (glyph == NULL) return 0;
-	
-	sx = x;	sy = y;
-	sw = glyph->width;
-	sh = glyph->height;
-	if (!gr_clip_xywh(sf, &sx, &sy, &sw, &sh)) return 0;
-	
-	gr_copy(sf, sx, sy, glyph, 0, 0, sw, sh);
-	
-	return sw;
 }
 
 /**
@@ -91,26 +65,14 @@ int dt_drawtext(surface_t *sf, int x, int y, char *buf) {
  * @param b: 文字色青
  * @return: 実際に描画した幅
  */ 
-int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b) {
-	agsurface_t *glyph;
-	int sx, sy, sw, sh;
-	FONT *font = nact->ags.font;
-	
-	font->sel_font(ftype, fsize);
-	
-	glyph = font->get_glyph(buf);
+int dt_drawtext_col(SDL_Surface *sf, int x, int y, char *buf, int r, int g, int b) {
+	ags_setFont(ftype, fsize);
+	SDL_Surface *glyph = ags_drawStringToSurface(buf, r, g, b);
 	if (glyph == NULL) return 0;
 
-	sx = x;	sy = y;
-	sw = glyph->width;
-	sh = glyph->height;
-	if (!gr_clip_xywh(sf, &sx, &sy, &sw, &sh)) return 0;
-	
-	// alpha map に文字そのものを描く
-	gr_draw_amap(sf, sx, sy, glyph->pixel, sw, sh, glyph->bytes_per_line);
-	
-	// pixel map には色情報を矩形で描く
-	gr_fill(sf, sx, sy, sw, sh, r, g, b);
-	
-	return sw;
+	SDL_Rect rect = {x, y, glyph->w, glyph->h};
+	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
+	SDL_BlitSurface(glyph, NULL, sf, &rect);
+	SDL_FreeSurface(glyph);
+	return rect.w;
 }

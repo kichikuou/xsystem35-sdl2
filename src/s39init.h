@@ -24,10 +24,12 @@
 #ifndef __S39INIT_H__
 #define __S39INIT_H__
 
-extern int s39ini_init();
-extern int s39ini_winopen();
-extern int s39ini_winclose();
-extern int s39ini_setvol();
-extern int s39ini_remove();
+#include <stdbool.h>
+
+bool s39ini_init(void);
+void s39ini_winopen(void);
+void s39ini_winclose(void);
+void s39ini_setvol(void);
+void s39ini_remove(void);
 
 #endif

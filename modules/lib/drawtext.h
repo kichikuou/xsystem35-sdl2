@@ -24,8 +24,11 @@
 #ifndef __DRAWTEXT_H__
 #define __DRAWTEXT_H__
 
-extern int dt_setfont(int type, int size);
-extern int dt_drawtext(surface_t *sf, int x, int y, char *buf);
-extern int dt_drawtext_col(surface_t *sf, int x, int y, char *buf, int r, int g, int b);
+#include "font.h"
+
+struct SDL_Surface;
+
+void dt_setfont(FontType type, int size);
+int dt_drawtext_col(struct SDL_Surface *sf, int x, int y, char *buf, int r, int g, int b);
 
 #endif /* __DRAWTEXT_H__ */

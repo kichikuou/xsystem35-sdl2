@@ -24,6 +24,7 @@
 #ifndef __SACTAMASK_H__
 #define __SACTAMASK_H__
 
-extern int smask_init(char *path);
+bool smask_init(const char *path);
+void sp_eupdate_amap(int type, int time, int key);
 
 #endif

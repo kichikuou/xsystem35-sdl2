@@ -30,7 +30,6 @@ GtkWidget* create_window2 (void);
 GtkWidget* create_window3 (void);
 GtkWidget* create_window4 (void);
 GtkWidget* create_window5 (void);
-GtkWidget* create_window6 (void);
 GtkWidget* create_menu1 (void);
 
 #endif /* !__MENU_GUI__ */

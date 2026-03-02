@@ -25,14 +25,12 @@
 #define __SACT_H__
 
 #include "config.h"
-
-#include <glib.h>
+#include <SDL_rect.h>
 #include "portab.h"
-#include "graphics.h"
-#include "surface.h"
+#include "list.h"
+#include "ags.h"
 #include "sacttimer.h"
 #include "variable.h"
-
 
 // スプライトの最大数
 #define SPRITEMAX 21845
@@ -61,17 +59,6 @@ typedef struct {
 	char *dst; // 置き換え文字列
 } strexchange_t;
 
-// SACTEFAM を使ったマスク
-typedef struct {
-	int fd;       // SACTEFAM.KLD のファイルディスクプリタ
-	char *mapadr; // mmap された最初のアドレス
-	off_t size;   // mmap した大きさ
-	int datanum;  // SACTEFAM.KLD 中のマスクファイルの数
-	int *no;      // シナリオ側での番号
-	int *offset;  // データへのオフセット
-} SACTEFAM_t;
-
-
 // CG_XX で作るCGの種類
 enum cgtype {
 	CG_NOTUSED = 0,
@@ -85,7 +72,7 @@ enum cgtype {
 struct _cginfo {
 	enum cgtype type;  // CGの種類, 0: 未使用, 1:リンクされている, ...
 	int no;            // CGの番号
-	surface_t *sf;     // CG本体
+	struct SDL_Surface *sf;
 	int refcnt;        // 参照カウンタ。０になったら開放してもよい。
 };
 typedef struct _cginfo cginfo_t;
@@ -119,7 +106,8 @@ struct _sprite {
 	int numsound1, numsound2, numsound3;
 	
 	// 初期 sprite の大きさ(cg1の大きさ)
-	MyDimension cursize;
+	int width;
+	int height;
 	
 	// それぞれの状態で表示する CG
 	cginfo_t *cg1, *cg2, *cg3;
@@ -128,8 +116,8 @@ struct _sprite {
 	cginfo_t *curcg;
 	
 	// スプライトを表示するか
-	boolean show;
-	boolean show_save; // Zkey hide save用
+	bool show;
+	bool show_save; // Zkey hide save用
 	
 	// 表示する際のブレンド率 0:全く見えない, 255: 通常表示
 	int blendrate; 
@@ -138,10 +126,10 @@ struct _sprite {
 	int freezed_state;
 	
 	// 表示位置 (SetPos)
-	MyPoint loc;
+	SDL_Point loc;
 	
 	// 現在のスプライトの表示位置
-	MyPoint cur;
+	SDL_Point cur;
 	
 	// event callback
 	int (* eventcb)(struct _sprite *sp, agsevent_t *e);  // for key/mouse
@@ -149,27 +137,27 @@ struct _sprite {
         // sprite削除時の callback
 	void (* remove)(struct _sprite *sp);
 	// spriteを再描画するときの callback
-	int  (* update)(struct _sprite *sp);
+	void (* update)(struct _sprite *sp);
 	
-	boolean focused; // forcusを得ているか
-	boolean pressed; // このsprite上でマウスが押されているか
+	bool focused; // forcusを得ているか
+	bool pressed; // このsprite上でマウスが押されているか
 	
-	GSList *expsp; // 説明スプライトのリスト
+	SList *expsp; // 説明スプライトのリスト
 	
 	// move command 用パラメータ
 	struct {
-		MyPoint to;     // 移動先
+		SDL_Point to;     // 移動先
 		int time;       // 移動完了時間
 		int speed;      // 移動速度
 		int starttime;  // 移動開始時刻
 		int endtime;    // 移動終了予定時刻
-		boolean moving; // 移動中かどうか
+		bool moving; // 移動中かどうか
 	} move;
 	
 	// SACT.Numeral用パラメータ
 	struct {
 		int cg[10];
-		MyPoint pos;
+		SDL_Point pos;
 		int span;
 	} numeral;
 	
@@ -182,8 +170,8 @@ struct _sprite {
 		
 		// ゲットスプライト
 		struct {
-			boolean dragging;  // ドラッグ中
-			MyPoint dragstart; // ドラッグ開始位置
+			bool dragging;  // ドラッグ中
+			SDL_Point dragstart; // ドラッグ開始位置
 		} get;
 
 		// プットスプライト
@@ -201,9 +189,9 @@ struct _sprite {
 		
 		// メッセージスプライト
 		struct {
-			GSList    *buf;       // 表示する文字のリスト
-			surface_t *canvas;    // 文字を描画するsurface
-			MyPoint    dspcur;    // 現在の表示位置
+			SList    *buf;       // 表示する文字のリスト
+			struct SDL_Surface *canvas;
+			SDL_Point    dspcur;    // 現在の表示位置
 		} msg;
 	} u;
 };
@@ -217,21 +205,18 @@ struct _sact {
 	// スプライト全体
 	sprite_t *sp[SPRITEMAX];
 	
-	GSList *sp_zhide;  // Zキーで消すスプライトのリスト
-	GSList *sp_quake;  // Quakeで揺らすスプライトのリスト
+	SList *sp_zhide;  // Zキーで消すスプライトのリスト
+	SList *sp_quake;  // Quakeで揺らすスプライトのリスト
 	
-	GSList *updatelist; // 再描画するスプライトのリスト
+	SList *updatelist; // 再描画するスプライトのリスト
 	
 	cginfo_t *cg[CGMAX]; // cgまたはCG_xxで作った CG
 	
 	// 座標系の原点
-	MyPoint origin;
+	SDL_Point origin;
 	
-	// 文字列 push/pop/replce 用
-	GSList *strstack;
-	GSList *strreplace;
-	char   *strreplacesrc;
-	char   *strreplacedst; 
+	// 文字列 replce 用
+	SList *strreplace;
 	
 	// メッセージスプライト用メッセージバッファ
 	char msgbuf[MSGBUFMAX];
@@ -249,27 +234,24 @@ struct _sact {
 		int align; // 行そろえ
 		void (* cbmove)(agsevent_t *);
 		void (* cbrelease)(agsevent_t *);
-		surface_t   *charcanvas;
+		struct SDL_Surface *charcanvas;
 	} sel;
 	
 	// event listener
-	GSList *eventlisteners;
-	GSList *teventlisteners;
-	GSList *teventremovelist;
+	SList *eventlisteners;
+	SList *teventlisteners;
+	SList *teventremovelist;
 	
 	// MOVEするスプライトのリスト
-	GSList *movelist;
+	SList *movelist;
 	int movestarttime; // 一斉に移動を開始するための開始時間
 	int movecurtime;
 	
-	MyRectangle updaterect; // 更新が必要なspriteの領域の和
-	
-	// sact timer
-	stimer_t timer[65536];
+	SDL_Rect updaterect; // 更新が必要なspriteの領域の和
 	
 	// DnDに関するもの
 	sprite_t *draggedsp;  // drag中のスプライト
-	boolean dropped;      // スプライトがドロップされたかどうか
+	bool dropped;      // スプライトがドロップされたかどうか
 	
 	// keywaitの種類
 	int waittype;
@@ -288,18 +270,15 @@ struct _sact {
 	int numsoundob;
 	
 	// depth map
-	surface_t *dmap;
+	struct SDL_Surface *dmap;
 	
-	// SACTEFAM.KLD
-	SACTEFAM_t am;
-	
-	boolean zhiding;  // Zkeyによる隠し中
+	bool zhiding;  // Zkeyによる隠し中
 	int     zofftime;
-	boolean zdooff;
+	bool zdooff;
 	
 	// バックログ
-	boolean logging;
-	GList  *log;
+	bool logging;
+	List *log;  // UTF-8 strings
 };
 typedef struct _sact sact_t;
 

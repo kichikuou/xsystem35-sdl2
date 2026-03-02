@@ -26,24 +26,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
 // #include "LittleEndian.h"
 #include "ags.h"
-#include "imput.h"
+#include "input.h"
 #include "sact.h"
-#include "surface.h"
-#include "ngraph.h"
 #include "sprite.h"
-#include "counter.h"
 #include "randMT.h"
 
-typedef void entrypoint (double step, int p1, int p2, int *retx, int *rety);
+#define M_PIf ((float)M_PI)
+
+typedef void entrypoint (float step, int p1, int p2, int *retx, int *rety);
 
 // 上下左右方向の揺らし
-static void quake0(double step, int ampx, int ampy, int *adjx, int *adjy) {
+static void quake0(float step, int ampx, int ampy, int *adjx, int *adjy) {
 	static int i = 0;
 	
 	*adjx = (int)(genrand() * ampx/2);
@@ -54,12 +52,12 @@ static void quake0(double step, int ampx, int ampy, int *adjx, int *adjy) {
 }
 
 // 回転の揺らし
-static void quake1(double curstep, int diam, int round, int *adjx, int *adjy) {
-	double R = (1 - curstep) * diam / 2;
-	double th = curstep * 2 * M_PI * round;
+static void quake1(float curstep, int diam, int round, int *adjx, int *adjy) {
+	float R = (1 - curstep) * diam / 2;
+	float th = curstep * 2 * M_PIf * round;
 
-	*adjx = (int)(R * cos(th));
-	*adjy = (int)(R * sin(th));
+	*adjx = (int)(R * cosf(th));
+	*adjy = (int)(R * sinf(th));
 }
 
 /*
@@ -72,29 +70,27 @@ static void quake1(double curstep, int diam, int round, int *adjx, int *adjy) {
    @param wCount: 時間(1/100秒)
    @param nfKeyEnable: キー抜け (1で有効)
 */
-int sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
+void sp_quake_screen(int type, int p1, int p2, int time, int cancel) {
 	int sttime, edtime, curtime;
 	int key;
 	entrypoint *cb[2] = {quake0, quake1};
 	
-	if (type > 1) return OK;
+	if (type > 1) return;
 	
-	sttime = get_high_counter(SYSTEMCOUNTER_MSEC);
+	sttime = sys_get_ticks();
 	edtime = time * 10 + sttime;
-	while ((curtime = get_high_counter(SYSTEMCOUNTER_MSEC)) < edtime) {
+	while ((curtime = sys_get_ticks()) < edtime) {
 		int adjx, adjy;
 		
-		cb[type]((double)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);
-		ags_setViewArea(adjx, adjy, sf0->width, sf0->height);
+		cb[type]((float)(curtime - sttime)/(edtime - sttime), p1, p2, &adjx, &adjy);
+		ags_setViewArea(adjx, adjy, main_surface->w, main_surface->h);
 		ags_updateFull();
 		
-		key = sys_keywait(10, cancel);
+		key = sys_keywait(10, cancel ? KEYWAIT_CANCELABLE : KEYWAIT_NONCANCELABLE);
 		if (cancel && key) break;
 	}
 	
-	ags_setViewArea(0, 0, sf0->width, sf0->height);
+	ags_setViewArea(0, 0, main_surface->w, main_surface->h);
 	ags_updateFull();
-	
-	return OK;
 }
 

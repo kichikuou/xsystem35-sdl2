@@ -1,11 +1,11 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <glib.h>
 
 #include "portab.h"
 #include "system.h"
 #include "xsystem35.h"
+#include "modules.h"
 #include "nact.h"
 #include "night.h"
 #include "nt_sound.h"
@@ -13,6 +13,7 @@
 #include "nt_scenario.h"
 #include "nt_msg.h"
 #include "nt_event.h"
+#include "sactcg.h"
 
 #include "sactstring.h"
 
@@ -20,7 +21,7 @@
 night_t nightprv;
 
 
-void Init(void) { /* 0 */
+static void Init(void) { /* 0 */
 	int *var = getCaliVariable();
 	int p1 = getCaliValue();  /* ISys3xCG */
 	int p2 = getCaliValue();  /* ISys3xDIB */
@@ -35,11 +36,22 @@ void Init(void) { /* 0 */
 	
 	*var = 1;
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.Init %p:\n", var);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.Init %p:", var);
 }
 
-void InitGame() { /* 1 */
-	nact->ags.font->antialiase_on = TRUE;
+static void NIGHTDLL_reset(void) {
+	nt_sstr_reset();
+	nt_sp_clear_updatelist();
+	for (int i = 0; i < SPRITEMAX; i++) {
+		if (night.sp[i])
+			nt_sp_free(night.sp[i]);
+	}
+	nt_scg_freeall();
+	memset(&night, 0, sizeof(night));
+}
+
+static void InitGame() { /* 1 */
+	ags_setAntialiasedStringMode(true);
 	sys_setHankakuMode(2);
 	
 	nact->msgout = ntmsg_add;
@@ -48,225 +60,225 @@ void InitGame() { /* 1 */
 	
 	nt_gr_init();
 	ntmsg_init();
-	sstr_init();
+	nt_sstr_init();
 
-	DEBUG_COMMAND_YET("NIGHTDLL.InitGame:\n");
+	TRACE_UNIMPLEMENTED("NIGHTDLL.InitGame:");
 }	
 
 // メッセージの枠の表示
-void SetMsgFrame() { /* 2 */
+static void SetMsgFrame() { /* 2 */
 	int p1 = getCaliValue(); // 0=枠消去, 1=枠あり, 2=中央
 	
 	ntmsg_set_frame(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgFram %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetMsgFram %d:", p1);
 }
 
 // メッセージの表示位置の設定
-void SetMsgPlaceMethod(void) { /* 3 */
+static void SetMsgPlaceMethod(void) { /* 3 */
 	int p1 = getCaliValue(); // 0=メッセージ枠内, 1=中央, 
 	                         // 2=メッセージ枠+顔つき 
 	ntmsg_set_place(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgPlaceMethod %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetMsgPlaceMethod %d:", p1);
 }
 
 // 未実装?
-void SetMsgDrawEffect(void) { /* 4 */
+static void SetMsgDrawEffect(void) { /* 4 */
 	int p1 = getCaliValue(); // 0, 1, 2, 3 (実際にはどれも機能しない?)
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgDrawEffect %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetMsgDrawEffect %d:", p1);
 }
 
 // 未実装?
-void SetMsgClearEffect(void) { /* 5 */
+static void SetMsgClearEffect(void) { /* 5 */
 	int p1 = getCaliValue(); // 0, 1, 2, 4 (実際にはどれも機能しない?)
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetMsgClearEffect %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetMsgClearEffect %d:", p1);
 }
 
 // 壁紙CGの設定
-void SetWallPaper(void) { /* 6 */
+static void SetWallPaper(void) { /* 6 */
 	int p1 = getCaliValue(); // 壁紙CG番号
 	
 	nt_gr_set_wallpaper(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetWallPaper %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetWallPaper %d:", p1);
 }
 
 // 背景CGの設定
-void SetScenery(void) { /* 7 */
+static void SetScenery(void) { /* 7 */
 	int p1 = getCaliValue(); // 背景GC番号
 	
 	nt_gr_set_scenery(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetScenery %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetScenery %d:", p1);
 }
 
 // 顔CGの設定
-void SetFace(void) { /* 8 */
+static void SetFace(void) { /* 8 */
 	int p1 = getCaliValue(); // 顔CG番号
 	
 	nt_gr_set_face(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetFace %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetFace %d:", p1);
 }
 
 // 立ち絵左の設定
-void SetSpriteL(void) { /* 9 */
+static void SetSpriteL(void) { /* 9 */
 	int p1 = getCaliValue(); // 左人物スプライト番号
 	
 	nt_gr_set_spL(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteL %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetSpriteL %d:", p1);
 }
 
 // 立ち絵中央の設定
-void SetSpriteM(void) { /* 10 */
+static void SetSpriteM(void) { /* 10 */
 	int p1 = getCaliValue(); // 中央人物スプライト番号
 	
 	nt_gr_set_spM(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteM %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetSpriteM %d:", p1);
 }
 
 // 立ち絵右の設定
-void SetSpriteR(void) { /* 11 */
+static void SetSpriteR(void) { /* 11 */
 	int p1 = getCaliValue(); // 右人物スプライト番号
 	
 	nt_gr_set_spR(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteR %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetSpriteR %d:", p1);
 }
 
 // 立ち絵左の設定（季節違い?)
-void SetSpriteSeasonL(void) { /* 12 */
+static void SetSpriteSeasonL(void) { /* 12 */
 	int p1 = getCaliValue(); // 左人物スプライト番号
 	
 	nt_gr_set_spsL(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteSeasonL %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetSpriteSeasonL %d:", p1);
 }
 
 // 立ち絵中央の設定（季節違い?)
-void SetSpriteSeasonM(void) { /* 13 */
+static void SetSpriteSeasonM(void) { /* 13 */
 	int p1 = getCaliValue(); // 中央人物スプライト番号
 	
 	nt_gr_set_spM(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteSeasonM %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetSpriteSeasonM %d:", p1);
 }
 
 // 立ち絵右の設定（季節違い?)
-void SetSpriteSeasonR(void) { /* 14 */
+static void SetSpriteSeasonR(void) { /* 14 */
 	int p1 = getCaliValue(); // 右人物スプライト番号
 	
 	nt_gr_set_spsR(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetSpriteSeasonR %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetSpriteSeasonR %d:", p1);
 }
 
 // 改行
-void StartNewLine(void) { /* 15 */
+static void StartNewLine(void) { /* 15 */
 	ntmsg_newline();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.StartNewLine:\n");
+	TRACE_UNIMPLEMENTED("NIGHTDLL.StartNewLine:");
 }
 
 // メッセージフォントサイズの設定
-void SetFontSize(void) { /* 16 */
+static void SetFontSize(void) { /* 16 */
 	int p1 = getCaliValue(); // メッセージフォントサイズ
 	
 	night.fontsize = p1;
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetFontSize %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetFontSize %d:", p1);
 }
 
 // フォントの種類の設定
-void SetFont(void) { /* 17 */
+static void SetFont(void) { /* 17 */
 	int p1 = getCaliValue(); // 0: ゴシック, 1: 明朝
 	
 	night.fonttype = p1;
 
-	DEBUG_COMMAND_YET("NIGHTDLL.SetFont %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetFont %d:", p1);
 }
 
 // 選択肢モード ON
-void SetSelMode(void) { /* 18 */
+static void SetSelMode(void) { /* 18 */
 	int p1 = getCaliValue(); // 0, 1(ほとんど0)
 	
 	night.selmode = p1;
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetSelMode %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetSelMode %d:", p1);
 }
 
 // キー入力待ち後、改ページ
-void AnalyzeMessage(void) { /* 19 */
+static void AnalyzeMessage(void) { /* 19 */
 	int *var = getCaliVariable(); // 入力されたキー
 
 	*var = ntmsg_ana();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.AnalyzeMessage %p:\n", var);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.AnalyzeMessage %p:", var);
 }
 
 // ~DRAWの効果時間
-void SetDrawTime(void) { /* 20 */
+static void SetDrawTime(void) { /* 20 */
 	int p1 = getCaliValue(); // 効果時間 (未使用？)
 	
 	nt_gr_set_drawtime(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetDrawTime %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetDrawTime %d:", p1);
 }
 
 // 効果つき画面更新
-void Draw(void) { /* 21 */
+static void Draw(void) { /* 21 */
 	int p1 = getCaliValue(); // 効果番号
 	
 	nt_gr_draw(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.Draw %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.Draw %d:", p1);
 }
 
 // 音声データを再生
-void SetVoice(void) { /* 22 */
+static void SetVoice(void) { /* 22 */
 	int p1 = getCaliValue(); // ファイル番号
 	
 	nt_voice_set(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetVoice %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetVoice %d:", p1);
 }
 
 // 未使用
-void WaitKey(void) { /* 23 */
+static void WaitKey(void) { /* 23 */
 	int p1 = getCaliValue(); // 
 
-	DEBUG_COMMAND_YET("NIGHTDLL.WaitKey %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.WaitKey %d:", p1);
 }
 
-void AddFeeling(void) { /* 24 */
+static void AddFeeling(void) { /* 24 */
 	int p1 = getCaliValue(); // person(1:新開,2:星川,3:百瀬,4:いずみ,5:鏡花,6:真言美,7:マコト	 
 	int p2 = getCaliValue(); // val
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.AddFeeling %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.AddFeeling %d:", p1);
 
 }
 
-void SubFeeling(void) { /* 25 */
+static void SubFeeling(void) { /* 25 */
 	int p1 = getCaliValue(); // person
 	int p2 = getCaliValue(); // val
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SubFeeling %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SubFeeling %d:", p1);
 }
 
-void CallEvent(void) { /* 26 */
+static void CallEvent(void) { /* 26 */
 	int p1 = getCaliValue(); // 1, 2 (Event Number)
 	
 	nt_sco_callevent(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.CallEvent %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.CallEvent %d:", p1);
 }
 
-void ScreenCG(void) { /* 27 */
+static void ScreenCG(void) { /* 27 */
 	/*
 	    CG を読み込んで、surface0 と BlendScreen で重ね合わせ
 
@@ -282,10 +294,10 @@ void ScreenCG(void) { /* 27 */
 	
 	nt_gr_screencg(no, x, y);
 
-	DEBUG_COMMAND_YET("NIGHTDLL.ScreenCG %d,%d,%d:\n", x, y, no);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.ScreenCG %d,%d,%d:", x, y, no);
 }
 
-void RunGameMain(void) { /* 28 */
+static void RunGameMain(void) { /* 28 */
 	int *p1 = getCaliVariable(); // result
 	int p2 = getCaliValue();     // month
 	int p3 = getCaliValue();     // day
@@ -298,32 +310,32 @@ void RunGameMain(void) { /* 28 */
 	
 	*p1 = nt_sco_main(p5);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.RunGameMain %p,%d,%d,%d,%d:\n", p1, p2, p3, p4, p5);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.RunGameMain %p,%d,%d,%d,%d:", p1, p2, p3, p4, p5);
 }
 
-void CheckNewGame(void) { /* 29 */
+static void CheckNewGame(void) { /* 29 */
 	int *p1 = getCaliVariable();
 	
 	*p1 = 0;
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.CheckNewGame %p:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.CheckNewGame %p:", p1);
 }
 
-void SaveStartData(void) { /* 30 */
-	DEBUG_COMMAND_YET("NIGHTDLL.SaveStartData:\n");
+static void SaveStartData(void) { /* 30 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SaveStartData:");
 }
 
-void PrintExitSystem(void) { /* 31 */
-	DEBUG_COMMAND_YET("NIGHTDLL.PrintExitSystem:\n");
+static void PrintExitSystem(void) { /* 31 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.PrintExitSystem:");
 }
 
-void SetCalendar(void) { /* 32 */
+static void SetCalendar(void) { /* 32 */
 	int p1 = getCaliValue(); // 0, 1, 2
 
-	DEBUG_COMMAND_YET("NIGHTDLL.SetCalendar %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetCalendar %d:", p1);
 }
 
-void SetDate(void) { /* 33 */
+static void SetDate(void) { /* 33 */
 	int p1 = getCaliValue(); // month
 	int p2 = getCaliValue(); // day
 	int p3 = getCaliValue(); // day of week
@@ -332,10 +344,10 @@ void SetDate(void) { /* 33 */
 	night.Day   = p2;
 	night.DayOfWeek = p3;
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetDate %d,%d,%d:\n", p1, p2, p3);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetDate %d,%d,%d:", p1, p2, p3);
 }
 
-void GetDate(void) { /* 34 */
+static void GetDate(void) { /* 34 */
 	int *p1 = getCaliVariable(); // month
 	int *p2 = getCaliVariable(); // day
 	int *p3 = getCaliVariable(); // day of weeek
@@ -344,231 +356,231 @@ void GetDate(void) { /* 34 */
 	*p2 = night.Day;
 	*p3 = night.DayOfWeek;
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.GetDate %p,%p,%p:\n", p1, p2, p3);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.GetDate %p,%p,%p:", p1, p2, p3);
 }
 
-void SelectGameLevel(void) { /* 35 */
-	DEBUG_COMMAND_YET("NIGHTDLL.SelectGameLevel:\n");
+static void SelectGameLevel(void) { /* 35 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SelectGameLevel:");
 }
 
-void RunEventDungeon(void) { /* 36 */
+static void RunEventDungeon(void) { /* 36 */
 	int *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 
 	*p1 = 1;
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.RunEventDungeon %p,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.RunEventDungeon %p,%d:", p1, p2);
 }
 
-void RunEventBattle(void) { /* 37 */
+static void RunEventBattle(void) { /* 37 */
 	int p1 = getCaliValue(); // 実際には機能しない？
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.RunEventBattle %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.RunEventBattle %d:", p1);
 }
 
 // CD再生開始
-void CDPlay(void) { /* 38 */
+static void CDPlay(void) { /* 38 */
 	int p1 = getCaliValue(); // no
 	
 	nt_cd_play(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.CDPlay %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.CDPlay %d:", p1);
 }
 
 // CD再生停止
-void CDStop(void) { /* 39 */
+static void CDStop(void) { /* 39 */
 	int p1 = getCaliValue(); // time(msec)
 	
 	nt_cd_stop(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.CDStop %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.CDStop %d:", p1);
 }
 
 // CDのmute
-void CDMute(void) { /* 40 */
+static void CDMute(void) { /* 40 */
 	int p1 = getCaliValue(); // 0: mute off, 1: mute on
 	
-	nt_cd_mute(p1 == 0 ? FALSE : TRUE);
+	nt_cd_mute(p1 != 0);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.CDMute %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.CDMute %d:", p1);
 }
 
 // ch に効果音番号をセット
-void SoundEffectSetWave(void) { /* 41 */
+static void SoundEffectSetWave(void) { /* 41 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // linkno
 	
 	nt_snd_setwave(p1, p2);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetWave %d,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectSetWave %d,%d:", p1, p2);
 }
 
 // ch にくり返し数をセット
-void SoundEffectSetLoop(void) { /* 42 */
+static void SoundEffectSetLoop(void) { /* 42 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // numloop
 	
 	nt_snd_setloop(p1, p2);
        
-	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetLoop %d,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectSetLoop %d,%d:", p1, p2);
 }
 
 // ch に音量をセット
-void SoundEffectSetVolume(void) { /* 43 */
+static void SoundEffectSetVolume(void) { /* 43 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // vol
 	
 	nt_snd_setvol(p1, p2);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetVolue %d,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectSetVolue %d,%d:", p1, p2);
 }
 
 // 効果音の再生を終るまで待つか待たないか？
-void SoundEffectSetSyncFlag(void) { /* 44 */
+static void SoundEffectSetSyncFlag(void) { /* 44 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // 0: 終るまで待たない, 1: 待つ
 	
-	nt_snd_waitend(p1, p2 == 0 ? FALSE : TRUE);
+	nt_snd_waitend(p1, p2 != 0);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectSetSyncFlag %d,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectSetSyncFlag %d,%d:", p1, p2);
 }
 
 // ch の効果音を再生
-void SoundEffectPlay(void) { /* 45 */
+static void SoundEffectPlay(void) { /* 45 */
 	int p1 = getCaliValue(); // ch
 	
 	nt_snd_play(p1);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectPlay %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectPlay %d:", p1);
 }
 
 // ch の効果音を停止
-void SoundEffectStop(void) { /* 46 */
+static void SoundEffectStop(void) { /* 46 */
 	int p1 = getCaliValue(); // ch
 	int p2 = getCaliValue(); // time (止まるまでの時間)
 	
 	nt_snd_stop(p1, p2);
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectStop %d,%d:\n", p1,p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectStop %d,%d:", p1,p2);
 }
 
 // 全てのチャンネルの再生を停止
-void SoundEffectStopAll(void) { /* 47 */
+static void SoundEffectStopAll(void) { /* 47 */
 	int p1 = getCaliValue(); // time (止まるまでの時間)
 	
 	nt_snd_stopall(p1);
 
-	DEBUG_COMMAND_YET("NIGHTDLL.SoundEffectStopAll %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SoundEffectStopAll %d:", p1);
 }
 
-void RunSoundMode(void) { /* 48 */
+static void RunSoundMode(void) { /* 48 */
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.RunSoundMode:\n");
+	TRACE_UNIMPLEMENTED("NIGHTDLL.RunSoundMode:");
 }
 
-void RunMapEditor(void) { /* 49 */
+static void RunMapEditor(void) { /* 49 */
 	int *p1 = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.RunMapEditor %p:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.RunMapEditor %p:", p1);
 }
 
-void VisualListClear(void) { /* 50 */
+static void VisualListClear(void) { /* 50 */
 
-	DEBUG_COMMAND_YET("NIGHTDLL.VisualListClear:\n");
+	TRACE_UNIMPLEMENTED("NIGHTDLL.VisualListClear:");
 }
 
-void VisualListAdd(void) { /* 51 */
+static void VisualListAdd(void) { /* 51 */
 	int p1 = getCaliValue();
 
-	DEBUG_COMMAND_YET("NIGHTDLL.VisualListAdd %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.VisualListAdd %d:", p1);
 }
 
-void GetLocalCountCG(void) { /* 52 */
+static void GetLocalCountCG(void) { /* 52 */
 	int *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.GetLocalCountCG %p,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.GetLocalCountCG %p,%d:", p1, p2);
 }
 
-void PlayMemory(void) { /* 53 */
+static void PlayMemory(void) { /* 53 */
 	int *p1 = getCaliVariable(); // 回想ページ
 	int *p2 = getCaliVariable(); // 回想RESULT
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.PlayMemory %p,%p:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.PlayMemory %p,%p:", p1, p2);
 }
 
-void GetEventFlagTotal(void) { /* 54 */
+static void GetEventFlagTotal(void) { /* 54 */
 	int *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.GetEventFlagTotal %p,%d:\n", p1, p2);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.GetEventFlagTotal %p,%d:", p1, p2);
 }
 
-void SetPlayerName(void) { /* 55 */
+static void SetPlayerName(void) { /* 55 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SetPlayerName %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetPlayerName %d:", p1);
 }
 
-void GetPlayerName(void) { /* 56 */
+static void GetPlayerName(void) { /* 56 */
 	int p1 = getCaliValue();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.GetPlayerName %d:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.GetPlayerName %d:", p1);
 }
 
-void SaveGame(void) { /* 57 */
+static void SaveGame(void) { /* 57 */
 	int *p1 = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.SaveGame %p:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SaveGame %p:", p1);
 }
 
-void LoadGame(void) { /* 58 */
+static void LoadGame(void) { /* 58 */
 	int *p1 = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.LoadGame %p:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.LoadGame %p:", p1);
 }
 
-void ExistSaveData(void) { /* 59 */
+static void ExistSaveData(void) { /* 59 */
 	int *p1 = getCaliVariable();
 	
-	DEBUG_COMMAND_YET("NIGHTDLL.ExistSaveData %p:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.ExistSaveData %p:", p1);
 }
 
-void ExistStartData(void) { /* 60 */
+static void ExistStartData(void) { /* 60 */
 	int *p1 = getCaliVariable();
 
-	DEBUG_COMMAND_YET("NIGHTDLL.ExistStartData %p:\n", p1);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.ExistStartData %p:", p1);
 }
 
-void SetAreaData(void) { /* 61 */
+static void SetAreaData(void) { /* 61 */
 	int p1 = getCaliValue();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 
-	DEBUG_COMMAND_YET("NIGHTDLL.SetAreaData %d,%d,%d:\n", p1, p2, p3);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.SetAreaData %d,%d,%d:", p1, p2, p3);
 }
 
-void RunBattleTest(void) { /* 62 */
-	DEBUG_COMMAND_YET("NIGHTDLL.RunBattleTest:\n");
+static void RunBattleTest(void) { /* 62 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.RunBattleTest:");
 }
 
-void RunTrainingTest(void) { /* 63 */
-	DEBUG_COMMAND_YET("NIGHTDLL.RunTrainingTest:\n");
+static void RunTrainingTest(void) { /* 63 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.RunTrainingTest:");
 }
 
-void TestEventCall(void) { /* 64 */
-	DEBUG_COMMAND_YET("NIGHTDLL.TestEventCall:\n");
+static void TestEventCall(void) { /* 64 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.TestEventCall:");
 }
 
-void Test(void) { /* 65 */
-	DEBUG_COMMAND_YET("NIGHTDLL.Test:\n");
+static void Test(void) { /* 65 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.Test:");
 }
 
-void DebugScenario(void) { /* 66 */
-	DEBUG_COMMAND_YET("NIGHTDLL.DebugScenario:\n");
+static void DebugScenario(void) { /* 66 */
+	TRACE_UNIMPLEMENTED("NIGHTDLL.DebugScenario:");
 }
 
-void GetDLLTime(void) { /* 67 */
+static void GetDLLTime(void) { /* 67 */
 	int *p1 = getCaliVariable();
 	int *p2 = getCaliVariable();
 	int *p3 = getCaliVariable();
@@ -577,6 +589,78 @@ void GetDLLTime(void) { /* 67 */
 	int *p6 = getCaliVariable();
 	int *p7 = getCaliVariable();
 
-	DEBUG_COMMAND_YET("NIGHTDLL.GetDLLTime %p,%p,%p,%p,%p,%p,%p:\n", p1, p2, p3, p4, p5, p6, p7);
+	TRACE_UNIMPLEMENTED("NIGHTDLL.GetDLLTime %p,%p,%p,%p,%p,%p,%p:", p1, p2, p3, p4, p5, p6, p7);
 }
 
+static const ModuleFunc functions[] = {
+	{"AddFeeling", AddFeeling},
+	{"AnalyzeMessage", AnalyzeMessage},
+	{"CDMute", CDMute},
+	{"CDPlay", CDPlay},
+	{"CDStop", CDStop},
+	{"CallEvent", CallEvent},
+	{"CheckNewGame", CheckNewGame},
+	{"DebugScenario", DebugScenario},
+	{"Draw", Draw},
+	{"ExistSaveData", ExistSaveData},
+	{"ExistStartData", ExistStartData},
+	{"GetDLLTime", GetDLLTime},
+	{"GetDate", GetDate},
+	{"GetEventFlagTotal", GetEventFlagTotal},
+	{"GetLocalCountCG", GetLocalCountCG},
+	{"GetPlayerName", GetPlayerName},
+	{"Init", Init},
+	{"InitGame", InitGame},
+	{"LoadGame", LoadGame},
+	{"PlayMemory", PlayMemory},
+	{"PrintExitSystem", PrintExitSystem},
+	{"RunBattleTest", RunBattleTest},
+	{"RunEventBattle", RunEventBattle},
+	{"RunEventDungeon", RunEventDungeon},
+	{"RunGameMain", RunGameMain},
+	{"RunMapEditor", RunMapEditor},
+	{"RunSoundMode", RunSoundMode},
+	{"RunTrainingTest", RunTrainingTest},
+	{"SaveGame", SaveGame},
+	{"SaveStartData", SaveStartData},
+	{"ScreenCG", ScreenCG},
+	{"SelectGameLevel", SelectGameLevel},
+	{"SetAreaData", SetAreaData},
+	{"SetCalendar", SetCalendar},
+	{"SetDate", SetDate},
+	{"SetDrawTime", SetDrawTime},
+	{"SetFace", SetFace},
+	{"SetFont", SetFont},
+	{"SetFontSize", SetFontSize},
+	{"SetMsgClearEffect", SetMsgClearEffect},
+	{"SetMsgDrawEffect", SetMsgDrawEffect},
+	{"SetMsgFrame", SetMsgFrame},
+	{"SetMsgPlaceMethod", SetMsgPlaceMethod},
+	{"SetPlayerName", SetPlayerName},
+	{"SetScenery", SetScenery},
+	{"SetSelMode", SetSelMode},
+	{"SetSpriteL", SetSpriteL},
+	{"SetSpriteM", SetSpriteM},
+	{"SetSpriteR", SetSpriteR},
+	{"SetSpriteSeasonL", SetSpriteSeasonL},
+	{"SetSpriteSeasonM", SetSpriteSeasonM},
+	{"SetSpriteSeasonR", SetSpriteSeasonR},
+	{"SetVoice", SetVoice},
+	{"SetWallPaper", SetWallPaper},
+	{"SoundEffectPlay", SoundEffectPlay},
+	{"SoundEffectSetLoop", SoundEffectSetLoop},
+	{"SoundEffectSetSyncFlag", SoundEffectSetSyncFlag},
+	{"SoundEffectSetVolume", SoundEffectSetVolume},
+	{"SoundEffectSetWave", SoundEffectSetWave},
+	{"SoundEffectStop", SoundEffectStop},
+	{"SoundEffectStopAll", SoundEffectStopAll},
+	{"StartNewLine", StartNewLine},
+	{"SubFeeling", SubFeeling},
+	{"Test", Test},
+	{"TestEventCall", TestEventCall},
+	{"VisualListAdd", VisualListAdd},
+	{"VisualListClear", VisualListClear},
+	{"WaitKey", WaitKey},
+};
+
+const Module module_NIGHTDLL = {"NIGHTDLL", functions, sizeof(functions) / sizeof(ModuleFunc), NIGHTDLL_reset};

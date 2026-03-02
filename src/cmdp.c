@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"
+#include "scenario.h"
 #include "ags.h"
 
 /* absolete */
@@ -31,18 +32,18 @@ void commandPN() {
 	/* num 番のＣＧを表示する時、カラーパレットを展開しないようにする。*/
 	int num = getCaliValue();
 	
-	DEBUG_COMMAND_YET("PN %d:\n",num);
+	TRACE_UNIMPLEMENTED("PN %d:",num);
 }
 
 void commandPF() {
-	int p1  = sys_getc();
+	int p1  = sl_getc();
 	int num = getCaliValue();
-	boolean cancel_enabled;
+	bool cancel_enabled;
 
 	if (p1 == 2 || p1 == 3) {
-		cancel_enabled = getCaliValue() == 0 ? FALSE : TRUE;
+		cancel_enabled = getCaliValue() != 0;
 	} else {
-		cancel_enabled = FALSE;
+		cancel_enabled = false;
 	}
 	switch(p1) {
 	case 0:
@@ -59,18 +60,18 @@ void commandPF() {
 		sysVar[0] = nact->waitcancel_key; break;
 	}
 	
-	DEBUG_COMMAND("PF %d,%d,%d:\n", p1, num, cancel_enabled);
+	TRACE("PF %d,%d,%d:", p1, num, cancel_enabled);
 }
 
 void commandPW() {
-	int p1  = sys_getc();
+	int p1  = sl_getc();
 	int num = getCaliValue();
-	boolean cancel_enabled;
+	bool cancel_enabled;
 	
 	if (p1 == 2 || p1 == 3) {
-		cancel_enabled = getCaliValue() == 0 ? FALSE : TRUE;
+		cancel_enabled = getCaliValue() != 0;
 	} else {
-		cancel_enabled = FALSE;
+		cancel_enabled = false;
 	}
 	switch(p1) {
 	case 0:
@@ -87,7 +88,7 @@ void commandPW() {
 		sysVar[0] = nact->waitcancel_key; break;
 	}
 	
-	DEBUG_COMMAND("PW %d,%d,%d:\n", p1, num, cancel_enabled);
+	TRACE("PW %d,%d,%d:", p1, num, cancel_enabled);
 }
 
 void commandPS() {
@@ -98,9 +99,9 @@ void commandPS() {
 	Green = getCaliValue();
 	Blue  = getCaliValue();
 
-	ags_setPallet(Plane , Red, Green, Blue);
-	ags_setPalletToSystem(Plane, 1);
-	DEBUG_COMMAND("PS %d,%d,%d,%d:\n", Plane, Red, Green, Blue);
+	ags_setPalette(Plane, Red, Green, Blue);
+	ags_setPaletteToSystem(Plane, 1);
+	TRACE("PS %d,%d,%d,%d:", Plane, Red, Green, Blue);
 }
 
 void commandPG() { /* T2 */
@@ -111,11 +112,11 @@ void commandPG() { /* T2 */
 	int i;
 	
 	for (i = 0; i < num2; i++) {
-		*var = nact->sys_pal->red[num1 + i];   var++;
-		*var = nact->sys_pal->green[num1 + i]; var++;
-		*var = nact->sys_pal->blue[num1 + i];  var++;
+		*var++ = nact->ags.pal[num1 + i].r;
+		*var++ = nact->ags.pal[num1 + i].g;
+		*var++ = nact->ags.pal[num1 + i].b;
 	}
-	DEBUG_COMMAND("PG %p,%d,%d:\n", var, num1, num2);
+	TRACE("PG %p,%d,%d:", var, num1, num2);
 }
 
 void commandPP() { /* T2 */
@@ -126,10 +127,10 @@ void commandPP() { /* T2 */
 	int i;
 
 	for (i = 0; i < num2; i++) {
-		ags_setPallet(num1 + i, *var, *(var +1), *(var +2)); var+=3;
+		ags_setPalette(num1 + i, *var, *(var +1), *(var +2)); var+=3;
 	}
-	ags_setPalletToSystem(num1, num2);
-	DEBUG_COMMAND("PP %p,%d,%d:\n", var, num1, num2);
+	ags_setPaletteToSystem(num1, num2);
+	TRACE("PP %p,%d,%d:", var, num1, num2);
 }
 
 void commandPC() {
@@ -138,16 +139,16 @@ void commandPC() {
 
 	cg_fflg = num;
 	
-	DEBUG_COMMAND("PC %d:\n",num);
+	TRACE("PC %d:",num);
 }
 
 void commandPD() {
 	/* ＣＧ展開の明度を指定する */
 	int num = getCaliValue();
 	
-	cg_alphaLevel = num;
+	cg_brightness = num;
 	
-	DEBUG_COMMAND("PD %d:\n",num);
+	TRACE("PD %d:",num);
 }
 
 void commandPT0() {
@@ -155,12 +156,12 @@ void commandPT0() {
 	int *var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	PixelColor cell;
 	
 	ags_getPixel(x, y, &cell);
-	*var = cell.pixel;
+	*var = cell.index;
 	
-	DEBUG_COMMAND("PT0 %p,%d,%d:\n", var, x, y);
+	TRACE("PT0 %p,%d,%d:", var, x, y);
 }
 
 void commandPT1() {
@@ -170,14 +171,14 @@ void commandPT1() {
 	int *b_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	PixelColor cell;
 	
 	ags_getPixel(x, y, &cell);
 	*r_var = cell.r;
 	*g_var = cell.g;
 	*b_var = cell.b;
 
-	DEBUG_COMMAND("PT1 %p,%p,%p,%d,%d:\n", r_var, g_var, b_var, x, y);
+	TRACE("PT1 %p,%p,%p,%d,%d:", r_var, g_var, b_var, x, y);
 }
 
 void commandPT2() {
@@ -186,7 +187,7 @@ void commandPT2() {
 	int *low_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
-	Pallet cell;
+	PixelColor cell;
 	int r, g, b, pic;
 	
 	ags_getPixel(x, y, &cell);
@@ -199,5 +200,5 @@ void commandPT2() {
 	*hi_var  = pic >> 8;
 	*low_var = pic & 0xff;
 	
-	DEBUG_COMMAND("PT2 %p,%p,%d,%d:\n", hi_var, low_var, x, y);
+	TRACE("PT2 %p,%p,%d,%d:", hi_var, low_var, x, y);
 }

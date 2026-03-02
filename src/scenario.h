@@ -25,41 +25,91 @@
 #define __SCENARIO__
 
 #include "portab.h"
+#include "system.h"
 
-extern boolean sl_init();
-extern boolean sl_reinit();
-extern int sl_getc();
-extern int sl_getw();
-#define sl_getdw sl_getadr
-extern int sl_getdAt(int address);
-extern int sl_getwAt(int address);
-extern int sl_getcAt(int address);
-extern int sl_getadr();
-extern void sl_jmpNear(int address);
-extern boolean sl_jmpFar(int page);
-extern boolean sl_jmpFar2(int page, int address);
-extern void sl_callNear(int address);
-extern void sl_retNear();
-extern void sl_callFar(int page);
-extern void sl_callFar2(int page, int address);
-extern void sl_retFar();
-extern void sl_retFar2();
-extern void sl_stackClear_allCall();
-extern void sl_stackClear_labelCall(int cnt);
-extern void sl_stackClear_pageCall(int cnt);
-extern void sl_pushVar(int *topvar, int cnt);
-extern void sl_popVar(int *topvar, int cnt);
-extern int sl_getIndex();
-extern int sl_getPage();
-extern int *sl_getStackInfo(int *size);
-extern void sl_putStackInfo(int *data, int size);
-extern void sl_pushData(int *data, int cnt);
-extern void sl_popData(int *data, int cnt);
-extern void *sl_setDataTable(int page, int index);
-extern void sl_returnGoto(int address);
+enum save_format;
+struct VarRef;
 
-#define TxxTEXTCOLOR 1
-#define TxxTEXTSIZE  2
-#define TxxTEXTLOC   3
+// Stack frame tags. Changing these will break savedata compatibility.
+#define STACK_FARCALL   0xFF
+#define STACK_NEARCALL  0xEE
+#define STACK_VARIABLE  0xDD
+#define STACK_TEXTCOLOR 0xCC
+#define STACK_TEXTSIZE  0xBB
+#define STACK_TEXTLOC   0xAA
+
+struct stack_info {
+	int top_attr;  // always zero?
+	int page_calls;
+	int label_calls;
+	int var_pushes;
+	int label_calls_after_page_call;
+	int var_pushes_after_call;
+};
+
+struct stack_frame_info {
+	uint8_t tag;
+	uint16_t page;  // STACK_FARCALL
+	int addr;       // STACK_FARCALL or STACK_NEARCALL
+	uint8_t *p;     // for internal use
+};
+
+// Use functions below instead of accessing these variables directly.
+extern const uint8_t *sl_sco; // scenario page buffer
+extern int sl_page;        // current scenario page (0-based)
+extern int sl_index;       // cureent scenario address
+
+bool sl_init(void);
+bool sl_reinit(void);
+int sl_getw(void);
+#define sl_getdw sl_getaddr
+int sl_getdAt(int address);
+int sl_getwAt(int address);
+int sl_getcAt(int address);
+int sl_getaddr(void);
+void sl_ungetc(void);
+const char *sl_getString(char term);
+const char *sl_getConstString(void);
+
+void sl_jmpNear(int address);
+bool sl_jmpFar(int page);
+bool sl_jmpFar2(int page, int address);
+void sl_callNear(int address);
+void sl_retNear(void);
+void sl_callFar(int page);
+void sl_callFar2(int page, int address);
+void sl_retFar(void);
+void sl_dropLabelCalls(int cnt);
+void sl_dropPageCalls(int cnt);
+void *sl_setDataTable(int page, int index);
+void sl_returnGoto(int address);
+
+void sl_clearStack(bool restore);
+void sl_pushVar(struct VarRef *vref, int cnt);
+void sl_popVar(struct VarRef *vref, int cnt);
+uint8_t *sl_saveStack(enum save_format format, int *size);
+void sl_loadStack(enum save_format format, uint8_t *data, int size);
+void sl_getStackInfo(struct stack_info *info);
+void sl_pushTextColor(uint8_t type, uint8_t color);
+void sl_pushTextSize(uint8_t type, int size);
+void sl_pushTextLoc(int x, int y);
+void sl_popState(uint8_t expected_type);
+struct stack_frame_info *sl_next_stack_frame(struct stack_frame_info *frame_info);
+
+static inline int sl_getIndex(void) { return sl_index; }
+static inline int sl_getPage(void) { return sl_page; }
+static inline int sl_getc(void) { return sl_sco[sl_index++]; }
+
+#define TRACE_UNIMPLEMENTED(fmt, ...) \
+	sys_message(2, "[UNIMPLEMENTED] " fmt "\n", ##__VA_ARGS__)
+
+#ifdef DEBUG
+#define TRACE(fmt, ...) \
+	sys_message(5, "[TRACE] " fmt "\n", ##__VA_ARGS__)
+#define TRACE_MESSAGE(...) sys_message(6, __VA_ARGS__)
+#else
+#define TRACE(...)
+#define TRACE_MESSAGE(...)
+#endif
 
 #endif /* !__SCENARIO_ */

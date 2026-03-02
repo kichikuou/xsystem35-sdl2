@@ -24,22 +24,25 @@
 #ifndef __SYSTEM__
 #define __SYSTEM__
 
+#include <stdint.h>
 #include "config.h"
 
-#ifndef HAVE_FUNC
-#ifndef  __GNUC__
-#define __func__ ""
-#else 
-#define __func__ __FUNCTION__
-#endif
-#endif
+void sys_error(char *format, ...);    /* show message and exit system */
+void sys_exit(int code);              /* exit system with code */
+void sys_message(int lv, char *format, ...);  /* show various message */
 
-/* should define in somewhere */ 
-extern void sys_error(char *format, ...);    /* show nessafe and exit system */
-extern void sys_exit(int code);              /* exit system with code */
-extern void sys_message(char *format, ...);  /* show various message */
-extern void sys_reset();
-extern int  sys_nextdebuglv;                 /* message level */
+uint32_t sys_get_ticks(void);
+void sys_sleep(int msec);
+void sys_wait_vsync(void);
+
+enum messagebox_type {
+	MESSAGEBOX_ERROR,
+	MESSAGEBOX_WARNING,
+	MESSAGEBOX_INFO,
+};
+void sys_show_message_box(enum messagebox_type type, const char* title_utf8, const char* message_utf8);
+
+void sys35_remove(void);
 
 /*
  DEBUGLEVEL
@@ -48,19 +51,21 @@ extern int  sys_nextdebuglv;                 /* message level */
   1: warning only(output to terminal)
   2+: more message [devel relase default]
 */
-
-#ifdef DEBUG
-#define DEBUGLEVEL 2
-#else
-#define DEBUGLEVEL 0
-#endif /* DEBUG */
+void sys_set_debug_level(int level);
 
 #define NOMEMERR()        sys_error("Out of memory at %s()\n", __func__)
-#define NOTICE            sys_nextdebuglv = 2, sys_message
 
-#define WARNING           sys_nextdebuglv = 1, \
-sys_message("*WARNING*(%s): ", __func__), sys_message
+#define SYSERROR(fmt, ...) \
+	sys_error("[ERROR] %s: " fmt, __func__, ##__VA_ARGS__)
+#define WARNING(fmt, ...) \
+	sys_message(1, "[WARNING] %s: " fmt "\n", __func__, ##__VA_ARGS__)
+#define NOTICE(fmt, ...) \
+	sys_message(2, "[INFO] " fmt "\n", ##__VA_ARGS__)
+#define SACT_DEBUG(fmt, ...) \
+	sys_message(5, "[SACT] %s: " fmt "\n", __func__, ##__VA_ARGS__)
 
-#define SYSERROR          fprintf(stderr, "*ERROR*(%s): ", __func__), sys_error
+#ifdef HAVE_SIGACTION
+void sys_set_signalhandler(int SIG, void (*handler)(int));
+#endif
 
 #endif /* !__SYSTEM__ */

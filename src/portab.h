@@ -24,49 +24,21 @@
 #ifndef __PORTAB__
 #define __PORTAB__
 
+#include <stdbool.h>
+#include <stdint.h>
 #include "config.h"
 
-#ifdef DMALLOC
-#include <dmalloc.h>
+#ifdef _WIN32
+# ifdef min
+#  undef min
+# endif
+# ifdef max
+#  undef max
+# endif
+# define NOMINMAX
 #endif
-
-#define	YES		1
-#define	NO		0
-#define OK		0
-#define ERROR	      (-1)
-#define NG	      (-1)
-#define true            1
-#define false           0
-
-#ifndef FALSE
-#define FALSE           0
-#undef  TRUE
-#define TRUE            (!FALSE)
-#endif
-
 #define min(x,y) ((x) < (y) ? (x) : (y))
 #define max(x,y) ((x) > (y) ? (x) : (y))
-
-typedef	unsigned char  ___BYTE;
-typedef	unsigned short ___WORD;
-typedef	unsigned int   ___DWORD;
-typedef char           ___boolean;
-
-#ifndef BYTE
-#define BYTE ___BYTE
-#endif
-
-#ifndef WORD
-#define WORD ___WORD
-#endif
-
-#ifndef DWORD
-#define DWORD ___DWORD
-#endif
-
-#ifndef boolean
-#define boolean ___boolean
-#endif
 
 /*
  * Standard gettext macros.
@@ -90,11 +62,8 @@ typedef char           ___boolean;
 #  define N_(String) (String)
 #endif
 
-#define swap16(a) ( (((a) & 0xff) << 8) | ((unsigned short)(a) >> 8) )
-#define swap32(a) ( ((a) << 24) | \
-		   (((a) << 8) & 0x00ff0000) | \
-		   (((a) >> 8) & 0x0000ff00) | \
-		   ((unsigned int)(a) >>24) )
-
+#ifndef __EMSCRIPTEN__
+#define EMSCRIPTEN_KEEPALIVE
+#endif
 
 #endif /* !__PORTAB__ */

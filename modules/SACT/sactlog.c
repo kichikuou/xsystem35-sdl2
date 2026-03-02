@@ -26,21 +26,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
+#include <SDL.h>
 
 #include "portab.h"
 #include "system.h"
-#include "counter.h"
+#include "list.h"
 #include "menu.h"
-#include "imput.h"
+#include "input.h"
 #include "nact.h"
-#include "key.h"
 #include "sact.h"
 #include "sprite.h"
-#include "ngraph.h"
-#include "drawtext.h"
-#include "utfsjis.h"
-#include "sactlog_sjismsg.c"
+#include "gfx.h"
+#include "ags.h"
+#include "font.h"
+
+#define LOGMSG_LINES 6
+
+static char *logmsg[LOGMSG_LINES] = {
+	"\n",
+	"※バックログ操作方法※",
+	"[ESC]またはマウス右クリックでゲームに戻る",
+	"[PageUp][PageDown]でページスクロール",
+	"[↑][↓]またはマウスホイールで行スクロール",
+	"\n",
+};
 
 /*
   ホイールで上下スクロール
@@ -48,115 +57,108 @@
   PageUP/Downで１ページ送り
 */
 
-#define FONTSIZEINDEX 10
+#define INDEX_FONTSIZE 10
 #define FONTSIZE 20
-#define LOGLINENUM (sf0->height / FONTSIZE)
+#define LOGLINENUM (main_surface->h / FONTSIZE)
 static int curline;
-static surface_t *back;
-static surface_t *chr;
+static SDL_Surface *back;
 
 static void draw_log() {
 	int i, y = 0, len;
 	int cur = curline;
 	char pinfo[256];
-	GList *node;
+	List *node;
 
-	// canvas clear
-	memset(chr->pixel, 0, chr->bytes_per_line * chr->height);
-	
+#ifdef __EMSCRIPTEN__
+	load_mincho_font();
+#endif
+
+	SDL_Surface *hline = SDL_CreateRGBSurfaceWithFormat(0, main_surface->w, 3, 32, SDL_PIXELFORMAT_RGB888);
+	SDL_FillRect(hline, NULL, SDL_MapRGB(hline->format, 255, 255, 255));
+	SDL_SetSurfaceBlendMode(hline, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceAlphaMod(hline, 128);
+
+	SDL_SetSurfaceColorMod(back, 128, 128, 128);
+	SDL_BlitSurface(back, NULL, main_surface, NULL);
+	SDL_SetSurfaceColorMod(back, 255, 255, 255);
+
 	// ページ位置情報
-	len = g_snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, g_list_length(sact.log));
+	len = snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, list_length(sact.log));
 	
-	dt_setfont(FONT_GOTHIC, FONTSIZEINDEX);
-	dt_drawtext(chr, sf0->width - FONTSIZEINDEX *len /2, 0, pinfo);
+	ags_setFont(FONT_GOTHIC, INDEX_FONTSIZE);
+	gfx_drawString(main_surface->w - INDEX_FONTSIZE * len / 2, 0, pinfo, 255);
 	
 	// 表示始め位置
-	node = g_list_nth(sact.log, g_list_length(sact.log) - curline);
+	node = list_nth(sact.log, list_length(sact.log) - curline);
 	for (i = 0; i < LOGLINENUM; i++) {
-		char *str, *streuc;
 		if (cur <= 0) continue;
 		
-		str = (char *)(node->data);
+		char *str = (char *)(node->data);
 		if (0 == strcmp(str, "\n")) {
-			gr_fill(chr, 0, y + FONTSIZE/2, sf0->width, 3, 128, 0, 0);
+			SDL_BlitSurface(hline, NULL, main_surface, &(SDL_Rect){0, y + FONTSIZE/2, main_surface->w, 3});
 		} else {
-			streuc = sjis2lang(str);
 			if (cur < 6) {
-				dt_setfont(FONT_MINCHO, FONTSIZE);
+				ags_setFont(FONT_MINCHO, FONTSIZE);
 			} else {
-				dt_setfont(FONT_GOTHIC, FONTSIZE);
+				ags_setFont(FONT_GOTHIC, FONTSIZE);
 			}
-			dt_drawtext(chr, 0, y, str);
-			free(streuc);
+			gfx_drawString(0, y, str, 255);
 		}
 		y += FONTSIZE;
 		cur--;
-		node = g_list_next(node);
+		node = list_next(node);
 	}
-	
-	gr_copy_bright(sf0, 0, 0, back, 0, 0, sf0->width, sf0->height, 128);
-	gr_expandcolor_blend(sf0, 0, 0, chr, 0, 0, sf0->width, sf0->height,
-			     255, 255, 255);
+
 	ags_updateFull();
 }
 
 
 
-int sblog_start(void) {
-	// 説明文章を追加
-	sact.log = g_list_append(sact.log, "\n");
-	sact.log = g_list_append(sact.log, LOGMSG1);
-	sact.log = g_list_append(sact.log, LOGMSG2);
-	sact.log = g_list_append(sact.log, LOGMSG3);
-	sact.log = g_list_append(sact.log, LOGMSG4);
-	sact.log = g_list_append(sact.log, "\n");
+bool sblog_start(void) {
+	if (sact.version < 120)
+		return false;
+
+	// Append instruction text
+	for (int i = 0; i < LOGMSG_LINES; i++)
+		sact.log = list_append(sact.log, logmsg[i]);
 	
-	back = sf_dup(sf0);
-	chr  = sf_create_surface(sf0->width, sf0->height, 8);
+	back = SDL_ConvertSurface(main_surface, main_surface->format, 0);
 	curline = 6;
 	draw_log();
-	return OK;
+	return true;
 }
 
-int sblog_end(void) {
-	GList *node;
+void sblog_end(void) {
+	List *node;
 	int i;
 	
-	sf_copyall(sf0, back);
+	SDL_BlitSurface(back, NULL, main_surface, NULL);
 	ags_updateFull();
 	
-	sf_free(back);
-	sf_free(chr);
-	
-	// 説明文章を削除
-	for (i = 0; i < 6; i++) {
-		node = g_list_last(sact.log);
-		sact.log = g_list_remove(sact.log, node->data);
+	SDL_FreeSurface(back);
+
+	// Remove instruction text
+	for (i = 0; i < LOGMSG_LINES; i++) {
+		sact.log = list_remove(sact.log, logmsg[i]);
 	}
-	
-	return OK;
 }
 
-int sblog_pageup(void) {
-	curline = MIN(g_list_length(sact.log), curline + (LOGLINENUM -1));
+void sblog_pageup(void) {
+	curline = min(list_length(sact.log), curline + (LOGLINENUM -1));
 	draw_log();
-	return OK;
 }
 
-int sblog_pagedown(void) {
-	curline = MAX(1, curline - (LOGLINENUM -1));
+void sblog_pagedown(void) {
+	curline = max(1, curline - (LOGLINENUM -1));
 	draw_log();
-	return OK;
 }
 
-int sblog_pagepre(void) {
-	curline = MAX(1, curline - 1);
+void sblog_pagepre(void) {
+	curline = max(1, curline - 1);
 	draw_log();
-	return OK;
 }
 
-int sblog_pagenext(void) {
-	curline = MIN(g_list_length(sact.log), curline + 1);
+void sblog_pagenext(void) {
+	curline = min(list_length(sact.log), curline + 1);
 	draw_log();
-	return OK;
 }
