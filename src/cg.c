@@ -562,46 +562,67 @@ void cg_clear_display_loc() {
 	clear_display_loc();
 }
 
-SDL_Surface *cg_load_as_sdlsurface(int no) {
-	dridata *dfile = ald_getdata(DRIFILE_CG, no);
-	if (!dfile) return NULL;
+SDL_Surface *cg_load_as_sdlsurface_from_data(uint8_t *data, size_t size, bool mosaic, bool as_alpha) {
 
-	CG_TYPE type = check_cgformat(dfile->data);
+	CG_TYPE type = check_cgformat(data);
 #ifdef HAVE_WEBP
-	if (type == ALCG_WEBP) {
-		SDL_Surface *sf = webp_extract(dfile->data, dfile->size);
-		ald_freedata(dfile);
-		return sf;
-	}
+	if (type == ALCG_WEBP)
+		return webp_extract(data, size);
 #endif
 
 	cgdata *cg = NULL;
 	switch (type) {
+	case ALCG_PMS8:
+		cg = pms256_extract(data);
+		break;
 	case ALCG_PMS16:
-		cg = pms64k_extract(dfile->data);
+		cg = pms64k_extract(data);
 		break;
 	case ALCG_QNT:
-		cg = qnt_extract(dfile->data);
+		cg = qnt_extract(data);
+		break;
+	case ALCG_BMP24:
+		cg = bmp16m_extract(data);
 		break;
 	default:
 		WARNING("Invalid CG type");
 		break;
 	}
-	ald_freedata(dfile);
 	if (!cg) return NULL;
 
-	if (is_censored_cg(no)) {
+	if (mosaic) {
 		cg_mosaic(cg);
 	}
 
-	SDL_Surface *pic = type == ALCG_PMS16
-		? SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565)
-		: SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
-
 	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, cg->width, cg->height, 32,
-		cg->alpha ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_XRGB8888);
-	SDL_BlitSurface(pic, NULL, sf, NULL);
+		(cg->alpha || (type == ALCG_PMS8 && as_alpha)) ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_XRGB8888);
 
+	if (type == ALCG_PMS8) {
+		if (as_alpha) {
+			// Treat PMS8 as an alpha map. Palette is ignored.
+			SDL_FillRect(sf, NULL, SDL_MapRGBA(sf->format, 255, 255, 255, 0));
+			cg->alpha = cg->pic;
+			cg->pic = NULL;
+		} else {
+			// Treat PMS8 as a paletted image.
+			SDL_Surface *pic = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 8, cg->width, SDL_PIXELFORMAT_INDEX8);
+			SDL_Palette *palette = SDL_AllocPalette(256);
+			SDL_SetPaletteColors(palette, cg->pal, 0, 256);
+			SDL_SetSurfacePalette(pic, palette);
+			SDL_FreePalette(palette);
+			SDL_BlitSurface(pic, NULL, sf, NULL);
+			SDL_FreeSurface(pic);
+		}
+	} else {
+		SDL_Surface *pic;
+		if (type == ALCG_PMS16 || type == ALCG_BMP24) {
+			pic = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
+		} else {
+			pic = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+		}
+		SDL_BlitSurface(pic, NULL, sf, NULL);
+		SDL_FreeSurface(pic);
+	}
 	if (cg->alpha) {
 		// Copy alpha values from cg->alpha to sf->pixels.
 		uint8_t *p_ds = ALPHA_AT(sf, 0, 0);
@@ -615,9 +636,15 @@ SDL_Surface *cg_load_as_sdlsurface(int no) {
 			p_ds += sf->pitch;
 		}
 	}
-
-	SDL_FreeSurface(pic);
 	cgdata_free(cg);
+	return sf;
+}
+
+SDL_Surface *cg_load_as_sdlsurface(int no) {
+	dridata *dfile = ald_getdata(DRIFILE_CG, no);
+	if (!dfile) return NULL;
+	SDL_Surface *sf = cg_load_as_sdlsurface_from_data(dfile->data, dfile->size, is_censored_cg(no), false);
+	ald_freedata(dfile);
 	return sf;
 }
 

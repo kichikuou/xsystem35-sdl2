@@ -42,7 +42,7 @@ Game Compatibility
 | これD・P・S？                               | Supported   | From 20世紀アリス |
 | 夜が来る！                                  | Unsupported |       |
 | Only you ～リ・クルス～                     | Supported   |       |
-| 大悪司                                      | Supported   | Opening demo is not supported |
+| 大悪司                                      | Supported   |       |
 | 王子さまＬｖ１                              | Supported   |       |
 | 王子さま１ヵ月後                            | Supported   | From 王子さまLV1.5 |
 | 白鳳の子分叩き                              | Supported   | From 王子さまLV1.5 |
