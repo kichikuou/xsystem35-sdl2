@@ -96,8 +96,13 @@ static void Init() {
 	int p3 = getCaliValue();
 	int *var = getCaliVariable();
 	
-	alk_t *alk = alk_new("dDEMO.alk");
+	if (!nact->files.alk[0]) {
+		WARNING("dDEMO.alk not found");
+		return;
+	}
+	alk_t *alk = alk_new(nact->files.alk[0]);  // dDEMO.alk
 	if (!alk) {
+		WARNING("Cannot open %s", nact->files.alk[0]);
 		*var = 0;
 		return;
 	}
@@ -936,7 +941,7 @@ static void Run() {
 			break;
 		}
 		SDL_RenderPresent(gfx_renderer);
-		SDL_Delay(16);
+		sys_wait_vsync();
 	}
 
 	muscd_stop();

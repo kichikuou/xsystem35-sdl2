@@ -85,8 +85,8 @@ bool initGameResourceFromDir(GameResource *gr, DIR *dir, const char *savedir, st
 		} else if (len >= 4 && strcasecmp(filename + len - 4, ".bgi") == 0) {
 			gr->bgi = strdup(filename);
 		} else if (len >= 5 && strcasecmp(filename + len - 4, ".alk") == 0) {
-			if (!isdigit(filename[len - 5])) continue;
-			gr->alk[filename[len - 5] - '0'] = strdup(filename);
+			int idx = isdigit(filename[len - 5]) ? filename[len - 5] - '0' : 0;
+			gr->alk[idx] = strdup(filename);
 		} else if (len >= 6 && strcasecmp(filename + len - 4, ".ald") == 0) {
 			int dno = toupper(filename[len - 5]) - 'A';
 			if (dno < 0 || dno >= DRIFILEMAX) continue;

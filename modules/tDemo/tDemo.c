@@ -62,9 +62,13 @@ static void SetLoopFlag() {
 }
 
 static void Run() {
-	alk_t *alk = alk_new("tDEMO.alk");
+	if (!nact->files.alk[0]) {
+		WARNING("tDEMO.alk not found");
+		return;
+	}
+	alk_t *alk = alk_new(nact->files.alk[0]);  // tDEMO.alk
 	if (!alk) {
-		WARNING("Cannot open tDEMO.alk");
+		WARNING("Cannot open %s", nact->files.alk[0]);
 		return;
 	}
 
