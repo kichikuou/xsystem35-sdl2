@@ -45,8 +45,15 @@ void menu_open(void) {
 	
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_on), msgskip_isActivated());
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item_msgskip_off), !msgskip_isActivated());
-	// gtk_menu_popup_at_pointer() cannot be used because there's no GdkEvent here.
-	gtk_menu_popup(GTK_MENU(menu_window_popup), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+	GdkDisplay *display = gdk_display_get_default();
+	GdkDevice *device = gdk_seat_get_pointer(gdk_display_get_default_seat(display));
+	GdkScreen *screen;
+	gint x, y;
+	gdk_device_get_position(device, &screen, &x, &y);
+	GdkRectangle rect = {x, y, 1, 1};
+	gtk_menu_popup_at_rect(
+		GTK_MENU(menu_window_popup), gdk_screen_get_root_window(screen),
+		&rect, GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
 	gtk_widget_show(menu_window_popup);
 	nact->popupmenu_opened = true;
 }
