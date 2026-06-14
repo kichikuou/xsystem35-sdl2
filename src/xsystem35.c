@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <locale.h>
 #include <unistd.h>
 
 #ifdef HAVE_SIGACTION
@@ -495,8 +496,12 @@ int main(int argc, char **argv) {
 	mus_init(audio_buffer_size);
 
 #ifdef ENABLE_NLS
-        bindtextdomain (PACKAGE, LOCALEDIR);
-        textdomain(PACKAGE);
+	setlocale(LC_ALL, "");
+	// Keep numeric formatting locale-independent (use '.' as the decimal
+	// point) so only message translation follows the user's locale.
+	setlocale(LC_NUMERIC, "C");
+	bindtextdomain (PACKAGE, LOCALEDIR);
+	textdomain(PACKAGE);
 #endif
 
 	sys35_init();
