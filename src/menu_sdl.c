@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "portab.h"
 #include "system.h"
@@ -169,11 +170,132 @@ bool menu_inputstring2(INPUTSTRING_PARAM *p) {
 	return edit_string(p);
 }
 
+// The number-input dialog.
+
+struct number_state {
+	modal base;
+	INPUTNUM_PARAM *param;
+	char buf[32];     // edited value as text
+	bool done;        // set when OK/Cancel/Esc ends the dialog
+	bool accepted;    // true on OK, false on Cancel
+	bool focus_init;  // focus the input field on the first frame
+};
+
+// Parse st->buf; returns true (and stores the value) if it is a valid integer
+// within [min, max].
+static bool num_value_valid(const struct number_state *st, int *out) {
+	if (!st->buf[0])
+		return false;
+	char *end;
+	long v = strtol(st->buf, &end, 10);
+	if (*end != '\0' || v < st->param->min || v > st->param->max)
+		return false;
+	if (out)
+		*out = (int)v;
+	return true;
+}
+
+// Add `delta` to the current value, clamp to [min, max], and write it back.
+static void num_adjust(struct number_state *st, int delta) {
+	long v = strtol(st->buf, NULL, 10) + delta;
+	if (v < st->param->min)
+		v = st->param->min;
+	if (v > st->param->max)
+		v = st->param->max;
+	snprintf(st->buf, sizeof(st->buf), "%ld", v);
+}
+
+static bool inputnumber_build(mu_Context *ctx, modal *modal) {
+	struct number_state *st = (struct number_state *)modal;
+	const char *title = (st->param->title && *st->param->title)
+	                        ? st->param->title : _("Enter a number");
+	int row_h = ctx->text_height(ctx->style->font) + ctx->style->padding * 2;
+	int w = 240;
+	int h = 3 * (row_h + ctx->style->spacing) + ctx->style->padding * 2
+	        + ctx->style->title_height;
+	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
+
+	if (mu_begin_window_ex(ctx, title, r,
+	        MU_OPT_NORESIZE | MU_OPT_NOCLOSE | MU_OPT_NOSCROLL)) {
+		mu_layout_row(ctx, 1, (int[]){ -1 }, 0);
+
+		char info[64];
+		snprintf(info, sizeof(info), "%d - %d", st->param->min, st->param->max);
+		mu_label(ctx, info);
+
+		// Input field flanked by - / + spin buttons.
+		int content = w - ctx->style->padding * 2;
+		int bw = row_h;  // square spin buttons
+		int tbw = content - (bw + ctx->style->spacing) * 2;
+		mu_layout_row(ctx, 3, (int[]){ tbw, bw, bw }, 0);
+
+		mu_Id id = mu_get_id(ctx, "value", 5);
+		mu_Rect box = mu_layout_next(ctx);
+		if (st->focus_init) {
+			mu_set_focus(ctx, id);
+			st->focus_init = false;
+		}
+		int res = mu_textbox_raw(ctx, st->buf, sizeof(st->buf), id, box, 0);
+		if (mu_button(ctx, "-"))
+			num_adjust(st, -1);
+		if (mu_button(ctx, "+"))
+			num_adjust(st, 1);
+
+		// OK is only enabled when the field holds an in-range number; Enter
+		// (the textbox SUBMIT) is gated the same way.
+		bool valid = num_value_valid(st, NULL);
+		if ((res & MU_RES_SUBMIT) && valid) {
+			st->accepted = true;
+			st->done = true;
+		}
+
+		int half = (content - ctx->style->spacing) / 2;
+		mu_layout_row(ctx, 2, (int[]){ half, -1 }, 0);
+		if (valid) {
+			if (mu_button(ctx, _("OK"))) {
+				st->accepted = true;
+				st->done = true;
+			}
+		} else {
+			modal_disabled_button(ctx, _("OK"));
+		}
+		if (mu_button(ctx, _("Cancel"))) {
+			st->accepted = false;
+			st->done = true;
+		}
+		mu_end_window(ctx);
+	}
+
+	if (st->base.cancelled) {  // Esc
+		st->accepted = false;
+		st->done = true;
+	}
+	return !st->done;
+}
+
 bool menu_inputnumber(INPUTNUM_PARAM *p) {
 #ifdef _WIN32
 	return input_number(p);
 #else
-	p->value = p->def;
+	struct number_state st = {
+		.base = { .build = inputnumber_build, .handler = modal_default_handler },
+		.param = p,
+		.focus_init = true,
+	};
+	snprintf(st.buf, sizeof(st.buf), "%d", p->def);
+
+	SDL_StartTextInput();
+	modal_run(&st.base);
+	SDL_StopTextInput();
+
+	if (!st.accepted)
+		return false;
+	long v = strtol(st.buf, NULL, 10);
+	if (v < p->min)
+		v = p->min;
+	if (v > p->max)
+		v = p->max;
+	p->value = (int)v;
 	return true;
 #endif
 }

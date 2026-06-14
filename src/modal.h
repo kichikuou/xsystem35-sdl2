@@ -46,4 +46,7 @@ void modal_run(modal *modal);
 // Draw a grayed-out, non-interactive checkbox.
 void modal_disabled_checkbox(mu_Context *ctx, const char *label, int state);
 
+// Draw a non-interactive, dimmed button occupying the next layout cell.
+void modal_disabled_button(mu_Context *ctx, const char *label);
+
 #endif /* __MODAL_H__ */

@@ -268,3 +268,19 @@ void modal_disabled_checkbox(mu_Context *ctx, const char *label, int state) {
 	mu_draw_control_text(ctx, label, r, MU_COLOR_TEXT, 0);
 	ctx->style->colors[MU_COLOR_TEXT] = saved_text;
 }
+
+void modal_disabled_button(mu_Context *ctx, const char *label) {
+	mu_Rect r = mu_layout_next(ctx);
+	mu_draw_rect(ctx, r, ctx->style->colors[MU_COLOR_BUTTON]);
+	mu_Color c = ctx->style->colors[MU_COLOR_TEXT];
+	c.r = c.r * 2 / 5;
+	c.g = c.g * 2 / 5;
+	c.b = c.b * 2 / 5;
+	mu_Font font = ctx->style->font;
+	int tw = ctx->text_width(font, label, -1);
+	int th = ctx->text_height(font);
+	mu_Vec2 pos = mu_vec2(r.x + (r.w - tw) / 2, r.y + (r.h - th) / 2);
+	mu_push_clip_rect(ctx, r);
+	mu_draw_text(ctx, font, label, -1, pos, c);
+	mu_pop_clip_rect(ctx);
+}
