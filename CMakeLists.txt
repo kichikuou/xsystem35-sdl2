@@ -87,11 +87,6 @@ else()  # non-emscripten, non-android
   add_library(zlib ALIAS ZLIB::ZLIB)
 
   include(FindPkgConfig)
-  optional_pkg_check_modules(GTK3 IMPORTED_TARGET gtk+-3.0)
-  if (GTK3_FOUND)
-    set(ENABLE_GTK 1)
-  endif()
-
   pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
   pkg_check_modules(SDL2TTF REQUIRED IMPORTED_TARGET SDL2_ttf)
   pkg_check_modules(SDL2MIXER REQUIRED IMPORTED_TARGET SDL2_mixer)
@@ -155,7 +150,7 @@ endif()
 
 # Menu
 
-if (ENABLE_GTK)
+if (NOT EMSCRIPTEN AND NOT ANDROID AND NOT WIN32)
   # i18n support (currently only menus are translated)
   include(FindIntl)
   include(FindGettext)

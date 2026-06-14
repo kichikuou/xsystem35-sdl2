@@ -121,7 +121,6 @@ void spev_main() {
 	// デフォルトのコールバックのうち、ここで必要なものだけ
 	// 処理。(VAコマンドcallbackはなし)
 	if (nact->popupmenu_opened) {
-		menu_gtkmainiteration();
 		if (nact->is_quit) sys_exit(0);
         }
 }

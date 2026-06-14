@@ -125,10 +125,6 @@ void menu_init(void) {
 	return;
 }
 
-void menu_gtkmainiteration() {
-	return;
-}
-
 void menu_render_overlay(void) {
 	return;
 }

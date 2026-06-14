@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Replaced the GTK-based popup menu and dialogs with a pure-SDL implementation.
+
 ## 2.18.0 - 2026-06-23
 - Added support for the intro demo of Daiakuji.
 - Replaced the bundled mincho font with IPA Mincho.

@@ -99,7 +99,6 @@ void ntev_callback(agsevent_t *e) {
 void ntev_main() {
         // デフォルトのコールバックのうち、ここで必要なものだけ処理。
         if (nact->popupmenu_opened) {
-                menu_gtkmainiteration();
                 if (nact->is_quit) sys_exit(0);
         }
 }

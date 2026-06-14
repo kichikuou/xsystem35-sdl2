@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-14 18:38+0900\n"
+"POT-Creation-Date: 2026-06-14 17:09+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,141 +17,39 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu.c:69
-#, c-format
-msgid "MAX %d charater"
+#: src/menu_sdl.c:151
+msgid "Message Skip"
 msgstr ""
 
-#: src/menu_gui.c:60
-msgid "InputNumber"
+#: src/menu_sdl.c:156
+msgid "Mouse Auto Move"
 msgstr ""
 
-#: src/menu_gui.c:97 src/menu_gui.c:745
-msgid "default"
+#: src/menu_sdl.c:159
+msgid "Volume"
 msgstr ""
 
-#: src/menu_gui.c:107
-msgid "min"
-msgstr ""
-
-#: src/menu_gui.c:117
-msgid "max"
-msgstr ""
-
-#: src/menu_gui.c:127 src/menu_gui.c:137 src/menu_gui.c:147
-msgid "0"
-msgstr ""
-
-#: src/menu_gui.c:164 src/menu_gui.c:273 src/menu_gui.c:426 src/menu_gui.c:781
-msgid "OK"
-msgstr ""
-
-#: src/menu_gui.c:171 src/menu_gui.c:266
-msgid "Cancel"
-msgstr ""
-
-#: src/menu_gui.c:214
-msgid "InputString"
-msgstr ""
-
-#: src/menu_gui.c:225
-msgid "title"
-msgstr ""
-
-#: src/menu_gui.c:241
-msgid "MAX charater"
-msgstr ""
-
-#: src/menu_gui.c:250
-msgid "Notice) HANKAKU is not available"
-msgstr ""
-
-#: src/menu_gui.c:306 src/menu_gui.c:673
+#: src/menu_sdl.c:164
 msgid "Exit"
 msgstr ""
 
-#: src/menu_gui.c:317
-msgid "Exit System35 ?"
-msgstr ""
-
-#: src/menu_gui.c:331
-msgid "Yes"
-msgstr ""
-
-#: src/menu_gui.c:338
-msgid "No"
-msgstr ""
-
-#: src/menu_gui.c:374 src/menu_gui.c:658
-msgid "About"
-msgstr ""
-
-#: src/menu_gui.c:400
-msgid "Information1"
-msgstr ""
-
-#: src/menu_gui.c:410
-msgid "Information2"
-msgstr ""
-
-#: src/menu_gui.c:420
-msgid "Information3"
-msgstr ""
-
-#: src/menu_gui.c:485
-msgid "MessageSkip"
-msgstr ""
-
-#: src/menu_gui.c:497 src/menu_gui.c:533 src/menu_gui.c:577 src/menu_gui.c:605
-#: src/menu_gui.c:633
-msgid "ON"
-msgstr ""
-
-#: src/menu_gui.c:505 src/menu_gui.c:541 src/menu_gui.c:585 src/menu_gui.c:613
-#: src/menu_gui.c:641
-msgid "OFF"
-msgstr ""
-
-#: src/menu_gui.c:521
-msgid "MouseAutoMove"
-msgstr ""
-
-#: src/menu_gui.c:557 src/menu_gui_volval.c:43
-msgid "VolumeValance"
-msgstr ""
-
-#: src/menu_gui.c:565
-msgid "PCM-audio"
-msgstr ""
-
-#: src/menu_gui.c:593
-msgid "CDROM-audio"
-msgstr ""
-
-#: src/menu_gui.c:621
-msgid "MIDI-audio"
-msgstr ""
-
-#: src/menu_gui.c:764
-msgid "MessageBox"
-msgstr ""
-
-#: src/menu_gui.c:774
-msgid "Messge"
-msgstr ""
-
-#: src/menu_gui_volval.c:41
-msgid "window1"
-msgstr ""
-
-#: src/menu_gui_volval.c:89
+#: src/menu_sdl.c:252
 msgid "mute"
 msgstr ""
 
-#: src/menu_gui_volval.c:114
-msgid "small"
+#: src/menu_sdl.c:260
+msgid "Close"
 msgstr ""
 
-#: src/menu_gui_volval.c:122
-msgid "large"
+#: src/menu_sdl.c:378 src/menu_sdl.c:383 src/menu_sdl.c:529
+msgid "OK"
+msgstr ""
+
+#: src/menu_sdl.c:385 src/menu_sdl.c:533
+msgid "Cancel"
+msgstr ""
+
+#: src/menu_sdl.c:521
+#, c-format
+msgid "Up to %d characters"
 msgstr ""

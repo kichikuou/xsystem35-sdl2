@@ -51,9 +51,7 @@ extern void menu_resetmenu_open(void);
 extern bool menu_inputstring(INPUTSTRING_PARAM *);
 extern bool menu_inputstring2(INPUTSTRING_PARAM *);
 extern bool menu_inputnumber(INPUTNUM_PARAM *);
-extern void menu_widgetinit(void);
 extern void menu_init();
-extern void menu_gtkmainiteration();
 extern void menu_setSkipState(bool enabled, bool activated);
 extern void menu_render_overlay(void);
 

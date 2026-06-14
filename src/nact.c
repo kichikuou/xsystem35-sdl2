@@ -134,9 +134,6 @@ static void nact_callback() {
 	if (nact->is_cursor_animation) {
 		/* cursor animation */
 	}
-	if (nact->popupmenu_opened) {
-		menu_gtkmainiteration();
-	}
 	if (nact->is_quit && !nact->restart) {
 		sys_exit(0);
 	}

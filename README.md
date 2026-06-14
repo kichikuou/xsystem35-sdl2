@@ -105,7 +105,7 @@ See [xsystem35 command manual](doc/xsystem35.6.adoc) for detailed usage.
 ### Linux (Debian / Ubuntu)
 
 ```bash
-$ sudo apt install build-essential cmake libgtk-3-dev libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor
+$ sudo apt install build-essential cmake libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor
 $ mkdir -p out/debug
 $ cd out/debug
 $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
