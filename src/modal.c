@@ -51,6 +51,28 @@ static int text_height_cb(mu_Font font) {
 	return h;
 }
 
+// A light color scheme (light gray windows, dark text), overriding microui's
+// dark default palette.
+static void set_light_style(mu_Style *style) {
+	static const mu_Color light[MU_COLOR_MAX] = {
+		[MU_COLOR_TEXT]        = { 30,  30,  30,  255 },
+		[MU_COLOR_BORDER]      = { 160, 160, 160, 255 },
+		[MU_COLOR_WINDOWBG]    = { 235, 235, 235, 255 },
+		[MU_COLOR_TITLEBG]     = { 210, 210, 210, 255 },
+		[MU_COLOR_TITLETEXT]   = { 32,  32,  32,  255 },
+		[MU_COLOR_PANELBG]     = { 0,   0,   0,   0   },
+		[MU_COLOR_BUTTON]      = { 210, 210, 210, 255 },
+		[MU_COLOR_BUTTONHOVER] = { 225, 225, 225, 255 },
+		[MU_COLOR_BUTTONFOCUS] = { 200, 200, 210, 255 },
+		[MU_COLOR_BASE]        = { 250, 250, 250, 255 },
+		[MU_COLOR_BASEHOVER]   = { 240, 240, 240, 255 },
+		[MU_COLOR_BASEFOCUS]   = { 235, 235, 242, 255 },
+		[MU_COLOR_SCROLLBASE]  = { 200, 200, 200, 255 },
+		[MU_COLOR_SCROLLTHUMB] = { 170, 170, 170, 255 },
+	};
+	memcpy(style->colors, light, sizeof(light));
+}
+
 static void init_context(void) {
 	mu_init(ctx);
 	ctx->text_width = text_width_cb;
@@ -59,6 +81,7 @@ static void init_context(void) {
 	// microui uses style->size.y as the default height of a control row, so
 	// set it to the font height to make each row tall enough for its text.
 	ctx->style->size.y = text_height_cb(ctx->style->font);
+	set_light_style(ctx->style);
 }
 
 bool modal_default_handler(const SDL_Event *e, modal *modal) {
@@ -254,17 +277,19 @@ void menu_render_overlay(void) {
 	modal_render();
 }
 
+// Mid-gray used for disabled controls; reads as "grayed out" in any scheme.
+static const mu_Color DISABLED_GRAY = { 128, 128, 128, 255 };
+
 // This mirrors mu_checkbox()'s drawing but registers no control.
 void modal_disabled_checkbox(mu_Context *ctx, const char *label, int state) {
-	mu_Color dim = mu_color(128, 128, 128, 255);
 	mu_Rect r = mu_layout_next(ctx);
 	mu_Rect box = mu_rect(r.x, r.y, r.h, r.h);
 	ctx->draw_frame(ctx, box, MU_COLOR_BASE);
 	if (state)
-		mu_draw_icon(ctx, MU_ICON_CHECK, box, dim);
+		mu_draw_icon(ctx, MU_ICON_CHECK, box, DISABLED_GRAY);
 	r = mu_rect(r.x + box.w, r.y, r.w - box.w, r.h);
 	mu_Color saved_text = ctx->style->colors[MU_COLOR_TEXT];
-	ctx->style->colors[MU_COLOR_TEXT] = dim;
+	ctx->style->colors[MU_COLOR_TEXT] = DISABLED_GRAY;
 	mu_draw_control_text(ctx, label, r, MU_COLOR_TEXT, 0);
 	ctx->style->colors[MU_COLOR_TEXT] = saved_text;
 }
@@ -272,15 +297,11 @@ void modal_disabled_checkbox(mu_Context *ctx, const char *label, int state) {
 void modal_disabled_button(mu_Context *ctx, const char *label) {
 	mu_Rect r = mu_layout_next(ctx);
 	mu_draw_rect(ctx, r, ctx->style->colors[MU_COLOR_BUTTON]);
-	mu_Color c = ctx->style->colors[MU_COLOR_TEXT];
-	c.r = c.r * 2 / 5;
-	c.g = c.g * 2 / 5;
-	c.b = c.b * 2 / 5;
 	mu_Font font = ctx->style->font;
 	int tw = ctx->text_width(font, label, -1);
 	int th = ctx->text_height(font);
 	mu_Vec2 pos = mu_vec2(r.x + (r.w - tw) / 2, r.y + (r.h - th) / 2);
 	mu_push_clip_rect(ctx, r);
-	mu_draw_text(ctx, font, label, -1, pos, c);
+	mu_draw_text(ctx, font, label, -1, pos, DISABLED_GRAY);
 	mu_pop_clip_rect(ctx);
 }
