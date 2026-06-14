@@ -33,16 +33,96 @@
 #include "gfx_private.h"
 #include "msgskip.h"
 #include "modal.h"
+#include "s39init.h"
 #include "utfsjis.h"
 #ifdef _WIN32
 #include "win/dialog.h"
 #endif
 
+// The volume panel.
+
+struct volume_state {
+	modal base;
+};
+
+static bool volume_build(mu_Context *ctx, modal *modal) {
+	struct volume_state *st = (struct volume_state *)modal;
+	bool keep_open = true;
+	int count;
+	struct volume_channel *ch = s39ini_channels(&count);
+
+	int nch = 0;
+	int label_w = 0;
+	for (int i = 0; i < count; i++) {
+		if (!ch[i].label)
+			continue;
+		nch++;
+		int lw = ctx->text_width(ctx->style->font, ch[i].label, -1);
+		if (lw > label_w)
+			label_w = lw;
+	}
+	label_w += ctx->style->padding * 2;
+
+	int row_h = ctx->text_height(ctx->style->font) + ctx->style->padding * 2;
+	int slider_w = 144;
+	int gap_w = 16;      // extra space between the slider and the mute checkbox
+	const char *mute_label = _("mute");
+	int mute_w = row_h + ctx->style->padding * 2
+	             + ctx->text_width(ctx->style->font, mute_label, -1);
+	int w = label_w + slider_w + gap_w + mute_w + ctx->style->spacing * 3
+	        + ctx->style->padding * 2;
+	int h = (nch + 1) * (row_h + ctx->style->spacing) + ctx->style->padding * 2
+	        + ctx->style->title_height;
+	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
+
+	if (mu_begin_window_ex(ctx, _("Volume"), r,
+	        MU_OPT_NORESIZE | MU_OPT_NOCLOSE | MU_OPT_NOSCROLL)) {
+		for (int i = 0; i < count; i++) {
+			if (!ch[i].label)
+				continue;
+			// Each control derives its id from the value pointer, which is the
+			// same across rows; push the channel index so the ids stay unique.
+			mu_push_id(ctx, &i, sizeof(i));
+			mu_layout_row(ctx, 4, (int[]){ label_w, slider_w, gap_w, mute_w }, 0);
+			mu_label(ctx, ch[i].label);
+			float v = ch[i].vol;
+			if (mu_slider_ex(ctx, &v, 0, 100, 1, "%.0f", MU_OPT_ALIGNCENTER)) {
+				ch[i].vol = (int)v;
+				s39ini_setvol();
+			}
+			mu_layout_next(ctx);  // spacer cell (gap_w)
+			int m = ch[i].mute;
+			if (mu_checkbox(ctx, mute_label, &m)) {
+				ch[i].mute = m;
+				s39ini_setvol();
+			}
+			mu_pop_id(ctx);
+		}
+
+		mu_layout_row(ctx, 1, (int[]){ -1 }, 0);
+		if (mu_button(ctx, _("Close")))
+			keep_open = false;
+		mu_end_window(ctx);
+	}
+
+	if (st->base.cancelled)  // Esc
+		keep_open = false;
+	return keep_open;
+}
+
 // The middle-click popup menu.
+
+// What the popup menu resolved to.
+enum menu_action {
+	MENU_ACTION_NONE,
+	MENU_ACTION_VOLUME,
+	MENU_ACTION_QUIT,
+};
 
 struct popup_state {
 	modal base;
 	mu_Rect rect;  // popup window rect from the most recent frame
+	enum menu_action action;  // what the user selected
 };
 
 // Message-skip state, kept in sync via menu_setSkipState().
@@ -65,7 +145,9 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 	struct popup_state *st = (struct popup_state *)modal;
 	bool keep_open = true;
 
-	int rows = 3;
+	bool has_volume = s39ini_available();
+
+	int rows = 3 + (has_volume ? 1 : 0);
 	int row_h = ctx->style->size.y + ctx->style->padding * 2;
 	int w = 200;
 	// `rows` rows with (rows - 1) inter-row gaps, plus the window's body padding.
@@ -89,9 +171,14 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 		if (mu_checkbox(ctx, _("Mouse Auto Move"), &warp))
 			nact->ags.mouse_warp_enabled = warp;
 
+		if (has_volume && mu_button(ctx, _("Volume"))) {
+			keep_open = false;
+			st->action = MENU_ACTION_VOLUME;
+		}
+
 		if (mu_button(ctx, _("Quit"))) {
 			keep_open = false;
-			menu_quitmenu_open();
+			st->action = MENU_ACTION_QUIT;
 		}
 		mu_end_window(ctx);
 	}
@@ -108,8 +195,23 @@ void menu_open(void) {
 #else
 	struct popup_state st = {
 		.base = { .build = menu_build, .handler = menu_popup_handler },
+		.action = MENU_ACTION_NONE,
 	};
 	modal_run(&st.base);
+	switch (st.action) {
+	case MENU_ACTION_VOLUME: {
+		struct volume_state vst = {
+			.base = { .build = volume_build, .handler = modal_default_handler },
+		};
+		modal_run(&vst.base);
+		break;
+	}
+	case MENU_ACTION_QUIT:
+		menu_quitmenu_open();
+		break;
+	case MENU_ACTION_NONE:
+		break;
+	}
 #endif
 }
 

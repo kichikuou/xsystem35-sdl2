@@ -26,10 +26,28 @@
 
 #include <stdbool.h>
 
+// One volume-valancer channel, as defined by VolumeValancer[] in System39.ini.
+struct volume_channel {
+	char *label;  // UTF-8 label, or NULL if this channel index is unused
+	int vol;      // 0-100
+	bool mute;
+};
+
+// Reads System39.ini / Volume.sav and applies the volumes. Returns true if the
+// game defines any volume channels.
 bool s39ini_init(void);
-void s39ini_winopen(void);
-void s39ini_winclose(void);
-void s39ini_setvol(void);
+
+// Saves the current volumes to Volume.sav (called at exit).
 void s39ini_remove(void);
+
+// Applies the current vol/mute settings to the music server.
+void s39ini_setvol(void);
+
+// True if the loaded game defines any volume channels.
+bool s39ini_available(void);
+
+// Returns the channel table. Entries with a NULL label are unused; *count is
+// set to the number of table entries to scan.
+struct volume_channel *s39ini_channels(int *count);
 
 #endif

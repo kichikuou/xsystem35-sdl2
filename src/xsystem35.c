@@ -33,10 +33,6 @@
 #include <signal.h>
 #endif
 
-#ifdef ENABLE_GTK
-#include <gtk/gtk.h>
-#endif
-
 #include <SDL.h>
 
 #ifdef __EMSCRIPTEN__
@@ -45,6 +41,10 @@
 
 #ifdef _WIN32
 #include "win/dialog.h"
+#endif
+
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#define HAVE_VOLUME_VALANCER 1
 #endif
 
 #include "nact.h"
@@ -180,7 +180,7 @@ void sys35_remove(void) {
 	dbg_quit();
 	mus_exit(); 
 	ags_remove();
-#ifdef ENABLE_GTK
+#ifdef HAVE_VOLUME_VALANCER
 	s39ini_remove();
 #endif
 }
@@ -503,8 +503,7 @@ int main(int argc, char **argv) {
 	if (integer_scaling)
 		gfx_setIntegerScaling(true);
 
-#ifdef ENABLE_GTK
-	gtk_init(&argc, &argv);
+#ifdef HAVE_VOLUME_VALANCER
 	s39ini_init();
 #endif
 	menu_init();

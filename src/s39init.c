@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <gtk/gtk.h>
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
@@ -37,15 +36,17 @@
 #define MAXVOLCH 16
 
 static int vval_max;  // 最大チャンネル番号
-struct _volval {
-	char *label;
-	int vol;
-	bool mute;
-};
-static struct _volval vval[MAXVOLCH];
-static GtkWidget *vval_win;
+static struct volume_channel vval[MAXVOLCH];
+static bool vval_available;
 
-#include "menu_gui_volval.c"
+bool s39ini_available(void) {
+	return vval_available;
+}
+
+struct volume_channel *s39ini_channels(int *count) {
+	*count = vval_max + 1;
+	return vval;
+}
 
 // 初期化
 bool s39ini_init(void) {
@@ -88,41 +89,21 @@ bool s39ini_init(void) {
 	// どちらにしても music server に送る
 	mus_vol_set_valance(vol, MAXVOLCH);
 	
-	// System39.ini に VolumeValancer が無かったらなし
-	if (vval_max > 0) {
-		vval_win = vval_win_open(vval, vval_max);
-	}
-	
+	vval_available = vval_max > 0;
+
 	return true;
 }
 
-// PopupMenuから呼ばれる
-void s39ini_winopen(void) {
-	if (vval_win) {
-		gtk_widget_show(vval_win);
-		nact->popupmenu_opened = true;
-	}
-}
-
-// ボリューム設定Windowが閉じられたときに呼ばれる
-void s39ini_winclose(void) {
-	if (vval_win) {
-		gtk_widget_hide(vval_win);
-		nact->popupmenu_opened = false;
-	}
-}
-
-// ボリューム設定でスケールを動かすたびに呼ばれる
 void s39ini_setvol(void) {
 	int vol[MAXVOLCH] = {0};
 	int i;
-	
-	if (vval_win == NULL) return;
-	
+
+	if (!vval_available) return;
+
 	for (i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].mute ? 0 : vval[i].vol;
 	}
-	
+
 	mus_vol_set_valance(vol, MAXVOLCH);
 }
 
@@ -130,8 +111,8 @@ void s39ini_setvol(void) {
 void s39ini_remove(void) {
 	int vol[MAXVOLCH] = {0};
 	char fn[256];
-	
-	if (vval_win == NULL) return;
+
+	if (!vval_available) return;
 	
 	for (int i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].vol;

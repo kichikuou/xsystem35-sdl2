@@ -125,7 +125,8 @@ elseif (ANDROID)
 elseif (ENABLE_GTK)
   target_sources(xsystem35 PRIVATE menu.c menu_callback.c menu_gui.c s39init.c)
 else ()
-  target_sources(xsystem35 PRIVATE menu_sdl.c editor.c modal.c microui/microui.c)
+  target_sources(xsystem35 PRIVATE
+    menu_sdl.c editor.c modal.c microui/microui.c s39init.c)
 endif()
 
 if (HAVE_WEBP)
