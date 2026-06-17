@@ -62,7 +62,7 @@ Game Compatibility
 | 翡翠の眸                                    | Unsupported |       |
 | 学園KING                                    | Supported   | From アリスCD |
 | 学園KING 番外編                             | Supported   | From アリスCD |
-| 蒼海に墜ちて                                | Supported   | From アリスCD |
+| 蒼海に堕ちて…                               | Supported   | From アリスCD |
 | ぶろぶろ                                    | Supported   | From アリスCD |
 | 裸ぶろぶろ狂                                | Supported   | From アリスCD |
 | メイドのススメ                              | Supported   | From アリスCD |
