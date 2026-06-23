@@ -16,7 +16,7 @@
 # supported.
 
 #ttfont_gothic: /usr/local/share/xsystem35/fonts/MTLc3m.ttf
-#ttfont_mincho: /usr/local/share/xsystem35/fonts/mincho.otf
+#ttfont_mincho: /usr/local/share/xsystem35/fonts/mincho.ttf
 
 # Some fonts have multiple "faces" included. This specifies which face to use
 # from the font file.

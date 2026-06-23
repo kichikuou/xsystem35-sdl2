@@ -17,7 +17,7 @@ class LicensesMenuActivity : Activity() {
         Entry("FreeType", "freetype", "https://freetype.org/"),
         Entry("HarfBuzz", "harfbuzz", "https://harfbuzz.github.io/"),
         Entry("MotoyaLCedar W3 mono", "MTLc3m", "https://github.com/aosp-mirror/platform_frameworks_base/tree/lollipop-release/data/fonts"),
-        Entry("Source Han Serif", "mincho", "https://github.com/adobe-fonts/source-han-serif/"),
+        Entry("IPA明朝", "mincho", "https://moji.or.jp/ipafont/"),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

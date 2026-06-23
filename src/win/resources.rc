@@ -10,7 +10,7 @@ CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "xsystem35.exe.manifest"
 // options in .xsys35rc.  That will allow your translated game run on other
 // other platforms, such as Android and Web.
 MTLc3m.ttf  FONTS  DISCARDABLE  "../../fonts/MTLc3m.ttf"
-mincho.otf  FONTS  DISCARDABLE  "../../fonts/mincho.otf"
+mincho.ttf  FONTS  DISCARDABLE  "../../fonts/mincho.ttf"
 
 
 ////////////////////////////////////////////////////////////////////////

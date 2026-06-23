@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Added support for the intro demo of Daiakuji.
+- Replaced the bundled mincho font with IPA Mincho.
 
 ## 2.17.1 - 2026-01-10
 - Fixed an issue where Rance 5D could not save files on non-Windows systems.
