@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.18.0 - 2026-06-23
 - Added support for the intro demo of Daiakuji.
 - Replaced the bundled mincho font with IPA Mincho.
 
