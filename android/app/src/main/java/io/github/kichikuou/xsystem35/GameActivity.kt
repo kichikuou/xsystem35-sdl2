@@ -61,9 +61,13 @@ class GameActivity : SDLActivity() {
     }
 
     override fun getArguments(): Array<String> {
-        return arrayOf(
+        val args = mutableListOf(
             "-gamedir", intent.getStringExtra(EXTRA_GAME_ROOT)!!,
             "-savedir", intent.getStringExtra(EXTRA_SAVE_DIRECTORY)!!)
+        val prefs = getSharedPreferences(Launcher.PREFS_NAME, MODE_PRIVATE)
+        if (prefs.getBoolean(Launcher.PREF_VIRTUAL_POINTER, false))
+            args.add("-virtualpointer")
+        return args.toTypedArray()
     }
 
     override fun setTitle(title: CharSequence?) {

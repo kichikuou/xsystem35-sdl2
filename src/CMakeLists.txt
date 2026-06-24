@@ -91,6 +91,7 @@ target_sources(xsystem35 PRIVATE
   system.c
   texthook.c
   variable.c
+  virtual_pointer.c
   vsp.c
   xsystem35.c
   )

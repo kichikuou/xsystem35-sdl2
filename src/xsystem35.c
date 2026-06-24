@@ -145,6 +145,7 @@ static void sys35_usage(bool verbose) {
 	puts(" -fullscreen             : start with fullscreen");
 	puts(" -integerscale           : use integer scaling when resizing");
 	puts(" -noimagecursor          : disable image cursor");
+	puts(" -virtualpointer         : enable the virtual mouse pointer (for touch)");
 	puts(" -version                : show version");
 	puts(" -h                      : show this message");
 	puts(" --help                  : show this message");
@@ -286,6 +287,8 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			}
 		} else if (0 == strcmp(argv[i], "-noimagecursor")) {
 			nact->ags.noimagecursor = true;
+		} else if (0 == strcmp(argv[i], "-virtualpointer")) {
+			nact->ags.virtualpointer = true;
 		} else if (0 == strcmp(argv[i], "-debuglv")) {
 			if (argv[i + 1] != NULL) {
 				sys_set_debug_level(argv[i + 1][0] - '0');
@@ -379,6 +382,9 @@ static void check_profile() {
 	}
 	/* disable image cursor */
 	get_boolean_profile("no_imagecursor", &nact->ags.noimagecursor);
+
+	/* enable the virtual mouse pointer */
+	get_boolean_profile("virtualpointer", &nact->ags.virtualpointer);
 
 	/* enable integer scaling */
 	get_boolean_profile("integerscale", &integer_scaling);

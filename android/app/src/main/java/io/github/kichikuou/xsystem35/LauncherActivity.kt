@@ -92,6 +92,9 @@ class LauncherActivity : Activity(), LauncherObserver {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.launcher_menu, menu)
+        val prefs = getSharedPreferences(Launcher.PREFS_NAME, MODE_PRIVATE)
+        menu.findItem(R.id.virtual_pointer).isChecked =
+            prefs.getBoolean(Launcher.PREF_VIRTUAL_POINTER, false)
         return true
     }
 
@@ -141,6 +144,13 @@ class LauncherActivity : Activity(), LauncherObserver {
             R.id.licenses -> {
                 val intent = Intent(this, LicensesMenuActivity::class.java)
                 startActivity(intent)
+                true
+            }
+            R.id.virtual_pointer -> {
+                val enabled = !item.isChecked
+                item.isChecked = enabled
+                getSharedPreferences(Launcher.PREFS_NAME, MODE_PRIVATE).edit()
+                    .putBoolean(Launcher.PREF_VIRTUAL_POINTER, enabled).apply()
                 true
             }
             else -> super.onOptionsItemSelected(item)

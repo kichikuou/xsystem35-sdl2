@@ -13,6 +13,10 @@
         android:id="@+id/clear_savedata"
         android:title="@string/action_clear_save_data" />
     <item
+        android:id="@+id/virtual_pointer"
+        android:checkable="true"
+        android:title="@string/action_virtual_pointer" />
+    <item
         android:id="@+id/help"
         android:title="@string/action_help" />
     <item

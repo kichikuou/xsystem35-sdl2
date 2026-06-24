@@ -42,6 +42,8 @@ interface LauncherObserver {
 class Launcher private constructor(private val rootDir: File) {
     companion object {
         const val SAVE_DIR = "save"
+        const val PREFS_NAME = "settings"
+        const val PREF_VIRTUAL_POINTER = "virtual_pointer"
         const val TITLE_FILE = "title.txt"
         const val GAMEDIR_FILE = "game_directory.txt"
         const val PLAYLIST_FILE = "playlist.txt"

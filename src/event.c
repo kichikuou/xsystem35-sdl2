@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <limits.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -40,6 +41,7 @@
 #include "input.h"
 #include "msgskip.h"
 #include "hacks.h"
+#include "virtual_pointer.h"
 
 static void get_event(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed);
@@ -277,6 +279,13 @@ void send_agsevent(enum agsevent_type type, int code) {
 }
 
 void event_set_mouse_location(int x, int y) {
+	if (vp_is_enabled()) {
+		// In virtual pointer mode there is no visible OS cursor to warp; move
+		// the internal location instead so the on-screen virtual cursor follows
+		// (including each step of the eased path in ags_setCursorLocation()).
+		event_set_mouse_internal_location(x, y);
+		return;
+	}
 	// scale mouse x and y
 	float scalex, scaley;
 	SDL_RenderGetScale(gfx_renderer, &scalex, &scaley);
@@ -306,7 +315,14 @@ void event_set_mouse_location(int x, int y) {
 void event_set_mouse_internal_location(int x, int y) {
 	mousex = x;
 	mousey = y;
+	if (vp_is_enabled())
+		gfx_dirty = true;  // repaint so the virtual cursor follows
 	send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+}
+
+void event_get_pointer_pos(int *x, int *y) {
+	*x = mousex;
+	*y = mousey;
 }
 
 // Stores a deferred touch event (valid if .timestamp != 0) to add a delay
@@ -350,6 +366,127 @@ static void rance4v2_hack(void) {
 		(RawKeyInfo[KEY_LEFT]  || RawKeyInfo[KEY_PAD_4]) ||
 		(RawKeyInfo[KEY_RIGHT] || RawKeyInfo[KEY_PAD_6]))
 		cancel_yield();
+}
+
+/*
+ * Virtual mouse pointer (trackpad-style touch input).
+ * Active only when nact->ags.virtualpointer is set. Reuses the pointer state
+ * (mousex/mousey/mouseb, RawKeyInfo) so all game queries are unaffected.
+ */
+#define VP_SENSITIVITY      1.5f   // finger-to-cursor movement multiplier
+#define VP_TAP_MAX_MOVE     0.02f  // max normalized finger travel for a tap
+#define VP_TAP_MAX_TIME     300    // max touch duration (ms) for a tap
+#define VP_LONGPRESS_TIME   500    // hold time (ms) to start a drag
+#define VP_CLICK_HOLD_TIME  100    // how long (ms) a tap holds the left button
+
+static bool vp_primary_down;       // a finger is tracked as the pointer
+static SDL_FingerID vp_primary_id;
+static uint32_t vp_down_time;
+static float vp_moved_dist;        // accumulated normalized finger travel
+static bool vp_moved;              // travel exceeded the tap threshold
+static bool vp_longpress;          // left button held due to a long press (drag)
+static bool vp_two_finger;         // right button held due to a 2nd finger
+static bool vp_click_release_pending;
+static uint32_t vp_click_release_time;
+static bool vp_centered;           // cursor has been placed at the center
+
+static void vp_press(int button) {
+	mouseb |= 1 << button;
+	RawKeyInfo[mouse_to_rawkey(button)] = true;
+	send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(button));
+}
+
+static void vp_release(int button) {
+	mouseb &= ~(1 << button);
+	RawKeyInfo[mouse_to_rawkey(button)] = false;
+	send_agsevent(AGSEVENT_BUTTON_RELEASE, mouse_to_agsevent(button));
+}
+
+static void vp_move(float dnx, float dny) {
+	mousex += (int)lroundf(dnx * view_w * VP_SENSITIVITY);
+	mousey += (int)lroundf(dny * view_h * VP_SENSITIVITY);
+	// Keep the cursor inside the view.
+	if (mousex < 0) mousex = 0;
+	else if (mousex >= view_w) mousex = view_w - 1;
+	if (mousey < 0) mousey = 0;
+	else if (mousey >= view_h) mousey = view_h - 1;
+	send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+	gfx_dirty = true;
+}
+
+static void vp_finger_down(SDL_TouchFingerEvent *t) {
+	if (SDL_GetNumTouchFingers(t->touchId) >= 2) {
+		// A second finger means a right click at the current position.
+		if (!vp_two_finger) {
+			vp_two_finger = true;
+			vp_press(SDL_BUTTON_RIGHT);
+		}
+		return;
+	}
+	// First finger: start tracking. The cursor moves only on drag.
+	vp_primary_down = true;
+	vp_primary_id = t->fingerId;
+	vp_down_time = SDL_GetTicks();
+	vp_moved_dist = 0.0f;
+	vp_moved = false;
+}
+
+static void vp_finger_motion(SDL_TouchFingerEvent *t) {
+	if (vp_two_finger || !vp_primary_down || t->fingerId != vp_primary_id)
+		return;
+	vp_moved_dist += hypotf(t->dx, t->dy);
+	if (vp_moved_dist > VP_TAP_MAX_MOVE)
+		vp_moved = true;
+	vp_move(t->dx, t->dy);
+}
+
+static void vp_finger_up(SDL_TouchFingerEvent *t) {
+	if (vp_two_finger) {
+		// Release the right button once every finger is lifted.
+		if (SDL_GetNumTouchFingers(t->touchId) == 0) {
+			vp_two_finger = false;
+			vp_primary_down = false;
+			vp_release(SDL_BUTTON_RIGHT);
+		}
+		return;
+	}
+	if (!vp_primary_down || t->fingerId != vp_primary_id)
+		return;
+	vp_primary_down = false;
+	if (vp_longpress) {
+		vp_longpress = false;
+		vp_release(SDL_BUTTON_LEFT);  // end drag
+	} else if (!vp_moved && SDL_GetTicks() - vp_down_time < VP_TAP_MAX_TIME) {
+		// Tap: left click. Hold the button briefly so polling games detect it.
+		vp_press(SDL_BUTTON_LEFT);
+		vp_click_release_pending = true;
+		vp_click_release_time = SDL_GetTicks() + VP_CLICK_HOLD_TIME;
+	}
+}
+
+// Time-driven virtual pointer transitions, polled each event pump.
+static void vp_tick(void) {
+	if (!vp_is_enabled())
+		return;
+	uint32_t now = SDL_GetTicks();
+	// Place the cursor at the center once the view size is known.
+	if (!vp_centered && view_w > 0 && view_h > 0) {
+		mousex = view_w / 2;
+		mousey = view_h / 2;
+		vp_centered = true;
+		gfx_dirty = true;
+	}
+	// A stationary long press starts a left-button drag.
+	if (vp_primary_down && !vp_moved && !vp_longpress && !vp_two_finger &&
+	    now - vp_down_time >= VP_LONGPRESS_TIME) {
+		vp_longpress = true;
+		vp_press(SDL_BUTTON_LEFT);
+	}
+	// Release the briefly-held tap click.
+	if (vp_click_release_pending && now >= vp_click_release_time) {
+		vp_click_release_pending = false;
+		vp_release(SDL_BUTTON_LEFT);
+	}
 }
 
 void event_handle_event(SDL_Event *e) {
@@ -396,6 +533,10 @@ void event_handle_event(SDL_Event *e) {
 #endif
 		break;
 	case SDL_MOUSEMOTION:
+		// Ignore real mouse motion while the virtual pointer is active. This
+		// also discards the spurious (0,0) motion seen right after startup.
+		if (vp_is_enabled())
+			break;
 		event_set_mouse_internal_location(e->motion.x, e->motion.y);
 #ifdef _WIN32
 		win_menu_onMouseMotion(e->motion.x, e->motion.y);
@@ -429,6 +570,10 @@ void event_handle_event(SDL_Event *e) {
 		break;
 
 	case SDL_FINGERDOWN:
+		if (vp_is_enabled()) {
+			vp_finger_down(&e->tfinger);
+			break;
+		}
 		if (SDL_GetNumTouchFingers(e->tfinger.touchId) >= 2) {
 			mouseb &= ~(1 << SDL_BUTTON_LEFT);
 			mouseb |= 1 << SDL_BUTTON_RIGHT;
@@ -455,6 +600,10 @@ void event_handle_event(SDL_Event *e) {
 		break;
 
 	case SDL_FINGERUP:
+		if (vp_is_enabled()) {
+			vp_finger_up(&e->tfinger);
+			break;
+		}
 		if (SDL_GetNumTouchFingers(e->tfinger.touchId) == 0) {
 			int ags_button = (mouseb & 1 << SDL_BUTTON_LEFT) ? AGSEVENT_BUTTON_LEFT : AGSEVENT_BUTTON_RIGHT;
 			mousex = e->tfinger.x * view_w;
@@ -465,6 +614,10 @@ void event_handle_event(SDL_Event *e) {
 		break;
 
 	case SDL_FINGERMOTION:
+		if (vp_is_enabled()) {
+			vp_finger_motion(&e->tfinger);
+			break;
+		}
 		mousex = e->tfinger.x * view_w;
 		mousey = e->tfinger.y * view_h;
 		send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
@@ -554,6 +707,7 @@ static void get_event(void) {
 	enum scheduler_event scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_MISS;
 
 	fire_deferred_touch_event();
+	vp_tick();
 
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {

@@ -31,6 +31,7 @@ void event_remove(void);
 void event_set_joy_device_index(int index);
 void event_set_mouse_location(int x, int y);
 void event_set_mouse_internal_location(int x, int y);
+void event_get_pointer_pos(int *x, int *y);
 int event_get_key(void);
 int event_get_mouse(SDL_Point *p);
 void event_get_wheel(int *forward, int *back);

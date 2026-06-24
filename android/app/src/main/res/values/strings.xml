@@ -6,6 +6,7 @@
     <string name="action_import_save_data">Import Save Files</string>
     <string name="action_install_from_zip">Install from ZIP</string>
     <string name="action_licenses">Open source licenses</string>
+    <string name="action_virtual_pointer">Virtual mouse pointer</string>
     <string name="cancel">Cancel</string>
     <string name="cannot_find_ald">Cannot find System 3.x game files (*.ald).</string>
     <string name="choose_a_file">Choose a file</string>

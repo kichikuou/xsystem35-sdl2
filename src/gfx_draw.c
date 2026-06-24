@@ -41,6 +41,7 @@
 #include "image.h"
 #include "nact.h"
 #include "debugger.h"
+#include "virtual_pointer.h"
 
 static void gfx_pal_check(void) {
 	if (nact->ags.pal_changed) {
@@ -60,6 +61,7 @@ void gfx_updateScreen(void) {
 		return;
 	SDL_RenderClear(gfx_renderer);
 	SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
+	vp_draw(gfx_renderer);
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
 }

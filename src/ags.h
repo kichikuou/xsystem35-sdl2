@@ -131,6 +131,7 @@ struct _ags {
 	bool enable_zb;
 	bool noantialias; /* antialias を使用しない */
 	bool noimagecursor; /* リソースファイルのカーソルを読みこまない */
+	bool virtualpointer; /* enable the virtual mouse pointer (trackpad-style touch) */
 };
 typedef struct _ags ags_t;
 
