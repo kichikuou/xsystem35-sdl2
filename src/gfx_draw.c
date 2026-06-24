@@ -267,9 +267,9 @@ int gfx_nearest_color(int r, int g, int b) {
 	return col;
 }
 
-SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col) {
+SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpec font) {
 	gfx_pal_check();
-	return font_draw_glyph(x, y, str_utf8, col);
+	return font_draw_text(font, x, y, str_utf8, col);
 }
 
 /*

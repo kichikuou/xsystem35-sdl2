@@ -56,7 +56,7 @@ void gfx_fillRectangleRGB(int x, int y, int w, int h, uint8_t r, uint8_t g, uint
 void gfx_fillCircle(int left, int top, int diameter, uint8_t c);
 void gfx_drawLine(int x1, int y1, int x2, int y2, uint8_t c);
 SDL_Rect gfx_floodFill(int x, int y, int col);
-SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col);
+SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpec font);
 void gfx_copyArea(int sx,int sy, int w, int h, int dx, int dy);
 void gfx_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp);
 void gfx_wrapColor(int sx, int sy, int w, int h, uint8_t cl, int rate);

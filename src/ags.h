@@ -123,7 +123,7 @@ struct _ags {
 	void (*eventcb)(agsevent_t *e); /* deliver event */
 
 	FontType font_type;
-	int font_weight;
+	FontWeight font_weight;
 	TextDecorationType text_decoration_type;
 	int text_decoration_color;
 
@@ -181,7 +181,7 @@ extern void ags_restoreRegion(void *region, int x, int y);
 extern void ags_putRegion(void *region, int x, int y);
 extern void ags_delRegion(void *region);
 
-extern int ags_drawString(int x, int y, const char *src, int col, SDL_Rect *rect_out);
+extern int ags_drawString(int x, int y, const char *src, int col, int size, SDL_Rect *rect_out);
 extern void ags_drawCg(cgdata *cg, int x, int y, int brightness, int sprite_color, bool alpha_blend);
 
 extern void ags_copyArea_shadow(int sx, int sy, int w, int h, int dx, int dy);
@@ -209,11 +209,9 @@ extern void ags_whiteIn(int rate, bool flg);
 extern void ags_whiteOut(int rate, bool flg);
 
 /* フォント関連 */
-extern void ags_setFont(FontType type, int size);
-extern void ags_setFontWithWeight(FontType type, int size, int weight);
 extern void ags_setTextDecorationType(TextDecorationType type);
 extern void ags_setTextDecorationColor(int color);
-extern SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b);
+extern SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b, FontSpec font);
 
 /* カーソル関係 */
 extern void ags_setCursorType(int type);

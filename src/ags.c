@@ -392,7 +392,9 @@ void ags_delRegion(void *region) {
 	gfx_delRegion(region);
 }
 
-int ags_drawString(int x, int y, const char *src, int col, SDL_Rect *rect_out) {
+int ags_drawString(int x, int y, const char *src, int col, int size, SDL_Rect *rect_out) {
+	FontSpec font = { nact->ags.font_type, nact->ags.font_weight, size };
+
 	if (!ags_check_param_xy(&x, &y)) {
 		if (rect_out) {
 			rect_out->x = x;
@@ -411,46 +413,46 @@ int ags_drawString(int x, int y, const char *src, int col, SDL_Rect *rect_out) {
 		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 0;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_BOTTOM:
-		gfx_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x, y +1, utf8, nact->ags.text_decoration_color, font);
 		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_RIGHT:
-		gfx_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x +1, y, utf8, nact->ags.text_decoration_color, font);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_BOTTOM_RIGHT:
-		gfx_drawString(x +1, y +1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x +1, y +1, utf8, nact->ags.text_decoration_color, font);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
 	case TEXT_DECORATION_OUTLINE:
-		gfx_drawString(x -1, y, utf8, nact->ags.text_decoration_color);
-		gfx_drawString(x +1, y, utf8, nact->ags.text_decoration_color);
-		gfx_drawString(x, y -1, utf8, nact->ags.text_decoration_color);
-		gfx_drawString(x, y +1, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x -1, y, utf8, nact->ags.text_decoration_color, font);
+		gfx_drawString(x +1, y, utf8, nact->ags.text_decoration_color, font);
+		gfx_drawString(x, y -1, utf8, nact->ags.text_decoration_color, font);
+		gfx_drawString(x, y +1, utf8, nact->ags.text_decoration_color, font);
 		adj.x = -1; adj.y = -1; adj.w = 2; adj.h = 2;
 		break;
 	case TEXT_DECORATION_BOLD_HORIZONTAL:
-		gfx_drawString(x +1, y, utf8, col);
+		gfx_drawString(x +1, y, utf8, col, font);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 0;
 		break;
 	case TEXT_DECORATION_BOLD_VERTICAL:
-		gfx_drawString(x, y +1, utf8, col);
+		gfx_drawString(x, y +1, utf8, col, font);
 		adj.x = 0; adj.y = 0; adj.w = 0; adj.h = 1;
 		break;
 	case TEXT_DECORATION_BOLD_HORIZONTAL_VERTICAL:
-		gfx_drawString(x +1, y +1, utf8, col);
+		gfx_drawString(x +1, y +1, utf8, col, font);
 		adj.x = 0; adj.y = 0; adj.w = 1; adj.h = 1;
 		break;
 	case TEXT_DECORATION_DROP_SHADOW_OUTLINE:
-		gfx_drawString(x -1, y   , utf8, nact->ags.text_decoration_color);
-		gfx_drawString(x +1, y   , utf8, nact->ags.text_decoration_color);
-		gfx_drawString(x   , y -1, utf8, nact->ags.text_decoration_color);
-		gfx_drawString(x   , y +1, utf8, nact->ags.text_decoration_color);
-		gfx_drawString(x +2, y +2, utf8, nact->ags.text_decoration_color);
+		gfx_drawString(x -1, y   , utf8, nact->ags.text_decoration_color, font);
+		gfx_drawString(x +1, y   , utf8, nact->ags.text_decoration_color, font);
+		gfx_drawString(x   , y -1, utf8, nact->ags.text_decoration_color, font);
+		gfx_drawString(x   , y +1, utf8, nact->ags.text_decoration_color, font);
+		gfx_drawString(x +2, y +2, utf8, nact->ags.text_decoration_color, font);
 		adj.x = -1; adj.y = -1; adj.w = 3; adj.h = 3;
 		break;
 	}
-	SDL_Rect r = gfx_drawString(x, y, utf8, col);
+	SDL_Rect r = gfx_drawString(x, y, utf8, col, font);
 	if (rect_out) {
 		rect_out->x = r.x + adj.x;
 		rect_out->y = r.y + adj.y;
@@ -461,9 +463,10 @@ int ags_drawString(int x, int y, const char *src, int col, SDL_Rect *rect_out) {
 	return r.w;
 }
 
-SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b) {
+SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b, FontSpec font) {
 	char *utf8 = toUTF8(str);
-	SDL_Surface *sf = font_get_glyph(utf8, r, g, b);
+	SDL_Color color = {r, g, b, 255};
+	SDL_Surface *sf = font_render_text(font, utf8, color);
 	free(utf8);
 	return sf;
 }
@@ -682,14 +685,6 @@ void ags_whiteOut(int rate, bool flag) {
 		memset(&pal, 255, sizeof(pal));
 		gfx_setPalette(pal, 0, 256);
 	}
-}
-
-void ags_setFont(FontType type, int size) {
-	font_select(type, size, FONT_WEIGHT_NORMAL);
-}
-
-void ags_setFontWithWeight(FontType type, int size, int weight) {
-	font_select(type, size, weight);
 }
 
 void ags_setTextDecorationType(TextDecorationType type) {

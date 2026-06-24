@@ -48,8 +48,6 @@ typedef struct {
 static FontTable fonttbl[FONTTABLEMAX];
 static int       fontcnt = 0;
 
-static FontTable *fontset;
-
 static struct {
 	bool antialiase_on;
 	const char *name[FONTTYPEMAX];
@@ -79,10 +77,15 @@ static FontTable *font_lookup(int size, FontType type) {
 	return NULL;
 }
 
-void font_select(FontType type, int size, int weight) {
+// Resolve a (type, size) pair to a TTF_Font, opening and caching it on first
+// use, and apply the requested weight. Returns NULL for an invalid type.
+static FontTable *font_resolve(FontSpec font) {
+	FontType type = font.type;
+	int size = font.size;
+
 	if (type >= FONTTYPEMAX) {
 		WARNING("Invalid font type %d", type);
-		return;
+		return NULL;
 	}
 
 	FontTable *tbl;
@@ -107,21 +110,20 @@ void font_select(FontType type, int size, int weight) {
 #endif
 		if (!fs)
 			SYSERROR("Cannot open font %s", this.name[type]);
-		
+
 		font_insert(size, type, fs);
-		fontset = &fonttbl[fontcnt - 1];
-	} else {
-		fontset = tbl;
+		tbl = &fonttbl[fontcnt - 1];
 	}
-	TTF_SetFontStyle(fontset->id, weight > 5 ? TTF_STYLE_BOLD : TTF_STYLE_NORMAL);
+	TTF_SetFontStyle(tbl->id, font.weight == FONT_WEIGHT_BOLD ? TTF_STYLE_BOLD : TTF_STYLE_NORMAL);
+	return tbl;
 }
 
-SDL_Surface *font_get_glyph(const char *str_utf8, int r, int g, int b) {
+SDL_Surface *font_render_text(FontSpec font, const char *str_utf8, SDL_Color color) {
+	FontTable *fontset = font_resolve(font);
 	if (!fontset)
 		return NULL;
 
 	SDL_Surface *fs;
-	SDL_Color color = {r, g, b, 255};
 	fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, color);
 	if (!fs)
 		WARNING("Text rendering failed: %s", TTF_GetError());
@@ -167,16 +169,17 @@ static void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t
 	}
 }
 
-SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t cl) {
+SDL_Rect font_draw_text(FontSpec font, int x, int y, const char *str_utf8, uint8_t cl) {
 	SDL_Surface *fs;
 	SDL_Rect r_src, r_dst = {};
 	int w, h;
-	
+
 	if (!*str_utf8)
 		return r_dst;
+	FontTable *fontset = font_resolve(font);
 	if (!fontset)
 		return r_dst;
-	
+
 	bool antialias = this.antialiase_on;
 	// The post-effect in Rance 3 opening does not work properly if colors other
 	// than the specified text color (32) are used.

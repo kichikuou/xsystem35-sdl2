@@ -107,7 +107,7 @@ void commandZB() {
 	int weight = getCaliValue();
 
 	if (nact->ags.enable_zb)
-		nact->ags.font_weight = weight;
+		nact->ags.font_weight = weight > 5 ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 
 	TRACE("ZB %d:", weight);
 }

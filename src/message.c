@@ -123,10 +123,8 @@ void msg_putMessage(const char *m) {
 	// fprintf(stdout, "x=%d, y = %d, msg=%s\n", msgcur.x,msgcur.y,msg);
 	if (!msg.mg_dspMsg) return;
 	
-	ags_setFontWithWeight(nact->ags.font_type, msg.MsgFontSize, nact->ags.font_weight);
-
 	SDL_Rect drawn;
-	msgcur.x += ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor, &drawn);
+	msgcur.x += ags_drawString(msgcur.x, msgcur.y, m, msg.MsgFontColor, msg.MsgFontSize, &drawn);
 
 	if (nact->messagewait_enable && nact->messagewait_time > 0 &&
 		!nact->messagewait_cancelled && !msgskip_isSkipping()) {
@@ -278,7 +276,7 @@ void msg_hitAnyKey() {
 	SDL_Rect r;
 	int x = msg.win->x + msg.win->width - msg.MsgFontSize;
 	int y = msg.win->y + msg.win->height - msg.MsgFontSize;
-	ags_drawString(x, y, prompt[nact->encoding], msg.HitAnyKeyMsgColor, &r);
+	ags_drawString(x, y, prompt[nact->encoding], msg.HitAnyKeyMsgColor, msg.MsgFontSize, &r);
 	ags_updateArea(r.x, r.y, r.w, r.h);
 }
 

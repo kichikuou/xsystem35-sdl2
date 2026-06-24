@@ -66,8 +66,7 @@ void dt_setfont(FontType type, int size) {
  * @return: 実際に描画した幅
  */ 
 int dt_drawtext_col(SDL_Surface *sf, int x, int y, char *buf, int r, int g, int b) {
-	ags_setFont(ftype, fsize);
-	SDL_Surface *glyph = ags_drawStringToSurface(buf, r, g, b);
+	SDL_Surface *glyph = ags_drawStringToSurface(buf, r, g, b, (FontSpec){ .type = ftype, .size = fsize });
 	if (glyph == NULL) return 0;
 
 	SDL_Rect rect = {x, y, glyph->w, glyph->h};

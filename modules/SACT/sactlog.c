@@ -85,8 +85,8 @@ static void draw_log() {
 	// ページ位置情報
 	len = snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, list_length(sact.log));
 	
-	ags_setFont(FONT_GOTHIC, INDEX_FONTSIZE);
-	gfx_drawString(main_surface->w - INDEX_FONTSIZE * len / 2, 0, pinfo, 255);
+	gfx_drawString(main_surface->w - INDEX_FONTSIZE * len / 2, 0, pinfo, 255,
+				   (FontSpec){ .size = INDEX_FONTSIZE });
 	
 	// 表示始め位置
 	node = list_nth(sact.log, list_length(sact.log) - curline);
@@ -97,12 +97,8 @@ static void draw_log() {
 		if (0 == strcmp(str, "\n")) {
 			SDL_BlitSurface(hline, NULL, main_surface, &(SDL_Rect){0, y + FONTSIZE/2, main_surface->w, 3});
 		} else {
-			if (cur < 6) {
-				ags_setFont(FONT_MINCHO, FONTSIZE);
-			} else {
-				ags_setFont(FONT_GOTHIC, FONTSIZE);
-			}
-			gfx_drawString(0, y, str, 255);
+			FontSpec font_spec = { .type = cur < 6 ? FONT_MINCHO : FONT_GOTHIC, .size = FONTSIZE };
+			gfx_drawString(0, y, str, 255, font_spec);
 		}
 		y += FONTSIZE;
 		cur--;

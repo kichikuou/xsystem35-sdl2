@@ -54,14 +54,16 @@ static void redraw() {
 		.h = input->rect.h - YMARGIN * 2,
 	};
 
+	const FontSpec font = { .size = input->params->h };
+
 	if (*input->text) {
-		int w = gfx_drawString(r.x, r.y, input->text, fgcolor).w;
+		int w = gfx_drawString(r.x, r.y, input->text, fgcolor, font).w;
 		r.x += w;
 		r.w -= w;
 	}
 
 	if (*input->composingText) {
-		int w = gfx_drawString(r.x, r.y, input->composingText, fgcolor).w;
+		int w = gfx_drawString(r.x, r.y, input->composingText, fgcolor, font).w;
 		ags_fillRectangle(r.x, r.y + r.h, w, 2, fgcolor);  // underline
 	}
 
@@ -152,7 +154,6 @@ bool edit_string(INPUTSTRING_PARAM *p) {
 	SDL_StartTextInput();
 
 	void *saved_region = ags_saveRegion(s.rect.x, s.rect.y, s.rect.w, s.rect.h);
-	ags_setFont(FONT_GOTHIC, p->h);
 	redraw();
 
 	event_custom_handler = handle_event;

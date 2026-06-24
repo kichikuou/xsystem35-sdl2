@@ -34,16 +34,23 @@ typedef enum {
 } FontType;
 #define FONTTYPEMAX 2
 
-#define FONT_WEIGHT_NORMAL 4
-#define FONT_WEIGHT_BOLD 7
+typedef enum {
+	FONT_WEIGHT_NORMAL,
+	FONT_WEIGHT_BOLD,
+} FontWeight;
+
+typedef struct {
+	FontType type;
+	FontWeight weight;
+	int size;
+} FontSpec;
 
 extern void font_init(void);
 extern void font_set_name_and_index(FontType type, const char *name, int index);
 extern void font_set_antialias(bool enable);
 extern bool font_get_antialias(void);
-extern void font_select(FontType type, int size, int weight);
-extern struct SDL_Surface *font_get_glyph(const char *str_utf8, int r, int g, int b);
-extern SDL_Rect font_draw_glyph(int x, int y, const char *str_utf8, uint8_t col);
+extern struct SDL_Surface *font_render_text(FontSpec font, const char *str_utf8, SDL_Color color);
+extern SDL_Rect font_draw_text(FontSpec font, int x, int y, const char *str_utf8, uint8_t col);
 
 #ifdef __EMSCRIPTEN__
 extern bool load_mincho_font(void);

@@ -220,8 +220,7 @@ void scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
 	// 勝手に出ていいのかな？
 	if (svar_length(wText) == 0) return;
 
-	ags_setFont(FONT_GOTHIC, wSize);
-	SDL_Surface *glyph = ags_drawStringToSurface(svar_get(wText), wR, wG, wB);
+	SDL_Surface *glyph = ags_drawStringToSurface(svar_get(wText), wR, wG, wB, (FontSpec){ .size = wSize });
 
 	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, glyph->w, wSize, 32, SDL_PIXELFORMAT_ARGB8888);
 	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
@@ -245,8 +244,7 @@ void scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs
 	}
 	sprintf(s, ss, wValue);
 
-	ags_setFont(FONT_GOTHIC, wSize);
-	SDL_Surface *glyph = ags_drawStringToSurface(s, wR, wG, wB);
+	SDL_Surface *glyph = ags_drawStringToSurface(s, wR, wG, wB, (FontSpec){ .size = wSize });
 
 	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, glyph->w, wSize, 32, SDL_PIXELFORMAT_ARGB8888);
 	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
