@@ -167,5 +167,8 @@ void menu_gtkmainiteration() {
 	}
 }
 
+void menu_render_overlay(void) {
+}
+
 void menu_setSkipState(bool enabled, bool activated) {
 }

@@ -29,12 +29,85 @@
 #include "menu.h"
 #include "editor.h"
 #include "gfx_private.h"
+#include "msgskip.h"
+#include "modal.h"
 #ifdef _WIN32
 #include "win/dialog.h"
 #endif
 
+// The middle-click popup menu.
+
+struct popup_state {
+	modal base;
+	mu_Rect rect;  // popup window rect from the most recent frame
+};
+
+// Message-skip state, kept in sync via menu_setSkipState().
+static bool skip_enabled = true;
+static bool skip_activated;
+
+static bool menu_popup_handler(const SDL_Event *e, modal *modal) {
+	struct popup_state *st = (struct popup_state *)modal;
+	if (e->type == SDL_MOUSEBUTTONUP) {
+		bool point_in_menu =
+			e->button.x >= st->rect.x && e->button.x < st->rect.x + st->rect.w &&
+			e->button.y >= st->rect.y && e->button.y < st->rect.y + st->rect.h;
+		if (e->button.button == SDL_BUTTON_RIGHT || !point_in_menu)
+			st->base.cancelled = true;
+	}
+	return modal_default_handler(e, modal);
+}
+
+static bool menu_build(mu_Context *ctx, modal *modal) {
+	struct popup_state *st = (struct popup_state *)modal;
+	bool keep_open = true;
+
+	int rows = 3;
+	int row_h = ctx->style->size.y + ctx->style->padding * 2;
+	int w = 200;
+	// `rows` rows with (rows - 1) inter-row gaps, plus the window's body padding.
+	int h = rows * row_h + (rows - 1) * ctx->style->spacing + ctx->style->padding * 2;
+	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
+	st->rect = r;
+
+	if (mu_begin_window_ex(ctx, "menu", r,
+	        MU_OPT_NOTITLE | MU_OPT_NORESIZE | MU_OPT_NOCLOSE | MU_OPT_NOSCROLL)) {
+		mu_layout_row(ctx, 1, (int[]){ -1 }, 0);
+
+		if (skip_enabled) {
+			int sk = skip_activated;
+			if (mu_checkbox(ctx, _("Message Skip"), &sk))
+				msgskip_activate(sk);
+		} else {
+			modal_disabled_checkbox(ctx, _("Message Skip"), skip_activated);
+		}
+
+		int warp = nact->ags.mouse_warp_enabled;
+		if (mu_checkbox(ctx, _("Mouse Auto Move"), &warp))
+			nact->ags.mouse_warp_enabled = warp;
+
+		if (mu_button(ctx, _("Quit"))) {
+			keep_open = false;
+			menu_quitmenu_open();
+		}
+		mu_end_window(ctx);
+	}
+
+	if (st->base.cancelled)
+		keep_open = false;
+
+	return keep_open;
+}
+
 void menu_open(void) {
-	return;
+#ifdef _WIN32
+	return;  // Windows uses the native menu bar
+#else
+	struct popup_state st = {
+		.base = { .build = menu_build, .handler = menu_popup_handler },
+	};
+	modal_run(&st.base);
+#endif
 }
 
 void menu_quitmenu_open(void) {
@@ -117,5 +190,7 @@ void menu_gtkmainiteration() {
 
 #ifndef _WIN32
 void menu_setSkipState(bool enabled, bool activated) {
+	skip_enabled = enabled;
+	skip_activated = activated;
 }
 #endif

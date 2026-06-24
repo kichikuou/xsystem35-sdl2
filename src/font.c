@@ -131,6 +131,30 @@ SDL_Surface *font_render_text(FontSpec font, const char *str_utf8, SDL_Color col
 	return fs;
 }
 
+void font_measure_text(FontSpec font, const char *str_utf8, int len, int *w, int *h) {
+	if (w) *w = 0;
+	if (h) *h = 0;
+	FontTable *fontset = font_resolve(font);
+	if (!fontset)
+		return;
+	if (h)
+		*h = TTF_FontHeight(fontset->id);
+	if (!w)
+		return;
+
+	// A negative length means the whole string.
+	if (len < 0) {
+		TTF_SizeUTF8(fontset->id, str_utf8, w, NULL);
+	} else {
+		char buf[256];
+		if (len > (int)sizeof(buf) - 1)
+			len = sizeof(buf) - 1;
+		memcpy(buf, str_utf8, len);
+		buf[len] = '\0';
+		TTF_SizeUTF8(fontset->id, buf, w, NULL);
+	}
+}
+
 // SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
 static void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col)
 {

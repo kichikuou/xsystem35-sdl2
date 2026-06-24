@@ -51,6 +51,7 @@ extern void font_set_antialias(bool enable);
 extern bool font_get_antialias(void);
 extern struct SDL_Surface *font_render_text(FontSpec font, const char *str_utf8, SDL_Color color);
 extern SDL_Rect font_draw_text(FontSpec font, int x, int y, const char *str_utf8, uint8_t col);
+extern void font_measure_text(FontSpec font, const char *str_utf8, int len, int *w, int *h);
 
 #ifdef __EMSCRIPTEN__
 extern bool load_mincho_font(void);

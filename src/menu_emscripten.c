@@ -74,6 +74,10 @@ void menu_gtkmainiteration() {
 	return;
 }
 
+void menu_render_overlay(void) {
+	return;
+}
+
 EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
 	xsystem35.shell.setSkipButtonState(enabled, activated);
 });

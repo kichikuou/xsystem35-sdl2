@@ -40,6 +40,7 @@
 #include "ags.h"
 #include "image.h"
 #include "nact.h"
+#include "menu.h"
 #include "debugger.h"
 
 static void gfx_pal_check(void) {
@@ -60,6 +61,7 @@ void gfx_updateScreen(void) {
 		return;
 	SDL_RenderClear(gfx_renderer);
 	SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
+	menu_render_overlay();
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
 }
