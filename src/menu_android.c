@@ -112,9 +112,12 @@ bool menu_inputnumber(INPUTNUM_PARAM *p) {
 	jobject context = SDL_AndroidGetActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"inputNumber", "(" STRING "III)I");
-	p->value = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);
+	int v = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);
 
 	(*env)->PopLocalFrame(env, NULL);
+	if (v < 0)
+		return false;  // cancelled
+	p->value = v;
 	return true;
 }
 

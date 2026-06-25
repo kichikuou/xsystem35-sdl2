@@ -146,7 +146,6 @@ bool input_string(INPUTSTRING_PARAM *p) {
 }
 
 bool input_number(INPUTNUM_PARAM *p) {
-	p->value = p->def;
 	INT_PTR ret = DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_NUMINPUT),

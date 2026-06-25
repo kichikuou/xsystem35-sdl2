@@ -365,13 +365,11 @@ void commandNI() { /* From Panyo */
 	if (!ni_param.title)
 		ni_param.title = strdup("");
 	
-	menu_inputnumber(&ni_param);
-	
-	if (ni_param.value < 0) {
-		sysVar[0] = 255;
-	} else {
+	if (menu_inputnumber(&ni_param)) {
 		*var = ni_param.value;
 		sysVar[0] = 0;
+	} else {
+		sysVar[0] = 255;
 	}
 	
 	TRACE("NI %p,%d,%d,%d:", var, def, _min, _max);

@@ -142,11 +142,9 @@ bool menu_inputnumber(INPUTNUM_PARAM *p) {
 	gtk_main();
 	g_idle_remove_by_data(menu_window_in);
 	
-	if (menu_ok_input) {
-		p->value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(menu_spinbutton));
-	} else {
-		p->value = -1;
-	}
+	if (!menu_ok_input)
+		return false;  // cancelled
+	p->value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(menu_spinbutton));
 	return true;
 }
 

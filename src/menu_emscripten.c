@@ -57,9 +57,12 @@ bool menu_inputstring2(INPUTSTRING_PARAM *p) {
 }
 
 bool menu_inputnumber(INPUTNUM_PARAM *p) {
-	p->value = EM_ASM_({
+	int v = EM_ASM_({
 			return xsystem35.shell.inputNumber(UTF8ToString($0), $1, $2, $3);
 		}, p->title, p->min, p->max, p->def);
+	if (v < 0)
+		return false;  // cancelled
+	p->value = v;
 	return true;
 }
 

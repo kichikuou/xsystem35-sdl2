@@ -77,12 +77,11 @@ static void InputListNum(void) { /* 1 */
 		.title = toUTF8(svar_get(title)),
 	};
 
-	menu_inputnumber(&ni_param);
-	if (ni_param.value < 0) {
-		*res = 0;
-	} else {
+	if (menu_inputnumber(&ni_param)) {
 		*val = (uint16_t)ni_param.value;
 		*res = 1;
+	} else {
+		*res = 0;
 	}
 
 	free(ni_param.title);
