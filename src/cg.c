@@ -93,7 +93,7 @@ static bool is_censored_cg(int no) {
 }
 
 static void cg_mosaic(cgdata *cg) {
-	Uint32 format;
+	Uint32 format = 0;
 	switch (cg->depth) {
 	case 8:
 		format = SDL_PIXELFORMAT_INDEX8;
