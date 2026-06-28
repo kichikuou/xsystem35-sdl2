@@ -124,7 +124,7 @@ elseif (ANDROID)
   target_sources(xsystem35 PRIVATE menu_android.c)
 else ()
   target_sources(xsystem35 PRIVATE
-    menu_sdl.c editor.c modal.c microui/microui.c s39init.c)
+    menu_sdl.c editor.c modal.c microui/microui.c volume.c)
 endif()
 
 if (HAVE_WEBP)

@@ -1,5 +1,5 @@
 /*
- * s39init.h  System39.ini read
+ * volume.h  System39.ini volume controller
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -19,35 +19,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: s39init.h,v 1.1 2003/04/25 17:23:55 chikama Exp $ */
 
-#ifndef __S39INIT_H__
-#define __S39INIT_H__
+#ifndef __VOLUME_H__
+#define __VOLUME_H__
 
 #include <stdbool.h>
 
-// One volume-valancer channel, as defined by VolumeValancer[] in System39.ini.
-struct volume_channel {
-	char *label;  // UTF-8 label, or NULL if this channel index is unused
-	int vol;      // 0-100
-	bool mute;
-};
-
 // Reads System39.ini / Volume.sav and applies the volumes. Returns true if the
 // game defines any volume channels.
-bool s39ini_init(void);
+bool volume_init(void);
 
 // Saves the current volumes to Volume.sav (called at exit).
-void s39ini_remove(void);
-
-// Applies the current vol/mute settings to the music server.
-void s39ini_setvol(void);
+void volume_save(void);
 
 // True if the loaded game defines any volume channels.
-bool s39ini_available(void);
+bool volume_available(void);
 
-// Returns the channel table. Entries with a NULL label are unused; *count is
-// set to the number of table entries to scan.
-struct volume_channel *s39ini_channels(int *count);
+// Opens the modal volume controller dialog. No-op if no channels are defined.
+void volume_dialog_open(void);
 
-#endif
+#endif /* __VOLUME_H__ */

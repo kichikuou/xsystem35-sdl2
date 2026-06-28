@@ -44,7 +44,7 @@
 #include "win/dialog.h"
 #endif
 
-#if !defined(_WIN32) && !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
 #define HAVE_VOLUME_VALANCER 1
 #endif
 
@@ -69,7 +69,7 @@
 #include "ald_manager.h"
 #include "gameresource.h"
 #include "filecheck.h"
-#include "s39init.h"
+#include "volume.h"
 #include "msgskip.h"
 #include "texthook.h"
 
@@ -182,7 +182,7 @@ void sys35_remove(void) {
 	mus_exit(); 
 	ags_remove();
 #ifdef HAVE_VOLUME_VALANCER
-	s39ini_remove();
+	volume_save();
 #endif
 }
 
@@ -509,7 +509,7 @@ int main(int argc, char **argv) {
 		gfx_setIntegerScaling(true);
 
 #ifdef HAVE_VOLUME_VALANCER
-	s39ini_init();
+	volume_init();
 #endif
 	menu_init();
 	
