@@ -117,10 +117,4 @@ void spev_main() {
 	
 	e.type = AGSEVENT_TIMER;
 	tevent_callback(&e);
-
-	// デフォルトのコールバックのうち、ここで必要なものだけ
-	// 処理。(VAコマンドcallbackはなし)
-	if (nact->popupmenu_opened) {
-		if (nact->is_quit) sys_exit(0);
-        }
 }

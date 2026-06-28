@@ -426,11 +426,6 @@ static void cb_waitkey_backlog(agsevent_t *e) {
   X|SDL のイベントディスパッチャからくる最初の場所
 */
 void spev_callback(agsevent_t *e) {
-	// menu open中は無視
-	if (nact->popupmenu_opened) {
-		return;
-	}
-	
 	if (sact.waittype != KEYWAIT_BACKLOG) {
 		if (e->type == AGSEVENT_KEY_PRESS && e->code == KEY_CTRL) {
 			sact.waitskiplv = 2;

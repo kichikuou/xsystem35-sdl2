@@ -119,7 +119,7 @@ void nact_main() {
 		exec_command();
 		scheduler_on_command();
 
-		if (is_yield_requested() || nact->popupmenu_opened || dbg_trapped()) {
+		if (is_yield_requested() || dbg_trapped()) {
 			nact->callback();  // Async in emscripten
 			sys_getInputInfo();
 			scheduler_yield();

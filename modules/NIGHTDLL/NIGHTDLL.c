@@ -56,8 +56,7 @@ static void InitGame() { /* 1 */
 	
 	nact->msgout = ntmsg_add;
 	nact->ags.eventcb = ntev_callback;
-	nact->callback = ntev_main;
-	
+
 	nt_gr_init();
 	ntmsg_init();
 	nt_sstr_init();

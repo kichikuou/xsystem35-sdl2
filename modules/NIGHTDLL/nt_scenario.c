@@ -55,19 +55,17 @@ static void ntmain(struct _scoadr inadr) {
 		while (!nact->is_quit && !is_yield_requested()) {
 			scheduler_on_command();
 			//SACT_DEBUG("%d:%x", sl_getPage(), sl_getIndex());
-			if (!nact->popupmenu_opened) {
-				exec_command();
-				if (sl_getPage()  == inadr.page &&
-					sl_getIndex() == inadr.index) {
-					// ~E%05dからの戻り
-					if (nact->fnc_return_value == 0) {
-						return;
-					} else {
-						scono = nact->fnc_return_value;
-					}
-					curadr = scene2adr(scono);
-					sl_callFar2(curadr.page -1, curadr.index);
+			exec_command();
+			if (sl_getPage()  == inadr.page &&
+				sl_getIndex() == inadr.index) {
+				// ~E%05dからの戻り
+				if (nact->fnc_return_value == 0) {
+					return;
+				} else {
+					scono = nact->fnc_return_value;
 				}
+				curadr = scene2adr(scono);
+				sl_callFar2(curadr.page -1, curadr.index);
 			}
 			nact->callback();
 		}

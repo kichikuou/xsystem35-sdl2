@@ -53,11 +53,6 @@ static void cb_waitkey_selection(agsevent_t *e) {
 }
 
 void ntev_callback(agsevent_t *e) {
-	// menu open中は無視
-	if (nact->popupmenu_opened) {
-		return;
-	}
-	
 	if (e->type == AGSEVENT_KEY_PRESS && e->code == KEY_CTRL) {
 		night.waitskiplv = 2;
 		night.waitkey = e->code;
@@ -90,15 +85,5 @@ void ntev_callback(agsevent_t *e) {
 	default:
 		return;
 	}
-	
-}
 
-/*
-  system35のメインループからで呼ばれるコールバック
-*/
-void ntev_main() {
-        // デフォルトのコールバックのうち、ここで必要なものだけ処理。
-        if (nact->popupmenu_opened) {
-                if (nact->is_quit) sys_exit(0);
-        }
 }

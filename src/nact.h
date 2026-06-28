@@ -72,7 +72,6 @@ typedef struct {
 	void     (*callback)(void);    /* main の callback */
 	bool   is_va_animation;     /* VA command working */
 	bool   is_cursor_animation; /* animation cursor working */
-	bool   popupmenu_opened;    /* popup menu が 開いているか */
 	CharacterEncoding encoding;
 	
 	char      *game_title_utf8;

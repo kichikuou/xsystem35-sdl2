@@ -241,12 +241,10 @@ void modal_run(modal *m) {
 	assert(!event_custom_handler);
 	event_custom_handler = modal_event_trampoline;
 
-	nact->popupmenu_opened = true;
-
 	mu_Id prev_hash = 0;
 
 	bool open = true;
-	while (open) {
+	while (open && !nact->is_quit) {
 		event_get_key();  // pump SDL events -> trampoline -> m->handler -> microui
 
 		mu_begin(ctx);
@@ -263,7 +261,6 @@ void modal_run(modal *m) {
 		sys_wait_vsync();  // -> gfx_updateScreen() -> menu_render_overlay()
 	}
 
-	nact->popupmenu_opened = false;
 	event_custom_handler = NULL;
 	current_modal = NULL;
 	free(ctx);
