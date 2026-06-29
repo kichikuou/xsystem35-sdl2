@@ -166,7 +166,7 @@ static bool volume_build(mu_Context *ctx, modal *modal) {
 	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
 
 	if (mu_begin_window_ex(ctx, _("Volume"), r,
-	        MU_OPT_NORESIZE | MU_OPT_NOCLOSE | MU_OPT_NOSCROLL)) {
+	        MU_OPT_NORESIZE | MU_OPT_NOSCROLL)) {
 		for (int i = 0; i < count; i++) {
 			if (!ch[i].label)
 				continue;
@@ -193,6 +193,8 @@ static bool volume_build(mu_Context *ctx, modal *modal) {
 		if (mu_button(ctx, _("Close")))
 			keep_open = false;
 		mu_end_window(ctx);
+	} else {
+		keep_open = false;  // The title-bar close button was clicked.
 	}
 
 	if (st->base.cancelled)  // Esc

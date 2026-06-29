@@ -182,6 +182,18 @@ static void render_icon(int id, mu_Rect rect, mu_Color color) {
 		draw_thick_line(bx, by, cx, cy, thickness);
 		break;
 	}
+	case MU_ICON_CLOSE: {
+		// An X mark: two crossing diagonal strokes.
+		float x = rect.x, y = rect.y, w = rect.w, h = rect.h;
+		float lx = x + w * 0.32f, rx = x + w * 0.68f;
+		float ty = y + h * 0.32f, by = y + h * 0.68f;
+		int thickness = rect.w / 16;
+		if (thickness < 1)
+			thickness = 1;
+		draw_thick_line(lx, ty, rx, by, thickness);
+		draw_thick_line(lx, by, rx, ty, thickness);
+		break;
+	}
 	default: {
 		SDL_Rect r = { rect.x + rect.w / 2 - 2, rect.y + rect.h / 2 - 2, 4, 4 };
 		SDL_RenderFillRect(gfx_renderer, &r);
