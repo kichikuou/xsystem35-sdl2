@@ -31,4 +31,10 @@ void volume_init(void);
 // Opens the modal volume controller dialog.
 void volume_dialog_open(void);
 
+// Enables muting audio while the window is unfocused (-mute_on_unfocus).
+void volume_set_mute_on_unfocus(bool enable);
+
+// Notifies the volume controller of window focus changes.
+void volume_on_window_focus(bool focused);
+
 #endif /* __VOLUME_H__ */

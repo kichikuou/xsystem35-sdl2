@@ -41,6 +41,7 @@
 #include "input.h"
 #include "msgskip.h"
 #include "hacks.h"
+#include "volume.h"
 
 static void get_event(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed);
@@ -366,6 +367,12 @@ void event_handle_event(SDL_Event *e) {
 		switch (e->window.event) {
 		case SDL_WINDOWEVENT_EXPOSED:
 			gfx_dirty = true;
+			break;
+		case SDL_WINDOWEVENT_FOCUS_LOST:
+			volume_on_window_focus(false);
+			break;
+		case SDL_WINDOWEVENT_FOCUS_GAINED:
+			volume_on_window_focus(true);
 			break;
 		}
 		break;

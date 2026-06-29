@@ -61,6 +61,10 @@
 
 #midi_output_device: e
 
+# Mute audio while the game window is not in focus (disabled by default).
+
+#mute_on_unfocus: Yes
+
 # ------------------------------------------------------------
 # Input
 #

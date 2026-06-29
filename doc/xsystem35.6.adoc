@@ -98,6 +98,9 @@ finds System 3.x game files (*.ALD) from the current directory.
 *-noimagecursor*::
   Disable custom mouse cursor images.
 
+*-mute_on_unfocus*::
+  Mute audio while the game window is not in focus.
+
 *-version*::
   Print the version number and exit.
 

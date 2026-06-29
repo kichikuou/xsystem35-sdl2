@@ -48,13 +48,27 @@ struct volume_channel {
 
 static int vval_max;  // 最大チャンネル番号
 static struct volume_channel vval[MAXVOLCH];
+static bool mute_on_unfocus;
+static bool global_mute;
 
 static void apply_volume(void) {
 	int vol[MAXVOLCH] = {0};
 	for (int i = 0; i < MAXVOLCH; i++) {
-		vol[i] = vval[i].mute ? 0 : vval[i].vol;
+		vol[i] = (global_mute || vval[i].mute) ? 0 : vval[i].vol;
 	}
 	mus_vol_set_valance(vol, MAXVOLCH);
+}
+
+void volume_set_mute_on_unfocus(bool enable) {
+	mute_on_unfocus = enable;
+}
+
+void volume_on_window_focus(bool focused) {
+	bool mute = mute_on_unfocus && !focused;
+	if (global_mute == mute)
+		return;
+	global_mute = mute;
+	apply_volume();
 }
 
 // Volume.sav per-channel record, matching the format used by the original

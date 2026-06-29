@@ -285,6 +285,8 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			exit(0);
 		} else if (0 == strcmp(argv[i], "-integerscale")) {
 			integer_scaling = true;
+		} else if (0 == strcmp(argv[i], "-mute_on_unfocus")) {
+			volume_set_mute_on_unfocus(true);
 		} else if (0 == strcmp(argv[i], "-game")) {
 			if (argv[i + 1] != NULL) {
 				enable_hack_by_gameid(argv[i + 1]);
@@ -372,6 +374,12 @@ static void check_profile() {
 
 	/* enable integer scaling */
 	get_boolean_profile("integerscale", &integer_scaling);
+
+	/* mute audio while the window is unfocused */
+	bool mute_on_unfocus;
+	if (get_boolean_profile("mute_on_unfocus", &mute_on_unfocus)) {
+		volume_set_mute_on_unfocus(mute_on_unfocus);
+	}
 
 	/* enable game-specific hacks */
 	param = get_profile("game");
