@@ -39,9 +39,19 @@
 static DRIFILETYPE dri_type;
 static int base_no;
 static int current_no;
+static int current_vol = 100;  // game-requested volume (0-100)
 static Mix_Music *mix_music;
 static dridata* dfile;
 static Uint32 start_time;
+
+static void apply_music_volume(int vol) {
+	current_vol = vol;
+	Mix_VolumeMusic(current_vol * prv.volval[BGM_VOLVAL_CH] * MIX_MAX_VOLUME / (100 * 100));
+}
+
+void musbgm_reapply_valance(void) {
+	apply_music_volume(current_vol);
+}
 
 static void free_music() {
 	current_no = 0;
@@ -104,7 +114,7 @@ bool musbgm_play(int no, int time, int vol, int loop_count) {
 	// We don't use the loop information in the BGI file, but SDL_mixer
 	// understands loop info in the WAVE's "smpl" chunk.
 
-	Mix_VolumeMusic(vol * MIX_MAX_VOLUME / 100);
+	apply_music_volume(vol);
 	if (Mix_FadeInMusic(mix_music, loop_count == 0 ? -1 : loop_count, time * 10) != 0) {
 		free_music();
 		return false;
@@ -124,7 +134,7 @@ void musbgm_fade(int no, int time, int vol) {
 		return;
 
 	// SDL_mixer doesn't provide arbitrary fading, so just set the volume immediately.
-	Mix_VolumeMusic(vol * MIX_MAX_VOLUME / 100);
+	apply_music_volume(vol);
 }
 
 int musbgm_getpos(int no) {

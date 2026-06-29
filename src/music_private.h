@@ -31,6 +31,9 @@
 #include "music_pcm.h"
 #include "ald_manager.h"
 
+// The volume valancer channel that BGM is mapped to.
+#define BGM_VOLVAL_CH 0
+
 struct _musprvdat {
 	bool midi_valid;
 	bool pcm_valid;

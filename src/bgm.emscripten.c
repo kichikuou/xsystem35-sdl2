@@ -87,3 +87,7 @@ void musbgm_wait(int no, int timeout) {
 		sys_wait_vsync();
 	}
 }
+
+void musbgm_reapply_valance(void) {
+	// not implemented
+}

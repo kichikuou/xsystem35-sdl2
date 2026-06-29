@@ -28,6 +28,8 @@
 struct _musprvdat musprv;
 
 bool mus_init(int audio_buffer_size) {
+	for (int i = 0; i < 16; i++)
+		prv.volval[i] = 100;
 	musbgm_init(DRIFILE_BGM, 0);
 	muscd_init();
 	musmidi_init();
@@ -385,6 +387,11 @@ bool mus_wav_load_lrsw(int ch, int num) {
 }
 
 bool mus_vol_set_valance(int *vols, int num) {
-	WARNING("not implemented");
-	return false;
+	if (num > 16)
+		num = 16;
+	for (int i = 0; i < num; i++)
+		prv.volval[i] = vols[i];
+	muspcm_reapply_valance();
+	musbgm_reapply_valance();
+	return true;
 }

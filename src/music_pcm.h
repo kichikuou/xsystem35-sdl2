@@ -42,5 +42,6 @@ void muspcm_setvol(int slot, int lv);
 int muspcm_getwavelen(int slot);
 bool muspcm_isplaying(int slot);
 void muspcm_waitend(int slot);
+void muspcm_reapply_valance(void);
 
 #endif /* __MUSIC_PCM_H__ */

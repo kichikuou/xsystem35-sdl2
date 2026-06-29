@@ -57,6 +57,16 @@ static mmap_t *wai_map;
 // Volume mixer channel
 #define WAIMIXCH(no) LittleEndian_getDW(wai_map->addr, 36 + (no -1) * 4 * 3 + 8)
 
+// Apply the slot's volume valancer level via its chunk volume.
+static void apply_valance(int slot) {
+	if (!slots[slot].chunk)
+		return;
+	int ch = prv.vol_pcm_sub[slot];
+	if ((unsigned)ch >= 16)  // guard against bad WAI data
+		ch = 0;
+	Mix_VolumeChunk(slots[slot].chunk, prv.volval[ch] * MIX_MAX_VOLUME / 100);
+}
+
 /**
  * 指定の番号の .WAV|.OGG をロードする。
  * @param no: DRIファイル番号
@@ -87,6 +97,7 @@ static bool load_chunk(int slot, Mix_Chunk *chunk) {
 		muspcm_unload(slot);
 
 	slots[slot].chunk = chunk;
+	apply_valance(slot);  // callers set vol_pcm_sub[slot] before this
 	return true;
 }
 
@@ -198,6 +209,7 @@ bool muspcm_load_mixlr(int slot, int noL, int noR) {
 	if (chunk == NULL) {
 		return false;
 	}
+	prv.vol_pcm_sub[slot] = 0;
 
 	return load_chunk(slot, chunk);
 }
@@ -209,6 +221,7 @@ bool muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
 	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(buf, len), 1);
 	if (!chunk)
 		return false;
+	prv.vol_pcm_sub[slot] = 0;
 
 	return load_chunk(slot, chunk);
 }
@@ -313,6 +326,12 @@ bool muspcm_isplaying(int slot) {
 // 指定のチャンネルの再生が終了するまで待つ
 void muspcm_waitend(int slot) {
 	WARNING("not implemented");
+}
+
+// Re-apply the valancer levels to all loaded chunks.
+void muspcm_reapply_valance(void) {
+	for (int slot = 0; slot < PCM_SLOTS; slot++)
+		apply_valance(slot);
 }
 
 static bool load_wai() {

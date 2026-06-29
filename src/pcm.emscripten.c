@@ -96,3 +96,7 @@ EM_JS(bool, muspcm_isplaying, (int slot), {
 EM_ASYNC_JS(void, muspcm_waitend, (int slot), {
 	await xsystem35.audio.pcm_waitend(slot);
 });
+
+void muspcm_reapply_valance(void) {
+	// not implemented
+}

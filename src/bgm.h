@@ -33,5 +33,6 @@ int musbgm_getlen(int no);
 bool musbgm_isplaying(int no);
 void musbgm_stopall(int time);
 void musbgm_wait(int no, int timeout);
+void musbgm_reapply_valance(void);
 
 #endif /* __BGM_H__ */
