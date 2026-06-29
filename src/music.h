@@ -36,6 +36,10 @@ enum MixDevice {
 	MIX_PCM
 };
 
+// Volume valancer channels.
+#define BGM_VOLVAL_CH 0  // BGM is always mapped to this channel.
+#define SE_VOLVAL_CH 1  // Sound-effect channel used when the game defines no VolumeValancer.
+
 /* init and exit */
 bool mus_init(int audio_buffer_size);
 void mus_exit(void);

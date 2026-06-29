@@ -86,8 +86,6 @@ void win_menu_init(void) {
 	// Let SDL recalc the window size, taking menu height into account.
 	SDL_SetWindowSize(gfx_window, view_w, view_h);
 	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
-	if (!volume_available())
-		EnableMenuItem(hmenu, ID_OPTION_SOUND, MF_BYCOMMAND | MF_GRAYED);
 }
 
 void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {

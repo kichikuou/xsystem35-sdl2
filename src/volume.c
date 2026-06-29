@@ -45,15 +45,8 @@ struct volume_channel {
 
 static int vval_max;  // 最大チャンネル番号
 static struct volume_channel vval[MAXVOLCH];
-static bool vval_available;
-
-bool volume_available(void) {
-	return vval_available;
-}
 
 static void apply_volume(void) {
-	if (!vval_available) return;
-
 	int vol[MAXVOLCH] = {0};
 	for (int i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].mute ? 0 : vval[i].vol;
@@ -62,28 +55,34 @@ static void apply_volume(void) {
 }
 
 // 初期化
-bool volume_init(void) {
-	FILE *fp;
-	char s[256], s1[256];
+void volume_init(void) {
 	int i, vol[MAXVOLCH] = {0};
 	char fn[256];
+	int nvalancer = 0;
 
-	if (nact->files.init == NULL) return false;
-
-	if (NULL == (fp = fopen(nact->files.init, "r"))) return false;
-
-	while (fgets(s, 255, fp) != NULL) {
-		s1[0] = '\0';
-		sscanf(s, "VolumeValancer[%d] = \"%s", &i, s1);
-		if (s1[0] == '\0') continue;
-		if (i >= MAXVOLCH || i < 0) continue;
-		s1[strlen(s1)-1] = '\0'; // remove last '"'
-		vval[i].label = sjis2utf(s1);
-		vval_max = max(vval_max, i);
-		//WARNING("VolumeValancer[%d] = %s", i, vval[i].label);
+	FILE *fp = nact->files.init ? fopen(nact->files.init, "r") : NULL;
+	if (fp) {
+		char s[256], s1[256];
+		while (fgets(s, 255, fp) != NULL) {
+			s1[0] = '\0';
+			sscanf(s, "VolumeValancer[%d] = \"%s", &i, s1);
+			if (s1[0] == '\0') continue;
+			if (i >= MAXVOLCH || i < 0) continue;
+			s1[strlen(s1)-1] = '\0'; // remove last '"'
+			vval[i].label = sjis2utf(s1);
+			vval_max = max(vval_max, i);
+			nvalancer++;
+		}
+		fclose(fp);
 	}
 
-	if (vval_max <= 0) return false;
+	if (nvalancer == 0) {
+		// No VolumeValancer[] is defined (or there is no System39.ini). Fall back
+		// to two generic channels that control BGM and sound effects separately.
+		vval[BGM_VOLVAL_CH].label = strdup(_("BGM"));
+		vval[SE_VOLVAL_CH].label = strdup(_("Sound effects"));
+		vval_max = SE_VOLVAL_CH;
+	}
 
 	// Volume.sav があればそれを読み込む
 	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
@@ -101,18 +100,12 @@ bool volume_init(void) {
 	}
 	// どちらにしても music server に送る
 	mus_vol_set_valance(vol, MAXVOLCH);
-
-	vval_available = vval_max > 0;
-
-	return true;
 }
 
 // Volume Valance をセーブ
 void volume_save(void) {
 	int vol[MAXVOLCH] = {0};
 	char fn[256];
-
-	if (!vval_available) return;
 
 	for (int i = 0; i < MAXVOLCH; i++) {
 		vol[i] = vval[i].vol;
@@ -203,8 +196,6 @@ static bool volume_build(mu_Context *ctx, modal *modal) {
 }
 
 void volume_dialog_open(void) {
-	if (!vval_available)
-		return;
 	struct volume_state st = {
 		.base = { .build = volume_build, .handler = modal_default_handler },
 	};

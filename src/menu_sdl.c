@@ -74,9 +74,7 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 	struct popup_state *st = (struct popup_state *)modal;
 	bool keep_open = true;
 
-	bool has_volume = volume_available();
-
-	int rows = 3 + (has_volume ? 1 : 0);
+	int rows = 4;
 	int row_h = ctx->style->size.y + ctx->style->padding * 2;
 	int w = 200;
 	// `rows` rows with (rows - 1) inter-row gaps, plus the window's body padding.
@@ -100,7 +98,7 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 		if (mu_checkbox(ctx, _("Mouse Auto Move"), &warp))
 			nact->ags.mouse_warp_enabled = warp;
 
-		if (has_volume && mu_button(ctx, _("Volume"))) {
+		if (mu_button(ctx, _("Volume"))) {
 			keep_open = false;
 			st->action = MENU_ACTION_VOLUME;
 		}

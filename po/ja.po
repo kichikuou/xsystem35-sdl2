@@ -41,6 +41,14 @@ msgstr "ミュート"
 msgid "Close"
 msgstr "閉じる"
 
+#: src/volume.c:90
+msgid "BGM"
+msgstr "BGM"
+
+#: src/volume.c:91
+msgid "Sound effects"
+msgstr "効果音"
+
 #: src/menu_sdl.c:378 src/menu_sdl.c:383 src/menu_sdl.c:529
 msgid "OK"
 msgstr "ＯＫ"

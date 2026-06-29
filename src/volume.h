@@ -25,17 +25,13 @@
 
 #include <stdbool.h>
 
-// Reads System39.ini / Volume.sav and applies the volumes. Returns true if the
-// game defines any volume channels.
-bool volume_init(void);
+// Reads System39.ini / Volume.sav and applies the volumes.
+void volume_init(void);
 
 // Saves the current volumes to Volume.sav (called at exit).
 void volume_save(void);
 
-// True if the loaded game defines any volume channels.
-bool volume_available(void);
-
-// Opens the modal volume controller dialog. No-op if no channels are defined.
+// Opens the modal volume controller dialog.
 void volume_dialog_open(void);
 
 #endif /* __VOLUME_H__ */

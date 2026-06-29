@@ -181,7 +181,7 @@ bool muspcm_load_no(int slot, int no) {
 		int ch = WAIMIXCH(no);
 		prv.vol_pcm_sub[slot] = ch < 0 ? 0: ch;
 	} else {
-		prv.vol_pcm_sub[slot] = 0;
+		prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;
 	}
 
 	return load_chunk(slot, chunk);
@@ -209,7 +209,7 @@ bool muspcm_load_mixlr(int slot, int noL, int noR) {
 	if (chunk == NULL) {
 		return false;
 	}
-	prv.vol_pcm_sub[slot] = 0;
+	prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;
 
 	return load_chunk(slot, chunk);
 }
@@ -221,7 +221,7 @@ bool muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
 	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(buf, len), 1);
 	if (!chunk)
 		return false;
-	prv.vol_pcm_sub[slot] = 0;
+	prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;
 
 	return load_chunk(slot, chunk);
 }

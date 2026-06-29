@@ -23,6 +23,7 @@
 #define __MUSIC_PRIVATE_H__
 
 #include "portab.h"
+#include "music.h"
 #include "bgm.h"
 #include "cdrom.h"
 #include "midi.h"
@@ -30,9 +31,6 @@
 #include "music_midi.h"
 #include "music_pcm.h"
 #include "ald_manager.h"
-
-// The volume valancer channel that BGM is mapped to.
-#define BGM_VOLVAL_CH 0
 
 struct _musprvdat {
 	bool midi_valid;
