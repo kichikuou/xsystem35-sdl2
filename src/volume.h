@@ -28,9 +28,6 @@
 // Reads System39.ini / Volume.sav and applies the volumes.
 void volume_init(void);
 
-// Saves the current volumes to Volume.sav (called at exit).
-void volume_save(void);
-
 // Opens the modal volume controller dialog.
 void volume_dialog_open(void);
 

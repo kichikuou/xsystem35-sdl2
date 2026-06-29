@@ -179,11 +179,8 @@ static void sys35_init() {
 
 void sys35_remove(void) {
 	dbg_quit();
-	mus_exit(); 
+	mus_exit();
 	ags_remove();
-#ifdef HAVE_VOLUME_VALANCER
-	volume_save();
-#endif
 }
 
 static void sys_reset(void) {

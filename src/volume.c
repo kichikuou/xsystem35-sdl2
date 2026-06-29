@@ -54,9 +54,16 @@ static void apply_volume(void) {
 	mus_vol_set_valance(vol, MAXVOLCH);
 }
 
-// 初期化
+// Volume.sav per-channel record, matching the format used by the original
+// System39.exe.
+struct volume_sav_channel {
+	uint8_t volume;    // 0-100
+	uint8_t mute;
+	uint8_t reserved;  // zero
+};
+
 void volume_init(void) {
-	int i, vol[MAXVOLCH] = {0};
+	int i;
 	char fn[256];
 	int nvalancer = 0;
 
@@ -84,32 +91,35 @@ void volume_init(void) {
 		vval_max = SE_VOLVAL_CH;
 	}
 
-	// Volume.sav があればそれを読み込む
-	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
-	if (NULL == (fp = fopen(fn, "rb"))) {
-		// とりあえず、初期ボリュームは 100
-		for (i = 0; i < MAXVOLCH; i++) {
-			vol[i] = vval[i].vol = 100;
-		}
-	} else {
-		int n = fread(vol, sizeof(int), MAXVOLCH, fp);
-		fclose(fp);
-		for (i = 0; i < n; i++) {
-			vval[i].vol = vol[i];
-		}
+	for (i = 0; i < MAXVOLCH; i++) {
+		vval[i].vol = 100;
+		vval[i].mute = false;
 	}
-	// どちらにしても music server に送る
-	mus_vol_set_valance(vol, MAXVOLCH);
+
+	// Load Volume.sav if it exists.
+	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
+	if (NULL != (fp = fopen(fn, "rb"))) {
+		uint8_t header[2];
+		if (fread(header, 1, 2, fp) == 2) {
+			int nr_channels = header[1];
+			for (i = 0; i < nr_channels; i++) {
+				struct volume_sav_channel ch;
+				if (fread(&ch, sizeof(ch), 1, fp) != 1)
+					break;
+				if (i >= MAXVOLCH)
+					continue;
+				vval[i].vol = ch.volume;
+				vval[i].mute = ch.mute;
+			}
+		}
+		fclose(fp);
+	}
+
+	apply_volume();
 }
 
-// Volume Valance をセーブ
-void volume_save(void) {
-	int vol[MAXVOLCH] = {0};
+static void volume_save(void) {
 	char fn[256];
-
-	for (int i = 0; i < MAXVOLCH; i++) {
-		vol[i] = vval[i].vol;
-	}
 
 	snprintf(fn, sizeof(fn) -1, "%s/Volume.sav", nact->files.save_path);
 	FILE *fp = fopen(fn, "wb");
@@ -118,7 +128,17 @@ void volume_save(void) {
 		return;
 	}
 
-	fwrite(vol, sizeof(int), MAXVOLCH, fp);
+	int nr_channels = vval_max + 1;
+	uint8_t header[2] = { 0, nr_channels };
+	fwrite(header, 1, 2, fp);
+	for (int i = 0; i < nr_channels; i++) {
+		struct volume_sav_channel ch = {
+			.volume = vval[i].vol,
+			.mute = vval[i].mute,
+			.reserved = 0,
+		};
+		fwrite(&ch, sizeof(ch), 1, fp);
+	}
 	fclose(fp);
 }
 
@@ -200,4 +220,5 @@ void volume_dialog_open(void) {
 		.base = { .build = volume_build, .handler = modal_default_handler },
 	};
 	modal_run(&st.base);
+	volume_save();
 }
