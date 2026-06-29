@@ -25,6 +25,7 @@
 #include "portab.h"
 #include "system.h"
 #include "midi.h"
+#include "music_private.h"
 
 // MIX_INIT_FLUIDSYNTH was renamed to MIX_INIT_MID in SDL_mixer 2.0.2
 #if (SDL_MIXER_MAJOR_VERSION == 2) && (SDL_MIXER_MINOR_VERSION == 0) && (SDL_MIXER_PATCHLEVEL < 2)
@@ -36,6 +37,11 @@ static void midi_stop(void);
 static Mix_Music *mix_music;
 static int start_time;
 static uint32_t fade_tick;
+static int current_vol = 100;  // game-requested volume (0-100)
+
+static void apply_volume(void) {
+	Mix_VolumeMusic(current_vol * prv.volval[BGM_VOLVAL_CH] * MIX_MAX_VOLUME / (100 * 100));
+}
 
 static bool midi_initialize(int subdev) {
 	if (Mix_Init(MIX_INIT_MID) != MIX_INIT_MID)
@@ -68,6 +74,8 @@ static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 		return false;
 	}
 
+	// The music volume is shared with BGM/CD playback, so set it explicitly.
+	apply_volume();
 	start_time = SDL_GetTicks();
 	return true;
 }
@@ -111,7 +119,8 @@ static bool midi_setflag(int mode, int index, int val) {
 
 static bool midi_fadestart(int time, int volume, int stop) {
 	if (time == 0) {
-		Mix_VolumeMusic(volume * MIX_MAX_VOLUME / 100);
+		current_vol = volume;
+		apply_volume();
 		if (stop)
 			midi_stop();
 		return true;
@@ -130,6 +139,11 @@ static bool midi_fading(void) {
 	return SDL_GetTicks() < fade_tick;
 }
 
+static void midi_reapply_volume(void) {
+	if (mix_music)
+		apply_volume();
+}
+
 mididevice_t midi_sdlmixer = {
 	.init = midi_initialize,
 	.exit = midi_exit,
@@ -143,4 +157,5 @@ mididevice_t midi_sdlmixer = {
 	.setflag = midi_setflag,
 	.fadestart = midi_fadestart,
 	.fading = midi_fading,
+	.reapply_volume = midi_reapply_volume,
 };

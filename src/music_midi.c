@@ -135,3 +135,10 @@ bool musmidi_fading(void) {
 		return false;
 	return prv.mididev.fading();
 }
+
+void musmidi_reapply_valance(void) {
+	if (!prv.midi_valid) return;
+
+	if (prv.mididev.reapply_volume)
+		prv.mididev.reapply_volume();
+}

@@ -115,3 +115,8 @@ int muscd_get_maxtrack(void) {
 bool muscd_is_available(void) {
 	return prv.cddev && prv.cddev->is_available();
 }
+
+void muscd_reapply_valance(void) {
+	if (prv.cddev && prv.cddev->reapply_volume)
+		prv.cddev->reapply_volume();
+}

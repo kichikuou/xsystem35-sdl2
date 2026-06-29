@@ -37,5 +37,6 @@ void muscd_stop(void);
 bool muscd_getpos(int *t, int *m, int *s, int *f);
 int muscd_get_maxtrack(void);
 bool muscd_is_available(void);
+void muscd_reapply_valance(void);
 
 #endif /* __MUSIC_CDROM_H__ */

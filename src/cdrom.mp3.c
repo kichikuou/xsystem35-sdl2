@@ -38,6 +38,10 @@ static void cdrom_stop(void);
 
 #define PLAYLIST_MAX 256
 
+static void apply_volume(void) {
+	Mix_VolumeMusic(prv.volval[BGM_VOLVAL_CH] * MIX_MAX_VOLUME / 100);
+}
+
 static bool      enabled = false;
 static char         *playlist[PLAYLIST_MAX];
 static Mix_Music    *mix_music;
@@ -130,6 +134,8 @@ static bool cdrom_start(int trk, int loop) {
 		return false;
 	}
 
+	// The music volume is shared with BGM/MIDI playback, so set it explicitly.
+	apply_volume();
 	trackno = trk;
 	start_time = SDL_GetTicks();
 	
@@ -168,6 +174,11 @@ static bool cdrom_is_available(void) {
 	return enabled;
 }
 
+static void cdrom_reapply_volume(void) {
+	if (mix_music)
+		apply_volume();
+}
+
 cdromdevice_t cdrom_mp3 = {
 	.init = cdrom_init,
 	.exit = cdrom_exit,
@@ -176,4 +187,5 @@ cdromdevice_t cdrom_mp3 = {
 	.stop = cdrom_stop,
 	.getpos = cdrom_getPlayingInfo,
 	.is_available = cdrom_is_available,
+	.reapply_volume = cdrom_reapply_volume,
 };

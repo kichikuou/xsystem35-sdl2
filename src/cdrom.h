@@ -39,6 +39,8 @@ typedef struct {
 	void (*stop)(void);
 	bool (*getpos)(cd_time *);
 	bool (*is_available)(void);
+	// Reapply the volume valancer to the currently playing track. May be NULL.
+	void (*reapply_volume)(void);
 } cdromdevice_t;
 
 extern cdromdevice_t cdrom_bgm;

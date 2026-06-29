@@ -16,5 +16,6 @@ bool musmidi_setflag(int mode, int index, int val);
 int musmidi_getflag(int mode, int index);
 bool musmidi_fadestart(int time, int volume, int stop);
 bool musmidi_fading(void);
+void musmidi_reapply_valance(void);
 
 #endif /* __MUSIC_MIDI_H__ */

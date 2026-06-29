@@ -393,5 +393,7 @@ bool mus_vol_set_valance(int *vols, int num) {
 		prv.volval[i] = vols[i];
 	muspcm_reapply_valance();
 	musbgm_reapply_valance();
+	musmidi_reapply_valance();
+	muscd_reapply_valance();
 	return true;
 }

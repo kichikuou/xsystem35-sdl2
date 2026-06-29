@@ -47,6 +47,8 @@ typedef struct {
 	bool (*setflag)(int mode, int index, int val);
 	bool (*fadestart)(int time, int volume, int stop);
 	bool (*fading)(void);
+	// Reapply the volume valancer to the currently playing music. May be NULL.
+	void (*reapply_volume)(void);
 } mididevice_t;
 
 bool midi_init(mididevice_t *);
