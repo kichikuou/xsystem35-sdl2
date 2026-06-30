@@ -36,6 +36,7 @@
 #define MODAL_FONT_SIZE 16
 
 static mu_Context *ctx;
+static modal *current_modal;
 
 static const FontSpec menu_font = { FONT_GOTHIC, FONT_WEIGHT_NORMAL, MODAL_FONT_SIZE };
 
@@ -206,8 +207,10 @@ static void modal_render(void) {
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_BLEND);
 
 	// Dim the game behind the menu.
-	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 110);
-	SDL_RenderFillRect(gfx_renderer, NULL);
+	if (!current_modal->no_dim) {
+		SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 110);
+		SDL_RenderFillRect(gfx_renderer, NULL);
+	}
 
 	mu_Command *cmd = NULL;
 	while (mu_next_command(ctx, &cmd)) {
@@ -236,8 +239,6 @@ static void modal_render(void) {
 	}
 	SDL_RenderSetClipRect(gfx_renderer, NULL);
 }
-
-static modal *current_modal;
 
 static bool modal_event_trampoline(const SDL_Event *e) {
 	return current_modal->handler(e, current_modal);

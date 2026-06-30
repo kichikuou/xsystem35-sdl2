@@ -26,8 +26,9 @@
 #include <string.h>
 
 #include "portab.h"
+#include "nact.h"
 #include "menu.h"
-#include "editor.h"
+#include "font.h"
 #include "gfx_private.h"
 #include "modal.h"
 #include "utfsjis.h"
@@ -45,6 +46,7 @@ struct string_state {
 	char composing[SDL_TEXTEDITINGEVENT_TEXT_SIZE];  // IME preedit text
 	bool done;
 	bool accepted;
+	FontSpec font;  // inline edit (menu_inputstring2) only
 };
 
 // Heap buffer holding the string dialog's edited text. It must outlive the
@@ -213,8 +215,73 @@ bool menu_inputstring(INPUTSTRING_PARAM *p) {
 #endif
 }
 
+// The inline text input (MJ command). It reuses the IME buffer handling
+// and the event handler of menu_inputstring.
+
+// Look up an AGS color index in the active palette and return it as a mu_Color.
+static mu_Color palette_color(int index) {
+	SDL_Color c = gfx_palette->colors[index];
+	return (mu_Color){ c.r, c.g, c.b, 255 };
+}
+
+static bool inline_edit_build(mu_Context *ctx, modal *modal) {
+	const int EDIT_XMARGIN = 3;
+	const int EDIT_YMARGIN = 2;
+
+	struct string_state *st = (struct string_state *)modal;
+	int fh = st->param->h;
+	mu_Rect rect = mu_rect(st->param->x, st->param->y,
+	                       fh * st->param->max + EDIT_XMARGIN * 2, fh + EDIT_YMARGIN * 2);
+
+	// A frameless, title-less window just to set up microui's clip/draw context;
+	// all drawing below is done manually with the game's colors.
+	if (mu_begin_window_ex(ctx, "editstr", rect,
+	        MU_OPT_NOFRAME | MU_OPT_NOTITLE | MU_OPT_NORESIZE | MU_OPT_NOSCROLL)) {
+		mu_Color bg = palette_color(nact->msg.WinBackgroundColor);
+		mu_Color fg = palette_color(nact->msg.MsgFontColor);
+		mu_Font font = (mu_Font)&st->font;
+
+		mu_draw_rect(ctx, rect, bg);
+
+		int x = rect.x + EDIT_XMARGIN;
+		int y = rect.y + EDIT_YMARGIN;
+		if (*str_buf) {
+			mu_draw_text(ctx, font, str_buf, -1, mu_vec2(x, y), fg);
+			x += ctx->text_width(font, str_buf, -1);
+		}
+		if (*st->composing) {
+			mu_draw_text(ctx, font, st->composing, -1, mu_vec2(x, y), fg);
+			int cw = ctx->text_width(font, st->composing, -1);
+			mu_draw_rect(ctx, mu_rect(x, y + fh, cw, 2), fg);  // preedit underline
+			x += cw;
+		}
+		mu_draw_rect(ctx, mu_rect(x, y, 2, fh), fg);  // caret
+		set_text_input_rect(rect);
+		mu_end_window(ctx);
+	}
+
+	if (st->base.cancelled)  // Esc; accepted stays false
+		st->done = true;
+	return !st->done;
+}
+
 bool menu_inputstring2(INPUTSTRING_PARAM *p) {
-	return edit_string(p);
+	struct string_state st = {
+		.base = { .build = inline_edit_build, .handler = menu_string_handler,
+		          .no_dim = true },
+		.param = p,
+		.font = { FONT_GOTHIC, FONT_WEIGHT_NORMAL, p->h },
+	};
+	free(str_buf);
+	str_buf = malloc(p->max * MAX_UTF8_BYTES_PAR_CHAR + 1);
+	strcpy(str_buf, p->oldstring ? p->oldstring : "");
+
+	SDL_StartTextInput();
+	modal_run(&st.base);
+	SDL_StopTextInput();
+
+	p->newstring = st.accepted ? str_buf : NULL;
+	return true;
 }
 
 // The number-input dialog.

@@ -34,6 +34,7 @@ typedef struct modal {
 	bool (*handler)(const union SDL_Event *e, struct modal *modal);
 
 	bool cancelled;          // set by the handler on Esc; build returns false
+	bool no_dim;             // don't dim the game behind the modal (for inline overlays)
 } modal;
 
 // Default modal event handler. Use it as a modal's `handler` for simple dialogs, or
