@@ -15,7 +15,7 @@ jobs:
     - name: Install Deps
       run: |
         sudo apt update
-        sudo apt install libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor
+        sudo apt install libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor gettext
 
     - name: Build
       run: |
@@ -27,3 +27,16 @@ jobs:
     - name: Test
       run: ctest --output-on-failure
       working-directory: out/${{ matrix.build-type }}
+
+    - name: Verify xsystem35.pot is up to date
+      if: matrix.build-type == 'Debug'
+      run: |
+        xgettext --default-domain=xsystem35 --directory=. \
+          --keyword=_ --keyword=N_ \
+          --files-from=po/POTFILES.in \
+          --output=/tmp/fresh.pot
+        if ! diff <(grep '^msgid' po/xsystem35.pot | sort) \
+                  <(grep '^msgid' /tmp/fresh.pot | sort); then
+          echo "::error::po/xsystem35.pot is out of date. Build the 'pot' target and commit the changes under po/."
+          exit 1
+        fi

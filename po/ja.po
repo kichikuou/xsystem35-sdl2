@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xsystem35 1.7.3pre3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-14 17:09+0900\n"
+"POT-Creation-Date: 2026-06-29 17:18+0900\n"
 "PO-Revision-Date: 2026-06-14 17:09+0900\n"
 "Last-Translator: CHIKAMA Masaki <chika@8ne.sakura.ne.jp>\n"
 "Language-Team: Japanese <chika@8ne.sakura.ne.jp>\n"
@@ -17,47 +17,55 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu_sdl.c:151
+#: src/menu_sdl.c:91 src/menu_sdl.c:94
 msgid "Message Skip"
 msgstr "メッセージスキップ"
 
-#: src/menu_sdl.c:156
+#: src/menu_sdl.c:98
 msgid "Mouse Auto Move"
 msgstr "マウスカーソル移動"
 
-#: src/menu_sdl.c:159
+#: src/menu_sdl.c:101 src/volume.c:181
 msgid "Volume"
 msgstr "ボリューム"
 
-#: src/menu_sdl.c:164
-msgid "Exit"
+#: src/menu_sdl.c:106
+msgid "Quit"
 msgstr "終了"
 
-#: src/menu_sdl.c:252
-msgid "mute"
-msgstr "ミュート"
+#: src/menu_sdl.c:306
+msgid "Enter a string"
+msgstr "文字を入力してください"
 
-#: src/menu_sdl.c:260
-msgid "Close"
-msgstr "閉じる"
-
-#: src/volume.c:90
-msgid "BGM"
-msgstr "BGM"
-
-#: src/volume.c:91
-msgid "Sound effects"
-msgstr "効果音"
-
-#: src/menu_sdl.c:378 src/menu_sdl.c:383 src/menu_sdl.c:529
-msgid "OK"
-msgstr "ＯＫ"
-
-#: src/menu_sdl.c:385 src/menu_sdl.c:533
-msgid "Cancel"
-msgstr "キャンセル"
-
-#: src/menu_sdl.c:521
+#: src/menu_sdl.c:318
 #, c-format
 msgid "Up to %d characters"
 msgstr "最大 %d 文字"
+
+#: src/menu_sdl.c:326 src/menu_sdl.c:451 src/menu_sdl.c:456
+msgid "OK"
+msgstr "ＯＫ"
+
+#: src/menu_sdl.c:330 src/menu_sdl.c:458
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/menu_sdl.c:407
+msgid "Enter a number"
+msgstr "数値を入力してください"
+
+#: src/volume.c:89
+msgid "BGM"
+msgstr "BGM"
+
+#: src/volume.c:90
+msgid "Sound effects"
+msgstr "効果音"
+
+#: src/volume.c:172
+msgid "mute"
+msgstr "ミュート"
+
+#: src/volume.c:206
+msgid "Close"
+msgstr "閉じる"

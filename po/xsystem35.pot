@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Masaki Chikama
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-14 17:09+0900\n"
+"POT-Creation-Date: 2026-06-29 17:18+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,39 +17,55 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu_sdl.c:151
+#: src/menu_sdl.c:91 src/menu_sdl.c:94
 msgid "Message Skip"
 msgstr ""
 
-#: src/menu_sdl.c:156
+#: src/menu_sdl.c:98
 msgid "Mouse Auto Move"
 msgstr ""
 
-#: src/menu_sdl.c:159
+#: src/menu_sdl.c:101 src/volume.c:181
 msgid "Volume"
 msgstr ""
 
-#: src/menu_sdl.c:164
-msgid "Exit"
+#: src/menu_sdl.c:106
+msgid "Quit"
 msgstr ""
 
-#: src/menu_sdl.c:252
-msgid "mute"
+#: src/menu_sdl.c:306
+msgid "Enter a string"
 msgstr ""
 
-#: src/menu_sdl.c:260
-msgid "Close"
+#: src/menu_sdl.c:318
+#, c-format
+msgid "Up to %d characters"
 msgstr ""
 
-#: src/menu_sdl.c:378 src/menu_sdl.c:383 src/menu_sdl.c:529
+#: src/menu_sdl.c:326 src/menu_sdl.c:451 src/menu_sdl.c:456
 msgid "OK"
 msgstr ""
 
-#: src/menu_sdl.c:385 src/menu_sdl.c:533
+#: src/menu_sdl.c:330 src/menu_sdl.c:458
 msgid "Cancel"
 msgstr ""
 
-#: src/menu_sdl.c:521
-#, c-format
-msgid "Up to %d characters"
+#: src/menu_sdl.c:407
+msgid "Enter a number"
+msgstr ""
+
+#: src/volume.c:89
+msgid "BGM"
+msgstr ""
+
+#: src/volume.c:90
+msgid "Sound effects"
+msgstr ""
+
+#: src/volume.c:172
+msgid "mute"
+msgstr ""
+
+#: src/volume.c:206
+msgid "Close"
 msgstr ""
