@@ -488,13 +488,15 @@ int main(int argc, char **argv) {
 
 	mus_init(audio_buffer_size);
 
-#ifdef ENABLE_NLS
+#ifdef HAVE_LIBINTL
 	setlocale(LC_ALL, "");
 	// Keep numeric formatting locale-independent (use '.' as the decimal
 	// point) so only message translation follows the user's locale.
 	setlocale(LC_NUMERIC, "C");
 	bindtextdomain (PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
+#else
+	builtin_nls_init();
 #endif
 
 	sys35_init();

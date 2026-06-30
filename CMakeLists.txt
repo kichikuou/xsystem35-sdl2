@@ -148,14 +148,19 @@ else()  # non-emscripten, non-android
   endif()
 endif()
 
-# Menu
+# i18n support
+#
+# Translate via libintl if available; otherwise fall back to a built-in catalog
+# compiled from the .po files.
+#
+# To add a language, create po/<lang>.po and list <lang> here.
+set(NLS_LANGUAGES ja)
 
 if (NOT EMSCRIPTEN AND NOT ANDROID AND NOT WIN32)
-  # i18n support (currently only menus are translated)
   include(FindIntl)
   include(FindGettext)
   if (Intl_FOUND AND GETTEXT_FOUND)
-    set(ENABLE_NLS 1)
+    set(HAVE_LIBINTL 1)
     add_compile_definitions(LOCALEDIR="${CMAKE_INSTALL_PREFIX}/share/locale")
     include_directories(${Intl_INCLUDE_DIRS})
     link_libraries(${Intl_LIBRARIES})
@@ -222,9 +227,7 @@ add_subdirectory(fonts)
 if (NOT ANDROID AND NOT EMSCRIPTEN)
   add_subdirectory(doc)
 endif()
-if (ENABLE_NLS)
-  add_subdirectory(po)
-endif()
+add_subdirectory(po)
 
 add_subdirectory(modules)
 target_link_libraries(xsystem35 PRIVATE modules)

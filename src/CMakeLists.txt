@@ -140,6 +140,10 @@ if (WIN32)
     win/dialog.c win/resources.rc win/resources.c win/menubar.c win/console.c)
 endif()
 
+if (NOT HAVE_LIBINTL)
+  target_sources(xsystem35 PRIVATE nls.c)
+endif()
+
 target_link_libraries(src_lib PRIVATE sdl2 zlib)
 target_link_libraries(xsystem35 PRIVATE m zlib sdl2 sdl2_ttf)
 if (TARGET sdl2_mixer)
