@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-30 12:31+0900\n"
+"POT-Creation-Date: 2026-06-30 16:41+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,56 +17,57 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu_sdl.c:92 src/menu_sdl.c:95
+#: src/menu_sdl.c:106 src/menu_sdl.c:109
 msgid "Message Skip"
 msgstr ""
 
-#: src/menu_sdl.c:99
+#: src/menu_sdl.c:113
 msgid "Mouse Auto Move"
 msgstr ""
 
-#: src/menu_sdl.c:102 src/volume.c:181
+#: src/menu_sdl.c:116 src/volume.c:181
 msgid "Volume"
 msgstr ""
 
-#: src/menu_sdl.c:107 src/menu_sdl.c:175
+#: src/menu_sdl.c:121 src/menu_sdl.c:189
 msgid "Restart"
 msgstr ""
 
-#: src/menu_sdl.c:112 src/menu_sdl.c:152
+#: src/menu_sdl.c:126 src/menu_sdl.c:166
 msgid "Quit"
 msgstr ""
 
-#: src/menu_sdl.c:153 src/menu_sdl.c:176 src/menu_sdl.c:339 src/menu_sdl.c:467
+#: src/menu_sdl.c:167 src/menu_sdl.c:190 src/input_modal.c:295
+#: src/input_modal.c:488
 msgid "Cancel"
 msgstr ""
 
-#: src/menu_sdl.c:158 src/menu_sdl.c:181
-msgid "Confirm"
+#: src/menu_sdl.c:172
+msgid "Quit game?"
 msgstr ""
 
-#: src/menu_sdl.c:159
-msgid "Quit xsystem35?"
+#: src/menu_sdl.c:173 src/menu_sdl.c:196
+msgid "Any unsaved progress will be lost."
 msgstr ""
 
-#: src/menu_sdl.c:182
-msgid "Restart the game?"
+#: src/menu_sdl.c:195
+msgid "Restart game?"
 msgstr ""
 
-#: src/menu_sdl.c:315
+#: src/input_modal.c:271
 msgid "Enter a string"
 msgstr ""
 
-#: src/menu_sdl.c:327
+#: src/input_modal.c:283
 #, c-format
 msgid "Up to %d characters"
 msgstr ""
 
-#: src/menu_sdl.c:335 src/menu_sdl.c:460 src/menu_sdl.c:465
+#: src/input_modal.c:291 src/input_modal.c:481 src/input_modal.c:486
 msgid "OK"
 msgstr ""
 
-#: src/menu_sdl.c:416
+#: src/input_modal.c:437
 msgid "Enter a number"
 msgstr ""
 

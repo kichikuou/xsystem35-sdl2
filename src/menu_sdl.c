@@ -171,8 +171,8 @@ void menu_quitmenu_open(void) {
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
 		.window = gfx_window,
-		.title = _("Confirm"),
-		.message = _("Quit xsystem35?"),
+		.title = _("Quit game?"),
+		.message = _("Any unsaved progress will be lost."),
 		.numbuttons = SDL_arraysize(buttons),
 		.buttons = buttons,
 	};
@@ -194,8 +194,8 @@ void menu_resetmenu_open(void) {
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
 		.window = gfx_window,
-		.title = _("Confirm"),
-		.message = _("Restart the game?"),
+		.title = _("Restart game?"),
+		.message = _("Any unsaved progress will be lost."),
 		.numbuttons = SDL_arraysize(buttons),
 		.buttons = buttons,
 	};
