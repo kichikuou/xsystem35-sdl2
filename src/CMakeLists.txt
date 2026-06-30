@@ -69,6 +69,7 @@ target_sources(xsystem35 PRIVATE
   gfx_video.c
   image.c
   input.c
+  input_modal.c
   jpeg.c
   message.c
   midi.c
@@ -124,7 +125,7 @@ elseif (ANDROID)
   target_sources(xsystem35 PRIVATE menu_android.c)
 else ()
   target_sources(xsystem35 PRIVATE
-    menu_sdl.c input_modal.c modal.c microui/microui.c volume.c)
+    menu_sdl.c modal.c microui/microui.c volume.c)
 endif()
 
 if (HAVE_WEBP)

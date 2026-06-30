@@ -25,32 +25,9 @@
 
 #include "portab.h"
 
-/* 文字列入力のパラメータ */
-typedef struct inputstring_param {
-	char *title;
-	char *oldstring;
-	const char *newstring;
-	int   max;
-	/* for MJ cmd */
-	bool need_window;
-	int     x, y, h;
-} INPUTSTRING_PARAM;
-
-/* 数値入力のパラメータ */
-typedef struct inputnum_param {
-	char *title;
-	int value;
-	int def;
-	int max;
-	int min;
-} INPUTNUM_PARAM;
-
 extern void menu_open(void);
 extern void menu_quitmenu_open(void);
 extern void menu_resetmenu_open(void);
-extern bool menu_inputstring(INPUTSTRING_PARAM *);
-extern bool menu_inputstring2(INPUTSTRING_PARAM *);
-extern bool menu_inputnumber(INPUTNUM_PARAM *);
 extern void menu_init();
 extern void menu_setSkipState(bool enabled, bool activated);
 extern void menu_render_overlay(void);

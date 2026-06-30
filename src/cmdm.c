@@ -29,7 +29,7 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "utfsjis.h"
-#include "menu.h"
+#include "input_modal.h"
 #include "ags.h"
 #include "message.h"
 #include "hankaku.h"
@@ -105,7 +105,7 @@ void commandMI(char terminator) {
 	mi_param.oldstring = t2;
 	mi_param.max = max_len;
 	
-	menu_inputstring(&mi_param);
+	input_modal_string(&mi_param);
 	if (mi_param.newstring == NULL) {
 		svar_set(dst_no, NULL);
 		free(t1); free(t2);
@@ -339,7 +339,7 @@ void commandMJ() {
 	mj_param.oldstring = t1;
 	
 	ags_setCursorLocation(x, y, false, false);
-	menu_inputstring2(&mj_param);
+	input_modal_string_inline(&mj_param);
 	if (mj_param.newstring == NULL) return;
 	
 	t2 = fromUTF8(mj_param.newstring);

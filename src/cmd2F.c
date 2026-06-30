@@ -28,7 +28,7 @@
 #include "xsystem35.h"
 #include "scenario.h"
 #include "savedata.h"
-#include "menu.h"
+#include "input_modal.h"
 #include "input.h"
 #include "msgskip.h"
 #include "selection.h"
@@ -620,7 +620,7 @@ void commands2F57() {
 	p.oldstring = t2;
 	p.max = eLength;
 	
-	menu_inputstring(&p);
+	input_modal_string(&p);
 	if (p.newstring == NULL) {
 		*vResult = 65535;
 	} else {

@@ -20,14 +20,11 @@
 #include "config.h"
 
 #include <SDL.h>
-#include <jni.h>
 
 #include "system.h"
 #include "portab.h"
 #include "menu.h"
 #include "nact.h"
-
-#define STRING "Ljava/lang/String;"
 
 void menu_open(void) {
 	return;
@@ -54,71 +51,6 @@ void menu_quitmenu_open(void) {
 	if (buttonid == 1) {
 		nact_quit(false);
 	}
-}
-
-bool menu_inputstring(INPUTSTRING_PARAM *p) {
-	static char buf[256];
-	JNIEnv *env = SDL_AndroidGetJNIEnv();
-	if ((*env)->PushLocalFrame(env, 16) < 0) {
-		WARNING("Failed to allocate JVM local references");
-		return false;
-	}
-
-	jstring msg = (*env)->NewStringUTF(env, p->title);
-	jstring oldstring = (*env)->NewStringUTF(env, p->oldstring);
-	if (!msg || !oldstring) {
-		WARNING("Failed to allocate a string");
-		(*env)->PopLocalFrame(env, NULL);
-		return false;
-	}
-
-	jobject context = SDL_AndroidGetActivity();
-	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
-										"inputString", "(" STRING STRING "I)" STRING);
-	jstring newstring = (jstring)(*env)->CallObjectMethod(env, context, mid, msg, oldstring, p->max);
-	if (newstring) {
-		const char *newstr_utf8 = (*env)->GetStringUTFChars(env, newstring, NULL);
-		strcpy(buf, newstr_utf8);
-		(*env)->ReleaseStringUTFChars(env, newstring, newstr_utf8);
-		(*env)->PopLocalFrame(env, NULL);
-		p->newstring = buf;
-		return true;
-	}
-
-	(*env)->PopLocalFrame(env, NULL);
-	p->newstring = p->oldstring;
-	return false;
-}
-
-bool menu_inputstring2(INPUTSTRING_PARAM *p) {
-	p->newstring = p->oldstring;
-	return true;
-}
-
-bool menu_inputnumber(INPUTNUM_PARAM *p) {
-	JNIEnv *env = SDL_AndroidGetJNIEnv();
-	if ((*env)->PushLocalFrame(env, 16) < 0) {
-		WARNING("Failed to allocate JVM local references");
-		return false;
-	}
-
-	jstring msg = (*env)->NewStringUTF(env, p->title);
-	if (!msg) {
-		WARNING("Failed to allocate a string");
-		(*env)->PopLocalFrame(env, NULL);
-		return false;
-	}
-
-	jobject context = SDL_AndroidGetActivity();
-	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
-										"inputNumber", "(" STRING "III)I");
-	int v = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);
-
-	(*env)->PopLocalFrame(env, NULL);
-	if (v < 0)
-		return false;  // cancelled
-	p->value = v;
-	return true;
 }
 
 void menu_init(void) {

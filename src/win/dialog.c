@@ -19,7 +19,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <SDL_syswm.h>
-#include "menu.h"
+#include "input_modal.h"
 #include "gfx_private.h"
 #include "resources.h"
 

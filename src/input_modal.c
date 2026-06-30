@@ -26,8 +26,120 @@
 #include <string.h>
 
 #include "portab.h"
+#include "input_modal.h"
+
+#if defined(__ANDROID__)
+
+#include <SDL.h>
+#include <jni.h>
+#include "system.h"
+
+#define STRING "Ljava/lang/String;"
+
+bool input_modal_string(INPUTSTRING_PARAM *p) {
+	static char buf[256];
+	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return false;
+	}
+
+	jstring msg = (*env)->NewStringUTF(env, p->title);
+	jstring oldstring = (*env)->NewStringUTF(env, p->oldstring);
+	if (!msg || !oldstring) {
+		WARNING("Failed to allocate a string");
+		(*env)->PopLocalFrame(env, NULL);
+		return false;
+	}
+
+	jobject context = SDL_AndroidGetActivity();
+	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
+										"inputString", "(" STRING STRING "I)" STRING);
+	jstring newstring = (jstring)(*env)->CallObjectMethod(env, context, mid, msg, oldstring, p->max);
+	if (newstring) {
+		const char *newstr_utf8 = (*env)->GetStringUTFChars(env, newstring, NULL);
+		strcpy(buf, newstr_utf8);
+		(*env)->ReleaseStringUTFChars(env, newstring, newstr_utf8);
+		(*env)->PopLocalFrame(env, NULL);
+		p->newstring = buf;
+		return true;
+	}
+
+	(*env)->PopLocalFrame(env, NULL);
+	p->newstring = p->oldstring;
+	return false;
+}
+
+bool input_modal_string_inline(INPUTSTRING_PARAM *p) {
+	p->newstring = p->oldstring;
+	return true;
+}
+
+bool input_modal_number(INPUTNUM_PARAM *p) {
+	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		WARNING("Failed to allocate JVM local references");
+		return false;
+	}
+
+	jstring msg = (*env)->NewStringUTF(env, p->title);
+	if (!msg) {
+		WARNING("Failed to allocate a string");
+		(*env)->PopLocalFrame(env, NULL);
+		return false;
+	}
+
+	jobject context = SDL_AndroidGetActivity();
+	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
+										"inputNumber", "(" STRING "III)I");
+	int v = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);
+
+	(*env)->PopLocalFrame(env, NULL);
+	if (v < 0)
+		return false;  // cancelled
+	p->value = v;
+	return true;
+}
+
+#elif defined(__EMSCRIPTEN__)
+
+#include <emscripten.h>
+
+bool input_modal_string(INPUTSTRING_PARAM *p) {
+	static char buf[256];
+	int ok = EM_ASM_({
+			var r = xsystem35.shell.inputString(UTF8ToString($0), UTF8ToString($1), $2);
+			if (r) {
+				stringToUTF8(r, $3, $4);
+				return 1;
+			}
+			return 0;
+		}, p->title, p->oldstring, p->max, buf, sizeof buf);
+	if (ok)
+		p->newstring = buf;
+	else
+		p->newstring = p->oldstring;
+	return ok;
+}
+
+bool input_modal_string_inline(INPUTSTRING_PARAM *p) {
+	p->newstring = p->oldstring;
+	return true;
+}
+
+bool input_modal_number(INPUTNUM_PARAM *p) {
+	int v = EM_ASM_({
+			return xsystem35.shell.inputNumber(UTF8ToString($0), $1, $2, $3);
+		}, p->title, p->min, p->max, p->def);
+	if (v < 0)
+		return false;  // cancelled
+	p->value = v;
+	return true;
+}
+
+#else  // not Android or Emscripten
+
 #include "nact.h"
-#include "menu.h"
 #include "font.h"
 #include "gfx_private.h"
 #include "modal.h"
@@ -46,11 +158,11 @@ struct string_state {
 	char composing[SDL_TEXTEDITINGEVENT_TEXT_SIZE];  // IME preedit text
 	bool done;
 	bool accepted;
-	FontSpec font;  // inline edit (menu_inputstring2) only
+	FontSpec font;  // inline edit (input_modal_string_inline) only
 };
 
 // Heap buffer holding the string dialog's edited text. It must outlive the
-// modal loop because the caller reads p->newstring after menu_inputstring()
+// modal loop because the caller reads p->newstring after input_modal_string()
 // returns; it is freed and reallocated on the next call.
 static char *str_buf;
 
@@ -194,7 +306,7 @@ static bool inputstring_build(mu_Context *ctx, modal *modal) {
 	return !st->done;
 }
 
-bool menu_inputstring(INPUTSTRING_PARAM *p) {
+bool input_modal_string(INPUTSTRING_PARAM *p) {
 #ifdef _WIN32
 	return input_string(p);
 #else
@@ -216,7 +328,7 @@ bool menu_inputstring(INPUTSTRING_PARAM *p) {
 }
 
 // The inline text input (MJ command). It reuses the IME buffer handling
-// and the event handler of menu_inputstring.
+// and the event handler of input_modal_string.
 
 // Look up an AGS color index in the active palette and return it as a mu_Color.
 static mu_Color palette_color(int index) {
@@ -265,7 +377,7 @@ static bool inline_edit_build(mu_Context *ctx, modal *modal) {
 	return !st->done;
 }
 
-bool menu_inputstring2(INPUTSTRING_PARAM *p) {
+bool input_modal_string_inline(INPUTSTRING_PARAM *p) {
 	struct string_state st = {
 		.base = { .build = inline_edit_build, .handler = menu_string_handler,
 		          .no_dim = true },
@@ -387,7 +499,7 @@ static bool inputnumber_build(mu_Context *ctx, modal *modal) {
 	return !st->done;
 }
 
-bool menu_inputnumber(INPUTNUM_PARAM *p) {
+bool input_modal_number(INPUTNUM_PARAM *p) {
 #ifdef _WIN32
 	return input_number(p);
 #else
@@ -413,3 +525,5 @@ bool menu_inputnumber(INPUTNUM_PARAM *p) {
 	return true;
 #endif
 }
+
+#endif  // platform select

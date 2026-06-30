@@ -1,7 +1,7 @@
 /*
- * menu_emscripten.c  menu implementation for Emscripten
+ * input_modal.h  string- and number-input dialogs
  *
- * Copyright (C) 2017 <KichikuouChrome@gmail.com>
+ * Copyright (C) 2026 <KichikuouChrome@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,32 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-#include "config.h"
 
-#include <stdio.h>
-#include <emscripten.h>
+#ifndef __INPUT_MODAL__
+#define __INPUT_MODAL__
 
 #include "portab.h"
-#include "menu.h"
 
-void menu_open(void) {
-	return;
-}
+typedef struct inputstring_param {
+	char *title;
+	char *oldstring;
+	const char *newstring;
+	int   max;
+	/* for MJ cmd */
+	bool need_window;
+	int     x, y, h;
+} INPUTSTRING_PARAM;
 
-void menu_quitmenu_open(void) {
-	return;
-}
+typedef struct inputnum_param {
+	char *title;
+	int value;
+	int def;
+	int max;
+	int min;
+} INPUTNUM_PARAM;
 
-void menu_init(void) {
-	return;
-}
+bool input_modal_string(INPUTSTRING_PARAM *);
+bool input_modal_string_inline(INPUTSTRING_PARAM *);
+bool input_modal_number(INPUTNUM_PARAM *);
 
-void menu_render_overlay(void) {
-	return;
-}
-
-EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
-	xsystem35.shell.setSkipButtonState(enabled, activated);
-});
+#endif /* !__INPUT_MODAL__ */

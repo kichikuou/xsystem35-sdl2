@@ -29,7 +29,7 @@
 #include "utfsjis.h"
 #include "xsystem35.h"
 #include "scenario.h"
-#include "menu.h"
+#include "input_modal.h"
 #include "cmd_check.h"
 
 /* NI/NT 用パラメータ */
@@ -365,7 +365,7 @@ void commandNI() { /* From Panyo */
 	if (!ni_param.title)
 		ni_param.title = strdup("");
 	
-	if (menu_inputnumber(&ni_param)) {
+	if (input_modal_number(&ni_param)) {
 		*var = ni_param.value;
 		sysVar[0] = 0;
 	} else {

@@ -36,7 +36,7 @@
 #include "xsystem35.h"
 #include "modules.h"
 #include "input.h"
-#include "menu.h"
+#include "input_modal.h"
 
 // キー変換テーブル
 #define KEYMAP_MAX 8
@@ -77,7 +77,7 @@ static void InputListNum(void) { /* 1 */
 		.title = toUTF8(svar_get(title)),
 	};
 
-	if (menu_inputnumber(&ni_param)) {
+	if (input_modal_number(&ni_param)) {
 		*val = (uint16_t)ni_param.value;
 		*res = 1;
 	} else {
