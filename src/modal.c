@@ -278,6 +278,10 @@ void modal_run(modal *m) {
 	free(ctx);
 	ctx = NULL;
 	gfx_dirty = true;  // repaint once more to clear the overlay
+
+	// The gesture that opened/dismissed the dialog must not leave the engine
+	// with a key or button stuck "down".
+	event_reset_input_state();
 }
 
 void menu_render_overlay(void) {

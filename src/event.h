@@ -36,6 +36,7 @@ int event_get_mouse(SDL_Point *p);
 void event_get_wheel(int *forward, int *back);
 void event_clear_wheel(void);
 int event_get_joy(void);
+void event_reset_input_state(void);
 void event_post_debugger_command(void *data);
 void event_handle_event(SDL_Event *e);
 

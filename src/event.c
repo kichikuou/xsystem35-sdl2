@@ -22,6 +22,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <SDL.h>
 #ifdef __EMSCRIPTEN__
@@ -587,6 +588,12 @@ int event_get_key(void) {
 	      (RawKeyInfo[KEY_TAB]    << 7));
 	
 	return rt;
+}
+
+void event_reset_input_state(void) {
+	memset(RawKeyInfo, 0, sizeof(RawKeyInfo));
+	mouseb = 0;
+	joyinfo = 0;
 }
 
 int event_get_mouse(SDL_Point *p) {
