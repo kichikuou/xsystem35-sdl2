@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xsystem35 1.7.3pre3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-29 17:18+0900\n"
+"POT-Creation-Date: 2026-06-30 12:31+0900\n"
 "PO-Revision-Date: 2026-06-14 17:09+0900\n"
 "Last-Translator: CHIKAMA Masaki <chika@8ne.sakura.ne.jp>\n"
 "Language-Team: Japanese <chika@8ne.sakura.ne.jp>\n"
@@ -17,40 +17,56 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu_sdl.c:91 src/menu_sdl.c:94
+#: src/menu_sdl.c:92 src/menu_sdl.c:95
 msgid "Message Skip"
 msgstr "メッセージスキップ"
 
-#: src/menu_sdl.c:98
+#: src/menu_sdl.c:99
 msgid "Mouse Auto Move"
 msgstr "マウスカーソル移動"
 
-#: src/menu_sdl.c:101 src/volume.c:181
+#: src/menu_sdl.c:102 src/volume.c:181
 msgid "Volume"
 msgstr "ボリューム"
 
-#: src/menu_sdl.c:106
+#: src/menu_sdl.c:107 src/menu_sdl.c:175
+msgid "Restart"
+msgstr "再起動"
+
+#: src/menu_sdl.c:112 src/menu_sdl.c:152
 msgid "Quit"
 msgstr "終了"
 
-#: src/menu_sdl.c:306
+#: src/menu_sdl.c:153 src/menu_sdl.c:176 src/menu_sdl.c:339 src/menu_sdl.c:467
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/menu_sdl.c:158 src/menu_sdl.c:181
+msgid "Confirm"
+msgstr "確認"
+
+#: src/menu_sdl.c:159
+msgid "Quit xsystem35?"
+msgstr "xsystem35を終了しますか？"
+
+#: src/menu_sdl.c:182
+msgid "Restart the game?"
+msgstr "ゲームを再起動しますか？"
+
+#: src/menu_sdl.c:315
 msgid "Enter a string"
 msgstr "文字を入力してください"
 
-#: src/menu_sdl.c:318
+#: src/menu_sdl.c:327
 #, c-format
 msgid "Up to %d characters"
 msgstr "最大 %d 文字"
 
-#: src/menu_sdl.c:326 src/menu_sdl.c:451 src/menu_sdl.c:456
+#: src/menu_sdl.c:335 src/menu_sdl.c:460 src/menu_sdl.c:465
 msgid "OK"
 msgstr "ＯＫ"
 
-#: src/menu_sdl.c:330 src/menu_sdl.c:458
-msgid "Cancel"
-msgstr "キャンセル"
-
-#: src/menu_sdl.c:407
+#: src/menu_sdl.c:416
 msgid "Enter a number"
 msgstr "数値を入力してください"
 

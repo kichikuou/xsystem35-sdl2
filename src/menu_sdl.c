@@ -45,6 +45,7 @@
 enum menu_action {
 	MENU_ACTION_NONE,
 	MENU_ACTION_VOLUME,
+	MENU_ACTION_RESET,
 	MENU_ACTION_QUIT,
 };
 
@@ -74,7 +75,7 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 	struct popup_state *st = (struct popup_state *)modal;
 	bool keep_open = true;
 
-	int rows = 4;
+	int rows = 5;
 	int row_h = ctx->style->size.y + ctx->style->padding * 2;
 	int w = 200;
 	// `rows` rows with (rows - 1) inter-row gaps, plus the window's body padding.
@@ -103,6 +104,11 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 			st->action = MENU_ACTION_VOLUME;
 		}
 
+		if (mu_button(ctx, _("Restart"))) {
+			keep_open = false;
+			st->action = MENU_ACTION_RESET;
+		}
+
 		if (mu_button(ctx, _("Quit"))) {
 			keep_open = false;
 			st->action = MENU_ACTION_QUIT;
@@ -129,6 +135,9 @@ void menu_open(void) {
 	case MENU_ACTION_VOLUME:
 		volume_dialog_open();
 		break;
+	case MENU_ACTION_RESET:
+		menu_resetmenu_open();
+		break;
 	case MENU_ACTION_QUIT:
 		menu_quitmenu_open();
 		break;
@@ -140,14 +149,14 @@ void menu_open(void) {
 
 void menu_quitmenu_open(void) {
 	const SDL_MessageBoxButtonData buttons[] = {
-		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Quit" },
-		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "Cancel" },
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, _("Quit") },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, _("Cancel") },
 	};
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
 		.window = gfx_window,
-		.title = "Confirm",
-		.message = "Quit xsystem35?",
+		.title = _("Confirm"),
+		.message = _("Quit xsystem35?"),
 		.numbuttons = SDL_arraysize(buttons),
 		.buttons = buttons,
 	};
@@ -163,14 +172,14 @@ void menu_quitmenu_open(void) {
 
 void menu_resetmenu_open(void) {
 	const SDL_MessageBoxButtonData buttons[] = {
-		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Restart" },
-		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "Cancel" },
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, _("Restart") },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, _("Cancel") },
 	};
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
 		.window = gfx_window,
-		.title = "Confirm",
-		.message = "Restart the game?",
+		.title = _("Confirm"),
+		.message = _("Restart the game?"),
 		.numbuttons = SDL_arraysize(buttons),
 		.buttons = buttons,
 	};
