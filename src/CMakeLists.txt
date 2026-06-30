@@ -121,8 +121,6 @@ endif()
 
 if (EMSCRIPTEN)
   target_sources(xsystem35 PRIVATE menu_emscripten.c)
-elseif (ANDROID)
-  target_sources(xsystem35 PRIVATE menu_android.c)
 else ()
   target_sources(xsystem35 PRIVATE
     menu_sdl.c modal.c microui/microui.c volume.c)

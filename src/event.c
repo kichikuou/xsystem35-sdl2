@@ -430,7 +430,9 @@ void event_handle_event(SDL_Event *e) {
 		break;
 
 	case SDL_FINGERDOWN:
-		if (SDL_GetNumTouchFingers(e->tfinger.touchId) >= 2) {
+		if (SDL_GetNumTouchFingers(e->tfinger.touchId) >= 3) {
+			menu_open();
+		} else if (SDL_GetNumTouchFingers(e->tfinger.touchId) >= 2) {
 			mouseb &= ~(1 << SDL_BUTTON_LEFT);
 			mouseb |= 1 << SDL_BUTTON_RIGHT;
 			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;

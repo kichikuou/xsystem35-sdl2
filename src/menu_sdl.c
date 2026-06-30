@@ -51,19 +51,37 @@ struct popup_state {
 	modal base;
 	mu_Rect rect;  // popup window rect from the most recent frame
 	enum menu_action action;  // what the user selected
+	// A three-finger tap opens the menu, but SDL_GetNumTouchFingers() reports the
+	// live finger count, so it already returns 3 while the first of the three
+	// near-simultaneous FINGERDOWN events is being processed - the menu opens on
+	// that first event. The other two FINGERDOWN events of the same gesture are
+	// still queued and, once the menu is up, would be seen as taps that dismiss
+	// it. Ignore touches until every finger has lifted, then arm tap-to-dismiss.
+	bool touch_armed;
 };
 
 // Message-skip state, kept in sync via menu_setSkipState().
 static bool skip_enabled = true;
 static bool skip_activated;
 
+static bool point_in_rect(int x, int y, mu_Rect r) {
+	return x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
+}
+
 static bool menu_popup_handler(const SDL_Event *e, modal *modal) {
 	struct popup_state *st = (struct popup_state *)modal;
 	if (e->type == SDL_MOUSEBUTTONUP) {
-		bool point_in_menu =
-			e->button.x >= st->rect.x && e->button.x < st->rect.x + st->rect.w &&
-			e->button.y >= st->rect.y && e->button.y < st->rect.y + st->rect.h;
-		if (e->button.button == SDL_BUTTON_RIGHT || !point_in_menu)
+		if (e->button.button == SDL_BUTTON_RIGHT ||
+		    !point_in_rect(e->button.x, e->button.y, st->rect))
+			st->base.cancelled = true;
+	} else if (e->type == SDL_FINGERUP) {
+		// Arm tap-to-dismiss once the opening gesture's fingers are all lifted.
+		if (SDL_GetNumTouchFingers(e->tfinger.touchId) == 0)
+			st->touch_armed = true;
+	} else if (e->type == SDL_FINGERDOWN && st->touch_armed) {
+		// A tap outside the menu dismisses it.
+		int x = e->tfinger.x * view_w, y = e->tfinger.y * view_h;
+		if (!point_in_rect(x, y, st->rect))
 			st->base.cancelled = true;
 	}
 	return modal_default_handler(e, modal);

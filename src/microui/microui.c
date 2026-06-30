@@ -426,6 +426,12 @@ void mu_input_text(mu_Context *ctx, const char *text) {
 
 mu_Command* mu_push_command(mu_Context *ctx, int type, int size) {
   mu_Command *cmd = (mu_Command*) (ctx->command_list.items + ctx->command_list.idx);
+#ifdef __arm__
+  /* xsystem35 change: round the entry size up to a pointer-aligned boundary.
+  ** Variable-length commands (text) would otherwise leave the following command
+  ** at an unaligned address, which faults on 32-bit ARM. */
+  size = (size + (int) sizeof(void*) - 1) & ~((int) sizeof(void*) - 1);
+#endif
   expect(ctx->command_list.idx + size < MU_COMMANDLIST_SIZE);
   cmd->base.type = type;
   cmd->base.size = size;

@@ -44,7 +44,7 @@
 #include "win/dialog.h"
 #endif
 
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#ifndef __EMSCRIPTEN__
 #define HAVE_VOLUME_VALANCER 1
 #endif
 

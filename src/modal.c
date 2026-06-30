@@ -38,6 +38,22 @@
 static mu_Context *ctx;
 static modal *current_modal;
 
+// Touch input. A tap is translated into a synthetic mouse hover->press->release
+// sequence spread across several frames, decoupled from the finger's real
+// timing. This is required because microui only registers a control as hovered
+// on a frame where no button is held, and the hovered window (hover_root) itself
+// updates a frame late; so the press must trail the finger landing by a couple
+// of frames or the tap never clicks. Holding the press also lets sliders drag.
+#define TOUCH_HOVER_FRAMES 2
+static enum {
+	TOUCH_NONE,
+	TOUCH_HOVER,   // finger down; letting microui settle hover before pressing
+	TOUCH_PRESS,   // mouse button held (a drag tracks the finger in this phase)
+} touch_phase;
+static int touch_hover_frames;          // frames left to dwell in TOUCH_HOVER
+static bool touch_release_after_press;  // finger lifted early; release once pressed
+static int touch_x, touch_y;
+
 static const FontSpec menu_font = { FONT_GOTHIC, FONT_WEIGHT_NORMAL, MODAL_FONT_SIZE };
 
 static int text_width_cb(mu_Font font, const char *text, int len) {
@@ -79,6 +95,8 @@ static void init_context(void) {
 	ctx->text_width = text_width_cb;
 	ctx->text_height = text_height_cb;
 	ctx->style->font = (mu_Font)&menu_font;
+	ctx->style->spacing = 8;
+	ctx->style->thumb_size = 16;
 	// microui uses style->size.y as the default height of a control row, so
 	// set it to the font height to make each row tall enough for its text.
 	ctx->style->size.y = text_height_cb(ctx->style->font);
@@ -114,6 +132,32 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 			mu_input_mouseup(ctx, e->button.x, e->button.y, b);
 		break;
 	}
+	// Touch handling (see touch_phase above). The press/release is driven
+	// from the frame loop in modal_run(), not emitted here directly.
+	case SDL_FINGERDOWN:
+		touch_x = e->tfinger.x * view_w;
+		touch_y = e->tfinger.y * view_h;
+		mu_input_mousemove(ctx, touch_x, touch_y);
+		touch_phase = TOUCH_HOVER;
+		touch_hover_frames = TOUCH_HOVER_FRAMES;
+		touch_release_after_press = false;
+		break;
+	case SDL_FINGERMOTION:
+		touch_x = e->tfinger.x * view_w;
+		touch_y = e->tfinger.y * view_h;
+		mu_input_mousemove(ctx, touch_x, touch_y);
+		break;
+	case SDL_FINGERUP:
+		touch_x = e->tfinger.x * view_w;
+		touch_y = e->tfinger.y * view_h;
+		if (touch_phase == TOUCH_PRESS) {
+			mu_input_mouseup(ctx, touch_x, touch_y, MU_MOUSE_LEFT);
+			touch_phase = TOUCH_NONE;
+		} else if (touch_phase == TOUCH_HOVER) {
+			// Tap ended before the press was emitted; release right after it.
+			touch_release_after_press = true;
+		}
+		break;
 	case SDL_KEYDOWN:
 	case SDL_KEYUP: {
 		if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE)
@@ -238,6 +282,8 @@ static void modal_render(void) {
 		}
 	}
 	SDL_RenderSetClipRect(gfx_renderer, NULL);
+	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 }
 
 static bool modal_event_trampoline(const SDL_Event *e) {
@@ -256,8 +302,25 @@ void modal_run(modal *m) {
 
 	mu_Id prev_hash = 0;
 
+	touch_phase = TOUCH_NONE;
+	touch_release_after_press = false;
 	bool open = true;
 	while (open && !nact->is_quit) {
+		// Drive the synthetic touch sequence.
+		if (touch_phase == TOUCH_HOVER) {
+			if (touch_hover_frames > 0) {
+				touch_hover_frames--;
+			} else {
+				mu_input_mousedown(ctx, touch_x, touch_y, MU_MOUSE_LEFT);
+				touch_phase = TOUCH_PRESS;
+			}
+		}
+		if (touch_phase == TOUCH_PRESS && touch_release_after_press) {
+			mu_input_mouseup(ctx, touch_x, touch_y, MU_MOUSE_LEFT);
+			touch_phase = TOUCH_NONE;
+			touch_release_after_press = false;
+		}
+
 		event_get_key();  // pump SDL events -> trampoline -> m->handler -> microui
 
 		mu_begin(ctx);

@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-- Replaced the GTK-based popup menu and dialogs with a pure-SDL implementation.
+- Replaced the GTK-based popup menu and dialogs with a pure-SDL implementation. On Android, the popup menu opens with a three-finger tap.
 
 ## 2.18.0 - 2026-06-23
 - Added support for the intro demo of Daiakuji.
