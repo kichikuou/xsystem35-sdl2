@@ -78,7 +78,7 @@ static bool toggle_menu_item(UINT id, bool *checked_out) {
 	return true;
 }
 
-void win_menu_init(void) {
+void menu_init(void) {
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
 	SetMenu(get_hwnd(gfx_window), hmenu);
@@ -86,6 +86,10 @@ void win_menu_init(void) {
 	// Let SDL recalc the window size, taking menu height into account.
 	SDL_SetWindowSize(gfx_window, view_w, view_h);
 	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
+}
+
+// The middle-click popup menu is unused on Windows.
+void menu_open(void) {
 }
 
 void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {

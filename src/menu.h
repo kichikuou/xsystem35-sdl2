@@ -34,7 +34,6 @@ extern void menu_render_overlay(void);
 
 #ifdef _WIN32
 struct SDL_SysWMmsg;
-void win_menu_init(void);
 void win_menu_onSysWMEvent(struct SDL_SysWMmsg* msg);
 void win_menu_onMouseMotion(int x, int y);
 #endif

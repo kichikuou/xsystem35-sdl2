@@ -134,7 +134,7 @@ static INT_PTR CALLBACK num_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 	return TRUE;
 }
 
-bool input_string(INPUTSTRING_PARAM *p) {
+bool input_modal_string(INPUTSTRING_PARAM *p) {
 	p->newstring = p->oldstring;
 	DialogBoxParamW(
 		GetModuleHandle(NULL),
@@ -145,7 +145,7 @@ bool input_string(INPUTSTRING_PARAM *p) {
 	return true;
 }
 
-bool input_number(INPUTNUM_PARAM *p) {
+bool input_modal_number(INPUTNUM_PARAM *p) {
 	INT_PTR ret = DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_NUMINPUT),

@@ -40,10 +40,6 @@
 #include <emscripten.h>
 #endif
 
-#ifdef _WIN32
-#include "win/dialog.h"
-#endif
-
 #ifndef __EMSCRIPTEN__
 #define HAVE_VOLUME_VALANCER 1
 #endif

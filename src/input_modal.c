@@ -144,9 +144,6 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 #include "gfx_private.h"
 #include "modal.h"
 #include "utfsjis.h"
-#ifdef _WIN32
-#include "win/dialog.h"
-#endif
 
 // The string-input dialog.
 // The input field is not a microui textbox: to support IME (SDL_TEXTEDITING)
@@ -237,6 +234,8 @@ static void set_text_input_rect(mu_Rect box) {
 	SDL_SetTextInputRect(&r);
 }
 
+#ifndef _WIN32  // input_modal_string is provided by win/dialog.c on Windows.
+
 // Draw the IME-aware text field (committed text, preedit with underline, caret).
 static void draw_string_field(mu_Context *ctx, mu_Rect box, const struct string_state *st) {
 	mu_draw_rect(ctx, box, ctx->style->colors[MU_COLOR_BASE]);
@@ -307,9 +306,6 @@ static bool inputstring_build(mu_Context *ctx, modal *modal) {
 }
 
 bool input_modal_string(INPUTSTRING_PARAM *p) {
-#ifdef _WIN32
-	return input_string(p);
-#else
 	struct string_state st = {
 		.base = { .build = inputstring_build, .handler = menu_string_handler },
 		.param = p,
@@ -324,8 +320,9 @@ bool input_modal_string(INPUTSTRING_PARAM *p) {
 
 	p->newstring = st.accepted ? str_buf : p->oldstring;
 	return true;
-#endif
 }
+
+#endif  // !_WIN32
 
 // The inline text input (MJ command). It reuses the IME buffer handling
 // and the event handler of input_modal_string.
@@ -397,6 +394,8 @@ bool input_modal_string_inline(INPUTSTRING_PARAM *p) {
 }
 
 // The number-input dialog.
+
+#ifndef _WIN32  // input_modal_number is provided by win/dialog.c on Windows.
 
 struct number_state {
 	modal base;
@@ -500,9 +499,6 @@ static bool inputnumber_build(mu_Context *ctx, modal *modal) {
 }
 
 bool input_modal_number(INPUTNUM_PARAM *p) {
-#ifdef _WIN32
-	return input_number(p);
-#else
 	struct number_state st = {
 		.base = { .build = inputnumber_build, .handler = modal_default_handler },
 		.param = p,
@@ -523,7 +519,8 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 		v = p->max;
 	p->value = (int)v;
 	return true;
-#endif
 }
+
+#endif  // !_WIN32
 
 #endif  // platform select

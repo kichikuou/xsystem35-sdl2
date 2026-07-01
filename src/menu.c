@@ -63,9 +63,6 @@ EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
 #include "msgskip.h"
 #include "modal.h"
 #include "volume.h"
-#ifdef _WIN32
-#include "win/dialog.h"
-#endif
 
 // The middle-click popup menu.
 
@@ -89,6 +86,8 @@ struct popup_state {
 	// it. Ignore touches until every finger has lifted, then arm tap-to-dismiss.
 	bool touch_armed;
 };
+
+#ifndef _WIN32  // Windows uses the native menu bar
 
 // Message-skip state, kept in sync via menu_setSkipState().
 static bool skip_enabled = true;
@@ -169,9 +168,6 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 }
 
 void menu_open(void) {
-#ifdef _WIN32
-	return;  // Windows uses the native menu bar
-#else
 	struct popup_state st = {
 		.base = { .build = menu_build, .handler = menu_popup_handler },
 		.action = MENU_ACTION_NONE,
@@ -190,8 +186,9 @@ void menu_open(void) {
 	case MENU_ACTION_NONE:
 		break;
 	}
-#endif
 }
+
+#endif  // !_WIN32
 
 static bool confirm_lose_progress(const char *title, const char *confirm_label) {
 	const SDL_MessageBoxButtonData buttons[] = {
@@ -224,13 +221,11 @@ void menu_resetmenu_open(void) {
 		nact_quit(true);
 }
 
+// On Windows, menu_open/menu_init/menu_setSkipState are provided by win/menubar.c.
+#ifndef _WIN32
 void menu_init(void) {
-#ifdef _WIN32
-	win_menu_init();
-#endif
 }
 
-#ifndef _WIN32
 void menu_setSkipState(bool enabled, bool activated) {
 	skip_enabled = enabled;
 	skip_activated = activated;
