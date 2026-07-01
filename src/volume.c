@@ -24,6 +24,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 #include "portab.h"
 #include "system.h"
 #include "nact.h"
@@ -215,6 +218,7 @@ static bool volume_build(mu_Context *ctx, modal *modal) {
 	return keep_open;
 }
 
+EMSCRIPTEN_KEEPALIVE
 void volume_dialog_open(void) {
 	struct volume_state st = {
 		.base = { .build = volume_build, .handler = modal_default_handler },

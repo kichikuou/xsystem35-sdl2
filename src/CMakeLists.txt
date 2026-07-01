@@ -73,8 +73,10 @@ target_sources(xsystem35 PRIVATE
   jpeg.c
   menu.c
   message.c
+  microui/microui.c
   midi.c
   mmap.c
+  modal.c
   msgskip.c
   mt19937-1.c
   music.c
@@ -93,6 +95,7 @@ target_sources(xsystem35 PRIVATE
   system.c
   texthook.c
   variable.c
+  volume.c
   vsp.c
   xsystem35.c
   )
@@ -118,11 +121,6 @@ else()
   if (ENABLE_MIDI_PORTMIDI)
     target_sources(xsystem35 PRIVATE midi.portmidi.c midifile.c)
   endif()
-endif()
-
-if (NOT EMSCRIPTEN)
-  target_sources(xsystem35 PRIVATE
-    modal.c microui/microui.c volume.c)
 endif()
 
 if (HAVE_WEBP)
@@ -167,7 +165,7 @@ if (EMSCRIPTEN)
     # Functions that call an asynchronous function via a function pointer must
     # be added to ASYNCIFY_ADD, even if it had a direct call to another
     # asynchronous function, so that the indirect call itself is instrumented.
-    -sASYNCIFY_ADD=commands2F60,nact_main,send_agsevent,cb_waitkey_sprite
+    -sASYNCIFY_ADD=commands2F60,nact_main,send_agsevent,cb_waitkey_sprite,modal_run
     -sALLOW_MEMORY_GROWTH=1
     -sNO_EXIT_RUNTIME=1
     -sEXPORTED_FUNCTIONS=_main,_malloc

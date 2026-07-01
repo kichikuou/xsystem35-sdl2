@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "event.h"
 #include "font.h"
@@ -290,6 +293,7 @@ static bool modal_event_trampoline(const SDL_Event *e) {
 	return current_modal->handler(e, current_modal);
 }
 
+EMSCRIPTEN_KEEPALIVE  // Prevent inlining, because this function is listed in ASYNCIFY_ADD
 void modal_run(modal *m) {
 	assert(!ctx);  // modals are not nestable
 	ctx = calloc(1, sizeof(*ctx));

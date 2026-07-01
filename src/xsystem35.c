@@ -40,10 +40,6 @@
 #include <emscripten.h>
 #endif
 
-#ifndef __EMSCRIPTEN__
-#define HAVE_VOLUME_VALANCER 1
-#endif
-
 #include "nact.h"
 #include "debugger.h"
 #include "portab.h"
@@ -503,9 +499,7 @@ int main(int argc, char **argv) {
 	if (integer_scaling)
 		gfx_setIntegerScaling(true);
 
-#ifdef HAVE_VOLUME_VALANCER
 	volume_init();
-#endif
 	menu_init();
 	
 	if (debugger_mode != DEBUGGER_DISABLED) {
