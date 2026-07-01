@@ -71,6 +71,7 @@ target_sources(xsystem35 PRIVATE
   input.c
   input_modal.c
   jpeg.c
+  menu.c
   message.c
   midi.c
   mmap.c
@@ -119,11 +120,9 @@ else()
   endif()
 endif()
 
-if (EMSCRIPTEN)
-  target_sources(xsystem35 PRIVATE menu_emscripten.c)
-else ()
+if (NOT EMSCRIPTEN)
   target_sources(xsystem35 PRIVATE
-    menu_sdl.c modal.c microui/microui.c volume.c)
+    modal.c microui/microui.c volume.c)
 endif()
 
 if (HAVE_WEBP)

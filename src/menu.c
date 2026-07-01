@@ -1,5 +1,5 @@
 /*
- * menu_sdl.c  popup menu for SDL
+ * menu.c  popup menu
  *
  * Copyright (C) 2000- Masaki Chikama (Wren) <masaki-c@is.aist-nara.ac.jp>
  *
@@ -20,6 +20,36 @@
 */
 
 #include "config.h"
+
+#ifdef __EMSCRIPTEN__
+
+#include <stdio.h>
+#include <emscripten.h>
+
+#include "portab.h"
+#include "menu.h"
+
+void menu_open(void) {
+	return;
+}
+
+void menu_quitmenu_open(void) {
+	return;
+}
+
+void menu_init(void) {
+	return;
+}
+
+void menu_render_overlay(void) {
+	return;
+}
+
+EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
+	xsystem35.shell.setSkipButtonState(enabled, activated);
+});
+
+#else  // !__EMSCRIPTEN__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -221,3 +251,5 @@ void menu_setSkipState(bool enabled, bool activated) {
 	skip_activated = activated;
 }
 #endif
+
+#endif  // !__EMSCRIPTEN__
