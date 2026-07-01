@@ -31,7 +31,6 @@
 #include "event.h"
 #include "font.h"
 #include "gfx_private.h"
-#include "menu.h"
 #include "modal.h"
 #include "nact.h"
 #include "system.h"
@@ -338,7 +337,7 @@ void modal_run(modal *m) {
 			gfx_dirty = true;
 		}
 		nact->callback();
-		sys_wait_vsync();  // -> gfx_updateScreen() -> menu_render_overlay()
+		sys_wait_vsync();  // -> gfx_updateScreen() -> modal_render_overlay()
 	}
 
 	event_custom_handler = NULL;
@@ -352,7 +351,7 @@ void modal_run(modal *m) {
 	event_reset_input_state();
 }
 
-void menu_render_overlay(void) {
+void modal_render_overlay(void) {
 	if (!ctx)
 		return;
 	modal_render();

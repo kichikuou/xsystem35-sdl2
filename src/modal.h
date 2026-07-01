@@ -44,6 +44,10 @@ bool modal_default_handler(const union SDL_Event *e, modal *modal);
 // Run a modal loop that drives `modal` until `build` returns false.
 void modal_run(modal *modal);
 
+// Render the active modal's overlay onto the screen. Call this from the screen
+// update path; it is a no-op when no modal is running.
+void modal_render_overlay(void);
+
 // Draw a grayed-out, non-interactive checkbox.
 void modal_disabled_checkbox(mu_Context *ctx, const char *label, int state);
 

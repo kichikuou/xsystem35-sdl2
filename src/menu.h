@@ -30,7 +30,6 @@ extern void menu_quitmenu_open(void);
 extern void menu_resetmenu_open(void);
 extern void menu_init();
 extern void menu_setSkipState(bool enabled, bool activated);
-extern void menu_render_overlay(void);
 
 #ifdef _WIN32
 struct SDL_SysWMmsg;
