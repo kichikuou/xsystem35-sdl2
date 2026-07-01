@@ -44,6 +44,10 @@ bool modal_default_handler(const union SDL_Event *e, modal *modal);
 // Run a modal loop that drives `modal` until `build` returns false.
 void modal_run(modal *modal);
 
+// Feed an SDL event to the active modal's handler. Returns true if the event was
+// consumed, false when no modal is running or the handler falls through.
+bool modal_handle_event(const union SDL_Event *e);
+
 // Render the active modal's overlay onto the screen. Call this from the screen
 // update path; it is a no-op when no modal is running.
 void modal_render_overlay(void);

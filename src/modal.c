@@ -288,7 +288,9 @@ static void modal_render(void) {
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 }
 
-static bool modal_event_trampoline(const SDL_Event *e) {
+bool modal_handle_event(const SDL_Event *e) {
+	if (!current_modal)
+		return false;
 	return current_modal->handler(e, current_modal);
 }
 
@@ -298,10 +300,8 @@ void modal_run(modal *m) {
 	ctx = calloc(1, sizeof(*ctx));
 	init_context();
 
+	assert(!current_modal);
 	current_modal = m;
-
-	assert(!event_custom_handler);
-	event_custom_handler = modal_event_trampoline;
 
 	mu_Id prev_hash = 0;
 
@@ -340,7 +340,6 @@ void modal_run(modal *m) {
 		sys_wait_vsync();  // -> gfx_updateScreen() -> modal_render_overlay()
 	}
 
-	event_custom_handler = NULL;
 	current_modal = NULL;
 	free(ctx);
 	ctx = NULL;

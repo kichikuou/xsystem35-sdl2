@@ -38,6 +38,7 @@
 #include "gfx_private.h"
 #include "scheduler.h"
 #include "menu.h"
+#include "modal.h"
 #include "input.h"
 #include "msgskip.h"
 #include "hacks.h"
@@ -45,8 +46,6 @@
 
 static void get_event(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed);
-
-bool (*event_custom_handler)(const SDL_Event *);
 
 static uint32_t custom_event_type = (uint32_t)-1;
 
@@ -355,7 +354,7 @@ static void rance4v2_hack(void) {
 }
 
 void event_handle_event(SDL_Event *e) {
-	if (event_custom_handler && event_custom_handler(e))
+	if (modal_handle_event(e))
 		return;
 
 	switch (e->type) {

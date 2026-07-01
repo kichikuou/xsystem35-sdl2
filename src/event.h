@@ -24,8 +24,6 @@
 #include <SDL_events.h>
 #include "portab.h"
 
-extern bool (*event_custom_handler)(const SDL_Event *);
-
 void event_init(void);
 void event_remove(void);
 void event_set_joy_device_index(int index);
