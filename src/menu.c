@@ -193,15 +193,15 @@ void menu_open(void) {
 #endif
 }
 
-void menu_quitmenu_open(void) {
+static bool confirm_lose_progress(const char *title, const char *confirm_label) {
 	const SDL_MessageBoxButtonData buttons[] = {
-		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, _("Quit") },
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, confirm_label },
 		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, _("Cancel") },
 	};
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
 		.window = gfx_window,
-		.title = _("Quit game?"),
+		.title = title,
 		.message = _("Any unsaved progress will be lost."),
 		.numbuttons = SDL_arraysize(buttons),
 		.buttons = buttons,
@@ -209,34 +209,19 @@ void menu_quitmenu_open(void) {
 	int buttonid = 0;
 	if (SDL_ShowMessageBox(&messagebox_data, &buttonid) < 0) {
 		WARNING("error displaying message box");
-		return;
+		return false;
 	}
-	if (buttonid == 1) {
+	return buttonid == 1;
+}
+
+void menu_quitmenu_open(void) {
+	if (confirm_lose_progress(_("Quit game?"), _("Quit")))
 		nact_quit(false);
-	}
 }
 
 void menu_resetmenu_open(void) {
-	const SDL_MessageBoxButtonData buttons[] = {
-		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, _("Restart") },
-		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, _("Cancel") },
-	};
-	const SDL_MessageBoxData messagebox_data = {
-		.flags = SDL_MESSAGEBOX_INFORMATION,
-		.window = gfx_window,
-		.title = _("Restart game?"),
-		.message = _("Any unsaved progress will be lost."),
-		.numbuttons = SDL_arraysize(buttons),
-		.buttons = buttons,
-	};
-	int buttonid = 0;
-	if (SDL_ShowMessageBox(&messagebox_data, &buttonid) < 0) {
-		WARNING("error displaying message box");
-		return;
-	}
-	if (buttonid == 1) {
+	if (confirm_lose_progress(_("Restart game?"), _("Restart")))
 		nact_quit(true);
-	}
 }
 
 void menu_init(void) {
