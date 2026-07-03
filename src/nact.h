@@ -25,6 +25,7 @@
 #define __NACT_H__
 
 #include "portab.h"
+#include "cali.h"
 #include "s39ain.h"
 #include "gameresource.h"
 #include "selection.h"
@@ -46,13 +47,6 @@ extern void nact_main();
 extern void nact_init();
 extern void nact_reset(void);
 extern void nact_quit(bool restart);
-
-// cali.c
-struct VarRef;
-int getCaliValue(void);
-int *getCaliVariable(void);
-bool getCaliArray(struct VarRef *ref);
-int *getVariable(void);
 
 // cmd_check.c
 extern void exec_command(void);

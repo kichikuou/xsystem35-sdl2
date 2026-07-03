@@ -26,6 +26,7 @@
 
 #include <sys/types.h>
 #include "portab.h"
+#include "utfsjis.h"
 
 struct VarPage {
 	int size;
@@ -50,6 +51,8 @@ static inline int v_sliceSize(struct VarRef *r) {
 	return varPage[r->page].size - r->index;
 }
 
+void v_set_encoding(CharacterEncoding encoding);
+void v_set_names(int count, char **names);
 const char *v_name(int var);
 int *v_ref_indexed(int var, int index, struct VarRef *ref);
 bool v_allocatePage(int page, int size, bool saveflag);

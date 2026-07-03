@@ -147,6 +147,7 @@ bool s39ain_init(const char *path_to_ain, S39AIN *ain) {
 			ain->var[i] = p;
 			p += strlen(p) + 1;
 		}
+		v_set_names(ain->varnum, ain->var);
 	}
 	
 	/* check MSGI */

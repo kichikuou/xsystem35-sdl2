@@ -262,6 +262,20 @@ void msg_setMessageLocation(int x, int y) {
 	nextLineIsAfterKaigyou = false;
 }
 
+void sl_restoreTextColor(uint8_t type, uint8_t color) {
+	if (type)
+		nact->sel.MsgFontColor = color;
+	else
+		msg.MsgFontColor = color;
+}
+
+void sl_restoreTextSize(uint8_t type, int size) {
+	if (type)
+		nact->sel.MsgFontSize = size;
+	else
+		msg.MsgFontSize = size;
+}
+
 void msg_getMessageLocation(SDL_Point *loc) {
 	loc->x = msgcur.x;
 	loc->y = msgcur.y;

@@ -27,10 +27,11 @@
 
 #include "portab.h"
 #include "ald_manager.h"
+#include "message.h"
+#include "savedata.h"
 #include "variable.h"
 #include "scenario.h"
 #include "LittleEndian.h"
-#include "xsystem35.h"
 
 const uint8_t *sl_sco;
 int sl_page;
@@ -682,20 +683,14 @@ static void pop_state(uint8_t tag) {
 		{
 			uint8_t color = stack_pop_byte();
 			uint8_t type = stack_pop_byte();
-			if (type)
-				nact->sel.MsgFontColor = color;
-			else
-				nact->msg.MsgFontColor = color;
+			sl_restoreTextColor(type, color);
 		}
 		break;
 	case STACK_TEXTSIZE:
 		{
 			int size = stack_pop_dword();
 			uint8_t type = stack_pop_byte();
-			if (type)
-				nact->sel.MsgFontSize = size;
-			else
-				nact->msg.MsgFontSize = size;
+			sl_restoreTextSize(type, size);
 		}
 		break;
 	case STACK_TEXTLOC:

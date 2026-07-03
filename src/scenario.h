@@ -96,6 +96,11 @@ void sl_pushTextLoc(int x, int y);
 void sl_popState(uint8_t expected_type);
 struct stack_frame_info *sl_next_stack_frame(struct stack_frame_info *frame_info);
 
+// Hooks called when text state is popped from the stack.
+// Implemented in message.c; unit tests provide their own stubs.
+void sl_restoreTextColor(uint8_t type, uint8_t color);
+void sl_restoreTextSize(uint8_t type, int size);
+
 static inline int sl_getIndex(void) { return sl_index; }
 static inline int sl_getPage(void) { return sl_page; }
 static inline int sl_getc(void) { return sl_sco[sl_index++]; }

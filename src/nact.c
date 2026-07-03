@@ -69,6 +69,7 @@ void sys_setHankakuMode(int mode) {
 
 void sys_setCharacterEncoding(CharacterEncoding encoding) {
 	nact->encoding = encoding;
+	v_set_encoding(encoding);
 }
 
 /* 選択肢・通常メッセージ振り分け */
@@ -146,6 +147,7 @@ void nact_init() {
 	nact->is_va_animation = false;
 	nact->is_cursor_animation = false;
 	nact->encoding = SHIFT_JIS;
+	v_set_encoding(SHIFT_JIS);
 
 	free(nact->game_title_utf8);
 	nact->game_title_utf8 = NULL;

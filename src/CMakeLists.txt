@@ -1,8 +1,26 @@
+# src_lib contains sources that can be unit-tested without linking the
+# rest of xsystem35. They may reference sys_* and other small hooks;
+# tests provide stub definitions for those.
 add_library(src_lib STATIC
+  ald_manager.c
+  alpha_plane.c
+  audio_meta.c
+  bmp.c
+  cache.c
+  cali.c
+  dri.c
+  filecheck.c
   gameresource.c
   hankaku.c
+  mmap.c
   msgqueue.c
+  pms.c
+  profile.c
+  qnt.c
+  scenario.c
   utfsjis.c
+  variable.c
+  vsp.c
   )
 target_compile_options(src_lib PRIVATE -Wno-pointer-sign -Wall)
 target_include_directories(src_lib PRIVATE .)
@@ -22,12 +40,6 @@ target_link_libraries(xsystem35 PRIVATE src_lib)
 
 target_sources(xsystem35 PRIVATE
   ags.c
-  ald_manager.c
-  alpha_plane.c
-  audio_meta.c
-  bmp.c
-  cache.c
-  cali.c
   cdrom.bgm.c
   cg.c
   cmd2F.c
@@ -57,11 +69,9 @@ target_sources(xsystem35 PRIVATE
   cmdy.c
   cmdz.c
   cursor.c
-  dri.c
   ecopy.c
   effect.c
   event.c
-  filecheck.c
   font.c
   hacks.c
   gfx_draw.c
@@ -75,7 +85,6 @@ target_sources(xsystem35 PRIVATE
   message.c
   microui/microui.c
   midi.c
-  mmap.c
   modal.c
   msgskip.c
   mt19937-1.c
@@ -84,19 +93,13 @@ target_sources(xsystem35 PRIVATE
   music_midi.c
   nact.c
   network.c
-  pms.c
-  profile.c
-  qnt.c
   s39ain.c
   savedata.c
-  scenario.c
   scheduler.c
   selection.c
   system.c
   texthook.c
-  variable.c
   volume.c
-  vsp.c
   xsystem35.c
   )
 

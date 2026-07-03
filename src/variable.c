@@ -25,9 +25,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "portab.h"
+#include "system.h"
 #include "utfsjis.h"
 #include "variable.h"
-#include "xsystem35.h"
 
 // For some reasons, System3.9's initial system page size is 65537.
 #define SYSVAR_MAX 65537
@@ -54,9 +54,24 @@ double longVar[SYSVARLONG_MAX];
 static char **strVar;
 static int strvar_cnt;
 
+// Encoding of string variables
+static CharacterEncoding encoding = SHIFT_JIS;
+// Variable name table (defined in System39.ain)
+static int varname_cnt;
+static char **varnames;
+
+void v_set_encoding(CharacterEncoding e) {
+	encoding = e;
+}
+
+void v_set_names(int count, char **names) {
+	varname_cnt = count;
+	varnames = names;
+}
+
 const char *v_name(int var) {
-	if (var < nact->ain.varnum)
-		return nact->ain.var[var];
+	if (var < varname_cnt)
+		return varnames[var];
 	static char buf[10];
 	sprintf(buf, "VAR%d", var);
 	return buf;
@@ -64,7 +79,7 @@ const char *v_name(int var) {
 
 static char *advance(const char *s, int n) {
 	while (*s && n > 0) {
-		s = advance_char(s, nact->encoding);
+		s = advance_char(s, encoding);
 		n--;
 	}
 	return (char *)s;
@@ -264,7 +279,7 @@ size_t svar_length(int no) {
 
 	int c = 0;
 	while (*s) {
-		s = advance_char(s, nact->encoding);
+		s = advance_char(s, encoding);
 		c++;
 	}
 	return c;
@@ -299,7 +314,7 @@ int svar_find(int no, int start, const char *str) {
 		return -1;
 	int n = 0;
 	while (p < found) {
-		p = advance_char(p, nact->encoding);
+		p = advance_char(p, encoding);
 		n++;
 	}
 	return n;

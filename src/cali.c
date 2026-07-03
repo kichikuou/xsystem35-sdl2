@@ -24,10 +24,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "portab.h"
+#include "system.h"
+#include "cali.h"
 #include "variable.h"
 #include "scenario.h"
-#include "nact.h"
-#include "xsystem35.h"
 
 #define OP_AND 0x74
 #define OP_OR 0x75
