@@ -35,8 +35,7 @@
 #include "music_pcm.h"
 #include "music_private.h"
 #include "nact.h"
-#include "LittleEndian.h"
-#include "mmap.h"
+#include "audio_meta.h"
 
 #define SAMPLE_RATE 44100
 #define BYTES_PER_SAMPLE 4
@@ -50,12 +49,6 @@ static struct {
 	Mix_Chunk* chunk;
 	uint32_t start_time;
 } slots[PCM_SLOTS];
-
-static bool load_wai();
-static mmap_t *wai_map;
-
-// Volume mixer channel
-#define WAIMIXCH(no) LittleEndian_getDW(wai_map->addr, 36 + (no -1) * 4 * 3 + 8)
 
 // Apply the slot's volume valancer level via its chunk volume.
 static void apply_valance(int slot) {
@@ -152,7 +145,7 @@ bool muspcm_init(int audio_buffer_size) {
 	if (Mix_OpenAudio(SAMPLE_RATE, AUDIO_S16LSB, 2, audio_buffer_size) < 0)
 		return false;
 	Mix_AllocateChannels(PCM_SLOTS);
-	load_wai();
+	wai_load(nact->files.wai);
 	return true;
 }
 
@@ -177,8 +170,8 @@ bool muspcm_load_no(int slot, int no) {
 	}
 	
 	// if has .wai file
-	if (wai_map) {
-		int ch = WAIMIXCH(no);
+	if (wai_loaded()) {
+		int ch = wai_mixch(no);
 		prv.vol_pcm_sub[slot] = ch < 0 ? 0: ch;
 	} else {
 		prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;
@@ -332,25 +325,4 @@ void muspcm_waitend(int slot) {
 void muspcm_reapply_valance(void) {
 	for (int slot = 0; slot < PCM_SLOTS; slot++)
 		apply_valance(slot);
-}
-
-static bool load_wai() {
-	if (wai_map) {
-		unmap_file(wai_map);
-		wai_map = NULL;
-	}
-	if (nact->files.wai == NULL)
-		return false;
-	wai_map = map_file(nact->files.wai);
-	if (!wai_map)
-		return false;
-
-	char *adr = wai_map->addr;
-	if (*adr != 'X' || *(adr+1) != 'I' || *(adr+2) != '2') {
-		WARNING("not WAI file");
-		unmap_file(wai_map);
-		wai_map = NULL;
-		return false;
-	}
-	return true;
 }

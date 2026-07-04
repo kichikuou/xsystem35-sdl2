@@ -24,7 +24,7 @@ target_sources(xsystem35 PRIVATE
   ags.c
   ald_manager.c
   alpha_plane.c
-  bgi.c
+  audio_meta.c
   bmp.c
   cache.c
   cali.c

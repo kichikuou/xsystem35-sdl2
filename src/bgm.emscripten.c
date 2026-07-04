@@ -23,7 +23,7 @@
 #include "portab.h"
 #include "nact.h"
 #include "bgm.h"
-#include "bgi.h"
+#include "audio_meta.h"
 #include "system.h"
 
 bool musbgm_init(DRIFILETYPE type, int base_no) {

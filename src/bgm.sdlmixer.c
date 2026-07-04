@@ -32,7 +32,7 @@
 #include "system.h"
 #include "nact.h"
 #include "bgm.h"
-#include "bgi.h"
+#include "audio_meta.h"
 #include "music_private.h"
 #include "ald_manager.h"
 

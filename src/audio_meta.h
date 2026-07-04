@@ -1,5 +1,5 @@
 /*
- * bgi.c: BGI (BGM information) parser
+ * audio_meta.h: BGI (BGM information) / WAI (wave information) parser
  *
  * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
  *               1998-                           <masaki-c@is.aist-nara.ac.jp>
@@ -34,5 +34,9 @@ typedef struct {
 
 extern bool bgi_read(const char *path);
 extern bgi_t *bgi_find(int no);
+
+bool wai_load(const char *path);
+bool wai_loaded(void);
+int wai_mixch(int no);
 
 #endif /* _BGI_H__ */
