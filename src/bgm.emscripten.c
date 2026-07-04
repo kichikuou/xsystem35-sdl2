@@ -25,6 +25,7 @@
 #include "bgm.h"
 #include "audio_meta.h"
 #include "system.h"
+#include "music_private.h"
 
 bool musbgm_init(DRIFILETYPE type, int base_no) {
 	if (type == DRIFILE_BGM)
@@ -89,5 +90,5 @@ void musbgm_wait(int no, int timeout) {
 }
 
 void musbgm_reapply_valance(void) {
-	// not implemented
+	EM_ASM({ xsystem35.cdPlayer.setValance($0); }, prv.volval[BGM_VOLVAL_CH]);
 }

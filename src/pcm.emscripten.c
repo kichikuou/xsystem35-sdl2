@@ -23,9 +23,23 @@
 
 #include "portab.h"
 #include "music_pcm.h"
+#include "music_private.h"
+#include "nact.h"
+#include "audio_meta.h"
 
 bool muspcm_init(int audio_buffer_size) {
+	wai_load(nact->files.wai);
 	return true;
+}
+
+// Volume-valancer channel for PCM file number `no`, based on the WAI file.
+static int pcm_channel(int no) {
+	if (!wai_loaded())
+		return SE_VOLVAL_CH;
+	int ch = wai_mixch(no);
+	if ((unsigned)ch >= 16)  // guard against bad WAI data
+		ch = 0;
+	return ch;
 }
 
 void muspcm_exit(void) {
@@ -36,20 +50,24 @@ EM_JS(void, muspcm_reset, (void), {
 	xsystem35.audio.pcm_reset();
 });
 
-EM_ASYNC_JS(bool, muspcm_load_no, (int slot, int no), {
-	return await xsystem35.audio.pcm_load(slot, no);
+EM_ASYNC_JS(bool, pcm_load_no_js, (int slot, int no, int ch), {
+	return await xsystem35.audio.pcm_load(slot, no, ch);
 });
 
+bool muspcm_load_no(int slot, int no) {
+	return pcm_load_no_js(slot, no, pcm_channel(no));
+}
+
 EM_ASYNC_JS(bool, muspcm_load_bgm, (int slot, int no), {
-	return await xsystem35.audio.pcm_load_bgm(slot, no);
+	return await xsystem35.audio.pcm_load_bgm(slot, no, BGM_VOLVAL_CH);
 });
 
 EM_ASYNC_JS(bool, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {
-	return await xsystem35.audio.pcm_load_data(slot, buf, len);
+	return await xsystem35.audio.pcm_load_data(slot, buf, len, SE_VOLVAL_CH);
 });
 
 EM_ASYNC_JS(bool, muspcm_load_mixlr, (int slot, int noL, int noR), {
-	return await xsystem35.audio.pcm_load_mixlr(slot, noL, noR);
+	return await xsystem35.audio.pcm_load_mixlr(slot, noL, noR, SE_VOLVAL_CH);
 });
 
 EM_JS(void, muspcm_unload, (int slot), {
@@ -97,6 +115,10 @@ EM_ASYNC_JS(void, muspcm_waitend, (int slot), {
 	await xsystem35.audio.pcm_waitend(slot);
 });
 
+EM_JS(void, pcm_set_valance, (const int *vols, int num), {
+	xsystem35.audio.setValance(HEAP32.subarray(vols >> 2, (vols >> 2) + num));
+});
+
 void muspcm_reapply_valance(void) {
-	// not implemented
+	pcm_set_valance(prv.volval, 16);
 }

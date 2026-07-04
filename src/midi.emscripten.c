@@ -23,6 +23,7 @@
 
 #include "portab.h"
 #include "midi.h"
+#include "music_private.h"
 
 static bool midi_initialize(int subdev) {
 	return true;
@@ -82,6 +83,10 @@ EM_JS(bool, midi_fading, (void), {
 	return xsystem35.midiPlayer.isFading();
 });
 
+static void midi_reapply_valance(void) {
+	EM_ASM({ xsystem35.midiPlayer.setValance($0); }, prv.volval[BGM_VOLVAL_CH]);
+}
+
 mididevice_t midi_emscripten = {
 	.init = midi_initialize,
 	.exit = midi_exit,
@@ -95,4 +100,5 @@ mididevice_t midi_emscripten = {
 	.setflag = midi_setflag,
 	.fadestart = midi_fadestart,
 	.fading = midi_fading,
+	.reapply_volume = midi_reapply_valance,
 };
