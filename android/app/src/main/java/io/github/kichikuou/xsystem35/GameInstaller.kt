@@ -70,6 +70,23 @@ class GameInstaller(private val store: GameStore) {
         }
     }
 
+    internal suspend fun installCdImageForTest(
+        cdImage: CdImageReader,
+        progressCallback: suspend (String) -> Unit
+    ): File {
+        val dir = store.createDirForGame()
+        var committed = false
+        try {
+            val gameDir = extractCdImage(cdImage, dir, progressCallback)
+            committed = true
+            return gameDir
+        } finally {
+            if (!committed && !dir.deleteRecursively()) {
+                Log.w("launcher", "Failed to delete incomplete install directory: $dir")
+            }
+        }
+    }
+
     private suspend fun extractFiles(
         input: InputStream,
         outDir: File,
@@ -107,28 +124,36 @@ class GameInstaller(private val store: GameStore) {
     ): File {
         progressCallback("metadata parsing")
         CdImageReader.open(contentResolver, files, tempDir).use { cdImage ->
-            val fs = Iso9660FileSystem(cdImage)
-            val gameData = fs.findGameDataDirectory()
-                ?: throw InstallFailureException(R.string.cannot_find_game_data_directory)
-            var foundAld = false
-            fs.extractDirectory(gameData, "GAMEDATA") { path, input ->
-                val resolvedPath = resolveOutputPath(outDir, path)
-                resolvedPath.file.parentFile?.mkdirs()
-                progressCallback(resolvedPath.relativePath)
-                FileOutputStream(resolvedPath.file).buffered().use {
-                    input.copyTo(it)
-                }
-                if (File(path).name.matches(""".*?s[a-z]\.ald""".toRegex(RegexOption.IGNORE_CASE))) {
-                    foundAld = true
-                }
-            }
-            if (!foundAld) {
-                throw InstallFailureException(R.string.cannot_find_ald)
-            }
-            File(outDir, Launcher.GAMEDIR_FILE).writeText("GAMEDATA")
-            extractAudioTracks(cdImage, File(outDir, "GAMEDATA"), progressCallback)
-            return File(outDir, "GAMEDATA")
+            return extractCdImage(cdImage, outDir, progressCallback)
         }
+    }
+
+    private suspend fun extractCdImage(
+        cdImage: CdImageReader,
+        outDir: File,
+        progressCallback: suspend (String) -> Unit
+    ): File {
+        val fs = Iso9660FileSystem(cdImage)
+        val gameData = fs.findGameDataDirectory()
+            ?: throw InstallFailureException(R.string.cannot_find_game_data_directory)
+        var foundAld = false
+        fs.extractDirectory(gameData, "GAMEDATA") { path, input ->
+            val resolvedPath = resolveOutputPath(outDir, path)
+            resolvedPath.file.parentFile?.mkdirs()
+            progressCallback(resolvedPath.relativePath)
+            FileOutputStream(resolvedPath.file).buffered().use {
+                input.copyTo(it)
+            }
+            if (File(path).name.matches(""".*?s[a-z]\.ald""".toRegex(RegexOption.IGNORE_CASE))) {
+                foundAld = true
+            }
+        }
+        if (!foundAld) {
+            throw InstallFailureException(R.string.cannot_find_ald)
+        }
+        File(outDir, Launcher.GAMEDIR_FILE).writeText("GAMEDATA")
+        extractAudioTracks(cdImage, File(outDir, "GAMEDATA"), progressCallback)
+        return File(outDir, "GAMEDATA")
     }
 
     private suspend fun extractAudioTracks(
@@ -152,7 +177,7 @@ class GameInstaller(private val store: GameStore) {
             }
             playlist[track - 1] = relativePath
         }
-        File(gameDir, Launcher.PLAYLIST_FILE).writeText(playlist.joinToString("\n").trimEnd('\n'))
+        File(gameDir, Launcher.PLAYLIST_FILE).writeText(playlist.joinToString("\n") { it ?: "" }.trimEnd('\n'))
     }
 }
 
@@ -206,6 +231,9 @@ private class GameConfigWriter {
 internal data class ResolvedOutputPath(val file: File, val relativePath: String)
 
 internal fun resolveOutputPath(baseDir: File, relativePath: String): ResolvedOutputPath {
+    if (File(relativePath).isAbsolute) {
+        throw IOException("Output path is absolute: $relativePath")
+    }
     val canonicalBase = baseDir.canonicalFile
     val file = File(canonicalBase, relativePath).canonicalFile
     if (!isFileInsideDirectory(file, canonicalBase)) {

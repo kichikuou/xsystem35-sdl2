@@ -140,6 +140,35 @@ internal class CdImageReader private constructor(
             }
         }
 
+        internal fun openForFile(
+            imageFile: File,
+            metadataName: String? = null,
+            metadataBytes: ByteArray? = null,
+        ): CdImageReader {
+            val image = RandomAccessImage.open(imageFile)
+            try {
+                if (metadataName == null) {
+                    return CdImageReader(image, listOf(null, TrackInfo.iso(image.size)))
+                }
+                val tracks = when {
+                    metadataName.lowercase(Locale.US).endsWith(".cue") -> {
+                        parseCue(metadataBytes?.toString(Charsets.UTF_8) ?: "", image.size)
+                    }
+                    metadataName.lowercase(Locale.US).endsWith(".ccd") -> {
+                        parseCcd(metadataBytes?.toString(Charsets.UTF_8) ?: "", image.size)
+                    }
+                    metadataName.lowercase(Locale.US).endsWith(".mds") -> {
+                        parseMds(metadataBytes ?: ByteArray(0))
+                    }
+                    else -> throw InstallFailureException(R.string.unsupported_cd_image)
+                }
+                return CdImageReader(image, tracks)
+            } catch (e: Exception) {
+                image.close()
+                throw e
+            }
+        }
+
         private fun selectImageFiles(files: List<SelectedInstallFile>): SelectedImageFiles {
             if (files.isEmpty()) {
                 throw InstallFailureException(R.string.unsupported_cd_image)
@@ -488,6 +517,10 @@ private class RandomAccessImage private constructor(
     }
 
     companion object {
+        internal fun open(file: File): RandomAccessImage {
+            return RandomAccessImage(FileInputStream(file).channel, null, null)
+        }
+
         fun open(
             contentResolver: ContentResolver,
             file: SelectedInstallFile,
