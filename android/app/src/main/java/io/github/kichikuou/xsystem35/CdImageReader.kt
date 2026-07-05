@@ -37,6 +37,8 @@ internal class CdImageReader private constructor(
     }
 
     fun readDataFully(offset: Long, buffer: ByteArray, bufferOffset: Int, length: Int) {
+        // ISO9660 always sees logical 2048-byte data sectors even when the
+        // image stores each sector as a raw 2352-byte CD-ROM block.
         var logicalOffset = offset
         var outOffset = bufferOffset
         var remaining = length
@@ -65,6 +67,8 @@ internal class CdImageReader private constructor(
             throw InstallFailureException(R.string.unsupported_cd_image)
         }
         val dataSize = track.numSectors.toLong() * RAW_AUDIO_SECTOR_SIZE
+        // CD-DA sectors are already 44.1kHz stereo 16-bit PCM; wrapping the
+        // raw sector stream in a WAV header makes it playable by SDL_mixer.
         writeWaveHeader(output, dataSize)
         val buffer = ByteArray(track.blockSize * 16)
         var sector = 0
@@ -329,6 +333,8 @@ internal class CdImageReader private constructor(
                 val mode = mdsBytes[trackOffset].toInt() and 0xff
                 val trackNumber = mdsBytes[trackOffset + 0x04].toInt() and 0xff
                 val sectorSize = readLittleEndianShort(mdsBytes, trackOffset + 0x10)
+                // MDS offsets are treated as 32-bit file offsets, so images
+                // beyond 4GB are unsupported.
                 val imageOffset = readLittleEndianInt(mdsBytes, trackOffset + 0x28)
                 val sectors = readLittleEndianInt(mdsBytes, extraOffset + 0x04).toInt()
                 if (trackNumber >= tracks.size) {
@@ -368,6 +374,7 @@ internal class CdImageReader private constructor(
                 val cueTrack = cueTracks[trackNumber] ?: continue
                 val index1 = cueTrack.index[1]
                     ?: throw InstallFailureException(R.string.unsupported_cd_image)
+                // INDEX 0 describes a pregap, but a zero INDEX 0 is treated as absent.
                 cueTrack.index[0]?.takeIf { it != 0 }?.let { index0 ->
                     val gap = index1 - index0
                     if (gap > 0) {
@@ -536,6 +543,8 @@ private class RandomAccessImage private constructor(
                 descriptor.close()
             }
 
+            // Some SAF providers expose the URI as a pipe. Copy those to an
+            // app-private temp file so the CD reader can use positional reads.
             val tempFile = File.createTempFile("cdimage-", ".img", tempDir)
             try {
                 contentResolver.openInputStream(file.uri)?.use { input ->
