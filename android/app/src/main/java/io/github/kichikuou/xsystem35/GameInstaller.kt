@@ -17,6 +17,8 @@
 */
 package io.github.kichikuou.xsystem35
 
+import android.content.ContentResolver
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.runBlocking
@@ -26,8 +28,14 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.UTFDataFormatException
 import java.nio.charset.Charset
+import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+
+data class SelectedInstallFile(
+    val uri: Uri,
+    val displayName: String,
+)
 
 class GameInstaller(private val store: GameStore) {
     suspend fun installZip(input: InputStream, progressCallback: suspend (String) -> Unit): File {
@@ -35,6 +43,25 @@ class GameInstaller(private val store: GameStore) {
         var committed = false
         try {
             val gameDir = extractFiles(input, dir, progressCallback)
+            committed = true
+            return gameDir
+        } finally {
+            if (!committed && !dir.deleteRecursively()) {
+                Log.w("launcher", "Failed to delete incomplete install directory: $dir")
+            }
+        }
+    }
+
+    suspend fun installCdImage(
+        files: List<SelectedInstallFile>,
+        contentResolver: ContentResolver,
+        tempDir: File,
+        progressCallback: suspend (String) -> Unit
+    ): File {
+        val dir = store.createDirForGame()
+        var committed = false
+        try {
+            val gameDir = extractCdImage(files, contentResolver, tempDir, dir, progressCallback)
             committed = true
             return gameDir
         } finally {
@@ -70,6 +97,52 @@ class GameInstaller(private val store: GameStore) {
         }
         configWriter.write(outDir)
         return configWriter.gameDir?.let { File(outDir, it) } ?: outDir
+    }
+
+    private suspend fun extractCdImage(
+        files: List<SelectedInstallFile>,
+        contentResolver: ContentResolver,
+        tempDir: File,
+        outDir: File,
+        progressCallback: suspend (String) -> Unit
+    ): File {
+        progressCallback("metadata parsing")
+        val imageFile = selectIsoImage(files)
+        CdImageReader.openIso(contentResolver, imageFile, tempDir).use { cdImage ->
+            val fs = Iso9660FileSystem(cdImage)
+            val gameData = fs.findGameDataDirectory()
+                ?: throw InstallFailureException(R.string.cannot_find_game_data_directory)
+            var foundAld = false
+            fs.extractDirectory(gameData, "GAMEDATA") { path, input ->
+                val resolvedPath = resolveOutputPath(outDir, path)
+                resolvedPath.file.parentFile?.mkdirs()
+                progressCallback(resolvedPath.relativePath)
+                FileOutputStream(resolvedPath.file).buffered().use {
+                    input.copyTo(it)
+                }
+                if (File(path).name.matches(""".*?s[a-z]\.ald""".toRegex(RegexOption.IGNORE_CASE))) {
+                    foundAld = true
+                }
+            }
+            if (!foundAld) {
+                throw InstallFailureException(R.string.cannot_find_ald)
+            }
+            File(outDir, Launcher.GAMEDIR_FILE).writeText("GAMEDATA")
+            return File(outDir, "GAMEDATA")
+        }
+    }
+
+    private fun selectIsoImage(files: List<SelectedInstallFile>): SelectedInstallFile {
+        if (files.isEmpty()) {
+            throw InstallFailureException(R.string.unsupported_cd_image)
+        }
+        val imageFiles = files.filter {
+            it.displayName.lowercase(Locale.US).endsWith(".iso")
+        }
+        if (imageFiles.size != 1 || imageFiles.size != files.size) {
+            throw InstallFailureException(R.string.unsupported_cd_image)
+        }
+        return imageFiles.single()
     }
 }
 

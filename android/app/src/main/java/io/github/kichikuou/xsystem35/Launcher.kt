@@ -17,6 +17,7 @@
 */
 package io.github.kichikuou.xsystem35
 
+import android.content.ContentResolver
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -95,6 +96,26 @@ class Launcher private constructor(rootDir: File) {
         }
     }
 
+    fun installCdImage(
+        files: List<SelectedInstallFile>,
+        contentResolver: ContentResolver,
+        tempDir: File,
+    ) {
+        if (installJob?.isActive == true) {
+            return
+        }
+        startInstallJob {
+            val gameDir = withContext(Dispatchers.IO) {
+                installer.installCdImage(files, contentResolver, tempDir) { msg ->
+                    withContext(Dispatchers.Main) {
+                        setInstallProgress(msg)
+                    }
+                }
+            }
+            InstallResult(gameDir, null)
+        }
+    }
+
     private fun startInstallJob(block: suspend () -> InstallResult) {
         if (installJob?.isActive == true) {
             return
@@ -107,8 +128,8 @@ class Launcher private constructor(rootDir: File) {
             } catch (e: InstallFailureException) {
                 setInstallFailed(e.msgId)
             } catch (e: Exception) {
-                Log.e("launcher", "Failed to extract ZIP", e)
-                setInstallFailed(R.string.zip_extraction_error)
+                Log.e("launcher", "Failed to install game", e)
+                setInstallFailed(R.string.install_error)
             }
         }
     }

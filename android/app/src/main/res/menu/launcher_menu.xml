@@ -4,6 +4,9 @@
         android:id="@+id/install_from_zip"
         android:title="@string/action_install_from_zip" />
     <item
+        android:id="@+id/install_from_cd_image"
+        android:title="@string/action_install_from_cd_image" />
+    <item
         android:id="@+id/export_savedata"
         android:title="@string/action_export_save_data" />
     <item

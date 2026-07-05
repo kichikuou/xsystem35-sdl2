@@ -33,9 +33,10 @@ import android.widget.Toast
 import java.io.*
 
 private const val CONTENT_TYPE_ZIP = "application/zip"
-private const val INSTALL_REQUEST = 1
+private const val ZIP_INSTALL_REQUEST = 1
 private const val SAVEDATA_EXPORT_REQUEST = 2
 private const val SAVEDATA_IMPORT_REQUEST = 3
+private const val CD_IMAGE_INSTALL_REQUEST = 4
 
 class LauncherActivity : Activity(), LauncherObserver {
     private lateinit var launcher: Launcher
@@ -90,7 +91,15 @@ class LauncherActivity : Activity(), LauncherObserver {
             R.id.install_from_zip -> {
                 val i = Intent(Intent.ACTION_GET_CONTENT)
                 i.type = CONTENT_TYPE_ZIP
-                startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)), INSTALL_REQUEST)
+                startActivityForResult(Intent.createChooser(i, getString(R.string.choose_a_file)), ZIP_INSTALL_REQUEST)
+                true
+            }
+            R.id.install_from_cd_image -> {
+                val i = Intent(Intent.ACTION_GET_CONTENT)
+                i.type = "*/*"
+                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                startActivityForResult(Intent.createChooser(i, getString(R.string.choose_cd_image_files)),
+                    CD_IMAGE_INSTALL_REQUEST)
                 true
             }
             R.id.export_savedata -> {
@@ -140,14 +149,20 @@ class LauncherActivity : Activity(), LauncherObserver {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK)
             return
-        val uri = data?.data ?: return
         when (requestCode) {
-            INSTALL_REQUEST -> {
+            ZIP_INSTALL_REQUEST -> {
+                val uri = data?.data ?: return
                 val input = contentResolver.openInputStream(uri) ?: return
                 launcher.installZip(input, getArchiveName(uri))
                 renderInstallState(launcher.installState)
             }
+            CD_IMAGE_INSTALL_REQUEST -> {
+                val files = getSelectedInstallFiles(data)
+                launcher.installCdImage(files, contentResolver, cacheDir)
+                renderInstallState(launcher.installState)
+            }
             SAVEDATA_EXPORT_REQUEST -> try {
+                val uri = data?.data ?: return
                 launcher.exportSaveData(contentResolver.openOutputStream(uri)!!)
                 Toast.makeText(this, R.string.save_data_export_success, Toast.LENGTH_SHORT).show()
             } catch (e: IOException) {
@@ -155,6 +170,7 @@ class LauncherActivity : Activity(), LauncherObserver {
                 errorDialog(R.string.save_data_export_error)
             }
             SAVEDATA_IMPORT_REQUEST -> {
+                val uri = data?.data ?: return
                 val input = contentResolver.openInputStream(uri) ?: return
                 val errMsgId = launcher.importSaveData(input)
                 if (errMsgId == null) {
@@ -243,13 +259,33 @@ class LauncherActivity : Activity(), LauncherObserver {
     }
 
     private fun getArchiveName(uri: Uri): String? {
+        val fname = getDisplayName(uri) ?: return null
+        return if (fname.endsWith(".zip", true)) fname.dropLast(4) else fname
+    }
+
+    private fun getSelectedInstallFiles(data: Intent?): List<SelectedInstallFile> {
+        val files = mutableListOf<SelectedInstallFile>()
+        val clipData = data?.clipData
+        if (clipData != null) {
+            for (i in 0 until clipData.itemCount) {
+                val uri = clipData.getItemAt(i).uri
+                files.add(SelectedInstallFile(uri, getDisplayName(uri) ?: uri.lastPathSegment ?: ""))
+            }
+        } else {
+            data?.data?.let { uri ->
+                files.add(SelectedInstallFile(uri, getDisplayName(uri) ?: uri.lastPathSegment ?: ""))
+            }
+        }
+        return files
+    }
+
+    private fun getDisplayName(uri: Uri): String? {
         val cursor = contentResolver.query(uri, null, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
                 val column = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                 if (column >= 0) {
-                    val fname = it.getString(column)
-                    return if (fname.endsWith(".zip", true)) fname.dropLast(4) else fname
+                    return it.getString(column)
                 }
             }
         }
