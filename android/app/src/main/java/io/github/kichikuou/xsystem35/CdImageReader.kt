@@ -103,6 +103,8 @@ internal class CdImageReader private constructor(
         const val ISO_SECTOR_SIZE = 2048
         private const val RAW_AUDIO_SECTOR_SIZE = 2352
         private const val WAVE_HEADER_SIZE = 44
+        private const val MDS_MODE_AUDIO = 0xa9
+        private const val MDS_MODE_MODE1 = 0xaa
 
         fun open(
             contentResolver: ContentResolver,
@@ -115,10 +117,23 @@ internal class CdImageReader private constructor(
                 if (selected.metadata == null) {
                     return CdImageReader(image, listOf(null, TrackInfo.iso(image.size)))
                 }
-                val cueText = contentResolver.openInputStream(selected.metadata.uri)?.bufferedReader()?.use {
-                    it.readText()
-                } ?: throw InstallFailureException(R.string.cd_image_read_error)
-                return CdImageReader(image, parseCue(cueText, image.size))
+                val metadataName = selected.metadata.displayName.lowercase(Locale.US)
+                val tracks = when {
+                    metadataName.endsWith(".cue") -> {
+                        val cueText = readMetadataText(contentResolver, selected.metadata)
+                        parseCue(cueText, image.size)
+                    }
+                    metadataName.endsWith(".ccd") -> {
+                        val ccdText = readMetadataText(contentResolver, selected.metadata)
+                        parseCcd(ccdText, image.size)
+                    }
+                    metadataName.endsWith(".mds") -> {
+                        val mdsBytes = readMetadataBytes(contentResolver, selected.metadata)
+                        parseMds(mdsBytes)
+                    }
+                    else -> throw InstallFailureException(R.string.unsupported_cd_image)
+                }
+                return CdImageReader(image, tracks)
             } catch (e: Exception) {
                 image.close()
                 throw e
@@ -136,23 +151,60 @@ internal class CdImageReader private constructor(
 
             val imageFiles = files.filter {
                 val name = it.displayName.lowercase(Locale.US)
-                name.endsWith(".bin") || name.endsWith(".img")
+                name.endsWith(".bin") || name.endsWith(".img") || name.endsWith(".mdf")
             }
-            val cueFiles = files.filter { it.displayName.lowercase(Locale.US).endsWith(".cue") }
-            if (imageFiles.size == 1 && cueFiles.isEmpty() && files.size == 1 ||
-                imageFiles.isEmpty() && cueFiles.size == 1 && files.size == 1
+            val metadataFiles = files.filter {
+                val name = it.displayName.lowercase(Locale.US)
+                name.endsWith(".cue") || name.endsWith(".ccd") || name.endsWith(".mds")
+            }
+            if (imageFiles.size == 1 && metadataFiles.isEmpty() && files.size == 1 ||
+                imageFiles.isEmpty() && metadataFiles.size == 1 && files.size == 1
             ) {
                 throw InstallFailureException(R.string.missing_cd_image_metadata)
             }
-            if (imageFiles.size != 1 || cueFiles.size != 1 || files.size != 2) {
+            if (imageFiles.size != 1 || metadataFiles.size != 1 || files.size != 2) {
                 throw InstallFailureException(R.string.unsupported_cd_image)
             }
             val imageBase = imageFiles.single().baseName()
-            val cueBase = cueFiles.single().baseName()
-            if (imageBase != cueBase) {
+            val metadataBase = metadataFiles.single().baseName()
+            if (imageBase != metadataBase) {
                 throw InstallFailureException(R.string.missing_cd_image_metadata)
             }
-            return SelectedImageFiles(imageFiles.single(), cueFiles.single())
+            if (!isSupportedMetadataForImage(imageFiles.single(), metadataFiles.single())) {
+                throw InstallFailureException(R.string.unsupported_cd_image)
+            }
+            return SelectedImageFiles(imageFiles.single(), metadataFiles.single())
+        }
+
+        private fun isSupportedMetadataForImage(
+            image: SelectedInstallFile,
+            metadata: SelectedInstallFile,
+        ): Boolean {
+            val imageName = image.displayName.lowercase(Locale.US)
+            val metadataName = metadata.displayName.lowercase(Locale.US)
+            return if (imageName.endsWith(".mdf")) {
+                metadataName.endsWith(".mds")
+            } else {
+                metadataName.endsWith(".cue") || metadataName.endsWith(".ccd")
+            }
+        }
+
+        private fun readMetadataText(
+            contentResolver: ContentResolver,
+            file: SelectedInstallFile,
+        ): String {
+            return contentResolver.openInputStream(file.uri)?.bufferedReader()?.use {
+                it.readText()
+            } ?: throw InstallFailureException(R.string.cd_image_read_error)
+        }
+
+        private fun readMetadataBytes(
+            contentResolver: ContentResolver,
+            file: SelectedInstallFile,
+        ): ByteArray {
+            return contentResolver.openInputStream(file.uri)?.use {
+                it.readBytes()
+            } ?: throw InstallFailureException(R.string.cd_image_read_error)
         }
 
         private fun parseCue(cueText: String, imageSize: Long): List<TrackInfo?> {
@@ -192,6 +244,91 @@ internal class CdImageReader private constructor(
                 }
             }
             return makeTrackInfo(cueTracks, imageSize)
+        }
+
+        private fun parseCcd(ccdText: String, imageSize: Long): List<TrackInfo?> {
+            val cueTracks = mutableListOf<CueTrack?>()
+            var currentTrack: Int? = null
+            for (line in ccdText.lines()) {
+                val trimmed = line.trim()
+                val trackMatch = Regex("""\[TRACK ([0-9]+)]""").matchEntire(trimmed)
+                if (trackMatch != null) {
+                    currentTrack = trackMatch.groupValues[1].toInt()
+                    while (cueTracks.size <= currentTrack) {
+                        cueTracks.add(null)
+                    }
+                    cueTracks[currentTrack] = CueTrack(false, 2352, 16)
+                    continue
+                }
+                val trackNumber = currentTrack ?: continue
+                val keyValue = trimmed.split("=", limit = 2)
+                if (keyValue.size != 2) {
+                    continue
+                }
+                when (keyValue[0].uppercase(Locale.US)) {
+                    "MODE" -> if (keyValue[1] == "0") {
+                        cueTracks[trackNumber] = CueTrack(true, 2352, 0, cueTracks[trackNumber]?.index ?: mutableMapOf())
+                    }
+                    "INDEX 0" -> cueTracks[trackNumber]?.index?.put(
+                        0,
+                        keyValue[1].toIntOrNull() ?: throw InstallFailureException(R.string.unsupported_cd_image)
+                    )
+                    "INDEX 1" -> cueTracks[trackNumber]?.index?.put(
+                        1,
+                        keyValue[1].toIntOrNull() ?: throw InstallFailureException(R.string.unsupported_cd_image)
+                    )
+                }
+            }
+            return makeTrackInfo(cueTracks, imageSize)
+        }
+
+        private fun parseMds(mdsBytes: ByteArray): List<TrackInfo?> {
+            if (mdsBytes.size < 0x70 ||
+                String(mdsBytes, 0, 16, Charsets.US_ASCII).trimEnd('\u0000') != "MEDIA DESCRIPTOR"
+            ) {
+                throw InstallFailureException(R.string.unsupported_cd_image)
+            }
+            val entries = mdsBytes[0x62].toInt() and 0xff
+            if (0x70 + entries * 0x58 > mdsBytes.size) {
+                throw InstallFailureException(R.string.unsupported_cd_image)
+            }
+
+            val tracks = MutableList<TrackInfo?>(100) { null }
+            for (i in 0 until entries) {
+                val trackOffset = 0x70 + i * 0x50
+                val extraOffset = 0x70 + entries * 0x50 + i * 8
+                val mode = mdsBytes[trackOffset].toInt() and 0xff
+                val trackNumber = mdsBytes[trackOffset + 0x04].toInt() and 0xff
+                val sectorSize = readLittleEndianShort(mdsBytes, trackOffset + 0x10)
+                val imageOffset = readLittleEndianInt(mdsBytes, trackOffset + 0x28)
+                val sectors = readLittleEndianInt(mdsBytes, extraOffset + 0x04).toInt()
+                if (trackNumber >= tracks.size) {
+                    continue
+                }
+                tracks[trackNumber] = when (mode) {
+                    MDS_MODE_AUDIO -> TrackInfo(
+                        isAudio = true,
+                        offset = imageOffset,
+                        blockSize = sectorSize,
+                        blockOffset = 0,
+                        startSector = 0,
+                        numSectors = sectors,
+                    )
+                    MDS_MODE_MODE1 -> TrackInfo(
+                        isAudio = false,
+                        offset = imageOffset,
+                        blockSize = sectorSize,
+                        blockOffset = 16,
+                        startSector = 0,
+                        numSectors = sectors,
+                    )
+                    else -> null
+                }
+            }
+            if (tracks.getOrNull(1)?.isAudio != false) {
+                throw InstallFailureException(R.string.unsupported_cd_image)
+            }
+            return tracks
         }
 
         private fun makeTrackInfo(cueTracks: List<CueTrack?>, imageSize: Long): List<TrackInfo?> {
@@ -275,6 +412,18 @@ internal class CdImageReader private constructor(
             buffer[offset + 1] = (value shr 8).toByte()
             buffer[offset + 2] = (value shr 16).toByte()
             buffer[offset + 3] = (value shr 24).toByte()
+        }
+
+        private fun readLittleEndianShort(buffer: ByteArray, offset: Int): Int {
+            return (buffer[offset].toInt() and 0xff) or
+                ((buffer[offset + 1].toInt() and 0xff) shl 8)
+        }
+
+        private fun readLittleEndianInt(buffer: ByteArray, offset: Int): Long {
+            return (buffer[offset].toLong() and 0xff) or
+                ((buffer[offset + 1].toLong() and 0xff) shl 8) or
+                ((buffer[offset + 2].toLong() and 0xff) shl 16) or
+                ((buffer[offset + 3].toLong() and 0xff) shl 24)
         }
     }
 }
