@@ -164,8 +164,9 @@ class Launcher private constructor(private val rootDir: File) {
                 if (zipEntry.isDirectory || !zipEntry.name.startsWith("save/") ||
                         zipEntry.name.count{it == '/'} != 1)
                     return@forEachZipEntry
+                val path = resolveOutputPath(rootDir, zipEntry.name).file
                 Log.i("importSaveData", zipEntry.name)
-                FileOutputStream(File(rootDir, zipEntry.name)).buffered().use {
+                FileOutputStream(path).buffered().use {
                     zip.copyTo(it)
                 }
                 imported = true
@@ -184,15 +185,16 @@ class Launcher private constructor(private val rootDir: File) {
         val configWriter = GameConfigWriter()
         val hadDecodeError = forEachZipEntry(input) { zipEntry, zip ->
             Log.i("extractFiles", zipEntry.name)
-            val path = File(outDir, zipEntry.name)
             if (zipEntry.isDirectory)
                 return@forEachZipEntry
+            val resolvedPath = resolveOutputPath(outDir, zipEntry.name)
+            val path = resolvedPath.file
             path.parentFile?.mkdirs()
-            progressCallback(zipEntry.name)
+            progressCallback(resolvedPath.relativePath)
             FileOutputStream(path).buffered().use {
                 zip.copyTo(it)
             }
-            configWriter.maybeAdd(zipEntry.name)
+            configWriter.maybeAdd(resolvedPath.relativePath)
         }
         if (!configWriter.ready) {
             if (hadDecodeError)
@@ -261,6 +263,27 @@ class Launcher private constructor(private val rootDir: File) {
         }
         return success
     }
+}
+
+/**
+ * @property file Safe canonical output path.
+ * @property relativePath Path relative to the install root after canonicalization.
+ */
+private data class ResolvedOutputPath(val file: File, val relativePath: String)
+
+private fun resolveOutputPath(baseDir: File, relativePath: String): ResolvedOutputPath {
+    val canonicalBase = baseDir.canonicalFile
+    val file = File(canonicalBase, relativePath).canonicalFile
+    if (!isFileInsideDirectory(file, canonicalBase)) {
+        throw IOException("Output path is outside target directory: $relativePath")
+    }
+    val basePath = canonicalBase.path + File.separator
+    val canonicalRelativePath = file.path.removePrefix(basePath)
+    return ResolvedOutputPath(file, canonicalRelativePath)
+}
+
+private fun isFileInsideDirectory(file: File, directory: File): Boolean {
+    return file.path.startsWith(directory.path + File.separator)
 }
 
 private fun forEachZipEntry(input: InputStream, action: (ZipEntry, ZipInputStream) -> Unit): Boolean {
