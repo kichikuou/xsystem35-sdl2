@@ -36,7 +36,6 @@ private const val CONTENT_TYPE_ZIP = "application/zip"
 private const val INSTALL_REQUEST = 1
 private const val SAVEDATA_EXPORT_REQUEST = 2
 private const val SAVEDATA_IMPORT_REQUEST = 3
-private const val STATE_PROGRESS_TEXT = "progressText"
 
 class LauncherActivity : Activity(), LauncherObserver {
     private lateinit var launcher: Launcher
@@ -48,9 +47,7 @@ class LauncherActivity : Activity(), LauncherObserver {
 
         launcher = Launcher.getInstance(filesDir)
         launcher.observer = this
-        if (launcher.isInstalling) {
-            showProgressDialog(savedInstanceState)
-        }
+        renderInstallState(launcher.installState)
 
         onGameListChange()
         val listView = findViewById<ListView>(R.id.list)
@@ -68,13 +65,6 @@ class LauncherActivity : Activity(), LauncherObserver {
         launcher.observer = null
         dismissProgressDialog()
         super.onDestroy()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        progressDialog?.let {
-            outState.putCharSequence(STATE_PROGRESS_TEXT, it.findViewById<TextView>(R.id.text).text)
-        }
-        super.onSaveInstanceState(outState)
     }
 
     private fun onListItemClick(position: Int) {
@@ -154,8 +144,8 @@ class LauncherActivity : Activity(), LauncherObserver {
         when (requestCode) {
             INSTALL_REQUEST -> {
                 val input = contentResolver.openInputStream(uri) ?: return
-                showProgressDialog()
                 launcher.install(input, getArchiveName(uri))
+                renderInstallState(launcher.installState)
             }
             SAVEDATA_EXPORT_REQUEST -> try {
                 launcher.exportSaveData(contentResolver.openOutputStream(uri)!!)
@@ -184,17 +174,15 @@ class LauncherActivity : Activity(), LauncherObserver {
     }
 
     override fun onInstallProgress(path: String) {
-        progressDialog?.findViewById<TextView>(R.id.text)?.text = getString(R.string.install_progress, path)
+        renderInstallState(launcher.installState)
     }
 
     override fun onInstallSuccess(path: File, archiveName: String?) {
-        dismissProgressDialog()
-        startGame(path, archiveName)
+        renderInstallState(launcher.installState)
     }
 
     override fun onInstallFailure(msgId: Int) {
-        dismissProgressDialog()
-        errorDialog(msgId)
+        renderInstallState(launcher.installState)
     }
 
     private fun startGame(path: File, archiveName: String?) {
@@ -210,16 +198,35 @@ class LauncherActivity : Activity(), LauncherObserver {
         launcher.uninstall(id)
     }
 
-    private fun showProgressDialog(savedInstanceState: Bundle? = null) {
-        progressDialog = Dialog(this)
-        progressDialog!!.apply {
-            setTitle(R.string.install_dialog_title)
-            setCancelable(false)
-            setContentView(R.layout.progress_dialog)
-            savedInstanceState?.let {
-                findViewById<TextView>(R.id.text)?.text = it.getCharSequence(STATE_PROGRESS_TEXT)
+    private fun renderInstallState(state: InstallState) {
+        when (state) {
+            InstallState.Idle -> dismissProgressDialog()
+            is InstallState.Installing -> showProgressDialog(state.progress)
+            is InstallState.Succeeded -> {
+                dismissProgressDialog()
+                startGame(state.path, state.archiveName)
+                launcher.consumeInstallResult()
             }
-            show()
+            is InstallState.Failed -> {
+                dismissProgressDialog()
+                errorDialog(state.msgId)
+                launcher.consumeInstallResult()
+            }
+        }
+    }
+
+    private fun showProgressDialog(progress: String? = null) {
+        if (progressDialog == null) {
+            progressDialog = Dialog(this)
+            progressDialog!!.apply {
+                setTitle(R.string.install_dialog_title)
+                setCancelable(false)
+                setContentView(R.layout.progress_dialog)
+                show()
+            }
+        }
+        progress?.let {
+            progressDialog?.findViewById<TextView>(R.id.text)?.text = getString(R.string.install_progress, it)
         }
     }
 
