@@ -144,7 +144,7 @@ class LauncherActivity : Activity(), LauncherObserver {
         when (requestCode) {
             INSTALL_REQUEST -> {
                 val input = contentResolver.openInputStream(uri) ?: return
-                launcher.install(input, getArchiveName(uri))
+                launcher.installZip(input, getArchiveName(uri))
                 renderInstallState(launcher.installState)
             }
             SAVEDATA_EXPORT_REQUEST -> try {
