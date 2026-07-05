@@ -16,13 +16,31 @@ Alternatively, you can install `xsystem35-sdl2` using [Obtainium](https://github
 
 ## Usage
 ### Basic Usage
+You can install games either from a prepared ZIP file or directly from a CD-ROM
+image.
+
+#### Installing from a ZIP
 1. Create a ZIP file containing all the game files and BGM files (see
    [below](#preparing-a-zip) for details), and transfer it to your device.
 2. Open the app. Tap the option menu (three dots in the top right corner) and
    select "Install from ZIP".
 3. Select the ZIP file you created in step 1.
-4. The game will start. To simulate a right-click, tap the black bars on either
-   the left or right, or top or bottom of the screen.
+4. The game will start.
+
+#### Installing from a CD image
+1. Transfer the CD image file(s) to your device.
+2. Open the app. Tap the option menu and select "Install from CD image".
+3. Select the image file and, when needed, the matching metadata file at the
+   same time. The supported combinations are:
+   - `.iso`
+   - `.bin` or `.img` with matching `.cue`
+   - `.bin` or `.img` with matching `.ccd`
+   - `.mdf` with matching `.mds`
+
+   In many Android file pickers, tapping a file immediately selects only that
+   one file. Long-press a file first to enter multi-select mode, then select
+   both the image file and its metadata file.
+4. The game will start.
 
 ### Preparing a ZIP
 - Include all files from the `GAMEDATA` folder (such as `.ALD` files and
@@ -41,6 +59,8 @@ Note: This ZIP format is also compatible with
 [Kichikuou on Web](http://kichikuou.github.io/web/).
 
 ### Miscellaneous
+- To simulate a right-click, tap the black bars on either the left or right,
+  or top or bottom of the screen.
 - You can export or import save files via the game list's option menu.
 - To uninstall a game, long-tap its title in the game list.
 

@@ -3,6 +3,7 @@
 ## Unreleased
 - Replaced the GTK-based popup menu and dialogs with a pure-SDL implementation.
 - On Android, the popup menu opens with a three-finger tap.
+- Android: Added installation directly from CD-ROM images.
 - Implemented volume control panel.
 - Added `mute_on_unfocus` option to mute audio while the window is unfocused.
 
