@@ -28,7 +28,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.UTFDataFormatException
 import java.nio.charset.Charset
-import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -107,8 +106,7 @@ class GameInstaller(private val store: GameStore) {
         progressCallback: suspend (String) -> Unit
     ): File {
         progressCallback("metadata parsing")
-        val imageFile = selectIsoImage(files)
-        CdImageReader.openIso(contentResolver, imageFile, tempDir).use { cdImage ->
+        CdImageReader.open(contentResolver, files, tempDir).use { cdImage ->
             val fs = Iso9660FileSystem(cdImage)
             val gameData = fs.findGameDataDirectory()
                 ?: throw InstallFailureException(R.string.cannot_find_game_data_directory)
@@ -128,21 +126,33 @@ class GameInstaller(private val store: GameStore) {
                 throw InstallFailureException(R.string.cannot_find_ald)
             }
             File(outDir, Launcher.GAMEDIR_FILE).writeText("GAMEDATA")
+            extractAudioTracks(cdImage, File(outDir, "GAMEDATA"), progressCallback)
             return File(outDir, "GAMEDATA")
         }
     }
 
-    private fun selectIsoImage(files: List<SelectedInstallFile>): SelectedInstallFile {
-        if (files.isEmpty()) {
-            throw InstallFailureException(R.string.unsupported_cd_image)
+    private suspend fun extractAudioTracks(
+        cdImage: CdImageReader,
+        gameDir: File,
+        progressCallback: suspend (String) -> Unit
+    ) {
+        val audioTracks = cdImage.audioTracks()
+        if (audioTracks.isEmpty()) {
+            return
         }
-        val imageFiles = files.filter {
-            it.displayName.lowercase(Locale.US).endsWith(".iso")
+        val cddaDir = File(gameDir, "cdda")
+        cddaDir.mkdirs()
+        val playlist = arrayOfNulls<String>(audioTracks.maxOrNull() ?: 0)
+        for (track in audioTracks) {
+            val relativePath = "cdda/track%02d.wav".format(track)
+            val outputFile = File(gameDir, relativePath)
+            progressCallback(relativePath)
+            FileOutputStream(outputFile).buffered().use {
+                cdImage.extractAudioTrack(track, it)
+            }
+            playlist[track - 1] = relativePath
         }
-        if (imageFiles.size != 1 || imageFiles.size != files.size) {
-            throw InstallFailureException(R.string.unsupported_cd_image)
-        }
-        return imageFiles.single()
+        File(gameDir, Launcher.PLAYLIST_FILE).writeText(playlist.joinToString("\n").trimEnd('\n'))
     }
 }
 

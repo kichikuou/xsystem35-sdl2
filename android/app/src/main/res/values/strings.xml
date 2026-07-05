@@ -20,6 +20,7 @@
     <string name="install_error">Failed to install game.</string>
     <string name="install_progress">Extracting %s</string>
     <string name="invalid_iso9660_image">This file is not a valid ISO9660 image.</string>
+    <string name="missing_cd_image_metadata">Select a matching .cue file with the .bin or .img file.</string>
     <string name="no_data_to_import">No save/ folder in the ZIP archive.</string>
     <string name="ok">OK</string>
     <string name="save_data_clear_error">Failed to clear save files.</string>
@@ -28,7 +29,7 @@
     <string name="save_data_import_success">Imported successfully.</string>
     <string name="save_data_export_success">Exported successfully.</string>
     <string name="uninstall_dialog_message">Uninstall \"%s\"?</string>
-    <string name="unsupported_cd_image">This CD image format is not supported yet. Currently only .iso is supported.</string>
+    <string name="unsupported_cd_image">This CD image format is not supported yet. Currently only .iso and .bin/.img + .cue are supported.</string>
     <string name="unsupported_zip">This type of ZIP is not supported.</string>
     <string name="zip_extraction_error">Failed to extract ZIP.</string>
     <string name="usage">

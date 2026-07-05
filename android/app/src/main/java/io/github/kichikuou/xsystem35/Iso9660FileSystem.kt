@@ -54,7 +54,7 @@ internal class Iso9660FileSystem(private val image: CdImageReader) {
 
     private fun listDirectory(directory: Entry): List<Entry> {
         val bytes = ByteArray(directory.size)
-        image.readFully(
+        image.readDataFully(
             directory.extent.toLong() * CdImageReader.ISO_SECTOR_SIZE,
             bytes,
             0,
@@ -108,7 +108,7 @@ internal class Iso9660FileSystem(private val image: CdImageReader) {
                     return -1
                 }
                 val count = minOf(length, entry.size - pos)
-                image.readFully(
+                image.readDataFully(
                     entry.extent.toLong() * CdImageReader.ISO_SECTOR_SIZE + pos,
                     buffer,
                     offset,

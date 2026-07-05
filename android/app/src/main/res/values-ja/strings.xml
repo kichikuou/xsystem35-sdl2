@@ -21,6 +21,7 @@
     <string name="install_error">ゲームのインストールに失敗しました。</string>
     <string name="install_progress">%s を展開中</string>
     <string name="invalid_iso9660_image">有効な ISO9660 イメージではありません。</string>
+    <string name="missing_cd_image_metadata">.bin または .img ファイルと対応する .cue ファイルを一緒に選択してください。</string>
     <string name="no_data_to_import">ZIP アーカイブ中に save/ フォルダが見つかりません。</string>
     <string name="save_data_export_error">セーブデータのエクスポートに失敗しました。</string>
     <string name="save_data_export_success">エクスポートに成功しました。</string>
@@ -28,7 +29,7 @@
     <string name="save_data_clear_success">セーブデータをクリアしました。</string>
     <string name="save_data_clear_error">セーブデータのクリアに失敗しました。</string>
     <string name="uninstall_dialog_message">「%s」をアンインストールしますか？</string>
-    <string name="unsupported_cd_image">この CD イメージ形式にはまだ対応していません。現在は .iso のみ対応しています。</string>
+    <string name="unsupported_cd_image">この CD イメージ形式にはまだ対応していません。現在は .iso と .bin/.img + .cue に対応しています。</string>
     <string name="unsupported_zip">この形式の ZIP はサポートしていません。</string>
     <string name="zip_extraction_error">ZIP の展開に失敗しました。</string>
     <string name="usage">
