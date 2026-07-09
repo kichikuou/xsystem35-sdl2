@@ -193,9 +193,10 @@ else()  # non-emscripten, non-android
     src_tests.c
     gameresource_test.c
     hankaku_test.c
+    qnt_test.c
     )
   target_compile_options(src_tests PRIVATE -Wno-pointer-sign -Wall)
-  target_link_libraries(src_tests PRIVATE src_lib)
+  target_link_libraries(src_tests PRIVATE src_lib sdl2)
   add_test(NAME src_tests COMMAND src_tests)
-  configure_file(testdata/test.gr ${CMAKE_CURRENT_BINARY_DIR}/testdata/test.gr COPYONLY)
+  file(COPY testdata DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
