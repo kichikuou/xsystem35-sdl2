@@ -40,11 +40,13 @@
 #include "qnt.h"
 #include "system.h"
 
-/*
-  zlib の展開バッファで、幅×高さ×３に、さらにどれくらい余裕をとるか
-   (リクルスで 1164バイトというのがあった)
-*/
-#define ZLIBBUF_MARGIN 5*1024
+// QNT compressed data is arranged in 2x2 pixel blocks, so odd dimensions
+// are decompressed through the next even width or height.
+static long zlibbuf_size(qnt_header *qnt, int bytes_per_pixel) {
+	long width = (qnt->width + 1) & ~1;
+	long height = (qnt->height + 1) & ~1;
+	return width * height * bytes_per_pixel;
+}
 
 /*
   Get information from header
@@ -86,8 +88,8 @@ static void extract_header(uint8_t *b, qnt_header *qnt) {
 */
 static void extract_pixel(qnt_header *qnt, uint8_t *pic, uint8_t *b) {
 	int i, j, x, y, w, h;
-	long ucbuf = (qnt->width+1) * (qnt->height+1) * 3 + ZLIBBUF_MARGIN;
-	uint8_t *raw = malloc(sizeof(uint8_t) * ucbuf);
+	long ucbuf = zlibbuf_size(qnt, 3);
+	uint8_t *raw = malloc(ucbuf);
 	
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->pixel_size)) {
 		WARNING("uncompress failed");
@@ -168,8 +170,8 @@ static void extract_pixel(qnt_header *qnt, uint8_t *pic, uint8_t *b) {
 */
 static void extract_alpha(qnt_header *qnt, uint8_t *pic, uint8_t *b) {
 	int i, x, y, w, h;
-	long ucbuf = (qnt->width+1) * (qnt->height+1) + ZLIBBUF_MARGIN;
-	uint8_t *raw = malloc(sizeof(uint8_t) * ucbuf);
+	long ucbuf = zlibbuf_size(qnt, 1);
+	uint8_t *raw = malloc(ucbuf);
 
 	if (Z_OK != uncompress(raw, &ucbuf, b, qnt->alpha_size)) {
 		WARNING("uncompress failed");
@@ -231,11 +233,11 @@ cgdata *qnt_extract(uint8_t *data) {
 	qnt_header qnt;
 	extract_header(data, &qnt);
 	
-	cg->pic = malloc(sizeof(uint8_t) * ((qnt.width+10) * (qnt.height+10) * 3));
+	cg->pic = malloc(qnt.width * qnt.height * 3);
 	extract_pixel(&qnt, cg->pic, data + qnt.hdr_size);
 	
 	if (qnt.alpha_size != 0) {
-		cg->alpha = malloc(sizeof(uint8_t) * ((qnt.width+10) * (qnt.height+10)));
+		cg->alpha = malloc(qnt.width * qnt.height);
 		extract_alpha(&qnt, (uint8_t *)cg->alpha, data + qnt.hdr_size + qnt.pixel_size);
 	}
 	
