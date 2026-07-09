@@ -29,7 +29,6 @@
 #include "gfx_private.h"
 
 #define M_PIf ((float)M_PI)
-#define HAS_SDL_RenderGeometry SDL_VERSION_ATLEAST(2, 0, 18)
 
 enum effect_type from_nact_effect(enum nact_effect effect) {
 	switch (effect) {
@@ -420,11 +419,7 @@ static void mosaic(EffectTexture *src, SDL_Texture *tmp, SDL_Texture *dst, int w
 	};
 	SDL_SetRenderTarget(gfx_renderer, dst);
 
-#if SDL_VERSION_ATLEAST(2, 0, 12)
 	SDL_SetTextureScaleMode(tmp, SDL_ScaleModeNearest);
-#else
-	// Should be okay because nearest is the default scaling mode.
-#endif
 	SDL_RenderCopy(gfx_renderer, tmp, NULL, &dstr);
 	SDL_SetRenderTarget(gfx_renderer, NULL);
 }
@@ -1201,7 +1196,6 @@ static void polygon_mask_step(struct effect *eff, float progress);
 static void polygon_mask_free(struct effect *eff);
 
 static struct effect *polygon_mask_new(SDL_Rect *rect, EffectTexture *old, EffectTexture *new, enum effect_type type) {
-#if HAS_SDL_RenderGeometry
 	if (SDL_RenderTargetSupported(gfx_renderer)) {
 		struct polygon_mask_effect *pmf = calloc(1, sizeof(struct polygon_mask_effect));
 		if (!pmf)
@@ -1212,12 +1206,9 @@ static struct effect *polygon_mask_new(SDL_Rect *rect, EffectTexture *old, Effec
 		pmf->f.finish = polygon_mask_free;
 		return &pmf->f;
 	}
-#endif // HAS_SDL_RenderGeometry
 
 	return fallback_effect_new(rect, old, new, type);
 }
-
-#if HAS_SDL_RenderGeometry
 
 static void draw_pentagram(int center_x, int center_y, float radius, float rotate) {
 	const SDL_FPoint p[10] = {
@@ -1447,8 +1438,6 @@ static void polygon_mask_free(struct effect *eff) {
 	eff_finish(&this->f, true);
 	free(this);
 }
-
-#endif // HAS_SDL_RenderGeometry
 
 // EFFECT_ROTATE_*
 

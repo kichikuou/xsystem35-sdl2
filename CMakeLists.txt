@@ -87,7 +87,7 @@ else()  # non-emscripten, non-android
   add_library(zlib ALIAS ZLIB::ZLIB)
 
   include(FindPkgConfig)
-  pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
+  pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2>=2.18.0)
   pkg_check_modules(SDL2TTF REQUIRED IMPORTED_TARGET SDL2_ttf)
   pkg_check_modules(SDL2MIXER REQUIRED IMPORTED_TARGET SDL2_mixer)
   if (WIN32)

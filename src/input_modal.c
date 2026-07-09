@@ -224,13 +224,11 @@ static bool menu_string_handler(const SDL_Event *e, modal *modal) {
 // pixels for SDL_SetTextInputRect.
 static void set_text_input_rect(mu_Rect box) {
 	SDL_Rect r = { box.x, box.y, box.w, box.h };
-#if SDL_VERSION_ATLEAST(2, 0, 18)
 	int x2, y2;
 	SDL_RenderLogicalToWindow(gfx_renderer, box.x, box.y, &r.x, &r.y);
 	SDL_RenderLogicalToWindow(gfx_renderer, box.x + box.w, box.y + box.h, &x2, &y2);
 	r.w = x2 - r.x;
 	r.h = y2 - r.y;
-#endif
 	SDL_SetTextInputRect(&r);
 }
 
