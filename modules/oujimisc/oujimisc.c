@@ -125,8 +125,8 @@ static void DrawNumber() {
 	int dstY = getCaliValue();
 	int num = getCaliValue();
 
-	char buf[6];
-	sprintf(buf, "%5d", num);
+	char buf[12];
+	snprintf(buf, sizeof(buf), "%5d", num);
 
 	surface_t *dib = ags_getDIB();
 	for (char *c = buf; *c; c++) {
@@ -225,7 +225,7 @@ static void TempMapFileSave() {
 	int p1 = getCaliValue();
 
 	char fname[32];
-	sprintf(fname, "王子_M%d.asd", p1);
+	snprintf(fname, sizeof(fname), "王子_M%d.asd", p1);
 	FILE *fp = fc_open(fname, 'w');
 	if (!fp) {
 		WARNING("Cannot open %s", fname);
@@ -257,7 +257,7 @@ static void TempMapFileLoad() {
 	int p1 = getCaliValue();
 
 	char fname[32];
-	sprintf(fname, "王子_M%d.asd", p1);
+	snprintf(fname, sizeof(fname), "王子_M%d.asd", p1);
 	FILE *fp = fc_open(fname, 'r');
 	if (!fp) {
 		WARNING("Cannot open %s", fname);
