@@ -99,8 +99,8 @@ void commandIK() {
 
 void commandIM() {
 	/* マウスカーソルの座標取得 */
-	int *x_var = getCaliVariable();
-	int *y_var = getCaliVariable();
+	vmvar_t *x_var = getCaliVariable();
+	vmvar_t *y_var = getCaliVariable();
 	SDL_Point p;
 	
 	sysVar[0] = sys_getMouseInfo(&p, false);
@@ -113,7 +113,7 @@ void commandIC() {
 	/* マウスカーソルの形状変更 */
 	static int pre = 1;
 	int cursor_num = getCaliValue();
-	int *oldcursor  = getCaliVariable();
+	vmvar_t *oldcursor  = getCaliVariable();
 	*oldcursor = pre;
 	pre = cursor_num;
 	
@@ -132,7 +132,7 @@ void commandIZ() {
 
 void commandIX() {
 	/* 「次の選択肢まで進む」の状態取得 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = msgskip_isSkipping() ? 1 : 0;
 	TRACE("IX %p:",var);
@@ -155,7 +155,7 @@ void commandIY() {
 }
 
 void commandIG() { /* T2 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int code = getCaliValue();
 	int cnt  = getCaliValue();
 	int rsv  = getCaliValue();

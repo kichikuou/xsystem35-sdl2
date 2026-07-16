@@ -95,7 +95,7 @@ void commandTAA() {
 
 void commandTAB() {
 	/* アンチエイリアシング付きテキスト描画のフラグ取得 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	*var = ags_getAntialiasedStringMode() ? 1 : 0;
 

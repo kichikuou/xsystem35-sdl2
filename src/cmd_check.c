@@ -37,18 +37,18 @@
 static void undeferr();
 
 static void commandsINC() {
-        int *var = getCaliVariable();
+        vmvar_t *var = getCaliVariable();
         if (*var < 65535) (*var)++;
 }
 
 static void commandsDEC() {
-        int *var = getCaliVariable();
+        vmvar_t *var = getCaliVariable();
         if (*var > 0) (*var)--;
 }
 
 /* 変数の代入 */
 static void letVar(int type) {
-	int *varno = getVariable();
+	vmvar_t *varno = getVariable();
 	int val    = getCaliValue();
 
 	if (varno == NULL) {
@@ -102,7 +102,7 @@ static void getDataTableAdr() {
 static void loopStart() {
 	int p1 = sl_getc();
 	int exitadr, limit, direction, step;
-	int *var;
+	vmvar_t *var;
 	
 	if (p1 == 0) {
 		sl_getc();

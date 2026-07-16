@@ -53,7 +53,7 @@ static void RandMTGet() {
 	  var: 結果を返す変数
 	*/
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	if (num == 0 || num == 1) {
 		*var = num;
@@ -83,7 +83,7 @@ static void RandMTGetNumTable() {
 
 	  var: 乱数を格納する変数
 	*/
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = (int)(genrand() * numtblmax) + 1;
 	

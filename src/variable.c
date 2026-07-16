@@ -37,13 +37,13 @@
 #define PAGE_MAX 256
 
 typedef struct {
-	int *pointvar;
+	vmvar_t *pointvar;
 	int page;
 	int offset;
 } VariableAttributes;
 
 /* システム変数 */
-int sysVar[SYSVAR_MAX];
+vmvar_t sysVar[SYSVAR_MAX];
 /* 配列変数の情報 */
 static VariableAttributes attributes[SYSVAR_MAX];
 /* 配列本体 */
@@ -85,7 +85,7 @@ static char *advance(const char *s, int n) {
 	return (char *)s;
 }
 
-int *v_ref_indexed(int var, int index, struct VarRef *ref) {
+vmvar_t *v_ref_indexed(int var, int index, struct VarRef *ref) {
 	VariableAttributes *attr = &attributes[var];
 	int page = attr->page;
 
@@ -126,9 +126,9 @@ bool v_allocatePage(int page, int size, bool saveflag) {
 	if (page != 0) {
 		void *buf = varPage[page].value;
 		if (buf != NULL)
-			buf = realloc(buf, size * sizeof(int));
+			buf = realloc(buf, size * sizeof(vmvar_t));
 		else
-			buf = calloc(size, sizeof(int));
+			buf = calloc(size, sizeof(vmvar_t));
 		if (!buf)
 			NOMEMERR();
 		varPage[page].value = buf;
@@ -141,7 +141,7 @@ bool v_allocatePage(int page, int size, bool saveflag) {
 }
 
 // DS command
-bool v_bindArray(int datavar, int *pointvar, int offset, int page) {
+bool v_bindArray(int datavar, vmvar_t *pointvar, int offset, int page) {
 	if (datavar <  0 || datavar >= SYSVAR_MAX)         { return false; }
 	if (page    <= 0 || page    >= PAGE_MAX)           { return false; }
 	if (offset  <  0 || offset  >= varPage[page].size) { return false; }
@@ -159,7 +159,7 @@ bool v_unbindArray(int datavar) {
 }
 
 // DI command
-void v_getPageStatus(int page, int *in_use, int *size) {
+void v_getPageStatus(int page, vmvar_t *in_use, vmvar_t *size) {
 	if (page == 0) {
 		*in_use = false;
 		*size = 1;  // why...
@@ -320,20 +320,20 @@ int svar_find(int no, int start, const char *str) {
 	return n;
 }
 
-void svar_fromVars(int no, const int *vars) {
+void svar_fromVars(int no, const vmvar_t *vars) {
 	if ((unsigned)no >= strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return;
 	}
 	int len = 0;
-	for (const int *c = vars; *c; c++)
+	for (const vmvar_t *c = vars; *c; c++)
 		len += (*c < 256) ? 1 : 2;
 
 	if (strVar[no])
 		free(strVar[no]);
 	char *p = strVar[no] = malloc(len + 1);
 
-	for (const int *v = vars; *v; v++) {
+	for (const vmvar_t *v = vars; *v; v++) {
 		if (*v < 256) {
 			*p++ = *v;
 		} else {
@@ -344,7 +344,7 @@ void svar_fromVars(int no, const int *vars) {
 	*p = '\0';
 }
 
-int svar_toVars(int no, int *vars) {
+int svar_toVars(int no, vmvar_t *vars) {
 	if ((unsigned)no >= strvar_cnt) {
 		WARNING("string index out of range: %d", no);
 		return 0;

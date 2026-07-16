@@ -135,7 +135,7 @@ static void Create() {
 	   height: surface の高さ
 	   bpp   : surface の深さ(24bppのみサポート)
 	*/
-	int *var   = getCaliVariable();
+	vmvar_t *var   = getCaliVariable();
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	int bpp    = getCaliValue();
@@ -162,7 +162,7 @@ static void CreatePixelOnly() {
 	   height: surface の高さ
 	   bpp   : surface の深さ(24bpp only)
 	*/
-	int *var   = getCaliVariable();
+	vmvar_t *var   = getCaliVariable();
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	int bpp    = getCaliValue();
@@ -188,7 +188,7 @@ static void CreateAMapOnly() {
 	   width : surface の幅
 	   height: surface の高さ
 	*/
-	int *var   = getCaliVariable();
+	vmvar_t *var   = getCaliVariable();
 	int width  = getCaliValue();
 	int height = getCaliValue();
 	surface_t *s;
@@ -214,7 +214,7 @@ static void IsSurface() {
 	   var : 結果を返す変数。surface ならば 1, !surface ならば 0
 	*/
 	int p1   = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	*var = sf_get(p1) ? 1 : 0;
 
@@ -229,7 +229,7 @@ static void IsPixel() {
 	   var : 結果を返す変数。pixel ならば 1, !pixel ならば 0
 	*/
 	int p1   = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	surface_t *s;
 	
 	s = sf_get(p1);
@@ -251,7 +251,7 @@ static void IsAlpha() {
 	   var : 結果を返す変数。alpha ならば 1, !alpha ならば 0
 	*/
 	int p1   = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	surface_t *s;
 	
 	s = sf_get(p1);
@@ -273,7 +273,7 @@ static void GetWidth() {
 	   var : 結果を返す変数。
 	*/
 	int p1   = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	surface_t *s;
 	
 	s = sf_get(p1);
@@ -295,7 +295,7 @@ static void GetHeight() {
 	   var : 結果を返す変数。
 	*/
 	int p1   = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	surface_t *s;
 	
 	s = sf_get(p1);
@@ -310,7 +310,7 @@ static void GetHeight() {
 }
 
 static void GetCreatedSurface() { /* not used ? */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("Gpx.GetCreatedSurface %p:", var);
 }
@@ -322,7 +322,7 @@ static void LoadCG() {
 	   var : 作成した surface の番号を返す変数
 	   p1  : 読み込む CG の番号
 	*/
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int p1   = getCaliValue();
 	
 	*var = load_cg_main(p1 -1);
@@ -331,14 +331,14 @@ static void LoadCG() {
 }
 
 static void GetCGPosX() { /* not useed ? */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int p1 = getCaliValue();
 	
 	TRACE_UNIMPLEMENTED("Gpx.GetCgPosX %p,%d:", var, p1);
 }
 
 static void GetCGPosY() { /* not useed ? */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int p1 = getCaliValue();
 	
 	TRACE_UNIMPLEMENTED("Gpx.GetCgPosY %p,%d:", var, p1);
@@ -1117,7 +1117,7 @@ static void EffectCopy() {
 	int sw   = getCaliValue();
 	int sh   = getCaliValue();
 	int time = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	TRACE("Gpx.EffectCopy %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%p:", no, dx, dy, ss1, sx1, sy1, ss2, sx2, sy2, sw, sh, time, var);
 

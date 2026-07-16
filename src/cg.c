@@ -54,7 +54,7 @@ int cg_vspPB;
 /* cg,palette 展開フラグ (funciotn flag) */
 int cg_fflg;
 /* CGをロードした回数を書き込む変数 */
-int *cg_loadCountVar;
+vmvar_t *cg_loadCountVar;
 /* Brightness (PD command) */
 int cg_brightness;
 

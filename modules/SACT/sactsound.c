@@ -112,7 +112,7 @@ void ssnd_wait(int no) {
 }
 
 // 指定の効果音が終了するか、キーが押されるまで待つ
-void ssnd_waitkey(int no, int *res) {
+void ssnd_waitkey(int no, vmvar_t *res) {
 	int slot = slt_find(no);
 	
 	if (slot == -1) {

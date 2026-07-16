@@ -331,7 +331,7 @@ int scg_querytype(int wNumCG) {
 }
 
 // CGの大きさを取得
-bool scg_querysize(int wNumCG, int *w, int *h) {
+bool scg_querysize(int wNumCG, vmvar_t *w, vmvar_t *h) {
 	if (wNumCG >= (CGMAX -1)) goto errexit;
 	if (!cg_store || !cg_store[wNumCG]) goto errexit;
 	if (cg_store[wNumCG]->sf == NULL) goto errexit;

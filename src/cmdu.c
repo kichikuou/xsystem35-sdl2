@@ -65,7 +65,7 @@ void commandUD() {
 
 void commandUR() {
 	/* 最後に積まれたスタックの属性をリード */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	struct stack_info info;
 	sl_getStackInfo(&info);

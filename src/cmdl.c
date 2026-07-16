@@ -68,7 +68,7 @@ void commandLP() {
 void commandLT() {
 	/* タイムスタンプの読み込み */
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int status;
 	struct stat buf;
 	struct tm *lc;
@@ -156,7 +156,8 @@ void commandLE(char terminator) {
 void commandLL() {
 	int type = sl_getc();
 	int link_no = getCaliValue();
-	int *var, _var = 0;
+	vmvar_t *var;
+	int _var = 0;
 	int num, i;
 	dridata *dfile = ald_getdata(DRIFILE_DATA, link_no - 1);
 	uint16_t *data;
@@ -321,8 +322,8 @@ void commandLXL() {
 void commandLXS() {
 	/* ファイルサイズ(バイト数)を取得する */
 	int num = getCaliValue();
-	int *hi = getCaliVariable();
-	int *lo = getCaliVariable();
+	vmvar_t *hi = getCaliVariable();
+	vmvar_t *lo = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("LXS %d,%d,%d:", num, *hi, *lo);
 }
@@ -339,7 +340,7 @@ void commandLXP() {
 void commandLXR() {
 	/* ファイルからデータを読み取る */
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int size = getCaliValue();
 	
 	TRACE_UNIMPLEMENTED("LXR %d,%d,%d:",num,*var,size);
@@ -348,7 +349,7 @@ void commandLXR() {
 void commandLXW() {
 	/* ファイルにデータを書き込む */
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int size = getCaliValue();
 	
 	TRACE_UNIMPLEMENTED("LXW %d,%d,%d:",num,*var,size);
@@ -358,7 +359,7 @@ void commandLXX() {
 	/* Gets file timestamp to [var, var+6] */
 	int type = getCaliValue();
 	int num = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	struct stat buf;
 	struct tm *lc;

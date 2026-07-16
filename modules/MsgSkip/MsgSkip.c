@@ -17,7 +17,7 @@ static bool valid;
 static int action;
 
 static void Init() {
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	int p2 = getCaliValue(); /* ISys3x */
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
@@ -30,7 +30,7 @@ static void Init() {
 }
 
 static void Start() {
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 
 	char *fname_utf8 = sjis2utf(svar_get(p2));
@@ -52,7 +52,7 @@ static void SetValid() {
 }
 
 static void GetValid() {
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 
 	*p1 = valid;
 
@@ -68,7 +68,7 @@ static void SetAction() {
 }
 
 static void GetAction() {
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 
 	*p1 = action;
 

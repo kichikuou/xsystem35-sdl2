@@ -335,7 +335,7 @@ void sl_dropLabelCalls(int cnt) {
 /* US */
 void sl_pushVar(struct VarRef *vref, int cnt) {
 	stack_reserve((2 + 2 + 2 + 1) * cnt);
-	int *val = v_resolveRef(vref);
+	vmvar_t *val = v_resolveRef(vref);
 	for (int i = 0; i < cnt; i++) {
 		stack_push_word(vref->index + i);
 		stack_push_word(vref->page);
@@ -346,7 +346,7 @@ void sl_pushVar(struct VarRef *vref, int cnt) {
 
 /* UG */
 void sl_popVar(struct VarRef *vref, int cnt) {
-	int *val = v_resolveRef(vref) + cnt;
+	vmvar_t *val = v_resolveRef(vref) + cnt;
 	while (cnt-- > 0) {
 		if (stack_pop_byte() != STACK_VARIABLE)
 			SYSERROR("stack top is not a variable push");

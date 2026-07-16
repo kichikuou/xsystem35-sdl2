@@ -60,7 +60,7 @@ bool mus_pcm_start(int no, int loop);
 bool mus_pcm_mix(int noL, int noR, int loop);
 void mus_pcm_stop(int msec);
 bool mus_pcm_load(int no);
-bool mus_pcm_get_playposition(int *pos);
+bool mus_pcm_get_playposition(vmvar_t *pos);
 bool mus_pcm_get_state(void);
 
 /* fader/mixer related function */

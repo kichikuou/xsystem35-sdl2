@@ -31,7 +31,7 @@ void event_set_mouse_location(int x, int y);
 void event_set_mouse_internal_location(int x, int y);
 int event_get_key(void);
 int event_get_mouse(SDL_Point *p);
-void event_get_wheel(int *forward, int *back);
+void event_get_wheel(vmvar_t *forward, vmvar_t *back);
 void event_clear_wheel(void);
 int event_get_joy(void);
 void event_reset_input_state(void);

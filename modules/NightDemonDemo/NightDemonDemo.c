@@ -90,7 +90,7 @@ static void Init() {
 	int p1 = getCaliValue(); /* ISys3x */
 	int p2 = getCaliValue(); /* IWinMsg */
 	int p3 = getCaliValue(); /* ITimer */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = 1;
 	

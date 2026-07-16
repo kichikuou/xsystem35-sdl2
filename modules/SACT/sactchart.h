@@ -24,6 +24,8 @@
 #ifndef __SACTCHART_H__
 #define __SACTCHART_H__
 
-void schart_pos(int *pos, int pos1, int pos2, int val1, int val2, int val);
+#include "portab.h"
+
+void schart_pos(vmvar_t *pos, int pos1, int pos2, int val1, int val2, int val);
 
 #endif

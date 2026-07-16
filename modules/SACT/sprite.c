@@ -455,7 +455,7 @@ bool sp_exists(int wNum) {
 }
 
 // スプライトのタイプと何番のCGがセットされているかの取得
-bool sp_query_info(int wNum, int *vtype, int *vcg1, int *vcg2, int *vcg3) {
+bool sp_query_info(int wNum, vmvar_t *vtype, vmvar_t *vcg1, vmvar_t *vcg2, vmvar_t *vcg3) {
 	sprite_t *sp;
 	
 	if (wNum >= SPRITEMAX) goto errexit;
@@ -479,7 +479,7 @@ bool sp_query_info(int wNum, int *vtype, int *vcg1, int *vcg2, int *vcg3) {
 }
 
 // スプライトの表示状態の取得
-bool sp_query_show(int wNum, int *vShow) {
+bool sp_query_show(int wNum, vmvar_t *vShow) {
 	if (wNum >= SPRITEMAX) goto errexit;
 	if (sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
 
@@ -492,7 +492,7 @@ bool sp_query_show(int wNum, int *vShow) {
 }
 
 // スプライトの表示位置の取得
-bool sp_query_pos(int wNum, int *vx, int *vy) {
+bool sp_query_pos(int wNum, vmvar_t *vx, vmvar_t *vy) {
 	if (wNum >= SPRITEMAX) goto errexit;
 	if (sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
 
@@ -507,7 +507,7 @@ bool sp_query_pos(int wNum, int *vx, int *vy) {
 }
 
 // スプライトの大きさの取得
-bool sp_query_size(int wNum, int *vw, int *vh) {
+bool sp_query_size(int wNum, vmvar_t *vw, vmvar_t *vh) {
 	sprite_t *sp;
 	
 	if (wNum >= SPRITEMAX) goto errexit;
@@ -528,7 +528,7 @@ bool sp_query_size(int wNum, int *vw, int *vh) {
 }
 
 // テキストスプライトの現在の文字表示位置の取得
-bool sp_query_textpos(int wNum, int *vx, int *vy) {
+bool sp_query_textpos(int wNum, vmvar_t *vx, vmvar_t *vy) {
 	if (wNum >= SPRITEMAX) goto errexit;
 	sprite_t *sp = sact.sp[wNum];
 	if (sp->type != SPRITE_MSG) goto errexit;
@@ -551,7 +551,7 @@ void sp_num_setcg(int nNum, int nIndex, int nCG) {
 }
 
 // NumeralXXXのCGの取得
-void sp_num_getcg(int nNum, int nIndex, int *vCG) {
+void sp_num_getcg(int nNum, int nIndex, vmvar_t *vCG) {
 	SP_ASSERT_NO(nNum);
 	
 	*vCG = sact.sp[nNum]->numeral.cg[nIndex];
@@ -566,7 +566,7 @@ void sp_num_setpos(int nNum, int nX, int nY) {
 }
 
 // NumeralXXXの位置の取得
-void sp_num_getpos(int nNum, int *vX, int *vY) {
+void sp_num_getpos(int nNum, vmvar_t *vX, vmvar_t *vY) {
 	SP_ASSERT_NO(nNum);
 	
 	*vX = sact.sp[nNum]->numeral.pos.x;
@@ -581,7 +581,7 @@ void sp_num_setspan(int nNum, int nSpan) {
 }
 
 // NumeralXXXのスパンの取得
-void sp_num_getspan(int nNum, int *vSpan) {
+void sp_num_getspan(int nNum, vmvar_t *vSpan) {
 	SP_ASSERT_NO(nNum);
 
 	*vSpan = sact.sp[nNum]->numeral.span;

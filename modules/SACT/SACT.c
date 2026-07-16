@@ -636,7 +636,7 @@ static void QuakeSprite() {
  */
 static void QuerySpriteIsExist() {
 	int wNum = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	*var = sp_exists(wNum) ? 1 : 0;
 	
@@ -654,10 +654,10 @@ static void QuerySpriteIsExist() {
  */
 static void QuerySpriteInfo() {
 	int wNum   = getCaliValue();
-	int *vType = getCaliVariable();
-	int *vCG1  = getCaliVariable();
-	int *vCG2  = getCaliVariable();
-	int *vCG3  = getCaliVariable();
+	vmvar_t *vType = getCaliVariable();
+	vmvar_t *vCG1  = getCaliVariable();
+	vmvar_t *vCG2  = getCaliVariable();
+	vmvar_t *vCG3  = getCaliVariable();
 	
 	sp_query_info(wNum, vType, vCG1, vCG2, vCG3);
 	
@@ -672,7 +672,7 @@ static void QuerySpriteInfo() {
  */
 static void QuerySpriteShow() {
 	int wNum = getCaliValue();
-	int *vShow = getCaliVariable();
+	vmvar_t *vShow = getCaliVariable();
 
 	sp_query_show(wNum, vShow);
 	
@@ -688,8 +688,8 @@ static void QuerySpriteShow() {
  */
 static void QuerySpritePos() {
 	int wNum = getCaliValue();
-	int *vX  = getCaliVariable();
-	int *vY  = getCaliVariable();
+	vmvar_t *vX  = getCaliVariable();
+	vmvar_t *vY  = getCaliVariable();
 	
 	sp_query_pos(wNum, vX, vY);
 	
@@ -705,8 +705,8 @@ static void QuerySpritePos() {
  */
 static void QuerySpriteSize() {
 	int wNum     = getCaliValue();
-	int *vWidth  = getCaliVariable();
-	int *vHeight = getCaliVariable();
+	vmvar_t *vWidth  = getCaliVariable();
+	vmvar_t *vHeight = getCaliVariable();
 	
 	sp_query_size(wNum, vWidth, vHeight);
 	
@@ -722,8 +722,8 @@ static void QuerySpriteSize() {
  */
 static void QueryTextPos() {
 	int wNum = getCaliValue();
-	int *vX  = getCaliVariable();
-	int *vY  = getCaliVariable();
+	vmvar_t *vX  = getCaliVariable();
+	vmvar_t *vY  = getCaliVariable();
 	
 	sp_query_textpos(wNum, vX, vY);
 	
@@ -762,7 +762,7 @@ static void CG_Reset() {
  */
 static void CG_QueryType() {
 	int wNumCG = getCaliValue();
-	int *vType = getCaliVariable();
+	vmvar_t *vType = getCaliVariable();
 	
 	*vType = scg_querytype(wNumCG);
 	
@@ -778,8 +778,8 @@ static void CG_QueryType() {
  */
 static void CG_QuerySize() {
 	int wNumCG   = getCaliValue();
-	int *vWidth  = getCaliVariable();
-	int *vHeight = getCaliVariable();
+	vmvar_t *vWidth  = getCaliVariable();
+	vmvar_t *vHeight = getCaliVariable();
 	
 	scg_querysize(wNumCG, vWidth, vHeight);
 	
@@ -794,7 +794,7 @@ static void CG_QuerySize() {
  */
 static void CG_QueryBpp() {
 	int wNumCG = getCaliValue();
-	int *vBpp  = getCaliVariable();
+	vmvar_t *vBpp  = getCaliVariable();
 	
 	*vBpp = scg_querybpp(wNumCG);
 	
@@ -809,7 +809,7 @@ static void CG_QueryBpp() {
  */
 static void CG_ExistAlphaMap() {
 	int wNumCG = getCaliValue();
-	int *vMask = getCaliVariable();
+	vmvar_t *vMask = getCaliVariable();
 	
 	*vMask = scg_existalphamap(wNumCG) ? 1 : 0;
 	
@@ -1021,7 +1021,7 @@ static void CG_PartCopy() {
  *   @param vKey: 入力されたキー
  */
 static void WaitKeySimple() {
-	int *vKey = getCaliVariable();
+	vmvar_t *vKey = getCaliVariable();
 
 	TRACE("SACT.WaitKeySimple %d:", vKey);
 
@@ -1071,10 +1071,10 @@ static void WaitKeyMessage() {
  *   @param vRsv2: 予約
  */
 static void WaitKeySprite() {
-	int *vOK = getCaliVariable();
-	int *vRND = getCaliVariable();
-	int *vRsv1 = getCaliVariable();
-	int *vRsv2 = getCaliVariable();
+	vmvar_t *vOK = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
+	vmvar_t *vRsv1 = getCaliVariable();
+	vmvar_t *vRsv2 = getCaliVariable();
 	
 	TRACE("SACT.WaitKeySprite %p,%p,%p,%p:", vOK, vRND, vRsv1, vRsv2);
 	
@@ -1092,7 +1092,7 @@ static void WaitKeySprite() {
 static void PeekKey() {
 	static int prevKeyCode = NUM_KEYCODES;
 	int nKeyCode = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 
 	// This function is called successively with different nKeyCodes.
 	// Only the first call hits the scheduler.
@@ -1121,8 +1121,8 @@ static void WaitMsgSkipKeyUp() {
  *   @param wTime: タイムアウト時間 (1/100sec)
  */
 static void WaitKeySimpleTimeOut() {
-	int *vRND = getCaliVariable();
-	int *vD03 = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
+	vmvar_t *vD03 = getCaliVariable();
 	int wTime = getCaliValue();
 
 	sact.waittype = KEYWAIT_SIMPLE;
@@ -1153,11 +1153,11 @@ static void WaitKeySimpleTimeOut() {
  *   @param wTime: タイムアウト時間 (1/100sec)
  */
 static void WaitKeySpriteTimeOut() {
-	int *vOK = getCaliVariable();
-	int *vRND = getCaliVariable();
-	int *vD01 = getCaliVariable();
-	int *vD02 = getCaliVariable();
-	int *vD03 = getCaliVariable();
+	vmvar_t *vOK = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
+	vmvar_t *vD01 = getCaliVariable();
+	vmvar_t *vD02 = getCaliVariable();
+	vmvar_t *vD03 = getCaliVariable();
 	int wTime = getCaliValue();
 	
 	sp_keywait(vOK, vRND, vD01, vD02, vD03, wTime);
@@ -1171,7 +1171,7 @@ static void WaitKeySpriteTimeOut() {
  *   @param vSkip:
  */
 static void QueryMessageSkip() {
-	int *vSkip = getCaliVariable();
+	vmvar_t *vSkip = getCaliVariable();
 
 	*vSkip = msgskip_isSkipping() ? 1 : 0;
 	
@@ -1219,7 +1219,7 @@ static void MessageOutput() {
 	int wMessageSpeed  = getCaliValue();
 	int wMessageLineSpace = getCaliValue();
 	int wMessageAlign   = 0;
-	int *vMessageLength  = NULL;
+	vmvar_t *vMessageLength  = NULL;
 	
 	if (sact.version >= 110) {
 		wMessageAlign  = getCaliValue();
@@ -1266,7 +1266,7 @@ static void MessageOutputEx() {
 	int wRubySize      = getCaliValue();
 	int wRubyFont      = getCaliValue();
 	int wRubyLineSpace = getCaliValue();
-	int *vLength = NULL;
+	vmvar_t *vLength = NULL;
 	
 	if (sact.version >= 120) {
 		vLength = getCaliVariable();
@@ -1311,7 +1311,7 @@ static void MessageClear() {
  *   @param wResult: 結果を返す変数
  */
 static void MessageIsEmpty() {
-	int *wResult = getCaliVariable();
+	vmvar_t *wResult = getCaliVariable();
 
 	*wResult = smsg_is_empty() ? 1 : 0;
 	
@@ -1325,7 +1325,7 @@ static void MessageIsEmpty() {
  *   @param nTopStringNum: バッファを取得する文字列変数の最初
  */
 static void MessagePeek() {
-	int *vCount = getCaliVariable();
+	vmvar_t *vCount = getCaliVariable();
 	int nTopStringNum = getCaliValue();
 
 	*vCount = smsg_peek(nTopStringNum);
@@ -1388,7 +1388,7 @@ static void MenuAdd() {
  *   @param nAlign: 行そろえ (0:左, 1:中央, 2: 右) (1.1~)
  */
 static void MenuOpen() {
-	int *wMenuResult = getCaliVariable();
+	vmvar_t *wMenuResult = getCaliVariable();
 	int wNum         = getCaliValue();
 	int wChoiceSize  = getCaliValue();
 	int wMenuOutSpc  = getCaliValue();
@@ -1464,7 +1464,7 @@ static void Numeral_SetCG() {
 static void Numeral_GetCG() {
 	int nNum = getCaliValue();
 	int nIndex = getCaliValue();
-	int *vCG = getCaliVariable();
+	vmvar_t *vCG = getCaliVariable();
 	
 	sp_num_getcg(nNum, nIndex, vCG);
 	
@@ -1497,8 +1497,8 @@ static void Numeral_SetPos() {
  */
 static void Numeral_GetPos() {
 	int nNum = getCaliValue();
-	int *vX = getCaliVariable();
-	int *vY = getCaliVariable();
+	vmvar_t *vX = getCaliVariable();
+	vmvar_t *vY = getCaliVariable();
 	
 	sp_num_getpos(nNum, vX, vY);
 	
@@ -1528,7 +1528,7 @@ static void Numeral_SetSpan() {
  */
 static void Numeral_GetSpan() {
 	int nNum = getCaliValue();
-	int *vSpan = getCaliVariable();
+	vmvar_t *vSpan = getCaliVariable();
 
 	sp_num_getspan(nNum, vSpan);
 	
@@ -1596,7 +1596,7 @@ static void TimerSet() {
  */
 static void TimerGet() {
 	int wTimerID = getCaliValue();
-	int *vRND = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
 
 	*vRND = stimer_get(wTimerID);
 	
@@ -1696,7 +1696,7 @@ static void SoundWait() {
  */
 static void SoundWaitKey() {
 	int wNum = getCaliValue();
-	int *vKey = getCaliVariable();
+	vmvar_t *vKey = getCaliVariable();
 	
 	ssnd_waitkey(wNum, vKey);
 	
@@ -1797,7 +1797,7 @@ static void SpriteSoundOB() {
  */
 static void MusicCheck() {
 	int wNum = getCaliValue();
-	int *vRND = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
 	
 	*vRND = ald_exists(DRIFILE_BGM, wNum - 1) ? 1 : 0;
 	
@@ -1812,7 +1812,7 @@ static void MusicCheck() {
  */
 static void MusicGetLength() {
 	int wNum = getCaliValue();
-	int *vRND = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
 	
 	*vRND = musbgm_getlen(wNum);
 	
@@ -1827,7 +1827,7 @@ static void MusicGetLength() {
  */
 static void MusicGetPos() {
 	int wNum = getCaliValue();
-	int *vRND = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
 	
 	*vRND = musbgm_getpos(wNum);
 	
@@ -1937,7 +1937,7 @@ static void MusicWaitPos() {
  */
 static void SoundGetLinkNum() {
 	int wNum = getCaliValue();
-	int *vRND = getCaliVariable();
+	vmvar_t *vRND = getCaliVariable();
 
 	*vRND = ssnd_getlinknum(wNum);
 	
@@ -1957,7 +1957,7 @@ static void SoundGetLinkNum() {
  *     pos = ((pos2-pos1) / (val2-val1)) * (val-val1) + pos1
  */
 static void ChartPos() {
-	int *pos = getCaliVariable();
+	vmvar_t *pos = getCaliVariable();
 	int pos1 = getCaliValue();
 	int pos2 = getCaliValue();
 	int val1 = getCaliValue();
@@ -2002,7 +2002,7 @@ static void Maze_Create() {
  * SACT.Maze_Get (1.0~)
  */
 static void Maze_Get() {
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 
@@ -2013,7 +2013,7 @@ static void Maze_Get() {
  * SACT.EncryptWORD (1.0~)
  */
 static void EncryptWORD() {
-	int *array = getCaliVariable();
+	vmvar_t *array = getCaliVariable();
 	int num = getCaliValue();
 	int key = getCaliValue();
 
@@ -2026,7 +2026,7 @@ static void EncryptWORD() {
  * SACT.DecryptWORD (1.0~)
  */
 static void DecryptWORD() {
-	int *array = getCaliVariable();
+	vmvar_t *array = getCaliVariable();
 	int num = getCaliValue();
 	int key = getCaliValue();
 
@@ -2092,7 +2092,7 @@ static void XMenuRegister() {
  */
 static void XMenuGetNum() {
 	int nRegiNum = getCaliValue();
-	int *vMenuID = getCaliVariable();
+	vmvar_t *vMenuID = getCaliVariable();
 	
 	*vMenuID = spxm_getnum(nRegiNum);
 	

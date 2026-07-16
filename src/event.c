@@ -617,7 +617,7 @@ int event_get_mouse(SDL_Point *p) {
 	return m1 | m2;
 }
 
-void event_get_wheel(int *forward, int *back) {
+void event_get_wheel(vmvar_t *forward, vmvar_t *back) {
 	*forward = mouse_wheel_up;
 	*back = mouse_wheel_down;
 

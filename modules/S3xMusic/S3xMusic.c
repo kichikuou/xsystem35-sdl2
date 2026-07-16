@@ -42,7 +42,7 @@ static void CreateChannel(void) {
 static void Prepare(void) {
 	int ch = getCaliValue();
 	int no = getCaliValue();
-	int *result = getCaliVariable();
+	vmvar_t *result = getCaliVariable();
 
 	if (ch == 0) {
 		current_no = no;
@@ -97,7 +97,7 @@ static void PlayPosSample(void) {
 
 static void IsPlay(void) {
 	int ch = getCaliValue();
-	int *result = getCaliVariable();
+	vmvar_t *result = getCaliVariable();
 
 	if (ch == 0) {
 		*result = current_no && musbgm_isplaying(current_no);
@@ -127,10 +127,10 @@ static void Restart(void) {
 
 static void GetPlayPos(void) {
 	int ch = getCaliValue();
-	int *hour = getCaliVariable();
-	int *min = getCaliVariable();
-	int *sec = getCaliVariable();
-	int *msec = getCaliVariable();
+	vmvar_t *hour = getCaliVariable();
+	vmvar_t *min = getCaliVariable();
+	vmvar_t *sec = getCaliVariable();
+	vmvar_t *msec = getCaliVariable();
 	if (ch == 0) {
 		int time = musbgm_getpos(current_no);
 		*hour = time / 360000;
@@ -149,8 +149,8 @@ static void GetPlayPos(void) {
 
 static void GetPlayPosSample(void) {
 	int p1 = getCaliValue();
-	int *var1 = getCaliVariable();
-	int *var2 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	TRACE_UNIMPLEMENTED("S3xMusic.GetPlayPosSample %d, %p, %p:", p1, var1, var2);
 }
 
@@ -192,7 +192,7 @@ static void FadeVolume(void) {
 
 static void IsFade(void) {
 	int ch = getCaliValue();
-	int *result = getCaliVariable();
+	vmvar_t *result = getCaliVariable();
 	*result = 0;
 	TRACE_UNIMPLEMENTED("S3xMusic.IsFade %d => %d:", ch, *result);
 }

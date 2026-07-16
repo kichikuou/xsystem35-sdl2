@@ -28,8 +28,8 @@
 struct VarRef;
 
 int getCaliValue(void);
-int *getCaliVariable(void);
+vmvar_t *getCaliVariable(void);
 bool getCaliArray(struct VarRef *ref);
-int *getVariable(void);
+vmvar_t *getVariable(void);
 
 #endif /* !__CALI_H__ */

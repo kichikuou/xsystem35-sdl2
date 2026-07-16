@@ -457,7 +457,7 @@ void commandVV() { /* from T2 */
 void commandVR() { /* from Rance4 */
 	int nPage = getCaliValue();
 	int nType = getCaliValue();
-	int *var  = getCaliVariable();
+	vmvar_t *var  = getCaliVariable();
 	int *dst;
 	
 	TRACE("VR %d,%d,%p:",nPage, nType, var);
@@ -487,7 +487,7 @@ void commandVR() { /* from Rance4 */
 void commandVW() { /* from Rance4 */
 	int nPage = getCaliValue();
 	int nType = getCaliValue();
-	int *var  = getCaliVariable();
+	vmvar_t *var  = getCaliVariable();
 	int *src;
 	
 	TRACE("VW %d,%d,%p:",nPage, nType, var);
@@ -720,7 +720,7 @@ void commandVA() { /* from Panyo */
 	int no = sl_getc();
 	int p1 = getCaliValue();
 	int p2, p3;
-	int *var1, *var2;
+	vmvar_t *var1, *var2;
 	
 	if (no >= 10) {
 		var1 = getCaliVariable();

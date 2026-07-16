@@ -38,8 +38,8 @@ static INPUTNUM_PARAM ni_param;
 void commandNB() {
 	/* var1 から始まるcount個の変数へ
 	   var2 から始まるcount個の変数をコピーする */
-	int *var1 = getCaliVariable();
-	int *var2 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	int cnt   = getCaliValue();
 	
 	if (var1 == NULL) {
@@ -60,7 +60,7 @@ void commandNB() {
 
 void commandNC() {
 	/* var1から始まるcount個の変数を0でクリアする */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	
 	TRACE("NC %d,%d:", *var1, cnt);
@@ -74,7 +74,7 @@ void commandNR() {
 	/* var1にvar2のルートを求める (間違い)*/
 	/* NR 100,D01:         ; < D01にルート100(10)が返る */
 	int var1  = getCaliValue();
-	int *var2 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	
 	*var2 = (int)sqrtf(var1);
 	TRACE("NR %d,%d:", var1, *var2);
@@ -82,7 +82,7 @@ void commandNR() {
 
 void commandN_ADD() {
 	/* var1から始まるcount個の変数にnumを足す */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
 	
@@ -95,7 +95,7 @@ void commandN_ADD() {
 
 void commandN_SUB() {
 	/* var1から始まるcount個の変数からnumを引く */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int num  = getCaliValue();
 	int cnt  = getCaliValue();
 	
@@ -108,7 +108,7 @@ void commandN_SUB() {
 
 void commandN_MUL() {
 	/* var1から始まるcount個の変数にnumを掛ける */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
 	
@@ -121,7 +121,7 @@ void commandN_MUL() {
 
 void commandN_DIV() {
 	/* var1から始まるcount個の変数をnumで割る */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
 	
@@ -136,10 +136,10 @@ void commandN_GT() {
 	/* var1 から始まるcount個の変数からnumより大きいければ1を、以下ならば0を
 	   var2から始まる変数列に返す
 	*/
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
-	int *var2 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	
 	TRACE("N> %d,%d,%d,%d:", *var1, num, cnt, *var2);
 	while (cnt--) {
@@ -151,10 +151,10 @@ void commandN_LT() {
 	/* var1から始まるcount個の変数からnumより小さければ1を、以上ならば0を
 	   var2から始まる変数列に返す
 	 */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
-	int *var2 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	
 	TRACE("N< %p,%d,%d,%p:", var1, num, cnt, var2);
 	while(cnt--) {
@@ -166,10 +166,10 @@ void commandN_EQ() {
 	/* var1から始まるcount個の変数からnumに等しければ1を、等しくなければ0を
 	   var2から始まる変数列に返す
 	 */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int num   = getCaliValue();
 	int cnt   = getCaliValue();
-	int *var2 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	
 	TRACE("N= %p,%d,%d,%p:", var1, num, cnt, var2);
 	while(cnt--) {
@@ -179,7 +179,7 @@ void commandN_EQ() {
 
 void commandN_NE() {
 	/* var1から始まるcount個の変数の0,1を反転する */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
 	
 	TRACE("N\\ %p,%d:", var1, cnt);
@@ -190,9 +190,9 @@ void commandN_NE() {
 
 void commandN_AND() {
 	/* var1,var2のcount個の変数のANDをとる */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
-	int *var2 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	
 	TRACE("N& %p,%d,%p:", var1, cnt, var2);
 	while(cnt--) {
@@ -202,9 +202,9 @@ void commandN_AND() {
 
 void commandN_OR() {
 	/* var1,var2のcount個の変数のORをとる */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
-	int *var2 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	
 	TRACE("N| %p,%d,%p:", var1, cnt, var2);
 	while(cnt--) {
@@ -214,9 +214,9 @@ void commandN_OR() {
 
 void commandN_XOR() {
 	/* var1,var2のcount個の変数のXORをとる */
-	int *var1 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
 	int cnt   = getCaliValue();
-	int *var2 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 	
 	TRACE("N^ %p,%d,%p:", var1, cnt, var2);
 	while(cnt--) {
@@ -226,7 +226,7 @@ void commandN_XOR() {
 
 void commandN_NOT() {
 	/* ビット反転する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int cnt  = getCaliValue();
 	
 	TRACE("N~ %p,%d", var, cnt);
@@ -237,8 +237,8 @@ void commandN_NOT() {
 
 void commandNO() { /* T2 */
 	int p1 = sl_getc();
-	int *dst_var = getCaliVariable();
-	int *src_var = getCaliVariable();
+	vmvar_t *dst_var = getCaliVariable();
+	vmvar_t *src_var = getCaliVariable();
 	int cnt      = getCaliValue();
 	int i, tmp = 0;
 	
@@ -277,7 +277,7 @@ void commandNDC() {
 
 void commandNDD() {
 	/* varにw64nをコピーする*/
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int w64n = getCaliValue();
 	*var = (int)longVar[w64n];
 	
@@ -354,7 +354,7 @@ void commandND_DIV() {
 
 void commandNI() { /* From Panyo */
 	/* 数値入力 */
-	int *var  = getCaliVariable();
+	vmvar_t *var  = getCaliVariable();
 	int def   = getCaliValue();
 	int _min  = getCaliValue();
 	int _max  = getCaliValue();
@@ -387,10 +387,10 @@ void commandNT(char terminator) {
 
 void commandNP() {
 	/* 配列比較 */
-	int *var1   = getCaliVariable();
-	int *var2   = getCaliVariable();
+	vmvar_t *var1   = getCaliVariable();
+	vmvar_t *var2   = getCaliVariable();
 	int count   = getCaliValue();
-	int *result = getCaliVariable();
+	vmvar_t *result = getCaliVariable();
 	
 	TRACE("NP %d,%d,%d,%d:", *var1, *var2, count, *result);
 

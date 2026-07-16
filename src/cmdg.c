@@ -59,7 +59,7 @@ void commandGS() {
         /* num 番にリンクされているＣＧの座標とサイズを取得する */
 	SDL_Rect r;
 	int num = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	if (num == 0) {
 		WARNING("GS num: num = 0!!");

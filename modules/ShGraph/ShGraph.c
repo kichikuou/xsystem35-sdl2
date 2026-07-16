@@ -59,8 +59,8 @@ struct animsrc {
 static struct animsrc src[SLOT];  /* アニメーション各コマ転送元 */
 	
 struct _s0 {
-	int *dst_p1;
-	int *dst_p2;
+	vmvar_t *dst_p1;
+	vmvar_t *dst_p2;
 	int dw_1000A188;
 };
 static struct _s0 s0[SLOT];
@@ -84,7 +84,7 @@ struct _s2 {
 };
 static struct _s2 s2[SLOT];
 
-static int* add_p5[SLOT]; /* どこまでアニメーションのコマが進んだか */
+static vmvar_t *add_p5[SLOT]; /* どこまでアニメーションのコマが進んだか */
 
 static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, int r, int g, int b) {
 	SDL_Surface *sf = nact->ags.dib->sdl_surface;
@@ -115,8 +115,8 @@ static void ChangeEquColor() {
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
-	int *p5 = getCaliVariable();
-	int *p6 = getCaliVariable();
+	vmvar_t *p5 = getCaliVariable();
+	vmvar_t *p6 = getCaliVariable();
 	int p7 = getCaliValue(); /* ISurface */
 	
 	TRACE_UNIMPLEMENTED("ShGraph.ChangeEquColor %d,%d,%d,%d,%p,%p,%d:", p1, p2, p3, p4, p5, p6, p7);
@@ -137,8 +137,8 @@ static void ChangeNotColor() {
 	int y0 = getCaliValue();
 	int width  = getCaliValue();
 	int height = getCaliValue();
-	int *src = getCaliVariable(); /* r, g, b */
-	int *dst = getCaliVariable(); /* r, g, b */
+	vmvar_t *src = getCaliVariable(); /* r, g, b */
+	vmvar_t *dst = getCaliVariable(); /* r, g, b */
 	int p7 = getCaliValue(); /* ISurface */
 	surface_t *dib;
 	int x, y;
@@ -216,7 +216,7 @@ static void ResetAnimeData() {
 	}
 	
 	memset(s1, 0, sizeof(struct _s1) * SLOT);
-	memset(add_p5, 0, sizeof(int *) * SLOT);
+	memset(add_p5, 0, sizeof(vmvar_t *) * SLOT);
 	
 }
 
@@ -240,7 +240,7 @@ static void SetAnimeSrc() {
 	int h = getCaliValue();
 	int uw = getCaliValue();
 	int uh = getCaliValue();
-	int *pal = getCaliVariable();
+	vmvar_t *pal = getCaliVariable();
 	int r, g, b;
 	
 	TRACE("ShGraph.SetAnimeSrc %d,%d,%d,%d,%d,%d,%d,%p:", no, x0, y0, w, h, uw, uh, pal);
@@ -276,8 +276,8 @@ static void SetAnimeDst() {
 	  p6: 描画先オフセット追加分 (h) 10000が中央
 	*/
 	int no = getCaliValue();
-	int *p1 = getCaliVariable();
-	int *p2 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
+	vmvar_t *p2 = getCaliVariable();
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
 	int p5 = getCaliValue();
@@ -313,7 +313,7 @@ static void AddAnimeData() {
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	int p4 = getCaliValue();
-	int *p5 = getCaliVariable();
+	vmvar_t *p5 = getCaliVariable();
 	int p6 = getCaliValue();
 	int i;
 	

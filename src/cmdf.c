@@ -43,7 +43,7 @@ static void commandF10();
 static void commandF11();
 
 /* F6/7 用変数 */
-static int *F6Index[256];
+static vmvar_t *F6Index[256];
 
 void commandF() {
 	switch (sl_getc()) {
@@ -93,7 +93,7 @@ static void commandF1() {
 }
 
 static void commandF2() {
-	int *read_var = getCaliVariable();
+	vmvar_t *read_var = getCaliVariable();
 	int skip      = getCaliValue();
 	uint16_t *p = (uint16_t *)nact->datatbl_addr;
 	
@@ -108,7 +108,7 @@ static void commandF2() {
 }
 
 static void commandF3() {
-	int *read_var = getCaliVariable();
+	vmvar_t *read_var = getCaliVariable();
 	int skip      = getCaliValue();
 	
 	*read_var = LittleEndian_getW(nact->datatbl_addr, skip *2);
@@ -117,7 +117,7 @@ static void commandF3() {
 }
 
 static void commandF4() {
-	int *read_var = getCaliVariable();
+	vmvar_t *read_var = getCaliVariable();
 	int count     = getCaliValue();
 	int i;
 	uint16_t *p = (uint16_t *)nact->datatbl_addr;
@@ -134,7 +134,7 @@ static void commandF4() {
 }
 
 static void commandF5() {
-	int *read_var = getCaliVariable();
+	vmvar_t *read_var = getCaliVariable();
 	int count     = getCaliValue();
 	int i;
 	
@@ -147,7 +147,7 @@ static void commandF5() {
 }
 
 static void commandF6() {
-	int *var  = getCaliVariable();
+	vmvar_t *var  = getCaliVariable();
 	int index = getCaliValue();
 	
 	F6Index[index] = var;

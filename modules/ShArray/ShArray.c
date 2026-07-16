@@ -43,10 +43,10 @@ static void GetAtArray(void) { /* 0 */
 	  type: 演算の種類
 	  vResult: 演算結果を返す変数
 	*/
-	int *vAry    = getCaliVariable();
+	vmvar_t *vAry    = getCaliVariable();
 	int cnt      = getCaliValue();
 	int type     = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i, j;
 
 	TRACE("ShArray.GetAtArray %p,%d,%d,%p:", vAry, cnt, type, vResult);
@@ -88,8 +88,8 @@ static void AddAtArray(void) { /* 1 */
 	  vAry2: 配列２
 	  cnt  : 個数
 	*/
-	int *vAry1 = getCaliVariable();
-	int *vAry2 = getCaliVariable();
+	vmvar_t *vAry1 = getCaliVariable();
+	vmvar_t *vAry2 = getCaliVariable();
 	int cnt    = getCaliValue();
 	int i;
 	
@@ -114,8 +114,8 @@ static void SubAtArray(void) { /* 2 */
 	  vAry2: 配列２
 	  cnt  : 個数
 	*/
-	int *vAry1 = getCaliVariable();
-	int *vAry2 = getCaliVariable();
+	vmvar_t *vAry1 = getCaliVariable();
+	vmvar_t *vAry2 = getCaliVariable();
 	int cnt    = getCaliValue();
 	int i;
 	
@@ -140,8 +140,8 @@ static void MulAtArray(void) { /* 3 */
 	  vAry2: 配列２
 	  cnt  : 個数
 	*/
-	int *vAry1 = getCaliVariable();
-	int *vAry2 = getCaliVariable();
+	vmvar_t *vAry1 = getCaliVariable();
+	vmvar_t *vAry2 = getCaliVariable();
 	int cnt    = getCaliValue();
 	int i;
 	
@@ -166,8 +166,8 @@ static void DivAtArray(void) { /* 4 */
 	  vAry2: 配列２
 	  cnt  : 個数
 	*/
-	int *vAry1 = getCaliVariable();
-	int *vAry2 = getCaliVariable();
+	vmvar_t *vAry1 = getCaliVariable();
+	vmvar_t *vAry2 = getCaliVariable();
 	int cnt    = getCaliValue();
 	int i;
 	
@@ -196,8 +196,8 @@ static void MinAtArray(void) { /* 5 */
 	  vAry2: 配列２
 	  cnt  : 個数
 	*/
-	int *vAry1 = getCaliVariable();
-	int *vAry2 = getCaliVariable();
+	vmvar_t *vAry1 = getCaliVariable();
+	vmvar_t *vAry2 = getCaliVariable();
 	int cnt    = getCaliValue();
 	int i;
 	
@@ -219,8 +219,8 @@ static void MaxAtArray(void) { /* 6 */
 	  vAry2: 配列２
 	  cnt  : 個数
 	*/
-	int *vAry1 = getCaliVariable();
-	int *vAry2 = getCaliVariable();
+	vmvar_t *vAry1 = getCaliVariable();
+	vmvar_t *vAry2 = getCaliVariable();
 	int cnt    = getCaliValue();
 	int i;
 	
@@ -242,7 +242,7 @@ static void AndNumArray(void) { /* 7 */
 	  cnt : 個数
 	  val : ANDをとる値
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
 	int i;
@@ -263,7 +263,7 @@ static void OrNumArray(void) { /* 8 */
 	  cnt : 個数
 	  val : ORをとる値
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
 	int i;
@@ -284,7 +284,7 @@ static void XorNumArray(void) { /* 9 */
 	  cnt : 個数
 	  val : XORをとる値
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
 	int i;
@@ -307,10 +307,10 @@ static void SetEquArray(void) { /* 10 */
 	  val : 比較する値
 	  vResults  : 結果を格納する配列
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.SetEquArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
@@ -331,10 +331,10 @@ static void SetNotArray(void) { /* 11 */
 	  val : 比較する値
 	  vResults  : 結果を格納する配列
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.SetNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
@@ -354,10 +354,10 @@ static void SetLowArray(void) { /* 12 */
 	  val : 閾値
 	  vResult: 結果を返す変数
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.SetLowArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
@@ -377,10 +377,10 @@ static void SetHighArray(void) { /* 13 */
 	  val : 閾値
 	  vResults: 結果を返す変数
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.SetHighArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
@@ -403,11 +403,11 @@ static void SetRangeArray(void) { /* 14 */
 	     min < vAry < max の時 vResults = 1;
              それ以外              vResults = 0;
 	 */
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int min   = getCaliValue();
 	int max   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.SetRangeArray %p,%d,%d,%d,%p:", vAry, cnt, min, max, vResults);
@@ -430,11 +430,11 @@ static void SetAndEquArray(void) { /* 15 */
 	   vResults  : 結果を代入する配列
 
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int mask   = getCaliValue();
 	int cnt    = getCaliValue();
 	int val    = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.SetAndEquArray: %p,%d,%d,%d,%p:", vAry, mask, cnt, val, vResults);
@@ -455,10 +455,10 @@ static void AndEquArray(void) { /* 16 */
 	   val : 比較する値
 	   vResults  : 結果を代入する配列
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.AndEquArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
@@ -479,10 +479,10 @@ static void AndNotArray(void) { /* 17 */
 	   val : 比較する値
 	   vResults  : 結果を代入する配列
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.AndNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
@@ -503,10 +503,10 @@ static void AndLowArray(void) { /* 18 */
 	   min : 最小値
 	   vResults  : 結果を代入する配列
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int min   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.AndLowArray: %d,%d,%d,%d:", vAry, cnt, min, vResults);
@@ -527,10 +527,10 @@ static void AndHighArray(void) { /* 19 */
 	   max : 最小値
 	   vResults  : 結果を代入する配列
 	*/
-	int *vAry     = getCaliVariable();
+	vmvar_t *vAry     = getCaliVariable();
 	int cnt       = getCaliValue();
 	int max       = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.AndHighArray: %p,%d,%d,%p:", vAry, cnt, max, vResults);
@@ -552,11 +552,11 @@ static void AndRangeArray(void) { /* 20 */
 	  max:  最大値
 	  vResults:   結果を返す配列
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int min   = getCaliValue();
 	int max   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.AndRangeArray %d,%d,%d,%d,%d:", vAry, cnt, min, max, vResults);
@@ -579,11 +579,11 @@ static void AndAndEquArray(void) { /* 21 */
 	   vResults  : 結果を代入する配列
 
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int mask  = getCaliValue();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.AndAndEquArray: %d,%d,%d,%d,%d:", vAry, mask, cnt, val, vResults);
@@ -612,10 +612,10 @@ static void OrNotArray(void) { /* 23 */
 	  val : 比較する値
 	  vResults: 結果を書き込む変数
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResults = getCaliVariable();
+	vmvar_t *vResults = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.OrNotArray %p,%d,%d,%p:", vAry, cnt, val, vResults);
@@ -674,10 +674,10 @@ static void EnumEquArray(void) { /* 28 */
 	  val : 比較する値
 	  vResult: 一致する個数を返す変数
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int val   = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.EnumEquArray %p,%d,%d,%p:", vAry, cnt, val, vResult);
@@ -713,12 +713,12 @@ static void EnumEquNotArray2(void) { /* 30 */
 	  val2: 配列２と比較する値
 	  vResult: 条件に一致する数を返す変数
 	*/
-	int *vAry1 = getCaliVariable();
-	int *vAry2 = getCaliVariable();
+	vmvar_t *vAry1 = getCaliVariable();
+	vmvar_t *vAry2 = getCaliVariable();
 	int cnt    = getCaliValue();
 	int val1   = getCaliValue();
 	int val2   = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.EnumEquNotArray2 %p,%p,%d,%d,%d,%p:", vAry1, vAry2, cnt, val1, val2, vResult);
@@ -742,10 +742,10 @@ static void EnumNotArray(void) { /* 31 */
 	  val: 比較する値
 	  vResult: 等しくないものの数
 	*/
-	int *vAry  = getCaliVariable();
+	vmvar_t *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
 	int val    = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 
 	TRACE("ShArray.EnumNotArray %p, %d, %d, %p:", vAry, cnt, val, vResult);
@@ -799,11 +799,11 @@ static void EnumRangeArray(void) { /* 35 */
 	  max : 最大値
 	  vResult: 一致した数を返す変数
 	*/
-	int *vAry  = getCaliVariable();
+	vmvar_t *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
 	int min    = getCaliValue();
 	int max    = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.EnumRangeArray %d,%d,%d,%d,%d:", vAry, cnt, min, max, vResult);
@@ -830,11 +830,11 @@ static void GrepEquArray(void) { /* 36 */
 	  vMatch: 一致したインデックス
 	  vResult: 一つでも val と同じ値があれば 1
 	*/
-	int *vAry  = getCaliVariable();
+	vmvar_t *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
 	int val    = getCaliValue();
-	int *vMatch  = getCaliVariable();
-	int *vResult = getCaliVariable();
+	vmvar_t *vMatch  = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 
 	TRACE("ShArray.GrepEquArray  %p,%d,%d,%p,%p:", vAry, cnt, val, vMatch, vResult);
@@ -862,11 +862,11 @@ static void GrepNotArray(void) { /* 37 */
 	  vMatch: 一致するindex
 	  vResult: 一つでも val と同じ値があれば 1
 	*/
-	int *vAry  = getCaliVariable();
+	vmvar_t *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
 	int val    = getCaliValue();
-	int *vMatch  = getCaliVariable();
-	int *vResult = getCaliVariable();
+	vmvar_t *vMatch  = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.GrepNotArray %p,%d,%d,%p,%p:", vAry, cnt, val, vMatch, vResult);
@@ -930,11 +930,11 @@ static void GrepLowArray(void) { /* 41 */
 	  vMatch: 一致したインデックス
 	  vResult: 一つでも val と同じ値があれば 1
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int min   = getCaliValue();
-	int *vMatch  = getCaliVariable();
-	int *vResult = getCaliVariable();
+	vmvar_t *vMatch  = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.GrepLowArray: %p,%d,%d,%p,%p:", vAry, cnt, min, vMatch, vResult);
@@ -962,11 +962,11 @@ static void GrepHighArray(void) { /* 42 */
 	  vMatch: 一致したインデックス
 	  vResult: 一つでも val と同じ値があれば 1
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int max   = getCaliValue();
-	int *vMatch  = getCaliVariable();
-	int *vResult = getCaliVariable();
+	vmvar_t *vMatch  = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.GrepHighArray: %p,%d,%d,%p,%p:", vAry, cnt, max, vMatch, vResult);
@@ -995,12 +995,12 @@ static void GrepRangeArray(void) { /* 43 */
 	  vMatch: 一致したインデックス
 	  vResult: 一つでも val と同じ値があれば 1
 	*/
-	int *vAry  = getCaliVariable();
+	vmvar_t *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
 	int min    = getCaliValue();
 	int max    = getCaliValue();
-	int *vMatch = getCaliVariable();
-	int *vResult    = getCaliVariable();
+	vmvar_t *vMatch = getCaliVariable();
+	vmvar_t *vResult    = getCaliVariable();
 	int i;
 	
 	TRACE("ShArray.GrepRangeArray %p,%d,%d,%d,%p,%p:", vAry, cnt, max, min, vMatch, vResult);
@@ -1031,13 +1031,13 @@ static void GrepLowOrderArray(void) { /* 44 */
 	  vLastMatch: 最小値を示す配列のindex
 	  vResult: 最小値が見つかれば 1, 見つからなければ 0
 	*/
-	int *vAry  = getCaliVariable();
+	vmvar_t *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
 	int min    = getCaliValue();
 	int max    = getCaliValue();
-	int *v1    = getCaliVariable();
-	int *vLastMatch = getCaliVariable();
-	int *vResult    = getCaliVariable();
+	vmvar_t *v1    = getCaliVariable();
+	vmvar_t *vLastMatch = getCaliVariable();
+	vmvar_t *vResult    = getCaliVariable();
 	int i, j, k = 0;
 	
 	TRACE("ShArray.GrepLowOrderArray %p,%d,%d,%d,%p,%p,%p:", vAry, cnt, min, max, v1, vLastMatch, vResult);
@@ -1082,13 +1082,13 @@ static void GrepHighOrderArray(void) { /* 45 */
 	  vLastMatch: 最大値を示す配列のindex
 	  vResult: 最大値が見つかれば 1, 見つからなければ 0
 	*/
-	int *vAry  = getCaliVariable();
+	vmvar_t *vAry  = getCaliVariable();
 	int cnt    = getCaliValue();
 	int min    = getCaliValue();
 	int max    = getCaliValue();
-	int *v1    = getCaliVariable();
-	int *vLastMatch = getCaliVariable();
-	int *vResult    = getCaliVariable();
+	vmvar_t *v1    = getCaliVariable();
+	vmvar_t *vLastMatch = getCaliVariable();
+	vmvar_t *vResult    = getCaliVariable();
 	int i, j, k = 0;
 	
 	TRACE("ShArray.GrepHighOrderArray %p,%d,%d,%d,%p,%p,%p:", vAry, cnt, min, max, v1, vLastMatch, vResult);
@@ -1119,7 +1119,7 @@ static void GrepHighOrderArray(void) { /* 45 */
 }
 
 static void ChangeEquArray(void) { /* 46 */
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt = getCaliValue();
 	int src = getCaliValue();
 	int dst = getCaliValue();
@@ -1172,7 +1172,7 @@ static void ChangeRangeArray(void) { /* 50 */
 	  max : 最大値
 	  val : 置き換える値
 	*/
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int cnt   = getCaliValue();
 	int min   = getCaliValue();
 	int max   = getCaliValue();
@@ -1202,12 +1202,12 @@ static void CopyArrayToRect(void) { /* 51 */
 	  dw  : コピー先 width
 	  dh  : コピー先 height
 	*/
-	int *vSrc = getCaliVariable();
+	vmvar_t *vSrc = getCaliVariable();
 	int sw    = getCaliValue();
 	int sh    = getCaliValue();
 	int sx    = getCaliValue();
 	int sy    = getCaliValue();
-	int *vDst = getCaliVariable();
+	vmvar_t *vDst = getCaliVariable();
 	int dw    = getCaliValue();
 	int dh    = getCaliValue();
 	int x, y;
@@ -1236,10 +1236,10 @@ static void CopyRectToArray(void) { /* 52 */
 	  dx  : コピー先 x
 	  dy  : コピー先 y
 	*/
-	int *vSrc = getCaliVariable();
+	vmvar_t *vSrc = getCaliVariable();
 	int sw    = getCaliValue();
 	int sh    = getCaliValue();
-	int *vDst = getCaliVariable();
+	vmvar_t *vDst = getCaliVariable();
 	int dw    = getCaliValue();
 	int dh    = getCaliValue();
 	int dx    = getCaliValue();
@@ -1266,10 +1266,10 @@ static void ChangeSecretArray(void) { /* 53 */
 	  type: 機能番号
 	  vResult: 結果を返す変数
 	*/
-	int *vAry    = getCaliVariable();
+	vmvar_t *vAry    = getCaliVariable();
 	int cnt      = getCaliValue();
 	int type     = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	static uint16_t key[4] = { 0x7A7A, 0xADAD, 0xBCBC, 0xCECE }; /* key */
 	
 	TRACE("ShArray.ChangeSecretArray %p,%d,%d,%p:", vAry, cnt, type, vResult);

@@ -33,7 +33,7 @@ static void allocate_page_test(void) {
 
 static void array_reference_test(void) {
 	struct VarRef ref;
-	int index = 2;
+	vmvar_t index = 2;
 
 	ASSERT_TRUE(v_allocatePage(1, 5, true));
 	ASSERT_FALSE(v_bindArray(-1, &index, 0, 1));
@@ -65,13 +65,13 @@ static void array_reference_test(void) {
 }
 
 static void string_variable_conversion_test(void) {
-	const int input[] = {
+	const vmvar_t input[] = {
 		0x41,    // 'A'
 		0xa082,  // Shift-JIS 0x82 0xa0 ('あ')
 		0x42,    // 'B'
 		0,       // terminator
 	};
-	int output[4] = {-1, -1, -1, -1};
+	vmvar_t output[4] = {-1, -1, -1, -1};
 
 	svar_fromVars(0, input);
 	ASSERT_STRCMP(svar_get(0), "A\x82\xa0" "B");

@@ -208,7 +208,7 @@ void commandMV() {
 
 void commandML() {
 	/* 文字列の長さを取得する */
-	int *var   = getCaliVariable();
+	vmvar_t *var   = getCaliVariable();
 	int str_no = getCaliValue();
 	
 	*var = svar_length(str_no);
@@ -242,7 +242,7 @@ void commandME() {
 
 void commandMF() {
 	/* 文字列中から指定文字列の位置を探す */
-	int *var      = getCaliVariable();
+	vmvar_t *var      = getCaliVariable();
 	int dst_no    = getCaliValue();
 	int key_no    = getCaliValue();
 	int start_pos = getCaliValue();
@@ -272,7 +272,8 @@ void commandMZ0() {
 
 void commandMG() {
 	int no = sl_getc();
-	int sw = 0, *var;
+	int sw = 0;
+	vmvar_t *var;
 	
 	switch(no) {
 	case 0:
@@ -353,7 +354,7 @@ void commandMJ() {
 void commandMN() {
 	int no   = sl_getc();
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	switch(no) {
 	case 0:

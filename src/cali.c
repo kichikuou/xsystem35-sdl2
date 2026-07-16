@@ -49,7 +49,7 @@
 
 #define CALI_DEPTH_MAX 256
 
-static int *getVar(int c0, struct VarRef *ref) {
+static vmvar_t *getVar(int c0, struct VarRef *ref) {
 	int addr = sl_getIndex();
 	int var;
 	if ((c0 & 0x40) == 0) {
@@ -63,7 +63,7 @@ static int *getVar(int c0, struct VarRef *ref) {
 			c1 = sl_getc();
 			var = c0 << 8 | c1;
 			int index = getCaliValue();
-			int *store = v_ref_indexed(var, index, ref);
+			vmvar_t *store = v_ref_indexed(var, index, ref);
 			if (!store)
 				WARNING("%03d:%05x: Out of bounds index access: %s[%d]", sl_getPage(), addr, v_name(var), index);
 			return store;
@@ -74,15 +74,15 @@ static int *getVar(int c0, struct VarRef *ref) {
 			return NULL;
 		}
 	}
-	int *store = v_ref(var, ref);
+	vmvar_t *store = v_ref(var, ref);
 	if (!store)
 		WARNING("%03d:%05x: Out of bounds array access: %s", sl_getPage(), addr, v_name(var));
 	return store;
 }
 
 // Returns a pointer to the variable
-int *getCaliVariable(void) {
-	int *c0 = getVar(sl_getc(), NULL);
+vmvar_t *getCaliVariable(void) {
+	vmvar_t *c0 = getVar(sl_getc(), NULL);
 	if (sl_getc() != OP_END) {
 		SYSERROR("Invalid variable expression at %03d:%05x", sl_getPage(), sl_getIndex());
 	}
@@ -98,7 +98,7 @@ bool getCaliArray(struct VarRef *ref) {
 }
 
 // For variable assignment commands
-int *getVariable(void) {
+vmvar_t *getVariable(void) {
 	return getVar(sl_getc(), NULL);
 }
 
@@ -112,7 +112,7 @@ int getCaliValue(void) {
 	while ((c0 = sl_getc()) != OP_END) {
 		if (c0 & 0x80) { // variable
 			int c1 = sl_getcAt(sl_getIndex());
-			int *t;
+			vmvar_t *t;
 			if (c0 == 0xc0) {
 				if (c1 == OP_C0_INDEX || c1 >= 0x34) goto l_var;
 				c1 = sl_getc();

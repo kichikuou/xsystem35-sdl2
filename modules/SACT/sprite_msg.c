@@ -236,7 +236,7 @@ void smsg_newline(int wNum, int size) {
   @param wRLineSpace: ルビと本文の文字間隔
   @param vLength: ???
 */
-void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, int *wLength) {
+void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, vmvar_t *wLength) {
 	char *msg;
 	sprite_t *sp;
 	int len = 0; // 処理した文字数?

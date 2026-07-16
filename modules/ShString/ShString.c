@@ -127,7 +127,7 @@ static void SetStringNum16(void) {
 	  p2: 変換された数値を格納する変数
 	*/
 	int st = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	const char *str = svar_get(st);
 	char _dst[100];
 	char *dst = _dst;
@@ -160,7 +160,7 @@ static void SetStringNum16(void) {
 
 static void SetStringNum32(void) {
 	int p1 = getCaliValue();
-	int *p2 = getCaliVariable();
+	vmvar_t *p2 = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("ShString.SetStringNum32: %d,%p:", p1, p2);
 }

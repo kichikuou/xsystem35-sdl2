@@ -190,7 +190,7 @@ static int saveVarPage(int page, FILE *fp) {
 	if (!varPage[page].saveflag)
 		return 0;
 	int cnt = varPage[page].size;
-	int *var = varPage[page].value;
+	vmvar_t *var = varPage[page].value;
 	if (!var)
 		return 0;
 	asd_varPageHdr head = {
@@ -215,7 +215,7 @@ static int loadVarPage(char *buf) {
 			return SAVE_LOADERR;
 		}
 	}
-	int *var = varPage[page].value;
+	vmvar_t *var = varPage[page].value;
 	uint16_t *data = (uint16_t *)(buf + sizeof(asd_varPageHdr));
 	for (int i = 0; i < cnt; i++)
 		*var++ = *data++;
@@ -367,7 +367,7 @@ int save_vars_to_file(char *fname_utf8, struct VarRef *src, int cnt) {
 		cnt = v_sliceSize(src);
 	}
 
-	int *p = v_resolveRef(src);
+	vmvar_t *p = v_resolveRef(src);
 	while (cnt--)
 		fputw(*p++, fp);
 
@@ -400,7 +400,7 @@ int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
 		cnt = v_sliceSize(dest);
 	}
 
-	int *start = v_resolveRef(dest);
+	vmvar_t *start = v_resolveRef(dest);
 	for (int i = 0; i < cnt; i++)
 		start[i] = SDL_SwapLE16(tmp[i]);
 
@@ -483,7 +483,7 @@ int save_loadPartial(int no, struct VarRef *vref, int cnt) {
 		return SAVE_SAVEERR;
 
 	cnt = min(cnt, v_sliceSize(vref));
-	int *var = v_resolveRef(vref);
+	vmvar_t *var = v_resolveRef(vref);
 	
 	int status, filesize;
 	char *saveTop = loadGameData(no, &status, &filesize);
@@ -523,7 +523,7 @@ int save_savePartial(int no, struct VarRef *vref, int cnt) {
 		return SAVE_SAVEERR;
 
 	cnt = min(cnt, v_sliceSize(vref));
-	int *var = v_resolveRef(vref);
+	vmvar_t *var = v_resolveRef(vref);
 	
 	int status, filesize;
 	char *saveTop = loadGameData(no, &status, &filesize);
@@ -725,4 +725,3 @@ int save_saveAll(int no) {
 	fclose(fp);
 	return SAVE_SAVEERR;
 }
-

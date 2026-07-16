@@ -274,7 +274,7 @@ void commandCP() {
 
 void commandCT() {
 	/* (24bitのみ) 影データを取得する。*/
-	int *var  = getCaliVariable();
+	vmvar_t *var  = getCaliVariable();
 	int x     = getCaliValue();
 	int y     = getCaliValue();
 

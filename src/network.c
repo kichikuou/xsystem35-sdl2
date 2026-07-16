@@ -45,10 +45,10 @@ int network_check_buffer() {
 	return 0;
 }
 
-void network_read_buffer(int *var) {
+void network_read_buffer(vmvar_t *var) {
 	
 }
 
-void network_write_buffer(int *var, int cnt) {
+void network_write_buffer(vmvar_t *var, int cnt) {
 	
 }

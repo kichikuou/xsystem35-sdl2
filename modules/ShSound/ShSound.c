@@ -268,7 +268,7 @@ static void wavPlayRing() {
 	*/
 	int start = getCaliValue();
 	int cnt   = getCaliValue();
-	int *cur  = getCaliVariable();
+	vmvar_t *cur  = getCaliVariable();
 	
 	mus_wav_play(start + (*cur % cnt), 1);
 	*cur = (*cur + 1) % cnt;
@@ -321,7 +321,7 @@ static void wavIsPlay() {
 	  *result: 0なら停止中、!0なら再生中
 	*/ 
 	int slot = getCaliValue();
-	int *result = getCaliVariable();
+	vmvar_t *result = getCaliVariable();
 	
 	*result = mus_wav_get_playposition(slot);
 	
@@ -338,7 +338,7 @@ static void wavIsPlayRange() {
 	*/
 	int slot  = getCaliValue();
 	int range = getCaliValue();
-	int *result = getCaliVariable();
+	vmvar_t *result = getCaliVariable();
 	int i, ret = 0;
 	
 	for (i = slot; i < (slot + range); i++) {

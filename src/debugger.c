@@ -142,7 +142,7 @@ static int eval_variable(void) {
 	int var = dbg_lookup_var(buf);
 	if (var < 0)
 		eval_error("unknown variable \"%s\"", buf);
-	int *store;
+	vmvar_t *store;
 	if (consume('[')) {
 		int index = eval_expr();
 		expect(']');

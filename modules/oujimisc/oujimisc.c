@@ -83,9 +83,9 @@ static void MakeMapDraw() {
 	int dstY = getCaliValue();
 	int posX = getCaliValue();
 	int posY = getCaliValue();
-	int *a1 = getCaliVariable();
-	int *a2 = getCaliVariable();
-	int *a3 = getCaliVariable();
+	vmvar_t *a1 = getCaliVariable();
+	vmvar_t *a2 = getCaliVariable();
+	vmvar_t *a3 = getCaliVariable();
 
 	for (int y = 0; y < window_height; y++) {
 		for (int x = 0; x < window_width; x++) {
@@ -178,9 +178,9 @@ static void TempMapLoadToShadow() {
 		WARNING("non-array destination variable");
 		return;
 	}
-	int *a1 = v_resolveRef(&r1);
-	int *a2 = v_resolveRef(&r2);
-	int *a3 = v_resolveRef(&r3);
+	vmvar_t *a1 = v_resolveRef(&r1);
+	vmvar_t *a2 = v_resolveRef(&r2);
+	vmvar_t *a3 = v_resolveRef(&r3);
 	uint16_t *p = mapdata[map];
 	for (int i = 0; i < size; i++)
 		*a1++ = SDL_SwapLE16(*p++);
@@ -207,9 +207,9 @@ static void TempMapSaveToShadow() {
 		WARNING("non-array source variable");
 		return;
 	}
-	int *a1 = v_resolveRef(&r1);
-	int *a2 = v_resolveRef(&r2);
-	int *a3 = v_resolveRef(&r3);
+	vmvar_t *a1 = v_resolveRef(&r1);
+	vmvar_t *a2 = v_resolveRef(&r2);
+	vmvar_t *a3 = v_resolveRef(&r3);
 	uint16_t *p = mapdata[map];
 	for (int i = 0; i < size; i++)
 		*p++ = SDL_SwapLE16(*a1++);
@@ -296,13 +296,13 @@ static void TempMapFileLoad() {
 }
 
 static void CalcMoveDiffer() {
-	int *dx = getCaliVariable();
-	int *dy = getCaliVariable();
+	vmvar_t *dx = getCaliVariable();
+	vmvar_t *dy = getCaliVariable();
 	int moveL = getCaliValue();
 	int moveU = getCaliValue();
 	int moveR = getCaliValue();
 	int moveD = getCaliValue();
-	int *pt = getCaliVariable();
+	vmvar_t *pt = getCaliVariable();
 	int duration = getCaliValue();
 
 	int t = min(*pt, duration);

@@ -31,7 +31,7 @@
   適当でいいとおもう
 */
 
-void scryp_encrypt_word(int *array, int num, int key) {
+void scryp_encrypt_word(vmvar_t *array, int num, int key) {
 	WARNING("NOT IMPLEMENTED");
 }
 

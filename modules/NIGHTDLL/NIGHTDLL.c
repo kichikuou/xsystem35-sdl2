@@ -22,7 +22,7 @@ night_t nightprv;
 
 
 static void Init(void) { /* 0 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int p1 = getCaliValue();  /* ISys3xCG */
 	int p2 = getCaliValue();  /* ISys3xDIB */
 	int p3 = getCaliValue();  /* ISys3xMsgString */
@@ -213,7 +213,7 @@ static void SetSelMode(void) { /* 18 */
 
 // キー入力待ち後、改ページ
 static void AnalyzeMessage(void) { /* 19 */
-	int *var = getCaliVariable(); // 入力されたキー
+	vmvar_t *var = getCaliVariable(); // 入力されたキー
 
 	*var = ntmsg_ana();
 	
@@ -297,7 +297,7 @@ static void ScreenCG(void) { /* 27 */
 }
 
 static void RunGameMain(void) { /* 28 */
-	int *p1 = getCaliVariable(); // result
+	vmvar_t *p1 = getCaliVariable(); // result
 	int p2 = getCaliValue();     // month
 	int p3 = getCaliValue();     // day
 	int p4 = getCaliValue();     // day of week
@@ -313,7 +313,7 @@ static void RunGameMain(void) { /* 28 */
 }
 
 static void CheckNewGame(void) { /* 29 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	
 	*p1 = 0;
 	
@@ -347,9 +347,9 @@ static void SetDate(void) { /* 33 */
 }
 
 static void GetDate(void) { /* 34 */
-	int *p1 = getCaliVariable(); // month
-	int *p2 = getCaliVariable(); // day
-	int *p3 = getCaliVariable(); // day of weeek
+	vmvar_t *p1 = getCaliVariable(); // month
+	vmvar_t *p2 = getCaliVariable(); // day
+	vmvar_t *p3 = getCaliVariable(); // day of weeek
 
 	*p1 = night.Month;
 	*p2 = night.Day;
@@ -363,7 +363,7 @@ static void SelectGameLevel(void) { /* 35 */
 }
 
 static void RunEventDungeon(void) { /* 36 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 
 	*p1 = 1;
@@ -478,7 +478,7 @@ static void RunSoundMode(void) { /* 48 */
 }
 
 static void RunMapEditor(void) { /* 49 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.RunMapEditor %p:", p1);
 }
@@ -495,21 +495,21 @@ static void VisualListAdd(void) { /* 51 */
 }
 
 static void GetLocalCountCG(void) { /* 52 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.GetLocalCountCG %p,%d:", p1, p2);
 }
 
 static void PlayMemory(void) { /* 53 */
-	int *p1 = getCaliVariable(); // 回想ページ
-	int *p2 = getCaliVariable(); // 回想RESULT
+	vmvar_t *p1 = getCaliVariable(); // 回想ページ
+	vmvar_t *p2 = getCaliVariable(); // 回想RESULT
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.PlayMemory %p,%p:", p1, p2);
 }
 
 static void GetEventFlagTotal(void) { /* 54 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.GetEventFlagTotal %p,%d:", p1, p2);
@@ -528,25 +528,25 @@ static void GetPlayerName(void) { /* 56 */
 }
 
 static void SaveGame(void) { /* 57 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.SaveGame %p:", p1);
 }
 
 static void LoadGame(void) { /* 58 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.LoadGame %p:", p1);
 }
 
 static void ExistSaveData(void) { /* 59 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("NIGHTDLL.ExistSaveData %p:", p1);
 }
 
 static void ExistStartData(void) { /* 60 */
-	int *p1 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
 
 	TRACE_UNIMPLEMENTED("NIGHTDLL.ExistStartData %p:", p1);
 }
@@ -580,13 +580,13 @@ static void DebugScenario(void) { /* 66 */
 }
 
 static void GetDLLTime(void) { /* 67 */
-	int *p1 = getCaliVariable();
-	int *p2 = getCaliVariable();
-	int *p3 = getCaliVariable();
-	int *p4 = getCaliVariable();
-	int *p5 = getCaliVariable();
-	int *p6 = getCaliVariable();
-	int *p7 = getCaliVariable();
+	vmvar_t *p1 = getCaliVariable();
+	vmvar_t *p2 = getCaliVariable();
+	vmvar_t *p3 = getCaliVariable();
+	vmvar_t *p4 = getCaliVariable();
+	vmvar_t *p5 = getCaliVariable();
+	vmvar_t *p6 = getCaliVariable();
+	vmvar_t *p7 = getCaliVariable();
 
 	TRACE_UNIMPLEMENTED("NIGHTDLL.GetDLLTime %p,%p,%p,%p,%p,%p,%p:", p1, p2, p3, p4, p5, p6, p7);
 }

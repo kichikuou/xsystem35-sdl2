@@ -89,7 +89,7 @@ extern void load_censor_list(const char *path);
 
 extern int cg_vspPB;
 extern int cg_fflg;
-extern int *cg_loadCountVar;
+extern vmvar_t *cg_loadCountVar;
 extern int cg_brightness;
 
 static inline uint32_t rgb565_to_rgb888(uint16_t rgb) {

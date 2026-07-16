@@ -96,7 +96,7 @@ void commands2F0D() {
 
 void commands2F0E() {
 	int eCh = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int pos = mus_wav_get_playposition(eCh);
 	
 	*vResult = ((pos == 0 || pos == 65535) ? 0 : 1);
@@ -117,7 +117,7 @@ void commands2F0F() {
 
 void commands2F10() {
 	int eCh = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	*vResult = (mus_wav_fadeout_get_state(eCh) ? 1 : 0);
 	
@@ -154,9 +154,9 @@ void commands2F14() {
 
 void commands2F15() {
 	int eCh = getCaliValue();
-	int *eX = getCaliVariable();
-	int *eY = getCaliVariable();
-	int *eZ = getCaliVariable();
+	vmvar_t *eX = getCaliVariable();
+	vmvar_t *eY = getCaliVariable();
+	vmvar_t *eZ = getCaliVariable();
 
 	*eX = 0;
 	*eY = 0;
@@ -173,9 +173,9 @@ void commands2F16() {
 }
 
 void commands2F17() {
-	int *vX = getCaliVariable();
-	int *vY = getCaliVariable();
-	int *vZ = getCaliVariable();
+	vmvar_t *vX = getCaliVariable();
+	vmvar_t *vY = getCaliVariable();
+	vmvar_t *vZ = getCaliVariable();
 	
 	*vX = 0;
 	*vY = 0;
@@ -195,7 +195,7 @@ void commands2F18() {
 
 void commands2F19() {
 	int eCh = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 
 	*vResult = 0;
 	TRACE_UNIMPLEMENTED("wav3DIsFadePos %d, %d:", eCh, *vResult);
@@ -217,7 +217,7 @@ void commands2F1B() {
 }
 
 void commands2F1C() {
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	*vResult = 0;
 	TRACE_UNIMPLEMENTED("wav3DIsFadePosL %d:", *vResult);
@@ -245,7 +245,7 @@ void commands2F1F() {
 }
 
 void commands2F20() {
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	mus_pcm_get_playposition(vResult);
 	
@@ -270,7 +270,7 @@ void commands2F2D() {
 
 void commands2F2E() {
 	int eCh = getCaliValue();
-	int *vTime = getCaliVariable();
+	vmvar_t *vTime = getCaliVariable();
 	
 	*vTime = mus_wav_get_playposition(eCh);
 	
@@ -289,7 +289,7 @@ void commands2F2F() {
 
 void commands2F30() {
 	int eCh = getCaliValue();
-	int *vTime = getCaliVariable();
+	vmvar_t *vTime = getCaliVariable();
 	
 	*vTime = mus_wav_wavtime(eCh);
 	
@@ -366,22 +366,22 @@ void commands2F38() {
 }
 
 void commands2F39() {
-	int *vForward = getCaliVariable();
-	int *vBack = getCaliVariable();
+	vmvar_t *vForward = getCaliVariable();
+	vmvar_t *vBack = getCaliVariable();
 	
 	sys_getWheelInfo(vForward, vBack);
 	TRACE("iptGetWheelCount %d, %d:", *vForward, *vBack);
 }
 
 void commands2F3A() {
-	int *vSize = getCaliVariable();
+	vmvar_t *vSize = getCaliVariable();
 
 	*vSize = nact->sel.MsgFontSize;
 	TRACE("menuGetFontSize %d:", *vSize);
 }
 
 void commands2F3B() {
-	int *vSize = getCaliVariable();
+	vmvar_t *vSize = getCaliVariable();
 	
 	*vSize = nact->msg.MsgFontSize;
 	TRACE("msgGetFontSize %d:", *vSize);
@@ -390,7 +390,7 @@ void commands2F3B() {
 void commands2F3C() {
 	int eNum = getCaliValue();
 	int ePos = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	*vResult = svar_getCharType(eNum, ePos);
 	
@@ -399,7 +399,7 @@ void commands2F3C() {
 
 void commands2F3D() {
 	int eNum = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	*vResult = svar_width(eNum);
 
@@ -417,10 +417,10 @@ void commands2F3F() {
 }
 
 void commands2F40() {
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int eCount = getCaliValue();
 	int eNum = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int cnt = 0;
 	
 	TRACE("aryCmpCount %d, %d, %d, %d:", *vAry, eCount, eNum, *vResult);
@@ -433,12 +433,12 @@ void commands2F40() {
 }
 
 void commands2F41() {
-	int *vAry = getCaliVariable();
+	vmvar_t *vAry = getCaliVariable();
 	int eNumof = getCaliValue();
 	int eNum = getCaliValue();
 	int eTransNum = getCaliValue();
 	int eMaxTrans = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int cnt = 0;
 	
 	TRACE("aryCmpTrans %d, %d, %d, %d, %d, %d:", 
@@ -527,7 +527,7 @@ void commands2F4A() {
 }
 
 void commands2F4B() {
-	int *vTime = getCaliVariable();
+	vmvar_t *vTime = getCaliVariable();
 	
 	*vTime = ags_getCursorMoveTime();
 	TRACE("iptGetMoveCursorTime %d:", *vTime);
@@ -582,12 +582,12 @@ void commands2F54() {
 }
 
 void commands2F55() {
-	int *vDx = getCaliVariable();
-	int *vDy = getCaliVariable();
-	int *vSx = getCaliVariable();
-	int *vSy = getCaliVariable();
-	int *vWidth  = getCaliVariable();
-	int *vHeight = getCaliVariable();
+	vmvar_t *vDx = getCaliVariable();
+	vmvar_t *vDy = getCaliVariable();
+	vmvar_t *vSx = getCaliVariable();
+	vmvar_t *vSy = getCaliVariable();
+	vmvar_t *vWidth  = getCaliVariable();
+	vmvar_t *vHeight = getCaliVariable();
 
 	TRACE("mathClip %d, %d, %d, %d, %d, %d:", *vDx, *vDy, *vSx, *vSy, *vWidth, *vHeight);
 
@@ -609,7 +609,7 @@ void commands2F57() {
 	const char *sTitle = sl_getString(0);
 	int eStrVar = getCaliValue();
 	int eLength = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 
 	char *t1, *t2, *t3;
 	INPUTSTRING_PARAM p;
@@ -637,7 +637,7 @@ void commands2F57() {
 
 void commands2F58() {
 	int eNum = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	*vResult = sjis_has_hankaku(svar_get(eNum)) ? 1 : 0;
 	
@@ -646,7 +646,7 @@ void commands2F58() {
 
 void commands2F59() {
 	int eNum = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	*vResult = sjis_has_zenkaku(svar_get(eNum)) ? 1 : 0;
 	
@@ -745,7 +745,7 @@ void commands2F62() {
 }
 
 void commands2F63() {
-	int *vSelect = getCaliVariable();
+	vmvar_t *vSelect = getCaliVariable();
 	
 	*vSelect = sel_getLastElement();
 
@@ -755,7 +755,7 @@ void commands2F63() {
 void commands2F64() {
 	int eType = getCaliValue();
 	int eNum  = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	DRIFILETYPE t = DRIFILE_DATA;
 
 	switch(eType) {
@@ -787,7 +787,7 @@ void commands2F64() {
 void commands2F65() {
 	int eType = getCaliValue();
 	int eNum  = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	DRIFILETYPE t = DRIFILE_DATA;
 
@@ -836,7 +836,7 @@ void commands2F66() {
 void commands2F67() {
 	int eNum = getCaliValue();
 	int eStrNum = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 
 	for (i = 0; i < nact->ain.fncnum; i++) {
@@ -892,7 +892,7 @@ void commands2F6A() {
 }
 
 void commands2F6B() {
-	int *vNum = getCaliVariable();
+	vmvar_t *vNum = getCaliVariable();
 	
 	*vNum = nact->fnc_return_value;
 	
@@ -909,7 +909,7 @@ void commands2F6C() {
 
 void commands2F6D() {
 	int eNum = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 
 	*vResult = save_delete_file(eNum -1);
 	
@@ -950,13 +950,13 @@ void commands2F71() {
 }
 
 void commands2F72() {
-	int *vFlag = getCaliVariable();
+	vmvar_t *vFlag = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("winGetFlipFlag %p:", vFlag);
 }
 
 void commands2F73() {
-	int *vTrack = getCaliVariable();
+	vmvar_t *vTrack = getCaliVariable();
 	
 	*vTrack = muscd_get_maxtrack();
 	
@@ -965,7 +965,7 @@ void commands2F73() {
 
 void commands2F74() {
 	const char *str1 = sl_getString(0);
-	int *var   = getCaliVariable();
+	vmvar_t *var   = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("dlgErrorOkCancel %s,%d:", str1, *var);
 }
@@ -979,7 +979,7 @@ void commands2F75() {
 }
 
 void commands2F76() {
-	int *var   = getCaliVariable();
+	vmvar_t *var   = getCaliVariable();
 
 	*var = sel_getnumberof();
 	
@@ -1084,7 +1084,7 @@ void commands2F80() {
 }
 
 void commands2F81() {
-	int *vData = getCaliVariable();
+	vmvar_t *vData = getCaliVariable();
 	int eNumof = getCaliValue();
 	int i;
 	uint16_t *p = (uint16_t *)nact->datatbl_addr;
@@ -1142,7 +1142,7 @@ void commands2F84() {
 }
 
 void commands2F85() {
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	*vResult = nact->ain.varnum;
 	
@@ -1161,7 +1161,7 @@ void commands2F87() {
 	int eSubKeyStrNum = getCaliValue();
 	int eBaneStrNum   = getCaliValue();
 	int eResultStrNum = getCaliValue();
-	int *vResult      = getCaliVariable();
+	vmvar_t *vResult      = getCaliVariable();
 
 	// This command is used to check if the game is installed, so we always
 	// return 1 with the dummy string REGREADSTRING_RESULT.
@@ -1174,7 +1174,7 @@ void commands2F87() {
 
 void commands2F88() {
 	int eFileNameStrNum = getCaliValue();
-	int *vResult        = getCaliVariable();
+	vmvar_t *vResult        = getCaliVariable();
 
 	const char *fname = svar_get(eFileNameStrNum);
 	if (strcmp(fname, REGREADSTRING_RESULT) == 0) {
@@ -1194,7 +1194,7 @@ void commands2F89() {
 	int eYear = getCaliValue();
 	int eMonth = getCaliValue();
 	int eData = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("timeCheckCurDate %d,%d,%d,%p:", eYear, eMonth, eData, vResult);
 }
@@ -1211,7 +1211,7 @@ void commands2F8B() {
 	int c3 = getCaliValue();
 	int c4 = getCaliValue();
 	const char *s6 = sl_getConstString();
-	int *c7 = getCaliVariable();
+	vmvar_t *c7 = getCaliVariable();
 
 	*c7 = 1;
 	

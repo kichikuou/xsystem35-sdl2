@@ -23,12 +23,14 @@
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
 
+#include "portab.h"
+
 int  network_create_channel(int portnum, int use_max);
 void network_close(int user_num);
 int  network_get_channel();
 int  network_get_user_state(int num);
 int  network_check_buffer();
-void network_read_buffer(int *var);
-void network_write_buffer(int *var, int cnt);
+void network_read_buffer(vmvar_t *var);
+void network_write_buffer(vmvar_t *var, int cnt);
 
 #endif  /* __NETWORK_H__ */

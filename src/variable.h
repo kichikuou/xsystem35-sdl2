@@ -31,7 +31,7 @@
 struct VarPage {
 	int size;
 	bool saveflag;
-	int *value;
+	vmvar_t *value;
 };
 
 struct VarRef {
@@ -40,11 +40,11 @@ struct VarRef {
 	int index;
 };
 
-extern int sysVar[];
+extern vmvar_t sysVar[];
 extern struct VarPage varPage[];
 extern double longVar[];
 
-static inline int *v_resolveRef(struct VarRef *r) {
+static inline vmvar_t *v_resolveRef(struct VarRef *r) {
 	return varPage[r->page].value + r->index;
 }
 static inline int v_sliceSize(struct VarRef *r) {
@@ -54,15 +54,15 @@ static inline int v_sliceSize(struct VarRef *r) {
 void v_set_encoding(CharacterEncoding encoding);
 void v_set_names(int count, char **names);
 const char *v_name(int var);
-int *v_ref_indexed(int var, int index, struct VarRef *ref);
+vmvar_t *v_ref_indexed(int var, int index, struct VarRef *ref);
 bool v_allocatePage(int page, int size, bool saveflag);
-bool v_bindArray(int datavar, int *pointvar, int offset, int page);
+bool v_bindArray(int datavar, vmvar_t *pointvar, int offset, int page);
 bool v_unbindArray(int datavar);
-void v_getPageStatus(int page, int *in_use, int *size);
+void v_getPageStatus(int page, vmvar_t *in_use, vmvar_t *size);
 void v_init(void);
 void v_reset(void);
 
-static inline int *v_ref(int var, struct VarRef *ref) {
+static inline vmvar_t *v_ref(int var, struct VarRef *ref) {
 	return v_ref_indexed(var, -1, ref);
 }
 
@@ -75,8 +75,8 @@ void svar_append(int no, const char *str);
 size_t svar_length(int no);
 int svar_width(int no);
 int svar_find(int no, int start, const char *str);
-void svar_fromVars(int no, const int *vars);
-int svar_toVars(int no, int *vars);
+void svar_fromVars(int no, const vmvar_t *vars);
+int svar_toVars(int no, vmvar_t *vars);
 int svar_getCharType(int no, int pos);
 void svar_replaceAll(int no, int pattern, int replacement);
 

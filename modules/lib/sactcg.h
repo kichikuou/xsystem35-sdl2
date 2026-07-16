@@ -55,7 +55,7 @@ void scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int 
 void scg_freeall(void);
 void scg_free(int cg);
 int scg_querytype(int wNumCG);
-bool scg_querysize(int wNumCG, int *w, int *h);
+bool scg_querysize(int wNumCG, vmvar_t *w, vmvar_t *h);
 int scg_querybpp(int wNumCG);
 bool scg_existalphamap(int wNumCG);
 

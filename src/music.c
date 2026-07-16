@@ -171,7 +171,7 @@ bool mus_pcm_load(int no) {
  *        停止している場合は 0 が入る
  *        loopしている場合は合計時間
  */
-bool mus_pcm_get_playposition(int *pos) {
+bool mus_pcm_get_playposition(vmvar_t *pos) {
 	if (!prv.pcm_valid) return false;
 
 	*pos = muspcm_getpos(0);

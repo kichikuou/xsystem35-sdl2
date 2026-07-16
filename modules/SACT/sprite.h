@@ -24,6 +24,7 @@
 #ifndef __SPRITE_H__
 #define __SPRITE_H__
 
+#include "portab.h"
 #include "sact.h"
 
 #define DEFAULT_UPDATE sp_draw
@@ -51,17 +52,17 @@ void sp_set_animeinterval(int wNum, int wTime);
 bool sp_is_insprite(sprite_t *sp, int x, int y);
 void sp_set_blendrate(int wNum, int wCount, int rate);
 bool sp_exists(int wNum);
-bool sp_query_info(int wNum, int *vtype, int *vcg1, int *vcg2, int *vcg3);
-bool sp_query_show(int wNum, int *vShow);
-bool sp_query_pos(int wNum, int *vx, int *vy);
-bool sp_query_size(int wNum, int *vw, int *vh);
-bool sp_query_textpos(int wNum, int *vx, int *vy);
+bool sp_query_info(int wNum, vmvar_t *vtype, vmvar_t *vcg1, vmvar_t *vcg2, vmvar_t *vcg3);
+bool sp_query_show(int wNum, vmvar_t *vShow);
+bool sp_query_pos(int wNum, vmvar_t *vx, vmvar_t *vy);
+bool sp_query_size(int wNum, vmvar_t *vw, vmvar_t *vh);
+bool sp_query_textpos(int wNum, vmvar_t *vx, vmvar_t *vy);
 void sp_num_setcg(int nNum, int nIndex, int nCG);
-void sp_num_getcg(int nNum, int nIndex, int *vCG);
+void sp_num_getcg(int nNum, int nIndex, vmvar_t *vCG);
 void sp_num_setpos(int nNum, int nX, int nY);
-void sp_num_getpos(int nNum, int *vX, int *vY);
+void sp_num_getpos(int nNum, vmvar_t *vX, vmvar_t *vY);
 void sp_num_setspan(int nNum, int nSpan);
-void sp_num_getspan(int nNUm, int *vSpan);
+void sp_num_getspan(int nNUm, vmvar_t *vSpan);
 void sp_exp_clear(void);
 void sp_exp_add(int nNumSP1, int nNumSP2);
 void sp_exp_del(int wNum);
@@ -85,7 +86,7 @@ void sp_draw_dmap(void* data, void* userdata);
 // in sprite_msg.c
 void smsg_add(const char *msg);
 void smsg_newline(int wNum, int size);
-void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, int *wLength);
+void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wFont, int wSpeed, int wLineSpace, int wAlign, int wRSize, int wRFont, int wRLineSpace, vmvar_t *wLength);
 void smsg_clear(int wNum);
 bool smsg_is_empty();
 int smsg_peek(int nTopStringNum);
@@ -133,7 +134,7 @@ void sp_eupdate(int type, int time, int key);
 void sp_quake_sprite(int wType, int wAmplitudeX, int wAmplitude, int wCount, int cancel);
 
 // in sprite_keywait.c
-void sp_keywait(int *vOK, int *vRND, int *vRsv1, int *vRsv2, int *vRsv3, int timeout);
+void sp_keywait(vmvar_t *vOK, vmvar_t *vRND, vmvar_t *vRsv1, vmvar_t *vRsv2, vmvar_t *vRsv3, int timeout);
 
 // in screen_quake.c
 void sp_quake_screen(int type, int p1, int p2, int time, int cancel);

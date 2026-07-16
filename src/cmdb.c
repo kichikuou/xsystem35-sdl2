@@ -135,8 +135,8 @@ void commandB4() {
 
 void commandB10() {
 	SDL_Point p;
-	int *x_var = getCaliVariable();
-	int *y_var = getCaliVariable();
+	vmvar_t *x_var = getCaliVariable();
+	vmvar_t *y_var = getCaliVariable();
 	
 	msg_getMessageLocation(&p);
 	*x_var = p.x;
@@ -145,8 +145,8 @@ void commandB10() {
 }
 
 void commandB11() {
-	int *sel_no_var = getCaliVariable();
-	int *msg_no_var = getCaliVariable();
+	vmvar_t *sel_no_var = getCaliVariable();
+	vmvar_t *msg_no_var = getCaliVariable();
 	
 	*sel_no_var = nact->sel.winno;
 	*msg_no_var = nact->msg.winno;
@@ -155,21 +155,21 @@ void commandB11() {
 }
 
 void commandB12() {
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = sel_getRegistoredElementNumber();
 	TRACE("B12 %d:", *var);
 }
 
 void commandB13() {
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = sel_getRegistoredElementWidth(); 
 	TRACE("B13 %d:", *var);
 }
 
 void commandB14() {
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = sel_getRegistoredElement_strlen(); 
 	TRACE("B14 %d:", *var);
@@ -177,8 +177,8 @@ void commandB14() {
 
 void commandB21() {
 	int no = getCaliValue();
-	int *x_var = getCaliVariable();
-	int *y_var = getCaliVariable();
+	vmvar_t *x_var = getCaliVariable();
+	vmvar_t *y_var = getCaliVariable();
 	
 	*x_var = nact->sel.win->x;
 	*y_var = nact->sel.win->y;
@@ -188,8 +188,8 @@ void commandB21() {
 
 void commandB22() {
 	int no = getCaliValue();
-	int *x_var = getCaliVariable();
-	int *y_var = getCaliVariable();
+	vmvar_t *x_var = getCaliVariable();
+	vmvar_t *y_var = getCaliVariable();
 	
 	*x_var = nact->sel.win->width;
 	*y_var = nact->sel.win->height;
@@ -199,8 +199,8 @@ void commandB22() {
 
 void commandB23() {
 	int no = getCaliValue();
-	int *x_var = getCaliVariable();
-	int *y_var = getCaliVariable();
+	vmvar_t *x_var = getCaliVariable();
+	vmvar_t *y_var = getCaliVariable();
 	
 	*x_var = nact->msg.win->x;
 	*y_var = nact->msg.win->y;
@@ -210,8 +210,8 @@ void commandB23() {
 
 void commandB24() {
 	int no = getCaliValue();
-	int *x_var_size = getCaliVariable();
-	int *y_var_size = getCaliVariable();
+	vmvar_t *x_var_size = getCaliVariable();
+	vmvar_t *y_var_size = getCaliVariable();
 	
 	*x_var_size = nact->msg.win->width;
 	*y_var_size = nact->msg.win->height;
@@ -222,8 +222,8 @@ void commandB24() {
 void commandB31() {
 	/* 設定されてある選択肢ウィンドウの左上座標を取得する */
 	int no = getCaliValue();
-	int *x_var = getCaliVariable();
-	int *y_var = getCaliVariable();
+	vmvar_t *x_var = getCaliVariable();
+	vmvar_t *y_var = getCaliVariable();
 	
 	*x_var = nact->sel.wininfo[no].x;
 	*y_var = nact->sel.wininfo[no].y;
@@ -233,8 +233,8 @@ void commandB31() {
 
 void commandB32() {
 	int no = getCaliValue();
-	int *x_var_size = getCaliVariable();
-	int *y_var_size = getCaliVariable();
+	vmvar_t *x_var_size = getCaliVariable();
+	vmvar_t *y_var_size = getCaliVariable();
 	
 	*x_var_size = nact->sel.wininfo[no].width;
 	*y_var_size = nact->sel.wininfo[no].height;
@@ -244,8 +244,8 @@ void commandB32() {
 
 void commandB33() {
 	int no = getCaliValue();
-	int *x_var = getCaliVariable();
-	int *y_var = getCaliVariable();
+	vmvar_t *x_var = getCaliVariable();
+	vmvar_t *y_var = getCaliVariable();
 
 	*x_var = nact->msg.wininfo[no].x;
 	*y_var = nact->msg.wininfo[no].y;
@@ -254,8 +254,8 @@ void commandB33() {
 
 void commandB34() {
 	int no = getCaliValue();
-	int *x_var_size = getCaliVariable();
-	int *y_var_size = getCaliVariable();
+	vmvar_t *x_var_size = getCaliVariable();
+	vmvar_t *y_var_size = getCaliVariable();
 
 	*x_var_size = nact->msg.wininfo[no].width;
 	*y_var_size = nact->msg.wininfo[no].height;

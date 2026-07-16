@@ -66,7 +66,7 @@ int sys_getMouseInfo(SDL_Point *p, bool is_dibgeo) {
 	return key;
 }
 
-void sys_getWheelInfo(int *forward, int *back) {
+void sys_getWheelInfo(vmvar_t *forward, vmvar_t *back) {
 	event_get_wheel(forward, back);
 }
 

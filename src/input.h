@@ -165,7 +165,7 @@ extern int sys_getMouseInfo(struct SDL_Point *p, bool is_dibgeo);
 extern int sys_getInputInfo(void);
 extern int sys_getKeyInfo(void);
 extern int sys_getJoyInfo(void);
-extern void sys_getWheelInfo(int *forward, int *back);
+extern void sys_getWheelInfo(vmvar_t *forward, vmvar_t *back);
 extern void sys_clearWheelInfo(void);
 extern void sys_key_releasewait(int key, bool zi_mask_enabled);
 extern void sys_hit_any_key();

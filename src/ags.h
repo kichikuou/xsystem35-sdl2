@@ -199,7 +199,7 @@ extern void ags_alpha_uppercut(int sx, int sy, int w, int h, int s, int d);
 extern void ags_alpha_lowercut(int sx, int sy, int w, int h, int s, int d);
 extern void ags_alpha_setLevel(int x, int y, int w, int h, int lv);
 extern void ags_alpha_copyArea(int sx, int sy, int w, int h, int dx, int dy);
-extern void ags_alpha_getPixel(int x, int y, int *pic);
+extern void ags_alpha_getPixel(int x, int y, vmvar_t *pic);
 extern void ags_alpha_setPixel(int x, int y, int w, int h, uint8_t *b);
 
 /* fader */

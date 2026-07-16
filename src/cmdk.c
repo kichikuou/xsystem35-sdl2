@@ -28,7 +28,7 @@
 
 void commandKI() {
 	/* ネットワークのチャンネルを新規作成する／ネットワークのチャンネルに接続する */
-	int *var     = getCaliVariable();
+	vmvar_t *var     = getCaliVariable();
 	int port_num = getCaliValue();
 	int user_max = getCaliValue();
 	
@@ -50,7 +50,7 @@ void commandKK() {
 
 void commandKN() {
 	/* 自分自身の接続番号を取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	*var = network_get_channel();
 	
@@ -60,7 +60,7 @@ void commandKN() {
 
 void commandKP() {
 	/* データ受信バッファにデータがあるか調べる */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = network_check_buffer();
 	
@@ -70,7 +70,7 @@ void commandKP() {
 
 void commandKQ() {
 	/* ユーザーが接続されているかどうか確認する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int user_num = getCaliValue();
 	
 	*var = network_get_user_state(user_num);
@@ -81,7 +81,7 @@ void commandKQ() {
 
 void commandKR() {
 	/* データ受信バッファからデータを取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	network_read_buffer(var);
 	
@@ -91,7 +91,7 @@ void commandKR() {
 
 void commandKW() {
 	/* データを送信する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int num  = getCaliValue();
 
 	network_write_buffer(var, num);

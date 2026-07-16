@@ -39,8 +39,8 @@ void commandDC() {
 
 void commandDI() {
 	int page      = getCaliValue();
-	int *var_use  = getCaliVariable();
-	int *var_size = getCaliVariable();
+	vmvar_t *var_use  = getCaliVariable();
+	vmvar_t *var_size = getCaliVariable();
 	
 	v_getPageStatus(page, var_use, var_size);
 
@@ -49,7 +49,7 @@ void commandDI() {
 
 void commandDS() {
 	struct VarRef data_var;
-	int *point_var = getCaliVariable();
+	vmvar_t *point_var = getCaliVariable();
 	getCaliArray(&data_var);
 	int offset     = getCaliValue();
 	int page       = getCaliValue();
@@ -86,7 +86,7 @@ void commandDF() {
 		}
 	}
 
-	int *p = v_resolveRef(&data_var);
+	vmvar_t *p = v_resolveRef(&data_var);
 	while (cnt--)
 		*p++ = data;
 }

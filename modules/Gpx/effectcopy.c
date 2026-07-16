@@ -17,7 +17,7 @@ void gpx_effect(int no,
 		surface_t *src, int sx, int sy,
 		int width, int height,
 		int time,
-		int *endtype) {
+		vmvar_t *endtype) {
 	surface_t *write = nact->ags.dib;
 	if (!gr_clip(dst, &dx, &dy, &width, &height, write, &wx, &wy)) return;
 	if (!gr_clip(src, &sx, &sy, &width, &height, write, &wx, &wy)) return;

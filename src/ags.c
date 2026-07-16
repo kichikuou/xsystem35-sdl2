@@ -579,7 +579,7 @@ void ags_alpha_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	alpha_copy_area(nact->ags.dib, sx, sy, w, h, dx, dy);
 }
 
-void ags_alpha_getPixel(int x, int y, int *pic) {
+void ags_alpha_getPixel(int x, int y, vmvar_t *pic) {
 	if (nact->ags.world_depth == 8) return;
 	
 	if (!ags_check_param_xy(&x, &y)) {

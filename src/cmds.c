@@ -50,7 +50,7 @@ void commandSS() {
 
 void commandSC() {
 	/* ＣＤのプレイ中のタイムを取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int t, m, s, f;
 	
 	if (muscd_getpos(&t, &m, &s, &f)) {
@@ -85,7 +85,8 @@ void commandSR() {
 	   var+3 = フェードイン／アウト中
 	*/
 	/* Hushaby から SR,c,P:に変更か？ */
-	int num, *var;
+	int num;
+	vmvar_t *var;
 	int c = sl_getcAt(sl_getIndex());
 	if (c < 0x40) {
 		num = sl_getc();
@@ -127,7 +128,7 @@ void commandSL() {
 void commandSI() {
 	/* 指定した音源の接続状態を var に取得 */
 	int type = sl_getc();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	if (type == 0) {        /* MIDI */
 		*var = mus_midi_get_state() ? 1 : 0;
@@ -144,7 +145,8 @@ void commandSG() {
 	/* MIDI演奏 */
 	static int loopcnt = 0;
 	int sw  = sl_getc();
-	int num, fnum, *var;
+	int num, fnum;
+	vmvar_t *var;
 	midiplaystate st;
 	
 	switch(sw) {
@@ -255,8 +257,8 @@ void commandST() {
 
 void commandSU() {
 	/* ＰＣＭの演奏状態を変数 var1 , var2 に返す */
-	int *var1 = getCaliVariable();
-	int *var2 = getCaliVariable();
+	vmvar_t *var1 = getCaliVariable();
+	vmvar_t *var2 = getCaliVariable();
 
 	if (!mus_pcm_get_state()) {
 		*var1 = dummy_pcm_in_play ? 1 : 0;
@@ -311,14 +313,14 @@ void commandSQ() {
 
 void commandSO() {
 	// ＰＣＭデバイスのサポート情報を取得
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("SO %p:",var);
 }
 
 void commandSW() {
 	/* 指定データ形式が演奏出来るかチェックする．*/
-	int *var    = getCaliVariable();
+	vmvar_t *var    = getCaliVariable();
 	int channel = getCaliValue();
 	int Srate   = getCaliValue();
 	int bit     = getCaliValue();
@@ -352,7 +354,7 @@ void commandSX() {
 	}
 	case 2: {
 		/* フェード終了確認 */
-		int *var   = getCaliVariable();
+		vmvar_t *var   = getCaliVariable();
 		bool st;
 		st = mus_mixer_fadeout_get_state(device);
 		*var = (st ? 0 : 1);
@@ -367,7 +369,7 @@ void commandSX() {
 	}
 	case 4: {
 		/* ボリューム取得 */
-		int *var   = getCaliVariable();
+		vmvar_t *var   = getCaliVariable();
 		*var = mus_mixer_get_level(device);
 		TRACE("SX %d,%d:", device, sw);
 		break;

@@ -47,7 +47,7 @@ static void OutputMessageBox(void) { /* 0 */
 	int p2 = getCaliValue();
 	int title = getCaliValue();
 	int msg = getCaliValue();
-	int *res = getCaliVariable();
+	vmvar_t *res = getCaliVariable();
 	int ISys3xSystem = getCaliValue();
 
 	char *title_utf8 = toUTF8(svar_get(title));
@@ -64,10 +64,10 @@ static void OutputMessageBox(void) { /* 0 */
 static void InputListNum(void) { /* 1 */
 	int flags = getCaliValue();
 	int title = getCaliValue();
-	int *val = getCaliVariable();
+	vmvar_t *val = getCaliVariable();
 	int minval = getCaliValue();
 	int maxval = getCaliValue();
-	int *res = getCaliVariable();
+	vmvar_t *res = getCaliVariable();
 	int ISys3xSystem = getCaliValue();
 
 	INPUTNUM_PARAM ni_param = {
@@ -151,7 +151,7 @@ static void SetKeyStatus(void) {
  */
 static void GetKeyStatus(void) {
 	int no   = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int i;
 	
 	if (no >= KEYMAP_MAX) {

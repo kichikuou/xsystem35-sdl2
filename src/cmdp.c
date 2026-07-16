@@ -106,7 +106,7 @@ void commandPS() {
 
 void commandPG() { /* T2 */
 	/* パレットデータを変数列に取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	int i;
@@ -121,7 +121,7 @@ void commandPG() { /* T2 */
 
 void commandPP() { /* T2 */
 	/* パレットデータを変数列から書き込み */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int num1 = getCaliValue();
 	int num2 = getCaliValue();
 	int i;
@@ -153,7 +153,7 @@ void commandPD() {
 
 void commandPT0() {
 	/* 指定座標に描かれているパレット番号を取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
 	PixelColor cell;
@@ -166,9 +166,9 @@ void commandPT0() {
 
 void commandPT1() {
 	/* 指定座標に描かれている色を取得する */
-	int *r_var = getCaliVariable();
-	int *g_var = getCaliVariable();
-	int *b_var = getCaliVariable();
+	vmvar_t *r_var = getCaliVariable();
+	vmvar_t *g_var = getCaliVariable();
+	vmvar_t *b_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
 	PixelColor cell;
@@ -183,8 +183,8 @@ void commandPT1() {
 
 void commandPT2() {
 	/* 指定座標に描かれている色を取得する */
-	int *hi_var  = getCaliVariable();
-	int *low_var = getCaliVariable();
+	vmvar_t *hi_var  = getCaliVariable();
+	vmvar_t *low_var = getCaliVariable();
 	int x = getCaliValue();
 	int y = getCaliValue();
 	PixelColor cell;

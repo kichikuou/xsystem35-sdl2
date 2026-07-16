@@ -15,8 +15,8 @@ static void Init() {
 
 static void ExistKeyFile() {
 	const char *p1 = sl_getString(0);
-	int *p2 = getCaliVariable();
-	int *var = getCaliVariable();
+	vmvar_t *p2 = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = 1;
 	
@@ -25,8 +25,8 @@ static void ExistKeyFile() {
 
 static void CheckProtectFile() {
 	const char *p1 = sl_getString(0);
-	int *p2 = getCaliVariable();
-	int *var = getCaliVariable();
+	vmvar_t *p2 = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = 1;
 
@@ -35,8 +35,8 @@ static void CheckProtectFile() {
 
 static void CreateKeyFile() {
 	const char *p1 = sl_getString(0);
-	int *p2 = getCaliVariable();
-	int *var = getCaliVariable();
+	vmvar_t *p2 = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = 1;
 

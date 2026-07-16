@@ -178,7 +178,8 @@ void commandZF() {
 
 void commandZD() {
 	int c0 = sl_getc();
-	int sw = 0, *var;
+	int sw = 0;
+	vmvar_t *var;
 	char *msg;
 	
 	switch(c0) {
@@ -209,7 +210,7 @@ void commandZT0() {
 	struct tm *lc;
 	int       sv = sl_getIndex();
 	int       c1, c2;
-	int       *var;
+	vmvar_t   *var;
 
 	/* ZT 0,1対策 for DALK */
 	c1 = sl_getc();
@@ -245,7 +246,7 @@ void commandZT1() {
 
 void commandZT2() {
 	/* タイマーを var に取得する 1/10 sec */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int val = get_counter(0) / 100;
 	
 	*var = val & 0xffff;
@@ -255,7 +256,7 @@ void commandZT2() {
 
 void commandZT3() {
 	/* タイマーを var に取得する 1/30 sec */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int val = get_counter(0) * 3 / 100;
 	
 	*var = val & 0xffff;
@@ -265,7 +266,7 @@ void commandZT3() {
 
 void commandZT4() {
 	/* タイマーを var に取得する 1/60 sec */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int val = get_counter(0) * 3 / 50;
 	
 	*var = val & 0xffff;
@@ -275,7 +276,7 @@ void commandZT4() {
 
 void commandZT5() {
 	/* タイマーを var に取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int val = get_counter(0) / 10;
 	
 	*var = val & 0xffff;
@@ -304,7 +305,7 @@ void commandZT10() {
 void commandZT11() {
 	/* 高精度タイマー取得 */
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	int divisor = counters[num].divisor ? counters[num].divisor : 1;
 	if (num > 256)
@@ -352,7 +353,7 @@ void commandZZ0() {
 
 void commandZZ1() {
 	/* 現在の動作機種コードを var に返す */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 #if 1
 	*var = 1;
 #else
@@ -392,7 +393,7 @@ void commandZZ2() {
 
 void commandZZ3() {
 	/* WINDOWSの全画面サイズや表示色数を変数列に返す */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	DispInfo info;
 	
 	ags_getWindowInfo(&info);
@@ -405,7 +406,7 @@ void commandZZ3() {
 
 void commandZZ4() {
 	/* ＤＩＢ の全画面 サイズや色数を変数列に返す */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	DispInfo info;
 	
 	ags_getDIBInfo(&info);
@@ -418,7 +419,7 @@ void commandZZ4() {
 
 void commandZZ5() {
 	/* ＳＹＳＴＥＭ３．５用表示画面 の サイズや色数を変数列に返す */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	DispInfo info;
 
 	ags_getViewAreaInfo(&info);
@@ -431,7 +432,7 @@ void commandZZ5() {
 
 void commandZZ7() {
 	// セーブドライブの残りディスク容量を得る
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	*var = 65535;
 	
@@ -440,14 +441,14 @@ void commandZZ7() {
 
 void commandZZ8() {
 	// メモリオンバッファの残り容量を得る
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	TRACE_UNIMPLEMENTED("ZZ8 %p:",var);
 }
 
 void commandZZ9() {
 	/* 起動時のスクリーンサイズを取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	DispInfo info;
 	
 	ags_getWindowInfo(&info);
@@ -460,7 +461,7 @@ void commandZZ9() {
 
 void commandZZ10() {
 	/* スクリーンモードを取得する */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	*var = gfx_isFullscreen() ? 1 : 0;
 	
@@ -500,7 +501,7 @@ void commandZZ14() {
 
 void commandZG() {
 	/* ＣＧのロードした回数をリンク番号毎に配列に書き込む配列を設定 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	cg_loadCountVar = var;
 	
@@ -549,7 +550,7 @@ void commandZK() {
 void commandZR() {
 	/* 1 〜 num までの乱数を発生して変数に返す。 */
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	if (num == 0 || num == 1) {
 		*var = num;

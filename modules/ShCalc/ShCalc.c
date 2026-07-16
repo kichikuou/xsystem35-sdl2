@@ -50,7 +50,7 @@ static int64_t div64(int64_t a1, int64_t a2) {
 	return a1 / a2;
 }
 
-static int64_t get32(int *var) {
+static int64_t get32(vmvar_t *var) {
 	return var[0] + mul64(var[1], 0x10000);
 }
 
@@ -74,7 +74,7 @@ static void SetIntNum16(void) { /* 1 */
 
 	  var: 数値の入った変数
 	*/
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	accumulator = mul64(*var, numbase);
 	
@@ -82,7 +82,7 @@ static void SetIntNum16(void) { /* 1 */
 }
 
 static void SetIntNum32(void) { /* 2 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	accumulator = mul64(get32(var), numbase);
 	
@@ -95,7 +95,7 @@ static void GetIntNum16(void) { /* 3 */
 
 	  var: 数値をいれる変数
 	 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int64_t i;
 	
 	i = div64(accumulator, numbase);
@@ -110,7 +110,7 @@ static void GetIntNum16(void) { /* 3 */
 }
 
 static void GetIntNum32(void) { /* 4 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int64_t i = div64(accumulator, numbase);
 	
 	var[0] = i & 0xFFFF;
@@ -126,7 +126,7 @@ static void AddIntNum16(void) { /* 5 */
 
 	  var: 足す数の入った変数
 	 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	accumulator += mul64(*var, numbase);
 	
@@ -134,7 +134,7 @@ static void AddIntNum16(void) { /* 5 */
 }
 
 static void AddIntNum32(void) { /* 6 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	accumulator += mul64(get32(var), numbase);
 
@@ -148,7 +148,7 @@ static void SubIntNum16(void) { /* 7 */
 }
 
 static void SubIntNum32(void) { /* 8 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	accumulator -= mul64(get32(var), numbase);
 
@@ -161,7 +161,7 @@ static void MulIntNum16(void) {  /* 9 */
 	  
 	  var: 掛ける数の入った変数
 	 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	
 	accumulator *= mul64(*var, numbase);
 	
@@ -180,7 +180,7 @@ static void DivIntNum16(void) { /* 11 */
 
 	   var: 足す数の入った変数
 	 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int64_t i;
 	
 	i = mul64(*var, numbase);
@@ -204,9 +204,9 @@ static void CmpIntNum16(void) { /* 13 */
 }
 
 static void CmpIntNum32(void) { /* 14 */
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int op = getCaliValue();
-	int *result = getCaliVariable();
+	vmvar_t *result = getCaliVariable();
 
 	int64_t val = mul64(get32(var), numbase);
 
@@ -230,8 +230,8 @@ static void GetLengthNum16(void) { /* 15 */
 	   var: 数値
 	   vResult: 数値の桁数を返す変数
 	 */
-	int *var     = getCaliVariable();
-	int *vResult = getCaliVariable();
+	vmvar_t *var     = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	
 	if (*var >= 10000) {
 		*vResult = 5;
@@ -270,7 +270,7 @@ static void NumToRate(void) { /* 17 */
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	int flag = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	i = (p1 * p3) / p2;
@@ -302,7 +302,7 @@ static void NumToRateNum(void) { /* 18 */
 	int p2 = getCaliValue();
 	int p3 = getCaliValue();
 	int flag = getCaliValue();
-	int *vResult = getCaliVariable();
+	vmvar_t *vResult = getCaliVariable();
 	int i;
 	
 	i = (p1 * p2) / p3;
@@ -333,7 +333,7 @@ static void SetRandomSeed() {
 
 static void GetRandomNumA() {
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 
 	if (num == 0 || num == 1) {
 		*var = num;
@@ -351,7 +351,7 @@ static void NumToBit() {
 	  var: 値を返す変数
 	*/
 	int beki = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int i, j = 1;
 	
 	if (beki < 17) {
@@ -379,7 +379,7 @@ static void BitToNum() {
 	  var: 値を返す変数
 	*/
 	int val = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int i;
 	
 	TRACE("ShCalc.BitToNum %d,%p:", val, var);

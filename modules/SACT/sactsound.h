@@ -24,11 +24,13 @@
 #ifndef __SACTSOUND_H__
 #define __SACTSOUND_H__
 
+#include "portab.h"
+
 void ssnd_init(void);
 void ssnd_play(int no);
 void ssnd_stop(int no, int fadetime);
 void ssnd_wait(int no);
-void ssnd_waitkey(int no, int *res);
+void ssnd_waitkey(int no, vmvar_t *res);
 void ssnd_prepare(int no);
 void ssnd_prepareLRrev(int no);
 void ssnd_playLRrev(int no);

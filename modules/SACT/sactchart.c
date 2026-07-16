@@ -25,7 +25,7 @@
 #include "portab.h"
 
 // グラフ用チャート作成
-void schart_pos(int *pos, int pos1, int pos2, int val1, int val2, int val) {
+void schart_pos(vmvar_t *pos, int pos1, int pos2, int val1, int val2, int val) {
 	if (val1 == val2) {
 		*pos = 0;
 	} else {

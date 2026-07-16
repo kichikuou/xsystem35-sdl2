@@ -28,6 +28,8 @@
 #include <stdint.h>
 #include "config.h"
 
+typedef int vmvar_t;
+
 #ifdef _WIN32
 # ifdef min
 #  undef min

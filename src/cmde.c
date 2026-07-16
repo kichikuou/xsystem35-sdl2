@@ -71,10 +71,10 @@ void commandEC() {
 
 void commandEG() {
 	int num     = getCaliValue();
-	int *x      = getCaliVariable();
-	int *y      = getCaliVariable();
-	int *width  = getCaliVariable();
-	int *height = getCaliVariable();
+	vmvar_t *x      = getCaliVariable();
+	vmvar_t *y      = getCaliVariable();
+	vmvar_t *width  = getCaliVariable();
+	vmvar_t *height = getCaliVariable();
 	
 	*x      = tbl[num -1].r.x;
 	*y      = tbl[num -1].r.y;
@@ -86,7 +86,7 @@ void commandEG() {
 
 void commandEM() {
 	int num  = getCaliValue();
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int x    = getCaliValue();
 	int y    = getCaliValue();
 
@@ -101,7 +101,7 @@ void commandEM() {
 }
 
 void commandEN() {
-	int *var = getCaliVariable();
+	vmvar_t *var = getCaliVariable();
 	int min  = getCaliValue();
 	int max  = getCaliValue();
 	int x    = getCaliValue();
