@@ -23,6 +23,7 @@
 void gameresource_test(void);
 void hankaku_test(void);
 void qnt_test(void);
+void variable_test(void);
 
 void sys_error(char *format, ...) {
 	va_list args;
@@ -41,6 +42,7 @@ void sys_message(int level, char *format, ...) {
 
 int main() {
 	gameresource_test();
+	variable_test();
 	hankaku_test();
 	qnt_test();
 	return 0;

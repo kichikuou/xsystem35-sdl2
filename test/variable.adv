@@ -1,0 +1,91 @@
+	MS FILE,"variable.adv":
+	!value:0!
+	!count:0!
+
+	; Values written outside the expression evaluator are observed as words.
+	NDC 0,0:
+	NDC 1,1:
+	ND- 2,0,1:
+	NDD value,2:
+	~AssertEquals value,65535,__LINE__:
+	ND+ 2,0,1:
+	NDD value,2:
+	~AssertEquals value,1,__LINE__:
+	NDC 0,65535:
+	ND+ 2,0,1:
+	NDD value,2:
+	~AssertEquals value,0,__LINE__:
+
+	; inc and dec saturate at the bounds.
+	!value:65535!
+	inc value:
+	~AssertEquals value,65535,__LINE__:
+	!value:0!
+	dec value:
+	~AssertEquals value,0,__LINE__:
+
+	; Compound assignments preserve their documented wrap/saturate behavior.
+	!value:65535!
+	!value+:1!
+	~AssertEquals value,0,__LINE__:
+	!value:0!
+	!value-:1!
+	~AssertEquals value,0,__LINE__:
+	!value:32768!
+	!value*:2!
+	~AssertEquals value,0,__LINE__:
+	!value:7!
+	!value/:2!
+	~AssertEquals value,3,__LINE__:
+	!value/:0!
+	~AssertEquals value,0,__LINE__:
+	!value:7!
+	!value%:4!
+	~AssertEquals value,3,__LINE__:
+	!value%:0!
+	~AssertEquals value,0,__LINE__:
+	!value:0xf0f0!
+	!value&:0x0ff0!
+	~AssertEquals value,0x00f0,__LINE__:
+	!value|:0x0f00!
+	~AssertEquals value,0x0ff0,__LINE__:
+	!value^:0x00ff!
+	~AssertEquals value,0x0f0f,__LINE__:
+
+	; FOR loops terminate after crossing either word boundary.
+	!count:0!
+	<value,1,0,0,2:
+		inc count:
+	>
+	~AssertEquals count,1,__LINE__:
+	~AssertEquals value,0,__LINE__:
+	!count:0!
+	<value,65535,65535,1,1:
+		inc count:
+	>
+	~AssertEquals count,1,__LINE__:
+	~AssertEquals value,65535,__LINE__:
+
+	; A module result above 65535 is observed through expressions as a word.
+	MS 10,"65536":
+	ShString.SetStringNum16 10,value:
+	~AssertEquals value,0,__LINE__:
+
+	; QE/LE keep the same word values across a file round trip.
+	NDC 0,0:
+	NDC 1,1:
+	ND- 2,0,1:
+	NDD D01,2:
+	NDC 0,65535:
+	ND+ 2,0,1:
+	NDD D02,2:
+	QE 0,"variable-u16.dat",D01,2:
+	~AssertEquals RND,0,__LINE__:
+	!D01:0!
+	!D02:1!
+	LE 0,"variable-u16.dat",D01,2:
+	~AssertEquals RND,0,__LINE__:
+	~AssertEquals D01,65535,__LINE__:
+	~AssertEquals D02,0,__LINE__:
+
+	%0:

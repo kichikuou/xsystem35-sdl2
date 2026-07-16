@@ -194,6 +194,7 @@ else()  # non-emscripten, non-android
     gameresource_test.c
     hankaku_test.c
     qnt_test.c
+    variable_test.c
     )
   target_compile_options(src_tests PRIVATE -Wno-pointer-sign -Wall)
   target_link_libraries(src_tests PRIVATE src_lib sdl2)
