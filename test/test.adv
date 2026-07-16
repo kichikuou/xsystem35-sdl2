@@ -18,4 +18,5 @@
 	HH0,tests_passed: ' tests passed' R
 	HH0,tests_failed: ' tests failed' R
 	{tests_failed: A}
+	!RND:tests_failed!
 	ZZ0,0:

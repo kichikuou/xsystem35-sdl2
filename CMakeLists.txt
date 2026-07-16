@@ -231,3 +231,7 @@ add_subdirectory(po)
 
 add_subdirectory(modules)
 target_link_libraries(xsystem35 PRIVATE modules)
+
+if (NOT ANDROID AND NOT EMSCRIPTEN)
+  add_subdirectory(test)
+endif()
