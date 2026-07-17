@@ -50,6 +50,7 @@ static void commandsDEC() {
 static void letVar(int type) {
 	vmvar_t *varno = getVariable();
 	int val    = getCaliValue();
+	uint32_t result;
 
 	if (varno == NULL) {
 		WARNING("varno is NULL");
@@ -60,11 +61,15 @@ static void letVar(int type) {
 	case '!':
 		*varno = val; break;
 	case 0x10: /* += */
-		*varno = (uint16_t)(*varno + val); break;
+		result = (uint32_t)*varno + val;
+		*varno = result > UINT16_MAX ? UINT16_MAX : result;
+		break;
 	case 0x11: /* -= */
 		*varno = max(0, *varno - val); break;
 	case 0x12: /* *= */
-		*varno = (uint16_t)(*varno * val); break;
+		result = (uint32_t)*varno * val;
+		*varno = result > UINT16_MAX ? UINT16_MAX : result;
+		break;
 	case 0x13: /* /= */
 		if (val == 0) *varno  = 0;
 		else          *varno /= val;
@@ -101,7 +106,7 @@ static void getDataTableAdr() {
 /* < ループ開始 */
 static void loopStart() {
 	int p1 = sl_getc();
-	int exitadr, limit, direction, step;
+	int exitadr, limit, direction, step, value;
 	vmvar_t *var;
 	
 	if (p1 == 0) {
@@ -116,32 +121,33 @@ static void loopStart() {
 	limit     = getCaliValue();
 	direction = getCaliValue();
 	step      = getCaliValue();
+	value     = *var;
 	
 	if (direction == 0) {
 		/* dec */
 		if (p1 == 1) {
-			*var -= step;
+			value -= step;
 		}
-		if (*var < limit) {
-			if (p1 == 0) *var-= step;
+		if (value < limit) {
+			if (p1 == 0) value -= step;
 			sl_jmpNear(exitadr);
-			if (*var < 0) { *var = 0; }
+			*var = max(0, value);
 			return;
 		}
 	} else if (direction == 1) {
 		/* inc */
 		if (p1 == 1) {
-			*var += step;
+			value += step;
 		}
-		if (*var > limit) {
-			// if (p1 == 0) *var+= step;
+		if (value > limit) {
 			sl_jmpNear(exitadr);
-			if (*var > 65535) { *var = 65535; }
+			*var = (uint16_t)value;
 			return;
 		}
 	} else {
 		undeferr();
 	}
+	*var = value;
 	return;
 }
 

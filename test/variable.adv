@@ -24,16 +24,16 @@
 	dec value:
 	~AssertEquals value,0,__LINE__:
 
-	; Compound assignments preserve their documented wrap/saturate behavior.
+	; Compound arithmetic assignments saturate at the word bounds.
 	!value:65535!
 	!value+:1!
-	~AssertEquals value,0,__LINE__:
+	~AssertEquals value,65535,__LINE__:
 	!value:0!
 	!value-:1!
 	~AssertEquals value,0,__LINE__:
 	!value:32768!
 	!value*:2!
-	~AssertEquals value,0,__LINE__:
+	~AssertEquals value,65535,__LINE__:
 	!value:7!
 	!value/:2!
 	~AssertEquals value,3,__LINE__:
@@ -52,7 +52,7 @@
 	!value^:0x00ff!
 	~AssertEquals value,0x0f0f,__LINE__:
 
-	; FOR loops terminate after crossing either word boundary.
+	; FOR loops test the wide result, then store the terminal word value.
 	!count:0!
 	<value,1,0,0,2:
 		inc count:
@@ -64,7 +64,7 @@
 		inc count:
 	>
 	~AssertEquals count,1,__LINE__:
-	~AssertEquals value,65535,__LINE__:
+	~AssertEquals value,0,__LINE__:
 
 	; A module result above 65535 is observed through expressions as a word.
 	MS 10,"65536":
