@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include "config.h"
 
-typedef int vmvar_t;
+typedef uint16_t vmvar_t;
 
 #ifdef _WIN32
 # ifdef min
