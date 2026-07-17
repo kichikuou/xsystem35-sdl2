@@ -77,7 +77,13 @@ add_library(modules STATIC
 target_include_directories(modules PUBLIC . lib)
 
 if (NOT ANDROID AND NOT EMSCRIPTEN)
-  add_executable(modules_tests lib/list_test.c)
+  add_executable(modules_tests
+    lib/list_test.c
+    module_test.c
+    ShArray/ShArray_test.c
+    ShCalc/ShCalc_test.c
+  )
+  target_compile_options(modules_tests PRIVATE -Wno-pointer-sign -Wall)
   target_link_libraries(modules_tests PRIVATE modules)
   add_test(NAME modules_tests COMMAND modules_tests)
 endif()

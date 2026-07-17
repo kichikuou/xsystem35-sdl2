@@ -20,6 +20,9 @@
 #include "unittest.h"
 #include <stdio.h>
 
+void sharray_test(void);
+void shcalc_test(void);
+
 static void list_func(void *data, void *user_data) {
 	ASSERT_EQUAL(*(int*)data, ++*(int*)user_data);
 }
@@ -31,6 +34,9 @@ static int compare_func(const void *a, const void *b) {
 int main() {
 	int data1 = 1;
 	int data2 = 2;
+
+	sharray_test();
+	shcalc_test();
 
 	// Basic
 	{

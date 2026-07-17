@@ -51,7 +51,7 @@ static int64_t div64(int64_t a1, int64_t a2) {
 }
 
 static int64_t get32(vmvar_t *var) {
-	return var[0] + mul64(var[1], 0x10000);
+	return (uint16_t)var[0] + mul64((uint16_t)var[1], 0x10000);
 }
 
 static void SetIntNumBase(void) { /* 0 */
@@ -104,7 +104,7 @@ static void GetIntNum16(void) { /* 3 */
 		i = 65535;
 	}
 	
-	*var = i;
+	*var = (uint16_t)i;
 	
 	TRACE("ShCalc.GetIntNum16 %d:", var);
 }
@@ -113,9 +113,9 @@ static void GetIntNum32(void) { /* 4 */
 	vmvar_t *var = getCaliVariable();
 	int64_t i = div64(accumulator, numbase);
 	
-	var[0] = i & 0xFFFF;
+	var[0] = (uint16_t)i;
 	i >>= 16;
-	var[1] = i > 0xFFFF ? 0xFFFF : i;
+	var[1] = i > 0xFFFF ? 0xFFFF : (uint16_t)i;
 
 	TRACE("ShCalc.GetIntNum32: %p:", var);
 }
