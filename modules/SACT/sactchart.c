@@ -29,7 +29,8 @@ void schart_pos(vmvar_t *pos, int pos1, int pos2, int val1, int val2, int val) {
 	if (val1 == val2) {
 		*pos = 0;
 	} else {
-		*pos = (((pos2 - pos1) * (val - val1)) / (val2 - val1)) + pos1;
+		*pos = (uint16_t)((((pos2 - pos1) * (val - val1)) /
+				   (val2 - val1)) + pos1);
 	}
 }
 

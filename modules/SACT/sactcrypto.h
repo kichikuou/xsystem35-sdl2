@@ -27,7 +27,7 @@
 #include "portab.h"
 
 void scryp_encrypt_word(vmvar_t *array, int num, int key);
-void scryp_decrypt_word(int *array, int num, int key);
+void scryp_decrypt_word(vmvar_t *array, int num, int key);
 void scryp_encrypt_str(int strno, int key);
 void scryp_decrypt_str(int strno, int key);
 

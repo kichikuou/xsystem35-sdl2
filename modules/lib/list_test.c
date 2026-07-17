@@ -22,6 +22,8 @@
 
 void sharray_test(void);
 void shcalc_test(void);
+void shstring_test(void);
+void sactchart_test(void);
 
 static void list_func(void *data, void *user_data) {
 	ASSERT_EQUAL(*(int*)data, ++*(int*)user_data);
@@ -37,6 +39,8 @@ int main() {
 
 	sharray_test();
 	shcalc_test();
+	shstring_test();
+	sactchart_test();
 
 	// Basic
 	{

@@ -155,7 +155,7 @@ static void SetStringNum16(void) {
 	}
 	*dst = '\0';
 	
-	*var = atoi(_dst);
+	*var = (uint16_t)atoi(_dst);
 }
 
 static void SetStringNum32(void) {

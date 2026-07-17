@@ -12,6 +12,7 @@
 
 #include "cali.h"
 #include "module_test.h"
+#include "nact.h"
 #include "system.h"
 #include "unittest.h"
 
@@ -21,6 +22,9 @@ static int value_index;
 static vmvar_t **variable_args;
 static int nr_variable_args;
 static int variable_index;
+static NACTINFO test_nact;
+
+NACTINFO *nact = &test_nact;
 
 int getCaliValue(void) {
 	ASSERT_TRUE(value_index < nr_value_args);
@@ -35,6 +39,15 @@ vmvar_t *getCaliVariable(void) {
 void sys_message(int level, char *format, ...) {
 	(void)level;
 	(void)format;
+}
+
+void sys_error(char *format, ...) {
+	(void)format;
+	ASSERT_TRUE(false);
+}
+
+void ags_setWindowTitle(const char *title_utf8) {
+	(void)title_utf8;
 }
 
 double genrand(void) {

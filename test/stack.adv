@@ -16,6 +16,13 @@ const word NUM_VAR_PUSHES_AFTER_CALL = 5:
 	~AssertEquals D03, 2, __LINE__:
 	~AssertEquals D04, 3, __LINE__:
 
+	; Variable stack entries preserve the full unsigned word range.
+	!D01 : 65535!
+	!D02 : 0!
+	US D01, 1:
+	UG D02, 1:
+	~AssertEquals D02, 65535, __LINE__:
+
 	UR D01:
 	~AssertEquals D01[STACK_TOP_ATTR], 0, __LINE__:
 	~AssertEquals D01[NUM_PAGE_CALLS], 1, __LINE__:

@@ -82,9 +82,11 @@ if (NOT ANDROID AND NOT EMSCRIPTEN)
     module_test.c
     ShArray/ShArray_test.c
     ShCalc/ShCalc_test.c
+    ShString/ShString_test.c
+    SACT/sactchart_test.c
   )
   target_compile_options(modules_tests PRIVATE -Wno-pointer-sign -Wall)
-  target_link_libraries(modules_tests PRIVATE modules)
+  target_link_libraries(modules_tests PRIVATE modules src_lib sdl2)
   add_test(NAME modules_tests COMMAND modules_tests)
 endif()
 
