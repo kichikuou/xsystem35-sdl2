@@ -10,3 +10,5 @@ variable.adv
 
 #DLLHeader
 ShString.HEL
+ShCalc.HEL
+SACT.HEL

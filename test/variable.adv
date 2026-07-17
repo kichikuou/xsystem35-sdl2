@@ -71,6 +71,35 @@
 	ShString.SetStringNum16 10,value:
 	~AssertEquals value,0,__LINE__:
 
+	; A ShString result is converted to a word before ShCalc reads it directly.
+	MS 10,"65601":
+	!D01:0!!D02:0!
+	ShString.SetStringNum16 10,D01:
+	ShCalc.SetIntNumBase 1:
+	ShCalc.SetIntNum16 D01:
+	ShCalc.GetIntNum16 D02:
+	~AssertEquals D02,65,__LINE__:
+
+	; ShCalc splits negative results into words before another entry reads them.
+	!D01:0!!D02:0!  ; zero as a 32-bit word pair
+	!D03:1!!D04:0!  ; one as a 32-bit word pair
+	!D05:0!!D06:0!!D07:0!
+	ShCalc.SetIntNumBase 1:
+	ShCalc.SetIntNum32 D01:
+	ShCalc.SubIntNum32 D03:
+	ShCalc.GetIntNum32 D05:
+	ShCalc.SetIntNum32 D05:
+	ShCalc.CmpIntNum32 D01,2,D07:
+	~AssertEquals D07,0,__LINE__:
+
+	; SACT.ChartPos publishes its out-of-range result as a word.
+	!D01:0!!D02:0!
+	SACT.ChartPos D01,40000,0,1,0,2:
+	ShCalc.SetIntNumBase 1:
+	ShCalc.SetIntNum16 D01:
+	ShCalc.GetIntNum16 D02:
+	~AssertEquals D02,14464,__LINE__:
+
 	; QE/LE keep the same word values across a file round trip.
 	NDC 0,0:
 	NDC 1,1:
