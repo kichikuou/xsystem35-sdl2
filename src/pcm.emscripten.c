@@ -58,17 +58,29 @@ bool muspcm_load_no(int slot, int no) {
 	return pcm_load_no_js(slot, no, pcm_channel(no));
 }
 
-EM_ASYNC_JS(bool, muspcm_load_bgm, (int slot, int no), {
-	return await xsystem35.audio.pcm_load_bgm(slot, no, BGM_VOLVAL_CH);
+EM_ASYNC_JS(bool, pcm_load_bgm_js, (int slot, int no, int ch), {
+	return await xsystem35.audio.pcm_load_bgm(slot, no, ch);
 });
 
-EM_ASYNC_JS(bool, muspcm_load_data, (int slot, uint8_t *buf, uint32_t len), {
-	return await xsystem35.audio.pcm_load_data(slot, buf, len, SE_VOLVAL_CH);
+bool muspcm_load_bgm(int slot, int no) {
+	return pcm_load_bgm_js(slot, no, BGM_VOLVAL_CH);
+}
+
+EM_ASYNC_JS(bool, pcm_load_data_js, (int slot, uint8_t *buf, uint32_t len, int ch), {
+	return await xsystem35.audio.pcm_load_data(slot, buf, len, ch);
 });
 
-EM_ASYNC_JS(bool, muspcm_load_mixlr, (int slot, int noL, int noR), {
-	return await xsystem35.audio.pcm_load_mixlr(slot, noL, noR, SE_VOLVAL_CH);
+bool muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
+	return pcm_load_data_js(slot, buf, len, SE_VOLVAL_CH);
+}
+
+EM_ASYNC_JS(bool, pcm_load_mixlr_js, (int slot, int noL, int noR, int ch), {
+	return await xsystem35.audio.pcm_load_mixlr(slot, noL, noR, ch);
 });
+
+bool muspcm_load_mixlr(int slot, int noL, int noR) {
+	return pcm_load_mixlr_js(slot, noL, noR, SE_VOLVAL_CH);
+}
 
 EM_JS(void, muspcm_unload, (int slot), {
 	xsystem35.audio.pcm_unload(slot);
