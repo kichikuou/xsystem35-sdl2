@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.19.0 - 2026-07-19
 - Replaced the GTK-based popup menu and dialogs with a pure-SDL implementation.
 - On Android, the popup menu opens with a three-finger tap.
 - Android: Added installation directly from CD-ROM images.
