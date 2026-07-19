@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-30 16:41+0900\n"
+"POT-Creation-Date: 2026-07-19 12:40+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,72 +17,71 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu_sdl.c:106 src/menu_sdl.c:109
+#: src/menu.c:136 src/menu.c:139
 msgid "Message Skip"
 msgstr ""
 
-#: src/menu_sdl.c:113
-msgid "Mouse Auto Move"
+#: src/menu.c:144
+msgid "Mouse Movement"
 msgstr ""
 
-#: src/menu_sdl.c:116 src/volume.c:181
-msgid "Volume"
+#: src/menu.c:148 src/volume.c:198
+msgid "Sound Settings"
 msgstr ""
 
-#: src/menu_sdl.c:121 src/menu_sdl.c:189
+#: src/menu.c:153 src/menu.c:221
 msgid "Restart"
 msgstr ""
 
-#: src/menu_sdl.c:126 src/menu_sdl.c:166
+#: src/menu.c:158 src/menu.c:216
 msgid "Quit"
 msgstr ""
 
-#: src/menu_sdl.c:167 src/menu_sdl.c:190 src/input_modal.c:295
-#: src/input_modal.c:488
+#: src/menu.c:197 src/input_modal.c:292 src/input_modal.c:485
 msgid "Cancel"
 msgstr ""
 
-#: src/menu_sdl.c:172
-msgid "Quit game?"
-msgstr ""
-
-#: src/menu_sdl.c:173 src/menu_sdl.c:196
+#: src/menu.c:203
 msgid "Any unsaved progress will be lost."
 msgstr ""
 
-#: src/menu_sdl.c:195
+#: src/menu.c:216
+msgid "Quit game?"
+msgstr ""
+
+#: src/menu.c:221
 msgid "Restart game?"
 msgstr ""
 
-#: src/input_modal.c:271
+#: src/input_modal.c:268
 msgid "Enter a string"
 msgstr ""
 
-#: src/input_modal.c:283
+#: src/input_modal.c:280
 #, c-format
 msgid "Up to %d characters"
 msgstr ""
 
-#: src/input_modal.c:291 src/input_modal.c:481 src/input_modal.c:486
+#: src/input_modal.c:288 src/input_modal.c:478 src/input_modal.c:483
 msgid "OK"
 msgstr ""
 
-#: src/input_modal.c:437
+#: src/input_modal.c:434
 msgid "Enter a number"
 msgstr ""
 
-#: src/volume.c:89
+#: src/volume.c:106
 msgid "BGM"
 msgstr ""
 
-#: src/volume.c:90
+#: src/volume.c:107
 msgid "Sound effects"
 msgstr ""
 
-#: src/volume.c:172
+#: src/volume.c:189
 msgid "mute"
 msgstr ""
 
-#: src/volume.c:206
+#: src/volume.c:223
 msgid "Close"
 msgstr ""

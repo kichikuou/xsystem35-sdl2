@@ -195,7 +195,7 @@ static bool volume_build(mu_Context *ctx, modal *modal) {
 	        + ctx->style->title_height;
 	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
 
-	if (mu_begin_window_ex(ctx, _("Volume"), r,
+	if (mu_begin_window_ex(ctx, _("Sound Settings"), r,
 	        MU_OPT_NORESIZE | MU_OPT_NOSCROLL)) {
 		for (int i = 0; i < count; i++) {
 			if (!ch[i].label)

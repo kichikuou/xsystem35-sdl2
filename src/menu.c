@@ -117,6 +117,9 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 	bool keep_open = true;
 
 	int rows = 5;
+#ifdef __ANDROID__
+	rows--;
+#endif
 	int row_h = ctx->style->size.y + ctx->style->padding * 2;
 	int w = 200;
 	// `rows` rows with (rows - 1) inter-row gaps, plus the window's body padding.
@@ -136,11 +139,13 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 			modal_disabled_checkbox(ctx, _("Message Skip"), skip_activated);
 		}
 
+#ifndef __ANDROID__
 		int warp = nact->ags.mouse_warp_enabled;
-		if (mu_checkbox(ctx, _("Mouse Auto Move"), &warp))
+		if (mu_checkbox(ctx, _("Mouse Movement"), &warp))
 			nact->ags.mouse_warp_enabled = warp;
+#endif
 
-		if (mu_button(ctx, _("Volume"))) {
+		if (mu_button(ctx, _("Sound Settings"))) {
 			keep_open = false;
 			st->action = MENU_ACTION_VOLUME;
 		}
