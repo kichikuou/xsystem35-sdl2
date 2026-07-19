@@ -60,9 +60,6 @@ class Launcher private constructor(rootDir: File) {
             return gLauncher!!
         }
 
-        fun updateGameList() {
-            gLauncher?.updateGameList()
-        }
     }
 
     private val store = GameStore(rootDir)
@@ -160,7 +157,7 @@ class Launcher private constructor(rootDir: File) {
         observer?.onGameListChange()
     }
 
-    private fun updateGameList() {
+    fun refreshGameList() {
         store.updateGameList()
         observer?.onGameListChange()
     }

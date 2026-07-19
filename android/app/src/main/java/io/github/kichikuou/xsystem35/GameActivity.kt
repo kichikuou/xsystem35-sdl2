@@ -20,6 +20,7 @@ package io.github.kichikuou.xsystem35
 import android.app.AlertDialog
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Process
 import android.text.InputType
 import android.util.Log
 import android.widget.EditText
@@ -56,6 +57,18 @@ class GameActivity : SDLActivity() {
         midi.onActivityResume()
     }
 
+    override fun onDestroy() {
+        try {
+            super.onDestroy()
+        } finally {
+            try {
+                midi.release()
+            } finally {
+                Process.killProcess(Process.myPid())
+            }
+        }
+    }
+
     override fun getLibraries(): Array<String> {
         return arrayOf("SDL2", "xsystem35")
     }
@@ -75,7 +88,6 @@ class GameActivity : SDLActivity() {
                 return
         }
         File(gameRoot, Launcher.TITLE_FILE).writeText(str)
-        Launcher.updateGameList()
     }
 
     private fun textInputDialog(msg: String, oldVal: String, maxLen: Int, result: Array<String?>) {
@@ -154,11 +166,21 @@ class GameActivity : SDLActivity() {
 }
 
 private class MidiPlayer {
+    private enum class State {
+        STOPPED,
+        PLAYING,
+        PAUSED,
+        RELEASED,
+    }
+
     private val player = MediaPlayer()
-    private var playing = false
-    private var playerPaused = false
+    private var state = State.STOPPED
 
     fun start(path: String, loop: Boolean) {
+        if (state == State.RELEASED) {
+            return
+        }
+        state = State.STOPPED
         try {
             player.apply {
                 reset()
@@ -167,7 +189,7 @@ private class MidiPlayer {
                 prepare()
                 start()
             }
-            playing = true
+            state = State.PLAYING
         } catch (e: IOException) {
             Log.e("midiStart", "Cannot play midi", e)
             player.reset()
@@ -175,27 +197,41 @@ private class MidiPlayer {
     }
 
     fun stop() {
-        if (playing && player.isPlaying) {
-            player.stop()
-            playing = false
+        when (state) {
+            State.PLAYING, State.PAUSED -> {
+                player.stop()
+                state = State.STOPPED
+            }
+            State.STOPPED, State.RELEASED -> Unit
         }
     }
 
     fun currentPosition(): Int {
-        return if (playing) player.currentPosition else 0
+        return when (state) {
+            State.PLAYING, State.PAUSED -> player.currentPosition
+            State.STOPPED, State.RELEASED -> 0
+        }
     }
 
     fun onActivityStop() {
-        if (playing && player.isPlaying) {
+        if (state == State.PLAYING && player.isPlaying) {
             player.pause()
-            playerPaused = true
+            state = State.PAUSED
         }
     }
 
     fun onActivityResume() {
-        if (playerPaused) {
+        if (state == State.PAUSED) {
             player.start()
-            playerPaused = false
+            state = State.PLAYING
         }
+    }
+
+    fun release() {
+        if (state == State.RELEASED) {
+            return
+        }
+        state = State.RELEASED
+        player.release()
     }
 }
