@@ -53,6 +53,14 @@ static uint32_t get_counter(int num) {
 	return sys_get_ticks() - counters[num].base;
 }
 
+static void write_display_info(vmvar_t *var, enum ags_display display) {
+	int width, height, depth;
+	ags_getDisplayInfo(display, &width, &height, &depth);
+	var[0] = width;
+	var[1] = height;
+	var[2] = depth;
+}
+
 void commandZC() {
 	/* システムの使用環境を変更する */
 	int m = getCaliValue();
@@ -394,39 +402,21 @@ void commandZZ2() {
 void commandZZ3() {
 	/* WINDOWSの全画面サイズや表示色数を変数列に返す */
 	vmvar_t *var = getCaliVariable();
-	DispInfo info;
-	
-	ags_getWindowInfo(&info);
-	*var = info.width;
-	*(var + 1) = info.height;
-	*(var + 2) = info.depth;
-	
+	write_display_info(var, AGS_DISPLAY_CURRENT);
 	TRACE("ZZ3 %p:",var);
 }
 
 void commandZZ4() {
 	/* ＤＩＢ の全画面 サイズや色数を変数列に返す */
 	vmvar_t *var = getCaliVariable();
-	DispInfo info;
-	
-	ags_getDIBInfo(&info);
-	*var = info.width;
-	*(var + 1) = info.height;
-	*(var + 2) = info.depth;
-	
+	write_display_info(var, AGS_DISPLAY_DIB);
 	TRACE("ZZ4 %p:",var);
 }
 
 void commandZZ5() {
 	/* ＳＹＳＴＥＭ３．５用表示画面 の サイズや色数を変数列に返す */
 	vmvar_t *var = getCaliVariable();
-	DispInfo info;
-
-	ags_getViewAreaInfo(&info);
-	*var = info.width;
-	*(var + 1) = info.height;
-	*(var + 2) = info.depth;
-	
+	write_display_info(var, AGS_DISPLAY_VIEW_AREA);
 	TRACE("ZZ5 %p:",var);
 }
 
@@ -449,13 +439,7 @@ void commandZZ8() {
 void commandZZ9() {
 	/* 起動時のスクリーンサイズを取得する */
 	vmvar_t *var = getCaliVariable();
-	DispInfo info;
-	
-	ags_getWindowInfo(&info);
-	*var = info.width;
-	*(var + 1) = info.height;
-	*(var + 2) = info.depth;
-	
+	write_display_info(var, AGS_DISPLAY_DESKTOP);
 	TRACE("ZZ9 %p:",var);
 }
 

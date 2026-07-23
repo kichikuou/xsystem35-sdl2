@@ -102,11 +102,12 @@ typedef struct {
 	uint32_t index;
 } PixelColor;
 
-typedef struct {
-	int width;
-	int height;
-	int depth;
-} DispInfo;
+enum ags_display {
+	AGS_DISPLAY_CURRENT,
+	AGS_DISPLAY_DIB,
+	AGS_DISPLAY_VIEW_AREA,
+	AGS_DISPLAY_DESKTOP,
+};
 
 struct _ags {
 	SDL_Color pal[256];         /* system palette */
@@ -145,9 +146,7 @@ void ags_reset(void);
 extern void ags_setWorldSize(int width, int height, int depth);
 extern void ags_setViewArea(int x, int y, int width, int height);
 extern void ags_setWindowTitle(const char *title_utf8);
-extern void ags_getDIBInfo(DispInfo *info);
-extern void ags_getWindowInfo(DispInfo *info);
-extern void ags_getViewAreaInfo(DispInfo *info);
+extern void ags_getDisplayInfo(enum ags_display display, int *width, int *height, int *depth);
 extern bool ags_check_param(int *x, int *y, int *w, int *h);
 extern bool ags_check_param_xy(int *x, int *y);
 extern surface_t *ags_getDIB();

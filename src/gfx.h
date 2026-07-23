@@ -38,7 +38,6 @@ SDL_Window *gfx_getWindow(void);
 void gfx_warpMouse(int x, int y);
 SDL_Rect gfx_viewToWindowRect(SDL_Rect rect);
 void gfx_setWindowTitle(char *name);
-void gfx_getDisplayInfo(int *width, int *height, int *depth);
 void gfx_setFullscreen(bool on);
 bool gfx_isFullscreen(void);
 void gfx_raiseWindow(void);

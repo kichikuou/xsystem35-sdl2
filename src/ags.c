@@ -202,20 +202,33 @@ void ags_setWindowTitle(const char *title_utf8) {
 	gfx_setWindowTitle(buf);
 }
 
-void ags_getDIBInfo(DispInfo *info) {
-	info->width  = nact->ags.world_width;
-	info->height = nact->ags.world_height;
-	info->depth  = nact->ags.world_depth;
-}
-
-void ags_getViewAreaInfo(DispInfo *info) {
-	gfx_getDisplayInfo(NULL, NULL, &info->depth);
-	info->width  = nact->ags.view_area.w;
-	info->height = nact->ags.view_area.h;
-}
-
-void ags_getWindowInfo(DispInfo *info) {
-	gfx_getDisplayInfo(&info->width, &info->height, &info->depth);
+void ags_getDisplayInfo(enum ags_display display, int *width, int *height, int *depth) {
+	SDL_DisplayMode dm;
+	switch (display) {
+	case AGS_DISPLAY_CURRENT:
+		SDL_GetCurrentDisplayMode(0, &dm);
+		*width = dm.w;
+		*height = dm.h;
+		*depth = SDL_BITSPERPIXEL(dm.format);
+		break;
+	case AGS_DISPLAY_DIB:
+		*width = nact->ags.world_width;
+		*height = nact->ags.world_height;
+		*depth = nact->ags.world_depth;
+		break;
+	case AGS_DISPLAY_VIEW_AREA:
+		SDL_GetCurrentDisplayMode(0, &dm);
+		*width = nact->ags.view_area.w;
+		*height = nact->ags.view_area.h;
+		*depth = SDL_BITSPERPIXEL(dm.format);
+		break;
+	case AGS_DISPLAY_DESKTOP:
+		SDL_GetDesktopDisplayMode(0, &dm);
+		*width = dm.w;
+		*height = dm.h;
+		*depth = SDL_BITSPERPIXEL(dm.format);
+		break;
+	}
 }
 
 void ags_setExposeSwitch(bool expose) {

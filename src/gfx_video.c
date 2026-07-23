@@ -170,14 +170,6 @@ void gfx_setWorldSize(int width, int height, int depth) {
 	SDL_FillRect(main_surface, NULL, 0);
 }
 
-void gfx_getDisplayInfo(int *width, int *height, int *depth) {
-	SDL_DisplayMode dm;
-	SDL_GetCurrentDisplayMode(0, &dm);
-	if (width)  *width  = dm.w;
-	if (height) *height = dm.h;
-	if (depth)  *depth  = SDL_BITSPERPIXEL(dm.format);
-}
-
 void gfx_getViewSize(int *width, int *height) {
 	if (width)
 		*width = view_w;
