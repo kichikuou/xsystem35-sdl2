@@ -34,7 +34,6 @@
 #include "utfsjis.h"
 #include "music.h"
 #include "modal.h"
-#include "gfx_private.h"
 
 // Volume Valancer で扱う最大チャンネル数
 #define MAXVOLCH 16
@@ -193,7 +192,7 @@ static bool volume_build(mu_Context *ctx, modal *modal) {
 	        + ctx->style->padding * 2;
 	int h = (nch + 1) * (row_h + ctx->style->spacing) + ctx->style->padding * 2
 	        + ctx->style->title_height;
-	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
+	mu_Rect r = modal_centered_rect(w, h);
 
 	if (mu_begin_window_ex(ctx, _("Sound Settings"), r,
 	        MU_OPT_NORESIZE | MU_OPT_NOSCROLL)) {

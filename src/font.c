@@ -35,7 +35,7 @@
 #include "portab.h"
 #include "system.h"
 #include "font.h"
-#include "gfx_private.h"
+#include "gfx.h"
 #include "hacks.h"
 
 typedef struct {
@@ -155,44 +155,6 @@ void font_measure_text(FontSpec font, const char *str_utf8, int len, int *w, int
 	}
 }
 
-// SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
-static void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col)
-{
-	const SDL_Color* palette = gfx_palette->colors;
-	Uint8 cache[256*7];
-	memset(cache, 0, 256);
-
-	for (int y = 0; y < src->h && dsty + y < main_surface->h; y++) {
-		if (dsty + y < 0)
-			continue;
-		uint8_t *sp = (uint8_t*)src->pixels + y * src->pitch;
-		uint8_t *dp = (uint8_t*)main_surface->pixels + (dsty + y) * main_surface->pitch + dstx;
-		for (int x = 0; x < src->w && dstx + x < main_surface->w; x++) {
-			Uint8 r, g, b, alpha;
-			SDL_GetRGBA(*((Uint32*)sp), src->format, &r, &g, &b, &alpha);
-			alpha = alpha >> 5; // reduce bit depth
-			if (!alpha) {
-				// Transparent, do nothing
-			} else if (alpha == 7) {
-				*dp = col; // Fully opaque
-			} else if (cache[*dp] & 1 << alpha) {
-				*dp = cache[alpha << 8 | *dp]; // use cached value
-			} else {
-				// find nearest color in palette
-				cache[*dp] |= 1 << alpha;
-				int c = gfx_nearest_color(
-					(palette[col].r * alpha + palette[*dp].r * (7 - alpha)) / 7,
-					(palette[col].g * alpha + palette[*dp].g * (7 - alpha)) / 7,
-					(palette[col].b * alpha + palette[*dp].b * (7 - alpha)) / 7);
-				cache[alpha << 8 | *dp] = c;
-				*dp = c;
-			}
-			sp += src->format->BytesPerPixel;
-			dp++;
-		}
-	}
-}
-
 SDL_Rect font_draw_text(FontSpec font, int x, int y, const char *str_utf8, uint8_t cl) {
 	SDL_Surface *fs;
 	SDL_Rect r_src, r_dst = {};
@@ -212,11 +174,11 @@ SDL_Rect font_draw_text(FontSpec font, int x, int y, const char *str_utf8, uint8
 	if ((game_id == GAME_RANCE3 || game_id == GAME_RANCE3_ENG) && cl == 32)
 		antialias = false;
 
-	if (antialias) {
-		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, gfx_palette->colors[cl]);
-	} else {
-		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, gfx_palette->colors[cl]);
-	}
+	SDL_Color color = gfx_getPaletteColor(cl);
+	if (antialias)
+		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, color);
+	else
+		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
 	if (!fs) {
 		WARNING("Text rendering failed: %s", TTF_GetError());
 		return r_dst;

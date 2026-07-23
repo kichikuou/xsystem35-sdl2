@@ -20,7 +20,7 @@
 #include <commctrl.h>
 #include <SDL_syswm.h>
 #include "input_modal.h"
-#include "gfx_private.h"
+#include "gfx.h"
 #include "resources.h"
 
 static HWND get_hwnd(SDL_Window *window) {
@@ -139,7 +139,7 @@ bool input_modal_string(INPUTSTRING_PARAM *p) {
 	DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_TEXTINPUT),
-		get_hwnd(gfx_window),
+		get_hwnd(gfx_getWindow()),
 		text_dialog_proc,
 		(LPARAM)p);
 	return true;
@@ -149,7 +149,7 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 	INT_PTR ret = DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_NUMINPUT),
-		get_hwnd(gfx_window),
+		get_hwnd(gfx_getWindow()),
 		num_dialog_proc,
 		(LPARAM)p);
 	return ret == IDOK;

@@ -193,7 +193,7 @@ void ags_setViewArea(int x, int y, int width, int height) {
 	nact->ags.view_area.y = y;
 	nact->ags.view_area.w = width;
 	nact->ags.view_area.h = height;
-	gfx_setWindowSize(width, height);
+	gfx_setViewSize(width, height);
 }
 
 void ags_setWindowTitle(const char *title_utf8) {
@@ -209,13 +209,13 @@ void ags_getDIBInfo(DispInfo *info) {
 }
 
 void ags_getViewAreaInfo(DispInfo *info) {
-	gfx_getWindowInfo(NULL, NULL, &info->depth);
+	gfx_getDisplayInfo(NULL, NULL, &info->depth);
 	info->width  = nact->ags.view_area.w;
 	info->height = nact->ags.view_area.h;
 }
 
 void ags_getWindowInfo(DispInfo *info) {
-	gfx_getWindowInfo(&info->width, &info->height, &info->depth);
+	gfx_getDisplayInfo(&info->width, &info->height, &info->depth);
 }
 
 void ags_setExposeSwitch(bool expose) {
@@ -733,10 +733,10 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 		for (int i = 1; i < 8; i++) {
 			int xi = ((dx*i*i*i) >> 9) - ((3*dx*i*i)>> 6) + ((3*dx*i) >> 3) + p.x;
 			int yi = ((dy*i*i*i) >> 9) - ((3*dy*i*i)>> 6) + ((3*dy*i) >> 3) + p.y;
-			event_set_mouse_location(xi, yi);
+			gfx_warpMouse(xi, yi);
 			sys_sleep(cursor_move_time / 7);
 		}
-		event_set_mouse_location(x, y);
+		gfx_warpMouse(x, y);
 	} else if (!for_selection) {
 		event_set_mouse_internal_location(x, y);
 		sys_sleep(cursor_move_time);

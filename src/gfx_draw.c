@@ -43,6 +43,8 @@
 #include "modal.h"
 #include "debugger.h"
 
+static bool gfx_dirty;
+
 static void gfx_pal_check(void) {
 	if (nact->ags.pal_changed) {
 		nact->ags.pal_changed = false;
@@ -56,6 +58,10 @@ static Uint32 palette_color(uint8_t c) {
 	return SDL_MapRGB(main_surface->format, gfx_palette->colors[c].r, gfx_palette->colors[c].g, gfx_palette->colors[c].b);
 }
 
+SDL_Color gfx_getPaletteColor(uint8_t color) {
+	return gfx_palette->colors[color];
+}
+
 void gfx_updateScreen(void) {
 	if (!gfx_dirty)
 		return;
@@ -64,6 +70,10 @@ void gfx_updateScreen(void) {
 	modal_render_overlay();
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
+}
+
+void gfx_requestRedraw(void) {
+	gfx_dirty = true;
 }
 
 /* off-screen の指定領域を Main Window へ転送 */
@@ -254,7 +264,7 @@ SDL_Rect gfx_floodFill(int x, int y, int c) {
 	}
 }
 
-int gfx_nearest_color(int r, int g, int b) {
+static int nearest_color(int r, int g, int b) {
 	int i, col, mind = INT_MAX;
 	for (i = 0; i < 256; i++) {
 		int dr = r - gfx_palette->colors[i].r;
@@ -267,6 +277,43 @@ int gfx_nearest_color(int r, int g, int b) {
 		}
 	}
 	return col;
+}
+
+// SDL can't blit ARGB to an indexed bitmap properly, so we do it ourselves.
+void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col) {
+	const SDL_Color *palette = gfx_palette->colors;
+	Uint8 cache[256 * 7];
+	memset(cache, 0, 256);
+
+	for (int y = 0; y < src->h && dsty + y < main_surface->h; y++) {
+		if (dsty + y < 0)
+			continue;
+		uint8_t *sp = (uint8_t *)src->pixels + y * src->pitch;
+		uint8_t *dp = (uint8_t *)main_surface->pixels
+		              + (dsty + y) * main_surface->pitch + dstx;
+		for (int x = 0; x < src->w && dstx + x < main_surface->w; x++) {
+			Uint8 r, g, b, alpha;
+			SDL_GetRGBA(*(Uint32 *)sp, src->format, &r, &g, &b, &alpha);
+			alpha >>= 5;  // reduce bit depth
+			if (!alpha) {
+				// Transparent, do nothing.
+			} else if (alpha == 7) {
+				*dp = col;  // Fully opaque.
+			} else if (cache[*dp] & 1 << alpha) {
+				*dp = cache[alpha << 8 | *dp];
+			} else {
+				cache[*dp] |= 1 << alpha;
+				int c = nearest_color(
+					(palette[col].r * alpha + palette[*dp].r * (7 - alpha)) / 7,
+					(palette[col].g * alpha + palette[*dp].g * (7 - alpha)) / 7,
+					(palette[col].b * alpha + palette[*dp].b * (7 - alpha)) / 7);
+				cache[alpha << 8 | *dp] = c;
+				*dp = c;
+			}
+			sp += src->format->BytesPerPixel;
+			dp++;
+		}
+	}
 }
 
 SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpec font) {

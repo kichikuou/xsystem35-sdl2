@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include <SDL_surface.h>
+#include <SDL_video.h>
 #include "portab.h"
 #include "ags.h"
 
@@ -31,9 +32,13 @@ void gfx_Remove(void);
 
 /* ウィンド関係 */
 void gfx_setWorldSize(int width, int height, int depth);
-void gfx_setWindowSize(int w, int h);
+void gfx_setViewSize(int w, int h);
+void gfx_getViewSize(int *width, int *height);
+SDL_Window *gfx_getWindow(void);
+void gfx_warpMouse(int x, int y);
+SDL_Rect gfx_viewToWindowRect(SDL_Rect rect);
 void gfx_setWindowTitle(char *name);
-void gfx_getWindowInfo(int *width, int *height, int *depth);
+void gfx_getDisplayInfo(int *width, int *height, int *depth);
 void gfx_setFullscreen(bool on);
 bool gfx_isFullscreen(void);
 void gfx_raiseWindow(void);
@@ -44,10 +49,12 @@ SDL_Surface *gfx_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h);
 /* 画面更新 */
 void gfx_updateArea(SDL_Rect *src, SDL_Point *dst);
 void gfx_updateAll(SDL_Rect *view_rect);
+void gfx_requestRedraw(void);
 void gfx_updateScreen(void);
 
 /* パレット関係 */
 void gfx_setPalette(SDL_Color *pal, int first, int count);
+SDL_Color gfx_getPaletteColor(uint8_t color);
 
 /* 描画関係 */
 void gfx_drawRectangle(int x, int y, int w, int h, uint8_t c);
@@ -55,6 +62,7 @@ void gfx_fillRectangle(int x, int y, int w, int h, uint8_t c);
 void gfx_fillRectangleRGB(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b);
 void gfx_fillCircle(int left, int top, int diameter, uint8_t c);
 void gfx_drawLine(int x1, int y1, int x2, int y2, uint8_t c);
+void gfx_drawAntiAlias_8bpp(int x, int y, SDL_Surface *src, uint8_t color);
 SDL_Rect gfx_floodFill(int x, int y, int col);
 SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpec font);
 void gfx_copyArea(int sx,int sy, int w, int h, int dx, int dy);

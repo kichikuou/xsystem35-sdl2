@@ -139,9 +139,11 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 
 #else  // not Android or Emscripten
 
+#include <SDL.h>
+
 #include "nact.h"
 #include "font.h"
-#include "gfx_private.h"
+#include "gfx.h"
 #include "modal.h"
 #include "utfsjis.h"
 
@@ -223,12 +225,8 @@ static bool menu_string_handler(const SDL_Event *e, modal *modal) {
 // near the field. `box` is in logical (view) coordinates; convert to window
 // pixels for SDL_SetTextInputRect.
 static void set_text_input_rect(mu_Rect box) {
-	SDL_Rect r = { box.x, box.y, box.w, box.h };
-	int x2, y2;
-	SDL_RenderLogicalToWindow(gfx_renderer, box.x, box.y, &r.x, &r.y);
-	SDL_RenderLogicalToWindow(gfx_renderer, box.x + box.w, box.y + box.h, &x2, &y2);
-	r.w = x2 - r.x;
-	r.h = y2 - r.y;
+	SDL_Rect r = gfx_viewToWindowRect(
+		(SDL_Rect){box.x, box.y, box.w, box.h});
 	SDL_SetTextInputRect(&r);
 }
 
@@ -270,7 +268,7 @@ static bool inputstring_build(mu_Context *ctx, modal *modal) {
 	int w = 320;
 	int h = 3 * (row_h + ctx->style->spacing) + ctx->style->padding * 2
 	        + ctx->style->title_height;
-	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
+	mu_Rect r = modal_centered_rect(w, h);
 
 	if (mu_begin_window_ex(ctx, title, r,
 	        MU_OPT_NORESIZE | MU_OPT_NOCLOSE | MU_OPT_NOSCROLL)) {
@@ -327,7 +325,7 @@ bool input_modal_string(INPUTSTRING_PARAM *p) {
 
 // Look up an AGS color index in the active palette and return it as a mu_Color.
 static mu_Color palette_color(int index) {
-	SDL_Color c = gfx_palette->colors[index];
+	SDL_Color c = gfx_getPaletteColor(index);
 	return (mu_Color){ c.r, c.g, c.b, 255 };
 }
 
@@ -436,7 +434,7 @@ static bool inputnumber_build(mu_Context *ctx, modal *modal) {
 	int w = 240;
 	int h = 3 * (row_h + ctx->style->spacing) + ctx->style->padding * 2
 	        + ctx->style->title_height;
-	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
+	mu_Rect r = modal_centered_rect(w, h);
 
 	if (mu_begin_window_ex(ctx, title, r,
 	        MU_OPT_NORESIZE | MU_OPT_NOCLOSE | MU_OPT_NOSCROLL)) {

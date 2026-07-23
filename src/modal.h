@@ -48,6 +48,9 @@ void modal_run(modal *modal);
 // consumed, false when no modal is running or the handler falls through.
 bool modal_handle_event(const union SDL_Event *e);
 
+// Return a rectangle of the requested size centered in the logical view.
+mu_Rect modal_centered_rect(int width, int height);
+
 // Render the active modal's overlay onto the screen. Call this from the screen
 // update path; it is a no-op when no modal is running.
 void modal_render_overlay(void);

@@ -30,17 +30,13 @@
 #include "portab.h"
 #include "ags.h"
 
-extern SDL_Window *gfx_window;
 extern SDL_Renderer *gfx_renderer;
 extern SDL_Texture *gfx_texture;
 extern SDL_Palette *gfx_palette;
 extern surface_t *gfx_dibinfo;
 extern int view_w;
 extern int view_h;
-extern bool gfx_dirty;
-extern bool gfx_fullscreen;
 
-int gfx_nearest_color(int r, int g, int b);
 SDL_Surface *gfx_dib_to_surface_with_alpha(int x, int y, int w, int h);
 SDL_Surface *gfx_dib_to_surface_colorkey(int x, int y, int w, int h, int col);
 

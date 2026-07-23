@@ -27,8 +27,8 @@
 void event_init(void);
 void event_remove(void);
 void event_set_joy_device_index(int index);
-void event_set_mouse_location(int x, int y);
 void event_set_mouse_internal_location(int x, int y);
+SDL_Point event_get_touch_position(const SDL_TouchFingerEvent *e);
 int event_get_key(void);
 int event_get_mouse(SDL_Point *p);
 void event_get_wheel(vmvar_t *forward, vmvar_t *back);

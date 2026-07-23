@@ -35,7 +35,6 @@
 #include "debugger.h"
 #include "nact.h"
 #include "gfx.h"
-#include "gfx_private.h"
 #include "scheduler.h"
 #include "menu.h"
 #include "modal.h"
@@ -54,8 +53,8 @@ enum CustomEventCode {
 	DEBUGGER_COMMAND,
 };
 
-/* pointer の状態 */
-static int mousex, mousey, mouseb;
+static SDL_Point mouse_pos;
+static int mouseb;
 static int mouse_wheel_up, mouse_wheel_down;
 bool RawKeyInfo[256];
 
@@ -264,8 +263,8 @@ void send_agsevent(enum agsevent_type type, int code) {
 	agsevent_t agse = {
 		.type = type,
 		.code = code,
-		.mousex = mousex,
-		.mousey = mousey
+		.mousex = mouse_pos.x,
+		.mousey = mouse_pos.y
 	};
 	nact->ags.eventcb(&agse);  // Async in emscripten
 
@@ -277,37 +276,16 @@ void send_agsevent(enum agsevent_type type, int code) {
 #endif
 }
 
-void event_set_mouse_location(int x, int y) {
-	// scale mouse x and y
-	float scalex, scaley;
-	SDL_RenderGetScale(gfx_renderer, &scalex, &scaley);
-	x *= scalex;
-	y *= scaley;
-
-	// calculate window borders
-	int logw, logh;
-	SDL_RenderGetLogicalSize(gfx_renderer, &logw, &logh);
-
-	float scalew, scaleh;
-	scalew = logw * scalex;
-	scaleh = logh * scaley;
-
-	int winw, winh;
-	SDL_GetWindowSize(gfx_window, &winw, &winh);
-
-	float border_left = (winw - scalew) / 2;
-	float border_top  = (winh - scaleh) / 2;
-
-	// offset x and y by window borders
-	x += border_left;
-	y += border_top;
-	SDL_WarpMouseInWindow(gfx_window, x, y);
+void event_set_mouse_internal_location(int x, int y) {
+	mouse_pos.x = x;
+	mouse_pos.y = y;
+	send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 }
 
-void event_set_mouse_internal_location(int x, int y) {
-	mousex = x;
-	mousey = y;
-	send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
+SDL_Point event_get_touch_position(const SDL_TouchFingerEvent *e) {
+	int view_w, view_h;
+	gfx_getViewSize(&view_w, &view_h);
+	return (SDL_Point){e->x * view_w, e->y * view_h};
 }
 
 // Stores a deferred touch event (valid if .timestamp != 0) to add a delay
@@ -365,7 +343,7 @@ void event_handle_event(SDL_Event *e) {
 	case SDL_WINDOWEVENT:
 		switch (e->window.event) {
 		case SDL_WINDOWEVENT_EXPOSED:
-			gfx_dirty = true;
+			gfx_requestRedraw();
 			break;
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 			volume_on_window_focus(false);
@@ -381,7 +359,7 @@ void event_handle_event(SDL_Event *e) {
 		break;
 #endif
 	case SDL_APP_DIDENTERFOREGROUND:
-		gfx_dirty = true;
+		gfx_requestRedraw();
 		break;
 	case SDL_KEYDOWN:
 		keyEventProsess(&e->key, true);
@@ -393,7 +371,7 @@ void event_handle_event(SDL_Event *e) {
 			msgskip_activate(!msgskip_isActivated());
 			break;
 		case SDLK_F4:
-			gfx_setFullscreen(!gfx_fullscreen);
+			gfx_setFullscreen(!gfx_isFullscreen());
 			break;
 		}
 #ifdef __ANDROID__
@@ -454,8 +432,7 @@ void event_handle_event(SDL_Event *e) {
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = true;
 			} else {
 				button = SDL_BUTTON_LEFT;
-				mousex = e->tfinger.x * view_w;
-				mousey = e->tfinger.y * view_h;
+				mouse_pos = event_get_touch_position(&e->tfinger);
 				send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 				defer_touch_event(&e->tfinger);
 			}
@@ -466,16 +443,14 @@ void event_handle_event(SDL_Event *e) {
 	case SDL_FINGERUP:
 		if (SDL_GetNumTouchFingers(e->tfinger.touchId) == 0) {
 			int ags_button = (mouseb & 1 << SDL_BUTTON_LEFT) ? AGSEVENT_BUTTON_LEFT : AGSEVENT_BUTTON_RIGHT;
-			mousex = e->tfinger.x * view_w;
-			mousey = e->tfinger.y * view_h;
+			mouse_pos = event_get_touch_position(&e->tfinger);
 			send_agsevent(AGSEVENT_BUTTON_RELEASE, ags_button);
 			defer_touch_event(&e->tfinger);
 		}
 		break;
 
 	case SDL_FINGERMOTION:
-		mousex = e->tfinger.x * view_w;
-		mousey = e->tfinger.y * view_h;
+		mouse_pos = event_get_touch_position(&e->tfinger);
 		send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 		break;
 
@@ -608,8 +583,7 @@ int event_get_mouse(SDL_Point *p) {
 	get_event();
 	
 	if (p) {
-		p->x = mousex;
-		p->y = mousey;
+		*p = mouse_pos;
 	}
 
 	int m1 = mouseb & (1 << 1) ? SYS35KEY_RET : 0;

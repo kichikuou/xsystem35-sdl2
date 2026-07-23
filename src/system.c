@@ -21,7 +21,6 @@
 #include <SDL.h>
 #include "debugger.h"
 #include "gfx.h"
-#include "gfx_private.h"
 #include "scheduler.h"
 
 #ifdef __ANDROID__
@@ -136,5 +135,5 @@ void sys_show_message_box(enum messagebox_type type, const char* title_utf8, con
 	case MESSAGEBOX_WARNING: flags = SDL_MESSAGEBOX_WARNING; break;
 	case MESSAGEBOX_INFO: flags = SDL_MESSAGEBOX_INFORMATION; break;
 	}
-	SDL_ShowSimpleMessageBox(flags, title_utf8, message_utf8, gfx_window);
+	SDL_ShowSimpleMessageBox(flags, title_utf8, message_utf8, gfx_getWindow());
 }

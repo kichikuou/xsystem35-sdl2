@@ -30,6 +30,7 @@
 
 #include "event.h"
 #include "font.h"
+#include "gfx.h"
 #include "gfx_private.h"
 #include "modal.h"
 #include "nact.h"
@@ -54,7 +55,7 @@ static enum {
 } touch_phase;
 static int touch_hover_frames;          // frames left to dwell in TOUCH_HOVER
 static bool touch_release_after_press;  // finger lifted early; release once pressed
-static int touch_x, touch_y;
+static SDL_Point touch_pos;
 
 static const FontSpec menu_font = { FONT_GOTHIC, FONT_WEIGHT_NORMAL, MODAL_FONT_SIZE };
 
@@ -137,23 +138,20 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 	// Touch handling (see touch_phase above). The press/release is driven
 	// from the frame loop in modal_run(), not emitted here directly.
 	case SDL_FINGERDOWN:
-		touch_x = e->tfinger.x * view_w;
-		touch_y = e->tfinger.y * view_h;
-		mu_input_mousemove(ctx, touch_x, touch_y);
+		touch_pos = event_get_touch_position(&e->tfinger);
+		mu_input_mousemove(ctx, touch_pos.x, touch_pos.y);
 		touch_phase = TOUCH_HOVER;
 		touch_hover_frames = TOUCH_HOVER_FRAMES;
 		touch_release_after_press = false;
 		break;
 	case SDL_FINGERMOTION:
-		touch_x = e->tfinger.x * view_w;
-		touch_y = e->tfinger.y * view_h;
-		mu_input_mousemove(ctx, touch_x, touch_y);
+		touch_pos = event_get_touch_position(&e->tfinger);
+		mu_input_mousemove(ctx, touch_pos.x, touch_pos.y);
 		break;
 	case SDL_FINGERUP:
-		touch_x = e->tfinger.x * view_w;
-		touch_y = e->tfinger.y * view_h;
+		touch_pos = event_get_touch_position(&e->tfinger);
 		if (touch_phase == TOUCH_PRESS) {
-			mu_input_mouseup(ctx, touch_x, touch_y, MU_MOUSE_LEFT);
+			mu_input_mouseup(ctx, touch_pos.x, touch_pos.y, MU_MOUSE_LEFT);
 			touch_phase = TOUCH_NONE;
 		} else if (touch_phase == TOUCH_HOVER) {
 			// Tap ended before the press was emitted; release right after it.
@@ -294,6 +292,13 @@ bool modal_handle_event(const SDL_Event *e) {
 	return current_modal->handler(e, current_modal);
 }
 
+mu_Rect modal_centered_rect(int width, int height) {
+	int view_w, view_h;
+	gfx_getViewSize(&view_w, &view_h);
+	return mu_rect((view_w - width) / 2, (view_h - height) / 2,
+	               width, height);
+}
+
 EMSCRIPTEN_KEEPALIVE  // Prevent inlining, because this function is listed in ASYNCIFY_ADD
 void modal_run(modal *m) {
 	assert(!ctx);  // modals are not nestable
@@ -314,12 +319,12 @@ void modal_run(modal *m) {
 			if (touch_hover_frames > 0) {
 				touch_hover_frames--;
 			} else {
-				mu_input_mousedown(ctx, touch_x, touch_y, MU_MOUSE_LEFT);
+				mu_input_mousedown(ctx, touch_pos.x, touch_pos.y, MU_MOUSE_LEFT);
 				touch_phase = TOUCH_PRESS;
 			}
 		}
 		if (touch_phase == TOUCH_PRESS && touch_release_after_press) {
-			mu_input_mouseup(ctx, touch_x, touch_y, MU_MOUSE_LEFT);
+			mu_input_mouseup(ctx, touch_pos.x, touch_pos.y, MU_MOUSE_LEFT);
 			touch_phase = TOUCH_NONE;
 			touch_release_after_press = false;
 		}
@@ -334,7 +339,7 @@ void modal_run(modal *m) {
 		mu_Id hash = mu_get_id(ctx, ctx->command_list.items, ctx->command_list.idx);
 		if (hash != prev_hash) {
 			prev_hash = hash;
-			gfx_dirty = true;
+			gfx_requestRedraw();
 		}
 		nact->callback();
 		sys_wait_vsync();  // -> gfx_updateScreen() -> modal_render_overlay()
@@ -343,7 +348,7 @@ void modal_run(modal *m) {
 	current_modal = NULL;
 	free(ctx);
 	ctx = NULL;
-	gfx_dirty = true;  // repaint once more to clear the overlay
+	gfx_requestRedraw();  // repaint once more to clear the overlay
 
 	// The gesture that opened/dismissed the dialog must not leave the engine
 	// with a key or button stuck "down".

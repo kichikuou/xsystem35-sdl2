@@ -50,12 +50,14 @@ EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL.h>
 
 #include "portab.h"
+#include "event.h"
 #include "system.h"
 #include "nact.h"
 #include "menu.h"
-#include "gfx_private.h"
+#include "gfx.h"
 #include "msgskip.h"
 #include "modal.h"
 #include "volume.h"
@@ -105,8 +107,8 @@ static bool menu_popup_handler(const SDL_Event *e, modal *modal) {
 			st->touch_armed = true;
 	} else if (e->type == SDL_FINGERDOWN && st->touch_armed) {
 		// A tap outside the menu dismisses it.
-		int x = e->tfinger.x * view_w, y = e->tfinger.y * view_h;
-		if (!point_in_rect(x, y, st->rect))
+		SDL_Point p = event_get_touch_position(&e->tfinger);
+		if (!point_in_rect(p.x, p.y, st->rect))
 			st->base.cancelled = true;
 	}
 	return modal_default_handler(e, modal);
@@ -124,7 +126,7 @@ static bool menu_build(mu_Context *ctx, modal *modal) {
 	int w = 200;
 	// `rows` rows with (rows - 1) inter-row gaps, plus the window's body padding.
 	int h = rows * row_h + (rows - 1) * ctx->style->spacing + ctx->style->padding * 2;
-	mu_Rect r = mu_rect((view_w - w) / 2, (view_h - h) / 2, w, h);
+	mu_Rect r = modal_centered_rect(w, h);
 	st->rect = r;
 
 	if (mu_begin_window_ex(ctx, "menu", r,
@@ -198,7 +200,7 @@ static bool confirm_lose_progress(const char *title, const char *confirm_label) 
 	};
 	const SDL_MessageBoxData messagebox_data = {
 		.flags = SDL_MESSAGEBOX_INFORMATION,
-		.window = gfx_window,
+		.window = gfx_getWindow(),
 		.title = title,
 		.message = _("Any unsaved progress will be lost."),
 		.numbuttons = SDL_arraysize(buttons),

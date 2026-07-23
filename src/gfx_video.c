@@ -36,7 +36,7 @@
 #include "xsystem35.h"
 #include "image.h"
 
-SDL_Window *gfx_window;
+static SDL_Window *gfx_window;
 SDL_Renderer *gfx_renderer;
 SDL_Texture *gfx_texture;
 SDL_Surface *main_surface; // offscreen surface
@@ -44,8 +44,7 @@ SDL_Palette *gfx_palette;
 surface_t *gfx_dibinfo;
 int view_w;
 int view_h;
-bool gfx_dirty;
-bool gfx_fullscreen;
+static bool gfx_fullscreen;
 
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
@@ -57,7 +56,7 @@ int gfx_Initialize(const char *render_driver) {
 	/* offscreen Pixmap */
 	makeDIB(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SYS35_DEFAULT_DEPTH);
 
-	gfx_setWindowSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
+	gfx_setViewSize(SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT);
 
 #ifdef __EMSCRIPTEN__
 	// Prevent SDL from calling emscripten_exit_fullscreen on visibilitychange
@@ -171,13 +170,40 @@ void gfx_setWorldSize(int width, int height, int depth) {
 	SDL_FillRect(main_surface, NULL, 0);
 }
 
-/* display の size と depth の取得 */
-void gfx_getWindowInfo(int *width, int *height, int *depth) {
+void gfx_getDisplayInfo(int *width, int *height, int *depth) {
 	SDL_DisplayMode dm;
 	SDL_GetCurrentDisplayMode(0, &dm);
 	if (width)  *width  = dm.w;
 	if (height) *height = dm.h;
 	if (depth)  *depth  = SDL_BITSPERPIXEL(dm.format);
+}
+
+void gfx_getViewSize(int *width, int *height) {
+	if (width)
+		*width = view_w;
+	if (height)
+		*height = view_h;
+}
+
+SDL_Window *gfx_getWindow(void) {
+	return gfx_window;
+}
+
+static SDL_Point view_to_window_point(int x, int y) {
+	SDL_Point point;
+	SDL_RenderLogicalToWindow(gfx_renderer, x, y, &point.x, &point.y);
+	return point;
+}
+
+void gfx_warpMouse(int x, int y) {
+	SDL_Point point = view_to_window_point(x, y);
+	SDL_WarpMouseInWindow(gfx_window, point.x, point.y);
+}
+
+SDL_Rect gfx_viewToWindowRect(SDL_Rect rect) {
+	SDL_Point tl = view_to_window_point(rect.x, rect.y);
+	SDL_Point br = view_to_window_point(rect.x + rect.w, rect.y + rect.h);
+	return (SDL_Rect){tl.x, tl.y, br.x - tl.x, br.y - tl.y};
 }
 
 /*  DIBの取得 */
@@ -212,7 +238,7 @@ void gfx_raiseWindow(void) {
 	SDL_RaiseWindow(gfx_window);
 }
 
-void gfx_setWindowSize(int w, int h) {
+void gfx_setViewSize(int w, int h) {
 	if (w == view_w && h == view_h) return;
 
 	view_w = w;
