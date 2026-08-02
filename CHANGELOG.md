@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.19.1 - 2026-08-02
+- Fixed an issue that prevented moving upward during battles in Rance 4.
+
 ## 2.19.0 - 2026-07-19
 - Replaced the GTK-based popup menu and dialogs with a pure-SDL implementation.
 - On Android, the popup menu opens with a three-finger tap.
