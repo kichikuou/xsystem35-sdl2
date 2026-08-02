@@ -90,7 +90,7 @@ typedef struct {
 #define UNITMAP_ATTRIB_WALKRESULT (3)
 
 /* UnitMAP 全体へのポインタ */
-static int *UnitMap = NULL;
+static vmvar_t *UnitMap = NULL;
 /* VC command */
 static int nPageNum;
 static int x0Map;
@@ -160,7 +160,7 @@ void commandVC() { /* from Rance4 */
 		return;
 	}
 	
-	UnitMap = (int *)calloc(cxMap * cyMap * nPageNum * UNITMAP_ATTRIB_DEPTH, sizeof(int));
+	UnitMap = calloc(cxMap * cyMap * nPageNum * UNITMAP_ATTRIB_DEPTH, sizeof(*UnitMap));
 	srcimg  = (UnitMapSrcImg *)calloc(nPageNum, sizeof(UnitMapSrcImg));
 	
 	if (NULL == UnitMap || NULL == srcimg) {
@@ -458,7 +458,7 @@ void commandVR() { /* from Rance4 */
 	int nPage = getCaliValue();
 	int nType = getCaliValue();
 	vmvar_t *var  = getCaliVariable();
-	int *dst;
+	vmvar_t *dst;
 	
 	TRACE("VR %d,%d,%p:",nPage, nType, var);
 	
@@ -481,14 +481,14 @@ void commandVR() { /* from Rance4 */
 		return;
 	}
 	
-	memcpy(dst, var, sizeof(int) * MAPSIZE_PER_ATTRIB);
+	memcpy(dst, var, MAPSIZE_PER_ATTRIB * sizeof(*dst));
 }
 
 void commandVW() { /* from Rance4 */
 	int nPage = getCaliValue();
 	int nType = getCaliValue();
 	vmvar_t *var  = getCaliVariable();
-	int *src;
+	vmvar_t *src;
 	
 	TRACE("VW %d,%d,%p:",nPage, nType, var);
 	
@@ -511,7 +511,7 @@ void commandVW() { /* from Rance4 */
 		return;
 	}
 	
-	memcpy(var, src, sizeof(int) * MAPSIZE_PER_ATTRIB);
+	memcpy(var, src, MAPSIZE_PER_ATTRIB * sizeof(*src));
 }
 
 void commandVE() { /* from T2 */

@@ -1,0 +1,30 @@
+	MS FILE,"unitmap.adv":
+	!unitmap_src0:11!!unitmap_src1:22!!unitmap_src2:33!!unitmap_src3:44!
+	!unitmap_dst0:0!!unitmap_dst1:0!!unitmap_dst2:0!!unitmap_dst3:0!!unitmap_sentinel:1234!
+
+	VC 1,0,0,2,2,1,1:
+
+	; VR copies consecutive 16-bit VM variables to the unit map.
+	VR 0,3,unitmap_src0:
+	VG 0,3,0,0:
+	~AssertEquals RND,11,__LINE__:
+	VG 0,3,1,0:
+	~AssertEquals RND,22,__LINE__:
+	VG 0,3,0,1:
+	~AssertEquals RND,33,__LINE__:
+	VG 0,3,1,1:
+	~AssertEquals RND,44,__LINE__:
+
+	; VW performs the reverse conversion without overwriting adjacent variables.
+	VS 0,3,0,0,101:
+	VS 0,3,1,0,102:
+	VS 0,3,0,1,103:
+	VS 0,3,1,1,104:
+	VW 0,3,unitmap_dst0:
+	~AssertEquals unitmap_dst0,101,__LINE__:
+	~AssertEquals unitmap_dst1,102,__LINE__:
+	~AssertEquals unitmap_dst2,103,__LINE__:
+	~AssertEquals unitmap_dst3,104,__LINE__:
+	~AssertEquals unitmap_sentinel,1234,__LINE__:
+
+	%0:

@@ -7,6 +7,7 @@ strvar.adv
 stack.adv
 math.adv
 variable.adv
+unitmap.adv
 
 #DLLHeader
 ShString.HEL

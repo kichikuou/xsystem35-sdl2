@@ -15,6 +15,7 @@
 	%#stack.adv:
 	%#math.adv:
 	%#variable.adv:
+	%#unitmap.adv:
 
 	HH0,tests_passed: ' tests passed' R
 	HH0,tests_failed: ' tests failed' R
