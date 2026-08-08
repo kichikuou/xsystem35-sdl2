@@ -58,6 +58,7 @@ enum {
   MU_COLOR_BASEFOCUS,
   MU_COLOR_SCROLLBASE,
   MU_COLOR_SCROLLTHUMB,
+  MU_COLOR_FOCUSRING,
   MU_COLOR_MAX
 };
 
@@ -88,7 +89,8 @@ enum {
   MU_OPT_AUTOSIZE     = (1 << 9),
   MU_OPT_POPUP        = (1 << 10),
   MU_OPT_CLOSED       = (1 << 11),
-  MU_OPT_EXPANDED     = (1 << 12)
+  MU_OPT_EXPANDED     = (1 << 12),
+  MU_OPT_NOKBNAV      = (1 << 13)  /* exclude from the keyboard focus cycle */
 };
 
 enum {
@@ -102,7 +104,13 @@ enum {
   MU_KEY_CTRL         = (1 << 1),
   MU_KEY_ALT          = (1 << 2),
   MU_KEY_BACKSPACE    = (1 << 3),
-  MU_KEY_RETURN       = (1 << 4)
+  MU_KEY_RETURN       = (1 << 4),
+  MU_KEY_TAB          = (1 << 5),
+  MU_KEY_UP           = (1 << 6),
+  MU_KEY_DOWN         = (1 << 7),
+  MU_KEY_LEFT         = (1 << 8),
+  MU_KEY_RIGHT        = (1 << 9),
+  MU_KEY_SPACE        = (1 << 10)
 };
 
 
@@ -179,6 +187,17 @@ struct mu_Context {
   mu_Style *style;
   mu_Id hover;
   mu_Id focus;
+  /* Unlike `focus`, which only lives for as long as a mouse button is held,
+  ** `kb_focus` persists across frames and is moved by Tab / arrow keys. The
+  ** nav_* fields are rebuilt every frame as mu_update_control() walks the
+  ** controls in submission order. */
+  mu_Id kb_focus;
+  mu_Id nav_first;     /* first navigable control of this frame */
+  mu_Id nav_last;      /* last navigable control of this frame */
+  mu_Id nav_prev;      /* control registered just before kb_focus */
+  mu_Id nav_next;      /* control registered just after kb_focus */
+  mu_Id nav_cursor;    /* scan state: last registered control */
+  int kb_focus_seen;   /* kb_focus was registered this frame */
   mu_Id last_id;
   mu_Rect last_rect;
   int last_zindex;
@@ -221,6 +240,7 @@ void mu_init(mu_Context *ctx);
 void mu_begin(mu_Context *ctx);
 void mu_end(mu_Context *ctx);
 void mu_set_focus(mu_Context *ctx, mu_Id id);
+void mu_set_kb_focus(mu_Context *ctx, mu_Id id);
 mu_Id mu_get_id(mu_Context *ctx, const void *data, int size);
 void mu_push_id(mu_Context *ctx, const void *data, int size);
 void mu_pop_id(mu_Context *ctx);

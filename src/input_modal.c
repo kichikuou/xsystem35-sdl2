@@ -453,7 +453,7 @@ static bool inputnumber_build(mu_Context *ctx, modal *modal) {
 		mu_Id id = mu_get_id(ctx, "value", 5);
 		mu_Rect box = mu_layout_next(ctx);
 		if (st->focus_init) {
-			mu_set_focus(ctx, id);
+			mu_set_kb_focus(ctx, id);
 			st->focus_init = false;
 		}
 		int res = mu_textbox_raw(ctx, st->buf, sizeof(st->buf), id, box, 0);

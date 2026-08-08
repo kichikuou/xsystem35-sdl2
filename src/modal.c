@@ -89,6 +89,7 @@ static void set_light_style(mu_Style *style) {
 		[MU_COLOR_BASEFOCUS]   = { 235, 235, 242, 255 },
 		[MU_COLOR_SCROLLBASE]  = { 200, 200, 200, 255 },
 		[MU_COLOR_SCROLLTHUMB] = { 170, 170, 170, 255 },
+		[MU_COLOR_FOCUSRING]   = { 40,  90,  200, 255 },
 	};
 	memcpy(style->colors, light, sizeof(light));
 }
@@ -164,11 +165,17 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 			modal->cancelled = true;
 		int c = 0;
 		switch (e->key.keysym.sym) {
-		case SDLK_LSHIFT: case SDLK_RSHIFT: c = MU_KEY_SHIFT;     break;
-		case SDLK_LCTRL:  case SDLK_RCTRL:  c = MU_KEY_CTRL;      break;
-		case SDLK_LALT:   case SDLK_RALT:   c = MU_KEY_ALT;       break;
-		case SDLK_RETURN:                   c = MU_KEY_RETURN;    break;
-		case SDLK_BACKSPACE:                c = MU_KEY_BACKSPACE; break;
+		case SDLK_LSHIFT: case SDLK_RSHIFT:   c = MU_KEY_SHIFT;     break;
+		case SDLK_LCTRL:  case SDLK_RCTRL:    c = MU_KEY_CTRL;      break;
+		case SDLK_LALT:   case SDLK_RALT:     c = MU_KEY_ALT;       break;
+		case SDLK_RETURN: case SDLK_KP_ENTER: c = MU_KEY_RETURN;    break;
+		case SDLK_BACKSPACE:                  c = MU_KEY_BACKSPACE; break;
+		case SDLK_TAB:                        c = MU_KEY_TAB;       break;
+		case SDLK_UP:                         c = MU_KEY_UP;        break;
+		case SDLK_DOWN:                       c = MU_KEY_DOWN;      break;
+		case SDLK_LEFT:                       c = MU_KEY_LEFT;      break;
+		case SDLK_RIGHT:                      c = MU_KEY_RIGHT;     break;
+		case SDLK_SPACE:                      c = MU_KEY_SPACE;     break;
 		}
 		if (!c)
 			break;

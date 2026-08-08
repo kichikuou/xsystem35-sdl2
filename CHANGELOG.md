@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- The popup menu and dialogs can now be operated with the keyboard.
+
 ## 2.19.1 - 2026-08-02
 - Fixed an issue that prevented moving upward during battles in Rance 4.
 

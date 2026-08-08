@@ -68,7 +68,8 @@ static mu_Style default_style = {
     { 35,  35,  35,  255 }, /* MU_COLOR_BASEHOVER */
     { 40,  40,  40,  255 }, /* MU_COLOR_BASEFOCUS */
     { 43,  43,  43,  255 }, /* MU_COLOR_SCROLLBASE */
-    { 30,  30,  30,  255 }  /* MU_COLOR_SCROLLTHUMB */
+    { 30,  30,  30,  255 }, /* MU_COLOR_SCROLLTHUMB */
+    { 120, 170, 255, 255 }  /* MU_COLOR_FOCUSRING */
   }
 };
 
@@ -144,6 +145,10 @@ void mu_begin(mu_Context *ctx) {
   ctx->next_hover_root = NULL;
   ctx->mouse_delta.x = ctx->mouse_pos.x - ctx->last_mouse_pos.x;
   ctx->mouse_delta.y = ctx->mouse_pos.y - ctx->last_mouse_pos.y;
+  /* restart the keyboard-navigation scan */
+  ctx->nav_first = ctx->nav_last = 0;
+  ctx->nav_prev = ctx->nav_next = ctx->nav_cursor = 0;
+  ctx->kb_focus_seen = 0;
   ctx->frame++;
 }
 
@@ -170,6 +175,20 @@ void mu_end(mu_Context *ctx) {
   /* unset focus if focus id was not touched this frame */
   if (!ctx->updated_focus) { ctx->focus = 0; }
   ctx->updated_focus = 0;
+
+  /* move the keyboard focus. The new focus takes effect on the next frame,
+  ** which is fine for a UI that is rebuilt every frame. */
+  if (!ctx->kb_focus_seen) { ctx->kb_focus = 0; }
+  if (ctx->key_pressed & (MU_KEY_TAB | MU_KEY_UP | MU_KEY_DOWN)) {
+    int back = (ctx->key_pressed & MU_KEY_UP) ||
+               ((ctx->key_pressed & MU_KEY_TAB) && (ctx->key_down & MU_KEY_SHIFT));
+    if (!ctx->kb_focus) {
+      ctx->kb_focus = back ? ctx->nav_last : ctx->nav_first;
+    } else {
+      ctx->kb_focus = back ? (ctx->nav_prev ? ctx->nav_prev : ctx->nav_last)
+                           : (ctx->nav_next ? ctx->nav_next : ctx->nav_first);
+    }
+  }
 
   /* bring hover root to front if mouse was pressed */
   if (ctx->mouse_pressed && ctx->next_hover_root &&
@@ -213,6 +232,12 @@ void mu_end(mu_Context *ctx) {
 void mu_set_focus(mu_Context *ctx, mu_Id id) {
   ctx->focus = id;
   ctx->updated_focus = 1;
+}
+
+
+void mu_set_kb_focus(mu_Context *ctx, mu_Id id) {
+  ctx->kb_focus = id;
+  ctx->kb_focus_seen = 1;
 }
 
 
@@ -652,6 +677,17 @@ void mu_draw_control_frame(mu_Context *ctx, mu_Id id, mu_Rect rect,
   if (opt & MU_OPT_NOFRAME) { return; }
   colorid += (ctx->focus == id) ? 2 : (ctx->hover == id) ? 1 : 0;
   ctx->draw_frame(ctx, rect, colorid);
+  if (ctx->kb_focus == id) {
+    mu_draw_box(ctx, expand_rect(rect, 1), ctx->style->colors[MU_COLOR_FOCUSRING]);
+  }
+}
+
+
+static int control_activated(mu_Context *ctx, mu_Id id) {
+  if (ctx->mouse_pressed == MU_MOUSE_LEFT && ctx->focus == id) { return 1; }
+  if (ctx->kb_focus == id &&
+      ctx->key_pressed & (MU_KEY_RETURN | MU_KEY_SPACE)) { return 1; }
+  return 0;
 }
 
 
@@ -689,6 +725,22 @@ void mu_update_control(mu_Context *ctx, mu_Id id, mu_Rect rect, int opt) {
   if (opt & MU_OPT_NOINTERACT) { return; }
   if (mouseover && !ctx->mouse_down) { ctx->hover = id; }
 
+  /* record this control in the keyboard focus cycle. Controls are visited in
+  ** submission order, so tracking the previous one is enough to know both
+  ** neighbours of kb_focus. */
+  if (~opt & MU_OPT_NOKBNAV && mu_check_clip(ctx, rect) != MU_CLIP_ALL) {
+    if (!ctx->nav_first) { ctx->nav_first = id; }
+    ctx->nav_last = id;
+    if (id == ctx->kb_focus) {
+      ctx->kb_focus_seen = 1;
+      ctx->nav_prev = ctx->nav_cursor;
+    } else if (ctx->kb_focus && !ctx->nav_next &&
+               ctx->nav_cursor == ctx->kb_focus) {
+      ctx->nav_next = id;
+    }
+    ctx->nav_cursor = id;
+  }
+
   if (ctx->focus == id) {
     if (ctx->mouse_pressed && !mouseover) { mu_set_focus(ctx, 0); }
     if (!ctx->mouse_down && ~opt & MU_OPT_HOLDFOCUS) { mu_set_focus(ctx, 0); }
@@ -697,6 +749,8 @@ void mu_update_control(mu_Context *ctx, mu_Id id, mu_Rect rect, int opt) {
   if (ctx->hover == id) {
     if (ctx->mouse_pressed) {
       mu_set_focus(ctx, id);
+      ctx->kb_focus = id;  /* clicking moves the keyboard focus too */
+      ctx->kb_focus_seen = 1;
     } else if (!mouseover) {
       ctx->hover = 0;
     }
@@ -742,7 +796,7 @@ int mu_button_ex(mu_Context *ctx, const char *label, int icon, int opt) {
   mu_Rect r = mu_layout_next(ctx);
   mu_update_control(ctx, id, r, opt);
   /* handle click */
-  if (ctx->mouse_pressed == MU_MOUSE_LEFT && ctx->focus == id) {
+  if (control_activated(ctx, id)) {
     res |= MU_RES_SUBMIT;
   }
   /* draw */
@@ -760,7 +814,7 @@ int mu_checkbox(mu_Context *ctx, const char *label, int *state) {
   mu_Rect box = mu_rect(r.x, r.y, r.h, r.h);
   mu_update_control(ctx, id, r, 0);
   /* handle click */
-  if (ctx->mouse_pressed == MU_MOUSE_LEFT && ctx->focus == id) {
+  if (control_activated(ctx, id)) {
     res |= MU_RES_CHANGE;
     *state = !*state;
   }
@@ -779,6 +833,11 @@ int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, mu_Id id, mu_Rect r,
   int opt)
 {
   int res = 0;
+  /* the keyboard focus decides which textbox is editable, so that Tab moves the
+  ** caret out of a MU_OPT_HOLDFOCUS textbox. A click reaches this through
+  ** mu_update_control(), which also sets kb_focus. */
+  if (ctx->kb_focus == id) { mu_set_focus(ctx, id); }
+  else if (ctx->focus == id) { mu_set_focus(ctx, 0); }
   mu_update_control(ctx, id, r, opt | MU_OPT_HOLDFOCUS);
 
   if (ctx->focus == id) {
@@ -878,6 +937,12 @@ int mu_slider_ex(mu_Context *ctx, mu_Real *value, mu_Real low, mu_Real high,
     v = low + (ctx->mouse_pos.x - base.x) * (high - low) / base.w;
     if (step) { v = ((long long)((v + step / 2) / step)) * step; }
   }
+  /* left/right are not navigation keys, so they need no arbitration with the
+  ** focus movement in mu_end() */
+  if (ctx->kb_focus == id && ctx->key_pressed & (MU_KEY_LEFT | MU_KEY_RIGHT)) {
+    mu_Real d = step ? step : (high - low) / 100;
+    v += (ctx->key_pressed & MU_KEY_RIGHT) ? d : -d;
+  }
   /* clamp and store value, update res */
   *value = v = mu_clamp(v, low, high);
   if (last != v) { res |= MU_RES_CHANGE; }
@@ -916,6 +981,9 @@ int mu_number_ex(mu_Context *ctx, mu_Real *value, mu_Real step,
   if (ctx->focus == id && ctx->mouse_down == MU_MOUSE_LEFT) {
     *value += ctx->mouse_delta.x * step;
   }
+  if (ctx->kb_focus == id && ctx->key_pressed & (MU_KEY_LEFT | MU_KEY_RIGHT)) {
+    *value += (ctx->key_pressed & MU_KEY_RIGHT) ? step : -step;
+  }
   /* set flag if value changed */
   if (*value != last) { res |= MU_RES_CHANGE; }
 
@@ -943,7 +1011,7 @@ static int header(mu_Context *ctx, const char *label, int istreenode, int opt) {
   mu_update_control(ctx, id, r, 0);
 
   /* handle click */
-  active ^= (ctx->mouse_pressed == MU_MOUSE_LEFT && ctx->focus == id);
+  active ^= control_activated(ctx, id);
 
   /* update pool ref */
   if (idx >= 0) {
@@ -1006,7 +1074,7 @@ void mu_end_treenode(mu_Context *ctx) {
       base.w = ctx->style->scrollbar_size;                                  \
                                                                             \
       /* handle input */                                                    \
-      mu_update_control(ctx, id, base, 0);                                  \
+      mu_update_control(ctx, id, base, MU_OPT_NOKBNAV);                     \
       if (ctx->focus == id && ctx->mouse_down == MU_MOUSE_LEFT) {           \
         cnt->scroll.y += ctx->mouse_delta.y * cs.y / base.h;                \
       }                                                                     \
@@ -1111,7 +1179,7 @@ int mu_begin_window_ex(mu_Context *ctx, const char *title, mu_Rect rect, int opt
     /* do title text */
     if (~opt & MU_OPT_NOTITLE) {
       mu_Id id = mu_get_id(ctx, "!title", 6);
-      mu_update_control(ctx, id, tr, opt);
+      mu_update_control(ctx, id, tr, opt | MU_OPT_NOKBNAV);
       mu_draw_control_text(ctx, title, tr, MU_COLOR_TITLETEXT, opt);
       if (id == ctx->focus && ctx->mouse_down == MU_MOUSE_LEFT) {
         cnt->rect.x += ctx->mouse_delta.x;
@@ -1127,7 +1195,7 @@ int mu_begin_window_ex(mu_Context *ctx, const char *title, mu_Rect rect, int opt
       mu_Rect r = mu_rect(tr.x + tr.w - tr.h, tr.y, tr.h, tr.h);
       tr.w -= r.w;
       mu_draw_icon(ctx, MU_ICON_CLOSE, r, ctx->style->colors[MU_COLOR_TITLETEXT]);
-      mu_update_control(ctx, id, r, opt);
+      mu_update_control(ctx, id, r, opt | MU_OPT_NOKBNAV);
       if (ctx->mouse_pressed == MU_MOUSE_LEFT && id == ctx->focus) {
         cnt->open = 0;
       }
@@ -1141,7 +1209,7 @@ int mu_begin_window_ex(mu_Context *ctx, const char *title, mu_Rect rect, int opt
     int sz = ctx->style->title_height;
     mu_Id id = mu_get_id(ctx, "!resize", 7);
     mu_Rect r = mu_rect(rect.x + rect.w - sz, rect.y + rect.h - sz, sz, sz);
-    mu_update_control(ctx, id, r, opt);
+    mu_update_control(ctx, id, r, opt | MU_OPT_NOKBNAV);
     if (id == ctx->focus && ctx->mouse_down == MU_MOUSE_LEFT) {
       cnt->rect.w = mu_max(96, cnt->rect.w + ctx->mouse_delta.x);
       cnt->rect.h = mu_max(64, cnt->rect.h + ctx->mouse_delta.y);
