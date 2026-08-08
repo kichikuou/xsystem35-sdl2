@@ -229,6 +229,11 @@ struct mu_Context {
   int key_down;
   int key_pressed;
   char input_text[32];
+  char preedit[32];         /* IME composition text, not yet committed */
+  /* Set by mu_textbox_input() while a textbox has the keyboard focus, so the
+  ** host can enable the IME and place its candidate window. */
+  int text_input;
+  mu_Rect text_input_rect;
 };
 
 
@@ -263,6 +268,7 @@ void mu_input_scroll(mu_Context *ctx, int x, int y);
 void mu_input_keydown(mu_Context *ctx, int key);
 void mu_input_keyup(mu_Context *ctx, int key);
 void mu_input_text(mu_Context *ctx, const char *text);
+void mu_input_preedit(mu_Context *ctx, const char *text);
 
 mu_Command* mu_push_command(mu_Context *ctx, int type, int size);
 int mu_next_command(mu_Context *ctx, mu_Command **cmd);
@@ -298,7 +304,12 @@ void mu_text(mu_Context *ctx, const char *text);
 void mu_label(mu_Context *ctx, const char *text);
 int mu_button_ex(mu_Context *ctx, const char *label, int icon, int opt);
 int mu_checkbox(mu_Context *ctx, const char *label, int *state);
-int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, mu_Id id, mu_Rect r, int opt);
+/* Edit `buf` in place, without drawing. `max_chars` limits the length in UTF-8
+** characters (0 for no limit beyond `bufsz`). Use this with mu_draw_textbox(),
+** or with custom drawing when the default appearance does not fit. */
+int mu_textbox_input(mu_Context *ctx, char *buf, int bufsz, int max_chars, mu_Id id, mu_Rect r, int opt);
+void mu_draw_textbox(mu_Context *ctx, const char *buf, mu_Id id, mu_Rect r, int opt);
+int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, int max_chars, mu_Id id, mu_Rect r, int opt);
 int mu_textbox_ex(mu_Context *ctx, char *buf, int bufsz, int opt);
 int mu_slider_ex(mu_Context *ctx, mu_Real *value, mu_Real low, mu_Real high, mu_Real step, const char *fmt, int opt);
 int mu_number_ex(mu_Context *ctx, mu_Real *value, mu_Real step, const char *fmt, int opt);

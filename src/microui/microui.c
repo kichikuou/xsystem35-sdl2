@@ -149,6 +149,7 @@ void mu_begin(mu_Context *ctx) {
   ctx->nav_first = ctx->nav_last = 0;
   ctx->nav_prev = ctx->nav_next = ctx->nav_cursor = 0;
   ctx->kb_focus_seen = 0;
+  ctx->text_input = 0;
   ctx->frame++;
 }
 
@@ -189,6 +190,9 @@ void mu_end(mu_Context *ctx) {
                            : (ctx->nav_next ? ctx->nav_next : ctx->nav_first);
     }
   }
+
+  /* drop a composition left over from a textbox that lost the focus */
+  if (!ctx->text_input) { ctx->preedit[0] = '\0'; }
 
   /* bring hover root to front if mouse was pressed */
   if (ctx->mouse_pressed && ctx->next_hover_root &&
@@ -427,6 +431,8 @@ void mu_input_scroll(mu_Context *ctx, int x, int y) {
 
 
 void mu_input_keydown(mu_Context *ctx, int key) {
+  /* while an IME composition is active the keys belong to the IME */
+  if (*ctx->preedit) { return; }
   ctx->key_pressed |= key;
   ctx->key_down |= key;
 }
@@ -438,10 +444,22 @@ void mu_input_keyup(mu_Context *ctx, int key) {
 
 
 void mu_input_text(mu_Context *ctx, const char *text) {
+  /* SDL splits a long commit into several events, which all arrive within one
+  ** frame and can overflow the buffer. Drop the excess instead of failing. */
   int len = strlen(ctx->input_text);
-  int size = strlen(text) + 1;
-  expect(len + size <= (int) sizeof(ctx->input_text));
-  memcpy(ctx->input_text + len, text, size);
+  int n = mu_min((int) strlen(text), (int) sizeof(ctx->input_text) - 1 - len);
+  while (n > 0 && (text[n] & 0xc0) == 0x80) { n--; }  /* keep utf-8 whole */
+  memcpy(ctx->input_text + len, text, n);
+  ctx->input_text[len + n] = '\0';
+  ctx->preedit[0] = '\0';  /* committing ends the composition */
+}
+
+
+void mu_input_preedit(mu_Context *ctx, const char *text) {
+  int n = mu_min((int) strlen(text), (int) sizeof(ctx->preedit) - 1);
+  while (n > 0 && (text[n] & 0xc0) == 0x80) { n--; }  /* keep utf-8 whole */
+  memcpy(ctx->preedit, text, n);
+  ctx->preedit[n] = '\0';
 }
 
 
@@ -829,59 +847,91 @@ int mu_checkbox(mu_Context *ctx, const char *label, int *state) {
 }
 
 
-int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, mu_Id id, mu_Rect r,
-  int opt)
+/* number of characters in a utf-8 string */
+static int utf8_strlen(const char *s) {
+  int n = 0;
+  for (; *s; s++) { if ((*s & 0xc0) != 0x80) { n++; } }
+  return n;
+}
+
+
+int mu_textbox_input(mu_Context *ctx, char *buf, int bufsz, int max_chars,
+  mu_Id id, mu_Rect r, int opt)
 {
   int res = 0;
-  /* the keyboard focus decides which textbox is editable, so that Tab moves the
-  ** caret out of a MU_OPT_HOLDFOCUS textbox. A click reaches this through
-  ** mu_update_control(), which also sets kb_focus. */
-  if (ctx->kb_focus == id) { mu_set_focus(ctx, id); }
-  else if (ctx->focus == id) { mu_set_focus(ctx, 0); }
-  mu_update_control(ctx, id, r, opt | MU_OPT_HOLDFOCUS);
+  /* the keyboard focus decides which textbox is editable, so that Tab moves
+  ** the caret out of it. A click reaches this through mu_update_control(). */
+  mu_update_control(ctx, id, r, opt);
+  if (ctx->kb_focus != id) { return 0; }
 
-  if (ctx->focus == id) {
-    /* handle text input */
-    int len = strlen(buf);
-    int n = mu_min(bufsz - len - 1, (int) strlen(ctx->input_text));
-    if (n > 0) {
-      memcpy(buf + len, ctx->input_text, n);
-      len += n;
-      buf[len] = '\0';
-      res |= MU_RES_CHANGE;
-    }
-    /* handle backspace */
-    if (ctx->key_pressed & MU_KEY_BACKSPACE && len > 0) {
-      /* skip utf-8 continuation bytes */
-      while ((buf[--len] & 0xc0) == 0x80 && len > 0);
-      buf[len] = '\0';
-      res |= MU_RES_CHANGE;
-    }
-    /* handle return */
-    if (ctx->key_pressed & MU_KEY_RETURN) {
-      mu_set_focus(ctx, 0);
-      res |= MU_RES_SUBMIT;
-    }
+  /* let the host turn the IME on and place its candidate window */
+  ctx->text_input = 1;
+  ctx->text_input_rect = r;
+
+  /* handle text input, honoring both the byte and the character limit */
+  int len = strlen(buf);
+  int room = bufsz - len - 1;
+  int chars = max_chars ? max_chars - utf8_strlen(buf) : bufsz;
+  int n = 0;
+  while (ctx->input_text[n] && chars > 0) {
+    int e = n + 1;
+    while ((ctx->input_text[e] & 0xc0) == 0x80) { e++; }
+    if (e > room) { break; }
+    n = e;
+    chars--;
   }
+  if (n > 0) {
+    memcpy(buf + len, ctx->input_text, n);
+    len += n;
+    buf[len] = '\0';
+    res |= MU_RES_CHANGE;
+  }
+  /* handle backspace */
+  if (ctx->key_pressed & MU_KEY_BACKSPACE && len > 0) {
+    /* skip utf-8 continuation bytes */
+    while ((buf[--len] & 0xc0) == 0x80 && len > 0);
+    buf[len] = '\0';
+    res |= MU_RES_CHANGE;
+  }
+  /* handle return */
+  if (ctx->key_pressed & MU_KEY_RETURN) { res |= MU_RES_SUBMIT; }
 
-  /* draw */
+  return res;
+}
+
+
+void mu_draw_textbox(mu_Context *ctx, const char *buf, mu_Id id, mu_Rect r,
+  int opt)
+{
   mu_draw_control_frame(ctx, id, r, MU_COLOR_BASE, opt);
-  if (ctx->focus == id) {
-    mu_Color color = ctx->style->colors[MU_COLOR_TEXT];
-    mu_Font font = ctx->style->font;
-    int textw = ctx->text_width(font, buf, -1);
-    int texth = ctx->text_height(font);
-    int ofx = r.w - ctx->style->padding - textw - 1;
-    int textx = r.x + mu_min(ofx, ctx->style->padding);
-    int texty = r.y + (r.h - texth) / 2;
-    mu_push_clip_rect(ctx, r);
-    mu_draw_text(ctx, font, buf, -1, mu_vec2(textx, texty), color);
-    mu_draw_rect(ctx, mu_rect(textx + textw, texty, 1, texth), color);
-    mu_pop_clip_rect(ctx);
-  } else {
+  if (ctx->kb_focus != id) {
     mu_draw_control_text(ctx, buf, r, MU_COLOR_TEXT, opt);
+    return;
   }
+  mu_Color color = ctx->style->colors[MU_COLOR_TEXT];
+  mu_Font font = ctx->style->font;
+  int textw = ctx->text_width(font, buf, -1);
+  int prew = *ctx->preedit ? ctx->text_width(font, ctx->preedit, -1) : 0;
+  int texth = ctx->text_height(font);
+  int ofx = r.w - ctx->style->padding - textw - prew - 1;
+  int textx = r.x + mu_min(ofx, ctx->style->padding);
+  int texty = r.y + (r.h - texth) / 2;
+  mu_push_clip_rect(ctx, r);
+  mu_draw_text(ctx, font, buf, -1, mu_vec2(textx, texty), color);
+  if (prew) {
+    mu_draw_text(ctx, font, ctx->preedit, -1, mu_vec2(textx + textw, texty), color);
+    mu_draw_rect(ctx, mu_rect(textx + textw, texty + texth, prew, 1), color);
+  }
+  mu_draw_rect(ctx, mu_rect(textx + textw + prew, texty, 1, texth), color);
+  mu_pop_clip_rect(ctx);
+}
 
+
+int mu_textbox_raw(mu_Context *ctx, char *buf, int bufsz, int max_chars,
+  mu_Id id, mu_Rect r, int opt)
+{
+  int res = mu_textbox_input(ctx, buf, bufsz, max_chars, id, r, opt);
+  mu_draw_textbox(ctx, buf, id, r, opt);
   return res;
 }
 
@@ -895,8 +945,8 @@ static int number_textbox(mu_Context *ctx, mu_Real *value, mu_Rect r, mu_Id id) 
   }
   if (ctx->number_edit == id) {
     int res = mu_textbox_raw(
-      ctx, ctx->number_edit_buf, sizeof(ctx->number_edit_buf), id, r, 0);
-    if (res & MU_RES_SUBMIT || ctx->focus != id) {
+      ctx, ctx->number_edit_buf, sizeof(ctx->number_edit_buf), 0, id, r, 0);
+    if (res & MU_RES_SUBMIT || ctx->kb_focus != id) {
       *value = strtod(ctx->number_edit_buf, NULL);
       ctx->number_edit = 0;
     } else {
@@ -910,7 +960,7 @@ static int number_textbox(mu_Context *ctx, mu_Real *value, mu_Rect r, mu_Id id) 
 int mu_textbox_ex(mu_Context *ctx, char *buf, int bufsz, int opt) {
   mu_Id id = mu_get_id(ctx, &buf, sizeof(buf));
   mu_Rect r = mu_layout_next(ctx);
-  return mu_textbox_raw(ctx, buf, bufsz, id, r, opt);
+  return mu_textbox_raw(ctx, buf, bufsz, 0, id, r, opt);
 }
 
 

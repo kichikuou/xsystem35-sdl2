@@ -120,6 +120,9 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 	case SDL_TEXTINPUT:
 		mu_input_text(ctx, e->text.text);
 		break;
+	case SDL_TEXTEDITING:
+		mu_input_preedit(ctx, e->edit.text);
+		break;
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP: {
 		int b = 0;
@@ -161,7 +164,9 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 		break;
 	case SDL_KEYDOWN:
 	case SDL_KEYUP: {
-		if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE)
+		// Esc cancels an IME composition first, not the modal.
+		if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE &&
+		    !*ctx->preedit)
 			modal->cancelled = true;
 		int c = 0;
 		switch (e->key.keysym.sym) {
@@ -293,6 +298,27 @@ static void modal_render(void) {
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 }
 
+// Turn SDL's text input on while a textbox has the keyboard focus, and keep the
+// IME candidate window near it. The rect is in logical (view) coordinates.
+static void update_text_input(void) {
+	static SDL_Rect last_rect;
+	if (!ctx->text_input) {
+		if (SDL_IsTextInputActive())
+			SDL_StopTextInput();
+		return;
+	}
+	if (!SDL_IsTextInputActive()) {
+		SDL_StartTextInput();
+		last_rect = (SDL_Rect){0, 0, 0, 0};
+	}
+	mu_Rect r = ctx->text_input_rect;
+	SDL_Rect wr = gfx_viewToWindowRect((SDL_Rect){r.x, r.y, r.w, r.h});
+	if (memcmp(&wr, &last_rect, sizeof(wr))) {
+		last_rect = wr;
+		SDL_SetTextInputRect(&wr);
+	}
+}
+
 bool modal_handle_event(const SDL_Event *e) {
 	if (!current_modal)
 		return false;
@@ -341,6 +367,7 @@ void modal_run(modal *m) {
 		mu_begin(ctx);
 		open = m->build(ctx, m);
 		mu_end(ctx);
+		update_text_input();
 
 		// Present only when the overlay changed.
 		mu_Id hash = mu_get_id(ctx, ctx->command_list.items, ctx->command_list.idx);
@@ -355,6 +382,8 @@ void modal_run(modal *m) {
 	current_modal = NULL;
 	free(ctx);
 	ctx = NULL;
+	if (SDL_IsTextInputActive())
+		SDL_StopTextInput();
 	gfx_requestRedraw();  // repaint once more to clear the overlay
 
 	// The gesture that opened/dismissed the dialog must not leave the engine

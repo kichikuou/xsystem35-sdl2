@@ -148,117 +148,30 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 #include "utfsjis.h"
 
 // The string-input dialog.
-// The input field is not a microui textbox: to support IME (SDL_TEXTEDITING)
-// composition we keep our own buffer (str_buf) and feed it from the handler,
-// mirroring editor.c.
 struct string_state {
 	modal base;
 	INPUTSTRING_PARAM *param;
-	char composing[SDL_TEXTEDITINGEVENT_TEXT_SIZE];  // IME preedit text
 	bool done;
 	bool accepted;
-	FontSpec font;  // inline edit (input_modal_string_inline) only
+	bool focus_init;  // focus the text field on the first frame
+	FontSpec font;    // inline edit (input_modal_string_inline) only
 };
 
-// Heap buffer holding the string dialog's edited text. It must outlive the
-// modal loop because the caller reads p->newstring after input_modal_string()
-// returns; it is freed and reallocated on the next call.
+// Heap buffer holding the edited text. It must outlive the modal loop because
+// the caller reads p->newstring after input_modal_string() returns; it is freed
+// and reallocated on the next call.
 static char *str_buf;
+static int str_bufsz;
 
-// Append `add` to str_buf, truncating so the total stays within
-// st->param->max characters (counted as UTF-8 code points).
-static void str_append(struct string_state *st, const char *add) {
-	int room = st->param->max;
-	for (const char *p = str_buf; *p; p = advance_char(p, UTF8))
-		room--;
-	const char *end = add;
-	while (room > 0 && *end) {
-		end = advance_char(end, UTF8);
-		room--;
-	}
-	strncat(str_buf, add, end - add);
-}
-
-// Delete the last UTF-8 character of str_buf.
-static void str_backspace(void) {
-	if (!*str_buf)
-		return;
-	char *p = str_buf + strlen(str_buf) - 1;
-	while (p > str_buf && UTF8_TRAIL_BYTE(*p))
-		p--;
-	*p = '\0';
-}
-
-static bool menu_string_handler(const SDL_Event *e, modal *modal) {
-	struct string_state *st = (struct string_state *)modal;
-	switch (e->type) {
-	case SDL_KEYDOWN:
-		// While an IME composition is active, let it consume the key.
-		if (!*st->composing) {
-			switch (e->key.keysym.sym) {
-			case SDLK_RETURN:
-				st->accepted = true;
-				st->done = true;
-				break;
-			case SDLK_ESCAPE:
-				st->base.cancelled = true;
-				break;
-			case SDLK_BACKSPACE:
-				str_backspace();
-				break;
-			}
-		}
-		return true;  // never forward keys to microui (there is no textbox)
-	case SDL_TEXTINPUT:
-		str_append(st, e->text.text);
-		st->composing[0] = '\0';
-		return true;
-	case SDL_TEXTEDITING:
-		strncpy(st->composing, e->edit.text, sizeof(st->composing) - 1);
-		st->composing[sizeof(st->composing) - 1] = '\0';
-		return true;
-	}
-	return modal_default_handler(e, modal);
-}
-
-// Tell SDL where the text input is, so the IME candidate window is positioned
-// near the field. `box` is in logical (view) coordinates; convert to window
-// pixels for SDL_SetTextInputRect.
-static void set_text_input_rect(mu_Rect box) {
-	SDL_Rect r = gfx_viewToWindowRect(
-		(SDL_Rect){box.x, box.y, box.w, box.h});
-	SDL_SetTextInputRect(&r);
+static void str_buf_init(const char *initial, int max_chars) {
+	free(str_buf);
+	str_bufsz = max_chars * MAX_UTF8_BYTES_PAR_CHAR + 1;
+	str_buf = malloc(str_bufsz);
+	strncpy(str_buf, initial ? initial : "", str_bufsz - 1);
+	str_buf[str_bufsz - 1] = '\0';
 }
 
 #ifndef _WIN32  // input_modal_string is provided by win/dialog.c on Windows.
-
-// Draw the IME-aware text field (committed text, preedit with underline, caret).
-static void draw_string_field(mu_Context *ctx, mu_Rect box, const struct string_state *st) {
-	mu_draw_rect(ctx, box, ctx->style->colors[MU_COLOR_BASE]);
-	mu_draw_box(ctx, box, ctx->style->colors[MU_COLOR_BORDER]);
-
-	mu_Font font = ctx->style->font;
-	mu_Color col = ctx->style->colors[MU_COLOR_TEXT];
-	int th = ctx->text_height(font);
-	int x = box.x + ctx->style->padding;
-	int y = box.y + (box.h - th) / 2;
-
-	mu_push_clip_rect(ctx, box);
-	if (*str_buf) {
-		mu_draw_text(ctx, font, str_buf, -1, mu_vec2(x, y), col);
-		x += ctx->text_width(font, str_buf, -1);
-	}
-	if (*st->composing) {
-		mu_draw_text(ctx, font, st->composing, -1, mu_vec2(x, y), col);
-		int cw = ctx->text_width(font, st->composing, -1);
-		mu_draw_rect(ctx, mu_rect(x, y + th, cw, 1), col);  // preedit underline
-		x += cw;
-	}
-	mu_draw_rect(ctx, mu_rect(x, y, 1, th), col);  // caret
-	mu_pop_clip_rect(ctx);
-
-	set_text_input_rect(box);
-}
 
 static bool inputstring_build(mu_Context *ctx, modal *modal) {
 	struct string_state *st = (struct string_state *)modal;
@@ -278,7 +191,17 @@ static bool inputstring_build(mu_Context *ctx, modal *modal) {
 		snprintf(info, sizeof(info), _("Up to %d characters"), st->param->max);
 		mu_label(ctx, info);
 
-		draw_string_field(ctx, mu_layout_next(ctx), st);
+		mu_Id id = mu_get_id(ctx, "value", 5);
+		mu_Rect box = mu_layout_next(ctx);
+		if (st->focus_init) {
+			mu_set_kb_focus(ctx, id);
+			st->focus_init = false;
+		}
+		if (mu_textbox_raw(ctx, str_buf, str_bufsz, st->param->max, id, box, 0)
+		    & MU_RES_SUBMIT) {
+			st->accepted = true;
+			st->done = true;
+		}
 
 		int content = w - ctx->style->padding * 2;
 		int half = (content - ctx->style->spacing) / 2;
@@ -303,16 +226,12 @@ static bool inputstring_build(mu_Context *ctx, modal *modal) {
 
 bool input_modal_string(INPUTSTRING_PARAM *p) {
 	struct string_state st = {
-		.base = { .build = inputstring_build, .handler = menu_string_handler },
+		.base = { .build = inputstring_build, .handler = modal_default_handler },
 		.param = p,
+		.focus_init = true,
 	};
-	free(str_buf);
-	str_buf = malloc(p->max * MAX_UTF8_BYTES_PAR_CHAR + 1);
-	strcpy(str_buf, p->oldstring ? p->oldstring : "");
-
-	SDL_StartTextInput();
+	str_buf_init(p->oldstring, p->max);
 	modal_run(&st.base);
-	SDL_StopTextInput();
 
 	p->newstring = st.accepted ? str_buf : p->oldstring;
 	return true;
@@ -320,8 +239,8 @@ bool input_modal_string(INPUTSTRING_PARAM *p) {
 
 #endif  // !_WIN32
 
-// The inline text input (MJ command). It reuses the IME buffer handling
-// and the event handler of input_modal_string.
+// The inline text input (MJ command). It shares the textbox input handling but
+// draws itself with the game's font and palette.
 
 // Look up an AGS color index in the active palette and return it as a mu_Color.
 static mu_Color palette_color(int index) {
@@ -342,6 +261,17 @@ static bool inline_edit_build(mu_Context *ctx, modal *modal) {
 	// all drawing below is done manually with the game's colors.
 	if (mu_begin_window_ex(ctx, "editstr", rect,
 	        MU_OPT_NOFRAME | MU_OPT_NOTITLE | MU_OPT_NORESIZE | MU_OPT_NOSCROLL)) {
+		mu_Id id = mu_get_id(ctx, "editstr", 7);
+		if (st->focus_init) {
+			mu_set_kb_focus(ctx, id);
+			st->focus_init = false;
+		}
+		if (mu_textbox_input(ctx, str_buf, str_bufsz, st->param->max, id, rect, 0)
+		    & MU_RES_SUBMIT) {
+			st->accepted = true;
+			st->done = true;
+		}
+
 		mu_Color bg = palette_color(nact->msg.WinBackgroundColor);
 		mu_Color fg = palette_color(nact->msg.MsgFontColor);
 		mu_Font font = (mu_Font)&st->font;
@@ -354,14 +284,13 @@ static bool inline_edit_build(mu_Context *ctx, modal *modal) {
 			mu_draw_text(ctx, font, str_buf, -1, mu_vec2(x, y), fg);
 			x += ctx->text_width(font, str_buf, -1);
 		}
-		if (*st->composing) {
-			mu_draw_text(ctx, font, st->composing, -1, mu_vec2(x, y), fg);
-			int cw = ctx->text_width(font, st->composing, -1);
+		if (*ctx->preedit) {
+			mu_draw_text(ctx, font, ctx->preedit, -1, mu_vec2(x, y), fg);
+			int cw = ctx->text_width(font, ctx->preedit, -1);
 			mu_draw_rect(ctx, mu_rect(x, y + fh, cw, 2), fg);  // preedit underline
 			x += cw;
 		}
 		mu_draw_rect(ctx, mu_rect(x, y, 2, fh), fg);  // caret
-		set_text_input_rect(rect);
 		mu_end_window(ctx);
 	}
 
@@ -372,18 +301,14 @@ static bool inline_edit_build(mu_Context *ctx, modal *modal) {
 
 bool input_modal_string_inline(INPUTSTRING_PARAM *p) {
 	struct string_state st = {
-		.base = { .build = inline_edit_build, .handler = menu_string_handler,
+		.base = { .build = inline_edit_build, .handler = modal_default_handler,
 		          .no_dim = true },
 		.param = p,
+		.focus_init = true,
 		.font = { FONT_GOTHIC, FONT_WEIGHT_NORMAL, p->h },
 	};
-	free(str_buf);
-	str_buf = malloc(p->max * MAX_UTF8_BYTES_PAR_CHAR + 1);
-	strcpy(str_buf, p->oldstring ? p->oldstring : "");
-
-	SDL_StartTextInput();
+	str_buf_init(p->oldstring, p->max);
 	modal_run(&st.base);
-	SDL_StopTextInput();
 
 	p->newstring = st.accepted ? str_buf : NULL;
 	return true;
@@ -456,7 +381,7 @@ static bool inputnumber_build(mu_Context *ctx, modal *modal) {
 			mu_set_kb_focus(ctx, id);
 			st->focus_init = false;
 		}
-		int res = mu_textbox_raw(ctx, st->buf, sizeof(st->buf), id, box, 0);
+		int res = mu_textbox_raw(ctx, st->buf, sizeof(st->buf), 0, id, box, 0);
 		if (mu_button(ctx, "-"))
 			num_adjust(st, -1);
 		if (mu_button(ctx, "+"))
@@ -501,10 +426,7 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 		.focus_init = true,
 	};
 	snprintf(st.buf, sizeof(st.buf), "%d", p->def);
-
-	SDL_StartTextInput();
 	modal_run(&st.base);
-	SDL_StopTextInput();
 
 	if (!st.accepted)
 		return false;
