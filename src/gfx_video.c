@@ -109,14 +109,11 @@ static void window_init(const char *render_driver) {
 #ifdef __ANDROID__
 	SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-	Uint32 flags = SDL_WINDOW_FULLSCREEN;
-#else
-	Uint32 flags = SDL_WINDOW_RESIZABLE;
 #endif
+
 	gfx_window = SDL_CreateWindow(
 		title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, flags);
+		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
 	gfx_renderer = SDL_CreateRenderer(gfx_window, -1, 0);
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	gfx_palette = SDL_AllocPalette(256);
