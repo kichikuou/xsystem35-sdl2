@@ -45,6 +45,8 @@ class GameActivity : SDLActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         gameRoot = File(intent.getStringExtra(EXTRA_GAME_ROOT)!!)
+        // Workaround for https://github.com/libsdl-org/SDL/issues/8995
+        SDLActivity.setWindowStyle(true)
     }
 
     override fun onStop() {
