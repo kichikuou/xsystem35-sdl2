@@ -55,6 +55,8 @@ check_symbol_exists(mmap "sys/mman.h" HAVE_MMAP)
 check_symbol_exists(sigaction "signal.h" HAVE_SIGACTION)
 
 if (EMSCRIPTEN)
+  option(JSPI "Use JavaScript Promise Integration instead of Asyncify" OFF)
+
   function(add_emscripten_library name option)
     add_library(${name} INTERFACE)
     set_target_properties(${name} PROPERTIES

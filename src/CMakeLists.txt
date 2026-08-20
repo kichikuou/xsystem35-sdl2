@@ -157,18 +157,28 @@ if (EMSCRIPTEN)
   # Without optimizations, Asyncify generates very large code.
   list(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG "-O1")
 
+  if (JSPI)
+    target_link_options(xsystem35 PRIVATE
+      -sJSPI
+      -sJSPI_IMPORTS=wait_vsync
+      )
+  else()
+    target_link_options(xsystem35 PRIVATE
+      -sASYNCIFY=1
+      -sASYNCIFY_IGNORE_INDIRECT=1
+      -sASYNCIFY_REMOVE=SDL_Delay
+      -sASYNCIFY_IMPORTS=wait_vsync
+      # Functions that call an asynchronous function via a function pointer must
+      # be added to ASYNCIFY_ADD, even if it had a direct call to another
+      # asynchronous function, so that the indirect call itself is instrumented.
+      -sASYNCIFY_ADD=commands2F60,nact_main,send_agsevent,cb_waitkey_sprite,modal_run
+      )
+  endif()
+
   target_link_options(xsystem35 PRIVATE
     -sENVIRONMENT=web
     -sMODULARIZE=1
     -sEXPORT_ES6=1
-    -sASYNCIFY=1
-    -sASYNCIFY_IGNORE_INDIRECT=1
-    -sASYNCIFY_REMOVE=SDL_Delay
-    -sASYNCIFY_IMPORTS=wait_vsync
-    # Functions that call an asynchronous function via a function pointer must
-    # be added to ASYNCIFY_ADD, even if it had a direct call to another
-    # asynchronous function, so that the indirect call itself is instrumented.
-    -sASYNCIFY_ADD=commands2F60,nact_main,send_agsevent,cb_waitkey_sprite,modal_run
     -sALLOW_MEMORY_GROWTH=1
     -sNO_EXIT_RUNTIME=1
     -sEXPORTED_FUNCTIONS=_main,_malloc
