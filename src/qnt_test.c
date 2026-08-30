@@ -22,8 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static void odd_size_test(void) {
-	FILE *fp = fopen("testdata/odd-size.qnt", "rb");
+static uint8_t *read_file(const char *path) {
+	FILE *fp = fopen(path, "rb");
 	ASSERT_TRUE(fp);
 
 	fseek(fp, 0, SEEK_END);
@@ -32,6 +32,11 @@ static void odd_size_test(void) {
 	uint8_t *data = malloc(size);
 	ASSERT_EQUAL(fread(data, 1, size, fp), size);
 	fclose(fp);
+	return data;
+}
+
+static void odd_size_test(void) {
+	uint8_t *data = read_file("testdata/odd-size.qnt");
 
 	cgdata *cg = qnt_extract(data);
 	ASSERT_EQUAL(cg->width, 3);
@@ -58,6 +63,31 @@ static void odd_size_test(void) {
 	free(data);
 }
 
+static void width1_test(void) {
+	uint8_t *data = read_file("testdata/width1.qnt");
+
+	cgdata *cg = qnt_extract(data);
+	ASSERT_EQUAL(cg->width, 1);
+	ASSERT_EQUAL(cg->height, 3);
+	ASSERT_TRUE(cg->alpha);
+
+	const uint8_t expected[] = {
+		0x10, 0x20, 0x30,
+		0x40, 0x50, 0x60,
+		0x70, 0x80, 0x90,
+	};
+	ASSERT_TRUE(!memcmp(cg->pic, expected, sizeof(expected)));
+
+	const uint8_t expected_alpha[] = { 0xff, 0x80, 0x40 };
+	ASSERT_TRUE(!memcmp(cg->alpha, expected_alpha, sizeof(expected_alpha)));
+
+	free(cg->pic);
+	free(cg->alpha);
+	free(cg);
+	free(data);
+}
+
 void qnt_test(void) {
 	odd_size_test();
+	width1_test();
 }

@@ -182,15 +182,13 @@ static void extract_alpha(qnt_header *qnt, uint8_t *pic, uint8_t *b) {
 	w = qnt->width;
 	h = qnt->height;
 	
-	i = 1;
-	if (w > 1) {
-		pic[0] = raw[0];
-		for (x = 1; x < w; x++) {
-			pic[x] = pic[x-1] - raw[i];
-			i++;
-		}
-		if (w%2) i++;
+	i = 0;
+	pic[0] = raw[i++];
+	for (x = 1; x < w; x++) {
+		pic[x] = pic[x-1] - raw[i];
+		i++;
 	}
+	if (w%2) i++;
 	
 	if (h > 1) {
 		for (y = 1; y < h; y++) {
