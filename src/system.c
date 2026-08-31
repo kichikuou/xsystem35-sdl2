@@ -83,12 +83,7 @@ void sys_error(char *format, ...) {
 
 void sys_exit(int code) {
 	sys35_remove();
-#ifdef __EMSCRIPTEN__
-	EM_ASM( xsystem35.shell.quit(); );
-	sys_sleep(1000000000);
-#else
 	exit(code);
-#endif
 }
 
 uint32_t sys_get_ticks(void) {
