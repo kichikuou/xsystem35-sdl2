@@ -10,6 +10,7 @@ add_library(src_lib STATIC
   cali.c
   dri.c
   filecheck.c
+  font.c
   gameresource.c
   hankaku.c
   mmap.c
@@ -72,7 +73,6 @@ target_sources(xsystem35 PRIVATE
   ecopy.c
   effect.c
   event.c
-  font.c
   hacks.c
   gfx_draw.c
   gfx_image.c
@@ -137,16 +137,17 @@ if (ENABLE_DEBUGGER)
 endif()
 
 if (WIN32)
+  target_sources(src_lib PRIVATE win/resources.c)
   target_sources(xsystem35 PRIVATE
-    win/dialog.c win/resources.rc win/resources.c win/menubar.c win/console.c)
+    win/dialog.c win/resources.rc win/menubar.c win/console.c)
 endif()
 
 if (NOT HAVE_LIBINTL)
   target_sources(xsystem35 PRIVATE nls.c)
 endif()
 
-target_link_libraries(src_lib PRIVATE sdl2 zlib)
-target_link_libraries(xsystem35 PRIVATE m zlib sdl2 freetype2)
+target_link_libraries(src_lib PRIVATE sdl2 freetype2 zlib)
+target_link_libraries(xsystem35 PRIVATE m zlib sdl2)
 if (TARGET sdl2_mixer)
   target_link_libraries(xsystem35 PRIVATE sdl2_mixer)
 endif()
@@ -201,12 +202,15 @@ else()  # non-emscripten, non-android
 
   add_executable(src_tests
     src_tests.c
+    font_test.c
     gameresource_test.c
     hankaku_test.c
     qnt_test.c
     variable_test.c
     )
   target_compile_options(src_tests PRIVATE -Wno-pointer-sign -Wall)
+  target_compile_definitions(src_tests PRIVATE
+      TEST_FONT_DIR="${PROJECT_SOURCE_DIR}/fonts")
   target_link_libraries(src_tests PRIVATE src_lib sdl2)
   add_test(NAME src_tests COMMAND src_tests)
   file(COPY testdata DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void font_test(void);
 void gameresource_test(void);
 void hankaku_test(void);
 void qnt_test(void);
@@ -41,6 +42,7 @@ void sys_message(int level, char *format, ...) {
 }
 
 int main() {
+	font_test();
 	gameresource_test();
 	variable_test();
 	hankaku_test();
