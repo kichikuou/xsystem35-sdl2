@@ -1,0 +1,46 @@
+	MS FILE,"patchec.adv":
+
+	; --- EC with a registered rectangle ---
+	; patchEC defaults to off, so EC clears a region 1px narrower and
+	; shorter than the rectangle registered by ES.
+	CF 100,100,40,30,7:
+	ES 1,3,100,100,40,30:
+	EC 1:
+	PT0 RND,120,115: ~AssertEquals RND,3,__LINE__:
+	PT0 RND,138,128: ~AssertEquals RND,3,__LINE__:
+	PT0 RND,139,115: ~AssertEquals RND,7,__LINE__:
+	PT0 RND,120,129: ~AssertEquals RND,7,__LINE__:
+
+	; patchEC 1 disables the adjustment, so EC clears the whole rectangle.
+	CF 100,100,40,30,7:
+	patchEC 1:
+	EC 1:
+	PT0 RND,139,115: ~AssertEquals RND,3,__LINE__:
+	PT0 RND,120,129: ~AssertEquals RND,3,__LINE__:
+
+	; Only eFlag == 1 turns the patch on; any other value restores the bug.
+	CF 100,100,40,30,7:
+	patchEC 2:
+	EC 1:
+	PT0 RND,139,115: ~AssertEquals RND,7,__LINE__:
+	patchEC 0:
+
+	; --- EC 0 clears the current view area, now with the same adjustment ---
+	ZZ5 D18:
+	WV 100,100,50,40:
+	CF 100,100,50,40,7:
+	EC 0:
+	PT0 RND,120,120: ~AssertEquals RND,0,__LINE__:
+	PT0 RND,148,138: ~AssertEquals RND,0,__LINE__:
+	PT0 RND,149,120: ~AssertEquals RND,7,__LINE__:
+	PT0 RND,120,139: ~AssertEquals RND,7,__LINE__:
+
+	CF 100,100,50,40,7:
+	patchEC 1:
+	EC 0:
+	PT0 RND,149,120: ~AssertEquals RND,0,__LINE__:
+	PT0 RND,120,139: ~AssertEquals RND,0,__LINE__:
+	patchEC 0:
+	WV 0,0,D18,D19:
+
+	%0:

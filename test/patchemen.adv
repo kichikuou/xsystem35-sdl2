@@ -1,0 +1,36 @@
+	MS FILE,"patchemen.adv":
+
+	ES 1,0,10,10,20,20:
+	ES 2,0,20,20,20,20:
+
+	; --- EM: point-in-rectangle test ---
+	; patchEMEN defaults to off, so the rectangle is treated as 1px
+	; narrower and shorter than registered by ES.
+	EM 1,RND,10,10: ~AssertEquals RND,1,__LINE__:
+	EM 1,RND,28,28: ~AssertEquals RND,1,__LINE__:
+	EM 1,RND,29,20: ~AssertEquals RND,0,__LINE__:
+	EM 1,RND,20,29: ~AssertEquals RND,0,__LINE__:
+	EM 1,RND,9,10:  ~AssertEquals RND,0,__LINE__:
+
+	; patchEMEN 1 disables the adjustment.
+	patchEMEN 1:
+	EM 1,RND,29,29: ~AssertEquals RND,1,__LINE__:
+	EM 1,RND,30,20: ~AssertEquals RND,0,__LINE__:
+
+	; Only eFlag == 1 turns the patch on; any other value restores the bug.
+	patchEMEN 2:
+	EM 1,RND,29,29: ~AssertEquals RND,0,__LINE__:
+	patchEMEN 0:
+
+	; --- EN: number of the rectangle containing the point ---
+	EN RND,1,2,15,15: ~AssertEquals RND,1,__LINE__:
+	EN RND,1,2,25,25: ~AssertEquals RND,2,__LINE__:
+	EN RND,1,2,5,5:   ~AssertEquals RND,0,__LINE__:
+
+	; The patch flag also applies to EN's edge handling.
+	EN RND,1,1,29,29: ~AssertEquals RND,0,__LINE__:
+	patchEMEN 1:
+	EN RND,1,1,29,29: ~AssertEquals RND,1,__LINE__:
+	patchEMEN 0:
+
+	%0:

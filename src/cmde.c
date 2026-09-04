@@ -55,13 +55,13 @@ void commandEC() {
 	int num = getCaliValue();
 	Ecomtbl *e;
 	SDL_Rect *r;
+	int adj = nact->patch_ec ? 0 : -1;
 	
 	if (num == 0) {
 		r = &nact->ags.view_area;
-		ags_fillRectangle(r->x, r->y, r->w, r->h, 0);
-		ags_updateArea(r->x, r->y, r->w, r->h);
+		ags_fillRectangle(r->x, r->y, r->w + adj, r->h + adj, 0);
+		ags_updateArea(r->x, r->y, r->w + adj, r->h + adj);
 	} else {
-		int adj = (nact->patch_ec == 0) ? -1 : 0;
 		e = &tbl[num - 1];
 		ags_fillRectangle(e->r.x, e->r.y, e->r.w + adj, e->r.h + adj, e->pal);
 		ags_updateArea(e->r.x, e->r.y, e->r.w + adj, e->r.h + adj);
@@ -92,7 +92,7 @@ void commandEM() {
 
 	SDL_Point p = {x, y};
 	SDL_Rect r = tbl[num - 1].r;
-	if (nact->patch_emen == 0) {
+	if (!nact->patch_emen) {
 		r.w -= 1;
 		r.h -= 1;
 	}
@@ -112,7 +112,7 @@ void commandEN() {
 	
 	for (int i = min; i <= max; i++) {
 		SDL_Rect r = tbl[i - 1].r;
-		if (nact->patch_emen == 0) {
+		if (!nact->patch_emen) {
 			r.w -= 1;
 			r.h -= 1;
 		}

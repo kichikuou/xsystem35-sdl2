@@ -167,9 +167,9 @@ void nact_init() {
 
 	sel_init();
 
-	nact->patch_ec = 1;  // TODO: revisit
-	nact->patch_emen = 0;
-	nact->patch_g0 = 0;
+	nact->patch_ec = false;
+	nact->patch_emen = false;
+	nact->patch_g0 = false;
 
 	msg_msgHankakuMode = 0;
 }

@@ -8,6 +8,8 @@ stack.adv
 math.adv
 variable.adv
 unitmap.adv
+patchec.adv
+patchemen.adv
 
 #DLLHeader
 ShString.HEL

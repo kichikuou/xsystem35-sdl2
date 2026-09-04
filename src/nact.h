@@ -97,10 +97,10 @@ typedef struct {
 	/* 選択肢関連 */
 	sel_t sel;
 	
-	/* patch 関連 */
-	int patch_ec;   /* see patch_ec command   */
-	int patch_emen; /* see patch_emen command */
-	int patch_g0;   /* see patch g0 command */
+	/* patch flags */
+	bool patch_ec;
+	bool patch_emen;
+	bool patch_g0;
 
 	/* ain 関連 */
 	S39AIN ain;

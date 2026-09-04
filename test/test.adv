@@ -16,6 +16,8 @@
 	%#math.adv:
 	%#variable.adv:
 	%#unitmap.adv:
+	%#patchec.adv:
+	%#patchemen.adv:
 
 	HH0,tests_passed: ' tests passed' R
 	HH0,tests_failed: ' tests failed' R

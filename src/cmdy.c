@@ -146,7 +146,7 @@ void commandY() {
 		}
 		break;
 	case 1900:
-		nact->patch_ec = p2;
+		nact->patch_ec = (p2 == 1);
 		// We're sure this game was built for System3.9 v5.50, which by default
 		// routes CD-DA commands to DRIFILE_WAVE.
 		muscd_init_bgm(DRIFILE_WAVE, 999);

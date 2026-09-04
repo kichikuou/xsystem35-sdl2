@@ -562,7 +562,7 @@ void commands2F52() {
 void commands2F53() {
 	int eFlag = getCaliValue();
 	
-	nact->patch_ec = eFlag;
+	nact->patch_ec = (eFlag == 1);
 	
 	TRACE("patchEC %d:", eFlag);
 }
@@ -936,7 +936,7 @@ void commands2F6F() {
 void commands2F70() {
 	int eFlag = getCaliValue();
 	
-	nact->patch_emen = eFlag;
+	nact->patch_emen = (eFlag == 1);
 	
 	TRACE("patchEMEN %d:", eFlag);
 }
@@ -1152,7 +1152,7 @@ void commands2F85() {
 void commands2F86() {
 	int eFlag = getCaliValue();
 	
-	nact->patch_g0 = eFlag;
+	nact->patch_g0 = (eFlag == 1);
 	
 	TRACE("patchG0 %d:", eFlag);
 }
