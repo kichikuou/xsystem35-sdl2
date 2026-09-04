@@ -146,7 +146,7 @@ if (NOT HAVE_LIBINTL)
 endif()
 
 target_link_libraries(src_lib PRIVATE sdl2 zlib)
-target_link_libraries(xsystem35 PRIVATE m zlib sdl2 sdl2_ttf)
+target_link_libraries(xsystem35 PRIVATE m zlib sdl2 freetype2)
 if (TARGET sdl2_mixer)
   target_link_libraries(xsystem35 PRIVATE sdl2_mixer)
 endif()

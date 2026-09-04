@@ -19,10 +19,14 @@
 */
 #include "config.h"
 
-#include <limits.h>
-#include <math.h>
+#include <stdlib.h>
 #include <SDL.h>
-#include <SDL_ttf.h>
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_BITMAP_H
+#include FT_OUTLINE_H
+#include FT_TRUETYPE_TABLES_H
 
 #ifdef _WIN32
 #include "win/resources.h"
@@ -35,130 +39,253 @@
 #include "portab.h"
 #include "system.h"
 #include "font.h"
+#include "utfsjis.h"
+
+// 26.6 fixed point helpers.
+#define FT_FLOOR(x) ((x) >> 6)
+#define FT_CEIL(x)  (((x) + 63) >> 6)
 
 typedef struct {
-	int      size;
-	FontType type;
-	TTF_Font *id;
-} FontTable;
+	FT_Face face;
+	int ascent;  // distance from the top of a rendered surface to the baseline
+	int height;  // height of a rendered surface
+} Font;
 
-#define FONTTABLEMAX 256
-static FontTable fonttbl[FONTTABLEMAX];
-static int       fontcnt = 0;
+static FT_Library ft_library;
 
 static struct {
 	bool antialiase_on;
 	const char *name[FONTTYPEMAX];
-	int face[FONTTYPEMAX];
+	int index[FONTTYPEMAX];
+	FT_Face face[FONTTYPEMAX];  // opened on first use, shared between all sizes
 } this;
 
-static void font_insert(int size, FontType type, TTF_Font *font) {
-	fonttbl[fontcnt].size = size;
-	fonttbl[fontcnt].type = type;
-	fonttbl[fontcnt].id   = font;
-	
-	if (fontcnt >= (FONTTABLEMAX -1)) {
-		WARNING("Font table is full.");
-	} else {
-		fontcnt++;
-	}
-}
-
-static FontTable *font_lookup(int size, FontType type) {
-	int i;
-	
-	for (i = 0; i < fontcnt; i++) {
-		if (fonttbl[i].size == size && fonttbl[i].type == type) { 
-			return &fonttbl[i];
-		}
-	}
-	return NULL;
-}
-
-// Resolve a (type, size) pair to a TTF_Font, opening and caching it on first
-// use, and apply the requested weight. Returns NULL for an invalid type.
-static FontTable *font_resolve(FontSpec font) {
-	FontType type = font.type;
-	int size = font.size;
-
-	if (type >= FONTTYPEMAX) {
-		WARNING("Invalid font type %d", type);
+#if defined(_WIN32) || defined(__ANDROID__)
+// Create a face from the whole content of `rw`. The memory holding the font
+// file must outlive the face, and faces are never closed, so it is never freed.
+static FT_Face face_from_rwops(SDL_RWops *rw, int index) {
+	Sint64 size = SDL_RWsize(rw);
+	if (size <= 0) {
+		SDL_RWclose(rw);
 		return NULL;
 	}
+	FT_Byte *buf = malloc(size);
+	if (SDL_RWread(rw, buf, 1, size) != (size_t)size) {
+		free(buf);
+		SDL_RWclose(rw);
+		return NULL;
+	}
+	SDL_RWclose(rw);
 
-	FontTable *tbl;
-	if (NULL == (tbl = font_lookup(size, type))) {
-		TTF_Font *fs = TTF_OpenFontIndex(this.name[type], size, this.face[type]);
-#ifdef __ANDROID__
-		// If `this.name[type]` is a custom font file specified in .xys35rc,
-		// SDL_RWFromFile used by TTF_OpenFontIndex does not work because it
-		// does not resolve relative path with the current directory. On the
-		// other hand, we can't just use fopen because SDL_RWFromFile can open
-		// apk assets and the default fonts are stored as assets.
-		if (!fs) {
-			FILE *fp = fopen(this.name[type], "r");
-			if (fp)
-				fs = TTF_OpenFontIndexRW(SDL_RWFromFP(fp, true), true, size, this.face[type]);
-		}
+	FT_Face face;
+	if (FT_New_Memory_Face(ft_library, buf, size, index, &face)) {
+		free(buf);
+		return NULL;
+	}
+	return face;
+}
 #endif
+
+static FT_Face open_face(const char *name, int index) {
+	FT_Face face = NULL;
+
 #ifdef _WIN32
-		SDL_RWops *r = open_resource(this.name[type], "fonts");
-		if (r)
-			fs = TTF_OpenFontIndexRW(r, true, size, this.face[type]);
+	SDL_RWops *res = open_resource(name, "fonts");
+	if (res)
+		face = face_from_rwops(res, index);
 #endif
-		if (!fs)
-			SYSERROR("Cannot open font %s", this.name[type]);
-
-		font_insert(size, type, fs);
-		tbl = &fonttbl[fontcnt - 1];
+	if (!face && FT_New_Face(ft_library, name, index, &face))
+		face = NULL;  // FT_New_Face() does not clear `face` on failure.
+#ifdef __ANDROID__
+	// The default fonts are stored as apk assets, which can only be opened
+	// through SDL_RWFromFile. (It is not used as the first choice because it
+	// does not resolve a relative path against the current directory, which a
+	// custom font specified in .xsys35rc may use.)
+	if (!face) {
+		SDL_RWops *rw = SDL_RWFromFile(name, "rb");
+		if (rw)
+			face = face_from_rwops(rw, index);
 	}
-	TTF_SetFontStyle(tbl->id, font.weight == FONT_WEIGHT_BOLD ? TTF_STYLE_BOLD : TTF_STYLE_NORMAL);
-	return tbl;
+#endif
+	if (face) {
+		// Prefer a Unicode charmap; if there is none, keep FreeType's choice.
+		FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+	}
+	return face;
 }
 
-SDL_Surface *font_render_text(FontSpec font, const char *str_utf8, SDL_Color color, bool antialias) {
-	FontTable *fontset = font_resolve(font);
-	if (!fontset)
+// Since a face is shared between all sizes of a FontType, the size has to be
+// applied on every call.
+static bool font_select(FontSpec spec, Font *font) {
+	if (spec.type >= FONTTYPEMAX) {
+		WARNING("Invalid font type %d", spec.type);
+		return false;
+	}
+	if (!this.face[spec.type]) {
+		this.face[spec.type] = open_face(this.name[spec.type], this.index[spec.type]);
+		if (!this.face[spec.type])
+			SYSERROR("Cannot open font %s", this.name[spec.type]);
+	}
+	FT_Face face = this.face[spec.type];
+
+	// With a resolution of 0 (i.e. the default 72dpi), 1pt equals 1px.
+	if (FT_Set_Char_Size(face, 0, spec.size * 64, 0, 0) &&
+	    FT_Set_Pixel_Sizes(face, 0, spec.size)) {
+		WARNING("Cannot set the size of font %s to %d", this.name[spec.type], spec.size);
+		return false;
+	}
+	font->face = face;
+	font->ascent = FT_CEIL(face->size->metrics.ascender);
+	font->height = font->ascent - FT_FLOOR(face->size->metrics.descender);
+	return true;
+}
+
+// Distance from the top of the character cell to the baseline, the same value
+// GDI reports as TEXTMETRIC::tmAscent. The original engine positions text by
+// the cell top, so this determines where a glyph lands on the screen.
+static int cell_ascent(const Font *font) {
+	TT_OS2 *os2 = FT_Get_Sfnt_Table(font->face, FT_SFNT_OS2);
+	if (!os2 || os2->version == 0xffff || !os2->usWinAscent)
+		return font->ascent;
+	int upem = font->face->units_per_EM;
+	return (os2->usWinAscent * font->face->size->metrics.y_ppem + upem / 2) / upem;
+}
+
+int font_cell_overhang(FontSpec spec) {
+	Font font;
+	if (!font_select(spec, &font))
+		return 0;
+	return font.ascent - cell_ascent(&font);
+}
+
+static bool load_glyph(FT_Face face, int code, bool bold) {
+	if (FT_Load_Char(face, code, FT_LOAD_DEFAULT))
+		return false;
+	if (bold) {
+		// Approximate GDI's synthetic bold at small sizes: grow only to the
+		// right by 1px, without changing the advance. Expand outlines before
+		// rasterization so antialiased edges are generated only once.
+		FT_GlyphSlot slot = face->glyph;
+		if (slot->format == FT_GLYPH_FORMAT_OUTLINE) {
+			if (FT_Outline_EmboldenXY(&slot->outline, 64, 0))
+				return false;
+		} else if (slot->format == FT_GLYPH_FORMAT_BITMAP) {
+			if (FT_GlyphSlot_Own_Bitmap(slot) ||
+			    FT_Bitmap_Embolden(ft_library, &slot->bitmap, 64, 0))
+				return false;
+		}
+	}
+	return true;
+}
+
+// Total advance of `str_utf8`, in pixels. A negative `len` means the whole
+// string, otherwise only its first `len` bytes are measured.
+static int text_width(FT_Face face, const char *str_utf8, int len) {
+	const char *end = len < 0 ? NULL : str_utf8 + len;
+	int pen = 0;  // 26.6
+
+	while (*str_utf8 && (!end || str_utf8 < end)) {
+		if (load_glyph(face, utf8_next_codepoint(&str_utf8), false))
+			pen += face->glyph->advance.x;
+	}
+	return FT_CEIL(pen);
+}
+
+// Composite a rendered glyph into `dst`, which is either an ARGB8888 surface
+// (the glyph is drawn in `color`, its coverage scaled by `color.a` becoming the
+// alpha value) or an INDEX8 surface (covered pixels are set to the index 1).
+static void blit_glyph(const FT_Bitmap *bmp, SDL_Surface *dst, int x, int y, SDL_Color color) {
+	int bpp = dst->format->BytesPerPixel;
+	uint32_t rgb = color.r << 16 | color.g << 8 | color.b;
+
+	for (unsigned int row = 0; row < bmp->rows; row++) {
+		int dy = y + row;
+		if (dy < 0 || dy >= dst->h)
+			continue;
+		const uint8_t *src = bmp->buffer + row * bmp->pitch;
+		uint8_t *dst_row = (uint8_t *)dst->pixels + dy * dst->pitch;
+		for (unsigned int col = 0; col < bmp->width; col++) {
+			int dx = x + col;
+			if (dx < 0 || dx >= dst->w)
+				continue;
+			uint8_t coverage;
+			switch (bmp->pixel_mode) {
+			case FT_PIXEL_MODE_MONO:
+				coverage = src[col >> 3] & (0x80 >> (col & 7)) ? 255 : 0;
+				break;
+			case FT_PIXEL_MODE_GRAY:
+				coverage = src[col];
+				break;
+			default:
+				continue;
+			}
+			if (!coverage)
+				continue;
+			uint8_t *dp = dst_row + dx * bpp;
+			if (bpp == 4)
+				*(uint32_t *)dp = (uint32_t)(coverage * color.a / 255) << 24 | rgb;
+			else
+				*dp = 1;
+		}
+	}
+}
+
+SDL_Surface *font_render_text(FontSpec spec, const char *str_utf8, SDL_Color color, bool antialias) {
+	Font font;
+	if (!font_select(spec, &font))
 		return NULL;
+	bool bold = spec.weight == FONT_WEIGHT_BOLD;
+	int width = max(text_width(font.face, str_utf8, -1), 1);
 
-	SDL_Surface *fs = antialias
-		? TTF_RenderUTF8_Blended(fontset->id, str_utf8, color)
-		: TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
-	if (!fs)
-		WARNING("Text rendering failed: %s", TTF_GetError());
+	SDL_Surface *sf;
+	if (antialias) {
+		sf = SDL_CreateRGBSurfaceWithFormat(0, width, font.height, 32, SDL_PIXELFORMAT_ARGB8888);
+		if (sf)
+			SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_BLEND);
+	} else {
+		sf = SDL_CreateRGBSurfaceWithFormat(0, width, font.height, 8, SDL_PIXELFORMAT_INDEX8);
+		if (sf) {
+			SDL_Color pal[2] = {{0, 0, 0, 0}, {color.r, color.g, color.b, 255}};
+			SDL_SetPaletteColors(sf->format->palette, pal, 0, 2);
+			SDL_SetColorKey(sf, SDL_TRUE, 0);
+		}
+	}
+	if (!sf) {
+		WARNING("Text rendering failed: %s", SDL_GetError());
+		return NULL;
+	}
 
-	return fs;
+	int pen = 0;  // 26.6
+	while (*str_utf8) {
+		if (!load_glyph(font.face, utf8_next_codepoint(&str_utf8), bold))
+			continue;
+		FT_GlyphSlot slot = font.face->glyph;
+		if (!FT_Render_Glyph(slot, antialias ? FT_RENDER_MODE_NORMAL : FT_RENDER_MODE_MONO)) {
+			blit_glyph(&slot->bitmap, sf, FT_FLOOR(pen) + slot->bitmap_left,
+			           font.ascent - slot->bitmap_top, color);
+		}
+		pen += slot->advance.x;
+	}
+	return sf;
 }
 
-void font_measure_text(FontSpec font, const char *str_utf8, int len, int *w, int *h) {
+void font_measure_text(FontSpec spec, const char *str_utf8, int len, int *w, int *h) {
 	if (w) *w = 0;
 	if (h) *h = 0;
-	FontTable *fontset = font_resolve(font);
-	if (!fontset)
+	Font font;
+	if (!font_select(spec, &font))
 		return;
 	if (h)
-		*h = TTF_FontHeight(fontset->id);
-	if (!w)
-		return;
-
-	// A negative length means the whole string.
-	if (len < 0) {
-		TTF_SizeUTF8(fontset->id, str_utf8, w, NULL);
-	} else {
-		char buf[256];
-		if (len > (int)sizeof(buf) - 1)
-			len = sizeof(buf) - 1;
-		memcpy(buf, str_utf8, len);
-		buf[len] = '\0';
-		TTF_SizeUTF8(fontset->id, buf, w, NULL);
-	}
+		*h = font.height;
+	if (w)
+		*w = text_width(font.face, str_utf8, len);
 }
 
 void font_init(void) {
 	this.antialiase_on = false;
-	
-	if (TTF_Init() == -1)
-		SYSERROR("Failed to intialize SDL_ttf: %s", TTF_GetError());
+
+	if (FT_Init_FreeType(&ft_library))
+		SYSERROR("Failed to initialize FreeType");
 }
 
 void font_set_name_and_index(FontType type, const char *name, int index) {
@@ -167,7 +294,7 @@ void font_set_name_and_index(FontType type, const char *name, int index) {
 		return;
 	}
 	this.name[type] = name;
-	this.face[type] = index;
+	this.index[type] = index;
 }
 
 void font_set_antialias(bool enable) {

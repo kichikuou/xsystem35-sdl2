@@ -105,7 +105,7 @@ See [xsystem35 command manual](doc/xsystem35.6.adoc) for detailed usage.
 ### Linux (Debian / Ubuntu)
 
 ```bash
-$ sudo apt install build-essential cmake libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor
+$ sudo apt install build-essential cmake libsdl2-dev libsdl2-mixer-dev libfreetype-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor
 $ mkdir -p out/debug
 $ cd out/debug
 $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
@@ -117,7 +117,7 @@ $ make && make install
 [Homebrew](https://brew.sh/) is required.
 
 ```bash
-$ brew install cmake pkg-config sdl2 sdl2_mixer sdl2_ttf webp portmidi cjson asciidoctor
+$ brew install cmake pkg-config sdl2 sdl2_mixer freetype webp portmidi cjson asciidoctor
 $ mkdir -p out/debug
 $ cd out/debug
 $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
@@ -129,7 +129,7 @@ $ make && make install
 [MSYS2](https://www.msys2.org) is required.
 
 ```bash
-$ pacman -S cmake mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-SDL2 mingw-w64-ucrt-x86_64-SDL2_ttf mingw-w64-ucrt-x86_64-SDL2_mixer mingw-w64-ucrt-x86_64-libwebp mingw-w64-ucrt-x86_64-portmidi mingw-w64-ucrt-x86_64-cjson
+$ pacman -S cmake mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-SDL2 mingw-w64-ucrt-x86_64-freetype mingw-w64-ucrt-x86_64-SDL2_mixer mingw-w64-ucrt-x86_64-libwebp mingw-w64-ucrt-x86_64-portmidi mingw-w64-ucrt-x86_64-cjson
 $ mkdir -p out/debug
 $ cd out/debug
 $ cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../

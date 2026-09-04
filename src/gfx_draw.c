@@ -336,10 +336,7 @@ SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpe
 	if (!fs)
 		return r_dst;
 
-	// Center vertically to the box.
-	int font_height;
-	font_measure_text(font, "", -1, NULL, &font_height);
-	y -= (font_height - font.size) / 2;
+	y -= font_cell_overhang(font);
 	r_dst = (SDL_Rect){x, y, fs->w, fs->h};
 
 	if (main_surface->format->BitsPerPixel == 8 && antialias) {

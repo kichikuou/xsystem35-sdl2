@@ -30,7 +30,7 @@ jobs:
         msystem: ${{ matrix.sys }}
         pacboy: >-
           SDL2:p
-          SDL2_ttf:p
+          freetype:p
           SDL2_mixer:p
           libwebp:p
           ${{ matrix.deps }}
