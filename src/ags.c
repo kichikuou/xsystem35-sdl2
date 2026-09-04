@@ -479,7 +479,7 @@ int ags_drawString(int x, int y, const char *src, int col, int size, SDL_Rect *r
 SDL_Surface *ags_drawStringToSurface(const char *str, int r, int g, int b, FontSpec font) {
 	char *utf8 = toUTF8(str);
 	SDL_Color color = {r, g, b, 255};
-	SDL_Surface *sf = font_render_text(font, utf8, color);
+	SDL_Surface *sf = font_render_text(font, utf8, color, true);
 	free(utf8);
 	return sf;
 }

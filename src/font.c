@@ -35,8 +35,6 @@
 #include "portab.h"
 #include "system.h"
 #include "font.h"
-#include "gfx.h"
-#include "hacks.h"
 
 typedef struct {
 	int      size;
@@ -118,13 +116,14 @@ static FontTable *font_resolve(FontSpec font) {
 	return tbl;
 }
 
-SDL_Surface *font_render_text(FontSpec font, const char *str_utf8, SDL_Color color) {
+SDL_Surface *font_render_text(FontSpec font, const char *str_utf8, SDL_Color color, bool antialias) {
 	FontTable *fontset = font_resolve(font);
 	if (!fontset)
 		return NULL;
 
-	SDL_Surface *fs;
-	fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, color);
+	SDL_Surface *fs = antialias
+		? TTF_RenderUTF8_Blended(fontset->id, str_utf8, color)
+		: TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
 	if (!fs)
 		WARNING("Text rendering failed: %s", TTF_GetError());
 
@@ -153,55 +152,6 @@ void font_measure_text(FontSpec font, const char *str_utf8, int len, int *w, int
 		buf[len] = '\0';
 		TTF_SizeUTF8(fontset->id, buf, w, NULL);
 	}
-}
-
-SDL_Rect font_draw_text(FontSpec font, int x, int y, const char *str_utf8, uint8_t cl) {
-	SDL_Surface *fs;
-	SDL_Rect r_src, r_dst = {};
-	int w, h;
-
-	if (!*str_utf8)
-		return r_dst;
-	FontTable *fontset = font_resolve(font);
-	if (!fontset)
-		return r_dst;
-
-	bool antialias = this.antialiase_on;
-	// The post-effect in Rance 3 opening does not work properly if colors other
-	// than the specified text color (32) are used.
-	// https://github.com/kichikuou/xsystem35-sdl2/issues/54
-	// In Rance 3, text color 32 is only used in the opening.
-	if ((game_id == GAME_RANCE3 || game_id == GAME_RANCE3_ENG) && cl == 32)
-		antialias = false;
-
-	SDL_Color color = gfx_getPaletteColor(cl);
-	if (antialias)
-		fs = TTF_RenderUTF8_Blended(fontset->id, str_utf8, color);
-	else
-		fs = TTF_RenderUTF8_Solid(fontset->id, str_utf8, color);
-	if (!fs) {
-		WARNING("Text rendering failed: %s", TTF_GetError());
-		return r_dst;
-	}
-	
-	TTF_SizeUTF8(fontset->id, str_utf8, &w, &h);
-	// Center vertically to the box.
-	y -= (TTF_FontHeight(fontset->id) - fontset->size) / 2;
-	r_dst = (SDL_Rect){x, y, w, h};
-	
-	if (main_surface->format->BitsPerPixel == 8 && antialias) {
-		gfx_drawAntiAlias_8bpp(x, y, fs, cl);
-	} else {
-		r_src = (SDL_Rect){0, 0, w, h};
-		SDL_BlitSurface(fs, &r_src, main_surface, &r_dst);
-	}
-
-	SDL_FreeSurface(fs);
-	if (r_dst.y < 0) {
-		r_dst.h += r_dst.y;
-		r_dst.y = 0;
-	}
-	return r_dst;
 }
 
 void font_init(void) {

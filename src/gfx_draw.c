@@ -38,6 +38,7 @@
 #include "gfx_private.h"
 #include "font.h"
 #include "ags.h"
+#include "hacks.h"
 #include "image.h"
 #include "nact.h"
 #include "modal.h"
@@ -317,8 +318,43 @@ void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col) {
 }
 
 SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpec font) {
+	SDL_Rect r_dst = {};
+
 	gfx_pal_check();
-	return font_draw_text(font, x, y, str_utf8, col);
+	if (!*str_utf8)
+		return r_dst;
+
+	bool antialias = font_get_antialias();
+	// The post-effect in Rance 3 opening does not work properly if colors other
+	// than the specified text color (32) are used.
+	// https://github.com/kichikuou/xsystem35-sdl2/issues/54
+	// In Rance 3, text color 32 is only used in the opening.
+	if ((game_id == GAME_RANCE3 || game_id == GAME_RANCE3_ENG) && col == 32)
+		antialias = false;
+
+	SDL_Surface *fs = font_render_text(font, str_utf8, gfx_getPaletteColor(col), antialias);
+	if (!fs)
+		return r_dst;
+
+	// Center vertically to the box.
+	int font_height;
+	font_measure_text(font, "", -1, NULL, &font_height);
+	y -= (font_height - font.size) / 2;
+	r_dst = (SDL_Rect){x, y, fs->w, fs->h};
+
+	if (main_surface->format->BitsPerPixel == 8 && antialias) {
+		gfx_drawAntiAlias_8bpp(x, y, fs, col);
+	} else {
+		SDL_Rect r_src = {0, 0, fs->w, fs->h};
+		SDL_BlitSurface(fs, &r_src, main_surface, &r_dst);
+	}
+
+	SDL_FreeSurface(fs);
+	if (r_dst.y < 0) {
+		r_dst.h += r_dst.y;
+		r_dst.y = 0;
+	}
+	return r_dst;
 }
 
 /*

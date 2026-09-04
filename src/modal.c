@@ -198,7 +198,7 @@ static void render_text(mu_Font font, const char *str, mu_Vec2 pos, mu_Color col
 	if (!*str)
 		return;
 	SDL_Color col = { color.r, color.g, color.b, color.a };
-	SDL_Surface *s = font_render_text(*(const FontSpec *)font, str, col);
+	SDL_Surface *s = font_render_text(*(const FontSpec *)font, str, col, true);
 	if (!s)
 		return;
 	SDL_Texture *t = SDL_CreateTextureFromSurface(gfx_renderer, s);
