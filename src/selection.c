@@ -303,7 +303,7 @@ static void init_selwindow() {
 	}
 	for (i = 0; i < regnum; i++) {
 		TRACE_MESSAGE("%d:%s\n", i +1, elm[i]);
-		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +1, elm[i], sel.MsgFontColor, sel.MsgFontSize, NULL);
+		ags_drawString(r.x +2, r.y + i * (sel.MsgFontSize +2) +2, elm[i], sel.MsgFontColor, sel.MsgFontSize, NULL);
 	}
 	ags_updateArea(saveArea.x, saveArea.y, saveArea.w, saveArea.h);
 	
@@ -376,31 +376,12 @@ static void lineEncloseElement(SDL_Rect *r, int col, bool thick) {
 static void encloseElement(int sw, int no) {
 	SDL_Rect *r = &workR[no];
 	
-	if (sw == 0) { /* off */
-		if (sel.WinBackgroundTransparent != 255) {
-			ags_restoreRegion(saveimg2, r->x, r->y);
-			ags_updateArea(r->x, r->y, r->w +2, r->h +2);
-			saveimg2 = NULL;
-		} else {
-			switch(sel.EncloseType) {
-			case 0:
-				lineEncloseElement(r, sel.WinBackgroundColor, true); break;
-			case 1:
-				lineEncloseElement(r, sel.WinBackgroundColor, false); break;
-			case 2:
-				ags_fillRectangle(r->x, r->y, r->w +2, r->h +2, sel.WinBackgroundColor);
-				ags_drawString(r->x +2, r->y +1, elm[no], sel.MsgFontColor, sel.MsgFontSize, NULL);
-				ags_updateArea(r->x, r->y, r->w +2, r->h +2);
-				break;
-			default:
-				break;
-			}
-		}
-		
-	} else {       /* on */
-		if (sel.WinBackgroundTransparent != 255) {
-			saveimg2 = ags_saveRegion(r->x, r->y, r->w +2, r->h +2);
-		}
+	if (sw == 0) {
+		ags_restoreRegion(saveimg2, r->x, r->y);
+		ags_updateArea(r->x, r->y, r->w +2, r->h +2);
+		saveimg2 = NULL;
+	} else {
+		saveimg2 = ags_saveRegion(r->x, r->y, r->w +2, r->h +2);
 		switch(sel.EncloseType) {
 		case 0:
 			lineEncloseElement(r, sel.WinFrameColor, true); break;
@@ -408,7 +389,7 @@ static void encloseElement(int sw, int no) {
 			lineEncloseElement(r, 255, false); break;
 		case 2:
 			ags_fillRectangle(r->x, r->y, r->w +2, r->h +2, sel.MsgFontColor);
-			ags_drawString(r->x +2, r->y +1, elm[no], sel.WinBackgroundColor, sel.MsgFontSize, NULL);
+			ags_drawString(r->x +2, r->y +2, elm[no], sel.WinBackgroundColor, sel.MsgFontSize, NULL);
 			ags_updateArea(r->x, r->y, r->w +2, r->h +2);
 			break;
 		default:
