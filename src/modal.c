@@ -61,13 +61,13 @@ static const FontSpec menu_font = { FONT_GOTHIC, FONT_WEIGHT_NORMAL, MODAL_FONT_
 
 static int text_width_cb(mu_Font font, const char *text, int len) {
 	int w;
-	font_measure_text(*(const FontSpec *)font, text, len, &w, NULL);
+	font_measure_text(*(const FontSpec *)font, text, len, true, &w, NULL);
 	return w;
 }
 
 static int text_height_cb(mu_Font font) {
 	int h;
-	font_measure_text(*(const FontSpec *)font, "", -1, NULL, &h);
+	font_measure_text(*(const FontSpec *)font, "", -1, true, NULL, &h);
 	return h;
 }
 

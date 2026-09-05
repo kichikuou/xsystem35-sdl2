@@ -50,7 +50,8 @@ extern void font_set_name_and_index(FontType type, const char *name, int index);
 extern void font_set_antialias(bool enable);
 extern bool font_get_antialias(void);
 extern struct SDL_Surface *font_render_text(FontSpec spec, const char *str_utf8, SDL_Color color, bool antialias);
-extern void font_measure_text(FontSpec spec, const char *str_utf8, int len, int *w, int *h);
+extern void font_measure_text(FontSpec spec, const char *str_utf8, int len, bool antialias,
+			      int *w, int *h);
 // Rows by which a rendered surface extends above the character cell. Subtract
 // it from a Y coordinate that denotes the cell top before blitting.
 extern int font_cell_overhang(FontSpec spec);

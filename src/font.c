@@ -46,6 +46,9 @@
 #define FT_FLOOR(x) ((x) >> 6)
 #define FT_CEIL(x)  (((x) + 63) >> 6)
 
+#define GLYPH_CACHE_LIMIT (4 * 1024 * 1024)
+#define GLYPH_CACHE_BUCKETS 1024
+
 typedef struct {
 	FT_Face face;
 	int ascent;  // distance from the top of a rendered surface to the baseline
@@ -53,6 +56,27 @@ typedef struct {
 } Font;
 
 static FT_Library ft_library;
+
+typedef struct Glyph {
+	FontSpec spec;
+	int code;
+	bool antialias;
+	FT_Pos advance;
+	int bitmap_left;
+	int bitmap_top;
+	FT_Bitmap bitmap;
+	size_t cache_size;
+	struct Glyph *hash_next;
+	struct Glyph *lru_prev;
+	struct Glyph *lru_next;
+} Glyph;
+
+static struct {
+	Glyph *buckets[GLYPH_CACHE_BUCKETS];
+	Glyph *lru_head;
+	Glyph *lru_tail;
+	size_t size;
+} glyph_cache;
 
 static struct {
 	bool antialiase_on;
@@ -189,15 +213,135 @@ static bool load_glyph(FT_Face face, int code, bool bold) {
 	return true;
 }
 
+static unsigned glyph_hash(FontSpec spec, int code, bool antialias) {
+	unsigned hash = (unsigned)code;
+	hash = hash * 31 + spec.type;
+	hash = hash * 31 + spec.weight;
+	hash = hash * 31 + spec.size;
+	hash = hash * 31 + antialias;
+	return hash % GLYPH_CACHE_BUCKETS;
+}
+
+static bool glyph_matches(const Glyph *glyph, FontSpec spec, int code, bool antialias) {
+	return glyph->spec.type == spec.type &&
+	       glyph->spec.weight == spec.weight &&
+	       glyph->spec.size == spec.size &&
+	       glyph->code == code && glyph->antialias == antialias;
+}
+
+static void glyph_lru_remove(Glyph *glyph) {
+	if (glyph->lru_prev)
+		glyph->lru_prev->lru_next = glyph->lru_next;
+	else
+		glyph_cache.lru_head = glyph->lru_next;
+	if (glyph->lru_next)
+		glyph->lru_next->lru_prev = glyph->lru_prev;
+	else
+		glyph_cache.lru_tail = glyph->lru_prev;
+}
+
+static void glyph_lru_prepend(Glyph *glyph) {
+	glyph->lru_prev = NULL;
+	glyph->lru_next = glyph_cache.lru_head;
+	if (glyph_cache.lru_head)
+		glyph_cache.lru_head->lru_prev = glyph;
+	else
+		glyph_cache.lru_tail = glyph;
+	glyph_cache.lru_head = glyph;
+}
+
+static void glyph_cache_remove(Glyph *glyph) {
+	unsigned bucket = glyph_hash(glyph->spec, glyph->code, glyph->antialias);
+	Glyph **link = &glyph_cache.buckets[bucket];
+	while (*link != glyph)
+		link = &(*link)->hash_next;
+	*link = glyph->hash_next;
+	glyph_lru_remove(glyph);
+	glyph_cache.size -= glyph->cache_size;
+	FT_Bitmap_Done(ft_library, &glyph->bitmap);
+	free(glyph);
+}
+
+static void glyph_cache_clear(void) {
+	while (glyph_cache.lru_tail)
+		glyph_cache_remove(glyph_cache.lru_tail);
+}
+
+static const Glyph *glyph_cache_find(FontSpec spec, int code, bool antialias) {
+	unsigned bucket = glyph_hash(spec, code, antialias);
+	for (Glyph *glyph = glyph_cache.buckets[bucket]; glyph; glyph = glyph->hash_next) {
+		if (glyph_matches(glyph, spec, code, antialias)) {
+			glyph_lru_remove(glyph);
+			glyph_lru_prepend(glyph);
+			return glyph;
+		}
+	}
+	return NULL;
+}
+
+// Load and render a glyph on a cache miss. If allocation fails, return a
+// temporary view of the face's glyph slot so text rendering can continue.
+static const Glyph *get_glyph(FontSpec spec, FT_Face face, int code, bool antialias) {
+	const Glyph *cached = glyph_cache_find(spec, code, antialias);
+	if (cached)
+		return cached;
+
+	if (!load_glyph(face, code, spec.weight == FONT_WEIGHT_BOLD))
+		return NULL;
+	FT_GlyphSlot slot = face->glyph;
+	static Glyph temporary;
+	temporary.advance = slot->advance.x;
+	FT_Bitmap_Init(&temporary.bitmap);
+	if (FT_Render_Glyph(slot, antialias ? FT_RENDER_MODE_NORMAL : FT_RENDER_MODE_MONO))
+		return &temporary;
+	temporary.bitmap_left = slot->bitmap_left;
+	temporary.bitmap_top = slot->bitmap_top;
+	temporary.bitmap = slot->bitmap;
+
+	size_t bitmap_size = slot->bitmap.rows * (size_t)abs(slot->bitmap.pitch);
+	size_t cache_size = sizeof(Glyph) + bitmap_size;
+	if (cache_size > GLYPH_CACHE_LIMIT)
+		return &temporary;
+
+	Glyph *glyph = calloc(1, sizeof(Glyph));
+	if (!glyph)
+		return &temporary;
+	FT_Bitmap_Init(&glyph->bitmap);
+	if (FT_Bitmap_Copy(ft_library, &slot->bitmap, &glyph->bitmap)) {
+		FT_Bitmap_Done(ft_library, &glyph->bitmap);
+		free(glyph);
+		return &temporary;
+	}
+	glyph->spec = spec;
+	glyph->code = code;
+	glyph->antialias = antialias;
+	glyph->advance = slot->advance.x;
+	glyph->bitmap_left = slot->bitmap_left;
+	glyph->bitmap_top = slot->bitmap_top;
+	glyph->cache_size = cache_size;
+
+	while (glyph_cache.size + cache_size > GLYPH_CACHE_LIMIT)
+		glyph_cache_remove(glyph_cache.lru_tail);
+	unsigned bucket = glyph_hash(spec, code, antialias);
+	glyph->hash_next = glyph_cache.buckets[bucket];
+	glyph_cache.buckets[bucket] = glyph;
+	glyph_lru_prepend(glyph);
+	glyph_cache.size += cache_size;
+	return glyph;
+}
+
 // Total advance of `str_utf8`, in pixels. A negative `len` means the whole
 // string, otherwise only its first `len` bytes are measured.
-static int text_width(FT_Face face, const char *str_utf8, int len) {
+static int text_width(FontSpec spec, FT_Face face, const char *str_utf8, int len,
+		      bool antialias) {
 	const char *end = len < 0 ? NULL : str_utf8 + len;
 	int pen = 0;  // 26.6
 
 	while (*str_utf8 && (!end || str_utf8 < end)) {
-		if (load_glyph(face, utf8_next_codepoint(&str_utf8), false))
-			pen += face->glyph->advance.x;
+		const Glyph *glyph = get_glyph(spec, face,
+		                               utf8_next_codepoint(&str_utf8), antialias);
+		if (glyph)
+			pen += glyph->advance;
 	}
 	return FT_CEIL(pen);
 }
@@ -245,8 +389,7 @@ SDL_Surface *font_render_text(FontSpec spec, const char *str_utf8, SDL_Color col
 	Font font;
 	if (!font_select(spec, &font))
 		return NULL;
-	bool bold = spec.weight == FONT_WEIGHT_BOLD;
-	int width = max(text_width(font.face, str_utf8, -1), 1);
+	int width = max(text_width(spec, font.face, str_utf8, -1, antialias), 1);
 
 	SDL_Surface *sf;
 	if (antialias) {
@@ -268,19 +411,19 @@ SDL_Surface *font_render_text(FontSpec spec, const char *str_utf8, SDL_Color col
 
 	int pen = 0;  // 26.6
 	while (*str_utf8) {
-		if (!load_glyph(font.face, utf8_next_codepoint(&str_utf8), bold))
+		const Glyph *glyph = get_glyph(spec, font.face,
+		                               utf8_next_codepoint(&str_utf8), antialias);
+		if (!glyph)
 			continue;
-		FT_GlyphSlot slot = font.face->glyph;
-		if (!FT_Render_Glyph(slot, antialias ? FT_RENDER_MODE_NORMAL : FT_RENDER_MODE_MONO)) {
-			blit_glyph(&slot->bitmap, sf, FT_FLOOR(pen) + slot->bitmap_left,
-			           font.ascent - slot->bitmap_top, color);
-		}
-		pen += slot->advance.x;
+		blit_glyph(&glyph->bitmap, sf, FT_FLOOR(pen) + glyph->bitmap_left,
+		           font.ascent - glyph->bitmap_top, color);
+		pen += glyph->advance;
 	}
 	return sf;
 }
 
-void font_measure_text(FontSpec spec, const char *str_utf8, int len, int *w, int *h) {
+void font_measure_text(FontSpec spec, const char *str_utf8, int len, bool antialias,
+		       int *w, int *h) {
 	if (w) *w = 0;
 	if (h) *h = 0;
 	Font font;
@@ -289,10 +432,11 @@ void font_measure_text(FontSpec spec, const char *str_utf8, int len, int *w, int
 	if (h)
 		*h = font.height;
 	if (w)
-		*w = text_width(font.face, str_utf8, len);
+		*w = text_width(spec, font.face, str_utf8, len, antialias);
 }
 
 void font_init(void) {
+	glyph_cache_clear();
 	this.antialiase_on = false;
 
 	if (FT_Init_FreeType(&ft_library))
@@ -304,6 +448,8 @@ void font_set_name_and_index(FontType type, const char *name, int index) {
 		WARNING("Invalid font type %d", type);
 		return;
 	}
+	// Cached glyphs include the font type but not the font file name.
+	glyph_cache_clear();
 	this.name[type] = name;
 	this.index[type] = index;
 }

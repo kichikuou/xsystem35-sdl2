@@ -39,16 +39,45 @@ static const char *texts[] = {
 
 static const SDL_Color white = {255, 255, 255, 255};
 
-static int measure_w(FontSpec f, const char *s) {
+static int measure_w(FontSpec f, const char *s, bool antialias) {
 	int w;
-	font_measure_text(f, s, -1, &w, NULL);
+	font_measure_text(f, s, -1, antialias, &w, NULL);
 	return w;
 }
 
 static int measure_h(FontSpec f) {
 	int h;
-	font_measure_text(f, "", -1, NULL, &h);
+	font_measure_text(f, "", -1, false, NULL, &h);
 	return h;
+}
+
+static void assert_same_pixels(SDL_Surface *a, SDL_Surface *b) {
+	ASSERT_EQUAL(a->w, b->w);
+	ASSERT_EQUAL(a->h, b->h);
+	ASSERT_EQUAL(a->format->format, b->format->format);
+	int row_bytes = a->w * a->format->BytesPerPixel;
+	for (int y = 0; y < a->h; y++) {
+		const uint8_t *ap = (uint8_t *)a->pixels + y * a->pitch;
+		const uint8_t *bp = (uint8_t *)b->pixels + y * b->pitch;
+		ASSERT_EQUAL(memcmp(ap, bp, row_bytes), 0);
+	}
+}
+
+static void glyph_cache_test(void) {
+	for (int ti = 0; ti < NTYPES; ti++) {
+		for (int weight = FONT_WEIGHT_NORMAL; weight <= FONT_WEIGHT_BOLD; weight++) {
+			FontSpec f = {font_types[ti], weight, 24};
+			for (int aa = 0; aa < 2; aa++) {
+				SDL_Surface *first = font_render_text(f, texts[3], white, aa);
+				SDL_Surface *cached = font_render_text(f, texts[3], white, aa);
+				ASSERT_TRUE(first);
+				ASSERT_TRUE(cached);
+				assert_same_pixels(first, cached);
+				SDL_FreeSurface(first);
+				SDL_FreeSurface(cached);
+			}
+		}
+	}
 }
 
 static void invariants_test(void) {
@@ -62,7 +91,7 @@ static void invariants_test(void) {
 					ASSERT_TRUE(s);
 					// gfx_drawString() blits the surface using the measured
 					// width, so the two must agree.
-					ASSERT_EQUAL(s->w, measure_w(f, text));
+					ASSERT_EQUAL(s->w, measure_w(f, text, aa));
 					// microui lays out text rows by the measured height,
 					// so the surface must be exactly that tall.
 					ASSERT_EQUAL(s->h, measure_h(f));
@@ -85,10 +114,10 @@ static void invariants_test(void) {
 			for (int len = 0; text[len]; len++) {
 				char buf[64];
 				int w;
-				font_measure_text(f, text, len, &w, NULL);
+				font_measure_text(f, text, len, false, &w, NULL);
 				memcpy(buf, text, len);
 				buf[len] = '\0';
-				ASSERT_EQUAL(w, measure_w(f, buf));
+				ASSERT_EQUAL(w, measure_w(f, buf, false));
 			}
 		}
 	}
@@ -100,4 +129,5 @@ void font_test(void) {
 	font_set_name_and_index(FONT_MINCHO, TEST_FONT_DIR "/mincho.ttf", 0);
 
 	invariants_test();
+	glyph_cache_test();
 }
