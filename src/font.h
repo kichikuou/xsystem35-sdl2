@@ -25,6 +25,7 @@
 #define __FONT_H__
 
 #include <SDL_surface.h>
+#include "cache.h"
 #include "config.h"
 #include "portab.h"
 
@@ -55,6 +56,7 @@ extern void font_measure_text(FontSpec spec, const char *str_utf8, int len, bool
 // Rows by which a rendered surface extends above the character cell. Subtract
 // it from a Y coordinate that denotes the cell top before blitting.
 extern int font_cell_overhang(FontSpec spec);
+extern CacheStats font_get_cache_stats(void);
 
 #ifdef __EMSCRIPTEN__
 extern bool load_mincho_font(void);

@@ -25,6 +25,7 @@
 #define __CG__
 
 #include <SDL_rect.h>
+#include "cache.h"
 #include "portab.h"
 
 struct SDL_Surface;
@@ -88,6 +89,7 @@ extern void cgdata_free(cgdata *cg);
 extern struct SDL_Surface *cg_load_as_sdlsurface(int no);
 struct SDL_Surface *cg_load_as_sdlsurface_from_data(uint8_t *data, size_t size, bool mosaic, bool as_alpha);
 extern void load_censor_list(const char *path);
+extern CacheStats cg_get_cache_stats(void);
 
 extern int cg_vspPB;
 extern int cg_fflg;

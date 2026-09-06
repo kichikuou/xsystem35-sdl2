@@ -148,3 +148,7 @@ int ald_get_maxno(DRIFILETYPE type) {
 		return 0;
 	return dri[type]->maxno;
 }
+
+CacheStats ald_get_cache_stats(void) {
+	return cache_get_stats(dri_cache);
+}

@@ -41,6 +41,8 @@ struct Cache {
 	size_t capacity;
 	size_t size;
 	size_t count;
+	size_t hits;
+	size_t misses;
 };
 
 static bool is_pinned(const Cache *cache, const CacheEntry *entry) {
@@ -112,8 +114,11 @@ void *cache_get(Cache *cache, const void *key) {
 	if (!cache || !key)
 		return NULL;
 	CacheEntry *entry = find_entry(cache, key, cache->ops.hash(key));
-	if (!entry)
+	if (!entry) {
+		cache->misses++;
 		return NULL;
+	}
+	cache->hits++;
 	lru_remove(cache, entry);
 	lru_prepend(cache, entry);
 	return entry->data;
@@ -175,4 +180,16 @@ size_t cache_clear(Cache *cache) {
 			remove_entry(cache, entry);
 	}
 	return cache->count;
+}
+
+CacheStats cache_get_stats(const Cache *cache) {
+	if (!cache)
+		return (CacheStats){0};
+	return (CacheStats){
+		.count = cache->count,
+		.size = cache->size,
+		.capacity = cache->capacity,
+		.hits = cache->hits,
+		.misses = cache->misses,
+	};
 }

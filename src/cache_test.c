@@ -64,14 +64,27 @@ void cache_test(void) {
 	Cache *cache = cache_new(2, &ops);
 	ASSERT_TRUE(cache);
 	destroyed = 0;
+	CacheStats stats = cache_get_stats(cache);
+	ASSERT_EQUAL(stats.count, 0);
+	ASSERT_EQUAL(stats.size, 0);
+	ASSERT_EQUAL(stats.capacity, 2);
+	ASSERT_EQUAL(stats.hits, 0);
+	ASSERT_EQUAL(stats.misses, 0);
 
 	// A lookup makes k1 most-recently used, so inserting k3 evicts k2.
 	int k1 = 1, k2 = 2, k3 = 3, k4 = 4, k5 = 5;
 	ASSERT_EQUAL(cache_insert(cache, &k1, new_value(1), 1), CACHE_INSERT_OK);
 	ASSERT_EQUAL(cache_insert(cache, &k2, new_value(2), 1), CACHE_INSERT_OK);
+	stats = cache_get_stats(cache);
+	ASSERT_EQUAL(stats.count, 2);
+	ASSERT_EQUAL(stats.size, 2);
+	ASSERT_EQUAL(stats.capacity, 2);
 	ASSERT_EQUAL(((TestValue *)cache_get(cache, &k1))->value, 1);
 	ASSERT_EQUAL(cache_insert(cache, &k3, new_value(3), 1), CACHE_INSERT_OK);
 	ASSERT_NULL(cache_get(cache, &k2));
+	stats = cache_get_stats(cache);
+	ASSERT_EQUAL(stats.hits, 1);
+	ASSERT_EQUAL(stats.misses, 1);
 
 	// Pinned entries survive both capacity eviction and cache_clear().
 	((TestValue *)cache_get(cache, &k1))->pinned = true;
@@ -94,4 +107,11 @@ void cache_test(void) {
 	ASSERT_EQUAL(cache_clear(cache), 0);
 	ASSERT_EQUAL(destroyed, 4);
 	cache_destroy(cache);
+
+	stats = cache_get_stats(NULL);
+	ASSERT_EQUAL(stats.count, 0);
+	ASSERT_EQUAL(stats.size, 0);
+	ASSERT_EQUAL(stats.capacity, 0);
+	ASSERT_EQUAL(stats.hits, 0);
+	ASSERT_EQUAL(stats.misses, 0);
 }

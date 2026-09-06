@@ -23,6 +23,9 @@
 #include "debugger.h"
 #include "debugger_private.h"
 #include "debug_symbol.h"
+#include "ald_manager.h"
+#include "cg.h"
+#include "font.h"
 #include "nact.h"
 #include "variable.h"
 #ifdef HAVE_SIGACTION
@@ -207,6 +210,34 @@ static const char * const help_help = NULL;
 
 static CommandResult cmd_help(void);
 
+static const char desc_info[] = "Print information about the program.";
+static const char help_info[] =
+	"Syntax: info cache\n"
+	"\n"
+	"Displays usage and lookup statistics for each cache.";
+
+static void print_cache_stats(const char *name, CacheStats stats) {
+	size_t lookups = stats.hits + stats.misses;
+	double hit_rate = lookups ? 100.0 * stats.hits / lookups : 0.0;
+	printf("%-8s %8zu %12zu %12zu %8zu %8zu %8.1f%%\n",
+	       name, stats.count, stats.size, stats.capacity,
+	       stats.hits, stats.misses, hit_rate);
+}
+
+static CommandResult cmd_info(void) {
+	char *arg = strtok(NULL, whitespaces);
+	if (!arg || strcmp(arg, "cache") || strtok(NULL, whitespaces)) {
+		puts(help_info);
+		return CONTINUE_REPL;
+	}
+
+	puts("Cache     Entries         Size     Capacity     Hits   Misses  Hit rate");
+	print_cache_stats("Glyph", font_get_cache_stats());
+	print_cache_stats("CG", cg_get_cache_stats());
+	print_cache_stats("Archive", ald_get_cache_stats());
+	return CONTINUE_REPL;
+}
+
 static const char desc_list[] = "List specified function or line.";
 static const char help_list[] =
 	"Syntax: list\n"
@@ -361,6 +392,7 @@ const Command dbg_cui_commands[] = {
 	{"continue",  "c",   desc_continue,  help_continue,  cmd_continue},
 	{"delete",    "d",   desc_delete,    help_delete,    cmd_delete},
 	{"help",      "h",   desc_help,      help_help,      cmd_help},
+	{"info",      "i",   desc_info,      help_info,      cmd_info},
 	{"list",      "l",   desc_list,      help_list,      cmd_list},
 	{"step",      "s",   desc_step,      help_step,      cmd_step},
 	{"finish",    NULL,  desc_finish,    help_finish,    cmd_finish},

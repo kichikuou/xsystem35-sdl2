@@ -25,6 +25,7 @@
 #define __ALD_MANAGER__
 
 #include "portab.h"
+#include "cache.h"
 #include "dri.h"
 
 #define DRIFILETYPEMAX 7
@@ -44,6 +45,6 @@ bool ald_exists(DRIFILETYPE type, int no);
 dridata *ald_getdata(DRIFILETYPE type, int no);
 void ald_freedata(dridata *data);
 int ald_get_maxno(DRIFILETYPE type);
+CacheStats ald_get_cache_stats(void);
 
 #endif /* !__ALD_MANAGER__ */
-

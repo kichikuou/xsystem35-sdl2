@@ -354,6 +354,10 @@ void cg_reset(void) {
 	memset(&loc_where0, 0, sizeof(loc_where0));
 }
 
+CacheStats cg_get_cache_stats(void) {
+	return cache_get_stats(cg_cache);
+}
+
 /*
  * Set cg display location
  *  x     : display location x

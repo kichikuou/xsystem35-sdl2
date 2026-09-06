@@ -40,6 +40,14 @@ typedef enum {
 	CACHE_INSERT_NOMEM,
 } CacheInsertResult;
 
+typedef struct {
+	size_t count;
+	size_t size;
+	size_t capacity;
+	size_t hits;
+	size_t misses;
+} CacheStats;
+
 Cache *cache_new(size_t capacity, const CacheOps *ops);
 void cache_destroy(Cache *cache);
 
@@ -54,5 +62,8 @@ bool cache_remove(Cache *cache, const void *key);
 
 /* Removes all unpinned entries and returns the number of entries left. */
 size_t cache_clear(Cache *cache);
+
+/* Returns zero-filled statistics when cache is NULL. */
+CacheStats cache_get_stats(const Cache *cache);
 
 #endif /* XSYSTEM35_CACHE_H */

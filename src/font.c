@@ -416,6 +416,10 @@ bool font_get_antialias(void) {
 	return this.antialiase_on;
 }
 
+CacheStats font_get_cache_stats(void) {
+	return cache_get_stats(glyph_cache);
+}
+
 #ifdef __EMSCRIPTEN__
 EM_ASYNC_JS(bool, load_mincho_font, (void), {
 	return await xsystem35.load_mincho_font();
