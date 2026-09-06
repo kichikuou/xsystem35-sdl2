@@ -167,7 +167,9 @@ void nact_init() {
 
 	sel_init();
 
-	nact->patch_ec = false;
+	// The EC bug was introduced in System 3.8. Older games expect the
+	// patch_ec=true behavior.
+	nact->patch_ec = !sl_is_s380;
 	nact->patch_emen = false;
 	nact->patch_g0 = false;
 

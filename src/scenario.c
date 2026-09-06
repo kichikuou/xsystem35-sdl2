@@ -36,6 +36,7 @@
 const uint8_t *sl_sco;
 int sl_page;
 int sl_index;
+bool sl_is_s380;
 
 static void pop_state(uint8_t tag);
 
@@ -102,6 +103,7 @@ bool sl_init(void) {
 	
 	stack_top = stack_buf;
 	sl_jmpFar(0);
+	sl_is_s380 = !memcmp(sl_sco, "S380", 4);
 
 	return true;
 }

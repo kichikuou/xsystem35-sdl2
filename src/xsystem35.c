@@ -147,9 +147,9 @@ static void sys35_usage(bool verbose) {
 static void sys35_init() {
 	int i;
 	
-	nact_init();
-	
 	sl_init();
+
+	nact_init();
 
 	v_init();
 	

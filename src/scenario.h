@@ -54,6 +54,8 @@ struct stack_frame_info {
 	uint8_t *p;     // for internal use
 };
 
+extern bool sl_is_s380;
+
 // Use functions below instead of accessing these variables directly.
 extern const uint8_t *sl_sco; // scenario page buffer
 extern int sl_page;        // current scenario page (0-based)
