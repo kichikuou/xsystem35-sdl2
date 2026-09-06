@@ -87,7 +87,6 @@ static char fontface[FONTTYPEMAX];
 
 static const char *savedir;
 static bool font_noantialias;
-static bool enable_zb = false;
 static bool integer_scaling = false;
 /* fullscreen on from command line */
 static bool fs_on;
@@ -153,7 +152,7 @@ static void sys35_init() {
 
 	v_init();
 	
-	ags_init(render_driver, enable_zb);
+	ags_init(render_driver);
 
 	for (i = 0; i < FONTTYPEMAX; i++)
 		font_set_name_and_index(i, fontname_tt[i], fontface[i]);
@@ -264,8 +263,6 @@ static void sys35_ParseOption(int *argc, char **argv) {
 			fs_on = true;
 		} else if (0 == strcmp(argv[i], "-noantialias")) {
 			font_noantialias = true;
-		} else if (0 == strcmp(argv[i], "-enable_zb")) {
-			enable_zb = true;
 		} else if (0 == strcmp(argv[i], "-ttfont_gothic")) {
 			if (argv[i + 1] != NULL) {
 				fontname_tt[FONT_GOTHIC] = argv[i + 1];
@@ -331,9 +328,6 @@ static void check_profile() {
 	if (get_boolean_profile("antialias", &antialias)) {
 		font_noantialias = !antialias;
 	}
-
-	/* Enable ZB command (font weight) */
-	get_boolean_profile("enable_zb", &enable_zb);
 
 	/* Audio buffer size */
 	param = get_profile("audio_buffer_size");

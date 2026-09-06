@@ -129,7 +129,6 @@ struct _ags {
 	int text_decoration_color;
 
 	bool mouse_warp_enabled;
-	bool enable_zb;
 	bool noantialias; /* antialias を使用しない */
 	bool noimagecursor; /* リソースファイルのカーソルを読みこまない */
 };
@@ -138,7 +137,7 @@ typedef struct _ags ags_t;
 extern SDL_Surface *main_surface;
 
 /* 初期化関係 */
-void ags_init(const char *render_driver, bool enable_zb);
+void ags_init(const char *render_driver);
 void ags_remove(void);
 void ags_reset(void);
 

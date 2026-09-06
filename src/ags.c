@@ -125,7 +125,7 @@ bool ags_check_param_xy(int *x, int *y) {
 	return true;
 }
 
-void ags_init(const char *render_driver, bool enable_zb) {
+void ags_init(const char *render_driver) {
 	nact->ags.mouse_warp_enabled = true;
 	nact->ags.world_width  =  SYS35_DEFAULT_WIDTH;
 	nact->ags.world_height =  SYS35_DEFAULT_HEIGHT;
@@ -138,8 +138,7 @@ void ags_init(const char *render_driver, bool enable_zb) {
 	nact->ags.font_type = FONT_GOTHIC;
 	nact->ags.text_decoration_type = 0;
 	nact->ags.text_decoration_color = 0;
-	nact->ags.enable_zb = enable_zb;
-	nact->ags.font_weight = enable_zb ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
+	nact->ags.font_weight = FONT_WEIGHT_BOLD;
 	
 	gfx_Initialize(render_driver);
 	event_init();

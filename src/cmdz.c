@@ -114,8 +114,7 @@ void commandZB() {
 	/* メッセージ文字を太さを設定 */
 	int weight = getCaliValue();
 
-	if (nact->ags.enable_zb)
-		nact->ags.font_weight = weight > 5 ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
+	nact->ags.font_weight = weight > 5 ? FONT_WEIGHT_BOLD : FONT_WEIGHT_NORMAL;
 
 	TRACE("ZB %d:", weight);
 }
