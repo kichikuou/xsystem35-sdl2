@@ -187,16 +187,20 @@ int font_cell_overhang(FontSpec spec) {
 	return font.ascent - cell_ascent(&font);
 }
 
-static bool load_glyph(FT_Face face, int code, bool bold) {
+static bool load_glyph(FontSpec spec, FT_Face face, int code) {
 	if (FT_Load_Char(face, code, FT_LOAD_DEFAULT))
 		return false;
-	if (bold) {
-		// Approximate GDI's synthetic bold at small sizes: grow only to the
-		// right by 1px, without changing the advance. Expand outlines before
-		// rasterization so antialiased edges are generated only once.
+	if (spec.weight == FONT_WEIGHT_BOLD) {
+		// Approximate GDI's synthetic bold without changing the advance.
+		// Expand outlines before rasterization so antialiased edges are
+		// generated only once.
 		FT_GlyphSlot slot = face->glyph;
 		if (slot->format == FT_GLYPH_FORMAT_OUTLINE) {
-			if (FT_Outline_EmboldenXY(&slot->outline, 64, 0))
+			// At small sizes, use half-pixel emboldening to better match
+			// GDI's synthetic bold for the thin bitmap glyphs of MS Gothic
+			// and MS Mincho.
+			int xstrength = spec.size <= 22 ? 32 : 64;
+			if (FT_Outline_EmboldenXY(&slot->outline, xstrength, 0))
 				return false;
 		} else if (slot->format == FT_GLYPH_FORMAT_BITMAP) {
 			if (FT_GlyphSlot_Own_Bitmap(slot) ||
@@ -239,7 +243,7 @@ static const Glyph *get_glyph(FontSpec spec, FT_Face face, int code, bool antial
 	if (cached)
 		return cached;
 
-	if (!load_glyph(face, code, spec.weight == FONT_WEIGHT_BOLD))
+	if (!load_glyph(spec, face, code))
 		return NULL;
 	FT_GlyphSlot slot = face->glyph;
 	static Glyph temporary;
