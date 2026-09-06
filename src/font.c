@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <SDL.h>
 
 #include <ft2build.h>
@@ -90,9 +91,19 @@ static FT_Face open_face(const char *name, int index) {
 	FT_Face face = NULL;
 
 #ifdef _WIN32
-	SDL_RWops *res = open_resource(name, "fonts");
-	if (res)
-		face = face_from_rwops(res, index);
+	const char *system_font = NULL;
+	if (!strcmp(name, DEFAULT_GOTHIC_TTF))
+		system_font = "C:/Windows/Fonts/msgothic.ttc";
+	else if (!strcmp(name, DEFAULT_MINCHO_TTF))
+		system_font = "C:/Windows/Fonts/msmincho.ttc";
+	if (system_font && FT_New_Face(ft_library, system_font, index, &face))
+		face = NULL;
+
+	if (!face) {
+		SDL_RWops *res = open_resource(name, "fonts");
+		if (res)
+			face = face_from_rwops(res, index);
+	}
 #endif
 	if (!face && FT_New_Face(ft_library, name, index, &face))
 		face = NULL;  // FT_New_Face() does not clear `face` on failure.
