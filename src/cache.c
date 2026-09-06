@@ -1,8 +1,5 @@
 /*
- * cache.c  general cache manager
- *
- * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
- *               1998-                           <masaki-c@is.aist-nara.ac.jp>
+ * Copyright (C) 2026 <KichikuouChrome@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,130 +16,163 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: cache.c,v 1.5 2003/07/21 23:06:47 chikama Exp $ */
-
-#include "config.h"
-#include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
-#include "portab.h"
 #include "cache.h"
 
-/* maximum cache size (in MB) */
-#ifndef CACHE_TOTALSIZE
-#define CACHE_TOTALSIZE 20
-#endif
+#include <stdlib.h>
+#include <string.h>
 
-static int     totalsize;     /* total size in cache */
-static int dummyfalse = 0; /* dummy in_use flag */
-static int dummytrue  = 1;  /* dummy in_use flag */
+#define CACHE_BUCKETS 1024
 
-/*
- * static methods
-*/
-static void remove_in_cache(cacher *id);
+typedef struct CacheEntry {
+	struct CacheEntry *hash_next;
+	struct CacheEntry *lru_prev;
+	struct CacheEntry *lru_next;
+	uint32_t hash;
+	size_t cost;
+	void *data;
+	unsigned char key[];
+} CacheEntry;
 
-/*
- * Remove data in cache
- *   id: cache handler
-*/
-static void remove_in_cache(cacher *id) {
-	cacheinfo *ip = id->top;
-	cacheinfo *ic = ip->next;
-	if (!ic)
-		return;
-	
-	while(ic->next != NULL) {
-		if (!*ic->in_use) {
-			totalsize -= ic->size;
-			ip->next = ic->next;
-			id->free_(ic->data);
-			free(ic);
-		} else {
-			ip = ic;
-		}
-		ic = ip->next;
-	}
-	return;
+struct Cache {
+	CacheOps ops;
+	CacheEntry *buckets[CACHE_BUCKETS];
+	CacheEntry *lru_head;
+	CacheEntry *lru_tail;
+	size_t capacity;
+	size_t size;
+	size_t count;
+};
+
+static bool is_pinned(const Cache *cache, const CacheEntry *entry) {
+	return cache->ops.is_pinned && cache->ops.is_pinned(entry->data);
 }
 
-/* 
- * Create new cache object
- *   delcallback: callback function for delete cache data object
- *   return: new cache handler
-*/
-cacher *cache_new(void *delcallback) {
-	cacher *c = calloc(1, sizeof(cacher));
-	
-	c->top = calloc(1, sizeof(cacheinfo));
-	c->top->next = NULL;
-	c->top->in_use = &dummytrue;
-	c->free_ = delcallback;
-	return c;
+static void lru_remove(Cache *cache, CacheEntry *entry) {
+	if (entry->lru_prev)
+		entry->lru_prev->lru_next = entry->lru_next;
+	else
+		cache->lru_head = entry->lru_next;
+	if (entry->lru_next)
+		entry->lru_next->lru_prev = entry->lru_prev;
+	else
+		cache->lru_tail = entry->lru_prev;
 }
 
-/*
- * Insert data to cache
- *   id    : cache handler
- *   key   : data key
- *   data  : data to be cached
- *   size  : data size
- *   in_use: in_use mark pointer, if in_use is nonzero, dont remove from cache
-*/
-void cache_insert(cacher *id, int key, void *data, int size, int *in_use) {
-	cacheinfo *i = id->top;
-	
-	if (CACHE_TOTALSIZE <= (totalsize >> 20)) {
-		remove_in_cache(id);
-	}
-	
-	while(i->next != NULL) {
-		i = i->next;
-	}
-	
-	i->key = key;
-	i->data = data;
-	i->size = size;
-	i->next = calloc(1, sizeof(cacheinfo));
-	i->next->next = NULL;
-	if (in_use) {
-		i->in_use = in_use;
-	} else {
-		i->in_use = &dummyfalse;
-	}
-	totalsize += size;
+static void lru_prepend(Cache *cache, CacheEntry *entry) {
+	entry->lru_prev = NULL;
+	entry->lru_next = cache->lru_head;
+	if (cache->lru_head)
+		cache->lru_head->lru_prev = entry;
+	else
+		cache->lru_tail = entry;
+	cache->lru_head = entry;
 }
 
-/*
- * Search data in cache
- *   id : cache handler
- *   key: data search key
- *   return: pointer to cached data
-*/
-void *cache_foreach(cacher *id, int key) {
-	cacheinfo *i = id->top;
-	
-	while(i != NULL) {
-		if (i->key == key) {
-			return i->data;
-		}
-		i = i->next;
+static void remove_entry(Cache *cache, CacheEntry *entry) {
+	CacheEntry **link = &cache->buckets[entry->hash % CACHE_BUCKETS];
+	while (*link != entry)
+		link = &(*link)->hash_next;
+	*link = entry->hash_next;
+	lru_remove(cache, entry);
+	cache->size -= entry->cost;
+	cache->count--;
+	cache->ops.destroy(entry->data);
+	free(entry);
+}
+
+static CacheEntry *find_entry(Cache *cache, const void *key, uint32_t hash) {
+	for (CacheEntry *entry = cache->buckets[hash % CACHE_BUCKETS]; entry;
+	     entry = entry->hash_next) {
+		if (entry->hash == hash && cache->ops.equal(entry->key, key))
+			return entry;
 	}
 	return NULL;
 }
 
-void cache_clear(cacher *id) {
-	cacheinfo *ic = id->top->next;
-	cacheinfo *next;
+Cache *cache_new(size_t capacity, const CacheOps *ops) {
+	if (!ops || !ops->key_size || !ops->hash || !ops->equal || !ops->destroy)
+		return NULL;
+	Cache *cache = calloc(1, sizeof(Cache));
+	if (!cache)
+		return NULL;
+	cache->ops = *ops;
+	cache->capacity = capacity;
+	return cache;
+}
 
-	while (ic != NULL) {
-		next = ic->next;
-		if (ic->data) {
-			totalsize -= ic->size;
-			id->free_(ic->data);
-		}
-		free(ic);
-		ic = next;
+void cache_destroy(Cache *cache) {
+	if (!cache)
+		return;
+	while (cache->lru_tail)
+		remove_entry(cache, cache->lru_tail);
+	free(cache);
+}
+
+void *cache_get(Cache *cache, const void *key) {
+	if (!cache || !key)
+		return NULL;
+	CacheEntry *entry = find_entry(cache, key, cache->ops.hash(key));
+	if (!entry)
+		return NULL;
+	lru_remove(cache, entry);
+	lru_prepend(cache, entry);
+	return entry->data;
+}
+
+CacheInsertResult cache_insert(Cache *cache, const void *key, void *data, size_t cost) {
+	if (!cache || !key || !data)
+		return CACHE_INSERT_NOMEM;
+	uint32_t hash = cache->ops.hash(key);
+	if (find_entry(cache, key, hash))
+		return CACHE_INSERT_EXISTS;
+	if (cost > cache->capacity)
+		return CACHE_INSERT_FULL;
+
+	CacheEntry *entry = malloc(sizeof(CacheEntry) + cache->ops.key_size);
+	if (!entry)
+		return CACHE_INSERT_NOMEM;
+
+	for (CacheEntry *old = cache->lru_tail, *prev;
+	     old && cache->size > cache->capacity - cost; old = prev) {
+		prev = old->lru_prev;
+		if (!is_pinned(cache, old))
+			remove_entry(cache, old);
 	}
-	id->top->next = NULL;
+	if (cache->size > cache->capacity - cost) {
+		free(entry);
+		return CACHE_INSERT_FULL;
+	}
+
+	entry->hash = hash;
+	entry->cost = cost;
+	entry->data = data;
+	memcpy(entry->key, key, cache->ops.key_size);
+	unsigned bucket = hash % CACHE_BUCKETS;
+	entry->hash_next = cache->buckets[bucket];
+	cache->buckets[bucket] = entry;
+	lru_prepend(cache, entry);
+	cache->size += cost;
+	cache->count++;
+	return CACHE_INSERT_OK;
+}
+
+bool cache_remove(Cache *cache, const void *key) {
+	if (!cache || !key)
+		return false;
+	CacheEntry *entry = find_entry(cache, key, cache->ops.hash(key));
+	if (!entry || is_pinned(cache, entry))
+		return false;
+	remove_entry(cache, entry);
+	return true;
+}
+
+size_t cache_clear(Cache *cache) {
+	if (!cache)
+		return 0;
+	for (CacheEntry *entry = cache->lru_tail, *prev; entry; entry = prev) {
+		prev = entry->lru_prev;
+		if (!is_pinned(cache, entry))
+			remove_entry(cache, entry);
+	}
+	return cache->count;
 }

@@ -33,16 +33,32 @@
 /* drifiles object */
 static drifiles *dri[DRIFILETYPEMAX];
 
-/* cache handler for dri file */
-static cacher *cacheid;
+static Cache *dri_cache;
+
+#ifndef ALD_CACHE_SIZE
+#define ALD_CACHE_SIZE (10 << 20)
+#endif
+
+static uint32_t int_hash(const void *key) {
+	return (uint32_t)*(const int *)key;
+}
+
+static bool int_equal(const void *a, const void *b) {
+	return *(const int *)a == *(const int *)b;
+}
 
 /*
  * free dridata 
  *   dfile: dridata to be free
 */
-static void ald_free(dridata *dfile) {
+static void ald_free(void *data) {
+	dridata *dfile = data;
 	free(dfile->data_raw);
 	free(dfile);
+}
+
+static bool ald_is_pinned(const void *data) {
+	return ((const dridata *)data)->refcnt != 0;
 }
 
 bool ald_is_linked(DRIFILETYPE type, int no) {
@@ -80,11 +96,12 @@ dridata *ald_getdata(DRIFILETYPE type, int no) {
 	if (dri[type]->mmapped) return dri_getdata(dri[type], no);
 	
 	/* not mmapped */
-	if (NULL == (ddata = (dridata *)cache_foreach(cacheid, (type << 16) + no))) {
+	int key = (type << 16) + no;
+	if (NULL == (ddata = cache_get(dri_cache, &key))) {
 		ddata = dri_getdata(dri[type], no);
 		if (ddata != NULL) {
 			ddata->refcnt = 0;
-			cache_insert(cacheid, (type << 16) + no, (void *)ddata, ddata->size, &(ddata->refcnt));
+			ddata->cached = cache_insert(dri_cache, &key, ddata, ddata->size) == CACHE_INSERT_OK;
 		}
 	}
 	if (ddata != NULL)
@@ -105,6 +122,8 @@ void ald_freedata(dridata *data) {
 		free(data);
 	} else {
 		data->refcnt--;
+		if (!data->cached && data->refcnt == 0)
+			ald_free(data);
 	}
 }
 
@@ -112,8 +131,15 @@ void ald_init(int type, const char **file, int cnt, bool use_mmap) {
 	if (type >= DRIFILETYPEMAX || cnt <= 0)
 		return;
 	dri[type] = dri_init(file, cnt, use_mmap);
-	if (!dri[type]->mmapped) {
-		cacheid = cache_new(ald_free);
+	if (!dri[type]->mmapped && !dri_cache) {
+		CacheOps ops = {
+			.key_size = sizeof(int),
+			.hash = int_hash,
+			.equal = int_equal,
+			.destroy = ald_free,
+			.is_pinned = ald_is_pinned,
+		};
+		dri_cache = cache_new((size_t)ALD_CACHE_SIZE, &ops);
 	}
 }
 

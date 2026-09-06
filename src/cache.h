@@ -1,8 +1,5 @@
 /*
- * cache.h  general cache manager
- *
- * Copyright (C) 1997-1998 Masaki Chikama (Wren) <chikama@kasumi.ipl.mech.nagoya-u.ac.jp>
- *               1998-                           <masaki-c@is.aist-nara.ac.jp>
+ * Copyright (C) 2026 <KichikuouChrome@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,33 +16,43 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
 */
-/* $Id: cache.h,v 1.2 2003/07/21 23:06:47 chikama Exp $ */
+#ifndef XSYSTEM35_CACHE_H
+#define XSYSTEM35_CACHE_H
 
-#ifndef __CASHE__
-#define __CASHE__
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#include "portab.h"
+typedef struct Cache Cache;
 
-/* cache controlr infomartion */
-struct _cacheinfo {
-	int key;            /* key of data */
-	int size;           /* data size */
-	struct _cacheinfo *next; /* next data */
-	int *in_use;    /* if *in_use is nonzero, dont remove from cache */
-	void *data;         /* real data */
-};
-typedef struct _cacheinfo cacheinfo;
+typedef struct {
+	size_t key_size;
+	uint32_t (*hash)(const void *key);
+	bool (*equal)(const void *a, const void *b);
+	void (*destroy)(void *data);
+	bool (*is_pinned)(const void *data);
+} CacheOps;
 
-/* cache handler */
-struct _cacher {
-	void (*free_)(void *);   /* free data callback */
-	struct _cacheinfo *top; /* pointer to data */
-};
-typedef struct _cacher cacher;
+typedef enum {
+	CACHE_INSERT_OK,
+	CACHE_INSERT_EXISTS,
+	CACHE_INSERT_FULL,
+	CACHE_INSERT_NOMEM,
+} CacheInsertResult;
 
-extern cacher *cache_new(void *delcallback);
-extern void    cache_insert(cacher *id, int key, void *data, int size, int *in_use);
-extern void   *cache_foreach(cacher *id, int key);
-extern void    cache_clear(cacher *id);
+Cache *cache_new(size_t capacity, const CacheOps *ops);
+void cache_destroy(Cache *cache);
 
-#endif /* !__CASHE__ */
+/* The returned pointer is owned by the cache and is invalidated by removal. */
+void *cache_get(Cache *cache, const void *key);
+
+/* Ownership of data is transferred only when CACHE_INSERT_OK is returned. */
+CacheInsertResult cache_insert(Cache *cache, const void *key, void *data, size_t cost);
+
+/* Pinned entries cannot be removed. */
+bool cache_remove(Cache *cache, const void *key);
+
+/* Removes all unpinned entries and returns the number of entries left. */
+size_t cache_clear(Cache *cache);
+
+#endif /* XSYSTEM35_CACHE_H */

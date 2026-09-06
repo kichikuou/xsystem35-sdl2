@@ -61,6 +61,8 @@ typedef struct {
 	
 	int vsp_bank;    // palette bank for vsp
 	int pms_bank;    // palette bank for pms
+	int refcnt;      // references held by cache users
+	bool cached;     // owned by the CG cache
 } cgdata;
 
 /*

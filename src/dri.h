@@ -46,6 +46,7 @@ struct _dridata {
 	char    *data;     /* real data */
 	char    *name;     /* not used */
 	int     refcnt;    /* reference count */
+	bool    cached;    /* owned by the archive cache */
 	drifiles *a;       /* archive file obj */
 };
 typedef struct _dridata dridata;

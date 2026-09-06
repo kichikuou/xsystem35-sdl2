@@ -39,6 +39,7 @@
 
 #include "portab.h"
 #include "system.h"
+#include "cache.h"
 #include "font.h"
 #include "utfsjis.h"
 
@@ -47,7 +48,6 @@
 #define FT_CEIL(x)  (((x) + 63) >> 6)
 
 #define GLYPH_CACHE_LIMIT (4 * 1024 * 1024)
-#define GLYPH_CACHE_BUCKETS 1024
 
 typedef struct {
 	FT_Face face;
@@ -58,25 +58,19 @@ typedef struct {
 static FT_Library ft_library;
 
 typedef struct Glyph {
-	FontSpec spec;
-	int code;
-	bool antialias;
 	FT_Pos advance;
 	int bitmap_left;
 	int bitmap_top;
 	FT_Bitmap bitmap;
-	size_t cache_size;
-	struct Glyph *hash_next;
-	struct Glyph *lru_prev;
-	struct Glyph *lru_next;
 } Glyph;
 
-static struct {
-	Glyph *buckets[GLYPH_CACHE_BUCKETS];
-	Glyph *lru_head;
-	Glyph *lru_tail;
-	size_t size;
-} glyph_cache;
+typedef struct {
+	FontSpec spec;
+	int code;
+	bool antialias;
+} GlyphKey;
+
+static Cache *glyph_cache;
 
 static struct {
 	bool antialiase_on;
@@ -213,76 +207,35 @@ static bool load_glyph(FT_Face face, int code, bool bold) {
 	return true;
 }
 
-static unsigned glyph_hash(FontSpec spec, int code, bool antialias) {
-	unsigned hash = (unsigned)code;
-	hash = hash * 31 + spec.type;
-	hash = hash * 31 + spec.weight;
-	hash = hash * 31 + spec.size;
-	hash = hash * 31 + antialias;
-	return hash % GLYPH_CACHE_BUCKETS;
+static uint32_t glyph_hash(const void *p) {
+	const GlyphKey *key = p;
+	uint32_t hash = (uint32_t)key->code;
+	hash = hash * 31 + key->spec.type;
+	hash = hash * 31 + key->spec.weight;
+	hash = hash * 31 + key->spec.size;
+	return hash * 31 + key->antialias;
 }
 
-static bool glyph_matches(const Glyph *glyph, FontSpec spec, int code, bool antialias) {
-	return glyph->spec.type == spec.type &&
-	       glyph->spec.weight == spec.weight &&
-	       glyph->spec.size == spec.size &&
-	       glyph->code == code && glyph->antialias == antialias;
+static bool glyph_key_equal(const void *a, const void *b) {
+	const GlyphKey *ka = a;
+	const GlyphKey *kb = b;
+	return ka->spec.type == kb->spec.type &&
+	       ka->spec.weight == kb->spec.weight &&
+	       ka->spec.size == kb->spec.size &&
+	       ka->code == kb->code && ka->antialias == kb->antialias;
 }
 
-static void glyph_lru_remove(Glyph *glyph) {
-	if (glyph->lru_prev)
-		glyph->lru_prev->lru_next = glyph->lru_next;
-	else
-		glyph_cache.lru_head = glyph->lru_next;
-	if (glyph->lru_next)
-		glyph->lru_next->lru_prev = glyph->lru_prev;
-	else
-		glyph_cache.lru_tail = glyph->lru_prev;
-}
-
-static void glyph_lru_prepend(Glyph *glyph) {
-	glyph->lru_prev = NULL;
-	glyph->lru_next = glyph_cache.lru_head;
-	if (glyph_cache.lru_head)
-		glyph_cache.lru_head->lru_prev = glyph;
-	else
-		glyph_cache.lru_tail = glyph;
-	glyph_cache.lru_head = glyph;
-}
-
-static void glyph_cache_remove(Glyph *glyph) {
-	unsigned bucket = glyph_hash(glyph->spec, glyph->code, glyph->antialias);
-	Glyph **link = &glyph_cache.buckets[bucket];
-	while (*link != glyph)
-		link = &(*link)->hash_next;
-	*link = glyph->hash_next;
-	glyph_lru_remove(glyph);
-	glyph_cache.size -= glyph->cache_size;
+static void glyph_destroy(void *data) {
+	Glyph *glyph = data;
 	FT_Bitmap_Done(ft_library, &glyph->bitmap);
 	free(glyph);
-}
-
-static void glyph_cache_clear(void) {
-	while (glyph_cache.lru_tail)
-		glyph_cache_remove(glyph_cache.lru_tail);
-}
-
-static const Glyph *glyph_cache_find(FontSpec spec, int code, bool antialias) {
-	unsigned bucket = glyph_hash(spec, code, antialias);
-	for (Glyph *glyph = glyph_cache.buckets[bucket]; glyph; glyph = glyph->hash_next) {
-		if (glyph_matches(glyph, spec, code, antialias)) {
-			glyph_lru_remove(glyph);
-			glyph_lru_prepend(glyph);
-			return glyph;
-		}
-	}
-	return NULL;
 }
 
 // Load and render a glyph on a cache miss. If allocation fails, return a
 // temporary view of the face's glyph slot so text rendering can continue.
 static const Glyph *get_glyph(FontSpec spec, FT_Face face, int code, bool antialias) {
-	const Glyph *cached = glyph_cache_find(spec, code, antialias);
+	GlyphKey key = {spec, code, antialias};
+	const Glyph *cached = cache_get(glyph_cache, &key);
 	if (cached)
 		return cached;
 
@@ -312,21 +265,13 @@ static const Glyph *get_glyph(FontSpec spec, FT_Face face, int code, bool antial
 		free(glyph);
 		return &temporary;
 	}
-	glyph->spec = spec;
-	glyph->code = code;
-	glyph->antialias = antialias;
 	glyph->advance = slot->advance.x;
 	glyph->bitmap_left = slot->bitmap_left;
 	glyph->bitmap_top = slot->bitmap_top;
-	glyph->cache_size = cache_size;
-
-	while (glyph_cache.size + cache_size > GLYPH_CACHE_LIMIT)
-		glyph_cache_remove(glyph_cache.lru_tail);
-	unsigned bucket = glyph_hash(spec, code, antialias);
-	glyph->hash_next = glyph_cache.buckets[bucket];
-	glyph_cache.buckets[bucket] = glyph;
-	glyph_lru_prepend(glyph);
-	glyph_cache.size += cache_size;
+	if (cache_insert(glyph_cache, &key, glyph, cache_size) != CACHE_INSERT_OK) {
+		glyph_destroy(glyph);
+		return &temporary;
+	}
 	return glyph;
 }
 
@@ -436,11 +381,20 @@ void font_measure_text(FontSpec spec, const char *str_utf8, int len, bool antial
 }
 
 void font_init(void) {
-	glyph_cache_clear();
+	cache_clear(glyph_cache);
 	this.antialiase_on = false;
 
 	if (FT_Init_FreeType(&ft_library))
 		SYSERROR("Failed to initialize FreeType");
+	if (!glyph_cache) {
+		CacheOps ops = {
+			.key_size = sizeof(GlyphKey),
+			.hash = glyph_hash,
+			.equal = glyph_key_equal,
+			.destroy = glyph_destroy,
+		};
+		glyph_cache = cache_new(GLYPH_CACHE_LIMIT, &ops);
+	}
 }
 
 void font_set_name_and_index(FontType type, const char *name, int index) {
@@ -449,7 +403,7 @@ void font_set_name_and_index(FontType type, const char *name, int index) {
 		return;
 	}
 	// Cached glyphs include the font type but not the font file name.
-	glyph_cache_clear();
+	cache_clear(glyph_cache);
 	this.name[type] = name;
 	this.index[type] = index;
 }

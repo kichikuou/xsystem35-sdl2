@@ -202,6 +202,7 @@ else()  # non-emscripten, non-android
 
   add_executable(src_tests
     src_tests.c
+    cache_test.c
     font_test.c
     gameresource_test.c
     hankaku_test.c

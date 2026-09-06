@@ -68,8 +68,11 @@ int cg_brightness;
 static CG_WHERETODISP loc_policy, loc_policy0;
 static SDL_Point        loc_where, loc_where0;
 
-/* extracted cg data cache control object */
-static cacher *cacheid;
+static Cache *cg_cache;
+
+#ifndef CG_CACHE_SIZE
+#define CG_CACHE_SIZE (10 << 20)
+#endif
 
 /* static methods */
 static CG_TYPE check_cgformat(uint8_t *data);
@@ -78,6 +81,23 @@ static SDL_Point set_display_loc(cgdata *cg);
 static void clear_display_loc();
 static void display_cg(cgdata *cg, int x, int y, int sprite_color, bool alpha_blend);
 static cgdata *loader(int no);
+static void release_cg(cgdata *cg);
+
+static uint32_t int_hash(const void *key) {
+	return (uint32_t)*(const int *)key;
+}
+
+static bool int_equal(const void *a, const void *b) {
+	return *(const int *)a == *(const int *)b;
+}
+
+static void destroy_cg(void *data) {
+	cgdata_free(data);
+}
+
+static bool cg_is_pinned(const void *data) {
+	return ((const cgdata *)data)->refcnt != 0;
+}
 
 static int compare_integers(const void *a, const void *b) {
 	int int_a = *(const int *)a;
@@ -244,7 +264,10 @@ static cgdata *loader(int no) {
 	cgdata *cg = NULL;
 
 	/* search in cache */
-	if (NULL != (cg = (cgdata *)cache_foreach(cacheid, no))) return cg;
+	if (NULL != (cg = cache_get(cg_cache, &no))) {
+		cg->refcnt++;
+		return cg;
+	}
 	
 	/* read from file */
 	if (NULL == (dfile = ald_getdata(DRIFILE_CG, no))) return NULL;
@@ -286,8 +309,9 @@ static cgdata *loader(int no) {
 			cg_mosaic(cg);
 		}
 		/* insert to cache */
-		int size = cg->width * cg->height * (cg->depth / 8);
-		cache_insert(cacheid, no, cg, size, NULL);
+		size_t size = (size_t)cg->width * cg->height * (cg->depth / 8);
+		cg->refcnt = 1;
+		cg->cached = cache_insert(cg_cache, &no, cg, size) == CACHE_INSERT_OK;
 	}
 	
 	/* ok to free */
@@ -296,11 +320,27 @@ static cgdata *loader(int no) {
 	return cg;
 }
 
+static void release_cg(cgdata *cg) {
+	if (!cg)
+		return;
+	cg->refcnt--;
+	if (!cg->cached && cg->refcnt == 0)
+		cgdata_free(cg);
+}
+
 /*
  * Initilize cache
 */
 void cg_init(void) {
-	cacheid = cache_new(cgdata_free);
+	CacheOps ops = {
+		.key_size = sizeof(int),
+		.hash = int_hash,
+		.equal = int_equal,
+		.destroy = destroy_cg,
+		.is_pinned = cg_is_pinned,
+	};
+	cache_destroy(cg_cache);
+	cg_cache = cache_new((size_t)CG_CACHE_SIZE, &ops);
 	cg_reset();
 }
 
@@ -405,6 +445,7 @@ void cg_load(int no, int flg) {
 	}
 	/* clear display offset */
 	clear_display_loc();
+	release_cg(cg);
 }
 
 /*
@@ -413,7 +454,7 @@ void cg_load(int no, int flg) {
  *   shadowno: file no for alpha ( >= 0 )
 */
 void cg_load_with_alpha(int cgno, int shadowno) {
-	cgdata *cg = NULL, *scg;
+	cgdata *cg = NULL, *scg = NULL;
 	SDL_Point p;
 	
 	/* load pixel */
@@ -421,15 +462,15 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 		if (NULL == (cg = loader(cgno))) return;
 		if (cg->type != ALCG_PMS16) {
 			WARNING("commandGX cg_no != 16bitPMS");
-			return;
+			goto cleanup;
 		}
 	}
 	
 	/* load alpha pixel */
-	if (NULL == (scg = loader(shadowno))) return;
+	if (NULL == (scg = loader(shadowno))) goto cleanup;
 	if (scg->type != ALCG_PMS8) {
 		WARNING("commandGX shadow_no != 8bitPMS");
-		return;
+		goto cleanup;
 	}
 	
 	/* set alpha pixel offset */
@@ -445,6 +486,10 @@ void cg_load_with_alpha(int cgno, int shadowno) {
 	
 	/* clear display offset */
 	clear_display_loc();
+
+cleanup:
+	release_cg(cg);
+	release_cg(scg);
 }
 
 static uint8_t* load_cg_from_file(char *fname_utf8, int *status, long *filesize) {
@@ -555,6 +600,7 @@ void cg_get_info(int no, SDL_Rect *info) {
 		info->y = p.y;
 		info->w = cg->width;
 		info->h = cg->height;
+		release_cg(cg);
 	}
 }
 
@@ -650,8 +696,8 @@ SDL_Surface *cg_load_as_sdlsurface(int no) {
 
 EMSCRIPTEN_KEEPALIVE
 void load_censor_list(const char *path) {
-	if (cacheid)
-		cache_clear(cacheid);
+	if (cg_cache)
+		cache_clear(cg_cache);
 	if (censor_list) {
 		free(censor_list);
 		censor_list = NULL;
