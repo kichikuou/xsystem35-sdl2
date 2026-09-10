@@ -728,10 +728,10 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 	}
 
 #ifdef __EMSCRIPTEN__
-	if (!for_selection) {
+	if (!sl_is_s380 && !for_selection) {
 		// We can't move the actual cursor in the browser, but can change the
 		// internal mouse coordinates. This can help with keyboard/gamepad
-		// navigation.
+		// navigation in Toushin Toshi 2.
 		event_set_mouse_internal_location(x, y);
 		EM_ASM({ xsystem35.shell.showMouseMoveEffect($0, $1); }, x, y);
 		sys_sleep(cursor_move_time);
@@ -749,7 +749,7 @@ void ags_setCursorLocation(int x, int y, bool is_dibgeo, bool for_selection) {
 			sys_sleep(cursor_move_time / 7);
 		}
 		gfx_warpMouse(x, y);
-	} else if (!for_selection) {
+	} else if (!sl_is_s380 && !for_selection) {
 		event_set_mouse_internal_location(x, y);
 		sys_sleep(cursor_move_time);
 	}
