@@ -33,6 +33,7 @@
 #include "portab.h"
 #include "system.h"
 #include "ald_manager.h"
+#include "audio_meta.h"
 #include "input.h"
 #include "msgskip.h"
 #include "xsystem35.h"
@@ -1845,8 +1846,9 @@ static void MusicPlay() {
 	int wNum = getCaliValue();
 	int wFadeTime = getCaliValue();
 	int wVolume = getCaliValue();
+	bgi_t *bgi = bgi_find(wNum);
 	
-	musbgm_play(wNum, wFadeTime, wVolume, 0);
+	musbgm_play(wNum, wFadeTime, wVolume, bgi ? bgi->loopno : 0);
 	
 	TRACE("SACT.MusicPlay %d,%d,%d:", wNum, wFadeTime, wVolume);
 }

@@ -111,11 +111,14 @@ bool musbgm_play(int no, int time, int vol, int loop_count) {
 	if (!bgm_load(no))
 		return false;
 
-	// We don't use the loop information in the BGI file, but SDL_mixer
-	// understands loop info in the WAVE's "smpl" chunk.
+	// We don't use the loop positions in the BGI file; SDL_mixer instead
+	// understands loop positions in the WAVE's "smpl" chunk.
 
 	apply_music_volume(vol);
-	if (Mix_FadeInMusic(mix_music, loop_count == 0 ? -1 : loop_count, time * 10) != 0) {
+	// SDL_mixer counts repeats after the first play, while System 3.x counts
+	// the total number of plays.  In both APIs, an infinite loop is special.
+	int loops = loop_count == 0 ? -1 : loop_count - 1;
+	if (Mix_FadeInMusic(mix_music, loops, time * 10) != 0) {
 		free_music();
 		return false;
 	}
