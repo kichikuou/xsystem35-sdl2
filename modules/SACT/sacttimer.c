@@ -28,7 +28,7 @@
 #include "sacttimer.h"
 #include "system.h"
 
-#define MAX_TIMER 10
+#define MAX_TIMER 128
 #define TICKS_PER_CENTISECOND 10
 
 uint32_t ticks_base[MAX_TIMER];
