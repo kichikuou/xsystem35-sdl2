@@ -30,6 +30,7 @@
 #include "system.h"
 #include "nact.h"
 #include "input.h"
+#include "msgskip.h"
 #include "sactsound.h"
 #include "music.h"
 #include "sact.h"
@@ -120,7 +121,7 @@ void ssnd_waitkey(int no, vmvar_t *res) {
 		return;
 	}
 
-	if (sact.waitskiplv > 1) {
+	if (sact.waitskiplv > 1 || msgskip_isSkipping()) {
 		*res = SYS35KEY_RET;
 		return;
 	}

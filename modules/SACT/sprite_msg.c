@@ -30,9 +30,11 @@
 #include "portab.h"
 #include "system.h"
 #include "ags.h"
+#include "gfx.h"
 #include "nact.h"
 #include "variable.h"
 #include "input.h"
+#include "msgskip.h"
 #include "sact.h"
 #include "sprite.h"
 #include "drawtext.h"
@@ -240,7 +242,8 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	char *msg;
 	sprite_t *sp;
 	int len = 0; // 処理した文字数?
-	bool needupdate = false;
+	bool has_batched_output = false;
+	bool flush_batched_output = wSpeed > 0;
 	SDL_Rect uparea = {0,0,0,0};
 	
 	// wRSize == 0 -> ルビ無し(SACT.MessageOutputからの呼出)
@@ -250,7 +253,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	if (!is_messagesprite(wNum)) return;
 	
 	// MessageSkip中は文字送り速度を最大に
-	if (sact.waitskiplv > 1) wSpeed = 0;
+	if (sact.waitskiplv > 1 || msgskip_isSkipping()) wSpeed = 0;
 	
 	// shortcut
 	sp = sact.sp[wNum];
@@ -302,7 +305,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 				     mbuf,
 				     wColorR, wColorG, wColorB);
 		
-		needupdate = true;
+		has_batched_output = true;
 		
 		append_to_log(mbuf);
 		
@@ -313,7 +316,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 					 cw,
 					 wSize + wRSize + wRLineSpace);
 			sp_update_clipped();
-			needupdate = false;
+			has_batched_output = false;
 			
 			// keywait
 			delta = sys_get_ticks() - wcnt;
@@ -333,11 +336,17 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	// バッファリング中の文字のクリア
 	sact.msgbuf[0] = '\0';
 	
-	// Waitなしの出力は最後にupdate
-	if (needupdate) {
+	// Register the update area after rendering without waits.
+	if (has_batched_output) {
 		uparea.w = sp->width;
-		uparea.h = min(sp->height, uparea.y - sp->u.msg.dspcur.y + wLineSpace + wLineSpace + wRSize);
+		uparea.h = min(sp->height - uparea.y,
+				sp->u.msg.dspcur.y - uparea.y + wSize + wRSize + wRLineSpace);
 		sp_updateme_part(sp, uparea.x, uparea.y, uparea.w, uparea.h);
+		// Present now if waiting was skipped.
+		if (flush_batched_output) {
+			sp_update_clipped();
+			gfx_updateScreen();
+		}
 	}
 	
 	// ????
@@ -408,7 +417,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	struct markinfo minfo[6];
 	int i = 0, j, maxstep;
 	
-	if (sact.waitskiplv > 0) {
+	if (sact.waitskiplv > 0 || msgskip_isSkipping()) {
 		sys_getInputInfo();
 		return 0;
 	}

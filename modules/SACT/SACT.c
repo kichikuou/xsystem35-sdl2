@@ -287,8 +287,11 @@ static void DrawEffect() {
 	if (sact.version >= 110) {
 		wEffectkey = getCaliValue();
 	}
-	
-	sp_eupdate(wType, wEffectTime, wEffectkey);
+
+	if (sact.waitskiplv > 1 || msgskip_isSkipping())
+		sp_update_all(true);
+	else
+		sp_eupdate(wType, wEffectTime, wEffectkey);
 	
 	TRACE("SACT.DrawEffect %d,%d,%d:", wType, wEffectTime, wEffectkey);
 }
@@ -305,7 +308,10 @@ static void DrawEffectAlphaMap() {
 	int wEffectTime = getCaliValue();
 	int wEffectKey  = getCaliValue();
 	
-	sp_eupdate_amap(nIndexAlphaMap, wEffectTime, wEffectKey);
+	if (sact.waitskiplv > 1 || msgskip_isSkipping())
+		sp_update_all(true);
+	else
+		sp_eupdate_amap(nIndexAlphaMap, wEffectTime, wEffectKey);
 	
 	TRACE("SACT.DrawEffectAlphaMap %d,%d,%d:", nIndexAlphaMap, wEffectTime, wEffectKey);
 }
@@ -623,9 +629,10 @@ static void QuakeSprite() {
 	if (sact.version >= 110) {
 		nfKeyEnable = getCaliValue();
 	}
-	
-	sp_quake_sprite(wType, wAmplitudeX, wAmplitudeY, wCount, nfKeyEnable);
-	
+
+	if (!msgskip_isSkipping())
+		sp_quake_sprite(wType, wAmplitudeX, wAmplitudeY, wCount, nfKeyEnable);
+
 	TRACE("SACT.QuakeSprite %d,%d,%d,%d:", wType, wAmplitudeX, wAmplitudeY, wCount);
 }
 
@@ -1616,7 +1623,7 @@ static void TimerWait() {
 
 	int msec = (wCount - stimer_get(wTimerID)) * 10;
 	if (msec > 0)
-		sys_keywait(msec, KEYWAIT_CTRL_CANCELABLE);
+		sys_keywait(msec, KEYWAIT_CTRL_CANCELABLE | KEYWAIT_SKIPPABLE);
 
 	TRACE("SACT.TimerWait %d,%d:", wTimerID, wCount);
 }
@@ -1629,7 +1636,7 @@ static void TimerWait() {
 static void Wait() {
 	int wCount = getCaliValue();
 
-	sys_keywait(wCount * 10, KEYWAIT_CTRL_CANCELABLE);
+	sys_keywait(wCount * 10, KEYWAIT_CTRL_CANCELABLE | KEYWAIT_SKIPPABLE);
 
 	TRACE("SACT.Wait %d:", wCount);
 }

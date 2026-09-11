@@ -39,11 +39,6 @@
   @param cancel: キー抜け(0:なし, 1:あり)
 */
 void sp_eupdate(int type, int time, int cancel) {
-	if (sact.waitskiplv > 1) {
-		sp_update_all(true);
-		return;
-	}
-
 	sp_update_all(false);
 
 	enum effect_type effect = from_sact_effect(type);
