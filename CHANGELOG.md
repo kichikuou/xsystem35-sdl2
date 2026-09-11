@@ -1,7 +1,18 @@
 # Changelog
 
-## Unreleased
+## 2.20.0 - 2026-09-11
+- Improved font rendering to more closely match the original engine. On
+  Windows, MS Gothic and MS Mincho are now used by default when available.
+- The experimental `enable_zb` option has been removed. (#44)
+- SACT: Message skipping now also skips text animation, effects, waits, and
+  related input waits.
+- SACT: BGM now honors the loop count specified by the game.
+- SACT: Fixed timer handling in 楽園行.
 - The popup menu and dialogs can now be operated with the keyboard.
+- Fixed mouse coordinates changing unexpectedly when automatic mouse movement
+  is disabled in System 3.8/3.9 games.
+- Android: The status bar now stays hidden after returning to the game. (#81)
+- Debugger: Added an `info cache` command for viewing cache usage and hit rates.
 
 ## 2.19.1 - 2026-08-02
 - Fixed an issue that prevented moving upward during battles in Rance 4.
