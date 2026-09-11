@@ -31,8 +31,11 @@
 #include "ags.h"
 #include "font.h"
 
-static FontType ftype;
-static int fsize;  // フォントの大きさ
+static FontSpec dt_spec = {
+	.type = FONT_GOTHIC,
+	.weight = FONT_WEIGHT_BOLD,
+	.size = 12
+};
 
 /**
  * 次に描く文字のフォントの種類と大きさを設定
@@ -48,8 +51,8 @@ void dt_setfont(FontType type, int size) {
 	}
 #endif
 
-	ftype = type;
-	fsize = size;
+	dt_spec.type = type;
+	dt_spec.size = size;
 }
 
 /**
@@ -66,7 +69,7 @@ void dt_setfont(FontType type, int size) {
  * @return: 実際に描画した幅
  */ 
 int dt_drawtext_col(SDL_Surface *sf, int x, int y, char *buf, int r, int g, int b) {
-	SDL_Surface *glyph = ags_drawStringToSurface(buf, r, g, b, (FontSpec){ .type = ftype, .size = fsize });
+	SDL_Surface *glyph = ags_drawStringToSurface(buf, r, g, b, dt_spec);
 	if (glyph == NULL) return 0;
 
 	SDL_Rect rect = {x, y, glyph->w, glyph->h};

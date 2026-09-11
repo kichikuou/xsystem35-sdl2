@@ -97,7 +97,11 @@ static void draw_log() {
 		if (0 == strcmp(str, "\n")) {
 			SDL_BlitSurface(hline, NULL, main_surface, &(SDL_Rect){0, y + FONTSIZE/2, main_surface->w, 3});
 		} else {
-			FontSpec font_spec = { .type = cur < 6 ? FONT_MINCHO : FONT_GOTHIC, .size = FONTSIZE };
+			FontSpec font_spec = {
+				.type = cur < 6 ? FONT_MINCHO : FONT_GOTHIC,
+				.weight = cur < 6 ? FONT_WEIGHT_NORMAL : FONT_WEIGHT_BOLD,
+				.size = FONTSIZE
+			};
 			gfx_drawString(0, y, str, 255, font_spec);
 		}
 		y += FONTSIZE;
