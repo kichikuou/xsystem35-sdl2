@@ -1,0 +1,29 @@
+# Censor list for ランス -光をもとめて- (Rance: The Quest for Hikari)
+# Images marked with a * might be allowed in an 18+ stream.
+5
+6
+8
+22
+26
+27
+29
+32
+39
+40
+41
+51
+56
+57
+75
+76
+77
+78 # *
+80
+82
+89
+91
+96 # *
+97 # *
+98
+99
+208

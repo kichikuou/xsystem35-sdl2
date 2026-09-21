@@ -12,8 +12,8 @@ or in your `.xsys35rc` file. For example:
 xsystem35 -censor misc/censor/kichikuou.txt
 ```
 
-The list files contain image numbers (integers), one per line. Lines starting
-with `#` are treated as comments.
+The list files contain image numbers (integers), one per line. A `#` starts a
+comment that continues to the end of the line.
 
 ## Contributing
 
