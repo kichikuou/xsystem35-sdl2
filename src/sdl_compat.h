@@ -326,4 +326,109 @@ static inline void sdl_get_rect_union(
 #define SDL_IntersectRect sdl_get_rect_intersection
 #define SDL_UnionRect sdl_get_rect_union
 
+#if XSYSTEM35_SDL_VERSION == 2
+typedef SDL_mutex sdl_mutex_t;
+typedef SDL_cond sdl_condition_t;
+typedef SDL_atomic_t sdl_atomic_int_t;
+#else
+typedef SDL_Mutex sdl_mutex_t;
+typedef SDL_Condition sdl_condition_t;
+typedef SDL_AtomicInt sdl_atomic_int_t;
+#endif
+
+static inline sdl_mutex_t *sdl_create_mutex(void)
+{
+	return SDL_CreateMutex();
+}
+
+static inline void sdl_destroy_mutex(sdl_mutex_t *mutex)
+{
+	SDL_DestroyMutex(mutex);
+}
+
+static inline void sdl_lock_mutex(sdl_mutex_t *mutex)
+{
+	SDL_LockMutex(mutex);
+}
+
+static inline void sdl_unlock_mutex(sdl_mutex_t *mutex)
+{
+	SDL_UnlockMutex(mutex);
+}
+
+static inline sdl_condition_t *sdl_create_condition(void)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_CreateCond();
+#else
+	return SDL_CreateCondition();
+#endif
+}
+
+static inline void sdl_destroy_condition(sdl_condition_t *condition)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_DestroyCond(condition);
+#else
+	SDL_DestroyCondition(condition);
+#endif
+}
+
+static inline void sdl_signal_condition(sdl_condition_t *condition)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_CondSignal(condition);
+#else
+	SDL_SignalCondition(condition);
+#endif
+}
+
+static inline void sdl_wait_condition(
+	sdl_condition_t *condition, sdl_mutex_t *mutex)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_CondWait(condition, mutex);
+#else
+	SDL_WaitCondition(condition, mutex);
+#endif
+}
+
+static inline bool sdl_wait_condition_timeout(sdl_condition_t *condition,
+	sdl_mutex_t *mutex, uint32_t timeout_ms)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_CondWaitTimeout(condition, mutex, timeout_ms) == 0;
+#else
+	return SDL_WaitConditionTimeout(condition, mutex, timeout_ms);
+#endif
+}
+
+static inline bool sdl_compare_and_swap_atomic_int(
+	sdl_atomic_int_t *value, int expected, int desired)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_AtomicCAS(value, expected, desired) == SDL_TRUE;
+#else
+	return SDL_CompareAndSwapAtomicInt(value, expected, desired);
+#endif
+}
+
+static inline int sdl_set_atomic_int(sdl_atomic_int_t *value, int desired)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_AtomicSet(value, desired);
+#else
+	return SDL_SetAtomicInt(value, desired);
+#endif
+}
+
+static inline int sdl_get_atomic_int(sdl_atomic_int_t *value)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_AtomicGet(value);
+#else
+	return SDL_GetAtomicInt(value);
+#endif
+}
+
 #endif /* XSYSTEM35_SDL_COMPAT_H */

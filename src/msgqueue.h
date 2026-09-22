@@ -26,8 +26,8 @@
 struct msgq_elem;
 
 struct msgq {
-	SDL_mutex *mutex;
-	SDL_cond *cond_nonempty;
+	sdl_mutex_t *mutex;
+	sdl_condition_t *cond_nonempty;
 	struct msgq_elem *head;
 	struct msgq_elem *last;
 };

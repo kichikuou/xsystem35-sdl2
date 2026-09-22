@@ -27,14 +27,14 @@ struct msgq_elem {
 
 struct msgq *msgq_new(void) {
 	struct msgq *q = calloc(1, sizeof(struct msgq));
-	q->mutex = SDL_CreateMutex();
-	q->cond_nonempty = SDL_CreateCond();
+	q->mutex = sdl_create_mutex();
+	q->cond_nonempty = sdl_create_condition();
 	return q;
 }
 
 void msgq_free(struct msgq *q) {
-	SDL_DestroyMutex(q->mutex);
-	SDL_DestroyCond(q->cond_nonempty);
+	sdl_destroy_mutex(q->mutex);
+	sdl_destroy_condition(q->cond_nonempty);
 	free(q);
 }
 
@@ -43,28 +43,28 @@ void msgq_enqueue(struct msgq *q, void *msg) {
 	e->msg = msg;
 	e->next = NULL;
 
-	SDL_LockMutex(q->mutex);
+	sdl_lock_mutex(q->mutex);
 	if (!q->head) {
 		q->head = q->last = e;
 	} else {
 		q->last->next = e;
 		q->last = e;
 	}
-	SDL_UnlockMutex(q->mutex);
-	SDL_CondSignal(q->cond_nonempty);
+	sdl_unlock_mutex(q->mutex);
+	sdl_signal_condition(q->cond_nonempty);
 }
 
 void *msgq_dequeue(struct msgq *q) {
-	SDL_LockMutex(q->mutex);
+	sdl_lock_mutex(q->mutex);
 	while (!q->head)
-		SDL_CondWait(q->cond_nonempty, q->mutex);
+		sdl_wait_condition(q->cond_nonempty, q->mutex);
 
 	struct msgq_elem *e = q->head;
 	q->head = e->next;
 	if (!e->next)
 		q->last = NULL;
 
-	SDL_UnlockMutex(q->mutex);
+	sdl_unlock_mutex(q->mutex);
 
 	void *msg = e->msg;
 	free(e);
@@ -72,13 +72,14 @@ void *msgq_dequeue(struct msgq *q) {
 }
 
 void *msgq_dequeue_timeout(struct msgq *q, uint32_t timeout_ms) {
-	SDL_LockMutex(q->mutex);
+	sdl_lock_mutex(q->mutex);
 
-	while (!q->head && SDL_CondWaitTimeout(q->cond_nonempty, q->mutex, timeout_ms) == 0)
+	while (!q->head &&
+	       sdl_wait_condition_timeout(q->cond_nonempty, q->mutex, timeout_ms))
 		;
 
 	if (!q->head) {  // timed out
-		SDL_UnlockMutex(q->mutex);
+		sdl_unlock_mutex(q->mutex);
 		return NULL;
 	}
 
@@ -87,7 +88,7 @@ void *msgq_dequeue_timeout(struct msgq *q, uint32_t timeout_ms) {
 	if (!e->next)
 		q->last = NULL;
 
-	SDL_UnlockMutex(q->mutex);
+	sdl_unlock_mutex(q->mutex);
 
 	void *msg = e->msg;
 	free(e);
