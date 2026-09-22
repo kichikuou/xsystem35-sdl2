@@ -12,6 +12,46 @@
 
 void sdl_compat_test(void)
 {
+	SDL_Event event = {0};
+	ASSERT_EQUAL(sdl_get_window_event(&event),
+		SDL_COMPAT_WINDOW_EVENT_NONE);
+#if XSYSTEM35_SDL_VERSION == 2
+	event.type = SDL_WINDOWEVENT;
+	event.window.event = SDL_WINDOWEVENT_EXPOSED;
+#else
+	event.type = SDL_EVENT_WINDOW_EXPOSED;
+#endif
+	ASSERT_EQUAL(sdl_get_window_event(&event),
+		SDL_COMPAT_WINDOW_EVENT_EXPOSED);
+
+	SDL_KeyboardEvent keyboard_event = {0};
+#if XSYSTEM35_SDL_VERSION == 2
+	keyboard_event.keysym.scancode = SDL_SCANCODE_F1;
+	keyboard_event.keysym.sym = SDLK_F1;
+#else
+	keyboard_event.scancode = SDL_SCANCODE_F1;
+	keyboard_event.key = SDLK_F1;
+#endif
+	ASSERT_EQUAL(sdl_keyboard_event_scancode(&keyboard_event),
+		SDL_SCANCODE_F1);
+	ASSERT_EQUAL(sdl_keyboard_event_key(&keyboard_event), SDLK_F1);
+
+	SDL_TouchFingerEvent touch_event = {0};
+#if XSYSTEM35_SDL_VERSION == 2
+	touch_event.touchId = 42;
+#else
+	touch_event.touchID = 42;
+#endif
+	ASSERT_EQUAL(sdl_touch_event_id(&touch_event), 42);
+
+	SDL_JoyButtonEvent joystick_button_event = {0};
+#if XSYSTEM35_SDL_VERSION == 2
+	joystick_button_event.state = SDL_PRESSED;
+#else
+	joystick_button_event.down = true;
+#endif
+	ASSERT_TRUE(sdl_joystick_button_event_pressed(&joystick_button_event));
+
 	static const uint8_t data[] = {1, 2, 3, 4};
 	sdl_iostream_t *stream = sdl_io_from_const_memory(data, sizeof(data));
 	ASSERT_TRUE(stream);

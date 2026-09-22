@@ -185,6 +185,268 @@ static inline void sdl_destroy_cursor(SDL_Cursor *cursor)
 #endif
 }
 
+#if XSYSTEM35_SDL_VERSION == 2
+#define SDL_COMPAT_SCANCODE_COUNT SDL_NUM_SCANCODES
+#define SDL_COMPAT_EVENT_QUIT SDL_QUIT
+#define SDL_COMPAT_EVENT_DID_ENTER_FOREGROUND SDL_APP_DIDENTERFOREGROUND
+#define SDL_COMPAT_EVENT_KEY_DOWN SDL_KEYDOWN
+#define SDL_COMPAT_EVENT_KEY_UP SDL_KEYUP
+#define SDL_COMPAT_EVENT_MOUSE_MOTION SDL_MOUSEMOTION
+#define SDL_COMPAT_EVENT_MOUSE_WHEEL SDL_MOUSEWHEEL
+#define SDL_COMPAT_EVENT_MOUSE_BUTTON_DOWN SDL_MOUSEBUTTONDOWN
+#define SDL_COMPAT_EVENT_MOUSE_BUTTON_UP SDL_MOUSEBUTTONUP
+#define SDL_COMPAT_EVENT_FINGER_DOWN SDL_FINGERDOWN
+#define SDL_COMPAT_EVENT_FINGER_UP SDL_FINGERUP
+#define SDL_COMPAT_EVENT_FINGER_MOTION SDL_FINGERMOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_ADDED SDL_JOYDEVICEADDED
+#define SDL_COMPAT_EVENT_JOYSTICK_AXIS_MOTION SDL_JOYAXISMOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_BALL_MOTION SDL_JOYBALLMOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_HAT_MOTION SDL_JOYHATMOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_BUTTON_DOWN SDL_JOYBUTTONDOWN
+#define SDL_COMPAT_EVENT_JOYSTICK_BUTTON_UP SDL_JOYBUTTONUP
+#define SDL_COMPAT_EVENT_TEXT_INPUT SDL_TEXTINPUT
+#define SDL_COMPAT_EVENT_TEXT_EDITING SDL_TEXTEDITING
+typedef int sdl_joystick_device_t;
+#else
+#define SDL_COMPAT_SCANCODE_COUNT SDL_SCANCODE_COUNT
+#define SDL_COMPAT_EVENT_QUIT SDL_EVENT_QUIT
+#define SDL_COMPAT_EVENT_DID_ENTER_FOREGROUND SDL_EVENT_DID_ENTER_FOREGROUND
+#define SDL_COMPAT_EVENT_KEY_DOWN SDL_EVENT_KEY_DOWN
+#define SDL_COMPAT_EVENT_KEY_UP SDL_EVENT_KEY_UP
+#define SDL_COMPAT_EVENT_MOUSE_MOTION SDL_EVENT_MOUSE_MOTION
+#define SDL_COMPAT_EVENT_MOUSE_WHEEL SDL_EVENT_MOUSE_WHEEL
+#define SDL_COMPAT_EVENT_MOUSE_BUTTON_DOWN SDL_EVENT_MOUSE_BUTTON_DOWN
+#define SDL_COMPAT_EVENT_MOUSE_BUTTON_UP SDL_EVENT_MOUSE_BUTTON_UP
+#define SDL_COMPAT_EVENT_FINGER_DOWN SDL_EVENT_FINGER_DOWN
+#define SDL_COMPAT_EVENT_FINGER_UP SDL_EVENT_FINGER_UP
+#define SDL_COMPAT_EVENT_FINGER_MOTION SDL_EVENT_FINGER_MOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_ADDED SDL_EVENT_JOYSTICK_ADDED
+#define SDL_COMPAT_EVENT_JOYSTICK_AXIS_MOTION SDL_EVENT_JOYSTICK_AXIS_MOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_BALL_MOTION SDL_EVENT_JOYSTICK_BALL_MOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_HAT_MOTION SDL_EVENT_JOYSTICK_HAT_MOTION
+#define SDL_COMPAT_EVENT_JOYSTICK_BUTTON_DOWN SDL_EVENT_JOYSTICK_BUTTON_DOWN
+#define SDL_COMPAT_EVENT_JOYSTICK_BUTTON_UP SDL_EVENT_JOYSTICK_BUTTON_UP
+#define SDL_COMPAT_EVENT_TEXT_INPUT SDL_EVENT_TEXT_INPUT
+#define SDL_COMPAT_EVENT_TEXT_EDITING SDL_EVENT_TEXT_EDITING
+typedef SDL_JoystickID sdl_joystick_device_t;
+#endif
+
+enum sdl_compat_window_event {
+	SDL_COMPAT_WINDOW_EVENT_NONE,
+	SDL_COMPAT_WINDOW_EVENT_EXPOSED,
+	SDL_COMPAT_WINDOW_EVENT_FOCUS_LOST,
+	SDL_COMPAT_WINDOW_EVENT_FOCUS_GAINED,
+};
+
+static inline enum sdl_compat_window_event sdl_get_window_event(
+	const SDL_Event *event)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	if (event->type != SDL_WINDOWEVENT)
+		return SDL_COMPAT_WINDOW_EVENT_NONE;
+	switch (event->window.event) {
+	case SDL_WINDOWEVENT_EXPOSED:
+		return SDL_COMPAT_WINDOW_EVENT_EXPOSED;
+	case SDL_WINDOWEVENT_FOCUS_LOST:
+		return SDL_COMPAT_WINDOW_EVENT_FOCUS_LOST;
+	case SDL_WINDOWEVENT_FOCUS_GAINED:
+		return SDL_COMPAT_WINDOW_EVENT_FOCUS_GAINED;
+	default:
+		return SDL_COMPAT_WINDOW_EVENT_NONE;
+	}
+#else
+	switch (event->type) {
+	case SDL_EVENT_WINDOW_EXPOSED:
+		return SDL_COMPAT_WINDOW_EVENT_EXPOSED;
+	case SDL_EVENT_WINDOW_FOCUS_LOST:
+		return SDL_COMPAT_WINDOW_EVENT_FOCUS_LOST;
+	case SDL_EVENT_WINDOW_FOCUS_GAINED:
+		return SDL_COMPAT_WINDOW_EVENT_FOCUS_GAINED;
+	default:
+		return SDL_COMPAT_WINDOW_EVENT_NONE;
+	}
+#endif
+}
+
+static inline SDL_Scancode sdl_keyboard_event_scancode(
+	const SDL_KeyboardEvent *event)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return event->keysym.scancode;
+#else
+	return event->scancode;
+#endif
+}
+
+static inline SDL_Keycode sdl_keyboard_event_key(
+	const SDL_KeyboardEvent *event)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return event->keysym.sym;
+#else
+	return event->key;
+#endif
+}
+
+static inline SDL_TouchID sdl_touch_event_id(
+	const SDL_TouchFingerEvent *event)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return event->touchId;
+#else
+	return event->touchID;
+#endif
+}
+
+static inline int sdl_get_num_touch_fingers(SDL_TouchID touch_id)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_GetNumTouchFingers(touch_id);
+#else
+	int count = 0;
+	SDL_Finger **fingers = SDL_GetTouchFingers(touch_id, &count);
+	SDL_free(fingers);
+	return count;
+#endif
+}
+
+static inline sdl_joystick_device_t *sdl_get_joystick_devices(int *count)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	int num_devices = SDL_NumJoysticks();
+	if (num_devices <= 0) {
+		*count = 0;
+		return NULL;
+	}
+	int *devices = SDL_malloc(sizeof(*devices) * num_devices);
+	if (!devices) {
+		*count = 0;
+		return NULL;
+	}
+	for (int i = 0; i < num_devices; i++)
+		devices[i] = i;
+	*count = num_devices;
+	return devices;
+#else
+	return SDL_GetJoysticks(count);
+#endif
+}
+
+static inline SDL_Joystick *sdl_open_joystick(sdl_joystick_device_t device)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_JoystickOpen(device);
+#else
+	return SDL_OpenJoystick(device);
+#endif
+}
+
+static inline const char *sdl_get_joystick_name(SDL_Joystick *joystick)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_JoystickName(joystick);
+#else
+	return SDL_GetJoystickName(joystick);
+#endif
+}
+
+static inline int sdl_get_num_joystick_axes(SDL_Joystick *joystick)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_JoystickNumAxes(joystick);
+#else
+	return SDL_GetNumJoystickAxes(joystick);
+#endif
+}
+
+static inline int sdl_get_num_joystick_buttons(SDL_Joystick *joystick)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_JoystickNumButtons(joystick);
+#else
+	return SDL_GetNumJoystickButtons(joystick);
+#endif
+}
+
+static inline void sdl_set_joystick_events_enabled(bool enabled)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_JoystickEventState(enabled ? SDL_ENABLE : SDL_DISABLE);
+#else
+	SDL_SetJoystickEventsEnabled(enabled);
+#endif
+}
+
+static inline void sdl_close_joystick(SDL_Joystick *joystick)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_JoystickClose(joystick);
+#else
+	SDL_CloseJoystick(joystick);
+#endif
+}
+
+static inline bool sdl_joystick_button_event_pressed(
+	const SDL_JoyButtonEvent *event)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return event->state == SDL_PRESSED;
+#else
+	return event->down;
+#endif
+}
+
+static inline bool sdl_show_message_box(
+	const SDL_MessageBoxData *data, int *button_id)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_ShowMessageBox(data, button_id) == 0;
+#else
+	return SDL_ShowMessageBox(data, button_id);
+#endif
+}
+
+static inline bool sdl_text_input_active(SDL_Window *window)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	(void)window;
+	return SDL_IsTextInputActive() == SDL_TRUE;
+#else
+	return SDL_TextInputActive(window);
+#endif
+}
+
+static inline void sdl_start_text_input(SDL_Window *window)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	(void)window;
+	SDL_StartTextInput();
+#else
+	SDL_StartTextInput(window);
+#endif
+}
+
+static inline void sdl_stop_text_input(SDL_Window *window)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	(void)window;
+	SDL_StopTextInput();
+#else
+	SDL_StopTextInput(window);
+#endif
+}
+
+static inline void sdl_set_text_input_rect(
+	SDL_Window *window, const SDL_Rect *rect)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	(void)window;
+	SDL_SetTextInputRect(rect);
+#else
+	SDL_SetTextInputArea(window, rect, 0);
+#endif
+}
+
 static inline SDL_Window *sdl_create_window(const char *title, int width,
 	int height, SDL_WindowFlags flags)
 {

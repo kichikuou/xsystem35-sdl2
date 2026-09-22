@@ -109,22 +109,22 @@ static void init_context(void) {
 
 bool modal_default_handler(const SDL_Event *e, modal *modal) {
 	switch (e->type) {
-	case SDL_QUIT:
+	case SDL_COMPAT_EVENT_QUIT:
 		return false;
-	case SDL_MOUSEMOTION:
+	case SDL_COMPAT_EVENT_MOUSE_MOTION:
 		mu_input_mousemove(ctx, e->motion.x, e->motion.y);
 		break;
-	case SDL_MOUSEWHEEL:
+	case SDL_COMPAT_EVENT_MOUSE_WHEEL:
 		mu_input_scroll(ctx, 0, e->wheel.y * -30);
 		break;
-	case SDL_TEXTINPUT:
+	case SDL_COMPAT_EVENT_TEXT_INPUT:
 		mu_input_text(ctx, e->text.text);
 		break;
-	case SDL_TEXTEDITING:
+	case SDL_COMPAT_EVENT_TEXT_EDITING:
 		mu_input_preedit(ctx, e->edit.text);
 		break;
-	case SDL_MOUSEBUTTONDOWN:
-	case SDL_MOUSEBUTTONUP: {
+	case SDL_COMPAT_EVENT_MOUSE_BUTTON_DOWN:
+	case SDL_COMPAT_EVENT_MOUSE_BUTTON_UP: {
 		int b = 0;
 		switch (e->button.button) {
 		case SDL_BUTTON_LEFT:   b = MU_MOUSE_LEFT;   break;
@@ -133,7 +133,7 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 		}
 		if (!b)
 			break;
-		if (e->type == SDL_MOUSEBUTTONDOWN)
+		if (e->type == SDL_COMPAT_EVENT_MOUSE_BUTTON_DOWN)
 			mu_input_mousedown(ctx, e->button.x, e->button.y, b);
 		else
 			mu_input_mouseup(ctx, e->button.x, e->button.y, b);
@@ -141,18 +141,18 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 	}
 	// Touch handling (see touch_phase above). The press/release is driven
 	// from the frame loop in modal_run(), not emitted here directly.
-	case SDL_FINGERDOWN:
+	case SDL_COMPAT_EVENT_FINGER_DOWN:
 		touch_pos = event_get_touch_position(&e->tfinger);
 		mu_input_mousemove(ctx, touch_pos.x, touch_pos.y);
 		touch_phase = TOUCH_HOVER;
 		touch_hover_frames = TOUCH_HOVER_FRAMES;
 		touch_release_after_press = false;
 		break;
-	case SDL_FINGERMOTION:
+	case SDL_COMPAT_EVENT_FINGER_MOTION:
 		touch_pos = event_get_touch_position(&e->tfinger);
 		mu_input_mousemove(ctx, touch_pos.x, touch_pos.y);
 		break;
-	case SDL_FINGERUP:
+	case SDL_COMPAT_EVENT_FINGER_UP:
 		touch_pos = event_get_touch_position(&e->tfinger);
 		if (touch_phase == TOUCH_PRESS) {
 			mu_input_mouseup(ctx, touch_pos.x, touch_pos.y, MU_MOUSE_LEFT);
@@ -162,14 +162,15 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 			touch_release_after_press = true;
 		}
 		break;
-	case SDL_KEYDOWN:
-	case SDL_KEYUP: {
+	case SDL_COMPAT_EVENT_KEY_DOWN:
+	case SDL_COMPAT_EVENT_KEY_UP: {
 		// Esc cancels an IME composition first, not the modal.
-		if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE &&
+		if (e->type == SDL_COMPAT_EVENT_KEY_DOWN &&
+		    sdl_keyboard_event_key(&e->key) == SDLK_ESCAPE &&
 		    !*ctx->preedit)
 			modal->cancelled = true;
 		int c = 0;
-		switch (e->key.keysym.sym) {
+		switch (sdl_keyboard_event_key(&e->key)) {
 		case SDLK_LSHIFT: case SDLK_RSHIFT:   c = MU_KEY_SHIFT;     break;
 		case SDLK_LCTRL:  case SDLK_RCTRL:    c = MU_KEY_CTRL;      break;
 		case SDLK_LALT:   case SDLK_RALT:     c = MU_KEY_ALT;       break;
@@ -184,7 +185,7 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 		}
 		if (!c)
 			break;
-		if (e->type == SDL_KEYDOWN)
+		if (e->type == SDL_COMPAT_EVENT_KEY_DOWN)
 			mu_input_keydown(ctx, c);
 		else
 			mu_input_keyup(ctx, c);
@@ -302,20 +303,21 @@ static void modal_render(void) {
 // IME candidate window near it. The rect is in logical (view) coordinates.
 static void update_text_input(void) {
 	static SDL_Rect last_rect;
+	SDL_Window *window = gfx_getWindow();
 	if (!ctx->text_input) {
-		if (SDL_IsTextInputActive())
-			SDL_StopTextInput();
+		if (sdl_text_input_active(window))
+			sdl_stop_text_input(window);
 		return;
 	}
-	if (!SDL_IsTextInputActive()) {
-		SDL_StartTextInput();
+	if (!sdl_text_input_active(window)) {
+		sdl_start_text_input(window);
 		last_rect = (SDL_Rect){0, 0, 0, 0};
 	}
 	mu_Rect r = ctx->text_input_rect;
 	SDL_Rect wr = gfx_viewToWindowRect((SDL_Rect){r.x, r.y, r.w, r.h});
 	if (memcmp(&wr, &last_rect, sizeof(wr))) {
 		last_rect = wr;
-		SDL_SetTextInputRect(&wr);
+		sdl_set_text_input_rect(window, &wr);
 	}
 }
 
@@ -382,8 +384,9 @@ void modal_run(modal *m) {
 	current_modal = NULL;
 	free(ctx);
 	ctx = NULL;
-	if (SDL_IsTextInputActive())
-		SDL_StopTextInput();
+	SDL_Window *window = gfx_getWindow();
+	if (sdl_text_input_active(window))
+		sdl_stop_text_input(window);
 	gfx_requestRedraw();  // repaint once more to clear the overlay
 
 	// The gesture that opened/dismissed the dialog must not leave the engine

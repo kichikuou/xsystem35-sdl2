@@ -61,7 +61,7 @@ bool RawKeyInfo[256];
 /* SDL Joystick */
 static int joyinfo=0;
 
-static int keytable[SDL_NUM_SCANCODES] = {
+static int keytable[SDL_COMPAT_SCANCODE_COUNT] = {
 	[SDL_SCANCODE_A] = KEY_A,
 	[SDL_SCANCODE_B] = KEY_B,
 	[SDL_SCANCODE_C] = KEY_C,
@@ -186,18 +186,18 @@ static int keytable[SDL_NUM_SCANCODES] = {
 static int joy_device_index = -1;
 static SDL_Joystick *js;
 
-static bool joy_open(int index) {
+static bool joy_open(sdl_joystick_device_t device) {
 	if (js)
 		return false;
 
-	js = SDL_JoystickOpen(index);
+	js = sdl_open_joystick(device);
 	if (!js)
 		return false;
 
-	const char *name = SDL_JoystickName(js);
-	int axes = SDL_JoystickNumAxes(js);
-	int buttons = SDL_JoystickNumButtons(js);
-	SDL_JoystickEventState(SDL_ENABLE);
+	const char *name = sdl_get_joystick_name(js);
+	int axes = sdl_get_num_joystick_axes(js);
+	int buttons = sdl_get_num_joystick_buttons(js);
+	sdl_set_joystick_events_enabled(true);
 	NOTICE("SDL joystick '%s' %d axes %d buttons", name, axes, buttons);
 	return true;
 }
@@ -205,14 +205,22 @@ static bool joy_open(int index) {
 static bool joy_init(void) {
 	SDL_Init(SDL_INIT_JOYSTICK);
 
-	if (joy_device_index >= 0)
-		return joy_open(joy_device_index);
-
-	for (int i = 0; i < SDL_NumJoysticks(); i++) {
-		if (joy_open(i))
-			return true;
+	int count = 0;
+	sdl_joystick_device_t *devices = sdl_get_joystick_devices(&count);
+	bool opened = false;
+	if (joy_device_index >= 0) {
+		if (joy_device_index < count)
+			opened = joy_open(devices[joy_device_index]);
+	} else {
+		for (int i = 0; i < count; i++) {
+			if (joy_open(devices[i])) {
+				opened = true;
+				break;
+			}
+		}
 	}
-	return false;
+	SDL_free(devices);
+	return opened;
 }
 
 void event_init(void) {
@@ -223,7 +231,7 @@ void event_init(void) {
 
 void event_remove(void) {
 	if (js) {
-		SDL_JoystickClose(js);
+		sdl_close_joystick(js);
 		js = NULL;
 	}
 }
@@ -293,28 +301,33 @@ SDL_Point event_get_touch_position(const SDL_TouchFingerEvent *e) {
 // touch event. This prevents the game from processing a button down event
 // before reading the pointer position.
 static SDL_TouchFingerEvent deferred_touch_event;
+static uint64_t deferred_touch_deadline;
 #define TOUCH_EVENT_DELAY 20
 
 static void defer_touch_event(SDL_TouchFingerEvent *e) {
 	switch (deferred_touch_event.type) {
-	case SDL_FINGERDOWN:
+	case SDL_COMPAT_EVENT_FINGER_DOWN:
 		mouseb |= 1 << SDL_BUTTON_LEFT;
 		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = true;
 		break;
-	case SDL_FINGERUP:
+	case SDL_COMPAT_EVENT_FINGER_UP:
 		mouseb &= ~(1 << SDL_BUTTON_LEFT | 1 << SDL_BUTTON_RIGHT);
 		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
 		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = false;
 		break;
+	default:
+		break;
 	}
-	if (e)
+	if (e) {
 		deferred_touch_event = *e;
-	else
-		deferred_touch_event.timestamp = 0;
+		deferred_touch_deadline = SDL_GetTicks() + TOUCH_EVENT_DELAY;
+	} else {
+		deferred_touch_deadline = 0;
+	}
 }
 
 static void fire_deferred_touch_event(void) {
-	if (deferred_touch_event.timestamp && deferred_touch_event.timestamp + TOUCH_EVENT_DELAY < SDL_GetTicks()) {
+	if (deferred_touch_deadline && deferred_touch_deadline < SDL_GetTicks()) {
 		defer_touch_event(NULL);
 	}
 }
@@ -335,38 +348,38 @@ void event_handle_event(SDL_Event *e) {
 	if (modal_handle_event(e))
 		return;
 
-	switch (e->type) {
-	case SDL_QUIT:
-		menu_quitmenu_open();
+	switch (sdl_get_window_event(e)) {
+	case SDL_COMPAT_WINDOW_EVENT_EXPOSED:
+		gfx_requestRedraw();
+		return;
+	case SDL_COMPAT_WINDOW_EVENT_FOCUS_LOST:
+		volume_on_window_focus(false);
+		return;
+	case SDL_COMPAT_WINDOW_EVENT_FOCUS_GAINED:
+		volume_on_window_focus(true);
+		return;
+	case SDL_COMPAT_WINDOW_EVENT_NONE:
 		break;
+	}
 
-	case SDL_WINDOWEVENT:
-		switch (e->window.event) {
-		case SDL_WINDOWEVENT_EXPOSED:
-			gfx_requestRedraw();
-			break;
-		case SDL_WINDOWEVENT_FOCUS_LOST:
-			volume_on_window_focus(false);
-			break;
-		case SDL_WINDOWEVENT_FOCUS_GAINED:
-			volume_on_window_focus(true);
-			break;
-		}
+	switch (e->type) {
+	case SDL_COMPAT_EVENT_QUIT:
+		menu_quitmenu_open();
 		break;
 #ifdef _WIN32
 	case SDL_SYSWMEVENT:
 		win_menu_onSysWMEvent(e->syswm.msg);
 		break;
 #endif
-	case SDL_APP_DIDENTERFOREGROUND:
+	case SDL_COMPAT_EVENT_DID_ENTER_FOREGROUND:
 		gfx_requestRedraw();
 		break;
-	case SDL_KEYDOWN:
+	case SDL_COMPAT_EVENT_KEY_DOWN:
 		keyEventProsess(&e->key, true);
 		break;
-	case SDL_KEYUP:
+	case SDL_COMPAT_EVENT_KEY_UP:
 		keyEventProsess(&e->key, false);
-		switch (e->key.keysym.sym) {
+		switch (sdl_keyboard_event_key(&e->key)) {
 		case SDLK_F1:
 			msgskip_activate(!msgskip_isActivated());
 			break;
@@ -375,19 +388,19 @@ void event_handle_event(SDL_Event *e) {
 			break;
 		}
 #ifdef __ANDROID__
-		if (e->key.keysym.scancode == SDL_SCANCODE_AC_BACK) {
+		if (sdl_keyboard_event_scancode(&e->key) == SDL_SCANCODE_AC_BACK) {
 			menu_quitmenu_open();
 		}
 #endif
 		break;
-	case SDL_MOUSEMOTION:
+	case SDL_COMPAT_EVENT_MOUSE_MOTION:
 		event_set_mouse_internal_location(e->motion.x, e->motion.y);
 #ifdef _WIN32
 		win_menu_onMouseMotion(e->motion.x, e->motion.y);
 #endif
 		break;
 
-	case SDL_MOUSEWHEEL:
+	case SDL_COMPAT_EVENT_MOUSE_WHEEL:
 		{
 			int y = e->wheel.y * (e->wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1);
 			if (y > 0)
@@ -398,13 +411,13 @@ void event_handle_event(SDL_Event *e) {
 			break;
 		}
 
-	case SDL_MOUSEBUTTONDOWN:
+	case SDL_COMPAT_EVENT_MOUSE_BUTTON_DOWN:
 		mouseb |= (1 << e->button.button);
 		RawKeyInfo[mouse_to_rawkey(e->button.button)] = true;
 		send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(e->button.button));
 		break;
 
-	case SDL_MOUSEBUTTONUP:
+	case SDL_COMPAT_EVENT_MOUSE_BUTTON_UP:
 		mouseb &= (0xffffffff ^ (1 << e->button.button));
 		RawKeyInfo[mouse_to_rawkey(e->button.button)] = false;
 		send_agsevent(AGSEVENT_BUTTON_RELEASE, mouse_to_agsevent(e->button.button));
@@ -413,10 +426,12 @@ void event_handle_event(SDL_Event *e) {
 		}
 		break;
 
-	case SDL_FINGERDOWN:
-		if (SDL_GetNumTouchFingers(e->tfinger.touchId) >= 3) {
+	case SDL_COMPAT_EVENT_FINGER_DOWN: {
+		int finger_count =
+			sdl_get_num_touch_fingers(sdl_touch_event_id(&e->tfinger));
+		if (finger_count >= 3) {
 			menu_open();
-		} else if (SDL_GetNumTouchFingers(e->tfinger.touchId) >= 2) {
+		} else if (finger_count >= 2) {
 			mouseb &= ~(1 << SDL_BUTTON_LEFT);
 			mouseb |= 1 << SDL_BUTTON_RIGHT;
 			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
@@ -439,9 +454,10 @@ void event_handle_event(SDL_Event *e) {
 			send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(button));
 		}
 		break;
+	}
 
-	case SDL_FINGERUP:
-		if (SDL_GetNumTouchFingers(e->tfinger.touchId) == 0) {
+	case SDL_COMPAT_EVENT_FINGER_UP:
+		if (sdl_get_num_touch_fingers(sdl_touch_event_id(&e->tfinger)) == 0) {
 			int ags_button = (mouseb & 1 << SDL_BUTTON_LEFT) ? AGSEVENT_BUTTON_LEFT : AGSEVENT_BUTTON_RIGHT;
 			mouse_pos = event_get_touch_position(&e->tfinger);
 			send_agsevent(AGSEVENT_BUTTON_RELEASE, ags_button);
@@ -449,16 +465,16 @@ void event_handle_event(SDL_Event *e) {
 		}
 		break;
 
-	case SDL_FINGERMOTION:
+	case SDL_COMPAT_EVENT_FINGER_MOTION:
 		mouse_pos = event_get_touch_position(&e->tfinger);
 		send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 		break;
 
-	case SDL_JOYDEVICEADDED:
+	case SDL_COMPAT_EVENT_JOYSTICK_ADDED:
 		joy_open(e->jdevice.which);
 		break;
 
-	case SDL_JOYAXISMOTION:
+	case SDL_COMPAT_EVENT_JOYSTICK_AXIS_MOTION:
 		if (abs(e->jaxis.value) < 0x4000) {
 			joyinfo &= e->jaxis.axis == 0 ? ~0xc : ~3;
 		} else {
@@ -468,10 +484,10 @@ void event_handle_event(SDL_Event *e) {
 		}
 		break;
 
-	case SDL_JOYBALLMOTION:
+	case SDL_COMPAT_EVENT_JOYSTICK_BALL_MOTION:
 		break;
 
-	case SDL_JOYHATMOTION:
+	case SDL_COMPAT_EVENT_JOYSTICK_HAT_MOTION:
 		joyinfo &= ~(SYS35KEY_UP | SYS35KEY_DOWN | SYS35KEY_LEFT | SYS35KEY_RIGHT);
 		switch (e->jhat.value) {
 		case SDL_HAT_UP:        joyinfo |= SYS35KEY_UP;    break;
@@ -485,8 +501,8 @@ void event_handle_event(SDL_Event *e) {
 		}
 		break;
 
-	case SDL_JOYBUTTONDOWN:
-	case SDL_JOYBUTTONUP:
+	case SDL_COMPAT_EVENT_JOYSTICK_BUTTON_DOWN:
+	case SDL_COMPAT_EVENT_JOYSTICK_BUTTON_UP:
 		{
 			int mask = 0;
 			switch (e->jbutton.button) {
@@ -503,7 +519,7 @@ void event_handle_event(SDL_Event *e) {
 #endif
 			}
 			if (mask) {
-				if (e->jbutton.state == SDL_PRESSED)
+				if (sdl_joystick_button_event_pressed(&e->jbutton))
 					joyinfo |= mask;
 				else
 					joyinfo &= ~mask;
@@ -551,7 +567,7 @@ static void get_event(void) {
 
 /* キー情報の取得 */
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed) {
-	int code = keytable[e->keysym.scancode];
+	int code = keytable[sdl_keyboard_event_scancode(e)];
 	RawKeyInfo[code] = pressed;
 	send_agsevent(pressed ? AGSEVENT_KEY_PRESS : AGSEVENT_KEY_RELEASE, code);
 }
