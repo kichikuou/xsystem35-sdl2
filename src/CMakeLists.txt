@@ -109,7 +109,7 @@ elseif (XSYSTEM35_SDL_VERSION STREQUAL "3")
   target_sources(xsystem35 PRIVATE
     pcm.sdl3mixer.c
     sdl3_mixer_backend.c
-    bgm.sdlmixer.c)
+    bgm.sdl3mixer.c)
   target_compile_definitions(xsystem35 PRIVATE HAVE_SDL3_MIXER_BACKEND)
 else()
   target_sources(xsystem35 PRIVATE pcm.sdlmixer.c bgm.sdlmixer.c)
