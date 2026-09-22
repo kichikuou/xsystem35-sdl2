@@ -56,7 +56,7 @@ void commandTPC() {
 	case 1: sl_pushTextColor(type, nact->sel.MsgFontColor); break;
 	default: WARNING("TPC: unknown type %d", type); break;
 	}
-	TRACE("TPC %d", exp);
+	TRACE("TPC %d", type);
 }
 
 void commandTPS() {
@@ -67,7 +67,7 @@ void commandTPS() {
 	case 1: sl_pushTextSize(type, nact->sel.MsgFontSize); break;
 	default: WARNING("TPS: unknown type %d", type); break;
 	}
-	TRACE("TPS %d", exp);
+	TRACE("TPS %d", type);
 }
 
 void commandTOP() {
