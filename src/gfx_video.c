@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "sdl_compat.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -45,6 +46,7 @@ surface_t *gfx_dibinfo;
 int view_w;
 int view_h;
 static bool gfx_fullscreen;
+static bool gfx_integer_scaling;
 
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
@@ -91,7 +93,9 @@ static void window_init(const char *render_driver) {
 	if (render_driver)
 		SDL_SetHint(SDL_HINT_RENDER_DRIVER, render_driver);
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+#endif
 
 	SDL_Init(SDL_INIT_VIDEO);
 	
@@ -111,10 +115,9 @@ static void window_init(const char *render_driver) {
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 #endif
 
-	gfx_window = SDL_CreateWindow(
-		title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
-	gfx_renderer = SDL_CreateRenderer(gfx_window, -1, 0);
+	gfx_window = sdl_create_window(title, SYS35_DEFAULT_WIDTH,
+		SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
+	gfx_renderer = sdl_create_renderer(gfx_window);
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	gfx_palette = sdl_create_palette(256);
 }
@@ -179,9 +182,7 @@ SDL_Window *gfx_getWindow(void) {
 }
 
 static SDL_Point view_to_window_point(int x, int y) {
-	SDL_Point point;
-	SDL_RenderLogicalToWindow(gfx_renderer, x, y, &point.x, &point.y);
-	return point;
+	return sdl_render_coordinates_to_window(gfx_renderer, x, y);
 }
 
 void gfx_warpMouse(int x, int y) {
@@ -215,7 +216,7 @@ void gfx_setFullscreen(bool on) {
 #ifndef __EMSCRIPTEN__
 	if (on == gfx_fullscreen)
 		return;
-	SDL_SetWindowFullscreen(gfx_window, on ? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+	sdl_set_window_fullscreen(gfx_window, on);
 	gfx_fullscreen = on;
 #endif
 }
@@ -235,9 +236,10 @@ void gfx_setViewSize(int w, int h) {
 	view_h = h;
 
 #ifndef __ANDROID__
-	SDL_SetWindowSize(gfx_window, w, h);
+	sdl_set_window_content_size(gfx_window, w, h);
 #endif
-	SDL_RenderSetLogicalSize(gfx_renderer, w, h);
+	sdl_set_render_logical_presentation(
+		gfx_renderer, w, h, gfx_integer_scaling);
 	if (gfx_texture)
 		SDL_DestroyTexture(gfx_texture);
 	gfx_texture = SDL_CreateTexture(
@@ -249,7 +251,9 @@ void gfx_setViewSize(int w, int h) {
 }
 
 void gfx_setIntegerScaling(bool enable) {
-	SDL_RenderSetIntegerScale(gfx_renderer, enable);
+	gfx_integer_scaling = enable;
+	sdl_set_render_logical_presentation(
+		gfx_renderer, view_w, view_h, gfx_integer_scaling);
 }
 
 bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {

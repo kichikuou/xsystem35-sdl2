@@ -204,7 +204,7 @@ static void render_text(mu_Font font, const char *str, mu_Vec2 pos, mu_Color col
 	SDL_Texture *t = SDL_CreateTextureFromSurface(gfx_renderer, s);
 	if (t) {
 		SDL_Rect dst = { pos.x, pos.y, s->w, s->h };
-		SDL_RenderCopy(gfx_renderer, t, NULL, &dst);
+		sdl_render_texture(gfx_renderer, t, NULL, &dst);
 		SDL_DestroyTexture(t);
 	}
 	sdl_destroy_surface(s);
@@ -217,7 +217,7 @@ static void draw_thick_line(float x1, float y1, float x2, float y2, int thicknes
 	for (int dx = 0; dx <= thickness; dx++) {
 		for (int dy = 0; dy <= thickness; dy++) {
 			float ox = dx - half, oy = dy - half;
-			SDL_RenderDrawLineF(gfx_renderer, x1 + ox, y1 + oy, x2 + ox, y2 + oy);
+			sdl_render_line(gfx_renderer, x1 + ox, y1 + oy, x2 + ox, y2 + oy);
 		}
 	}
 }
@@ -253,7 +253,7 @@ static void render_icon(int id, mu_Rect rect, mu_Color color) {
 	}
 	default: {
 		SDL_Rect r = { rect.x + rect.w / 2 - 2, rect.y + rect.h / 2 - 2, 4, 4 };
-		SDL_RenderFillRect(gfx_renderer, &r);
+		sdl_render_fill_rect(gfx_renderer, &r);
 		break;
 	}
 	}
@@ -265,7 +265,7 @@ static void modal_render(void) {
 	// Dim the game behind the menu.
 	if (!current_modal->no_dim) {
 		SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 110);
-		SDL_RenderFillRect(gfx_renderer, NULL);
+		sdl_render_fill_rect(gfx_renderer, NULL);
 	}
 
 	mu_Command *cmd = NULL;
@@ -276,7 +276,7 @@ static void modal_render(void) {
 			SDL_SetRenderDrawColor(gfx_renderer, c.r, c.g, c.b, c.a);
 			SDL_Rect r = { cmd->rect.rect.x, cmd->rect.rect.y,
 			               cmd->rect.rect.w, cmd->rect.rect.h };
-			SDL_RenderFillRect(gfx_renderer, &r);
+			sdl_render_fill_rect(gfx_renderer, &r);
 			break;
 		}
 		case MU_COMMAND_TEXT:
@@ -288,12 +288,12 @@ static void modal_render(void) {
 		case MU_COMMAND_CLIP: {
 			SDL_Rect r = { cmd->clip.rect.x, cmd->clip.rect.y,
 			               cmd->clip.rect.w, cmd->clip.rect.h };
-			SDL_RenderSetClipRect(gfx_renderer, &r);
+			sdl_set_render_clip_rect(gfx_renderer, &r);
 			break;
 		}
 		}
 	}
-	SDL_RenderSetClipRect(gfx_renderer, NULL);
+	sdl_set_render_clip_rect(gfx_renderer, NULL);
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 255);
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 }

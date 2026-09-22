@@ -68,7 +68,7 @@ void gfx_updateScreen(void) {
 	if (!gfx_dirty)
 		return;
 	SDL_RenderClear(gfx_renderer);
-	SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
+	sdl_render_texture(gfx_renderer, gfx_texture, NULL, NULL);
 	modal_render_overlay();
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
@@ -236,7 +236,7 @@ void gfx_drawLine(int x1, int y1, int x2, int y2, uint8_t c) {
 	
 	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(main_surface);
 	SDL_SetRenderDrawColor(renderer, gfx_palette->colors[c].r, gfx_palette->colors[c].g, gfx_palette->colors[c].b, SDL_ALPHA_OPAQUE);
-	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+	sdl_render_line_int(renderer, x1, y1, x2, y2);
 	SDL_DestroyRenderer(renderer);
 }
 

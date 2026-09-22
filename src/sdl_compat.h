@@ -32,6 +32,266 @@
 #define SDL_PIXELFORMAT_RGB888 SDL_PIXELFORMAT_XRGB8888
 #endif
 
+static inline SDL_Window *sdl_create_window(const char *title, int width,
+	int height, SDL_WindowFlags flags)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+#else
+	float scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	if (scale <= 0.0f)
+		scale = 1.0f;
+	width = (int)(width * scale + 0.5f);
+	height = (int)(height * scale + 0.5f);
+#ifndef __EMSCRIPTEN__
+	flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+#endif
+	return SDL_CreateWindow(title, width, height, flags);
+#endif
+}
+
+static inline void sdl_set_window_content_size(
+	SDL_Window *window, int width, int height)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_SetWindowSize(window, width, height);
+#else
+	float pixel_density = SDL_GetWindowPixelDensity(window);
+	float scale = SDL_GetWindowDisplayScale(window);
+	if (pixel_density > 0.0f && scale > 0.0f)
+		scale /= pixel_density;
+	else
+		scale = 1.0f;
+	SDL_SetWindowSize(window, (int)(width * scale + 0.5f),
+		(int)(height * scale + 0.5f));
+#endif
+}
+
+static inline bool sdl_set_window_fullscreen(
+	SDL_Window *window, bool fullscreen)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_SetWindowFullscreen(window,
+		fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) == 0;
+#else
+	return SDL_SetWindowFullscreen(window, fullscreen);
+#endif
+}
+
+static inline SDL_Renderer *sdl_create_renderer(SDL_Window *window)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_CreateRenderer(window, -1, 0);
+#else
+	return SDL_CreateRenderer(window, NULL);
+#endif
+}
+
+static inline bool sdl_set_render_logical_presentation(SDL_Renderer *renderer,
+	int width, int height, bool integer_scaling)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	if (SDL_RenderSetLogicalSize(renderer, width, height) < 0)
+		return false;
+	return SDL_RenderSetIntegerScale(renderer,
+		integer_scaling ? SDL_TRUE : SDL_FALSE) == 0;
+#else
+	return SDL_SetRenderLogicalPresentation(renderer, width, height,
+		integer_scaling ? SDL_LOGICAL_PRESENTATION_INTEGER_SCALE :
+		SDL_LOGICAL_PRESENTATION_LETTERBOX);
+#endif
+}
+
+static inline SDL_Point sdl_render_coordinates_to_window(
+	SDL_Renderer *renderer, int x, int y)
+{
+	SDL_Point point;
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_RenderLogicalToWindow(renderer, x, y, &point.x, &point.y);
+#else
+	float window_x = x;
+	float window_y = y;
+	SDL_RenderCoordinatesToWindow(renderer, x, y, &window_x, &window_y);
+	point.x = (int)SDL_lroundf(window_x);
+	point.y = (int)SDL_lroundf(window_y);
+#endif
+	return point;
+}
+
+static inline bool sdl_render_texture(SDL_Renderer *renderer,
+	SDL_Texture *texture, const SDL_Rect *source, const SDL_Rect *destination)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderCopy(renderer, texture, source, destination) == 0;
+#else
+	SDL_FRect source_float;
+	SDL_FRect destination_float;
+	const SDL_FRect *source_ptr = NULL;
+	const SDL_FRect *destination_ptr = NULL;
+	if (source) {
+		source_float = (SDL_FRect){source->x, source->y,
+			source->w, source->h};
+		source_ptr = &source_float;
+	}
+	if (destination) {
+		destination_float = (SDL_FRect){destination->x, destination->y,
+			destination->w, destination->h};
+		destination_ptr = &destination_float;
+	}
+	return SDL_RenderTexture(
+		renderer, texture, source_ptr, destination_ptr);
+#endif
+}
+
+static inline bool sdl_render_texture_float(SDL_Renderer *renderer,
+	SDL_Texture *texture, const SDL_Rect *source, const SDL_FRect *destination)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderCopyF(renderer, texture, source, destination) == 0;
+#else
+	SDL_FRect source_float;
+	const SDL_FRect *source_ptr = NULL;
+	if (source) {
+		source_float = (SDL_FRect){source->x, source->y,
+			source->w, source->h};
+		source_ptr = &source_float;
+	}
+	return SDL_RenderTexture(renderer, texture, source_ptr, destination);
+#endif
+}
+
+static inline bool sdl_render_texture_rotated(SDL_Renderer *renderer,
+	SDL_Texture *texture, const SDL_Rect *source, const SDL_Rect *destination,
+	double angle, const SDL_Point *center, int flip)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderCopyEx(renderer, texture, source, destination, angle,
+		center, (SDL_RendererFlip)flip) == 0;
+#else
+	SDL_FRect source_float;
+	SDL_FRect destination_float;
+	SDL_FPoint center_float;
+	const SDL_FRect *source_ptr = NULL;
+	const SDL_FRect *destination_ptr = NULL;
+	const SDL_FPoint *center_ptr = NULL;
+	if (source) {
+		source_float = (SDL_FRect){source->x, source->y,
+			source->w, source->h};
+		source_ptr = &source_float;
+	}
+	if (destination) {
+		destination_float = (SDL_FRect){destination->x, destination->y,
+			destination->w, destination->h};
+		destination_ptr = &destination_float;
+	}
+	if (center) {
+		center_float = (SDL_FPoint){center->x, center->y};
+		center_ptr = &center_float;
+	}
+	return SDL_RenderTextureRotated(renderer, texture, source_ptr,
+		destination_ptr, angle, center_ptr, (SDL_FlipMode)flip);
+#endif
+}
+
+static inline bool sdl_render_fill_rect(
+	SDL_Renderer *renderer, const SDL_Rect *rect)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderFillRect(renderer, rect) == 0;
+#else
+	SDL_FRect float_rect;
+	const SDL_FRect *rect_ptr = NULL;
+	if (rect) {
+		float_rect = (SDL_FRect){rect->x, rect->y, rect->w, rect->h};
+		rect_ptr = &float_rect;
+	}
+	return SDL_RenderFillRect(renderer, rect_ptr);
+#endif
+}
+
+static inline bool sdl_render_line(SDL_Renderer *renderer,
+	float x1, float y1, float x2, float y2)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderDrawLineF(renderer, x1, y1, x2, y2) == 0;
+#else
+	return SDL_RenderLine(renderer, x1, y1, x2, y2);
+#endif
+}
+
+static inline bool sdl_render_line_int(SDL_Renderer *renderer,
+	int x1, int y1, int x2, int y2)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderDrawLine(renderer, x1, y1, x2, y2) == 0;
+#else
+	return SDL_RenderLine(renderer, x1, y1, x2, y2);
+#endif
+}
+
+static inline bool sdl_get_texture_size(
+	SDL_Texture *texture, int *width, int *height)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_QueryTexture(texture, NULL, NULL, width, height) == 0;
+#else
+	float float_width;
+	float float_height;
+	if (!SDL_GetTextureSize(texture, &float_width, &float_height))
+		return false;
+	if (width)
+		*width = (int)float_width;
+	if (height)
+		*height = (int)float_height;
+	return true;
+#endif
+}
+
+static inline bool sdl_render_target_supported(SDL_Renderer *renderer)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderTargetSupported(renderer) == SDL_TRUE;
+#else
+	(void)renderer;
+	return true;
+#endif
+}
+
+static inline bool sdl_set_texture_scale_mode_nearest(SDL_Texture *texture)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_SetTextureScaleMode(texture, SDL_ScaleModeNearest) == 0;
+#else
+	return SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+#endif
+}
+
+static inline bool sdl_set_render_clip_rect(
+	SDL_Renderer *renderer, const SDL_Rect *rect)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RenderSetClipRect(renderer, rect) == 0;
+#else
+	return SDL_SetRenderClipRect(renderer, rect);
+#endif
+}
+
+#if XSYSTEM35_SDL_VERSION == 2
+static inline SDL_Color sdl_vertex_color(
+	uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
+{
+	return (SDL_Color){red, green, blue, alpha};
+}
+#else
+static inline SDL_FColor sdl_vertex_color(
+	uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
+{
+	return (SDL_FColor){red / 255.0f, green / 255.0f,
+		blue / 255.0f, alpha / 255.0f};
+}
+#endif
+
 static inline uint32_t sdl_surface_format(const SDL_Surface *surface)
 {
 #if XSYSTEM35_SDL_VERSION == 2

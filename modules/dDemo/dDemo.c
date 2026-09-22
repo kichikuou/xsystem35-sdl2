@@ -31,7 +31,7 @@ static void render_quad(SDL_Texture *tex, SDL_Vertex verts[4]) {
 static void fade_overlay(Uint8 r, Uint8 g, Uint8 b, Uint8 alpha) {
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(gfx_renderer, r, g, b, alpha);
-	SDL_RenderFillRect(gfx_renderer, NULL);
+	sdl_render_fill_rect(gfx_renderer, NULL);
 }
 
 #define NR_SCENES 13
@@ -144,7 +144,7 @@ static void render_affine_bg(SDL_Texture *scroll_bg, int elapsed, int duration,
 	if (!scroll_bg) return;
 
 	int bg_w, bg_h;
-	SDL_QueryTexture(scroll_bg, NULL, NULL, &bg_w, &bg_h);
+	sdl_get_texture_size(scroll_bg, &bg_w, &bg_h);
 
 	int xs[4], ys[4];
 	const float angle = angle_deg * (float)M_PI / 180.0f;
@@ -183,7 +183,7 @@ static void render_affine_bg(SDL_Texture *scroll_bg, int elapsed, int duration,
 	for (int i = 0; i < 4; i++) {
 		verts[i].position.x = (i == 1 || i == 2) ? w : 0;
 		verts[i].position.y = (i == 2 || i == 3) ? h : (float)y_toggle;
-		verts[i].color = (SDL_Color){255, 255, 255, 255};
+		verts[i].color = sdl_vertex_color(255, 255, 255, 255);
 		verts[i].tex_coord.x = uv[i][0];
 		verts[i].tex_coord.y = uv[i][1];
 	}
@@ -194,7 +194,7 @@ static void render_affine_bg(SDL_Texture *scroll_bg, int elapsed, int duration,
 	y_toggle = (y_toggle + 1) & 1;
 	for (int i = 0; i < 4; i++) {
 		verts[i].position.y = (i == 2 || i == 3) ? h : (float)y_toggle;
-		verts[i].color = (SDL_Color){255, 255, 255, 128};
+		verts[i].color = sdl_vertex_color(255, 255, 255, 128);
 	}
 	// Swap mapping: TL<->BR, TR<->BL for 180° rotation effect
 	verts[0].tex_coord.x = uv[2][0]; verts[0].tex_coord.y = uv[2][1];
@@ -212,7 +212,7 @@ static void render_scene0(int elapsed) {
 	if (!sprite) return;
 
 	int spr_w, spr_h;
-	SDL_QueryTexture(sprite, NULL, NULL, &spr_w, &spr_h);
+	sdl_get_texture_size(sprite, &spr_w, &spr_h);
 	const int slide_end = 4700;
 	const int duration  = scene_duration[0];  // 5400
 
@@ -234,12 +234,12 @@ static void render_scene0(int elapsed) {
 			int dest_w = a0 - ((a0 - spr_w) * elapsed) / slide_end;
 			if (dest_w <= 0) continue;
 			SDL_Rect dst = {view_w - 2 * dest_w, dest_y, dest_w, spr_h};
-			SDL_RenderCopy(gfx_renderer, sprite, NULL, &dst);
+			sdl_render_texture(gfx_renderer, sprite, NULL, &dst);
 		}
 	} else {
 		SDL_SetTextureAlphaMod(sprite, 0xd0);
 		SDL_Rect dst = {view_w - 2 * spr_w, dest_y, spr_w, spr_h};
-		SDL_RenderCopy(gfx_renderer, sprite, NULL, &dst);
+		sdl_render_texture(gfx_renderer, sprite, NULL, &dst);
 	}
 
 	// 3. Horizontal accent line (grows rightward over 4700ms)
@@ -247,12 +247,12 @@ static void render_scene0(int elapsed) {
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 	SDL_SetRenderDrawColor(gfx_renderer, 0xc0, 0xc0, 0xc0, 0xff);
 	SDL_Rect hline = {0, (spr_h + view_h) / 2 - 4, line_w, 2};
-	SDL_RenderFillRect(gfx_renderer, &hline);
+	sdl_render_fill_rect(gfx_renderer, &hline);
 
 	// 4. Vertical accent line (right edge of sprite, grows downward)
 	int line_h = elapsed < slide_end ? 479 * elapsed / slide_end + 1 : 480;
 	SDL_Rect vline = {view_w - spr_w, 0, 2, line_h};
-	SDL_RenderFillRect(gfx_renderer, &vline);
+	sdl_render_fill_rect(gfx_renderer, &vline);
 }
 
 static void render_scene1(int elapsed) {
@@ -261,7 +261,7 @@ static void render_scene1(int elapsed) {
 	if (!sprite) return;
 
 	int spr_w, spr_h;
-	SDL_QueryTexture(sprite, NULL, NULL, &spr_w, &spr_h);
+	sdl_get_texture_size(sprite, &spr_w, &spr_h);
 	const int duration = scene_duration[1];  // 4752
 
 	// --- Background: DrawAffineSurfaceAlpha50 x2 (alpha=50%) ---
@@ -275,7 +275,7 @@ static void render_scene1(int elapsed) {
 		SDL_SetTextureBlendMode(sprite, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureAlphaMod(sprite, (Uint8)alpha);
 		SDL_Rect dst = {(view_w - spr_w) / 2, (view_h - spr_h) / 2, spr_w, spr_h};
-		SDL_RenderCopy(gfx_renderer, sprite, NULL, &dst);
+		sdl_render_texture(gfx_renderer, sprite, NULL, &dst);
 	}
 
 	// Fade to black: graph_FillAlphaColor(0,0,0), starts at 4000ms.
@@ -397,12 +397,14 @@ static void render_scene_2_4_6_3d(int elapsed, int phase_dur, SDL_Texture *tex1,
 	// Object border quad: solid color RGB(244,221,181) = BGR(0xb5,0xdd,0xf4),
 	// drawn first as a backdrop. The bg quad drawn on top leaves only the thin
 	// border ring visible.
-	for (int i = 0; i < 4; i++) obj_verts[i].color = (SDL_Color){0xf4, 0xdd, 0xb5, 0xff};
+	for (int i = 0; i < 4; i++)
+		obj_verts[i].color = sdl_vertex_color(0xf4, 0xdd, 0xb5, 0xff);
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 	render_quad(NULL, obj_verts);
 
 	// Background quad: textured, opaque, drawn on top (covers center of border quad)
-	for (int i = 0; i < 4; i++) bg_verts[i].color = (SDL_Color){255, 255, 255, 255};
+	for (int i = 0; i < 4; i++)
+		bg_verts[i].color = sdl_vertex_color(255, 255, 255, 255);
 	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
 	render_quad(tex, bg_verts);
 }
@@ -425,7 +427,7 @@ static void render_scene_2_4_6(int elapsed, int scene_idx, int sprite_idx, int t
 	if (bg) {
 		SDL_SetTextureBlendMode(bg, SDL_BLENDMODE_NONE);
 		SDL_SetTextureColorMod(bg, 0xff, 0xff, 0xff);
-		SDL_RenderCopy(gfx_renderer, bg, NULL, NULL);
+		sdl_render_texture(gfx_renderer, bg, NULL, NULL);
 	}
 
 	// 2. 3D rotating quad animation (8-phase timing)
@@ -439,23 +441,23 @@ static void render_scene_2_4_6(int elapsed, int scene_idx, int sprite_idx, int t
 	// 3. Scrolling sprite: x moves from -sprite_w (off-screen left) to view_w (off-screen right)
 	int sprite_w = 0, sprite_h = 0;
 	if (sprite)
-		SDL_QueryTexture(sprite, NULL, NULL, &sprite_w, &sprite_h);
+		sdl_get_texture_size(sprite, &sprite_w, &sprite_h);
 	int x = sprite_w ? ((sprite_w + view_w) * elapsed) / duration - sprite_w : 0;
 
 	// Shadow drawn first (color-modded to black), sprite on top (full color)
 	if (sprite_shadow) {
 		int sw, sh;
-		SDL_QueryTexture(sprite_shadow, NULL, NULL, &sw, &sh);
+		sdl_get_texture_size(sprite_shadow, &sw, &sh);
 		SDL_SetTextureBlendMode(sprite_shadow, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(sprite_shadow, 0, 0, 0);
 		SDL_Rect dst = {x, 0, sw, sh};
-		SDL_RenderCopy(gfx_renderer, sprite_shadow, NULL, &dst);
+		sdl_render_texture(gfx_renderer, sprite_shadow, NULL, &dst);
 	}
 	if (sprite) {
 		SDL_SetTextureBlendMode(sprite, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(sprite, 0xff, 0xff, 0xff);
 		SDL_Rect dst = {x, 0, sprite_w, sprite_h};
-		SDL_RenderCopy(gfx_renderer, sprite, NULL, &dst);
+		sdl_render_texture(gfx_renderer, sprite, NULL, &dst);
 	}
 }
 
@@ -490,7 +492,7 @@ static void render_scene_3_5_7_9(int elapsed, int image_idx) {
 		if (alpha > 0) {
 			SDL_SetTextureBlendMode(main_img, alpha < 255 ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
 			SDL_SetTextureAlphaMod(main_img, (Uint8)alpha);
-			SDL_RenderCopy(gfx_renderer, main_img, NULL, NULL);
+			sdl_render_texture(gfx_renderer, main_img, NULL, NULL);
 		}
 	}
 
@@ -500,10 +502,14 @@ static void render_scene_3_5_7_9(int elapsed, int image_idx) {
 		float t3 = (float)elapsed / (4000.0f * 3.0f);  // 0 → 1/3
 		float w = (float)view_w, h = (float)view_h;
 		SDL_Vertex verts[4] = {
-			/* TL */ {{0.f, 0.f}, {255, 255, 255, 128}, {t3,        0.f    }},
-			/* TR */ {{w,   0.f}, {255, 255, 255, 128}, {1.0f,      t3     }},
-			/* BR */ {{w,   h  }, {255, 255, 255, 128}, {1.0f - t3, 1.0f   }},
-			/* BL */ {{0.f, h  }, {255, 255, 255, 128}, {0.f,       1.0f-t3}},
+			{{0.f, 0.f}, sdl_vertex_color(255, 255, 255, 128),
+				{t3, 0.f}},
+			{{w, 0.f}, sdl_vertex_color(255, 255, 255, 128),
+				{1.0f, t3}},
+			{{w, h}, sdl_vertex_color(255, 255, 255, 128),
+				{1.0f - t3, 1.0f}},
+			{{0.f, h}, sdl_vertex_color(255, 255, 255, 128),
+				{0.f, 1.0f - t3}},
 		};
 		SDL_SetTextureBlendMode(overlay, SDL_BLENDMODE_BLEND);
 		render_quad(overlay, verts);
@@ -527,7 +533,7 @@ static void render_scene8(int elapsed) {
 		if (imgs[0]) {
 			SDL_SetTextureBlendMode(imgs[0], SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(imgs[0], (Uint8)SDL_min(alpha, 255));
-			SDL_RenderCopy(gfx_renderer, imgs[0], NULL, NULL);
+			sdl_render_texture(gfx_renderer, imgs[0], NULL, NULL);
 		}
 	} else if (elapsed < 6 * seg) {
 		// Segments 2–6: crossfade image[idx] → image[idx+1]
@@ -536,19 +542,19 @@ static void render_scene8(int elapsed) {
 		if (imgs[idx]) {
 			SDL_SetTextureBlendMode(imgs[idx], SDL_BLENDMODE_NONE);
 			SDL_SetTextureAlphaMod(imgs[idx], 255);
-			SDL_RenderCopy(gfx_renderer, imgs[idx], NULL, NULL);
+			sdl_render_texture(gfx_renderer, imgs[idx], NULL, NULL);
 		}
 		if (imgs[idx + 1]) {
 			SDL_SetTextureBlendMode(imgs[idx + 1], SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(imgs[idx + 1], (Uint8)SDL_min(alpha, 255));
-			SDL_RenderCopy(gfx_renderer, imgs[idx + 1], NULL, NULL);
+			sdl_render_texture(gfx_renderer, imgs[idx + 1], NULL, NULL);
 		}
 	} else {
 		// Segment 7: hold image[5] at full opacity
 		if (imgs[5]) {
 			SDL_SetTextureBlendMode(imgs[5], SDL_BLENDMODE_NONE);
 			SDL_SetTextureAlphaMod(imgs[5], 255);
-			SDL_RenderCopy(gfx_renderer, imgs[5], NULL, NULL);
+			sdl_render_texture(gfx_renderer, imgs[5], NULL, NULL);
 		}
 	}
 }
@@ -588,7 +594,7 @@ static void render_scene10(int elapsed) {
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
 			SDL_SetTextureAlphaMod(tex, 255);
 			SDL_SetTextureColorMod(tex, 255, 255, 255);
-			SDL_RenderCopy(gfx_renderer, tex, NULL, NULL);
+			sdl_render_texture(gfx_renderer, tex, NULL, NULL);
 		}
 	} else if (elapsed < 9610) {
 		// Phase 2: zoom in
@@ -607,7 +613,7 @@ static void render_scene10(int elapsed) {
 			SDL_SetTextureBlendMode(surface3, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(surface3, 255);
 			SDL_SetTextureColorMod(surface3, 255, 255, 255);
-			SDL_RenderCopy(gfx_renderer, surface3, &src_rect, NULL);
+			sdl_render_texture(gfx_renderer, surface3, &src_rect, NULL);
 		}
 	} else {
 		// Phase 3: fade out to black
@@ -618,7 +624,7 @@ static void render_scene10(int elapsed) {
 				combined < 255 ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
 			SDL_SetTextureAlphaMod(surface3, (Uint8)combined);
 			SDL_SetTextureColorMod(surface3, 255, 255, 255);
-			SDL_RenderCopy(gfx_renderer, surface3, NULL, NULL);
+			sdl_render_texture(gfx_renderer, surface3, NULL, NULL);
 		}
 	}
 }
@@ -644,12 +650,12 @@ static void render_scene11(int elapsed) {
 	// srcY = (bg_h - view_h) * (duration - elapsed) / duration
 	if (bg) {
 		int bg_w, bg_h;
-		SDL_QueryTexture(bg, NULL, NULL, &bg_w, &bg_h);
+		sdl_get_texture_size(bg, &bg_w, &bg_h);
 		int scroll = (int)((long long)(bg_h - view_h) * elapsed / duration);
 		int src_y = SDL_max(0, (bg_h - view_h) - scroll);
 		SDL_Rect src = {0, src_y, SDL_min(view_w, bg_w), view_h};
 		SDL_SetTextureBlendMode(bg, SDL_BLENDMODE_NONE);
-		SDL_RenderCopy(gfx_renderer, bg, &src, NULL);
+		sdl_render_texture(gfx_renderer, bg, &src, NULL);
 	}
 
 	if (elapsed < unit) {
@@ -659,12 +665,12 @@ static void render_scene11(int elapsed) {
 		SDL_Texture *tex = slide[2];
 		if (tex) {
 			int tw, th;
-			SDL_QueryTexture(tex, NULL, NULL, &tw, &th);
+			sdl_get_texture_size(tex, &tw, &th);
 			int y = (int)((long long)(th + view_h) * (elapsed - unit) / unit) - th;
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(tex, 0x80);
 			SDL_Rect dst = {(view_w - tw) / 2, y, tw, th};
-			SDL_RenderCopy(gfx_renderer, tex, NULL, &dst);
+			sdl_render_texture(gfx_renderer, tex, NULL, &dst);
 		}
 	} else if (elapsed < unit * 3) {
 		// Segment 2: overlay[0] (ALK 69) pingpong fade
@@ -675,19 +681,19 @@ static void render_scene11(int elapsed) {
 			int alpha = (t2 * 255) / (unit / 2);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(tex, (Uint8)SDL_min(alpha, 255));
-			SDL_RenderCopy(gfx_renderer, tex, NULL, NULL);
+			sdl_render_texture(gfx_renderer, tex, NULL, NULL);
 		}
 	} else if (elapsed < unit * 4) {
 		// Segment 3: slide[1] (ALK 62) passes top-to-bottom at 50% alpha
 		SDL_Texture *tex = slide[1];
 		if (tex) {
 			int tw, th;
-			SDL_QueryTexture(tex, NULL, NULL, &tw, &th);
+			sdl_get_texture_size(tex, &tw, &th);
 			int y = (int)((long long)(th + view_h) * (elapsed - unit * 3) / unit) - th;
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(tex, 0x80);
 			SDL_Rect dst = {(view_w - tw) / 2, y, tw, th};
-			SDL_RenderCopy(gfx_renderer, tex, NULL, &dst);
+			sdl_render_texture(gfx_renderer, tex, NULL, &dst);
 		}
 	} else if (elapsed < unit * 5) {
 		// Segment 4: overlay[1] (ALK 70) pingpong fade
@@ -698,19 +704,19 @@ static void render_scene11(int elapsed) {
 			int alpha = (t2 * 255) / (unit / 2);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(tex, (Uint8)SDL_min(alpha, 255));
-			SDL_RenderCopy(gfx_renderer, tex, NULL, NULL);
+			sdl_render_texture(gfx_renderer, tex, NULL, NULL);
 		}
 	} else if (elapsed < unit * 6) {
 		// Segment 5: slide[0] (ALK 61) passes top-to-bottom at 50% alpha
 		SDL_Texture *tex = slide[0];
 		if (tex) {
 			int tw, th;
-			SDL_QueryTexture(tex, NULL, NULL, &tw, &th);
+			sdl_get_texture_size(tex, &tw, &th);
 			int y = (int)((long long)(th + view_h) * (elapsed - unit * 5) / unit) - th;
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(tex, 0x80);
 			SDL_Rect dst = {(view_w - tw) / 2, y, tw, th};
-			SDL_RenderCopy(gfx_renderer, tex, NULL, &dst);
+			sdl_render_texture(gfx_renderer, tex, NULL, &dst);
 		}
 	} else if (elapsed < unit * 7) {
 		// Segment 6: overlay[2] (ALK 71) pingpong fade
@@ -721,7 +727,7 @@ static void render_scene11(int elapsed) {
 			int alpha = (t2 * 255) / (unit / 2);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(tex, (Uint8)SDL_min(alpha, 255));
-			SDL_RenderCopy(gfx_renderer, tex, NULL, NULL);
+			sdl_render_texture(gfx_renderer, tex, NULL, NULL);
 		}
 	} else {
 		// Segment 7: white fade out
@@ -799,7 +805,7 @@ static void render_scene12_3d(int elapsed) {
 		// NDC → screen
 		verts[i].position.x = (wx * PROJ_SCALE_X / w + 1.0f) * half_w;
 		verts[i].position.y = (wy * PROJ_SCALE_Y / w + 1.0f) * half_h;
-		verts[i].color = (SDL_Color){255, 255, 255, 255};
+		verts[i].color = sdl_vertex_color(255, 255, 255, 255);
 		verts[i].tex_coord.x = muv[i][0];
 		verts[i].tex_coord.y = muv[i][1];
 	}
@@ -817,7 +823,7 @@ static void render_scene12(int elapsed) {
 		// 0–2076ms: bg_a with white fade-in overlay
 		if (bg_a) {
 			SDL_SetTextureBlendMode(bg_a, SDL_BLENDMODE_NONE);
-			SDL_RenderCopy(gfx_renderer, bg_a, NULL, NULL);
+			sdl_render_texture(gfx_renderer, bg_a, NULL, NULL);
 		}
 		int white_alpha = 0xff - (elapsed * 0xff) / 2076;
 		fade_overlay(0xff, 0xff, 0xff, (Uint8)white_alpha);
@@ -825,32 +831,32 @@ static void render_scene12(int elapsed) {
 		// 2076–2226ms: bg_a static
 		if (bg_a) {
 			SDL_SetTextureBlendMode(bg_a, SDL_BLENDMODE_NONE);
-			SDL_RenderCopy(gfx_renderer, bg_a, NULL, NULL);
+			sdl_render_texture(gfx_renderer, bg_a, NULL, NULL);
 		}
 	} else if (elapsed < 3826) {
 		// 2226–3826ms: crossfade bg_a → bg_b
 		if (bg_a) {
 			SDL_SetTextureBlendMode(bg_a, SDL_BLENDMODE_NONE);
-			SDL_RenderCopy(gfx_renderer, bg_a, NULL, NULL);
+			sdl_render_texture(gfx_renderer, bg_a, NULL, NULL);
 		}
 		if (bg_b) {
 			int alpha = ((elapsed - 2226) * 0xff) / 1600;
 			SDL_SetTextureBlendMode(bg_b, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(bg_b, (Uint8)SDL_min(alpha, 0xff));
-			SDL_RenderCopy(gfx_renderer, bg_b, NULL, NULL);
+			sdl_render_texture(gfx_renderer, bg_b, NULL, NULL);
 		}
 	} else if (elapsed < 3976) {
 		// 3826–3976ms: bg_b static
 		if (bg_b) {
 			SDL_SetTextureBlendMode(bg_b, SDL_BLENDMODE_NONE);
-			SDL_RenderCopy(gfx_renderer, bg_b, NULL, NULL);
+			sdl_render_texture(gfx_renderer, bg_b, NULL, NULL);
 		}
 	} else if (elapsed < 7803) {
 		// 3976–7803ms: TODO wave distortion on bg_b; for now just show bg_b,
 		// then fade to white
 		if (bg_b) {
 			SDL_SetTextureBlendMode(bg_b, SDL_BLENDMODE_BLEND);
-			SDL_RenderCopy(gfx_renderer, bg_b, NULL, NULL);
+			sdl_render_texture(gfx_renderer, bg_b, NULL, NULL);
 		}
 		int white_alpha = ((elapsed - 3976) * 0xff) / 3827;
 		fade_overlay(0xff, 0xff, 0xff, (Uint8)SDL_min(white_alpha, 0xff));
@@ -858,19 +864,19 @@ static void render_scene12(int elapsed) {
 		// 7803–9397ms: white bg + 3D rotating quad + overlay fade-in
 		SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 		SDL_SetRenderDrawColor(gfx_renderer, 0xff, 0xff, 0xff, 0xff);
-		SDL_RenderFillRect(gfx_renderer, NULL);
+		sdl_render_fill_rect(gfx_renderer, NULL);
 		render_scene12_3d(elapsed);
 		if (overlay) {
 			int alpha = ((elapsed - 7803) * 0xff) / 1594;
 			SDL_SetTextureBlendMode(overlay, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(overlay, (Uint8)SDL_min(alpha, 0xff));
-			SDL_RenderCopy(gfx_renderer, overlay, NULL, NULL);
+			sdl_render_texture(gfx_renderer, overlay, NULL, NULL);
 		}
 	} else {
 		// 9397–10338ms: overlay static
 		if (overlay) {
 			SDL_SetTextureBlendMode(overlay, SDL_BLENDMODE_NONE);
-			SDL_RenderCopy(gfx_renderer, overlay, NULL, NULL);
+			sdl_render_texture(gfx_renderer, overlay, NULL, NULL);
 		}
 	}
 }
