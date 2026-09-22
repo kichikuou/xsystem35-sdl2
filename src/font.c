@@ -30,7 +30,7 @@
 #include FT_TRUETYPE_TABLES_H
 
 #ifdef _WIN32
-#include "win/resources.h"
+#include "win/resource_io.h"
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -80,21 +80,25 @@ static struct {
 } this;
 
 #if defined(_WIN32) || defined(__ANDROID__)
-// Create a face from the whole content of `rw`. The memory holding the font
+// Create a face from the whole content of `stream`. The memory holding the font
 // file must outlive the face, and faces are never closed, so it is never freed.
-static FT_Face face_from_rwops(SDL_RWops *rw, int index) {
-	Sint64 size = SDL_RWsize(rw);
+static FT_Face face_from_io(sdl_iostream_t *stream, int index) {
+	int64_t size = sdl_get_io_size(stream);
 	if (size <= 0) {
-		SDL_RWclose(rw);
+		sdl_close_io(stream);
 		return NULL;
 	}
 	FT_Byte *buf = malloc(size);
-	if (SDL_RWread(rw, buf, 1, size) != (size_t)size) {
-		free(buf);
-		SDL_RWclose(rw);
+	if (!buf) {
+		sdl_close_io(stream);
 		return NULL;
 	}
-	SDL_RWclose(rw);
+	if (sdl_read_io(stream, buf, size) != (size_t)size) {
+		free(buf);
+		sdl_close_io(stream);
+		return NULL;
+	}
+	sdl_close_io(stream);
 
 	FT_Face face;
 	if (FT_New_Memory_Face(ft_library, buf, size, index, &face)) {
@@ -118,22 +122,22 @@ static FT_Face open_face(const char *name, int index) {
 		face = NULL;
 
 	if (!face) {
-		SDL_RWops *res = open_resource(name, "fonts");
+		sdl_iostream_t *res = open_resource(name, "fonts");
 		if (res)
-			face = face_from_rwops(res, index);
+			face = face_from_io(res, index);
 	}
 #endif
 	if (!face && FT_New_Face(ft_library, name, index, &face))
 		face = NULL;  // FT_New_Face() does not clear `face` on failure.
 #ifdef __ANDROID__
 	// The default fonts are stored as apk assets, which can only be opened
-	// through SDL_RWFromFile. (It is not used as the first choice because it
+	// through SDL's IO API. (It is not used as the first choice because it
 	// does not resolve a relative path against the current directory, which a
 	// custom font specified in .xsys35rc may use.)
 	if (!face) {
-		SDL_RWops *rw = SDL_RWFromFile(name, "rb");
-		if (rw)
-			face = face_from_rwops(rw, index);
+		sdl_iostream_t *stream = sdl_io_from_file(name, "rb");
+		if (stream)
+			face = face_from_io(stream, index);
 	}
 #endif
 	if (face) {

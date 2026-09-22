@@ -42,7 +42,4 @@
 #define ID_OPTION_SOUND           40023
 #define ID_MSGSKIP                40030
 
-struct SDL_RWops;
-struct SDL_RWops *open_resource(const char* name, const char* type);
-
 #endif /* __RESOURCES_H__ */

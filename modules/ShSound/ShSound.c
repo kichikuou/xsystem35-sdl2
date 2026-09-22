@@ -25,6 +25,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "sdl_compat.h"
 
@@ -44,7 +45,7 @@ static struct {
 } memwav;
 
 static void free_memory_wav(void) {
-	SDL_FreeWAV(memwav.buf);
+	sdl_free_wav(memwav.buf);
 	memwav.buf = NULL;
 }
 
@@ -132,11 +133,15 @@ static void wavLoadMemory() {
 		WARNING("cannot open WAVE %d", no - 1);
 		return;
 	}
-	if (!SDL_LoadWAV_RW(SDL_RWFromConstMem(dfile->data, dfile->size), 1, &memwav.spec, &memwav.buf, &memwav.len)) {
+	sdl_iostream_t *stream = sdl_io_from_const_memory(
+		dfile->data, dfile->size);
+	if (!stream || !sdl_load_wav_io(
+			stream, true, &memwav.spec, &memwav.buf, &memwav.len)) {
 		WARNING("cannot load WAVE %d", no - 1);
 		return;
 	}
-	if (memwav.spec.channels != 2 || memwav.spec.format != AUDIO_S16LSB) {
+	if (memwav.spec.channels != 2 ||
+	    memwav.spec.format != sdl_audio_s16le_format()) {
 		WARNING("unexpected audio format");
 		free_memory_wav();
 		return;

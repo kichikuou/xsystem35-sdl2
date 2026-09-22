@@ -12,6 +12,17 @@
 
 void sdl_compat_test(void)
 {
+	static const uint8_t data[] = {1, 2, 3, 4};
+	sdl_iostream_t *stream = sdl_io_from_const_memory(data, sizeof(data));
+	ASSERT_TRUE(stream);
+	ASSERT_EQUAL(sdl_get_io_size(stream), sizeof(data));
+	uint8_t buffer[3];
+	ASSERT_EQUAL(sdl_read_io(stream, buffer, sizeof(buffer)), sizeof(buffer));
+	ASSERT_EQUAL(buffer[0], 1);
+	ASSERT_EQUAL(buffer[1], 2);
+	ASSERT_EQUAL(buffer[2], 3);
+	ASSERT_TRUE(sdl_close_io(stream));
+
 	SDL_Surface *source = sdl_create_surface(
 		4, 4, 32, SDL_PIXELFORMAT_XRGB8888);
 	SDL_Surface *destination = sdl_create_surface(

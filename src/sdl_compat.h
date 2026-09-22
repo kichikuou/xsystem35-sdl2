@@ -2,6 +2,7 @@
 #define XSYSTEM35_SDL_COMPAT_H
 
 #include <stdbool.h>
+#include <limits.h>
 #include <stdint.h>
 
 #ifndef XSYSTEM35_SDL_VERSION
@@ -31,6 +32,94 @@
 #define SDL_SwapLE32 SDL_Swap32LE
 #define SDL_PIXELFORMAT_RGB888 SDL_PIXELFORMAT_XRGB8888
 #endif
+
+#if XSYSTEM35_SDL_VERSION == 2
+typedef SDL_RWops sdl_iostream_t;
+#else
+typedef SDL_IOStream sdl_iostream_t;
+#endif
+
+static inline sdl_iostream_t *sdl_io_from_file(
+	const char *path, const char *mode)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RWFromFile(path, mode);
+#else
+	return SDL_IOFromFile(path, mode);
+#endif
+}
+
+static inline sdl_iostream_t *sdl_io_from_const_memory(
+	const void *data, size_t size)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	if (size > INT_MAX) {
+		SDL_SetError("Memory stream is too large");
+		return NULL;
+	}
+	return SDL_RWFromConstMem(data, (int)size);
+#else
+	return SDL_IOFromConstMem(data, size);
+#endif
+}
+
+static inline int64_t sdl_get_io_size(sdl_iostream_t *stream)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RWsize(stream);
+#else
+	return SDL_GetIOSize(stream);
+#endif
+}
+
+static inline size_t sdl_read_io(
+	sdl_iostream_t *stream, void *destination, size_t bytes)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RWread(stream, destination, 1, bytes);
+#else
+	return SDL_ReadIO(stream, destination, bytes);
+#endif
+}
+
+static inline bool sdl_close_io(sdl_iostream_t *stream)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_RWclose(stream) == 0;
+#else
+	return SDL_CloseIO(stream);
+#endif
+}
+
+static inline bool sdl_load_wav_io(sdl_iostream_t *stream, bool close_stream,
+	SDL_AudioSpec *spec, uint8_t **buffer, uint32_t *length)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_LoadWAV_RW(stream, close_stream ? 1 : 0,
+		spec, buffer, length) != NULL;
+#else
+	return SDL_LoadWAV_IO(
+		stream, close_stream, spec, buffer, length);
+#endif
+}
+
+static inline void sdl_free_wav(uint8_t *buffer)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_FreeWAV(buffer);
+#else
+	SDL_free(buffer);
+#endif
+}
+
+static inline SDL_AudioFormat sdl_audio_s16le_format(void)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return AUDIO_S16LSB;
+#else
+	return SDL_AUDIO_S16LE;
+#endif
+}
 
 static inline SDL_Window *sdl_create_window(const char *title, int width,
 	int height, SDL_WindowFlags flags)
