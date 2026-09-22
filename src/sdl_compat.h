@@ -121,6 +121,34 @@ static inline SDL_AudioFormat sdl_audio_s16le_format(void)
 #endif
 }
 
+static inline bool sdl_get_current_display_mode(SDL_DisplayMode *mode)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_GetCurrentDisplayMode(0, mode) == 0;
+#else
+	const SDL_DisplayMode *current =
+		SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
+	if (!current)
+		return false;
+	*mode = *current;
+	return true;
+#endif
+}
+
+static inline bool sdl_get_desktop_display_mode(SDL_DisplayMode *mode)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_GetDesktopDisplayMode(0, mode) == 0;
+#else
+	const SDL_DisplayMode *desktop =
+		SDL_GetDesktopDisplayMode(SDL_GetPrimaryDisplay());
+	if (!desktop)
+		return false;
+	*mode = *desktop;
+	return true;
+#endif
+}
+
 static inline SDL_Window *sdl_create_window(const char *title, int width,
 	int height, SDL_WindowFlags flags)
 {

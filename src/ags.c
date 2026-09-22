@@ -205,7 +205,7 @@ void ags_getDisplayInfo(enum ags_display display, int *width, int *height, int *
 	SDL_DisplayMode dm;
 	switch (display) {
 	case AGS_DISPLAY_CURRENT:
-		SDL_GetCurrentDisplayMode(0, &dm);
+		sdl_get_current_display_mode(&dm);
 		*width = dm.w;
 		*height = dm.h;
 		*depth = SDL_BITSPERPIXEL(dm.format);
@@ -216,13 +216,13 @@ void ags_getDisplayInfo(enum ags_display display, int *width, int *height, int *
 		*depth = nact->ags.world_depth;
 		break;
 	case AGS_DISPLAY_VIEW_AREA:
-		SDL_GetCurrentDisplayMode(0, &dm);
+		sdl_get_current_display_mode(&dm);
 		*width = nact->ags.view_area.w;
 		*height = nact->ags.view_area.h;
 		*depth = SDL_BITSPERPIXEL(dm.format);
 		break;
 	case AGS_DISPLAY_DESKTOP:
-		SDL_GetDesktopDisplayMode(0, &dm);
+		sdl_get_desktop_display_mode(&dm);
 		*width = dm.w;
 		*height = dm.h;
 		*depth = SDL_BITSPERPIXEL(dm.format);
