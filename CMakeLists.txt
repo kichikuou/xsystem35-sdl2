@@ -139,9 +139,15 @@ else()  # non-emscripten, non-android
         )
       FetchContent_MakeAvailable(SDL3_mixer)
     endif()
-    target_link_libraries(xsystem35_sdl INTERFACE SDL3::SDL3)
-    target_link_libraries(xsystem35_sdl_mixer INTERFACE
-      SDL3_mixer::SDL3_mixer)
+    if (WIN32)
+      target_link_libraries(xsystem35_sdl INTERFACE SDL3::SDL3-static)
+      target_link_libraries(xsystem35_sdl_mixer INTERFACE
+        SDL3_mixer::SDL3_mixer-static)
+    else()
+      target_link_libraries(xsystem35_sdl INTERFACE SDL3::SDL3)
+      target_link_libraries(xsystem35_sdl_mixer INTERFACE
+        SDL3_mixer::SDL3_mixer)
+    endif()
   endif()
   if (WIN32)
     add_static_library(freetype2 FREETYPE)

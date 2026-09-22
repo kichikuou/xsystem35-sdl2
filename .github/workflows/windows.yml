@@ -74,9 +74,6 @@ jobs:
     - name: Package
       run: |
         cp out/release/src/xsystem35.exe out/release/doc/*.html *.md COPYING xsys35rc.sample dist/
-        ldd out/release/src/xsystem35.exe \
-          | awk '$2 == "=>" && tolower($3) ~ /\.dll$/ && $3 !~ /WINDOWS/ { print $3 }' \
-          | xargs -r cp -t dist/
 
     - name: Upload
       uses: actions/upload-artifact@v7
