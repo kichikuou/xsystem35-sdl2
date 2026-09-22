@@ -208,6 +208,12 @@ else()  # non-emscripten, non-android
   endif()
   if (ENABLE_MIDI_PORTMIDI)
     target_link_libraries(xsystem35 PRIVATE ${PORTMIDI})
+    if (WIN32)
+      # Other static dependencies can place winmm before PortMidi on the link
+      # line. Rescan the pair so PortMidi's WinMM imports are resolved.
+      target_link_libraries(xsystem35 PRIVATE
+        "-Wl,--start-group,-lportmidi,-lwinmm,--end-group")
+    endif()
   endif()
 
   install(TARGETS xsystem35 RUNTIME DESTINATION bin)

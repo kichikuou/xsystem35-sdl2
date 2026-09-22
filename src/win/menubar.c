@@ -18,9 +18,10 @@
  */
 #include <windows.h>
 #include <time.h>
-#include "sdl_compat.h"
+#include "window.h"
 #include "system.h"
 #include "menu.h"
+#include "event.h"
 #include "nact.h"
 #include "gfx.h"
 #include "resources.h"
@@ -30,12 +31,15 @@
 
 static HMENU hmenu;
 
-static HWND get_hwnd(SDL_Window *window) {
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(window, &info);
-	return info.info.win.window;
+#if XSYSTEM35_SDL_VERSION == 3
+static bool SDLCALL menu_message_hook(void *userdata, MSG *msg)
+{
+	if (msg->message == WM_COMMAND && msg->hwnd &&
+	    msg->hwnd == win_get_hwnd((SDL_Window *)userdata))
+		event_post_win_menu_command((unsigned int)msg->wParam);
+	return true;
 }
+#endif
 
 static void saveScreenshot(void) {
 	char pathbuf[MAX_PATH];
@@ -45,7 +49,7 @@ static void saveScreenshot(void) {
 
 	OPENFILENAME ofn = {
 		.lStructSize = sizeof(OPENFILENAME),
-		.hwndOwner = get_hwnd(gfx_getWindow()),
+		.hwndOwner = win_get_hwnd(gfx_getWindow()),
 		.lpstrFilter = "Bitmap files (*.bmp)\0*.bmp\0All files (*.*)\0*.*\0",
 		.lpstrFile = pathbuf,
 		.nMaxFile = MAX_PATH,
@@ -83,8 +87,12 @@ void menu_init(void) {
 	gfx_getViewSize(&view_w, &view_h);
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
-	SetMenu(get_hwnd(window), hmenu);
+	SetMenu(win_get_hwnd(window), hmenu);
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+#else
+	SDL_SetWindowsMessageHook(menu_message_hook, window);
+#endif
 	// Let SDL recalc the window size, taking menu height into account.
 	SDL_SetWindowSize(window, view_w, view_h);
 	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
@@ -94,11 +102,9 @@ void menu_init(void) {
 void menu_open(void) {
 }
 
-void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
+void win_menu_onCommand(unsigned int command) {
 	bool checked;
-	switch (msg->msg.win.msg) {
-	case WM_COMMAND:
-		switch (msg->msg.win.wParam) {
+	switch (command) {
 		case ID_SCREENSHOT:
 			saveScreenshot();
 			break;
@@ -110,11 +116,11 @@ void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 			break;
 		case ID_SCREEN_WINDOW:
 			gfx_setFullscreen(false);
-			SetMenu(get_hwnd(gfx_getWindow()), hmenu);
+			SetMenu(win_get_hwnd(gfx_getWindow()), hmenu);
 			break;
 		case ID_SCREEN_FULL:
 			gfx_setFullscreen(true);
-			SetMenu(get_hwnd(gfx_getWindow()), NULL);
+			SetMenu(win_get_hwnd(gfx_getWindow()), NULL);
 			break;
 		case ID_SCREEN_INTEGER_SCALING:
 			if (toggle_menu_item(ID_SCREEN_INTEGER_SCALING, &checked))
@@ -134,19 +140,17 @@ void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 		case ID_MSGSKIP:
 			msgskip_activate(!msgskip_isActivated());
 			break;
-		}
-		break;
 	}
 }
 
 void win_menu_onMouseMotion(int x, int y) {
 	if (!gfx_isFullscreen())
 		return;
-	SetMenu(get_hwnd(gfx_getWindow()), y > 0 ? NULL : hmenu);
+	SetMenu(win_get_hwnd(gfx_getWindow()), y > 0 ? NULL : hmenu);
 }
 
 void menu_setSkipState(bool enabled, bool activated) {
-	HWND hwnd = get_hwnd(gfx_getWindow());
+	HWND hwnd = win_get_hwnd(gfx_getWindow());
 
 	EnableMenuItem(hmenu, ID_MSGSKIP, enabled ? MF_ENABLED : MF_GRAYED);
 

@@ -51,6 +51,9 @@ static uint32_t custom_event_type = (uint32_t)-1;
 enum CustomEventCode {
 	SIMULATE_RIGHT_BUTTON,
 	DEBUGGER_COMMAND,
+#if defined(_WIN32) && XSYSTEM35_SDL_VERSION == 3
+	WIN_MENU_COMMAND,
+#endif
 };
 
 static SDL_Point mouse_pos;
@@ -385,9 +388,10 @@ void event_handle_event(SDL_Event *e) {
 	case SDL_COMPAT_EVENT_QUIT:
 		menu_quitmenu_open();
 		break;
-#ifdef _WIN32
+#if defined(_WIN32) && XSYSTEM35_SDL_VERSION == 2
 	case SDL_SYSWMEVENT:
-		win_menu_onSysWMEvent(e->syswm.msg);
+		if (e->syswm.msg->msg.win.msg == WM_COMMAND)
+			win_menu_onCommand((unsigned int)e->syswm.msg->msg.win.wParam);
 		break;
 #endif
 	case SDL_COMPAT_EVENT_DID_ENTER_FOREGROUND:
@@ -562,6 +566,11 @@ void event_handle_event(SDL_Event *e) {
 			case DEBUGGER_COMMAND:
 				dbg_post_command(e->user.data1);
 				break;
+#if defined(_WIN32) && XSYSTEM35_SDL_VERSION == 3
+			case WIN_MENU_COMMAND:
+				win_menu_onCommand((unsigned int)(uintptr_t)e->user.data1);
+				break;
+#endif
 			}
 		}
 		break;
@@ -654,6 +663,19 @@ void event_post_debugger_command(void *data) {
 	};
 	SDL_PushEvent(&event);
 }
+
+#if defined(_WIN32) && XSYSTEM35_SDL_VERSION == 3
+void event_post_win_menu_command(unsigned int command) {
+	SDL_Event event = {
+		.user = {
+			.type = custom_event_type,
+			.code = WIN_MENU_COMMAND,
+			.data1 = (void *)(uintptr_t)command
+		}
+	};
+	SDL_PushEvent(&event);
+}
+#endif
 
 #ifdef __EMSCRIPTEN__
 EMSCRIPTEN_KEEPALIVE

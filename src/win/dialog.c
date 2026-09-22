@@ -18,17 +18,10 @@
  */
 #include <windows.h>
 #include <commctrl.h>
-#include "sdl_compat.h"
+#include "window.h"
 #include "input_modal.h"
 #include "gfx.h"
 #include "resources.h"
-
-static HWND get_hwnd(SDL_Window *window) {
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(window, &info);
-	return info.info.win.window;
-}
 
 static INT_PTR CALLBACK text_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -139,7 +132,7 @@ bool input_modal_string(INPUTSTRING_PARAM *p) {
 	DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_TEXTINPUT),
-		get_hwnd(gfx_getWindow()),
+		win_get_hwnd(gfx_getWindow()),
 		text_dialog_proc,
 		(LPARAM)p);
 	return true;
@@ -149,7 +142,7 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 	INT_PTR ret = DialogBoxParamW(
 		GetModuleHandle(NULL),
 		MAKEINTRESOURCEW(IDD_NUMINPUT),
-		get_hwnd(gfx_getWindow()),
+		win_get_hwnd(gfx_getWindow()),
 		num_dialog_proc,
 		(LPARAM)p);
 	return ret == IDOK;
