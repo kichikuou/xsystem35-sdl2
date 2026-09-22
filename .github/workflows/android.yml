@@ -24,5 +24,6 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v7
       with:
+        name: xsystem35-android-sdl3
         path: android/app/build/outputs/apk/release/app-release.apk
         archive: false

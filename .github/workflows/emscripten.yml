@@ -8,6 +8,11 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdl-version: [2, 3]
+    name: Emscripten SDL${{ matrix.sdl-version }}
     steps:
 
     - uses: actions/checkout@v6
@@ -17,7 +22,7 @@ jobs:
       uses: actions/cache@v5
       with:
         path: ${{env.EM_CACHE_FOLDER}}
-        key: ${{env.EM_VERSION}}-${{ runner.os }}
+        key: ${{env.EM_VERSION}}-${{ runner.os }}-sdl${{ matrix.sdl-version }}
 
     - name: Setup Emscripten toolchain
       uses: emscripten-core/setup-emsdk@v16
@@ -30,15 +35,16 @@ jobs:
 
     - name: Build
       run: |
-        mkdir -p out/wasm
-        cd out/wasm
-        emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_COMPILE_WARNING_AS_ERROR=YES ../../
-        make -j4
-        mkdir xsystem35
-        mv src/xsystem35.* xsystem35/
+        emcmake cmake -S . -B out/wasm \
+          -DCMAKE_BUILD_TYPE=MinSizeRel \
+          -DCMAKE_COMPILE_WARNING_AS_ERROR=YES \
+          -DXSYSTEM35_SDL_VERSION=${{ matrix.sdl-version }}
+        cmake --build out/wasm -j4
+        mkdir out/wasm/xsystem35
+        mv out/wasm/src/xsystem35.* out/wasm/xsystem35/
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v7
       with:
-        name: xsystem35-wasm
+        name: xsystem35-wasm-sdl${{ matrix.sdl-version }}
         path: out/wasm/xsystem35

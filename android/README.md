@@ -73,6 +73,11 @@ Note: This ZIP format is also compatible with
 
 ## Building from Source
 
+Android builds use SDL3 exclusively. Gradle downloads the fixed official SDL3
+3.4.16 and SDL3_mixer 3.2.4 AARs, verifies their checksums, and supplies their
+native libraries to CMake through Prefab. No separate SDL installation is
+required.
+
 ### Using Android Studio
 Open this directory as an Android Studio project.
 

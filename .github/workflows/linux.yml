@@ -3,33 +3,38 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
+      fail-fast: false
       matrix:
         build-type: ["Debug", "Release"]
+        sdl-version: [2, 3]
 
-    name: Linux ${{ matrix.build-type }}
+    name: Linux SDL${{ matrix.sdl-version }} ${{ matrix.build-type }}
     steps:
     - uses: actions/checkout@v6
 
     - name: Install Deps
       run: |
         sudo apt update
-        sudo apt install libsdl2-dev libfreetype-dev libsdl2-mixer-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor gettext
+        sudo apt install libfreetype-dev libwebp-dev libportmidi-dev libcjson-dev asciidoctor gettext
+        if [ "${{ matrix.sdl-version }}" = 2 ]; then
+          sudo apt install libsdl2-dev libsdl2-mixer-dev
+        else
+          sudo apt install libsdl3-dev libsdl3-mixer-dev
+        fi
 
     - name: Build
       run: |
-        mkdir -p out/${{ matrix.build-type }}
-        cd out/${{ matrix.build-type }}
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} ../../
-        make -j4
+        cmake -S . -B out/build -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} \
+          -DXSYSTEM35_SDL_VERSION=${{ matrix.sdl-version }}
+        cmake --build out/build -j4
 
     - name: Test
-      run: ctest --output-on-failure
-      working-directory: out/${{ matrix.build-type }}
+      run: ctest --test-dir out/build --output-on-failure
 
     - name: Verify xsystem35.pot is up to date
-      if: matrix.build-type == 'Debug'
+      if: matrix.build-type == 'Debug' && matrix.sdl-version == 2
       run: |
         xgettext --default-domain=xsystem35 --directory=. \
           --keyword=_ --keyword=N_ \

@@ -9,11 +9,23 @@ jobs:
       matrix:
         include:
           - sys: mingw32
-            package: "xsystem35-32bit"
+            package: "xsystem35-sdl2-32bit"
+            sdl-version: 2
+            sdl-deps: "SDL2:p SDL2_mixer:p"
             cmake_args: "-DENABLE_DEBUGGER=no"
             deps: ""
           - sys: ucrt64
-            package: "xsystem35-64bit"
+            package: "xsystem35-sdl2-64bit"
+            sdl-version: 2
+            sdl-deps: "SDL2:p SDL2_mixer:p"
+            cmake_args: ""
+            deps: >-
+              cjson:p
+              portmidi:p
+          - sys: ucrt64
+            package: "xsystem35-sdl3-64bit"
+            sdl-version: 3
+            sdl-deps: "sdl3:p sdl3-mixer:p"
             cmake_args: ""
             deps: >-
               cjson:p
@@ -21,7 +33,7 @@ jobs:
     defaults:
       run:
         shell: msys2 {0}
-    name: MSYS2 ${{ matrix.sys }}
+    name: MSYS2 SDL${{ matrix.sdl-version }} ${{ matrix.sys }}
     steps:
 
     - name: Set up MSYS2
@@ -29,9 +41,8 @@ jobs:
       with:
         msystem: ${{ matrix.sys }}
         pacboy: >-
-          SDL2:p
+          ${{ matrix.sdl-deps }}
           freetype:p
-          SDL2_mixer:p
           libwebp:p
           ${{ matrix.deps }}
 
@@ -50,10 +61,11 @@ jobs:
 
     - name: Build
       run: |
-        mkdir -p out/release
-        cd out/release
-        cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_COMPILE_WARNING_AS_ERROR=YES ${{ matrix.cmake_args }} ../../
-        ninja
+        cmake -S . -B out/release -GNinja -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_COMPILE_WARNING_AS_ERROR=YES \
+          -DXSYSTEM35_SDL_VERSION=${{ matrix.sdl-version }} \
+          ${{ matrix.cmake_args }}
+        cmake --build out/release
 
     - name: Test
       run: ctest --output-on-failure
@@ -62,6 +74,9 @@ jobs:
     - name: Package
       run: |
         cp out/release/src/xsystem35.exe out/release/doc/*.html *.md COPYING xsys35rc.sample dist/
+        ldd out/release/src/xsystem35.exe \
+          | awk '$2 == "=>" && tolower($3) ~ /\.dll$/ && $3 !~ /WINDOWS/ { print $3 }' \
+          | xargs -r cp -t dist/
 
     - name: Upload
       uses: actions/upload-artifact@v7
