@@ -15,7 +15,8 @@ static surface_t *create(int width, int height, bool has_pixel, bool has_alpha) 
 	s->height = height;
 
 	if (has_pixel) {
-		s->sdl_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_RGB888);
+		s->sdl_surface = sdl_create_surface(
+			width, height, 32, SDL_PIXELFORMAT_RGB888);
 	}
 	
 	if (has_alpha) {
@@ -47,7 +48,7 @@ surface_t *sf_create_pixel(int width, int height) {
  */
 void sf_free(surface_t *s) {
 	if (s == NULL) return;
-	if (s->sdl_surface) SDL_FreeSurface(s->sdl_surface);
+	if (s->sdl_surface) sdl_destroy_surface(s->sdl_surface);
 	if (s->alpha) free(s->alpha);
 	free(s);
 }
@@ -67,7 +68,8 @@ surface_t *sf_dup(surface_t *in) {
 	memcpy(sf, in, sizeof(surface_t));
 	
 	if (in->sdl_surface) {
-		sf->sdl_surface = SDL_ConvertSurface(in->sdl_surface, in->sdl_surface->format, 0);
+		sf->sdl_surface = sdl_convert_surface(
+			in->sdl_surface, sdl_surface_format(in->sdl_surface));
 	}
 	
 	if (in->alpha) {

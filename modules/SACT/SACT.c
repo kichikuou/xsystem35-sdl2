@@ -147,7 +147,8 @@ static void Init() {
 	}
 	
 	// create depth map
-	sact.dmap = SDL_CreateRGBSurface(0, main_surface->w, main_surface->h, 16, 0, 0, 0, 0);
+	sact.dmap = sdl_create_surface_with_masks(
+		main_surface->w, main_surface->h, 16, 0, 0, 0, 0);
 	
 	// その他 System35 のデフォルト動作の変更
 	ags_setAntialiasedStringMode(true);
@@ -2154,7 +2155,7 @@ static void SACT_reset(void) {
 	sp_reset();
 
 	scg_freeall();
-	SDL_FreeSurface(sact.dmap);
+	sdl_destroy_surface(sact.dmap);
 	memset(&sact, 0, sizeof(sact));
 }
 

@@ -84,10 +84,11 @@ static void Run() {
 
 		cgdata *cg = jpeg_extract(alk->entries[i].data, alk->entries[i].size);
 		if (cg) {
-			SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+			SDL_Surface *sf = sdl_create_surface_from(cg->pic, cg->width,
+				cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
 			SDL_BlitSurface(sf, NULL, main_surface, NULL);
 			ags_updateFull();
-			SDL_FreeSurface(sf);
+			sdl_destroy_surface(sf);
 			cgdata_free(cg);
 		} else {
 			WARNING("Cannot decode CG %d", i);

@@ -142,7 +142,7 @@ void ntmsg_set_frame(int type) {
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], true);
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], true);
 		
-		SDL_FillRect(sf, &msgframe_0, SDL_MapRGBA(sf->format, 16, 32, 64, 192));
+		SDL_FillRect(sf, &msgframe_0, sdl_map_rgba(sf, 16, 32, 64, 192));
 		ntmsg_clear(SPNO_MSGFRAME_FG);
 		nt_sp_update_all(true);
 		break;
@@ -151,7 +151,7 @@ void ntmsg_set_frame(int type) {
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_BG], false);
 		nt_sp_set_show(night.sp[SPNO_MSGFRAME_FG], true);
 		
-		SDL_FillRect(sf, &msgframe_1, SDL_MapRGBA(sf->format, 32, 32, 32, 128));
+		SDL_FillRect(sf, &msgframe_1, sdl_map_rgba(sf, 32, 32, 32, 128));
 		ntmsg_clear(SPNO_MSGFRAME_FG);
 		nt_sp_update_all(true);
 	

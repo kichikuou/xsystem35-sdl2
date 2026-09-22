@@ -88,11 +88,11 @@ static vmvar_t *add_p5[SLOT]; /* どこまでアニメーションのコマが�
 
 static void copy_sprite(int sx, int sy, int width, int height, int dx, int dy, int r, int g, int b) {
 	SDL_Surface *sf = nact->ags.dib->sdl_surface;
-	SDL_SetColorKey(sf, SDL_TRUE, SDL_MapRGB(sf->format, r, g, b));
+	sdl_set_surface_color_key(sf, true, sdl_map_rgb(sf, r, g, b));
 	SDL_Rect src_rect = { sx, sy, width, height };
 	SDL_Rect dst_rect = { dx, dy, width, height };
 	SDL_BlitSurface(sf, &src_rect, sf, &dst_rect);
-	SDL_SetColorKey(sf, SDL_FALSE, 0);
+	sdl_set_surface_color_key(sf, false, 0);
 }
 
 static void Init() {

@@ -55,7 +55,7 @@ void nt_sp_draw(sprite_t *sp, SDL_Rect *r) {
 		return;
 	}
 
-	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format) || sp->blendrate < 255) {
+	if (SDL_ISPIXELFORMAT_ALPHA(sdl_surface_format(cg->sf)) || sp->blendrate < 255) {
 		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_BLEND);
 		SDL_SetSurfaceAlphaMod(cg->sf, sp->blendrate);
 	} else {

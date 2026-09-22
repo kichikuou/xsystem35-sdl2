@@ -204,5 +204,5 @@ void nt_sp_clear_updatelist(void) {
 
 // デフォルトの壁紙update
 void nt_sp_draw_wall(sprite_t *sp, SDL_Rect *area) {
-	SDL_FillRect(main_surface, area, SDL_MapRGB(main_surface->format, 0, 0, 0));
+	SDL_FillRect(main_surface, area, sdl_map_rgb(main_surface, 0, 0, 0));
 }

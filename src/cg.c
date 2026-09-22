@@ -127,17 +127,19 @@ static void cg_mosaic(cgdata *cg) {
 	default:
 		SYSERROR("Unsupported cg depth %d", cg->depth);
 	}
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormatFrom(
-		cg->pic, cg->width, cg->height, cg->depth, cg->width * (cg->depth / 8), format);
-	SDL_Surface *tmp = SDL_CreateRGBSurfaceWithFormat(
-		0, (cg->width + MOSAIC_SIZE - 1) / MOSAIC_SIZE, (cg->height + MOSAIC_SIZE - 1) / MOSAIC_SIZE, cg->depth, format);
-	if (sf->format->palette)
-		SDL_SetSurfacePalette(tmp, sf->format->palette);
+	SDL_Surface *sf = sdl_create_surface_from(cg->pic, cg->width, cg->height,
+		cg->depth, cg->width * (cg->depth / 8), format);
+	SDL_Surface *tmp = sdl_create_surface(
+		(cg->width + MOSAIC_SIZE - 1) / MOSAIC_SIZE,
+		(cg->height + MOSAIC_SIZE - 1) / MOSAIC_SIZE, cg->depth, format);
+	SDL_Palette *palette = sdl_get_surface_palette(sf);
+	if (palette)
+		sdl_set_surface_palette(tmp, palette);
 	// NOTE: SDL_BlitScaled() does not support 8-bit surfaces.
 	SDL_SoftStretch(sf, NULL, tmp, NULL);
 	SDL_SoftStretch(tmp, NULL, sf, NULL);
-	SDL_FreeSurface(tmp);
-	SDL_FreeSurface(sf);
+	sdl_destroy_surface(tmp);
+	sdl_destroy_surface(sf);
 }
 
 /*
@@ -644,34 +646,37 @@ SDL_Surface *cg_load_as_sdlsurface_from_data(uint8_t *data, size_t size, bool mo
 		cg_mosaic(cg);
 	}
 
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, cg->width, cg->height, 32,
+	SDL_Surface *sf = sdl_create_surface(cg->width, cg->height, 32,
 		(cg->alpha || (type == ALCG_PMS8 && as_alpha)) ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_XRGB8888);
 
 	if (type == ALCG_PMS8) {
 		if (as_alpha) {
 			// Treat PMS8 as an alpha map. Palette is ignored.
-			SDL_FillRect(sf, NULL, SDL_MapRGBA(sf->format, 255, 255, 255, 0));
+			SDL_FillRect(sf, NULL, sdl_map_rgba(sf, 255, 255, 255, 0));
 			cg->alpha = cg->pic;
 			cg->pic = NULL;
 		} else {
 			// Treat PMS8 as a paletted image.
-			SDL_Surface *pic = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 8, cg->width, SDL_PIXELFORMAT_INDEX8);
-			SDL_Palette *palette = SDL_AllocPalette(256);
+			SDL_Surface *pic = sdl_create_surface_from(cg->pic, cg->width,
+				cg->height, 8, cg->width, SDL_PIXELFORMAT_INDEX8);
+			SDL_Palette *palette = sdl_create_palette(256);
 			SDL_SetPaletteColors(palette, cg->pal, 0, 256);
-			SDL_SetSurfacePalette(pic, palette);
-			SDL_FreePalette(palette);
+			sdl_set_surface_palette(pic, palette);
+			sdl_destroy_palette(palette);
 			SDL_BlitSurface(pic, NULL, sf, NULL);
-			SDL_FreeSurface(pic);
+			sdl_destroy_surface(pic);
 		}
 	} else {
 		SDL_Surface *pic;
 		if (type == ALCG_PMS16 || type == ALCG_BMP24) {
-			pic = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
+			pic = sdl_create_surface_from(cg->pic, cg->width, cg->height,
+				16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
 		} else {
-			pic = SDL_CreateRGBSurfaceWithFormatFrom(cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+			pic = sdl_create_surface_from(cg->pic, cg->width, cg->height,
+				24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
 		}
 		SDL_BlitSurface(pic, NULL, sf, NULL);
-		SDL_FreeSurface(pic);
+		sdl_destroy_surface(pic);
 	}
 	if (cg->alpha) {
 		// Copy alpha values from cg->alpha to sf->pixels.

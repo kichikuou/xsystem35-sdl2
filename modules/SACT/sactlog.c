@@ -73,8 +73,9 @@ static void draw_log() {
 	load_mincho_font();
 #endif
 
-	SDL_Surface *hline = SDL_CreateRGBSurfaceWithFormat(0, main_surface->w, 3, 32, SDL_PIXELFORMAT_RGB888);
-	SDL_FillRect(hline, NULL, SDL_MapRGB(hline->format, 255, 255, 255));
+	SDL_Surface *hline = sdl_create_surface(
+		main_surface->w, 3, 32, SDL_PIXELFORMAT_RGB888);
+	SDL_FillRect(hline, NULL, sdl_map_rgb(hline, 255, 255, 255));
 	SDL_SetSurfaceBlendMode(hline, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(hline, 128);
 
@@ -122,7 +123,7 @@ bool sblog_start(void) {
 	for (int i = 0; i < LOGMSG_LINES; i++)
 		sact.log = list_append(sact.log, logmsg[i]);
 	
-	back = SDL_ConvertSurface(main_surface, main_surface->format, 0);
+	back = sdl_convert_surface(main_surface, sdl_surface_format(main_surface));
 	curline = 6;
 	draw_log();
 	return true;
@@ -135,7 +136,7 @@ void sblog_end(void) {
 	SDL_BlitSurface(back, NULL, main_surface, NULL);
 	ags_updateFull();
 	
-	SDL_FreeSurface(back);
+	sdl_destroy_surface(back);
 
 	// Remove instruction text
 	for (i = 0; i < LOGMSG_LINES; i++) {

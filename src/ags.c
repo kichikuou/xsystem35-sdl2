@@ -333,10 +333,10 @@ void ags_getPixel(int x, int y, PixelColor *cell) {
 	if (!ags_check_param_xy(&x, &y)) return;
 
 	uint32_t pixel = gfx_getPixel(x, y);
-	if (main_surface->format->BitsPerPixel == 8) {
+	if (sdl_surface_bits_per_pixel(main_surface) == 8) {
 		cell->index = pixel;
 	} else {
-		SDL_GetRGB(pixel, main_surface->format, &cell->r, &cell->g, &cell->b);
+		sdl_get_rgb(pixel, main_surface, &cell->r, &cell->g, &cell->b);
 	}
 }
 

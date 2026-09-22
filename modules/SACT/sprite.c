@@ -65,7 +65,8 @@ static int compare_spriteno_smallfirst(const void *a, const void *b) {
 
 // デフォルトの壁紙update
 static void sp_draw_wall(sprite_t *sp) {
-	SDL_FillRect(main_surface, &sact.updaterect, SDL_MapRGB(main_surface->format, 0, 0, 0));
+	SDL_FillRect(main_surface, &sact.updaterect,
+		sdl_map_rgb(main_surface, 0, 0, 0));
 }
 
 /**
@@ -207,7 +208,8 @@ void sp_new_msg(int no, int x, int y, int width, int height) {
 	sp->u.msg.buf = NULL;
 
 	// canvas for drawing text
-	sp->u.msg.canvas = SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, SDL_PIXELFORMAT_ARGB8888);
+	sp->u.msg.canvas = sdl_create_surface(
+		width, height, 32, SDL_PIXELFORMAT_ARGB8888);
 
 	// スプライト再描画用コールバック
 	sp->update = smsg_update;
@@ -279,7 +281,7 @@ void sp_free(int no) {
 	
 	if (sp->type == SPRITE_MSG) {
 		slist_free(sp->u.msg.buf);
-		SDL_FreeSurface(sp->u.msg.canvas);
+		sdl_destroy_surface(sp->u.msg.canvas);
 	}
 	sact.updatelist = slist_remove(sact.updatelist, sp);
 	

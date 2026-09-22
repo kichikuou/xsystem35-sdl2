@@ -139,7 +139,7 @@ static EffectTexture *create_effect_texture(surface_t *as, int x, int y, int w, 
 	} else {
 		SDL_Surface *sf = gfx_createSurfaceView(as->sdl_surface, x, y, w, h);
 		t->tx = SDL_CreateTextureFromSurface(gfx_renderer, sf);
-		SDL_FreeSurface(sf);
+		sdl_destroy_surface(sf);
 		t->rect = (SDL_Rect){ 0, 0, w, h };
 	}
 	return t;
@@ -531,9 +531,8 @@ static void dithering_fade_step(struct effect *eff, float progress);
 static void dithering_fade_free(struct effect *eff);
 
 static EffectTexture *create_dither_pattern_texture(int w, int h, int val) {
-	SDL_PixelFormat *fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
-	Uint32 col = SDL_MapRGBA(fmt, val, val, val, SDL_ALPHA_OPAQUE);
-	SDL_FreeFormat(fmt);
+	Uint32 col = sdl_map_rgba_format(
+		SDL_PIXELFORMAT_ARGB8888, val, val, val, SDL_ALPHA_OPAQUE);
 
 	Uint32 *pixels = calloc(w * h, sizeof(Uint32));
 	if (!pixels)
@@ -1690,7 +1689,7 @@ static void raster_blend_free(struct effect *eff);
 static struct effect *raster_blend_new(SDL_Rect *rect, int sx, int sy) {
 	SDL_Surface *sprite = gfx_dib_to_surface_with_alpha(sx, sy, rect->w, rect->h);
 	EffectTexture *texture = create_effect_texture_from_surface(sprite);
-	SDL_FreeSurface(sprite);
+	sdl_destroy_surface(sprite);
 	struct effect *eff = calloc(1, sizeof(struct effect));
 	if (!eff)
 		NOMEMERR();
@@ -1876,7 +1875,7 @@ struct effect *sprite_effect_init(SDL_Rect *rect, int dx, int dy, int sx, int sy
 	EffectTexture *tx_old = create_effect_texture(gfx_dibinfo, dx, dy, rect->w, rect->h);
 	SDL_Surface *sprite = gfx_dib_to_surface_colorkey(sx, sy, rect->w, rect->h, col);
 	EffectTexture *tx_new = create_effect_texture_from_surface(sprite);
-	SDL_FreeSurface(sprite);
+	sdl_destroy_surface(sprite);
 
 	switch (type) {
 	case EFFECT_PAN_IN_DOWN:

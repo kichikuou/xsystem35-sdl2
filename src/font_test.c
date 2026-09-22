@@ -54,8 +54,8 @@ static int measure_h(FontSpec f) {
 static void assert_same_pixels(SDL_Surface *a, SDL_Surface *b) {
 	ASSERT_EQUAL(a->w, b->w);
 	ASSERT_EQUAL(a->h, b->h);
-	ASSERT_EQUAL(a->format->format, b->format->format);
-	int row_bytes = a->w * a->format->BytesPerPixel;
+	ASSERT_EQUAL(sdl_surface_format(a), sdl_surface_format(b));
+	int row_bytes = a->w * sdl_surface_bytes_per_pixel(a);
 	for (int y = 0; y < a->h; y++) {
 		const uint8_t *ap = (uint8_t *)a->pixels + y * a->pitch;
 		const uint8_t *bp = (uint8_t *)b->pixels + y * b->pitch;
@@ -73,8 +73,8 @@ static void glyph_cache_test(void) {
 				ASSERT_TRUE(first);
 				ASSERT_TRUE(cached);
 				assert_same_pixels(first, cached);
-				SDL_FreeSurface(first);
-				SDL_FreeSurface(cached);
+				sdl_destroy_surface(first);
+				sdl_destroy_surface(cached);
 			}
 		}
 	}
@@ -98,8 +98,8 @@ static void invariants_test(void) {
 					// The antialiased surface goes to gfx_drawAntiAlias_8bpp(),
 					// which reads a 32-bit alpha channel. The other one is
 					// blitted onto the indexed screen surface as is.
-					ASSERT_EQUAL(s->format->BitsPerPixel, aa ? 32 : 8);
-					SDL_FreeSurface(s);
+					ASSERT_EQUAL(sdl_surface_bits_per_pixel(s), aa ? 32 : 8);
+					sdl_destroy_surface(s);
 				}
 			}
 			// gfx_drawString() draws text by the top of the character cell,

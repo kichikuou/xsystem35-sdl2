@@ -194,5 +194,5 @@ void nt_gr_screencg(int no, int x, int y) {
 	SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_ADD);
 	SDL_BlitSurface(sf, NULL, main_surface, &(SDL_Rect){x, y, sf->w, sf->h});
 	ags_updateArea(x, y, sf->w, sf->h);
-	SDL_FreeSurface(sf);
+	sdl_destroy_surface(sf);
 }

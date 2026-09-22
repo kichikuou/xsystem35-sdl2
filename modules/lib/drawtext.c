@@ -75,6 +75,6 @@ int dt_drawtext_col(SDL_Surface *sf, int x, int y, char *buf, int r, int g, int 
 	SDL_Rect rect = {x, y, glyph->w, glyph->h};
 	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
 	SDL_BlitSurface(glyph, NULL, sf, &rect);
-	SDL_FreeSurface(glyph);
+	sdl_destroy_surface(glyph);
 	return rect.w;
 }

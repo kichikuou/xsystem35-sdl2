@@ -140,14 +140,14 @@ static void cb_select_release(agsevent_t *e) {
 }
 
 static void draw_box(SDL_Surface *dst, int x, int y, int w, int h) {
-	SDL_FillRect(dst, &(SDL_Rect){x, y, w, h}, SDL_MapRGB(dst->format, 0, 0, 0));
+	SDL_FillRect(dst, &(SDL_Rect){x, y, w, h}, sdl_map_rgb(dst, 0, 0, 0));
 	SDL_Rect border_rects[4] = {
 		{x, y, w, 1},
 		{x, y + h - 1, w, 1},
 		{x, y, 1, h},
 		{x + w - 1, y, 1, h}
 	};
-	SDL_FillRects(dst, border_rects, 4, SDL_MapRGB(dst->format, 255, 255, 255));
+	SDL_FillRects(dst, border_rects, 4, sdl_map_rgb(dst, 255, 255, 255));
 }
 
 // 選択ウィンドを更新するときの callback
@@ -180,7 +180,8 @@ static void setup_selwindow() {
 	int i;
 	
 	// 選択肢文字用 canvas
-	sact.sel.charcanvas = SDL_CreateRGBSurfaceWithFormat(0, sp->cg1->sf->w, sp->cg1->sf->h, 32, SDL_PIXELFORMAT_ARGB8888);
+	sact.sel.charcanvas = sdl_create_surface(
+		sp->cg1->sf->w, sp->cg1->sf->h, 32, SDL_PIXELFORMAT_ARGB8888);
 	SDL_SetSurfaceBlendMode(sact.sel.charcanvas, SDL_BLENDMODE_BLEND);
 	
 	dt_setfont(sact.sel.font_type, sact.sel.font_size);
@@ -228,7 +229,7 @@ static void remove_selwindow() {
 	
 	// 作業用 surface の削除
 	if (sact.sel.charcanvas)
-		SDL_FreeSurface(sact.sel.charcanvas);
+		sdl_destroy_surface(sact.sel.charcanvas);
 	sact.sel.charcanvas = NULL;
 }
 
@@ -266,7 +267,7 @@ void ssel_init() {
 void ssel_reset(void) {
 	ssel_clear();
 	if (sact.sel.charcanvas) {
-		SDL_FreeSurface(sact.sel.charcanvas);
+		sdl_destroy_surface(sact.sel.charcanvas);
 		sact.sel.charcanvas = NULL;
 	}
 }

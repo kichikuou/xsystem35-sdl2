@@ -38,7 +38,7 @@
 static void fill_dmap_mask(SDL_Surface *src, int sx, int sy, int dx ,int dy, int w, int h, uint16_t val) {
 	uint8_t *sp, *dp;
 	int x, y;
-	assert(src->format->Amask == 0xff000000);
+	assert(sdl_surface_alpha_mask(src) == 0xff000000);
 	dp = PIXEL_AT(sact.dmap, dx, dy);
 	sp = ALPHA_AT(src, sx, sy);
 	
@@ -75,7 +75,7 @@ void sp_draw(sprite_t *sp) {
 		return;
 	}
 
-	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format) || sp->blendrate < 255) {
+	if (SDL_ISPIXELFORMAT_ALPHA(sdl_surface_format(cg->sf)) || sp->blendrate < 255) {
 		SDL_SetSurfaceBlendMode(cg->sf, SDL_BLENDMODE_BLEND);
 		SDL_SetSurfaceAlphaMod(cg->sf, sp->blendrate);
 	} else {
@@ -116,7 +116,7 @@ void sp_draw_dmap(void* data, void* userdata) {
 		return;
 	}
 	
-	if (SDL_ISPIXELFORMAT_ALPHA(cg->sf->format->format)) {
+	if (SDL_ISPIXELFORMAT_ALPHA(sdl_surface_format(cg->sf))) {
 		fill_dmap_mask(cg->sf, sx, sy, dx, dy, w, h, sp->no);
 	} else {
 		SDL_FillRect(sact.dmap, &(SDL_Rect){dx, dy, w, h}, sp->no);

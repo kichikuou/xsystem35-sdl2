@@ -299,7 +299,7 @@ static int text_width(FontSpec spec, FT_Face face, const char *str_utf8, int len
 // (the glyph is drawn in `color`, its coverage scaled by `color.a` becoming the
 // alpha value) or an INDEX8 surface (covered pixels are set to the index 1).
 static void blit_glyph(const FT_Bitmap *bmp, SDL_Surface *dst, int x, int y, SDL_Color color) {
-	int bpp = dst->format->BytesPerPixel;
+	int bpp = sdl_surface_bytes_per_pixel(dst);
 	uint32_t rgb = color.r << 16 | color.g << 8 | color.b;
 
 	for (unsigned int row = 0; row < bmp->rows; row++) {
@@ -342,15 +342,15 @@ SDL_Surface *font_render_text(FontSpec spec, const char *str_utf8, SDL_Color col
 
 	SDL_Surface *sf;
 	if (antialias) {
-		sf = SDL_CreateRGBSurfaceWithFormat(0, width, font.height, 32, SDL_PIXELFORMAT_ARGB8888);
+		sf = sdl_create_surface(width, font.height, 32, SDL_PIXELFORMAT_ARGB8888);
 		if (sf)
 			SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_BLEND);
 	} else {
-		sf = SDL_CreateRGBSurfaceWithFormat(0, width, font.height, 8, SDL_PIXELFORMAT_INDEX8);
+		sf = sdl_create_surface(width, font.height, 8, SDL_PIXELFORMAT_INDEX8);
 		if (sf) {
 			SDL_Color pal[2] = {{0, 0, 0, 0}, {color.r, color.g, color.b, 255}};
-			SDL_SetPaletteColors(sf->format->palette, pal, 0, 2);
-			SDL_SetColorKey(sf, SDL_TRUE, 0);
+			SDL_SetPaletteColors(sdl_get_surface_palette(sf), pal, 0, 2);
+			sdl_set_surface_color_key(sf, true, 0);
 		}
 	}
 	if (!sf) {

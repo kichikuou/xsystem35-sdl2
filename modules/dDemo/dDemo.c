@@ -121,7 +121,7 @@ static void Init() {
 			continue;
 		}
 		dd.images[i] = SDL_CreateTextureFromSurface(gfx_renderer, sf);
-		SDL_FreeSurface(sf);
+		sdl_destroy_surface(sf);
 	}
 	*var = 1;
 	TRACE("dDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);

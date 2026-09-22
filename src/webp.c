@@ -61,11 +61,11 @@ SDL_Surface *webp_extract(uint8_t *data, size_t size) {
 	if (WebPGetFeatures(data, size, &features) != VP8_STATUS_OK) {
 		return NULL;
 	}
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(
-		0, features.width, features.height, 32,
+	SDL_Surface *sf = sdl_create_surface(
+		features.width, features.height, 32,
 		features.has_alpha ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_XRGB8888);
 	if (!WebPDecodeBGRAInto(data, size, sf->pixels, features.height * sf->pitch, sf->pitch)) {
-		SDL_FreeSurface(sf);
+		sdl_destroy_surface(sf);
 		return NULL;
 	}
 
@@ -88,7 +88,7 @@ SDL_Surface *webp_extract(uint8_t *data, size_t size) {
 	if (sf->w != base->w || sf->h != base->h) {
 		WARNING("webp base CG dimensions don't match: (%d,%d) / (%d,%d)",
 			base->w, base->h, sf->w, sf->h);
-		SDL_FreeSurface(base);
+		sdl_destroy_surface(base);
 		return sf;
 	}
 
@@ -106,6 +106,6 @@ SDL_Surface *webp_extract(uint8_t *data, size_t size) {
 			bp += 4;
 		}
 	}
-	SDL_FreeSurface(base);
+	sdl_destroy_surface(base);
 	return sf;
 }

@@ -68,9 +68,9 @@ int gfx_Initialize(const char *render_driver) {
 
 void gfx_Remove(void) {
 	if (gfx_palette)
-		SDL_FreePalette(gfx_palette);
+		sdl_destroy_palette(gfx_palette);
 	if (main_surface)
-		SDL_FreeSurface(main_surface);
+		sdl_destroy_surface(main_surface);
 	if (gfx_renderer)
 		SDL_DestroyRenderer(gfx_renderer);
 	SDL_Quit();
@@ -116,13 +116,13 @@ static void window_init(const char *render_driver) {
 		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
 	gfx_renderer = SDL_CreateRenderer(gfx_window, -1, 0);
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	gfx_palette = SDL_AllocPalette(256);
+	gfx_palette = sdl_create_palette(256);
 }
 
 static void makeDIB(int width, int height, int depth) {
 	
 	if (main_surface) {
-		SDL_FreeSurface(main_surface);
+		sdl_destroy_surface(main_surface);
 	}
 
 	uint32_t format = 0;
@@ -142,10 +142,10 @@ static void makeDIB(int width, int height, int depth) {
 		SYSERROR("invalid pixel depth %d", depth);
 	}
 
-	main_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
+	main_surface = sdl_create_surface(width, height, depth, format);
 	
-	if (main_surface->format->BitsPerPixel == 8) {
-		SDL_SetSurfacePalette(main_surface, gfx_palette);
+	if (sdl_surface_bits_per_pixel(main_surface) == 8) {
+		sdl_set_surface_palette(main_surface, gfx_palette);
 	}
 
 	if (gfx_dibinfo) {
@@ -158,7 +158,7 @@ static void makeDIB(int width, int height, int depth) {
 	gfx_dibinfo->alpha  = NULL;
 	gfx_dibinfo->sdl_surface = main_surface;
 	
-	image_setdepth(main_surface->format->BitsPerPixel);
+	image_setdepth(sdl_surface_bits_per_pixel(main_surface));
 }
 
 /* offscreen の設定 */
@@ -202,11 +202,12 @@ surface_t *gfx_getDIB(void) {
 
 SDL_Surface *gfx_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) {
 	uint8_t *pixels = sf->pixels;
-	pixels += y * sf->pitch + x * sf->format->BytesPerPixel;
-	SDL_Surface *view = SDL_CreateRGBSurfaceWithFormatFrom(
-		pixels, w, h, sf->format->BitsPerPixel, sf->pitch, sf->format->format);
-	if (sf->format->palette)
-		SDL_SetSurfacePalette(view, sf->format->palette);
+	pixels += y * sf->pitch + x * sdl_surface_bytes_per_pixel(sf);
+	SDL_Surface *view = sdl_create_surface_from(pixels, w, h,
+		sdl_surface_bits_per_pixel(sf), sf->pitch, sdl_surface_format(sf));
+	SDL_Palette *palette = sdl_get_surface_palette(sf);
+	if (palette)
+		sdl_set_surface_palette(view, palette);
 	return view;
 }
 
@@ -255,6 +256,6 @@ bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
 	SDL_Rect *r = &nact->ags.view_area;
 	SDL_Surface *view = gfx_createSurfaceView(main_surface, r->x, r->y, r->w, r->h);
 	bool ok = SDL_SaveBMP(view, path) == 0;
-	SDL_FreeSurface(view);
+	sdl_destroy_surface(view);
 	return ok;
 }

@@ -40,7 +40,7 @@ void gfx_FlipSurfaceHorizontal(SDL_Surface *s) {
 	SDL_FlipSurface(s, SDL_FLIP_HORIZONTAL);
 #else
 	uint8_t *p = s->pixels;
-	int bpp = s->format->BytesPerPixel;
+	int bpp = sdl_surface_bytes_per_pixel(s);
 	uint8_t tmp[4];
 	for (int y = 0; y < s->h; y++) {
 		uint8_t *p1 = p;
@@ -88,7 +88,7 @@ void gfx_scaledCopyArea(int sx, int sy, int sw, int sh, int dx, int dy, int dw, 
 			gfx_FlipSurfaceVertical(view);
 		if (mirror & 2)
 			gfx_FlipSurfaceHorizontal(view);
-		SDL_FreeSurface(view);
+		sdl_destroy_surface(view);
 	}
 }
 
@@ -104,19 +104,19 @@ void gfx_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, 
 	if (cg->alpha && alpha_blend) {
 		uint16_t *p_src = (uint16_t *)cg->pic;
 		uint8_t *a_src = cg->alpha;
-		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+		s = sdl_create_surface(w, h, 32, SDL_PIXELFORMAT_ARGB8888);
 		for (int y = 0; y < h; y++) {
 			uint32_t *dst = (uint32_t *)(((uint8_t *)s->pixels) + y * s->pitch);
 			for (int x = 0; x < w; x++) {
 				*dst++ = rgb565_to_rgb888(*p_src++) | *a_src++ << 24;
 			}
 		}
-	} else if (sf->sdl_surface->format->BitsPerPixel > 16) {
+	} else if (sdl_surface_bits_per_pixel(sf->sdl_surface) > 16) {
 		// Convert to RGB888 by ourselves. SDL blit functions use a slightly
 		// different mapping, so the color expanded by SDL may not match the
 		// color key specified in the CX command.
 		uint16_t *src = (uint16_t *)cg->pic;
-		s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGB888);
+		s = sdl_create_surface(w, h, 32, SDL_PIXELFORMAT_RGB888);
 		for (int y = 0; y < h; y++) {
 			uint32_t *dst = (uint32_t *)(((uint8_t *)s->pixels) + y * s->pitch);
 			for (int x = 0; x < w; x++) {
@@ -124,8 +124,8 @@ void gfx_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, 
 			}
 		}
 	} else {
-		s = SDL_CreateRGBSurfaceWithFormatFrom(
-			cg->pic, cg->width, cg->height, 16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
+		s = sdl_create_surface_from(cg->pic, cg->width, cg->height,
+			16, cg->width * 2, SDL_PIXELFORMAT_RGB565);
 	}
 
 	if (brightness != 255)
@@ -133,7 +133,7 @@ void gfx_drawImage16(cgdata *cg, surface_t *sf, int dx, int dy, int brightness, 
 
 	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_BlitSurface(s, NULL, sf->sdl_surface, &r_dst);
-	SDL_FreeSurface(s);
+	sdl_destroy_surface(s);
 }
 
 void gfx_drawImage24(cgdata *cg, surface_t *sf, int x, int y, int brightness) {
@@ -141,14 +141,14 @@ void gfx_drawImage24(cgdata *cg, surface_t *sf, int x, int y, int brightness) {
 		gfx_drawImageAlphaMap(cg, sf, x, y);
 	}
 
-	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
-		cg->pic, cg->width, cg->height, 24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
+	SDL_Surface *s = sdl_create_surface_from(cg->pic, cg->width, cg->height,
+		24, cg->width * 3, SDL_PIXELFORMAT_RGB24);
 	if (brightness != 255)
 		SDL_SetSurfaceColorMod(s, brightness, brightness, brightness);
 
 	SDL_Rect r_dst = {x, y, cg->width, cg->height};
 	SDL_BlitSurface(s, NULL, sf->sdl_surface, &r_dst);
-	SDL_FreeSurface(s);
+	sdl_destroy_surface(s);
 }
 
 void gfx_drawImageAlphaMap(cgdata *cg, surface_t *sf, int x, int y) {
@@ -165,7 +165,7 @@ void gfx_drawImageAlphaMap(cgdata *cg, surface_t *sf, int x, int y) {
 }
 
 SDL_Surface *gfx_dib_to_surface_with_alpha(int x, int y, int w, int h) {
-	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_Surface *s = sdl_create_surface(w, h, 32, SDL_PIXELFORMAT_ARGB8888);
 
 	SDL_Rect r_src = {x, y, w, h};
 	SDL_BlitSurface(main_surface, &r_src, s, NULL);
@@ -192,7 +192,7 @@ void gfx_copyAreaSP16_shadow(int sx, int sy, int w, int h, int dx, int dy, int l
 
 	SDL_Rect r_dst = {dx, dy, w, h};
 	SDL_BlitSurface(s, NULL, main_surface, &r_dst);
-	SDL_FreeSurface(s);
+	sdl_destroy_surface(s);
 }
 
 void gfx_copyAreaSP16_alphaBlend(int sx, int sy, int w, int h, int dx, int dy, int lv) {
@@ -230,7 +230,7 @@ void gfx_copy_to_alpha(int sx, int sy, int w, int h, int dx, int dy, ALPHA_DIB_C
 uint32_t gfx_getPixel(int x, int y) {
 	uint8_t *p = PIXEL_AT(main_surface, x, y);
 
-	switch (main_surface->format->BytesPerPixel) {
+	switch (sdl_surface_bytes_per_pixel(main_surface)) {
 	case 1:
 		return *p;
 	case 2:
@@ -252,10 +252,14 @@ uint32_t gfx_getPixel(int x, int y) {
  * dib から領域の切り出し
  */
 void* gfx_saveRegion(int x, int y, int w, int h) {
-	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, main_surface->format->BitsPerPixel, main_surface->format->format);
-	if (main_surface->format->BitsPerPixel == 8)
-		memcpy(s->format->palette->colors, main_surface->format->palette->colors,
-		       sizeof(SDL_Color) * main_surface->format->palette->ncolors);
+	SDL_Surface *s = sdl_create_surface(w, h,
+		sdl_surface_bits_per_pixel(main_surface), sdl_surface_format(main_surface));
+	if (sdl_surface_bits_per_pixel(main_surface) == 8) {
+		SDL_Palette *dst_palette = sdl_get_surface_palette(s);
+		SDL_Palette *src_palette = sdl_get_surface_palette(main_surface);
+		SDL_SetPaletteColors(dst_palette, src_palette->colors, 0,
+			src_palette->ncolors);
+	}
 	SDL_Rect r_src = {x, y, w, h};
 	SDL_Rect r_dst = {0, 0, w, h};
 	SDL_BlitSurface(main_surface, &r_src, s, &r_dst);
@@ -266,7 +270,7 @@ void* gfx_saveRegion(int x, int y, int w, int h) {
  * セーブした領域を破棄
  */
 void gfx_delRegion(void *psrc) {
-	SDL_FreeSurface((SDL_Surface *)psrc);
+	sdl_destroy_surface((SDL_Surface *)psrc);
 }
 
 /*
@@ -287,5 +291,5 @@ void gfx_putRegion(void *psrc, int x, int y) {
 void gfx_restoreRegion(void *psrc, int x, int y) {
 	SDL_Surface *src = (SDL_Surface *)psrc;
 	gfx_putRegion(src, x ,y);
-	SDL_FreeSurface(src);
+	sdl_destroy_surface(src);
 }

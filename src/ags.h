@@ -58,7 +58,7 @@ typedef struct agsurface surface_t;
 #define GETOFFSET_PIXEL(suf, x, y) PIXEL_AT((suf)->sdl_surface, x, y)
 #define GETOFFSET_ALPHA(suf, x, y) ((suf)->alpha + (y) * (suf)->width + (x))
 // for SDL_surface
-#define PIXEL_AT(suf, x, y) ((suf)->pixels + (y) * (suf)->pitch + (x) * (suf)->format->BytesPerPixel)
+#define PIXEL_AT(suf, x, y) ((suf)->pixels + (y) * (suf)->pitch + (x) * sdl_surface_bytes_per_pixel(suf))
 #define ALPHA_AT(suf, x, y) (PIXEL_AT(suf, x, y) + (SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0))
 
 typedef struct {

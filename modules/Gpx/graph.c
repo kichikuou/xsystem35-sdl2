@@ -76,12 +76,13 @@ void gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int
 		SDL_Rect r;
 		if (SDL_IntersectRect(&src_rect, &dst_rect, &r)) {
 			SDL_Surface *view = gfx_createSurfaceView(src->sdl_surface, sx, sy, sw, sh);
-			SDL_Surface *tmp = SDL_ConvertSurface(view, dst->sdl_surface->format, 0);
+			SDL_Surface *tmp = sdl_convert_surface(
+				view, sdl_surface_format(dst->sdl_surface));
 			src_rect.x = 0;
 			src_rect.y = 0;
 			SDL_LowerBlit(tmp, &src_rect, dst->sdl_surface, &dst_rect);
-			SDL_FreeSurface(tmp);
-			SDL_FreeSurface(view);
+			sdl_destroy_surface(tmp);
+			sdl_destroy_surface(view);
 			return;
 		}
 	}
@@ -99,7 +100,7 @@ void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int 
 
 void gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b) {
 	SDL_Rect rect = {dx, dy, dw, dh};
-	uint32_t color = SDL_MapRGB(dst->sdl_surface->format, r, g, b);
+	uint32_t color = sdl_map_rgb(dst->sdl_surface, r, g, b);
 	SDL_FillRect(dst->sdl_surface, &rect, color);
 }
 
@@ -227,12 +228,12 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 
 // Fill the rectangle with the specified color (rgb) and blend rate (lv)
 void gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv) {
-	SDL_Surface *src = SDL_CreateRGBSurfaceWithFormat(0, dw, dh, 32, SDL_PIXELFORMAT_ARGB8888);
-	SDL_FillRect(src, NULL, SDL_MapRGBA(src->format, r, g, b, lv));
+	SDL_Surface *src = sdl_create_surface(dw, dh, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_FillRect(src, NULL, sdl_map_rgba(src, r, g, b, lv));
 	SDL_SetSurfaceBlendMode(src, SDL_BLENDMODE_BLEND);
 	SDL_Rect dstrect = {dx, dy, dw, dh};
 	SDL_BlitSurface(src, NULL, dst->sdl_surface, &dstrect);
-	SDL_FreeSurface(src);
+	sdl_destroy_surface(src);
 }
 
 #include "graph2.c"

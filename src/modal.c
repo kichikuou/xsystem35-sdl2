@@ -207,7 +207,7 @@ static void render_text(mu_Font font, const char *str, mu_Vec2 pos, mu_Color col
 		SDL_RenderCopy(gfx_renderer, t, NULL, &dst);
 		SDL_DestroyTexture(t);
 	}
-	SDL_FreeSurface(s);
+	sdl_destroy_surface(s);
 }
 
 // Draw a line thickened into a square brush of the given width, so it looks
