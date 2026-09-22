@@ -512,6 +512,51 @@ static inline bool sdl_fill_surface_rects(SDL_Surface *surface,
 #endif
 }
 
+static inline bool sdl_blit_surface(SDL_Surface *source,
+	const SDL_Rect *source_rect, SDL_Surface *destination,
+	SDL_Rect *destination_rect)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_BlitSurface(
+		source, source_rect, destination, destination_rect) == 0;
+#else
+	bool result = SDL_BlitSurface(
+		source, source_rect, destination, destination_rect);
+	if (!result || !destination_rect)
+		return result;
+
+	SDL_Rect clipped_source = {0, 0, source->w, source->h};
+	SDL_Rect clipped_destination = {
+		destination_rect->x, destination_rect->y, 0, 0};
+	if (source_rect) {
+		SDL_Rect intersection;
+		if (!SDL_GetRectIntersection(
+				source_rect, &clipped_source, &intersection))
+			goto empty;
+		clipped_destination.x += intersection.x - source_rect->x;
+		clipped_destination.y += intersection.y - source_rect->y;
+		clipped_source = intersection;
+	}
+
+	clipped_destination.w = clipped_source.w;
+	clipped_destination.h = clipped_source.h;
+	SDL_Rect destination_clip;
+	if (!SDL_GetSurfaceClipRect(destination, &destination_clip))
+		return false;
+	if (!SDL_GetRectIntersection(&clipped_destination,
+			&destination_clip, &clipped_destination))
+		goto empty;
+
+	*destination_rect = clipped_destination;
+	return true;
+
+empty:
+	destination_rect->w = 0;
+	destination_rect->h = 0;
+	return true;
+#endif
+}
+
 static inline bool sdl_blit_surface_unchecked(SDL_Surface *source,
 	SDL_Rect *source_rect, SDL_Surface *destination, SDL_Rect *destination_rect)
 {
@@ -573,6 +618,7 @@ static inline void sdl_get_rect_union(
 /* Keep call sites readable while routing renamed SDL2 surface APIs here. */
 #undef SDL_FillRect
 #undef SDL_FillRects
+#undef SDL_BlitSurface
 #undef SDL_LowerBlit
 #undef SDL_BlitScaled
 #undef SDL_SoftStretch
@@ -580,6 +626,7 @@ static inline void sdl_get_rect_union(
 #undef SDL_UnionRect
 #define SDL_FillRect sdl_fill_surface_rect
 #define SDL_FillRects sdl_fill_surface_rects
+#define SDL_BlitSurface sdl_blit_surface
 #define SDL_LowerBlit sdl_blit_surface_unchecked
 #define SDL_BlitScaled sdl_blit_surface_scaled
 #define SDL_SoftStretch sdl_stretch_surface

@@ -25,6 +25,7 @@ void cache_test(void);
 void gameresource_test(void);
 void hankaku_test(void);
 void qnt_test(void);
+void sdl_compat_test(void);
 void variable_test(void);
 
 void sys_error(char *format, ...) {
@@ -49,5 +50,6 @@ int main() {
 	variable_test();
 	hankaku_test();
 	qnt_test();
+	sdl_compat_test();
 	return 0;
 }
