@@ -24,12 +24,18 @@
 #include "system.h"
 #include "music.h"
 #include "music_private.h"
+#ifdef HAVE_SDL3_MIXER_BACKEND
+#include "sdl3_mixer_backend.h"
+#endif
 
 struct _musprvdat musprv;
 
 bool mus_init(int audio_buffer_size) {
 	for (int i = 0; i < 16; i++)
 		prv.volval[i] = 100;
+#ifdef HAVE_SDL3_MIXER_BACKEND
+	sdl3_mixer_backend_init(audio_buffer_size);
+#endif
 	musbgm_init(DRIFILE_BGM, 0);
 	muscd_init();
 	musmidi_init();
@@ -42,6 +48,9 @@ void mus_exit(void) {
 	muscd_exit();
 	if (prv.midi_valid) musmidi_exit();
 	if (prv.pcm_valid) muspcm_exit();
+#ifdef HAVE_SDL3_MIXER_BACKEND
+	sdl3_mixer_backend_exit();
+#endif
 }
 
 void mus_reset(void) {
