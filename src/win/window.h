@@ -4,6 +4,10 @@
 #include <windows.h>
 #include "sdl_compat.h"
 
+#if XSYSTEM35_SDL_VERSION == 2
+#include <SDL_syswm.h>
+#endif
+
 static inline HWND win_get_hwnd(SDL_Window *window)
 {
 #if XSYSTEM35_SDL_VERSION == 2

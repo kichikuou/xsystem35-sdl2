@@ -11,9 +11,6 @@
 
 #if XSYSTEM35_SDL_VERSION == 2
 #include <SDL.h>
-#ifdef _WIN32
-#include <SDL_syswm.h>
-#endif
 #elif XSYSTEM35_SDL_VERSION == 3
 #include <SDL3/SDL.h>
 #else

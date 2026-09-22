@@ -43,6 +43,12 @@
 #include "hacks.h"
 #include "volume.h"
 
+#if defined(_WIN32) && XSYSTEM35_SDL_VERSION == 2
+#include <SDL_syswm.h>
+// Windows defines this name too; the key table below uses input.h's enum.
+#undef KEY_EXECUTE
+#endif
+
 static void get_event(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed);
 
