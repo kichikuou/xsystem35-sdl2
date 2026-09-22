@@ -21,6 +21,7 @@
 #include "music_private.h"
 #include "nact.h"
 #include "sdl3_mixer_backend.h"
+#include "sdl3_mixer_utils.h"
 #include "system.h"
 
 #define SAMPLE_RATE 44100
@@ -40,15 +41,6 @@ struct decoded_audio {
 	size_t length;
 };
 
-static int clamp_volume(int volume)
-{
-	if (volume < 0)
-		return 0;
-	if (volume > 100)
-		return 100;
-	return volume;
-}
-
 static void apply_volume(int slot)
 {
 	if (!slots[slot].track)
@@ -56,9 +48,8 @@ static void apply_volume(int slot)
 	int channel = prv.vol_pcm_sub[slot];
 	if ((unsigned)channel >= 16)
 		channel = 0;
-	float gain = clamp_volume(slots[slot].volume) / 100.0f;
-	gain *= clamp_volume(prv.volval[channel]) / 100.0f;
-	MIX_SetTrackGain(slots[slot].track, gain);
+	MIX_SetTrackGain(slots[slot].track,
+		sdl3_mixer_gain(slots[slot].volume, prv.volval[channel]));
 }
 
 static MIX_Audio *load_audio(const void *data, size_t size)

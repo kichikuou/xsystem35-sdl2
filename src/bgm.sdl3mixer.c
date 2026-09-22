@@ -18,6 +18,7 @@
 #include "music_private.h"
 #include "nact.h"
 #include "sdl3_mixer_backend.h"
+#include "sdl3_mixer_utils.h"
 #include "system.h"
 
 static DRIFILETYPE dri_type;
@@ -26,19 +27,9 @@ static int current_no;
 static int current_vol = 100;
 static uint32_t start_time;
 
-static int clamp_volume(int volume)
-{
-	if (volume < 0)
-		return 0;
-	if (volume > 100)
-		return 100;
-	return volume;
-}
-
 static float music_gain(int volume)
 {
-	float gain = clamp_volume(volume) / 100.0f;
-	return gain * clamp_volume(prv.volval[BGM_VOLVAL_CH]) / 100.0f;
+	return sdl3_mixer_gain(volume, prv.volval[BGM_VOLVAL_CH]);
 }
 
 static void apply_music_volume(int volume)
@@ -105,7 +96,7 @@ bool musbgm_play(int no, int time, int volume, int loop_count)
 	int loops = loop_count == 0 ? -1 : loop_count - 1;
 	current_vol = volume;
 	if (!sdl3_mixer_play_music(SDL3_MIXER_MUSIC_BGM, audio,
-		loops, time * 10, music_gain(current_vol)))
+		loops, sdl3_mixer_10ms_to_ms(time), music_gain(current_vol)))
 		return false;
 	current_no = no;
 	start_time = sys_get_ticks();
@@ -115,7 +106,8 @@ bool musbgm_play(int no, int time, int volume, int loop_count)
 void musbgm_stop(int no, int time)
 {
 	if (no == current_no)
-		sdl3_mixer_stop_music(SDL3_MIXER_MUSIC_BGM, time * 10);
+		sdl3_mixer_stop_music(SDL3_MIXER_MUSIC_BGM,
+			sdl3_mixer_10ms_to_ms(time));
 }
 
 void musbgm_fade(int no, int time, int volume)
@@ -129,7 +121,7 @@ int musbgm_getpos(int no)
 {
 	if (!musbgm_isplaying(no))
 		return 0;
-	return (sys_get_ticks() - start_time) / 10;
+	return sdl3_mixer_elapsed_10ms(start_time, sys_get_ticks());
 }
 
 int musbgm_getlen(int no)

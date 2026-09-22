@@ -21,6 +21,7 @@
 #include "cdrom.h"
 #include "music_private.h"
 #include "sdl3_mixer_backend.h"
+#include "sdl3_mixer_utils.h"
 #include "system.h"
 
 #define PLAYLIST_MAX 256
@@ -32,18 +33,9 @@ static uint32_t start_time;
 
 static void cdrom_stop(void);
 
-static int clamp_volume(int volume)
-{
-	if (volume < 0)
-		return 0;
-	if (volume > 100)
-		return 100;
-	return volume;
-}
-
 static float music_gain(void)
 {
-	return clamp_volume(prv.volval[BGM_VOLVAL_CH]) / 100.0f;
+	return sdl3_mixer_gain(100, prv.volval[BGM_VOLVAL_CH]);
 }
 
 static void apply_volume(void)
