@@ -35,12 +35,21 @@ static const struct nls_entry *find_catalog(const char *lang) {
 }
 
 void builtin_nls_init(void) {
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_Locale *locales = SDL_GetPreferredLocales();
 	if (!locales)
 		return;
 	// Pick the catalog for the highest-priority locale that has one.
 	for (const SDL_Locale *l = locales; l->language && !active_table; l++)
 		active_table = find_catalog(l->language);
+#else
+	SDL_Locale **locales = SDL_GetPreferredLocales(NULL);
+	if (!locales)
+		return;
+	// Pick the catalog for the highest-priority locale that has one.
+	for (SDL_Locale **l = locales; *l && !active_table; l++)
+		active_table = find_catalog((*l)->language);
+#endif
 	SDL_free(locales);
 }
 
