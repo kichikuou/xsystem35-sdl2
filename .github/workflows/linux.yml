@@ -21,7 +21,7 @@ jobs:
         if [ "${{ matrix.sdl-version }}" = 2 ]; then
           sudo apt install libsdl2-dev libsdl2-mixer-dev
         else
-          sudo apt install libsdl3-dev libsdl3-mixer-dev
+          sudo apt install libsdl3-dev
         fi
 
     - name: Build

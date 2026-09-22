@@ -129,7 +129,16 @@ else()  # non-emscripten, non-android
     endif()
   else()
     find_package(SDL3 3.4 REQUIRED CONFIG)
-    find_package(SDL3_mixer 3.2 REQUIRED CONFIG)
+    find_package(SDL3_mixer 3.2 QUIET CONFIG)
+    if (NOT SDL3_mixer_FOUND)
+      message(STATUS "SDL3_mixer not found; building SDL3_mixer 3.2.4 from source")
+      FetchContent_Declare(
+        SDL3_mixer
+        URL https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-3.2.4.tar.gz
+        URL_HASH SHA256=f2ea848ccdf2f394cd4973ee0f6c482e04511044695cccfd46bab6dcd7f780aa
+        )
+      FetchContent_MakeAvailable(SDL3_mixer)
+    endif()
     target_link_libraries(xsystem35_sdl INTERFACE SDL3::SDL3)
     target_link_libraries(xsystem35_sdl_mixer INTERFACE
       SDL3_mixer::SDL3_mixer)

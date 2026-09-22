@@ -133,8 +133,10 @@ $ sudo cmake --install out/sdl2
 ```
 
 For SDL3 on a distribution that provides SDL 3.4 or later (for example,
-Ubuntu 26.04), install `libsdl3-dev libsdl3-mixer-dev` instead of the SDL2
-packages and configure `out/sdl3` with `-DXSYSTEM35_SDL_VERSION=3`.
+Ubuntu 26.04), install `libsdl3-dev` instead of the SDL2 packages and
+configure `out/sdl3` with `-DXSYSTEM35_SDL_VERSION=3`. If SDL3_mixer 3.2 or
+later is installed, CMake uses it; otherwise, CMake downloads and builds
+SDL3_mixer 3.2.4 during configuration.
 
 ### MacOS
 
