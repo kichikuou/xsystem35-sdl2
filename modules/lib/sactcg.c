@@ -35,6 +35,7 @@
 #include "ags.h"
 #include "variable.h"
 #include "sactcg.h"
+#include "ald_manager.h"
 #include "cg.h"
 #include "gfx.h"
 
@@ -328,24 +329,27 @@ void scg_free(int no) {
 // CGの種類を取得
 int scg_querytype(int wNumCG) {
 	if (wNumCG >= (CGMAX -1)) return CG_NOTUSED;
-	if (!cg_store || !cg_store[wNumCG]) return CG_NOTUSED;
-	return cg_store[wNumCG]->type;
+	if (cg_store && cg_store[wNumCG])
+		return cg_store[wNumCG]->type;
+	// Linked CGs are valid even before they are loaded into cg_store.
+	return ald_is_linked(DRIFILE_CG, wNumCG - 1) ? CG_LINKED : CG_NOTUSED;
 }
 
 // CGの大きさを取得
 bool scg_querysize(int wNumCG, vmvar_t *w, vmvar_t *h) {
-	if (wNumCG >= (CGMAX -1)) goto errexit;
-	if (!cg_store || !cg_store[wNumCG]) goto errexit;
-	if (cg_store[wNumCG]->sf == NULL) goto errexit;
-
-	*w = cg_store[wNumCG]->sf->w;
-	*h = cg_store[wNumCG]->sf->h;
-	
-	return true;
-
- errexit:
 	*w = *h = 0;
-	return false;
+
+	if (wNumCG >= (CGMAX - 1))
+		return false;
+	cginfo_t *cg = cg_store ? cg_store[wNumCG] : NULL;
+	if (!cg && ald_is_linked(DRIFILE_CG, wNumCG - 1))
+		cg = scg_get(wNumCG);
+	if (!cg || !cg->sf)
+		return false;
+
+	*w = cg->sf->w;
+	*h = cg->sf->h;
+	return true;
 }
 
 // CGのBPPを取得
