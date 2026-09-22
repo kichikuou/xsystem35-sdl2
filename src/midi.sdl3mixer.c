@@ -96,7 +96,6 @@ static MIX_Audio *load_midi(const uint8_t *data, int length)
 			sdl3_mixer_backend_get());
 
 	const char *soundfonts = getenv("SDL_SOUNDFONTS");
-	const char *timidity_cfg = getenv("TIMIDITY_CFG");
 	char *soundfont_path = NULL;
 	if (success && soundfonts && *soundfonts && has_decoder("FLUIDSYNTH")) {
 		soundfont_path = last_soundfont_path(soundfonts);
@@ -105,10 +104,6 @@ static MIX_Audio *load_midi(const uint8_t *data, int length)
 				"FLUIDSYNTH") &&
 			SDL_SetStringProperty(props, FLUIDSYNTH_SOUNDFONT_PATH,
 				soundfont_path);
-	} else if (success && timidity_cfg && *timidity_cfg &&
-		   has_decoder("TIMIDITY")) {
-		success = SDL_SetStringProperty(props, MIX_PROP_AUDIO_DECODER_STRING,
-			"TIMIDITY");
 	}
 
 	MIX_Audio *audio = success ? MIX_LoadAudioWithProperties(props) : NULL;
