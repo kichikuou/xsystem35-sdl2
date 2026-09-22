@@ -180,6 +180,14 @@ SDL_Window *gfx_getWindow(void) {
 	return gfx_window;
 }
 
+bool gfx_convertEventCoordinates(SDL_Event *event) {
+#if XSYSTEM35_SDL_VERSION == 2
+	return true;
+#else
+	return SDL_ConvertEventToRenderCoordinates(gfx_renderer, event);
+#endif
+}
+
 static SDL_Point view_to_window_point(int x, int y) {
 	return sdl_render_coordinates_to_window(gfx_renderer, x, y);
 }
@@ -261,7 +269,7 @@ void gfx_setIntegerScaling(bool enable) {
 bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
 	SDL_Rect *r = &nact->ags.view_area;
 	SDL_Surface *view = gfx_createSurfaceView(main_surface, r->x, r->y, r->w, r->h);
-	bool ok = SDL_SaveBMP(view, path) == 0;
+	bool ok = sdl_save_bmp(view, path);
 	sdl_destroy_surface(view);
 	return ok;
 }

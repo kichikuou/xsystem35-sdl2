@@ -801,6 +801,15 @@ static inline void sdl_destroy_surface(SDL_Surface *surface)
 #endif
 }
 
+static inline bool sdl_save_bmp(SDL_Surface *surface, const char *path)
+{
+#if XSYSTEM35_SDL_VERSION == 2
+	return SDL_SaveBMP(surface, path) == 0;
+#else
+	return SDL_SaveBMP(surface, path);
+#endif
+}
+
 static inline SDL_Palette *sdl_create_palette(int colors)
 {
 #if XSYSTEM35_SDL_VERSION == 2

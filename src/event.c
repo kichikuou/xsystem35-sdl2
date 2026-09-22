@@ -291,9 +291,25 @@ void event_set_mouse_internal_location(int x, int y) {
 }
 
 SDL_Point event_get_touch_position(const SDL_TouchFingerEvent *e) {
+#if XSYSTEM35_SDL_VERSION == 2
 	int view_w, view_h;
 	gfx_getViewSize(&view_w, &view_h);
 	return (SDL_Point){e->x * view_w, e->y * view_h};
+#else
+	return (SDL_Point){(int)e->x, (int)e->y};
+#endif
+}
+
+static bool touch_is_on_view_edge(const SDL_TouchFingerEvent *e) {
+#if XSYSTEM35_SDL_VERSION == 2
+	return e->x == 0.0f || e->x == 1.0f ||
+		e->y == 0.0f || e->y == 1.0f;
+#else
+	int view_w, view_h;
+	gfx_getViewSize(&view_w, &view_h);
+	return e->x <= 0.0f || e->x >= view_w ||
+		e->y <= 0.0f || e->y >= view_h;
+#endif
 }
 
 // Stores a deferred touch event (valid if .timestamp != 0) to add a delay
@@ -345,6 +361,9 @@ static void rance4v2_hack(void) {
 }
 
 void event_handle_event(SDL_Event *e) {
+	if (!gfx_convertEventCoordinates(e))
+		WARNING("Failed to convert event coordinates: %s", SDL_GetError());
+
 	if (modal_handle_event(e))
 		return;
 
@@ -438,10 +457,10 @@ void event_handle_event(SDL_Event *e) {
 			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = true;
 			send_agsevent(AGSEVENT_BUTTON_PRESS, AGSEVENT_BUTTON_RIGHT);
 		} else {
-			// SDL_RendererEventWatch clamps touch locations outside of the
-			// viewport to 0.0-1.0. Treat such events as right-clicks.
+			// Treat touches on the edge or outside the viewport as
+			// right-clicks.
 			int button;
-			if  (e->tfinger.x == 0.0f || e->tfinger.x == 1.0f || e->tfinger.y == 0.0f || e->tfinger.y == 1.0f) {
+			if (touch_is_on_view_edge(&e->tfinger)) {
 				button = SDL_BUTTON_RIGHT;
 				mouseb |= 1 << SDL_BUTTON_RIGHT;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = true;

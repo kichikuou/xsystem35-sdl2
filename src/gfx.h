@@ -34,6 +34,7 @@ void gfx_setWorldSize(int width, int height, int depth);
 void gfx_setViewSize(int w, int h);
 void gfx_getViewSize(int *width, int *height);
 SDL_Window *gfx_getWindow(void);
+bool gfx_convertEventCoordinates(SDL_Event *event);
 void gfx_warpMouse(int x, int y);
 SDL_Rect gfx_viewToWindowRect(SDL_Rect rect);
 void gfx_setWindowTitle(char *name);
