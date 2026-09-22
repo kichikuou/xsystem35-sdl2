@@ -17,7 +17,7 @@
  *
 */
 
-#include <SDL.h>
+#include "sdl_compat.h"
 #include <webp/decode.h>
 
 #include "system.h"

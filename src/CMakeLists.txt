@@ -146,10 +146,10 @@ if (NOT HAVE_LIBINTL)
   target_sources(xsystem35 PRIVATE nls.c)
 endif()
 
-target_link_libraries(src_lib PRIVATE sdl2 freetype2 zlib)
-target_link_libraries(xsystem35 PRIVATE m zlib sdl2)
-if (TARGET sdl2_mixer)
-  target_link_libraries(xsystem35 PRIVATE sdl2_mixer)
+target_link_libraries(src_lib PRIVATE xsystem35_sdl freetype2 zlib)
+target_link_libraries(xsystem35 PRIVATE m zlib xsystem35_sdl)
+if (TARGET xsystem35_sdl_mixer)
+  target_link_libraries(xsystem35 PRIVATE xsystem35_sdl_mixer)
 endif()
 
 if (EMSCRIPTEN)
@@ -212,7 +212,7 @@ else()  # non-emscripten, non-android
   target_compile_options(src_tests PRIVATE -Wno-pointer-sign -Wall)
   target_compile_definitions(src_tests PRIVATE
       TEST_FONT_DIR="${PROJECT_SOURCE_DIR}/fonts")
-  target_link_libraries(src_tests PRIVATE src_lib sdl2)
+  target_link_libraries(src_tests PRIVATE src_lib xsystem35_sdl)
   add_test(NAME src_tests COMMAND src_tests)
   file(COPY testdata DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()

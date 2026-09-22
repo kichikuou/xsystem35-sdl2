@@ -3,7 +3,7 @@
 #define __SPRITE_H__
 
 #include "portab.h"
-#include <SDL_rect.h>
+#include "sdl_compat.h"
 #include "sactcg.h"
 
 #define DEFAULT_UPDATE nt_sp_draw

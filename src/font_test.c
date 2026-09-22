@@ -19,7 +19,7 @@
 #include "font.h"
 #include "unittest.h"
 
-#include <SDL.h>
+#include "sdl_compat.h"
 
 static const FontType font_types[] = {FONT_GOTHIC, FONT_MINCHO};
 #define NTYPES ((int)(sizeof(font_types) / sizeof(font_types[0])))

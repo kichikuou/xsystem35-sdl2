@@ -24,7 +24,7 @@
 #ifndef __FONT_H__
 #define __FONT_H__
 
-#include <SDL_surface.h>
+#include "sdl_compat.h"
 #include "cache.h"
 #include "config.h"
 #include "portab.h"

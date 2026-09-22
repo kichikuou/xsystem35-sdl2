@@ -25,7 +25,7 @@
 #define __SACT_H__
 
 #include "config.h"
-#include <SDL_rect.h>
+#include "sdl_compat.h"
 #include "portab.h"
 #include "list.h"
 #include "ags.h"

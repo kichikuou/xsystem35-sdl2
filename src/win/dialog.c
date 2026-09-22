@@ -18,7 +18,7 @@
  */
 #include <windows.h>
 #include <commctrl.h>
-#include <SDL_syswm.h>
+#include "sdl_compat.h"
 #include "input_modal.h"
 #include "gfx.h"
 #include "resources.h"

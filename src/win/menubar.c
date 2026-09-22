@@ -18,8 +18,7 @@
  */
 #include <windows.h>
 #include <time.h>
-#include <SDL_events.h>
-#include <SDL_syswm.h>
+#include "sdl_compat.h"
 #include "system.h"
 #include "menu.h"
 #include "nact.h"

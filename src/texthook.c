@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 #include "scenario.h"
 #include "texthook.h"
 #include "nact.h"

@@ -1,7 +1,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "sprite.h"

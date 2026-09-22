@@ -21,7 +21,7 @@
 
 #include <assert.h>
 #include <math.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "system.h"
 #include "gfx.h"

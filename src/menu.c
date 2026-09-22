@@ -50,7 +50,7 @@ EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "event.h"

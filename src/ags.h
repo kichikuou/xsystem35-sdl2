@@ -26,7 +26,7 @@
 
 #include "config.h"
 
-#include <SDL_surface.h>
+#include "sdl_compat.h"
 #include "portab.h"
 #include "cg.h"
 #include "font.h"

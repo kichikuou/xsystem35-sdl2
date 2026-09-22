@@ -24,7 +24,7 @@
 #ifndef __IMAGE__
 #define __IMAGE__
 
-#include <SDL_surface.h>
+#include "sdl_compat.h"
 #include "cg.h"
 #include "ags.h"
 

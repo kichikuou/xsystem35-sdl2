@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

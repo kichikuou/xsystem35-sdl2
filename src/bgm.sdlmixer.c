@@ -25,8 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <SDL.h>
-#include <SDL_mixer.h>
+#include "sdl_mixer_compat.h"
 
 #include "portab.h"
 #include "system.h"

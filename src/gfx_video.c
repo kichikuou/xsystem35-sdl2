@@ -23,7 +23,7 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>

@@ -17,7 +17,7 @@
  *
 */
 
-#include <SDL.h>
+#include "sdl_compat.h"
 #include <jni.h>
 #include "system.h"
 #include "portab.h"

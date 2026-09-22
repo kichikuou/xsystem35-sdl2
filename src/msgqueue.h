@@ -21,7 +21,7 @@
 #define __MSGQUEUE_H__
 
 #include <stdbool.h>
-#include <SDL_mutex.h>
+#include "sdl_compat.h"
 
 struct msgq_elem;
 

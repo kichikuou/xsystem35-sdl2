@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL_thread.h>
+#include "sdl_compat.h"
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>

@@ -84,7 +84,7 @@ endif()
 
 target_compile_options(modules PRIVATE -Wno-pointer-sign)
 
-target_link_libraries(modules PRIVATE sdl2 zlib)
-if (TARGET sdl2_mixer)
-  target_link_libraries(modules PRIVATE sdl2_mixer)
+target_link_libraries(modules PRIVATE xsystem35_sdl zlib)
+if (TARGET xsystem35_sdl_mixer)
+  target_link_libraries(modules PRIVATE xsystem35_sdl_mixer)
 endif()

@@ -27,7 +27,7 @@
 #define __LITTLEENDIAN__
 
 #include <string.h>
-#include <SDL_endian.h>
+#include "sdl_compat.h"
 
 static inline int LittleEndian_getDW(const uint8_t *b, int index) {
 	uint32_t t;

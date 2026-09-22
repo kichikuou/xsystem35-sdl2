@@ -25,9 +25,7 @@
 #include "config.h"
 
 #include <portmidi.h>
-#include <SDL_atomic.h>
-#include <SDL_thread.h>
-#include <SDL_timer.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "system.h"
