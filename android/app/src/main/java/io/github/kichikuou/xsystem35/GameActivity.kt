@@ -72,7 +72,7 @@ class GameActivity : SDLActivity() {
     }
 
     override fun getLibraries(): Array<String> {
-        return arrayOf("SDL2", "xsystem35")
+        return arrayOf("SDL3", "xsystem35")
     }
 
     override fun getArguments(): Array<String> {

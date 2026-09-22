@@ -112,7 +112,6 @@ static void window_init(const char *render_driver) {
 
 #ifdef __ANDROID__
 	SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 #endif
 
 	gfx_window = sdl_create_window(title, SYS35_DEFAULT_WIDTH,
@@ -244,6 +243,9 @@ void gfx_setViewSize(int w, int h) {
 		SDL_DestroyTexture(gfx_texture);
 	gfx_texture = SDL_CreateTexture(
 		gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, w, h);
+#ifdef __ANDROID__
+	SDL_SetTextureScaleMode(gfx_texture, SDL_SCALEMODE_LINEAR);
+#endif
 
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.windowSizeChanged(); );

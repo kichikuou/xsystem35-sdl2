@@ -38,14 +38,14 @@ static void midi_reset(void) {
 }
 
 static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
-	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	JNIEnv *env = SDL_GetAndroidJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
 		return false;
 	}
 
 	char path[PATH_MAX];
-	snprintf(path, PATH_MAX, "%s/tmp.mid", SDL_AndroidGetInternalStoragePath());
+	snprintf(path, PATH_MAX, "%s/tmp.mid", SDL_GetAndroidInternalStoragePath());
 	FILE* fp = fopen(path, "w");
 	if (!fp) {
 		WARNING("Failed to create temporary file");
@@ -62,7 +62,7 @@ static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 		return false;
 	}
 
-	jobject context = SDL_AndroidGetActivity();
+	jobject context = SDL_GetAndroidActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"midiStart", "(Ljava/lang/String;Z)V");
 	(*env)->CallVoidMethod(env, context, mid, path_str, loop == 0);
@@ -72,12 +72,12 @@ static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 }
 
 static void midi_stop(void) {
-	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	JNIEnv *env = SDL_GetAndroidJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
 		return;
 	}
-	jobject context = SDL_AndroidGetActivity();
+	jobject context = SDL_GetAndroidActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"midiStop", "()V");
 	(*env)->CallVoidMethod(env, context, mid);
@@ -96,12 +96,12 @@ static bool midi_get_playing_info(midiplaystate *st) {
 	st->in_play = false;
 	st->loc_ms  = 0;
 
-	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	JNIEnv *env = SDL_GetAndroidJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
 		return false;
 	}
-	jobject context = SDL_AndroidGetActivity();
+	jobject context = SDL_GetAndroidActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"midiCurrentPosition", "()I");
 	int pos = (*env)->CallIntMethod(env, context, mid);

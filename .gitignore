@@ -1,6 +1,7 @@
 out
 android/.gradle
 android/.idea
+android/app/aars
 android/app/.cxx
 android/app/.externalNativeBuild
 android/app/build
