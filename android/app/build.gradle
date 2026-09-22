@@ -8,15 +8,8 @@ else {
 }
 apply plugin: 'kotlin-android'
 
-def sdlVersion = '3.4.16'
-def sdlArchiveUrl = "https://github.com/libsdl-org/SDL/releases/download/release-${sdlVersion}/SDL3-devel-${sdlVersion}-android.zip"
-def sdlArchiveSha256 = 'e1da8d9298471ea4ab8c6d48a804c0ac5415f35f30fcf7eba61aa7357e165765'
-def sdlAarName = "SDL3-${sdlVersion}.aar"
-def sdlAarSha256 = '03710fc7b49cc070551446841a843840fabf2aaaaa3043cd5739292a55e4e61c'
 def aarsDir = file('aars')
 def assetsLicensesDir = file('src/main/assets/licenses')
-def aarFile = new File(aarsDir, sdlAarName)
-def licenseFile = new File(assetsLicensesDir, 'SDL')
 
 def sha256 = { File file ->
     def digest = java.security.MessageDigest.getInstance('SHA-256')
@@ -29,36 +22,58 @@ def sha256 = { File file ->
     digest.digest().encodeHex().toString()
 }
 
-if (!aarFile.exists() || !licenseFile.exists()) {
-    logger.lifecycle("Downloading ${sdlAarName} ...")
-    def archive = File.createTempFile('sdl3-android', '.zip')
-    try {
-        new URL(sdlArchiveUrl).withInputStream { input ->
-            archive.withOutputStream { it << input }
+def installAar = { String url, String archiveSha256, String aarName,
+                   String aarSha256, String licenseName ->
+    def aarFile = new File(aarsDir, aarName)
+    def licenseFile = new File(assetsLicensesDir, licenseName)
+    if (!aarFile.exists() || sha256(aarFile) != aarSha256 || !licenseFile.exists()) {
+        logger.lifecycle("Downloading ${aarName} ...")
+        def archive = File.createTempFile('sdl-android', '.zip')
+        try {
+            new URL(url).withInputStream { input ->
+                archive.withOutputStream { it << input }
+            }
+            if (sha256(archive) != archiveSha256) {
+                throw new GradleException("Checksum mismatch for ${url}")
+            }
+            aarsDir.mkdirs()
+            assetsLicensesDir.mkdirs()
+            copy {
+                from zipTree(archive)
+                include aarName
+                into aarsDir
+            }
+            copy {
+                from zipTree(archive)
+                include 'LICENSE.txt'
+                into assetsLicensesDir
+                rename 'LICENSE.txt', licenseName
+            }
+        } finally {
+            archive.delete()
         }
-        if (sha256(archive) != sdlArchiveSha256) {
-            throw new GradleException("Checksum mismatch for ${sdlArchiveUrl}")
-        }
-        aarsDir.mkdirs()
-        assetsLicensesDir.mkdirs()
-        copy {
-            from zipTree(archive)
-            include sdlAarName
-            into aarsDir
-        }
-        copy {
-            from zipTree(archive)
-            include 'LICENSE.txt'
-            into assetsLicensesDir
-            rename 'LICENSE.txt', 'SDL'
-        }
-    } finally {
-        archive.delete()
     }
+    if (!aarFile.exists() || sha256(aarFile) != aarSha256) {
+        throw new GradleException("Checksum mismatch for ${aarFile}")
+    }
+    aarFile
 }
-if (!aarFile.exists() || sha256(aarFile) != sdlAarSha256) {
-    throw new GradleException("Checksum mismatch for ${aarFile}")
-}
+
+def sdlVersion = '3.4.16'
+def sdlAarFile = installAar(
+    "https://github.com/libsdl-org/SDL/releases/download/release-${sdlVersion}/SDL3-devel-${sdlVersion}-android.zip",
+    'e1da8d9298471ea4ab8c6d48a804c0ac5415f35f30fcf7eba61aa7357e165765',
+    "SDL3-${sdlVersion}.aar",
+    '03710fc7b49cc070551446841a843840fabf2aaaaa3043cd5739292a55e4e61c',
+    'SDL')
+
+def sdlMixerVersion = '3.2.4'
+def sdlMixerAarFile = installAar(
+    "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${sdlMixerVersion}/SDL3_mixer-devel-${sdlMixerVersion}-android.zip",
+    'b7f9f1ee5162a0492e71941f2cbdc50ec256ef15c0e995ca72c7e519eebd810d',
+    "SDL3_mixer-${sdlMixerVersion}.aar",
+    'd13dc45d4a4d6a2db4132400e77629c466ed533641fc9e211dfe85fab025b792',
+    'SDL_mixer')
 
 android {
     if (buildAsApplication) {
@@ -138,7 +153,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation files(aarFile)
+    implementation files(sdlAarFile, sdlMixerAarFile)
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     testImplementation 'junit:junit:4.13.2'
