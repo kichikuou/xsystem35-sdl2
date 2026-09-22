@@ -117,6 +117,8 @@ endif()
 
 if (EMSCRIPTEN)
   target_sources(xsystem35 PRIVATE cdrom.emscripten.c)
+elseif (XSYSTEM35_SDL_VERSION STREQUAL "3")
+  target_sources(xsystem35 PRIVATE cdrom.sdl3mixer.c)
 else()
   target_sources(xsystem35 PRIVATE cdrom.mp3.c)
 endif()
