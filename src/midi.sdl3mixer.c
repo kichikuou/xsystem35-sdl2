@@ -15,7 +15,6 @@
 #include "midi.h"
 #include "music_private.h"
 #include "sdl3_mixer_backend.h"
-#include "sdl3_mixer_utils.h"
 #include "system.h"
 
 #define FLUIDSYNTH_SOUNDFONT_PATH \
@@ -34,9 +33,19 @@ static bool has_decoder(const char *name)
 	return false;
 }
 
+static int clamp_volume(int volume)
+{
+	if (volume < 0)
+		return 0;
+	if (volume > 100)
+		return 100;
+	return volume;
+}
+
 static float music_gain(void)
 {
-	return sdl3_mixer_gain(current_vol, prv.volval[BGM_VOLVAL_CH]);
+	float gain = clamp_volume(current_vol) / 100.0f;
+	return gain * clamp_volume(prv.volval[BGM_VOLVAL_CH]) / 100.0f;
 }
 
 static void apply_volume(void)

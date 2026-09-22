@@ -26,9 +26,6 @@ void gameresource_test(void);
 void hankaku_test(void);
 void qnt_test(void);
 void sdl_compat_test(void);
-#if XSYSTEM35_SDL_VERSION == 3
-void sdl3_mixer_utils_test(void);
-#endif
 void variable_test(void);
 
 void sys_error(char *format, ...) {
@@ -54,8 +51,5 @@ int main() {
 	hankaku_test();
 	qnt_test();
 	sdl_compat_test();
-#if XSYSTEM35_SDL_VERSION == 3
-	sdl3_mixer_utils_test();
-#endif
 	return 0;
 }

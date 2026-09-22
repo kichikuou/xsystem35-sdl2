@@ -109,7 +109,6 @@ elseif (XSYSTEM35_SDL_VERSION STREQUAL "3")
   target_sources(xsystem35 PRIVATE
     pcm.sdl3mixer.c
     sdl3_mixer_backend.c
-    sdl3_mixer_utils.c
     bgm.sdl3mixer.c)
   target_compile_definitions(xsystem35 PRIVATE HAVE_SDL3_MIXER_BACKEND)
 else()
@@ -227,11 +226,6 @@ else()  # non-emscripten, non-android
   target_compile_definitions(src_tests PRIVATE
       TEST_FONT_DIR="${PROJECT_SOURCE_DIR}/fonts")
   target_link_libraries(src_tests PRIVATE src_lib xsystem35_sdl)
-  if (XSYSTEM35_SDL_VERSION STREQUAL "3")
-    target_sources(src_tests PRIVATE
-      sdl3_mixer_utils.c
-      sdl3_mixer_utils_test.c)
-  endif()
   add_test(NAME src_tests COMMAND src_tests)
   file(COPY testdata DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
