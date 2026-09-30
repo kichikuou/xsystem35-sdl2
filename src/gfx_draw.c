@@ -45,6 +45,7 @@
 #include "debugger.h"
 
 static bool gfx_dirty;
+static bool gfx_effect_running;
 
 static void gfx_pal_check(void) {
 	if (nact->ags.pal_changed) {
@@ -64,12 +65,18 @@ SDL_Color gfx_getPaletteColor(uint8_t color) {
 }
 
 void gfx_updateScreen(void) {
-	if (!gfx_dirty)
+	if (!gfx_dirty || gfx_effect_running)
 		return;
 	SDL_RenderClear(gfx_renderer);
 	SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
 	modal_render_overlay();
 	SDL_RenderPresent(gfx_renderer);
+	gfx_dirty = false;
+}
+
+void gfx_setEffectRunning(bool running) {
+	gfx_effect_running = running;
+	// Effects present directly. Do not replay pending redraws over their frames.
 	gfx_dirty = false;
 }
 

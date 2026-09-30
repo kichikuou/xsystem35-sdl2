@@ -37,6 +37,8 @@ extern surface_t *gfx_dibinfo;
 extern int view_w;
 extern int view_h;
 
+void gfx_setEffectRunning(bool running);
+
 SDL_Surface *gfx_dib_to_surface_with_alpha(int x, int y, int w, int h);
 SDL_Surface *gfx_dib_to_surface_colorkey(int x, int y, int w, int h, int col);
 

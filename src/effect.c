@@ -191,6 +191,7 @@ static void eff_init(struct effect *eff, SDL_Rect *rect, EffectTexture *old, Eff
 
 	if (!eff->is_fullscreen)
 		gfx_updateScreen();  // Flush pending display changes.
+	gfx_setEffectRunning(true);
 }
 
 static void eff_finish(struct effect *eff, bool present) {
@@ -1912,4 +1913,5 @@ void effect_step(struct effect *eff, float progress) {
 
 void effect_finish(struct effect *eff) {
 	eff->finish(eff);
+	gfx_setEffectRunning(false);
 }
