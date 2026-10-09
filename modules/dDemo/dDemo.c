@@ -58,6 +58,9 @@ static struct {
 	bool loop;
 	bool key_cancel;
 	SDL_Texture *images[NR_TEXTURES];
+	// State of the current frame, drawn by redraw().
+	int scene;
+	int elapsed;
 } dd;
 
 // For each corner, if a coordinate is out of [0, view_w-1] x [0, view_h-1],
@@ -177,12 +180,11 @@ static void render_affine_bg(SDL_Texture *scroll_bg, int elapsed, int duration,
 	}
 
 	SDL_Vertex verts[4];
-	static int y_toggle = 0;
 
 	// Pass 1: Forward mapping layer
 	for (int i = 0; i < 4; i++) {
 		verts[i].position.x = (i == 1 || i == 2) ? w : 0;
-		verts[i].position.y = (i == 2 || i == 3) ? h : (float)y_toggle;
+		verts[i].position.y = (i == 2 || i == 3) ? h : 0;
 		verts[i].color = (SDL_Color){255, 255, 255, 255};
 		verts[i].tex_coord.x = uv[i][0];
 		verts[i].tex_coord.y = uv[i][1];
@@ -191,9 +193,7 @@ static void render_affine_bg(SDL_Texture *scroll_bg, int elapsed, int duration,
 	render_quad(scroll_bg, verts);
 
 	// Pass 2: 180° rotated mapping layer
-	y_toggle = (y_toggle + 1) & 1;
 	for (int i = 0; i < 4; i++) {
-		verts[i].position.y = (i == 2 || i == 3) ? h : (float)y_toggle;
 		verts[i].color = (SDL_Color){255, 255, 255, 128};
 	}
 	// Swap mapping: TL<->BR, TR<->BL for 180° rotation effect
@@ -875,12 +875,61 @@ static void render_scene12(int elapsed) {
 	}
 }
 
+static void redraw(void *arg) {
+	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 255);
+	SDL_RenderClear(gfx_renderer);
+	switch (dd.scene) {
+	case 0:
+		render_scene0(dd.elapsed);
+		break;
+	case 1:
+		render_scene1(dd.elapsed);
+		break;
+	case 2:
+		render_scene_2_4_6(dd.elapsed, 2, 0, 3, 4);
+		break;
+	case 3:
+		render_scene_3_5_7_9(dd.elapsed, 11);
+		break;
+	case 4:
+		render_scene_2_4_6(dd.elapsed, 4, 1, 5, 6);
+		break;
+	case 5:
+		render_scene_3_5_7_9(dd.elapsed, 12);
+		break;
+	case 6:
+		render_scene_2_4_6(dd.elapsed, 6, 2, 7, 8);
+		break;
+	case 7:
+		render_scene_3_5_7_9(dd.elapsed, 13);
+		break;
+	case 8:
+		render_scene8(dd.elapsed);
+		break;
+	case 9:
+		render_scene_3_5_7_9(dd.elapsed, 14);
+		break;
+	case 10:
+		render_scene10(dd.elapsed);
+		break;
+	case 11:
+		render_scene11(dd.elapsed);
+		break;
+	case 12:
+		render_scene12(dd.elapsed);
+		break;
+	}
+}
+
 static void Run() {
 	TRACE("dDemo.Run:");
 
 	muscd_start(13, 1);
 	uint32_t start = sys_get_ticks();
 	int current_scene = 0;
+	dd.scene = 0;
+	dd.elapsed = 0;
+	gfx_setRedrawHandler(redraw, NULL);
 	while (!nact->is_quit && !(sys_getInputInfo() && dd.key_cancel)) {
 		uint32_t now = sys_get_ticks();
 		if (current_scene < NR_SCENES && now - start >= (uint32_t)scene_duration[current_scene]) {
@@ -897,53 +946,13 @@ static void Run() {
 		if (current_scene >= NR_SCENES) {
 			break;
 		}
-		SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 255);
-		SDL_RenderClear(gfx_renderer);
-		switch (current_scene) {
-		case 0:
-			render_scene0(now - start);
-			break;
-		case 1:
-			render_scene1(now - start);
-			break;
-		case 2:
-			render_scene_2_4_6(now - start, 2, 0, 3, 4);
-			break;
-		case 3:
-			render_scene_3_5_7_9(now - start, 11);
-			break;
-		case 4:
-			render_scene_2_4_6(now - start, 4, 1, 5, 6);
-			break;
-		case 5:
-			render_scene_3_5_7_9(now - start, 12);
-			break;
-		case 6:
-			render_scene_2_4_6(now - start, 6, 2, 7, 8);
-			break;
-		case 7:
-			render_scene_3_5_7_9(now - start, 13);
-			break;
-		case 8:
-			render_scene8(now - start);
-			break;
-		case 9:
-			render_scene_3_5_7_9(now - start, 14);
-			break;
-		case 10:
-			render_scene10(now - start);
-			break;
-		case 11:
-			render_scene11(now - start);
-			break;
-		case 12:
-			render_scene12(now - start);
-			break;
-		}
-		SDL_RenderPresent(gfx_renderer);
+		dd.scene = current_scene;
+		dd.elapsed = now - start;
+		gfx_requestRedraw();
 		sys_wait_vsync();
 	}
 
+	gfx_setRedrawHandler(NULL, NULL);
 	muscd_stop();
 
 	for (int i = 0; i < NR_TEXTURES; i++) {

@@ -45,6 +45,8 @@
 #include "debugger.h"
 
 static bool gfx_dirty;
+static gfx_RedrawFunc redraw_handler;
+static void *redraw_handler_arg;
 
 static void gfx_pal_check(void) {
 	if (nact->ags.pal_changed) {
@@ -67,10 +69,19 @@ void gfx_updateScreen(void) {
 	if (!gfx_dirty)
 		return;
 	SDL_RenderClear(gfx_renderer);
-	SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
+	if (redraw_handler)
+		redraw_handler(redraw_handler_arg);
+	else
+		SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
 	modal_render_overlay();
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
+}
+
+void gfx_setRedrawHandler(gfx_RedrawFunc fn, void *arg) {
+	assert(!fn || !redraw_handler);
+	redraw_handler = fn;
+	redraw_handler_arg = arg;
 }
 
 void gfx_requestRedraw(void) {

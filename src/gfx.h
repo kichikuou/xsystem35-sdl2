@@ -50,6 +50,8 @@ void gfx_updateArea(SDL_Rect *src, SDL_Point *dst);
 void gfx_updateAll(SDL_Rect *view_rect);
 void gfx_requestRedraw(void);
 void gfx_updateScreen(void);
+typedef void (*gfx_RedrawFunc)(void *arg);
+void gfx_setRedrawHandler(gfx_RedrawFunc fn, void *arg);
 
 /* パレット関係 */
 void gfx_setPalette(SDL_Color *pal, int first, int count);
