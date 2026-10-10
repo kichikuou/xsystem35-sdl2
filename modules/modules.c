@@ -32,7 +32,6 @@ static const Module *modules[] = {
 	&module_Gpx,
 	&module_Math,
 	&module_MsgSkip,
-	&module_NIGHTDLL,
 	&module_NightDemonDemo,
 	&module_RandMT,
 	&module_S3xMusic,

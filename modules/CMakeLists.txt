@@ -13,18 +13,6 @@ add_library(modules STATIC
   Gpx/surface.c
   Math/Math.c
   MsgSkip/MsgSkip.c
-  NIGHTDLL/NIGHTDLL.c
-  NIGHTDLL/nt_scenario.c
-  NIGHTDLL/sactstring.c
-  NIGHTDLL/sprite.c
-  NIGHTDLL/sprite_draw.c
-  NIGHTDLL/sprite_update.c
-  NIGHTDLL/sprite_eupdate.c
-  NIGHTDLL/nt_event.c
-  NIGHTDLL/nt_msg.c
-  NIGHTDLL/nt_sel.c
-  NIGHTDLL/nt_graph.c
-  NIGHTDLL/nt_sound.c
   NightDemonDemo/NightDemonDemo.c
   RandMT/RandMT.c
   S3xMusic/S3xMusic.c
