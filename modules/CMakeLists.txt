@@ -17,6 +17,9 @@ add_library(modules STATIC
   RandMT/RandMT.c
   S3xMusic/S3xMusic.c
   SACT/SACT.c
+  SACT/drawtext.c
+  SACT/list.c
+  SACT/sactcg.c
   SACT/sactsound.c
   SACT/sacttimer.c
   SACT/sactstring.c
@@ -51,10 +54,7 @@ add_library(modules STATIC
   eDemo/eDemo.c
   eeDemo/eeDemo.c
   lib/alk.c
-  lib/drawtext.c
-  lib/list.c
   lib/graph_blend_amap.c
-  lib/sactcg.c
   nDEMO/nDEMO.c
   nDEMOE/nDEMOE.c
   oDEMO/oDEMO.c
@@ -65,7 +65,7 @@ add_library(modules STATIC
 target_include_directories(modules PUBLIC . lib)
 
 if (NOT ANDROID AND NOT EMSCRIPTEN)
-  add_executable(modules_tests lib/list_test.c)
+  add_executable(modules_tests SACT/list_test.c)
   target_link_libraries(modules_tests PRIVATE modules)
   add_test(NAME modules_tests COMMAND modules_tests)
 endif()
