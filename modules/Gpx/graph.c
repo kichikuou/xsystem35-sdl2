@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "system.h"
@@ -54,7 +54,7 @@ bool gr_clip(surface_t *ss, int *sx, int *sy, int *sw, int *sh, surface_t *ds, i
 bool gr_clip_xywh(surface_t *ss, int *sx, int *sy, int *sw, int *sh) {
 	if (!ss) return false;
 	SDL_Rect rect = {*sx, *sy, *sw, *sh};
-	if (!SDL_IntersectRect(&rect, &(SDL_Rect){ 0, 0, ss->width, ss->height }, &rect))
+	if (!SDL_GetRectIntersection(&rect, &(SDL_Rect){ 0, 0, ss->width, ss->height }, &rect))
 		return false;
 	*sx = rect.x;
 	*sy = rect.y;
@@ -74,18 +74,18 @@ void gr_copy(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int
 	SDL_Rect dst_rect = {dx, dy, sw, sh};
 	if (dst == src) {
 		SDL_Rect r;
-		if (SDL_IntersectRect(&src_rect, &dst_rect, &r)) {
+		if (SDL_GetRectIntersection(&src_rect, &dst_rect, &r)) {
 			SDL_Surface *view = gfx_createSurfaceView(src->sdl_surface, sx, sy, sw, sh);
-			SDL_Surface *tmp = SDL_ConvertSurface(view, dst->sdl_surface->format, 0);
+			SDL_Surface *tmp = SDL_DuplicateSurface(view);
 			src_rect.x = 0;
 			src_rect.y = 0;
-			SDL_LowerBlit(tmp, &src_rect, dst->sdl_surface, &dst_rect);
-			SDL_FreeSurface(tmp);
-			SDL_FreeSurface(view);
+			SDL_BlitSurfaceUnchecked(tmp, &src_rect, dst->sdl_surface, &dst_rect);
+			SDL_DestroySurface(tmp);
+			SDL_DestroySurface(view);
 			return;
 		}
 	}
-	SDL_LowerBlit(src->sdl_surface, &src_rect, dst->sdl_surface, &dst_rect);
+	SDL_BlitSurfaceUnchecked(src->sdl_surface, &src_rect, dst->sdl_surface, &dst_rect);
 }
 
 // Copy the specified surface area with brightness lv/255 times
@@ -99,14 +99,14 @@ void gr_copy_bright(surface_t *dst, int dx, int dy, surface_t *src, int sx, int 
 
 void gr_fill(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b) {
 	SDL_Rect rect = {dx, dy, dw, dh};
-	uint32_t color = SDL_MapRGB(dst->sdl_surface->format, r, g, b);
-	SDL_FillRect(dst->sdl_surface, &rect, color);
+	uint32_t color = SDL_MapSurfaceRGB(dst->sdl_surface, r, g, b);
+	SDL_FillSurfaceRect(dst->sdl_surface, &rect, color);
 }
 
 void gr_copy_stretch(surface_t *dst, int dx, int dy, int dw, int dh, surface_t *src, int sx, int sy, int sw, int sh) {
 	SDL_Rect srcrect = {sx, sy, sw, sh};
 	SDL_Rect dstrect = {dx, dy, dw, dh};
-	SDL_BlitScaled(src->sdl_surface, &srcrect, dst->sdl_surface, &dstrect);
+	sdl_BlitSurfaceScaled(src->sdl_surface, &srcrect, dst->sdl_surface, &dstrect);
 }
 
 void gr_blend(surface_t *dst, int dx, int dy, surface_t *src, int sx, int sy, int width, int height, int lv) {
@@ -227,12 +227,12 @@ void gr_copy_stretch_blend_alpha_map(surface_t *dst, int dx, int dy, int dw, int
 
 // Fill the rectangle with the specified color (rgb) and blend rate (lv)
 void gr_fill_alpha_color(surface_t *dst, int dx, int dy, int dw, int dh, int r, int g, int b, int lv) {
-	SDL_Surface *src = SDL_CreateRGBSurfaceWithFormat(0, dw, dh, 32, SDL_PIXELFORMAT_ARGB8888);
-	SDL_FillRect(src, NULL, SDL_MapRGBA(src->format, r, g, b, lv));
+	SDL_Surface *src = sdl_CreateSurface(dw, dh, SDL_PIXELFORMAT_ARGB8888);
+	SDL_FillSurfaceRect(src, NULL, SDL_MapSurfaceRGBA(src, r, g, b, lv));
 	SDL_SetSurfaceBlendMode(src, SDL_BLENDMODE_BLEND);
 	SDL_Rect dstrect = {dx, dy, dw, dh};
 	SDL_BlitSurface(src, NULL, dst->sdl_surface, &dstrect);
-	SDL_FreeSurface(src);
+	SDL_DestroySurface(src);
 }
 
 #include "graph2.c"

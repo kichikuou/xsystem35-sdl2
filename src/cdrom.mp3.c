@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL_timer.h>
+#include "sdl_compat.h"
 #include <SDL_mixer.h>
 
 #include "portab.h"

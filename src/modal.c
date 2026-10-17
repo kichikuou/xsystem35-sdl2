@@ -23,7 +23,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -109,22 +109,22 @@ static void init_context(void) {
 
 bool modal_default_handler(const SDL_Event *e, modal *modal) {
 	switch (e->type) {
-	case SDL_QUIT:
+	case SDL_EVENT_QUIT:
 		return false;
-	case SDL_MOUSEMOTION:
+	case SDL_EVENT_MOUSE_MOTION:
 		mu_input_mousemove(ctx, e->motion.x, e->motion.y);
 		break;
-	case SDL_MOUSEWHEEL:
+	case SDL_EVENT_MOUSE_WHEEL:
 		mu_input_scroll(ctx, 0, e->wheel.y * -30);
 		break;
-	case SDL_TEXTINPUT:
+	case SDL_EVENT_TEXT_INPUT:
 		mu_input_text(ctx, e->text.text);
 		break;
-	case SDL_TEXTEDITING:
+	case SDL_EVENT_TEXT_EDITING:
 		mu_input_preedit(ctx, e->edit.text);
 		break;
-	case SDL_MOUSEBUTTONDOWN:
-	case SDL_MOUSEBUTTONUP: {
+	case SDL_EVENT_MOUSE_BUTTON_DOWN:
+	case SDL_EVENT_MOUSE_BUTTON_UP: {
 		int b = 0;
 		switch (e->button.button) {
 		case SDL_BUTTON_LEFT:   b = MU_MOUSE_LEFT;   break;
@@ -133,7 +133,7 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 		}
 		if (!b)
 			break;
-		if (e->type == SDL_MOUSEBUTTONDOWN)
+		if (e->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 			mu_input_mousedown(ctx, e->button.x, e->button.y, b);
 		else
 			mu_input_mouseup(ctx, e->button.x, e->button.y, b);
@@ -141,18 +141,18 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 	}
 	// Touch handling (see touch_phase above). The press/release is driven
 	// from the frame loop in modal_run(), not emitted here directly.
-	case SDL_FINGERDOWN:
+	case SDL_EVENT_FINGER_DOWN:
 		touch_pos = event_get_touch_position(&e->tfinger);
 		mu_input_mousemove(ctx, touch_pos.x, touch_pos.y);
 		touch_phase = TOUCH_HOVER;
 		touch_hover_frames = TOUCH_HOVER_FRAMES;
 		touch_release_after_press = false;
 		break;
-	case SDL_FINGERMOTION:
+	case SDL_EVENT_FINGER_MOTION:
 		touch_pos = event_get_touch_position(&e->tfinger);
 		mu_input_mousemove(ctx, touch_pos.x, touch_pos.y);
 		break;
-	case SDL_FINGERUP:
+	case SDL_EVENT_FINGER_UP:
 		touch_pos = event_get_touch_position(&e->tfinger);
 		if (touch_phase == TOUCH_PRESS) {
 			mu_input_mouseup(ctx, touch_pos.x, touch_pos.y, MU_MOUSE_LEFT);
@@ -162,14 +162,15 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 			touch_release_after_press = true;
 		}
 		break;
-	case SDL_KEYDOWN:
-	case SDL_KEYUP: {
+	case SDL_EVENT_KEY_DOWN:
+	case SDL_EVENT_KEY_UP: {
+		SDL_Keycode key = sdl_KeyboardEventKey(&e->key);
 		// Esc cancels an IME composition first, not the modal.
-		if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE &&
+		if (e->type == SDL_EVENT_KEY_DOWN && key == SDLK_ESCAPE &&
 		    !*ctx->preedit)
 			modal->cancelled = true;
 		int c = 0;
-		switch (e->key.keysym.sym) {
+		switch (key) {
 		case SDLK_LSHIFT: case SDLK_RSHIFT:   c = MU_KEY_SHIFT;     break;
 		case SDLK_LCTRL:  case SDLK_RCTRL:    c = MU_KEY_CTRL;      break;
 		case SDLK_LALT:   case SDLK_RALT:     c = MU_KEY_ALT;       break;
@@ -184,7 +185,7 @@ bool modal_default_handler(const SDL_Event *e, modal *modal) {
 		}
 		if (!c)
 			break;
-		if (e->type == SDL_KEYDOWN)
+		if (e->type == SDL_EVENT_KEY_DOWN)
 			mu_input_keydown(ctx, c);
 		else
 			mu_input_keyup(ctx, c);
@@ -204,10 +205,10 @@ static void render_text(mu_Font font, const char *str, mu_Vec2 pos, mu_Color col
 	SDL_Texture *t = SDL_CreateTextureFromSurface(gfx_renderer, s);
 	if (t) {
 		SDL_Rect dst = { pos.x, pos.y, s->w, s->h };
-		SDL_RenderCopy(gfx_renderer, t, NULL, &dst);
+		sdl_RenderTexture(gfx_renderer, t, NULL, &dst);
 		SDL_DestroyTexture(t);
 	}
-	SDL_FreeSurface(s);
+	SDL_DestroySurface(s);
 }
 
 // Draw a line thickened into a square brush of the given width, so it looks
@@ -217,7 +218,7 @@ static void draw_thick_line(float x1, float y1, float x2, float y2, int thicknes
 	for (int dx = 0; dx <= thickness; dx++) {
 		for (int dy = 0; dy <= thickness; dy++) {
 			float ox = dx - half, oy = dy - half;
-			SDL_RenderDrawLineF(gfx_renderer, x1 + ox, y1 + oy, x2 + ox, y2 + oy);
+			SDL_RenderLine(gfx_renderer, x1 + ox, y1 + oy, x2 + ox, y2 + oy);
 		}
 	}
 }
@@ -253,7 +254,7 @@ static void render_icon(int id, mu_Rect rect, mu_Color color) {
 	}
 	default: {
 		SDL_Rect r = { rect.x + rect.w / 2 - 2, rect.y + rect.h / 2 - 2, 4, 4 };
-		SDL_RenderFillRect(gfx_renderer, &r);
+		sdl_RenderFillRect(gfx_renderer, &r);
 		break;
 	}
 	}
@@ -265,7 +266,7 @@ static void modal_render(void) {
 	// Dim the game behind the menu.
 	if (!current_modal->no_dim) {
 		SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 110);
-		SDL_RenderFillRect(gfx_renderer, NULL);
+		sdl_RenderFillRect(gfx_renderer, NULL);
 	}
 
 	mu_Command *cmd = NULL;
@@ -276,7 +277,7 @@ static void modal_render(void) {
 			SDL_SetRenderDrawColor(gfx_renderer, c.r, c.g, c.b, c.a);
 			SDL_Rect r = { cmd->rect.rect.x, cmd->rect.rect.y,
 			               cmd->rect.rect.w, cmd->rect.rect.h };
-			SDL_RenderFillRect(gfx_renderer, &r);
+			sdl_RenderFillRect(gfx_renderer, &r);
 			break;
 		}
 		case MU_COMMAND_TEXT:
@@ -288,12 +289,12 @@ static void modal_render(void) {
 		case MU_COMMAND_CLIP: {
 			SDL_Rect r = { cmd->clip.rect.x, cmd->clip.rect.y,
 			               cmd->clip.rect.w, cmd->clip.rect.h };
-			SDL_RenderSetClipRect(gfx_renderer, &r);
+			SDL_SetRenderClipRect(gfx_renderer, &r);
 			break;
 		}
 		}
 	}
-	SDL_RenderSetClipRect(gfx_renderer, NULL);
+	SDL_SetRenderClipRect(gfx_renderer, NULL);
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, 255);
 	SDL_SetRenderDrawBlendMode(gfx_renderer, SDL_BLENDMODE_NONE);
 }
@@ -303,19 +304,19 @@ static void modal_render(void) {
 static void update_text_input(void) {
 	static SDL_Rect last_rect;
 	if (!ctx->text_input) {
-		if (SDL_IsTextInputActive())
-			SDL_StopTextInput();
+		if (SDL_TextInputActive(gfx_getWindow()))
+			sdl_StopTextInput(gfx_getWindow());
 		return;
 	}
-	if (!SDL_IsTextInputActive()) {
-		SDL_StartTextInput();
+	if (!SDL_TextInputActive(gfx_getWindow())) {
+		sdl_StartTextInput(gfx_getWindow());
 		last_rect = (SDL_Rect){0, 0, 0, 0};
 	}
 	mu_Rect r = ctx->text_input_rect;
 	SDL_Rect wr = gfx_viewToWindowRect((SDL_Rect){r.x, r.y, r.w, r.h});
 	if (memcmp(&wr, &last_rect, sizeof(wr))) {
 		last_rect = wr;
-		SDL_SetTextInputRect(&wr);
+		SDL_SetTextInputArea(gfx_getWindow(), &wr, 0);
 	}
 }
 
@@ -382,8 +383,8 @@ void modal_run(modal *m) {
 	current_modal = NULL;
 	free(ctx);
 	ctx = NULL;
-	if (SDL_IsTextInputActive())
-		SDL_StopTextInput();
+	if (SDL_TextInputActive(gfx_getWindow()))
+		sdl_StopTextInput(gfx_getWindow());
 	gfx_requestRedraw();  // repaint once more to clear the overlay
 
 	// The gesture that opened/dismissed the dialog must not leave the engine

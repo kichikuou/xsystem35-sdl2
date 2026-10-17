@@ -23,7 +23,7 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
@@ -45,6 +45,7 @@ surface_t *gfx_dibinfo;
 int view_w;
 int view_h;
 static bool gfx_fullscreen;
+static bool gfx_integer_scaling;
 
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
@@ -68,9 +69,9 @@ int gfx_Initialize(const char *render_driver) {
 
 void gfx_Remove(void) {
 	if (gfx_palette)
-		SDL_FreePalette(gfx_palette);
+		SDL_DestroyPalette(gfx_palette);
 	if (main_surface)
-		SDL_FreeSurface(main_surface);
+		SDL_DestroySurface(main_surface);
 	if (gfx_renderer)
 		SDL_DestroyRenderer(gfx_renderer);
 	SDL_Quit();
@@ -111,18 +112,17 @@ static void window_init(const char *render_driver) {
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 #endif
 
-	gfx_window = SDL_CreateWindow(
-		title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
-	gfx_renderer = SDL_CreateRenderer(gfx_window, -1, 0);
+	gfx_window = sdl_CreateWindow(
+		title, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
+	gfx_renderer = sdl_CreateRenderer(gfx_window);
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	gfx_palette = SDL_AllocPalette(256);
+	gfx_palette = SDL_CreatePalette(256);
 }
 
 static void makeDIB(int width, int height, int depth) {
 	
 	if (main_surface) {
-		SDL_FreeSurface(main_surface);
+		SDL_DestroySurface(main_surface);
 	}
 
 	uint32_t format = 0;
@@ -134,17 +134,16 @@ static void makeDIB(int width, int height, int depth) {
 		format = SDL_PIXELFORMAT_RGB565;
 		break;
 	case 24:
-		format = SDL_PIXELFORMAT_RGB888;
+		format = SDL_PIXELFORMAT_XRGB8888;
 		// Graphic routines in modules/ assume 4 bytes/pixel mode for 24-bit surfaces.
-		depth = 32;
 		break;
 	default:
 		SYSERROR("invalid pixel depth %d", depth);
 	}
 
-	main_surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);
+	main_surface = sdl_CreateSurface(width, height, format);
 	
-	if (main_surface->format->BitsPerPixel == 8) {
+	if (sdl_SurfaceBitsPerPixel(main_surface) == 8) {
 		SDL_SetSurfacePalette(main_surface, gfx_palette);
 	}
 
@@ -158,13 +157,13 @@ static void makeDIB(int width, int height, int depth) {
 	gfx_dibinfo->alpha  = NULL;
 	gfx_dibinfo->sdl_surface = main_surface;
 	
-	image_setdepth(main_surface->format->BitsPerPixel);
+	image_setdepth(sdl_SurfaceBitsPerPixel(main_surface));
 }
 
 /* offscreen の設定 */
 void gfx_setWorldSize(int width, int height, int depth) {
 	makeDIB(width, height, depth);
-	SDL_FillRect(main_surface, NULL, 0);
+	SDL_FillSurfaceRect(main_surface, NULL, 0);
 }
 
 void gfx_getViewSize(int *width, int *height) {
@@ -180,7 +179,7 @@ SDL_Window *gfx_getWindow(void) {
 
 static SDL_Point view_to_window_point(int x, int y) {
 	SDL_Point point;
-	SDL_RenderLogicalToWindow(gfx_renderer, x, y, &point.x, &point.y);
+	sdl_RenderCoordinatesToWindow(gfx_renderer, x, y, &point.x, &point.y);
 	return point;
 }
 
@@ -202,11 +201,10 @@ surface_t *gfx_getDIB(void) {
 
 SDL_Surface *gfx_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) {
 	uint8_t *pixels = sf->pixels;
-	pixels += y * sf->pitch + x * sf->format->BytesPerPixel;
-	SDL_Surface *view = SDL_CreateRGBSurfaceWithFormatFrom(
-		pixels, w, h, sf->format->BitsPerPixel, sf->pitch, sf->format->format);
-	if (sf->format->palette)
-		SDL_SetSurfacePalette(view, sf->format->palette);
+	pixels += y * sf->pitch + x * sdl_SurfaceBytesPerPixel(sf);
+	SDL_Surface *view = sdl_CreateSurfaceFrom(w, h, sdl_SurfaceFormat(sf), pixels, sf->pitch);
+	if (SDL_GetSurfacePalette(sf))
+		SDL_SetSurfacePalette(view, SDL_GetSurfacePalette(sf));
 	return view;
 }
 
@@ -214,7 +212,7 @@ void gfx_setFullscreen(bool on) {
 #ifndef __EMSCRIPTEN__
 	if (on == gfx_fullscreen)
 		return;
-	SDL_SetWindowFullscreen(gfx_window, on ? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+	sdl_SetWindowFullscreen(gfx_window, on);
 	gfx_fullscreen = on;
 #endif
 }
@@ -236,11 +234,11 @@ void gfx_setViewSize(int w, int h) {
 #ifndef __ANDROID__
 	SDL_SetWindowSize(gfx_window, w, h);
 #endif
-	SDL_RenderSetLogicalSize(gfx_renderer, w, h);
+	sdl_SetRenderLogicalPresentation(gfx_renderer, w, h, gfx_integer_scaling);
 	if (gfx_texture)
 		SDL_DestroyTexture(gfx_texture);
 	gfx_texture = SDL_CreateTexture(
-		gfx_renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, w, h);
+		gfx_renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
 
 #ifdef __EMSCRIPTEN__
 	EM_ASM( xsystem35.shell.windowSizeChanged(); );
@@ -248,13 +246,14 @@ void gfx_setViewSize(int w, int h) {
 }
 
 void gfx_setIntegerScaling(bool enable) {
-	SDL_RenderSetIntegerScale(gfx_renderer, enable);
+	gfx_integer_scaling = enable;
+	sdl_SetRenderLogicalPresentation(gfx_renderer, view_w, view_h, enable);
 }
 
 bool EMSCRIPTEN_KEEPALIVE save_screenshot(const char* path) {
 	SDL_Rect *r = &nact->ags.view_area;
 	SDL_Surface *view = gfx_createSurfaceView(main_surface, r->x, r->y, r->w, r->h);
-	bool ok = SDL_SaveBMP(view, path) == 0;
-	SDL_FreeSurface(view);
+	bool ok = sdl_SaveBMP(view, path);
+	SDL_DestroySurface(view);
 	return ok;
 }

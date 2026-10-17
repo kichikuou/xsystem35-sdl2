@@ -20,7 +20,7 @@
 #ifndef __EFFECT_H__
 #define __EFFECT_H__
 
-#include <SDL_surface.h>
+#include "sdl_compat.h"
 #include "ags.h"
 
 // Effect types of the CE/CD command.

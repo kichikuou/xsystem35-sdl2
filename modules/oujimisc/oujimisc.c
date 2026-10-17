@@ -183,11 +183,11 @@ static void TempMapLoadToShadow() {
 	vmvar_t *a3 = v_resolveRef(&r3);
 	uint16_t *p = mapdata[map];
 	for (int i = 0; i < size; i++)
-		*a1++ = SDL_SwapLE16(*p++);
+		*a1++ = SDL_Swap16LE(*p++);
 	for (int i = 0; i < size; i++)
-		*a2++ = SDL_SwapLE16(*p++);
+		*a2++ = SDL_Swap16LE(*p++);
 	for (int i = 0; i < size; i++)
-		*a3++ = SDL_SwapLE16(*p++);
+		*a3++ = SDL_Swap16LE(*p++);
 
 	TRACE("oujimisc.TempMapLoadToShadow %d,%p,%p,%p,%d:", map,a1,a2,a3,size);
 }
@@ -212,11 +212,11 @@ static void TempMapSaveToShadow() {
 	vmvar_t *a3 = v_resolveRef(&r3);
 	uint16_t *p = mapdata[map];
 	for (int i = 0; i < size; i++)
-		*p++ = SDL_SwapLE16(*a1++);
+		*p++ = SDL_Swap16LE(*a1++);
 	for (int i = 0; i < size; i++)
-		*p++ = SDL_SwapLE16(*a2++);
+		*p++ = SDL_Swap16LE(*a2++);
 	for (int i = 0; i < size; i++)
-		*p++ = SDL_SwapLE16(*a3++);
+		*p++ = SDL_Swap16LE(*a3++);
 
 	TRACE("oujimisc.TempMapSaveToShadow %d,%p,%p,%p,%d:", map,a1,a2,a3,size);
 }

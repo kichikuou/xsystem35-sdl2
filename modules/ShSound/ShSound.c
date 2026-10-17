@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "LittleEndian.h"
@@ -44,7 +44,7 @@ static struct {
 } memwav;
 
 static void free_memory_wav(void) {
-	SDL_FreeWAV(memwav.buf);
+	SDL_free(memwav.buf);
 	memwav.buf = NULL;
 }
 
@@ -132,11 +132,11 @@ static void wavLoadMemory() {
 		WARNING("cannot open WAVE %d", no - 1);
 		return;
 	}
-	if (!SDL_LoadWAV_RW(SDL_RWFromConstMem(dfile->data, dfile->size), 1, &memwav.spec, &memwav.buf, &memwav.len)) {
+	if (!SDL_LoadWAV_IO(SDL_IOFromConstMem(dfile->data, dfile->size), true, &memwav.spec, &memwav.buf, &memwav.len)) {
 		WARNING("cannot load WAVE %d", no - 1);
 		return;
 	}
-	if (memwav.spec.channels != 2 || memwav.spec.format != AUDIO_S16LSB) {
+	if (memwav.spec.channels != 2 || memwav.spec.format != SDL_AUDIO_S16LE) {
 		WARNING("unexpected audio format");
 		free_memory_wav();
 		return;

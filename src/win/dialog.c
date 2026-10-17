@@ -18,16 +18,13 @@
  */
 #include <windows.h>
 #include <commctrl.h>
-#include <SDL_syswm.h>
+#include "sdl_compat.h"
 #include "input_modal.h"
 #include "gfx.h"
 #include "resources.h"
 
 static HWND get_hwnd(SDL_Window *window) {
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(window, &info);
-	return info.info.win.window;
+	return sdl_GetWindowHWND(window);
 }
 
 static INT_PTR CALLBACK text_dialog_proc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)

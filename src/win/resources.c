@@ -17,14 +17,14 @@
  *
  */
 #include <windows.h>
-#include <SDL_rwops.h>
+#include "sdl_compat.h"
 #include "resources.h"
 
-SDL_RWops *open_resource(const char* name, const char* type) {
+SDL_IOStream *open_resource(const char* name, const char* type) {
 	HINSTANCE hInst = GetModuleHandle(NULL);
 	HRSRC hRes = FindResource(hInst, name, type);
 	if (!hRes) return NULL;
 	HGLOBAL hGlobal = LoadResource(hInst, hRes);
 	if (!hGlobal) return NULL;
-	return SDL_RWFromConstMem(LockResource(hGlobal), SizeofResource(hInst, hRes));
+	return SDL_IOFromConstMem(LockResource(hGlobal), SizeofResource(hInst, hRes));
 }

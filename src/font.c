@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -82,19 +82,19 @@ static struct {
 #if defined(_WIN32) || defined(__ANDROID__)
 // Create a face from the whole content of `rw`. The memory holding the font
 // file must outlive the face, and faces are never closed, so it is never freed.
-static FT_Face face_from_rwops(SDL_RWops *rw, int index) {
-	Sint64 size = SDL_RWsize(rw);
+static FT_Face face_from_rwops(SDL_IOStream *rw, int index) {
+	Sint64 size = SDL_GetIOSize(rw);
 	if (size <= 0) {
-		SDL_RWclose(rw);
+		SDL_CloseIO(rw);
 		return NULL;
 	}
 	FT_Byte *buf = malloc(size);
-	if (SDL_RWread(rw, buf, 1, size) != (size_t)size) {
+	if (SDL_ReadIO(rw, buf, size) != (size_t)size) {
 		free(buf);
-		SDL_RWclose(rw);
+		SDL_CloseIO(rw);
 		return NULL;
 	}
-	SDL_RWclose(rw);
+	SDL_CloseIO(rw);
 
 	FT_Face face;
 	if (FT_New_Memory_Face(ft_library, buf, size, index, &face)) {
@@ -118,7 +118,7 @@ static FT_Face open_face(const char *name, int index) {
 		face = NULL;
 
 	if (!face) {
-		SDL_RWops *res = open_resource(name, "fonts");
+		SDL_IOStream *res = open_resource(name, "fonts");
 		if (res)
 			face = face_from_rwops(res, index);
 	}
@@ -127,11 +127,11 @@ static FT_Face open_face(const char *name, int index) {
 		face = NULL;  // FT_New_Face() does not clear `face` on failure.
 #ifdef __ANDROID__
 	// The default fonts are stored as apk assets, which can only be opened
-	// through SDL_RWFromFile. (It is not used as the first choice because it
+	// through SDL_IOFromFile. (It is not used as the first choice because it
 	// does not resolve a relative path against the current directory, which a
 	// custom font specified in .xsys35rc may use.)
 	if (!face) {
-		SDL_RWops *rw = SDL_RWFromFile(name, "rb");
+		SDL_IOStream *rw = SDL_IOFromFile(name, "rb");
 		if (rw)
 			face = face_from_rwops(rw, index);
 	}
@@ -299,7 +299,7 @@ static int text_width(FontSpec spec, FT_Face face, const char *str_utf8, int len
 // (the glyph is drawn in `color`, its coverage scaled by `color.a` becoming the
 // alpha value) or an INDEX8 surface (covered pixels are set to the index 1).
 static void blit_glyph(const FT_Bitmap *bmp, SDL_Surface *dst, int x, int y, SDL_Color color) {
-	int bpp = dst->format->BytesPerPixel;
+	int bpp = sdl_SurfaceBytesPerPixel(dst);
 	uint32_t rgb = color.r << 16 | color.g << 8 | color.b;
 
 	for (unsigned int row = 0; row < bmp->rows; row++) {
@@ -342,15 +342,15 @@ SDL_Surface *font_render_text(FontSpec spec, const char *str_utf8, SDL_Color col
 
 	SDL_Surface *sf;
 	if (antialias) {
-		sf = SDL_CreateRGBSurfaceWithFormat(0, width, font.height, 32, SDL_PIXELFORMAT_ARGB8888);
+		sf = sdl_CreateSurface(width, font.height, SDL_PIXELFORMAT_ARGB8888);
 		if (sf)
 			SDL_SetSurfaceBlendMode(sf, SDL_BLENDMODE_BLEND);
 	} else {
-		sf = SDL_CreateRGBSurfaceWithFormat(0, width, font.height, 8, SDL_PIXELFORMAT_INDEX8);
+		sf = sdl_CreateSurface(width, font.height, SDL_PIXELFORMAT_INDEX8);
 		if (sf) {
 			SDL_Color pal[2] = {{0, 0, 0, 0}, {color.r, color.g, color.b, 255}};
-			SDL_SetPaletteColors(sf->format->palette, pal, 0, 2);
-			SDL_SetColorKey(sf, SDL_TRUE, 0);
+			SDL_SetPaletteColors(SDL_GetSurfacePalette(sf), pal, 0, 2);
+			SDL_SetColorKey(sf, true, 0);
 		}
 	}
 	if (!sf) {

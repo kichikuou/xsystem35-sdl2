@@ -18,7 +18,7 @@
  */
 #include <windows.h>
 #include <time.h>
-#include <SDL_events.h>
+#include "sdl_compat.h"
 #include <SDL_syswm.h>
 #include "system.h"
 #include "menu.h"
@@ -32,10 +32,7 @@
 static HMENU hmenu;
 
 static HWND get_hwnd(SDL_Window *window) {
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(window, &info);
-	return info.info.win.window;
+	return sdl_GetWindowHWND(window);
 }
 
 static void saveScreenshot(void) {
@@ -85,7 +82,7 @@ void menu_init(void) {
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
 	SetMenu(get_hwnd(window), hmenu);
-	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+	SDL_SetEventEnabled(SDL_SYSWMEVENT, true);
 	// Let SDL recalc the window size, taking menu height into account.
 	SDL_SetWindowSize(window, view_w, view_h);
 	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
@@ -96,46 +93,47 @@ void menu_open(void) {
 }
 
 void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
+	if (msg->msg.win.msg == WM_COMMAND)
+		win_menu_onCommand(msg->msg.win.wParam);
+}
+
+void win_menu_onCommand(uintptr_t wparam) {
 	bool checked;
-	switch (msg->msg.win.msg) {
-	case WM_COMMAND:
-		switch (msg->msg.win.wParam) {
-		case ID_SCREENSHOT:
-			saveScreenshot();
-			break;
-		case ID_RESTART:
-			menu_resetmenu_open();
-			break;
-		case ID_EXIT:
-			menu_quitmenu_open();
-			break;
-		case ID_SCREEN_WINDOW:
-			gfx_setFullscreen(false);
-			SetMenu(get_hwnd(gfx_getWindow()), hmenu);
-			break;
-		case ID_SCREEN_FULL:
-			gfx_setFullscreen(true);
-			SetMenu(get_hwnd(gfx_getWindow()), NULL);
-			break;
-		case ID_SCREEN_INTEGER_SCALING:
-			if (toggle_menu_item(ID_SCREEN_INTEGER_SCALING, &checked))
-				gfx_setIntegerScaling(checked);
-			break;
-		case ID_OPTION_MOUSE_MOVE:
-			if (toggle_menu_item(ID_OPTION_MOUSE_MOVE, &checked))
-				nact->ags.mouse_warp_enabled = checked;
-			break;
-		case ID_OPTION_AUTO_COPY:
-			if (toggle_menu_item(ID_OPTION_AUTO_COPY, &checked))
-				texthook_set_mode(checked ? TEXTHOOK_COPY : TEXTHOOK_NONE);
-			break;
-		case ID_OPTION_SOUND:
-			volume_dialog_open();
-			break;
-		case ID_MSGSKIP:
-			msgskip_activate(!msgskip_isActivated());
-			break;
-		}
+	switch (wparam) {
+	case ID_SCREENSHOT:
+		saveScreenshot();
+		break;
+	case ID_RESTART:
+		menu_resetmenu_open();
+		break;
+	case ID_EXIT:
+		menu_quitmenu_open();
+		break;
+	case ID_SCREEN_WINDOW:
+		gfx_setFullscreen(false);
+		SetMenu(get_hwnd(gfx_getWindow()), hmenu);
+		break;
+	case ID_SCREEN_FULL:
+		gfx_setFullscreen(true);
+		SetMenu(get_hwnd(gfx_getWindow()), NULL);
+		break;
+	case ID_SCREEN_INTEGER_SCALING:
+		if (toggle_menu_item(ID_SCREEN_INTEGER_SCALING, &checked))
+			gfx_setIntegerScaling(checked);
+		break;
+	case ID_OPTION_MOUSE_MOVE:
+		if (toggle_menu_item(ID_OPTION_MOUSE_MOVE, &checked))
+			nact->ags.mouse_warp_enabled = checked;
+		break;
+	case ID_OPTION_AUTO_COPY:
+		if (toggle_menu_item(ID_OPTION_AUTO_COPY, &checked))
+			texthook_set_mode(checked ? TEXTHOOK_COPY : TEXTHOOK_NONE);
+		break;
+	case ID_OPTION_SOUND:
+		volume_dialog_open();
+		break;
+	case ID_MSGSKIP:
+		msgskip_activate(!msgskip_isActivated());
 		break;
 	}
 }

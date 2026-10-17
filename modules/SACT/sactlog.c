@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "system.h"
@@ -73,8 +73,8 @@ static void draw_log() {
 	load_mincho_font();
 #endif
 
-	SDL_Surface *hline = SDL_CreateRGBSurfaceWithFormat(0, main_surface->w, 3, 32, SDL_PIXELFORMAT_RGB888);
-	SDL_FillRect(hline, NULL, SDL_MapRGB(hline->format, 255, 255, 255));
+	SDL_Surface *hline = sdl_CreateSurface(main_surface->w, 3, SDL_PIXELFORMAT_XRGB8888);
+	SDL_FillSurfaceRect(hline, NULL, SDL_MapSurfaceRGB(hline, 255, 255, 255));
 	SDL_SetSurfaceBlendMode(hline, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(hline, 128);
 
@@ -122,7 +122,7 @@ bool sblog_start(void) {
 	for (int i = 0; i < LOGMSG_LINES; i++)
 		sact.log = list_append(sact.log, logmsg[i]);
 	
-	back = SDL_ConvertSurface(main_surface, main_surface->format, 0);
+	back = SDL_DuplicateSurface(main_surface);
 	curline = 6;
 	draw_log();
 	return true;
@@ -135,7 +135,7 @@ void sblog_end(void) {
 	SDL_BlitSurface(back, NULL, main_surface, NULL);
 	ags_updateFull();
 	
-	SDL_FreeSurface(back);
+	SDL_DestroySurface(back);
 
 	// Remove instruction text
 	for (i = 0; i < LOGMSG_LINES; i++) {

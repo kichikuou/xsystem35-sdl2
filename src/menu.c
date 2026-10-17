@@ -50,7 +50,7 @@ EM_JS(void, menu_setSkipState, (bool enabled, bool activated), {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "event.h"
@@ -97,15 +97,15 @@ static bool point_in_rect(int x, int y, mu_Rect r) {
 
 static bool menu_popup_handler(const SDL_Event *e, modal *modal) {
 	struct popup_state *st = (struct popup_state *)modal;
-	if (e->type == SDL_MOUSEBUTTONUP) {
+	if (e->type == SDL_EVENT_MOUSE_BUTTON_UP) {
 		if (e->button.button == SDL_BUTTON_RIGHT ||
 		    !point_in_rect(e->button.x, e->button.y, st->rect))
 			st->base.cancelled = true;
-	} else if (e->type == SDL_FINGERUP) {
+	} else if (e->type == SDL_EVENT_FINGER_UP) {
 		// Arm tap-to-dismiss once the opening gesture's fingers are all lifted.
-		if (SDL_GetNumTouchFingers(e->tfinger.touchId) == 0)
+		if (sdl_CountTouchFingers(&e->tfinger) == 0)
 			st->touch_armed = true;
-	} else if (e->type == SDL_FINGERDOWN && st->touch_armed) {
+	} else if (e->type == SDL_EVENT_FINGER_DOWN && st->touch_armed) {
 		// A tap outside the menu dismisses it.
 		SDL_Point p = event_get_touch_position(&e->tfinger);
 		if (!point_in_rect(p.x, p.y, st->rect))
@@ -207,7 +207,7 @@ static bool confirm_lose_progress(const char *title, const char *confirm_label) 
 		.buttons = buttons,
 	};
 	int buttonid = 0;
-	if (SDL_ShowMessageBox(&messagebox_data, &buttonid) < 0) {
+	if (!sdl_ShowMessageBox(&messagebox_data, &buttonid)) {
 		WARNING("error displaying message box");
 		return false;
 	}

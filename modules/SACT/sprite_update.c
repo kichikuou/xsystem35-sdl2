@@ -43,7 +43,7 @@ static void do_update_each(void* data, void* userdata);
 static void disjunction(void* region, void* data) {
 	SDL_Rect *r1 = (SDL_Rect *)region;
 	SDL_Rect *r2 = (SDL_Rect *)data;
-	SDL_UnionRect(r1, r2, r2);
+	SDL_GetRectUnion(r1, r2, r2);
 	free(r1);
 }
 
@@ -58,7 +58,7 @@ static void get_updatearea() {
 	updatearea = NULL;
 	
 	// surface0との領域の積をとる
-	SDL_IntersectRect(&screen, &clip, &sact.updaterect);
+	SDL_GetRectIntersection(&screen, &clip, &sact.updaterect);
 	
 	SACT_DEBUG("clipped area x=%d y=%d w=%d h=%d",
 		sact.updaterect.x, sact.updaterect.y,

@@ -21,7 +21,7 @@
 #define __EVENT_H__
 
 #include "config.h"
-#include <SDL_events.h>
+#include "sdl_compat.h"
 #include "portab.h"
 
 void event_init(void);

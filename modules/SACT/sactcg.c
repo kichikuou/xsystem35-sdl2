@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "nact.h"
@@ -104,7 +104,7 @@ void scg_deref(cginfo_t *cg) {
 		return;
 
 	if (cg->sf)
-		SDL_FreeSurface(cg->sf);
+		SDL_DestroySurface(cg->sf);
 	free(cg);
 }
 
@@ -112,8 +112,8 @@ void scg_deref(cginfo_t *cg) {
 void scg_create(int wNumCG, int wWidth, int wHeight, int wR, int wG, int wB, int wBlendRate) {
 	SPCG_ASSERT_NO(wNumCG);
 
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, 32, SDL_PIXELFORMAT_ARGB8888);
-	SDL_FillRect(sf, NULL, SDL_MapRGBA(sf->format, wR, wG, wB, wBlendRate));
+	SDL_Surface *sf = sdl_CreateSurface(wWidth, wHeight, SDL_PIXELFORMAT_ARGB8888);
+	SDL_FillSurfaceRect(sf, NULL, SDL_MapSurfaceRGBA(sf, wR, wG, wB, wBlendRate));
 	scg_new(CG_SET, wNumCG, sf);
 }
 
@@ -126,7 +126,7 @@ void scg_create_reverse(int wNumCG, int wNumSrcCG, int wReverseX, int wReverseY)
 	if (!src)
 		return;
 
-	SDL_Surface *sf = SDL_ConvertSurface(src->sf, src->sf->format, 0);
+	SDL_Surface *sf = SDL_DuplicateSurface(src->sf);
 	if (wReverseX)
 		gfx_FlipSurfaceHorizontal(sf);
 	if (wReverseY)
@@ -143,17 +143,17 @@ void scg_create_stretch(int wNumCG, int wWidth, int wHeight, int wNumSrcCG) {
 	if (!src)
 		return;
 
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, src->sf->format->BitsPerPixel, src->sf->format->format);
-	SDL_BlitScaled(src->sf, NULL, sf, NULL);
+	SDL_Surface *sf = sdl_CreateSurface(wWidth, wHeight, sdl_SurfaceFormat(src->sf));
+	sdl_BlitSurfaceScaled(src->sf, NULL, sf, NULL);
 	scg_new(CG_STRETCH, wNumCG, sf);
 }
 
 static SDL_Surface *blend(SDL_Surface *base, int x, int y, SDL_Surface *blend, int mode) {
-	assert(blend->format->format == SDL_PIXELFORMAT_ARGB8888 || blend->format->format == SDL_PIXELFORMAT_XRGB8888);
-	bool src_has_alpha = SDL_ISPIXELFORMAT_ALPHA(blend->format->format);
-	SDL_Surface *dst = SDL_ConvertSurfaceFormat(base, SDL_PIXELFORMAT_ARGB8888, 0);
+	assert(sdl_SurfaceFormat(blend) == SDL_PIXELFORMAT_ARGB8888 || sdl_SurfaceFormat(blend) == SDL_PIXELFORMAT_XRGB8888);
+	bool src_has_alpha = SDL_ISPIXELFORMAT_ALPHA(sdl_SurfaceFormat(blend));
+	SDL_Surface *dst = sdl_ConvertSurface(base, SDL_PIXELFORMAT_ARGB8888);
 	SDL_Rect rect = {x, y, blend->w, blend->h};
-	SDL_IntersectRect(&(SDL_Rect){0, 0, dst->w, dst->h}, &rect, &rect);
+	SDL_GetRectIntersection(&(SDL_Rect){0, 0, dst->w, dst->h}, &rect, &rect);
 
 	for (int i = 0; i < rect.h; i++) {
 		uint8_t *dstp = (uint8_t *)dst->pixels + (i + rect.y) * dst->pitch + rect.x * 4;
@@ -224,10 +224,10 @@ void scg_create_text(int wNumCG, int wSize, int wR, int wG, int wB, int wText) {
 	FontSpec spec = { .type = FONT_GOTHIC, .weight = FONT_WEIGHT_BOLD, .size = wSize };
 	SDL_Surface *glyph = ags_drawStringToSurface(svar_get(wText), wR, wG, wB, spec);
 
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, glyph->w, wSize, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_Surface *sf = sdl_CreateSurface(glyph->w, wSize, SDL_PIXELFORMAT_ARGB8888);
 	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
 	SDL_BlitSurface(glyph, NULL, sf, NULL);
-	SDL_FreeSurface(glyph);
+	SDL_DestroySurface(glyph);
 
 	scg_new(CG_SET, wNumCG, sf);
 }
@@ -249,10 +249,10 @@ void scg_create_textnum(int wNumCG, int wSize, int wR, int wG, int wB, int wFigs
 	FontSpec spec = { .type = FONT_GOTHIC, .weight = FONT_WEIGHT_BOLD, .size = wSize };
 	SDL_Surface *glyph = ags_drawStringToSurface(s, wR, wG, wB, spec);
 
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, glyph->w, wSize, 32, SDL_PIXELFORMAT_ARGB8888);
+	SDL_Surface *sf = sdl_CreateSurface(glyph->w, wSize, SDL_PIXELFORMAT_ARGB8888);
 	SDL_SetSurfaceBlendMode(glyph, SDL_BLENDMODE_NONE);
 	SDL_BlitSurface(glyph, NULL, sf, NULL);
-	SDL_FreeSurface(glyph);
+	SDL_DestroySurface(glyph);
 
 	scg_new(CG_SET, wNumCG, sf);
 }
@@ -266,7 +266,7 @@ void scg_copy(int wNumDstCG, int wNumSrcCG) {
 	if (!src)
 		return;
 
-	scg_new(CG_SET, wNumDstCG, SDL_ConvertSurface(src->sf, src->sf->format, 0));
+	scg_new(CG_SET, wNumDstCG, SDL_DuplicateSurface(src->sf));
 }
 
 // CGの一部を切りぬいたCGを作成
@@ -278,7 +278,7 @@ void scg_cut(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int wHeig
 	if (!src)
 		return;
 
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, wWidth, wHeight, src->sf->format->BitsPerPixel, src->sf->format->format);
+	SDL_Surface *sf = sdl_CreateSurface(wWidth, wHeight, sdl_SurfaceFormat(src->sf));
 	SDL_BlitSurface(src->sf, &(SDL_Rect){wX, wY, wWidth, wHeight}, sf, NULL);
 
 	scg_new(CG_SET, wNumDstCG, sf);
@@ -293,8 +293,8 @@ void scg_partcopy(int wNumDstCG, int wNumSrcCG, int wX, int wY, int wWidth, int 
 	if (!src)
 		return;
 
-	SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, src->sf->w, src->sf->h, src->sf->format->BitsPerPixel, src->sf->format->format);
-	SDL_FillRect(sf, NULL, SDL_MapRGBA(sf->format, 0, 0, 0, 255));
+	SDL_Surface *sf = sdl_CreateSurface(src->sf->w, src->sf->h, sdl_SurfaceFormat(src->sf));
+	SDL_FillSurfaceRect(sf, NULL, SDL_MapSurfaceRGBA(sf, 0, 0, 0, 255));
 	SDL_BlitSurface(src->sf, &(SDL_Rect){wX, wY, wWidth, wHeight}, sf, &(SDL_Rect){wX, wY, wWidth, wHeight});
 
 	scg_new(CG_SET, wNumDstCG, sf);
@@ -357,7 +357,7 @@ int scg_querybpp(int wNumCG) {
 	if (wNumCG >= (CGMAX -1)) return 0;
 	if (!cg_store || !cg_store[wNumCG]) return 0;
 	if (cg_store[wNumCG]->sf == NULL) return 0;
-	return cg_store[wNumCG]->sf->format->BitsPerPixel;
+	return sdl_SurfaceBitsPerPixel(cg_store[wNumCG]->sf);
 }
 
 // CGの alphamap が存在するかを取得
@@ -365,5 +365,5 @@ bool scg_existalphamap(int wNumCG) {
 	if (wNumCG >= (CGMAX -1)) return false;
 	if (!cg_store || !cg_store[wNumCG]) return false;
 	if (cg_store[wNumCG]->sf == NULL) return false;
-	return SDL_ISPIXELFORMAT_ALPHA(cg_store[wNumCG]->sf->format->format);
+	return SDL_ISPIXELFORMAT_ALPHA(sdl_SurfaceFormat(cg_store[wNumCG]->sf));
 }

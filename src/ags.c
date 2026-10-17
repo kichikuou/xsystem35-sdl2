@@ -205,7 +205,7 @@ void ags_getDisplayInfo(enum ags_display display, int *width, int *height, int *
 	SDL_DisplayMode dm;
 	switch (display) {
 	case AGS_DISPLAY_CURRENT:
-		SDL_GetCurrentDisplayMode(0, &dm);
+		sdl_GetCurrentDisplayMode(&dm);
 		*width = dm.w;
 		*height = dm.h;
 		*depth = SDL_BITSPERPIXEL(dm.format);
@@ -216,13 +216,13 @@ void ags_getDisplayInfo(enum ags_display display, int *width, int *height, int *
 		*depth = nact->ags.world_depth;
 		break;
 	case AGS_DISPLAY_VIEW_AREA:
-		SDL_GetCurrentDisplayMode(0, &dm);
+		sdl_GetCurrentDisplayMode(&dm);
 		*width = nact->ags.view_area.w;
 		*height = nact->ags.view_area.h;
 		*depth = SDL_BITSPERPIXEL(dm.format);
 		break;
 	case AGS_DISPLAY_DESKTOP:
-		SDL_GetDesktopDisplayMode(0, &dm);
+		sdl_GetDesktopDisplayMode(&dm);
 		*width = dm.w;
 		*height = dm.h;
 		*depth = SDL_BITSPERPIXEL(dm.format);
@@ -239,7 +239,7 @@ void ags_updateArea(int x, int y, int w, int h) {
 		return;
 
 	SDL_Rect r = {x, y, w, h}, update;
-	if (SDL_IntersectRect(&nact->ags.view_area, &r, &update)) {
+	if (SDL_GetRectIntersection(&nact->ags.view_area, &r, &update)) {
 		SDL_Point p = {
 			update.x - nact->ags.view_area.x,
 			update.y - nact->ags.view_area.y
@@ -333,10 +333,10 @@ void ags_getPixel(int x, int y, PixelColor *cell) {
 	if (!ags_check_param_xy(&x, &y)) return;
 
 	uint32_t pixel = gfx_getPixel(x, y);
-	if (main_surface->format->BitsPerPixel == 8) {
+	if (sdl_SurfaceBitsPerPixel(main_surface) == 8) {
 		cell->index = pixel;
 	} else {
-		SDL_GetRGB(pixel, main_surface->format, &cell->r, &cell->g, &cell->b);
+		sdl_GetSurfaceRGB(pixel, main_surface, &cell->r, &cell->g, &cell->b);
 	}
 }
 
@@ -801,7 +801,7 @@ void ags_autorepeat(bool enable) {
 bool ags_clipCopyRect(const SDL_Rect *sw, const SDL_Rect *dw, int *sx, int *sy, int *dx, int *dy, int *w, int *h) {
 	// Clip source rectangle to source window
 	SDL_Rect sr = {*sx, *sy, *w, *h};
-	if (!SDL_IntersectRect(&sr, sw, &sr))
+	if (!SDL_GetRectIntersection(&sr, sw, &sr))
 		return false;
 
 	// Shift destination rectangle if source origin has changed
@@ -810,7 +810,7 @@ bool ags_clipCopyRect(const SDL_Rect *sw, const SDL_Rect *dw, int *sx, int *sy, 
 
 	// Clip destination rectangle to destination window
 	SDL_Rect dr = {dx_, dy_, sr.w, sr.h};
-	if (!SDL_IntersectRect(&dr, dw, &dr))
+	if (!SDL_GetRectIntersection(&dr, dw, &dr))
 		return false;
 
 	// Shift source rectangle if destination origin has changed

@@ -25,9 +25,7 @@
 #include "config.h"
 
 #include <portmidi.h>
-#include <SDL_atomic.h>
-#include <SDL_thread.h>
-#include <SDL_timer.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "system.h"
@@ -63,7 +61,7 @@ static PmDeviceID device_id;
 static SDL_Thread *thread;
 static struct msgq *queue;
 static int start_time;
-static SDL_atomic_t atomic_seq;
+static SDL_AtomicInt atomic_seq;
 
 static void enqueue(struct midi_message msg) {
 	struct midi_message *buf = malloc(sizeof(struct midi_message));
@@ -227,7 +225,7 @@ static int midi_thread(void* unused) {
 				midi_playloop(stream, msg.music);
 				send_reset(stream);
 			}
-			SDL_AtomicCAS(&atomic_seq, msg.seq, 0);
+			SDL_CompareAndSwapAtomicInt(&atomic_seq, msg.seq, 0);
 			mf_remove_midifile(msg.music);
 			break;
 
@@ -300,7 +298,7 @@ static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 		WARNING("error reading midi file");
 		return false;
 	}
-	SDL_AtomicSet(&atomic_seq, ++seq);
+	SDL_SetAtomicInt(&atomic_seq, ++seq);
 	ENQUEUE(CMD_PLAY, seq, midi);
 
 	start_time = SDL_GetTicks();
@@ -310,7 +308,7 @@ static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 
 static void midi_stop(void) {
 	if (queue) {
-		SDL_AtomicSet(&atomic_seq, 0);
+		SDL_SetAtomicInt(&atomic_seq, 0);
 		ENQUEUE(CMD_STOP);
 	}
 }
@@ -326,7 +324,7 @@ static void midi_unpause(void) {
 }
 
 static bool midi_get_playing_info(midiplaystate *st) {
-	if (SDL_AtomicGet(&atomic_seq) == 0) {
+	if (SDL_GetAtomicInt(&atomic_seq) == 0) {
 		st->in_play = false;
 		st->loc_ms  = 0;
 		return true;

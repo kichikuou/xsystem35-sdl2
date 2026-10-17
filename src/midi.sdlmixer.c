@@ -19,7 +19,7 @@
  *
 */
 
-#include <SDL.h>
+#include "sdl_compat.h"
 #include <SDL_mixer.h>
 
 #include "portab.h"
@@ -60,7 +60,7 @@ static void midi_reset(void) {
 static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 	midi_stop();
 
-	SDL_RWops *rwops = SDL_RWFromConstMem(data, datalen);
+	SDL_IOStream *rwops = SDL_IOFromConstMem(data, datalen);
 	mix_music = Mix_LoadMUSType_RW(rwops, MUS_MID, SDL_TRUE /* freesrc */);
 	if (!mix_music) {
 		WARNING("Cannot load MIDI: %s", SDL_GetError());

@@ -371,7 +371,7 @@ void smsg_clear(int wNum) {
 	sact.msgbuf2[0] = '\0';
 
 	// Clear the canvas
-	SDL_FillRect(sp->u.msg.canvas, NULL, 0);
+	SDL_FillSurfaceRect(sp->u.msg.canvas, NULL, 0);
 
 	sp_updateme(sp);
 	

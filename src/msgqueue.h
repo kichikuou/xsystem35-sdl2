@@ -21,13 +21,13 @@
 #define __MSGQUEUE_H__
 
 #include <stdbool.h>
-#include <SDL_mutex.h>
+#include "sdl_compat.h"
 
 struct msgq_elem;
 
 struct msgq {
-	SDL_mutex *mutex;
-	SDL_cond *cond_nonempty;
+	SDL_Mutex *mutex;
+	SDL_Condition *cond_nonempty;
 	struct msgq_elem *head;
 	struct msgq_elem *last;
 };

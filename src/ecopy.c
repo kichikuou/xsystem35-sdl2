@@ -364,7 +364,7 @@ void ags_eCopyArea(int sx, int sy, int w, int h, int dx, int dy, int sw, int opt
 		ags_copyArea(sx, sy, w, h, dx, dy);
 		{
 			SDL_Rect r = {dx, dy, w, h}, update;
-			SDL_IntersectRect(&nact->ags.view_area, &r, &update);
+			SDL_GetRectIntersection(&nact->ags.view_area, &r, &update);
 			w = update.w;
 			h = update.h;
 		}

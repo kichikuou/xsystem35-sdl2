@@ -42,7 +42,9 @@
 #define ID_OPTION_SOUND           40023
 #define ID_MSGSKIP                40030
 
-struct SDL_RWops;
-struct SDL_RWops *open_resource(const char* name, const char* type);
+#ifndef RC_INVOKED
+#include "sdl_compat.h"
+SDL_IOStream *open_resource(const char* name, const char* type);
+#endif
 
 #endif /* __RESOURCES_H__ */

@@ -18,7 +18,7 @@
 */
 
 #include "system.h"
-#include <SDL.h>
+#include "sdl_compat.h"
 #include "debugger.h"
 #include "gfx.h"
 #include "scheduler.h"

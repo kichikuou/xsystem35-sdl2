@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "system.h"
@@ -164,15 +164,15 @@ static SDL_Cursor *init_system_cursor(const char *image[]) {
 void cursor_init(void) {
 	cursor[CURSOR_ARROW]    = SDL_GetDefaultCursor();
 	cursor[CURSOR_CROSS]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
-	cursor[CURSOR_IBEAM]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+	cursor[CURSOR_IBEAM]    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);
 	cursor[CURSOR_ICON]     = SDL_GetDefaultCursor();
-	cursor[CURSOR_NO]       = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
-	cursor[CURSOR_SIZE]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
-	cursor[CURSOR_SIZEALL]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
-	cursor[CURSOR_SIZENESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
-	cursor[CURSOR_SIZENS]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
-	cursor[CURSOR_SIZENWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
-	cursor[CURSOR_SIZEWE]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
+	cursor[CURSOR_NO]       = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NOT_ALLOWED);
+	cursor[CURSOR_SIZE]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_MOVE);
+	cursor[CURSOR_SIZEALL]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_MOVE);
+	cursor[CURSOR_SIZENESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NESW_RESIZE);
+	cursor[CURSOR_SIZENS]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NS_RESIZE);
+	cursor[CURSOR_SIZENWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NWSE_RESIZE);
+	cursor[CURSOR_SIZEWE]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_EW_RESIZE);
 	cursor[CURSOR_UPARROW]  = init_system_cursor(cursor_uparrow);
 	cursor[CURSOR_WAIT]     = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
 }
@@ -215,7 +215,7 @@ static bool cursor_new(uint8_t* data, int no, CursorImage *cursorImage, TCursorD
 	}
 
 	if (cursor[no])
-		SDL_FreeCursor(cursor[no]);
+		SDL_DestroyCursor(cursor[no]);
 	cursor[no] = SDL_CreateCursor(buf3, buf4, 32, 32, cursordirentry->wxHotspot, cursordirentry->wyHotspot);
 
 	free(buf1);

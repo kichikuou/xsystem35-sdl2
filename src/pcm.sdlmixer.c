@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "sdl_compat.h"
 #include <SDL_mixer.h>
 
 #include "portab.h"
@@ -71,7 +72,7 @@ static Mix_Chunk *load_asset(DRIFILETYPE type, int no) {
 		return NULL;
 	}
 
-	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(dfile->data, dfile->size), 1);
+	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_IOFromConstMem(dfile->data, dfile->size), 1);
 	ald_freedata(dfile);
 	if (chunk == NULL) {
 		WARNING("DRIFILE_WAVE %d: not a valid wav file", no-1);
@@ -211,7 +212,7 @@ bool muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return false;
 
-	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(buf, len), 1);
+	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_IOFromConstMem(buf, len), 1);
 	if (!chunk)
 		return false;
 	prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "system.h"
@@ -90,13 +90,13 @@ void sp_eupdate_amap(int index, int time, int cancel) {
 		sp_update_all(true);
 		return;
 	}
-	SDL_Surface *mask_sf = SDL_CreateRGBSurfaceFrom(mask->pic, mask->width, mask->height, 8, mask->width, 0, 0, 0, 0);
+	SDL_Surface *mask_sf = sdl_CreateSurfaceFrom(mask->width, mask->height, SDL_PIXELFORMAT_INDEX8, mask->pic, mask->width);
 	sp_update_all(false);  // old = gfx_texture, new = main_surface
 	struct effect *eff = effect_sactamask_init(mask_sf);
 	ags_runEffect(time * 10, cancel, (ags_EffectStepFunc)effect_step, eff);
 	effect_finish(eff);
 	ags_updateFull();
 
-	SDL_FreeSurface(mask_sf);
+	SDL_DestroySurface(mask_sf);
 	cgdata_free(mask);
 }

@@ -19,7 +19,7 @@
 #include "nls.h"
 
 #include <string.h>
-#include <SDL_locale.h>
+#include "sdl_compat.h"
 
 // Defines the translation tables and the nls_catalogs registry.
 #include "nls_catalog.h"

@@ -592,7 +592,7 @@ void commands2F55() {
 	TRACE("mathClip %d, %d, %d, %d, %d, %d:", *vDx, *vDy, *vSx, *vSy, *vWidth, *vHeight);
 
 	SDL_Rect r = { *vDx, *vDy, *vWidth, *vHeight };
-	if (SDL_IntersectRect(&r, &clip_window, &r)) {
+	if (SDL_GetRectIntersection(&r, &clip_window, &r)) {
 		*vSx += r.x - *vDx;
 		*vSy += r.y - *vDy;
 		*vDx = r.x;

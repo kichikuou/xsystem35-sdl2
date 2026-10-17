@@ -30,7 +30,7 @@
 
 #if defined(__ANDROID__)
 
-#include <SDL.h>
+#include "sdl_compat.h"
 #include <jni.h>
 #include "system.h"
 
@@ -139,7 +139,7 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 
 #else  // not Android or Emscripten
 
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "nact.h"
 #include "font.h"

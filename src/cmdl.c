@@ -185,7 +185,7 @@ void commandLL() {
 			num = dfile->size / sizeof(uint16_t);
 		}
 		for (i = 0; i < num; i++) {
-			var[i] = SDL_SwapLE16(data[i]);
+			var[i] = SDL_Swap16LE(data[i]);
 		}
 		break;
 		

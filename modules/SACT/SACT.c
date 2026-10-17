@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -147,7 +147,7 @@ static void Init() {
 	}
 	
 	// create depth map
-	sact.dmap = SDL_CreateRGBSurface(0, main_surface->w, main_surface->h, 16, 0, 0, 0, 0);
+	sact.dmap = sdl_CreateSurface(main_surface->w, main_surface->h, SDL_PIXELFORMAT_RGB565);
 	
 	// その他 System35 のデフォルト動作の変更
 	ags_setAntialiasedStringMode(true);
@@ -2154,7 +2154,7 @@ static void SACT_reset(void) {
 	sp_reset();
 
 	scg_freeall();
-	SDL_FreeSurface(sact.dmap);
+	SDL_DestroySurface(sact.dmap);
 	memset(&sact, 0, sizeof(sact));
 }
 

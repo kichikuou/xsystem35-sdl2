@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 #include <SDL_mixer.h>
 
 #include "portab.h"
@@ -75,7 +75,7 @@ static Mix_Music *bgm_load(int no) {
 		return NULL;
 	}
 
-	SDL_RWops *rwops = SDL_RWFromConstMem(dfile->data, dfile->size);
+	SDL_IOStream *rwops = SDL_IOFromConstMem(dfile->data, dfile->size);
 
 	mix_music = Mix_LoadMUS_RW(rwops, SDL_TRUE /* freesrc */);
 	if (mix_music == NULL) {

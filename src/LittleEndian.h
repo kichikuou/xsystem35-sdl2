@@ -27,33 +27,33 @@
 #define __LITTLEENDIAN__
 
 #include <string.h>
-#include <SDL_endian.h>
+#include "sdl_compat.h"
 
 static inline int LittleEndian_getDW(const uint8_t *b, int index) {
 	uint32_t t;
 	memcpy(&t, b + index, sizeof t);
-	return SDL_SwapLE32(t);
+	return SDL_Swap32LE(t);
 }
 
 static inline int LittleEndian_get3B(const uint8_t *b, int index) {
 	uint32_t t = 0;
 	memcpy(&t, b + index, 3);
-	return SDL_SwapLE32(t);
+	return SDL_Swap32LE(t);
 }
 
 static inline int LittleEndian_getW(const uint8_t *b, int index) {
 	uint16_t t;
 	memcpy(&t, b + index, sizeof t);
-	return SDL_SwapLE16(t);
+	return SDL_Swap16LE(t);
 }
 
 static inline void LittleEndian_putW(uint16_t num, uint8_t *b, int index) {
-	num = SDL_SwapLE16(num);
+	num = SDL_Swap16LE(num);
 	memcpy(b + index, &num, sizeof(num));
 }
 
 static inline void LittleEndian_putDW(uint32_t num, uint8_t *b, int index) {
-	num = SDL_SwapLE32(num);
+	num = SDL_Swap32LE(num);
 	memcpy(b + index, &num, sizeof(num));
 }
 

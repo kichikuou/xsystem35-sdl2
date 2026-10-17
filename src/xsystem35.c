@@ -34,7 +34,7 @@
 #include <signal.h>
 #endif
 
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

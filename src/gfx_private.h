@@ -25,7 +25,7 @@
 
 #include "config.h"
 
-#include <SDL.h>
+#include "sdl_compat.h"
 
 #include "portab.h"
 #include "ags.h"

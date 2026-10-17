@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <SDL.h>
+#include "sdl_compat.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -56,9 +56,9 @@ static void gfx_pal_check(void) {
 }
 
 static Uint32 palette_color(uint8_t c) {
-	if (main_surface->format->BitsPerPixel == 8)
+	if (sdl_SurfaceBitsPerPixel(main_surface) == 8)
 		return c;
-	return SDL_MapRGB(main_surface->format, gfx_palette->colors[c].r, gfx_palette->colors[c].g, gfx_palette->colors[c].b);
+	return SDL_MapSurfaceRGB(main_surface, gfx_palette->colors[c].r, gfx_palette->colors[c].g, gfx_palette->colors[c].b);
 }
 
 SDL_Color gfx_getPaletteColor(uint8_t color) {
@@ -72,7 +72,7 @@ void gfx_updateScreen(void) {
 	if (redraw_handler)
 		redraw_handler(redraw_handler_arg);
 	else
-		SDL_RenderCopy(gfx_renderer, gfx_texture, NULL, NULL);
+		sdl_RenderTexture(gfx_renderer, gfx_texture, NULL, NULL);
 	modal_render_overlay();
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
@@ -123,16 +123,16 @@ void gfx_drawRectangle(int x, int y, int w, int h, uint8_t c) {
 	Uint32 col = palette_color(c);
 
 	SDL_Rect rect = {x, y, w, 1};
-	SDL_FillRect(main_surface, &rect, col);
+	SDL_FillSurfaceRect(main_surface, &rect, col);
 	
 	rect = (SDL_Rect){x, y, 1, h};
-	SDL_FillRect(main_surface, &rect, col);
+	SDL_FillSurfaceRect(main_surface, &rect, col);
 	
 	rect = (SDL_Rect){x, y + h - 1, w, 1};
-	SDL_FillRect(main_surface, &rect, col);
+	SDL_FillSurfaceRect(main_surface, &rect, col);
 	
 	rect = (SDL_Rect){x + w - 1, y, 1, h};
-	SDL_FillRect(main_surface, &rect, col);
+	SDL_FillSurfaceRect(main_surface, &rect, col);
 }
 
 /* 矩形塗りつぶし */
@@ -140,15 +140,15 @@ void gfx_fillRectangle(int x, int y, int w, int h, uint8_t c) {
 	gfx_pal_check();
 	
 	SDL_Rect rect = {x, y, w, h};
-	SDL_FillRect(main_surface, &rect, palette_color(c));
+	SDL_FillSurfaceRect(main_surface, &rect, palette_color(c));
 }
 
 void gfx_fillRectangleRGB(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b) {
-	if (main_surface->format->BitsPerPixel == 8)
+	if (sdl_SurfaceBitsPerPixel(main_surface) == 8)
 		return;
 
 	SDL_Rect rect = {x, y, w, h};
-	SDL_FillRect(main_surface, &rect, SDL_MapRGB(main_surface->format, r, g, b));
+	SDL_FillSurfaceRect(main_surface, &rect, SDL_MapSurfaceRGB(main_surface, r, g, b));
 }
 
 void gfx_fillCircle(int left, int top, int diameter, uint8_t c) {
@@ -165,7 +165,7 @@ void gfx_fillCircle(int left, int top, int diameter, uint8_t c) {
 		for (int x = 0; 2*x < diameter; x++) {
 			if (dy*dy + dx*dx <= diameter*diameter) {
 				SDL_Rect rect = {left + x, top + y, diameter - 2*x, 1};
-				SDL_FillRect(main_surface, &rect, col);
+				SDL_FillSurfaceRect(main_surface, &rect, col);
 				break;
 			}
 			dx -= 2;
@@ -182,7 +182,7 @@ void gfx_copyArea(int sx, int sy, int w, int h, int dx, int dy) {
 	SDL_Rect r_dst = {dx, dy, w, h};
 
 	SDL_Rect intersect;
-	if (SDL_IntersectRect(&r_src, &r_dst, &intersect)) {
+	if (SDL_GetRectIntersection(&r_src, &r_dst, &intersect)) {
 		void* region = gfx_saveRegion(sx, sy, w, h);
 		gfx_restoreRegion(region, dx, dy);
 	} else {
@@ -194,13 +194,13 @@ static void gfx_dib_sprite_copy(SDL_Surface *dst, int sx, int sy, int w, int h, 
 	gfx_pal_check();
 
 	Uint32 col = palette_color(sp);
-	SDL_SetColorKey(main_surface, SDL_TRUE, col);
+	SDL_SetColorKey(main_surface, true, col);
 	
 	SDL_Rect r_src = {sx, sy, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
 	SDL_BlitSurface(main_surface, &r_src, dst, &r_dst);
-	SDL_SetColorKey(main_surface, SDL_FALSE, 0);
+	SDL_SetColorKey(main_surface, false, 0);
 }
 
 /*
@@ -211,8 +211,8 @@ void gfx_copyAreaSP(int sx, int sy, int w, int h, int dx, int dy, uint8_t sp) {
 }
 
 SDL_Surface *gfx_dib_to_surface_colorkey(int x, int y, int w, int h, int sp) {
-	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
-	SDL_FillRect(s, NULL, 0);
+	SDL_Surface *s = sdl_CreateSurface(w, h, SDL_PIXELFORMAT_ARGB8888);
+	SDL_FillSurfaceRect(s, NULL, 0);
 	gfx_dib_sprite_copy(s, x, y, w, h, 0, 0, sp);
 	return s;
 }
@@ -220,24 +220,23 @@ SDL_Surface *gfx_dib_to_surface_colorkey(int x, int y, int w, int h, int sp) {
 void gfx_drawImage8(cgdata *cg, int dx, int dy, int sprite_color) {
 	int w = cg->width;
 	int h = cg->height;
-	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormatFrom(
-		cg->pic, w, h, 8, w, SDL_PIXELFORMAT_INDEX8);
+	SDL_Surface *s = sdl_CreateSurfaceFrom(w, h, SDL_PIXELFORMAT_INDEX8, cg->pic, w);
 	
 	gfx_pal_check();
 	
-	if (main_surface->format->BitsPerPixel > 8 && cg->pal) {
-		SDL_SetPaletteColors(s->format->palette, cg->pal, 0, 256);
+	if (sdl_SurfaceBitsPerPixel(main_surface) > 8 && cg->pal) {
+		SDL_SetPaletteColors(SDL_GetSurfacePalette(s), cg->pal, 0, 256);
 	} else {
 		SDL_SetSurfacePalette(s, gfx_palette);
 	}
 	
 	if (sprite_color != -1)
-		SDL_SetColorKey(s, SDL_TRUE, sprite_color);
+		SDL_SetColorKey(s, true, sprite_color);
 	
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
 	SDL_BlitSurface(s, NULL, main_surface, &r_dst);
-	SDL_FreeSurface(s);
+	SDL_DestroySurface(s);
 }
 
 /* 直線描画 */
@@ -246,7 +245,7 @@ void gfx_drawLine(int x1, int y1, int x2, int y2, uint8_t c) {
 	
 	SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(main_surface);
 	SDL_SetRenderDrawColor(renderer, gfx_palette->colors[c].r, gfx_palette->colors[c].g, gfx_palette->colors[c].b, SDL_ALPHA_OPAQUE);
-	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+	SDL_RenderLine(renderer, x1, y1, x2, y2);
 	SDL_DestroyRenderer(renderer);
 }
 
@@ -263,7 +262,7 @@ void gfx_drawLine(int x1, int y1, int x2, int y2, uint8_t c) {
 SDL_Rect gfx_floodFill(int x, int y, int c) {
 	Uint32 col = palette_color(c);
 
-	switch (main_surface->format->BytesPerPixel) {
+	switch (sdl_SurfaceBytesPerPixel(main_surface)) {
 	case 1:
 		return gfx_floodFill_uint8_t(x, y, col);
 	case 2:
@@ -305,7 +304,7 @@ void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col) {
 		              + (dsty + y) * main_surface->pitch + dstx;
 		for (int x = 0; x < src->w && dstx + x < main_surface->w; x++) {
 			Uint8 r, g, b, alpha;
-			SDL_GetRGBA(*(Uint32 *)sp, src->format, &r, &g, &b, &alpha);
+			sdl_GetSurfaceRGBA(*(Uint32 *)sp, src, &r, &g, &b, &alpha);
 			alpha >>= 5;  // reduce bit depth
 			if (!alpha) {
 				// Transparent, do nothing.
@@ -322,7 +321,7 @@ void gfx_drawAntiAlias_8bpp(int dstx, int dsty, SDL_Surface *src, uint8_t col) {
 				cache[alpha << 8 | *dp] = c;
 				*dp = c;
 			}
-			sp += src->format->BytesPerPixel;
+			sp += sdl_SurfaceBytesPerPixel(src);
 			dp++;
 		}
 	}
@@ -350,14 +349,14 @@ SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpe
 	y -= font_cell_overhang(font);
 	r_dst = (SDL_Rect){x, y, fs->w, fs->h};
 
-	if (main_surface->format->BitsPerPixel == 8 && antialias) {
+	if (sdl_SurfaceBitsPerPixel(main_surface) == 8 && antialias) {
 		gfx_drawAntiAlias_8bpp(x, y, fs, col);
 	} else {
 		SDL_Rect r_src = {0, 0, fs->w, fs->h};
-		SDL_BlitSurface(fs, &r_src, main_surface, &r_dst);
+		sdl_BlitSurfaceClipped(fs, &r_src, main_surface, &r_dst);
 	}
 
-	SDL_FreeSurface(fs);
+	SDL_DestroySurface(fs);
 	if (r_dst.y < 0) {
 		r_dst.h += r_dst.y;
 		r_dst.y = 0;
@@ -369,15 +368,15 @@ SDL_Rect gfx_drawString(int x, int y, const char *str_utf8, uint8_t col, FontSpe
  * 指定範囲にパレット col を rate の割合で重ねる CK1
  */
 void gfx_wrapColor(int sx, int sy, int w, int h, uint8_t c, int rate) {
-	SDL_Surface *s = SDL_CreateRGBSurfaceWithFormat(0, w, h, main_surface->format->BitsPerPixel, main_surface->format->format);
-	assert(s->format->BitsPerPixel > 8);
+	SDL_Surface *s = sdl_CreateSurface(w, h, sdl_SurfaceFormat(main_surface));
+	assert(sdl_SurfaceBitsPerPixel(s) > 8);
 
 	SDL_Rect r_src = {0, 0, w, h};
-	SDL_FillRect(s, &r_src, palette_color(c));
+	SDL_FillSurfaceRect(s, &r_src, palette_color(c));
 	
 	SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_BLEND);
 	SDL_SetSurfaceAlphaMod(s, rate);
 	SDL_Rect r_dst = {sx, sy, w, h};
 	SDL_BlitSurface(s, &r_src, main_surface, &r_dst);
-	SDL_FreeSurface(s);
+	SDL_DestroySurface(s);
 }

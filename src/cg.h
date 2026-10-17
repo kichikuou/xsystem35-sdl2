@@ -24,7 +24,7 @@
 #ifndef __CG__
 #define __CG__
 
-#include <SDL_rect.h>
+#include "sdl_compat.h"
 #include "cache.h"
 #include "portab.h"
 

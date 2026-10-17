@@ -28,13 +28,13 @@ struct msgq_elem {
 struct msgq *msgq_new(void) {
 	struct msgq *q = calloc(1, sizeof(struct msgq));
 	q->mutex = SDL_CreateMutex();
-	q->cond_nonempty = SDL_CreateCond();
+	q->cond_nonempty = SDL_CreateCondition();
 	return q;
 }
 
 void msgq_free(struct msgq *q) {
 	SDL_DestroyMutex(q->mutex);
-	SDL_DestroyCond(q->cond_nonempty);
+	SDL_DestroyCondition(q->cond_nonempty);
 	free(q);
 }
 
@@ -51,13 +51,13 @@ void msgq_enqueue(struct msgq *q, void *msg) {
 		q->last = e;
 	}
 	SDL_UnlockMutex(q->mutex);
-	SDL_CondSignal(q->cond_nonempty);
+	SDL_SignalCondition(q->cond_nonempty);
 }
 
 void *msgq_dequeue(struct msgq *q) {
 	SDL_LockMutex(q->mutex);
 	while (!q->head)
-		SDL_CondWait(q->cond_nonempty, q->mutex);
+		SDL_WaitCondition(q->cond_nonempty, q->mutex);
 
 	struct msgq_elem *e = q->head;
 	q->head = e->next;
@@ -74,7 +74,7 @@ void *msgq_dequeue(struct msgq *q) {
 void *msgq_dequeue_timeout(struct msgq *q, uint32_t timeout_ms) {
 	SDL_LockMutex(q->mutex);
 
-	while (!q->head && SDL_CondWaitTimeout(q->cond_nonempty, q->mutex, timeout_ms) == 0)
+	while (!q->head && SDL_WaitConditionTimeout(q->cond_nonempty, q->mutex, timeout_ms))
 		;
 
 	if (!q->head) {  // timed out

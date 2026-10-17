@@ -402,7 +402,7 @@ int load_vars_from_file(char *fname_utf8, struct VarRef *dest, int cnt) {
 
 	vmvar_t *start = v_resolveRef(dest);
 	for (int i = 0; i < cnt; i++)
-		start[i] = SDL_SwapLE16(tmp[i]);
+		start[i] = SDL_Swap16LE(tmp[i]);
 
 	free(tmp);
 	return SAVE_LOADOK;

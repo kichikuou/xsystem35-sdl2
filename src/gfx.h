@@ -21,8 +21,7 @@
 #define __GFX_H__
 
 #include "config.h"
-#include <SDL_surface.h>
-#include <SDL_video.h>
+#include "sdl_compat.h"
 #include "portab.h"
 #include "ags.h"
 
