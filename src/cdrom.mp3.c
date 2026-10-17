@@ -27,26 +27,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sdl_compat.h"
-#include <SDL_mixer.h>
 
 #include "portab.h"
 #include "system.h"
 #include "cdrom.h"
 #include "music_private.h"
+#include "mixer.h"
 
 static void cdrom_stop(void);
 
 #define PLAYLIST_MAX 256
 
-static void apply_volume(void) {
-	Mix_VolumeMusic(prv.volval[BGM_VOLVAL_CH] * MIX_MAX_VOLUME / 100);
-}
-
 static bool      enabled = false;
 static char         *playlist[PLAYLIST_MAX];
-static Mix_Music    *mix_music;
+static mixer_music  *music;
 static int          trackno; // 現在演奏中のトラック
 static int          start_time;
+
+static void apply_volume(void) {
+	mixer_music_set_gain(music, prv.volval[BGM_VOLVAL_CH] / 100.0f);
+}
 
 static bool cdrom_init(char *playlist_path) {
 	char buf[256];
@@ -111,31 +111,33 @@ static bool cdrom_start(int trk, int loop) {
 	if (trk >= PLAYLIST_MAX || !playlist[trk])
 		return false;
 	
-	if (mix_music)
-		Mix_FreeMusic(mix_music);
+	if (music) {
+		mixer_music_free(music);
+		music = NULL;
+	}
 
 #ifdef __ANDROID__
-	// Mix_LoadMUS uses SDL_RWFromFile which requires absolute path on Android
+	// mixer_music_load_file() opens the file with SDL_IOFromFile(), which
+	// requires an absolute path on Android.
 	char path[PATH_MAX];
 	if (!realpath(playlist[trk], path))
 		return false;
-	mix_music = Mix_LoadMUS(path);
+	music = mixer_music_load_file(path);
 #else
-	mix_music = Mix_LoadMUS(playlist[trk]);
+	music = mixer_music_load_file(playlist[trk]);
 #endif
 
-	if (!mix_music) {
-		WARNING("Cannot load %s: %s", playlist[trk], Mix_GetError());
+	if (!music) {
+		WARNING("Cannot load %s: %s", playlist[trk], SDL_GetError());
 		return false;
 	}
-	if (Mix_PlayMusic(mix_music, loop == 0 ? -1 : loop) != 0) {
-		Mix_FreeMusic(mix_music);
-		mix_music = NULL;
+	apply_volume();
+	if (!mixer_music_play(music, loop == 0 ? -1 : loop, 0)) {
+		mixer_music_free(music);
+		music = NULL;
 		return false;
 	}
 
-	// The music volume is shared with BGM/MIDI playback, so set it explicitly.
-	apply_volume();
 	trackno = trk;
 	start_time = SDL_GetTicks();
 	
@@ -143,21 +145,21 @@ static bool cdrom_start(int trk, int loop) {
 }
 
 static void cdrom_stop(void) {
-	if (!enabled || !mix_music)
+	if (!enabled || !music)
 		return;
-	Mix_FreeMusic(mix_music);
-	mix_music = NULL;
+	mixer_music_free(music);
+	music = NULL;
 	trackno = 0;
 }
 
 /* 現在演奏中のトラック情報の取得 */
 static bool cdrom_getPlayingInfo (cd_time *inf) {
-	if (!enabled || !mix_music)
+	if (!enabled || !music)
 		return false;
 	
-	if (!Mix_PlayingMusic()) {
-		Mix_FreeMusic(mix_music);
-		mix_music = NULL;
+	if (!mixer_music_playing(music)) {
+		mixer_music_free(music);
+		music = NULL;
 		return false;
 	}
 	int ms = SDL_GetTicks() - start_time;
@@ -175,7 +177,7 @@ static bool cdrom_is_available(void) {
 }
 
 static void cdrom_reapply_volume(void) {
-	if (mix_music)
+	if (music)
 		apply_volume();
 }
 

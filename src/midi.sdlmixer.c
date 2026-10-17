@@ -20,37 +20,30 @@
 */
 
 #include "sdl_compat.h"
-#include <SDL_mixer.h>
 
 #include "portab.h"
 #include "system.h"
 #include "midi.h"
 #include "music_private.h"
-
-// MIX_INIT_FLUIDSYNTH was renamed to MIX_INIT_MID in SDL_mixer 2.0.2
-#if (SDL_MIXER_MAJOR_VERSION == 2) && (SDL_MIXER_MINOR_VERSION == 0) && (SDL_MIXER_PATCHLEVEL < 2)
-#define MIX_INIT_MID MIX_INIT_FLUIDSYNTH
-#endif
+#include "mixer.h"
 
 static void midi_stop(void);
 
-static Mix_Music *mix_music;
+static mixer_music *music;
 static int start_time;
 static uint32_t fade_tick;
 static int current_vol = 100;  // game-requested volume (0-100)
 
 static void apply_volume(void) {
-	Mix_VolumeMusic(current_vol * prv.volval[BGM_VOLVAL_CH] * MIX_MAX_VOLUME / (100 * 100));
+	mixer_music_set_gain(music, current_vol * prv.volval[BGM_VOLVAL_CH] / 10000.0f);
 }
 
 static bool midi_initialize(int subdev) {
-	if (Mix_Init(MIX_INIT_MID) != MIX_INIT_MID)
-		return false;
-	return true;
+	return mixer_init_midi();
 }
 
 static void midi_exit(void) {
-	Mix_Quit();
+	mixer_quit_midi();
 }
 
 static void midi_reset(void) {
@@ -60,45 +53,45 @@ static void midi_reset(void) {
 static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 	midi_stop();
 
-	SDL_IOStream *rwops = SDL_IOFromConstMem(data, datalen);
-	mix_music = Mix_LoadMUSType_RW(rwops, MUS_MID, SDL_TRUE /* freesrc */);
-	if (!mix_music) {
+	music = mixer_music_load_midi(data, datalen);
+	if (!music) {
 		WARNING("Cannot load MIDI: %s", SDL_GetError());
 		return false;
 	}
 
-	if (Mix_PlayMusic(mix_music, loop ? loop : -1) != 0) {
+	apply_volume();
+	if (!mixer_music_play(music, loop ? loop : -1, 0)) {
 		WARNING("Cannot play MIDI: %s", SDL_GetError());
-		Mix_FreeMusic(mix_music);
-		mix_music = NULL;
+		mixer_music_free(music);
+		music = NULL;
 		return false;
 	}
 
-	// The music volume is shared with BGM/CD playback, so set it explicitly.
-	apply_volume();
 	start_time = SDL_GetTicks();
 	return true;
 }
 
 static void midi_stop() {
-	if (!mix_music)
+	if (!music)
 		return;
-	Mix_FreeMusic(mix_music);
-	mix_music = NULL;
+	mixer_music_free(music);
+	music = NULL;
 }
 
 static void midi_pause(void) {
 	// FIXME: adjust start_time
-	Mix_PauseMusic();
+	if (music)
+		mixer_music_pause(music);
 }
 
 static void midi_unpause(void) {
 	// FIXME: adjust start_time
-	Mix_ResumeMusic();
+	if (music)
+		mixer_music_resume(music);
 }
 
 static bool midi_get_playing_info(midiplaystate *st) {
-	if (!mix_music || !Mix_PlayingMusic()) {
+	if (!music || !mixer_music_playing(music)) {
 		st->in_play = false;
 		st->loc_ms  = 0;
 		return true;
@@ -120,14 +113,16 @@ static bool midi_setflag(int mode, int index, int val) {
 static bool midi_fadestart(int time, int volume, int stop) {
 	if (time == 0) {
 		current_vol = volume;
-		apply_volume();
+		if (music)
+			apply_volume();
 		if (stop)
 			midi_stop();
 		return true;
 	}
 
 	if (volume == 0) {
-		Mix_FadeOutMusic(time);  // FIXME: this always stops the music
+		if (music)
+			mixer_music_fade_out(music, time);  // FIXME: this always stops the music
 		fade_tick = SDL_GetTicks() + time;
 		return true;
 	}
@@ -140,7 +135,7 @@ static bool midi_fading(void) {
 }
 
 static void midi_reapply_volume(void) {
-	if (mix_music)
+	if (music)
 		apply_volume();
 }
 

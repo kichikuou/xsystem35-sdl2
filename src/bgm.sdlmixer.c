@@ -26,7 +26,6 @@
 #include <string.h>
 #include <stdint.h>
 #include "sdl_compat.h"
-#include <SDL_mixer.h>
 
 #include "portab.h"
 #include "system.h"
@@ -35,18 +34,20 @@
 #include "audio_meta.h"
 #include "music_private.h"
 #include "ald_manager.h"
+#include "mixer.h"
 
 static DRIFILETYPE dri_type;
 static int base_no;
 static int current_no;
 static int current_vol = 100;  // game-requested volume (0-100)
-static Mix_Music *mix_music;
+static mixer_music *music;
 static dridata* dfile;
 static Uint32 start_time;
 
 static void apply_music_volume(int vol) {
 	current_vol = vol;
-	Mix_VolumeMusic(current_vol * prv.volval[BGM_VOLVAL_CH] * MIX_MAX_VOLUME / (100 * 100));
+	if (music)
+		mixer_music_set_gain(music, current_vol * prv.volval[BGM_VOLVAL_CH] / 10000.0f);
 }
 
 void musbgm_reapply_valance(void) {
@@ -55,9 +56,9 @@ void musbgm_reapply_valance(void) {
 
 static void free_music() {
 	current_no = 0;
-	if (mix_music) {
-		Mix_FreeMusic(mix_music);
-		mix_music = NULL;
+	if (music) {
+		mixer_music_free(music);
+		music = NULL;
 	}
 	if (dfile) {
 		ald_freedata(dfile);
@@ -65,7 +66,7 @@ static void free_music() {
 	}
 }
 
-static Mix_Music *bgm_load(int no) {
+static mixer_music *bgm_load(int no) {
 	free_music();
 
 	int ald_no = no + base_no - 1;
@@ -75,17 +76,15 @@ static Mix_Music *bgm_load(int no) {
 		return NULL;
 	}
 
-	SDL_IOStream *rwops = SDL_IOFromConstMem(dfile->data, dfile->size);
-
-	mix_music = Mix_LoadMUS_RW(rwops, SDL_TRUE /* freesrc */);
-	if (mix_music == NULL) {
+	music = mixer_music_load(dfile->data, dfile->size);
+	if (music == NULL) {
 		WARNING("Failed to load BGM %d: %s", ald_no, SDL_GetError());
 		free_music();
 		return NULL;
 	}
 
 	current_no = no;
-	return mix_music;
+	return music;
 }
 
 bool musbgm_init(DRIFILETYPE type, int base) {
@@ -118,7 +117,7 @@ bool musbgm_play(int no, int time, int vol, int loop_count) {
 	// SDL_mixer counts repeats after the first play, while System 3.x counts
 	// the total number of plays.  In both APIs, an infinite loop is special.
 	int loops = loop_count == 0 ? -1 : loop_count - 1;
-	if (Mix_FadeInMusic(mix_music, loops, time * 10) != 0) {
+	if (!mixer_music_play(music, loops, time * 10)) {
 		free_music();
 		return false;
 	}
@@ -129,7 +128,7 @@ bool musbgm_play(int no, int time, int vol, int loop_count) {
 
 void musbgm_stop(int no, int time) {
 	if (no == current_no)
-		Mix_FadeOutMusic(time * 10);
+		mixer_music_fade_out(music, time * 10);
 }
 
 void musbgm_fade(int no, int time, int vol) {
@@ -157,7 +156,7 @@ int musbgm_getlen(int no) {
 }
 
 bool musbgm_isplaying(int no) {
-	return no == current_no && Mix_PlayingMusic();
+	return no == current_no && mixer_music_playing(music);
 }
 
 void musbgm_stopall(int time) {

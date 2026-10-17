@@ -21,13 +21,10 @@
 */
 /* $Id: music_pcm.c,v 1.16 2003/11/09 15:06:13 chikama Exp $ */
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include "sdl_compat.h"
-#include <SDL_mixer.h>
 
 #include "portab.h"
 #include "system.h"
@@ -37,9 +34,8 @@
 #include "music_private.h"
 #include "nact.h"
 #include "audio_meta.h"
+#include "mixer.h"
 
-#define SAMPLE_RATE 44100
-#define BYTES_PER_SAMPLE 4
 #define DEFAULT_AUDIO_BUFFER_SIZE 2048
 
 // 0:     S comman 用
@@ -47,51 +43,67 @@
 #define PCM_SLOTS (128 + 1)
 
 static struct {
-	Mix_Chunk* chunk;
+	mixer_sound *sound;
 	uint32_t start_time;
+	int volume;  // 0-100
 } slots[PCM_SLOTS];
 
-// Apply the slot's volume valancer level via its chunk volume.
-static void apply_valance(int slot) {
-	if (!slots[slot].chunk)
-		return;
+// Set the channel gain from the slot's volume and its volume valancer level.
+static void apply_volume(int slot) {
 	int ch = prv.vol_pcm_sub[slot];
 	if ((unsigned)ch >= 16)  // guard against bad WAI data
 		ch = 0;
-	Mix_VolumeChunk(slots[slot].chunk, prv.volval[ch] * MIX_MAX_VOLUME / 100);
+	mixer_channel_set_gain(slot, prv.volval[ch] * slots[slot].volume / 10000.0f);
+}
+
+static dridata *open_asset(DRIFILETYPE type, int no) {
+	dridata *dfile = ald_getdata(type, no -1);
+	if (dfile == NULL)
+		WARNING("DRIFILE_WAVE fail to open %d", no -1);
+	return dfile;
 }
 
 /**
  * 指定の番号の .WAV|.OGG をロードする。
  * @param no: DRIファイル番号
  */
-static Mix_Chunk *load_asset(DRIFILETYPE type, int no) {
-	dridata *dfile = ald_getdata(type, no -1);
-	if (dfile == NULL) {
-		WARNING("DRIFILE_WAVE fail to open %d", no -1);
+static mixer_sound *load_asset(DRIFILETYPE type, int no) {
+	dridata *dfile = open_asset(type, no);
+	if (dfile == NULL)
 		return NULL;
-	}
 
-	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_IOFromConstMem(dfile->data, dfile->size), 1);
+	mixer_sound *sound = mixer_sound_load(dfile->data, dfile->size);
 	ald_freedata(dfile);
-	if (chunk == NULL) {
+	if (sound == NULL) {
 		WARNING("DRIFILE_WAVE %d: not a valid wav file", no-1);
 		return NULL;
 	}
-	assert(chunk->allocated);
-
-	return chunk;
+	return sound;
 }
 
-static bool load_chunk(int slot, Mix_Chunk *chunk) {
+static int16_t *decode_asset(DRIFILETYPE type, int no, size_t *frames) {
+	dridata *dfile = open_asset(type, no);
+	if (dfile == NULL)
+		return NULL;
+
+	int16_t *samples = mixer_decode(dfile->data, dfile->size, frames);
+	ald_freedata(dfile);
+	if (samples == NULL) {
+		WARNING("DRIFILE_WAVE %d: not a valid wav file", no-1);
+		return NULL;
+	}
+	return samples;
+}
+
+static bool load_sound(int slot, mixer_sound *sound) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return false;
 
-	if (slots[slot].chunk)
+	if (slots[slot].sound)
 		muspcm_unload(slot);
 
-	slots[slot].chunk = chunk;
-	apply_valance(slot);  // callers set vol_pcm_sub[slot] before this
+	slots[slot].sound = sound;
+	apply_volume(slot);  // callers set vol_pcm_sub[slot] before this
 	return true;
 }
 
@@ -100,41 +112,38 @@ static bool load_chunk(int slot, Mix_Chunk *chunk) {
  *
  * @param noL: 左の WAV ファイルの番号
  * @param noR: 右の WAV ファイルの番号
- * @return   : 合成後の Mix_Chunk
+ * @return   : 合成後の mixer_sound
  */
-static Mix_Chunk *pcm_mixlr(int noL, int noR) {
-	Mix_Chunk *chunkL = load_asset(DRIFILE_WAVE, noL);
-	Mix_Chunk *chunkR = load_asset(DRIFILE_WAVE, noR);
-	if (chunkL == NULL || chunkR == NULL) {
-		if (chunkL)
-			Mix_FreeChunk(chunkL);
-		if (chunkR)
-			Mix_FreeChunk(chunkR);
+static mixer_sound *pcm_mixlr(int noL, int noR) {
+	size_t lframes, rframes;
+	int16_t *lbuf = decode_asset(DRIFILE_WAVE, noL, &lframes);
+	int16_t *rbuf = decode_asset(DRIFILE_WAVE, noR, &rframes);
+	if (lbuf == NULL || rbuf == NULL) {
+		free(lbuf);
+		free(rbuf);
 		return NULL;
 	}
 
-	short *lbuf = (short*)chunkL->abuf;
-	short *rbuf = (short*)chunkR->abuf;
-	if (chunkL->alen >= chunkR->alen) {
-		int i;
-		for (i = 0; i < chunkR->alen / 4; i++) {
+	if (lframes >= rframes) {
+		size_t i;
+		for (i = 0; i < rframes; i++) {
 			lbuf[i * 2 + 1] = rbuf[i * 2 + 1];
 		}
-		for (; i < chunkL->alen / 4; i++) {
+		for (; i < lframes; i++) {
 			lbuf[i * 2 + 1] = 0;
 		}
-		Mix_FreeChunk(chunkR);
-		return chunkL;
+		free(rbuf);
+		return mixer_sound_from_samples(lbuf, lframes);
 	} else {
-		int i;
-		for (i = 0; i < chunkL->alen / 4; i++) {
+		size_t i;
+		for (i = 0; i < lframes; i++) {
 			rbuf[i * 2] = lbuf[i * 2];
 		}
-		for (; i < chunkR->alen / 4; i++) {
+		for (; i < rframes; i++) {
 			rbuf[i * 2] = 0;
 		}
-		Mix_FreeChunk(chunkL);
-		return chunkR;
+		free(lbuf);
+		return mixer_sound_from_samples(rbuf, rframes);
 	}
 }
 
@@ -142,17 +151,16 @@ bool muspcm_init(int audio_buffer_size) {
 	if (!audio_buffer_size)
 		audio_buffer_size = DEFAULT_AUDIO_BUFFER_SIZE;
 
-	Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
-	if (Mix_OpenAudio(SAMPLE_RATE, AUDIO_S16LSB, 2, audio_buffer_size) < 0)
+	if (!mixer_init(PCM_SLOTS, audio_buffer_size))
 		return false;
-	Mix_AllocateChannels(PCM_SLOTS);
+	for (int i = 0; i < PCM_SLOTS; i++)
+		slots[i].volume = 100;
 	wai_load(nact->files.wai);
 	return true;
 }
 
 void muspcm_exit(void) {
-	Mix_CloseAudio();
-	Mix_Quit();
+	mixer_quit();
 }
 
 void muspcm_reset(void) {
@@ -165,8 +173,8 @@ bool muspcm_load_no(int slot, int no) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return false;
 
-	Mix_Chunk *chunk = load_asset(DRIFILE_WAVE, no);
-	if (chunk == NULL) {
+	mixer_sound *sound = load_asset(DRIFILE_WAVE, no);
+	if (sound == NULL) {
 		return false;
 	}
 	
@@ -178,20 +186,20 @@ bool muspcm_load_no(int slot, int no) {
 		prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;
 	}
 
-	return load_chunk(slot, chunk);
+	return load_sound(slot, sound);
 }
 
 bool muspcm_load_bgm(int slot, int no) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return false;
 
-	Mix_Chunk *chunk = load_asset(DRIFILE_BGM, no);
-	if (chunk == NULL) {
+	mixer_sound *sound = load_asset(DRIFILE_BGM, no);
+	if (sound == NULL) {
 		return false;
 	}
 	prv.vol_pcm_sub[slot] = 0;
 
-	return load_chunk(slot, chunk);
+	return load_sound(slot, sound);
 }
 
 bool muspcm_load_mixlr(int slot, int noL, int noR) {
@@ -199,37 +207,37 @@ bool muspcm_load_mixlr(int slot, int noL, int noR) {
 		return false;
 
 	/* mix 2 wave files */
-	Mix_Chunk* chunk = pcm_mixlr(noL, noR);
-	if (chunk == NULL) {
+	mixer_sound *sound = pcm_mixlr(noL, noR);
+	if (sound == NULL) {
 		return false;
 	}
 	prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;
 
-	return load_chunk(slot, chunk);
+	return load_sound(slot, sound);
 }
 
 bool muspcm_load_data(int slot, uint8_t *buf, uint32_t len) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return false;
 
-	Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_IOFromConstMem(buf, len), 1);
-	if (!chunk)
+	mixer_sound *sound = mixer_sound_load(buf, len);
+	if (!sound)
 		return false;
 	prv.vol_pcm_sub[slot] = SE_VOLVAL_CH;
 
-	return load_chunk(slot, chunk);
+	return load_sound(slot, sound);
 }
 
 // PCMデータのメモリ上からのアンロード
 void muspcm_unload(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return;
-	if (!slots[slot].chunk)
+	if (!slots[slot].sound)
 		return;
 
-	Mix_HaltChannel(slot);
-	Mix_FreeChunk(slots[slot].chunk);
-	slots[slot].chunk = NULL;
+	mixer_channel_halt(slot);
+	mixer_sound_free(slots[slot].sound);
+	slots[slot].sound = NULL;
 }
 
 // PCMデータを再生
@@ -237,10 +245,10 @@ bool muspcm_start(int slot, int loop) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return false;
 
-	if (!slots[slot].chunk)
+	if (!slots[slot].sound)
 		return false;
 
-	if (Mix_PlayChannel(slot, slots[slot].chunk, loop - 1) < 0)
+	if (!mixer_channel_play(slot, slots[slot].sound, loop - 1))
 		return false;
 
 	slots[slot].start_time = sys_get_ticks();
@@ -251,28 +259,28 @@ bool muspcm_start(int slot, int loop) {
 void muspcm_stop(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return;
-	Mix_HaltChannel(slot);
+	mixer_channel_halt(slot);
 }
 
 // 指定時間のフェードアウトの後に再生停止
 void muspcm_fadeout(int slot, int msec) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return;
-	Mix_FadeOutChannel(slot, msec);
+	mixer_channel_fade_out(slot, msec);
 }
 
 // PCMデータ再生一時停止
 void muspcm_pause(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return;
-	Mix_Pause(slot);
+	mixer_channel_pause(slot);
 }
 
 // PCMデータ再生一時停止解除
 void muspcm_unpause(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return;
-	Mix_Resume(slot);
+	mixer_channel_resume(slot);
 }
 
 // 現在の再生位置を返す
@@ -280,7 +288,7 @@ int muspcm_getpos(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return 0;
 
-	if (!Mix_Playing(slot))
+	if (!mixer_channel_playing(slot))
 		return 0;
 
 	int pos = sys_get_ticks() - slots[slot].start_time;
@@ -294,7 +302,8 @@ int muspcm_getpos(int slot) {
 void muspcm_setvol(int slot, int lv) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return;
-	Mix_Volume(slot, lv * MIX_MAX_VOLUME / 100);
+	slots[slot].volume = lv;
+	apply_volume(slot);
 }
 
 // PCMデータの長さを取得
@@ -302,10 +311,10 @@ int muspcm_getwavelen(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return 0;
 
-	if (!slots[slot].chunk)
+	if (!slots[slot].sound)
 		return 0;
 
-	long len = slots[slot].chunk->alen * 1000LL / (SAMPLE_RATE * BYTES_PER_SAMPLE);
+	int len = mixer_sound_duration_ms(slots[slot].sound);
 	return len > 65535 ? 65535 : len;
 }
 
@@ -314,7 +323,7 @@ bool muspcm_isplaying(int slot) {
 	if ((unsigned)slot >= PCM_SLOTS)
 		return false;
 
-	return Mix_Playing(slot);
+	return mixer_channel_playing(slot);
 }
 
 // 指定のチャンネルの再生が終了するまで待つ
@@ -322,8 +331,8 @@ void muspcm_waitend(int slot) {
 	WARNING("not implemented");
 }
 
-// Re-apply the valancer levels to all loaded chunks.
+// Re-apply the valancer levels to all channels.
 void muspcm_reapply_valance(void) {
 	for (int slot = 0; slot < PCM_SLOTS; slot++)
-		apply_valance(slot);
+		apply_volume(slot);
 }

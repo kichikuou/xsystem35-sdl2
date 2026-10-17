@@ -73,6 +73,3 @@ endif()
 target_compile_options(modules PRIVATE -Wno-pointer-sign)
 
 target_link_libraries(modules PRIVATE sdl zlib)
-if (TARGET sdl_mixer)
-  target_link_libraries(modules PRIVATE sdl_mixer)
-endif()
