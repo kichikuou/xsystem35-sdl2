@@ -24,6 +24,7 @@
 
 #include "config.h"
 
+#include <stdlib.h>
 #include <portmidi.h>
 #include "sdl_compat.h"
 

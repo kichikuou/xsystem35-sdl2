@@ -21,6 +21,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+
+#if XSYSTEM35_SDL_VERSION == 2
+
 #ifdef _WIN32
 #include <SDL_syswm.h>
 #endif
@@ -81,3 +84,26 @@ void *sdl_GetWindowHWND(SDL_Window *window) {
 	return info.info.win.window;
 }
 #endif
+
+#else // XSYSTEM35_SDL_VERSION == 2
+
+bool sdl_BlitSurfaceClipped(SDL_Surface *src, const SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
+	SDL_Rect sr = srcrect ? *srcrect : (SDL_Rect){0, 0, src->w, src->h};
+	SDL_Rect bounds = {0, 0, src->w, src->h};
+	SDL_Rect r;
+	if (!SDL_GetRectIntersection(&sr, &bounds, &r)) {
+		dstrect->w = dstrect->h = 0;
+		return true;
+	}
+	SDL_Rect d = {dstrect->x + r.x - sr.x, dstrect->y + r.y - sr.y, r.w, r.h};
+	SDL_Rect clip;
+	SDL_GetSurfaceClipRect(dst, &clip);
+	if (!SDL_GetRectIntersection(&d, &clip, dstrect)) {
+		dstrect->w = dstrect->h = 0;
+		return true;
+	}
+	sr = (SDL_Rect){r.x + dstrect->x - d.x, r.y + dstrect->y - d.y, dstrect->w, dstrect->h};
+	return SDL_BlitSurface(src, &sr, dst, dstrect);
+}
+
+#endif // XSYSTEM35_SDL_VERSION == 2

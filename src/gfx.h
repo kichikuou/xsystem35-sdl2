@@ -36,6 +36,10 @@ void gfx_getViewSize(int *width, int *height);
 SDL_Window *gfx_getWindow(void);
 void gfx_warpMouse(int x, int y);
 SDL_Rect gfx_viewToWindowRect(SDL_Rect rect);
+// Converts the mouse coordinates in e to view coordinates, and the touch
+// coordinates to the range 0.0-1.0 of the view. Touches outside the view get
+// the value at the nearest edge.
+void gfx_convertEventCoordinates(SDL_Event *e);
 void gfx_setWindowTitle(char *name);
 void gfx_setFullscreen(bool on);
 bool gfx_isFullscreen(void);

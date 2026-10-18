@@ -17,6 +17,9 @@
  *
 */
 
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "system.h"
 #include "sdl_compat.h"
 #include "debugger.h"

@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <stdlib.h>
 #include "sdl_compat.h"
 
 #include "system.h"

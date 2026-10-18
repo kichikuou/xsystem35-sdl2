@@ -22,6 +22,7 @@
 /* $Id: cmdz.c,v 1.35 2003/01/12 10:48:50 chikama Exp $ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
 

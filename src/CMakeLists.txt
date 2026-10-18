@@ -107,7 +107,8 @@ target_sources(xsystem35 PRIVATE
 if (EMSCRIPTEN)
   target_sources(xsystem35 PRIVATE pcm.emscripten.c bgm.emscripten.c)
 else()
-  target_sources(xsystem35 PRIVATE pcm.sdlmixer.c bgm.sdlmixer.c mixer.sdl2mixer.c)
+  target_sources(xsystem35 PRIVATE
+    pcm.sdlmixer.c bgm.sdlmixer.c mixer.sdl${XSYSTEM35_SDL_VERSION}mixer.c)
 endif()
 
 if (EMSCRIPTEN)

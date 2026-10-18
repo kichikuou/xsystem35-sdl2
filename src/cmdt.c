@@ -21,6 +21,7 @@
 */
 /* $Id: cmdt.c,v 1.8 2006/04/21 16:40:48 chikama Exp $ */
 
+#include <math.h>
 #include <stdio.h>
 #include "portab.h"
 #include "xsystem35.h"

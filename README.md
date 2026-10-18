@@ -102,6 +102,10 @@ $ xsystem35
 See [xsystem35 command manual](doc/xsystem35.6.adoc) for detailed usage.
 
 ## Building
+
+SDL2 is used by default. To build with SDL3 (3.4 or later) and SDL3_mixer (3.2
+or later), pass `-DXSYSTEM35_SDL_VERSION=3` to `cmake`.
+
 ### Linux (Debian / Ubuntu)
 
 ```bash
@@ -110,6 +114,16 @@ $ mkdir -p out/debug
 $ cd out/debug
 $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
 $ make && make install
+```
+
+For SDL3, install `libsdl3-dev libsdl3-mixer-dev` instead of
+`libsdl2-dev libsdl2-mixer-dev`. If your distribution does not package
+SDL3_mixer, add `-DXSYSTEM35_FETCH_SDL3_MIXER=ON` to download and build it from
+source. Install `libfluidsynth-dev` before this to enable MIDI playback through
+FluidSynth.
+
+```bash
+$ cmake -DCMAKE_BUILD_TYPE=Debug -DXSYSTEM35_SDL_VERSION=3 -DXSYSTEM35_FETCH_SDL3_MIXER=ON ../../
 ```
 
 ### MacOS
@@ -124,6 +138,8 @@ $ cmake -DCMAKE_BUILD_TYPE=Debug ../../
 $ make && make install
 ```
 
+For SDL3, install `sdl3 sdl3_mixer` instead of `sdl2 sdl2_mixer`.
+
 ### Windows
 
 [MSYS2](https://www.msys2.org) is required.
@@ -135,6 +151,9 @@ $ cd out/debug
 $ cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE=Debug ../../
 $ make
 ```
+
+For SDL3, install `mingw-w64-ucrt-x86_64-sdl3 mingw-w64-ucrt-x86_64-sdl3-mixer`
+instead of `mingw-w64-ucrt-x86_64-SDL2 mingw-w64-ucrt-x86_64-SDL2_mixer`.
 
 ### Emscripten
 

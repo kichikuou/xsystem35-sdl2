@@ -37,6 +37,8 @@
 
 #if XSYSTEM35_SDL_VERSION == 2
 #include <SDL.h>
+#elif XSYSTEM35_SDL_VERSION == 3
+#include <SDL3/SDL.h>
 #else
 #error "Unsupported XSYSTEM35_SDL_VERSION"
 #endif
@@ -123,6 +125,10 @@ static inline Uint32 SDL_MapSurfaceRGBA(SDL_Surface *surface, Uint8 r, Uint8 g, 
 	return SDL_MapRGBA(surface->format, r, g, b, a);
 }
 
+static inline bool SDL_SetSurfaceColorKey(SDL_Surface *surface, bool enabled, Uint32 key) {
+	return SDL_SetColorKey(surface, enabled, key) == 0;
+}
+
 static inline bool SDL_FillSurfaceRect(SDL_Surface *dst, const SDL_Rect *rect, Uint32 color) {
 	return SDL_FillRect(dst, rect, color) == 0;
 }
@@ -187,174 +193,398 @@ static inline bool SDL_WaitConditionTimeout(SDL_Condition *cond, SDL_Mutex *mute
 	return SDL_CondWaitTimeout(cond, mutex, timeout_ms) == 0;
 }
 
+#endif // XSYSTEM35_SDL_VERSION == 2
+
 // Surface
 
-// Unlike SDL3's SDL_CreateSurface(), this also creates a palette for an
-// indexed format.
+// Also creates a palette for an indexed format.
 static inline SDL_Surface *sdl_CreateSurface(int width, int height, Uint32 format) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_CreateRGBSurfaceWithFormat(0, width, height, SDL_BITSPERPIXEL(format), format);
+#else
+	SDL_Surface *surface = SDL_CreateSurface(width, height, format);
+	if (surface && SDL_ISPIXELFORMAT_INDEXED(format))
+		SDL_CreateSurfacePalette(surface);
+	return surface;
+#endif
 }
 
-// Unlike SDL3's SDL_CreateSurfaceFrom(), this also creates a palette for an
-// indexed format.
+// Also creates a palette for an indexed format.
 static inline SDL_Surface *sdl_CreateSurfaceFrom(int width, int height, Uint32 format, void *pixels, int pitch) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_CreateRGBSurfaceWithFormatFrom(pixels, width, height, SDL_BITSPERPIXEL(format), pitch, format);
+#else
+	SDL_Surface *surface = SDL_CreateSurfaceFrom(width, height, format, pixels, pitch);
+	if (surface && SDL_ISPIXELFORMAT_INDEXED(format))
+		SDL_CreateSurfacePalette(surface);
+	return surface;
+#endif
 }
 
 static inline Uint32 sdl_SurfaceFormat(const SDL_Surface *surface) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return surface->format->format;
+#else
+	return surface->format;
+#endif
 }
 
 static inline int sdl_SurfaceBitsPerPixel(const SDL_Surface *surface) {
-	return surface->format->BitsPerPixel;
+	return SDL_BITSPERPIXEL(sdl_SurfaceFormat(surface));
 }
 
 static inline int sdl_SurfaceBytesPerPixel(const SDL_Surface *surface) {
-	return surface->format->BytesPerPixel;
+	return SDL_BYTESPERPIXEL(sdl_SurfaceFormat(surface));
 }
 
-static inline void sdl_GetSurfaceRGB(Uint32 pixel, const SDL_Surface *surface, Uint8 *r, Uint8 *g, Uint8 *b) {
+static inline void sdl_GetSurfaceRGB(Uint32 pixel, SDL_Surface *surface, Uint8 *r, Uint8 *g, Uint8 *b) {
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_GetRGB(pixel, surface->format, r, g, b);
+#else
+	SDL_GetRGB(pixel, SDL_GetPixelFormatDetails(surface->format), SDL_GetSurfacePalette(surface), r, g, b);
+#endif
 }
 
-static inline void sdl_GetSurfaceRGBA(Uint32 pixel, const SDL_Surface *surface, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
+static inline void sdl_GetSurfaceRGBA(Uint32 pixel, SDL_Surface *surface, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_GetRGBA(pixel, surface->format, r, g, b, a);
+#else
+	SDL_GetRGBA(pixel, SDL_GetPixelFormatDetails(surface->format), SDL_GetSurfacePalette(surface), r, g, b, a);
+#endif
 }
 
 static inline SDL_Surface *sdl_ConvertSurface(SDL_Surface *surface, Uint32 format) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_ConvertSurfaceFormat(surface, format, 0);
+#else
+	return SDL_ConvertSurface(surface, format);
+#endif
 }
 
 // Same as SDL_BlitSurface(), but also stores the destination area that the
-// blit changed in dstrect.
+// blit changed in dstrect. The width and height of dstrect are ignored.
+#if XSYSTEM35_SDL_VERSION == 2
 static inline bool sdl_BlitSurfaceClipped(SDL_Surface *src, const SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
 	return SDL_BlitSurface(src, srcrect, dst, dstrect) == 0;
 }
+#else
+bool sdl_BlitSurfaceClipped(SDL_Surface *src, const SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect);
+#endif
 
 // Scales with nearest-neighbor sampling.
 static inline bool sdl_BlitSurfaceScaled(SDL_Surface *src, const SDL_Rect *srcrect, SDL_Surface *dst, const SDL_Rect *dstrect) {
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_Rect r;
 	if (dstrect)
 		r = *dstrect;
 	return SDL_BlitScaled(src, srcrect, dst, dstrect ? &r : NULL) == 0;
+#else
+	return SDL_BlitSurfaceScaled(src, srcrect, dst, dstrect, SDL_SCALEMODE_NEAREST);
+#endif
 }
 
 // Scales with nearest-neighbor sampling. Supports 8-bit surfaces.
 static inline bool sdl_StretchSurface(SDL_Surface *src, const SDL_Rect *srcrect, SDL_Surface *dst, const SDL_Rect *dstrect) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_SoftStretch(src, srcrect, dst, dstrect) == 0;
+#else
+	return SDL_StretchSurface(src, srcrect, dst, dstrect, SDL_SCALEMODE_NEAREST);
+#endif
 }
 
+#if XSYSTEM35_SDL_VERSION == 2
 bool sdl_FlipSurface(SDL_Surface *surface, SDL_FlipMode flip);
+#else
+static inline bool sdl_FlipSurface(SDL_Surface *surface, SDL_FlipMode flip) {
+	return SDL_FlipSurface(surface, flip);
+}
+#endif
 
 // Rendering
 
+#if XSYSTEM35_SDL_VERSION == 3
+static inline const SDL_FRect *sdl_RectToFRect(const SDL_Rect *rect, SDL_FRect *frect) {
+	if (!rect)
+		return NULL;
+	SDL_RectToFRect(rect, frect);
+	return frect;
+}
+#endif
+
 static inline bool sdl_RenderTexture(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect *srcrect, const SDL_Rect *dstrect) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_RenderCopy(renderer, texture, srcrect, dstrect) == 0;
+#else
+	SDL_FRect src, dst;
+	return SDL_RenderTexture(renderer, texture, sdl_RectToFRect(srcrect, &src), sdl_RectToFRect(dstrect, &dst));
+#endif
 }
 
 static inline bool sdl_RenderTextureF(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect *srcrect, const SDL_FRect *dstrect) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_RenderCopyF(renderer, texture, srcrect, dstrect) == 0;
+#else
+	SDL_FRect src;
+	return SDL_RenderTexture(renderer, texture, sdl_RectToFRect(srcrect, &src), dstrect);
+#endif
 }
 
 static inline bool sdl_RenderTextureRotated(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect *srcrect, const SDL_Rect *dstrect, double angle, const SDL_Point *center, SDL_FlipMode flip) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, angle, center, flip) == 0;
+#else
+	SDL_FRect src, dst;
+	SDL_FPoint fcenter;
+	if (center)
+		fcenter = (SDL_FPoint){center->x, center->y};
+	return SDL_RenderTextureRotated(renderer, texture, sdl_RectToFRect(srcrect, &src), sdl_RectToFRect(dstrect, &dst),
+		angle, center ? &fcenter : NULL, flip);
+#endif
 }
 
 static inline bool sdl_RenderFillRect(SDL_Renderer *renderer, const SDL_Rect *rect) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_RenderFillRect(renderer, rect) == 0;
+#else
+	SDL_FRect frect;
+	return SDL_RenderFillRect(renderer, sdl_RectToFRect(rect, &frect));
+#endif
 }
 
 static inline bool sdl_GetTextureSize(SDL_Texture *texture, int *w, int *h) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_QueryTexture(texture, NULL, NULL, w, h) == 0;
+#else
+	float fw, fh;
+	if (!SDL_GetTextureSize(texture, &fw, &fh))
+		return false;
+	*w = fw;
+	*h = fh;
+	return true;
+#endif
 }
 
 static inline bool sdl_RenderTargetSupported(SDL_Renderer *renderer) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_RenderTargetSupported(renderer);
+#else
+	(void)renderer;
+	return true;
+#endif
 }
 
 // Sets the logical size with letterboxing, and with integer scaling if
 // integer_scale is true.
 static inline bool sdl_SetRenderLogicalPresentation(SDL_Renderer *renderer, int w, int h, bool integer_scale) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_RenderSetLogicalSize(renderer, w, h) == 0 &&
 		SDL_RenderSetIntegerScale(renderer, integer_scale) == 0;
+#else
+	return SDL_SetRenderLogicalPresentation(renderer, w, h,
+		integer_scale ? SDL_LOGICAL_PRESENTATION_INTEGER_SCALE : SDL_LOGICAL_PRESENTATION_LETTERBOX);
+#endif
 }
 
 static inline bool sdl_RenderCoordinatesToWindow(SDL_Renderer *renderer, int x, int y, int *window_x, int *window_y) {
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_RenderLogicalToWindow(renderer, x, y, window_x, window_y);
 	return true;
+#else
+	float wx, wy;
+	if (!SDL_RenderCoordinatesToWindow(renderer, x, y, &wx, &wy))
+		return false;
+	*window_x = wx;
+	*window_y = wy;
+	return true;
+#endif
 }
 
+#if XSYSTEM35_SDL_VERSION == 2
 static inline SDL_Color sdl_VertexColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 	return (SDL_Color){r, g, b, a};
 }
+#else
+static inline SDL_FColor sdl_VertexColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+	return (SDL_FColor){r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f};
+}
+#endif
 
 // Window and display
 
+// Creates a window whose content area has the same apparent size on displays
+// with different pixel densities.
 static inline SDL_Window *sdl_CreateWindow(const char *title, int w, int h, Uint32 flags) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flags);
+#else
+	// On platforms where window coordinates are in pixels, such as Windows,
+	// the content scale of the display is larger than 1.
+	float scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	if (scale <= 0.0f)
+		scale = 1.0f;
+	SDL_WindowFlags window_flags = flags;
+#ifndef __EMSCRIPTEN__
+	// The web page scales the canvas to its display size.
+	window_flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+#endif
+	return SDL_CreateWindow(title, (int)(w * scale + 0.5f), (int)(h * scale + 0.5f), window_flags);
+#endif
+}
+
+// Sets the size of the window's content area, with the same scaling as
+// sdl_CreateWindow().
+static inline void sdl_SetWindowContentSize(SDL_Window *window, int w, int h) {
+#if XSYSTEM35_SDL_VERSION == 2
+	SDL_SetWindowSize(window, w, h);
+#else
+	// The display scale divided by the pixel density is the content scale.
+	float density = SDL_GetWindowPixelDensity(window);
+	float scale = SDL_GetWindowDisplayScale(window);
+	if (density > 0.0f && scale > 0.0f)
+		scale /= density;
+	else
+		scale = 1.0f;
+	SDL_SetWindowSize(window, (int)(w * scale + 0.5f), (int)(h * scale + 0.5f));
+#endif
 }
 
 static inline SDL_Renderer *sdl_CreateRenderer(SDL_Window *window) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_CreateRenderer(window, -1, 0);
+#else
+	return SDL_CreateRenderer(window, NULL);
+#endif
 }
 
 // Uses the desktop resolution when fullscreen is true.
 static inline bool sdl_SetWindowFullscreen(SDL_Window *window, bool fullscreen) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) == 0;
+#else
+	return SDL_SetWindowFullscreen(window, fullscreen);
+#endif
 }
 
 // Gets the current display mode of the primary display.
 static inline bool sdl_GetCurrentDisplayMode(SDL_DisplayMode *mode) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_GetCurrentDisplayMode(0, mode) == 0;
+#else
+	const SDL_DisplayMode *m = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
+	if (!m)
+		return false;
+	*mode = *m;
+	return true;
+#endif
 }
 
 // Gets the desktop display mode of the primary display.
 static inline bool sdl_GetDesktopDisplayMode(SDL_DisplayMode *mode) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_GetDesktopDisplayMode(0, mode) == 0;
+#else
+	const SDL_DisplayMode *m = SDL_GetDesktopDisplayMode(SDL_GetPrimaryDisplay());
+	if (!m)
+		return false;
+	*mode = *m;
+	return true;
+#endif
 }
 
 #ifdef _WIN32
 // Returns the HWND of the window, or NULL.
+#if XSYSTEM35_SDL_VERSION == 2
 void *sdl_GetWindowHWND(SDL_Window *window);
+#else
+static inline void *sdl_GetWindowHWND(SDL_Window *window) {
+	return SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+}
+#endif
 #endif
 
 // Input
 
 static inline SDL_Keycode sdl_KeyboardEventKey(const SDL_KeyboardEvent *e) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return e->keysym.sym;
+#else
+	return e->key;
+#endif
 }
 
 static inline SDL_Scancode sdl_KeyboardEventScancode(const SDL_KeyboardEvent *e) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return e->keysym.scancode;
+#else
+	return e->scancode;
+#endif
+}
+
+// Returns the vertical scroll amount in whole steps.
+static inline int sdl_MouseWheelEventY(const SDL_MouseWheelEvent *e) {
+#if XSYSTEM35_SDL_VERSION == 2
+	return e->y;
+#else
+	return e->integer_y;
+#endif
 }
 
 // Returns the number of fingers that touch the device of the event.
 static inline int sdl_CountTouchFingers(const SDL_TouchFingerEvent *e) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_GetNumTouchFingers(e->touchId);
+#else
+	int count = 0;
+	SDL_free(SDL_GetTouchFingers(e->touchID, &count));
+	return count;
+#endif
+}
+
+// Converts the timestamp of an event to the time scale of SDL_GetTicks().
+static inline Uint64 sdl_TimestampToTicks(Uint64 timestamp) {
+#if XSYSTEM35_SDL_VERSION == 2
+	return timestamp;
+#else
+	return SDL_NS_TO_MS(timestamp);
+#endif
 }
 
 static inline bool sdl_StartTextInput(SDL_Window *window) {
+#if XSYSTEM35_SDL_VERSION == 2
 	(void)window;
 	SDL_StartTextInput();
 	return true;
+#else
+	return SDL_StartTextInput(window);
+#endif
 }
 
 static inline bool sdl_StopTextInput(SDL_Window *window) {
+#if XSYSTEM35_SDL_VERSION == 2
 	(void)window;
 	SDL_StopTextInput();
 	return true;
+#else
+	return SDL_StopTextInput(window);
+#endif
 }
 
 // Miscellaneous
 
 static inline bool sdl_SaveBMP(SDL_Surface *surface, const char *file) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_SaveBMP(surface, file) == 0;
+#else
+	return SDL_SaveBMP(surface, file);
+#endif
 }
 
 static inline bool sdl_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid) {
+#if XSYSTEM35_SDL_VERSION == 2
 	return SDL_ShowMessageBox(messageboxdata, buttonid) == 0;
+#else
+	return SDL_ShowMessageBox(messageboxdata, buttonid);
+#endif
 }
-
-#endif // XSYSTEM35_SDL_VERSION == 2
 
 #endif /* __SDL_COMPAT_H__ */

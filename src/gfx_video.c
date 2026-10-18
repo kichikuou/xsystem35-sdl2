@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "sdl_compat.h"
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -92,7 +93,9 @@ static void window_init(const char *render_driver) {
 	if (render_driver)
 		SDL_SetHint(SDL_HINT_RENDER_DRIVER, render_driver);
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+#endif
 
 	SDL_Init(SDL_INIT_VIDEO);
 	
@@ -115,6 +118,9 @@ static void window_init(const char *render_driver) {
 	gfx_window = sdl_CreateWindow(
 		title, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
 	gfx_renderer = sdl_CreateRenderer(gfx_window);
+#if XSYSTEM35_SDL_VERSION == 3
+	SDL_SetDefaultTextureScaleMode(gfx_renderer, SDL_SCALEMODE_NEAREST);
+#endif
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	gfx_palette = SDL_CreatePalette(256);
 }
@@ -194,6 +200,23 @@ SDL_Rect gfx_viewToWindowRect(SDL_Rect rect) {
 	return (SDL_Rect){tl.x, tl.y, br.x - tl.x, br.y - tl.y};
 }
 
+void gfx_convertEventCoordinates(SDL_Event *e) {
+#if XSYSTEM35_SDL_VERSION == 2
+	// The renderer of SDL2 converts the coordinates in events.
+	(void)e;
+#else
+	SDL_ConvertEventToRenderCoordinates(gfx_renderer, e);
+	switch (e->type) {
+	case SDL_EVENT_FINGER_DOWN:
+	case SDL_EVENT_FINGER_UP:
+	case SDL_EVENT_FINGER_MOTION:
+		e->tfinger.x = SDL_clamp(e->tfinger.x / view_w, 0.0f, 1.0f);
+		e->tfinger.y = SDL_clamp(e->tfinger.y / view_h, 0.0f, 1.0f);
+		break;
+	}
+#endif
+}
+
 /*  DIBの取得 */
 surface_t *gfx_getDIB(void) {
 	return gfx_dibinfo;
@@ -232,7 +255,7 @@ void gfx_setViewSize(int w, int h) {
 	view_h = h;
 
 #ifndef __ANDROID__
-	SDL_SetWindowSize(gfx_window, w, h);
+	sdl_SetWindowContentSize(gfx_window, w, h);
 #endif
 	sdl_SetRenderLogicalPresentation(gfx_renderer, w, h, gfx_integer_scaling);
 	if (gfx_texture)

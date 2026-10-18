@@ -350,7 +350,7 @@ SDL_Surface *font_render_text(FontSpec spec, const char *str_utf8, SDL_Color col
 		if (sf) {
 			SDL_Color pal[2] = {{0, 0, 0, 0}, {color.r, color.g, color.b, 255}};
 			SDL_SetPaletteColors(SDL_GetSurfacePalette(sf), pal, 0, 2);
-			SDL_SetColorKey(sf, true, 0);
+			SDL_SetSurfaceColorKey(sf, true, 0);
 		}
 	}
 	if (!sf) {

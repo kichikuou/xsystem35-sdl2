@@ -73,7 +73,8 @@ mixer_music *mixer_music_load_file(const char *path);
 void mixer_music_free(mixer_music *music);
 
 // Plays the music play_count times. If play_count is -1, plays it forever.
-// A play_count of 0 is the same as 1.
+// A play_count of 0 is the same as 1. With SDL2_mixer, this stops the music
+// that is playing.
 bool mixer_music_play(mixer_music *music, int play_count, int fade_in_ms);
 void mixer_music_fade_out(mixer_music *music, int ms);
 void mixer_music_pause(mixer_music *music);

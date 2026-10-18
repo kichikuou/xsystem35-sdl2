@@ -19,8 +19,11 @@
 #include <windows.h>
 #include <time.h>
 #include "sdl_compat.h"
+#if XSYSTEM35_SDL_VERSION == 2
 #include <SDL_syswm.h>
+#endif
 #include "system.h"
+#include "event.h"
 #include "menu.h"
 #include "nact.h"
 #include "gfx.h"
@@ -75,6 +78,16 @@ static bool toggle_menu_item(UINT id, bool *checked_out) {
 	return true;
 }
 
+#if XSYSTEM35_SDL_VERSION == 3
+// SDL calls this from SDL_PumpEvents(). The command can open a modal dialog
+// that pumps events, so it is handled later as an SDL event.
+static bool SDLCALL message_hook(void *userdata, MSG *msg) {
+	if (msg->message == WM_COMMAND)
+		event_post_win_menu_command(msg->wParam);
+	return true;
+}
+#endif
+
 void menu_init(void) {
 	SDL_Window *window = gfx_getWindow();
 	int view_w, view_h;
@@ -82,9 +95,13 @@ void menu_init(void) {
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	hmenu = LoadMenu(hinst, MAKEINTRESOURCE(IDR_MENU1));
 	SetMenu(get_hwnd(window), hmenu);
+#if XSYSTEM35_SDL_VERSION == 2
 	SDL_SetEventEnabled(SDL_SYSWMEVENT, true);
+#else
+	SDL_SetWindowsMessageHook(message_hook, NULL);
+#endif
 	// Let SDL recalc the window size, taking menu height into account.
-	SDL_SetWindowSize(window, view_w, view_h);
+	sdl_SetWindowContentSize(window, view_w, view_h);
 	CheckMenuItem(hmenu, ID_OPTION_MOUSE_MOVE, MF_BYCOMMAND | MFS_CHECKED);
 }
 
@@ -92,10 +109,12 @@ void menu_init(void) {
 void menu_open(void) {
 }
 
+#if XSYSTEM35_SDL_VERSION == 2
 void win_menu_onSysWMEvent(SDL_SysWMmsg* msg) {
 	if (msg->msg.win.msg == WM_COMMAND)
 		win_menu_onCommand(msg->msg.win.wParam);
 }
+#endif
 
 void win_menu_onCommand(uintptr_t wparam) {
 	bool checked;

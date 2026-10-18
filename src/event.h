@@ -36,6 +36,9 @@ void event_clear_wheel(void);
 int event_get_joy(void);
 void event_reset_input_state(void);
 void event_post_debugger_command(void *data);
+#ifdef _WIN32
+void event_post_win_menu_command(uintptr_t wparam);
+#endif
 void event_handle_event(SDL_Event *e);
 
 #endif // __EVENT_H__

@@ -35,6 +35,9 @@
 #endif
 
 #include "sdl_compat.h"
+#if XSYSTEM35_SDL_VERSION == 3
+#include <SDL3/SDL_main.h>
+#endif
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

@@ -18,7 +18,9 @@
  */
 
 #include <assert.h>
+#include <ctype.h>
 #include <setjmp.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "debugger.h"

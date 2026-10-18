@@ -51,6 +51,7 @@ static uint32_t custom_event_type = (uint32_t)-1;
 enum CustomEventCode {
 	SIMULATE_RIGHT_BUTTON,
 	DEBUGGER_COMMAND,
+	WIN_MENU_COMMAND,
 };
 
 static SDL_Point mouse_pos;
@@ -186,11 +187,16 @@ static int keytable[SDL_SCANCODE_COUNT] = {
 static int joy_device_index = -1;
 static SDL_Joystick *js;
 
-static bool joy_open(int index) {
+// id is a device index in SDL2, and an instance ID in SDL3.
+static bool joy_open(int id) {
 	if (js)
 		return false;
 
-	js = SDL_JoystickOpen(index);
+#if XSYSTEM35_SDL_VERSION == 2
+	js = SDL_JoystickOpen(id);
+#else
+	js = SDL_OpenJoystick(id);
+#endif
 	if (!js)
 		return false;
 
@@ -205,6 +211,7 @@ static bool joy_open(int index) {
 static bool joy_init(void) {
 	SDL_Init(SDL_INIT_JOYSTICK);
 
+#if XSYSTEM35_SDL_VERSION == 2
 	if (joy_device_index >= 0)
 		return joy_open(joy_device_index);
 
@@ -213,6 +220,20 @@ static bool joy_init(void) {
 			return true;
 	}
 	return false;
+#else
+	int count = 0;
+	SDL_JoystickID *ids = SDL_GetJoysticks(&count);
+	bool opened = false;
+	if (joy_device_index >= 0) {
+		if (joy_device_index < count)
+			opened = joy_open(ids[joy_device_index]);
+	} else {
+		for (int i = 0; i < count && !opened; i++)
+			opened = joy_open(ids[i]);
+	}
+	SDL_free(ids);
+	return opened;
+#endif
 }
 
 void event_init(void) {
@@ -306,6 +327,8 @@ static void defer_touch_event(SDL_TouchFingerEvent *e) {
 		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
 		RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = false;
 		break;
+	default:
+		break;
 	}
 	if (e)
 		deferred_touch_event = *e;
@@ -314,7 +337,7 @@ static void defer_touch_event(SDL_TouchFingerEvent *e) {
 }
 
 static void fire_deferred_touch_event(void) {
-	if (deferred_touch_event.timestamp && deferred_touch_event.timestamp + TOUCH_EVENT_DELAY < SDL_GetTicks()) {
+	if (deferred_touch_event.timestamp && sdl_TimestampToTicks(deferred_touch_event.timestamp) + TOUCH_EVENT_DELAY < SDL_GetTicks()) {
 		defer_touch_event(NULL);
 	}
 }
@@ -332,6 +355,8 @@ static void rance4v2_hack(void) {
 }
 
 void event_handle_event(SDL_Event *e) {
+	gfx_convertEventCoordinates(e);
+
 	if (modal_handle_event(e))
 		return;
 
@@ -340,6 +365,7 @@ void event_handle_event(SDL_Event *e) {
 		menu_quitmenu_open();
 		break;
 
+#if XSYSTEM35_SDL_VERSION == 2
 	case SDL_WINDOWEVENT:
 		switch (e->window.event) {
 		case SDL_WINDOWEVENT_EXPOSED:
@@ -356,6 +382,17 @@ void event_handle_event(SDL_Event *e) {
 #ifdef _WIN32
 	case SDL_SYSWMEVENT:
 		win_menu_onSysWMEvent(e->syswm.msg);
+		break;
+#endif
+#else
+	case SDL_EVENT_WINDOW_EXPOSED:
+		gfx_requestRedraw();
+		break;
+	case SDL_EVENT_WINDOW_FOCUS_LOST:
+		volume_on_window_focus(false);
+		break;
+	case SDL_EVENT_WINDOW_FOCUS_GAINED:
+		volume_on_window_focus(true);
 		break;
 #endif
 	case SDL_EVENT_DID_ENTER_FOREGROUND:
@@ -389,7 +426,7 @@ void event_handle_event(SDL_Event *e) {
 
 	case SDL_EVENT_MOUSE_WHEEL:
 		{
-			int y = e->wheel.y * (e->wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1);
+			int y = sdl_MouseWheelEventY(&e->wheel) * (e->wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1 : 1);
 			if (y > 0)
 				mouse_wheel_up += y;
 			else if (y < 0)
@@ -527,6 +564,11 @@ void event_handle_event(SDL_Event *e) {
 			case DEBUGGER_COMMAND:
 				dbg_post_command(e->user.data1);
 				break;
+#ifdef _WIN32
+			case WIN_MENU_COMMAND:
+				win_menu_onCommand((uintptr_t)e->user.data1);
+				break;
+#endif
 			}
 		}
 		break;
@@ -619,6 +661,19 @@ void event_post_debugger_command(void *data) {
 	};
 	SDL_PushEvent(&event);
 }
+
+#ifdef _WIN32
+void event_post_win_menu_command(uintptr_t wparam) {
+	SDL_Event event = {
+		.user = {
+			.type = custom_event_type,
+			.code = WIN_MENU_COMMAND,
+			.data1 = (void *)wparam
+		}
+	};
+	SDL_PushEvent(&event);
+}
+#endif
 
 #ifdef __EMSCRIPTEN__
 EMSCRIPTEN_KEEPALIVE

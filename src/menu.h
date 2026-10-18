@@ -32,8 +32,10 @@ extern void menu_init();
 extern void menu_setSkipState(bool enabled, bool activated);
 
 #ifdef _WIN32
+#if XSYSTEM35_SDL_VERSION == 2
 struct SDL_SysWMmsg;
 void win_menu_onSysWMEvent(struct SDL_SysWMmsg* msg);
+#endif
 void win_menu_onCommand(uintptr_t wparam);
 void win_menu_onMouseMotion(int x, int y);
 #endif

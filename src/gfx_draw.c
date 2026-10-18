@@ -194,13 +194,13 @@ static void gfx_dib_sprite_copy(SDL_Surface *dst, int sx, int sy, int w, int h, 
 	gfx_pal_check();
 
 	Uint32 col = palette_color(sp);
-	SDL_SetColorKey(main_surface, true, col);
+	SDL_SetSurfaceColorKey(main_surface, true, col);
 	
 	SDL_Rect r_src = {sx, sy, w, h};
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
 	SDL_BlitSurface(main_surface, &r_src, dst, &r_dst);
-	SDL_SetColorKey(main_surface, false, 0);
+	SDL_SetSurfaceColorKey(main_surface, false, 0);
 }
 
 /*
@@ -231,7 +231,7 @@ void gfx_drawImage8(cgdata *cg, int dx, int dy, int sprite_color) {
 	}
 	
 	if (sprite_color != -1)
-		SDL_SetColorKey(s, true, sprite_color);
+		SDL_SetSurfaceColorKey(s, true, sprite_color);
 	
 	SDL_Rect r_dst = {dx, dy, w, h};
 	
