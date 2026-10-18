@@ -1,8 +1,9 @@
 # Changelog
 
 ## Unreleased
-- xsystem35 can now be built with SDL3 and SDL3_mixer, except on Android. SDL2
-  is still the default. See the "Building" section of README.md.
+- xsystem35 can now be built with SDL3 and SDL3_mixer. SDL2 is still the
+  default except on Android. See the "Building" section of README.md.
+- Android: Migrated to SDL3.
 
 ## 2.20.0 - 2026-09-11
 - Improved font rendering to more closely match the original engine. On

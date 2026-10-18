@@ -38,7 +38,7 @@
 
 bool input_modal_string(INPUTSTRING_PARAM *p) {
 	static char buf[256];
-	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	JNIEnv *env = SDL_GetAndroidJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
 		return false;
@@ -52,7 +52,7 @@ bool input_modal_string(INPUTSTRING_PARAM *p) {
 		return false;
 	}
 
-	jobject context = SDL_AndroidGetActivity();
+	jobject context = SDL_GetAndroidActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"inputString", "(" STRING STRING "I)" STRING);
 	jstring newstring = (jstring)(*env)->CallObjectMethod(env, context, mid, msg, oldstring, p->max);
@@ -76,7 +76,7 @@ bool input_modal_string_inline(INPUTSTRING_PARAM *p) {
 }
 
 bool input_modal_number(INPUTNUM_PARAM *p) {
-	JNIEnv *env = SDL_AndroidGetJNIEnv();
+	JNIEnv *env = SDL_GetAndroidJNIEnv();
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
 		WARNING("Failed to allocate JVM local references");
 		return false;
@@ -89,7 +89,7 @@ bool input_modal_number(INPUTNUM_PARAM *p) {
 		return false;
 	}
 
-	jobject context = SDL_AndroidGetActivity();
+	jobject context = SDL_GetAndroidActivity();
 	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
 										"inputNumber", "(" STRING "III)I");
 	int v = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);

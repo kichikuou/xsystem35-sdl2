@@ -8,9 +8,43 @@ else {
 }
 apply plugin: 'kotlin-android'
 
+// Use SDL3's official prebuilt Android Archive (AAR). The AAR provides SDL3
+// to the native CMake build through Prefab. If it is not available locally,
+// download the official Android package and extract the AAR and license.
+def sdlAarUrl = 'https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-devel-3.4.16-android.zip'
+def sdlAarName = 'SDL3-3.4.16.aar'
+def aarsDir = file('aars')
+def assetsLicensesDir = file('src/main/assets/licenses')
+aarsDir.mkdirs()
+assetsLicensesDir.mkdirs()
+def aarFile = new File(aarsDir, sdlAarName)
+def licenseFile = new File(assetsLicensesDir, 'SDL')
+if (!aarFile.exists() || !licenseFile.exists()) {
+    logger.lifecycle("Downloading ${sdlAarName} ...")
+    def tmpZip = File.createTempFile('sdl-aar', '.zip')
+    new URL(sdlAarUrl).withInputStream { input ->
+        tmpZip.withOutputStream { it << input }
+    }
+    copy {
+        from zipTree(tmpZip)
+        include sdlAarName
+        into aarsDir
+    }
+    copy {
+        from zipTree(tmpZip)
+        include 'LICENSE.txt'
+        into assetsLicensesDir
+        rename 'LICENSE.txt', 'SDL'
+    }
+    tmpZip.delete()
+}
+
 android {
     if (buildAsApplication) {
         namespace "io.github.kichikuou.xsystem35"
+    }
+    buildFeatures {
+        prefab true
     }
     compileSdkVersion 34
     defaultConfig {
@@ -20,7 +54,7 @@ android {
         versionName "2.20.0" + gitRevision()
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_APP_PLATFORM=android-19", "-DANDROID_STL=c++_static"
+                arguments "-DANDROID_STL=c++_static"
                 // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 abiFilters 'armeabi-v7a', 'arm64-v8a'
             }
@@ -83,6 +117,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation files(aarFile)
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     testImplementation 'junit:junit:4.13.2'

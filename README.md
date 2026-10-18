@@ -104,7 +104,8 @@ See [xsystem35 command manual](doc/xsystem35.6.adoc) for detailed usage.
 ## Building
 
 SDL2 is used by default. To build with SDL3 (3.4 or later) and SDL3_mixer (3.2
-or later), pass `-DXSYSTEM35_SDL_VERSION=3` to `cmake`.
+or later), pass `-DXSYSTEM35_SDL_VERSION=3` to `cmake`. Android always uses
+SDL3.
 
 ### Linux (Debian / Ubuntu)
 

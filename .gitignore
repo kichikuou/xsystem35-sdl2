@@ -3,6 +3,7 @@ android/.gradle
 android/.idea
 android/app/.cxx
 android/app/.externalNativeBuild
+android/app/aars/
 android/app/build
 android/app/src/main/assets
 android/build

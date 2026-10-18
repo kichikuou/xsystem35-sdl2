@@ -110,16 +110,22 @@ static void window_init(const char *render_driver) {
 	const char title[] = "XSystem35 Version " VERSION;
 #endif
 
+	Uint32 flags = SDL_WINDOW_RESIZABLE;
 #ifdef __ANDROID__
 	SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	// SDL3 hides the system bars only for a fullscreen window.
+	flags |= SDL_WINDOW_FULLSCREEN;
 #endif
 
 	gfx_window = sdl_CreateWindow(
-		title, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, SDL_WINDOW_RESIZABLE);
+		title, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, flags);
 	gfx_renderer = sdl_CreateRenderer(gfx_window);
 #if XSYSTEM35_SDL_VERSION == 3
+#ifdef __ANDROID__
+	SDL_SetDefaultTextureScaleMode(gfx_renderer, SDL_SCALEMODE_LINEAR);
+#else
 	SDL_SetDefaultTextureScaleMode(gfx_renderer, SDL_SCALEMODE_NEAREST);
+#endif
 #endif
 	SDL_SetRenderDrawColor(gfx_renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	gfx_palette = SDL_CreatePalette(256);
@@ -232,7 +238,7 @@ SDL_Surface *gfx_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) 
 }
 
 void gfx_setFullscreen(bool on) {
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
 	if (on == gfx_fullscreen)
 		return;
 	sdl_SetWindowFullscreen(gfx_window, on);
