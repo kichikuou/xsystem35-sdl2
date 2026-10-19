@@ -258,6 +258,8 @@ static bool midi_initialize(int subdev) {
 		NOTICE("MIDI #%d: interf=\"%s\", name=\"%s\", input=%d, output=%d",
 		       i, info->interf, info->name, info->input, info->output);
 	}
+	if (subdev < 0)
+		subdev = Pm_GetDefaultOutputDeviceID();
 	if (subdev < 0 || subdev >= ndevices) {
 		WARNING("invalid midi device number");
 		return false;

@@ -28,7 +28,12 @@
 #include "portab.h"
 #include "midi.h"
 
+// SDL3_mixer has no native MIDI player.
+#if defined(_WIN32) && XSYSTEM35_SDL_VERSION == 3 && defined(ENABLE_MIDI_PORTMIDI)
+static char default_mode = 'p';
+#else
 static char default_mode = 'e';
+#endif
 static int subdev = -1;
 
 #ifdef __EMSCRIPTEN__
@@ -77,8 +82,8 @@ bool midi_init(mididevice_t *midi) {
 	return ret;
 }
 
-void midi_set_output_device(int mode) {
-	switch(mode & 0x7f) {
+void midi_set_output_device(char mode, int device) {
+	switch(mode) {
 	case 'e':
 		/* external player */
 		default_mode = 'e';
@@ -86,7 +91,7 @@ void midi_set_output_device(int mode) {
 	case 'p':
 		/* portmidi midi mode */
 		default_mode = 'p';
-		subdev = mode >> 8;
+		subdev = device;
 		break;
 	case '0':
 		/* disable midi */

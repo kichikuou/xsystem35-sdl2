@@ -253,11 +253,11 @@ static void sys35_ParseOption(int *argc, char **argv) {
 				load_censor_list(argv[i + 1]);
 			}
 		} else if (0 == strncmp(argv[i], "-M", 2)) {
-			int subdev = 0;
-			if (argv[i][3] != '\0') {
-				subdev = (argv[i][3] - '0') << 8;
+			int device = -1;
+			if (argv[i][2] != '\0' && argv[i][3] != '\0') {
+				device = atoi(&argv[i][3]);
 			}
-			midi_set_output_device(argv[i][2] | subdev);
+			midi_set_output_device(argv[i][2], device);
 		} else if (0 == strcmp(argv[i], "-devjoy")) {
 			if (argv[i + 1] != NULL) {
 				event_set_joy_device_index(atoi(argv[i + 1]));
@@ -360,11 +360,11 @@ static void check_profile() {
 	/* MIDI output device の設定 */
 	param = get_profile("midi_output_device");
 	if (param) {
-		int subdev = 0;
-		if (*(param+1) != '\0') {
-			subdev = (*(param + 1) - '0') << 8;
+		int device = -1;
+		if (param[0] != '\0' && param[1] != '\0') {
+			device = atoi(param + 1);
 		}
-		midi_set_output_device(*param | subdev);
+		midi_set_output_device(*param, device);
 	}
 	/* disable image cursor */
 	get_boolean_profile("no_imagecursor", &nact->ags.noimagecursor);

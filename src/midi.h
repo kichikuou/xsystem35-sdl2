@@ -52,6 +52,7 @@ typedef struct {
 } mididevice_t;
 
 bool midi_init(mididevice_t *);
-void midi_set_output_device(int mode);
+// A negative device selects the default output device.
+void midi_set_output_device(char mode, int device);
 
 #endif /* __MIDI_H__ */
