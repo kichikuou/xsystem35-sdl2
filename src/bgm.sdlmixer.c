@@ -114,10 +114,7 @@ bool musbgm_play(int no, int time, int vol, int loop_count) {
 	// understands loop positions in the WAVE's "smpl" chunk.
 
 	apply_music_volume(vol);
-	// SDL_mixer counts repeats after the first play, while System 3.x counts
-	// the total number of plays.  In both APIs, an infinite loop is special.
-	int loops = loop_count == 0 ? -1 : loop_count - 1;
-	if (!mixer_music_play(music, loops, time * 10)) {
+	if (!mixer_music_play(music, loop_count == 0 ? -1 : loop_count, time * 10)) {
 		free_music();
 		return false;
 	}
