@@ -74,11 +74,6 @@ The `misc/censor/` directory contains example censor list files for some games.
 Prebuilt packages for Windows and Android can be downloaded from the
 [Releases](https://github.com/kichikuou/xsystem35-sdl2/releases) page.
 
-Note for Windows:
-- The 64-bit version supports Windows 10 or later. For older versions of
-  Windows, please use the 32-bit version.
-- Debugging is supported only in the 64-bit version.
-
 For other platforms, refer to the [Building](#building) section.
 
 ## Running

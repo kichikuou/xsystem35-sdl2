@@ -8,52 +8,37 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - sys: mingw32
-            package: "xsystem35-32bit"
+          - package: "xsystem35-64bit"
             sdl-version: 2
             sdl-deps: "SDL2:p SDL2_mixer:p"
-            cmake_args: "-DENABLE_DEBUGGER=no"
-            deps: ""
-          - sys: ucrt64
-            package: "xsystem35-64bit"
-            sdl-version: 2
-            sdl-deps: "SDL2:p SDL2_mixer:p"
-            cmake_args: ""
-            deps: >-
-              cjson:p
-              portmidi:p
-          - sys: ucrt64
-            package: "xsystem35-sdl3-64bit"
+          - package: "xsystem35-sdl3-64bit"
             sdl-version: 3
             sdl-deps: "sdl3:p sdl3-mixer:p"
-            cmake_args: ""
-            deps: >-
-              cjson:p
-              portmidi:p
     defaults:
       run:
         shell: msys2 {0}
-    name: MSYS2 SDL${{ matrix.sdl-version }} ${{ matrix.sys }}
+    name: MSYS2 SDL${{ matrix.sdl-version }}
     steps:
 
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
       with:
-        msystem: ${{ matrix.sys }}
+        msystem: ucrt64
         pacboy: >-
           ${{ matrix.sdl-deps }}
           freetype:p
           libwebp:p
-          ${{ matrix.deps }}
+          cjson:p
+          portmidi:p
 
     - name: Checkout
       uses: actions/checkout@v6
 
     - name: Copy licenses
       run: |
-        ls /${{ matrix.sys }}/share/licenses
+        ls /ucrt64/share/licenses
         mkdir dist
-        cp -r /${{ matrix.sys }}/share/licenses dist/
+        cp -r /ucrt64/share/licenses dist/
         cp licenses/* dist/licenses/
 
     - name: Install dev dependencies
@@ -64,7 +49,7 @@ jobs:
         mkdir -p out/release
         cd out/release
         cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_COMPILE_WARNING_AS_ERROR=YES \
-          -DXSYSTEM35_SDL_VERSION=${{ matrix.sdl-version }} ${{ matrix.cmake_args }} ../../
+          -DXSYSTEM35_SDL_VERSION=${{ matrix.sdl-version }} ../../
         ninja
 
     - name: Test
