@@ -19,6 +19,7 @@
 #ifndef __MMAP_H__
 #define __MMAP_H__
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #if defined(HAVE_MMAP) || defined(_WIN32)
@@ -30,11 +31,13 @@ typedef struct {
 #ifndef _WIN32
 	size_t length;
 	int fd;	 // Emscripten needs fd for mmap kept open.
+	bool writable;
 #endif
 } mmap_t;
 
 mmap_t *map_file(const char *path);
 mmap_t *map_file_readwrite(const char *path, size_t size);
+int sync_mapped_file(mmap_t *m);
 int unmap_file(mmap_t *m);
 
 #endif /* __MMAP_H__ */

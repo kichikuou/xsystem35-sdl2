@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -78,10 +79,28 @@ struct volume_sav_channel {
 	uint8_t reserved;  // zero
 };
 
+void volume_fini(void) {
+	for (int i = 0; i < MAXVOLCH; i++) {
+		free(vval[i].label);
+		vval[i].label = NULL;
+		vval[i].vol = 0;
+		vval[i].mute = false;
+	}
+	vval_max = 0;
+	mute_on_unfocus = false;
+	global_mute = false;
+}
+
 void volume_init(void) {
 	int i;
 	char fn[256];
 	int nvalancer = 0;
+
+	for (i = 0; i < MAXVOLCH; i++) {
+		free(vval[i].label);
+		vval[i].label = NULL;
+	}
+	vval_max = 0;
 
 	FILE *fp = nact->files.init ? fopen(nact->files.init, "r") : NULL;
 	if (fp) {
@@ -92,7 +111,17 @@ void volume_init(void) {
 			if (s1[0] == '\0') continue;
 			if (i >= MAXVOLCH || i < 0) continue;
 			s1[strlen(s1)-1] = '\0'; // remove last '"'
-			vval[i].label = sjis2utf(s1);
+			if (!sys_isCharacterEncodingLocked() && nact->encoding == SHIFT_JIS && cjk_looks_like_gbk((const uint8_t *)s1)) {
+				sys_setDefaultCharacterEncoding(GBK, false);
+			}
+			// Decode mixed System39.ini labels accurately even if game text and INI encodings differ.
+			int sjis_err = 0, gbk_err = 0, gbk_valid = 0;
+			cjk_score_sample((const uint8_t *)s1, &sjis_err, &gbk_err, &gbk_valid);
+			CharacterEncoding label_enc = (gbk_valid > 0 && sjis_err > gbk_err) ? GBK
+				: (nact->encoding == GBK && gbk_err > sjis_err) ? SHIFT_JIS
+				: nact->encoding;
+			free(vval[i].label);
+			vval[i].label = codeconv(UTF8, label_enc, s1);
 			vval_max = max(vval_max, i);
 			nvalancer++;
 		}

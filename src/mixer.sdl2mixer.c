@@ -57,6 +57,10 @@ bool mixer_init(int num_channels, int buffer_size) {
 		return false;
 	Mix_QuerySpec(&output_rate, NULL, NULL);
 	Mix_AllocateChannels(num_channels);
+#if defined(ALICEHUB_IOS) || defined(__SWITCH__)
+	extern void midi_tsf_audio_ready(void);
+	midi_tsf_audio_ready();
+#endif
 	return true;
 }
 
@@ -206,4 +210,18 @@ void mixer_music_set_gain(mixer_music *music, float gain) {
 	music->gain = gain;
 	if (music == current_music)
 		Mix_VolumeMusic(to_mix_volume(gain));
+}
+
+void mixer_pause_all(bool paused) {
+#if defined(ALICEHUB_IOS) || defined(__SWITCH__)
+	extern void midi_tsf_pause_all(bool paused);
+	midi_tsf_pause_all(paused);
+#endif
+	if (paused) {
+		Mix_Pause(-1);
+		Mix_PauseMusic();
+	} else {
+		Mix_Resume(-1);
+		Mix_ResumeMusic();
+	}
 }

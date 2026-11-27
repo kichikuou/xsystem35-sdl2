@@ -164,6 +164,10 @@ static void message(int c0) {
 			*p++ = (char)c0;
 		} else if (c0 == 0x20) {
 			*p++ = (char)c0;
+		} else if (nact->encoding == GBK) {
+			*p++ = (char)c0;
+			if (CHECKGBK1BYTE(c0))
+				*p++ = (char)sl_getc();
 		} else if (c0 >= 0xe0) {
 			*p++ = (char)c0; *p++ = (char)sl_getc();
 		} else if (c0 >= 0xa0) {
@@ -189,6 +193,8 @@ void exec_command(void) {
 	if (c0 == BREAKPOINT) {
 		gfx_updateScreen();
 		c0 = dbg_handle_breakpoint(sl_getPage(), sl_getIndex() - 1);
+		if (nact->is_quit)
+			return;
 	}
 
 	if (c0 == 0x20 || c0 >= 0x80) {

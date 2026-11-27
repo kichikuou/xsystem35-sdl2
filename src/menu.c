@@ -215,13 +215,49 @@ static bool confirm_lose_progress(const char *title, const char *confirm_label) 
 }
 
 void menu_quitmenu_open(void) {
+#ifdef __ANDROID__
+	static const SDL_MessageBoxButtonData buttons[] = {
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "OK" },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "Cancel" },
+	};
+	const SDL_MessageBoxData messagebox_data = {
+		.flags = SDL_MESSAGEBOX_INFORMATION,
+		.window = gfx_getWindow(),
+		.title = "__ALICEHUB_QUIT__",
+		.message = "",
+		.numbuttons = SDL_arraysize(buttons),
+		.buttons = buttons,
+	};
+	int buttonid = 0;
+	if (sdl_ShowMessageBox(&messagebox_data, &buttonid) && buttonid == 1)
+		nact_quit(false);
+#else
 	if (confirm_lose_progress(_("Quit game?"), _("Quit")))
 		nact_quit(false);
+#endif
 }
 
 void menu_resetmenu_open(void) {
+#ifdef __ANDROID__
+	static const SDL_MessageBoxButtonData buttons[] = {
+		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "OK" },
+		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 0, "Cancel" },
+	};
+	const SDL_MessageBoxData messagebox_data = {
+		.flags = SDL_MESSAGEBOX_INFORMATION,
+		.window = gfx_getWindow(),
+		.title = "__ALICEHUB_RESET__",
+		.message = "",
+		.numbuttons = SDL_arraysize(buttons),
+		.buttons = buttons,
+	};
+	int buttonid = 0;
+	if (sdl_ShowMessageBox(&messagebox_data, &buttonid) && buttonid == 1)
+		nact_quit(true);
+#else
 	if (confirm_lose_progress(_("Restart game?"), _("Restart")))
 		nact_quit(true);
+#endif
 }
 
 // On Windows, menu_open/menu_init/menu_setSkipState are provided by win/menubar.c.

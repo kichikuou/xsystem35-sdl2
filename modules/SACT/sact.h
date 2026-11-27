@@ -33,7 +33,7 @@
 #include "sactcg.h"
 
 // スプライトの最大数
-#define SPRITEMAX 21845
+#define SPRITEMAX 65536
 
 // メッセージの最大長さ
 #define MSGBUFMAX 257*10
@@ -262,5 +262,6 @@ typedef struct _sact sact_t;
 // shortcut
 #define sact sactprv
 extern sact_t sact;
+int sact_wait_skip_level(void);
 
 #endif /* __SACT_H__ */

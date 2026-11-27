@@ -178,6 +178,9 @@ void cursor_init(void) {
 }
 
 static bool cursor_new(uint8_t* data, int no, CursorImage *cursorImage, TCursorDirEntry *cursordirentry) {
+	if (no < 100 || no >= 256)
+		return false;
+
 	int    xormasklen, andmasklen, xornum;
 	int    i, j;
 	int    h = 0;
@@ -230,6 +233,10 @@ static bool cursor_new(uint8_t* data, int no, CursorImage *cursorImage, TCursorD
 }
 
 void cursor_set_type(int type) {
+	if (type < 0 || type >= 256) {
+		WARNING("wrong cursor number(%d)", type);
+		return;
+	}
 	if (cursor[type] != NULL) {
 		SDL_SetCursor(cursor[type]);
 	}
@@ -543,6 +550,7 @@ static bool cursor_load_anim(uint8_t *data, int no) {
 			NOTICE("rate size = %d", c.size);
 			if (anicurHeader.fl & 0x01) {
 				int i;
+				free(anicurHeader.rate);
 				anicurHeader.rate = malloc(sizeof(int) * anicurHeader.cSteps);
 				for (i = 0; i < anicurHeader.cSteps; i++) {
 					anicurHeader.rate[i] = LittleEndian_getW(src, i*4);
@@ -569,8 +577,9 @@ void cursor_load(int no, int linkno) {
 	dridata *dfile;
 
 	/* no must be from 100 to 255 */
-	if (no < 100 || no > 256){
+	if (no < 100 || no >= 256) {
 		WARNING("wrong cursor number(%d)", no);
+		return;
 	}
 	
 	/* load data */
@@ -588,4 +597,24 @@ void cursor_load(int no, int linkno) {
 	ald_freedata(dfile);
 	
 	return;
+}
+
+void cursor_reset(void) {
+	SDL_Cursor *def = SDL_GetDefaultCursor();
+	if (def)
+		SDL_SetCursor(def);
+	for (int i = 0; i < 256; i++) {
+		if (cursor[i] && i != CURSOR_ARROW && i != CURSOR_ICON && cursor[i] != def) {
+			SDL_DestroyCursor(cursor[i]);
+		}
+		cursor[i] = NULL;
+	}
+	free(cursorImage.icColors);
+	free(anicurHeader.rate);
+	free(anicurHeader.seq);
+	memset(&cursorHeader, 0, sizeof(cursorHeader));
+	memset(&cursordirentry, 0, sizeof(cursordirentry));
+	memset(&cursorImage, 0, sizeof(cursorImage));
+	memset(&anicurHeader, 0, sizeof(anicurHeader));
+	memset(&anicurImage, 0, sizeof(anicurImage));
 }

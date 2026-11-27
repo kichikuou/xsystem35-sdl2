@@ -126,12 +126,12 @@ static void DrawNumber() {
 	int dstY = getCaliValue();
 	int num = getCaliValue();
 
-	char buf[6];
-	sprintf(buf, "%5d", num);
+	char buf[16];
+	snprintf(buf, sizeof(buf), "%5d", num);
 
 	surface_t *dib = ags_getDIB();
 	for (char *c = buf; *c; c++) {
-		if (*c != ' ') {
+		if (*c >= '0' && *c <= '9') {
 			int sx = srcX + (*c - '0') * width;
 			gr_blend_alpha_map(dib, dstX, dstY, dib, sx, srcY, width, height);
 		}
@@ -171,7 +171,7 @@ static void TempMapLoadToShadow() {
 		return;
 	int size = getCaliValue();
 
-	if (!mapdata[map]) {
+	if (map < 0 || map >= NUM_MAPS || !mapdata[map]) {
 		WARNING("No map %d", map);
 		return;
 	}
@@ -179,6 +179,16 @@ static void TempMapLoadToShadow() {
 		WARNING("non-array destination variable");
 		return;
 	}
+	if (size <= 0)
+		return;
+	int max_size = (int)(MAPDATASIZE / (sizeof(uint16_t) * NUM_LAYERS));
+	if (size > max_size) {
+		WARNING("TempMapLoadToShadow size %d exceeds max %d", size, max_size);
+		size = max_size;
+	}
+	size = min(size, v_sliceSize(&r1));
+	size = min(size, v_sliceSize(&r2));
+	size = min(size, v_sliceSize(&r3));
 	vmvar_t *a1 = v_resolveRef(&r1);
 	vmvar_t *a2 = v_resolveRef(&r2);
 	vmvar_t *a3 = v_resolveRef(&r3);
@@ -200,7 +210,7 @@ static void TempMapSaveToShadow() {
 		return;
 	int size = getCaliValue();
 
-	if (!mapdata[map]) {
+	if (map < 0 || map >= NUM_MAPS || !mapdata[map]) {
 		WARNING("No map %d", map);
 		return;
 	}
@@ -208,6 +218,16 @@ static void TempMapSaveToShadow() {
 		WARNING("non-array source variable");
 		return;
 	}
+	if (size <= 0)
+		return;
+	int max_size = (int)(MAPDATASIZE / (sizeof(uint16_t) * NUM_LAYERS));
+	if (size > max_size) {
+		WARNING("TempMapSaveToShadow size %d exceeds max %d", size, max_size);
+		size = max_size;
+	}
+	size = min(size, v_sliceSize(&r1));
+	size = min(size, v_sliceSize(&r2));
+	size = min(size, v_sliceSize(&r3));
 	vmvar_t *a1 = v_resolveRef(&r1);
 	vmvar_t *a2 = v_resolveRef(&r2);
 	vmvar_t *a3 = v_resolveRef(&r3);

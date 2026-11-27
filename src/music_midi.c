@@ -41,13 +41,19 @@ bool musmidi_init(void) {
 
 void musmidi_exit(void) {
 	if (prv.midi_valid) {
+		musmidi_stop();
 		prv.mididev.exit();
+		prv.midi_valid = false;
 	}
 }
 
 void musmidi_reset(void) {
 	if (prv.midi_valid) {
 		prv.mididev.reset();
+		if (prv.midi_dfile) {
+			ald_freedata(prv.midi_dfile);
+			prv.midi_dfile = NULL;
+		}
 		prv.midi_current_track = 0;
 	}
 }

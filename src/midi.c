@@ -43,6 +43,9 @@ extern mididevice_t midi_emscripten;
 #ifdef __ANDROID__
 extern mididevice_t midi_android;
 #endif
+#if defined(ALICEHUB_IOS) || defined(__SWITCH__)
+extern mididevice_t midi_tsf;
+#endif
 
 #ifdef ENABLE_MIDI_SDLMIXER
 extern mididevice_t midi_sdlmixer;
@@ -57,6 +60,10 @@ bool midi_init(mididevice_t *midi) {
 
 	switch(default_mode) {
 	case 'e':
+#if defined(ALICEHUB_IOS) || defined(__SWITCH__)
+		ret = midi_tsf.init(0);
+		memcpy(midi, &midi_tsf, sizeof(mididevice_t));
+#endif
 #ifdef __EMSCRIPTEN__
 		ret = midi_emscripten.init(0);
 		memcpy(midi, &midi_emscripten, sizeof(mididevice_t));

@@ -32,73 +32,278 @@
 
 #include "sdl_compat.h"
 #include <jni.h>
+#include <limits.h>
+#include <stdint.h>
 #include "system.h"
 
 #define STRING "Ljava/lang/String;"
 
+static bool jni_check_clear_exception(JNIEnv *env) {
+	if ((*env)->ExceptionCheck(env)) {
+		(*env)->ExceptionClear(env);
+		return true;
+	}
+	return false;
+}
+
+static jstring utf8_to_jstring(JNIEnv *env, const char *s) {
+	if (!env)
+		return NULL;
+	if (!s || !s[0]) {
+		jchar empty = 0;
+		jstring js = (*env)->NewString(env, &empty, 0);
+		if (jni_check_clear_exception(env)) {
+			if (js)
+				(*env)->DeleteLocalRef(env, js);
+			return NULL;
+		}
+		return js;
+	}
+
+	size_t len = strlen(s);
+	jchar stack_buf[256];
+	jchar *buf = stack_buf;
+	if (len > sizeof(stack_buf) / sizeof(stack_buf[0])) {
+		if (len > SIZE_MAX / sizeof(jchar))
+			return NULL;
+		buf = malloc(len * sizeof(jchar));
+		if (!buf)
+			return NULL;
+	}
+
+	const unsigned char *p = (const unsigned char *)s;
+	size_t i = 0;
+	size_t out = 0;
+	while (i < len) {
+		uint32_t cp = 0xFFFDu;
+		unsigned char b0 = p[i];
+		if (b0 < 0x80u) {
+			cp = b0;
+			i += 1;
+		} else if (b0 >= 0xC2u && b0 <= 0xDFu) {
+			if (i + 1 < len && (p[i + 1] & 0xC0u) == 0x80u) {
+				cp = ((uint32_t)(b0 & 0x1Fu) << 6) | (uint32_t)(p[i + 1] & 0x3Fu);
+				i += 2;
+			} else {
+				i += 1;
+			}
+		} else if (b0 >= 0xE0u && b0 <= 0xEFu) {
+			bool b1_ok = (i + 1 < len) && (
+				(b0 == 0xE0u) ? (p[i + 1] >= 0xA0u && p[i + 1] <= 0xBFu) :
+				(b0 == 0xEDu) ? (p[i + 1] >= 0x80u && p[i + 1] <= 0x9Fu) :
+				((p[i + 1] & 0xC0u) == 0x80u));
+			if (b1_ok && i + 2 < len && (p[i + 2] & 0xC0u) == 0x80u) {
+				cp = ((uint32_t)(b0 & 0x0Fu) << 12) |
+				     ((uint32_t)(p[i + 1] & 0x3Fu) << 6) |
+				     (uint32_t)(p[i + 2] & 0x3Fu);
+				i += 3;
+			} else {
+				i += b1_ok ? 2 : 1;
+			}
+		} else if (b0 >= 0xF0u && b0 <= 0xF4u) {
+			bool b1_ok = (i + 1 < len) && (
+				(b0 == 0xF0u) ? (p[i + 1] >= 0x90u && p[i + 1] <= 0xBFu) :
+				(b0 == 0xF4u) ? (p[i + 1] >= 0x80u && p[i + 1] <= 0x8Fu) :
+				((p[i + 1] & 0xC0u) == 0x80u));
+			bool b2_ok = b1_ok && (i + 2 < len) && ((p[i + 2] & 0xC0u) == 0x80u);
+			if (b2_ok && i + 3 < len && (p[i + 3] & 0xC0u) == 0x80u) {
+				cp = ((uint32_t)(b0 & 0x07u) << 18) |
+				     ((uint32_t)(p[i + 1] & 0x3Fu) << 12) |
+				     ((uint32_t)(p[i + 2] & 0x3Fu) << 6) |
+				     (uint32_t)(p[i + 3] & 0x3Fu);
+				i += 4;
+			} else {
+				i += b2_ok ? 3 : (b1_ok ? 2 : 1);
+			}
+		} else {
+			i += 1;
+		}
+
+		if (cp <= 0xFFFFu) {
+			buf[out++] = (jchar)cp;
+		} else {
+			uint32_t u = cp - 0x10000u;
+			buf[out++] = (jchar)(0xD800u | (u >> 10));
+			buf[out++] = (jchar)(0xDC00u | (u & 0x3FFu));
+		}
+	}
+
+	jstring js = NULL;
+	if (out <= (size_t)INT32_MAX) {
+		js = (*env)->NewString(env, buf, (jsize)out);
+		if (jni_check_clear_exception(env)) {
+			if (js)
+				(*env)->DeleteLocalRef(env, js);
+			js = NULL;
+		}
+	}
+	if (buf != stack_buf)
+		free(buf);
+	return js;
+}
+
 bool input_modal_string(INPUTSTRING_PARAM *p) {
-	static char buf[256];
+	static char *buf = NULL;
+	static size_t buf_cap = 0;
+	if (!p)
+		return false;
+	p->newstring = p->oldstring;
+
 	JNIEnv *env = SDL_GetAndroidJNIEnv();
+	if (!env) {
+		WARNING("Failed to obtain JNIEnv");
+		return false;
+	}
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		jni_check_clear_exception(env);
 		WARNING("Failed to allocate JVM local references");
 		return false;
 	}
 
-	jstring msg = (*env)->NewStringUTF(env, p->title);
-	jstring oldstring = (*env)->NewStringUTF(env, p->oldstring);
+	bool ok = false;
+	jstring msg = NULL;
+	jstring oldstring = NULL;
+	jobject context = NULL;
+	jclass cls = NULL;
+	jstring newstring = NULL;
+
+	msg = utf8_to_jstring(env, p->title ? p->title : "");
+	oldstring = utf8_to_jstring(env, p->oldstring ? p->oldstring : "");
 	if (!msg || !oldstring) {
 		WARNING("Failed to allocate a string");
-		(*env)->PopLocalFrame(env, NULL);
-		return false;
+		goto cleanup;
 	}
 
-	jobject context = SDL_GetAndroidActivity();
-	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
+	context = SDL_GetAndroidActivity();
+	if (jni_check_clear_exception(env) || !context) {
+		WARNING("Failed to obtain Android activity");
+		goto cleanup;
+	}
+
+	cls = (*env)->GetObjectClass(env, context);
+	if (jni_check_clear_exception(env) || !cls) {
+		WARNING("Failed to obtain Android activity class");
+		goto cleanup;
+	}
+
+	jmethodID mid = (*env)->GetMethodID(env, cls,
 										"inputString", "(" STRING STRING "I)" STRING);
-	jstring newstring = (jstring)(*env)->CallObjectMethod(env, context, mid, msg, oldstring, p->max);
-	if (newstring) {
-		const char *newstr_utf8 = (*env)->GetStringUTFChars(env, newstring, NULL);
-		strcpy(buf, newstr_utf8);
-		(*env)->ReleaseStringUTFChars(env, newstring, newstr_utf8);
-		(*env)->PopLocalFrame(env, NULL);
-		p->newstring = buf;
-		return true;
+	if (jni_check_clear_exception(env) || !mid) {
+		WARNING("Failed to resolve inputString method");
+		goto cleanup;
 	}
 
+	newstring = (jstring)(*env)->CallObjectMethod(env, context, mid, msg, oldstring, p->max);
+	if (jni_check_clear_exception(env)) {
+		WARNING("inputString threw a Java exception");
+		goto cleanup;
+	}
+
+	if (newstring) {
+		jsize utf8_len = (*env)->GetStringUTFLength(env, newstring);
+		const char *newstr_utf8 = (*env)->GetStringUTFChars(env, newstring, NULL);
+		if (!newstr_utf8) {
+			jni_check_clear_exception(env);
+			goto cleanup;
+		}
+		size_t cstr_len = strlen(newstr_utf8);
+		size_t copy_len = utf8_len >= 0 && (size_t)utf8_len < cstr_len ? (size_t)utf8_len : cstr_len;
+		size_t needed = copy_len + 1;
+		if (needed > buf_cap) {
+			char *new_buf = realloc(buf, needed);
+			if (!new_buf) {
+				(*env)->ReleaseStringUTFChars(env, newstring, newstr_utf8);
+				goto cleanup;
+			}
+			buf = new_buf;
+			buf_cap = needed;
+		}
+		memcpy(buf, newstr_utf8, copy_len);
+		buf[copy_len] = '\0';
+		(*env)->ReleaseStringUTFChars(env, newstring, newstr_utf8);
+		p->newstring = buf;
+		ok = true;
+	}
+
+cleanup:
+	if (newstring) (*env)->DeleteLocalRef(env, newstring);
+	if (cls) (*env)->DeleteLocalRef(env, cls);
+	if (context) (*env)->DeleteLocalRef(env, context);
+	if (oldstring) (*env)->DeleteLocalRef(env, oldstring);
+	if (msg) (*env)->DeleteLocalRef(env, msg);
 	(*env)->PopLocalFrame(env, NULL);
-	p->newstring = p->oldstring;
-	return false;
+	return ok;
 }
 
 bool input_modal_string_inline(INPUTSTRING_PARAM *p) {
+	if (!p)
+		return false;
 	p->newstring = p->oldstring;
 	return true;
 }
 
 bool input_modal_number(INPUTNUM_PARAM *p) {
+	if (!p)
+		return false;
+
 	JNIEnv *env = SDL_GetAndroidJNIEnv();
+	if (!env) {
+		WARNING("Failed to obtain JNIEnv");
+		return false;
+	}
 	if ((*env)->PushLocalFrame(env, 16) < 0) {
+		jni_check_clear_exception(env);
 		WARNING("Failed to allocate JVM local references");
 		return false;
 	}
 
-	jstring msg = (*env)->NewStringUTF(env, p->title);
+	bool ok = false;
+	jstring msg = NULL;
+	jobject context = NULL;
+	jclass cls = NULL;
+
+	msg = utf8_to_jstring(env, p->title ? p->title : "");
 	if (!msg) {
 		WARNING("Failed to allocate a string");
-		(*env)->PopLocalFrame(env, NULL);
-		return false;
+		goto cleanup;
 	}
 
-	jobject context = SDL_GetAndroidActivity();
-	jmethodID mid = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, context),
-										"inputNumber", "(" STRING "III)I");
-	int v = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);
+	context = SDL_GetAndroidActivity();
+	if (jni_check_clear_exception(env) || !context) {
+		WARNING("Failed to obtain Android activity");
+		goto cleanup;
+	}
 
+	cls = (*env)->GetObjectClass(env, context);
+	if (jni_check_clear_exception(env) || !cls) {
+		WARNING("Failed to obtain Android activity class");
+		goto cleanup;
+	}
+
+	jmethodID mid = (*env)->GetMethodID(env, cls,
+										"inputNumber", "(" STRING "III)I");
+	if (jni_check_clear_exception(env) || !mid) {
+		WARNING("Failed to resolve inputNumber method");
+		goto cleanup;
+	}
+
+	jint v = (*env)->CallIntMethod(env, context, mid, msg, p->min, p->max, p->def);
+	if (jni_check_clear_exception(env)) {
+		WARNING("inputNumber threw a Java exception");
+		goto cleanup;
+	}
+
+	if (v >= 0) {
+		p->value = v;
+		ok = true;
+	}
+
+cleanup:
+	if (cls) (*env)->DeleteLocalRef(env, cls);
+	if (context) (*env)->DeleteLocalRef(env, context);
+	if (msg) (*env)->DeleteLocalRef(env, msg);
 	(*env)->PopLocalFrame(env, NULL);
-	if (v < 0)
-		return false;  // cancelled
-	p->value = v;
-	return true;
+	return ok;
 }
 
 #elif defined(__EMSCRIPTEN__)

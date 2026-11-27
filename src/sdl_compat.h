@@ -68,6 +68,8 @@ typedef SDL_RendererFlip SDL_FlipMode;
 #define SDL_SYSTEM_CURSOR_EW_RESIZE SDL_SYSTEM_CURSOR_SIZEWE
 
 #define SDL_EVENT_QUIT SDL_QUIT
+#define SDL_EVENT_TERMINATING SDL_APP_TERMINATING
+#define SDL_EVENT_WILL_ENTER_BACKGROUND SDL_APP_WILLENTERBACKGROUND
 #define SDL_EVENT_DID_ENTER_FOREGROUND SDL_APP_DIDENTERFOREGROUND
 #define SDL_EVENT_KEY_DOWN SDL_KEYDOWN
 #define SDL_EVENT_KEY_UP SDL_KEYUP
@@ -107,6 +109,12 @@ typedef SDL_RendererFlip SDL_FlipMode;
 #define SDL_GetAtomicInt SDL_AtomicGet
 #define SDL_SetAtomicInt SDL_AtomicSet
 #define SDL_CompareAndSwapAtomicInt SDL_AtomicCAS
+
+#ifdef __ANDROID__
+#define SDL_GetAndroidJNIEnv SDL_AndroidGetJNIEnv
+#define SDL_GetAndroidActivity SDL_AndroidGetActivity
+#define SDL_GetAndroidInternalStoragePath SDL_AndroidGetInternalStoragePath
+#endif
 
 static inline bool SDL_GetRectUnion(const SDL_Rect *a, const SDL_Rect *b, SDL_Rect *result) {
 	SDL_UnionRect(a, b, result);
@@ -450,7 +458,11 @@ static inline void sdl_SetWindowContentSize(SDL_Window *window, int w, int h) {
 
 static inline SDL_Renderer *sdl_CreateRenderer(SDL_Window *window) {
 #if XSYSTEM35_SDL_VERSION == 2
+#ifdef __ANDROID__
+	return SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+#else
 	return SDL_CreateRenderer(window, -1, 0);
+#endif
 #else
 	return SDL_CreateRenderer(window, NULL);
 #endif

@@ -32,6 +32,7 @@
 #include "ags.h"
 #include "gfx.h"
 #include "nact.h"
+#include "utfsjis.h"
 #include "variable.h"
 #include "input.h"
 #include "msgskip.h"
@@ -84,7 +85,7 @@ static void replacestr_cb(void* data, void* userdata) {
 	strexchange_t *ex = (strexchange_t *)data;
 	char *start, *next, *out;
 	
-	if (ex == NULL) return;
+	if (ex == NULL || !ex->src || ex->src[0] == '\0') return;
 	
 	start = replacesrc;
 	out   = replacedst;
@@ -92,11 +93,19 @@ static void replacestr_cb(void* data, void* userdata) {
 	while (true) {
 		next = strstr(start, ex->src);
 		if (next == NULL) break;
-		strncat(out, start, (size_t)(next - start));
-		strncat(out, ex->dst, max(0, (REPLACEBUFSIZE - (int)strlen(out))));
+		size_t cur_len = strlen(out);
+		size_t avail = cur_len < REPLACEBUFSIZE - 1 ? (REPLACEBUFSIZE - 1) - cur_len : 0;
+		size_t prefix_len = (size_t)(next - start);
+		if (prefix_len > avail) prefix_len = avail;
+		strncat(out, start, prefix_len);
+		cur_len += prefix_len;
+		avail = cur_len < REPLACEBUFSIZE - 1 ? (REPLACEBUFSIZE - 1) - cur_len : 0;
+		strncat(out, ex->dst, avail);
 		start = next + strlen(ex->src);
 	}
-	strncat(out, start, max(0, REPLACEBUFSIZE - (int)strlen(out)));
+	size_t cur_len = strlen(out);
+	size_t avail = cur_len < REPLACEBUFSIZE - 1 ? (REPLACEBUFSIZE - 1) - cur_len : 0;
+	strncat(out, start, avail);
 	
 	replacedst = replacesrc;
 	replacesrc = out;
@@ -109,7 +118,8 @@ static char *replacestr(char *msg) {
 	
 	repbuf[0][0] = '\0';
 	repbuf[1][0] = '\0';
-	strncpy(repbuf[0], msg, REPLACEBUFSIZE);
+	strncpy(repbuf[0], msg, REPLACEBUFSIZE - 1);
+	repbuf[0][REPLACEBUFSIZE - 1] = '\0';
 	replacesrc = repbuf[0];
 	replacedst = repbuf[1];
 	slist_foreach(sact.strreplace, replacestr_cb, NULL);
@@ -193,13 +203,13 @@ void smsg_add(const char *msg) {
 	
 	if (msg[0] == '\0') return;
 	
-	len = MSGBUFMAX - (int)strlen(sact.msgbuf);
-	if (len < 0) {
+	len = MSGBUFMAX - 1 - (int)strlen(sact.msgbuf);
+	if (len <= 0) {
 		WARNING("buf shortage (%d)", len);
 		return;
 	}
 	
-	strncat(sact.msgbuf, msg, len);
+	strncat(sact.msgbuf, msg, (size_t)len);
 	sact.msgbuf[MSGBUFMAX -1] = '\0';
 }
 
@@ -253,7 +263,7 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 	if (!is_messagesprite(wNum)) return;
 	
 	// MessageSkip中は文字送り速度を最大に
-	if (sact.waitskiplv > 1 || msgskip_isSkipping()) wSpeed = 0;
+	if (sact_wait_skip_level() > 1 || msgskip_isSkipping()) wSpeed = 0;
 	
 	// shortcut
 	sp = sact.sp[wNum];
@@ -287,8 +297,8 @@ void smsg_out(int wNum, int wSize, int wColorR, int wColorG, int wColorB, int wF
 		}
 		
 		if (rbuf[0] != '\0') {
-			int mlen = strlen(mbuf) * wSize  /2;
-			int rlen = strlen(rbuf) * wRSize /2;
+			int mlen = cjk_display_width(mbuf, nact->encoding) * wSize / 2;
+			int rlen = cjk_display_width(rbuf, nact->encoding) * wRSize / 2;
 			int adjx = max(0, (mlen - rlen) /2);
 			dt_setfont(wRFont, wRSize);
 			dt_drawtext_col(sp->u.msg.canvas,
@@ -417,7 +427,7 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 	struct markinfo minfo[6];
 	int i = 0, j, maxstep;
 	
-	if (sact.waitskiplv > 0 || msgskip_isSkipping()) {
+	if (sact_wait_skip_level() > 0 || msgskip_isSkipping()) {
 		sys_getInputInfo();
 		return 0;
 	}
@@ -444,6 +454,10 @@ int smsg_keywait(int wNum1, int wNum2, int msglen) {
 			i++;
 		} 
 		sys_keywait(interval - (sys_get_ticks() - st), KEYWAIT_NONCANCELABLE);
+#ifdef __SWITCH__
+		if (sact.waitkey == -1 && sact.waittype == KEYWAIT_MESSAGE && sact_wait_skip_level() > 0)
+			sact.waitkey = 0;
+#endif
 	}
 	
 	sact.waittype = KEYWAIT_NONE;
@@ -474,24 +488,35 @@ void smsg_update(sprite_t *sp) {
 		sp->no, sx, sy, w, h, dx, dy);
 }
 
+static int advance_char_display_width(uint8_t **msgp) {
+	if (nact->encoding == UTF8) {
+		const char *p = (const char *)*msgp;
+		int cp = utf8_next_codepoint(&p);
+		*msgp = (uint8_t *)p;
+		return (cp <= 0x7f || (cp >= 0xff61 && cp <= 0xff9f)) ? 1 : 2;
+	}
+	(*msgp)++;
+	return 1;
+}
+
 // 改行を含む文字列バッファ中から、改行までの文字列の長さを取り出す
 static int get_linelen(uint8_t *msg) {
 	int c = 0;
 	
 	while (*msg) {
 		if (*msg == '\n') break;
-		if (0 == strncmp("|RB|", msg, 4)) {
+		if (0 == strncmp("|RB|", (const char *)msg, 4)) {
 			msg += 4;
-			while (*msg != '|') {
-				msg++; c++;
+			while (*msg && *msg != '|') {
+				c += advance_char_display_width(&msg);
 			}
-			msg++;
-			while (*msg != '|') {
+			if (*msg == '|') msg++;
+			while (*msg && *msg != '|') {
 				msg++;
 			}
-			msg++;
+			if (*msg == '|') msg++;
 		} else {
-			msg++; c++;
+			c += advance_char_display_width(&msg);
 		}
 	}
 	return c;
@@ -506,26 +531,37 @@ static uint8_t *get_char(uint8_t *msg, char *mbuf, char *rbuf, int bufmax) {
 		mbuf[0] = '\n';
 		mbuf[1] = msg[1];
 		mbuf[2] = '\0';
-		return msg +2;
+		return msg[1] ? msg + 2 : msg + 1;
 	}
 	
 	// ルビつき文字
-	if (0 == strncmp("|RB|", msg, 4)) {
+	if (0 == strncmp("|RB|", (const char *)msg, 4)) {
 		int i;
 		msg += 4;
-		for (i = 0; *msg != '|' && i < bufmax; i++) {
+		for (i = 0; *msg && *msg != '|' && i < bufmax; i++) {
 			mbuf[i] = *msg++;
 		}
-		msg++; mbuf[i] = '\0';
-		for (i = 0; *msg != '|' && i < bufmax; i++) {
+		mbuf[i] = '\0';
+		while (*msg && *msg != '|')
+			msg++;
+		if (*msg == '|')
+			msg++;
+		for (i = 0; *msg && *msg != '|' && i < bufmax; i++) {
 			rbuf[i] = *msg++;
 		}
-		msg++; rbuf[i] = '\0';
+		rbuf[i] = '\0';
+		while (*msg && *msg != '|')
+			msg++;
+		if (*msg == '|')
+			msg++;
 	} else {
-		uint8_t *p = advance_char(msg, nact->encoding);
-		while (msg < p)
-			*mbuf++ = *msg++;
-		*mbuf = '\0';
+		uint8_t *p = (uint8_t *)advance_char((const char *)msg, nact->encoding);
+		int i = 0;
+		while (msg < p && i < bufmax) {
+			mbuf[i++] = *msg++;
+		}
+		msg = p;
+		mbuf[i] = '\0';
 	}
 	return msg;
 }
@@ -533,9 +569,11 @@ static uint8_t *get_char(uint8_t *msg, char *mbuf, char *rbuf, int bufmax) {
 // バックログ用バッファに追加
 static void append_to_log(char *msg) {
 	if (sact.logging) {
-		int len = MSGBUFMAX - (int)strlen(sact.msgbuf2);
-		strncat(sact.msgbuf2, msg, len);
-		sact.msgbuf2[MSGBUFMAX -1] = '\0';
+		int len = MSGBUFMAX - 1 - (int)strlen(sact.msgbuf2);
+		if (len > 0) {
+			strncat(sact.msgbuf2, msg, (size_t)len);
+			sact.msgbuf2[MSGBUFMAX -1] = '\0';
+		}
 	}
 }
 

@@ -28,6 +28,7 @@
 #include "ald_manager.h"
 
 void muscd_set_playlist(const char *);
+void muscd_reset_playlist(void);
 bool muscd_init(void);
 bool muscd_init_bgm(DRIFILETYPE type, int base_no);
 void muscd_exit(void);
@@ -38,5 +39,10 @@ bool muscd_getpos(int *t, int *m, int *s, int *f);
 int muscd_get_maxtrack(void);
 bool muscd_is_available(void);
 void muscd_reapply_valance(void);
+bool muscd_fadestart(int time, int volume, int stop);
+bool muscd_fading(void);
+void muscd_fadestop(void);
+int muscd_get_volume(void);
+bool muscd_set_volume(int volume);
 
 #endif /* __MUSIC_CDROM_H__ */

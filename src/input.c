@@ -32,6 +32,20 @@
 #include "texthook.h"
 #include "msgskip.h"
 
+#ifdef __SWITCH__
+#include "hub/runtime_menu_engines.h"
+#endif
+
+#define KEYWAIT_MENU_SKIP 8
+
+static bool menu_skip(void) {
+#ifdef __SWITCH__
+	return switch_menu35_ctrl_skip();
+#else
+	return false;
+#endif
+}
+
 static int hak_ignore_mask      = 0xffffffff;
 static int hak_releasewait_mask = (0 << 0) | (0 << 1) | (0 << 2) | (0 << 3) |
                                   (1 << 4) | (0 << 5) | (0 << 6) | (0 << 7) ;
@@ -101,7 +115,7 @@ int sys_keywait(int msec, unsigned flags) {
 
 	int key=0, n;
 	int end = msec == INT_MAX ? INT_MAX : sys_get_ticks() + msec;
-	while (!nact->is_quit &&
+	while (!nact->is_quit && !sys_is_quit_requested() &&
 		   !((flags & KEYWAIT_SKIPPABLE) && msgskip_isSkipping()) &&
 		   (n = end - sys_get_ticks()) > 0) {
 		if (n <= 16)
@@ -112,14 +126,21 @@ int sys_keywait(int msec, unsigned flags) {
 		key = sys_getInputInfo();
 		cancel_yield();  // We just yielded!
 		if ((flags & KEYWAIT_CANCELABLE) && key) break;
-		if ((flags & KEYWAIT_CTRL_CANCELABLE) && RawKeyInfo[KEY_CTRL]) break;
+		if ((flags & KEYWAIT_CTRL_CANCELABLE) && event_rawkey_down(KEY_CTRL)) break;
+		if ((flags & KEYWAIT_MENU_SKIP) && menu_skip()) break;
 	}
+	if (sys_is_quit_requested())
+		nact_quit(false);
 
 	return key;
 }
 
 void sys_hit_any_key() {
 	int key=0;
+	if (menu_skip()) {
+		nact->messagewait_cancelled = false;
+		return;
+	}
 	if (msgskip_isSkipping()) {
 		if (msgskip_getFlags() & MSGSKIP_STOP_ON_CLICK && sys_getInputInfo())
 			msgskip_activate(false);
@@ -133,20 +154,20 @@ void sys_hit_any_key() {
 	if (nact->messagewait_cancelled) {
 		nact->messagewait_cancelled = false;
 		/* consume the input that cancelled message wait */
-		while (!nact->is_quit && !(key & hak_ignore_mask)) {
-			key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE);
+		while (!nact->is_quit && !menu_skip() && !(key & hak_ignore_mask)) {
+			key = sys_keywait(INT_MAX, KEYWAIT_CANCELABLE | KEYWAIT_MENU_SKIP);
 		}
-		while (!nact->is_quit && key & hak_releasewait_mask) {
-			key = sys_keywait(100, KEYWAIT_CANCELABLE);
+		while (!nact->is_quit && !menu_skip() && key & hak_releasewait_mask) {
+			key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_MENU_SKIP);
 		}
 	}
 
-	while (!nact->is_quit && !msgskip_isSkipping() && 0 == (key & hak_ignore_mask)) {
-		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
+	while (!nact->is_quit && !menu_skip() && !msgskip_isSkipping() && 0 == (key & hak_ignore_mask)) {
+		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE | KEYWAIT_MENU_SKIP);
 	}
 	
-	while (!nact->is_quit && !msgskip_isSkipping() && (key & hak_releasewait_mask)) {
-		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE);
+	while (!nact->is_quit && !menu_skip() && !msgskip_isSkipping() && (key & hak_releasewait_mask)) {
+		key = sys_keywait(100, KEYWAIT_CANCELABLE | KEYWAIT_SKIPPABLE | KEYWAIT_MENU_SKIP);
 	}
 }
 

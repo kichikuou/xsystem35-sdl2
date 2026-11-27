@@ -24,6 +24,7 @@
 #define __CURSOR_H__
 
 void cursor_init(void);
+void cursor_reset(void);
 void cursor_load(int no, int linkno);
 void cursor_set_type(int type);
 

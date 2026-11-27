@@ -39,19 +39,26 @@ static void apply_volume(void) {
 }
 
 static bool midi_initialize(int subdev) {
+	current_vol = 100;
+	fade_tick = 0;
 	return mixer_init_midi();
 }
 
 static void midi_exit(void) {
+	midi_stop();
 	mixer_quit_midi();
 }
 
 static void midi_reset(void) {
 	midi_stop();
+	current_vol = 100;
+	fade_tick = 0;
 }
 
 static bool midi_start(int no, int loop, const uint8_t *data, int datalen) {
 	midi_stop();
+	current_vol = 100;
+	fade_tick = 0;
 
 	music = mixer_music_load_midi(data, datalen);
 	if (!music) {

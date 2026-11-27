@@ -101,6 +101,7 @@ static void Init() {
 	
 	if (!nact->files.alk[0]) {
 		WARNING("dDEMO.alk not found");
+		*var = 0;
 		return;
 	}
 	alk_t *alk = alk_new(nact->files.alk[0]);  // dDEMO.alk
@@ -126,6 +127,7 @@ static void Init() {
 		dd.images[i] = SDL_CreateTextureFromSurface(gfx_renderer, sf);
 		SDL_DestroySurface(sf);
 	}
+	alk_free(alk);
 	*var = 1;
 	TRACE("dDemo.Init %d,%d,%d,%p:", p1, p2, p3, var);
 }

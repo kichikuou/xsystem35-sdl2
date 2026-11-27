@@ -52,6 +52,10 @@ struct _dridata {
 typedef struct _dridata dridata;
 
 drifiles *dri_init(const char **file, int cnt, bool use_mmap);
+#ifdef __SWITCH__
+bool dri_validate(const char **files, int count, bool scenario);
+#endif
+drifiles *dri_init_optional(const char *file, bool use_mmap);
 bool dri_is_linked(drifiles *d, int no);
 bool dri_exists(drifiles *d, int no);
 dridata *dri_getdata(drifiles *d, int no);

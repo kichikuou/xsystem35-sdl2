@@ -55,6 +55,7 @@ void commandMP() {
 	const char *fullwidth_blank[CHARACTER_ENCODING_MAX + 1] = {
 		[SHIFT_JIS] = "\x81\x40",
 		[UTF8] = "　",
+		[GBK] = "\xa1\xa1",
 	};
 	const char *src = svar_get(num1);
 	int chars = num2;
@@ -152,6 +153,9 @@ void commandMT(char terminator) {
 	/* ウインドウのタイトル文字列を設定する */
 	const char *str = sl_getString(terminator);
 	
+	if (!sys_isCharacterEncodingLocked() && nact->encoding == SHIFT_JIS && cjk_looks_like_gbk((const uint8_t *)str)) {
+		sys_setDefaultCharacterEncoding(GBK, false);
+	}
 	if (nact->game_title_utf8)
 		free(nact->game_title_utf8);
 	nact->game_title_utf8 = toUTF8(str);

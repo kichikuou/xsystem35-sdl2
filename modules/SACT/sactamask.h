@@ -25,6 +25,7 @@
 #define __SACTAMASK_H__
 
 bool smask_init(const char *path);
+void smask_reset(void);
 void sp_eupdate_amap(int type, int time, int key);
 
 #endif

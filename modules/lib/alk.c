@@ -35,16 +35,38 @@
 
 alk_t *alk_new(const char *path) {
 	mmap_t *m = map_file(path);
-	
+	if (!m)
+		return NULL;
+
+#ifndef _WIN32
+	if (m->length < 8) {
+		WARNING("%s: truncated ALK file", path);
+		unmap_file(m);
+		return NULL;
+	}
+#endif
 	if (0 != strncmp(m->addr, "ALK0", 4)) {
 		WARNING("%s: not an ALK file", path);
 		unmap_file(m);
 		return NULL;
-	}		
+	}
 
 	int nr_entries = LittleEndian_getDW(m->addr, 4);
+	if (nr_entries < 0
+#ifndef _WIN32
+	    || (size_t)nr_entries > (m->length - 8) / 8
+#endif
+	) {
+		WARNING("%s: invalid ALK entry count %d", path, nr_entries);
+		unmap_file(m);
+		return NULL;
+	}
 
 	alk_t *alk = malloc(sizeof(alk_t) + sizeof(struct alk_entry) * nr_entries);
+	if (!alk) {
+		unmap_file(m);
+		return NULL;
+	}
 	alk->mmap = m;
 	alk->datanum = nr_entries;
 
@@ -56,6 +78,8 @@ alk_t *alk_new(const char *path) {
 }
 
 void alk_free(alk_t *alk) {
+	if (!alk)
+		return;
 	unmap_file(alk->mmap);
 	free(alk);
 }

@@ -29,6 +29,14 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #endif
+#ifdef __ANDROID__
+#include <dlfcn.h>
+#include <errno.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/prctl.h>
+#include <sys/resource.h>
+#endif
 
 #include "portab.h"
 #include "system.h"
@@ -36,6 +44,11 @@
 #include "gfx_private.h"
 #include "xsystem35.h"
 #include "image.h"
+#ifdef ALICEHUB_IOS
+#include "EnginePlatform.h"
+#include "mixer.h"
+#include "msgskip.h"
+#endif
 
 static SDL_Window *gfx_window;
 SDL_Renderer *gfx_renderer;
@@ -51,6 +64,262 @@ static bool gfx_integer_scaling;
 static void window_init(const char *render_driver);
 static void makeDIB(int width, int height, int depth);
 
+#ifdef __ANDROID__
+#define EGL_DRAW_SURFACE_ENUM 0x3059
+#define ANDROID_ADPF_TARGET_NS 12500000LL
+#define ANDROID_FRAME_PERIOD_NS 16666667LL
+
+typedef void *(*pfn_eglGetCurrentDisplay_t)(void);
+typedef void *(*pfn_eglGetCurrentSurface_t)(int readdraw);
+typedef void *(*pfn_eglGetProcAddress_t)(const char *procname);
+typedef unsigned int (*pfn_eglPresentationTimeANDROID_t)(void *dpy, void *surf, int64_t time_ns);
+
+typedef struct APerformanceHintManager APerformanceHintManager;
+typedef struct APerformanceHintSession APerformanceHintSession;
+typedef APerformanceHintManager *(*pfn_adpf_get_manager_t)(void);
+typedef APerformanceHintSession *(*pfn_adpf_create_session_t)(
+	APerformanceHintManager *mgr, const int32_t *tids, size_t size, int64_t target_ns);
+typedef int64_t (*pfn_adpf_get_pref_rate_t)(APerformanceHintManager *mgr);
+typedef int (*pfn_adpf_report_work_t)(APerformanceHintSession *sess, int64_t actual_ns);
+typedef void (*pfn_adpf_close_session_t)(APerformanceHintSession *sess);
+
+static void *s_lib_egl = NULL;
+static void *s_lib_android = NULL;
+static pfn_eglGetCurrentDisplay_t s_pfn_egl_cur_dpy = NULL;
+static pfn_eglGetCurrentSurface_t s_pfn_egl_cur_surf = NULL;
+static pfn_eglPresentationTimeANDROID_t s_pfn_egl_pres_time = NULL;
+
+static APerformanceHintSession *s_adpf_session = NULL;
+static pfn_adpf_get_manager_t s_pfn_adpf_get_mgr = NULL;
+static pfn_adpf_create_session_t s_pfn_adpf_create = NULL;
+static pfn_adpf_get_pref_rate_t s_pfn_adpf_get_rate = NULL;
+static pfn_adpf_report_work_t s_pfn_adpf_report = NULL;
+static pfn_adpf_close_session_t s_pfn_adpf_close = NULL;
+static int64_t s_adpf_min_interval_ns = 16000000LL;
+static int64_t s_last_adpf_report_ns = 0;
+
+static int64_t s_last_frame_end_ns = 0;
+static int64_t s_work_start_ns = 0;
+static int64_t s_frame_sleep_ns = 0;
+static int64_t s_work_cputime_start_ns = 0;
+static bool s_android_in_background = false;
+static bool s_adpf_needs_focus_refresh = false;
+
+static inline int64_t android_monotonic_ns(void) {
+	struct timespec ts;
+	if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0)
+		return 0;
+	return (int64_t)ts.tv_sec * 1000000000LL + (int64_t)ts.tv_nsec;
+}
+
+static inline int64_t android_thread_cputime_ns(void) {
+	struct timespec ts;
+	if (clock_gettime(CLOCK_THREAD_CPUTIME_ID, &ts) != 0)
+		return 0;
+	return (int64_t)ts.tv_sec * 1000000000LL + (int64_t)ts.tv_nsec;
+}
+
+static void android_apply_render_thread_sched(void) {
+	/* THREAD_PRIORITY_URGENT_DISPLAY (-8) + 50us timer slack for accurate pacing */
+	setpriority(PRIO_PROCESS, 0, -8);
+	prctl(PR_SET_TIMERSLACK, 50000UL, 0, 0, 0);
+}
+
+static void android_apply_vsync(void) {
+#if XSYSTEM35_SDL_VERSION == 2 && SDL_VERSION_ATLEAST(2, 0, 18)
+	if (gfx_renderer)
+		SDL_RenderSetVSync(gfx_renderer, 1);
+#endif
+}
+
+static void android_reset_pacer_timestamps(void) {
+	s_last_frame_end_ns = 0;
+	s_work_start_ns = 0;
+	s_frame_sleep_ns = 0;
+	s_work_cputime_start_ns = 0;
+}
+
+static void android_adpf_close_session(void) {
+	if (s_adpf_session && s_pfn_adpf_close) {
+		s_pfn_adpf_close(s_adpf_session);
+		s_adpf_session = NULL;
+	}
+	s_last_adpf_report_ns = 0;
+}
+
+static void android_adpf_open_session(void) {
+	if (!s_pfn_adpf_get_mgr || !s_pfn_adpf_create || !s_pfn_adpf_report)
+		return;
+	android_adpf_close_session();
+	APerformanceHintManager *mgr = s_pfn_adpf_get_mgr();
+	if (!mgr)
+		return;
+	if (s_pfn_adpf_get_rate) {
+		int64_t rate = s_pfn_adpf_get_rate(mgr);
+		if (rate > s_adpf_min_interval_ns && rate <= 250000000LL)
+			s_adpf_min_interval_ns = rate;
+	}
+	int32_t tid = (int32_t)gettid();
+	s_adpf_session = s_pfn_adpf_create(mgr, &tid, 1, ANDROID_ADPF_TARGET_NS);
+}
+
+static void android_perf_pacing_init(void) {
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+	SDL_SetHint(SDL_HINT_ANDROID_BLOCK_ON_PAUSE_PAUSEAUDIO, "1");
+	android_apply_render_thread_sched();
+
+	if (!s_lib_egl)
+		s_lib_egl = dlopen("libEGL.so", RTLD_NOW | RTLD_LOCAL);
+	if (s_lib_egl) {
+		s_pfn_egl_cur_dpy = (pfn_eglGetCurrentDisplay_t)dlsym(s_lib_egl, "eglGetCurrentDisplay");
+		s_pfn_egl_cur_surf = (pfn_eglGetCurrentSurface_t)dlsym(s_lib_egl, "eglGetCurrentSurface");
+		pfn_eglGetProcAddress_t get_proc =
+			(pfn_eglGetProcAddress_t)dlsym(s_lib_egl, "eglGetProcAddress");
+		if (get_proc)
+			s_pfn_egl_pres_time = (pfn_eglPresentationTimeANDROID_t)get_proc("eglPresentationTimeANDROID");
+		if (!s_pfn_egl_pres_time)
+			s_pfn_egl_pres_time = (pfn_eglPresentationTimeANDROID_t)dlsym(s_lib_egl, "eglPresentationTimeANDROID");
+	}
+
+	if (!s_lib_android)
+		s_lib_android = dlopen("libandroid.so", RTLD_NOW | RTLD_LOCAL);
+	if (s_lib_android) {
+		s_pfn_adpf_get_mgr = (pfn_adpf_get_manager_t)dlsym(s_lib_android, "APerformanceHint_getManager");
+		s_pfn_adpf_create = (pfn_adpf_create_session_t)dlsym(s_lib_android, "APerformanceHint_createSession");
+		s_pfn_adpf_get_rate = (pfn_adpf_get_pref_rate_t)dlsym(s_lib_android, "APerformanceHint_getPreferredUpdateRateNanos");
+		s_pfn_adpf_report = (pfn_adpf_report_work_t)dlsym(s_lib_android, "APerformanceHint_reportActualWorkDuration");
+		s_pfn_adpf_close = (pfn_adpf_close_session_t)dlsym(s_lib_android, "APerformanceHint_closeSession");
+		android_adpf_open_session();
+	}
+}
+
+static void android_perf_pacing_fini(void) {
+	android_adpf_close_session();
+	android_reset_pacer_timestamps();
+}
+#endif
+
+void gfx_reset_frame_pacer(void) {
+#ifdef __ANDROID__
+	android_reset_pacer_timestamps();
+	android_apply_vsync();
+	android_apply_render_thread_sched();
+	if (!s_android_in_background && !s_adpf_session)
+		android_adpf_open_session();
+#endif
+}
+
+void gfx_android_on_background(void) {
+#ifdef __ANDROID__
+	s_android_in_background = true;
+	s_adpf_needs_focus_refresh = true;
+	android_adpf_close_session();
+	android_reset_pacer_timestamps();
+#endif
+}
+
+void gfx_android_on_foreground(void) {
+#ifdef __ANDROID__
+	bool should_reopen = s_android_in_background || !s_adpf_session || s_adpf_needs_focus_refresh;
+	s_android_in_background = false;
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+	android_apply_vsync();
+	android_apply_render_thread_sched();
+	if (should_reopen) {
+		android_adpf_open_session();
+		s_adpf_needs_focus_refresh = false;
+	}
+	android_reset_pacer_timestamps();
+#endif
+}
+
+void gfx_android_delay(Uint32 ms) {
+#ifdef __ANDROID__
+	int64_t t0 = android_monotonic_ns();
+	SDL_Delay(ms);
+	int64_t t1 = android_monotonic_ns();
+	if (t0 > 0 && t1 > t0)
+		s_frame_sleep_ns += (t1 - t0);
+#else
+	SDL_Delay(ms);
+#endif
+}
+
+void gfx_android_pre_present(void) {
+#ifdef __ANDROID__
+	int64_t work_end_ns = android_monotonic_ns();
+	if (!s_android_in_background && s_adpf_session && s_pfn_adpf_report &&
+	    s_work_start_ns > 0 && work_end_ns > s_work_start_ns) {
+		int64_t wall_elapsed_ns = work_end_ns - s_work_start_ns;
+		int64_t actual_ns = (wall_elapsed_ns > s_frame_sleep_ns)
+			? (wall_elapsed_ns - s_frame_sleep_ns) : 0;
+		int64_t cputime_now_ns = android_thread_cputime_ns();
+		if (s_work_cputime_start_ns > 0 && cputime_now_ns >= s_work_cputime_start_ns) {
+			int64_t cpu_active_ns = cputime_now_ns - s_work_cputime_start_ns;
+			int64_t cap_ns = cpu_active_ns + 4500000LL;
+			if (actual_ns > cap_ns)
+				actual_ns = cap_ns;
+		}
+		if (actual_ns < 500000LL)
+			actual_ns = 500000LL;
+		else if (actual_ns > 20000000LL)
+			actual_ns = 20000000LL;
+		if (actual_ns >= 10500000LL ||
+		    (work_end_ns - s_last_adpf_report_ns) >= s_adpf_min_interval_ns) {
+			s_pfn_adpf_report(s_adpf_session, actual_ns);
+			s_last_adpf_report_ns = work_end_ns;
+		}
+	}
+	s_frame_sleep_ns = 0;
+#endif
+}
+
+void gfx_android_on_pre_swap(void) {
+#ifdef __ANDROID__
+	if (s_last_frame_end_ns > 0 &&
+	    s_pfn_egl_pres_time && s_pfn_egl_cur_dpy && s_pfn_egl_cur_surf) {
+		int64_t now_ns = android_monotonic_ns();
+		int64_t present_ns = s_last_frame_end_ns + 15500000LL;
+		if (now_ns > 0 && present_ns > now_ns && (present_ns - now_ns) < 25000000LL) {
+			void *dpy = s_pfn_egl_cur_dpy();
+			void *surf = dpy ? s_pfn_egl_cur_surf(EGL_DRAW_SURFACE_ENUM) : NULL;
+			if (dpy && surf)
+				s_pfn_egl_pres_time(dpy, surf, present_ns);
+		}
+	}
+#endif
+}
+
+void gfx_android_post_present_wait(void) {
+#ifdef __ANDROID__
+	int64_t after_swap_ns = android_monotonic_ns();
+	if (after_swap_ns > 0) {
+		int64_t target_end_ns = (s_last_frame_end_ns > 0)
+			? (s_last_frame_end_ns + ANDROID_FRAME_PERIOD_NS) : 0;
+		if (target_end_ns > after_swap_ns + 300000LL &&
+		    (target_end_ns - after_swap_ns) < 17000000LL) {
+			struct timespec ts = {
+				.tv_sec  = (time_t)(target_end_ns / 1000000000LL),
+				.tv_nsec = (long)(target_end_ns % 1000000000LL),
+			};
+			while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL) == EINTR) {
+			}
+			after_swap_ns = android_monotonic_ns();
+		}
+		if (target_end_ns > 0 && after_swap_ns >= target_end_ns &&
+		    (after_swap_ns - target_end_ns) < 1500000LL)
+			s_last_frame_end_ns = target_end_ns;
+		else
+			s_last_frame_end_ns = after_swap_ns;
+	} else {
+		s_last_frame_end_ns = 0;
+	}
+	s_work_start_ns = after_swap_ns;
+	s_work_cputime_start_ns = android_thread_cputime_ns();
+	s_frame_sleep_ns = 0;
+#endif
+}
+
 /* SDL の初期化 */
 int gfx_Initialize(const char *render_driver) {
 	window_init(render_driver);
@@ -64,11 +333,20 @@ int gfx_Initialize(const char *render_driver) {
 	// Prevent SDL from calling emscripten_exit_fullscreen on visibilitychange
 	emscripten_set_visibilitychange_callback(NULL, 0, NULL);
 #endif
+#ifdef __ANDROID__
+	android_perf_pacing_init();
+#endif
 
 	return 0;
 }
 
 void gfx_Remove(void) {
+#ifdef ALICEHUB_IOS
+	alicehub_ios_set_background_hook(NULL);
+#endif
+#ifdef __ANDROID__
+	android_perf_pacing_fini();
+#endif
 	if (gfx_palette)
 		SDL_DestroyPalette(gfx_palette);
 	if (main_surface)
@@ -76,6 +354,14 @@ void gfx_Remove(void) {
 	if (gfx_renderer)
 		SDL_DestroyRenderer(gfx_renderer);
 	SDL_Quit();
+#ifdef ALICEHUB_IOS
+	gfx_texture = NULL;
+	gfx_palette = NULL;
+	main_surface = NULL;
+	gfx_renderer = NULL;
+	gfx_window = NULL;
+	gfx_integer_scaling = gfx_fullscreen = false;
+#endif
 }
 
 /* name is UTF-8 */
@@ -86,6 +372,16 @@ EM_JS(void, gfx_setWindowTitle, (char *name), {
 #else
 void gfx_setWindowTitle(char *name) {
 	SDL_SetWindowTitle(gfx_window, name);
+}
+#endif
+
+#ifdef ALICEHUB_IOS
+static void ios_background_changed(SDL_bool backgrounded) {
+	if (backgrounded) {
+		SDL_RenderFlush(gfx_renderer);
+		msgskip_syncFile();
+	}
+	mixer_pause_all(backgrounded);
 }
 #endif
 
@@ -111,7 +407,15 @@ static void window_init(const char *render_driver) {
 #endif
 
 	Uint32 flags = SDL_WINDOW_RESIZABLE;
+#ifdef ALICEHUB_IOS
+	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	flags |= SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI;
+#endif
 #ifdef __ANDROID__
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+	SDL_SetHint(SDL_HINT_ANDROID_BLOCK_ON_PAUSE_PAUSEAUDIO, "1");
+	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 	SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
 	// SDL3 hides the system bars only for a fullscreen window.
 	flags |= SDL_WINDOW_FULLSCREEN;
@@ -119,7 +423,16 @@ static void window_init(const char *render_driver) {
 
 	gfx_window = sdl_CreateWindow(
 		title, SYS35_DEFAULT_WIDTH, SYS35_DEFAULT_HEIGHT, flags);
+#if XSYSTEM35_SDL_VERSION == 2
+#ifdef __ANDROID__
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+#endif
+#endif
 	gfx_renderer = sdl_CreateRenderer(gfx_window);
+#ifdef ALICEHUB_IOS
+	alicehub_ios_set_background_hook(ios_background_changed);
+	alicehub_ios_prepare_window(gfx_window);
+#endif
 #if XSYSTEM35_SDL_VERSION == 3
 #ifdef __ANDROID__
 	SDL_SetDefaultTextureScaleMode(gfx_renderer, SDL_SCALEMODE_LINEAR);
@@ -238,7 +551,7 @@ SDL_Surface *gfx_createSurfaceView(SDL_Surface *sf, int x, int y, int w, int h) 
 }
 
 void gfx_setFullscreen(bool on) {
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !defined(ALICEHUB_IOS)
 	if (on == gfx_fullscreen)
 		return;
 	sdl_SetWindowFullscreen(gfx_window, on);
@@ -260,7 +573,7 @@ void gfx_setViewSize(int w, int h) {
 	view_w = w;
 	view_h = h;
 
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(ALICEHUB_IOS)
 	sdl_SetWindowContentSize(gfx_window, w, h);
 #endif
 	sdl_SetRenderLogicalPresentation(gfx_renderer, w, h, gfx_integer_scaling);

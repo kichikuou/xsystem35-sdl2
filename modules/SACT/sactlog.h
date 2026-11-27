@@ -26,6 +26,7 @@
 
 bool sblog_start(void);
 void sblog_end(void);
+void sblog_reset(void);
 void sblog_pageup(void);
 void sblog_pagedown(void);
 void sblog_pagepre(void);

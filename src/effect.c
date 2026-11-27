@@ -409,27 +409,19 @@ static struct effect *mosaic_new(SDL_Rect *rect, EffectTexture *old, EffectTextu
 }
 
 static void mosaic(EffectTexture *src, SDL_Texture *tmp, SDL_Texture *dst, int w, int h, float scale) {
-	int cx = w / 2;
-	int cy = h / 2;
-	SDL_FRect fr = {
-		.x = cx - cx / scale,
-		.y = cy - cy / scale,
-		.w = w / scale,
-		.h = h / scale,
+	SDL_Rect sample = {
+		.w = max(1, (int)(w / scale)),
+		.h = max(1, (int)(h / scale)),
 	};
 	SDL_SetRenderTarget(gfx_renderer, tmp);
-	sdl_RenderTextureF(gfx_renderer, src->tx, &src->rect, &fr);
+	sdl_RenderTexture(gfx_renderer, src->tx, &src->rect, &sample);
 
-	SDL_Rect dstr = {
-		.x = w * (1 - scale) / 2,
-		.y = h * (1 - scale) / 2,
-		.w = w * scale,
-		.h = h * scale,
-	};
+	// Keep software renderers from allocating a full-size, scale-times-larger surface.
+	SDL_Rect dstr = { .w = w, .h = h };
 	SDL_SetRenderTarget(gfx_renderer, dst);
 
 	SDL_SetTextureScaleMode(tmp, SDL_SCALEMODE_NEAREST);
-	sdl_RenderTexture(gfx_renderer, tmp, NULL, &dstr);
+	sdl_RenderTexture(gfx_renderer, tmp, &sample, &dstr);
 	SDL_SetRenderTarget(gfx_renderer, NULL);
 }
 

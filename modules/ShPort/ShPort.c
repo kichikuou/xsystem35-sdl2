@@ -54,6 +54,7 @@ static void OutputMessageBox(void) { /* 0 */
 	char *msg_utf8 = toUTF8(svar_get(msg));
 
 	sys_show_message_box(MESSAGEBOX_INFO, title_utf8, msg_utf8);
+	*res = 0;
 
 	free(title_utf8);
 	free(msg_utf8);
@@ -99,6 +100,13 @@ static void Init(void) {
 	TRACE_UNIMPLEMENTED("ShPort.Init: %d:", p1);
 }
 
+static void ShPort_reset(void) {
+	for (int i = 0; i < KEYMAP_MAX; i++) {
+		free(keymap[i]);
+		keymap[i] = NULL;
+	}
+}
+
 /**
  * ShPort:InitKeyStatus
  *   指定のキーコードマップの初期化
@@ -107,8 +115,8 @@ static void Init(void) {
 static void InitKeyStatus(void) {
 	int no = getCaliValue();
 	
-	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)", no);
+	if (no <= 0 || no > KEYMAP_MAX) {
+		WARNING("Overflow keymap table(%d)", no);
 		return;
 	}
 	
@@ -133,8 +141,16 @@ static void SetKeyStatus(void) {
 	int key  = getCaliValue();
 	int func = getCaliValue();
 	
-	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)", no);
+	if (no <= 0 || no > KEYMAP_MAX) {
+		WARNING("Overflow keymap table(%d)", no);
+		return;
+	}
+	if (key < 0 || key >= 256) {
+		WARNING("Invalid keycode(%d)", key);
+		return;
+	}
+	if (keymap[no - 1] == NULL) {
+		WARNING("Uninitialized keymap table(%d)", no);
 		return;
 	}
 	
@@ -154,14 +170,18 @@ static void GetKeyStatus(void) {
 	vmvar_t *var = getCaliVariable();
 	int i;
 	
-	if (no >= KEYMAP_MAX) {
-		WARNING("Overflow keymap table(p1)", no);
+	*var = 0;
+	if (no <= 0 || no > KEYMAP_MAX) {
+		WARNING("Overflow keymap table(%d)", no);
+		return;
+	}
+	if (keymap[no - 1] == NULL) {
+		WARNING("Uninitialized keymap table(%d)", no);
 		return;
 	}
 	
-	*var = 0;
-	for (i = 0; i < NUM_KEYCODES; i++) {
-		*var |= (keymap[no -1][i] * RawKeyInfo[i]);
+	for (i = 0; i < NUM_KEYCODES && i < 256; i++) {
+		*var |= (keymap[no -1][i] * event_rawkey_down(i));
 	}
 	
 	TRACE("ShPort.GetKeyStatus: %d,%p:", no, var);
@@ -215,4 +235,4 @@ static const ModuleFunc functions[] = {
 	{"SetKeyStatus", SetKeyStatus},
 };
 
-const Module module_ShPort = {"ShPort", functions, sizeof(functions) / sizeof(ModuleFunc)};
+const Module module_ShPort = {"ShPort", functions, sizeof(functions) / sizeof(ModuleFunc), ShPort_reset};

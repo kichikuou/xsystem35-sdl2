@@ -33,6 +33,32 @@
 #include "s39ain.h"
 #include "xsystem35.h"
 #include "modules.h"
+#include "nact.h"
+#include "utfsjis.h"
+
+static bool s39ain_msg_is_valid_utf8(const uint8_t *s, bool *has_non_ascii) {
+	while (*s) {
+		if (*s < 0x80) {
+			s++;
+		} else if ((s[0] & 0xe0) == 0xc0 && s[0] >= 0xc2 && (s[1] & 0xc0) == 0x80) {
+			*has_non_ascii = true;
+			s += 2;
+		} else if ((s[0] & 0xf0) == 0xe0 && (s[1] & 0xc0) == 0x80 && (s[2] & 0xc0) == 0x80) {
+			if ((s[0] == 0xe0 && s[1] < 0xa0) || (s[0] == 0xed && s[1] >= 0xa0))
+				return false;
+			*has_non_ascii = true;
+			s += 3;
+		} else if ((s[0] & 0xf8) == 0xf0 && s[0] <= 0xf4 && (s[1] & 0xc0) == 0x80 && (s[2] & 0xc0) == 0x80 && (s[3] & 0xc0) == 0x80) {
+			if ((s[0] == 0xf0 && s[1] < 0x90) || (s[0] == 0xf4 && s[1] >= 0x90))
+				return false;
+			*has_non_ascii = true;
+			s += 4;
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
 
 /*
   system39.ain の読み込み
@@ -163,11 +189,50 @@ bool s39ain_init(const char *path_to_ain, S39AIN *ain) {
 		}
 	}
 
+	if (!sys_isCharacterEncodingLocked() && ain->msgnum > 0) {
+		int sjis_err = 0, gbk_err = 0, gbk_valid = 0;
+		int utf8_non_ascii = 0, utf8_err = 0;
+		int step = ain->msgnum > 2000 ? ain->msgnum / 2000 : 1;
+		for (int m = 0; m < ain->msgnum; m += step) {
+			const uint8_t *msg = (const uint8_t *)ain->msg[m];
+			bool has_non_ascii = false;
+			if (s39ain_msg_is_valid_utf8(msg, &has_non_ascii)) {
+				if (has_non_ascii) utf8_non_ascii++;
+			} else {
+				utf8_err++;
+			}
+			cjk_score_sample(msg, &sjis_err, &gbk_err, &gbk_valid);
+		}
+		if (utf8_non_ascii > 0 && utf8_err == 0)
+			sys_setDefaultCharacterEncoding(UTF8, false);
+		else if (gbk_valid > 0 && sjis_err > gbk_err)
+			sys_setDefaultCharacterEncoding(GBK, false);
+	}
+
 	for (i = 0; i < ain->dllnum; i++)
 		resolve_module(&ain->dll[i]);
 
+#ifdef ALICEHUB_IOS
+	ain->file_data = buf;
+#endif
 	return true;
 }
+
+#ifdef ALICEHUB_IOS
+void s39ain_fini(S39AIN *ain) {
+	s39ain_reset(ain);
+	for (int i = 0; i < ain->dllnum; i++) {
+		for (int j = 0; j < ain->dll[i].function_num; j++)
+			free(ain->dll[i].function[j].argv);
+		free(ain->dll[i].function);
+	}
+	free(ain->dll);
+	free(ain->fnc);
+	free(ain->var);
+	free(ain->msg);
+	free(ain->file_data);
+}
+#endif
 
 void s39ain_reset(S39AIN *ain) {
 	for (int i = 0; i < ain->dllnum; i++) {

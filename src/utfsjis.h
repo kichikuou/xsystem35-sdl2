@@ -29,16 +29,19 @@
 typedef enum {
 	SHIFT_JIS,
 	UTF8,
-	CHARACTER_ENCODING_MAX = UTF8
+	GBK,
+	CHARACTER_ENCODING_MAX = GBK
 } CharacterEncoding;
 
 #define MAX_SJIS_BYTES_PAR_CHAR 2
 #define MAX_UTF8_BYTES_PAR_CHAR 4
 #define MAX_BYTES_PAR_CHAR(encoding) \
-	((encoding) == SHIFT_JIS ? MAX_SJIS_BYTES_PAR_CHAR : MAX_UTF8_BYTES_PAR_CHAR)
+	((encoding) == UTF8 ? MAX_UTF8_BYTES_PAR_CHAR : MAX_SJIS_BYTES_PAR_CHAR)
 
 #define UTF8_TRAIL_BYTE(b) ((signed char)(b) < -0x40)
 #define CHECKSJIS1BYTE(b) ( ((b) & 0xe0) == 0x80 || ((b) & 0xe0) == 0xe0 )
+#define CHECKGBK1BYTE(b) ( (unsigned char)(b) >= 0x81 && (unsigned char)(b) <= 0xfe )
+#define CHECKCJK1BYTE(b, enc) ( (enc) == GBK ? CHECKGBK1BYTE(b) : CHECKSJIS1BYTE(b) )
 
 extern char* codeconv(CharacterEncoding tocode,
 					  CharacterEncoding fromcode,
@@ -46,8 +49,19 @@ extern char* codeconv(CharacterEncoding tocode,
 
 extern uint8_t* sjis2utf(const uint8_t *src);
 extern uint8_t* utf2sjis(const uint8_t *src);
+extern uint8_t* gbk2utf(const uint8_t *src);
+extern uint8_t* utf2gbk(const uint8_t *src);
+extern bool chs_tbl_load(const char *path);
+extern bool chs_tbl_load_from_dir(const char *dir_path);
+extern void chs_tbl_reset(void);
+extern bool chs_tbl_is_loaded(void);
+extern void cjk_score_sample(const uint8_t *src, int *sjis_err, int *gbk_err, int *gbk_valid);
+extern bool cjk_looks_like_gbk(const uint8_t *src);
 extern bool sjis_has_hankaku(const uint8_t *src);
 extern bool sjis_has_zenkaku(const uint8_t *src);
+extern bool cjk_has_hankaku(const uint8_t *src, CharacterEncoding enc);
+extern bool cjk_has_zenkaku(const uint8_t *src, CharacterEncoding enc);
+extern int  cjk_display_width(const char *s, CharacterEncoding enc);
 extern int     utf8_next_codepoint(const char **msg);
 
 extern char *advance_char(const char *s, CharacterEncoding e);

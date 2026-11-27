@@ -639,7 +639,7 @@ void commands2F58() {
 	int eNum = getCaliValue();
 	vmvar_t *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_hankaku(svar_get(eNum)) ? 1 : 0;
+	*vResult = cjk_has_hankaku(svar_get(eNum), nact->encoding) ? 1 : 0;
 	
 	TRACE("strCheckASCII %d, %d:", eNum, *vResult);
 }
@@ -648,7 +648,7 @@ void commands2F59() {
 	int eNum = getCaliValue();
 	vmvar_t *vResult = getCaliVariable();
 	
-	*vResult = sjis_has_zenkaku(svar_get(eNum)) ? 1 : 0;
+	*vResult = cjk_has_zenkaku(svar_get(eNum), nact->encoding) ? 1 : 0;
 	
 	TRACE("strCheckSJIS %d, %d:", eNum, *vResult);
 }
@@ -1182,7 +1182,7 @@ void commands2F88() {
 		// is checking if the game CD is inserted. We return 1 in this case.
 		*vResult = 1;
 	} else {
-		char *fname_utf8 = sjis2utf(fname);
+		char *fname_utf8 = toUTF8(fname);
 		*vResult = fc_exists(fname_utf8) ? 1 : 0;
 		free(fname_utf8);
 	}

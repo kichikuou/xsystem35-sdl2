@@ -32,8 +32,34 @@
 
 /* drifiles object */
 static drifiles *dri[DRIFILETYPEMAX];
+static drifiles *dri_overlay[DRIFILETYPEMAX];
 
 static Cache *dri_cache;
+
+#ifdef ALICEHUB_IOS
+static void free_dri(drifiles *archive) {
+	if (!archive)
+		return;
+	for (int i = 0; i < DRIFILEMAX; i++) {
+		if (archive->mmap[i])
+			unmap_file(archive->mmap[i]);
+		free(archive->fnames[i]);
+	}
+	free(archive->link);
+	free(archive->offset);
+	free(archive);
+}
+
+void ald_fini(void) {
+	cache_destroy(dri_cache);
+	dri_cache = NULL;
+	for (int i = 0; i < DRIFILETYPEMAX; i++) {
+		free_dri(dri[i]);
+		free_dri(dri_overlay[i]);
+		dri[i] = dri_overlay[i] = NULL;
+	}
+}
+#endif
 
 #ifndef ALD_CACHE_SIZE
 #define ALD_CACHE_SIZE (10 << 20)
@@ -62,13 +88,21 @@ static bool ald_is_pinned(const void *data) {
 }
 
 bool ald_is_linked(DRIFILETYPE type, int no) {
-	if (type >= DRIFILETYPEMAX || !dri[type])
+	if (type >= DRIFILETYPEMAX)
+		return false;
+	if (dri_overlay[type] && dri_is_linked(dri_overlay[type], no))
+		return true;
+	if (!dri[type])
 		return false;
 	return dri_is_linked(dri[type], no);
 }
 
 bool ald_exists(DRIFILETYPE type, int no) {
-	if (type >= DRIFILETYPEMAX || !dri[type])
+	if (type >= DRIFILETYPEMAX)
+		return false;
+	if (dri_overlay[type] && dri_exists(dri_overlay[type], no))
+		return true;
+	if (!dri[type])
 		return false;
 	return dri_exists(dri[type], no);
 }
@@ -89,16 +123,22 @@ dridata *ald_getdata(DRIFILETYPE type, int no) {
 	/* check wrong type */
 	if (type >= DRIFILETYPEMAX) return NULL;
 	
+	drifiles *src = NULL;
+	if (dri_overlay[type] && dri_exists(dri_overlay[type], no))
+		src = dri_overlay[type];
+	else
+		src = dri[type];
+
 	/* check uninitilized data */
-	if (dri[type] == NULL) return NULL;
+	if (src == NULL) return NULL;
 	
 	/* if mmapped */
-	if (dri[type]->mmapped) return dri_getdata(dri[type], no);
+	if (src->mmapped) return dri_getdata(src, no);
 	
 	/* not mmapped */
 	int key = (type << 16) + no;
 	if (NULL == (ddata = cache_get(dri_cache, &key))) {
-		ddata = dri_getdata(dri[type], no);
+		ddata = dri_getdata(src, no);
 		if (ddata != NULL) {
 			ddata->refcnt = 0;
 			ddata->cached = cache_insert(dri_cache, &key, ddata, ddata->size) == CACHE_INSERT_OK;
@@ -127,11 +167,8 @@ void ald_freedata(dridata *data) {
 	}
 }
 
-void ald_init(int type, const char **file, int cnt, bool use_mmap) {
-	if (type >= DRIFILETYPEMAX || cnt <= 0)
-		return;
-	dri[type] = dri_init(file, cnt, use_mmap);
-	if (!dri[type]->mmapped && !dri_cache) {
+static void ald_ensure_cache(void) {
+	if (!dri_cache) {
 		CacheOps ops = {
 			.key_size = sizeof(int),
 			.hash = int_hash,
@@ -143,10 +180,32 @@ void ald_init(int type, const char **file, int cnt, bool use_mmap) {
 	}
 }
 
+void ald_init(int type, const char **file, int cnt, bool use_mmap) {
+	if (type >= DRIFILETYPEMAX || cnt <= 0)
+		return;
+	dri[type] = dri_init(file, cnt, use_mmap);
+	if (!dri[type]->mmapped)
+		ald_ensure_cache();
+}
+
+void ald_init_overlay(int type, const char *file, bool use_mmap) {
+	if (type >= DRIFILETYPEMAX || !file || !file[0])
+		return;
+	drifiles *ov = dri_init_optional(file, use_mmap);
+	if (!ov)
+		return;
+	dri_overlay[type] = ov;
+	if (!ov->mmapped)
+		ald_ensure_cache();
+}
+
 int ald_get_maxno(DRIFILETYPE type) {
-	if (type >= DRIFILETYPEMAX || !dri[type])
+	if (type >= DRIFILETYPEMAX)
 		return 0;
-	return dri[type]->maxno;
+	int maxno = dri[type] ? dri[type]->maxno : 0;
+	if (dri_overlay[type] && dri_overlay[type]->maxno > maxno)
+		maxno = dri_overlay[type]->maxno;
+	return maxno;
 }
 
 CacheStats ald_get_cache_stats(void) {

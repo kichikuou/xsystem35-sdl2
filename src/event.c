@@ -42,6 +42,15 @@
 #include "msgskip.h"
 #include "hacks.h"
 #include "volume.h"
+#include "mixer.h"
+#include "alicehub_bridge.h"
+#ifdef __SWITCH__
+#include "hub/controller_runtime.h"
+#include "hub/runtime_menu.h"
+#include "hub/runtime_menu_engines.h"
+#include "escalayer_modifier.h"
+#include "gfx_private.h"
+#endif
 
 static void get_event(void);
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed);
@@ -52,12 +61,13 @@ enum CustomEventCode {
 	SIMULATE_RIGHT_BUTTON,
 	DEBUGGER_COMMAND,
 	WIN_MENU_COMMAND,
+	VIRTUAL_MENU_COMMAND,
 };
 
 static SDL_Point mouse_pos;
 static int mouseb;
 static int mouse_wheel_up, mouse_wheel_down;
-bool RawKeyInfo[256];
+static bool RawKeyInfo[NUM_KEYCODES];
 
 /* SDL Joystick */
 static int joyinfo=0;
@@ -186,6 +196,9 @@ static int keytable[SDL_SCANCODE_COUNT] = {
 
 static int joy_device_index = -1;
 static SDL_Joystick *js;
+#ifdef __SWITCH__
+static uint32_t switch_joy_buttons;
+#endif
 
 // id is a device index in SDL2, and an instance ID in SDL3.
 static bool joy_open(int id) {
@@ -247,6 +260,10 @@ void event_remove(void) {
 		SDL_CloseJoystick(js);
 		js = NULL;
 	}
+#ifdef ALICEHUB_IOS
+	custom_event_type = (uint32_t)-1;
+	memset(RawKeyInfo, 0, sizeof(RawKeyInfo));
+#endif
 }
 
 void event_set_joy_device_index(int index) {
@@ -297,6 +314,11 @@ void send_agsevent(enum agsevent_type type, int code) {
 #endif
 }
 
+static void set_raw_key(int code, bool pressed) {
+	RawKeyInfo[code] = pressed;
+	send_agsevent(pressed ? AGSEVENT_KEY_PRESS : AGSEVENT_KEY_RELEASE, code);
+}
+
 void event_set_mouse_internal_location(int x, int y) {
 	mouse_pos.x = x;
 	mouse_pos.y = y;
@@ -314,6 +336,7 @@ SDL_Point event_get_touch_position(const SDL_TouchFingerEvent *e) {
 // touch event. This prevents the game from processing a button down event
 // before reading the pointer position.
 static SDL_TouchFingerEvent deferred_touch_event;
+static int touch_button = 0;
 #define TOUCH_EVENT_DELAY 20
 
 static void defer_touch_event(SDL_TouchFingerEvent *e) {
@@ -354,9 +377,17 @@ static void rance4v2_hack(void) {
 		cancel_yield();
 }
 
-void event_handle_event(SDL_Event *e) {
-	gfx_convertEventCoordinates(e);
-
+static void handle_render_event(SDL_Event *e, bool virtual_input) {
+#ifdef __SWITCH__
+	if (e->type == SDL_EVENT_QUIT) {
+		nact_quit(false);
+		return;
+	}
+	if (switch_controls_touch(e)) {
+		gfx_requestRedraw();
+		return;
+	}
+#endif
 	if (modal_handle_event(e))
 		return;
 
@@ -376,6 +407,9 @@ void event_handle_event(SDL_Event *e) {
 			break;
 		case SDL_WINDOWEVENT_FOCUS_GAINED:
 			volume_on_window_focus(true);
+#ifdef __ANDROID__
+			gfx_android_on_foreground();
+#endif
 			break;
 		}
 		break;
@@ -393,9 +427,27 @@ void event_handle_event(SDL_Event *e) {
 		break;
 	case SDL_EVENT_WINDOW_FOCUS_GAINED:
 		volume_on_window_focus(true);
+#ifdef __ANDROID__
+		gfx_android_on_foreground();
+#endif
 		break;
 #endif
+	case SDL_EVENT_WILL_ENTER_BACKGROUND:
+#ifdef __SWITCH__
+		switch_menu35_release_skip();
+		event_reset_input_state();
+#endif
+#ifdef __ANDROID__
+		gfx_android_on_background();
+		msgskip_syncFile();
+#endif
+		mixer_pause_all(true);
+		break;
 	case SDL_EVENT_DID_ENTER_FOREGROUND:
+#ifdef __ANDROID__
+		gfx_android_on_foreground();
+#endif
+		mixer_pause_all(false);
 		gfx_requestRedraw();
 		break;
 	case SDL_EVENT_KEY_DOWN:
@@ -445,15 +497,30 @@ void event_handle_event(SDL_Event *e) {
 		mouseb &= (0xffffffff ^ (1 << e->button.button));
 		RawKeyInfo[mouse_to_rawkey(e->button.button)] = false;
 		send_agsevent(AGSEVENT_BUTTON_RELEASE, mouse_to_agsevent(e->button.button));
-		if (e->button.button == 2) {
-			menu_open();
+		if (e->button.button == SDL_BUTTON_MIDDLE) {
+			if (virtual_input) {
+				SDL_Event menu = { .user = { .type = custom_event_type, .code = VIRTUAL_MENU_COMMAND } };
+				SDL_PushEvent(&menu);
+			} else {
+				menu_open();
+			}
 		}
 		break;
 
-	case SDL_EVENT_FINGER_DOWN:
-		if (sdl_CountTouchFingers(&e->tfinger) >= 3) {
+	case SDL_EVENT_FINGER_DOWN: {
+#ifdef __SWITCH__
+		int fingers = switch_controls_game_fingers(&e->tfinger);
+#else
+		int fingers = sdl_CountTouchFingers(&e->tfinger);
+#endif
+		alicehub_on_touch_input();
+		if (fingers >= 3) {
+			touch_button = 0;
+			deferred_touch_event.timestamp = 0;
 			menu_open();
-		} else if (sdl_CountTouchFingers(&e->tfinger) >= 2) {
+		} else if (fingers >= 2) {
+			touch_button = SDL_BUTTON_RIGHT;
+			deferred_touch_event.timestamp = 0;
 			mouseb &= ~(1 << SDL_BUTTON_LEFT);
 			mouseb |= 1 << SDL_BUTTON_RIGHT;
 			RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_LEFT)] = false;
@@ -465,6 +532,7 @@ void event_handle_event(SDL_Event *e) {
 			int button;
 			if  (e->tfinger.x == 0.0f || e->tfinger.x == 1.0f || e->tfinger.y == 0.0f || e->tfinger.y == 1.0f) {
 				button = SDL_BUTTON_RIGHT;
+				deferred_touch_event.timestamp = 0;
 				mouseb |= 1 << SDL_BUTTON_RIGHT;
 				RawKeyInfo[mouse_to_rawkey(SDL_BUTTON_RIGHT)] = true;
 			} else {
@@ -473,20 +541,28 @@ void event_handle_event(SDL_Event *e) {
 				send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 				defer_touch_event(&e->tfinger);
 			}
+			touch_button = button;
 			send_agsevent(AGSEVENT_BUTTON_PRESS, mouse_to_agsevent(button));
 		}
 		break;
+	}
 
 	case SDL_EVENT_FINGER_UP:
+#ifdef __SWITCH__
+		if (switch_controls_game_fingers(&e->tfinger) == 0) {
+#else
 		if (sdl_CountTouchFingers(&e->tfinger) == 0) {
-			int ags_button = (mouseb & 1 << SDL_BUTTON_LEFT) ? AGSEVENT_BUTTON_LEFT : AGSEVENT_BUTTON_RIGHT;
+#endif
+			int btn = touch_button ? touch_button : ((mouseb & (1 << SDL_BUTTON_LEFT)) ? SDL_BUTTON_LEFT : SDL_BUTTON_RIGHT);
+			touch_button = 0;
 			mouse_pos = event_get_touch_position(&e->tfinger);
-			send_agsevent(AGSEVENT_BUTTON_RELEASE, ags_button);
+			send_agsevent(AGSEVENT_BUTTON_RELEASE, mouse_to_agsevent(btn));
 			defer_touch_event(&e->tfinger);
 		}
 		break;
 
 	case SDL_EVENT_FINGER_MOTION:
+		alicehub_on_touch_input();
 		mouse_pos = event_get_touch_position(&e->tfinger);
 		send_agsevent(AGSEVENT_MOUSE_MOTION, 0);
 		break;
@@ -495,7 +571,23 @@ void event_handle_event(SDL_Event *e) {
 		joy_open(e->jdevice.which);
 		break;
 
+#ifdef __SWITCH__
+	case SDL_JOYDEVICEREMOVED:
+		if (js && SDL_JoystickInstanceID(js) == e->jdevice.which) {
+			event_remove();
+			joyinfo = 0;
+			switch_joy_buttons = 0;
+			joy_init();
+		}
+		break;
+#endif
+
 	case SDL_EVENT_JOYSTICK_AXIS_MOTION:
+#ifdef __SWITCH__
+		if (e->jaxis.axis > 1)
+			break;
+		joyinfo &= e->jaxis.axis == 0 ? ~0xc : ~3;
+#endif
 		if (abs(e->jaxis.value) < 0x4000) {
 			joyinfo &= e->jaxis.axis == 0 ? ~0xc : ~3;
 		} else {
@@ -525,12 +617,29 @@ void event_handle_event(SDL_Event *e) {
 	case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
 	case SDL_EVENT_JOYSTICK_BUTTON_UP:
 		{
+#ifdef __SWITCH__
+			if (switch_controls_remapping()) {
+				if (js && SDL_JoystickInstanceID(js) == e->jbutton.which) {
+					uint32_t button = switch_controls_joystick_button(e->jbutton.button);
+					if (e->type == SDL_EVENT_JOYSTICK_BUTTON_DOWN)
+						switch_joy_buttons |= button;
+					else
+						switch_joy_buttons &= ~button;
+				}
+				break;
+			}
+#endif
 			int mask = 0;
 			switch (e->jbutton.button) {
 			case 0: case 1: case 2: case 3:
 				mask = 1 << (e->jbutton.button + 4);
 				break;
-#ifdef __EMSCRIPTEN__
+#if defined(__SWITCH__)
+			case 12: mask = SYS35KEY_LEFT;  break;
+			case 13: mask = SYS35KEY_UP;    break;
+			case 14: mask = SYS35KEY_RIGHT; break;
+			case 15: mask = SYS35KEY_DOWN;  break;
+#elif defined(__EMSCRIPTEN__)
 			// Gamepads known to browsers get a "standard" mapping where D-pad
 			// keys are mapped to buttons 12-15.
 			case 12: mask = SYS35KEY_UP;    break;
@@ -564,6 +673,9 @@ void event_handle_event(SDL_Event *e) {
 			case DEBUGGER_COMMAND:
 				dbg_post_command(e->user.data1);
 				break;
+			case VIRTUAL_MENU_COMMAND:
+				menu_open();
+				break;
 #ifdef _WIN32
 			case WIN_MENU_COMMAND:
 				win_menu_onCommand((uintptr_t)e->user.data1);
@@ -575,17 +687,38 @@ void event_handle_event(SDL_Event *e) {
 	}
 }
 
+void event_handle_event(SDL_Event *e) {
+	gfx_convertEventCoordinates(e);
+	handle_render_event(e, false);
+}
+
 /* Event処理 */
 static void get_event(void) {
 	enum scheduler_event scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_MISS;
 
+#ifdef __SWITCH__
+	if (switch_menu35_poll(gfx_renderer)) {
+		event_reset_input_state();
+		deferred_touch_event.timestamp = 0;
+		touch_button = 0;
+		mouse_wheel_up = mouse_wheel_down = 0;
+		if (!switch_menu_lifecycle_pending()) {
+			gfx_requestRedraw();
+			gfx_updateScreen();
+		}
+	}
+	escalayer_modifier_tick();
+#endif
 	fire_deferred_touch_event();
+	alicehub_pump_events();
 
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {
 		scheduler_event = SCHEDULER_EVENT_INPUT_CHECK_HIT;
 		event_handle_event(&e);
 	}
+	if (sys_is_quit_requested())
+		nact_quit(false);
 	scheduler_on_event(scheduler_event);
 	if (game_id == GAME_RANCE4_V2)
 		rance4v2_hack();
@@ -594,8 +727,7 @@ static void get_event(void) {
 /* キー情報の取得 */
 static void keyEventProsess(SDL_KeyboardEvent *e, bool pressed) {
 	int code = keytable[sdl_KeyboardEventScancode(e)];
-	RawKeyInfo[code] = pressed;
-	send_agsevent(pressed ? AGSEVENT_KEY_PRESS : AGSEVENT_KEY_RELEASE, code);
+	set_raw_key(code, pressed);
 }
 
 int event_get_key(void) {
@@ -615,10 +747,21 @@ int event_get_key(void) {
 	return rt;
 }
 
+bool event_rawkey_down(unsigned code) {
+#ifdef __SWITCH__
+	if (code == KEY_CTRL && switch_menu35_ctrl_skip())
+		return true;
+#endif
+	return code < NUM_KEYCODES && RawKeyInfo[code];
+}
+
 void event_reset_input_state(void) {
 	memset(RawKeyInfo, 0, sizeof(RawKeyInfo));
 	mouseb = 0;
 	joyinfo = 0;
+#ifdef __SWITCH__
+	switch_joy_buttons = 0;
+#endif
 }
 
 int event_get_mouse(SDL_Point *p) {
@@ -648,7 +791,89 @@ void event_clear_wheel(void) {
 
 int event_get_joy(void) {
 	get_event();
+#ifdef __SWITCH__
+	if (switch_controls_remapping())
+		return joyinfo | (switch_controls_buttons(switch_joy_buttons) & 0xff);
+#endif
 	return joyinfo;
+}
+
+void event_inject_mouse_motion(int x, int y) {
+#ifdef ALICEHUB_IOS
+	SDL_Event e = { .motion = { .type = SDL_EVENT_MOUSE_MOTION, .x = x, .y = y } };
+	handle_render_event(&e, true);
+#else
+	event_set_mouse_internal_location(x, y);
+#endif
+}
+
+void event_inject_mouse_button(int sdl_button, bool pressed, int x, int y) {
+#ifdef ALICEHUB_IOS
+	SDL_Event e = { .button = {
+		.type = pressed ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP,
+		.button = sdl_button, .x = x >= 0 ? x : mouse_pos.x, .y = y >= 0 ? y : mouse_pos.y,
+	} };
+	handle_render_event(&e, true);
+#else
+	(void)x;
+	(void)y;
+	int rawkey = mouse_to_rawkey(sdl_button);
+	int agsbtn = mouse_to_agsevent(sdl_button);
+	if (pressed)
+		mouseb |= (1 << sdl_button);
+	else
+		mouseb &= ~(1 << sdl_button);
+	if (rawkey)
+		RawKeyInfo[rawkey] = pressed;
+	if (agsbtn)
+		send_agsevent(pressed ? AGSEVENT_BUTTON_PRESS : AGSEVENT_BUTTON_RELEASE, agsbtn);
+#endif
+}
+
+void event_inject_mouse_wheel(int dir) {
+#ifdef ALICEHUB_IOS
+	SDL_Event e = { .wheel = { .type = SDL_EVENT_MOUSE_WHEEL, .y = dir,
+#if XSYSTEM35_SDL_VERSION >= 3
+		.integer_y = dir,
+#endif
+	} };
+	handle_render_event(&e, true);
+#else
+	if (dir > 0)
+		mouse_wheel_up++;
+	else if (dir < 0)
+		mouse_wheel_down++;
+	if (dir != 0)
+		send_agsevent(AGSEVENT_MOUSE_WHEEL, dir);
+#endif
+}
+
+void event_inject_rawkey(int keycode, bool pressed) {
+	if (keycode <= 0 || keycode >= 256)
+		return;
+#ifdef ALICEHUB_IOS
+	for (int i = 1; i < SDL_SCANCODE_COUNT; i++) {
+		if (keytable[i] != keycode)
+			continue;
+		SDL_Event e = { .key = { .type = pressed ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP,
+#if XSYSTEM35_SDL_VERSION == 2
+			.keysym = { .scancode = i, .sym = SDL_GetKeyFromScancode(i) },
+#else
+			.scancode = i, .key = SDL_GetKeyFromScancode(i, SDL_KMOD_NONE, true),
+#endif
+		} };
+		handle_render_event(&e, true);
+		return;
+	}
+#endif
+	set_raw_key(keycode, pressed);
+}
+
+void event_inject_joy_mask(int mask, bool pressed) {
+	if (pressed)
+		joyinfo |= mask;
+	else
+		joyinfo &= ~mask;
 }
 
 void event_post_debugger_command(void *data) {

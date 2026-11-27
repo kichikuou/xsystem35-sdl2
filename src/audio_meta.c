@@ -50,7 +50,12 @@ static char *bgi_gets(char *buf, int n, FILE *fp) {
 	return buf;
 }
 
+void bgi_clear(void) {
+	bgi_nfile = 0;
+}
+
 bool bgi_read(const char *path) {
+	bgi_clear();
 	if (!path)
 		return false;
 
@@ -74,6 +79,7 @@ bool bgi_read(const char *path) {
 		}
 		bgi_nfile++;
 	}
+	fclose(fp);
 	return true;
 }
 
@@ -88,10 +94,15 @@ bgi_t *bgi_find(int no) {
 static int *wai_channels;
 static int wai_count;
 
-static void wai_unload(void) {
+void wai_unload(void) {
 	free(wai_channels);
 	wai_channels = NULL;
 	wai_count = 0;
+}
+
+void audio_meta_fini(void) {
+	bgi_clear();
+	wai_unload();
 }
 
 bool wai_load(const char *path) {

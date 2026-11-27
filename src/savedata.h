@@ -45,6 +45,7 @@ enum save_format {
 struct VarRef;
 
 bool save_setFormat(const char *format_name);
+void save_resetFormat(void);
 int save_loadAll(int no);
 int save_saveAll(int no);
 int save_loadPartial(int no, struct VarRef *vref, int cnt);

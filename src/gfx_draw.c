@@ -43,6 +43,9 @@
 #include "nact.h"
 #include "modal.h"
 #include "debugger.h"
+#ifdef __SWITCH__
+#include "hub/controller_runtime.h"
+#endif
 
 static bool gfx_dirty;
 static gfx_RedrawFunc redraw_handler;
@@ -74,6 +77,12 @@ void gfx_updateScreen(void) {
 	else
 		sdl_RenderTexture(gfx_renderer, gfx_texture, NULL, NULL);
 	modal_render_overlay();
+#ifdef __ANDROID__
+	gfx_android_on_pre_swap();
+#endif
+#ifdef __SWITCH__
+	switch_controls_draw_sdl(gfx_renderer);
+#endif
 	SDL_RenderPresent(gfx_renderer);
 	gfx_dirty = false;
 }

@@ -55,6 +55,13 @@ void commands2F60() {
 	dll[type].function[fnum].entrypoint();
 	return;
 	
- eexit:
-	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)", type, fnum, dll[type].name, dll[type].function[fnum].name);
+ eexit: {
+	const char *dll_name = (type >= 0 && type < nact->ain.dllnum && dll[type].name)
+		? dll[type].name : "<invalid>";
+	const char *fn_name = (type >= 0 && type < nact->ain.dllnum &&
+	                       fnum >= 0 && fnum < dll[type].function_num &&
+	                       dll[type].function && dll[type].function[fnum].name)
+		? dll[type].function[fnum].name : "<invalid>";
+	SYSERROR("Can't continue further scenario.(%d,%d)(%s,%s)", type, fnum, dll_name, fn_name);
+}
 }

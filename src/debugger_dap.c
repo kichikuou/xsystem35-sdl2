@@ -616,9 +616,17 @@ static void dbg_dap_init(const char *path) {
 	SDL_CreateThread(read_command_thread, "Debugger", NULL);
 
 	while (!initialized && !nact->is_quit) {
+		if (sys_is_quit_requested()) {
+			nact_quit(false);
+			break;
+		}
 		SDL_Event e;
-		SDL_WaitEvent(&e);
-		event_handle_event(&e);
+		if (SDL_WaitEventTimeout(&e, 50))
+			event_handle_event(&e);
+		if (sys_is_quit_requested()) {
+			nact_quit(false);
+			break;
+		}
 		while (!msgq_isempty(queue)) {
 			char *msg = msgq_dequeue(queue);
 			if (!msg)
@@ -638,9 +646,17 @@ static void dbg_dap_repl(int bp_no) {
 
 	bool continue_repl = true;
 	while (continue_repl && !nact->is_quit) {
+		if (sys_is_quit_requested()) {
+			nact_quit(false);
+			break;
+		}
 		SDL_Event e;
-		SDL_WaitEvent(&e);
-		event_handle_event(&e);
+		if (SDL_WaitEventTimeout(&e, 50))
+			event_handle_event(&e);
+		if (sys_is_quit_requested()) {
+			nact_quit(false);
+			break;
+		}
 		while (!msgq_isempty(queue)) {
 			char *msg = msgq_dequeue(queue);
 			if (!msg)

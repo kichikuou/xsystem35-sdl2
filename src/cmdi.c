@@ -162,7 +162,7 @@ void commandIG() { /* T2 */
 	int i;
 	
 	for (i = 0; i < cnt; i++) {
-		*var = RawKeyInfo[code + i] ? 1 : 0;
+		*var = event_rawkey_down(code + i) ? 1 : 0;
 		var++;
 	}
 	

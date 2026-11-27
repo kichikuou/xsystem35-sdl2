@@ -33,6 +33,8 @@
 #include "music_pcm.h"
 #include "music_private.h"
 #include "nact.h"
+#include "input.h"
+#include "msgskip.h"
 #include "audio_meta.h"
 #include "mixer.h"
 
@@ -160,6 +162,8 @@ bool muspcm_init(int audio_buffer_size) {
 }
 
 void muspcm_exit(void) {
+	muspcm_reset();
+	wai_unload();
 	mixer_quit();
 }
 
@@ -328,7 +332,11 @@ bool muspcm_isplaying(int slot) {
 
 // 指定のチャンネルの再生が終了するまで待つ
 void muspcm_waitend(int slot) {
-	WARNING("not implemented");
+	if ((unsigned)slot >= PCM_SLOTS)
+		return;
+	while (muspcm_isplaying(slot) && !nact->is_quit && !msgskip_isSkipping()) {
+		sys_keywait(10, KEYWAIT_NONCANCELABLE);
+	}
 }
 
 // Re-apply the valancer levels to all channels.

@@ -42,11 +42,21 @@ static int compare_spriteno_smallfirst(const void *a, const void *b);
 
 
 #define SP_ASSERT_NO(no) do {                                        \
-  if ((no) >= SPRITEMAX) {                                           \
-    WARNING("no is too large (should be %d < %d)", no, SPRITEMAX); \
+  if ((no) < 0 || (no) >= SPRITEMAX) {                               \
+    WARNING("no is out of range (should be 0 <= %d < %d)", no, SPRITEMAX); \
     return;                                                       \
   }                                                                  \
 } while (0)
+
+static sprite_t *sp_ensure(int no) {
+	if (sact.sp[no] == NULL) {
+		sact.sp[no] = calloc(1, sizeof(sprite_t));
+		sact.sp[no]->no   = no;
+		sact.sp[no]->type = SPRITE_NONE;
+		sact.sp[no]->show = false;
+	}
+	return sact.sp[no];
+}
 
 
 // スプライトの番号順に更新するためにリストに順番に要れるためのcallbck
@@ -72,8 +82,6 @@ static void sp_draw_wall(sprite_t *sp) {
  * sprite 関連の初期化
  */
 void sp_init(void) {
-	int i;
-	
 	// DLL用メッセージ表示
 	nact->msgout = smsg_add;
 
@@ -82,18 +90,14 @@ void sp_init(void) {
 
 	// main callback
 	nact->callback = spev_main;
-	
-	// いろいろな理由から全てのスプライトをあらかじめ作成しておく
-	for (i = 0; i < SPRITEMAX; i++) {
-		sact.sp[i] = calloc(1, sizeof(sprite_t));
-		sact.sp[i]->no   = i;
-		sact.sp[i]->type = SPRITE_NONE;
-		sact.sp[i]->show = false;
-	}
-	
+
+	// Allocate sprites lazily so sparse high sprite IDs (e.g. 50000) work cheaply.
+	memset(sact.sp, 0, sizeof(sact.sp));
+	sp_ensure(0);
+
 	// 壁紙(スプライト番号０)はデフォルトへ
 	sp_set_wall_paper(0);
-	
+
 	// 壁紙を updateリストに追加
 	sact.updatelist = slist_append(sact.updatelist, sact.sp[0]);
 }
@@ -117,7 +121,7 @@ void sp_new(int no, int cg1, int cg2, int cg3, int type) {
 	
 	SP_ASSERT_NO(no);
 
-	sp = sact.sp[no];
+	sp = sp_ensure(no);
 
 	if (sp->type != SPRITE_NONE) {
 		sp_free(no);
@@ -183,7 +187,7 @@ void sp_new_msg(int no, int x, int y, int width, int height) {
 	
 	SP_ASSERT_NO(no);
 	
-	sp = sact.sp[no];
+	sp = sp_ensure(no);
 	
 	if (sp->type != SPRITE_NONE) {
 		sp_free(no);
@@ -244,7 +248,9 @@ void sp_free_all(void) {
 	int i;
 	
 	for (i = 1; i < SPRITEMAX; i++) {
-		sp_free(i);
+		if (sact.sp[i] != NULL) {
+			sp_free(i);
+		}
 	}
 }
 
@@ -255,6 +261,9 @@ void sp_free(int no) {
 	SP_ASSERT_NO(no);
 	
 	sp = sact.sp[no];
+	if (sp == NULL) {
+		return;
+	}
 
 	// 移動開始していない場合はリストから削除
 	if (!sp->move.moving) {
@@ -298,16 +307,13 @@ void sp_free(int no) {
 // 表示状態の変更
 void sp_set_show(int wNum, int wCount, int sShow) {
 	int i;
-	bool oldstate;
 	sprite_t *sp;
 	
 	SP_ASSERT_NO(wNum);
 	
 	for (i = wNum; i < (wNum + wCount); i++) {
-		if (i >= (SPRITEMAX -1)) break;
-		sp = sact.sp[i];
-		oldstate = sp->show;
-		
+		if (i >= SPRITEMAX) break;
+		sp = sp_ensure(i);
 		sp->show = sShow == 1;
 	}
 }
@@ -318,7 +324,7 @@ void sp_set_pos(int wNum, int wX, int wY) {
 	
 	SP_ASSERT_NO(wNum);
 	
-	sp = sact.sp[wNum];
+	sp = sp_ensure(wNum);
 	sp->loc.x = wX - sact.origin.x;
 	sp->loc.y = wY - sact.origin.y;
 	sp->cur.x = sp->loc.x;
@@ -331,7 +337,7 @@ void sp_set_move(int wNum, int wX, int wY) {
 	
 	SP_ASSERT_NO(wNum);
 	
-	sp = sact.sp[wNum];
+	sp = sp_ensure(wNum);
 	sp->move.to.x = wX - sact.origin.x;
 	sp->move.to.y = wY - sact.origin.y;
 	
@@ -349,8 +355,9 @@ void sp_set_move(int wNum, int wX, int wY) {
 void sp_set_movetime(int wNum, int wTime) {
 	SP_ASSERT_NO(wNum);
 	
-	sact.sp[wNum]->move.time = wTime * 10;
-	sact.sp[wNum]->move.speed = 0;
+	sprite_t *sp = sp_ensure(wNum);
+	sp->move.time = wTime * 10;
+	sp->move.speed = 0;
 }
 
 // スプライト移動速度の設定
@@ -359,8 +366,9 @@ void sp_set_movespeed(int wNum, int wSpeed) {
 	
 	if (wSpeed == 0) wSpeed = 1;
 	
-	sact.sp[wNum]->move.speed = wSpeed;
-	sact.sp[wNum]->move.time = 0;
+	sprite_t *sp = sp_ensure(wNum);
+	sp->move.speed = wSpeed;
+	sp->move.time = 0;
 }
 
 // Zキーを押したときに隠すスプライトの登録
@@ -368,7 +376,7 @@ void sp_add_zkey_hidesprite(int wNum) {
 	sprite_t *sp;
 	
 	SP_ASSERT_NO(wNum);
-	sp = sact.sp[wNum];
+	sp = sp_ensure(wNum);
 
 	// 登録時点でまだ生成していないスプライトは隠さない
 	//   シェルクレイルでまずいのがあったので中止
@@ -390,7 +398,7 @@ void sp_freeze_sprite(int wNum, int wIndex) {
 	
 	SP_ASSERT_NO(wNum);
 	
-	sp = sact.sp[wNum];
+	sp = sp_ensure(wNum);
 	sp->freezed_state = wIndex;
 
 	oldstate = (void *)sp->curcg;
@@ -408,14 +416,16 @@ void sp_freeze_sprite(int wNum, int wIndex) {
 void sp_thaw_sprite(int wNum) {
 	SP_ASSERT_NO(wNum);
 	
-	sact.sp[wNum]->freezed_state = 0;
+	if (sact.sp[wNum] != NULL) {
+		sact.sp[wNum]->freezed_state = 0;
+	}
 }
 
 // SP_QUAKEで揺らすスプライトの登録
 void sp_add_quakesprite(int wNum) {
 	SP_ASSERT_NO(wNum);
 	
-	sact.sp_quake = slist_append(sact.sp_quake, sact.sp[wNum]);
+	sact.sp_quake = slist_append(sact.sp_quake, sp_ensure(wNum));
 }
 
 // 上で登録したスプライトの削除
@@ -428,7 +438,7 @@ void sp_clear_quakesprite_all(void) {
 void sp_set_animeinterval(int wNum, int wTime) {
 	SP_ASSERT_NO(wNum);
 
-	if (sact.sp[wNum]->type != SPRITE_ANIME) return;
+	if (sact.sp[wNum] == NULL || sact.sp[wNum]->type != SPRITE_ANIME) return;
 	
 	sact.sp[wNum]->u.anime.interval = wTime * 10;
 }
@@ -441,16 +451,16 @@ void sp_set_blendrate(int wNum, int wCount, int rate) {
 	SP_ASSERT_NO(wNum);
 	
 	for (i = wNum; i < (wNum + wCount); i++) {
-		if (i >= (SPRITEMAX -1)) break;
-		sp = sact.sp[i];
+		if (i >= SPRITEMAX) break;
+		sp = sp_ensure(i);
 		sp->blendrate = rate;
 	}
 }
 
 // スプライトが create されているかどうかの取得
 bool sp_exists(int wNum) {
-	if (wNum >= SPRITEMAX) return false;
-	if (sact.sp[wNum]->type == SPRITE_NONE) return false;
+	if (wNum < 0 || wNum >= SPRITEMAX) return false;
+	if (sact.sp[wNum] == NULL || sact.sp[wNum]->type == SPRITE_NONE) return false;
 	return true;
 }
 
@@ -458,10 +468,10 @@ bool sp_exists(int wNum) {
 bool sp_query_info(int wNum, vmvar_t *vtype, vmvar_t *vcg1, vmvar_t *vcg2, vmvar_t *vcg3) {
 	sprite_t *sp;
 	
-	if (wNum >= SPRITEMAX) goto errexit;
+	if (wNum < 0 || wNum >= SPRITEMAX) goto errexit;
 
 	sp = sact.sp[wNum];
-	if (sp->type == SPRITE_NONE) goto errexit;
+	if (sp == NULL || sp->type == SPRITE_NONE) goto errexit;
 	
 	*vtype = sp->type;
 	*vcg1 = sp->cg1 ? sp->cg1->no : 0;
@@ -480,8 +490,8 @@ bool sp_query_info(int wNum, vmvar_t *vtype, vmvar_t *vcg1, vmvar_t *vcg2, vmvar
 
 // スプライトの表示状態の取得
 bool sp_query_show(int wNum, vmvar_t *vShow) {
-	if (wNum >= SPRITEMAX) goto errexit;
-	if (sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
+	if (wNum < 0 || wNum >= SPRITEMAX) goto errexit;
+	if (sact.sp[wNum] == NULL || sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
 
 	*vShow = sact.sp[wNum]->show ? 1: 0;
 	return true;
@@ -493,8 +503,8 @@ bool sp_query_show(int wNum, vmvar_t *vShow) {
 
 // スプライトの表示位置の取得
 bool sp_query_pos(int wNum, vmvar_t *vx, vmvar_t *vy) {
-	if (wNum >= SPRITEMAX) goto errexit;
-	if (sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
+	if (wNum < 0 || wNum >= SPRITEMAX) goto errexit;
+	if (sact.sp[wNum] == NULL || sact.sp[wNum]->type == SPRITE_NONE) goto errexit;
 
 	*vx = sact.sp[wNum]->loc.x;
 	*vy = sact.sp[wNum]->loc.y;
@@ -510,11 +520,11 @@ bool sp_query_pos(int wNum, vmvar_t *vx, vmvar_t *vy) {
 bool sp_query_size(int wNum, vmvar_t *vw, vmvar_t *vh) {
 	sprite_t *sp;
 	
-	if (wNum >= SPRITEMAX) goto errexit;
+	if (wNum < 0 || wNum >= SPRITEMAX) goto errexit;
 
 	sp = sact.sp[wNum];
 
-	if (sp->type == SPRITE_NONE) goto errexit;
+	if (sp == NULL || sp->type == SPRITE_NONE) goto errexit;
 
 	*vw = sp->width;
 	*vh = sp->height;
@@ -529,9 +539,9 @@ bool sp_query_size(int wNum, vmvar_t *vw, vmvar_t *vh) {
 
 // テキストスプライトの現在の文字表示位置の取得
 bool sp_query_textpos(int wNum, vmvar_t *vx, vmvar_t *vy) {
-	if (wNum >= SPRITEMAX) goto errexit;
+	if (wNum < 0 || wNum >= SPRITEMAX) goto errexit;
 	sprite_t *sp = sact.sp[wNum];
-	if (sp->type != SPRITE_MSG) goto errexit;
+	if (sp == NULL || sp->type != SPRITE_MSG) goto errexit;
 
 	*vx = sp->u.msg.dspcur.x + sp->loc.x;
 	*vy = sp->u.msg.dspcur.y + sp->loc.y;
@@ -547,44 +557,46 @@ bool sp_query_textpos(int wNum, vmvar_t *vx, vmvar_t *vy) {
 void sp_num_setcg(int nNum, int nIndex, int nCG) {
 	SP_ASSERT_NO(nNum);
 
-	sact.sp[nNum]->numeral.cg[nIndex] = nCG;
+	sp_ensure(nNum)->numeral.cg[nIndex] = nCG;
 }
 
 // NumeralXXXのCGの取得
 void sp_num_getcg(int nNum, int nIndex, vmvar_t *vCG) {
 	SP_ASSERT_NO(nNum);
 	
-	*vCG = sact.sp[nNum]->numeral.cg[nIndex];
+	*vCG = sp_ensure(nNum)->numeral.cg[nIndex];
 }
 
 // NumeralXXXの位置のセット
 void sp_num_setpos(int nNum, int nX, int nY) {
 	SP_ASSERT_NO(nNum);
 
-	sact.sp[nNum]->numeral.pos.x = nX;
-	sact.sp[nNum]->numeral.pos.y = nY;
+	sprite_t *sp = sp_ensure(nNum);
+	sp->numeral.pos.x = nX;
+	sp->numeral.pos.y = nY;
 }
 
 // NumeralXXXの位置の取得
 void sp_num_getpos(int nNum, vmvar_t *vX, vmvar_t *vY) {
 	SP_ASSERT_NO(nNum);
 	
-	*vX = sact.sp[nNum]->numeral.pos.x;
-	*vY = sact.sp[nNum]->numeral.pos.y;
+	sprite_t *sp = sp_ensure(nNum);
+	*vX = sp->numeral.pos.x;
+	*vY = sp->numeral.pos.y;
 }
 
 // NumeralXXXのスパンのセット
 void sp_num_setspan(int nNum, int nSpan) {
 	SP_ASSERT_NO(nNum);
 	
-	sact.sp[nNum]->numeral.span = nSpan;
+	sp_ensure(nNum)->numeral.span = nSpan;
 }
 
 // NumeralXXXのスパンの取得
 void sp_num_getspan(int nNum, vmvar_t *vSpan) {
 	SP_ASSERT_NO(nNum);
 
-	*vSpan = sact.sp[nNum]->numeral.span;
+	*vSpan = sp_ensure(nNum)->numeral.span;
 }
 
 // すべての説明スプライトの削除
@@ -604,8 +616,8 @@ void sp_exp_add(int nNumSP1, int nNumSP2) {
 	SP_ASSERT_NO(nNumSP1);
 	SP_ASSERT_NO(nNumSP2);
 
-	swsp  = sact.sp[nNumSP1];
-	expsp = sact.sp[nNumSP2];
+	swsp  = sp_ensure(nNumSP1);
+	expsp = sp_ensure(nNumSP2);
 	
 	swsp->expsp = slist_append(swsp->expsp, expsp);
 }
@@ -617,6 +629,7 @@ void sp_exp_del(int nNum) {
 	SP_ASSERT_NO(nNum);
 	
 	sp  = sact.sp[nNum];
+	if (sp == NULL) return;
 	
 	slist_free(sp->expsp);
 	sp->expsp = NULL;
@@ -628,7 +641,7 @@ void sp_sound_set(int wNumSP, int wNumWave1, int wNumWave2, int wNumWave3) {
 	
 	SP_ASSERT_NO(wNumSP);
 
-	sp  = sact.sp[wNumSP];
+	sp  = sp_ensure(wNumSP);
 	sp->numsound1 = wNumWave1;
 	sp->numsound2 = wNumWave2;
 	sp->numsound3 = wNumWave3;

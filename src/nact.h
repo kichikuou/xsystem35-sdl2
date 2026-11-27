@@ -42,6 +42,11 @@
 extern void sys_addMsg(const char *str);
 extern void sys_setHankakuMode(int mode);
 extern void sys_setCharacterEncoding(CharacterEncoding encoding);
+extern void sys_setDefaultCharacterEncoding(CharacterEncoding encoding, bool locked);
+#ifdef ALICEHUB_IOS
+extern void sys_resetCharacterEncoding(void);
+#endif
+extern bool sys_isCharacterEncodingLocked(void);
 
 extern void nact_main();
 extern void nact_init();
@@ -51,6 +56,8 @@ extern void nact_quit(bool restart);
 // cmd_check.c
 extern void exec_command(void);
 
+// cmdf.c
+void cmdf_reset(void);
 // cmdv.c
 void va_animation(void);
 void va_reset(void);

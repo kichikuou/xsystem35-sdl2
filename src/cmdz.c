@@ -445,7 +445,7 @@ void commandZZ13() {
 			num = FONT_GOTHIC;
 	}
 #endif
-	if (num < FONTTYPEMAX)
+	if (num >= 0 && num < FONTTYPEMAX)
 		nact->ags.font_type = num;
 	
 	TRACE("ZZ13 %d:",num);
@@ -533,7 +533,7 @@ void commandZU() {
 	/* xsystem35 extension: sets unicode mode */
 	int sw = getCaliValue();
 
-	if (sw <= CHARACTER_ENCODING_MAX)
+	if (sw >= 0 && sw <= CHARACTER_ENCODING_MAX)
 		sys_setCharacterEncoding(sw);
 
 	TRACE("ZU %d:",sw);

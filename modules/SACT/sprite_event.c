@@ -422,6 +422,14 @@ static void cb_waitkey_backlog(agsevent_t *e) {
 	}
 }
 
+int sact_wait_skip_level(void) {
+#ifdef __SWITCH__
+	return event_rawkey_down(KEY_CTRL) ? 2 : 0;
+#else
+	return sact.waitskiplv;
+#endif
+}
+
 /*
   X|SDL のイベントディスパッチャからくる最初の場所
 */
@@ -477,4 +485,3 @@ void spev_add_eventlistener(sprite_t *sp, int (*cb)(sprite_t *, agsevent_t *)) {
 void spev_remove_eventlistener(sprite_t *sp) {
 	sact.eventlisteners = slist_remove(sact.eventlisteners, sp);
 }
-

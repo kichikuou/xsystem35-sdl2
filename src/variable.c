@@ -118,6 +118,21 @@ vmvar_t *v_ref_indexed(int var, int index, struct VarRef *ref) {
 	return varPage[page].value + index;
 }
 
+int v_boundSliceSize(const struct VarRef *ref) {
+	if (!ref || ref->page <= 0 || ref->page >= PAGE_MAX || !varPage[ref->page].value)
+		return 0;
+	int start = ref->index;
+	int end = varPage[ref->page].size;
+	if (start < 0 || start >= end)
+		return 0;
+	for (int i = 0; i < SYSVAR_MAX; i++) {
+		if (attributes[i].page == ref->page && attributes[i].offset > start && attributes[i].offset < end) {
+			end = attributes[i].offset;
+		}
+	}
+	return end - start;
+}
+
 // DC command
 bool v_allocatePage(int page, int size, bool saveflag) {
 	if (page <  0 || page >= PAGE_MAX) { return false; }
@@ -287,7 +302,7 @@ size_t svar_length(int no) {
 
 /* Width of a string (2 for full-width characters, 1 for half-width) */
 int svar_width(int no) {
-	return strlen(svar_get(no));
+	return cjk_display_width(svar_get(no), encoding);
 }
 
 /* 文字変数そのもの */
@@ -325,6 +340,37 @@ void svar_fromVars(int no, const vmvar_t *vars) {
 		WARNING("string index out of range: %d", no);
 		return;
 	}
+	if (encoding == UTF8) {
+		size_t len = 0;
+		for (const vmvar_t *c = vars; *c; c++) {
+			uint16_t cp = (uint16_t)*c;
+			if (cp <= 0x7f)
+				len += 1;
+			else if (cp <= 0x7ff)
+				len += 2;
+			else
+				len += 3;
+		}
+		if (strVar[no])
+			free(strVar[no]);
+		uint8_t *p = malloc(len + 1);
+		strVar[no] = (char *)p;
+		for (const vmvar_t *v = vars; *v; v++) {
+			uint16_t cp = (uint16_t)*v;
+			if (cp <= 0x7f) {
+				*p++ = (uint8_t)cp;
+			} else if (cp <= 0x7ff) {
+				*p++ = (uint8_t)(0xc0 | (cp >> 6));
+				*p++ = (uint8_t)(0x80 | (cp & 0x3f));
+			} else {
+				*p++ = (uint8_t)(0xe0 | (cp >> 12));
+				*p++ = (uint8_t)(0x80 | ((cp >> 6) & 0x3f));
+				*p++ = (uint8_t)(0x80 | (cp & 0x3f));
+			}
+		}
+		*p = '\0';
+		return;
+	}
 	int len = 0;
 	for (const vmvar_t *c = vars; *c; c++)
 		len += (*c < 256) ? 1 : 2;
@@ -355,9 +401,21 @@ int svar_toVars(int no, vmvar_t *vars) {
 	}
 
 	int count = 0;
+	if (encoding == UTF8) {
+		const char *p = strVar[no];
+		while (*p) {
+			int cp = utf8_next_codepoint(&p);
+			if (cp <= 0 || cp > 0xffff)
+				cp = 0xfffd;
+			vars[count++] = (vmvar_t)cp;
+		}
+		vars[count++] = 0;
+		return count;
+	}
+
 	for (const char *p = strVar[no]; *p; p++, count++) {
 		vars[count] = *p & 0xff;
-		if (CHECKSJIS1BYTE(*p) && *(p + 1))
+		if (CHECKCJK1BYTE(*p, encoding) && *(p + 1))
 			vars[count] |= (*++p & 0xff) << 8;
 	}
 	vars[count++] = 0;
@@ -367,10 +425,10 @@ int svar_toVars(int no, vmvar_t *vars) {
 int svar_getCharType(int no, int pos) {
 	const char *p = svar_get(no);
 	for (; *p && pos > 0; pos--)
-		p += CHECKSJIS1BYTE(*p) ? 2 : 1;
+		p = advance_char(p, encoding);
 	if (!*p)
 		return 0;
-	return CHECKSJIS1BYTE(*p) ? 2 : 1;
+	return advance_char(p, encoding) - p > 1 ? 2 : 1;
 }
 
 void svar_replaceAll(int no, int pattern, int replacement) {

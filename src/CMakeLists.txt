@@ -27,7 +27,9 @@ add_library(src_lib STATIC
 target_compile_options(src_lib PRIVATE -Wno-pointer-sign -Wall)
 target_include_directories(src_lib PRIVATE .)
 
-if (ANDROID)
+if (ALICEHUB_IOS)
+  add_library(xsystem35 STATIC)
+elseif (ANDROID)
   add_library(xsystem35 SHARED)
 else()
   add_executable(xsystem35)
@@ -121,6 +123,8 @@ if (EMSCRIPTEN)
   target_sources(xsystem35 PRIVATE midi.emscripten.c)
 elseif (ANDROID)
   target_sources(xsystem35 PRIVATE midi.android.c)
+elseif (ALICEHUB_IOS OR NINTENDO_SWITCH)
+  target_sources(xsystem35 PRIVATE midi.tsf.c)
 else()
   target_sources(xsystem35 PRIVATE midi.sdlmixer.c)
   if (ENABLE_MIDI_PORTMIDI)
@@ -190,7 +194,26 @@ if (EMSCRIPTEN)
     )
 
 elseif (ANDROID)
+  target_sources(xsystem35 PRIVATE alicehub_bridge.c escalayer_modifier.c cJSON.c)
   target_link_libraries(xsystem35 PRIVATE ${ndk_log})
+  target_link_options(xsystem35 PRIVATE "LINKER:-z,max-page-size=16384")
+  install(TARGETS xsystem35 LIBRARY DESTINATION lib)
+
+elseif (ALICEHUB_IOS)
+  target_sources(xsystem35 PRIVATE alicehub_bridge.c escalayer_modifier.c cJSON.c)
+  install(TARGETS xsystem35 src_lib ARCHIVE DESTINATION lib)
+  install(FILES xsystem35_main.h DESTINATION include)
+
+elseif (NINTENDO_SWITCH)
+  include(../../cmake/switch/Packaging.cmake)
+  target_sources(xsystem35 PRIVATE escalayer_modifier.c cJSON.c
+    ../../cmake/switch/hub/runtime_menu_system35.c)
+  target_include_directories(xsystem35 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+  target_link_libraries(xsystem35 PRIVATE freetype2)
+  set(romfs "${CMAKE_CURRENT_BINARY_DIR}/romfs")
+  file(COPY "${PROJECT_SOURCE_DIR}/fonts" "${PROJECT_SOURCE_DIR}/soundfonts" DESTINATION "${romfs}")
+  target_compile_definitions(xsystem35 PRIVATE ALICEHUB_SWITCH_XSYSTEM35 SDL_MAIN_HANDLED)
+  alicehub_switch_package(xsystem35 "${romfs}")
 
 else()  # non-emscripten, non-android
   if (TARGET cJSON)
@@ -214,7 +237,34 @@ else()  # non-emscripten, non-android
   target_compile_options(src_tests PRIVATE -Wno-pointer-sign -Wall)
   target_compile_definitions(src_tests PRIVATE
       TEST_FONT_DIR="${PROJECT_SOURCE_DIR}/fonts")
-  target_link_libraries(src_tests PRIVATE src_lib sdl)
+  target_link_libraries(src_tests PRIVATE src_lib sdl freetype2)
   add_test(NAME src_tests COMMAND src_tests)
+
+  # Exercise message cursor/capture state without a window or game assets.
+  add_executable(message_tests message_test.c message.c)
+  target_compile_options(message_tests PRIVATE -Wno-pointer-sign -Wall)
+  target_link_libraries(message_tests PRIVATE sdl)
+  add_test(NAME message_tests COMMAND message_tests)
+
+  add_executable(effect_tests effect_test.c effect.c)
+  target_compile_options(effect_tests PRIVATE -Wno-pointer-sign -Wall)
+  target_link_libraries(effect_tests PRIVATE src_lib sdl m)
+  add_test(NAME effect_tests COMMAND effect_tests)
+  set_tests_properties(effect_tests PROPERTIES
+    ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy"
+    TIMEOUT 10)
+
+  # Exercise BGM-backed CD fade/volume handling with deterministic ticks.
+  add_executable(music_cdrom_tests
+    music_cdrom_test.c
+    music.c
+    music_cdrom.c
+    cdrom.bgm.c
+    bgm.sdlmixer.c
+    )
+  target_compile_options(music_cdrom_tests PRIVATE -Wno-pointer-sign -Wall)
+  target_include_directories(music_cdrom_tests PRIVATE . ${SDL_INCLUDE_DIRS})
+  target_link_libraries(music_cdrom_tests PRIVATE m)
+  add_test(NAME music_cdrom_tests COMMAND music_cdrom_tests)
   file(COPY testdata DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()

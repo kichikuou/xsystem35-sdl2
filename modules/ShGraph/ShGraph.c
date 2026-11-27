@@ -206,9 +206,9 @@ static void ResetAnimeData() {
 	TRACE("ShGraph.ResetAnimeData %d:", no);
 	
 	if (no > 0 && no <= SLOT) {
-		memset(&src[no-1], 0, sizeof(struct animsrc));
-		memset(&s0[no-1],  0, sizeof(struct _s2));
-		memset(&s2[no-1],  0, sizeof(struct _s0));
+		memset(&src[no-1], 0, sizeof(src[no-1]));
+		memset(&s0[no-1],  0, sizeof(s0[no-1]));
+		memset(&s2[no-1],  0, sizeof(s2[no-1]));
 	} else {
 		memset(src, 0, sizeof(struct animsrc) * SLOT);
 		memset(s0,  0, sizeof(struct _s0) * SLOT);
@@ -477,13 +477,17 @@ static void PlayAnimeData() {
 				
 				if (wavno != 0) {
 					if (wavno > 255) {
-						mus_pcm_stop(wavno % 255);
+						mus_wav_stop(wavno % 256);
 					}
 					// printf("wavPlay %d\n", wavno % 256);
 					mus_wav_play(wavno % 256, 1);
 					s1[i].add_p6 = 0;
 				}
 				
+				if (srcno < 0 || srcno >= SLOT || dstno < 0 || dstno >= SLOT ||
+				    !add_p5[i] || !s0[dstno].dst_p1 || !s0[dstno].dst_p2 || src[srcno].uw <= 0)
+					continue;
+
 				sx = src[srcno].x + (*add_p5[i] % src[srcno].uw) * src[srcno].w;
 				sy = src[srcno].y + (*add_p5[i] / src[srcno].uw) * src[srcno].h;
 				
@@ -534,6 +538,18 @@ static void PlayAnimeData() {
 	}
 }
 
+static void ShGraph_reset(void) {
+	memset(&maprect, 0, sizeof(maprect));
+	memset(&mapback, 0, sizeof(mapback));
+	mapback_p5 = 0;
+	mapback_p6 = 0;
+	memset(src, 0, sizeof(src));
+	memset(s0, 0, sizeof(s0));
+	memset(s1, 0, sizeof(s1));
+	memset(s2, 0, sizeof(s2));
+	memset(add_p5, 0, sizeof(add_p5));
+}
+
 static const ModuleFunc functions[] = {
 	{"AddAnimeData", AddAnimeData},
 	{"AddAnimeRemain", AddAnimeRemain},
@@ -549,4 +565,4 @@ static const ModuleFunc functions[] = {
 	{"SetAnimeSrc", SetAnimeSrc},
 };
 
-const Module module_ShGraph = {"ShGraph", functions, sizeof(functions) / sizeof(ModuleFunc)};
+const Module module_ShGraph = {"ShGraph", functions, sizeof(functions) / sizeof(ModuleFunc), ShGraph_reset};

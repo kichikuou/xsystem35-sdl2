@@ -151,7 +151,10 @@ void msg_nextLine() {
 	// puts("next Line");
 	if (msg.mg_getString) {
 		msgget_at_r();
-		return;
+		// Capturing a backlog and displaying it are independent. Keep the
+		// visible cursor in sync with R even when MG also captures the text.
+		if (!msg.mg_dspMsg)
+			return;
 	}
 	
 	msgcur.x  = msg.win->x;
@@ -285,6 +288,7 @@ void msg_hitAnyKey() {
 	const char *prompt[CHARACTER_ENCODING_MAX + 1] = {
 		[SHIFT_JIS] = "\x81\xa5",
 		[UTF8] = "▼",
+		[GBK] = "\xa8\x8b",
 	};
 	
 	SDL_Rect r;

@@ -121,7 +121,7 @@ void ssnd_waitkey(int no, vmvar_t *res) {
 		return;
 	}
 
-	if (sact.waitskiplv > 1 || msgskip_isSkipping()) {
+	if (sact_wait_skip_level() > 1 || msgskip_isSkipping()) {
 		*res = SYS35KEY_RET;
 		return;
 	}

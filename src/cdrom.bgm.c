@@ -27,35 +27,51 @@
 #include "music_private.h"
 
 static int current_track;
+static int fade_volume = 100;
+
+static int clamp_volume(int level) {
+	if (level < 0) return 0;
+	if (level > 100) return 100;
+	return level;
+}
+
+static void cdrom_bgm_stop(void);
 
 static bool cdrom_bgm_init(char *playlist) {
+	current_track = 0;
+	fade_volume = 100;
 	prv.cd_maxtrk = ald_get_maxno(DRIFILE_BGM) + 1;
 	return true;
 }
 
 static void cdrom_bgm_exit(void) {
-	// Do nothing
+	cdrom_bgm_stop();
+	fade_volume = 100;
 }
 
 static void cdrom_bgm_reset(void) {
-	// Do nothing
+	cdrom_bgm_stop();
+	fade_volume = 100;
 }
 
 static bool cdrom_bgm_start(int trk, int loop) {
-	if (!musbgm_play(trk, 0, 100, loop))
+	if (!musbgm_play(trk, 0, fade_volume, loop))
 		return false;
 	current_track = trk;
 	return true;
 }
 
 static void cdrom_bgm_stop(void) {
-	musbgm_stop(current_track, 0);
+	if (current_track) {
+		musbgm_stop(current_track, 0);
+		current_track = 0;
+	}
 }
 
 static bool cdrom_bgm_getPlayingInfo(cd_time *info) {
-	int t = musbgm_getpos(current_track);  // in 10ms
-	if (!t)
+	if (!current_track || !musbgm_isplaying(current_track))
 		return false;
+	int t = musbgm_getpos(current_track);  // in 10ms
 	info->t = current_track;
 	info->m = t / (60*100); t %= (60*100);
 	info->s = t / 100;      t %= 100;
@@ -67,6 +83,12 @@ static bool cdrom_bgm_is_available(void) {
 	return true;
 }
 
+static void cdrom_bgm_set_volume(int level) {
+	fade_volume = clamp_volume(level);
+	if (current_track && musbgm_isplaying(current_track))
+		musbgm_fade(current_track, 0, fade_volume);
+}
+
 cdromdevice_t cdrom_bgm = {
 	.init = cdrom_bgm_init,
 	.exit = cdrom_bgm_exit,
@@ -75,4 +97,5 @@ cdromdevice_t cdrom_bgm = {
 	.stop = cdrom_bgm_stop,
 	.getpos = cdrom_bgm_getPlayingInfo,
 	.is_available = cdrom_bgm_is_available,
+	.set_volume = cdrom_bgm_set_volume,
 };

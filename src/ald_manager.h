@@ -40,6 +40,7 @@ typedef enum {
 } DRIFILETYPE;
 
 void ald_init(int type, const char **file, int cnt, bool use_mmap);
+void ald_init_overlay(int type, const char *file, bool use_mmap);
 bool ald_is_linked(DRIFILETYPE type, int no);
 bool ald_exists(DRIFILETYPE type, int no);
 dridata *ald_getdata(DRIFILETYPE type, int no);

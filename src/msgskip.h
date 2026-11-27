@@ -37,5 +37,6 @@ extern void msgskip_onAinMessage(int msgid);
 extern unsigned msgskip_getFlags();
 extern void msgskip_setFlags(unsigned flags, unsigned mask);
 extern void msgskip_pause(bool pause);
+extern void msgskip_syncFile(void);
 
 #endif // __MSGSKIP_H__

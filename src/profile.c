@@ -44,6 +44,18 @@ struct profile_kv {
 static struct profile_kv *profile = NULL;
 static int profile_values = 0;
 
+#ifdef ALICEHUB_IOS
+void profile_fini(void) {
+	for (int i = 0; i < profile_values; i++) {
+		free(profile[i].name);
+		free(profile[i].value);
+	}
+	free(profile);
+	profile = NULL;
+	profile_values = 0;
+}
+#endif
+
 static struct profile_kv *check_profile(const char *name)
 {
 	for (int i = 0; i < profile_values; i++) {
@@ -89,6 +101,7 @@ static int load_rc_file(const char *profile_path)
 				break;
 			else {
 				WARNING("%s: %s", profile_path, strerror(errno));
+				fclose(fp);
 				return 1;
 			}
 		}
@@ -116,6 +129,7 @@ static int load_rc_file(const char *profile_path)
 
 		if (!(p = strchr(rc_line, ':'))) {
 			WARNING("Syntax Error in '%s' line %d.", profile_path, line);
+			fclose(fp);
 			return 1;
 		}
 
@@ -125,9 +139,12 @@ static int load_rc_file(const char *profile_path)
 			if (!isspace(*p) && !iscntrl(*p))
 				break;
 
-		if (!insert_profile(rc_line, p))
+		if (!insert_profile(rc_line, p)) {
+			fclose(fp);
 			return 1;
+		}
 	}
+	fclose(fp);
 	return 0;
 }
 

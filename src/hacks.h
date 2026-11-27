@@ -38,6 +38,7 @@ extern enum gameId game_id;
 
 void enable_hack_by_gameid(const char *gameid);
 void enable_hack_by_title(const char *game_title_utf8);
+void hacks_reset(void);
 
 extern bool daiakuji_cx_hack;
 

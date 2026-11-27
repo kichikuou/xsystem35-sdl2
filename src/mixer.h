@@ -83,5 +83,6 @@ void mixer_music_resume(mixer_music *music);
 bool mixer_music_playing(mixer_music *music);
 // gain is from 0.0 to 1.0.
 void mixer_music_set_gain(mixer_music *music, float gain);
+void mixer_pause_all(bool paused);
 
 #endif /* __MIXER_H__ */

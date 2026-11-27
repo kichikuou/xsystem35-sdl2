@@ -34,9 +34,12 @@ typedef struct {
 
 extern bool bgi_read(const char *path);
 extern bgi_t *bgi_find(int no);
+extern void bgi_clear(void);
 
 bool wai_load(const char *path);
+void wai_unload(void);
 bool wai_loaded(void);
 int wai_mixch(int no);
+void audio_meta_fini(void);
 
 #endif /* _BGI_H__ */

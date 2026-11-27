@@ -150,6 +150,10 @@ static void commandF6() {
 	vmvar_t *var  = getCaliVariable();
 	int index = getCaliValue();
 	
+	if (index < 0 || index >= 256) {
+		WARNING("F6 index out of range: %d", index);
+		return;
+	}
 	F6Index[index] = var;
 	
 	TRACE("F6 %d,%d:", *var, index);
@@ -160,6 +164,23 @@ static void commandF7() {
 	int count      = getCaliValue();
 	int i, j;
 	uint16_t *p = (uint16_t *)nact->datatbl_addr;
+
+	if (data_width < 0 || data_width > 256 || count < 0) {
+		WARNING("F7 invalid parameters: width=%d count=%d", data_width, count);
+		return;
+	}
+	if (count > 0 && data_width > 0) {
+		if (!p) {
+			WARNING("F7 null datatbl_addr");
+			return;
+		}
+		for (j = 0; j < data_width; j++) {
+			if (!F6Index[j]) {
+				WARNING("F7 uninitialized F6Index[%d]", j);
+				return;
+			}
+		}
+	}
 	
 	for (i = 0; i < count; i++) {
 		for (j = 0; j < data_width; j++) {
@@ -171,6 +192,10 @@ static void commandF7() {
 	nact->datatbl_addr = p;
 	
 	TRACE("F7 %d,%d", data_width, count);
+}
+
+void cmdf_reset(void) {
+	memset(F6Index, 0, sizeof(F6Index));
 }
 
 static void commandF8() {

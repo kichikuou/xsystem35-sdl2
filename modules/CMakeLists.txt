@@ -64,7 +64,7 @@ add_library(modules STATIC
 
 target_include_directories(modules PUBLIC . lib)
 
-if (NOT ANDROID AND NOT EMSCRIPTEN)
+if (NOT ANDROID AND NOT EMSCRIPTEN AND NOT ALICEHUB_IOS)
   add_executable(modules_tests SACT/list_test.c)
   target_link_libraries(modules_tests PRIVATE modules)
   add_test(NAME modules_tests COMMAND modules_tests)
@@ -73,3 +73,7 @@ endif()
 target_compile_options(modules PRIVATE -Wno-pointer-sign)
 
 target_link_libraries(modules PRIVATE sdl zlib)
+
+if (ALICEHUB_IOS)
+  install(TARGETS modules ARCHIVE DESTINATION lib)
+endif()

@@ -28,6 +28,9 @@
 // Reads System39.ini / Volume.sav and applies the volumes.
 void volume_init(void);
 
+// Releases allocated volume-valancer state.
+void volume_fini(void);
+
 // Opens the modal volume controller dialog.
 void volume_dialog_open(void);
 

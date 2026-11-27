@@ -49,6 +49,7 @@
 #include "sactcrypto.h"
 #include "sactchart.h"
 #include "sactamask.h"
+#include "sactlog.h"
 
 /*
   妻みぐい２キー説明
@@ -288,7 +289,7 @@ static void DrawEffect() {
 		wEffectkey = getCaliValue();
 	}
 
-	if (sact.waitskiplv > 1 || msgskip_isSkipping())
+	if (sact_wait_skip_level() > 1 || msgskip_isSkipping())
 		sp_update_all(true);
 	else
 		sp_eupdate(wType, wEffectTime, wEffectkey);
@@ -308,7 +309,7 @@ static void DrawEffectAlphaMap() {
 	int wEffectTime = getCaliValue();
 	int wEffectKey  = getCaliValue();
 	
-	if (sact.waitskiplv > 1 || msgskip_isSkipping())
+	if (sact_wait_skip_level() > 1 || msgskip_isSkipping())
 		sp_update_all(true);
 	else
 		sp_eupdate_amap(nIndexAlphaMap, wEffectTime, wEffectKey);
@@ -1108,7 +1109,7 @@ static void PeekKey() {
 		sys_getKeyInfo();
 	prevKeyCode = nKeyCode;
 
-	*vResult = RawKeyInfo[nKeyCode] ? 1 : 0;
+	*vResult = event_rawkey_down(nKeyCode) ? 1 : 0;
 
 	TRACE("SACT.PeekKey %d,%p:", nKeyCode, vResult);
 }
@@ -2152,6 +2153,8 @@ static void SACT_reset(void) {
 	ssel_reset();
 	sstr_reset();
 	sp_reset();
+	smask_reset();
+	sblog_reset();
 
 	scg_freeall();
 	SDL_DestroySurface(sact.dmap);

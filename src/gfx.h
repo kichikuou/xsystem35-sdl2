@@ -92,4 +92,12 @@ void gfx_FlipSurfaceVertical(SDL_Surface *s);
 
 bool save_screenshot(const char* path);
 
+void gfx_android_on_background(void);
+void gfx_android_on_foreground(void);
+void gfx_reset_frame_pacer(void);
+void gfx_android_delay(Uint32 ms);
+void gfx_android_pre_present(void);
+void gfx_android_on_pre_swap(void);
+void gfx_android_post_present_wait(void);
+
 #endif /* __GFX_H__ */

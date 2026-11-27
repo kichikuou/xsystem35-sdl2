@@ -33,7 +33,7 @@ static void Start() {
 	vmvar_t *p1 = getCaliVariable();
 	int p2 = getCaliValue();
 
-	char *fname_utf8 = sjis2utf(svar_get(p2));
+	char *fname_utf8 = toUTF8(svar_get(p2));
 	char *path = fc_get_path(fname_utf8);
 	msgskip_init(path);
 	free(path);

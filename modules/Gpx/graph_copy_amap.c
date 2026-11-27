@@ -49,13 +49,17 @@ void gr_copy_alpha_map(surface_t *dst, int dx, int dy, surface_t *src, int sx, i
 	sp = GETOFFSET_ALPHA(src, sx, sy);
 	dp = GETOFFSET_ALPHA(dst, dx, dy);
 
-	if (sp == NULL) {
-		WARNING("src alpha NULL");
-		return;
-	}
-	
 	if (dp == NULL) {
 		WARNING("dst alpha NULL");
+		return;
+	}
+
+	if (sp == NULL) {
+		// Legacy Gpx.LoadCG treated CGs without an alpha channel as having a 0-cleared alpha plane.
+		while (sh--) {
+			memset(dp, 0, sw);
+			dp += dst->width;
+		}
 		return;
 	}
 	

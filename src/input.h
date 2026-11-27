@@ -158,7 +158,7 @@ enum keycode {
 	KEY_SCROLLLOCK   = 0x91,  // Scroll Lockキー
 };
 
-extern bool RawKeyInfo[NUM_KEYCODES];
+bool event_rawkey_down(unsigned code);
 
 extern int sys_keywait(int msec, unsigned flags);
 extern int sys_getMouseInfo(struct SDL_Point *p, bool is_dibgeo);

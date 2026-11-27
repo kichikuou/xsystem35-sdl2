@@ -10,15 +10,15 @@ Game Compatibility
 | 兰斯IV －教团的遗产－ (CN)                  | Supported   | Fan translation |
 | ランス4.1                                   | Supported   | [Ver1.05](https://hannylaboratory.blogspot.com/2023/02/blog-post_9.html). Use system3-sdl2 for older versions |
 | ランス4.2                                   | Supported   | [Ver1.05](https://hannylaboratory.blogspot.com/2023/02/blog-post_9.html). Use system3-sdl2 for older versions |
-| いけないかつみ先生                          | Supported   | Emojis are not supported |
-| 闘神都市II                                  | Supported   | Win95 edition |
-| かえるにょ・ぱにょ～ん                      | Supported   | Normal / Low-priced edition |
+| いけないかつみ先生                          | Supported   | Emojis are not supported (Shift-JIS Gaiji guarded against false GBK auto-switch) |
+| 闘神都市II                                  | Supported   | Win95 edition (JP and EN fan translation supported) |
+| かえるにょ・ぱにょ～ん                      | Supported   | Normal / Low-priced edition; CN GBK fan translation supported |
 | 戦巫女                                      | Supported   | Normal / Low-priced edition |
-| 零式                                        | Supported   | From ALICEの館４・５・６ / Low-priced edition |
-| アトラク＝ナクア                            | Supported   | From ALICEの館４・５・６ / Low-priced edition |
-| Rance －光を求めて－                        | Supported   | From ALICEの館４・５・６ |
-| Rance II －反逆の少女達－                   | Supported   | From ALICEの館４・５・６ |
-| Rance III －リーザス陥落－                  | Supported   | From ALICEの館４・５・６ |
+| 零式                                        | Supported   | From ALICEの館４・５・６ / Low-priced edition; CN GBK fan translation supported |
+| アトラク＝ナクア                            | Supported   | From ALICEの館４・５・６ / Low-priced edition; CN Longinus `CHS.TBL` + `*_CHS.ALD` supported |
+| Rance －光を求めて－                        | Supported   | From ALICEの館４・５・６ (host E2E verified: boot, menu, MIDI/WAV audio) |
+| Rance II －反逆の少女達－                   | Supported   | From ALICEの館４・５・６ (host E2E verified: boot, intro, gameplay, MIDI/WAV audio) |
+| Rance III －リーザス陥落－                  | Supported   | From ALICEの館４・５・６ (host E2E verified: boot, menu, MIDI/WAV audio) |
 | DALK                                        | Supported   | From ALICEの館４・５・６ |
 | 闘神都市                                    | Supported   | From ALICEの館４・５・６ |
 | Dr.STOP                                     | Supported   | From ALICEの館４・５・６ |
@@ -34,7 +34,7 @@ Game Compatibility
 | 守り神様                                    | Supported   |       |
 | ママトト                                    | Supported   |       |
 | HUSHABY BABY                                | Supported   |       |
-| DARCROWS                                    | Supported   |       |
+| DARCROWS                                    | Supported   | JP and CN fan dialogue patch supported |
 | 隠れ月                                      | Supported   |       |
 | PERSIOM                                     | Supported   | 3D sound is not supported |
 | SeeIn青                                     | Supported   |       |
@@ -49,13 +49,14 @@ Game Compatibility
 | チェシャのお部屋1.5                         | Supported   | From 王子さまLV1.5 |
 | 王子さま１／１６                            | Supported   | From 王子さまLV1.5 |
 | スパイ伊藤の「クイズ！俺にさぼらせろ」      | Supported   | From 王子さまLV1.5 |
-| 妻みぐい                                    | Supported   | Opening demo is not supported |
+| 妻みぐい                                    | Supported   | Opening demo is not supported; CN GBK fan translation supported |
 | 超昂天使エスカレイヤー                      | Supported   | Opening demo is not supported |
 | ランス５Ｄ                                  | Supported   |       |
 | Rance 5D - The Lonely Girl (EN)             | Supported   | MangaGamer version |
+| 兰斯5D (ZH)                                | Supported   | GBK fan translation |
 | 俺の下であがけ                              | Supported   |       |
 | 楽園行                                      | Supported   |       |
-| 妻みぐい２                                  | Supported   |       |
+| 妻みぐい２                                  | Supported   | JP and CN (UTF-8 `System39.ain` + `AlphaMap.alk` skip + CJK fallback font) supported |
 | シェル・クレイル                            | Supported   |       |
 | ナイトデーモン                              | Supported   |       |
 | Nor                                         | Unsupported |       |

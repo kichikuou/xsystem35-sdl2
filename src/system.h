@@ -24,6 +24,7 @@
 #ifndef __SYSTEM__
 #define __SYSTEM__
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "config.h"
 
@@ -41,8 +42,10 @@ enum messagebox_type {
 	MESSAGEBOX_INFO,
 };
 void sys_show_message_box(enum messagebox_type type, const char* title_utf8, const char* message_utf8);
+void sys_write_crash_log(const char *reason);
 
 void sys35_remove(void);
+bool sys_is_quit_requested(void);
 
 /*
  DEBUGLEVEL

@@ -50,6 +50,7 @@ static inline vmvar_t *v_resolveRef(struct VarRef *r) {
 static inline int v_sliceSize(struct VarRef *r) {
 	return varPage[r->page].size - r->index;
 }
+int v_boundSliceSize(const struct VarRef *r);
 
 void v_set_encoding(CharacterEncoding encoding);
 void v_set_names(int count, char **names);

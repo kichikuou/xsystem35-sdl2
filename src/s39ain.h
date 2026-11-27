@@ -60,6 +60,9 @@ typedef struct {
 	S39AIN_FUNCNAME *fnc; /* FUNC に関する情報 */
 	char **var;           /* VARI に関する情報 */
 	char **msg;           /* MSGI に関する情報 */
+#ifdef ALICEHUB_IOS
+	char *file_data;
+#endif
 } S39AIN;
 
 bool s39ain_init(const char *path, S39AIN *ain);

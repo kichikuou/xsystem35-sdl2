@@ -154,6 +154,41 @@ static void initGameResourceFromDir_test(void) {
 			ASSERT_STRCMP(gr.save_fname[i], buf);
 		}
 	}
+	{
+		// Unnumbered dDemo.alk must take precedence over backup dDemo0.alk regardless of directory order.
+		const char *files1[] = {"foosa.ald", "dDemo.alk", "dDemo0.alk", NULL};
+		const char **dir1 = files1;
+		GameResource gr1;
+		ASSERT_TRUE(initGameResourceFromDir(&gr1, (DIR *)&dir1, NULL, mockReaddir));
+		ASSERT_STRCMP(gr1.alk[0], "dDemo.alk");
+
+		const char *files2[] = {"foosa.ald", "dDemo0.alk", "dDemo.alk", NULL};
+		const char **dir2 = files2;
+		GameResource gr2;
+		ASSERT_TRUE(initGameResourceFromDir(&gr2, (DIR *)&dir2, NULL, mockReaddir));
+		ASSERT_STRCMP(gr2.alk[0], "dDemo.alk");
+	}
+	{
+		// Longinus *_CHS.ALD patches must win over base *.ALD regardless of directory order,
+		// while preserving non-CHS archive slots and stripping _CHS from save filenames.
+		const char *files1[] = {"spiderSA.ALD", "spiderSA_CHS.ALD", "spiderGA.ALD", "spiderGA_CHS.ALD", "spiderWA.ALD", NULL};
+		const char **dir1 = files1;
+		GameResource gr1;
+		ASSERT_TRUE(initGameResourceFromDir(&gr1, (DIR *)&dir1, NULL, mockReaddir));
+		ASSERT_STRCMP(gr1.game_fname[DRIFILE_SCO][0], "spiderSA_CHS.ALD");
+		ASSERT_STRCMP(gr1.game_fname[DRIFILE_CG][0], "spiderGA_CHS.ALD");
+		ASSERT_STRCMP(gr1.game_fname[DRIFILE_WAVE][0], "spiderWA.ALD");
+		ASSERT_STRCMP(gr1.save_fname[0], "spiderSA.asd");
+
+		const char *files2[] = {"spiderSA_CHS.ALD", "spiderSA.ALD", "spiderGA_CHS.ALD", "spiderGA.ALD", "spiderWA.ALD", NULL};
+		const char **dir2 = files2;
+		GameResource gr2;
+		ASSERT_TRUE(initGameResourceFromDir(&gr2, (DIR *)&dir2, NULL, mockReaddir));
+		ASSERT_STRCMP(gr2.game_fname[DRIFILE_SCO][0], "spiderSA_CHS.ALD");
+		ASSERT_STRCMP(gr2.game_fname[DRIFILE_CG][0], "spiderGA_CHS.ALD");
+		ASSERT_STRCMP(gr2.game_fname[DRIFILE_WAVE][0], "spiderWA.ALD");
+		ASSERT_STRCMP(gr2.save_fname[0], "spiderSA.asd");
+	}
 }
 
 void gameresource_test(void) {

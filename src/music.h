@@ -88,4 +88,7 @@ bool mus_wav_load_lrsw(int ch, int num);
 /* volume valaner */
 bool mus_vol_set_valance(int *vols, int num);
 
+/* periodic main-thread update for timed fades */
+void mus_update(void);
+
 #endif /* MUSIC_CLIENT_H__ */

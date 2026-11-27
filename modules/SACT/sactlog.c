@@ -74,13 +74,17 @@ static void draw_log() {
 #endif
 
 	SDL_Surface *hline = sdl_CreateSurface(main_surface->w, 3, SDL_PIXELFORMAT_XRGB8888);
-	SDL_FillSurfaceRect(hline, NULL, SDL_MapSurfaceRGB(hline, 255, 255, 255));
-	SDL_SetSurfaceBlendMode(hline, SDL_BLENDMODE_BLEND);
-	SDL_SetSurfaceAlphaMod(hline, 128);
+	if (hline) {
+		SDL_FillSurfaceRect(hline, NULL, SDL_MapSurfaceRGB(hline, 255, 255, 255));
+		SDL_SetSurfaceBlendMode(hline, SDL_BLENDMODE_BLEND);
+		SDL_SetSurfaceAlphaMod(hline, 128);
+	}
 
-	SDL_SetSurfaceColorMod(back, 128, 128, 128);
-	SDL_BlitSurface(back, NULL, main_surface, NULL);
-	SDL_SetSurfaceColorMod(back, 255, 255, 255);
+	if (back) {
+		SDL_SetSurfaceColorMod(back, 128, 128, 128);
+		SDL_BlitSurface(back, NULL, main_surface, NULL);
+		SDL_SetSurfaceColorMod(back, 255, 255, 255);
+	}
 
 	// ページ位置情報
 	len = snprintf(pinfo, sizeof(pinfo) -1, "%d/%d", curline, list_length(sact.log));
@@ -91,11 +95,12 @@ static void draw_log() {
 	// 表示始め位置
 	node = list_nth(sact.log, list_length(sact.log) - curline);
 	for (i = 0; i < LOGLINENUM; i++) {
-		if (cur <= 0) continue;
+		if (cur <= 0 || !node) continue;
 		
 		char *str = (char *)(node->data);
 		if (0 == strcmp(str, "\n")) {
-			SDL_BlitSurface(hline, NULL, main_surface, &(SDL_Rect){0, y + FONTSIZE/2, main_surface->w, 3});
+			if (hline)
+				SDL_BlitSurface(hline, NULL, main_surface, &(SDL_Rect){0, y + FONTSIZE/2, main_surface->w, 3});
 		} else {
 			FontSpec font_spec = {
 				.type = cur < 6 ? FONT_MINCHO : FONT_GOTHIC,
@@ -109,10 +114,21 @@ static void draw_log() {
 		node = list_next(node);
 	}
 
+	if (hline)
+		SDL_DestroySurface(hline);
+
 	ags_updateFull();
 }
 
 
+
+static bool is_static_logmsg(const void *p) {
+	for (int i = 0; i < LOGMSG_LINES; i++) {
+		if (p == logmsg[i])
+			return true;
+	}
+	return false;
+}
 
 bool sblog_start(void) {
 	if (sact.version < 120)
@@ -122,6 +138,10 @@ bool sblog_start(void) {
 	for (int i = 0; i < LOGMSG_LINES; i++)
 		sact.log = list_append(sact.log, logmsg[i]);
 	
+	if (back) {
+		SDL_DestroySurface(back);
+		back = NULL;
+	}
 	back = SDL_DuplicateSurface(main_surface);
 	curline = 6;
 	draw_log();
@@ -129,18 +149,34 @@ bool sblog_start(void) {
 }
 
 void sblog_end(void) {
-	List *node;
 	int i;
 	
-	SDL_BlitSurface(back, NULL, main_surface, NULL);
-	ags_updateFull();
-	
-	SDL_DestroySurface(back);
+	if (back) {
+		SDL_BlitSurface(back, NULL, main_surface, NULL);
+		ags_updateFull();
+		SDL_DestroySurface(back);
+		back = NULL;
+	}
 
 	// Remove instruction text
 	for (i = 0; i < LOGMSG_LINES; i++) {
 		sact.log = list_remove(sact.log, logmsg[i]);
 	}
+}
+
+void sblog_reset(void) {
+	if (back) {
+		SDL_DestroySurface(back);
+		back = NULL;
+	}
+	curline = 0;
+	for (List *node = sact.log; node; node = list_next(node)) {
+		if (node->data && !is_static_logmsg(node->data)) {
+			free(node->data);
+		}
+	}
+	slist_free(sact.log);
+	sact.log = NULL;
 }
 
 void sblog_pageup(void) {

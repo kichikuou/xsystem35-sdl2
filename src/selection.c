@@ -33,6 +33,7 @@
 #include "input.h"
 #include "msgskip.h"
 #include "message.h"
+#include "utfsjis.h"
 #include "selection.h"
 
 /* ショートカット */
@@ -232,7 +233,7 @@ int sel_getRegistoredElement_strlen() {
 	int i, _max = 0;
 	
 	for (i = 0; i < regnum; i++) {
-		_max = max(_max, strlen(elm[i]));
+		_max = max(_max, cjk_display_width(elm[i], nact->encoding));
 	}
 	return _max;
 }
@@ -245,6 +246,8 @@ void sel_setFontSize(int size) {
 /* 選択肢の登録 */
 void sel_addElement(const char *str) {
 	int catlen;
+	if (regnum >= ELEMENT_MAX)
+		return;
 	
 	catlen = ELEMENT_LENGTH - strlen(elm[regnum]) -1;
 	strncat(elm[regnum], str, catlen);
@@ -252,13 +255,17 @@ void sel_addElement(const char *str) {
 
 /* 選択したときの返り値を登録 */
 void sel_addRetValue(int val) {
+	if (regnum >= ELEMENT_MAX)
+		return;
 	elm[regnum][0] = 0;
 	elmv[regnum] = val;
 }
 
 /* １要素の登録の終了 */
 void sel_fixElement() {
-	maxElementLength = max(maxElementLength, strlen(elm[regnum]) /2);
+	if (regnum >= ELEMENT_MAX)
+		return;
+	maxElementLength = max(maxElementLength, cjk_display_width(elm[regnum], nact->encoding) / 2);
 	regnum++;
 }
 

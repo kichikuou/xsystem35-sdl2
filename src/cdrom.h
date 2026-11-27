@@ -41,6 +41,8 @@ typedef struct {
 	bool (*is_available)(void);
 	// Reapply the volume valancer to the currently playing track. May be NULL.
 	void (*reapply_volume)(void);
+	// Scale CD volume independently of VolumeValancer (level 0..100). May be NULL.
+	void (*set_volume)(int level);
 } cdromdevice_t;
 
 extern cdromdevice_t cdrom_bgm;

@@ -94,7 +94,15 @@ mmap_t *map_file_readwrite(const char *path, size_t size) {
 	return m;
 }
 
+int sync_mapped_file(mmap_t *m) {
+	if (!m || !m->addr)
+		return 0;
+	return FlushViewOfFile(m->addr, 0) ? 0 : -1;
+}
+
 int unmap_file(mmap_t *m) {
+	if (!m)
+		return 0;
 	UnmapViewOfFile(m->addr);
 	free(m);
 	return 0;
@@ -124,41 +132,77 @@ mmap_t *map_file(const char *path) {
 		return NULL;
 	}
 #else
-	void *addr = malloc(sbuf.st_size);
+	void *addr = malloc(sbuf.st_size > 0 ? (size_t)sbuf.st_size : 1);
 	if (!addr) {
 		close(fd);
 		return NULL;
 	}
 	size_t bytes = 0;
-	while (bytes < sbuf.st_size) {
-		ssize_t ret = read(fd, addr + bytes, sbuf.st_size - bytes);
+	while (bytes < (size_t)sbuf.st_size) {
+		ssize_t ret = read(fd, (uint8_t *)addr + bytes, (size_t)sbuf.st_size - bytes);
+		if (ret < 0 && errno == EINTR)
+			continue;
 		if (ret <= 0) {
 			WARNING("read: %s", strerror(errno));
 			close(fd);
 			free(addr);
 			return NULL;
 		}
-		bytes += ret;
+		bytes += (size_t)ret;
 	}
 #endif
 
 	mmap_t *m = malloc(sizeof(mmap_t));
 	m->addr = addr;
-	m->length = sbuf.st_size;
+	m->length = (size_t)sbuf.st_size;
 	m->fd = fd;
+	m->writable = false;
 	return m;
 }
 
 mmap_t *map_file_readwrite(const char *path, size_t size) {
-#ifndef HAVE_MMAP
-	return NULL;
-#else
 	int fd = open(path, O_RDWR | O_CREAT, 0644);
 	if (fd < 0) {
 		WARNING("open: %s", strerror(errno));
 		return NULL;
 	}
 
+#ifndef HAVE_MMAP
+	void *addr = calloc(1, size > 0 ? size : 1);
+	if (!addr) {
+		close(fd);
+		return NULL;
+	}
+
+	struct stat sbuf;
+	if (fstat(fd, &sbuf) == 0 && sbuf.st_size > 0) {
+		size_t to_read = (size_t)sbuf.st_size < size ? (size_t)sbuf.st_size : size;
+		size_t bytes = 0;
+		while (bytes < to_read) {
+			ssize_t ret = read(fd, (uint8_t *)addr + bytes, to_read - bytes);
+			if (ret < 0 && errno == EINTR)
+				continue;
+			if (ret <= 0) {
+				WARNING("read: %s", strerror(errno));
+				close(fd);
+				free(addr);
+				return NULL;
+			}
+			bytes += (size_t)ret;
+		}
+	}
+
+	if (ftruncate(fd, (off_t)size) < 0) {
+		WARNING("ftruncate: %s", strerror(errno));
+	}
+
+	mmap_t *m = malloc(sizeof(mmap_t));
+	m->addr = addr;
+	m->length = size;
+	m->fd = fd;
+	m->writable = true;
+	return m;
+#else
 	if (ftruncate(fd, size) < 0) {
 		WARNING("ftruncate: %s", strerror(errno));
 		close(fd);
@@ -176,20 +220,57 @@ mmap_t *map_file_readwrite(const char *path, size_t size) {
 	m->addr = addr;
 	m->length = size;
 	m->fd = fd;
+	m->writable = true;
 	return m;
 #endif
 }
 
-int unmap_file(mmap_t *m) {
+int sync_mapped_file(mmap_t *m) {
+	if (!m || !m->addr || !m->writable)
+		return 0;
 #ifdef HAVE_MMAP
+	return msync(m->addr, m->length, MS_ASYNC);
+#else
+	if (m->fd < 0)
+		return -1;
+	if (lseek(m->fd, 0, SEEK_SET) < 0) {
+		WARNING("lseek: %s", strerror(errno));
+		return -1;
+	}
+	size_t written = 0;
+	while (written < m->length) {
+		ssize_t ret = write(m->fd, (const uint8_t *)m->addr + written, m->length - written);
+		if (ret < 0 && errno == EINTR)
+			continue;
+		if (ret <= 0) {
+			WARNING("write: %s", strerror(errno));
+			return -1;
+		}
+		written += (size_t)ret;
+	}
+	return 0;
+#endif
+}
+
+int unmap_file(mmap_t *m) {
+	if (!m)
+		return 0;
+#ifdef HAVE_MMAP
+	if (m->writable)
+		msync(m->addr, m->length, MS_ASYNC);
 	int rv = munmap(m->addr, m->length);
 	close(m->fd);
 	free(m);
 	return rv;
 #else
+	int rv = 0;
+	if (m->writable)
+		rv = sync_mapped_file(m);
+	if (m->fd >= 0)
+		close(m->fd);
 	free(m->addr);
 	free(m);
-	return 0;
+	return rv;
 #endif
 }
 

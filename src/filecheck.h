@@ -27,6 +27,9 @@
 #include <stdbool.h>
 
 void fc_init(const char *name);
+void fc_fini(void);
+char *fc_resolve_existing_path(const char *path);
+int fc_remove_case_variants(const char *canonical_path, bool keep_canonical, const char *backup_first_to);
 char *fc_get_path(const char *fname_utf8);
 bool fc_exists(const char *fname_utf8);
 FILE *fc_open(const char *fname_utf8, char type);

@@ -32,6 +32,7 @@
 #include "LittleEndian.h"
 #include "ags.h"
 #include "sact.h"
+#include "sactamask.h"
 #include "pms.h"
 #include "sprite.h"
 #include "effect.h"
@@ -47,18 +48,39 @@ typedef struct {
 
 static SACTEFAM_t am;
 
+void smask_reset(void) {
+	if (am.mmap) {
+		unmap_file(am.mmap);
+		am.mmap = NULL;
+	}
+	free(am.no);
+	am.no = NULL;
+	free(am.offset);
+	am.offset = NULL;
+	am.datanum = 0;
+}
+
 // SACTEFAM.KLD の読み込み
-bool smask_init(char *path) {
+bool smask_init(const char *path) {
 	if (am.mmap)
 		return true;  // already loaded
 
 	mmap_t *m = map_file(path);
 	if (!m)
 		return false;
+	int datanum = LittleEndian_getDW(m->addr, 0);
+	if (datanum < 0) {
+		unmap_file(m);
+		return false;
+	}
 	am.mmap = m;
-	am.datanum = LittleEndian_getDW(m->addr, 0);
-	am.no = malloc(sizeof(int) * am.datanum);
-	am.offset = malloc(sizeof(int) * am.datanum);
+	am.datanum = datanum;
+	am.no = datanum > 0 ? malloc(sizeof(int) * datanum) : NULL;
+	am.offset = datanum > 0 ? malloc(sizeof(int) * datanum) : NULL;
+	if (datanum > 0 && (!am.no || !am.offset)) {
+		smask_reset();
+		return false;
+	}
 	
 	for (int i = 0; i < am.datanum; i++) {
 		am.no[i] = LittleEndian_getDW(m->addr, 16 + i * 16);
@@ -71,7 +93,10 @@ bool smask_init(char *path) {
 // 指定番号の alphamask ファイルをよみだす
 static cgdata *smask_get(int no) {
 	int i;
-	
+
+	if (!am.mmap)
+		return NULL;
+
 	for (i = 0; i < am.datanum; i++) {
 		if (am.no[i] == no) break;
 	}

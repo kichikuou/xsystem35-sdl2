@@ -20,6 +20,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef ALICEHUB_IOS
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 #include "system.h"
 #include "sdl_compat.h"
 #include "debugger.h"
@@ -28,7 +32,13 @@
 
 #ifdef __ANDROID__
 #include <android/log.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <string.h>
+#include <unistd.h>
 #endif
+
+#include "nact.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -71,6 +81,59 @@ void sys_message(int lv, char *format, ...) {
 	va_end(args);
 }
 
+void sys_write_crash_log(const char *reason) {
+#ifdef ALICEHUB_IOS
+	const char *path = getenv("XSYSTEM4_CRASH_LOG_PATH");
+	if (!path || !*path) return;
+	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0) return;
+	dprintf(fd, "=== XSystem35 Crash Report ===\nReason: %s\nPage: %d Address: 0x%x\n",
+		reason ? reason : "(unknown)", nact ? nact->current_page : -1,
+		nact ? nact->current_addr : 0);
+	close(fd);
+#elif defined(__ANDROID__)
+	char buf[1024];
+	int len = snprintf(buf, sizeof(buf),
+		"=== XSystem35 Crash Report ===\nReason: %s\nPage: %d Address: 0x%x\n",
+		reason ? reason : "(unknown)",
+		nact ? nact->current_page : -1,
+		nact ? nact->current_addr : 0);
+	if (len <= 0) return;
+	if (len >= (int)sizeof(buf)) len = (int)sizeof(buf) - 1;
+
+	const char *candidates[3];
+	int ncand = 0;
+	char ext_crash[PATH_MAX];
+#if XSYSTEM35_SDL_VERSION == 2
+	const char *ext_dir = SDL_AndroidGetExternalStoragePath();
+#else
+	const char *ext_dir = SDL_GetAndroidExternalStoragePath();
+#endif
+	if (ext_dir && ext_dir[0]) {
+		snprintf(ext_crash, sizeof(ext_crash), "%s/crash.log", ext_dir);
+		candidates[ncand++] = ext_crash;
+	}
+	char save_crash[PATH_MAX];
+	if (nact && nact->files.save_path && nact->files.save_path[0]) {
+		snprintf(save_crash, sizeof(save_crash), "%s/crash.log", nact->files.save_path);
+		candidates[ncand++] = save_crash;
+	}
+	candidates[ncand++] = "crash.log";
+
+	for (int i = 0; i < ncand; i++) {
+		int fd = open(candidates[i], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (fd >= 0) {
+			ssize_t unused_w = write(fd, buf, (size_t)len);
+			(void)unused_w;
+			close(fd);
+		}
+	}
+	__android_log_write(ANDROID_LOG_FATAL, "XSystem35Crash", buf);
+#else
+	(void)reason;
+#endif
+}
+
 void sys_error(char *format, ...) {
 	char buf[512];
 	va_list args;
@@ -78,13 +141,17 @@ void sys_error(char *format, ...) {
 	va_start(args, format);
 	vsnprintf(buf, sizeof buf, format, args);
 	va_end(args);
+	sys_write_crash_log(buf);
 	sys_show_message_box(MESSAGEBOX_ERROR, "xsystem35", buf);
 
-	sys35_remove();
-	exit(1);
+	sys_exit(1);
 }
 
 void sys_exit(int code) {
+#ifdef ALICEHUB_IOS
+	extern void xsystem35_ios_exit(int code);
+	xsystem35_ios_exit(code);
+#endif
 	sys35_remove();
 	exit(code);
 }
@@ -94,12 +161,24 @@ uint32_t sys_get_ticks(void) {
 }
 
 void sys_sleep(int msec) {
+	if (sys_is_quit_requested()) {
+		nact_quit(false);
+		return;
+	}
 	gfx_updateScreen();
 	dbg_onsleep();
 #ifdef __EMSCRIPTEN__
 	emscripten_sleep(msec);
+#elif defined(__ANDROID__)
+	gfx_android_delay(msec);
 #else
-	SDL_Delay(msec);
+	while (msec > 0 && !sys_is_quit_requested()) {
+		int chunk = msec > 50 ? 50 : msec;
+		SDL_Delay(chunk);
+		msec -= chunk;
+	}
+	if (sys_is_quit_requested())
+		nact_quit(false);
 #endif
 	scheduler_on_event(SCHEDULER_EVENT_SLEEP);
 }
@@ -116,12 +195,23 @@ EM_JS(void, wait_vsync, (void), {
 #endif
 
 void sys_wait_vsync(void) {
+	if (sys_is_quit_requested()) {
+		nact_quit(false);
+		return;
+	}
+#ifdef __ANDROID__
+	gfx_android_pre_present();
+	gfx_updateScreen();
+	dbg_onsleep();
+	gfx_android_post_present_wait();
+#else
 	gfx_updateScreen();
 	dbg_onsleep();
 #ifdef __EMSCRIPTEN__
 	wait_vsync();
 #else
 	SDL_Delay(16);
+#endif
 #endif
 	scheduler_on_event(SCHEDULER_EVENT_SLEEP);
 }

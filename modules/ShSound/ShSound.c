@@ -133,7 +133,9 @@ static void wavLoadMemory() {
 		WARNING("cannot open WAVE %d", no - 1);
 		return;
 	}
-	if (!SDL_LoadWAV_IO(SDL_IOFromConstMem(dfile->data, dfile->size), true, &memwav.spec, &memwav.buf, &memwav.len)) {
+	bool ok = SDL_LoadWAV_IO(SDL_IOFromConstMem(dfile->data, dfile->size), true, &memwav.spec, &memwav.buf, &memwav.len);
+	ald_freedata(dfile);
+	if (!ok) {
 		WARNING("cannot load WAVE %d", no - 1);
 		return;
 	}
@@ -370,4 +372,4 @@ static const ModuleFunc functions[] = {
 	{"wavUnloadRange", wavUnloadRange},
 };
 
-const Module module_ShSound = {"ShSound", functions, sizeof(functions) / sizeof(ModuleFunc)};
+const Module module_ShSound = {"ShSound", functions, sizeof(functions) / sizeof(ModuleFunc), free_memory_wav};
