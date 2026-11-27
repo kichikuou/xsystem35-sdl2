@@ -153,6 +153,13 @@ else()  # non-emscripten, non-android
     # harfbuzz and graphite2, which the static freetype depends on, are C++ libraries.
     target_link_libraries(freetype2 INTERFACE -lstdc++)
     if (NOT TARGET sdl_mixer)
+      if (XSYSTEM35_SDL_VERSION EQUAL 2)
+        # The static libSDL2 from sdl2-compat already contains SDL3, so linking
+        # libSDL3 (required by fluidsynth) causes multiple definitions.
+        list(REMOVE_ITEM SDLMIXER_STATIC_LIBRARIES SDL3)
+        # fluidsynth, which the static SDL2_mixer depends on, contains C++ code.
+        list(APPEND SDLMIXER_STATIC_LIBRARIES stdc++)
+      endif()
       add_static_library(sdl_mixer SDLMIXER)
     endif()
   else()
